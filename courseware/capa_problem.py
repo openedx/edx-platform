@@ -26,15 +26,9 @@ class LoncapaProblem():
             return {'score':correct,
                     'total':len(self.questions)}
 
-    def max_score(self):
-        pass
-
     def get_html(self):
         ''' Return the HTML of the question '''
         return self.text
-
-    def handle_ajax(self, json):
-        pass
 
     def __init__(self, filename, id=None, state=None):
         ''' Create a new problem of the type defined in filename. 
@@ -71,7 +65,7 @@ class LoncapaProblem():
         ot=False ## Are we in an outtext context? 
 
         for e in dom.childNodes:
-            if e.localName=='script' and context==None:
+            if e.localName=='script':
                 exec e.childNodes[0].data in g,self.context
             if e.localName=='endouttext':
                 ot=False
@@ -85,7 +79,7 @@ class LoncapaProblem():
 
         self.text=buf.getvalue()
         self.text=self.contextualize_text(self.text)
-
+        self.filename=filename
 
     text=""
     context={}   # Execution context from loncapa/python

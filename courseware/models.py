@@ -44,10 +44,13 @@ class StudentModule(models.Model):
     state = models.TextField(null=True, blank=True)
     grade = models.FloatField(null=True, blank=True)
     student = models.ForeignKey(User)
-    MODULE_TYPES = (('hw','homework'),)
-    module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='hw')
-    module_id = models.CharField(max_length=255) # Filename
+    MODULE_TYPES = (('problem','problem'),)
+    module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem')
+    module_id = models.CharField(max_length=255) # Filename for homeworks, etc. 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     class Meta:
-        unique_together = (('student', 'module_id'),)
+        unique_together = (('student', 'module_id', 'module_type'),)
+
+    def __unicode__(self):
+        return self.module_type+'/'+self.student.username+"/"+self.module_id+'/'+str(self.state)[:20]

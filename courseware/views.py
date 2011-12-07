@@ -12,15 +12,19 @@ from django.shortcuts import redirect
 
 import StringIO
 
+from django.http import Http404
+
 import urllib
 
-import capa_problem
+import capa_module, capa_problem
 
 from models import StudentModule
 
 import urllib
 
 from django.conf import settings
+
+from content_parser import *
 
 template_imports={'urllib':urllib}
 
@@ -49,9 +53,7 @@ def profile(request):
                                 correct=response.grade
                             else:
                                 correct=0
-                    # CRITICAL TODO: Benchmark, and probably cache. We shouldn't recalculate this 
-                    # every time. By modularity, this also belongs inside LoncapaProblem. 
-                    total=len(capa_problem.LoncapaProblem(settings.DATA_DIR+id+'.xml', id=id).questions) 
+                    total=capa_module.LoncapaModule(p, id=id).max_score()
                     scores.append((int(correct),total))
                 score={'course':course.getAttribute('name'),
                        'section':s.getAttribute("name"),
@@ -70,27 +72,6 @@ def profile(request):
              'homeworks':hw
              }
     return render_to_response('profile.html', context)
-
-def toc_from_xml(active_chapter,active_section):
-    dom=parse(settings.DATA_DIR+'course.xml')
-
-    course = dom.getElementsByTagName('course')[0]
-    name=course.getAttribute("name")
-    chapters = course.getElementsByTagName('chapter')
-    ch=list()
-    for c in chapters:
-        sections=list()
-        for s in c.getElementsByTagName('section'):
-            sections.append({'name':s.getAttribute("name"), 
-                             'time':s.getAttribute("time"), 
-                             'format':s.getAttribute("format"), 
-                             'due':s.getAttribute("due"),
-                             'active':(c.getAttribute("name")==active_chapter and \
-                                           s.getAttribute("name")==active_section)})
-        ch.append({'name':c.getAttribute("name"), 
-                   'sections':sections,
-                   'active':(c.getAttribute("name")==active_chapter)})
-    return ch
 
 def render_accordion(request,course,chapter,section):
     ''' Draws accordion. Takes current position in accordion as
@@ -138,28 +119,43 @@ def vertical_module(request, module):
     return {'js':js, 
             'content':render_to_string('vert_module.html',{'items':contents})}
 
-def render_problem(request, filename):
+def render_x_module(request, xml_module):
     # Check if problem has an instance in DB
-    s = StudentModule.objects.filter(student=request.user, module_id=filename)
+    module_id=xml_module.getAttribute(capa_module.LoncapaModule.id_attribute)
+    s = StudentModule.objects.filter(student=request.user, module_id=module_id)
     if len(s) == 0:
-        # If not, create one, and return it
-        problem=capa_problem.LoncapaProblem(settings.DATA_DIR+filename+'.xml', id=filename)
+        # If not, create one, and save it
+        problem=capa_module.LoncapaModule(xml_module.toxml(), module_id)
         smod=StudentModule(student=request.user, 
-                           module_id=filename, 
+                           module_id=module_id, 
                            state=problem.get_state())
         smod.save()
     elif len(s) == 1:
         # If so, render it
-        problem=capa_problem.LoncapaProblem(settings.DATA_DIR+filename+'.xml', 
-                                            id=filename, 
-                                            state=s[0].state)
+        problem=capa_module.LoncapaModule(xml_module.toxml(), 
+                                          module_id, 
+                                          state=s[0].state)
     else:
         raise Exception("Database is inconsistent (1).")
-        
-    return problem.get_html()
 
-def reset_problem(request):
-    s = StudentModule.objects.filter(student=request.user, module_id=request.GET['id'])
+    return {'content':problem.get_html()}
+
+def modx_dispatch(request, dispatch=None, id=None):
+    s = StudentModule.objects.filter(student=request.user, module_id=id)
+    if len(s) == 0:
+        raise Http404
+
+    if dispatch=='problem_check': 
+        return check_problem(request)
+    elif dispatch=='problem_reset':
+        return reset_problem(request,id)
+    else: 
+        print "AAA"
+        raise Http404
+
+
+def reset_problem(request,id):
+    s = StudentModule.objects.filter(student=request.user, module_id=id)
     s[0].delete()
     return HttpResponse(json.dumps({}), mimetype="application/json")
 
@@ -194,32 +190,11 @@ def check_problem(request):
 
     return HttpResponse(js, mimetype="application/json")
 
-def problem_module(request, module):
-    filename=module.getAttribute('filename')
-    content={'name':module.getAttribute('name'), 
-             'html':render_problem(request, filename)}
-    return {'content':render_to_string('problem.html', {'problem':content, 'id':filename})}
-
-def homework_module(request, module):
-    content={'name':module.getAttribute('name'), 
-             'problems':[]}
-    filename=module.getAttribute('filename')
-    dom=parse(settings.DATA_DIR+filename)
-    homework=dom.getElementsByTagName('homework')[0]
-    for e in homework.childNodes:
-        if e.nodeType==1:
-            problem={'name':e.getAttribute('name'),
-                     'html':render_problem(request, e.getAttribute('filename'))}
-            content['problems'].append(problem)
-
-    return {'content':render_to_string('homework.html', {'homework':content})}
-
 module_types={'video':video_module,
               'html':html_module,
               'tab':tab_module,
               'vertical':vertical_module,
-              'homework':homework_module,
-              'problem':problem_module}
+              'problem':render_x_module}
                   #'lab':lab_module,
 
 def render_module(request, module):
