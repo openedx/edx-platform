@@ -29,8 +29,10 @@ class LoncapaModule(XModule):
         inner_html=self.lcp.get_html()
         content={'name':self.name, 
                  'html':inner_html}
+        print "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        print self.lcp.done
         return render_to_string('problem.html', 
-                                {'problem':content, 'id':self.filename})
+                                {'problem':content, 'id':self.filename, 'done':self.lcp.done})
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
@@ -54,6 +56,7 @@ class LoncapaModule(XModule):
     # Temporary -- move to capa_problem
 
     def check_problem(self, get):
+        self.lcp.done=True
         answer=dict()
         # input_resistor_1 ==> resistor_1
         for key in get:
@@ -64,6 +67,7 @@ class LoncapaModule(XModule):
         return js
 
     def reset_problem(self, get):
+        self.lcp.done=False
         self.lcp.answers=dict()
         self.lcp.context=dict()
         self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 

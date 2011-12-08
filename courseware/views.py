@@ -16,7 +16,7 @@ from django.http import Http404
 
 import urllib
 
-import capa_module, capa_problem
+import capa_module
 
 from models import StudentModule
 
@@ -29,6 +29,8 @@ from content_parser import *
 template_imports={'urllib':urllib}
 
 def profile(request):
+    ''' User profile. Show username, location, etc, as well as grades .
+        We need to allow the user to change some of these settings .'''
     if not request.user.is_authenticated():
         return redirect('/')
 
@@ -74,7 +76,7 @@ def profile(request):
     return render_to_response('profile.html', context)
 
 def render_accordion(request,course,chapter,section):
-    ''' Draws accordion. Takes current position in accordion as
+    ''' Draws navigation bar. Takes current position in accordion as
         parameter. Returns (initialization_javascript, content)'''
     def format_string(string):
         return urllib.quote(string.replace(' ','_'))
@@ -93,15 +95,21 @@ def render_accordion(request,course,chapter,section):
             'content':render_to_string('accordion.html',context)}
 
 def video_module(request, module):
+    ''' Shows a video, with subtitles. 
+    '''
     id=module.getAttribute('youtube')
     return {'js':render_to_string('video_init.js',{'id':id}), 
             'content':render_to_string('video.html',{})}
 
 def html_module(request, module):
+    ''' Show basic text
+    '''
     template_source=module.getAttribute('filename')
     return {'content':render_to_string(template_source, {})}
 
 def tab_module(request, module):
+    ''' Layout module which lays out content in tabs.  
+    '''
     contents=[(e.getAttribute("name"),render_module(request, e)) \
               for e in module.childNodes \
               if e.nodeType==1]
@@ -111,6 +119,8 @@ def tab_module(request, module):
             'content':render_to_string('tab_module.html',{'tabs':contents})}
 
 def vertical_module(request, module):
+    ''' Layout module which lays out content vertically. 
+    '''
     contents=[(e.getAttribute("name"),render_module(request, e)) \
               for e in module.childNodes \
               if e.nodeType==1]
@@ -122,6 +132,7 @@ def vertical_module(request, module):
 modx_modules={'problem':capa_module.LoncapaModule}
 
 def render_x_module(request, xml_module):
+    ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
     print xml_module
     module_id=xml_module.getAttribute(capa_module.LoncapaModule.id_attribute)
@@ -148,6 +159,7 @@ def render_x_module(request, xml_module):
     return {'content':problem.get_html()}
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
+    ''' Generic module for extensions. This handles AJAX. '''
     s = StudentModule.objects.filter(module_type=module, student=request.user, module_id=id)
     if len(s) == 0:
         raise Http404
@@ -170,22 +182,16 @@ module_types={'video':video_module,
                   #'lab':lab_module,
 
 def render_module(request, module):
+    ''' Generic dispatch for internal modules. '''
     if module==None:
         return {"content":""}
     if str(module.localName) in module_types:
         return module_types[module.localName](request, module)
     return {"content":""}
 
-def dom_select(dom, element_type, element_name):
-    if dom==None:
-        return None
-    elements=dom.getElementsByTagName(element_type)
-    for e in elements:
-        if e.getAttribute("name")==element_name:
-            return e
-    return None
-
 def index(request, course="6.002 Spring 2012", chapter="Using the System", section="Hints"): 
+    ''' Displays courseware accordion, and any associated content. 
+    ''' 
     if not request.user.is_authenticated():
         return redirect('/')
 
@@ -200,9 +206,9 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
         return redirect('/')
 
     dom=parse(settings.DATA_DIR+'course.xml')
-    dom_course=dom_select(dom, 'course', course)
-    dom_chapter=dom_select(dom_course, 'chapter', chapter)
-    dom_section=dom_select(dom_chapter, 'section', section)
+    dom_course=content_parser.dom_select(dom, 'course', course)
+    dom_chapter=content_parser.dom_select(dom_course, 'chapter', chapter)
+    dom_section=content_parser.dom_select(dom_chapter, 'section', section)
     if dom_section!=None:
         module=[e for e in dom_section.childNodes if e.nodeType==1][0]
     else:

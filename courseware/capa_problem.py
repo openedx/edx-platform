@@ -12,7 +12,8 @@ class LoncapaProblem():
             2) Populate any student answers. '''
         return json.dumps({'seed':self.seed, 
                            'answers':self.answers,
-                           'correct_map':self.correct_map})
+                           'correct_map':self.correct_map, 
+                           'done':self.done})
 
     def get_score(self):
         correct=0
@@ -41,7 +42,10 @@ class LoncapaProblem():
         else:
             state={}
         self.gid=id
-        
+
+        if 'done' in state:
+            self.done=state['done']
+
         if 'seed' in state and state['seed']!=None and state['seed']!="":
             self.seed=state['seed']
         else:
@@ -81,6 +85,7 @@ class LoncapaProblem():
         self.text=self.contextualize_text(self.text)
         self.filename=filename
 
+    done=False
     text=""
     context={}   # Execution context from loncapa/python
     questions={} # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
