@@ -26,7 +26,8 @@ class XModule:
     def handle_ajax(self, json):
         return 
 
-    def __init__(self, xml, item_id, ajax_url, track_url, state=None):
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
+        ''' In most cases, you must pass state or xml'''
         self.xml=xml
         self.item_id=item_id
         self.ajax_url=ajax_url

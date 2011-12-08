@@ -33,8 +33,6 @@ class LoncapaModule(XModule):
         return render_to_string('problem.html', 
                                 {'problem':content, 'id':self.filename})
 
-
-
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
         dom=parseString(xml)
@@ -48,4 +46,11 @@ class LoncapaModule(XModule):
     # Temporary
 
     def check_problem(self, get):
-        pass
+        answer=dict()
+        # input_resistor_1 ==> resistor_1
+        for key in get:
+            answer['_'.join(key.split('_')[1:])]=get[key]
+
+        js=json.dumps(self.lcp.grade_answers(answer))
+
+        return js

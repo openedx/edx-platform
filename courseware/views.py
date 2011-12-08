@@ -128,7 +128,8 @@ def render_x_module(request, xml_module):
         problem=capa_module.LoncapaModule(xml_module.toxml(), module_id)
         smod=StudentModule(student=request.user, 
                            module_id=module_id, 
-                           state=problem.get_state())
+                           state=problem.get_state(), 
+                           xml=problem.xml)
         smod.save()
     elif len(s) == 1:
         # If so, render it
@@ -140,55 +141,31 @@ def render_x_module(request, xml_module):
 
     return {'content':problem.get_html()}
 
-def modx_dispatch(request, dispatch=None, id=None):
-    s = StudentModule.objects.filter(student=request.user, module_id=id)
+def modx_dispatch(request, module=None, dispatch=None, id=None):
+    s = StudentModule.objects.filter(module_type=module, student=request.user, module_id=id)
     if len(s) == 0:
         raise Http404
 
+    s=s[0]
+
+    dispatch=dispatch.split('?')[0]
     if dispatch=='problem_check': 
-        return check_problem(request)
+        problem=capa_module.LoncapaModule(s.xml, s.module_id, state=s.state)
+        html = problem.check_problem(request.GET)
+        s.state=problem.get_state()
+        s.grade=problem.get_score()['score']
+        s.save()
+
+        return HttpResponse(html) #check_problem(s, request.GET)
     elif dispatch=='problem_reset':
         return reset_problem(request,id)
     else: 
-        print "AAA"
         raise Http404
-
 
 def reset_problem(request,id):
     s = StudentModule.objects.filter(student=request.user, module_id=id)
     s[0].delete()
     return HttpResponse(json.dumps({}), mimetype="application/json")
-
-def check_problem(request):
-    answer=dict()
-    # input_resistor_1 ==> resistor_1
-    for key in request.GET:
-        answer['_'.join(key.split('_')[1:])]=request.GET[key]
-    ## THE NEXT TWO LINES ARE SUBTLE, AND CAN EASILY INTRODUCE SECURITY ISSUES
-    # 
-    # The filename is grabbed from the user. The user could inject arbitrary 
-    # filenames and potentially compromise our system. The second line prevents
-    # this, since we confirm filename is a valid module_id in the database. 
-    # Small changes to the code or to the database could break this. 
-    # 
-    # We should probably add an explicit check to make sure the filename is in 
-    # the XML file to make this less fragile. 
-    filename=answer.keys()[0].split('_')[0] 
-    s = StudentModule.objects.filter(student=request.user, module_id=filename)
-
-    if len(s) == 1:
-        s=s[0]
-        problem=capa_problem.LoncapaProblem(settings.DATA_DIR+filename+'.xml', 
-                                            id=filename, 
-                                            state=s.state)
-        js=json.dumps(problem.grade_answers(answer))
-        s.state=problem.get_state()
-        s.grade=problem.get_score()['score']
-        s.save()
-    else:
-        raise Exception("Database is inconsistent (3).")
-
-    return HttpResponse(js, mimetype="application/json")
 
 module_types={'video':video_module,
               'html':html_module,
