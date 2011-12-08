@@ -163,8 +163,9 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         raise Http404
 
 def reset_problem(request,id):
-    s = StudentModule.objects.filter(student=request.user, module_id=id)
-    s[0].delete()
+    s = StudentModule.objects.filter(student=request.user, module_id=id)[0]
+    s.state="{}"
+    s.save()
     return HttpResponse(json.dumps({}), mimetype="application/json")
 
 module_types={'video':video_module,
