@@ -119,8 +119,11 @@ def vertical_module(request, module):
     return {'js':js, 
             'content':render_to_string('vert_module.html',{'items':contents})}
 
+modx_modules={'problem':capa_module.LoncapaModule}
+
 def render_x_module(request, xml_module):
     # Check if problem has an instance in DB
+    print xml_module
     module_id=xml_module.getAttribute(capa_module.LoncapaModule.id_attribute)
     s = StudentModule.objects.filter(student=request.user, module_id=module_id)
     if len(s) == 0:
@@ -133,9 +136,12 @@ def render_x_module(request, xml_module):
         smod.save()
     elif len(s) == 1:
         # If so, render it
+        s=s[0]
         problem=capa_module.LoncapaModule(xml_module.toxml(), 
                                           module_id, 
-                                          state=s[0].state)
+                                          state=s.state)
+        s.state=problem.get_state()
+        s.save()
     else:
         raise Exception("Database is inconsistent (1).")
 
@@ -149,24 +155,12 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     s=s[0]
 
     dispatch=dispatch.split('?')[0]
-    if dispatch=='problem_check': 
-        problem=capa_module.LoncapaModule(s.xml, s.module_id, state=s.state)
-        html = problem.check_problem(request.GET)
-        s.state=problem.get_state()
-        s.grade=problem.get_score()['score']
-        s.save()
-
-        return HttpResponse(html) #check_problem(s, request.GET)
-    elif dispatch=='problem_reset':
-        return reset_problem(request,id)
-    else: 
-        raise Http404
-
-def reset_problem(request,id):
-    s = StudentModule.objects.filter(student=request.user, module_id=id)[0]
-    s.state="{}"
+    problem=modx_modules[module](s.xml, s.module_id, state=s.state)
+    html=problem.handle_ajax(dispatch, request.GET)
+    s.state=problem.get_state()
+    s.grade=problem.get_score()['score']
     s.save()
-    return HttpResponse(json.dumps({}), mimetype="application/json")
+    return HttpResponse(html)
 
 module_types={'video':video_module,
               'html':html_module,

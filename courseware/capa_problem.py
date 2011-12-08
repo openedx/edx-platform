@@ -42,7 +42,7 @@ class LoncapaProblem():
             state={}
         self.gid=id
         
-        if 'seed' in state:
+        if 'seed' in state and state['seed']!=None and state['seed']!="":
             self.seed=state['seed']
         else:
             # TODO: Check performance of urandom -- depending on

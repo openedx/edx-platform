@@ -17,7 +17,6 @@ class LoncapaModule(XModule):
     id_attribute="filename"
 
     def get_state(self):
-        print "got"
         return self.lcp.get_state()
 
     def get_score(self):
@@ -40,10 +39,19 @@ class LoncapaModule(XModule):
         self.filename=node.getAttribute("filename")
         filename=settings.DATA_DIR+self.filename+".xml"
         self.name=node.getAttribute("name")
-        print state
         self.lcp=LoncapaProblem(filename, item_id, state)
 
-    # Temporary
+    def handle_ajax(self, dispatch, get):
+        if dispatch=='problem_check': 
+            html = self.check_problem(get)
+        elif dispatch=='problem_reset':
+            html = self.reset_problem(get)
+        else: 
+            return "Error"
+        return html
+
+
+    # Temporary -- move to capa_problem
 
     def check_problem(self, get):
         answer=dict()
@@ -54,3 +62,12 @@ class LoncapaModule(XModule):
         js=json.dumps(self.lcp.grade_answers(answer))
 
         return js
+
+    def reset_problem(self, get):
+        self.lcp.answers=dict()
+        self.lcp.context=dict()
+        self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
+        self.lcp.answers=dict()   # Student answers
+        self.lcp.correct_map=dict()
+        self.lcp.seed=None
+        return "{}"

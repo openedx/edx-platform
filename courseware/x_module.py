@@ -23,8 +23,10 @@ class XModule:
     def get_html(self):
         return "Unimplemented"
 
-    def handle_ajax(self, json):
-        return 
+    def handle_ajax(self, dispatch, get):
+        ''' dispatch is last part of the URL. 
+            get is a dictionary-like object ''' 
+        return ""
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
         ''' In most cases, you must pass state or xml'''
