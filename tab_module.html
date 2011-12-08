@@ -1,0 +1,14 @@
+<div id="tabs">
+<ul>
+  % for t in tabs:
+  <li> <a href="#tabs-${tabs.index(t)}">${t[0]}</a>
+  % endfor
+</ul>
+
+% for t in tabs:
+  <div id="tabs-${tabs.index(t)}">
+  ${t[1]['content']}
+  </div>
+% endfor
+
+</div>

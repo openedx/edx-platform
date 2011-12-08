@@ -1,0 +1,35 @@
+<h2> ${ problem['name'] } </h2>
+  ${ problem['html'] }
+  <br>
+  <input type="hidden" name="problem_id" value="${ problem['name'] }"> 
+  <script>$(function() {
+    $('#check_${ id }').click(function() {
+      var submit_data={};
+      $.each($("[id^=input_${ id }_]"), function(index,value){
+        submit_data[value.id]=value.value;
+      });
+
+      if($('#check_${ id }').attr('value') == 'Check') { 
+        $.getJSON('/modx/problem/${ id }/problem_check',
+           submit_data,
+           function(json) {
+             for(p in json) {
+               if(json[p]=='correct')
+                  $("#status_"+p).attr("class", "ui-icon ui-icon-check");
+               if(json[p]=='incorrect')
+                  $("#status_"+p).attr("class", "ui-icon ui-icon-close");
+                  $('#check_${ id }').attr("value", "Reset");
+             }
+        });
+      } else /* if 'Reset' */ {
+        $.getJSON('/modx/problem/${ id }/problem_reset', {'id':'${ id }'}, function(json) {
+           location.reload(true); // TODO: Reimplement with AJAX.
+        });
+      }
+    });
+});
+</script>
+  <input id="check_${ id }" type="button" value="Check" >   
+
+
+<!--$("[id^=input_resistor_]");-->

@@ -1,0 +1,41 @@
+<%inherit file="main.html" />
+<!-- TODO: http://docs.jquery.com/Plugins/Validation -->
+<script type="text/javascript">
+$(function() {
+${init}
+// Show and hide sidebar
+var acc_hidden=false;
+$('#hide_acc').click(function() {
+  if(acc_hidden) {
+    $('#accordion').show();
+    $('#acc_td').attr("width","320");
+    $('#hide_acc').html("&lt;<br>&lt;<br>&lt;");
+    acc_hidden=false;
+  } else {
+    $('#accordion').hide();
+    $('#acc_td').attr("width","0");
+    $('#hide_acc').html("&gt;<br>&gt;<br>&gt;");
+    acc_hidden=true;
+  }
+});
+});
+</script>
+
+<table width=100%>
+<tr><td id="acc_td" width=320 rowspan=2 valign=top>
+<div id="accordion">
+${accordion}
+</div>
+</td><td rowspan=2 valign=center><div id="hide_acc">&lt;<br>&lt;<br>&lt;</div></td>
+<td align=right valign=top><a href="/courseware"><b>Digital Textbook</b></a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/discussion">Discussion</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/profile">Profile</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/help">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/logout">Log out</a>
+</td></tr><tr><td valign=top>
+
+${content}
+</td></tr></table>
