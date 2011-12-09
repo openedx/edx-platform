@@ -37,6 +37,7 @@ class LoncapaProblem():
             seed will provide the random seed. Alternatively, passing
             context will bypass all script execution, and use the 
             given execution context.  '''
+        print "!!",filename, id
         if state!=None:
             state=json.loads(state)
         else:
