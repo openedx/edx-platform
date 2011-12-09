@@ -29,8 +29,6 @@ class LoncapaModule(XModule):
         inner_html=self.lcp.get_html()
         content={'name':self.name, 
                  'html':inner_html}
-        print "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
-        print self.lcp.done
         return render_to_string('problem.html', 
                                 {'problem':content, 'id':self.filename, 'done':self.lcp.done})
 

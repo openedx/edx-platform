@@ -24,7 +24,7 @@ import urllib
 
 from django.conf import settings
 
-from content_parser import *
+import content_parser
 
 template_imports={'urllib':urllib}
 
@@ -81,7 +81,7 @@ def render_accordion(request,course,chapter,section):
     def format_string(string):
         return urllib.quote(string.replace(' ','_'))
 
-    toc=toc_from_xml(chapter, section)
+    toc=content_parser.toc_from_xml(chapter, section)
     active_chapter=1
     for i in range(len(toc)):
         if toc[i]['active']:
@@ -129,12 +129,32 @@ def vertical_module(request, module):
     return {'js':js, 
             'content':render_to_string('vert_module.html',{'items':contents})}
 
+def seq_module(request, module):
+    ''' Layout module which lays out content in a temporal sequence
+    '''
+    def j(m): 
+        # jsonify contents so it can be embedded in a js array
+        # We also need to split </script> tags so they don't break
+        # mid-string
+        if 'js' not in m: m['js']=""
+        content=json.dumps(m['content']) 
+        content=content.replace('</script>', '<"+"/script>') 
+        return {'content':content, 'js':m['js']}
+    contents=[(e.getAttribute("name"),j(render_module(request, e))) \
+              for e in module.childNodes \
+              if e.nodeType==1]
+        
+    js="".join([e[1]['js'] for e in contents if 'js' in e[1]])
+
+    return {'js':js+render_to_string('seq_module.js',{'items':contents}), 
+            'content':render_to_string('seq_module.html',{'items':contents})}
+
+
 modx_modules={'problem':capa_module.LoncapaModule}
 
 def render_x_module(request, xml_module):
     ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
-    print xml_module
     module_id=xml_module.getAttribute(capa_module.LoncapaModule.id_attribute)
     s = StudentModule.objects.filter(student=request.user, module_id=module_id)
     if len(s) == 0:
@@ -178,6 +198,7 @@ module_types={'video':video_module,
               'html':html_module,
               'tab':tab_module,
               'vertical':vertical_module,
+              'sequential':seq_module,
               'problem':render_x_module}
                   #'lab':lab_module,
 
