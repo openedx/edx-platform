@@ -22,8 +22,9 @@
              }
         });
       } else /* if 'Reset' */ {
+        // Possible cleanup: Move from getJSON to just load
         $.getJSON('/modx/problem/${ id }/problem_reset', {'id':'${ id }'}, function(json) {
-           location.reload(true); // TODO: Reimplement with AJAX.
+           $('#main_${ id }').html(json);
         });
       }
     });
