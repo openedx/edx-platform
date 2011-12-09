@@ -1,0 +1,27 @@
+    <div id='debug' ellpadding=5></div>
+    <table width=800 >
+      <tr><td></td><td style="background-color:grey" id="tt_1" height=10></td>
+<td style="background-color:grey" id="tt_2"></td>
+<td style="background-color:grey" id="tt_3"></td>
+<td style="background-color:grey" id="tt_4"></td>
+<td style="background-color:grey" id="tt_5"></td>
+<td style="background-color:grey" id="tt_6"></td>
+<td style="background-color:grey" id="tt_7"></td>
+<td style="background-color:grey" id="tt_8"></td>
+<td style="background-color:grey" id="tt_9"></td>
+<td style="background-color:grey" id="tt_10"></td><td></td></tr>
+<tr><td align=center valign=center><div id="prev"><span class="ui-icon ui-icon-circle-triangle-w" onclick="pause();"></span></div></td>
+<td colspan=10><div id="content">This is content</div></td>
+<td align=center valign=center><div id="next"><span class="ui-icon ui-icon-circle-triangle-e" onclick="pause();">&nbsp;</span></div></td>
+</tr>
+      <tr></tr>
+    </table>
+
+
+<div>
+ %for t in items:
+  <div id="vert-${items.index(t)}">
+  ${t[1]['content']}
+  </div>
+ %endfor
+</div>

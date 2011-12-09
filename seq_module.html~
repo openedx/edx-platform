@@ -1,0 +1,7 @@
+<div>
+% for t in items:
+  <div id="vert-${items.index(t)}">
+  ${t[1]['content']}
+  </div>
+% endfor
+</div>
