@@ -71,7 +71,7 @@ function updateHTML(elmId, value) {
 }
 
 function setytplayerState(newState) {
-    updateHTML("playerstate", newState);
+    //    updateHTML("playerstate", newState);
 }
 
 function onYouTubePlayerReady(playerId) {
@@ -143,10 +143,10 @@ function updateytplayerInfo() {
 	update_captions(getCurrentTime());
     }
 
-    updateHTML("videoduration", getDuration());
-    updateHTML("videotime", getCurrentTime());
-    updateHTML("startbytes", getStartBytes());
-    updateHTML("volume", getVolume());
+    //    updateHTML("videoduration", getDuration());
+    //    updateHTML("videotime", getCurrentTime());
+    //    updateHTML("startbytes", getStartBytes());
+    //    updateHTML("volume", getVolume());
 }
 
 // functions for the api calls

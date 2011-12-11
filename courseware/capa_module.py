@@ -28,7 +28,7 @@ class LoncapaModule(XModule):
         return self.lcp.get_score()
 
     def max_score(self):
-        return len(lcp.questions)
+        return len(self.lcp.questions)
 
     def get_html(self, encapsulate=True):
         html = self.lcp.get_html()
@@ -39,6 +39,9 @@ class LoncapaModule(XModule):
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
         return html
+
+    def get_js(self):
+        return ""
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)

@@ -17,6 +17,7 @@ from django.http import Http404
 import urllib
 
 import capa_module
+import video_module
 
 from models import StudentModule
 
@@ -55,7 +56,7 @@ def profile(request):
                                 correct=response.grade
                             else:
                                 correct=0
-                    total=capa_module.LoncapaModule(p, id=id).max_score()
+                    total=capa_module.LoncapaModule(p.toxml(), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     scores.append((int(correct),total))
                 score={'course':course.getAttribute('name'),
                        'section':s.getAttribute("name"),
@@ -71,7 +72,8 @@ def profile(request):
              'location':user_info.location,
              'language':user_info.language,
              'email':request.user.email,
-             'homeworks':hw
+             'homeworks':hw, 
+             'csrf':csrf(request)['csrf_token']
              }
     return render_to_response('profile.html', context)
 
@@ -94,12 +96,12 @@ def render_accordion(request,course,chapter,section):
     return {'js':render_to_string('accordion_init.js',context), 
             'content':render_to_string('accordion.html',context)}
 
-def video_module(request, module):
+def video_mod(request, module):
     ''' Shows a video, with subtitles. 
     '''
     id=module.getAttribute('youtube')
     return {'js':render_to_string('video_init.js',{'id':id}), 
-            'content':render_to_string('video.html',{})}
+            'content':render_to_string('video.html',{'id':id})}
 
 def html_module(request, module):
     ''' Show basic text
@@ -150,33 +152,36 @@ def seq_module(request, module):
             'content':render_to_string('seq_module.html',{'items':contents})}
 
 
-modx_modules={'problem':capa_module.LoncapaModule}
+modx_modules={'problem':capa_module.LoncapaModule}#, 'video1':video_module.VideoModule}
 
 def render_x_module(request, xml_module):
     ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
-    module_id=xml_module.getAttribute(capa_module.LoncapaModule.id_attribute)
+    module_type=xml_module.nodeName
+    module_class=modx_modules[module_type]
+    module_id=xml_module.getAttribute(module_class.id_attribute)
     s = StudentModule.objects.filter(student=request.user, module_id=module_id)
     if len(s) == 0:
         # If not, create one, and save it
-        problem=capa_module.LoncapaModule(xml_module.toxml(), module_id)
+        instance=module_class(xml_module.toxml(), module_id)
         smod=StudentModule(student=request.user, 
                            module_id=module_id, 
-                           state=problem.get_state(), 
-                           xml=problem.xml)
+                           state=instance.get_state(), 
+                           xml=instance.xml)
         smod.save()
     elif len(s) == 1:
         # If so, render it
         s=s[0]
-        problem=capa_module.LoncapaModule(xml_module.toxml(), 
-                                          module_id, 
-                                          state=s.state)
-        s.state=problem.get_state()
+        instance=module_class(xml_module.toxml(), 
+                             module_id, 
+                             state=s.state)
+        s.state=instance.get_state()
         s.save()
     else:
         raise Exception("Database is inconsistent (1).")
 
-    return {'content':problem.get_html()}
+    return {'content':instance.get_html(), 
+            'js':instance.get_js()}
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic module for extensions. This handles AJAX. '''
@@ -187,14 +192,14 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     s=s[0]
 
     dispatch=dispatch.split('?')[0]
-    problem=modx_modules[module](s.xml, s.module_id, state=s.state)
-    html=problem.handle_ajax(dispatch, request.GET)
-    s.state=problem.get_state()
-    s.grade=problem.get_score()['score']
+    instance=modx_modules[module](s.xml, s.module_id, state=s.state)
+    html=instance.handle_ajax(dispatch, request.GET)
+    s.state=instance.get_state()
+    s.grade=instance.get_score()['score']
     s.save()
     return HttpResponse(html)
 
-module_types={'video':video_module,
+module_types={'video':video_mod,
               'html':html_module,
               'tab':tab_module,
               'vertical':vertical_module,
