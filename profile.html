@@ -1,5 +1,13 @@
 <%inherit file="main.html" />
 
+<script>
+$(function() {
+	$("a#inline").fancybox({
+		'hideOnContentClick': false
+	});
+})
+</script>
+
 <div align="right"><table><tr><td align=right valign=top><a href="/courseware">Digital Textbook</a> 
 <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
 <a href="/discussion">Discussion</a> 
@@ -13,24 +21,57 @@
 <center>
 <br><br><br><br>
 <h1> ${name} </h1>
-<table><td align=right>Username:</td><td>${username}</td></tr>
+<table><td align=right>Forum name:</td><td>${username}</td></tr>
 <td align=right>E-mail:</td><td>${email}</td></tr>
-<td align=right>Location:</td><td>${location}</td></tr>
-<td align=right>Language:</td><td>${language}</td></tr></table>
+<td align=right><a id="inline" href="#change_location">Location:</a></td><td><a id="inline" href="#change_location">${location}</a></td></tr>
+<td align=right><a id="inline" href="#change_language">Language:</a></td><td><a id="inline" href="#change_location">${language}</a></td></tr>
+<td align=right><a id="inline" href="#change_password">Password:</a></td><td><a id="inline" href="#change_location">********</a></td></tr></table>
 <h1> Course Status </h1>
 <table>
   % for hw in homeworks:
-    <td> ${ hw['chapter'] }</td><td>/</td> <td> ${ hw['section'] } </td><td>&nbsp;</td><td>
+    <tr><td> ${ hw['chapter'] }</td><td>/</td> <td> ${ hw['section'] } </td><td>&nbsp;</td><td>
     % for score in hw['scores']:
       ${ score[0] }/${ score[1] }
     % endfor
-    </td>
+    </td></tr>
   % endfor
 </table>
 </center>
-<br><br><br><br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br><br><br>
+
+<div style="display:none" ><div id="change_location"><h1>Change location</h1>
+<table width=400><tr><td> Preferred format is city, state, country (so for us,
+&quot;Cambridge, Massachusetts, USA&quot;), but give as 
+much or as little detail as you want. 
+<p>
+<div align=right>
+<input id="id_loc_text" type="text" name="loc_text" maxlength="75" value="${location}" /> 
+<input type="button" id="change_loc_button" value="Change" /></p>
+</div>
+</td></tr></table>
+</div></div>
+<div style="display:none"><div id="change_language"><h1>Change language</h1>
+<table width=400><tr><td> Update your language:
+<p>
+<div align=right>
+<input id="id_lang_text" type="text" name="lang_text" maxlength="75" value="${language}" /> 
+<input type="button" id="change_lang_button" value="Change" /></p>
+</div>
+</td></tr></table>
+
+</div></div>
+<div style="display:none"><div id="change_password">
+<table width=400><tr><td> <h1>Password reset</h1>
+
+<p>Hit the button below, and we'll e-mail you a password reset link at ${email}.</p>
+
+<p>
+<div align=right>
+<input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" /> 
+<input type="button" id="pwd_change_button" value="E-mail me" /></p>
+</div>
+</td></tr></table>
+
+</div></div>
+
 
 <hr>

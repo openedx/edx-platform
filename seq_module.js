@@ -13,15 +13,12 @@ function goto(i) {
 }
 
 function setup_click(i) {
-    $.get(i+'.html', function(data){
-	    files[i]=data;
-        })
         $('#tt_'+i).click(function(eo) { goto(i);});
 }
 
 function next() { 
     loc=loc+1;
-    if(loc>10) loc=10;
+    if(loc> ${ len(items) } ) loc=${ len(items) };
     goto(loc);
 }
 
@@ -38,6 +35,5 @@ $(function() {
 	}
         $('#next').click(function(eo) { next();});
         $('#prev').click(function(eo) { prev();});
+	goto(1);
     });
-
-$('#debug').text('loaded');
