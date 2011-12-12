@@ -27,6 +27,8 @@ from django.conf import settings
 
 import content_parser
 
+import uuid
+
 template_imports={'urllib':urllib}
 
 def profile(request):
@@ -149,8 +151,12 @@ def seq_module(request, module):
      
     js="".join([e[1]['js'] for e in contents if 'js' in e[1]])
 
-    return {'js':js+render_to_string('seq_module.js',{'items':contents}), 
-            'content':render_to_string('seq_module.html',{'items':contents})}
+    iid=uuid.uuid1().hex
+
+    return {'js':js+render_to_string('seq_module.js',{'items':contents,
+                                                      'id':"seq"}),
+            'content':render_to_string('seq_module.html',{'items':contents,
+                                                          'id':"seq"})}
 
 
 modx_modules={'problem':capa_module.LoncapaModule, 'video':video_module.VideoModule}
