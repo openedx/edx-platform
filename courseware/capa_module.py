@@ -34,8 +34,16 @@ class LoncapaModule(XModule):
         html = self.lcp.get_html()
         content={'name':self.name, 
                  'html':html}
+        closed = False
+        if self.lcp.done:
+            check_button="Reset"
+        else:
+            check_button="Check"
         html=render_to_string('problem.html', 
-                              {'problem':content, 'id':self.filename, 'done':self.lcp.done})
+                              {'problem':content, 
+                               'id':self.filename, 
+                               'check_button':check_button,
+                               })
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
         return html

@@ -98,6 +98,7 @@ def render_accordion(request,course,chapter,section):
 
 def video_mod(request, module):
     ''' Shows a video, with subtitles. 
+        OBSOLETE. Remove once x_module version confirmed
     '''
     id=module.getAttribute('youtube')
     return {'js':render_to_string('video_init.js',{'id':id}), 
@@ -145,14 +146,14 @@ def seq_module(request, module):
     contents=[(e.getAttribute("name"),j(render_module(request, e))) \
               for e in module.childNodes \
               if e.nodeType==1]
-        
+     
     js="".join([e[1]['js'] for e in contents if 'js' in e[1]])
 
     return {'js':js+render_to_string('seq_module.js',{'items':contents}), 
             'content':render_to_string('seq_module.html',{'items':contents})}
 
 
-modx_modules={'problem':capa_module.LoncapaModule}#, 'video1':video_module.VideoModule}
+modx_modules={'problem':capa_module.LoncapaModule, 'video':video_module.VideoModule}
 
 def render_x_module(request, xml_module):
     ''' Generic module for extensions. This renders to HTML. '''
@@ -160,28 +161,36 @@ def render_x_module(request, xml_module):
     module_type=xml_module.nodeName
     module_class=modx_modules[module_type]
     module_id=xml_module.getAttribute(module_class.id_attribute)
-    s = StudentModule.objects.filter(student=request.user, module_id=module_id)
+    
+    # Grab state from database
+    s = StudentModule.objects.filter(student=request.user, 
+                                     module_id=module_id, 
+                                     module_type = module_type)
+    if len(s) == 0: # If nothing in the database...
+        state=None
+    else:
+        smod = s[0]
+        state = smod.state
+
+    # Create a new instance
+    instance=module_class(xml_module.toxml(), 
+                          module_id, 
+                          state=state)
+    
+    # If instance wasn't already in the database, create it
     if len(s) == 0:
-        # If not, create one, and save it
-        instance=module_class(xml_module.toxml(), module_id)
         smod=StudentModule(student=request.user, 
+                           module_type = module_type,
                            module_id=module_id, 
                            state=instance.get_state(), 
                            xml=instance.xml)
-        smod.save()
-    elif len(s) == 1:
-        # If so, render it
-        s=s[0]
-        instance=module_class(xml_module.toxml(), 
-                             module_id, 
-                             state=s.state)
-        s.state=instance.get_state()
-        s.save()
-    else:
-        raise Exception("Database is inconsistent (1).")
+    # Grab content
+    content = {'content':instance.get_html(), 
+               'js':instance.get_js()}
 
-    return {'content':instance.get_html(), 
-            'js':instance.get_js()}
+    smod.save() # This may be optional (at least in the case of no instance in the dB)
+
+    return content
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic module for extensions. This handles AJAX. '''
@@ -199,12 +208,13 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     s.save()
     return HttpResponse(html)
 
-module_types={'video':video_mod,
+module_types={'video':render_x_module,
               'html':html_module,
               'tab':tab_module,
               'vertical':vertical_module,
               'sequential':seq_module,
-              'problem':render_x_module}
+              'problem':render_x_module,
+              }
                   #'lab':lab_module,
 
 def render_module(request, module):

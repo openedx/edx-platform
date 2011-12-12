@@ -1,4 +1,4 @@
-var load_id;
+var load_id = 0;
 
 function caption_at(index) {
     if (captions==0)
@@ -74,15 +74,20 @@ function setytplayerState(newState) {
     //    updateHTML("playerstate", newState);
 }
 
+// Updates server with location in video so we can resume from the same place
+// IMPORTANT TODO: Load test
+// POSSIBLE FIX: Move to unload() event and similar
+var ajax_video=function(){};
+
 function onYouTubePlayerReady(playerId) {
     ytplayer = document.getElementById("myytplayer");
     setInterval(updateytplayerInfo, 1000);
+    setInterval(ajax_video,1000);
     ytplayer.addEventListener("onStateChange", "onytplayerStateChange");
     ytplayer.addEventListener("onError", "onPlayerError");
-    if((typeof load_id != "undefined") && (load_id != null)) {
+    if((typeof load_id != "undefined") && (load_id != 0)) {
 	var id=load_id;
-	load_id = null; 
-	loadNewVideo(id);
+	loadNewVideo(id, 0);
     }
 
 }
@@ -151,16 +156,20 @@ function updateytplayerInfo() {
 
 // functions for the api calls
 function loadNewVideo(id, startSeconds) {
-    if (typeof ytplayer != "undefined") {
-	ytplayer.loadVideoById(id, parseInt(startSeconds));
-    } else {
-	load_id = id;
-    }
-    
     $.getJSON("/static/subs/"+id+".srt.sjson", function(data) {
         captions=data;
     });
-
+    load_id = id;
+    //if ((typeof ytplayer != "undefined") && (ytplayer.type=="application/x-shockwave-flash")) {
+    // Try it every time. If we fail, we want the error message for now. 
+    // TODO: Add try/catch
+    try {
+	ytplayer.loadVideoById(id, parseInt(startSeconds));
+        load_id=0;
+    }
+    catch(e) {
+	window['console'].log(JSON.stringify(e));
+    }
 }
 
 function cueNewVideo(id, startSeconds) {

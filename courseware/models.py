@@ -44,7 +44,10 @@ class StudentModule(models.Model):
     state = models.TextField(null=True, blank=True)
     grade = models.FloatField(null=True, blank=True)
     student = models.ForeignKey(User)
-    MODULE_TYPES = (('problem','problem'),)
+    MODULE_TYPES = (('problem','problem'),
+                    ('video','video'),
+                    ('html','html'),
+                    )
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem')
     module_id = models.CharField(max_length=255) # Filename for homeworks, etc. 
     created = models.DateTimeField(auto_now_add=True)
