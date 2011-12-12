@@ -173,8 +173,10 @@ def render_x_module(request, xml_module):
         state = smod.state
 
     # Create a new instance
+    ajax_url = '/modx/'+module_type+'/'+module_id+'/'
     instance=module_class(xml_module.toxml(), 
                           module_id, 
+                          ajax_url=ajax_url,
                           state=state)
     
     # If instance wasn't already in the database, create it
@@ -201,7 +203,10 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     s=s[0]
 
     dispatch=dispatch.split('?')[0]
-    instance=modx_modules[module](s.xml, s.module_id, state=s.state)
+
+    ajax_url = '/modx/'+module+'/'+id+'/'
+
+    instance=modx_modules[module](s.xml, s.module_id, ajax_url=ajax_url, state=s.state)
     html=instance.handle_ajax(dispatch, request.GET)
     s.state=instance.get_state()
     s.grade=instance.get_score()['score']

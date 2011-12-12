@@ -43,6 +43,7 @@ class LoncapaModule(XModule):
                               {'problem':content, 
                                'id':self.filename, 
                                'check_button':check_button,
+                               'ajax_url':self.ajax_url,
                                })
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
