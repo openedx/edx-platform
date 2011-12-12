@@ -9,7 +9,7 @@
         submit_data[value.id]=value.value;
       });
 
-      if($('#check_${ id }').attr('value') == 'Check') { 
+      if($('#check_${ id }').attr('value').substring(0,5) != 'Reset') { 
         $.getJSON('/modx/problem/${ id }/problem_check',
            submit_data,
            function(json) {
@@ -30,8 +30,6 @@
     });
 });
 </script>
-% if not done:
-  <input id="check_${ id }" type="button" value="Check" >   
-% else:
-  <input id="check_${ id }" type="button" value="Reset" >
+% if check_button:
+  <input id="check_${ id }" type="button" value="${ check_button }" >   
 % endif

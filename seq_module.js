@@ -1,3 +1,5 @@
+// CRITICAL TODO: Namespace
+
 var files=["",
  %for t in items:
  ${t[1]['content']} , 
@@ -5,10 +7,17 @@ var files=["",
  ""
        ];
 
+var functions=["",
+ %for t in items:
+	       function(){ ${t[1]['js']} }, 
+ %endfor
+	       ""];
+
 var loc;
 
 function goto(i) {
     $('#content').html(files[i]);
+    functions[i]()
     loc=i;
 }
 
