@@ -1,11 +1,60 @@
 <%inherit file="main.html" />
 
 <script>
+var loc=true; // Activate on clicks? Not if already clicked. 
+var lang=true;
 $(function() {
+        $("#change_location").click(function() {
+           if(loc) {
+             $("#description").html('<div style="color:#FF0000">'+
+                                    "Preferred format is city, state, country (so for us, "+
+                                    "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
+                                    "as much or as little detail as you want. </div>");
+
+             loc=false;
+             $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
+                                     '<input type="button" id="change_loc_button" value="Change" />');
+             $("#change_loc_button").click(function() {
+                $.getJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
+                  $("#location_sub").text(json.location);
+                  loc=true;
+                  $("#description").html("");
+                });
+             });
+           }
+        });
+
+        $("#change_language").click(function() {
+           if(lang) {
+             lang=false;
+             $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
+                                     '<input type="button" id="change_lang_button" value="Change" />');
+             $("#change_lang_button").click(function() {
+                $.getJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
+                  $("#language_sub").text(json.language);
+                  lang=true;
+                  $("#description").html("");
+                });
+             });
+           }
+        });
+
 	$("a#inline").fancybox({
 		'hideOnContentClick': false
 	});
+
+        $('#change_password').click(function(){
+          $('#inline').trigger('click');
+        });
+
+    $('#pwd_reset_button').click(function() {
+      $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
+                    "email"  : $('#id_email').val()}, function(data){
+         $('#pwd_reset').html(data);
+      });
+    });
 })
+
 </script>
 
 <div align="right"><table><tr><td align=right valign=top><a href="/courseware">Digital Textbook</a> 
@@ -23,9 +72,14 @@ $(function() {
 <h1> ${name} </h1>
 <table><td align=right>Forum name:</td><td>${username}</td></tr>
 <td align=right>E-mail:</td><td>${email}</td></tr>
-<td align=right><a id="inline" href="#change_location">Location:</a></td><td><a id="inline" href="#change_location">${location}</a></td></tr>
-<td align=right><a id="inline" href="#change_language">Language:</a></td><td><a id="inline" href="#change_location">${language}</a></td></tr>
-<td align=right><a id="inline" href="#change_password">Password:</a></td><td><a id="inline" href="#change_location">********</a></td></tr></table>
+<tr id="change_location"> <td align=right>Location:</a></td><td><div id="location_sub">${location}</a></td></tr>
+<tr id="change_language"><td align=right><div id="change_language">Language:</a></td><td><div id="language_sub">${language}</a></td></tr>
+<tr id="change_password"><td align=right><div>Password:</a></td><td><div id="change_password">********</a></td></tr></table>
+
+<div><a id="inline" href="#change_password_pop"></a></div> <!-- hidden trigger for password -->
+
+<div id="description"></div>
+
 <h1> Course Status </h1>
 <table>
   % for hw in homeworks:
@@ -38,28 +92,8 @@ $(function() {
 </table>
 </center>
 
-<div style="display:none" ><div id="change_location"><h1>Change location</h1>
-<table width=400><tr><td> Preferred format is city, state, country (so for us,
-&quot;Cambridge, Massachusetts, USA&quot;), but give as 
-much or as little detail as you want. 
-<p>
-<div align=right>
-<input id="id_loc_text" type="text" name="loc_text" maxlength="75" value="${location}" /> 
-<input type="button" id="change_loc_button" value="Change" /></p>
-</div>
-</td></tr></table>
-</div></div>
-<div style="display:none"><div id="change_language"><h1>Change language</h1>
-<table width=400><tr><td> Update your language:
-<p>
-<div align=right>
-<input id="id_lang_text" type="text" name="lang_text" maxlength="75" value="${language}" /> 
-<input type="button" id="change_lang_button" value="Change" /></p>
-</div>
-</td></tr></table>
-
-</div></div>
-<div style="display:none"><div id="change_password">
+<div style="display:none"><div id="change_password_pop">
+<div id="pwd_reset">
 <table width=400><tr><td> <h1>Password reset</h1>
 
 <p>Hit the button below, and we'll e-mail you a password reset link at ${email}.</p>
@@ -67,10 +101,10 @@ much or as little detail as you want.
 <p>
 <div align=right>
 <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" /> 
-<input type="button" id="pwd_change_button" value="E-mail me" /></p>
+<input type="button" id="pwd_reset_button" value="E-mail me" /></p>
 </div>
 </td></tr></table>
-
+</div>
 </div></div>
 
 

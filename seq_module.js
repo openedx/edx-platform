@@ -1,6 +1,6 @@
 // CRITICAL TODO: Namespace
 
-var ${ id }files=["",
+var ${ id }contents=["",
  %for t in items:
  ${t[1]['content']} , 
  %endfor
@@ -9,14 +9,14 @@ var ${ id }files=["",
 
 var ${ id }functions=["",
  %for t in items:
-	       function(){ ${t[1]['js']} }, 
+	       function(){ ${t[1]['init_js']} }, 
  %endfor
 	       ""];
 
 var ${ id }loc;
 
 function ${ id }goto(i) {
-    $('#content').html(${ id }files[i]);
+    $('#content').html(${ id }contents[i]);
     ${ id }functions[i]()
     ${ id }loc=i;
 }
