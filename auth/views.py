@@ -46,6 +46,22 @@ def logout_user(request):
     logout(request)
     return redirect('/')
 
+def change_setting(request):
+    if not request.user.is_authenticated():
+        return redirect('/')
+    up=UserProfile.objects.get(user=request.user)
+    if 'location' in request.GET:
+        print "loc"
+        up.location=request.GET['location']
+    if 'language' in request.GET:
+        print "lang"
+        up.language=request.GET['language']
+    up.save()
+
+    return HttpResponse(json.dumps({'success':True, 
+                                    'language':up.language,
+                                    'location':up.location,}))
+
 def create_account(request):
     js={'success':False}
     # Confirm we have a properly formed request

@@ -1,3 +1,18 @@
+// Things to abstract out to another file
+
+function postJSON(url, data, callback, csrf) {
+  $.ajax({
+    url: url,
+    dataType: 'json',
+    data: data,
+    success: callback
+  });
+}
+
+var global=5; 
+
+// Video player
+
 var load_id = 0;
 
 function caption_at(index) {
@@ -92,7 +107,16 @@ function onYouTubePlayerReady(playerId) {
 
 }
 
+function videoDestroy() {
+    load_id = 0;
+    // TODO/BUG: Figure out why removeEventListener doesn't work
+    ytplayer.removeEventListener("onStateChange", "onytplayerStateChange");
+    ytplayer.removeEventListener("onError", "onPlayerError");
+    ytplayer = false;
+}
+
 function log_event(e) {
+    // CRITICAL TODO: Change to AJAX
     //$("#eventlog").append("<br>");
     //$("#eventlog").append(JSON.stringify(e));
     window['console'].log(JSON.stringify(e));

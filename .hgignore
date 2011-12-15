@@ -2,3 +2,7 @@ syntax: glob
 *.pyc
 *~
 database.sqlite
+courseware/static/js/mathjax/*
+
+syntax: regexp
+

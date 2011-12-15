@@ -23,11 +23,14 @@ class XModule:
     def get_html(self):
         return "Unimplemented"
 
-    def get_js(self):
+    def get_init_js(self):
         ''' JavaScript code to be run when problem is shown. Be aware
         that this may happen several times on the same page
         (e.g. student switching tabs). Common functions should be put
         in the main course .js files for now. ''' 
+        return ""
+
+    def get_destroy_js(self):
         return ""
 
     def handle_ajax(self, dispatch, get):

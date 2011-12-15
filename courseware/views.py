@@ -95,7 +95,7 @@ def render_accordion(request,course,chapter,section):
                   ['course_name',course],
                   ['format_string',format_string]]+ \
                      template_imports.items())
-    return {'js':render_to_string('accordion_init.js',context), 
+    return {'init_js':render_to_string('accordion_init.js',context), 
             'content':render_to_string('accordion.html',context)}
 
 def video_mod(request, module):
@@ -103,7 +103,7 @@ def video_mod(request, module):
         OBSOLETE. Remove once x_module version confirmed
     '''
     id=module.getAttribute('youtube')
-    return {'js':render_to_string('video_init.js',{'id':id}), 
+    return {'init_js':render_to_string('video_init.js',{'id':id}), 
             'content':render_to_string('video.html',{'id':id})}
 
 def html_module(request, module):
@@ -118,9 +118,9 @@ def tab_module(request, module):
     contents=[(e.getAttribute("name"),render_module(request, e)) \
               for e in module.childNodes \
               if e.nodeType==1]
-    js="".join([e[1]['js'] for e in contents if 'js' in e[1]])
+    js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
 
-    return {'js':render_to_string('tab_module.js',{'tabs':contents})+js, 
+    return {'init_js':render_to_string('tab_module.js',{'tabs':contents})+js, 
             'content':render_to_string('tab_module.html',{'tabs':contents})}
 
 def vertical_module(request, module):
@@ -129,9 +129,9 @@ def vertical_module(request, module):
     contents=[(e.getAttribute("name"),render_module(request, e)) \
               for e in module.childNodes \
               if e.nodeType==1]
-    js="".join([e[1]['js'] for e in contents if 'js' in e[1]])
+    js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
 
-    return {'js':js, 
+    return {'init_js':js, 
             'content':render_to_string('vert_module.html',{'items':contents})}
 
 def seq_module(request, module):
@@ -141,22 +141,28 @@ def seq_module(request, module):
         # jsonify contents so it can be embedded in a js array
         # We also need to split </script> tags so they don't break
         # mid-string
-        if 'js' not in m: m['js']=""
+        if 'init_js' not in m: m['init_js']=""
         content=json.dumps(m['content']) 
         content=content.replace('</script>', '<"+"/script>') 
-        return {'content':content, 'js':m['js']}
+        return {'content':content, 'init_js':m['init_js']}
     contents=[(e.getAttribute("name"),j(render_module(request, e))) \
               for e in module.childNodes \
               if e.nodeType==1]
      
-    js="".join([e[1]['js'] for e in contents if 'js' in e[1]])
+    js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
 
     iid=uuid.uuid1().hex
 
-    return {'js':js+render_to_string('seq_module.js',{'items':contents,
-                                                      'id':"seq"}),
-            'content':render_to_string('seq_module.html',{'items':contents,
-                                                          'id':"seq"})}
+    params={'items':contents,
+            'id':"seq"}
+
+    print module.nodeName
+    if module.nodeName == 'sequential':
+        return {'init_js':js+render_to_string('seq_module.js',params),
+                'content':render_to_string('seq_module.html',params)}
+    if module.nodeName == 'tab':
+        return {'init_js':js+render_to_string('tab_module.js',params),
+                'content':render_to_string('tab_module.html',params)}
 
 
 modx_modules={'problem':capa_module.LoncapaModule, 'video':video_module.VideoModule}
@@ -194,7 +200,7 @@ def render_x_module(request, xml_module):
                            xml=instance.xml)
     # Grab content
     content = {'content':instance.get_html(), 
-               'js':instance.get_js()}
+               'init_js':instance.get_init_js()}
 
     smod.save() # This may be optional (at least in the case of no instance in the dB)
 
@@ -221,7 +227,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
 module_types={'video':render_x_module,
               'html':html_module,
-              'tab':tab_module,
+              'tab':seq_module,
               'vertical':vertical_module,
               'sequential':seq_module,
               'problem':render_x_module,
@@ -265,10 +271,10 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     module=render_module(request, module)
 
-    if 'js' not in module:
-        module['js']=''
+    if 'init_js' not in module:
+        module['init_js']=''
 
-    context={'init':accordion['js']+module['js'],
+    context={'init':accordion['init_js']+module['init_js'],
              'accordion':accordion['content'],
              'content':module['content']}
     return render_to_response('courseware.html', context)

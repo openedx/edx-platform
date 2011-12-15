@@ -3,6 +3,10 @@ from django.contrib.auth.models import User
 import uuid
 
 class UserProfile(models.Model):
+    ## CRITICAL TODO/SECURITY
+    # Sanitize all fields. 
+    # This is not visible to other users, but could introduce holes 
+    # later
     user = models.ForeignKey(User, unique=True, db_index=True)
     name = models.TextField(blank=True)
     language = models.TextField(blank=True)

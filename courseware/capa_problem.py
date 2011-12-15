@@ -37,7 +37,6 @@ class LoncapaProblem():
             seed will provide the random seed. Alternatively, passing
             context will bypass all script execution, and use the 
             given execution context.  '''
-        print "!!",filename, id
         if state!=None:
             state=json.loads(state)
         else:
@@ -65,25 +64,36 @@ class LoncapaProblem():
         
         g={'random':random,'numpy':numpy,'math':math,'scipy':scipy}
 
+        # Buffer stores HTML for problem
         buf=StringIO.StringIO()
         
         ot=False ## Are we in an outtext context? 
 
+        # Loop through the nodes of the problem, and 
         for e in dom.childNodes:
+            print e, ot
+            #
             if e.localName=='script':
+                print e.childNodes[0].data
                 exec e.childNodes[0].data in g,self.context
-            if e.localName=='endouttext':
+            elif e.localName=='endouttext':
                 ot=False
-            if ot:
+            elif ot:
+                print e, "::", e.toxml()
                 e.writexml(buf)
-            if e.localName=='startouttext':
+            elif e.localName=='startouttext':
                 ot=True
-            if e.localName in self.handlers:
+            elif e.localName in self.handlers:
                 problem=self.handlers[e.localName](self,e)
                 buf.write(problem)
+            elif e.localName==None:
+                pass
+            else: 
+                raise Exception("ERROR: UNRECOGNIZED XML"+e.localName)
 
         self.text=buf.getvalue()
         self.text=self.contextualize_text(self.text)
+        print self.text
         self.filename=filename
 
     done=False

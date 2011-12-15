@@ -49,7 +49,7 @@ class LoncapaModule(XModule):
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
         return html
 
-    def get_js(self):
+    def get_init_js(self):
         return ""
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
