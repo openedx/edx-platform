@@ -17,10 +17,10 @@ class LoncapaProblem():
         ''' Stored per-user session data neeeded to: 
             1) Recreate the problem
             2) Populate any student answers. '''
-        return json.dumps({'seed':self.seed, 
-                           'answers':self.answers,
-                           'correct_map':self.correct_map, 
-                           'done':self.done})
+        return {'seed':self.seed, 
+                'answers':self.answers,
+                'correct_map':self.correct_map, 
+                'done':self.done}
 
     def get_score(self):
         correct=0
@@ -44,9 +44,7 @@ class LoncapaProblem():
             seed will provide the random seed. Alternatively, passing
             context will bypass all script execution, and use the 
             given execution context.  '''
-        if state!=None:
-            state=json.loads(state)
-        else:
+        if state==None:
             state={}
         self.gid=id
 

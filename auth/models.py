@@ -11,7 +11,7 @@ class UserProfile(models.Model):
     language = models.TextField(blank=True)
     location = models.TextField(blank=True)
     meta = models.TextField(blank=True) # JSON dictionary for future expansion
-    courseware = models.TextField(blank=True)
+    courseware = models.TextField(blank=True, default='courseware.xml')
 
 class Registration(models.Model):
     ''' Allows us to wait for e-mail before user is registered. A

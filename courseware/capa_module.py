@@ -25,13 +25,15 @@ class LoncapaModule(XModule):
     xml_tags = ["problem"]
     id_attribute = "filename"
 
-    attempts = None
+    attempts = 0
     max_attempts = None
 
     due_date = None
 
     def get_state(self):
-        return self.lcp.get_state()
+        state = self.lcp.get_state()
+        state['attempts'] = self.attempts
+        return json.dumps(state)
 
     def get_score(self):
         return self.lcp.get_score()
@@ -56,14 +58,34 @@ class LoncapaModule(XModule):
         content={'name':self.name, 
                  'html':html}
         closed = False
+
         if self.lcp.done:
             check_button="Reset"
         else:
             check_button="Check"
+
+        save_button = True
+
+        if self.max_attempts == None:
+            pass
+        elif self.max_attempts == self.attempts: 
+            save_button = False
+            check_button = False
+        else:
+            check_button = check_button + \
+                " ({a}/{m})".format(a=self.attempts, m=self.max_attempts)
+
+        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
+            save_button = False
+            check_button = False
+            results = True
+
+
         html=render_to_string('problem.html', 
                               {'problem':content, 
                                'id':self.filename, 
                                'check_button':check_button,
+                               'save_button':save_button,
                                'ajax_url':self.ajax_url,
                                })
         if encapsulate:
@@ -88,6 +110,11 @@ class LoncapaModule(XModule):
         else:
             self.max_attempts=None
 
+        if state!=None:
+            state=json.loads(state)
+        if state!=None and 'attempts' in state:
+            self.attempts=state['attempts']
+
         self.filename=node.getAttribute("filename")
         filename=settings.DATA_DIR+self.filename+".xml"
         self.name=node.getAttribute("name")
@@ -102,6 +129,8 @@ class LoncapaModule(XModule):
             response = self.check_problem(get)
         elif dispatch=='problem_reset':
             response = self.reset_problem(get)
+        elif dispatch=='problem_save':
+            response = self.save_problem(get)
         else: 
             return "Error"
         return response
@@ -116,19 +145,47 @@ class LoncapaModule(XModule):
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and returns
             a map of correct/incorrect answers '''
+        if self.attempts == self.max_attempts:
+            return "Too many attempts. You shouldn't be here."
+
+        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
+            return "Too late. problem was due."
+            
+        self.attempts = self.attempts + 1
         self.lcp.done=True
-        answer=dict()
+        answers=dict()
         # input_resistor_1 ==> resistor_1
         for key in get:
-            answer['_'.join(key.split('_')[1:])]=get[key]
+            answers['_'.join(key.split('_')[1:])]=get[key]
 
-        js=json.dumps(self.lcp.grade_answers(answer))
+        js=json.dumps(self.lcp.grade_answers(answers))
 
         return js
+
+    def save_problem(self, get):
+        if self.attempts == self.max_attempts:
+            return "Too many attempts. You shouldn't be here."
+
+        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
+            return "Too late. problem was due."
+            
+        answers=dict()
+        for key in get:
+            answers['_'.join(key.split('_')[1:])]=get[key]
+        
+        self.lcp.answers=answers
+
+        return json.dumps({'success':True})
 
     def reset_problem(self, get):
         ''' Changes problem state to unfinished -- removes student answers, 
             and causes problem to rerender itself. '''
+        if self.attempts == self.max_attempts:
+            return "Too many attempts. You shouldn't be here."
+
+        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
+            return "Too late. problem was due."
+            
         self.lcp.done=False
         self.lcp.answers=dict()
         self.lcp.context=dict()

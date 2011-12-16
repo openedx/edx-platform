@@ -92,9 +92,7 @@ def render_x_module(request, xml_module):
     # Check if problem has an instance in DB
     module_type=xml_module.nodeName
     module_class=modx_modules[module_type]
-    print "mida",module_class.id_attribute
     module_id=xml_module.getAttribute(module_class.id_attribute)
-    print "mid",module_id
 
     # Grab state from database
     s = StudentModule.objects.filter(student=request.user, 
