@@ -1,4 +1,4 @@
-// CRITICAL TODO: Namespace
+// IMPORTANT TODO: Namespace
 
 var ${ id }contents=["",
  %for t in items:
@@ -7,19 +7,27 @@ var ${ id }contents=["",
  ""
        ];
 
-var ${ id }functions=["",
+var ${ id }init_functions=["",
  %for t in items:
 	       function(){ ${t[1]['init_js']} }, 
  %endfor
 	       ""];
 
-var ${ id }loc;
+var ${ id }destroy_functions=["",
+ %for t in items:
+	       function(){ ${t[1]['destroy_js']} }, 
+ %endfor
+	       ""];
+
+var ${ id }loc = -1;
 
 function ${ id }goto(i) {
     // TODO: 
     //    ${ id }contents[${ id }loc] = $('#content').html();
+    if (${ id }loc!=-1)
+	${ id }init_functions[ ${ id }loc ]();
     $('#content').html(${ id }contents[i]);
-    ${ id }functions[i]()
+    ${ id }init_functions[i]()
 	       $('#tt_'+${ id }loc).attr("style", "background-color:grey");
     ${ id }loc=i;
     $('#tt_'+i).attr("style", "background-color:red");
