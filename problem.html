@@ -25,6 +25,7 @@
         // Possible cleanup: Move from getJSON to just load
         $.getJSON('/modx/problem/${ id }/problem_reset', {'id':'${ id }'}, function(json) {
            $('#main_${ id }').html(json);
+           MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
         });
       }
     });

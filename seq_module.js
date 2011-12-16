@@ -16,9 +16,13 @@ var ${ id }functions=["",
 var ${ id }loc;
 
 function ${ id }goto(i) {
+    // TODO: 
+    //    ${ id }contents[${ id }loc] = $('#content').html();
     $('#content').html(${ id }contents[i]);
     ${ id }functions[i]()
+	       $('#tt_'+${ id }loc).attr("style", "background-color:grey");
     ${ id }loc=i;
+    $('#tt_'+i).attr("style", "background-color:red");
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 }
 
@@ -27,15 +31,15 @@ function ${ id }setup_click(i) {
 }
 
 function ${ id }next() { 
-    ${ id }loc=${ id }loc+1;
-    if(${ id }loc> ${ len(items) } ) ${ id }loc=${ len(items) };
-    ${ id }goto(${ id }loc);
+    var i=${ id }loc+1;
+    if(i > ${ len(items) } ) i = ${ len(items) };
+    ${ id }goto(i);
 }
 
 function ${ id }prev() { 
-    ${ id }loc=${ id }loc-1;
-    if(${ id }loc<1) ${ id }loc=1;
-    ${ id }goto(${ id }loc);
+    var i=${ id }loc-1;
+    if (i < 1 ) i = 1;
+    ${ id }goto(i);
 }
 
 $(function() {
