@@ -78,6 +78,7 @@ def seq_module(request, module):
                 "destroy_js":"",
                 'content':render_to_string('seq_module.html',params)}
     if module.nodeName == 'tab':
+        params['id'] = 'tab'
         return {'init_js':js+render_to_string('tab_module.js',params),
                 "destroy_js":"",
                 'content':render_to_string('tab_module.html',params)}
