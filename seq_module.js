@@ -19,6 +19,7 @@ function ${ id }goto(i) {
     $('#content').html(${ id }contents[i]);
     ${ id }functions[i]()
     ${ id }loc=i;
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 }
 
 function ${ id }setup_click(i) {
