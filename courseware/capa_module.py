@@ -30,7 +30,19 @@ class LoncapaModule(XModule):
     def max_score(self):
         return len(self.lcp.questions)
 
-    def get_html(self, encapsulate=True):
+    def get_html(self):
+        return render_to_string('problem_ajax.html', 
+                              {'id':self.filename, 
+                               'ajax_url':self.ajax_url,
+                               })
+
+    def get_init_js(self):
+        return render_to_string('problem.js', 
+                              {'id':self.filename, 
+                               'ajax_url':self.ajax_url,
+                               })
+
+    def get_problem_html(self, encapsulate=True):
         html = self.lcp.get_html()
         content={'name':self.name, 
                  'html':html}
@@ -47,10 +59,8 @@ class LoncapaModule(XModule):
                                })
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
+            
         return html
-
-    def get_init_js(self):
-        return ""
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
@@ -63,17 +73,25 @@ class LoncapaModule(XModule):
 
     def handle_ajax(self, dispatch, get):
         if dispatch=='problem_check': 
-            html = self.check_problem(get)
+            response = self.check_problem(get)
         elif dispatch=='problem_reset':
-            html = self.reset_problem(get)
+            response = self.reset_problem(get)
+        elif dispatch=='problem_get':
+            response = self.get_problem(get)
         else: 
             return "Error"
-        return html
+        return response
 
 
-    # Temporary -- move to capa_problem
+    # Figure out if we should move these to capa_problem?
+    def get_problem(self, get):
+        ''' Same as get_problem_html -- if we want to reconfirm we have the right 
+            thing e.g. after several AJAX calls. '''
+        return self.get_problem_html(encapsulate=False)        
 
     def check_problem(self, get):
+        ''' Checks whether answers to a problem are correct, and returns
+            a map of correct/incorrect answers '''
         self.lcp.done=True
         answer=dict()
         # input_resistor_1 ==> resistor_1
@@ -85,6 +103,8 @@ class LoncapaModule(XModule):
         return js
 
     def reset_problem(self, get):
+        ''' Changes problem state to unfinished -- removes student answers, 
+            and causes problem to rerender itself. '''
         self.lcp.done=False
         self.lcp.answers=dict()
         self.lcp.context=dict()
@@ -92,9 +112,6 @@ class LoncapaModule(XModule):
         self.lcp.answers=dict()   # Student answers
         self.lcp.correct_map=dict()
         self.lcp.seed=None
-        # Minor cleanup would be nice
-        # We recreate the capa_problem on a reset
         filename=settings.DATA_DIR+self.filename+".xml"
         self.lcp=LoncapaProblem(filename, self.item_id, self.lcp.get_state())
-#        self.lcp.__init__(filename, self.item_id, self.lcp.get_state())
-        return json.dumps(self.get_html(encapsulate=False))
+        return json.dumps(self.get_problem_html(encapsulate=False))

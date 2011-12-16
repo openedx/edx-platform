@@ -188,7 +188,7 @@ def render_x_module(request, xml_module):
     return content
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic module for extensions. This handles AJAX. '''
+    ''' Generic module for extensions. '''
     s = StudentModule.objects.filter(module_type=module, student=request.user, module_id=id)
     if len(s) == 0:
         raise Http404
@@ -229,7 +229,8 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     if not request.user.is_authenticated():
         return redirect('/')
 
-    # Fix URLs
+    # Fixes URLs -- we don't get funny encoding characters from spaces
+    # so they remain readable
     course=course.replace("_"," ")
     chapter=chapter.replace("_"," ")
     section=section.replace("_"," ")
