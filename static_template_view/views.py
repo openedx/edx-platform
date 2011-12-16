@@ -6,7 +6,7 @@
 from djangomako.shortcuts import render_to_response, render_to_string
 from django.shortcuts import redirect
 
-valid_templates=['index.html', 'staff.html', 'info.html']
+valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
 
 def index(request, template): 
     if template in valid_templates:

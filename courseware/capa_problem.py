@@ -1,4 +1,5 @@
 import random, numpy, math, scipy, sys, StringIO, os, struct, json
+from dateutil import parser
 
 from xml.dom.minidom import parse, parseString
 
@@ -198,6 +199,7 @@ class LoncapaProblem():
         return html
 
     def grade_fr(self, question, answer):
+        print question, answer
         correct = True
         for i in range(question['samples_count']):
             instructor_variables = strip_dict(dict(self.context))
@@ -208,6 +210,9 @@ class LoncapaProblem():
                 student_variables[str(var)] = value
             instructor_result = evaluator(instructor_variables,{},str(question['answer']))
             student_result = evaluator(student_variables,{},str(answer))
+            print student_result, instructor_result
+            if math.isnan(student_result) or math.isinf(student_result):
+                return "incorrect"
             if abs( student_result - instructor_result ) > question['tolerance']:
                 return "incorrect"
  

@@ -6,6 +6,10 @@ from x_module import XModule
 
 from capa_problem import LoncapaProblem
 
+import dateutil
+import datetime
+
+
 from xml.dom.minidom import parse, parseString
 
 ## TODO: Abstract out from Django
@@ -18,8 +22,13 @@ class LoncapaModule(XModule):
     prupose now. We can e.g .destroy and create the capa_problem on a
     reset. 
     '''
-    xml_tags=["problem"]
-    id_attribute="filename"
+    xml_tags = ["problem"]
+    id_attribute = "filename"
+
+    attempts = None
+    max_attempts = None
+
+    due_date = None
 
     def get_state(self):
         return self.lcp.get_state()
@@ -66,18 +75,33 @@ class LoncapaModule(XModule):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
         dom=parseString(xml)
         node=dom.childNodes[0]
+
+        self.due_date=node.getAttribute("due")
+        if len(self.due_date)>0:
+            self.due_date=dateutil.parser.parse(self.due_date)
+        else:
+            self.due_date=None
+            
+        self.max_attempts=node.getAttribute("attempts")
+        if len(self.max_attempts)>0:
+            self.max_attempts=int(self.max_attempts)
+        else:
+            self.max_attempts=None
+
         self.filename=node.getAttribute("filename")
         filename=settings.DATA_DIR+self.filename+".xml"
         self.name=node.getAttribute("name")
         self.lcp=LoncapaProblem(filename, self.item_id, state)
 
     def handle_ajax(self, dispatch, get):
-        if dispatch=='problem_check': 
+        if dispatch=='problem_get':
+            response = self.get_problem(get)
+        elif False: #self.due_date > 
+            return json.dumps({"error":"Past due date"})
+        elif dispatch=='problem_check': 
             response = self.check_problem(get)
         elif dispatch=='problem_reset':
             response = self.reset_problem(get)
-        elif dispatch=='problem_get':
-            response = self.get_problem(get)
         else: 
             return "Error"
         return response

@@ -1,6 +1,3 @@
-# For calculator: 
-# http://pyparsing.wikispaces.com/file/view/fourFn.py
-
 from x_module import XModule
 
 from xml.dom.minidom import parse, parseString
@@ -12,10 +9,6 @@ from django.conf import settings
 from djangomako.shortcuts import render_to_response, render_to_string
 
 class VideoModule(XModule):
-    ''' Implements a generic learning module. 
-        Initialized on access with __init__, first time with state=None, and
-        then with state
-    '''
     id_attribute = 'youtube'
     video_time = 0
 
@@ -31,12 +24,8 @@ class VideoModule(XModule):
 
     def get_xml_tags():
         ''' Tags in the courseware file guaranteed to correspond to the module '''
-        return "video1"
+        return "video"
         
-    def get_id_attribute():
-        ''' An attribute in the XML scheme that is guaranteed unique. '''
-        return "youtube"
-
     def get_html(self):
         return render_to_string('video.html',{'id':self.item_id,
                                               'time':self.video_time})

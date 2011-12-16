@@ -29,6 +29,8 @@ import content_parser
 
 import uuid
 
+from module_render import *
+
 template_imports={'urllib':urllib}
 
 def profile(request):
@@ -97,131 +99,6 @@ def render_accordion(request,course,chapter,section):
                      template_imports.items())
     return {'init_js':render_to_string('accordion_init.js',context), 
             'content':render_to_string('accordion.html',context)}
-
-def html_module(request, module):
-    ''' Show basic text
-    '''
-    template_source=module.getAttribute('filename')
-    return {'content':render_to_string(template_source, {})}
-
-def vertical_module(request, module):
-    ''' Layout module which lays out content vertically. 
-    '''
-    contents=[(e.getAttribute("name"),render_module(request, e)) \
-              for e in module.childNodes \
-              if e.nodeType==1]
-    js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
-
-    return {'init_js':js, 
-            'content':render_to_string('vert_module.html',{'items':contents})}
-
-def seq_module(request, module):
-    ''' Layout module which lays out content in a temporal sequence
-    '''
-    def j(m): 
-        # jsonify contents so it can be embedded in a js array
-        # We also need to split </script> tags so they don't break
-        # mid-string
-        if 'init_js' not in m: m['init_js']=""
-        content=json.dumps(m['content']) 
-        content=content.replace('</script>', '<"+"/script>') 
-        return {'content':content, 'init_js':m['init_js']}
-    contents=[(e.getAttribute("name"),j(render_module(request, e))) \
-              for e in module.childNodes \
-              if e.nodeType==1]
-     
-    js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
-
-    iid=uuid.uuid1().hex
-
-    params={'items':contents,
-            'id':"seq"}
-
-    print module.nodeName
-    if module.nodeName == 'sequential':
-        return {'init_js':js+render_to_string('seq_module.js',params),
-                'content':render_to_string('seq_module.html',params)}
-    if module.nodeName == 'tab':
-        return {'init_js':js+render_to_string('tab_module.js',params),
-                'content':render_to_string('tab_module.html',params)}
-
-
-modx_modules={'problem':capa_module.LoncapaModule, 'video':video_module.VideoModule}
-
-def render_x_module(request, xml_module):
-    ''' Generic module for extensions. This renders to HTML. '''
-    # Check if problem has an instance in DB
-    module_type=xml_module.nodeName
-    module_class=modx_modules[module_type]
-    module_id=xml_module.getAttribute(module_class.id_attribute)
-    
-    # Grab state from database
-    s = StudentModule.objects.filter(student=request.user, 
-                                     module_id=module_id, 
-                                     module_type = module_type)
-    if len(s) == 0: # If nothing in the database...
-        state=None
-    else:
-        smod = s[0]
-        state = smod.state
-
-    # Create a new instance
-    ajax_url = '/modx/'+module_type+'/'+module_id+'/'
-    instance=module_class(xml_module.toxml(), 
-                          module_id, 
-                          ajax_url=ajax_url,
-                          state=state)
-    
-    # If instance wasn't already in the database, create it
-    if len(s) == 0:
-        smod=StudentModule(student=request.user, 
-                           module_type = module_type,
-                           module_id=module_id, 
-                           state=instance.get_state(), 
-                           xml=instance.xml)
-    # Grab content
-    content = {'content':instance.get_html(), 
-               'init_js':instance.get_init_js()}
-
-    smod.save() # This may be optional (at least in the case of no instance in the dB)
-
-    return content
-
-def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic module for extensions. '''
-    s = StudentModule.objects.filter(module_type=module, student=request.user, module_id=id)
-    if len(s) == 0:
-        raise Http404
-
-    s=s[0]
-
-    dispatch=dispatch.split('?')[0]
-
-    ajax_url = '/modx/'+module+'/'+id+'/'
-
-    instance=modx_modules[module](s.xml, s.module_id, ajax_url=ajax_url, state=s.state)
-    html=instance.handle_ajax(dispatch, request.GET)
-    s.state=instance.get_state()
-    s.grade=instance.get_score()['score']
-    s.save()
-    return HttpResponse(html)
-
-module_types={'video':render_x_module,
-              'html':html_module,
-              'tab':seq_module,
-              'vertical':vertical_module,
-              'sequential':seq_module,
-              'problem':render_x_module,
-              }
-                  #'lab':lab_module,
-
-def render_module(request, module):
-    ''' Generic dispatch for internal modules. '''
-    if module==None:
-        return {"content":""}
-    if str(module.localName) in module_types:
-        return module_types[module.localName](request, module)
-    return {"content":""}
 
 def index(request, course="6.002 Spring 2012", chapter="Using the System", section="Hints"): 
     ''' Displays courseware accordion, and any associated content. 
