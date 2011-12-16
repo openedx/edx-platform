@@ -98,30 +98,11 @@ def render_accordion(request,course,chapter,section):
     return {'init_js':render_to_string('accordion_init.js',context), 
             'content':render_to_string('accordion.html',context)}
 
-def video_mod(request, module):
-    ''' Shows a video, with subtitles. 
-        OBSOLETE. Remove once x_module version confirmed
-    '''
-    id=module.getAttribute('youtube')
-    return {'init_js':render_to_string('video_init.js',{'id':id}), 
-            'content':render_to_string('video.html',{'id':id})}
-
 def html_module(request, module):
     ''' Show basic text
     '''
     template_source=module.getAttribute('filename')
     return {'content':render_to_string(template_source, {})}
-
-def tab_module(request, module):
-    ''' Layout module which lays out content in tabs.  
-    '''
-    contents=[(e.getAttribute("name"),render_module(request, e)) \
-              for e in module.childNodes \
-              if e.nodeType==1]
-    js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
-
-    return {'init_js':render_to_string('tab_module.js',{'tabs':contents})+js, 
-            'content':render_to_string('tab_module.html',{'tabs':contents})}
 
 def vertical_module(request, module):
     ''' Layout module which lays out content vertically. 
