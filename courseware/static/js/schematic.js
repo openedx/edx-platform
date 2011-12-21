@@ -15,29 +15,30 @@
 //   height -- height in pixels of diagram
 //   parts -- comma-separated list of parts for parts bin (see parts_map)
 
+// JSON schematic representation:
+//  sch :=  [part, part, ...]
+//  part := [type, coords, properties, connections]
+//  type := string (see parts_map)
+//  coords := [number, ...]  // (x,y,rot) or (x1,y1,x2,y2)
+//  properties := {name: value, ...}
+//  connections := [node, ...]   // one per connection point in canoncial order
+//  node := string
+
 // TO DO:
 
-// - read initial diagram from value of hidden input field
-// - write diagram state into value of hidden input field
+// - draggable overlay window base class (dialogs, scope, ...)
 // - wire labels?
 // - devices: diode, nfet, pfet, opamp, scope probe
 // - icons for test equipment? (scope, sig gen, counter, ...)
 
+// - zoom/scroll canvas
+// - freeze_diagram, freeze_properties attributes (freeze certain components/properties?)
 // - rotate multiple objects around their center of mass
 // - rubber band wires when moving components
-// - add help messages/tooltips
-// - tool bar (zoom in/zoom out, rotate, mode: wire/select, save/restore, simulate, help)
-// - scroll canvas
-// - freeze_diagram, freeze_properties attributes (freeze certain components/properties?)
-// - add thumb to resize work area
 
-// - label nodes, extract component netlist
 // - simulation: operating points, trans, ac analysis, sweeps?
-// - how to integrate plot display? 
 
-// add ourselves to the tasks that get performed when window is loaded
-window.onload = add_schematic_handler(window.onload);
-
+// set up each schematic entry widget
 function update_schematics() {
     // set up each schematic on the page
     var schematics = document.getElementsByClassName('schematic');
@@ -48,27 +49,37 @@ function update_schematics() {
 	}
 }
 
+// add ourselves to the tasks that get performed when window is loaded
 function add_schematic_handler(other_onload) {
     return function() {
 	// execute othe onload functions first
 	if (other_onload) other_onload();
-	
+
 	update_schematics();
     }
 }
+window.onload = add_schematic_handler(window.onload);
 
-background_style = 'rgb(200,255,200)';
+background_style = 'rgb(220,220,220)';
 element_style = 'rgb(255,255,255)';
+thumb_style = 'rgb(128,128,128)';
+normal_style = 'rgb(0,0,0)';  // color for unselected components
+selected_style = 'rgb(64,255,64)';  // highlight color for selected components
+grid_style = "rgb(128,128,128)";
 
 // list of all the defined parts
 parts_map = {
-    'g': Ground,
-    'v': VSource,
-    'i': ISource,
-    'r': Resistor,
-    'c': Capacitor,
-    'l': Inductor,
+    'g': [Ground, 'Ground connection'],
+    'v': [VSource, 'Voltage source'],
+    'i': [ISource, 'Current source'],
+    'r': [Resistor, 'Resistor'],
+    'c': [Capacitor, 'Capacitor'],
+    'l': [Inductor, 'Inductor'],
 };
+
+// fix cursor bug in Chrome (default behavior: change to text cursor
+// whenever a drag is initiated).
+document.onselectstart = function() { return false; };
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -78,29 +89,30 @@ parts_map = {
 
 // setup a schematic by populating the <div> with the appropriate children
 function Schematic(input) {
-    var div = document.createElement('div');
+    this.div = document.createElement('div');
     // set up div so we can position elements inside of it
-    div.style.position = 'relative';
+    this.div.style.position = 'relative';
+    this.div.style.cursor = 'default';
 
-    // grab attributes from the <div> that created us
-    this.div = div;
     this.grid = 8;
-
     this.scale = 2;
     this.origin_x = 0;
     this.origin_y = 0;
+    this.clipboard = null;
 
     // start with a background element with normal positioning
     this.background = document.createElement('canvas');
     this.background.style.backgroundColor = background_style;
+    this.background.style.borderStyle = 'solid';
+    this.background.style.borderWidth = '2px';
 
     this.status_div = document.createElement('div');
-    this.status_div.style.borderStyle = 'solid';
-    this.status_div.style.borderWidth = '1px';
+    //this.status_div.style.borderStyle = 'solid';
+    //this.status_div.style.borderWidth = '1px';
     this.status_div.style.position = 'absolute';
     this.status_div.style.padding = '2px';
-    this.status_div.style.backgroundColor = element_style;
-    this.status = document.createTextNode('Ready.');
+    //this.status_div.style.backgroundColor = element_style;
+    this.status = document.createTextNode('');
     this.status_div.appendChild(this.status);
 
     this.connection_points = new Array();  // location string => list of cp's
@@ -111,17 +123,26 @@ function Schematic(input) {
     this.canvas.tabIndex = 1; // so we get keystrokes
     this.canvas.style.borderStyle = 'solid';
     this.canvas.style.borderWidth = '1px';
+    this.canvas.style.borderColor = grid_style;
     this.canvas.style.position = 'absolute';
+    this.canvas.style.outline = 'none';
 
     this.canvas.schematic = this;
-    this.canvas.addEventListener('mousemove',this.mouse_move,false);
-    this.canvas.addEventListener('mouseover',this.mouse_enter,false);
-    this.canvas.addEventListener('mouseout',this.mouse_leave,false);
-    this.canvas.addEventListener('mousedown',this.mouse_down,false);
-    this.canvas.addEventListener('mouseup',this.mouse_up,false);
-    this.canvas.addEventListener('dblclick',this.double_click,false);
-    this.canvas.addEventListener('keydown',this.key_down,false);
-    this.canvas.addEventListener('keypress',this.key_press,false);
+    this.canvas.addEventListener('mousemove',schematic_mouse_move,false);
+    this.canvas.addEventListener('mouseover',schematic_mouse_enter,false);
+    this.canvas.addEventListener('mouseout',schematic_mouse_leave,false);
+    this.canvas.addEventListener('mousedown',schematic_mouse_down,false);
+    this.canvas.addEventListener('mouseup',schematic_mouse_up,false);
+    this.canvas.addEventListener('dblclick',schematic_double_click,false);
+    this.canvas.addEventListener('keydown',schematic_key_down,false);
+    this.canvas.addEventListener('keypress',schematic_key_press,false);
+
+    // toolbar
+    this.tools = new Array();
+    this.toolbar = [];
+    this.tools['cut'] = this.add_tool(cut_icon,'Cut: move selected components from diagram to the clipboard',this.cut);
+    this.tools['copy'] = this.add_tool(copy_icon,'Copy: copy selected components into the clipboard',this.copy);
+    this.tools['paste'] = this.add_tool(paste_icon,'Paste: copy clipboard into the diagram',this.paste);
 
     // make the canvas "clickable" by registering a dummy click handler
     // this should make things work on the iPad
@@ -153,17 +174,20 @@ function Schematic(input) {
     this.parts_bin = [];
     for (var i = 0; i < parts.length; i++) {
 	var part = new Part(this);
-	part.set_component(new parts_map[parts[i]](part,0,0,0));
+	var pm = parts_map[parts[i]];
+	part.set_component(new pm[0](part,0,0,0),pm[1]);
 	this.parts_bin.push(part);
     }
 
     // add all elements to the DOM
-    div.appendChild(this.background);
-    div.appendChild(this.canvas);
-    div.appendChild(this.status_div);
+    this.div.appendChild(this.background);
+    for (var i = 0; i < this.toolbar.length; i++)
+	this.div.appendChild(this.toolbar[i]);
+    this.div.appendChild(this.canvas);
+    this.div.appendChild(this.status_div);
     for (var i = 0; i < this.parts_bin.length; i++)
-	div.appendChild(this.parts_bin[i].canvas);
-    input.parentNode.insertBefore(div,input.nextSibling);
+	this.div.appendChild(this.parts_bin[i].canvas);
+    input.parentNode.insertBefore(this.div,input.nextSibling);
 
     // make sure other code can find us!
     input.schematic = this;
@@ -173,13 +197,56 @@ function Schematic(input) {
     var w = parseInt(input.getAttribute('width'));
     var h = parseInt(input.getAttribute('height'));
     this.set_locations(w,h);
+
+    // process initial contents of diagram
+    this.load_schematic(this.input.value);
+}
+
+
+Schematic.prototype.load_schematic = function(value) {
+    if (value) {
+	// convert string value into data structure
+	var json = JSON.parse(value);
+
+	// top level is a list of components
+	for (var i = json.length - 1; i >= 0; --i) {
+	    var c = json[i];
+	    if (c[0] == 'view') {
+		// special hack: view component lets us recreate view
+		this.origin_x = c[1];
+		this.origin_y = c[2];
+		this.scale = c[3];
+	    } else if (c[0] == 'w') {
+		// wire
+		this.add_wire(c[1][0],c[1][1],c[1][2],c[1][3]);
+	    } else {
+		// ordinary component
+		//  c := [type, coords, properties, connections]
+		var type = c[0];
+		var coords = c[1];
+		var properties = c[2];
+
+		// make the part
+		var part = new parts_map[type][0](this,coords[0],coords[1],coords[2]);
+
+		// give it its properties
+		for (var name in properties)
+		    part.properties[name] = properties[name];
+
+		// add component to the diagram
+		this.add_component(part);
+	    }
+	}
+
+	// see what we've got!
+	this.redraw_background();
+    }
 }
 
 background_margin = 5;
-part_w = 56;   // size of a parts bin compartment
-part_h = 56;
+part_w = 42;   // size of a parts bin compartment
+part_h = 42;
 status_height = 18;
-thumb_style = 'rgb(128,128,128)';
 
 // w,h are the dimensions of the canvas, everyone else is positioned accordingly
 Schematic.prototype.set_locations = function(w,h) {
@@ -197,33 +264,48 @@ Schematic.prototype.set_locations = function(w,h) {
     this.max_x = w/this.scale;
     this.max_y = h/this.scale;
 
+    var left = 2*background_margin;   // space to the left
+
+    // start with tool bar
+    var top = background_margin;
+    if (this.toolbar.length > 0) {
+	tool_left = left;
+	for (var i = 0; i < this.toolbar.length; i++) {
+	    var img = this.toolbar[i];
+	    img.style.left = tool_left + 'px';
+	    img.style.top = top + 'px';
+	    tool_left += 24;   // width + 2*padding + 2*border + gap
+	}
+	top += 27;  // height + 2*padding + 2*border + gap;
+    }
+
     // configure canvas
-    this.canvas.style.left = background_margin + 'px';
-    this.canvas.style.top = background_margin + 'px';
+    this.canvas.style.left = left + 'px';
+    this.canvas.style.top = top + 'px';
     this.canvas.width = w;
     this.canvas.height = h;
     this.redraw_background();   // redraw diagram
 
     // configure status bar
-    this.status_div.style.left = background_margin + 'px';
+    this.status_div.style.left = left + 'px';
     this.status_div.style.top = this.canvas.offsetTop + this.canvas.offsetHeight + 3 + 'px';
     this.status_div.style.width = (w - 4) + 'px';   // subtract interior padding
     this.status_div.style.height = status_height + 'px';
 
     // configure parts bin
     var total_w = this.canvas.offsetLeft + this.canvas.offsetWidth;
-    var parts_left = total_w + 3;
-    var parts_top = background_margin;
+    var parts_left = total_w + 5;
+    var parts_top = top;
     var parts_h_limit = this.canvas.offsetTop + this.canvas.offsetHeight;
     for (var i = 0; i < this.parts_bin.length; i++) {
 	var part = this.parts_bin[i];
 	part.set_location(parts_left,parts_top);
 
 	total_w = part.right();
-	parts_top = part.bottom()-1;
+	parts_top = part.bottom() + 2;
 	if (parts_top + part_h > parts_h_limit) {
 	    parts_left = total_w - 1;
-	    parts_top = background_margin;
+	    parts_top = top;
 	}
     }
 
@@ -249,10 +331,63 @@ Schematic.prototype.set_locations = function(w,h) {
     */
 }
 
+// label all the nodes in the circuit
+Schematic.prototype.label_connection_points = function() {
+    // start by clearing all the connection point labels
+    for (var i = this.components.length - 1; i >=0; --i)
+	this.components[i].clear_labels();
+
+    // components are in charge of labeling their unlabeled connections.
+    // labels given to connection points will propagate to coincident connection
+    // points and across Wires.
+
+    // let special components like GND label their connection(s)
+    for (var i = this.components.length - 1; i >=0; --i)
+	this.components[i].add_default_labels();
+
+    // now have components generate labels for unlabeled connections
+    this.next_label = 0;
+    for (var i = this.components.length - 1; i >=0; --i)
+	this.components[i].label_connections();
+}
+
+// generate a new label
+Schematic.prototype.get_next_label = function() {
+    // generate next label in sequence
+    this.next_label += 1;
+    return this.next_label.toString();
+}
+
+// propagate label to coincident connection points
+Schematic.prototype.propagate_label = function(label,location) {
+    var cplist = this.connection_points[location];
+    for (var i = cplist.length - 1; i >= 0; --i)
+	cplist[i].propagate_label(label);
+}
+
 // update the value field of our corresponding input field with JSON
 // representation of schematic
 Schematic.prototype.update_value = function() {
-    // to do: fill in this.input.value
+    // label connection points
+    this.label_connection_points();
+
+    // build JSON data structure, convert to string value for
+    // input field
+    this.input.value = JSON.stringify(this.json());
+}
+
+// produce a JSON representation of the diagram
+Schematic.prototype.json = function() {
+    var json = [];
+
+    // output all the components/wires in the diagram
+    for (var i = this.components.length - 1; i >=0; --i)
+	json.push(this.components[i].json());
+
+    // capture the current view parameters
+    json.push(['view',this.origin_x,this.origin_y,this.scale]);
+
+    return json;
 }
 
 Schematic.prototype.add_component = function(new_c) {
@@ -268,7 +403,7 @@ Schematic.prototype.remove_component = function(c) {
 
 // add connection point to list of connection points at that location
 Schematic.prototype.add_connection_point = function(cp) {
-    cplist = this.connection_points[cp.location]
+    var cplist = this.connection_points[cp.location];
     if (cplist) cplist.push(cp);
     else {
 	cplist = [cp];
@@ -332,6 +467,90 @@ Schematic.prototype.check_wires = function(c) {
     }
 }
 
+Schematic.prototype.unselect_all = function(which) {
+    for (var i = this.components.length - 1; i >= 0; --i)
+	if (i != which) this.components[i].set_select(false);
+}
+
+Schematic.prototype.drag_begin = function() {
+    // let components know they're about to move
+    for (var i = this.components.length - 1; i >= 0; --i) {
+	var component = this.components[i];
+	if (component.selected) component.move_begin();
+    }
+
+    // remember where drag started
+    this.drag_x = this.cursor_x;
+    this.drag_y = this.cursor_y;
+    this.dragging = true;
+}
+
+Schematic.prototype.drag_end = function() {
+    // let components know they're done moving
+    for (var i = this.components.length - 1; i >= 0; --i) {
+	var component = this.components[i];
+	if (component.selected) component.move_end();
+    }
+    this.dragging = false;
+}
+
+Schematic.prototype.cut = function() {
+    // clear previous contents
+    this.clipboard = [];
+
+    // look for selected components, move them to clipboard.
+    for (var i = this.components.length - 1; i >=0; --i) {
+	var c = this.components[i];
+	if (c.selected) {
+	    c.delete();
+	    this.clipboard.push(c);
+	}
+    }
+
+    // update diagram view
+    this.redraw();
+}
+
+Schematic.prototype.copy = function() {
+    // clear previous contents
+    this.clipboard = [];
+
+    // look for selected components, copy them to clipboard.
+    for (var i = this.components.length - 1; i >=0; --i) {
+	var c = this.components[i];
+	if (c.selected)
+	    this.clipboard.push(c.clone(this,c.x,c.y));
+    }
+}
+
+Schematic.prototype.paste = function() {
+    // compute left,top of bounding box for origins of
+    // components in the clipboard
+    var left = null;
+    var top = null;
+    for (var i = this.clipboard.length - 1; i >= 0; --i) {
+	var c = this.clipboard[i];
+	left = left ? Math.min(left,c.x) : left;
+	top = top ? Math.min(top,c.y) : top;
+    }
+
+    // clear current selections
+    this.unselect_all(-1);
+    this.redraw_background();  // so we see any components that got unselected
+
+    // make clones of components on the clipboard, positioning
+    // them relative to the cursor
+    for (var i = this.clipboard.length - 1; i >= 0; --i) {
+	var c = this.clipboard[i];
+	var new_c = c.clone(this,this.cursor_x + (c.x - left),this.cursor_y + (c.y - top));
+	this.add_component(new_c);
+	new_c.set_select(true);
+    }
+
+    // see what we've wrought
+    this.redraw();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  Drawing support -- deals with scaling and scrolling of diagrama
@@ -354,7 +573,7 @@ Schematic.prototype.redraw_background = function() {
     //c.strokeRect(0,0,this.width,this.height);
 
     // grid
-    c.strokeStyle = "rgb(128,128,128)";
+    c.strokeStyle = grid_style;
     var first_x = this.min_x;
     var last_x = this.max_x;
     var first_y = this.min_y;
@@ -381,10 +600,17 @@ Schematic.prototype.redraw = function() {
     c.drawImage(this.bg_image, 0, 0);
 
     // selected components
+    var selections = false;
     for (var i = this.components.length - 1; i >= 0; --i) {
 	var component = this.components[i];
-	if (component.selected) component.draw(c);
+	if (component.selected) {
+	    component.draw(c);
+	    selections = true;
+	}
     }
+    this.enable_tool('cut',selections);
+    this.enable_tool('copy',selections);
+    this.enable_tool('paste',this.clipboard);
 
     // connection points: draw one at each location
     for (var location in this.connection_points) {
@@ -475,7 +701,7 @@ HTMLCanvasElement.prototype.relMouseCoords = function(event){
 ////////////////////////////////////////////////////////////////////////////////
 
 // process special keys here since they don't get delivered correctly on keypress
-Schematic.prototype.key_down = function(event) {
+function schematic_key_down(event) {
     if (!event) event = window.event;
     var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
     var code = event.keyCode;
@@ -494,13 +720,14 @@ Schematic.prototype.key_down = function(event) {
 }
 
 // process normal characters
-Schematic.prototype.key_press = function(event) {
+function schematic_key_press(event) {
     if (!event) event = window.event;
     var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
     var code = window.event ? event.keyCode : event.charCode;
     var char = String.fromCharCode(code);
 
-    if (char == 'r' || char == 'R') {
+    // rotate
+    if (!event.control && !event.altKey && (char == 'r' || char == 'R')) {
 	// rotate
 	for (var i = sch.components.length - 1; i >= 0; --i) {
 	    var component = sch.components[i];
@@ -510,10 +737,33 @@ Schematic.prototype.key_press = function(event) {
 	event.preventDefault();
 	return false;
     }
+
+    // cut
+    if ((event.ctrlKey || event.altKey) && char == 'x') {
+	sch.cut();
+	event.preventDefault();
+	return false;
+    }
+
+    // copy
+    if ((event.ctrlKey || event.altKey) && char == 'c') {
+	sch.copy();
+	event.preventDefault();
+	return false;
+    }
+
+    // paste
+    if ((event.ctrlKey || event.altKey) && char == 'v') {
+	sch.paste();
+	event.preventDefault();
+	return false;
+    }
+
+
     return true;
 }
 
-Schematic.prototype.mouse_enter = function(event) {
+function schematic_mouse_enter(event) {
     if (!event) event = window.event;
     var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
 
@@ -540,21 +790,18 @@ Schematic.prototype.mouse_enter = function(event) {
     sch.drawCursor = true;
     sch.redraw();
     sch.canvas.focus();  // capture key strokes
+    return false;
 }
 
-Schematic.prototype.mouse_leave = function(event) {
+function schematic_mouse_leave(event) {
     if (!event) event = window.event;
     var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
     sch.drawCursor = false;
     sch.redraw();
+    return false;
 }
 
-Schematic.prototype.unselect_all = function(which) {
-    for (var i = this.components.length - 1; i >= 0; --i)
-	if (i != which) this.components[i].set_select(false);
-}
-
-Schematic.prototype.mouse_down = function(event) {
+function schematic_mouse_down(event) {
     if (!event) event = window.event;
     else event.preventDefault();
     var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
@@ -565,6 +812,14 @@ Schematic.prototype.mouse_down = function(event) {
     var y = sch.canvas.mouse_y/sch.scale + sch.origin_y;
     sch.cursor_x = Math.round(x/sch.grid) * sch.grid;
     sch.cursor_y = Math.round(y/sch.grid) * sch.grid;
+
+    /*
+    // for debugging... triggered by clicks in upper left corner
+    if (sch.cursor_x < 10 && sch.cursor_y < 10) {
+	sch.label_connection_points();
+	sch.append_message(JSON.stringify(sch.json()));
+    }
+    */
 
     // is mouse over a connection point?  If so, start dragging a wire
     var cplist = sch.connection_points[sch.cursor_x + ',' + sch.cursor_y];
@@ -598,9 +853,52 @@ Schematic.prototype.mouse_down = function(event) {
     }
 
     sch.redraw_background();
+    return false;
 }
 
-Schematic.prototype.mouse_up = function(event) {
+function schematic_mouse_move(event) {
+    if (!event) event = window.event;
+    var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
+
+    sch.canvas.relMouseCoords(event);
+    var x = sch.canvas.mouse_x/sch.scale + sch.origin_x;
+    var y = sch.canvas.mouse_y/sch.scale + sch.origin_y;
+    sch.cursor_x = Math.round(x/sch.grid) * sch.grid;
+    sch.cursor_y = Math.round(y/sch.grid) * sch.grid;
+
+    if (sch.wire) {
+	// update new wire end point
+	sch.wire[2] = sch.cursor_x;
+	sch.wire[3] = sch.cursor_y;
+    } else if (sch.dragging) {
+	// see how far we moved
+	var dx = sch.cursor_x - sch.drag_x;
+	var dy = sch.cursor_y - sch.drag_y;
+	if (dx != 0 || dy != 0) {
+	    // update position for next time
+	    sch.drag_x = sch.cursor_x;
+	    sch.drag_y = sch.cursor_y;
+
+	    // give all components a shot at processing the event
+	    for (var i = sch.components.length - 1; i >= 0; --i) {
+		var component = sch.components[i];
+		if (component.selected) component.move(dx,dy);
+	    }
+	}
+    } else if (sch.select_rect) {
+	// update moving corner of selection rectangle
+	sch.select_rect[2] = sch.canvas.mouse_x;
+	sch.select_rect[3] = sch.canvas.mouse_y;
+	//sch.message(sch.select_rect.toString());
+    }
+    
+    // just redraw dynamic components
+    sch.redraw();
+
+    return false;
+}
+
+function schematic_mouse_up(event) {
     if (!event) event = window.event;
     else event.preventDefault();
     var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
@@ -642,9 +940,10 @@ Schematic.prototype.mouse_up = function(event) {
 	sch.select_rect = null;
 	sch.redraw_background();
     }
+    return false;
 }
 
-Schematic.prototype.double_click = function(event) {
+function schematic_double_click(event) {
     if (!event) event = window.event;
     else event.preventDefault();
     var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
@@ -659,68 +958,8 @@ Schematic.prototype.double_click = function(event) {
     // see if we double-clicked a component.  If so, edit it's properties
     for (var i = sch.components.length - 1; i >= 0; --i)
 	if (sch.components[i].edit_properties(x,y)) break;
-}
 
-Schematic.prototype.drag_begin = function() {
-    // let components know they're about to move
-    for (var i = this.components.length - 1; i >= 0; --i) {
-	var component = this.components[i];
-	if (component.selected) component.move_begin();
-    }
-
-    // remember where drag started
-    this.drag_x = this.cursor_x;
-    this.drag_y = this.cursor_y;
-    this.dragging = true;
-}
-
-Schematic.prototype.drag_end = function() {
-    // let components know they're done moving
-    for (var i = this.components.length - 1; i >= 0; --i) {
-	var component = this.components[i];
-	if (component.selected) component.move_end();
-    }
-    this.dragging = false;
-}
-
-Schematic.prototype.mouse_move = function(event) {
-    if (!event) event = window.event;
-    var sch = (window.event) ? event.srcElement.schematic : event.target.schematic;
-
-    sch.canvas.relMouseCoords(event);
-    var x = sch.canvas.mouse_x/sch.scale + sch.origin_x;
-    var y = sch.canvas.mouse_y/sch.scale + sch.origin_y;
-    sch.cursor_x = Math.round(x/sch.grid) * sch.grid;
-    sch.cursor_y = Math.round(y/sch.grid) * sch.grid;
-
-    if (sch.wire) {
-	// update new wire end point
-	sch.wire[2] = sch.cursor_x;
-	sch.wire[3] = sch.cursor_y;
-    } else if (sch.dragging) {
-	// see how far we moved
-	var dx = sch.cursor_x - sch.drag_x;
-	var dy = sch.cursor_y - sch.drag_y;
-	if (dx != 0 || dy != 0) {
-	    // update position for next time
-	    sch.drag_x = sch.cursor_x;
-	    sch.drag_y = sch.cursor_y;
-
-	    // give all components a shot at processing the event
-	    for (var i = sch.components.length - 1; i >= 0; --i) {
-		var component = sch.components[i];
-		if (component.selected) component.move(dx,dy);
-	    }
-	}
-    } else if (sch.select_rect) {
-	// update moving corner of selection rectangle
-	sch.select_rect[2] = sch.canvas.mouse_x;
-	sch.select_rect[3] = sch.canvas.mouse_y;
-	//sch.message(sch.select_rect.toString());
-    }
-    
-    // just redraw dynamic components
-    sch.redraw();
+    return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -731,12 +970,10 @@ Schematic.prototype.mouse_move = function(event) {
 
 Schematic.prototype.message = function(message) {
     this.status.nodeValue = message;
-    this.recompute_height();
 }
 
 Schematic.prototype.append_message = function(message) {
     this.status.nodeValue += ' / '+message;
-    this.recompute_height();
 }
     
 // set up a dialog with specified title, content and two buttons at
@@ -825,6 +1062,85 @@ function dialog_okay(event) {
 
 ///////////////////////////////////////////////////////////////////////////////
 //
+//  Toolbar
+//
+////////////////////////////////////////////////////////////////////////////////
+
+Schematic.prototype.add_tool = function(icon,tip,callback) {
+    var img = document.createElement('img');
+    img.src = icon;
+    img.style.borderWidth = '1px';
+    img.style.borderStyle = 'solid';
+    img.style.borderColor = background_style;
+    img.style.position = 'absolute';
+    img.style.padding = '2px';
+
+    img.addEventListener('mouseover',tool_enter,false);
+    img.addEventListener('mouseout',tool_leave,false);
+    img.addEventListener('click',tool_click,false);
+
+    img.sch = this;
+    img.tip = tip;
+    img.callback = callback;
+    this.toolbar.push(img);
+
+    img.enabled = false;
+    img.style.opacity = 0.2;
+
+    return img;
+}
+
+Schematic.prototype.enable_tool = function(tname,which) {
+    var img = this.tools[tname];
+    img.style.opacity = which ? 1.0 : 0.2;
+    img.enabled = which;
+
+    // if disabling tool, remove border and tip
+    if (!which) {
+	img.style.borderColor = background_style;
+	img.sch.message('');
+    }
+}
+
+// highlight tool button by turning on border, changing background
+function tool_enter(event) {
+    if (!event) event = window.event;
+    var img = (window.event) ? event.srcElement : event.target;
+
+    if (img.enabled) {
+	img.style.borderColor = normal_style;
+	img.sch.message(img.tip);
+	img.opacity = 1.0;
+    }
+}
+
+// unhighlight tool button by turning off border, reverting to normal background
+function tool_leave(event) {
+    if (!event) event = window.event;
+    var img = (window.event) ? event.srcElement : event.target;
+
+    if (img.enabled) {
+	img.style.borderColor = background_style;
+	img.sch.message('');
+    }
+}
+
+// handle click on a tool
+function tool_click(event) {
+    if (!event) event = window.event;
+    var img = (window.event) ? event.srcElement : event.target;
+
+    if (img.enabled) img.callback.call(img.sch);
+}
+
+cut_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQu8MhJqz1g5qs7lxv2gRkQfuWomarXEgDRHjJhf3YtyRav0xcfcFgR0nhB5OwTAQA7';
+
+copy_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQ+8MhJ6wE4Wwqef9gmdV8HiKZJrCz3ecS7TikWfzExvk+M9a0a4MbTkXCgTMeoHPJgG5+yF31SLazsTMTtViIAOw==';
+
+paste_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAARL8MhJqwUYWJnxWp3GDcgAgCdQIqLKXmVLhhnyHiqpr7rME8AgocVDEB5IJHD0SyofBFzxGIQGAbvB0ZkcTq1CKK6z5YorwnR0w44AADs=';
+
+///////////////////////////////////////////////////////////////////////////////
+//
 //  Parts bin
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -839,13 +1155,17 @@ function Part(sch) {
     this.canvas = document.createElement('canvas');
     this.canvas.style.borderStyle = 'solid';
     this.canvas.style.borderWidth = '1px';
+    this.canvas.style.borderColor = background_style;
     this.canvas.style.position = 'absolute';
+    this.canvas.style.cursor = 'default';
     this.canvas.height = part_w;
     this.canvas.width = part_h;
     this.canvas.part = this;
 
-    this.canvas.addEventListener('mousedown',this.mouse_down,false);
-    this.canvas.addEventListener('mouseup',this.mouse_up,false);
+    this.canvas.addEventListener('mouseover',part_enter,false);
+    this.canvas.addEventListener('mouseout',part_leave,false);
+    this.canvas.addEventListener('mousedown',part_mouse_down,false);
+    this.canvas.addEventListener('mouseup',part_mouse_up,false);
 
     // make the part "clickable" by registering a dummy click handler
     // this should make things work on the iPad
@@ -865,16 +1185,17 @@ Part.prototype.bottom = function() {
     return this.canvas.offsetTop + this.canvas.offsetHeight;
 }
 
-Part.prototype.set_component = function(component) {
+Part.prototype.set_component = function(component,tip) {
     this.component = component;
+    this.tip = tip;
 
     // figure out scaling and centering of parts icon
     var b = component.bounding_box;
     var dx = b[2] - b[0];
     var dy = b[3] - b[1];
-    this.scale = 1; //Math.min(part_w/(1.2*dx),part_h/(1.2*dy));
-    this.origin_x = this.scale*(b[0] + dx/2.0) - part_w/2.0;
-    this.origin_y = this.scale*(b[1] + dy/2.0) - part_h/2.0;
+    this.scale = 0.8; //Math.min(part_w/(1.2*dx),part_h/(1.2*dy));
+    this.origin_x = b[0] + dx/2.0 - part_w/(2.0*this.scale);
+    this.origin_y = b[1] + dy/2.0 - part_h/(2.0*this.scale);
 
     this.redraw();
 }
@@ -883,7 +1204,7 @@ Part.prototype.redraw = function(part) {
     var c = this.canvas.getContext('2d');
 
     // paint background color
-    c.fillStyle = this.selected ? selected_style : element_style;
+    c.fillStyle = this.selected ? selected_style : background_style;
     c.fillRect(0,0,part_w,part_h);
 
     if (this.component) this.component.draw(c);
@@ -919,20 +1240,42 @@ Part.prototype.draw_text = function(c,text,x,y,size) {
     // no text displayed for the parts icon
 }
 
-Part.prototype.mouse_down = function(event) {
+function part_enter(event) {
+    if (!event) event = window.event;
+    var canvas = (window.event) ? event.srcElement : event.target;
+    var part = canvas.part;
+
+    canvas.style.borderColor = normal_style;
+    part.sch.message(part.tip+': drag onto diagram to insert');
+    return false;
+}
+
+function part_leave(event) {
+    if (!event) event = window.event;
+    var canvas = (window.event) ? event.srcElement : event.target;
+    var part = canvas.part;
+
+    canvas.style.borderColor = background_style;
+    part.sch.message('');
+    return false;
+}
+
+function part_mouse_down(event) {
     if (!event) event = window.event;
     var part = (window.event) ? event.srcElement.part : event.target.part;
 
     part.select(true);
     part.sch.new_part = part;
+    return false;
 }
 
-Part.prototype.mouse_up = function(event) {
+function part_mouse_up(event) {
     if (!event) event = window.event;
     var part = (window.event) ? event.srcElement.part : event.target.part;
 
     part.select(false);
     part.sch.new_part = null;
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -987,8 +1330,6 @@ function intersect(r1,r2) {
 ////////////////////////////////////////////////////////////////////////////////
 
 property_size = 5;  // point size for Component property text
-normal_style = 'rgb(0,0,0)';  // color for unselected components
-selected_style = 'rgb(64,255,64)';  // highlight color for selected components
 
 function Component(sch,x,y,rotation) {
     this.sch = sch;
@@ -1000,6 +1341,18 @@ function Component(sch,x,y,rotation) {
     this.bounding_box = [0,0,0,0];   // in device coords [left,top,right,bottom]
     this.bbox = this.bounding_box;   // in absolute coords
     this.connections = [];
+}
+
+Component.prototype.json = function() {
+    var props = {};
+    for (var p in this.properties) props[p] = this.properties[p];
+
+    var conns = [];
+    for (var i = 0; i < this.connections.length; i++)
+	conns.push(this.connections[i].json());
+
+    var json = [this.type,[this.x, this.y, this.rotation],props,conns];
+    return json;
 }
 
 Component.prototype.add_connection = function(offset_x,offset_y) {
@@ -1227,6 +1580,31 @@ Component.prototype.edit_properties = function(x,y) {
     } else return false;
 }
 
+// clear the labels on all connections
+Component.prototype.clear_labels = function() {
+    for (var i = this.connections.length - 1; i >=0; --i) {
+	this.connections[i].clear_label();
+    }
+}
+
+// default action: don't propagate label
+Component.prototype.propagate_label = function(label) {
+}
+
+// give components a chance to generate default labels for their connection(s)
+// default action: do nothing
+Component.prototype.add_default_labels = function() {
+}
+
+// component should generate labels for all unlabeled connections
+Component.prototype.label_connections = function() {
+    for (var i = this.connections.length - 1; i >=0; --i) {
+	var cp = this.connections[i];
+	if (!cp.label)
+	    cp.propagate_label(this.sch.get_next_label());
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Connection point
@@ -1241,10 +1619,34 @@ function ConnectionPoint(parent,x,y) {
     this.offset_y = y;
     this.location = '';
     this.update_location();
+    this.label = null;
 }
 
 ConnectionPoint.prototype.toString = function() {
     return '<ConnectionPoint ('+this.offset_x+','+this.offset_y+') '+this.parent.toString()+'>';
+}
+
+ConnectionPoint.prototype.json = function() {
+    return this.label;
+}
+
+ConnectionPoint.prototype.clear_label = function() {
+    this.label = null;
+}
+
+ConnectionPoint.prototype.propagate_label = function(label) {
+    // should we check if existing label is the same?  it should be...
+
+    if (this.label == null) {
+	// label this connection point
+	this.label = label;
+
+	// propagate label to coincident connection points
+	this.parent.sch.propagate_label(label,this.location);
+
+	// possibly label other cp's for this device?
+	this.parent.propagate_label(label);
+    }
 }
 
 ConnectionPoint.prototype.update_location = function() {
@@ -1306,6 +1708,11 @@ Wire.prototype.toString = function() {
     return '<Wire ('+this.x+','+this.y+') ('+(this.x+this.dx)+','+(this.y+this.dy)+')>';
 }
     
+Wire.prototype.json = function() {
+    var json = ['w',[this.x, this.y, this.x+this.dx, this.y+this.dy]];
+    return json;
+}
+
 Wire.prototype.draw = function(c) {
     this.draw_line(c,0,0,this.dx,this.dy);
 }
@@ -1367,6 +1774,18 @@ Wire.prototype.move_end = function() {
     this.sch.check_wires(this);
 }
 
+// wires "conduct" their label to the other end
+Wire.prototype.propagate_label = function(label) {
+    // don't worry about relabeling a cp, it won't recurse!
+    this.connections[0].propagate_label(label);
+    this.connections[1].propagate_label(label);
+}
+
+// some actual component will start the labeling of electrical nodes,
+// so do nothing here
+Wire.prototype.label_connections = function() {
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Ground
@@ -1378,6 +1797,7 @@ function Ground(sch,x,y,rotation) {
     this.add_connection(0,0);
     this.bounding_box = [-6,0,6,8];
     this.update_coords();
+    this.type = 'g';
 }
 Ground.prototype = new Component();
 Ground.prototype.constructor = Ground;
@@ -1395,6 +1815,12 @@ Ground.prototype.clone = function(sch,x,y) {
     return new Ground(sch,x,y,this.rotation);
 }
 
+// give components a chance to generate a label for their connection(s)
+// default action: do nothing
+Ground.prototype.add_default_labels = function() {
+    this.connections[0].propagate_label('0');   // canonical label for GND node
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Resistor
@@ -1409,6 +1835,7 @@ function Resistor(sch,x,y,rotation,name,r) {
     this.add_connection(0,48);
     this.bounding_box = [-4,0,4,48];
     this.update_coords();
+    this.type = 'r';
 }
 Resistor.prototype = new Component();
 Resistor.prototype.constructor = Resistor;
@@ -1451,6 +1878,7 @@ function Capacitor(sch,x,y,rotation,name,c) {
     this.add_connection(0,48);
     this.bounding_box = [-8,0,8,48];
     this.update_coords();
+    this.type = 'c';
 }
 Capacitor.prototype = new Component();
 Capacitor.prototype.constructor = Capacitor;
@@ -1488,6 +1916,7 @@ function Inductor(sch,x,y,rotation,name,l) {
     this.add_connection(0,48);
     this.bounding_box = [-4,0,5,48];
     this.update_coords();
+    this.type = 'l';
 }
 Inductor.prototype = new Component();
 Inductor.prototype.constructor = Inductor;
@@ -1568,7 +1997,7 @@ Source.prototype.clone = function(sch,x,y) {
 
 function VSource(sch,x,y,rotation,name,value) {
     Source.call(this,sch,x,y,rotation,name,'v',value);
-
+    this.type = 'v';
 }
 VSource.prototype = new Component();
 VSource.prototype.constructor = VSource;
@@ -1578,7 +2007,7 @@ VSource.prototype.clone = Source.prototype.clone;
 
 function ISource(sch,x,y,rotation,name,value) {
     Source.call(this,sch,x,y,rotation,name,'i',value);
-
+    this.type = 'i';
 }
 ISource.prototype = new Component();
 ISource.prototype.constructor = ISource;
