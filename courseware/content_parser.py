@@ -1,6 +1,7 @@
 from django.conf import settings
 from xml.dom.minidom import parse, parseString
 import libxml2
+from auth.models import UserProfile
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
@@ -8,10 +9,14 @@ course XML file and the rest of the system.
 TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
 
-def module_xml(module, id_tag, module_id):
+def course_file(user):
+    # TODO: Cache. Also, return the libxml2 object. 
+    return settings.DATA_DIR+UserProfile.objects.get(user=user).courseware
+
+def module_xml(coursefile, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes
-        module occurs once in course.xml. '''
-    doc = libxml2.parseFile(settings.DATA_DIR+'course.xml')
+        module occurs once in courseware XML file.. '''
+    doc = libxml2.parseFile(coursefile)
 
     # Sanitize input
     if not module.isalnum():
@@ -28,8 +33,8 @@ def module_xml(module, id_tag, module_id):
         return None
     return result_set[0].serialize()
 
-def toc_from_xml(active_chapter,active_section):
-    dom=parse(settings.DATA_DIR+'course.xml')
+def toc_from_xml(coursefile, active_chapter, active_section):
+    dom=parse(coursefile)
 
     course = dom.getElementsByTagName('course')[0]
     name=course.getAttribute("name")

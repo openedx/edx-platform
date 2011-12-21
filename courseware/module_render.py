@@ -142,7 +142,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     #print "X",s.xml, "Y",content_parser.module_xml(module, id_tag, id)
     print
 
-    xml = content_parser.module_xml(module, id_tag, id)
+    xml = content_parser.module_xml(content_parser.course_file(request.user), module, id_tag, id)
 
     instance=modx_modules[module](xml, 
                                   s.module_id, 

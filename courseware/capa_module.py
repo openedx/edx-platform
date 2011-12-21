@@ -9,7 +9,6 @@ from capa_problem import LoncapaProblem
 import dateutil
 import datetime
 
-
 from xml.dom.minidom import parse, parseString
 
 ## TODO: Abstract out from Django

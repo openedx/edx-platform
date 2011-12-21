@@ -39,7 +39,7 @@ def profile(request):
     if not request.user.is_authenticated():
         return redirect('/')
 
-    dom=parse(settings.DATA_DIR+'course.xml')
+    dom=parse(content_parser.course_file(request.user))
     hw=[]
     course = dom.getElementsByTagName('course')[0]
     chapters = course.getElementsByTagName('chapter')
@@ -87,7 +87,7 @@ def render_accordion(request,course,chapter,section):
     def format_string(string):
         return urllib.quote(string.replace(' ','_'))
 
-    toc=content_parser.toc_from_xml(chapter, section)
+    toc=content_parser.toc_from_xml(content_parser.course_file(request.user), chapter, section)
     active_chapter=1
     for i in range(len(toc)):
         if toc[i]['active']:
@@ -117,7 +117,8 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     if course!="6.002 Spring 2012":
         return redirect('/')
 
-    dom=parse(settings.DATA_DIR+'course.xml')
+    cf = content_parser.course_file(request.user)
+    dom=parse(cf)
     dom_course=content_parser.dom_select(dom, 'course', course)
     dom_chapter=content_parser.dom_select(dom_course, 'chapter', chapter)
     dom_section=content_parser.dom_select(dom_chapter, 'section', section)
