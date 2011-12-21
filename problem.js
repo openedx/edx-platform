@@ -2,6 +2,7 @@ function ${ id }_load() {
    $('#main_${ id }').load('${ ajax_url }problem_get?id=${ id }', 
       function() {
         MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+	update_schematics();
 
 	$('#check_${ id }').click(function() {
 	  var submit_data={};
