@@ -100,7 +100,7 @@ function Schematic(input) {
     this.status_div.style.position = 'absolute';
     this.status_div.style.padding = '2px';
     this.status_div.style.backgroundColor = element_style;
-    this.status = document.createTextNode('Wow, schematic entry all in javascript!');
+    this.status = document.createTextNode('Ready.');
     this.status_div.appendChild(this.status);
 
     this.connection_points = new Array();  // location string => list of cp's

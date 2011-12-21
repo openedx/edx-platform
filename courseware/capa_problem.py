@@ -138,15 +138,22 @@ class LoncapaProblem():
         return correct_map
 
     def handle_schem(self, element):
-        height = 480
-        width = 640
+        print element
+        height = element.getAttribute('height')
+        width = element.getAttribute('width')
+        if height=="":
+            height=480
+        if width=="":
+            width=640
         self.lid+=1
         id=str(self.gid)+'_'+str(self.lid)
         
-        html='<input type="hidden" class="schematic" name="{id}" '+ \
-            'height="{height}" width="{width}" value="{value}">'
-        
-        return html.format(height=height, width=width, id=id, value="")
+        html='<input type="hidden" class="schematic" name="input_{id}" '+ \
+            'height="{height}" width="{width}" value="{value}" id="input_{id}">'
+        html = html.format(height=height, width=width, id=id, value="")
+        print html
+
+        return html
     
     def grade_schem(self, element):
         return "correct"
