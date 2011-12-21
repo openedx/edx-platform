@@ -52,7 +52,6 @@ class StudentModule(models.Model):
     module_id = models.CharField(max_length=255) # Filename for homeworks, etc. 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    xml = models.TextField(blank=True) 
     class Meta:
         unique_together = (('student', 'module_id', 'module_type'),)
 

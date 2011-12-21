@@ -1,9 +1,32 @@
 from django.conf import settings
 from xml.dom.minidom import parse, parseString
+import libxml2
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
+
+TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
+
+def module_xml(module, id_tag, module_id):
+    ''' Get XML for a module based on module and module_id. Assumes
+        module occurs once in course.xml. '''
+    doc = libxml2.parseFile(settings.DATA_DIR+'course.xml')
+
+    # Sanitize input
+    if not module.isalnum():
+        raise Exception("Module is not alphanumeric")
+    if not module_id.isalnum():
+        raise Exception("Module ID is not alphanumeric")
+    xpath_search='//*/{module}[@{id_tag} = "{id}"]'.format(module=module, 
+                                                           id_tag=id_tag,
+                                                           id=module_id)
+    result_set=doc.xpathEval(xpath_search)
+    if len(result_set)>1:
+        print "WARNING: Potentially malformed course file", module, module_id
+    if len(result_set)==0:
+        return None
+    return result_set[0].serialize()
 
 def toc_from_xml(active_chapter,active_section):
     dom=parse(settings.DATA_DIR+'course.xml')

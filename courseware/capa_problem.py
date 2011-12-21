@@ -76,15 +76,12 @@ class LoncapaProblem():
 
         # Loop through the nodes of the problem, and 
         for e in dom.childNodes:
-#            print e, ot
-            #
             if e.localName=='script':
                 #print e.childNodes[0].data
                 exec e.childNodes[0].data in g,self.context
             elif e.localName=='endouttext':
                 ot=False
             elif ot:
-#                print e, "::", e.toxml()
                 e.writexml(buf)
             elif e.localName=='startouttext':
                 ot=True
@@ -98,7 +95,6 @@ class LoncapaProblem():
 
         self.text=buf.getvalue()
         self.text=self.contextualize_text(self.text)
-#        print self.text
         self.filename=filename
 
     done=False
@@ -134,8 +130,6 @@ class LoncapaProblem():
            if id not in answers:
                correct_map[id]='incorrect' # Should always be there
            else:
-               #correct_map[id]=self.grade_nr(self.questions[key],
-               #                              self.answers[id])
                grader=self.graders[self.questions[key]['type']]
                print grader
                correct_map[id]=grader(self, self.questions[key],
@@ -143,22 +137,20 @@ class LoncapaProblem():
         self.correct_map=correct_map
         return correct_map
 
+    def handle_schem(self, element):
+        height = 480
+        width = 640
+        self.lid+=1
+        id=str(self.gid)+'_'+str(self.lid)
+        
+        html='<input type="hidden" class="schematic" name="{id}" '+ \
+            'height="{height}" width="{width}" value="{value}">'
+        
+        return html.format(height=height, width=width, id=id, value="")
+    
+    def grade_schem(self, element):
+        return "correct"
 
-
-    ## Internal methods
-#    def number(self,text):
-#        ''' Convert a number to a float, understanding suffixes '''
-#        try:
-#            text.strip()
-#            suffixes={'%':0.01,'k':1e3,'M':1e6,'G':1e9,'T':1e12,'P':1e15,
-#                      'E':1e18,'Z':1e21,'Y':1e24,'c':1e-2,'m':1e-3,'u':1e-6,
-#                      'n':1e-9,'p':1e-12,'f':1e-15,'a':1e-18,'z':1e-21,'y':1e-24}
-#            if text[-1] in suffixes:
-#                return float(text[:-1])*suffixes[text[-1]]
-#            else:
-#                return float(text)
-#        except:
-#            return 0 # TODO: Better error handling? 
 
     def grade_nr(self, question, answer):
         error = abs(evaluator({},{},answer) - question['answer'])
@@ -255,9 +247,11 @@ class LoncapaProblem():
         return html
 
     graders={'numericalresponse':grade_nr,
-             'formularesponse':grade_fr}
+             'formularesponse':grade_fr, 
+             'schematicresponse':grade_schem}
     handlers={'numericalresponse':handle_nr,
-              'formularesponse':handle_fr}
+              'formularesponse':handle_fr, 
+              'schematicresponse':handle_schem}
 
     def contextualize_text(self, text):
         ''' Takes a string with variables. E.g. $a+$b. 

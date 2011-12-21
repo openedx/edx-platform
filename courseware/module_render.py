@@ -19,6 +19,7 @@ import urllib
 import capa_module
 import video_module
 import html_module
+import schematic_module
 
 from models import StudentModule
 
@@ -29,12 +30,6 @@ from django.conf import settings
 import content_parser
 
 import uuid
-
-#def html_module(request, module):
-#    ''' Show basic text
-#    '''
-#    template_source=module.getAttribute('filename')
-#    return {'content':render_to_string(template_source, {})}
 
 def vertical_module(request, module):
     ''' Layout module which lays out content vertically. 
@@ -86,7 +81,8 @@ def seq_module(request, module):
 
 modx_modules={'problem':capa_module.LoncapaModule, 
               'video':video_module.VideoModule,
-              'html':html_module.HtmlModule}
+              'html':html_module.HtmlModule,
+              'schematic':schematic_module.SchematicModule}
 
 def render_x_module(request, xml_module):
     ''' Generic module for extensions. This renders to HTML. '''
@@ -117,8 +113,7 @@ def render_x_module(request, xml_module):
         smod=StudentModule(student=request.user, 
                            module_type = module_type,
                            module_id=module_id, 
-                           state=instance.get_state(), 
-                           xml=instance.xml)
+                           state=instance.get_state())
     # Grab content
     content = {'content':instance.get_html(), 
                "destroy_js":instance.get_destroy_js(),
@@ -130,8 +125,11 @@ def render_x_module(request, xml_module):
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic module for extensions. '''
-    s = StudentModule.objects.filter(module_type=module, student=request.user, module_id=id)
+    s = StudentModule.objects.filter(module_type=module, 
+                                     student=request.user, 
+                                     module_id=id)
     if len(s) == 0:
+        print "ls404"
         raise Http404
 
     s=s[0]
@@ -140,7 +138,16 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     ajax_url = '/modx/'+module+'/'+id+'/'
 
-    instance=modx_modules[module](s.xml, s.module_id, ajax_url=ajax_url, state=s.state)
+    id_tag=modx_modules[module].id_attribute
+    #print "X",s.xml, "Y",content_parser.module_xml(module, id_tag, id)
+    print
+
+    xml = content_parser.module_xml(module, id_tag, id)
+
+    instance=modx_modules[module](xml, 
+                                  s.module_id, 
+                                  ajax_url=ajax_url, 
+                                  state=s.state)
     html=instance.handle_ajax(dispatch, request.GET)
     s.state=instance.get_state()
     s.grade=instance.get_score()['score']
@@ -153,8 +160,8 @@ module_types={'video':render_x_module,
               'vertical':vertical_module,
               'sequential':seq_module,
               'problem':render_x_module,
+              'schematic':render_x_module
               }
-                  #'lab':lab_module,
 
 def render_module(request, module):
     ''' Generic dispatch for internal modules. '''
@@ -162,4 +169,5 @@ def render_module(request, module):
         return {"content":""}
     if str(module.localName) in module_types:
         return module_types[module.localName](request, module)
+    print "rm404"
     raise Http404

@@ -38,15 +38,22 @@
 // add ourselves to the tasks that get performed when window is loaded
 window.onload = add_schematic_handler(window.onload);
 
+function update_schematics() {
+    // set up each schematic on the page
+    var schematics = document.getElementsByClassName('schematic');
+    for (var i = schematics.length - 1; i >= 0; i--)
+	if (schematics[i].getAttribute("loaded") != "true") {
+	    new Schematic(schematics[i]);
+	    schematics[i].setAttribute("loaded","true");
+	}
+}
+
 function add_schematic_handler(other_onload) {
     return function() {
 	// execute othe onload functions first
 	if (other_onload) other_onload();
-
-	// set up each schematic on the page
-	var schematics = document.getElementsByClassName('schematic');
-	for (var i = schematics.length - 1; i >= 0; i--)
-	    new Schematic(schematics[i]);
+	
+	update_schematics();
     }
 }
 

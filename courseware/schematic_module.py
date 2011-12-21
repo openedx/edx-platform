@@ -8,25 +8,18 @@ import json
 from django.conf import settings
 from djangomako.shortcuts import render_to_response, render_to_string
 
-class HtmlModule(XModule):
-    id_attribute = 'filename'
+class SchematicModule(XModule):
+    id_attribute = 'id'
 
     def get_state(self):
         return json.dumps({ })
 
     def get_xml_tags():
-        return "html"
+        return "schematic"
         
     def get_html(self):
-        return render_to_string(self.item_id, {'id': self.item_id})
+        return '<input type="hidden" class="schematic" name="{item_id}" height="480" width="640">'.format(item_id=self.item_id)
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
-        print "item id" , item_id
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
 
-#        template_source=module.getAttribute('filename')
-#    	return {'content':render_to_string(template_source, {})}
-
- #       print state
- #       if state!=None and "time" not in json.loads(state):
- #           self.video_time = 0
