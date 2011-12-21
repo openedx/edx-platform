@@ -3,7 +3,8 @@
 <head>
 <title> MITX 6.002 </title> 
 <link rel="stylesheet" href="/static/css/theme.css" type="text/css" media="all" />
-<link href="/static/css/cupertino/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" href="/static/css/local.css" type="text/css" media="all" />
+<link href="/static/css/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
 <style type="text/css">#slider { margin: 10px; }</style>
 <script type="text/javascript" src="/static/lib/jquery-1.6.2.min.js"></script>
 <script type="text/javascript" src="/static/lib/jquery-ui-1.8.16.custom.min.js"></script>
@@ -27,8 +28,14 @@
 <body>
 
 ${self.body()}
+    <div id="bottomWrapper">
+      <div id="footer"> 
+        <p style="padding-top:20px"> Copyright (c). 2011. MIT. <a href=http://creativecommons.org/licenses/by-sa/3.0/>Some rights reserved.</a>
+          <!-- Template based on a design from http://www.dotemplate.com/ -- Donated $10 (pmitros) so we don't need to include credit. --> 
+        </p> 
+      </div> 
+    </div> 
 
-<center>Copyright &copy; 2011. Massachusetts Institute of Technology. Some rights reserved. </center>
 
 </body>
 </html>
