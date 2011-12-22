@@ -41,7 +41,8 @@ def vertical_module(request, module):
 
     return {'init_js':js, 
             "destroy_js":"",
-            'content':render_to_string('vert_module.html',{'items':contents})}
+            'content':render_to_string('vert_module.html',{'items':contents}), 
+            'type':'vertical'}
 
 def seq_module(request, module):
     ''' Layout module which lays out content in a temporal sequence
@@ -51,11 +52,13 @@ def seq_module(request, module):
         # We also need to split </script> tags so they don't break
         # mid-string
         if 'init_js' not in m: m['init_js']=""
+        if 'type' not in m: m['init_js']=""
         content=json.dumps(m['content']) 
         content=content.replace('</script>', '<"+"/script>') 
         return {'content':content, 
                 "destroy_js":"",
-                'init_js':m['init_js']}
+                'init_js':m['init_js'], 
+                'type':m['type']}
     contents=[(e.getAttribute("name"),j(render_module(request, e))) \
               for e in module.childNodes \
               if e.nodeType==1]
@@ -76,7 +79,8 @@ def seq_module(request, module):
         params['id'] = 'tab'
         return {'init_js':js+render_to_string('tab_module.js',params),
                 "destroy_js":"",
-                'content':render_to_string('tab_module.html',params)}
+                'content':render_to_string('tab_module.html',params), 
+                'type':'sequential'}
 
 
 modx_modules={'problem':capa_module.LoncapaModule, 
@@ -117,7 +121,8 @@ def render_x_module(request, xml_module):
     # Grab content
     content = {'content':instance.get_html(), 
                "destroy_js":instance.get_destroy_js(),
-               'init_js':instance.get_init_js()}
+               'init_js':instance.get_init_js(), 
+               'type':module_type}
 
     smod.save() # This may be optional (at least in the case of no instance in the dB)
 
