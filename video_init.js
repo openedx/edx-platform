@@ -16,8 +16,28 @@ ajax_video=good;
 
 loadNewVideo(streams["1.0"], ${ video_time });
 
+function add_speed(key, stream) {
+    var id = 'speed_' + stream
+    $("#video_speeds").append(' <span id="'+id+'">'+key+'X</span>');
+    $("#"+id).click(function(){
+	    change_video_speed(key, stream)
+	});
+}
+
 var l=[]
 for (var key in streams) {
     l.push(key);
-    $("#video_speeds").append(" "+key+"X");
+}
+
+function sort_by_value(a,b) {
+    var x=parseFloat(a);
+    var y=parseFloat(b);
+    var r=((x < y) ? -1 : ((x > y) ? 1 : 0));
+    return r;
+}
+
+l.sort(sort_by_value);
+
+for(var i=0; i<l.length; i++) {
+    add_speed(l[i], streams[l[i]])
 }
