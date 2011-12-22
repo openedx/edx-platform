@@ -180,6 +180,7 @@ function updateytplayerInfo() {
 
 // functions for the api calls
 function loadNewVideo(id, startSeconds) {
+    captions={"start":[0],"end":[0],"text":["Attempting to load captions..."]};
     $.getJSON("/static/subs/"+id+".srt.sjson", function(data) {
         captions=data;
     });

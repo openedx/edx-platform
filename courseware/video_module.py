@@ -26,16 +26,23 @@ class VideoModule(XModule):
         ''' Tags in the courseware file guaranteed to correspond to the module '''
         return "video"
         
+    def video_list(self):
+        l=self.item_id.split(',')
+        l=[i.split(":") for i in l]
+        return json.dumps(dict(l))
+    
     def get_html(self):
-        return render_to_string('video.html',{'id':self.item_id,
-                                              'time':self.video_time})
+        return render_to_string('video.html',{'streams':self.video_list(),
+                                              'id':self.item_id,
+                                              'video_time':self.video_time})
 
     def get_init_js(self):
         ''' JavaScript code to be run when problem is shown. Be aware
         that this may happen several times on the same page
         (e.g. student switching tabs). Common functions should be put
         in the main course .js files for now. ''' 
-        return render_to_string('video_init.js',{'id':self.item_id,
+        return render_to_string('video_init.js',{'streams':self.video_list(),
+                                                 'id':self.item_id,
                                                  'video_time':self.video_time})
 
     def get_destroy_js(self):
