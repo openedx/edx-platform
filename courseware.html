@@ -21,21 +21,29 @@ $('#hide_acc').click(function() {
 });
 </script>
 
-<table width=100%>
-<tr><td id="acc_td" width=320 rowspan=2 valign=top>
-<div id="accordion">
-${accordion}
-</div>
-</td><td rowspan=2 valign=center><div id="hide_acc">&lt;<br>&lt;<br>&lt;</div></td>
-<td align=right valign=top><div id="coursenav"><a href="/courseware"><b>Digital Textbook</b></a> 
+<div id="bodyContent">
+<table width=100% cellpadding=0><tr>
+<td width=276 valign=top>
+    <div id="accordion">
+    ${accordion}
+    </div>
+</td>
+<td valign=top>
+    <div id="coursenav">
+       <a href="/courseware"><b>Digital Textbook</b></a> 
 <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
 <a href="/discussion">Discussion</a> 
 <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
 <a href="/profile">Profile</a> 
 <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
 <a href="/help">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/logout">Log out</a></div>
-</td></tr><tr><td valign=top>
+<a href="/logout">Log out</a>
+    </div>
+    <div>
+       ${content}
+       </div>
+</td>
+</tr></table>
 
-${content}
-</td></tr></table>
+
+</div>
