@@ -1,3 +1,5 @@
+var streams=${ streams }
+
 var params = { allowScriptAccess: "always", bgcolor: "#cccccc" };
 var atts = { id: "myytplayer" };
 swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer", 
@@ -12,5 +14,10 @@ function good() {
 
 ajax_video=good;
 
-loadNewVideo('${id}', ${ video_time });
+loadNewVideo(streams["1.0"], ${ video_time });
 
+var l=[]
+for (var key in streams) {
+    l.push(key);
+    $("#video_speeds").append(" "+key+"X");
+}
