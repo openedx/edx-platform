@@ -15,6 +15,14 @@ var global=5;
 
 var load_id = 0;
 
+var video_speed = 1.0;
+
+function change_video_speed(speed, youtube_id) {
+    new_position = ytplayer.getCurrentTime() * video_speed / speed;
+    video_speed = speed;
+    ytplayer.loadVideoById(youtube_id, new_position);    
+}
+
 function caption_at(index) {
     if (captions==0)
 	return "&nbsp;";
@@ -37,11 +45,13 @@ function caption_time_at(index) {
     if (index>=time_array.length)
 	return ytplayer.getDuration();
 
-    return time_array[index]/1000.0;
+    return time_array[index] / 1000.0 / video_speed;
 }
 
 function caption_index(now) {
     // Returns the index of the current caption, given a time
+    now = now * video_speed;
+
     if (captions==0)
 	return 0;
 
