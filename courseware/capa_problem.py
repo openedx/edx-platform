@@ -44,8 +44,19 @@ class LoncapaProblem():
             seed will provide the random seed. Alternatively, passing
             context will bypass all script execution, and use the 
             given execution context.  '''
+        self.done=False
+        self.text=""
+        self.context=dict()   # Execution context from loncapa/python
+        self.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
+        self.answers=dict()   # Student answers
+        self.correct_map=dict()
+        self.seed=None
+        self.gid="" # ID of the problem
+        self.lid=-1 # ID of the field within the problem
+
+
         if state==None:
-            state={}
+            state=dict()
         self.gid=id
 
         if 'done' in state:
@@ -66,7 +77,7 @@ class LoncapaProblem():
             self.correct_map=state['correct_map']
         random.seed(self.seed)
         dom=parse(filename).childNodes[0]
-        
+
         g={'random':random,'numpy':numpy,'math':math,'scipy':scipy}
 
         # Buffer stores HTML for problem
@@ -77,7 +88,6 @@ class LoncapaProblem():
         # Loop through the nodes of the problem, and 
         for e in dom.childNodes:
             if e.localName=='script':
-                #print e.childNodes[0].data
                 exec e.childNodes[0].data in g,self.context
             elif e.localName=='endouttext':
                 ot=False
@@ -96,16 +106,6 @@ class LoncapaProblem():
         self.text=buf.getvalue()
         self.text=self.contextualize_text(self.text)
         self.filename=filename
-
-    done=False
-    text=""
-    context={}   # Execution context from loncapa/python
-    questions={} # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
-    answers={}   # Student answers
-    correct_map={}
-    seed=None
-    gid="" # ID of the problem
-    lid=-1 # ID of the field within the problem
 
     def get_context(self):
         ''' Return the execution context '''
@@ -131,14 +131,12 @@ class LoncapaProblem():
                correct_map[id]='incorrect' # Should always be there
            else:
                grader=self.graders[self.questions[key]['type']]
-               print grader
                correct_map[id]=grader(self, self.questions[key],
                                       self.answers[id])
         self.correct_map=correct_map
         return correct_map
 
     def handle_schem(self, element):
-        print element
         height = element.getAttribute('height')
         width = element.getAttribute('width')
         if height=="":
@@ -151,7 +149,6 @@ class LoncapaProblem():
         html='<input type="hidden" class="schematic" name="input_{id}" '+ \
             'height="{height}" width="{width}" value="{value}" id="input_{id}">'
         html = html.format(height=height, width=width, id=id, value="")
-        print html
 
         return html
     
@@ -196,7 +193,6 @@ class LoncapaProblem():
         return html
 
     def grade_fr(self, question, answer):
-        print question, answer
         correct = True
         for i in range(question['samples_count']):
             instructor_variables = strip_dict(dict(self.context))
@@ -207,7 +203,6 @@ class LoncapaProblem():
                 student_variables[str(var)] = value
             instructor_result = evaluator(instructor_variables,{},str(question['answer']))
             student_result = evaluator(student_variables,{},str(answer))
-            print student_result, instructor_result
             if math.isnan(student_result) or math.isinf(student_result):
                 return "incorrect"
             if abs( student_result - instructor_result ) > question['tolerance']:

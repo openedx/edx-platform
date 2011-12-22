@@ -24,10 +24,6 @@ class LoncapaModule(XModule):
     xml_tags = ["problem"]
     id_attribute = "filename"
 
-    attempts = 0
-    max_attempts = None
-
-    due_date = None
 
     def get_state(self):
         state = self.lcp.get_state()
@@ -94,6 +90,11 @@ class LoncapaModule(XModule):
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
+
+        self.attempts = 0
+        self.max_attempts = None
+        self.due_date = None
+
         dom=parseString(xml)
         node=dom.childNodes[0]
 

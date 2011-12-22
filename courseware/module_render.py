@@ -70,7 +70,6 @@ def seq_module(request, module):
     params={'items':contents,
             'id':"seq"}
 
-    print module.nodeName
     if module.nodeName == 'sequential':
         return {'init_js':js+render_to_string('seq_module.js',params),
                 "destroy_js":"",
@@ -145,7 +144,6 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     id_tag=modx_modules[module].id_attribute
     #print "X",s.xml, "Y",content_parser.module_xml(module, id_tag, id)
-    print
 
     xml = content_parser.module_xml(content_parser.course_file(request.user), module, id_tag, id)
 
