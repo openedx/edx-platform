@@ -121,6 +121,12 @@ class LoncapaProblem():
     def set_answers(self, answers):
         self.answers=answers
 
+    def get_question_answers(self):
+        rv = dict()
+        for key in self.questions:
+            rv[key]=str(self.questions[key]['answer'])
+        return rv
+
     def grade_answers(self, answers):
         ''' Takes a map of IDs to answers. Return which ones are correct '''
         self.answers=answers
@@ -189,7 +195,7 @@ class LoncapaProblem():
         if id in self.correct_map and self.correct_map[id]=='incorrect':
             icon='close'
 
-        html='<input type="text" name="input_{id}" id="input_{id}" value="{value}"><span class="ui-icon ui-icon-{icon}" style="display:inline-block;" id="status_{id}"></span> '.format(id=id,value=value,icon=icon)
+        html='<input type="text" name="input_{id}" id="input_{id}" value="{value}"><span id="answer_{id}"></span><span class="ui-icon ui-icon-{icon}" style="display:inline-block;" id="status_{id}"></span> '.format(id=id,value=value,icon=icon)
         return html
 
     def grade_fr(self, question, answer):
@@ -245,7 +251,7 @@ class LoncapaProblem():
         if id in self.correct_map and self.correct_map[id]=='incorrect':
             icon='close'
 
-        html='<input type="text" name="input_{id}" id="input_{id}" value="{value}"><span class="ui-icon ui-icon-{icon}" style="display:inline-block;" id="status_{id}"></span> '.format(id=id,value=value,icon=icon)
+        html='<input type="text" name="input_{id}" id="input_{id}" value="{value}"><span id="answer_{id}"></span><span class="ui-icon ui-icon-{icon}" style="display:inline-block;" id="status_{id}"></span> '.format(id=id,value=value,icon=icon)
         return html
 
     graders={'numericalresponse':grade_nr,

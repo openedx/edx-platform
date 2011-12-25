@@ -5,6 +5,7 @@ import random, numpy, math, scipy, sys, StringIO, os, struct, json
 from x_module import XModule
 
 from capa_problem import LoncapaProblem
+from django.http import Http404
 
 import dateutil
 import datetime
@@ -81,6 +82,7 @@ class LoncapaModule(XModule):
                                'id':self.filename, 
                                'check_button':check_button,
                                'save_button':save_button,
+                               'answer_available':self.answer_available(),
                                'ajax_url':self.ajax_url,
                                })
         if encapsulate:
@@ -114,6 +116,16 @@ class LoncapaModule(XModule):
         if self.show_answer=="":
             self.show_answer="closed"
 
+        self.resettable=node.getAttribute("resettable")
+        if self.resettable=="":
+            self.resettable=True
+        elif self.resettable=="false":
+            self.resettable=False
+        elif self.resettable=="true":
+            self.resettable=True
+        else:
+            raise Exception("Invalid resettable attribute "+self.resettable)
+
         if state!=None:
             state=json.loads(state)
         if state!=None and 'attempts' in state:
@@ -135,11 +147,21 @@ class LoncapaModule(XModule):
             response = self.reset_problem(get)
         elif dispatch=='problem_save':
             response = self.save_problem(get)
-        elif dispatch=='get_answer':
+        elif dispatch=='problem_show':
             response = self.get_answer(get)
         else: 
             return "Error"
         return response
+
+    def closed(self):
+        ''' Is the student still allowed to submit answers? '''
+        if self.attempts == self.max_attempts:
+            return True
+        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
+            return True
+
+        return False
+        
 
     def answer_available(self):
         ''' Is the user allowed to see an answer? 
@@ -160,13 +182,14 @@ class LoncapaModule(XModule):
             return True
         if self.show_answer == 'closed' and not self.closed():
             return False
+        print "aa", self.show_answer
         raise Http404
 
     def get_answer(self, get):
         if not self.answer_available():
             raise Http404
         else: 
-            raise Http404
+            return json.dumps(self.lcp.get_question_answers())
 
 
     # Figure out if we should move these to capa_problem?
@@ -178,11 +201,9 @@ class LoncapaModule(XModule):
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and returns
             a map of correct/incorrect answers '''
-        if self.attempts == self.max_attempts:
-            return "Too many attempts. You shouldn't be here."
-
-        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
-            return "Too late. problem was due."
+        if self.closed():
+            print "cp"
+            raise Http404
             
         self.attempts = self.attempts + 1
         self.lcp.done=True
@@ -196,11 +217,9 @@ class LoncapaModule(XModule):
         return js
 
     def save_problem(self, get):
-        if self.attempts == self.max_attempts:
-            return "Too many attempts. You shouldn't be here."
-
-        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
-            return "Too late. problem was due."
+        if self.closed():
+            print "sp"
+            raise Http404
             
         answers=dict()
         for key in get:
