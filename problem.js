@@ -22,6 +22,13 @@ function ${ id }_load() {
 		  });
 	  }
 	    });
+	$('#show_${ id }').click(function() {
+		$.getJSON('/modx/problem/${ id }/problem_show', function(data) {
+			for (var key in data) {
+			    $("#answer_${ id }_"+key).text(data[key]);
+			}
+		    });
+	    });
 	$('#save_${ id }').click(function() {
 	  var submit_data={};
 	  $.each($("[id^=input_${ id }_]"), function(index,value){
