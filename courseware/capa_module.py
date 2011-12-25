@@ -110,6 +110,10 @@ class LoncapaModule(XModule):
         else:
             self.max_attempts=None
 
+        self.show_answer=node.getAttribute("showanswer")
+        if self.show_answer=="":
+            self.show_answer="closed"
+
         if state!=None:
             state=json.loads(state)
         if state!=None and 'attempts' in state:
@@ -131,9 +135,38 @@ class LoncapaModule(XModule):
             response = self.reset_problem(get)
         elif dispatch=='problem_save':
             response = self.save_problem(get)
+        elif dispatch=='get_answer':
+            response = self.get_answer(get)
         else: 
             return "Error"
         return response
+
+    def answer_available(self):
+        ''' Is the user allowed to see an answer? 
+        ''' 
+        if self.show_answer == '':
+            return False
+        if self.show_answer == "never":
+            return False
+        if self.show_answer == 'attempted' and self.attempts == 0:
+            return False
+        if self.show_answer == 'attempted' and self.attempts > 0:
+            return True
+        if self.show_answer == 'answered' and self.lcp.done:
+            return True
+        if self.show_answer == 'answered' and not self.lcp.done:
+            return False
+        if self.show_answer == 'closed' and self.closed():
+            return True
+        if self.show_answer == 'closed' and not self.closed():
+            return False
+        raise Http404
+
+    def get_answer(self, get):
+        if not self.answer_available():
+            raise Http404
+        else: 
+            raise Http404
 
 
     # Figure out if we should move these to capa_problem?
