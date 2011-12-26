@@ -133,7 +133,7 @@ class LoncapaModule(XModule):
             self.attempts=state['attempts']
 
         self.filename=node.getAttribute("filename")
-        filename=settings.DATA_DIR+self.filename+".xml"
+        filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
         self.name=node.getAttribute("name")
         self.lcp=LoncapaProblem(filename, self.item_id, state)
 
@@ -262,6 +262,6 @@ class LoncapaModule(XModule):
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None
 
-        filename=settings.DATA_DIR+self.filename+".xml"
+        filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
         self.lcp=LoncapaProblem(filename, self.item_id, self.lcp.get_state())
         return json.dumps(self.get_problem_html(encapsulate=False))
