@@ -90,7 +90,7 @@ class LoncapaProblem():
         
         ot=False ## Are we in an outtext context? 
 
-        print "Here", dom
+        #print "Here", dom
 
         # Loop through the nodes of the problem, and 
         for e in dom.childNodes:

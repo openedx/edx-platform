@@ -9,6 +9,15 @@ course XML file and the rest of the system.
 TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
 
+def item(l, default="", process=lambda x:x):
+    if len(l)==0:
+        return default
+    elif len(l)==1:
+        return process(l[0].getContent())
+    else:
+        raise Exception('Malformed XML')
+    
+
 def course_file(user):
     # TODO: Cache. Also, return the libxml2 object. 
     return settings.DATA_DIR+UserProfile.objects.get(user=user).courseware

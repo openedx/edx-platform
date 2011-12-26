@@ -125,15 +125,26 @@ function videoDestroy() {
     ytplayer = false;
 }
 
-function log_event(e) {
+function log_event(e, d) {
     // CRITICAL TODO: Change to AJAX
     //$("#eventlog").append("<br>");
     //$("#eventlog").append(JSON.stringify(e));
-    window['console'].log(JSON.stringify(e));
+
+    // TODO: Figure out 
+    // XMLHttpRequest cannot load http://localhost:7000/userlog. Origin http://localhost:8000 is not allowed by Access-Control-Allow-Origin.
+
+    /*window['console'].log(JSON.stringify(e));
+    $.get("http://localhost:7000/userlog", 
+	  {'user':'pmitros',
+		  'key':'key',
+		  'event_type':'unknown',
+		  'data':'e'},
+	  function(data) {
+	  });*/
 }
 
 function seek_slide(type,oe,value) {
-    //log_event([type, value]);
+    //log_event('video', [type, value]);
     if(type=='slide') {
 	 // HACK/TODO: Youtube recommends this be false for slide and true for stop.
 	 // Works better on my system with true/true. 
@@ -145,7 +156,7 @@ function seek_slide(type,oe,value) {
 	ytplayer.seekTo(value, true);
     } else if (type=='stop') {
 	ytplayer.seekTo(value, true);
-	log_event([type, value]);
+	log_event('video', [type, value]);
     }
 
     update_captions(value);
@@ -166,7 +177,7 @@ function get_state() {
 
 function onytplayerStateChange(newState) {
     setytplayerState(newState);
-    log_event(['State Change',newState, get_state()]);
+    log_event('video', ['State Change',newState, get_state()]);
 }
 
 function onPlayerError(errorCode) {

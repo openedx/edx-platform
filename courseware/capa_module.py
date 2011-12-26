@@ -7,7 +7,10 @@ from django.http import Http404
 import dateutil
 import datetime
 
-from xml.dom.minidom import parse, parseString
+#from xml.dom.minidom import parse, parseString
+import content_parser
+
+import libxml2
 
 ## TODO: Abstract out from Django
 from django.conf import settings
@@ -65,7 +68,8 @@ class LoncapaModule(XModule):
 
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions. 
-        if self.lcp.done:
+        if self.lcp.done and not self.rerandomize:
+            #print "!"
             check_button = False
             save_button = False
         
@@ -85,6 +89,7 @@ class LoncapaModule(XModule):
                                'save_button' : save_button,
                                'answer_available' : self.answer_available(),
                                'ajax_url' : self.ajax_url,
+                               'attempts': attempts_str
                                })
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
@@ -98,43 +103,53 @@ class LoncapaModule(XModule):
         self.max_attempts = None
         self.due_date = None
 
-        dom=parseString(xml)
-        node=dom.childNodes[0]
+        #dom=parseString(xml)
+        dom2 = libxml2.parseMemory(xml, len(xml))
 
-        self.due_date=node.getAttribute("due")
+        #node=dom.childNodes[0]
+
+        #self.due_date=node.getAttribute("due")
+        self.due_date=content_parser.item(dom2.xpathEval('/problem/@due'))
         if len(self.due_date)>0:
             self.due_date=dateutil.parser.parse(self.due_date)
         else:
             self.due_date=None
             
-        self.max_attempts=node.getAttribute("attempts")
+        #self.max_attempts=node.getAttribute("attempts")
+        self.max_attempts=content_parser.item(dom2.xpathEval('/problem/@attempts'))
         if len(self.max_attempts)>0:
             self.max_attempts=int(self.max_attempts)
         else:
             self.max_attempts=None
 
-        self.show_answer=node.getAttribute("showanswer")
+        #self.show_answer=node.getAttribute("showanswer")
+        self.show_answer=content_parser.item(dom2.xpathEval('/problem/@showanswer'))
+
         if self.show_answer=="":
             self.show_answer="closed"
 
-        self.resettable=node.getAttribute("resettable")
-        if self.resettable=="":
-            self.resettable=True
-        elif self.resettable=="false":
-            self.resettable=False
-        elif self.resettable=="true":
-            self.resettable=True
+        self.rerandomize=content_parser.item(dom2.xpathEval('/problem/@rerandomize'))
+        #self.rerandomize=node.getAttribute("rerandomize")
+        if self.rerandomize=="":
+            self.rerandomize=True
+        elif self.rerandomize=="false":
+            self.rerandomize=False
+        elif self.rerandomize=="true":
+            self.rerandomize=True
         else:
-            raise Exception("Invalid resettable attribute "+self.resettable)
+            raise Exception("Invalid rerandomize attribute "+self.rerandomize)
 
         if state!=None:
             state=json.loads(state)
         if state!=None and 'attempts' in state:
             self.attempts=state['attempts']
 
-        self.filename=node.getAttribute("filename")
+        self.filename=content_parser.item(dom2.xpathEval('/problem/@filename'))
+        #self.filename=node.getAttribute("filename")
+        #print self.filename
         filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
-        self.name=node.getAttribute("name")
+        #self.name=node.getAttribute("name")
+        self.name=content_parser.item(dom2.xpathEval('/problem/@name'))
         self.lcp=LoncapaProblem(filename, self.item_id, state)
 
     def handle_ajax(self, dispatch, get):
@@ -209,7 +224,7 @@ class LoncapaModule(XModule):
             
         # Problem submitted. Student should reset before checking
         # again.
-        if self.lcp.done and self.resettable:
+        if self.lcp.done and self.rerandomize:
             print "cpdr"
             raise Http404
 
@@ -232,7 +247,7 @@ class LoncapaModule(XModule):
             
         # Problem submitted. Student should reset before saving
         # again.
-        if self.lcp.done and self.resettable:
+        if self.lcp.done and self.rerandomize:
             print "spdr"
             return "Problem needs to be reset prior to save."
 
@@ -257,7 +272,7 @@ class LoncapaModule(XModule):
         self.lcp.answers=dict()
         self.lcp.correct_map=dict()
 
-        if self.resettable:
+        if self.rerandomize:
             self.lcp.context=dict()
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None
