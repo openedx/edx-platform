@@ -69,7 +69,7 @@ def evaluator(variables, functions, string):
     (dot,minus,plus,times,div,lpar,rpar,exp)=map(Literal,".-+*/()^")
     
     number_part=Word(nums)
-    number=Optional("+-")+number_part+Optional("."+number_part)+ \
+    number=Optional(minus | plus)+number_part+Optional("."+number_part)+ \
         Optional(CaselessLiteral("E")+Optional("-")+number_part)+ \
         Optional(number_suffix)
     number=number.setParseAction( number_parse_action )
@@ -114,3 +114,4 @@ if __name__=='__main__':
     print evaluator({'R1': 2.0, 'R3':4.0}, {}, "13")
     # 
     print evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5")
+    print evaluator({},{}, "-1")

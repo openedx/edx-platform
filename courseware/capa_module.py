@@ -1,6 +1,3 @@
-# For calculator: 
-# http://pyparsing.wikispaces.com/file/view/fourFn.py
-
 import random, numpy, math, scipy, sys, StringIO, os, struct, json
 from x_module import XModule
 
@@ -53,37 +50,41 @@ class LoncapaModule(XModule):
         html = self.lcp.get_html()
         content={'name':self.name, 
                  'html':html}
-        closed = False
-
-        if self.lcp.done:
-            check_button="Reset"
-        else:
-            check_button="Check"
-
+        
+        check_button = True
+        reset_button = True
         save_button = True
 
-        if self.max_attempts == None:
-            pass
-        elif self.max_attempts == self.attempts: 
-            save_button = False
+        # If we're after deadline, or user has exhuasted attempts, 
+        # question is read-only. 
+        if self.closed():
             check_button = False
-        else:
-            check_button = check_button + \
-                " ({a}/{m})".format(a=self.attempts, m=self.max_attempts)
-
-        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
+            reset_button = False
             save_button = False
-            check_button = False
-            results = True
+            
 
+        # User submitted a problem, and hasn't reset. We don't want
+        # more submissions. 
+        if self.lcp.done:
+            check_button = False
+            save_button = False
+        
+        # User hasn't submitted an answer yet -- we don't want resets
+        if not self.lcp.done:
+            reset_button = False
+
+        attempts_str = ""
+        if self.max_attempts != None: 
+            attempts_str = " ({a}/{m})".format(a=self.attempts, m=self.max_attempts)
 
         html=render_to_string('problem.html', 
-                              {'problem':content, 
-                               'id':self.filename, 
-                               'check_button':check_button,
-                               'save_button':save_button,
-                               'answer_available':self.answer_available(),
-                               'ajax_url':self.ajax_url,
+                              {'problem' : content, 
+                               'id' : self.filename, 
+                               'check_button' : check_button,
+                               'reset_button' : reset_button,
+                               'save_button' : save_button,
+                               'answer_available' : self.answer_available(),
+                               'ajax_url' : self.ajax_url,
                                })
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
@@ -194,17 +195,24 @@ class LoncapaModule(XModule):
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
-        ''' Same as get_problem_html -- if we want to reconfirm we have the right 
-            thing e.g. after several AJAX calls. '''
+        ''' Same as get_problem_html -- if we want to reconfirm we
+            have the right thing e.g. after several AJAX calls.'''
         return self.get_problem_html(encapsulate=False)        
 
     def check_problem(self, get):
-        ''' Checks whether answers to a problem are correct, and returns
-            a map of correct/incorrect answers '''
+        ''' Checks whether answers to a problem are correct, and
+            returns a map of correct/incorrect answers'''
+        # Too late. Cannot submit
         if self.closed():
             print "cp"
             raise Http404
             
+        # Problem submitted. Student should reset before checking
+        # again.
+        if self.lcp.done and self.resettable:
+            print "cpdr"
+            raise Http404
+
         self.attempts = self.attempts + 1
         self.lcp.done=True
         answers=dict()
@@ -217,10 +225,17 @@ class LoncapaModule(XModule):
         return js
 
     def save_problem(self, get):
+        # Too late. Cannot submit
         if self.closed():
             print "sp"
-            raise Http404
+            return "Problem is closed"
             
+        # Problem submitted. Student should reset before saving
+        # again.
+        if self.lcp.done and self.resettable:
+            print "spdr"
+            return "Problem needs to be reset prior to save."
+
         answers=dict()
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
@@ -232,19 +247,21 @@ class LoncapaModule(XModule):
     def reset_problem(self, get):
         ''' Changes problem state to unfinished -- removes student answers, 
             and causes problem to rerender itself. '''
-        if self.attempts == self.max_attempts:
-            return "Too many attempts. You shouldn't be here."
-
-        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
-            return "Too late. problem was due."
+        if self.closed():
+            return "Problem is closed"
             
+        if not self.lcp.done:
+            return "Refresh the page and make an attempt before resetting."
+
         self.lcp.done=False
         self.lcp.answers=dict()
-        self.lcp.context=dict()
-        self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
-        self.lcp.answers=dict()   # Student answers
         self.lcp.correct_map=dict()
-        self.lcp.seed=None
+
+        if self.resettable:
+            self.lcp.context=dict()
+            self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
+            self.lcp.seed=None
+
         filename=settings.DATA_DIR+self.filename+".xml"
         self.lcp=LoncapaProblem(filename, self.item_id, self.lcp.get_state())
         return json.dumps(self.get_problem_html(encapsulate=False))

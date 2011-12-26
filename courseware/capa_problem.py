@@ -75,8 +75,13 @@ class LoncapaProblem():
             self.answers=state['answers']
         if 'correct_map' in state:
             self.correct_map=state['correct_map']
+
         random.seed(self.seed)
-        dom=parse(filename).childNodes[0]
+        dom=parse(filename)
+        for d in dom.childNodes:
+            if d.localName == 'problem':
+                dom = d
+                
 
         g={'random':random,'numpy':numpy,'math':math,'scipy':scipy}
 
@@ -85,8 +90,11 @@ class LoncapaProblem():
         
         ot=False ## Are we in an outtext context? 
 
+        print "Here", dom
+
         # Loop through the nodes of the problem, and 
         for e in dom.childNodes:
+            #print e.localName
             if e.localName=='script':
                 exec e.childNodes[0].data in g,self.context
             elif e.localName=='endouttext':
