@@ -33,6 +33,8 @@
     width: 100%;
 }
 
+.bordered { border: 1px solid #AAAAAA; } 
+
 .seq_problem_visited    {     background-color: #ccccaa;}
 .seq_video_visited      {     background-color: #ccaacc;}
 .seq_video_visited      {     background-color: #cccaac;}
