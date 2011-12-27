@@ -235,7 +235,11 @@ class LoncapaModule(XModule):
             answers['_'.join(key.split('_')[1:])]=get[key]
 
         correct_map = self.lcp.grade_answers(answers)
-        success = False # TODO
+
+        success = True
+        for i in correct_map:
+            if correct_map[i]!='correct':
+                success = False
 
         js=json.dumps({'correct_map' : correct_map,
                        'success' : success})
