@@ -7,7 +7,6 @@ from django.http import Http404
 import dateutil
 import datetime
 
-#from xml.dom.minidom import parse, parseString
 import content_parser
 
 import libxml2
@@ -68,7 +67,7 @@ class LoncapaModule(XModule):
 
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions. 
-        if self.lcp.done and not self.rerandomize:
+        if self.lcp.done and self.rerandomize:
             #print "!"
             check_button = False
             save_button = False
@@ -235,7 +234,11 @@ class LoncapaModule(XModule):
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
 
-        js=json.dumps(self.lcp.grade_answers(answers))
+        correct_map = self.lcp.grade_answers(answers)
+        success = False # TODO
+
+        js=json.dumps({'correct_map' : correct_map,
+                       'success' : success})
 
         return js
 

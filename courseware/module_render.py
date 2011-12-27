@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.template import Context, loader
 from djangomako.shortcuts import render_to_response, render_to_string
-from xml.dom.minidom import parse, parseString
 import json, os, sys
 from django.core.context_processors import csrf
 

@@ -1,7 +1,5 @@
 from x_module import XModule
 
-from xml.dom.minidom import parse, parseString
-
 import json
 
 ## TODO: Abstract out from Django
