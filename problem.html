@@ -4,7 +4,10 @@
 
   <input type="hidden" name="problem_id" value="${ problem['name'] }"> 
 % if check_button:
-  <input id="check_${ id }" type="button" value="${ check_button }" >   
+  <input id="check_${ id }" type="button" value="Check ${ attempts }" >   
+% endif
+% if reset_button:
+  <input id="reset_${ id }" type="button" value="Reset ${ attempts }" >   
 % endif
 % if save_button:
   <input id="save_${ id }" type="button" value="Save" >   
