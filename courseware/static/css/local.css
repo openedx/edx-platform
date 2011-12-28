@@ -33,7 +33,7 @@
     width: 100%;
 }
 
-.bordered { border: 1px solid #AAAAAA; } 
+.bordered { border: 1px solid #AAAAAA; border-style : dotted; } 
 
 .seq_problem_visited    {     background-color: #ccccaa;}
 .seq_video_visited      {     background-color: #ccaacc;}

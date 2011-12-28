@@ -30,6 +30,41 @@ import content_parser
 
 import uuid
 
+modx_modules={'problem':capa_module.LoncapaModule, 
+              'video':video_module.VideoModule,
+              'html':html_module.HtmlModule,
+              'schematic':schematic_module.SchematicModule}
+
+def modx_dispatch(request, module=None, dispatch=None, id=None):
+    ''' Generic view for extensions. '''
+    s = StudentModule.objects.filter(module_type=module, 
+                                     student=request.user, 
+                                     module_id=id)
+    if len(s) == 0:
+        print "ls404"
+        raise Http404
+
+    s=s[0]
+
+    dispatch=dispatch.split('?')[0]
+
+    ajax_url = '/modx/'+module+'/'+id+'/'
+
+    id_tag=modx_modules[module].id_attribute
+    #print "X",s.xml, "Y",content_parser.module_xml(module, id_tag, id)
+
+    xml = content_parser.module_xml(content_parser.course_file(request.user), module, id_tag, id)
+
+    instance=modx_modules[module](xml, 
+                                  s.module_id, 
+                                  ajax_url=ajax_url, 
+                                  state=s.state)
+    html=instance.handle_ajax(dispatch, request.GET)
+    s.state=instance.get_state()
+    s.grade=instance.get_score()['score']
+    s.save()
+    return HttpResponse(html)
+
 def vertical_module(request, module):
     ''' Layout module which lays out content vertically. 
     '''
@@ -81,11 +116,6 @@ def seq_module(request, module):
                 'type':'sequential'}
 
 
-modx_modules={'problem':capa_module.LoncapaModule, 
-              'video':video_module.VideoModule,
-              'html':html_module.HtmlModule,
-              'schematic':schematic_module.SchematicModule}
-
 def render_x_module(request, xml_module):
     ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
@@ -125,36 +155,6 @@ def render_x_module(request, xml_module):
     smod.save() # This may be optional (at least in the case of no instance in the dB)
 
     return content
-
-def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic module for extensions. '''
-    s = StudentModule.objects.filter(module_type=module, 
-                                     student=request.user, 
-                                     module_id=id)
-    if len(s) == 0:
-        print "ls404"
-        raise Http404
-
-    s=s[0]
-
-    dispatch=dispatch.split('?')[0]
-
-    ajax_url = '/modx/'+module+'/'+id+'/'
-
-    id_tag=modx_modules[module].id_attribute
-    #print "X",s.xml, "Y",content_parser.module_xml(module, id_tag, id)
-
-    xml = content_parser.module_xml(content_parser.course_file(request.user), module, id_tag, id)
-
-    instance=modx_modules[module](xml, 
-                                  s.module_id, 
-                                  ajax_url=ajax_url, 
-                                  state=s.state)
-    html=instance.handle_ajax(dispatch, request.GET)
-    s.state=instance.get_state()
-    s.grade=instance.get_score()['score']
-    s.save()
-    return HttpResponse(html)
 
 module_types={'video':render_x_module,
               'html':render_x_module,

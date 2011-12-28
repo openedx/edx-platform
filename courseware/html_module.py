@@ -1,4 +1,5 @@
 from x_module import XModule
+from lxml import etree
 
 import json
 
@@ -19,5 +20,4 @@ class HtmlModule(XModule):
         return render_to_string(self.item_id, {'id': self.item_id})
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
-        print "item id" , item_id
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)

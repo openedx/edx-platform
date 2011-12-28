@@ -1,6 +1,8 @@
 from django.conf import settings
 from xml.dom.minidom import parse, parseString
-import libxml2
+
+from lxml import etree
+
 from auth.models import UserProfile
 
 ''' This file will eventually form an abstraction layer between the
@@ -13,7 +15,7 @@ def item(l, default="", process=lambda x:x):
     if len(l)==0:
         return default
     elif len(l)==1:
-        return process(l[0].getContent())
+        return process(l[0])
     else:
         raise Exception('Malformed XML')
     
@@ -25,7 +27,8 @@ def course_file(user):
 def module_xml(coursefile, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes
         module occurs once in courseware XML file.. '''
-    doc = libxml2.parseFile(coursefile)
+    #doc = libxml2.parseFile(coursefile)
+    doc = etree.parse(coursefile)
 
     # Sanitize input
     if not module.isalnum():
@@ -35,12 +38,14 @@ def module_xml(coursefile, module, id_tag, module_id):
     xpath_search='//*/{module}[@{id_tag} = "{id}"]'.format(module=module, 
                                                            id_tag=id_tag,
                                                            id=module_id)
-    result_set=doc.xpathEval(xpath_search)
+    #result_set=doc.xpathEval(xpath_search)
+    result_set=doc.xpath(xpath_search)
     if len(result_set)>1:
         print "WARNING: Potentially malformed course file", module, module_id
     if len(result_set)==0:
         return None
-    return result_set[0].serialize()
+    return etree.tostring(result_set[0])
+    #return result_set[0].serialize()
 
 def toc_from_xml(coursefile, active_chapter, active_section):
     dom=parse(coursefile)
@@ -50,6 +55,8 @@ def toc_from_xml(coursefile, active_chapter, active_section):
     chapters = course.getElementsByTagName('chapter')
     ch=list()
     for c in chapters:
+        if c.getAttribute("name") == 'hidden':
+            continue
         sections=list()
         for s in c.getElementsByTagName('section'):
             sections.append({'name':s.getAttribute("name"), 
