@@ -102,34 +102,26 @@ class LoncapaModule(XModule):
         self.max_attempts = None
         self.due_date = None
 
-        #dom=parseString(xml)
-        #dom2 = libxml2.parseMemory(xml, len(xml))
         dom2 = etree.fromstring(xml)
 
-        #node=dom.childNodes[0]
-
-        #self.due_date=node.getAttribute("due")
-        self.due_date=content_parser.item(dom2.xpath('/problem/@due'))#dom2.xpathEval('/problem/@due'))
+        self.due_date=content_parser.item(dom2.xpath('/problem/@due'))
         if len(self.due_date)>0:
             self.due_date=dateutil.parser.parse(self.due_date)
         else:
             self.due_date=None
             
-        #self.max_attempts=node.getAttribute("attempts")
         self.max_attempts=content_parser.item(dom2.xpath('/problem/@attempts'))
         if len(self.max_attempts)>0:
             self.max_attempts=int(self.max_attempts)
         else:
             self.max_attempts=None
 
-        #self.show_answer=node.getAttribute("showanswer")
         self.show_answer=content_parser.item(dom2.xpath('/problem/@showanswer'))
 
         if self.show_answer=="":
             self.show_answer="closed"
 
         self.rerandomize=content_parser.item(dom2.xpath('/problem/@rerandomize'))
-        #self.rerandomize=node.getAttribute("rerandomize")
         if self.rerandomize=="":
             self.rerandomize=True
         elif self.rerandomize=="false":
@@ -145,10 +137,7 @@ class LoncapaModule(XModule):
             self.attempts=state['attempts']
 
         self.filename=content_parser.item(dom2.xpath('/problem/@filename'))
-        #self.filename=node.getAttribute("filename")
-        #print self.filename
         filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
-        #self.name=node.getAttribute("name")
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
         self.lcp=LoncapaProblem(filename, self.item_id, state)
 

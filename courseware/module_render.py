@@ -51,7 +51,6 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     ajax_url = '/modx/'+module+'/'+id+'/'
 
     id_tag=modx_modules[module].id_attribute
-    #print "X",s.xml, "Y",content_parser.module_xml(module, id_tag, id)
 
     xml = content_parser.module_xml(content_parser.course_file(request.user), module, id_tag, id)
 
@@ -97,7 +96,7 @@ def seq_module(request, module):
               for e in module.childNodes \
               if e.nodeType==1]
      
-    js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
+    js=""
 
     iid=uuid.uuid1().hex
 

@@ -21,3 +21,4 @@ class HtmlModule(XModule):
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
+        print xml

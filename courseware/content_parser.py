@@ -27,7 +27,6 @@ def course_file(user):
 def module_xml(coursefile, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes
         module occurs once in courseware XML file.. '''
-    #doc = libxml2.parseFile(coursefile)
     doc = etree.parse(coursefile)
 
     # Sanitize input
@@ -35,7 +34,7 @@ def module_xml(coursefile, module, id_tag, module_id):
         raise Exception("Module is not alphanumeric")
     if not module_id.isalnum():
         raise Exception("Module ID is not alphanumeric")
-    xpath_search='//*/{module}[@{id_tag} = "{id}"]'.format(module=module, 
+    xpath_search='//*/{module}[(@{id_tag} = "{id}") or (@id = "{id}")]'.format(module=module, 
                                                            id_tag=id_tag,
                                                            id=module_id)
     #result_set=doc.xpathEval(xpath_search)
