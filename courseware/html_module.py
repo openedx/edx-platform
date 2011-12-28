@@ -17,8 +17,18 @@ class HtmlModule(XModule):
         return "html"
         
     def get_html(self):
-        return render_to_string(self.item_id, {'id': self.item_id})
+        if self.filename!=None:
+            return render_to_string(self.filename, {'id': self.item_id})
+        else: 
+            xmltree=etree.fromstring(self.xml)
+            textlist=[xmltree.text]+[etree.tostring(i) for i in xmltree]+[xmltree.tail]
+            textlist=[i for i in textlist if type(i)==str]
+            return "".join(textlist)
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
-        print xml
+        xmltree=etree.fromstring(xml)
+        self.filename = None
+        filename_l=xmltree.xpath("/html/@filename")
+        if len(filename_l)>0:
+            self.filename=str(filename_l[0])

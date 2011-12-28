@@ -80,6 +80,16 @@ class LoncapaModule(XModule):
         if self.max_attempts != None: 
             attempts_str = " ({a}/{m})".format(a=self.attempts, m=self.max_attempts)
 
+        # Check if explanation is available, and if so, give a link
+        explain=""
+        if self.lcp.done and self.explain_available=='attempted':
+            explain=self.explanation
+        if self.closed() and self.explain_available=='closed':
+            explain=self.explanation
+        
+        if len(explain) == 0:
+            explain = False
+
         html=render_to_string('problem.html', 
                               {'problem' : content, 
                                'id' : self.filename, 
@@ -88,7 +98,8 @@ class LoncapaModule(XModule):
                                'save_button' : save_button,
                                'answer_available' : self.answer_available(),
                                'ajax_url' : self.ajax_url,
-                               'attempts': attempts_str
+                               'attempts': attempts_str, 
+                               'explain': explain
                                })
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
@@ -103,6 +114,9 @@ class LoncapaModule(XModule):
         self.due_date = None
 
         dom2 = etree.fromstring(xml)
+
+        self.explanation=content_parser.item(dom2.xpath('/problem/@explain'))
+        self.explain_available=content_parser.item(dom2.xpath('/problem/@explain_available'))
 
         self.due_date=content_parser.item(dom2.xpath('/problem/@due'))
         if len(self.due_date)>0:
