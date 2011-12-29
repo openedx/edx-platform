@@ -1,0 +1,84 @@
+<%inherit file="main.html" />
+<script>
+var page=${ page };
+
+$(document).ready(function(){
+   $("#booknav").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
+});
+
+function goto_page(n) {
+  var prefix = "";
+  if(n<100) {
+    prefix="0";
+  }
+  if(n<10) {
+    prefix="00";
+  }
+  $("#bookpage").attr("src","/static/book/p"+prefix+n+".jpg");
+};
+
+function prev_page() {
+  page=page-1;
+  if(page<1) page=1;
+  goto_page(page);
+}
+
+function next_page() {
+  page=page+1;
+  if(page>1764) page=1764;
+  goto_page(page);
+}
+
+</script>
+<div id="bodyContent">
+<table width=100% cellpadding=0><tr>
+<td valign=top>
+    <div id="coursenav">
+       <a href="/textbook/index.html"><b>Textbook</b></a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+       <a href="/courseware">Courseware</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/discussion">Discussion</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/profile">Profile</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/help">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/logout">Log out</a>
+    </div>
+<table>
+<tr><td valign=top>
+<ul id="booknav" class="treeview-booknav">
+<li> <a href="javascript:goto_page(1)">Front material</a>
+<ul>
+<li> <a href="javascript:goto_page(5);">Contents</a>
+<li> <a href="javascript:goto_page(23);">Preface</a>
+</ul>
+<li> <a href="javascript:goto_page(31);">Ch 1: The Circuit Abstraction</a>
+<ul>
+<li> Section 1
+<li> Section 2
+</ul>
+<li> <a href="javascript:goto_page();">Ch 2: </a>
+<li> <a href="javascript:goto_page();">Ch 3: </a>
+<li> <a href="javascript:goto_page();">Ch 4: </a>
+<li> <a href="javascript:goto_page();">Ch 5: </a>
+<li> <a href="javascript:goto_page();">Ch 6: </a>
+<li> <a href="javascript:goto_page();">Ch 7: </a>
+<li> <a href="javascript:goto_page();">Ch 8: </a>
+<li> <a href="javascript:goto_page();">Ch 9: </a>
+<li> <a href="javascript:goto_page();">Ch 10: </a>
+<li> <a href="javascript:goto_page();">Ch 11: </a>
+<li> <a href="javascript:goto_page();">Ch 12: </a>
+</ul>
+</td><td width=10></td><td width=1 bgcolor=black></td><td>
+    <div align=center>
+<table>
+<tr><td><a href="javascript:prev_page()"><span class="ui-icon ui-icon-circle-triangle-w">&nbsp;</span></a></td><td>
+<img id="bookpage" src="/static/book/p${ "%03i"%(page) }.jpg">
+</td><td><a href="javascript:next_page()"><span class="ui-icon ui-icon-circle-triangle-e">&nbsp;</span></a></td></tr>
+       </div>
+</td>
+</tr></table></td></tr>
+</table>
+
+</div>
