@@ -115,7 +115,7 @@ class LoncapaModule(XModule):
 
         dom2 = etree.fromstring(xml)
 
-        self.explanation=content_parser.item(dom2.xpath('/problem/@explain'))
+        self.explanation=content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
         self.explain_available=content_parser.item(dom2.xpath('/problem/@explain_available'))
 
         self.due_date=content_parser.item(dom2.xpath('/problem/@due'))

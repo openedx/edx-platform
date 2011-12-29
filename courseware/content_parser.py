@@ -11,6 +11,30 @@ course XML file and the rest of the system.
 TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
 
+def xpath(xml, query_string, **args):
+    ''' Safe xpath query into an xml tree:
+        * xml is the tree.
+        * query_string is the query
+        * args are the parameters. Substitute for {params}. '''
+    doc = etree.fromstring(xml)
+    print type(doc)
+    def escape(x):
+        # TODO: This should escape the string. For now, we just assume it's made of valid characters. 
+        # Couldn't figure out how to escape for lxml in a few quick Googles
+        valid_chars="".join(map(chr, range(ord('a'),ord('z')+1)+range(ord('A'),ord('Z')+1)+range(ord('0'), ord('9')+1)))+"_ "
+        for e in x:
+            if e not in valid_chars:
+                raise Exception("Invalid char in xpath expression. TODO: Escape")
+        return x
+
+    args=dict( ((k, escape(args[k])) for k in args) )
+    print args
+    results = doc.xpath(query_string.format(**args))
+    return results
+
+if __name__=='__main__':
+    print xpath('<html><problem name="Bob"></problem></html>', '/{search}/problem[@name="{name}"]', search='html', name="Bob")
+
 def item(l, default="", process=lambda x:x):
     if len(l)==0:
         return default
