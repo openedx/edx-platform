@@ -6,4 +6,6 @@ from django.conf import settings
 from django.http import Http404
 
 def index(request, page=1): 
+    if not request.user.is_authenticated():
+        return redirect('/')
     return render_to_response('staticbook.html',{'page':int(page)})
