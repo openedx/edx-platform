@@ -1,0 +1,363 @@
+
+/* 
+----------------------------------------------------------------------------------------
+
+Copyright 2010 - Thierry Ruiz - www.dotemplate.com - All rights reserved.
+
+THIS TEMPLATE IS FREE AS LONG AS YOU KEEP THE LINK TO WWW.DOTEMPLATE.COM IN THE FOOTER
+TO REMOVE THE LINK, PLEASE MAKE A 10 DOLLARS DONATION at www.dotemplate.com/#donate
+
+pmitros donated $10
+
+Colors: 
+Light blue: bddeff
+      Blue: 7fbcfd
+Very dark blue: #031634
+
+Dark blue: #023063;
+Dark Greenish: #7a994c;
+Greenish: #adcc80;
+Very light greenish: #dae5c9;
+Bright orange: #fa720a;
+
+
+----------------------------------------------------------------------------------------
+*/
+
+
+html {
+	background: $bottomWrapper.bg.color;
+	margin:0 0 0 -1px;
+	padding:0;	
+	overflow-Y: scroll;
+}
+
+
+body {
+	padding:0;
+	margin :0;
+	display:table; 
+	width:100%;	
+}
+
+
+body {
+	color:#023063;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 0.8em;
+	font-style: normal;
+	font-weight: normal;
+	text-transform: normal;
+}
+
+p {
+	letter-spacing: normal;
+	line-height: 20px;
+}
+
+h1 {
+	color:#adcc80;
+	font-size:1.6em;
+	margin:25px 0 10px 0;
+	clear:both;
+}
+
+
+h2 {
+	color:#adcc80;
+	font-size:1.1em;
+	margin:20px 0 10px 0;
+	clear:both;
+}
+
+
+h3 {
+	color:#adcc80;
+	font-size:1em;
+	margin:20px 0 5px 0;
+	clear:both;
+}
+
+
+
+a:link, a:visited {
+	color:#adcc80;
+	text-decoration:none;
+}
+
+
+a:hover {
+	color:#fa720a;
+	text-decoration:underline;
+}
+
+#sectiondesc {
+    font-size:8px;
+}	
+					
+#wrapper {
+	background: transparent url( images/css/page-vbg.jpg ) repeat-y scroll 50% 0px;
+	margin:0 auto ;
+	width:100%;
+}
+
+					body {
+	background-color:#FFFFFF;
+}
+
+#wrapper {
+	border-top: 1px solid #ffffff;
+}
+	
+
+					
+#topWrapper {
+	width:100%;
+	height:100px;
+	background-color:${topWrapper.bg.color};
+	background-image:url(images/css/topWrapper-bg.jpg);
+	background-position:center top ;
+	background-repeat:repeat-x;
+}
+
+
+					
+#topBanner {
+	width:800px;
+	margin:0 auto;
+	height:100px;
+	background-image:url(images/css/topBanner.jpg);
+	background-repeat:no-repeat;
+}
+
+	
+
+#topnav {
+	background:transparent url('images/css/hmenu.jpg') repeat-x top left;
+}
+
+
+					
+
+#topnav {
+	height:20px;
+	margin:0 auto ;
+	text-align:center;
+}
+
+#topnav ul {
+	display:table;
+	margin:0 auto;
+	padding:0;
+	list-style-type:none;
+	position:relative;
+	height:20px;
+	text-transform:uppercase;
+	font-size:0.9em;
+	font-family:Arial,sans-serif;
+}
+
+
+#topnav ul li {
+	display:block;
+	float:left;
+	margin:0;
+	padding:0;
+	background:transparent url('images/css/hmenu.jpg') repeat-x top left;
+
+}
+
+
+#topnav ul li a {
+	display:block;
+	float:left;
+	color:#031634;
+	text-decoration:none;
+	padding:0px 50px ;
+	line-height:20px;
+	font-weight:bold;
+}
+
+
+#topnav ul li a:hover, #topnav li#current a {
+	color:#7a994c;
+	background:transparent url('images/css/hmenu-sel.jpg') repeat-x top left;
+}
+
+	
+
+#topnav ul {
+	width:800px;
+}
+
+
+
+
+body {
+	background-position : center 120px;
+}
+
+	
+
+#bg {
+	margin:0 auto;
+	padding:0;
+	background:transparent ;
+	background-image:url(images/css/hat.jpg);
+ 	background-repeat:no-repeat;	
+	background-position: center top ;
+}
+
+
+
+					#header {
+	margin: 0 auto;
+	min-height:0px;
+	height: 0px;
+	width: 800px;
+}
+	
+
+#page {
+	background: transparent url( images/css/page-bg.jpg ) no-repeat center top;
+}
+
+
+					
+
+
+#container {
+	margin:0 auto;
+	width:800px;
+}
+
+
+#content {
+	width:780px;
+	margin:0 auto ;
+	text-align:left;
+	min-height:800px;
+}
+
+
+#content p {
+	text-align:justify;
+}
+
+	
+
+
+
+#footerWrapper {
+	margin:0 auto;
+	height:10px;
+	padding:0;
+	background:transparent url( images/css/footerWrapper-bg.jpg ) no-repeat scroll center top;
+}
+
+
+#footer {
+	margin:0 auto;
+	padding:0;
+	width:800px;
+	height:10px;
+}
+
+
+	
+	
+					
+#right {
+	width:200px;
+	padding:10px 20px 20px 20px;
+	float:left;
+}
+
+
+#center {
+	width:500px;
+	padding:10px 20px 20px 20px;
+	float:left;
+}
+
+ 
+#content p {
+	margin-top:10px;
+	text-align:justify;
+}
+
+
+										
+#sidebar ul.vmenu {
+	list-style: none;
+	text-align: left;
+	margin: 7px 0px 8px 0px; 
+	padding: 0;
+	text-decoration: none;	
+	border-top: 1px solid #eeeeee;
+}
+
+
+#sidebar ul.vmenu li {
+	list-style: none;
+	padding: 4px 0 4px 0px;
+	margin: 0 2px;	
+	border-bottom: 1px solid #eeeeee;
+}
+
+
+
+#sidebar ul.vmenu li a {
+	text-decoration: none;
+	color:#023063;
+}
+
+
+#sidebar ul.vmenu li a:hover {
+	color:#adcc80;
+}
+
+
+#sidebar ul.vmenu ul { margin: 0 0 0 5px; padding: 0; }
+#sidebar ul.vmenu ul li { border: none; }
+
+
+			
+					
+
+#bottomWrapper {
+	height:140px;
+	background-color:#031634;
+	background-image:url(images/css/bottomWrapper-bg.jpg);
+	background-position:center top ;
+	background-repeat:repeat-x;
+	text-align:center;
+	color:#adcc80;
+	text-align:center;	
+}
+
+#bottomWrapper a:link, #footer a:visited {
+	color:#dae5c9;
+}
+
+
+#bottomWrapper a:hover{
+	color:#adcc80;
+	text-decoration:none;
+}
+
+	
+
+a img {
+	border:none;
+} 
+
+
+.clear {
+	clear: both;
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
