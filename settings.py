@@ -1,8 +1,3 @@
-# Django settings for mitx project.
-
-execfile("../settings.py")
-
-
 DEFAULT_FROM_EMAIL = 'pmitros@csail.mit.edu'
 
 HTTPS = 'on'
@@ -134,3 +129,6 @@ LOGGING = {
         },
     }
 }
+
+# Django settings for mitx project.
+execfile("../settings.py")
