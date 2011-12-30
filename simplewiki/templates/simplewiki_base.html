@@ -6,6 +6,8 @@
 <link rel="stylesheet" media="screen,print" href="/static/simplewiki/css/base.css" />
 <link rel="stylesheet" media="print" href="/static/simplewiki/css/base_print.css" />
 <link rel="stylesheet" href="/static/simplewiki/css/autosuggest_inquisitor.css" />
+<link rel="stylesheet" href="/static/css/local.css" type="text/css" media="all" />
+<link href="/static/css/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="/static/simplewiki/js/bsn.AutoSuggest_c_2.0.js"></script>
 <script type="text/javascript">
 	function set_related_article_id(s) {
@@ -32,6 +34,76 @@
 </head>
 <body>
 
+<style>
+#coursenav_wiki {
+background-color: #031634;
+border-bottom-color: #023063;
+border-collapse: separate;
+border-left-color: #023063;
+border-right-color: #023063;
+border-top-color: #023063;
+color: #023063;
+display: block;
+font-family: Helvetica, Arial, sans-serif;
+font-size: 13px;
+font-style: normal;
+font-weight: normal;
+height: 19px;
+margin-bottom: 8px;
+margin-left: 0px;
+margin-right: 8px;
+margin-top: 4px;
+padding-bottom: 8px;
+padding-left: 0px;
+padding-right: 8px;
+padding-top: 4px;
+text-align: right;
+}
+
+a.navwiki {
+background-color: transparent;
+border-bottom-color: #ADCC80;
+border-collapse: separate;
+border-left-color: #ADCC80;
+border-right-color: #ADCC80;
+border-top-color: #ADCC80;
+color: #ADCC80;
+cursor: auto;
+display: inline;
+font-family: Helvetica, Arial, sans-serif;
+font-size: 13px;
+font-style: normal;
+font-weight: normal;
+height: 0px;
+margin-bottom: 0px;
+margin-left: 0px;
+margin-right: 0px;
+margin-top: 0px;
+padding-bottom: 0px;
+padding-left: 0px;
+padding-right: 0px;
+padding-top: 0px;
+text-align: right;
+text-decoration: none;
+width: 0px;
+}
+</style>
+
+<div id="coursenav_wiki" width="100%">
+       <a class="navwiki" href="/book">Textbook</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+       <a class="navwiki" href="/courseware">Courseware</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a class="navwiki" href="/discussion">Discussion</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a class="navwiki" href="/wiki"><b>Wiki</b></a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a class="navwiki" href="/profile">Profile</a> 
+<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a class="navwiki" href="/help">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a class="navwiki" href="/logout">Log out</a>
+</div>
+    
 <h1>{% block wiki_page_title %}{% endblock %}</h1>
 <hr />
 
