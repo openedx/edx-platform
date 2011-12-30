@@ -41,6 +41,9 @@ def root_redirect(request):
     """
     try:
         root = Article.get_root()
+        if root.slug == "":
+            root.slug = "Home"
+            root.save()
     except:
         err = not_found(request, 'mainpage')
         return err
