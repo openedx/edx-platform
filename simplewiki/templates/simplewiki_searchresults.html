@@ -1,0 +1,21 @@
+{% extends "simplewiki_base.html" %}
+{% load i18n simplewiki_utils %}
+{% block wiki_page_title %}
+    {% if wiki_search_query %}
+        {% trans "Search results for" %} '{{ wiki_search_query|escape }}'
+    {% else %}
+        {% trans "Displaying all articles" %}
+    {% endif %}
+{% endblock %}
+
+{% block wiki_body %}
+    {% for article in wiki_search_results %}
+        {% if article.get_url %}
+            <a href="{% url wiki_view article.get_url %}">{{ article.get_url }}</a><br/>
+        {% else %}
+            <a href="{% url wiki_view '' %}">/</a><br/>
+        {% endif %}
+    {% empty %}
+        {% trans "No articles were found!" %}
+    {% endfor %}
+{% endblock %}

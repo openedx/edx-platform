@@ -1,0 +1,281 @@
+body
+{
+	font-family: 'Lucida Sans', 'Sans';
+}
+
+a img
+{
+	border: 0;
+}
+
+div#wiki_article a {
+    color: #06d;
+    text-decoration: none;
+}
+
+div#wiki_article a:hover {
+    color: #f82;
+    text-decoration: underline;
+}
+
+hr
+{
+	background-color: #def;
+	height: 2px;
+	border: 0;
+}
+
+div#wiki_article .toc a
+{
+	color: #025
+}
+
+div#wiki_article p
+{
+	/* font-size: 90%; looks funny when combined with lists/tables */
+	line-height: 140%;
+}
+div#wiki_article h1
+{
+	font-size: 200%;
+	font-weight: normal;
+	color: #048;
+}
+
+div#wiki_article h2
+{
+	font-size: 150%;
+	font-weight: normal;
+	color: #025;
+}
+
+div#wiki_article h3
+{
+	font-size: 120%;
+	font-weight: bold;
+	color: #000;
+}
+
+table
+{
+    border: 1px solid black;
+    border-collapse: collapse;
+    margin: 12px;
+}
+
+table tr.dark
+{
+    background-color: #F3F3F3;
+}
+
+table thead tr 
+{
+    background-color: #def;
+    border-bottom: 2px solid black;
+}
+
+table td, th
+{
+    padding: 6px 10px 6px 10px;
+    border: 1px solid black;
+}
+
+table thead th
+{
+    padding-bottom: 8px;
+    padding-top: 8px;
+}
+
+div#wiki_panel
+{
+	float: right;
+}
+
+div.wiki_box
+{
+	width: 230px;
+	padding: 10px;
+	color: #fff;
+	font-size: 80%;
+}
+
+div.wiki_box div.wiki_box_contents
+{	background-color: #222;
+	padding: 5px 10px;}
+
+div.wiki_box div.wiki_box_header,
+div.wiki_box div.wiki_box_footer
+{
+	position: relative;
+	height: 6px;
+	padding: 0 6px;
+	background-image: url(../img/box_corner_tr.gif);
+	background-position: top right;
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
+
+div.wiki_box div.wiki_box_footer
+{
+	background-image: url(../img/box_corner_br.gif);
+}
+
+div.wiki_box div.wiki_box_header div.wiki_box_corner,
+div.wiki_box div.wiki_box_footer div.wiki_box_corner
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 6px;
+	width: 6px;
+	background-image: url(../img/box_corner_tl.gif);
+	background-position: top left;
+	background-repeat: no-repeat;
+}
+
+div.wiki_box div.wiki_box_footer div.wiki_box_corner
+{
+	background-image: url(../img/box_corner_bl.gif);
+}
+
+div.wiki_box div.wiki_box_header div.wiki_box_bar,
+div.wiki_box div.wiki_box_footer div.wiki_box_bar
+{
+	height: 6px;
+	overflow: hidden;
+	background-color: #222;
+}
+
+
+div.wiki_box a
+{
+	color: #acf;
+}
+
+div.wiki_box p
+{
+	margin: 5px 0;
+}
+
+div.wiki_box ul
+{
+	padding-left: 20px;
+	margin-left: 0;
+}
+
+div.wiki_box div.wiki_box_title
+{
+	margin-bottom: 5px;
+	font-size: 140%;
+}
+
+form#wiki_revision #id_contents
+{
+	width:500px;
+	height: 400px;
+	font-family: monospace;
+}
+
+form#wiki_revision #id_title
+{
+	width: 500px;
+}
+
+form#wiki_revision #id_revision_text
+{
+	width: 500px;
+}
+
+table#wiki_revision_table
+{
+    border: none;
+    border-collapse: collapse;
+	padding-right: 250px;
+}
+
+table#wiki_revision_table th
+{
+    border: none;
+	text-align: left;
+	vertical-align: top;
+}
+
+table#wiki_revision_table td
+{
+    border: none;
+}
+
+table#wiki_history_table
+{
+    border-collapse: collapse;
+    border-spacing: 0;
+	padding-right: 250px;
+}
+
+table#wiki_history_table th#modified
+{
+    width: 220px;
+}
+
+table#wiki_history_table td
+{
+    border: none;
+}
+
+table#wiki_history_table tbody tr
+{
+    border-bottom: 1px solid black;
+}
+
+table#wiki_history_table tbody td
+{
+	vertical-align: top;
+	padding: 5px;
+}
+
+table#wiki_history_table tfoot td
+{
+    border: none;
+}
+
+table#wiki_history_table tbody td.diff
+{
+    font-family: monospace;
+    overflow: hidden;
+    border-left: 1px dotted black;
+    border-right: 1px dotted black;
+}
+
+table#wiki_history_table th
+{
+	text-align: left;
+}
+
+div#wiki_attach_progress_container
+{
+	background-color: #333;
+	width: 100%;
+	height: 20px;
+	display: none;
+}
+
+div#wiki_attach_progress
+{
+	width: 25%;
+	background-color: #999;
+}
+
+blockquote {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-left: 50px;
+  padding-left: 15px;
+  border-left: 3px solid #666;
+  color: #999;
+  max-width: 400px ;
+}
+
+blockquote p {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}

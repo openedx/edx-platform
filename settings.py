@@ -92,13 +92,14 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
+#    'django.contrib.admin',
     'courseware',
     'auth',
     'django.contrib.humanize',
     'static_template_view',
     'textbook',
     'staticbook',
+    'simplewiki',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

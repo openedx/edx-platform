@@ -1,0 +1,57 @@
+{% extends "simplewiki_base.html" %}
+{% load i18n simplewiki_utils %}
+{% block wiki_page_title %}
+    {{ wiki_article.title }}
+{% endblock %}
+{% block wiki_body %}
+<form method="POST">{% csrf_token %}
+<table id="wiki_history_table">
+    <thead>
+        <tr>
+            <th id="revision">Revision</th>
+            <th id="comment">Comment</th>
+            <th id="diff">Diff</th>
+            <th id="modified">Modified</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for revision in wiki_history %}
+            <tr style="border-top: 1px" {%cycle '' 'class="dark"'%}>
+                <td width="15px">
+                    <input  type="radio" name="revision" id="{{ revision.id }}" value="{{ revision.id }}"{%ifequal wiki_article.current_revision.id revision.id%} checked{%endifequal%} />
+                    <label for="{{ revision.id }}">
+                        {{ revision }}
+                        {% if revision.previous_revision %}
+                            {% ifnotequal revision.counter revision.previous_revision.counter|add:1 %}
+                                <br/>(based on {{ revision.previous_revision }})
+                            {% endifnotequal %}
+                        {% endif %}
+                    </label>
+                </td>
+                <td>{% if revision.revision_text %}{{ revision.revision_text}}{% else %}<i>None</i>{% endif %}</td>
+                <td class="diff">{% for x in revision.get_diff %}{{x|escape}}<br />{% endfor %}</td>
+                <td>{{ revision.get_user}}
+                    <br/>
+                    {{ revision.revision_date|date}} {{ revision.revision_date|time}}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    {% if wiki_prev_page or wiki_next_page %}
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    {% if wiki_prev_page %}
+                        <a href="{% url wiki_history wiki_article.get_url wiki_prev_page %}">{% trans "Previous page" %}</a>
+                    {% endif %}
+                    {% if wiki_next_page %}
+                        <a href="{% url wiki_history wiki_article.get_url wiki_next_page %}">{% trans "Next page" %}</a>
+                    {% endif %}
+                </td>
+            </tr>
+        </tfoot>
+    {% endif %}
+</table>
+<input type="submit" value="Change revision"{% if not wiki_write %} disabled="true"{% endif %} />
+</form>
+{% endblock %}

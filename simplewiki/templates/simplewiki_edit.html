@@ -1,0 +1,17 @@
+{% extends "simplewiki_base.html" %}
+{% load i18n simplewiki_utils %}
+{% block wiki_page_title %}
+	{{wiki_article.title}}
+{% endblock %}
+
+{% block wiki_body %}
+<form method="POST" id="wiki_revision">{% csrf_token %}
+	<table id="wiki_revision_table">
+	{{ wiki_form }}
+	<tr>
+		<td colspan="2" align="right">
+			<input type="submit" value="{% trans "Edit article" %}" /></td>
+	</tr>
+	</table>
+</form>
+{% endblock %}

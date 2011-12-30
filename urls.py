@@ -6,6 +6,7 @@ import django.contrib.auth.views
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+   (r'^wiki/', include('simplewiki.urls')),
     url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index'),
     url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index'),
     url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index'),

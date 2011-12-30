@@ -1,0 +1,32 @@
+{% load i18n simplewiki_utils %}
+
+{% if started %}
+<script type="text/javascript">
+	parent.document.getElementById("wiki_attach_progress_container").style.display='block';
+</script>
+{% else %}
+{% if finished %}
+<script type="text/javascript">
+	parent.document.getElementById("wiki_attach_progress_container").style.display='none';
+	parent.location.reload();
+</script>
+{% else %}
+{% if overwrite_warning %}
+<script type="text/javascript">
+	if (confirm('{% trans "Warning: The filename already exists? Really overwrite" %} {{ filename }}?'))
+		parent.document.getElementById("wiki_attach_overwrite").checked=true;
+		parent.document.getElementById("wiki_attach_overwrite").form.submit();
+</script>
+{% else %}
+{% if too_big %}
+<script type="text/javascript">
+	alert('File is too big. Maximum: {{max_size|filesizeformat}}\nYour file was: {{file.size|filesizeformat}}');
+</script>
+{% else %}
+<script type="text/javascript">
+	parent.document.getElementById("wiki_attach_progress").style.width='{{progress_width}}%';
+</script>
+{% endif %}
+{% endif %}
+{% endif %}
+{% endif %}
