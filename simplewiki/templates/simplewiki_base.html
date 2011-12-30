@@ -38,25 +38,7 @@
 {% block wiki_panel %}
 
 <div id="wiki_panel">
-    
-    <div class="wiki_box">
-    	<div class="wiki_box_header">
-    		<div class="wiki_box_corner"></div>
-    		<div class="wiki_box_bar"></div>
-    	</div>
-    	<div class="wiki_box_contents">
-        	<div class="wiki_box_title">{% trans "Search" %}</div>
-            <form method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
-            	<input type="text" name="value" id="wiki_search_input" style="width: 72%" value="{{wiki_search_query|escape}}"/>
-            	<input type="submit" id="wiki_search_input_submit" value={% trans "Go!" %} style="width: 20%" />
-            </form>
-        </div>
-        <div class="wiki_box_footer">
-        	<div class="wiki_box_corner"></div>
-        	<div class="wiki_box_bar"></div>
-        </div>
-    </div>
-    
+        
     <div class="wiki_box">
     	<div class="wiki_box_header">
     		<div class="wiki_box_corner"></div>
@@ -105,85 +87,6 @@
     		<div class="wiki_box_bar"></div>
     	</div>
     </div>
-
-
-    {% if wiki_article %}    
-        <div class="wiki_box">
-        	<div class="wiki_box_header">
-        		<div class="wiki_box_corner"></div>
-        		<div class="wiki_box_bar"></div>
-        	</div>
-        	<div class="wiki_box_contents">
-
-        	<div class="wiki_box_title">{% trans "Related articles" %}</div>
-        {% if wiki_article.related.all %}
-        	<p>
-        		{% for rel in wiki_article.related.all %}
-        		<span class="related">
-        			{% if wiki_write %}
-        				<a href="javascript:if(confirm('{% trans "Are you sure, you want to delete this relation?" %}')) { location.href='{% url wiki_remove_relation wiki_article.get_url rel.id%}'; }">
-        					<img src="{{ "simplewiki/img/delete.gif"|prepend_media_url }}" alt="{% trans "remove relation" %}" />
-        				</a>
-        			{% endif %}
-        			<a href="{% url wiki_view rel.get_url %}">{{rel.title}}</a>
-        		</span>
-        		{% endfor %}
-        	</p>
-        {% else %}
-        	<p><i>({% trans "none" %})</i></p>
-        {% endif %}
-        {% if wiki_write %}
-        <form method="POST" action="{% url add_related wiki_article.get_url %}">{% csrf_token %}
-        	<input type="text" name="value" id="wiki_related_input" style="width: 72%" />
-        	<input type="submit" id="wiki_related_input_submit" disabled="true" value="Add" style="width: 20%" />
-        	<input type="hidden" name="id" value="" id="wiki_related_input_id" />
-        </form>
-        {% endif %}
-
-        	</div>
-        	<div class="wiki_box_footer">
-        		<div class="wiki_box_corner"></div>
-        		<div class="wiki_box_bar"></div>
-        	</div>
-        </div>
-
-        <div class="wiki_box">
-        	<div class="wiki_box_header">
-        		<div class="wiki_box_corner"></div>
-        		<div class="wiki_box_bar"></div>
-        	</div>
-        	<div class="wiki_box_contents">
-
-        	<div class="wiki_box_title">{% trans "Attachments" %}</div>
-        	{% if wiki_article.attachments %}
-        	<ul>
-        		{% for a in wiki_article.attachments %}
-        		<li><a href="{{a.download_url}}">{{a.filename|slice:":13"|slice:":-3" }}{% if a.filename|slice:"10:" %}...{{ a.filename|slice:"-3:" }}{% endif %}</a> ({{a.get_size|filesizeformat}})</li>
-        		{% endfor %}
-        	</ul>
-        	{% else %}
-        	<p><i>({% trans "none" %})</i></p>
-        	{% endif %}
-        	
-        {% if wiki_attachments_write %}
-        	<form method="POST" action="{% url add_attachment wiki_article.get_url %}" enctype="multipart/form-data" target="wiki_attach_frame">{% csrf_token %}
-        		<input type="file" class="fileinput" name="attachment" size="10" /><br />
-        		<input type="checkbox" name="overwrite" id="wiki_attach_overwrite" value="1" /> Overwrite same filename
-        		<p><input type="submit" value="Attach" /></p>
-        		<div id="wiki_attach_progress_container">
-        			<div id="wiki_attach_progress"><br /></div>
-        		</div>
-        	</form>
-        	<iframe name="wiki_attach_frame" style="display:none"></iframe>
-        {% endif %}
-
-        	</div>
-        	<div class="wiki_box_footer">
-        		<div class="wiki_box_corner"></div>
-        		<div class="wiki_box_bar"></div>
-        	</div>
-        </div>
-    {% endif %}
 
 </div>
 
