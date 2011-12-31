@@ -6,7 +6,10 @@ import json
 
 import tempfile
 
-directory = tempfile.mkdtemp(prefix = settings.TRACK_DIR)
+if settings.TRACK_DIR != None:
+    directory = tempfile.mkdtemp(prefix = settings.TRACK_DIR)
+else:
+    directory = None
 
 logfile = None
 file_index = 0 
@@ -24,7 +27,7 @@ def make_file():
 def log_event(event):
     global logfile, log_index
     if settings.TRACK_DIR == None:
-        print event
+#        print event
         return
 
     if logfile == None or log_index >= MAXLOG:
