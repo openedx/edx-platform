@@ -135,5 +135,7 @@ LOGGING = {
     }
 }
 
+TRACK_DIR = None
+
 # Django settings for mitx project.
 execfile("../settings.py")
