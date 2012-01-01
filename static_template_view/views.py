@@ -13,3 +13,14 @@ def index(request, template):
         return render_to_response(template,{})
     else:
         return redirect('/')
+
+valid_auth_templates=['help.html']
+
+def auth_index(request, template): 
+    if not request.user.is_authenticated():
+        return redirect('/')
+
+    if template in valid_auth_templates:
+        return render_to_response(template,{})
+    else:
+        return redirect('/')
