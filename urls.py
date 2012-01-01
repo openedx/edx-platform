@@ -1,26 +1,23 @@
 from django.conf.urls.defaults import patterns, include, url
 import django.contrib.auth.views
+from django.conf import settings
+from django.contrib import admin
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = ('',
     url(r'^event$', 'track.views.user_track'),
    (r'^wiki/', include('simplewiki.urls')),
     url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index'),
     url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index'),
     url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index'),
-#    url(r'^courseware/modx/(?P<id>[^/]*)/problem_check$', 'courseware.views.check_problem'),
     url(r'^modx/(?P<module>[^/]*)/(?P<id>[^/]*)/(?P<dispatch>[^/]*)$', 'courseware.views.modx_dispatch'), #reset_problem'),
     url(r'^courseware/$', 'courseware.views.index'),
     url(r'^profile$', 'courseware.views.profile'),
     url(r'^change_setting$', 'auth.views.change_setting'),
-#    url(r'^admin/', include('django.contrib.admin.urls')),
-#    url(r'^accounts/register/$', 'registration.views.register', {'success_url':'/accounts/register/complete'}),
-#    url(r'^accounts/', include('registration.urls')),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),
-#    url(r'^textbook/(?P<filename>[^/]*)$', 'textbook.views.index'), 
     url(r'^book/(?P<page>[^/]*)$', 'staticbook.views.index'), 
     url(r'^book*$', 'staticbook.views.index'), 
     url(r'^logout$', 'auth.views.logout_user'),
@@ -39,6 +36,13 @@ urlpatterns = patterns('',
         name='auth_password_reset_complete'),
     url(r'^password_reset_done/$',django.contrib.auth.views.password_reset_done,
         name='auth_password_reset_done'),
-#    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-#    url(r'^admin/', include(admin.site.urls)),
 )
+
+if settings.ASKBOT_ENABLED:
+   urlpatterns=urlpatterns + (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
+                                 url(r'^admin/', include(admin.site.urls)), \
+                                 url(r'^settings/', include('askbot.deps.livesettings.urls')), \
+                                 url(r'^followit/', include('followit.urls')), \
+                                 url(r'^robots.txt$', include('robots.urls')),)
+
+urlpatterns = patterns(*urlpatterns)

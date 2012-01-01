@@ -1,3 +1,5 @@
+ASKBOT_ENABLED = True
+
 DEFAULT_FROM_EMAIL = 'pmitros@csail.mit.edu'
 
 WIKI_REQUIRE_LOGIN_EDIT = True
@@ -25,7 +27,7 @@ TIME_ZONE = 'America/Chicago'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
 SITE_ID = 1
 
@@ -84,6 +86,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'djangomako.middleware.MakoMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'mitx.urls'
@@ -95,7 +98,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-#    'django.contrib.admin',
     'courseware',
     'auth',
     'django.contrib.humanize',
@@ -139,3 +141,75 @@ TRACK_DIR = None
 
 # Django settings for mitx project.
 execfile("../settings.py")
+
+if ASKBOT_ENABLED:
+   import os
+   import askbot
+   import site
+   site.addsitedir(os.path.join(os.path.dirname(askbot.__file__), 'deps'))
+   TEMPLATE_LOADERS = TEMPLATE_LOADERS + ('askbot.skins.loaders.filesystem_load_template_source',)
+
+   MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
+	   'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
+	   'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+	   'askbot.middleware.cancel.CancelActionMiddleware',
+	   'django.middleware.transaction.TransactionMiddleware',
+	   'askbot.middleware.view_log.ViewLogMiddleware',
+	   'askbot.middleware.spaceless.SpacelessMiddleware',
+	   'askbot.middleware.forum_mode.ForumModeMiddleware',
+	   )
+
+   FILE_UPLOAD_TEMP_DIR = os.path.join(
+	   os.path.dirname(__file__),
+	   'tmp'
+	   ).replace('\\','/')
+   FILE_UPLOAD_HANDLERS = (
+	   'django.core.files.uploadhandler.MemoryFileUploadHandler',
+	   'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+	   )
+   ASKBOT_ALLOWED_UPLOAD_FILE_TYPES = ('.jpg', '.jpeg', '.gif', '.bmp', '.png', '.tiff')
+   ASKBOT_MAX_UPLOAD_FILE_SIZE = 1024 * 1024 #result in bytes
+   ASKBOT_FILE_UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'askbot', 'upfiles')
+   DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+   
+   PROJECT_ROOT = os.path.dirname(__file__)
+   
+   TEMPLATE_CONTEXT_PROCESSORS = (
+	   'django.core.context_processors.request',
+	   'askbot.context.application_settings',
+	   #'django.core.context_processors.i18n',
+	   'askbot.user_messages.context_processors.user_messages',#must be before auth
+	   'django.core.context_processors.auth', #this is required for admin
+	   'django.core.context_processors.csrf', #necessary for csrf protection
+	   )
+   
+   INSTALLED_APPS = INSTALLED_APPS + (
+	   'django.contrib.sitemaps',
+	   'django.contrib.admin',
+	   'south',
+	   'askbot.deps.livesettings',
+	   'askbot',
+	   'keyedcache',
+	   'robots',
+	   'django_countries',
+	   'djcelery',
+	   'djkombu',
+	   'followit',
+	   )
+   
+   CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+   ASKBOT_URL = 'discussion/'
+   LOGIN_REDIRECT_URL = '/'
+   LOGIN_URL = '/#login'
+   
+   ASKBOT_UPLOADED_FILES_URL = '%s%s' % (ASKBOT_URL, 'upfiles/')
+   ALLOW_UNICODE_SLUGS = False
+   ASKBOT_USE_STACKEXCHANGE_URLS = False #mimic url scheme of stackexchange
+   ASKBOT_CSS_DEVEL = True
+   
+   #Celery Settings
+   BROKER_TRANSPORT = "djkombu.transport.DatabaseTransport"
+   CELERY_ALWAYS_EAGER = True
+   
+   import djcelery
+   djcelery.setup_loader()
