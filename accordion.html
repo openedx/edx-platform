@@ -1,7 +1,7 @@
 <%def name="make_chapter(chapter)">
 	<h3><a href="#">${chapter['name']}</a></h3>
 	<div>
-	  <ul>
+	  <ul style="margin-left:-2em;">
             % for section in chapter['sections']:
                <li> <div
 		      % if 'active' in section and section['active']:

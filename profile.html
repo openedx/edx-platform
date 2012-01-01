@@ -5,6 +5,8 @@ var loc=true; // Activate on clicks? Not if already clicked.
 var lang=true;
 $(function() {
         $("#change_location").click(function() {
+           log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
+
            if(loc) {
              $("#description").html('<div style="color:#FF0000">'+
                                     "Preferred format is city, state, country (so for us, "+
@@ -19,12 +21,15 @@ $(function() {
                   $("#location_sub").text(json.location);
                   loc=true;
                   $("#description").html("");
+                 log_event("profile", {"type":"location_change", "new":json.location});
                 });
              });
            }
         });
 
         $("#change_language").click(function() {
+           log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
+
            if(lang) {
              lang=false;
              $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
@@ -34,6 +39,7 @@ $(function() {
                   $("#language_sub").text(json.language);
                   lang=true;
                   $("#description").html("");
+                 log_event("profile", {"type":"language_change", "new":json.language});
                 });
              });
            }
@@ -45,12 +51,14 @@ $(function() {
 
         $('#change_password').click(function(){
           $('#inline').trigger('click');
+            log_event("profile", {"type":"password_show"});
         });
 
     $('#pwd_reset_button').click(function() {
       $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
                     "email"  : $('#id_email').val()}, function(data){
          $('#pwd_reset').html(data);
+         log_event("profile", {"type":"password_send"});
       });
     });
 })

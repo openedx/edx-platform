@@ -7,6 +7,7 @@ $(document).ready(function(){
 });
 
 function goto_page(n) {
+  log_event("book", {"type":"gotopage","old":page,"new":n});
   page=n;
   var prefix = "";
   if(n<100) {
@@ -22,12 +23,14 @@ function prev_page() {
   page=page-1;
   if(page<1) page=1;
   goto_page(page);
+  log_event("book", {"type":"prevpage","new":page});
 }
 
 function next_page() {
   page=page+1;
   if(page>1764) page=1764;
   goto_page(page);
+  log_event("book", {"type":"nextpage","new":page});
 }
 
 </script>

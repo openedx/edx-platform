@@ -21,15 +21,7 @@ $('#hide_acc').click(function() {
 });
 </script>
 
-<div id="bodyContent">
-<table width=100% cellpadding=0><tr>
-<td width=276 valign=top>
-    <div id="accordion">
-    ${accordion}
-    </div>
-</td>
-<td valign=top>
-    <div id="coursenav">
+    <div id="coursenav" align=right width=100%>
        <a href="/book">Textbook</a> 
 <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
        <a href="/courseware"><b>Courseware</b></a> 
@@ -43,6 +35,16 @@ $('#hide_acc').click(function() {
 <a href="/help">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
 <a href="/logout">Log out</a>
     </div>
+
+
+<div id="bodyContent">
+<table width=100% cellpadding=0><tr>
+<td width=276 valign=top>
+    <div id="accordion" style="position:relative; top:-6px; ">
+    ${accordion}
+    </div>
+</td>
+<td valign=top>
     <div>
        ${content}
        </div>
