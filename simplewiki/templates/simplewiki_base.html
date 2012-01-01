@@ -87,6 +87,41 @@ text-align: right;
 text-decoration: none;
 width: 0px;
 }
+
+#footer_wiki {
+background-color: #031634;
+background-image: url(/static/css/images/css/bottomWrapper-bg.jpg);
+background-position: 50% 0%;
+background-repeat: repeat-x;
+color: #ADCC80;
+display: block;
+font-family: Helvetica, Arial, sans-serif;
+font-size: 13px;
+font-style: normal;
+font-weight: normal;
+height: 140px;
+text-align: center;
+}
+
+a.footwiki {
+background-color: transparent;
+background-image: none;
+background-position: 0% 0%;
+background-repeat: repeat;
+color: #ADCC80;
+cursor: auto;
+display: inline;
+font-family: Helvetica, Arial, sans-serif;
+font-size: 13px;
+font-style: normal;
+font-weight: normal;
+height: 0px;
+letter-spacing: normal;
+line-height: 20px;
+text-align: center;
+text-decoration: none;
+}
+
 </style>
 
 <div id="coursenav_wiki" width="100%">
@@ -167,6 +202,8 @@ width: 0px;
 {% block wiki_body %}
 
 {% endblock %}
+
+<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <div id="footer_wiki"> <p style="padding-top:20px"> Copyright (c). 2011. MIT. <a class="footwiki" href=http://creativecommons.org/licenses/by-sa/3.0/>Some rights reserved.</a> <!-- Template based on a design from http://www.dotemplate.com/ -- Donated $10 (pmitros) so we don't need to include credit. --> </p> </div>
 
 </body>
 </html>
