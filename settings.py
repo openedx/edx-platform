@@ -143,6 +143,8 @@ TRACK_DIR = None
 execfile("../settings.py")
 
 if ASKBOT_ENABLED:
+   import sys
+   sys.path.append(ASKBOT_DIR)
    import os
    import askbot
    import site
@@ -200,7 +202,7 @@ if ASKBOT_ENABLED:
    CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
    ASKBOT_URL = 'discussion/'
    LOGIN_REDIRECT_URL = '/'
-   LOGIN_URL = '/#login'
+   LOGIN_URL = '/'
    
    ASKBOT_UPLOADED_FILES_URL = '%s%s' % (ASKBOT_URL, 'upfiles/')
    ALLOW_UNICODE_SLUGS = False

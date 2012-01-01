@@ -44,6 +44,7 @@ if settings.ASKBOT_ENABLED:
                                  url(r'^admin/', include(admin.site.urls)), \
                                  url(r'^settings/', include('askbot.deps.livesettings.urls')), \
                                  url(r'^followit/', include('followit.urls')), \
-                                 url(r'^robots.txt$', include('robots.urls')),)
+#                                 url(r'^robots.txt$', include('robots.urls')),
+                              )
 
 urlpatterns = patterns(*urlpatterns)
