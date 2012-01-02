@@ -30,12 +30,12 @@ function ${ id }_load() {
 	    });
 	
 	$('#show_${ id }').click(function() {
-		postJSON('/modx/problem/${ id }/problem_show', function(data) {
+		postJSON('/modx/problem/${ id }/problem_show', {}, function(data) {
 			for (var key in data) {
 			    $("#answer_${ id }_"+key).text(data[key]);
 			}
 		    });
-		log_event('problem_show', submit_data);
+		log_event('problem_show', {'problem':'${ id }'});
 	    });
 
 	$('#save_${ id }').click(function() {
