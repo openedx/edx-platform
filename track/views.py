@@ -2,7 +2,7 @@
 from django.http import HttpResponse
 from django.http import Http404
 from django.conf import settings
-import json
+import json, os, stat
 
 import tempfile
 
@@ -15,12 +15,17 @@ logfile = None
 file_index = 0 
 log_index = 0
 MAXLOG = 5
+filename = None
 
 def make_file():
-    global logfile, log_index, file_index
+    global logfile, log_index, file_index, filename
     if logfile != None:
         logfile.close()
-    logfile = open(directory+"/%05i"%(file_index), "w")
+        os.chmod(filename, stat.S_IRUSR | stat.S_IWUSR | \
+                           stat.S_IRGRP | stat.S_IWGRP | \
+                           stat.S_IROTH )
+    filename = directory+"/%05i"%(file_index)+".trklog"
+    logfile = open(filename, "w")
     file_index = file_index + 1
     log_index = 0
 
