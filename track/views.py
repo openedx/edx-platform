@@ -55,7 +55,6 @@ def server_track(request, event_type, event, page=None):
     event = {
         "username" : request.user.username, 
         "ip" : request.META['REMOTE_ADDR'],
-        "ip" : request.META['REMOTE_ADDR'],
         "event_source" : "server",
         "event_type" : event_type, 
         "event" : event,
