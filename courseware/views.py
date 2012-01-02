@@ -95,7 +95,8 @@ def render_accordion(request,course,chapter,section):
     context=dict([['active_chapter',active_chapter],
                   ['toc',toc], 
                   ['course_name',course],
-                  ['format_string',format_string]]+ \
+                  ['format_string',format_string],
+                  ['csrf',csrf(request)['csrf_token']]] + \
                      template_imports.items())
     return {'init_js':render_to_string('accordion_init.js',context), 
             'content':render_to_string('accordion.html',context)}
@@ -136,7 +137,8 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     context={'init':accordion['init_js']+module['init_js'],
              'accordion':accordion['content'],
-             'content':module['content']}
+             'content':module['content'],
+             'csrf':csrf(request)['csrf_token']}
     return render_to_response('courseware.html', context)
 
 

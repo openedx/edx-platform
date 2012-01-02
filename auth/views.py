@@ -21,26 +21,34 @@ def index(request):
     if request.user.is_authenticated():
         return redirect('/courseware')
     else:
-        return render_to_response('index.html', {'error':'', 'csrf':csrf(request)['csrf_token']}) # Clean up how error is done. 
+        csrf_token = csrf(request)['csrf_token']
+        # TODO: Clean up how 'error' is done. 
+        return render_to_response('index.html', {'error' : '',
+                                                 'csrf': csrf_token }) 
 
 def login_user(request, error=""):
-    if 'email' not in request.GET or 'password' not in request.GET:
+    print request.POST
+    if 'email' not in request.POST or 'password' not in request.POST:
+        print "X"
         return render_to_response('login.html', {'error':error.replace('+',' ')})
-    email = request.GET['email']
-    password = request.GET['password']
+    email = request.POST['email']
+    password = request.POST['password']
     try:
         user=User.objects.get(email=email)
     except User.DoesNotExist:
-        return HttpResponse(json.dumps({'success':False, 'error': 'Invalid login'})) # TODO: User error message
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error': 'Invalid login'})) # TODO: User error message
 
     username=user.username
     user=authenticate(username=username, password=password)
     if user is None:
-        return HttpResponse(json.dumps({'success':False, 'error': 'Invalid login'}))
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error': 'Invalid login'}))
     if user is not None and user.is_active:
         login(request, user)
         return HttpResponse(json.dumps({'success':True}))
-    return HttpResponse(json.dumps({'success':False, 'error': 'Account not active. Check your e-mail.'}))
+    return HttpResponse(json.dumps({'success':False, 
+                                    'error': 'Account not active. Check your e-mail.'}))
 
 def logout_user(request):
     logout(request)
@@ -50,12 +58,12 @@ def change_setting(request):
     if not request.user.is_authenticated():
         return redirect('/')
     up=UserProfile.objects.get(user=request.user)
-    if 'location' in request.GET:
+    if 'location' in request.POST:
         print "loc"
-        up.location=request.GET['location']
-    if 'language' in request.GET:
+        up.location=request.POST['location']
+    if 'language' in request.POST:
         print "lang"
-        up.language=request.GET['language']
+        up.language=request.POST['language']
     up.save()
 
     return HttpResponse(json.dumps({'success':True, 
@@ -66,18 +74,18 @@ def create_account(request):
     js={'success':False}
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'location', 'language', 'name']:
-        if a not in request.GET:
+        if a not in request.POST:
             js['value']="Error (401 {field}). E-mail us.".format(field=a)
             return HttpResponse(json.dumps(js))
 
 
 
-    if request.GET['honor_code']!=u'true':
+    if request.POST['honor_code']!=u'true':
         js['value']="To enroll, you must follow the honor code.".format(field=a)
         return HttpResponse(json.dumps(js))
 
 
-    if request.GET['terms_of_service']!=u'true':
+    if request.POST['terms_of_service']!=u'true':
         js['value']="You must accept the terms of service.".format(field=a)
         return HttpResponse(json.dumps(js))
 
@@ -87,18 +95,18 @@ def create_account(request):
     # this is a good idea
     # TODO: Check password is sane
     for a in ['username', 'email', 'password', 'terms_of_service', 'honor_code']:
-        if len(request.GET[a])<2:
+        if len(request.POST[a])<2:
             js['value']="{field} is required.".format(field=a)
             return HttpResponse(json.dumps(js))
 
     try:
-        validate_email(request.GET['email'])
+        validate_email(request.POST['email'])
     except:
         js['value']="Valid e-mail is required.".format(field=a)
         return HttpResponse(json.dumps(js))
 
     try:
-        validate_slug(request.GET['username'])
+        validate_slug(request.POST['username'])
     except:
         js['value']="Username should only consist of A-Z and 0-9.".format(field=a)
         return HttpResponse(json.dumps(js))
@@ -106,18 +114,18 @@ def create_account(request):
     
 
     # Confirm username and e-mail are unique. TODO: This should be in a transaction
-    if len(User.objects.filter(username=request.GET['username']))>0:
+    if len(User.objects.filter(username=request.POST['username']))>0:
         js['value']="An account with this username already exists."
         return HttpResponse(json.dumps(js))
 
-    if len(User.objects.filter(email=request.GET['email']))>0:
+    if len(User.objects.filter(email=request.POST['email']))>0:
         js['value']="An account with this e-mail already exists."
         return HttpResponse(json.dumps(js))
 
-    u=User(username=request.GET['username'],
-           email=request.GET['email'],
+    u=User(username=request.POST['username'],
+           email=request.POST['email'],
            is_active=False)
-    u.set_password(request.GET['password'])
+    u.set_password(request.POST['password'])
     r=Registration()
     # TODO: Rearrange so that if part of the process fails, the whole process fails. 
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
@@ -125,12 +133,12 @@ def create_account(request):
     r.register(u)
 
     up=UserProfile(user=u)
-    up.name=request.GET['name']
-    up.language=request.GET['language']
-    up.location=request.GET['location']
+    up.name=request.POST['name']
+    up.language=request.POST['language']
+    up.location=request.POST['location']
     up.save()
 
-    d={'name':request.GET['name'],
+    d={'name':request.POST['name'],
        'key':r.activation_key,
        'site':settings.SITE_NAME}
 
@@ -146,14 +154,15 @@ def create_account(request):
         return HttpResponse(json.dumps(js))
         
     js={'success':True,
-        'value':render_to_string('registration/reg_complete.html', {'email':request.GET['email']})}
+        'value':render_to_string('registration/reg_complete.html', {'email':request.POST['email'], 
+                                                                    'csrf':csrf(request)['csrf_token']})}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
 def activate_account(request, key):
     r=Registration.objects.filter(activation_key=key)
     if len(r)==1:
         r[0].activate()
-        return render_to_response("activation_complete.html",{})
+        return render_to_response("activation_complete.html",{'csrf':csrf(request)['csrf_token']})
     if len(r)==0:
-        return render_to_response("activation_invalid.html",{})
+        return render_to_response("activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
     return HttpResponse("Unknown error. Please e-mail us to let us know how it happened.")

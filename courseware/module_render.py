@@ -58,7 +58,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                   s.module_id, 
                                   ajax_url=ajax_url, 
                                   state=s.state)
-    html=instance.handle_ajax(dispatch, request.GET)
+    html=instance.handle_ajax(dispatch, request.POST)
     s.state=instance.get_state()
     s.grade=instance.get_score()['score']
     s.save()
