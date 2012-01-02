@@ -10,11 +10,14 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.conf import settings
+from django.shortcuts import redirect
 
 from models import *
 from settings import *
 
 def view(request, wiki_url):
+    if not request.user.is_authenticated():
+        return redirect('/')
     
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
@@ -39,6 +42,8 @@ def root_redirect(request):
     skipped having problematic URLs like '/wiki/_edit' for editing the main page.
     #benjaoming
     """
+    if not request.user.is_authenticated():
+        return redirect('/')
     try:
         root = Article.get_root()
         if root.slug == "":
@@ -51,6 +56,8 @@ def root_redirect(request):
     return HttpResponseRedirect(reverse('wiki_view', args=(root.slug,)))
 
 def create(request, wiki_url):
+    if not request.user.is_authenticated():
+        return redirect('/')
     
     url_path = get_url_path(wiki_url)
 
@@ -119,6 +126,8 @@ def create(request, wiki_url):
     return render_to_response('simplewiki_create.html', c)
 
 def edit(request, wiki_url):
+    if not request.user.is_authenticated():
+        return redirect('/')
 
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
@@ -160,6 +169,8 @@ def edit(request, wiki_url):
     return render_to_response('simplewiki_edit.html', c)
 
 def history(request, wiki_url, page=1):
+    if not request.user.is_authenticated():
+        return redirect('/')
 
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
@@ -211,6 +222,8 @@ def history(request, wiki_url, page=1):
     return render_to_response('simplewiki_history.html', c)
 
 def search_articles(request, wiki_url):
+    if not request.user.is_authenticated():
+        return redirect('/')
     # blampe: We should check for the presence of other popular django search
     # apps and use those if possible. Only fall back on this as a last resort.
     # Adding some context to results (eg where matches were) would also be nice.
@@ -245,6 +258,8 @@ def search_articles(request, wiki_url):
     return view(request, wiki_url)
 
 def search_add_related(request, wiki_url):
+    if not request.user.is_authenticated():
+        return redirect('/')
 
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
@@ -298,6 +313,8 @@ def add_related(request, wiki_url):
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
 def remove_related(request, wiki_url, related_id):
+    if not request.user.is_authenticated():
+        return redirect('/')
 
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
@@ -318,6 +335,8 @@ def remove_related(request, wiki_url, related_id):
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
 def random_article(request, wiki_url):
+    if not request.user.is_authenticated():
+        return redirect('/')
     from random import randint
     num_arts = Article.objects.count()
     article = Article.objects.all()[randint(0, num_arts-1)]
@@ -328,6 +347,8 @@ def encode_err(request, url):
                               RequestContext(request, {'wiki_err_encode': True}))
     
 def not_found(request, wiki_url):
+    if not request.user.is_authenticated():
+        return redirect('/')
     """Generate a NOT FOUND message for some URL"""
     return render_to_response('simplewiki_error.html',
                               RequestContext(request, {'wiki_err_notfound': True,
