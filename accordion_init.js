@@ -1,1 +1,7 @@
 $("#accordion").accordion({active:${ active_chapter }});
+
+$('.ui-accordion').bind('accordionchange', function(event, ui) {
+   var event_data = {'newheader':ui.newHeader.text(),
+		     'oldheader':ui.oldHeader.text()};
+   log_event('accordion', event_data);
+});

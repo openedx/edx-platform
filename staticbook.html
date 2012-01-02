@@ -20,16 +20,16 @@ function goto_page(n) {
 };
 
 function prev_page() {
-  page=page-1;
-  if(page<1) page=1;
-  goto_page(page);
+  var newpage=page-1;
+  if(newpage<1) newpage=1;
+  goto_page(newpage);
   log_event("book", {"type":"prevpage","new":page});
 }
 
 function next_page() {
-  page=page+1;
-  if(page>1764) page=1764;
-  goto_page(page);
+  var newpage=page+1;
+  if(newpage>1764) newpage=1764;
+  goto_page(newpage);
   log_event("book", {"type":"nextpage","new":page});
 }
 
@@ -48,7 +48,7 @@ function next_page() {
 <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
 <a href="/profile">Profile</a> 
 <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/help">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
+<a href="/s/help.html">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
 <a href="/logout">Log out</a>
     </div>
 <table>
