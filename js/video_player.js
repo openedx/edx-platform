@@ -67,20 +67,25 @@ function caption_index(now) {
     return i-1;
 }
 
+function format_time(t)
+{
+    seconds = Math.round(t);
+    minutes = Math.round(seconds / 60);
+    hours = Math.round(minutes / 60);
+    seconds = seconds % 60;
+    minutes = minutes % 60;
+    return hours+":"+((minutes < 10)?"0":"")+minutes+":"+((seconds < 10)?"0":"")+(seconds%60);
+}
+
 function update_captions(t) {
     var i=caption_index(t);
-    $("#std_n5").html(caption_at(i-5));
-    $("#std_n4").html(caption_at(i-4));
-    $("#std_n3").html(caption_at(i-3));
-    $("#std_n2").html(caption_at(i-2));
-    $("#std_n1").html(caption_at(i-1));
+    $("#vidtime").html(format_time(ytplayer.getCurrentTime())+'/'+format_time(ytplayer.getDuration()));
+    var j;
+    for(j=1; j<9; j++) {
+	$("#std_n"+j).html(caption_at(i-j));
+	$("#std_p"+j).html(caption_at(i+j));
+    }
     $("#std_0").html(caption_at(i));
-    $("#std_p1").html(caption_at(i+1));
-    $("#std_p2").html(caption_at(i+2));
-    $("#std_p3").html(caption_at(i+3));
-    $("#std_p4").html(caption_at(i+4));
-    $("#std_p5").html(caption_at(i+5));
-    $("#std_p6").html(caption_at(i+6));
 }
 
 function title_seek(i) {
@@ -106,8 +111,8 @@ var ajax_video=function(){};
 
 function onYouTubePlayerReady(playerId) {
     ytplayer = document.getElementById("myytplayer");
-    setInterval(updateytplayerInfo, 1000);
-    setInterval(ajax_video,1000);
+    setInterval(updateytplayerInfo, 500);
+    setInterval(ajax_video,5000);
     ytplayer.addEventListener("onStateChange", "onytplayerStateChange");
     ytplayer.addEventListener("onError", "onPlayerError");
     if((typeof load_id != "undefined") && (load_id != 0)) {
@@ -126,21 +131,23 @@ function videoDestroy() {
 }
 
 function log_event(e, d) {
-    // CRITICAL TODO: Change to AJAX
     //$("#eventlog").append("<br>");
     //$("#eventlog").append(JSON.stringify(e));
 
-    // TODO: Figure out 
-    // XMLHttpRequest cannot load http://localhost:7000/userlog. Origin http://localhost:8000 is not allowed by Access-Control-Allow-Origin.
+    // TODO: Decide if we want seperate tracking server. 
+    // If so, we need to resolve: 
+    // * AJAX from different domain (XMLHttpRequest cannot load http://localhost:7000/userlog. Origin http://localhost:8000 is not allowed by Access-Control-Allow-Origin.)
+    // * Verifying sessions/authentication
 
-    /*window['console'].log(JSON.stringify(e));
-    $.get("http://localhost:7000/userlog", 
-	  {'user':'pmitros',
-		  'key':'key',
-		  'event_type':'unknown',
-		  'data':'e'},
+    /*window['console'].log(JSON.stringify(e));*/
+    $.get("/event", 
+	  {
+	      "event_type" : e, 
+		  "event" : JSON.stringify(d),
+		  "page" : document.URL
+		  },
 	  function(data) {
-	  });*/
+	  });
 }
 
 function seek_slide(type,oe,value) {
