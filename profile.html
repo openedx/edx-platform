@@ -17,7 +17,7 @@ $(function() {
              $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
                                      '<input type="button" id="change_loc_button" value="Change" />');
              $("#change_loc_button").click(function() {
-                $.getJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
+                postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
                   $("#location_sub").text(json.location);
                   loc=true;
                   $("#description").html("");
@@ -35,7 +35,7 @@ $(function() {
              $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
                                      '<input type="button" id="change_lang_button" value="Change" />');
              $("#change_lang_button").click(function() {
-                $.getJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
+                postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
                   $("#language_sub").text(json.language);
                   lang=true;
                   $("#description").html("");

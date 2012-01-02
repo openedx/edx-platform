@@ -19,7 +19,7 @@ $(function() {
         submit_data[value.name]=value.checked;
       });
 
-  $.getJSON('/create_account',
+        postJSON('/create_account',
            submit_data,
            function(json) {
                if(json.success) {
@@ -39,7 +39,7 @@ $(function() {
         submit_data[value.name]=value.value;
       });
 
-  $.getJSON('/login',
+    postJSON('/login',
            submit_data,
            function(json) {
                if(json.success) {
