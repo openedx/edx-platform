@@ -1,4 +1,5 @@
 <%inherit file="main.html" />
+
 <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
 <script type="text/javascript">
 $(function() {
@@ -21,34 +22,14 @@ $('#hide_acc').click(function() {
 });
 </script>
 
-<div id="coursenav" align=right width=100%>
-  <a href="/book">Textbook</a> 
-  <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-  <a href="/courseware"><b>Courseware</b></a> 
-  <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-  <a href="/discussion">Discussion</a> 
-  <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-  <a href="/wiki">Wiki</a> 
-  <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-  <a href="/profile">Profile</a> 
-  <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-  <a href="/s/help.html">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-  <a href="/logout">Log out</a>
-</div>
+<%include file="navigation.html" />
 
-<div id="bodyContent">
-  <table width=100% cellpadding=0><tr>
-      <td width=276 valign=top>
-        <div id="accordion" style="position:relative; top:-6px; ">
-          ${accordion}
-        </div>
-      </td>
+<div>
+  <div id="accordion" style="position:relative; top:-6px; ">
+    ${accordion}
+  </div>
 
-      <td valign=top>
-        <div>
-          ${content}
-        </div>
-      </td>
-    </tr>
-  </table>
+  <div>
+    ${content}
+  </div>
 </div>
