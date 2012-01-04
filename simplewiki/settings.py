@@ -17,7 +17,7 @@ WIKI_USE_MARKUP_WIDGET = True
 
 # Adds standard django login protection for viewing
 WIKI_REQUIRE_LOGIN_VIEW = getattr(settings, 'SIMPLE_WIKI_REQUIRE_LOGIN_VIEW',
-                                  False)
+                                  True)
 
 # Adds standard django login protection for editing
 WIKI_REQUIRE_LOGIN_EDIT = getattr(settings, 'SIMPLE_WIKI_REQUIRE_LOGIN_EDIT',
@@ -34,7 +34,7 @@ WIKI_ATTACHMENTS = getattr(settings, 'SIMPLE_WIKI_ATTACHMENTS',
 
 # If false, attachments will completely disappear
 WIKI_ALLOW_ATTACHMENTS = getattr(settings, 'SIMPLE_WIKI_ALLOW_ATTACHMENTS',
-                                 True)
+                                 False)
 
 # If WIKI_REQUIRE_LOGIN_EDIT is False, then attachments can still be disallowed
 WIKI_ALLOW_ANON_ATTACHMENTS = getattr(settings, 'SIMPLE_WIKI_ALLOW_ANON_ATTACHMENTS', False)
@@ -88,6 +88,7 @@ WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
                             'codehilite',
                             'abbr',
                             'toc',
+                            'mathjax',
                             'camelcase', # CamelCase-style wikilinks
                             'video',      # In-line embedding for YouTube, etc.
                             #'image'       # In-line embedding for images - too many bugs. It has a failed REG EXP.

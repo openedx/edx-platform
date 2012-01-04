@@ -411,8 +411,8 @@ def check_permissions(request, article, check_read=False, check_write=False, che
 if WIKI_REQUIRE_LOGIN_VIEW:
     view            = login_required(view)
     history         = login_required(history)
-    search_related  = login_required(search_related)
-    wiki_encode_err = login_required(wiki_encode_err)
+#    search_related  = login_required(search_related)
+#    wiki_encode_err = login_required(wiki_encode_err)
     
 if WIKI_REQUIRE_LOGIN_EDIT:
     create          = login_required(create)
