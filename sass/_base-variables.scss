@@ -1,0 +1,32 @@
+// Percentage of container calculator
+@function perc($width, $container-width: $max-width) {
+  @return percentage($width / $container-width);
+}
+
+// Line-height
+@function lh($amount: 1) {
+  @return $base-line-height * $amount;
+}
+
+@mixin border-box {
+  @include box-sizing(border-box);
+}
+
+
+// Variables
+// ---------------------------------------- //
+
+// fonts
+$body-font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;;
+$body-font-size: 14px;
+
+// grid
+$columns: 12;
+$column-width: golden-ratio($body-font-size, 3);
+$gutter-width: golden-ratio($body-font-size, 1);
+$max-width: ($columns * $column-width) + (($columns - 1) * $gutter-width);
+
+$gw-column: perc($column-width);
+$gw-gutter: perc($gutter-width);
+$base-line-height: golden-ratio($body-font-size, 1);
+

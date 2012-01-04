@@ -32,39 +32,19 @@ function next_page() {
   goto_page(newpage);
   log_event("book", {"type":"nextpage","new":page});
 }
-
 </script>
-<div id="bodyContent">
-<table width=100% cellpadding=0><tr>
-<td valign=top>
-    <div id="coursenav">
-       <a href="/book"><b>Textbook</b></a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-       <a href="/courseware">Courseware</a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/discussion">Discussion</a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/wiki">Wiki</a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/profile">Profile</a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/s/help.html">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/logout">Log out</a>
-    </div>
-<table>
-<tr><td valign=top>
+
+<%include file="navigation.html" />
+
 <ul id="booknav" class="treeview-booknav">
-<%include file="book_toc.html" />
+  <%include file="book_toc.html" />
 </ul>
-</td><td width=10></td><td width=1 bgcolor=black></td><td>
-    <div align=center>
+
 <table>
-<tr><td><a href="javascript:prev_page()"><span class="ui-icon ui-icon-circle-triangle-w">&nbsp;</span></a></td><td>
-<img id="bookpage" src="/static/book/p${ "%03i"%(page) }.jpg">
-</td><td><a href="javascript:next_page()"><span class="ui-icon ui-icon-circle-triangle-e">&nbsp;</span></a></td></tr>
-       </div>
-</td>
-</tr></table></td></tr>
+  <tr>
+    <td><a href="javascript:prev_page()"><span class="ui-icon ui-icon-circle-triangle-w">&nbsp;</span></a></td>
+    <td> <img id="bookpage" src="/static/book/p${ "%03i"%(page) }.jpg"> </td>
+    <td><a href="javascript:next_page()"><span class="ui-icon ui-icon-circle-triangle-e">&nbsp;</span></a></td>
+  </tr>
 </table>
 
-</div>

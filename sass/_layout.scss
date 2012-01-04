@@ -1,0 +1,34 @@
+html {
+  text-align: center;
+  margin: 0 $gw-gutter;
+
+  body {
+    text-align: left;
+    width: grid-width(12);
+    margin: 0 auto;
+    font: $body-font-size $body-font-family;
+    max-width: $max-width;
+
+    header {
+      @extend .clearfix;
+
+      h1 {
+        float: left;
+        font-weight: bold;
+      }
+
+      nav {
+        float: right;
+
+        ul {
+          @extend .clearfix;
+
+          li {
+            float: left;
+            margin-right: $gw-gutter;
+          }
+        }
+      }
+    }
+  }
+}
