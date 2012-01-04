@@ -65,75 +65,47 @@ $(function() {
 
 </script>
 
-<div align="right" id="coursenav"><div align=right><table><tr><td align=right valign=top>
-       <a href="/book">Textbook</a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/courseware">Courseware</a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/discussion">Discussion</a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/wiki">Wiki</a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/profile"><b>Profile</b></a> 
-<span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/s/help.html">Help</a> <span class="ui-icon ui-icon-bullet" style="display:inline-block;"></span> 
-<a href="/logout">Log out</a>
-</td></tr><tr><td valign=top>
-</td></tr></table>
-</div></div>
-<center>
-<br><br><br><br>
-<h1> ${name} </h1>
-<table><td align=right>Forum name:</td><td>${username}</td></tr>
-<td align=right>E-mail:</td><td>${email}</td></tr>
-<tr id="change_location"> <td align=right>Location:</a></td><td><div  class="bordered" id="location_sub">${location}&nbsp;</div></td></tr>
-<tr id="change_language"><td align=right><div id="change_language">Language:</a></td><td><div id="language_sub" class="bordered">${language}&nbsp;</div></td></tr>
-<tr id="change_password"><td align=right><div>Password:</a></td><td><div id="change_password" class="bordered">********</a></td></tr></table>
+<%include file="navigation.html" />
 
-<div><a id="inline" href="#change_password_pop"></a></div> <!-- hidden trigger for password -->
+<section>
 
-<div id="description"></div>
+  <h1>${name} </h1>
 
-<h1> Course Progress </h1>
-<table>
-  % for hw in homeworks:
-    <tr><td> ${ hw['chapter'] }</td><td>/</td> <td> ${ hw['section'] } </td><td>&nbsp;</td><td>
-    % for score in hw['scores']:
-      ${ score[0] }/${ score[1] }
+  <ul>
+    <li>Forum name: ${username}</li>
+    <li>E-mail: ${email}</li>
+    <li>Location: ${location}</li>
+    <li>Language: ${language}</li>
+    <li>Password: ********</li>
+  </ul>
+
+  <div><a href="#change_password_pop">Reset password</a></div> <!-- hidden trigger for password -->
+
+  <div id="description"></div>
+
+  <section>
+    <h1>Course Progress</h1>
+
+    % for hw in homeworks:
+    <li>
+      <p>${ hw['chapter'] }</p>
+      <p>${ hw['section'] }</p>
+
+      <ul>
+        % for score in hw['scores']:
+        <li>${ score[0] }/${ score[1] }</li>
+        % endfor
+      </ul>
+    </li>
     % endfor
-    </td></tr>
-  % endfor
-</table>
-</center>
+  </section>
 
-<div style="display:none"><div id="change_password_pop">
-<div id="pwd_reset">
-<table width=400><tr><td> <h1>Password reset</h1>
+  <div id="change_password_pop">
+    <h1>Password reset</h1>
 
-<p>Hit the button below, and we'll e-mail you a password reset link at ${email}.</p>
+    <p>We'll e-mail you a password reset link at ${email}.</p>
+    <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
 
-<p>
-<div align=right>
-<input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" /> 
-<input type="button" id="pwd_reset_button" value="E-mail me" /></p>
-</div>
-</td></tr></table>
-</div>
-</div></div>
-
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+    <input type="button" id="pwd_reset_button" value="E-mail me" />
+  </div>
+</section>
