@@ -102,7 +102,7 @@ def evaluator(variables, functions, string):
     paritem=paritem.setParseAction(parallel)
     term = paritem + ZeroOrMore((times|div)+paritem)
     term = term.setParseAction(prod_parse_action)
-    expr << term + ZeroOrMore((plus|minus)+term)
+    expr << Optional((plus|minus)) + term + ZeroOrMore((plus|minus)+term)
     expr=expr.setParseAction(sum_parse_action)
     return expr.parseString(string)[0]
 
@@ -115,3 +115,4 @@ if __name__=='__main__':
     # 
     print evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5")
     print evaluator({},{}, "-1")
+    print evaluator({},{}, "-(7+5)")
