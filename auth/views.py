@@ -46,7 +46,16 @@ def login_user(request, error=""):
                                         'error': 'Invalid login'}))
     if user is not None and user.is_active:
         login(request, user)
+        if request.POST['remember'] == 'true':
+            request.session.set_expiry(None) # or change to 604800 for 7 days
+            print "recall"
+        else:
+            request.session.set_expiry(0)
+        print "close"
+
+
         return HttpResponse(json.dumps({'success':True}))
+
     return HttpResponse(json.dumps({'success':False, 
                                     'error': 'Account not active. Check your e-mail.'}))
 
