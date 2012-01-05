@@ -238,12 +238,16 @@ class LoncapaModule(XModule):
             answers['_'.join(key.split('_')[1:])]=get[key]
 
         try:
-            ocm = lcp.correct_map
-            oa = lcp.answers
+            print "A"
+            ocm = self.lcp.correct_map
+            print "."
+            oa = self.lcp.answers
+            print "."
             correct_map = self.lcp.grade_answers(answers)
+            print "."
         except: 
-            lcp.correct_map = ocm # HACK: Reset state
-            lcp.answers = oa
+            self.lcp.correct_map = ocm # HACK: Reset state
+            self.lcp.answers = oa
             return json.dumps({'success':'syntax'})
 
         self.attempts = self.attempts + 1
