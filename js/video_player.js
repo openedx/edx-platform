@@ -26,7 +26,20 @@ function postJSON(url, data, callback) {
   });
 }
 
-var global=5; 
+// For easy embedding of CSRF in forms
+$(function() {
+    $('#csrfmiddlewaretoken').attr("value", getCookie('csrftoken'))
+});
+
+// For working with circuits in wiki: 
+
+function submit_circuit(circuit_id) {
+    $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
+    postJSON('/save_circuit/'+circuit_id, 
+	     {'schematic': $('#schematic_'+circuit_id).attr("value")}, 
+	     function(data){ if (data.results=='success') alert("Saved");});
+    return false;
+}
 
 // Video player
 
