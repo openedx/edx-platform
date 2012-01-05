@@ -70,10 +70,11 @@ def vertical_module(request, module):
     contents=[(e.getAttribute("name"),render_module(request, e)) \
               for e in module.childNodes \
               if e.nodeType==1]
-    js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
+    init_js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
+    destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
 
-    return {'init_js':js, 
-            "destroy_js":"",
+    return {'init_js':init_js, 
+            'destroy_js':destroy_js, 
             'content':render_to_string('vert_module.html',{'items':contents}), 
             'type':'vertical'}
 
@@ -88,8 +89,9 @@ def seq_module(request, module):
         if 'type' not in m: m['init_js']=""
         content=json.dumps(m['content']) 
         content=content.replace('</script>', '<"+"/script>') 
+
         return {'content':content, 
-                "destroy_js":"",
+                "destroy_js":m['destroy_js'], 
                 'init_js':m['init_js'], 
                 'type':m['type']}
     contents=[(e.getAttribute("name"),j(render_module(request, e))) \
@@ -103,16 +105,24 @@ def seq_module(request, module):
     params={'items':contents,
             'id':"seq"}
 
+    # TODO/BUG: Destroy JavaScript should only be called for the active view
+    # This calls it for all the views
+    # 
+    # To fix this, we'd probably want to have some way of assigning unique
+    # IDs to sequences. 
+    destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
+
     if module.nodeName == 'sequential':
         return {'init_js':js+render_to_string('seq_module.js',params),
-                "destroy_js":"",
-                'content':render_to_string('seq_module.html',params)}
+                "destroy_js":destroy_js,
+                'content':render_to_string('seq_module.html',params), 
+                'type':'sequential'}
     if module.nodeName == 'tab':
         params['id'] = 'tab'
         return {'init_js':js+render_to_string('tab_module.js',params),
-                "destroy_js":"",
+                "destroy_js":destroy_js,
                 'content':render_to_string('tab_module.html',params), 
-                'type':'sequential'}
+                'type':'tab'}
 
 
 def render_x_module(request, xml_module):
