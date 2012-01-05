@@ -47,6 +47,9 @@ var load_id = 0;
 
 var video_speed = 1.0;
 
+var updateytPlayerInterval;
+var ajax_videoInterval;
+
 function change_video_speed(speed, youtube_id) {
     new_position = ytplayer.getCurrentTime() * video_speed / speed;
     video_speed = speed;
@@ -141,8 +144,8 @@ var ajax_video=function(){};
 
 function onYouTubePlayerReady(playerId) {
     ytplayer = document.getElementById("myytplayer");
-    setInterval(updateytplayerInfo, 500);
-    setInterval(ajax_video,5000);
+    updateytplayerInfoInterval = setInterval(updateytplayerInfo, 500);
+    ajax_videoInterval = setInterval(ajax_video,5000);
     ytplayer.addEventListener("onStateChange", "onytplayerStateChange");
     ytplayer.addEventListener("onError", "onPlayerError");
     if((typeof load_id != "undefined") && (load_id != 0)) {
@@ -152,11 +155,11 @@ function onYouTubePlayerReady(playerId) {
 
 }
 
+// clear pings to video status when we switch to a different sequence tab with ajax
 function videoDestroy() {
     load_id = 0;
-    // TODO/BUG: Figure out why removeEventListener doesn't work
-    ytplayer.removeEventListener("onStateChange", "onytplayerStateChange");
-    ytplayer.removeEventListener("onError", "onPlayerError");
+    clearInterval(updateytplayerInfoInterval);
+    clearInterval(ajax_videoInterval);
     ytplayer = false;
 }
 
