@@ -37,6 +37,9 @@ urlpatterns = ('',
         name='auth_password_reset_complete'),
     url(r'^password_reset_done/$',django.contrib.auth.views.password_reset_done,
         name='auth_password_reset_done'),
+#    url(r'^show_circuit/(?P<circuit>[^/]*)$', 'circuit.views.show_circuit'),
+    url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
+    url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
 )
 
 if settings.ASKBOT_ENABLED:

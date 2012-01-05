@@ -107,6 +107,7 @@ INSTALLED_APPS = (
     'staticbook',
     'simplewiki',
     'track',
+    'circuit',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -192,7 +193,7 @@ if ASKBOT_ENABLED:
 	   'south',
 	   'askbot.deps.livesettings',
 	   'askbot',
-	   'keyedcache',
+	   #'keyedcache', # TODO: Main askbot tree has this installed, but we get intermittent errors if we include it. 
 	   'robots',
 	   'django_countries',
 	   'djcelery',

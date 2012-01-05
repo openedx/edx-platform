@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+print "Hello"
+
 '''
 WikiLink Extention for Python-Markdown
 ======================================

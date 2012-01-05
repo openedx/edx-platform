@@ -1,5 +1,7 @@
 # Source: https://github.com/mayoff/python-markdown-mathjax
 
+print "Hello"
+
 import markdown
 
 class MathJaxPattern(markdown.inlinepatterns.Pattern):

@@ -91,9 +91,10 @@ WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
                             'mathjax',
                             'camelcase', # CamelCase-style wikilinks
                             'video',      # In-line embedding for YouTube, etc.
-                            #'image'       # In-line embedding for images - too many bugs. It has a failed REG EXP.
+                            'circuit' 
                             ])
 
+print WIKI_MARKDOWN_EXTENSIONS
 
 WIKI_IMAGE_EXTENSIONS       = getattr(settings, 
                                 'SIMPLE_WIKI_IMAGE_EXTENSIONS',

@@ -1,3 +1,5 @@
+# Source: django-simplewiki. GPL license. 
+
 from django.contrib import admin
 from django import forms
 from django.utils.translation import ugettext as _

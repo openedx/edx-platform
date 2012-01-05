@@ -6,7 +6,8 @@ from xml.dom.minidom import parse, parseString
 from calc import evaluator
 
 def strip_dict(d):
-    ''' Takes a dict. Returns an identical dict, with all non-word keys stripped out. ''' 
+    ''' Takes a dict. Returns an identical dict, with all non-word
+    keys stripped out. ''' 
     d=dict([(k, float(d[k])) for k in d if type(k)==str and \
                                            k.isalnum() and \
                                            (type(d[k]) == float or type(d[k]) == int) ])

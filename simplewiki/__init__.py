@@ -1,3 +1,5 @@
+# Source: django-simplewiki. GPL license. 
+
 import sys, os
 
 # allow mdx_* parsers to be just dropped in the simplewiki folder

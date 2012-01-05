@@ -162,6 +162,7 @@ class LoncapaModule(XModule):
             return json.dumps({"error":"Past due date"})
         elif dispatch=='problem_check': 
             response = self.check_problem(get)
+            print response
         elif dispatch=='problem_reset':
             response = self.reset_problem(get)
         elif dispatch=='problem_save':
@@ -231,19 +232,27 @@ class LoncapaModule(XModule):
             print "cpdr"
             raise Http404
 
-        self.attempts = self.attempts + 1
-        self.lcp.done=True
         answers=dict()
         # input_resistor_1 ==> resistor_1
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
 
-        correct_map = self.lcp.grade_answers(answers)
+        try:
+            ocm = lcp.correct_map
+            oa = lcp.answers
+            correct_map = self.lcp.grade_answers(answers)
+        except: 
+            lcp.correct_map = ocm # HACK: Reset state
+            lcp.answers = oa
+            return json.dumps({'success':'syntax'})
 
-        success = True
+        self.attempts = self.attempts + 1
+        self.lcp.done=True
+
+        success = 'finished'
         for i in correct_map:
             if correct_map[i]!='correct':
-                success = False
+                success = 'errors'
 
         js=json.dumps({'correct_map' : correct_map,
                        'success' : success})

@@ -116,3 +116,4 @@ if __name__=='__main__':
     print evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5")
     print evaluator({},{}, "-1")
     print evaluator({},{}, "-(7+5)")
+    print evaluator({},{}, "QWSEKO")
