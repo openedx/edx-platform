@@ -67,45 +67,52 @@ $(function() {
 
 <%include file="navigation.html" />
 
-<section>
+<section class="profile-content">
+  <section class="user-info">
 
-  <h1>${name} </h1>
+    <h1>${name}</h1>
 
-  <ul>
-    <li>Forum name: ${username}</li>
-    <li>E-mail: ${email}</li>
-    <li>Location: ${location}</li>
-    <li>Language: ${language}</li>
-    <li>Password: ********</li>
-  </ul>
+    <ul>
+      <li>Forum name: ${username}</li>
+      <li>E-mail: ${email}</li>
+      <li>Location: ${location}</li>
+      <li>Language: ${language}</li>
+      <li>Password: ********</li>
+    </ul>
 
-  <div><a href="#change_password_pop">Reset password</a></div> <!-- hidden trigger for password -->
+    <!-- <div><a href="#change_password_pop">Reset password</a></div> -->
+    <!-- hidden trigger for password -->
 
-  <div id="description"></div>
+    <div id="change_password_pop">
+      <h2>Password reset</h2>
 
-  <section>
-    <h1>Course Progress</h1>
+      <p>We'll e-mail you a password reset link at ${email}.</p>
+      <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
 
-    % for hw in homeworks:
-    <li>
-      <p>${ hw['chapter'] }</p>
-      <p>${ hw['section'] }</p>
+      <input type="button" id="pwd_reset_button" value="Reset Password" />
+    </div>
 
-      <ul>
-        % for score in hw['scores']:
-        <li>${ score[0] }/${ score[1] }</li>
-        % endfor
-      </ul>
-    </li>
-    % endfor
   </section>
 
-  <div id="change_password_pop">
-    <h1>Password reset</h1>
 
-    <p>We'll e-mail you a password reset link at ${email}.</p>
-    <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
+  <section class="course-info">
+    <h1>Course Progress</h1>
 
-    <input type="button" id="pwd_reset_button" value="E-mail me" />
-  </div>
+    <!-- <div id="description"></div> -->
+
+    <ol>
+      % for hw in homeworks:
+      <li>
+        <h2>${ hw['chapter'] }</h2>
+        <h3>${ hw['section'] }</h3>
+
+        <ul>
+          % for score in hw['scores']:
+          <li>${ score[0] }/${ score[1] }</li>
+          % endfor
+        </ul>
+      </li>
+      % endfor
+    </ol>
+  </section>
 </section>

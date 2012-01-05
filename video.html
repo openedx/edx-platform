@@ -1,34 +1,36 @@
-<table>
-  <tr><td rowspan=1 colspan=4>
-      <div id="ytapiplayer">
-	You need Flash player 8+ and JavaScript enabled to view this video.
-      </div>
-    </td>
-<td>
-<table>
-<tr><td id=stt_n5 align=center><div id=std_n7 onclick="title_seek(-7);">&nbsp;</div></td></tr>
-<tr><td id=stt_n4 align=center><div id=std_n6 onclick="title_seek(-6);">&nbsp;</div></td></tr>
-<tr><td id=stt_n4 align=center><div id=std_n5 onclick="title_seek(-5);">&nbsp;</div></td></tr>
-<tr><td id=stt_n4 align=center><div id=std_n4 onclick="title_seek(-4);">&nbsp;</div></td></tr>
-<tr><td id=stt_n3 align=center><div id=std_n3 onclick="title_seek(-3);">&nbsp;</div></td></tr>
-<tr><td id=stt_n2 align=center><div id=std_n2 onclick="title_seek(-2);">&nbsp;</div></td></tr>
-<tr><td id=stt_n1 align=center><div id=std_n1 onclick="title_seek(-1);">&nbsp;</div></td></tr>
-<tr><td id=stt_0 align=center bgcolor=#aed0ea><div id=std_0 onclick="title_seek(0);">&nbsp;</div></td></tr>
-<tr><td id=stt_p1 align=center><div id=std_p1 onclick="title_seek( 1);">&nbsp;</div></td></tr>
-<tr><td id=stt_p2 align=center><div id=std_p2 onclick="title_seek( 2);">&nbsp;</div></td></tr>
-<tr><td id=stt_p3 align=center><div id=std_p3 onclick="title_seek( 3);">&nbsp;</div></td></tr>
-<tr><td id=stt_p4 align=center><div id=std_p4 onclick="title_seek( 4);">&nbsp;</div></td></tr>
-<tr><td id=stt_p5 align=center><div id=std_p5 onclick="title_seek( 5);">&nbsp;</div></td></tr>
-<tr><td id=stt_p6 align=center><div id=std_p7 onclick="title_seek( 6);">&nbsp;</div></td></tr>
-<tr><td id=stt_p6 align=center><div id=std_p7 onclick="title_seek( 7);">&nbsp;</div></td></tr>
-<tr><td id=stt_p6 align=center><div id=std_p7 onclick="title_seek( 8);">&nbsp;</div></td></tr>
-<tr><td><img src="/static/pixel.jpg" width=400 height=0></td></tr>
-</table>
-</td>
-<tr><td width=15><span class="ui-icon ui-icon-play" onclick="play();"></span></td>
-               <td width=15><span class="ui-icon ui-icon-pause" onclick="pause();"></span></td>
-               <td colspan=4><div id=slider></div></td></tr>
-<tr><td colspan=4><div id="vidtime">0:00/0:00</div></td><td><div align=right id="video_speeds"> </div></td></tr>
-</table>
+<div id="ytapiplayer">
+  <p>You need Flash player 8+ and JavaScript enabled to view this video.</p>
+</div>
+
+<ol>
+  <li id=stt_n5><div id=std_n7 onclick="title_seek(-7);">&nbsp;</div></li>
+  <li id=stt_n4><div id=std_n6 onclick="title_seek(-6);">&nbsp;</div></li>
+  <li id=stt_n4><div id=std_n5 onclick="title_seek(-5);">&nbsp;</div></li>
+  <li id=stt_n4><div id=std_n4 onclick="title_seek(-4);">&nbsp;</div></li>
+  <li id=stt_n3><div id=std_n3 onclick="title_seek(-3);">&nbsp;</div></li>
+  <li id=stt_n2><div id=std_n2 onclick="title_seek(-2);">&nbsp;</div></li>
+  <li id=stt_n1><div id=std_n1 onclick="title_seek(-1);">&nbsp;</div></li>
+  <li id=stt_0 class="current"><div id=std_0 onclick="title_seek(0);">&nbsp;</div></li>
+  <li id=stt_p1><div id=std_p1 onclick="title_seek( 1);">&nbsp;</div></li>
+  <li id=stt_p2><div id=std_p2 onclick="title_seek( 2);">&nbsp;</div></li>
+  <li id=stt_p3><div id=std_p3 onclick="title_seek( 3);">&nbsp;</div></li>
+  <li id=stt_p4><div id=std_p4 onclick="title_seek( 4);">&nbsp;</div></li>
+  <li id=stt_p5><div id=std_p5 onclick="title_seek( 5);">&nbsp;</div></li>
+  <li id=stt_p6><div id=std_p7 onclick="title_seek( 6);">&nbsp;</div></li>
+  <li id=stt_p6><div id=std_p7 onclick="title_seek( 7);">&nbsp;</div></li>
+  <li id=stt_p6><div id=std_p7 onclick="title_seek( 8);">&nbsp;</div></li>
+</ol>
+
+<section class="video-controls">
+<ul>
+  <li><span class="ui-icon ui-icon-play" onclick="play();"></span></li>
+  <li><span class="ui-icon ui-icon-pause" onclick="pause();"></span></li>
+</ul>
+
+<div id=slider></div>
+<div id="vidtime">0:00/0:00</div>
+<div id="video_speeds"></div>
+
+</section>
 
 

@@ -3,32 +3,61 @@ html {
   margin: 0 $gw-gutter;
 
   body {
+    color: $dark-gray;
+    font: $body-font-size $body-font-family;
+    margin: $body-line-height auto;
+    max-width: $max-width;
     text-align: left;
     width: grid-width(12);
-    margin: 0 auto;
-    font: $body-font-size $body-font-family;
-    max-width: $max-width;
 
     header {
       @extend .clearfix;
+      border-bottom: 1px solid $border-color;
+      margin-bottom: $body-line-height;
 
       h1 {
-        float: left;
+        border-right: 1px solid $border-color;
+        font-size: $body-font-size;
         font-weight: bold;
+        margin: 0 $gw-gutter 0 0;
+        padding: $body-line-height $gw-gutter $body-line-height 0;
+        display: block;
+        float: left;
       }
 
       nav {
-        float: right;
+        float: left;
+        display: block;
+        margin: 0;
 
         ul {
           @extend .clearfix;
+          display: inline-block;
+          padding: $body-line-height 0;
+          margin: 0;
 
           li {
-            float: left;
-            margin-right: $gw-gutter;
+            margin-right: $body-line-height;
+            display: inline-block;
+            margin-bottom: 0;
           }
         }
       }
+    }
+
+    section {
+      @extend .clearfix;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    footer {
+      padding: $body-line-height 0;
+      border-top: 1px solid $border-color;
+      margin-top: $body-line-height;
     }
   }
 }

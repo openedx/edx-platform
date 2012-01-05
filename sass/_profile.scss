@@ -1,0 +1,20 @@
+section.profile-content {
+
+  section.user-info {
+    width: grid-width(6);
+    float: left;
+    margin-right: $gw-gutter;
+  }
+
+  section.course-info {
+    width: grid-width(6);
+    float: left;
+
+    ul {
+      li {
+        display: inline-block;
+        padding-right: 1em;
+      }
+    }
+  }
+}

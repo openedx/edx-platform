@@ -1,0 +1,11 @@
+ul#booknav {
+  @extend .sidebar;
+}
+
+section.book {
+  @extend .content;
+
+  img {
+    border: 1px solid $border-color;
+  }
+}

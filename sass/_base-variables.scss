@@ -22,11 +22,17 @@ $body-font-size: 14px;
 
 // grid
 $columns: 12;
-$column-width: golden-ratio($body-font-size, 3);
+$column-width: golden-ratio($body-font-size, 4);
 $gutter-width: golden-ratio($body-font-size, 1);
 $max-width: ($columns * $column-width) + (($columns - 1) * $gutter-width);
 
 $gw-column: perc($column-width);
 $gw-gutter: perc($gutter-width);
-$base-line-height: golden-ratio($body-font-size, 1);
+$body-line-height: golden-ratio($body-font-size, 1);
 
+// color
+$light-gray: #f3f3f3;
+$dark-gray: #333;
+
+$text-color: $dark-gray;
+$border-color: $light-gray;

@@ -1,10 +1,15 @@
 @import "bourbon/bourbon";
 @import "reset";
 
-
+// Base layout
 @import "base-variables", "base-extends";
+@import "layout";
 
+// pages
+@import "courseware";
+@import "textbook";
+@import "profile";
+
+// left over
 @import "theme";
 @import "local";
-
-@import "layout";

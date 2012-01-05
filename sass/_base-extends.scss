@@ -6,3 +6,13 @@
   visibility: hidden;
 }
 
+.sidebar {
+  width: grid-width(4);
+  float: left;
+  margin-right: $gw-gutter;
+}
+
+.content {
+  width: grid-width(8);
+  float: left;
+}

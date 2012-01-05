@@ -1,0 +1,7 @@
+div#accordion {
+  @extend .sidebar;
+}
+
+section.main-content {
+  @extend .content;
+}

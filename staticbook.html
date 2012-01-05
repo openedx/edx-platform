@@ -36,15 +36,25 @@ function next_page() {
 
 <%include file="navigation.html" />
 
-<ul id="booknav" class="treeview-booknav">
-  <%include file="book_toc.html" />
-</ul>
+<section class="book-container">
+  <ul id="booknav" class="treeview-booknav">
+    <%include file="book_toc.html" />
+  </ul>
 
-<table>
-  <tr>
-    <td><a href="javascript:prev_page()"><span class="ui-icon ui-icon-circle-triangle-w">&nbsp;</span></a></td>
-    <td> <img id="bookpage" src="/static/book/p${ "%03i"%(page) }.jpg"> </td>
-    <td><a href="javascript:next_page()"><span class="ui-icon ui-icon-circle-triangle-e">&nbsp;</span></a></td>
-  </tr>
-</table>
+  <section class="book">
+    <nav>
+      <ol>
+        <li>
+          <a href="javascript:prev_page()">Last page</a>
+        </li>
+        <li>
+          <a href="javascript:next_page()">Next page</a>
+        </li>
+      </ol>
+    </nav>
 
+    <section class="page">
+      <img id="bookpage" src="/static/book/p${ "%03i"%(page) }.jpg">
+    </section>
+  </section>
+</section>
