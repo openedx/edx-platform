@@ -1,0 +1,206 @@
+/*
+----------------------------------------------------------------------------------------
+
+Copyright 2010 - Thierry Ruiz - www.dotemplate.com - All rights reserved.
+
+THIS TEMPLATE IS FREE AS LONG AS YOU KEEP THE LINK TO WWW.DOTEMPLATE.COM IN THE FOOTER
+TO REMOVE THE LINK, PLEASE MAKE A 10 DOLLARS DONATION at www.dotemplate.com/#donate
+
+pmitros donated $10
+
+Colors: 
+Light blue: bddeff
+      Blue: 7fbcfd
+Very dark blue: #031634
+
+Dark blue: #023063;
+Dark Greenish: #7a994c;
+Greenish: #adcc80;
+Very light greenish: #dae5c9;
+Bright orange: #fa720a;
+
+----------------------------------------------------------------------------------------
+*/
+
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+h1 {
+  font-size:1.6em;
+  margin:25px 0 10px 0;
+  clear:both;
+}
+
+h2 {
+  font-size:1.1em;
+  margin:20px 0 10px 0;
+  clear:both;
+}
+
+h3 {
+  font-size:1em;
+  margin:20px 0 5px 0;
+  clear:both;
+}
+
+a:link, a:visited {
+  text-decoration:none;
+}
+
+a:hover {
+  text-decoration:underline;
+}
+
+#wrapper {
+	background: transparent url( images/css/page-vbg.jpg ) repeat-y scroll 50% 0px;
+	margin:0 auto ;
+	width:100%;
+}
+
+// marketing pages
+#topWrapper {
+  width:100%;
+  height:100px;
+  background-image:url(images/css/topWrapper-bg.jpg);
+  background-position:center top ;
+  background-repeat:repeat-x;
+}
+
+#topBanner {
+  width:800px;
+  margin:0 auto;
+  height:100px;
+  background-image:url(images/css/topBanner.jpg);
+  background-repeat:no-repeat;
+}
+
+#topnav {
+  background:transparent url('images/css/hmenu.jpg') repeat-x top left;
+  height:20px;
+  margin:0 auto ;
+  text-align:center;
+  width:800px;
+
+  ul {
+    display:table;
+    margin:0 auto;
+    padding:0;
+    list-style-type:none;
+    position:relative;
+    height:20px;
+    text-transform:uppercase;
+    font-size:0.9em;
+    font-family:Arial,sans-serif;
+
+    li {
+      display:block;
+      float:left;
+      margin:0;
+      padding:0;
+      background:transparent url('images/css/hmenu.jpg') repeat-x top left;
+
+      a {
+        display:block;
+        float:left;
+        color:#031634;
+        text-decoration:none;
+        padding:0px 50px ;
+        line-height:20px;
+        font-weight:bold;
+      }
+    }
+  }
+}
+
+#topnav ul li a:hover, #topnav li#current a {
+  color:#7a994c;
+  background:transparent url('images/css/hmenu-sel.jpg') repeat-x top left;
+}
+
+#bg {
+  margin:0 auto;
+  padding:0;
+  background:transparent ;
+  background-image:url(images/css/hat.jpg);
+  background-repeat:no-repeat;	
+  background-position: center top ;
+}
+
+#header {
+  margin: 0 auto;
+  min-height:0px;
+  height: 0px;
+  width: 800px;
+}
+
+
+#page {
+  background: transparent url( images/css/page-bg.jpg ) no-repeat center top;
+}
+
+#container {
+  margin:0 auto;
+  width:800px;
+}
+
+
+#content {
+  width:780px;
+  margin:0 auto ;
+  text-align:left;
+  min-height:800px;
+}
+
+
+#content p {
+  text-align:justify;
+}
+
+
+
+
+
+#footerWrapper {
+  margin:0 auto;
+  height:10px;
+  padding:0;
+  background:transparent url( images/css/footerWrapper-bg.jpg ) no-repeat scroll center top;
+}
+
+
+#footer {
+  margin:0 auto;
+  padding:0;
+  width:800px;
+  height:10px;
+}
+
+#sidebar ul.vmenu {
+  list-style: none;
+  text-align: left;
+  margin: 7px 0px 8px 0px;
+  padding: 0;
+  text-decoration: none;	
+  border-top: 1px solid #eeeeee;
+}
+
+#sidebar ul.vmenu li {
+  list-style: none;
+  padding: 4px 0 4px 0px;
+  margin: 0 2px;	
+  border-bottom: 1px solid #eeeeee;
+}
+
+#sidebar ul.vmenu li a {
+  text-decoration: none;
+  color:#023063;
+}
+
+#sidebar ul.vmenu li a:hover {
+  color:#adcc80;
+}
+
+#sidebar ul.vmenu ul { margin: 0 0 0 5px; padding: 0; }
+#sidebar ul.vmenu ul li { border: none; }

@@ -1,29 +1,29 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-<title> MITX 6.002 </title> 
-<link rel="stylesheet" href="/static/lib/jquery.treeview.css" type="text/css" media="all" />
-<link rel="stylesheet" href="/static/css/theme.css" type="text/css" media="all" />
-<link rel="stylesheet" href="/static/css/local.css" type="text/css" media="all" />
-<link href="/static/css/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
-<style type="text/css">#slider { margin: 10px; }</style>
-<script type="text/javascript" src="/static/lib/jquery-1.6.2.min.js"></script>
-<script type="text/javascript" src="/static/lib/jquery-ui-1.8.16.custom.min.js"></script>
-<script type="text/javascript" src="/static/lib//swfobject/swfobject.js"></script>
-<script type="text/javascript" src="/static/lib/jquery.treeview.js"></script>
-<script type="text/javascript" src="/static/js/video_player.js"></script>
-<script type="text/javascript" src="/static/js/schematic.js"></script>
-<style type="text/css">#slider { margin: 10px; }</style>
-<!-- Warning: Do not upgrade FancyBox. V2.0 is under a non-free CC license -->
-<script type="text/javascript" src="/static/lib/fancybox/jquery.fancybox-1.3.4.js"></script>
-<link rel="stylesheet" href="/static/lib/fancybox/jquery.fancybox-1.3.4.css">
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {inlineMath: [["\\(","\\)"]],
-              displayMath: [["\\[","\\]"]]}
-  });
-</script>
-<script type="text/javascript" src="/static/lib/mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
+  <title>MITX 6.002</title>
+
+  <link rel="stylesheet" href="/static/lib/jquery.treeview.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all" />
+  <link href="/static/css/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
+
+  <script type="text/javascript" src="/static/lib/jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="/static/lib/jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="/static/lib//swfobject/swfobject.js"></script>
+  <script type="text/javascript" src="/static/lib/jquery.treeview.js"></script>
+  <script type="text/javascript" src="/static/js/video_player.js"></script>
+  <script type="text/javascript" src="/static/js/schematic.js"></script>
+
+  <!-- Warning: Do not upgrade FancyBox. V2.0 is under a non-free CC license -->
+  <script type="text/javascript" src="/static/lib/fancybox/jquery.fancybox-1.3.4.js"></script>
+  <link rel="stylesheet" href="/static/lib/fancybox/jquery.fancybox-1.3.4.css">
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [["\\(","\\)"]],
+      displayMath: [["\\[","\\]"]]}
+    });
+  </script>
+  <script type="text/javascript" src="/static/lib/mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
 <script>
 $(function() {
@@ -34,21 +34,18 @@ $(function() {
 });
 </script>
 </head>
+
 <body>
 
-${self.body()}
-    <div id="bottomWrapper">
-      <div id="footer"> 
-        <p style="padding-top:20px"> Copyright
-        (c). 2011. MIT. <a href=http://creativecommons.org/licenses/by-sa/3.0/>Some
-        rights reserved.</a> Please give us <a id="inline"
+  ${self.body()}
+
+  <footer>
+    <p> Copyright (c). 2011. MIT. <a href=http://creativecommons.org/licenses/by-sa/3.0/>Some rights reserved.</a> Please give us <a id="inline"
         href="#feedback_div">feedback</a>. Try our <a id="inline"
         href="#calculator_div">calculator</a>.
 
-
-        </p> 
-      </div> 
-    </div> 
+      <!-- Template based on a design from http://www.dotemplate.com/ - Donated $10 (pmitros) so we don't need to include credit. -->
+    </p>
 
 <div style="display:none"><div id="feedback_div">Found a bug? Got an
 idea for improving our system? Let us know. 
@@ -85,10 +82,15 @@ idea for improving our system? Let us know.
 });</script>
 <br>
 Supported operations: ^ * / + - || ()
-<br> 
+<br>
 Supported suffixes: %kMGTcmunp
 
 </div></div>
 
+    <ul>
+      <li><a href="/s/help.html">Help</a></li>
+      <li><a href="/logout">Log out</a></li>
+    </ul>
+  </footer>
 </body>
 </html>

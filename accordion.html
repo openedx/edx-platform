@@ -1,27 +1,32 @@
 <%def name="make_chapter(chapter)">
-	<h3><a href="#">${chapter['name']}</a></h3>
-	<div>
-	  <ul style="margin-left:-2em;">
-            % for section in chapter['sections']:
-               <li> <div
-		      % if 'active' in section and section['active']:
-  		       style="background-color:#aed0ea;"
-		      % endif
-		       >
-		      <a href='/courseware/${format_string(course_name)}/${format_string(chapter['name'])}/${format_string(section['name'])}'>${section['name']}</a> <br>
-                    <small><b>${section['format']}</b>
-		      % if 'time' in section and section['time']!="":
-		        (${int(section['time'])/60} min)
-		      % endif
-		      % if 'due' in section and section['due']!="":
-		        due ${section['due']}
-		      % endif
-		    </small>
-		    </div>
-	    % endfor
-	  </ul>
-	</div>   
-</%def>
+  <h3><a href="#">${chapter['name']}</a></h3>
+
+    <ul>
+      % for section in chapter['sections']:
+      <li
+          % if 'active' in section and section['active']:
+            class="active"
+          % endif
+        >
+
+          <a href='/courseware/${format_string(course_name)}/${format_string(chapter['name'])}/${format_string(section['name'])}'>
+            ${section['name']}
+
+            <p>
+              ${section['format']}
+
+              % if 'time' in section and section['time']!="":
+                (${int(section['time'])/60} min)
+              % endif
+
+              % if 'due' in section and section['due']!="":
+                due ${section['due']}
+              % endif
+            </p>
+          </a>
+        % endfor
+      </ul>
+    </%def>
 
 % for chapter in toc:
     ${make_chapter(chapter)}
