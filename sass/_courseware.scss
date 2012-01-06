@@ -1,7 +1,61 @@
 div#accordion {
-  @extend .sidebar;
+  @include box-shadow( inset -1px 0 0 #f6f6f6);
+  background: #e3e3e3;
+  border-right: 1px solid #d3d3d3;
+  display: table-cell;
+  font-family: $body-font-family;
+  // padding: $body-line-height 0;
+  text-shadow: 0 1px 0 #f6f6f6;
+  vertical-align: top;
+  width: 280px;
+
+  h3 {
+    &.ui-accordion-header {
+      color: #000;
+
+      a {
+        font-size: $body-font-size;
+        color: lighten($text-color, 10%);
+      }
+
+      &.ui-state-default {
+        background: none;
+        font-weight: normal;
+        border: none;
+        border-bottom: 1px solid #d3d3d3;
+        @include box-shadow(0 1px 0 #eee);
+      }
+
+      &.ui-state-hover {
+        border: none;
+        border-bottom: 1px solid #d3d3d3;
+      }
+
+      &.ui-state-active {
+        background: none;
+        border: 0;
+        color: #000;
+        font-weight: bold;
+        @include box-shadow(none);
+
+        a {
+          color: #000;
+        }
+      }
+    }
+  }
+
+  ul.ui-accordion-content {
+    background: #d6d6d6;
+    border: none;
+    font-size: 12px;
+    margin: 0;
+  }
 }
 
-section.main-content {
-  @extend .content;
+section.course-content {
+  @include box-sizing(border-box);
+  display: table-cell;
+  padding: $gw-gutter 0 $gw-gutter $gw-gutter;
+  vertical-align: top;
 }

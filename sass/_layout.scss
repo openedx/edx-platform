@@ -1,63 +1,106 @@
 html {
-  text-align: center;
-  margin: 0 $gw-gutter;
+  margin-top: 0;
 
   body {
     color: $dark-gray;
     font: $body-font-size $body-font-family;
-    margin: $body-line-height auto;
-    max-width: $max-width;
-    text-align: left;
-    width: grid-width(12);
+    text-align: center;
+    margin: 0;
+    background: #f3f3f3;
 
-    header {
-      @extend .clearfix;
-      border-bottom: 1px solid $border-color;
-      margin-bottom: $body-line-height;
+    div.header-wrapper {
+      @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%), 0 1px 1px #ccc);
+      @include linear-gradient(lighten($mit-red, 5%), darken($mit-red, 5%));
+      border-bottom: 1px solid darken($mit-red, 10%);
+      z-index: 99;
 
-      h1 {
-        border-right: 1px solid $border-color;
-        font-size: $body-font-size;
-        font-weight: bold;
-        margin: 0 $gw-gutter 0 0;
-        padding: $body-line-height $gw-gutter $body-line-height 0;
-        display: block;
-        float: left;
-      }
+      header {
+        @extend .clearfix;
+        @extend .wrapper;
+        @include box-sizing(border-box);
+        padding: 0 $body-line-height;
 
-      nav {
-        float: left;
-        display: block;
-        margin: 0;
+        h1 {
+          border-right: 1px solid $mit-red;
+          font-size: $body-font-size;
+          font-weight: bold;
+          margin: 0 $gw-gutter 0 0;
+          padding: 15px $gw-gutter 15px 0;
+          display: block;
+          float: left;
+          text-shadow: 0 1px 0 lighten($mit-red, 10%);
+        }
 
-        ul {
-          @extend .clearfix;
-          display: inline-block;
-          padding: $body-line-height 0;
+        nav {
+          float: left;
+          display: block;
           margin: 0;
 
-          li {
-            margin-right: $body-line-height;
+          ul {
+            @extend .clearfix;
             display: inline-block;
-            margin-bottom: 0;
+            padding: 15px 0;
+            margin: 0;
+
+            li {
+              margin-right: $body-line-height;
+              display: inline-block;
+              margin-bottom: 0;
+
+              a {
+                color: #fff;
+                text-shadow: 0 -1px 0 darken($mit-red, 10%);
+              }
+            }
           }
         }
       }
     }
 
-    section {
+    section.main-content {
       @extend .clearfix;
+      @extend .wrapper;
+      @include box-shadow(0 0px 1px #ccc);
+      @include box-sizing(border-box);
+      background: #fff;
+      border-top: 0;
+      border: 1px solid #ccc;
+      z-index: 0;
     }
 
     img {
       max-width: 100%;
       height: auto;
     }
+  }
 
-    footer {
-      padding: $body-line-height 0;
-      border-top: 1px solid $border-color;
-      margin-top: $body-line-height;
+  footer {
+    @extend .clearfix;
+    @extend .wrapper;
+    @include box-sizing(border-box);
+    color: #777;
+    margin-top: $body-line-height;
+    padding: 0 $body-line-height;
+
+    p {
+      float: left;
+
+      a {
+        color: #444;
+      }
+    }
+
+    ul {
+      float: right;
+
+      li {
+        display: inline-block;
+        margin-right: 20px;
+
+        a {
+          color: #444;
+        }
+      }
     }
   }
 }

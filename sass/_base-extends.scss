@@ -16,3 +16,10 @@
   width: grid-width(8);
   float: left;
 }
+
+.wrapper {
+      margin: 0 auto;
+      max-width: $max-width;
+      width: grid-width(12);
+      text-align: left;
+}
