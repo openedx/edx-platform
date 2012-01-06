@@ -18,7 +18,6 @@ html {
         @extend .wrapper;
         @include box-sizing(border-box);
         padding: 0 $body-line-height;
-        text-shadow: 0 -1px 0 darken($mit-red, 10%);
 
         h1 {
           border-right: 1px solid darken($mit-red, 5%);
@@ -28,13 +27,15 @@ html {
           padding: 15px $gw-gutter 15px 0;
           display: block;
           float: left;
-          color: #fff;
+          color: #000;
+          text-shadow: 0 1px 0 lighten($mit-red, 10%);
         }
 
         nav {
           float: left;
           display: block;
           margin: 0;
+          text-shadow: 0 -1px 0 darken($mit-red, 10%);
 
           ul {
             @extend .clearfix;

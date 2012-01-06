@@ -35,12 +35,12 @@ div.course-wrapper {
         }
 
         &.ui-state-active {
+          @include box-shadow(none);
           background: none;
-          border-bottom: 1px solid #aaa;
           border: 0;
+          border-bottom: 1px solid #aaa;
           color: #000;
           font-weight: bold;
-          @include box-shadow(none);
 
           a {
             color: #000;
@@ -53,9 +53,9 @@ div.course-wrapper {
       @include border-radius(0);
       @include box-shadow( inset -1px 0 0 #e6e6e6);
       background: #d6d6d6;
-      border: none;
-      border-top: 1px solid #c3c3c3;
       border-bottom: 1px solid #c3c3c3;
+      border-top: 1px solid #c3c3c3;
+      border: none;
       font-size: 12px;
       margin: 0;
 
@@ -73,5 +73,85 @@ div.course-wrapper {
     padding: $gw-gutter;
     vertical-align: top;
     width: grid-width(9);
+
+    ol.vert-mod {
+      li {
+        @extend .clearfix;
+      }
+    }
+
+    ol.sequence-nav {
+      margin-bottom: $body-line-height;
+
+      li {
+        cursor: pointer;
+        display: table-cell;
+        min-width: 30px;
+        min-height: 30px;
+        padding: 0 10px;
+      }
+    }
+
+    div.video-wrapper {
+      float: left;
+      width: 640px;
+      min-height: 500px;
+
+      section {
+        ul {
+          display: inline-block;
+
+          li {
+            margin-top: 5px;
+            display: inline-block;
+            cursor: pointer;
+
+            div {
+              &:empty {
+                display: none;
+              }
+            }
+          }
+        }
+
+        div#slider {
+          margin: -14px 0 10px 60px;
+        }
+
+        div#vidtime {
+          float: left;
+        }
+
+        div#video_speeds {
+          float: right;
+          cursor: pointer;
+
+          span {
+            &:hover {
+              color: $mit-red;
+            }
+          }
+        }
+      }
+    }
+
+    ol.subtitles {
+      width: 220px;
+      margin-left: 20px;
+      float: left;
+
+      li {
+        margin-bottom: 8px;
+        cursor: pointer;
+
+        &.current {
+          background-color: #f3f3f3;
+        }
+
+        &:hover {
+          color: $mit-red;
+        }
+      }
+    }
   }
 }
