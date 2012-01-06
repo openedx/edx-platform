@@ -52,10 +52,23 @@ ${self.body()}
 
 <div style="display:none"><div id="feedback_div">Found a bug? Got an
 idea for improving our system? Please give us your feedback. 
-<br> Subject: <br><input size=40>
-<br> Feedback: <br><textarea cols="40" rows="5">
+<br> Subject: <br><input id="feedback_subject" size=40>
+<br> Feedback: <br><textarea id="feedback_message" cols="40" rows="5">
 </textarea>
-<br> <input type="submit">
+<br> <input id="feedback_button" type="button" value="Submit">
+
+<script>$(function() {
+  $("#feedback_button").click(function(){
+  postJSON("/send_feedback", {"subject":$("#feedback_subject").attr("value"),
+                              "url":document.URL,
+                              "message":$("#feedback_message").attr("value")},
+      function(data){
+         $("#feedback_subject").attr("value","")
+         $("#feedback_message").attr("value","")
+      });
+  });
+});</script>
+
 </div></div>
 
 <div style="display:none"><div id="calculator_div">
