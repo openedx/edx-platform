@@ -12,7 +12,11 @@ function ${ id }_load() {
 	  postJSON('/modx/problem/${ id }/problem_check',
 		    submit_data,
 		    function(json) {
-			${ id }_load();
+		       
+		       if(json['success'] == 'syntax')
+			   alert('Syntax error');
+		       else
+			   ${ id }_load();
 		    });
 	  log_event('problem_check', submit_data);
 	    });

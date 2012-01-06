@@ -25,14 +25,15 @@
   </script>
   <script type="text/javascript" src="/static/lib/mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
-<script>
-$(function() {
-// Set up FancyBox pop-ups
-	$("a#inline").fancybox({
-		'hideOnContentClick': false
-	});
-});
-</script>
+  <script>
+    $(function() {
+        // Set up FancyBox pop-ups
+        $("a#inline").fancybox({
+          'hideOnContentClick': false
+          });
+        });
+      </script>
+
 </head>
 
 <body>
@@ -82,7 +83,7 @@ idea for improving our system? Let us know.
 });</script>
 <br>
 Supported operations: ^ * / + - || ()
-<br>
+<br> 
 Supported suffixes: %kMGTcmunp
 
 </div></div>
