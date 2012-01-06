@@ -26,13 +26,13 @@ def send_feedback(request):
         raise Http404
     
     feedback = render_to_string("feedback_email.txt", 
-                                {"subject":request.GET['subject'], 
-                                 "url": request.GET['url'], 
+                                {"subject":request.POST['subject'], 
+                                 "url": request.POST['url'], 
                                  "time": datetime.datetime.now().isoformat(),
-                                 "feedback": request.GET['message'], 
+                                 "feedback": request.POST['message'], 
                                  "user":request.user.username})
 
-    send_mail("MITx Feedback / " +request.GET['subject'], 
+    send_mail("MITx Feedback / " +request.POST['subject'], 
               feedback, 
               settings.DEFAULT_FROM_EMAIL,
               [ settings.DEFAULT_FEEDBACK_EMAIL ],
