@@ -25,18 +25,56 @@
 </script>
 <script type="text/javascript" src="/static/lib/mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
+<script>
+$(function() {
+// Set up FancyBox pop-ups
+	$("a#inline").fancybox({
+		'hideOnContentClick': false
+	});
+});
+</script>
 </head>
 <body>
 
 ${self.body()}
     <div id="bottomWrapper">
       <div id="footer"> 
-        <p style="padding-top:20px"> Copyright (c). 2011. MIT. <a href=http://creativecommons.org/licenses/by-sa/3.0/>Some rights reserved.</a>
-          <!-- Template based on a design from http://www.dotemplate.com/ -- Donated $10 (pmitros) so we don't need to include credit. --> 
+        <p style="padding-top:20px"> Copyright
+        (c). 2011. MIT. <a href=http://creativecommons.org/licenses/by-sa/3.0/>Some
+        rights reserved.</a> Please give us <a id="inline"
+        href="#feedback_div">feedback</a>. Try our <a id="inline"
+        href="#calculator_div">calculator</a>.
+
+
         </p> 
       </div> 
     </div> 
 
+<div style="display:none"><div id="feedback_div">Found a bug? Got an
+idea for improving our system? Please give us your feedback. 
+<br> Subject: <br><input size=40>
+<br> Feedback: <br><textarea cols="40" rows="5">
+</textarea>
+<br> <input type="submit">
+</div></div>
+
+<div style="display:none"><div id="calculator_div">
+<input id="calculator_input" > <input id="calculator_button" type=button value="=&gt;">
+<input id="calculator_output" readonly>
+<script>$(function() {
+  $("#calculator_button").click(function(){
+    $.getJSON("/calculate", {"equation":$("#calculator_input").attr("value")},
+      function(data){
+         $("#calculator_output").attr("value",data.result);
+      });
+  });
+});</script>
+<br>
+Supported operations: ^ * / + - || ()
+<br> 
+Supported suffixes: %kMGTcmunp
+
+</div></div>
 
 </body>
 </html>
