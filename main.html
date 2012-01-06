@@ -51,7 +51,7 @@ ${self.body()}
     </div> 
 
 <div style="display:none"><div id="feedback_div">Found a bug? Got an
-idea for improving our system? Please give us your feedback. 
+idea for improving our system? Let us know. 
 <br> Subject: <br><input id="feedback_subject" size=40>
 <br> Feedback: <br><textarea id="feedback_message" cols="40" rows="5">
 </textarea>
@@ -63,8 +63,9 @@ idea for improving our system? Please give us your feedback.
                               "url":document.URL,
                               "message":$("#feedback_message").attr("value")},
       function(data){
-         $("#feedback_subject").attr("value","")
-         $("#feedback_message").attr("value","")
+         $("#feedback_subject").attr("value","");
+         $("#feedback_message").attr("value","");
+         $("#feedback_div").html("Feedback submitted. Thank you");
       });
   });
 });</script>
