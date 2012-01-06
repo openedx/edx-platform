@@ -4,7 +4,6 @@ div#accordion {
   border-right: 1px solid #d3d3d3;
   display: table-cell;
   font-family: $body-font-family;
-  // padding: $body-line-height 0;
   text-shadow: 0 1px 0 #f6f6f6;
   vertical-align: top;
   width: 280px;
@@ -33,6 +32,7 @@ div#accordion {
 
       &.ui-state-active {
         background: none;
+        border-bottom: 1px solid #aaa;
         border: 0;
         color: #000;
         font-weight: bold;
@@ -46,8 +46,12 @@ div#accordion {
   }
 
   ul.ui-accordion-content {
+    @include border-radius(0);
+    @include box-shadow( inset -1px 0 0 #e6e6e6);
     background: #d6d6d6;
     border: none;
+    border-top: 1px solid #c3c3c3;
+    border-bottom: 1px solid #c3c3c3;
     font-size: 12px;
     margin: 0;
   }
@@ -56,6 +60,6 @@ div#accordion {
 section.course-content {
   @include box-sizing(border-box);
   display: table-cell;
-  padding: $gw-gutter 0 $gw-gutter $gw-gutter;
+  padding: $gw-gutter;
   vertical-align: top;
 }

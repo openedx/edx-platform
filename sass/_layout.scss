@@ -12,23 +12,23 @@ html {
       @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%), 0 1px 1px #ccc);
       @include linear-gradient(lighten($mit-red, 5%), darken($mit-red, 5%));
       border-bottom: 1px solid darken($mit-red, 10%);
-      z-index: 99;
 
       header {
         @extend .clearfix;
         @extend .wrapper;
         @include box-sizing(border-box);
         padding: 0 $body-line-height;
+        text-shadow: 0 -1px 0 darken($mit-red, 10%);
 
         h1 {
-          border-right: 1px solid $mit-red;
+          border-right: 1px solid darken($mit-red, 5%);
           font-size: $body-font-size;
           font-weight: bold;
           margin: 0 $gw-gutter 0 0;
           padding: 15px $gw-gutter 15px 0;
           display: block;
           float: left;
-          text-shadow: 0 1px 0 lighten($mit-red, 10%);
+          color: #fff;
         }
 
         nav {
@@ -49,7 +49,12 @@ html {
 
               a {
                 color: #fff;
-                text-shadow: 0 -1px 0 darken($mit-red, 10%);
+
+                &:hover {
+                  color: rgba(#fff, .7);
+                  background-color: none;
+                  text-decoration: none;
+                }
               }
             }
           }
@@ -60,12 +65,11 @@ html {
     section.main-content {
       @extend .clearfix;
       @extend .wrapper;
-      @include box-shadow(0 0px 1px #ccc);
+      @include box-shadow(0 1px 0 #fff);
       @include box-sizing(border-box);
       background: #fff;
       border-top: 0;
       border: 1px solid #ccc;
-      z-index: 0;
     }
 
     img {

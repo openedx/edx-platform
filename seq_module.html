@@ -1,14 +1,13 @@
-    <table width=800 >
-      <tr><td></td>
 % for t in range(1,1+len(items)):
-<td class="seq_inactive" id="tt_${ t }" height=10>&nbsp;</td>
+<ol>
+  <li class="seq_inactive" id="tt_${ t }" height=10>&nbsp;</li>
+</ol>
 % endfor
 
-<td></td></tr>
-<tr><td align=center valign=top><br><br><br><br><br><br><br><br><br><br><br><div id="${ id }prev"><span class="ui-icon ui-icon-circle-triangle-w"></span></div></td>
-<td colspan=${ len(items) }><div id="seq_content"></div></td>
-<td align=center valign=top><br><br><br><br><br><br><br><br><br><br><br><div id="${ id }next"><span class="ui-icon ui-icon-circle-triangle-e">&nbsp;</span></div></td>
-</tr>
-      <tr></tr>
-    </table>
+<div id="${ id }prev">Previous</div>
+<div id="${ id }next">Next</div>
+
+<!-- <td colspan=${ len(items) }> -->
+  <div id="seq_content"></div>
+<!-- </td> -->
 
