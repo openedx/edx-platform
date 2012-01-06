@@ -40,6 +40,8 @@ urlpatterns = ('',
 #    url(r'^show_circuit/(?P<circuit>[^/]*)$', 'circuit.views.show_circuit'),
     url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
     url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
+    url(r'^calculate$', 'util.views.calculate'),
+    url(r'^send_feedback$', 'util.views.send_feedback'),
 )
 
 if settings.ASKBOT_ENABLED:

@@ -168,8 +168,8 @@ class LoncapaProblem():
         return html
     
     def grade_schem(self, element):
+        print element
         return "correct"
-
 
     def grade_nr(self, question, answer):
         error = abs(evaluator({},{},answer) - question['answer'])
