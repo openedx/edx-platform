@@ -1,65 +1,77 @@
-div#accordion {
-  @include box-shadow( inset -1px 0 0 #f6f6f6);
-  background: #e3e3e3;
-  border-right: 1px solid #d3d3d3;
-  display: table-cell;
-  font-family: $body-font-family;
-  text-shadow: 0 1px 0 #f6f6f6;
-  vertical-align: top;
-  width: 280px;
+div.course-wrapper {
+  display: table;
+  width: 100%;
 
-  h3 {
-    &.ui-accordion-header {
-      color: #000;
+  div#accordion {
+    @include box-shadow( inset -1px 0 0 #f6f6f6);
+    background: #e3e3e3;
+    border-right: 1px solid #d3d3d3;
+    display: table-cell;
+    font-family: $body-font-family;
+    text-shadow: 0 1px 0 #f6f6f6;
+    vertical-align: top;
+    width: grid-width(3);
 
-      a {
-        font-size: $body-font-size;
-        color: lighten($text-color, 10%);
-      }
-
-      &.ui-state-default {
-        background: none;
-        font-weight: normal;
-        border: none;
-        border-bottom: 1px solid #d3d3d3;
-        @include box-shadow(0 1px 0 #eee);
-      }
-
-      &.ui-state-hover {
-        border: none;
-        border-bottom: 1px solid #d3d3d3;
-      }
-
-      &.ui-state-active {
-        background: none;
-        border-bottom: 1px solid #aaa;
-        border: 0;
+    h3 {
+      &.ui-accordion-header {
         color: #000;
-        font-weight: bold;
-        @include box-shadow(none);
 
         a {
+          font-size: $body-font-size;
+          color: lighten($text-color, 10%);
+        }
+
+        &.ui-state-default {
+          background: none;
+          font-weight: normal;
+          border: none;
+          border-bottom: 1px solid #d3d3d3;
+          @include box-shadow(0 1px 0 #eee);
+        }
+
+        &.ui-state-hover {
+          border: none;
+          border-bottom: 1px solid #d3d3d3;
+        }
+
+        &.ui-state-active {
+          background: none;
+          border-bottom: 1px solid #aaa;
+          border: 0;
           color: #000;
+          font-weight: bold;
+          @include box-shadow(none);
+
+          a {
+            color: #000;
+          }
+        }
+      }
+    }
+
+    ul.ui-accordion-content {
+      @include border-radius(0);
+      @include box-shadow( inset -1px 0 0 #e6e6e6);
+      background: #d6d6d6;
+      border: none;
+      border-top: 1px solid #c3c3c3;
+      border-bottom: 1px solid #c3c3c3;
+      font-size: 12px;
+      margin: 0;
+
+      li {
+        &.active {
+          font-weight: bold;
         }
       }
     }
   }
 
-  ul.ui-accordion-content {
-    @include border-radius(0);
-    @include box-shadow( inset -1px 0 0 #e6e6e6);
-    background: #d6d6d6;
-    border: none;
-    border-top: 1px solid #c3c3c3;
-    border-bottom: 1px solid #c3c3c3;
-    font-size: 12px;
-    margin: 0;
+  section.course-content {
+    @include box-sizing(border-box);
+    display: table-cell;
+    padding: $gw-gutter;
+    vertical-align: top;
+    width: grid-width(9);
   }
-}
-
-section.course-content {
-  @include box-sizing(border-box);
-  display: table-cell;
-  padding: $gw-gutter;
-  vertical-align: top;
 }

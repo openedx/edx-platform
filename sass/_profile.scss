@@ -1,17 +1,28 @@
-section.user-info {
-  width: grid-width(6);
-  float: left;
-  margin-right: $gw-gutter;
-}
+div.profile-wrapper {
+  display: table;
 
-section.course-info {
-  width: grid-width(6);
-  float: left;
+  section.user-info {
+    @include box-sizing(border-box);
+    margin-right: $gw-gutter;
+    padding: $body-line-height;
+    width: grid-width(6);
+    background: #e3e3e3;
+    border-right: 1px solid #d3d3d3;
+    text-shadow: 0 1px 0 #f6f6f6;
+    display: table-cell;
+  }
 
-  ul {
-    li {
-      display: inline-block;
-      padding-right: 1em;
+  section.course-info {
+    @include box-sizing(border-box);
+    padding: $body-line-height;
+    width: grid-width(6);
+    display: table-cell;
+
+    ul {
+      li {
+        display: inline-block;
+        padding-right: 1em;
+      }
     }
   }
 }

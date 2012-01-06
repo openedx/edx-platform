@@ -8,11 +8,6 @@
   @return $base-line-height * $amount;
 }
 
-@mixin border-box {
-  @include box-sizing(border-box);
-}
-
-
 // Variables
 // ---------------------------------------- //
 
@@ -22,8 +17,8 @@ $body-font-size: 14px;
 
 // grid
 $columns: 12;
-$column-width: golden-ratio($body-font-size, 4);
-$gutter-width: golden-ratio($body-font-size, 1);
+$column-width: 80px;
+$gutter-width: 25px;
 $max-width: ($columns * $column-width) + (($columns - 1) * $gutter-width);
 
 $gw-column: perc($column-width);
@@ -31,7 +26,7 @@ $gw-gutter: perc($gutter-width);
 $body-line-height: golden-ratio($body-font-size, 1);
 
 // color
-$light-gray: #f3f3f3;
+$light-gray: #ddd;
 $dark-gray: #333;
 $mit-red: #993333;
 

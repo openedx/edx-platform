@@ -1,3 +1,33 @@
+h1 {
+  
+}
+
+h2 {
+  
+}
+
+h3 {
+  
+}
+
 p {
   margin-bottom: $body-line-height;
 }
+
+#{$all-text-inputs}, textarea {
+  @include border-radius(3px);
+  @include box-shadow(0 -1px 0 #fff);
+  @include linear-gradient(#eee, #fff);
+  border: 1px solid #bbb;
+  font: $body-font-size $body-font-family;
+  padding: 8px;
+
+  &:focus {
+    border-color: $mit-red;
+  }
+}
+
+input[type="submit"], input[type="button"], button {
+  // @extend .button;
+}
+
