@@ -22,6 +22,7 @@
 		document.getElementById('wiki_related_input_id').value = s.id;
 		document.getElementById('wiki_related_input_submit').disabled=false;
 	}
+	%if wiki_article is not UNDEFINED:
 	var x = window.onload;
 	window.onload = function(){
 			var options = {
@@ -36,6 +37,7 @@
 		if (typeof x == 'function')
 			x();
 	}
+	%endif
 </script>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -188,14 +190,19 @@ text-decoration: none;
     	<div style="border: 2px outset #CCC; width: 250px; padding: 10px; background-color: #FFF; position: absolute; right: 100px; top: -80px; display: none; color: #000;" id="wiki_create_form">
 			<%
 				theaction = "this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '')+'/_create/'"
+				if (wiki_article is not UNDEFINED):
+					baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
+				else:
+					baseURL = reverse("wiki_view", args=[""])
+					
 			%>
-    		<form method="GET" onsubmit="this.action='${reverse("wiki_view", args=[wiki_article.get_url()])}/' + ${theaction};">
+    		<form method="GET" onsubmit="this.action='${baseURL + "/' + " + theaction};">
     			<h2>Create article</h2>
     			<p>
     			    <label for="id_wiki_article_name">Title of article</label>
     			    <input type="text" name="wiki_article_name" id="id_wiki_article_name" /><br/>
     			    <label for="id_wiki_article_is_child">Create as a child of current article</label>
-    			    <input type="checkbox" name="wiki_article_is_child" id="id_wiki_artcile_is_child" disabled="true" checked=${ "yes" if wiki_article else "no" }>
+    			    <input type="checkbox" name="wiki_article_is_child" id="id_wiki_artcile_is_child" disabled="true" ${ 'checked="checked"' if wiki_article is not UNDEFINED else ""}>
     			</p>
     			<p>
     				<input type="button" class="button" value="Cancel" style="display: inline-block; margin-right: 2px;" onclick="document.getElementById('wiki_create_form').style.display='none';" />
@@ -205,15 +212,15 @@ text-decoration: none;
     	</div>
     	<p>
     	
-	    %if wiki_article:
+	    %if wiki_article is not UNDEFINED:
     	    <input type="button" onclick="javascript:location.href='${reverse("wiki_view", args=[wiki_article.get_url()])}'" value="View" style="width: 100%;" /><br />
     	    <input type="button" onclick="javascript:location.href='${reverse("wiki_edit", args=[wiki_article.get_url()])}'" value="Edit" style="width: 100%;"${'disabled="true"' if not wiki_write else ""}/><br />
     	    <input type="button" onclick="javascript:location.href='${reverse("wiki_history", args=[wiki_article.get_url(),1])}'" value="History" style="width: 100%;" />
     	%endif
     	<input type="button" onclick="document.getElementById('wiki_create_form').style.display='block';" value="Create article" style="width: 100%; margin-bottom: 2px;" class="button" />
-    	<input type="button" onclick="javascript:location.href='${reverse("wiki_random", args=[wiki_article.get_url()])}'" value="Random article" style="width: 100%; margin-bottom: 2px;" class="button" />
+    	<input type="button" onclick="javascript:location.href='${reverse("wiki_random", args=["wiki_articleget_url"])}'" value="Random article" style="width: 100%; margin-bottom: 2px;" class="button" />
     	</p>
-		%if wiki_article:
+		%if wiki_article is not UNDEFINED:
 			%if wiki_article.locked:
 			<p><strong>This article has been locked</strong></p>
 			%endif

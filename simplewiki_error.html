@@ -7,15 +7,12 @@ Oops...
 
 <%block name="wiki_body">
 <div class="wiki_error">
+%if wiki_error is not UNDEFINED:
 ${wiki_error}
-
-%if wiki_err_notfound:
-
-
 %endif
 
-%if wiki_err_notfound:
-%if wiki_url:
+%if wiki_err_notfound is not UNDEFINED:
+%if wiki_url is not UNDEFINED:
 <p>
 The page you requested could not be found.
 Click <a href="{% url wiki_create wiki_url %}">here</a> to create it.
@@ -29,7 +26,7 @@ Click <a href="{% url wiki_create "" %}">here</a> to create it.
 </p>
 %endif
 %else:
-%if wiki_err_noparent:
+%if wiki_err_noparent is not UNDEFINED:
 <p>
 You cannot create this page, because its parent
 does not exist. Click <a href="${reverse("wiki_create", args=[wiki_url_parent])}">here</a>
@@ -37,43 +34,43 @@ to create it.
 </p>
 %else:
 
-%if wiki_err_keyword:
+%if wiki_err_keyword is not UNDEFINED:
 <p>
 The page you're trying to create <b>${wiki_url}</b> starts with <b>_</b>, which is reserved for internal use.
 </p>
 %else:
 
-%if wiki_err_locked:
+%if wiki_err_locked is not UNDEFINED:
 <p>
 The article you are trying to modify is locked.
 </p>
 %else:
 
-%if wiki_err_noread:
+%if wiki_err_noread is not UNDEFINED:
 <p>
 You do not have access to read this article.
 </p>
 %else:
 
-%if wiki_err_nowrite:
+%if wiki_err_nowrite is not UNDEFINED:
 <p>
 You do not have access to edit this article.
 </p>
 %else:
 
-%if wiki_err_noanon:
+%if wiki_err_noanon is not UNDEFINED:
 <p>
 Anonymous attachments are not allowed. Try logging in.
 </p>
 %else:
 
-%if wiki_err_create:
+%if wiki_err_create is not UNDEFINED:
 <p>
 You do not have access to create this article.
 </p>
 %else:
 
-%if wiki_err_encode:
+%if wiki_err_encode is not UNDEFINED:
 <p>
 The url you requested could not be handled by the wiki.
 Probably you used a bad character in the URL.
