@@ -1,0 +1,19 @@
+<%inherit file="simplewiki_base.html"/>
+
+<%block name="wiki_page_title">
+Create article
+</%block>
+<%block name="wiki_body">
+<form method="POST" id="wiki_revision">
+	<div style="display:none">
+	    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+	</div>
+	<table id="wiki_revision_table">
+	${ wiki_form }
+	<tr>
+		<td colspan="2" align="right">
+			<input type="submit" value="Create article" /></td>
+	</tr>
+	</table>
+</form>
+</%block>
