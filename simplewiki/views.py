@@ -21,30 +21,6 @@ import djangomako.middleware
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
-
-# def render_to_string(template_name, dictionary, context_instance=None):
-#     context_instance = context_instance or Context(dictionary)
-#     # add dictionary to context_instance
-#     context_instance.update(dictionary or {})
-#     # collapse context_instance to a single dictionary for mako
-#     context_dictionary = {}
-#     for d in context_instance:
-#         context_dictionary.update(d)
-#     # fetch and render template
-#     #template = djangomako.middleware.lookup.get_template(template_name)
-# 	mylookup = TemplateLookup('/Users/bridger/Development/mitx_all/templates/')
-# 	template = Template(filename='/Users/bridger/Development/mitx_all/templates/' + template_name, strict_undefined = True, lookup=mylookup)
-#     return template.render(**context_dictionary)
-# 
-# def render_to_response(template_name, dictionary, context_instance=None, **kwargs):
-#     """
-#     Returns a HttpResponse whose content is filled with the result of calling
-#     lookup.get_template(args[0]).render with the passed arguments.
-#     """
-#     return HttpResponse(render_to_string(template_name, dictionary, context_instance), **kwargs)
-
-
-
 from models import *
 from settings import *
 
