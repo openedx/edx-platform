@@ -11,8 +11,13 @@ div.course-wrapper {
     text-shadow: 0 1px 0 #f6f6f6;
     vertical-align: top;
     width: grid-width(3);
+    overflow: hidden;
 
     h3 {
+      &:last-child {
+        @include box-shadow(none);
+      }
+
       &.ui-accordion-header {
         color: #000;
 
@@ -22,11 +27,11 @@ div.course-wrapper {
         }
 
         &.ui-state-default {
+          @include box-shadow(0 1px 0 #eee);
           background: none;
-          font-weight: normal;
           border: none;
           border-bottom: 1px solid #d3d3d3;
-          @include box-shadow(0 1px 0 #eee);
+          font-weight: normal;
         }
 
         &.ui-state-hover {

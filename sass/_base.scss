@@ -28,6 +28,6 @@ p {
 }
 
 input[type="submit"], input[type="button"], button {
-  // @extend .button;
+  @extend .button;
 }
 
