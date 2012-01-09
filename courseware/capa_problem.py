@@ -13,7 +13,7 @@ def strip_dict(d):
                                            (type(d[k]) == float or type(d[k]) == int) ])
     return d
 
-class LoncapaProblem():
+class LoncapaProblem(object):
     def get_state(self):
         ''' Stored per-user session data neeeded to: 
             1) Recreate the problem

@@ -3,7 +3,8 @@ import types
 from django.core.urlresolvers import get_callable
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotAllowed
 from django.utils import simplejson
-from django.shortcuts import get_object_or_404, render_to_response 
+from djangomako.shortcuts import render_to_response, render_to_string
+from django.shortcuts import get_object_or_404 
 from django.template import RequestContext, Context, loader
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
@@ -11,6 +12,14 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.conf import settings
 from django.shortcuts import redirect
+from django.core.context_processors import csrf
+
+from django.template import Context
+from django.http import HttpResponse
+
+import djangomako.middleware
+from mako.template import Template
+from mako.lookup import TemplateLookup
 
 from models import *
 from settings import *
@@ -26,11 +35,12 @@ def view(request, wiki_url):
     perm_err = check_permissions(request, article, check_read=True)
     if perm_err:
         return perm_err
-    c = RequestContext(request, {'wiki_article': article,
-                                 'wiki_write': article.can_write_l(request.user),
-                                 'wiki_attachments_write': article.can_attach(request.user),
-                                 } ) 
-    return render_to_response('simplewiki_view.html', c)
+    d = {'wiki_article': article,
+			'wiki_write': article.can_write_l(request.user),
+			'wiki_attachments_write': article.can_attach(request.user),
+			}
+
+    return render_to_response('simplewiki_view.html', d)
 
 def root_redirect(request):
     """
@@ -62,9 +72,9 @@ def create(request, wiki_url):
     url_path = get_url_path(wiki_url)
 
     if url_path != [] and url_path[0].startswith('_'):
-            c = RequestContext(request, {'wiki_err_keyword': True,
-                                         'wiki_url': '/'.join(url_path) })
-            return render_to_response('simplewiki_error.html', c)        
+            d = {'wiki_err_keyword': True,
+                'wiki_url': '/'.join(url_path) }
+            return render_to_response('simplewiki_error.html', d)        
 
     # Lookup path
     try:
@@ -76,9 +86,9 @@ def create(request, wiki_url):
         
         path = Article.get_url_reverse(url_path[:-1], root)
         if not path:
-            c = RequestContext(request, {'wiki_err_noparent': True,
-                                         'wiki_url_parent': '/'.join(url_path[:-1]) })
-            return render_to_response('simplewiki_error.html', c)
+            d = {'wiki_err_noparent': True,
+                'wiki_url_parent': '/'.join(url_path[:-1]) }
+            return render_to_response('simplewiki_error.html', d)
         
         perm_err = check_permissions(request, path[-1], check_locked=False, check_write=True)
         if perm_err:
@@ -119,11 +129,12 @@ def create(request, wiki_url):
         f = CreateArticleForm(initial={'title':request.GET.get('wiki_article_name', url_path[-1]),
                                        'contents':_('Headline\n===\n\n')})
         
-    c = RequestContext(request, {'wiki_form': f,
-                                 'wiki_write': True,
-                                 })
+    d = {'wiki_form': f,
+        'wiki_write': True,
+        }
+    d.update(csrf(request))
 
-    return render_to_response('simplewiki_create.html', c)
+    return render_to_response('simplewiki_create.html', d)
 
 def edit(request, wiki_url):
     if not request.user.is_authenticated():
@@ -160,13 +171,14 @@ def edit(request, wiki_url):
             return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
     else:
         f = EditForm({'contents': article.current_revision.contents, 'title': article.title})
-    c = RequestContext(request, {'wiki_form': f,
-                                 'wiki_write': True,
-                                 'wiki_article': article,
-                                 'wiki_attachments_write': article.can_attach(request.user),
-                                 })
+    d = {'wiki_form': f,
+        	'wiki_write': True,
+        	'wiki_article': article,
+        	'wiki_attachments_write': article.can_attach(request.user),
+        	}
+    d.update(csrf(request))
 
-    return render_to_response('simplewiki_edit.html', c)
+    return render_to_response('simplewiki_edit.html', d)
 
 def history(request, wiki_url, page=1):
     if not request.user.is_authenticated():
@@ -211,15 +223,16 @@ def history(request, wiki_url, page=1):
     next_page = p + 1 if page_count > p else None
     prev_page = p - 1 if p > 1 else None
     
-    c = RequestContext(request, {'wiki_page': p,
-                                 'wiki_next_page': next_page,
-                                 'wiki_prev_page': prev_page,
-                                 'wiki_write': article.can_write_l(request.user),
-                                 'wiki_attachments_write': article.can_attach(request.user),
-                                 'wiki_article': article,
-                                 'wiki_history': history[beginItem:beginItem+page_size],})
+    d = {'wiki_page': p,
+	        'wiki_next_page': next_page,
+	        'wiki_prev_page': prev_page,
+	        'wiki_write': article.can_write_l(request.user),
+	        'wiki_attachments_write': article.can_attach(request.user),
+	        'wiki_article': article,
+	        'wiki_history': history[beginItem:beginItem+page_size],}
+    d.update(csrf(request))
 
-    return render_to_response('simplewiki_history.html', c)
+    return render_to_response('simplewiki_history.html', d)
 
 def search_articles(request, wiki_url):
     if not request.user.is_authenticated():
@@ -251,9 +264,9 @@ def search_articles(request, wiki_url):
         if results.count() == 1:
             return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
         else:        
-            c = RequestContext(request, {'wiki_search_results': results,
-                                         'wiki_search_query': querystring})
-            return render_to_response('simplewiki_searchresults.html', c)
+            d = {'wiki_search_results': results,
+                	'wiki_search_query': querystring}
+            return render_to_response('simplewiki_searchresults.html', d)
     
     return view(request, wiki_url)
 
@@ -344,15 +357,14 @@ def random_article(request, wiki_url):
 
 def encode_err(request, url):
     return render_to_response('simplewiki_error.html',
-                              RequestContext(request, {'wiki_err_encode': True}))
+                              {'wiki_err_encode': True})
     
 def not_found(request, wiki_url):
     if not request.user.is_authenticated():
         return redirect('/')
     """Generate a NOT FOUND message for some URL"""
-    return render_to_response('simplewiki_error.html',
-                              RequestContext(request, {'wiki_err_notfound': True,
-                                                       'wiki_url': wiki_url}))
+    return render_to_response('simplewiki_error.html', {'wiki_err_notfound': True,
+                                                       'wiki_url': wiki_url})
 
 def get_url_path(url):
     """Return a list of all actual elements of a url, safely ignoring
@@ -392,15 +404,15 @@ def check_permissions(request, article, check_read=False, check_write=False, che
     locked_err = check_locked and article.locked
 
     if read_err or write_err or locked_err:
-        c = RequestContext(request, {'wiki_article': article,
-                                     'wiki_err_noread': read_err,
-                                     'wiki_err_nowrite': write_err,
-                                     'wiki_err_locked': locked_err,})
+        d = {'wiki_article': article,
+	            'wiki_err_noread': read_err,
+	            'wiki_err_nowrite': write_err,
+	            'wiki_err_locked': locked_err,}
         # TODO: Make this a little less jarring by just displaying an error
         #       on the current page? (no such redirect happens for an anon upload yet)
         # benjaoming: I think this is the nicest way of displaying an error, but
         # these errors shouldn't occur, but rather be prevented on the other pages.
-        return render_to_response('simplewiki_error.html', c)
+        return render_to_response('simplewiki_error.html', d)
     else:
         return None
 
