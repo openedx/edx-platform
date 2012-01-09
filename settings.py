@@ -1,6 +1,7 @@
 ASKBOT_ENABLED = True
 
 DEFAULT_FROM_EMAIL = 'pmitros@csail.mit.edu'
+DEFAULT_FEEDBACK_EMAIL = 'pmitros@csail.mit.edu'
 
 WIKI_REQUIRE_LOGIN_EDIT = True
 WIKI_REQUIRE_LOGIN_VIEW = True

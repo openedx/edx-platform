@@ -1,4 +1,4 @@
-class XModule:
+class XModule(object):
     ''' Implements a generic learning module. 
         Initialized on access with __init__, first time with state=None, and
         then with state
