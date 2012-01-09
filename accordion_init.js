@@ -1,4 +1,7 @@
-$("#accordion").accordion({active:${ active_chapter }});
+$("#accordion").accordion({
+  active:${ active_chapter },
+  autoHeight: false
+});
 
 $('.ui-accordion').bind('accordionchange', function(event, ui) {
    var event_data = {'newheader':ui.newHeader.text(),

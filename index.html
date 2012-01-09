@@ -2,9 +2,6 @@
 <script> 
 $(function() {
 /* Set up FancyBox pop-ups */
-	$("a#inline").fancybox({
-		'hideOnContentClick': false
-	});
 
     // TODO: Clean up as per http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
 
@@ -107,8 +104,8 @@ $(function() {
 
           <center>
             <table>
-              <tr><td align=right><big><a id="inline" href="#enroll">Enroll &gt;&gt;</a><br><br><br>
-                    <a id="inline" href="#login">Log In &gt;&gt;</a></big></td><td><div style="width:50px; float:center;"></div></td><td>
+              <tr><td align=right><big><a class="modal" href="#enroll">Enroll &gt;&gt;</a><br><br><br>
+                    <a class="modal" href="#login">Log In &gt;&gt;</a></big></td><td><div style="width:50px; float:center;"></div></td><td>
                   <div style="width:300px; float:center;">
                     Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris
                     Terman, "6.002 Circuits and Electronics" is an an on-line adaption of
