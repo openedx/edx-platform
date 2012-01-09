@@ -1,0 +1,6 @@
+Feedback from: ${ user }
+url: ${ url }
+time: ${ time }
+Subject: ${ subject }
+Feedback: 
+${ feedback }
