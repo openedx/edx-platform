@@ -1,0 +1,13 @@
+##This file is based on the template from the SimpleWiki source which carries the GPL license
+
+<%inherit file="simplewiki_base.html"/>
+
+<%block name="wiki_page_title">
+${ wiki_article.title }
+</%block>
+<%block name="wiki_body">
+
+<div id="wiki_article">
+	${ wiki_article.current_revision.contents_parsed| n}
+</div>
+</%block>

@@ -1,0 +1,25 @@
+##This file is based on the template from the SimpleWiki source which carries the GPL license
+
+<%inherit file="simplewiki_base.html"/>
+
+<%block name="wiki_page_title">
+%if wiki_search_query:
+	Search results for ${wiki_search_query | h}
+%else:
+	Displaying all articles
+%endif
+</%block>
+
+<%block name="wiki_body">
+	%for article in wiki_search_results:
+		%if article.get_url:
+			<a href="${reverse("wiki_view", args=[article.get_url()])}">${article.get_url()}</a><br/>
+		%else:
+			<a href="${reverse("wiki_view", args=[''])}">/</a><br/>
+		%endif
+	%endfor
+	
+	%if not wiki_search_results: 
+		No articles were found!
+	%endif
+</%block>
