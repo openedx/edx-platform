@@ -8,10 +8,10 @@ div.course-wrapper {
     border-right: 1px solid #d3d3d3;
     display: table-cell;
     font-family: $body-font-family;
-    text-shadow: 0 1px 0 #f6f6f6;
+    overflow: hidden;
+    text-shadow: 0 1px 0 #f1f1f1;
     vertical-align: top;
     width: grid-width(3);
-    overflow: hidden;
 
     h3 {
       &:last-child {
@@ -32,6 +32,10 @@ div.course-wrapper {
           border: none;
           border-bottom: 1px solid #d3d3d3;
           font-weight: normal;
+
+          span.ui-icon {
+            background-image: url(images/ui-icons_454545_256x240.png);
+          }
         }
 
         &.ui-state-hover {
@@ -43,7 +47,7 @@ div.course-wrapper {
           @include box-shadow(none);
           background: none;
           border: 0;
-          border-bottom: 1px solid #aaa;
+          border-bottom: 1px solid #bbb;
           color: #000;
           font-weight: bold;
 
@@ -58,15 +62,33 @@ div.course-wrapper {
       @include border-radius(0);
       @include box-shadow( inset -1px 0 0 #e6e6e6);
       background: #d6d6d6;
-      border-bottom: 1px solid #c3c3c3;
-      border-top: 1px solid #c3c3c3;
       border: none;
+      border-bottom: 1px solid #c3c3c3;
       font-size: 12px;
       margin: 0;
+      overflow: hidden;
 
       li {
         &.active {
           font-weight: bold;
+        }
+
+        a {
+          text-decoration: none;
+          margin-bottom: $body-line-height;
+          display: block;
+
+          &:hover {
+            color: #666;
+          }
+
+          p {
+            margin-bottom: 0;
+
+            &.subtitle {
+              color: #666;
+            }
+          }
         }
       }
     }
@@ -82,6 +104,19 @@ div.course-wrapper {
     ol.vert-mod {
       li {
         @extend .clearfix;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+
+        h2 {
+          margin-top: 0;
+          margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+          display: inline-block;
+          margin: 8px 4px 4px 10px;
+        }
       }
     }
 

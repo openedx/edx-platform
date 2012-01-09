@@ -10,9 +10,9 @@
         >
 
           <a href='/courseware/${format_string(course_name)}/${format_string(chapter['name'])}/${format_string(section['name'])}'>
-            ${section['name']}
+            <p>${section['name']}</p>
 
-            <p>
+            <p class="subtitle">
               ${section['format']}
 
               % if 'time' in section and section['time']!="":
