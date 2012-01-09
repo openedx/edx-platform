@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MITX 6.002</title>
+  <%block name="title"><title>MITX 6.002</title></%block>
 
   <link rel="stylesheet" href="/static/lib/jquery.treeview.css" type="text/css" media="all" />
   <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all" />
@@ -33,11 +33,16 @@ $(function() {
 	});
 });
 </script>
+
+
+<%block name="headextra"/>
+
 </head>
 
 <body>
 
   ${self.body()}
+  <%block name="bodyextra"/>
 
   <footer>
     <p> Copyright (c). 2011. MIT. <a href=http://creativecommons.org/licenses/by-sa/3.0/>Some rights reserved.</a> Please give us <a id="inline"
