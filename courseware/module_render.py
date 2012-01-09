@@ -37,6 +37,7 @@ modx_modules={'problem':capa_module.LoncapaModule,
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
+    # Grab the student information for the module from the database
     s = StudentModule.objects.filter(module_type=module, 
                                      student=request.user, 
                                      module_id=id)
@@ -52,17 +53,22 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     id_tag=modx_modules[module].id_attribute
 
+    # Grab the XML corresponding to the request from course.xml
     xml = content_parser.module_xml(content_parser.course_file(request.user), module, id_tag, id)
 
+    # Create the module
     instance=modx_modules[module](xml, 
                                   s.module_id, 
                                   ajax_url=ajax_url, 
                                   state=s.state)
-    html=instance.handle_ajax(dispatch, request.POST)
+    # Let the module handle the AJAX
+    ajax_return=instance.handle_ajax(dispatch, request.POST)
+    # Save the state back to the database
     s.state=instance.get_state()
     s.grade=instance.get_score()['score']
     s.save()
-    return HttpResponse(html)
+    # Return whatever the module wanted to return to the client/caller
+    return HttpResponse(ajax_return)
 
 def vertical_module(request, module):
     ''' Layout module which lays out content vertically. 

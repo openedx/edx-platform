@@ -41,19 +41,21 @@ from django.contrib.auth.models import User
 class StudentModule(models.Model):
     # For a homework problem, contains a JSON
     # object consisting of state
+    module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem')
+    module_id = models.CharField(max_length=255) # Filename for homeworks, etc. 
+    student = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = (('student', 'module_id', 'module_type'),)
+
     state = models.TextField(null=True, blank=True)
     grade = models.FloatField(null=True, blank=True)
-    student = models.ForeignKey(User)
     MODULE_TYPES = (('problem','problem'),
                     ('video','video'),
                     ('html','html'),
                     )
-    module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem')
-    module_id = models.CharField(max_length=255) # Filename for homeworks, etc. 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    class Meta:
-        unique_together = (('student', 'module_id', 'module_type'),)
 
     def __unicode__(self):
         return self.module_type+'/'+self.student.username+"/"+self.module_id+'/'+str(self.state)[:20]
