@@ -258,7 +258,7 @@ def search_articles(request, wiki_url):
                     results._search = lambda x: results.filter(x)
                     
                 results = results._search(Q(current_revision__contents__icontains = queryword) | \
-                                          Q(title = queryword))
+                                          Q(title__icontains = queryword))
         else:
             # Need to throttle results by splitting them into pages...
             results = Article.objects.all()
