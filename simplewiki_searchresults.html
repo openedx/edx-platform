@@ -2,6 +2,10 @@
 
 <%inherit file="simplewiki_base.html"/>
 
+<%!
+    from django.core.urlresolvers import reverse
+%>
+
 <%block name="wiki_page_title">
 %if wiki_search_query:
 	Search results for ${wiki_search_query | h}
@@ -12,7 +16,7 @@
 
 <%block name="wiki_body">
 	%for article in wiki_search_results:
-		%if article.get_url:
+		%if article is not UNDEFINED:
 			<a href="${reverse("wiki_view", args=[article.get_url()])}">${article.get_url()}</a><br/>
 		%else:
 			<a href="${reverse("wiki_view", args=[''])}">/</a><br/>
@@ -20,6 +24,6 @@
 	%endfor
 	
 	%if not wiki_search_results: 
-		No articles were found!
+		No articles matching <b>${wiki_search_query if wiki_search_query is not UNDEFINED else ""} </b>!
 	%endif
 </%block>

@@ -72,8 +72,35 @@ update_schematics();});
 	<hr />
 
 	<%block name="wiki_panel">
+    <%
+        if (wiki_article is not UNDEFINED):
+        	baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
+        else:
+        	baseURL = reverse("wiki_view", args=[""])
+    %>
 
 	<div id="wiki_panel">
+    	<div class="wiki_box">
+    	    <div class="wiki_box_header">
+    	            <div class="wiki_box_corner"></div>
+    	            <div class="wiki_box_bar"></div>
+    	    </div>
+    	    <div class="wiki_box_contents">
+    	            <div class="wiki_box_title">Search</div>
+    	        <form method="POST" action='${reverse("wiki_search_articles", args=[""])}'>
+    	            <div style="display:none">
+                	    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+                	</div>
+    	            <input type="text" name="value" id="wiki_search_input" style="width: 72%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
+    	            <input type="submit" id="wiki_search_input_submit" value=Go! style="width: 20%" />
+    	        </form>
+    	    </div>
+    	    <div class="wiki_box_footer">
+    	            <div class="wiki_box_corner"></div>
+    	            <div class="wiki_box_bar"></div>
+    	    </div>
+    	</div>
+    	
 	    <div class="wiki_box">
 	    	<div class="wiki_box_header">
 	    		<div class="wiki_box_corner"></div>
@@ -84,11 +111,6 @@ update_schematics();});
 	    	<div style="border: 2px outset #CCC; width: 250px; padding: 10px; background-color: #FFF; position: absolute; right: 100px; top: -80px; display: none; color: #000;" id="wiki_create_form">
 				<%
 					theaction = "this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '')+'/_create/'"
-					if (wiki_article is not UNDEFINED):
-						baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
-					else:
-						baseURL = reverse("wiki_view", args=[""])
-					
 				%>
 	    		<form method="GET" onsubmit="this.action='${baseURL + "/' + " + theaction};">
 	    			<h2>Create article</h2>
