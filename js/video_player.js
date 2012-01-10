@@ -102,9 +102,9 @@ function caption_index(now) {
 
 function format_time(t)
 {
-    seconds = Math.round(t);
-    minutes = Math.round(seconds / 60);
-    hours = Math.round(minutes / 60);
+    seconds = Math.floor(t);
+    minutes = Math.floor(seconds / 60);
+    hours = Math.floor(minutes / 60);
     seconds = seconds % 60;
     minutes = minutes % 60;
     return hours+":"+((minutes < 10)?"0":"")+minutes+":"+((seconds < 10)?"0":"")+(seconds%60);
