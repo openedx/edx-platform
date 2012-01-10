@@ -152,8 +152,31 @@ function onYouTubePlayerReady(playerId) {
 	var id=load_id;
 	loadNewVideo(id, 0);
     }
-
 }
+
+/* HTML5 YouTube iFrame API Specific */
+function onYouTubePlayerAPIReady() {
+  ytplayer = new YT.Player('html5_player', {
+    events: { 
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+  updateytplayerInfoInterval = setInterval(updateytplayerInfo, 500);
+  ajax_videoInterval = setInterval(ajax_video, 5000);
+}
+
+function onPlayerReady(event) {
+  // alert("ready");
+  event.target.playVideo();
+}
+
+function onPlayerStateChange(event) {
+  if (event.data == YT.PlayerState.PLAYING) {
+  }
+}
+
+/* End HTML5 Specific */
 
 // clear pings to video status when we switch to a different sequence tab with ajax
 function videoDestroy() {
@@ -233,7 +256,7 @@ function updateytplayerInfo() {
 	update_captions(getCurrentTime());
     }
 
-    //    updateHTML("videoduration", getDuration());
+       // updateHTML("videoduration", getDuration());
     //    updateHTML("videotime", getCurrentTime());
     //    updateHTML("startbytes", getStartBytes());
     //    updateHTML("volume", getVolume());
