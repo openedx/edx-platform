@@ -41,6 +41,10 @@ from django.contrib.auth.models import User
 class StudentModule(models.Model):
     # For a homework problem, contains a JSON
     # object consisting of state
+    MODULE_TYPES = (('problem','problem'),
+                    ('video','video'),
+                    ('html','html'),
+                    )
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem')
     module_id = models.CharField(max_length=255) # Filename for homeworks, etc. 
     student = models.ForeignKey(User)
@@ -50,10 +54,6 @@ class StudentModule(models.Model):
 
     state = models.TextField(null=True, blank=True)
     grade = models.FloatField(null=True, blank=True)
-    MODULE_TYPES = (('problem','problem'),
-                    ('video','video'),
-                    ('html','html'),
-                    )
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
