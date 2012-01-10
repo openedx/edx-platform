@@ -31,7 +31,7 @@ def view(request, wiki_url):
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
-        
+    
     perm_err = check_permissions(request, article, check_read=True)
     if perm_err:
         return perm_err
@@ -39,7 +39,7 @@ def view(request, wiki_url):
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
 			}
-
+    d.update(csrf(request))
     return render_to_response('simplewiki_view.html', d)
 
 def root_redirect(request):
@@ -74,6 +74,7 @@ def create(request, wiki_url):
     if url_path != [] and url_path[0].startswith('_'):
             d = {'wiki_err_keyword': True,
                 'wiki_url': '/'.join(url_path) }
+            d.update(csrf(request))
             return render_to_response('simplewiki_error.html', d)        
 
     # Lookup path
@@ -88,6 +89,7 @@ def create(request, wiki_url):
         if not path:
             d = {'wiki_err_noparent': True,
                 'wiki_url_parent': '/'.join(url_path[:-1]) }
+            d.update(csrf(request))
             return render_to_response('simplewiki_error.html', d)
         
         perm_err = check_permissions(request, path[-1], check_locked=False, check_write=True)
@@ -266,6 +268,7 @@ def search_articles(request, wiki_url):
         else:        
             d = {'wiki_search_results': results,
                 	'wiki_search_query': querystring}
+            d.update(csrf(request))
             return render_to_response('simplewiki_searchresults.html', d)
     
     return view(request, wiki_url)
@@ -356,15 +359,18 @@ def random_article(request, wiki_url):
     return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
 def encode_err(request, url):
-    return render_to_response('simplewiki_error.html',
-                              {'wiki_err_encode': True})
+    d = {'wiki_err_encode': True}
+    d.update(csrf(request))
+    return render_to_response('simplewiki_error.html', d)
     
 def not_found(request, wiki_url):
     if not request.user.is_authenticated():
         return redirect('/')
     """Generate a NOT FOUND message for some URL"""
-    return render_to_response('simplewiki_error.html', {'wiki_err_notfound': True,
-                                                       'wiki_url': wiki_url})
+    d = {'wiki_err_notfound': True,
+         'wiki_url': wiki_url}
+    d.update(csrf(request))
+    return render_to_response('simplewiki_error.html', d)
 
 def get_url_path(url):
     """Return a list of all actual elements of a url, safely ignoring
@@ -408,6 +414,7 @@ def check_permissions(request, article, check_read=False, check_write=False, che
 	            'wiki_err_noread': read_err,
 	            'wiki_err_nowrite': write_err,
 	            'wiki_err_locked': locked_err,}
+        d.update(csrf(request))
         # TODO: Make this a little less jarring by just displaying an error
         #       on the current page? (no such redirect happens for an anon upload yet)
         # benjaoming: I think this is the nicest way of displaying an error, but
