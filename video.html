@@ -1,19 +1,25 @@
+
 <div class="video-wrapper">
   <div id="ytapiplayer">
-    <p>You need Flash player 8+ and JavaScript enabled to view this video.</p>
   </div>
-
+  
+  <!-- TODO(Ernie/Kyle) move styles to css -->
+  <iframe id="html5_player" type="text/html" width="640" height="390" style="display:none;" frameborder="0">
+  </iframe>
+  
   <section class="video-controls">
     <ul>
       <li><span class="ui-icon ui-icon-play" onclick="play();"></span></li>
       <li><span class="ui-icon ui-icon-pause" onclick="pause();"></span></li>
     </ul>
 
-    <div id=slider></div>
+    <div id="slider"></div>
     <div id="vidtime">0:00/0:00</div>
     <div id="video_speeds"></div>
   </section>
 </div>
+
+
 
 <ol class="subtitles">
   <li id=stt_n5><div id=std_n7 onclick="title_seek(-7);"></div></li>
@@ -33,5 +39,4 @@
   <li id=stt_p6><div id=std_p7 onclick="title_seek( 7);"></div></li>
   <li id=stt_p6><div id=std_p7 onclick="title_seek( 8);"></div></li>
 </ol>
-
 

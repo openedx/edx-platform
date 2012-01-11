@@ -1,9 +1,25 @@
 var streams=${ streams }
-
-var params = { allowScriptAccess: "always", bgcolor: "#cccccc" };
+var params = { allowScriptAccess: "always", bgcolor: "#cccccc", wmode: "transparent" };
 var atts = { id: "myytplayer" };
-swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer", 
-		   "ytapiplayer", "640", "385", "8", null, null, params, atts);
+
+// If the user doesn't have flash, use the HTML5 Video instead. YouTube's
+// iFrame API which supports HTML5 is still developmental so it is not default 
+if (swfobject.hasFlashPlayerVersion("10.1")){
+  swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer?wmode=transparent", 
+        "ytapiplayer", "640", "385", "8", null, null, params, atts);  
+} else {
+
+  //end of this URL may need &origin=http://..... once pushed to production to prevent XSS
+  $("#html5_player").attr("src", "http://www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1");
+  $("#html5_player").show();
+
+  var tag = document.createElement('script');
+  tag.src = "http://www.youtube.com/player_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+  loadHTML5Video();
+}
 var captions=0;
 $("#slider").slider({slide:function(event,ui){seek_slide('slide',event.originalEvent,ui.value);},
                      stop:function(event,ui){seek_slide('stop',event.originalEvent,ui.value);}});
@@ -17,10 +33,10 @@ ajax_video=good;
 loadNewVideo(streams["1.0"], ${ video_time });
 
 function add_speed(key, stream) {
-    var id = 'speed_' + stream
+    var id = 'speed_' + stream;
     $("#video_speeds").append(' <span id="'+id+'">'+key+'X</span>');
     $("#"+id).click(function(){
-	    change_video_speed(key, stream)
+	    change_video_speed(key, stream);
 	});
 }
 
@@ -41,3 +57,4 @@ l.sort(sort_by_value);
 for(var i=0; i<l.length; i++) {
     add_speed(l[i], streams[l[i]])
 }
+
