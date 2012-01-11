@@ -254,45 +254,48 @@ div.course-wrapper {
     text-shadow: 0 1px 0 #f1f1f1;
     vertical-align: top;
     width: 23.482%; }
-    div.course-wrapper div#accordion h3:last-child {
-      -webkit-box-shadow: none;
-      -moz-box-shadow: none;
-      -ms-box-shadow: none;
-      -o-box-shadow: none;
-      box-shadow: none; }
-    div.course-wrapper div#accordion h3.ui-accordion-header {
-      color: #000; }
-      div.course-wrapper div#accordion h3.ui-accordion-header a {
-        font-size: 14px;
-        color: #4d4d4d; }
-      div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-default {
-        -webkit-box-shadow: 0 1px 0 #eeeeee;
-        -moz-box-shadow: 0 1px 0 #eeeeee;
-        -ms-box-shadow: 0 1px 0 #eeeeee;
-        -o-box-shadow: 0 1px 0 #eeeeee;
-        box-shadow: 0 1px 0 #eeeeee;
-        background: none;
-        border: none;
-        border-bottom: 1px solid #d3d3d3;
-        font-weight: normal; }
-        div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-default span.ui-icon {
-          background-image: url(images/ui-icons_454545_256x240.png); }
-      div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-hover {
-        border: none;
-        border-bottom: 1px solid #d3d3d3; }
-      div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active {
+    div.course-wrapper div#accordion h3 {
+      overflow: hidden;
+      margin: 0; }
+      div.course-wrapper div#accordion h3:last-child {
         -webkit-box-shadow: none;
         -moz-box-shadow: none;
         -ms-box-shadow: none;
         -o-box-shadow: none;
-        box-shadow: none;
-        background: none;
-        border: 0;
-        border-bottom: 1px solid #bbb;
-        color: #000;
-        font-weight: bold; }
-        div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a {
-          color: #000; }
+        box-shadow: none; }
+      div.course-wrapper div#accordion h3.ui-accordion-header {
+        color: #000; }
+        div.course-wrapper div#accordion h3.ui-accordion-header a {
+          font-size: 14px;
+          color: #4d4d4d; }
+        div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-default {
+          -webkit-box-shadow: 0 1px 0 #eeeeee;
+          -moz-box-shadow: 0 1px 0 #eeeeee;
+          -ms-box-shadow: 0 1px 0 #eeeeee;
+          -o-box-shadow: 0 1px 0 #eeeeee;
+          box-shadow: 0 1px 0 #eeeeee;
+          background: none;
+          border: none;
+          border-bottom: 1px solid #d3d3d3;
+          font-weight: normal; }
+          div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-default span.ui-icon {
+            background-image: url(images/ui-icons_454545_256x240.png); }
+        div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-hover {
+          border: none;
+          border-bottom: 1px solid #d3d3d3; }
+        div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active {
+          -webkit-box-shadow: none;
+          -moz-box-shadow: none;
+          -ms-box-shadow: none;
+          -o-box-shadow: none;
+          box-shadow: none;
+          background: none;
+          border: 0;
+          border-bottom: 1px solid #bbb;
+          color: #000;
+          font-weight: bold; }
+          div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a {
+            color: #000; }
     div.course-wrapper div#accordion ul.ui-accordion-content {
       -webkit-border-radius: 0;
       -moz-border-radius: 0;
