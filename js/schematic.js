@@ -4,11 +4,29 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-// Chris Terman, Nov. 2011
+// Copyright (C) 2011 Massachusetts Institute of Technology
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+// of the Software, and to permit persons to whom the Software is furnished to do
+// so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
 // add schematics to a document with 
 //
-//   <input type="hidden" class="schematic" name="unique_form_id" value="...schematic/netlist info..." .../>
+//   <input type="hidden" class="schematic" name="unique_form_id" value="JSON netlist..." .../>
 //
 // other attributes you can add to the input tag:
 //   width -- width in pixels of diagram
@@ -27,14 +45,8 @@
 // need a netlist? just use the part's type, properites and connections
 
 // TO DO:
-
-// - draggable overlay window base class (dialogs, scope, ...)
 // - wire labels?
-// - devices: diode, nfet, pfet, opamp, scope probe
-// - icons for test equipment? (scope, sig gen, counter, ...)
-
 // - zoom/scroll canvas
-// - freeze_diagram, freeze_properties attributes (freeze certain components/properties?)
 // - rotate multiple objects around their center of mass
 // - rubber band wires when moving components
 
@@ -100,11 +112,7 @@ schematic = (function() {
 
 	// setup a schematic by populating the <div> with the appropriate children
 	function Schematic(input) {
-	    this.div = document.createElement('div');
-	    // set up div so we can position elements inside of it
-	    this.div.style.position = 'relative';
-	    this.div.style.cursor = 'default';
-
+	    // set up diagram viewing parameters
 	    this.grid = 8;
 	    this.scale = 2;
 	    this.origin_x = input.getAttribute("origin_x");
@@ -125,6 +133,15 @@ schematic = (function() {
 		parts = [];
 	    } else parts = parts.split(',');
 
+	    // now add the parts to the parts bin
+	    this.parts_bin = [];
+	    for (var i = 0; i < parts.length; i++) {
+		var part = new Part(this);
+		var pm = parts_map[parts[i]];
+		part.set_component(new pm[0](0,0,0),pm[1]);
+		this.parts_bin.push(part);
+	    }
+
 	    // use user-supplied list of analyses, otherwise provide them all
 	    // analyses="" means no analyses
 	    var analyses = input.getAttribute('analyses');
@@ -134,46 +151,6 @@ schematic = (function() {
 
 	    if (parts.length == 0 && analyses.length == 0) this.diagram_only = true;
 	    else this.diagram_only = false;
-
-	    if (!this.diagram_only) {
-		// start with a background element with normal positioning
-		this.background = document.createElement('canvas');
-		this.background.style.backgroundColor = background_style;
-		this.background.style.borderStyle = 'solid';
-		this.background.style.borderWidth = '2px';
-
-		this.status_div = document.createElement('div');
-		this.status_div.style.position = 'absolute';
-		this.status_div.style.padding = '2px';
-		this.status = document.createTextNode('');
-		this.status_div.appendChild(this.status);
-	    }
-
-	    this.connection_points = new Array();  // location string => list of cp's
-	    this.components = [];
-
-	    // this is where schematic is rendered
-	    this.canvas = document.createElement('canvas');
-	    if (!this.diagram_only) {
-		this.canvas.tabIndex = 1; // so we get keystrokes
-		this.canvas.style.borderStyle = 'solid';
-		this.canvas.style.borderWidth = '1px';
-		this.canvas.style.borderColor = grid_style;
-		this.canvas.style.position = 'absolute';
-		this.canvas.style.outline = 'none';
-	    }
-
-	    this.canvas.schematic = this;
-	    if (this.edits_allowed) {
-		this.canvas.addEventListener('mousemove',schematic_mouse_move,false);
-		this.canvas.addEventListener('mouseover',schematic_mouse_enter,false);
-		this.canvas.addEventListener('mouseout',schematic_mouse_leave,false);
-		this.canvas.addEventListener('mousedown',schematic_mouse_down,false);
-		this.canvas.addEventListener('mouseup',schematic_mouse_up,false);
-		this.canvas.addEventListener('dblclick',schematic_double_click,false);
-		this.canvas.addEventListener('keydown',schematic_key_down,false);
-		this.canvas.addEventListener('keyup',schematic_key_up,false);
-	    }
 
 	    // toolbar
 	    this.tools = new Array();
@@ -206,6 +183,52 @@ schematic = (function() {
 		}
 	    }
  
+	    // set up diagram canvas
+	    this.canvas = document.createElement('canvas');
+	    this.width = input.getAttribute('width');
+	    this.width = parseInt(this.width == undefined ? '400' : this.width);
+	    this.canvas.width = this.width;
+	    this.height = input.getAttribute('height');
+	    this.height = parseInt(this.height == undefined ? '300' : this.height);
+	    this.canvas.height = this.height;
+
+	    // repaint simply draws this buffer and then adds selected elements on top
+	    this.bg_image = document.createElement('canvas');
+	    this.bg_image.width = this.width;
+	    this.bg_image.height = this.height;
+
+	    if (!this.diagram_only) {
+		this.canvas.tabIndex = 1; // so we get keystrokes
+		this.canvas.style.borderStyle = 'solid';
+		this.canvas.style.borderWidth = '1px';
+		this.canvas.style.borderColor = grid_style;
+		//this.canvas.style.position = 'absolute';
+		this.canvas.style.outline = 'none';
+	    }
+
+	    this.canvas.schematic = this;
+	    if (this.edits_allowed) {
+		this.canvas.addEventListener('mousemove',schematic_mouse_move,false);
+		this.canvas.addEventListener('mouseover',schematic_mouse_enter,false);
+		this.canvas.addEventListener('mouseout',schematic_mouse_leave,false);
+		this.canvas.addEventListener('mousedown',schematic_mouse_down,false);
+		this.canvas.addEventListener('mouseup',schematic_mouse_up,false);
+		this.canvas.addEventListener('dblclick',schematic_double_click,false);
+		this.canvas.addEventListener('keydown',schematic_key_down,false);
+		this.canvas.addEventListener('keyup',schematic_key_up,false);
+	    }
+
+	    // set up message area
+	    if (!this.diagram_only) {
+		this.status_div = document.createElement('div');
+		this.status = document.createTextNode('');
+		this.status_div.appendChild(this.status);
+		this.status_div.style.height = status_height + 'px';
+	    } else this.status_div = undefined;
+
+	    this.connection_points = new Array();  // location string => list of cp's
+	    this.components = [];
+
 	    this.dragging = false;
 	    this.drawCursor = false;
 	    this.cursor_x = 0;
@@ -222,147 +245,77 @@ schematic = (function() {
 	    this.altKey = false;
 	    this.cmdKey = false;
 
-	    // repaint simply draws this buffer and then adds selected elements on top
-	    this.bg_image = document.createElement('canvas');
-
-	    // now add the parts to the parts bin
-	    var parts_left = this.width + 3 + background_margin;
-	    var parts_top = background_margin;
-	    this.parts_bin = [];
-	    for (var i = 0; i < parts.length; i++) {
-		var part = new Part(this);
-		var pm = parts_map[parts[i]];
-		part.set_component(new pm[0](0,0,0),pm[1]);
-		this.parts_bin.push(part);
-	    }
-
-	    // add all elements to the DOM
-	    if (!this.diagram_only) {
-		this.div.appendChild(this.background);
-		for (var i = 0; i < this.toolbar.length; i++) {
-		    var tool = this.toolbar[i];
-		    if (tool != null) this.div.appendChild(tool);
-		}
-		this.div.appendChild(this.status_div);
-		for (var i = 0; i < this.parts_bin.length; i++)
-		    this.div.appendChild(this.parts_bin[i].canvas);
-	    }
-	    this.div.appendChild(this.canvas);
-	    input.parentNode.insertBefore(this.div,input.nextSibling);
-
 	    // make sure other code can find us!
 	    input.schematic = this;
 	    this.input = input;
 
-	    // set locations of all the elements in the editor
-	    var w = parseInt(input.getAttribute('width'));
-	    var h = parseInt(input.getAttribute('height'));
-	    this.set_locations(w,h);
+	    // set up DOM -- use nested tables to do the layout
+	    var table,tr,td;
+	    table = document.createElement('table');
+	    if (!this.diagram_only) {
+		table.style.borderStyle = 'solid';
+		table.style.borderWidth = '2px';
+		table.style.padding = '5px';
+		table.style.backgroundColor = background_style;
+	    }
+
+	    // add tools to DOM
+	    if (this.toolbar.length > 0) {
+		tr = document.createElement('tr');
+		table.appendChild(tr);
+		td = document.createElement('td');
+		td.colspan = 2;
+		td.vAlign = 'baseline';
+		tr.appendChild(td);
+		for (var i = 0; i < this.toolbar.length; ++i) {
+		    var tool = this.toolbar[i];
+		    if (tool != null) td.appendChild(tool);
+		}
+	    }
+	    
+	    // add canvas and parts bin to DOM
+	    tr = document.createElement('tr');
+	    tr.vAlign = 'top';
+	    table.appendChild(tr);
+	    td = document.createElement('td');
+	    tr.appendChild(td);
+	    td.appendChild(this.canvas);
+	    td = document.createElement('td');
+	    tr.appendChild(td);
+	    var parts_table = document.createElement('table');
+	    td.appendChild(parts_table);
+
+	    // fill in parts_table here!!!
+	    var parts_per_column = Math.floor(this.height / part_h);
+	    for (var i = 0; i < parts_per_column; ++i) {
+		tr = document.createElement('tr');
+		parts_table.appendChild(tr);
+		for (var j = i; j < this.parts_bin.length; j += parts_per_column) {
+		    td = document.createElement('td');
+		    tr.appendChild(td);
+		    td.appendChild(this.parts_bin[j].canvas);
+		}
+	    }
+
+	    if (this.status_div != undefined) {
+		tr = document.createElement('tr');
+		table.appendChild(tr);
+		td = document.createElement('td');
+		tr.appendChild(td);
+		td.colspan = 2;
+		td.appendChild(this.status_div);
+	    }
+
+	    // add to dom
+	    this.input.parentNode.insertBefore(table,this.input.nextSibling);
 
 	    // process initial contents of diagram
 	    this.load_schematic(this.input.value);
 	}
 
-	background_margin = 5;
 	part_w = 42;   // size of a parts bin compartment
 	part_h = 42;
 	status_height = 18;
-
-	// w,h are the dimensions of the canvas, everyone else is positioned accordingly
-	Schematic.prototype.set_locations = function(w,h) {
-	    // limit the shrinkage factor
-	    w = Math.max(w,120);
-	    h = Math.max(h,120);
-	    this.width = w;
-	    this.height = h;
-	    this.bg_image.width = w;
-	    this.bg_image.height = h;
-
-	    if (this.diagram_only) {
-		this.canvas.width = w;
-		this.canvas.height = h;
-		this.redraw_background();   // redraw diagram
-		return;
-	    }
-
-	    this.min_x = 0;
-	    this.min_y = 0;
-	    this.max_x = w/this.scale;
-	    this.max_y = h/this.scale;
-
-	    var left,top;
-
-	    // start with tool bar
-	    left = 2*background_margin;   // space to the left
-	    top = background_margin;
-	    var max_height = 0;
-	    if (this.toolbar.length > 0) {
-		tool_left = left;
-		for (var i = 0; i < this.toolbar.length; i++) {
-		    var tool = this.toolbar[i];
-		    if (tool == null) {  // spacer
-			tool_left += 8;
-			continue;
-		    }
-		    tool.style.left = tool_left + 'px';
-		    tool.style.top = top + 'px';
-		    tool_left += tool.offsetWidth + 2;   // width + padding + border + gap
-		    max_height = Math.max(max_height,tool.offsetHeight);
-		}
-		top += max_height + 5;  // height + padding + border + gap;
-	    }
-
-	    // configure canvas
-	    this.canvas.style.left = left + 'px';
-	    this.canvas.style.top = top + 'px';
-	    this.canvas.width = w;
-	    this.canvas.height = h;
-	    this.redraw_background();   // redraw diagram
-
-	    // configure status bar
-	    this.status_div.style.left = left + 'px';
-	    this.status_div.style.top = this.canvas.offsetTop + this.canvas.offsetHeight + 3 + 'px';
-	    this.status_div.style.width = (w - 4) + 'px';   // subtract interior padding
-	    this.status_div.style.height = status_height + 'px';
-
-	    // configure parts bin
-	    var total_w = this.canvas.offsetLeft + this.canvas.offsetWidth;
-	    var parts_left = total_w + 5;
-	    var parts_top = top;
-	    var parts_h_limit = this.canvas.offsetTop + this.canvas.offsetHeight;
-	    for (var i = 0; i < this.parts_bin.length; i++) {
-		var part = this.parts_bin[i];
-		part.set_location(parts_left,parts_top);
-		
-		total_w = part.right();
-		parts_top = part.bottom() + 2;
-		if (parts_top + part_h > parts_h_limit) {
-		    parts_left = total_w + 2;
-		    parts_top = top;
-		}
-	    }
-
-	    // configure background
-	    var total_h = this.status_div.offsetTop + this.status_div.offsetHeight + background_margin;
-	    total_w += background_margin;
-	    this.background.height = total_h;
-	    this.background.width = total_w;
-
-	    /* enable when there's support for resizing schematic
-	    // redraw thumb
-	    var c = this.background.getContext('2d');
-	    c.clearRect(0,0,w,h);
-	    c.strokeStyle = thumb_style;
-	    c.lineWidth = 1;
-	    c.beginPath();
-	    w = total_w - 1;
-	    h = total_h - 1;
-	    c.moveTo(w,h-4); c.lineTo(w-4,h);
-	    c.moveTo(w,h-8); c.lineTo(w-8,h);
-	    c.moveTo(w,h-12); c.lineTo(w-12,h);
-	    c.stroke();
-	    */
-	}
 
 	Schematic.prototype.add_component = function(new_c) {
 	    this.components.push(new_c);
@@ -570,10 +523,10 @@ schematic = (function() {
 			part.add(this)
 			    }
 		}
-
-		// see what we've got!
-		this.redraw_background();
 	    }
+
+	    // see what we've got!
+	    this.redraw_background();
 	}
 
 	// label all the nodes in the circuit
@@ -764,8 +717,6 @@ schematic = (function() {
 	// Also redraws dynamic portion.
 	Schematic.prototype.redraw_background = function() {
 	    var c = this.bg_image.getContext('2d');
-	    var w = this.bg_image.width;
-	    var h = this.bg_imageheight;
 
 	    c.lineCap = 'round';
 
@@ -776,10 +727,10 @@ schematic = (function() {
 
 		// grid
 		c.strokeStyle = grid_style;
-		var first_x = this.min_x;
-		var last_x = this.max_x;
-		var first_y = this.min_y;
-		var last_y = this.max_y;
+		var first_x = 0;
+		var last_x = this.width/this.scale;
+		var first_y = 0;
+		var last_y = this.height/this.scale;
 		for (var i = first_x; i < last_x; i += this.grid)
 		    this.draw_line(c,i,first_y,i,last_y,0.1);
 		for (var i = first_y; i < last_y; i += this.grid)
@@ -903,22 +854,27 @@ schematic = (function() {
 	    c.fillText(text,(x - this.origin_x) * this.scale,(y - this.origin_y) * this.scale);
 	}
 
+	HTMLCanvasElement.prototype.totalOffset = function(){
+	}
+
 	// add method to canvas to compute relative coords for event
 	HTMLCanvasElement.prototype.relMouseCoords = function(event){
 	    // run up the DOM tree to figure out coords for top,left of canvas
 	    var totalOffsetX = 0;
 	    var totalOffsetY = 0;
-	    var canvasY = 0;
 	    var currentElement = this;
 	    do {
 		totalOffsetX += currentElement.offsetLeft;
 		totalOffsetY += currentElement.offsetTop;
 	    }
-	    while(currentElement = currentElement.offsetParent);
+	    while (currentElement = currentElement.offsetParent);
 
 	    // now compute relative position of click within the canvas
 	    this.mouse_x = event.pageX - totalOffsetX;
 	    this.mouse_y = event.pageY - totalOffsetY;
+
+	    this.page_x = event.pageX;
+	    this.page_y = event.pageY;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -1365,8 +1321,8 @@ schematic = (function() {
 	    content.win = win;   // so content can contact us
 
 	    // compute location in top-level div
-	    win.left = this.canvas.mouse_x + this.canvas.offsetLeft;
-	    win.top = this.canvas.mouse_y + this.canvas.offsetTop;
+	    win.left = this.canvas.page_x;
+	    win.top = this.canvas.page_y;
 
 	    // add to DOM
 	    win.style.background = 'white';
@@ -1375,7 +1331,8 @@ schematic = (function() {
 	    win.style.left = win.left + 'px';
 	    win.style.top = win.top + 'px';
 	    win.style.border = '2px solid';
-	    this.div.appendChild(win);
+
+	    this.input.parentNode.insertBefore(win,this.input.nextSibling);
 	}
 
 	// close the window
@@ -1458,7 +1415,7 @@ schematic = (function() {
 	    tool.style.borderWidth = '1px';
 	    tool.style.borderStyle = 'solid';
 	    tool.style.borderColor = background_style;
-	    tool.style.position = 'absolute';
+	    //tool.style.position = 'absolute';
 	    tool.style.padding = '2px';
 
 	    // set up event processing
@@ -1783,7 +1740,7 @@ schematic = (function() {
 	    this.canvas.style.borderStyle = 'solid';
 	    this.canvas.style.borderWidth = '1px';
 	    this.canvas.style.borderColor = background_style;
-	    this.canvas.style.position = 'absolute';
+	    //this.canvas.style.position = 'absolute';
 	    this.canvas.style.cursor = 'default';
 	    this.canvas.height = part_w;
 	    this.canvas.width = part_h;
