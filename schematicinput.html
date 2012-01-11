@@ -1,5 +1,11 @@
 <span>
-<input type="hidden" class="schematic" height="${height}" width="${width}" name="input_${id}" id="input_${id}" value="${value}" />
+<input type="hidden" class="schematic" height="${height}" width="${width}" name="input_${id}" id="input_${id}" value="" />
+<div id="hidden_${id}" style="display:none">
+${value}
+</div>
+<script>
+$("#input_${id}").attr("value",$("#hidden_${id}").text())
+</script>
 <span id="answer_${id}"></span>
 % if state == 'unsubmitted':
   <span class="ui-icon ui-icon-bullet" style="display:inline-block;" id="status_${id}"></span>

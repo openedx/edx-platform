@@ -5,6 +5,7 @@ function ${ id }_load() {
   update_schematics();
 
   $('#check_${ id }').click(function() {
+  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
       submit_data[value.id]=value.value;
@@ -44,6 +45,7 @@ function ${ id }_load() {
 });
 
 $('#save_${ id }').click(function() {
+  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
   var submit_data={};
   $.each($("[id^=input_${ id }_]"), function(index,value){
     submit_data[value.id]=value.value;});
