@@ -1,0 +1,22 @@
+form#wiki_revision {
+  label {
+    display: block;
+    margin-bottom: 7px ;
+  }
+
+  textarea {
+    @include box-sizing(border-box);
+    margin-bottom: 20px;
+    min-height: 300px;
+    width: 100%;
+  }
+
+  input[type="text"] {
+    width: 50%;
+  }
+
+  input[type="submit"] {
+    display: block;
+    margin-top: 20px;
+  }
+}
