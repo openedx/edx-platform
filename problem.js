@@ -36,7 +36,7 @@ function ${ id }_load() {
   $('#show_${ id }').click(function() {
     postJSON('/modx/problem/${ id }/problem_show', {}, function(data) {
       for (var key in data) {
-      $("#answer_${ id }_"+key).text(data[key]);
+      $("#answer_"+key).text(data[key]);
     }
   });
 
