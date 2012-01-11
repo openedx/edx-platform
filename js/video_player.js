@@ -141,6 +141,7 @@ function setytplayerState(newState) {
 // IMPORTANT TODO: Load test
 // POSSIBLE FIX: Move to unload() event and similar
 var ajax_video=function(){};
+var ytplayer;
 
 function onYouTubePlayerReady(playerId) {
     ytplayer = document.getElementById("myytplayer");
@@ -166,6 +167,14 @@ function onYouTubePlayerAPIReady() {
   ajax_videoInterval = setInterval(ajax_video, 5000);
 }
 
+// Need this function to call the API ready callback when we switch to a tab with AJAX that has a video
+// That callback is not being fired when we switch tabs. 
+function loadHTML5Video() {
+    if (!ytplayer && switched_tab){
+      onYouTubePlayerAPIReady();
+    }
+}
+
 function onPlayerReady(event) {
   // alert("ready");
   event.target.playVideo();
@@ -178,12 +187,15 @@ function onPlayerStateChange(event) {
 
 /* End HTML5 Specific */
 
+
+var switched_tab = false; // switch to true when we destroy so we know to call onYouTubePlayerAPIReady()
 // clear pings to video status when we switch to a different sequence tab with ajax
 function videoDestroy() {
     load_id = 0;
     clearInterval(updateytplayerInfoInterval);
     clearInterval(ajax_videoInterval);
     ytplayer = false;
+    switched_tab = true;
 }
 
 function log_event(e, d) {
