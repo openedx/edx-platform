@@ -6,7 +6,7 @@ import json
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.http import Http404
-import courseware.calc
+import courseware.capa.calc
 from django.core.mail import send_mail
 from django.conf import settings
 import datetime

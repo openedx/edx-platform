@@ -1,7 +1,8 @@
 import random, numpy, math, scipy, sys, StringIO, os, struct, json
 from x_module import XModule
+import sys
 
-from capa_problem import LoncapaProblem
+from capa.capa_problem import LoncapaProblem
 from django.http import Http404
 
 import dateutil
@@ -34,7 +35,7 @@ class LoncapaModule(XModule):
         return self.lcp.get_score()
 
     def max_score(self):
-        return len(self.lcp.questions)
+        return self.lcp.get_max_score()
 
     def get_html(self):
         return render_to_string('problem_ajax.html', 
@@ -162,7 +163,6 @@ class LoncapaModule(XModule):
             return json.dumps({"error":"Past due date"})
         elif dispatch=='problem_check': 
             response = self.check_problem(get)
-            print response
         elif dispatch=='problem_reset':
             response = self.reset_problem(get)
         elif dispatch=='problem_save':
@@ -238,16 +238,12 @@ class LoncapaModule(XModule):
             answers['_'.join(key.split('_')[1:])]=get[key]
 
         try:
-            print "A"
-            ocm = self.lcp.correct_map
-            print "."
-            oa = self.lcp.answers
-            print "."
+            old_state = self.lcp.get_state()
+            lcp_id = self.lcp.problem_id
+            filename = self.lcp.filename
             correct_map = self.lcp.grade_answers(answers)
-            print "."
         except: 
-            self.lcp.correct_map = ocm # HACK: Reset state
-            self.lcp.answers = oa
+            self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
             return json.dumps({'success':'syntax'})
 
         self.attempts = self.attempts + 1
@@ -279,7 +275,7 @@ class LoncapaModule(XModule):
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
         
-        self.lcp.answers=answers
+        self.lcp.student_answers=answers
 
         return json.dumps({'success':True})
 
