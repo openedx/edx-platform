@@ -1,5 +1,5 @@
 $("#accordion").accordion({
-  active:${ active_chapter },
+  active: ${ active_chapter },
   autoHeight: false
 });
 
