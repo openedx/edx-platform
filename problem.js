@@ -5,6 +5,7 @@ function ${ id }_load() {
   update_schematics();
 
   $('#check_${ id }').click(function() {
+  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
       submit_data[value.id]=value.value;
@@ -36,7 +37,7 @@ function ${ id }_load() {
   $('#show_${ id }').click(function() {
     postJSON('/modx/problem/${ id }/problem_show', {}, function(data) {
       for (var key in data) {
-      $("#answer_${ id }_"+key).text(data[key]);
+      $("#answer_"+key).text(data[key]);
     }
   });
 
@@ -44,6 +45,7 @@ function ${ id }_load() {
 });
 
 $('#save_${ id }').click(function() {
+  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
   var submit_data={};
   $.each($("[id^=input_${ id }_]"), function(index,value){
     submit_data[value.id]=value.value;});
