@@ -25,6 +25,15 @@ def index(request):
         # TODO: Clean up how 'error' is done. 
         return render_to_response('index.html', {'error' : '',
                                                  'csrf': csrf_token }) 
+                                                 
+def courseinfo(request):
+    if request.user.is_authenticated():
+        return redirect('/courseware')
+    else:
+        csrf_token = csrf(request)['csrf_token']
+        # TODO: Clean up how 'error' is done. 
+        return render_to_response('index.html', {'error' : '',
+                                                 'csrf': csrf_token }) 
 
 def login_user(request, error=""):
     print request.POST
