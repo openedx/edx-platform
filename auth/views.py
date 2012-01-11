@@ -32,7 +32,7 @@ def courseinfo(request):
     else:
         csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done. 
-        return render_to_response('index.html', {'error' : '',
+        return render_to_response('courseinfo.html', {'error' : '',
                                                  'csrf': csrf_token }) 
 
 def login_user(request, error=""):
