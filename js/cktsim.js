@@ -4,12 +4,30 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-// Chris Terman, Dec. 2011
+// Copyright (C) 2011 Massachusetts Institute of Technology
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+// of the Software, and to permit persons to whom the Software is furnished to do
+// so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
 // create a circuit for simulation using "new cktsim.Circuit()"
 
 // for modified nodal analysis (MNA) stamps see
-// http://books.google.com/books?id=qhHsSlazGrQC&pg=PA44&lpg=PA44&dq=MNA+stamp+inductor&source=bl&ots=ThMq-FmhLo&sig=cTP1ld_fhIJbGPSBXPDbh3Xappk&hl=en&sa=X&ei=6wb-ToecFMHj0QH61-Fs&ved=0CFcQ6AEwAw#v=onepage&q=MNA%20stamp%20inductor&f=false
+// http://www.analog-electronics.eu/analog-electronics/modified-nodal-analysis/modified-nodal-analysis.xhtml
 
 cktsim = (function() {
 
@@ -23,6 +41,15 @@ cktsim = (function() {
 	T_VOLTAGE = 0;
 	T_CURRENT = 1;
 
+	v_abstol = 1e-6;	// criterion for absolute convergence (voltage)
+	i_abstol = 1e-12;	// criterion for absolute convergence (current)
+	min_time_step = 1e-18;	// smallest possible time step
+	max_iterations = 50;	// max iterations before giving up
+	increase_limit = 4;	// if we converge in this many iterations, increase time step
+	time_step_increase_factor = 2.0;
+	time_step_decrease_factor = 0.3;
+	reltol = 0.001;		// convergence criterion relative to max observed value
+
 	function Circuit() {
 	    this.node_map = new Array();
 	    this.ntypes = [];
@@ -34,11 +61,6 @@ cktsim = (function() {
 
 	    this.finalized = false;
 	    this.node_index = -1;
-
-	    // for backward Euler: coeff0 = 1/timestep, coeff1 = 0
-	    // for trapezoidal: coeff0 = 2/timestep, coeff1 = 1
-	    this.coeff0 = undefined;
-	    this.coeff1 = undefined;
 	}
 
 	// index of ground node
@@ -67,10 +89,22 @@ cktsim = (function() {
 
 		// set up augmented matrix and various temp vectors
 		this.matrix = new Array(this.N);
-		for (var i = this.N - 1; i >= 0; --i)
+		this.soln_max = new Array(this.N);   // max abs value seen for each unknown
+		this.rtol = new Array(this.N);       // soln_max * reltol
+		this.abstol = new Array(this.N);
+		this.solution = new Array(this.N);
+		for (var i = this.N - 1; i >= 0; --i) {
 		    this.matrix[i] = new Array(this.N + 1);
-		this.swap = new Array(this.N);  // keep track of row swaps during pivoting
-		this.soln = new Array(this.N);  // hold swapped solution
+		    this.soln_max[i] = 0.0;
+		    this.rtol[i] = 0.0;
+		    this.abstol[i] = this.ntypes[i] == T_VOLTAGE ? v_abstol : i_abstol;
+		    this.solution[i] = 0.0;
+		}
+
+		// for backward Euler: coeff0 = 1/timestep, coeff1 = 0
+		// for trapezoidal: coeff0 = 2/timestep, coeff1 = 1
+		this.coeff0 = undefined;
+		this.coeff1 = undefined;
 	    }
 	}
 
@@ -84,8 +118,8 @@ cktsim = (function() {
 		var component = netlist[i];
 		var type = component[0];
 
-		// ignore wires, ground connections and view info
-		if (type == 'view' || type == 'w' || type == 'g') continue;
+		// ignore wires, ground connections, scope probes and view info
+		if (type == 'view' || type == 'w' || type == 'g' || type == 's') continue;
 
 		var properties = component[2];
 		var name = properties['name'];
@@ -121,24 +155,124 @@ cktsim = (function() {
 	    }
 	}
 
+	// if converges: updates this.solution, this.soln_max, returns iter count
+	// otherwise: return undefined and set this.problem_node
+	// The argument should be a function that sets up the linear system.
+	Circuit.prototype.find_solution = function(load) {
+	    var soln = this.solution;
+	    var old_soln,temp,converged;
+
+	    // iteratively solve until values convere or iteration limit exceeded
+	    for (var iter = 0; iter < max_iterations; i++) {
+		// set up equations
+		this.initialize_linear_system();
+		load(this);
+
+		// solve for node voltages and branch currents
+		old_soln = soln;
+		soln = solve_linear_system(this.matrix);
+
+		// check convergence: abs(new-old) <= abstol + reltol*max;
+		converged = true;
+		for (var i = this.N - 1; i >= 0; --i) {
+		    temp = Math.abs(soln[i] - old_soln);
+		    if (temp > this.abstol[i] + this.rtol[i]) {
+			converged = false;
+			this.problem_node = i;
+			break;
+		    }
+		}
+		if (!converged) continue;
+
+		// other convergence checks here?
+
+		// update solution and maximum
+		this.solution = soln;
+		for (var i = this.N - 1; i >= 0; --i) {
+		    temp = Math.abs(soln[i]);
+		    if (temp > this.soln_max[i]) {
+			this.soln_max[i] = temp;
+			this.rtol[i] = temp * reltol;
+		    }
+		}
+		return iter+1;
+	    }
+
+	    // too many iterations
+	    return undefined;
+	}
+
 	// DC analysis
 	Circuit.prototype.dc = function() {
 	    this.finalize();
 
-	    // set up equations
-	    this.initialize_linear_system();
-	    for (var i = this.devices.length - 1; i >= 0; --i)
-		this.devices[i].load_dc(this);
+	    // this function calls load_dc for all devices
+	    function load_dc(ckt) {
+		for (var i = ckt.devices.length - 1; i >= 0; --i)
+		    ckt.devices[i].load_dc(ckt);
+	    }
 
-	    // solve for operating point
-	    var x = solve_linear_system(this.matrix);
+	    // find the operating point
+	    var iterations = this.find_solution(load_dc);
+
+	    if (typeof iterations == 'undefined')
+		return 'Node '+this.node_map[this.problem_node]+' did not converge';
 
 	    // create solution dictionary
 	    var result = new Array();
 	    for (var name in this.node_map) {
 		var index = this.node_map[name];
-		result[name] = (index == -1) ? 0 : x[index];
+		result[name] = (index == -1) ? 0 : this.solution[index];
 	    }
+	    return result;
+	}
+
+	// AC analysis: npts/decade for freqs in range [fstart,fstop]
+	// result['frequencies'] = vector of log10(sample freqs)
+	// result['xxx'] = vector of dB(response for node xxx)
+	Circuit.prototype.ac = function(npts,fstart,fstop) {
+	    this.finalize();
+
+	    // this function calls load_ac for all devices
+	    function load_ac(ckt) {
+		for (var i = ckt.devices.length - 1; i >= 0; --i)
+		    ckt.devices[i].load_ac(ckt);
+	    }
+
+	    // build array to hold list of results for each node
+	    // last entry is for frequency values
+	    var response = new Array(this.N + 1);
+	    for (var i = this.N; i >= 0; --i) response[i] = new Array();
+
+	    // multiplicative frequency increase between freq points
+	    var delta_f = Math.exp(Math.LN10/npts);
+
+	    var f = fstart;
+	    fstop *= 1.0001;  // capture that last time point!
+	    while (f <= fstop) {
+		this.omega = 2 * Math.PI * f;
+
+		// find the operating point
+		var iterations = this.find_solution(load_ac);
+
+		if (typeof iterations == 'undefined')
+		    return 'Node '+this.node_map[this.problem_node]+' did not converge';
+		else {
+		    response[this.N].push(f);
+		    for (var i = this.N - 1; i >= 0; --i)
+			response[i].push(this.solution[i]);
+		}
+
+		f *= delta_f;    // increment frequency
+	    }
+
+	    // create solution dictionary
+	    var result = new Array();
+	    for (var name in this.node_map) {
+		var index = this.node_map[name];
+		result[name] = (index == -1) ? 0 : response[index];
+	    }
+	    result['frequencies'] = response[this.N];
 	    return result;
 	}
 
@@ -488,6 +622,8 @@ cktsim = (function() {
 	    return result;
 	}
 
+	Circuit.prototype.parse_number = parse_number;  // make it easy to call from outside
+
 	///////////////////////////////////////////////////////////////////////////////
 	//
 	//  Sources
@@ -650,19 +786,23 @@ cktsim = (function() {
 	VSource.prototype.construction = VSource;
 
 	// load linear system equations for dc analysis
-	VSource.prototype.load_dc = function(ckt,soln) {
+	VSource.prototype.load_dc = function(ckt) {
+	    // MNA stamp for independent voltage source
+	    ckt.add_to_A(this.branch,this.npos,1.0);
+	    ckt.add_to_A(this.branch,this.nneg,-1.0);
+	    ckt.add_to_A(this.npos,this.branch,1.0);
+	    ckt.add_to_A(this.nneg,this.branch,-1.0);
+	    ckt.add_to_b(this.branch,this.src.dc);
+	}
+
+	// load linear system equations for tran analysis (just like DC)
+	VSource.prototype.load_tran = function(ckt,soln) {
 	    // MNA stamp for independent voltage source
 	    ckt.add_to_A(this.branch,this.npos,1.0);
 	    ckt.add_to_A(this.branch,this.nneg,-1.0);
 	    ckt.add_to_A(this.npos,this.branch,1.0);
 	    ckt.add_to_A(this.nneg,this.branch,-1.0);
 	    ckt.add_to_b(this.branch,this.src.value(ckt.time));
-
-	}
-
-	// load linear system equations for tran analysis (just like DC)
-	VSource.prototype.load_tran = function(ckt,soln) {
-	    this.load_dc(ckt);
 	}
 
 	// return time of next breakpoint for the device
@@ -671,12 +811,8 @@ cktsim = (function() {
 	}
 
 	// small signal model: short circuit
-	VSource.prototype.load_ac = function() {
-	    // use branch row in matrix to set following constraint on system:
-	    // v_pos - v_neg = 0V
-	    ckt.add_to_A(this.branch,this.npos,1.0);
-	    ckt.add_to_A(this.branch,this.nneg,-1.0);
-	    // ckt.add_to_b(this.branch,0);   // adding 0 isn't necessary!
+	VSource.prototype.load_ac = function(ckt) {
+	    this.load_dc(ckt);
 	}
 
 	function ISource(npos,nneg,v) {
@@ -691,7 +827,7 @@ cktsim = (function() {
 
 	// load linear system equations for dc analysis
 	ISource.prototype.load_dc = function(ckt) {
-	    var i = this.src.value(ckt.time);
+	    var i = this.src.dc;
 
 	    // MNA stamp for independent current source
 	    ckt.add_to_b(this.npos,-i);  // current flow into npos
@@ -700,7 +836,11 @@ cktsim = (function() {
 
 	// load linear system equations for tran analysis (just like DC)
 	ISource.prototype.load_tran = function(ckt,soln) {
-	    this.load_dc(ckt);
+	    var i = this.src.value(ckt.time);
+
+	    // MNA stamp for independent current source
+	    ckt.add_to_b(this.npos,-i);  // current flow into npos
+	    ckt.add_to_b(this.nneg,i);   // and out of nneg
 	}
 
 	// return time of next breakpoint for the device
@@ -709,7 +849,8 @@ cktsim = (function() {
 	}
 
 	// small signal model: open circuit
-	ISource.prototype.load_ac = function() {
+	ISource.prototype.load_ac = function(ckt) {
+	    this.load_dc(ckt);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
