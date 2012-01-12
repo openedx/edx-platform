@@ -237,15 +237,14 @@ class LoncapaModule(XModule):
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
 
-        #try:
-        if True: 
+        try:
             old_state = self.lcp.get_state()
             lcp_id = self.lcp.problem_id
             filename = self.lcp.filename
             correct_map = self.lcp.grade_answers(answers)
-        #except: 
-        #    self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
-        #    return json.dumps({'success':'syntax'})
+        except: 
+            self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
+            return json.dumps({'success':'syntax'})
 
         self.attempts = self.attempts + 1
         self.lcp.done=True

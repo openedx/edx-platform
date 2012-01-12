@@ -51,11 +51,8 @@ class customresponse(object):
             self.code = answer.text
 
     def grade(self, student_answers):
-        print "YY", self.answer_ids
-        print "XX", student_answers
         submission = [student_answers[k] for k in sorted(self.answer_ids)]
         self.context.update({'submission':submission})
-        print self.code
         exec self.code in global_context, self.context
         return  zip(sorted(self.answer_ids), self.context['correct'])
 
