@@ -1,7 +1,42 @@
 <%inherit file="main.html" />
 
-<a href="/course_info/">Course</a>
-<a class="modal" href="#login">Log In</a>
+<header class="announcement">
+  <div class="anouncement-wrapper">
+  <nav>
+    <a class="modal login" href="#login">Log In</a>
+  </nav>
+
+    <section>
+      <h1>An MIT Education Anywhere. <br />For free.</h1>
+      <p>MITx is an open learning software available free of cost, so that others &mdash; whether other universities or different educational institutions, such as K&ndash;12 school systems &mdash; can leverage the same software for their online education offerings.</p>
+    </section>
+  </div>
+
+</header>
+
+<section class="index-content">
+  <section class="about">
+    <h1>About MITx</h1>
+    <p>MITx is a portfolio of MIT courses through an online interactive learning platform that:</p>
+
+    <ul>
+      <li>organizes and presents course material to enable students to learn at their own pace</li>
+      <li>features interactivity, online laboratories and student-to-student communication</li>
+      <li>allows for the individual assessment of any student&rsquo;s work and allow students who demonstrate their mastery of subjects to earn a certificate of completion awarded by MITx</li>
+      <li>operates on an open-source, scalable software infrastructure in order to make it continuously improving and readily available to other educational institutions.</li>
+    </ul>
+
+    <p>This learning platform will enhance the educational experience of its on-campus students, offering them online tools that supplement and enrich their classroom and laboratory experiences. It will also be host to a virtual community learners around the world.</p>
+  </section>
+
+  <section>
+    <h1>Course offering</h1>
+    <h2>6.002 Circuits and Electronics</h2>
+    <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, "6.002 Circuits and Electronics" is an on-line adaption of MIT's first undergraduate analog design course. This course will run, free of charge, for students worldwide from February 1, 2012 through July 1, 2012.</p>
+    <p>
+      <a href="/course_info/" class="more-info">More information about Circuits and Electronics</a>
+    </p>
+  </section>
 
 <div style="display:none">
   <div id="login"><%include file="login.html" /></div>
@@ -14,6 +49,7 @@
 <div style="display:none">
   <div id="reset_done"></div>
 </div>
+</section>
 
 
 <script> 

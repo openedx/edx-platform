@@ -1,74 +1,68 @@
-<!-- TODO: Add pattern field to username. See HTML5 cookbook, 
-     page 84 for details-->
+<!-- TODO: Add pattern field to username. See HTML5 cookbook, page 84 for details-->
 <div name="enroll_form" id="enroll_form">
-<form name="login"  method="get">
-<%
-   if 'error' in locals():
-     e = error
-%>
-<table width=360><tr><td>
 
-<tr><td colspan=3 align=center
-style="color:red;"><div id="enroll_error"
-name="enroll_error"></div></td></tr>
-<tr><td align=right>E-mail</td><td><input name="email" id="ca_email"
-type="email" required> </td><td></td></tr>
-<tr><td align=right>Password</td><td><input name="password"
-id="ca_password" type="password" required> </td><td></td></tr>
+  <h1>Enroll in 6.002 Circuits &amp; Electronics</h1>
+  <form name="login"  method="get">
+    <% if 'error' in locals(): e = error %>
 
-<tr><td align=right>Public Name</td><td><input name="username"
-id="ca_username" type="text" required> </td><td><span class="ui-icon ui-icon-help" id="spinner_nick" style="display:inline-block;"></td></tr>
-<tr><td colspan=3 align=center><div style="display:none"
-id="sregion_nick">Nickname you'd like to use on forums. We recommend
-some variant of your real name (e.g. first name, last initial), but we
-allow you to be fully anonymous as well. </div></td></tr>
+    <div id="enroll_error" name="enroll_error"></div>
+
+    <ol>
+
+      <li>
+        <label>E-mail*</label>
+        <input name="email" id="ca_email" type="email" required />
+      </li>
+
+      <li>
+        <label>Password*</label>
+        <input name="password" id="ca_password" type="password" required />
+      </li>
+
+      <li>
+        <label>Public Name* <span class="ui-icon ui-icon-help" id="spinner_nick" style="display:inline-block;"></span></label>
+        <input name="username" id="ca_username" type="text" required /> 
+
+        <div style="display:none" id="sregion_nick">Nickname you'd like to use on forums. We recommend some variant of your real name (e.g. first name, last initial), but we allow you to be fully anonymous as well. </div>
+      </li>
 
 
-<tr><td align=right>Full name</td><td><input name="name" id="ca_name" type="input">  </td><td><span class="ui-icon ui-icon-help" id="spinner_name" style="display:inline-block;"></td></tr>
-<tr><td colspan=3 align=center><div style="display:none" id="sregion_name">If you would
-like us to give you a certificate of completion at the end, we need
-your full legal name, as you would like it to appear on the
-certificate (e.g. &quot;John Smith, Jr&quot;). Otherwise, feel free to
-leave it blank. </div> </td></tr>
+      <li>
+        <label>Full name <span class="ui-icon ui-icon-help" id="spinner_name" style="display:inline-block;"></span></label>
+        <input name="name" id="ca_name" type="text" />
 
-<tr><td align=right>Location</td><td><input name="location" id="ca_location" type="input">  </td><td><span class="ui-icon ui-icon-help" id="spinner_location" style="display:inline-block;"></td></tr>
-<tr><td colspan=3 align=center><div style="display:none" id="sregion_location">Preferred format is city, state, country (so for us,
-&quot;Cambridge, Massachusetts, USA&quot;). We'd eventually like to
-group people into study groups. Studies show that geographic proximity
-helps. It'll also help us understand efforts needed for
-internationalization, low bandwidth, cultural issues, etc. We may also
-use statistics from this to help us raise money. </div></td></tr>
+        <div style="display:none" id="sregion_name">If you would like us to give you a certificate of completion at the end, we need your full legal name, as you would like it to appear on the certificate (e.g. &quot;John Smith, Jr&quot;). Otherwise, feel free to leave it blank. </div>
+      </li>
 
-<tr><td align=right>Preferred Language</td><td><input name="language"
-id="ca_language" type="input"> </td><td><span class="ui-icon ui-icon-help" id="spinner_language" style="display:inline-block;"></td></tr>
-<tr><td colspan=3 align=center><div style="display:none" id="sregion_language">Please let us
-know what language you'd most like to see the content in (even if not
-your native). We're working on translations and
-internationalization. This will help us know what languages and
-regions to focus on. </div></td></tr>
+      <li>
+        <label>Location <span class="ui-icon ui-icon-help" id="spinner_location" style="display:inline-block;"></span></label>
+        <input name="location" id="ca_location" type="text" />
 
-<tr><td align=right><input name="terms_of_service"
-id="cb_terms_of_service" type="checkbox"
-value="terms_of_service" required></td><td colspan=2>I agree to the Terms of
-Service</td></tr>
+        <div style="display:none" id="sregion_location">Preferred format is city, state, country (so for us, &quot;Cambridge, Massachusetts, USA&quot;). We'd eventually like to group people into study groups. Studies show that geographic proximity helps. It'll also help us understand efforts needed for internationalization, low bandwidth, cultural issues, etc. We may also use statistics from this to help us raise money. </div>
 
-<tr><td align=right><input name="honor_code" id="cb_honor_code"
-type="checkbox" value="honor_code" required></td><td colspan=2>I agree
-to:</td></tr>
-<tr><td colspan=3 align=center>
-<br>
-Not engage in any activities that would dishonestly improve my
-results, or improve or hurt those of others
-<br><br>
-Never post answers to problems 
-<br><br>
-Maintain only one account
-<br><br>
-</ol>
-</td></tr>
-<tr><td align=right></td><td align=right><input name="create_account_button"
-id="create_account_button" type="button" value="Create
-Account"> </td><td></td></tr>
-</table>
-</form>
+      </li>
+
+      <li>
+        <label>Preferred Language <span class="ui-icon ui-icon-help" id="spinner_language" style="display:inline-block;"></span></label>
+
+        <input name="language" id="ca_language" type="text" />
+
+        <div style="display:none" id="sregion_language">Please let us know what language you'd most like to see the content in (even if not your native). We're working on translations and internationalization. This will help us know what languages and regions to focus on. </div>
+      </li>
+
+      <li class="terms">
+        <label>
+          <input name="terms_of_service" id="cb_terms_of_service" type="checkbox" value="terms_of_service" required />I agree to the Terms of Service
+        </label>
+      </li>
+
+      <li class="honor-code">
+        <label>
+          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code" required />I agree to: Not engage in any activities that would dishonestly improve my results, or improve or hurt those of others. Never post answers to problems. Maintain only one account.
+        </label>
+      </li>
+
+    </ol>
+    <input name="create_account_button" id="create_account_button" type="button" value="Create Account">
+  </form>
 </div>

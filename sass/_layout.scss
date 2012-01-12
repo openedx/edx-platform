@@ -69,8 +69,8 @@ html {
       @include box-shadow(0 1px 0 #fff);
       @include box-sizing(border-box);
       background: #fff;
-      border-top: 0;
       border: 1px solid #ccc;
+      border-top: 0;
     }
 
     img {
