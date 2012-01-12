@@ -2,17 +2,29 @@
 ${ error }
 
 <div id="login_div">
+  <h1>Log in to MITx</h1>
   <form name="login" action="/login" method="get">
     <div id="login_error"></div>
-    E-mail
-    <input name="email" id="li_email" type="email" required>
-    Password
-    <input name="password" id="li_password" type="password" required>  </td></tr>
-    <input name="remember" id="remember"  type="checkbox">Remember me
+    <ol>
+      <li>
+        <label>E-mail*</label>
+        <input name="email" id="li_email" type="email" required>
+      </li>
+
+      <li>
+        <label>Password*</label>
+        <input name="password" id="li_password" type="password" required>
+      </li>
+
+      <li class="remember">
+        <label><input name="remember" id="remember"  type="checkbox">Remember me</label>
+      </li>
+
+    </ol>
     <input name="submit" id="login_button" type="button" value="Log in">
   </form>
 
-  <div>
+  <div class="lost-password">
     <div id="lost_password"><a class="modal" href="#pwd_reset">Lost password?</a></div>
   </div>
 </div>

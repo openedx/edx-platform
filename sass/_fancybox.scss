@@ -3,6 +3,7 @@ div#fancybox-overlay {
 }
 
 div#fancybox-wrap {
+  width: auto  !important;
   div#fancybox-outer {
     background: none;
     max-width: 600px;
@@ -20,6 +21,7 @@ div#fancybox-wrap {
       border: none;
       padding: lh(2);
       max-width: 600px;
+      width: auto !important;
 
       h1 {
         font-size: 24px;
@@ -51,7 +53,7 @@ div#fancybox-wrap {
               margin-right: $gw-gutter;
             }
 
-            &.terms {
+            &.terms, &.remember {
               float: none;
               width: auto;
               clear: both;
@@ -84,6 +86,29 @@ div#fancybox-wrap {
           @include button($mit-red);
           font-size: 18px;
           padding: lh(.5);
+        }
+      }
+
+      div#login {
+        min-width: 300px;
+
+        ol {
+          li {
+            width: auto;
+            float: none;
+          }
+        }
+      }
+
+      div.lost-password {
+        text-align: left;
+        margin-top: lh();
+
+        a {
+          color: #999;
+          &:hover {
+            color: #444;
+          }
         }
       }
     }
