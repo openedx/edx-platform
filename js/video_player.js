@@ -102,9 +102,9 @@ function caption_index(now) {
 
 function format_time(t)
 {
-    seconds = Math.round(t);
-    minutes = Math.round(seconds / 60);
-    hours = Math.round(minutes / 60);
+    seconds = Math.floor(t);
+    minutes = Math.floor(seconds / 60);
+    hours = Math.floor(minutes / 60);
     seconds = seconds % 60;
     minutes = minutes % 60;
     return hours+":"+((minutes < 10)?"0":"")+minutes+":"+((seconds < 10)?"0":"")+(seconds%60);
@@ -141,6 +141,7 @@ function setytplayerState(newState) {
 // IMPORTANT TODO: Load test
 // POSSIBLE FIX: Move to unload() event and similar
 var ajax_video=function(){};
+var ytplayer;
 
 function onYouTubePlayerReady(playerId) {
     ytplayer = document.getElementById("myytplayer");
@@ -152,15 +153,49 @@ function onYouTubePlayerReady(playerId) {
 	var id=load_id;
 	loadNewVideo(id, 0);
     }
-
 }
 
+/* HTML5 YouTube iFrame API Specific */
+function onYouTubePlayerAPIReady() {
+  ytplayer = new YT.Player('html5_player', {
+    events: { 
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+  updateytplayerInfoInterval = setInterval(updateytplayerInfo, 500);
+  ajax_videoInterval = setInterval(ajax_video, 5000);
+}
+
+// Need this function to call the API ready callback when we switch to a tab with AJAX that has a video
+// That callback is not being fired when we switch tabs. 
+function loadHTML5Video() {
+    if (!ytplayer && switched_tab){
+      onYouTubePlayerAPIReady();
+    }
+}
+
+function onPlayerReady(event) {
+  // alert("ready");
+  event.target.playVideo();
+}
+
+function onPlayerStateChange(event) {
+  if (event.data == YT.PlayerState.PLAYING) {
+  }
+}
+
+/* End HTML5 Specific */
+
+
+var switched_tab = false; // switch to true when we destroy so we know to call onYouTubePlayerAPIReady()
 // clear pings to video status when we switch to a different sequence tab with ajax
 function videoDestroy() {
     load_id = 0;
     clearInterval(updateytplayerInfoInterval);
     clearInterval(ajax_videoInterval);
     ytplayer = false;
+    switched_tab = true;
 }
 
 function log_event(e, d) {
@@ -233,7 +268,7 @@ function updateytplayerInfo() {
 	update_captions(getCurrentTime());
     }
 
-    //    updateHTML("videoduration", getDuration());
+       // updateHTML("videoduration", getDuration());
     //    updateHTML("videotime", getCurrentTime());
     //    updateHTML("startbytes", getStartBytes());
     //    updateHTML("volume", getVolume());
