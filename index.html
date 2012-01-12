@@ -1,4 +1,57 @@
-<%inherit file="main.html" /> 
+<%inherit file="main.html" />
+
+<header class="announcement">
+  <div class="anouncement-wrapper">
+  <nav>
+    <a class="modal login" href="#login">Log In</a>
+  </nav>
+
+    <section>
+      <h1>An MIT Education Anywhere. <br />For free.</h1>
+      <p>MITx is an open learning software available free of cost, so that others &mdash; whether other universities or different educational institutions, such as K&ndash;12 school systems &mdash; can leverage the same software for their online education offerings.</p>
+    </section>
+  </div>
+
+</header>
+
+<section class="index-content">
+  <section class="about">
+    <h1>About MITx</h1>
+    <p>MITx is a portfolio of MIT courses through an online interactive learning platform that:</p>
+
+    <ul>
+      <li>organizes and presents course material to enable students to learn at their own pace</li>
+      <li>features interactivity, online laboratories and student-to-student communication</li>
+      <li>allows for the individual assessment of any student&rsquo;s work and allow students who demonstrate their mastery of subjects to earn a certificate of completion awarded by MITx</li>
+      <li>operates on an open-source, scalable software infrastructure in order to make it continuously improving and readily available to other educational institutions.</li>
+    </ul>
+
+    <p>This learning platform will enhance the educational experience of its on-campus students, offering them online tools that supplement and enrich their classroom and laboratory experiences. It will also be host to a virtual community learners around the world.</p>
+  </section>
+
+  <section>
+    <h1>Course offering</h1>
+    <h2>6.002 Circuits and Electronics</h2>
+    <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, "6.002 Circuits and Electronics" is an on-line adaption of MIT's first undergraduate analog design course. This course will run, free of charge, for students worldwide from February 1, 2012 through July 1, 2012.</p>
+    <p>
+      <a href="/course_info/" class="more-info">More information about Circuits and Electronics</a>
+    </p>
+  </section>
+
+<div style="display:none">
+  <div id="login"><%include file="login.html" /></div>
+</div>
+
+<div style="display:none">
+  <div id="pwd_reset"><%include file="password_reset_form.html" /></div>
+</div>
+
+<div style="display:none">
+  <div id="reset_done"></div>
+</div>
+</section>
+
+
 <script> 
 $(function() {
 /* Set up FancyBox pop-ups */
@@ -7,6 +60,7 @@ $(function() {
 
     /* Handles when the user hits 'enroll'. Grabs form data. Does AJAX. 
             Either shows error, or shows success. */
+
     $('#create_account_button').click(function() {
       var submit_data={};
       $.each($("[id^=ca_]"), function(index,value){
@@ -50,11 +104,11 @@ $(function() {
     });
 
     $('#pwd_reset_button').click(function() {
-      $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
-                    "email"  : $('#id_email').val()}, function(data){
-         $('#pwd_reset').html(data);
-      });
-    });
+        $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
+          "email"  : $('#id_email').val()}, function(data){
+          $('#pwd_reset').html(data);
+          });
+        });
 
     /* Activate stupid spinner drop-downs in enrollment form */
     var spinner_array=$("[id^=spinner_]");
@@ -70,79 +124,3 @@ $(function() {
 });
 
 </script>
-
-<div id="topWrapper"> 
-  <div id="topBanner"></div> 
-</div>
-
-<div id="topnav">
-  <ul>
-    <li id="current" style="border:none">
-      <a href="#" shape="rect">Home</a>
-    </li>
-    <li style="border:none">
-      <a href="/t/info.html" shape="rect">Course Info</a>
-    </li>
-    <li style="border:none">
-      <a href="/t/staff.html" shape="rect">Instructors</a>
-    </li>
-    <li style="border:none">
-      <a href="/t/credits.html" shape="rect">Credits</a>
-    </li>
-  </ul> 
-</div>  
-
-<!-- end top wrapper -->  
-<div id="wrapper"> 
-  <div id="bg"> 
-    <div id="header"></div>  
-    <div id="page"> 
-      <!-- begin container -->  
-      <div id="container"> 
-        <!--  content -->  
-        <div id="content"> 
-
-          <center>
-            <table>
-              <tr><td align=right><big><a class="modal" href="#enroll">Enroll &gt;&gt;</a><br><br><br>
-                    <a class="modal" href="#login">Log In &gt;&gt;</a></big></td><td><div style="width:50px; float:center;"></div></td><td>
-                  <div style="width:300px; float:center;">
-                    Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris
-                    Terman, "6.002 Circuits and Electronics" is an an on-line adaption of
-                    MIT's first undergraduate analog design course. This course will run,
-                    free of charge, for students worldwide from February 1, 2012 through
-                    July 1, 2012.
-
-                    <br><br>Students who successfully complete the course will receive an
-                    electronic certificate of accomplishment from MIT. Students will not
-                    receive course credit, but students successfully finishing the course
-                    will be well-placed to take an exam to pass out of 6.002 should they
-                    ever enroll at MIT, and potentially, similar courses at other schools.
-
-                    <br><br> In order to succeed in this course, students must have some
-                    background in calculus and differential equations. Since more advanced
-                    mathematics will not show up until the second half of the course, the
-                    first half of the course will include an optional remedial
-                    differential equations component for students with weaker math
-                    backgrounds.
-
-                  </div>
-
-                  <div style="display:none"><div id="enroll" name="enroll"><%include file="create_account.html" /></div></div>
-                  <div style="display:none"><div id="login"><%include file="login.html" /></div></div>
-                  <div style="display:none"><div id="pwd_reset"><%include file="password_reset_form.html" /></div></div>
-                  <div style="display:none"><div id="reset_done"></div></div>
-
-
-            </td></tr></table>
-
-
-
-          </div>
-          <!-- end content --> 
-        </div>  
-        <!-- end container --> 
-      </div>  
-      <div id="footerWrapper"></div> 
-    </div> 
-  </div>  

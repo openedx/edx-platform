@@ -5,12 +5,15 @@
 // Base layout
 @import "base-variables", "base-extends", "base";
 @import "layout";
+@import "fancybox";
 
 // pages
 @import "courseware";
 @import "textbook";
 @import "profile";
 @import "wiki-create", "wiki";
+@import "index";
+@import "activation";
 
 // left over
 @import "theme";
