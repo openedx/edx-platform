@@ -6,6 +6,7 @@ from capa.capa_problem import LoncapaProblem
 from django.http import Http404
 
 import dateutil
+import dateutil.parser
 import datetime
 
 import content_parser
