@@ -39,6 +39,8 @@ class customresponse(object):
     def __init__(self, xml, context):
         self.xml = xml
         ## CRITICAL TODO: Should cover all entrytypes
+        ## NOTE: xpath will look at root of XML tree, not just 
+        ## what's in xml. @id=id keeps us in the right customresponse. 
         self.answer_ids = xml.xpath('//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
         self.context = context
