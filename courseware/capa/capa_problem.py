@@ -10,11 +10,11 @@ from content_parser import xpath_remove
 from util import contextualize_text
 
 from inputtypes import textline, schematic
-from responsetypes import numericalresponse, formularesponse
+from responsetypes import numericalresponse, formularesponse, customresponse
 
 response_types = {'numericalresponse':numericalresponse, 
                   'formularesponse':formularesponse,
-                  'customresponse':None}
+                  'customresponse':customresponse}
 entry_types = ['textline', 'schematic']
 response_properties = ["responseparam", "answer"]
 # How to convert from original XML to HTML
@@ -124,6 +124,12 @@ class LoncapaProblem(object):
             responder = response_types[response.tag](response, self.context)
             results = responder.get_answers()
             answer_map.update(results)
+
+        for entry in problems_simple.xpath("//"+"|//".join(response_properties+entry_types)):
+            answer = entry.get('correct_answer')
+            if answer != None:
+                answer_map[entry.get('id')] = contextualize_text(answer, self.context())
+
         return answer_map
 
     # ======= Private ========

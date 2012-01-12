@@ -1,6 +1,14 @@
+import random, numpy, math, scipy
 from util import contextualize_text
 from calc import evaluator
 import random, math
+from django.conf import settings
+
+# TODO: Should be the same object as in capa_problem
+global_context={'random':random,
+                'numpy':numpy,
+                'math':math,
+                'scipy':scipy}
 
 class numericalresponse(object):
     def __init__(self, xml, context):
@@ -30,15 +38,31 @@ class numericalresponse(object):
 class customresponse(object):
     def __init__(self, xml, context):
         self.xml = xml
-        self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
-                                   id=xml.get('id'))[0]
-        return {self.answer_id:'correct'}
+        ## CRITICAL TODO: Should cover all entrytypes
+        self.answer_ids = xml.xpath('//*[@id=$id]//textline/@id',
+                                    id=xml.get('id'))
+        self.context = context
+        answer = xml.xpath('//*[@id=$id]//answer',
+                           id=xml.get('id'))[0]
+        answer_src = answer.get('src')
+        if answer_src != None:
+            self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
+        else:
+            self.code = answer.text
 
     def grade(self, student_answers):
-        return {self.answer_id:'correct'}
+        print "YY", self.answer_ids
+        print "XX", student_answers
+        submission = [student_answers[k] for k in sorted(self.answer_ids)]
+        self.context.update({'submission':submission})
+        print self.code
+        exec self.code in global_context, self.context
+        return  zip(sorted(self.answer_ids), self.context['correct'])
 
     def get_answers(self):
-        return {self.answer_id:'correct'}
+        # Since this is explicitly specified in the problem, this will 
+        # be handled by capa_problem
+        return {}
 
 
 class formularesponse(object):
