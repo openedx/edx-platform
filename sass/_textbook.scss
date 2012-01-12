@@ -2,17 +2,9 @@ div.book-wrapper {
   display: table;
 
   ul#booknav {
-    @include box-shadow( inset -1px 0 0 #f6f6f6);
+    @extend .sidebar;
     @include box-sizing(border-box);
-    background: #e3e3e3;
-    border-right: 1px solid #d3d3d3;
-    font-family: $body-font-family;
     padding: $body-line-height;
-    text-shadow: 0 1px 0 #f6f6f6;
-    vertical-align: top;
-    width: grid-width(3);
-    min-width: 240px;
-    display: table-cell;
 
     li {
       ul {
@@ -29,9 +21,7 @@ div.book-wrapper {
     display: table-cell;
 
     nav {
-      background: #F6EFD4;
-      border-bottom: 1px solid darken(#F6EFD4, 10%);
-      margin: (-$body-line-height) (-$body-line-height) $body-line-height;
+      @extend .topbar;
 
       ul {
         @extend .clearfix;
@@ -44,17 +34,6 @@ div.book-wrapper {
 
           &.next {
             float: right;
-          }
-
-          a {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: darken(#F6EFD4, 80%);
-            text-shadow: 0 1px 0 #fff;
-
-            &:hover {
-              color: darken(#F6EFD4, 60%);
-            }
           }
         }
       }

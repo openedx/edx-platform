@@ -45,9 +45,8 @@ $(function() {
            }
         });
 
-
         $('#change_password').click(function(){
-          $('#inline').trigger('click');
+          $('.modal').trigger('click');
             log_event("profile", {"type":"password_show"});
         });
 
@@ -75,10 +74,9 @@ $(function() {
         <li>E-mail: ${email}</li>
         <li>Location: ${location}</li>
         <li>Language: ${language}</li>
-        <li>Password: ********</li>
       </ul>
 
-      <!-- <div><a href="#change_password_pop">Reset password</a></div> -->
+      <!-- <div><a class="modal" href="#change_password_pop">Reset password</a></div> -->
       <!-- hidden trigger for password -->
 
       <div id="change_password_pop">

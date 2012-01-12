@@ -1,0 +1,19 @@
+<span>
+<input type="hidden" class="schematic" height="${height}" width="${width}" name="input_${id}" id="input_${id}" value="" />
+<div id="hidden_${id}" style="display:none">
+${value}
+</div>
+<script>
+$("#input_${id}").attr("value",$("#hidden_${id}").text())
+</script>
+<span id="answer_${id}"></span>
+% if state == 'unsubmitted':
+  <span class="ui-icon ui-icon-bullet" style="display:inline-block;" id="status_${id}"></span>
+% elif state == 'correct': 
+  <span class="ui-icon ui-icon-check" style="display:inline-block;" id="status_${id}"></span>
+% elif state == 'incorrect':
+  <span class="ui-icon ui-icon-close" style="display:inline-block;" id="status_${id}"></span>
+% elif state == 'incomplete':
+  <span class="ui-icon ui-icon-close" style="display:inline-block;" id="status_${id}"></span>
+% endif
+</span>

@@ -11,12 +11,9 @@ ${ wiki_article.title }
 	<div style="display:none">
 	    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
 	</div>
-	<table id="wiki_revision_table">
-	${wiki_form}
-	<tr>
-		<td colspan="2" align="right">
-			<input type="submit" value="Edit article" /></td>
-	</tr>
-	</table>
+
+  ${wiki_form}
+
+  <input type="submit" value="Edit article" /></td>
 </form>
 </%block>

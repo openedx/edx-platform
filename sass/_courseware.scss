@@ -3,17 +3,12 @@ div.course-wrapper {
   width: 100%;
 
   div#accordion {
-    @include box-shadow( inset -1px 0 0 #f6f6f6);
-    background: #e3e3e3;
-    border-right: 1px solid #d3d3d3;
-    display: table-cell;
-    font-family: $body-font-family;
-    overflow: hidden;
-    text-shadow: 0 1px 0 #f1f1f1;
-    vertical-align: top;
-    width: grid-width(3);
+    @extend .sidebar;
 
     h3 {
+      overflow: hidden;
+      margin: 0;
+
       &:last-child {
         @include box-shadow(none);
       }
@@ -26,34 +21,13 @@ div.course-wrapper {
           color: lighten($text-color, 10%);
         }
 
-        &.ui-state-default {
-          @include box-shadow(0 1px 0 #eee);
-          background: none;
-          border: none;
-          border-bottom: 1px solid #d3d3d3;
-          font-weight: normal;
-
-          span.ui-icon {
-            background-image: url(images/ui-icons_454545_256x240.png);
-          }
-        }
-
         &.ui-state-hover {
           border: none;
           border-bottom: 1px solid #d3d3d3;
         }
 
         &.ui-state-active {
-          @include box-shadow(none);
-          background: none;
-          border: 0;
-          border-bottom: 1px solid #bbb;
-          color: #000;
-          font-weight: bold;
-
-          a {
-            color: #000;
-          }
+          @extend .active;
         }
       }
     }
@@ -124,6 +98,7 @@ div.course-wrapper {
       margin-bottom: $body-line-height;
 
       li {
+        border: none;
         cursor: pointer;
         display: table-cell;
         min-width: 30px;
@@ -135,7 +110,7 @@ div.course-wrapper {
     div.video-wrapper {
       float: left;
       width: 640px;
-      min-height: 500px;
+      min-height: 620px;
 
       section {
         ul {
@@ -145,6 +120,8 @@ div.course-wrapper {
             margin-top: 5px;
             display: inline-block;
             cursor: pointer;
+            border: 0;
+            padding: 0;
 
             div {
               &:empty {
@@ -183,9 +160,13 @@ div.course-wrapper {
       li {
         margin-bottom: 8px;
         cursor: pointer;
+        border: 0;
+        padding: 0;
+        color: #666;
 
         &.current {
           background-color: #f3f3f3;
+          color: #333;
         }
 
         &:hover {
