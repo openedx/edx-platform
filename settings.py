@@ -3,10 +3,12 @@ ASKBOT_ENABLED = True
 if not COURSEWARE_ENABLED:
    ASKBOT_ENABLED = False
 
+# Defaults to be overridden
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+SITE_NAME = "localhost:8000"
 
-DEFAULT_FROM_EMAIL = 'pmitros@csail.mit.edu'
-DEFAULT_FEEDBACK_EMAIL = 'pmitros@csail.mit.edu'
+DEFAULT_FROM_EMAIL = 'nobody@localhost'
+DEFAULT_FEEDBACK_EMAIL = 'nobody@localhost'
 
 WIKI_REQUIRE_LOGIN_EDIT = True
 WIKI_REQUIRE_LOGIN_VIEW = True
