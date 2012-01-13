@@ -112,6 +112,13 @@ div.course-wrapper {
       width: 640px;
       min-height: 620px;
 
+      iframe#html5_player {
+        border: none;
+        display: none;
+        height: 390px;
+        width:  640px;
+      }
+
       section {
         ul {
           display: inline-block;
