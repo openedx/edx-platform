@@ -104,7 +104,7 @@ def render_accordion(request,course,chapter,section):
 def index(request, course="6.002 Spring 2012", chapter="Using the System", section="Hints"): 
     ''' Displays courseware accordion, and any associated content. 
     ''' 
-    if not request.user.is_authenticated():
+    if not settings.COURSEWARE_ENABLED or not request.user.is_authenticated():
         return redirect('/')
 
     # Fixes URLs -- we don't get funny encoding characters from spaces

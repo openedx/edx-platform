@@ -16,7 +16,7 @@ def calculate(request):
         raise Http404
     equation = request.GET['equation']
     try: 
-        result = courseware.calc.evaluator({}, {}, equation)
+        result = courseware.capa.calc.evaluator({}, {}, equation)
     except:
         return HttpResponse(json.dumps({'result':'Invalid syntax'}))
     return HttpResponse(json.dumps({'result':result}))

@@ -18,7 +18,7 @@ def csrf_token(context):
 
 
 def index(request):
-    if request.user.is_authenticated():
+    if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect('/courseware')
     else:
         csrf_token = csrf(request)['csrf_token']
@@ -26,14 +26,14 @@ def index(request):
         return render_to_response('index.html', {'error' : '',
                                                  'csrf': csrf_token }) 
                                                  
-def courseinfo(request):
-    if request.user.is_authenticated():
-        return redirect('/courseware')
-    else:
-        csrf_token = csrf(request)['csrf_token']
-        # TODO: Clean up how 'error' is done. 
-        return render_to_response('courseinfo.html', {'error' : '',
-                                                 'csrf': csrf_token }) 
+# def courseinfo(request):
+#     if request.user.is_authenticated():
+#         return redirect('/courseware')
+#     else:
+#         csrf_token = csrf(request)['csrf_token']
+#         # TODO: Clean up how 'error' is done. 
+#         return render_to_response('courseinfo.html', {'error' : '',
+#                                                  'csrf': csrf_token }) 
 
 def login_user(request, error=""):
     print request.POST
