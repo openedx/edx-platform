@@ -1,5 +1,19 @@
 // Things to abstract out to another file
 
+var close_event_logged = false;
+
+function log_close() {
+    close_event_logged = "waiting";
+    log_event('page_close', {});
+    // Google Chrome will close without letting the event go through.
+    // This causes the page close to be delayed until we've hit the
+    // server.
+    while(close_event_logged != "done") {
+    }
+}
+
+window.onbeforeunload = log_close;
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
@@ -199,15 +213,6 @@ function videoDestroy() {
 }
 
 function log_event(e, d) {
-    //$("#eventlog").append("<br>");
-    //$("#eventlog").append(JSON.stringify(e));
-
-    // TODO: Decide if we want seperate tracking server. 
-    // If so, we need to resolve: 
-    // * AJAX from different domain (XMLHttpRequest cannot load http://localhost:7000/userlog. Origin http://localhost:8000 is not allowed by Access-Control-Allow-Origin.)
-    // * Verifying sessions/authentication
-
-    /*window['console'].log(JSON.stringify(e));*/
     $.get("/event", 
 	  {
 	      "event_type" : e, 
@@ -215,6 +220,9 @@ function log_event(e, d) {
 		  "page" : document.URL
 		  },
 	  function(data) {
+	      if (close_event_logged == "waiting") {
+		  close_event_logged == "done";
+	  }
 	  });
 }
 
