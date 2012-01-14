@@ -6,6 +6,7 @@ from lxml.etree import Element
 import copy
 from mako.template import Template
 from content_parser import xpath_remove
+import calc, eia
 
 from util import contextualize_text
 
@@ -28,7 +29,9 @@ html_transforms = {'problem': {'tag':'div'},
 global_context={'random':random,
                 'numpy':numpy,
                 'math':math,
-                'scipy':scipy}
+                'scipy':scipy, 
+                'calc':calc, 
+                'eia':eia}
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["responseparam", "answer", "script"]
