@@ -12,8 +12,8 @@ from django.conf import settings
 import datetime
 
 def calculate(request):
-    if not request.user.is_authenticated():
-        raise Http404
+#    if not request.user.is_authenticated():
+#        raise Http404
     equation = request.GET['equation']
     try: 
         result = courseware.capa.calc.evaluator({}, {}, equation)
@@ -22,15 +22,19 @@ def calculate(request):
     return HttpResponse(json.dumps({'result':result}))
 
 def send_feedback(request):
-    if not request.user.is_authenticated():
-        raise Http404
+#    if not request.user.is_authenticated():
+#        raise Http404
+    try: 
+        username = request.user.username
+    except: 
+        username = "anonymous"
     
     feedback = render_to_string("feedback_email.txt", 
                                 {"subject":request.POST['subject'], 
                                  "url": request.POST['url'], 
                                  "time": datetime.datetime.now().isoformat(),
                                  "feedback": request.POST['message'], 
-                                 "user":request.user.username})
+                                 "user":username})
 
     send_mail("MITx Feedback / " +request.POST['subject'], 
               feedback, 
