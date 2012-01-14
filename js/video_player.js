@@ -3,12 +3,16 @@
 var close_event_logged = false;
 
 function log_close() {
+    var d=new Date();
+    var t=d.getTime();
     close_event_logged = "waiting";
     log_event('page_close', {});
     // Google Chrome will close without letting the event go through.
     // This causes the page close to be delayed until we've hit the
     // server.
-    while(close_event_logged != "done") {
+    // TODO: Check what happens with no network. 
+    while((close_event_logged != "done") && (d.getTime() < t+500)) {
+	console.log(close_event_logged);
     }
 }
 
@@ -220,8 +224,10 @@ function log_event(e, d) {
 		  "page" : document.URL
 		  },
 	  function(data) {
+	      console.log("closing");
 	      if (close_event_logged == "waiting") {
-		  close_event_logged == "done";
+		  close_event_logged = "done";
+	      console.log("closed");
 	  }
 	  });
 }
