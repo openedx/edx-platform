@@ -7,8 +7,8 @@ if not COURSEWARE_ENABLED:
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 SITE_NAME = "localhost:8000"
 
-DEFAULT_FROM_EMAIL = 'nobody@localhost'
-DEFAULT_FEEDBACK_EMAIL = 'nobody@localhost'
+DEFAULT_FROM_EMAIL = 'registration@mitx.mit.edu'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
 
 WIKI_REQUIRE_LOGIN_EDIT = True
 WIKI_REQUIRE_LOGIN_VIEW = True

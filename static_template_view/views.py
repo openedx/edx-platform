@@ -6,11 +6,16 @@
 from djangomako.shortcuts import render_to_response, render_to_string
 from django.shortcuts import redirect
 
-valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
+from auth.views import csrf
+
+#valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
+valid_templates=['mitx.html', 'index.html', 'courseinfo.html']
 
 def index(request, template): 
+    csrf_token = csrf(request)['csrf_token']
     if template in valid_templates:
-        return render_to_response(template,{})
+        return render_to_response(template,{'error' : '',
+                                            'csrf': csrf_token})
     else:
         return redirect('/')
 
