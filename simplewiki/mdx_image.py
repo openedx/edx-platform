@@ -16,7 +16,15 @@ Requires Python-Markdown 1.6+
 '''
 
 import simplewiki.settings as settings
+
 import markdown
+try:
+    # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
+    # but import the 2.0.3 version if it fails
+    from markdown.util import etree
+except:
+    from markdown import etree
+
 
 class ImageExtension(markdown.Extension):
     def __init__(self, configs):
@@ -35,7 +43,7 @@ class ImageExtension(markdown.Extension):
 
 class ImageLink(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
-        img = markdown.etree.Element('img')
+        img = etree.Element('img')
         proto  = m.group('proto') or "http://"
         domain = m.group('domain')
         path   = m.group('path')
