@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-print "Hello"
-
 '''
 WikiLink Extention for Python-Markdown
 ======================================
@@ -69,6 +67,13 @@ Dependencies:
 '''
 
 import markdown
+try:
+    # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
+    # but import the 2.0.3 version if it fails
+    from markdown.util import etree
+except:
+    from markdown import etree
+
 
 class CamelCaseExtension(markdown.Extension):
     def __init__(self, configs):
@@ -97,14 +102,14 @@ class CamelCaseExtension(markdown.Extension):
 class CamelCaseLinks(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m) :
         if  m.group('escape') == '\\':
-            a = markdown.etree.Element('a')#doc.createTextNode(m.group('camelcase'))
+            a = etree.Element('a')#doc.createTextNode(m.group('camelcase'))
         else :
             url = m.group('camelcase')
                              #'%s%s%s'% (self.md.wiki_config['base_url'][0], \
                              #m.group('camelcase'), \
                              #self.md.wiki_config['end_url'][0])
             label = m.group('camelcase').replace('_', ' ')
-            a = markdown.etree.Element('a')
+            a = etree.Element('a')
             a.set('href', url)
             a.text = label
         a.set('class', 'wikilink')

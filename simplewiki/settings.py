@@ -94,7 +94,6 @@ WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
                             'circuit' 
                             ])
 
-print WIKI_MARKDOWN_EXTENSIONS
 
 WIKI_IMAGE_EXTENSIONS       = getattr(settings, 
                                 'SIMPLE_WIKI_IMAGE_EXTENSIONS',

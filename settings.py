@@ -125,7 +125,12 @@ LOGGING = {
     }
 }
 
-TRACK_DIR = None
+#TRACK_DIR = None
+DEBUG_TRACK_LOG = False
+# Maximum length of a tracking string. We don't want e.g. a file upload in our log
+TRACK_MAX_EVENT = 1000 
+# Maximum length of log file before starting a new one. 
+MAXLOG = 500
 
 execfile("../settings.py")
 

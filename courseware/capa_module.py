@@ -245,6 +245,10 @@ class LoncapaModule(XModule):
             correct_map = self.lcp.grade_answers(answers)
         except: 
             self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
+            print {'error':sys.exc_info(),
+                   'answers':answers, 
+                   'seed':self.lcp.seed, 
+                   'filename':self.lcp.filename}
             return json.dumps({'success':'syntax'})
 
         self.attempts = self.attempts + 1
