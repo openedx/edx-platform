@@ -292,6 +292,8 @@ class LoncapaModule(XModule):
         self.lcp.done=False
         self.lcp.answers=dict()
         self.lcp.correct_map=dict()
+        self.lcp.student_answers = dict()
+
 
         if self.rerandomize:
             self.lcp.context=dict()
