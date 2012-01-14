@@ -14,7 +14,6 @@ else:
 logfile = None
 file_index = 0 
 log_index = 0
-MAXLOG = 5
 filename = None
 
 def make_file():
@@ -31,20 +30,28 @@ def make_file():
 
 def log_event(event):
     global logfile, log_index
+    event_str = json.dumps(event)
     if settings.TRACK_DIR == None:
 #        print event
         return
 
-    if logfile == None or log_index >= MAXLOG:
+    if logfile == None or log_index >= settings.MAXLOG:
         make_file()
 
-    event_str = json.dumps(event)
-    logfile.write(event_str+'\n')
+    logfile.write(event_str[:settings.TRACK_MAX_EVENT]+'\n')
+    if settings.DEBUG_TRACK_LOG:
+        print event_str
     log_index = log_index + 1
 
 def user_track(request):
+    try: # TODO: Do the same for many of the optional META parameters
+        username = request.user.username
+    except: 
+        username = "anonymous"
+
+    # TODO: Move a bunch of this into log_event
     event = {
-        "username" : request.user.username,
+        "username" : username,
         "session" : request.META['HTTP_COOKIE'],
         "ip" : request.META['REMOTE_ADDR'],
         "event_source" : "browser",
@@ -57,8 +64,13 @@ def user_track(request):
     return HttpResponse('success')
 
 def server_track(request, event_type, event, page=None):
+    try: 
+        username = request.user.username
+    except: 
+        username = "anonymous"
+
     event = {
-        "username" : request.user.username, 
+        "username" : username, 
         "ip" : request.META['REMOTE_ADDR'],
         "event_source" : "server",
         "event_type" : event_type, 

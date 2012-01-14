@@ -10,6 +10,8 @@ import courseware.capa.calc
 from django.core.mail import send_mail
 from django.conf import settings
 import datetime
+import sys
+import track.views
 
 def calculate(request):
 #    if not request.user.is_authenticated():
@@ -18,6 +20,9 @@ def calculate(request):
     try: 
         result = courseware.capa.calc.evaluator({}, {}, equation)
     except:
+        event = {'error':map(str,sys.exc_info()),
+                 'equation':equation}
+        track.views.server_track(request, 'error:calc', event, page='calc')
         return HttpResponse(json.dumps({'result':'Invalid syntax'}))
     return HttpResponse(json.dumps({'result':result}))
 
