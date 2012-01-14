@@ -26,7 +26,6 @@ class CircuitExtension(markdown.Extension):
         md.inlinePatterns.add(name, pattern, "<reference")
     
     def extendMarkdown(self, md, md_globals):
-        print "Here"
         self.add_inline(md, 'circuit', CircuitLink, r'^circuit:(?P<name>[a-zA-Z0-9]*)$')
 
 class CircuitLink(markdown.inlinepatterns.Pattern):
@@ -39,5 +38,4 @@ class CircuitLink(markdown.inlinepatterns.Pattern):
         
     
 def makeExtension(configs=None) :
-    print "Here"
     return CircuitExtension(configs=configs)
