@@ -306,4 +306,9 @@ class LoncapaModule(XModule):
 
         filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
         self.lcp=LoncapaProblem(filename, self.item_id, self.lcp.get_state())
+
+        event_info = self.lcp.get_state()
+        event_info.update({'filename':filename})
+        #server_track(request, 'reset_problem', event_info)
+
         return json.dumps(self.get_problem_html(encapsulate=False))

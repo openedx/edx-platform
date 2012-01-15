@@ -2,6 +2,7 @@ from django.conf.urls.defaults import patterns, include, url
 import django.contrib.auth.views
 from django.conf import settings
 from django.contrib import admin
+import perfstats
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -29,6 +30,9 @@ urlpatterns = ('',
     url(r'^send_feedback$', 'util.views.send_feedback'),
     url(r'^courseware/$', 'courseware.views.index'),
 )
+
+if settings.PROFILE:
+   urlpatterns=urlpatterns + (url(r'^reprofile$','perfstats.views.end_profile'),)
 
 if settings.COURSEWARE_ENABLED:
    urlpatterns=urlpatterns + (url(r'^wiki/', include('simplewiki.urls')),

@@ -13,6 +13,8 @@ DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
 WIKI_REQUIRE_LOGIN_EDIT = True
 WIKI_REQUIRE_LOGIN_VIEW = True
 
+PROFILE = False
+
 HTTPS = 'on'
 
 DEBUG = True
@@ -68,14 +70,14 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'track.middleware.TrackMiddleware',
-    'djangomako.middleware.MakoMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+   'django.middleware.common.CommonMiddleware',
+   'django.contrib.sessions.middleware.SessionMiddleware',
+   'django.middleware.csrf.CsrfViewMiddleware',
+   'django.contrib.auth.middleware.AuthenticationMiddleware',
+   'django.contrib.messages.middleware.MessageMiddleware',
+   'track.middleware.TrackMiddleware',
+   'djangomako.middleware.MakoMiddleware',
+   #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'mitx.urls'
@@ -96,6 +98,7 @@ INSTALLED_APPS = (
     'simplewiki',
     'track',
     'circuit',
+    'perfstats',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -133,6 +136,9 @@ TRACK_MAX_EVENT = 1000
 MAXLOG = 500
 
 execfile("../settings.py")
+
+if PROFILE :
+   MIDDLEWARE_CLASSES = ( 'perfstats.middleware.ProfileMiddleware',) + MIDDLEWARE_CLASSES
 
 if 'TRACK_DIR' not in locals():
    TRACK_DIR = BASE_DIR+'/track_dir/'
