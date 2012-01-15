@@ -31,7 +31,7 @@ urlpatterns = ('',
     url(r'^courseware/$', 'courseware.views.index'),
 )
 
-if settings.PROFILE:
+if settings.PERFSTATS:
    urlpatterns=urlpatterns + (url(r'^reprofile$','perfstats.views.end_profile'),)
 
 if settings.COURSEWARE_ENABLED:

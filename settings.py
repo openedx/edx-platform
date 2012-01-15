@@ -13,7 +13,7 @@ DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
 WIKI_REQUIRE_LOGIN_EDIT = True
 WIKI_REQUIRE_LOGIN_VIEW = True
 
-PROFILE = False
+PERFSTATS = False
 
 HTTPS = 'on'
 
@@ -137,7 +137,7 @@ MAXLOG = 500
 
 execfile("../settings.py")
 
-if PROFILE :
+if PERFSTATS :
    MIDDLEWARE_CLASSES = ( 'perfstats.middleware.ProfileMiddleware',) + MIDDLEWARE_CLASSES
 
 if 'TRACK_DIR' not in locals():
