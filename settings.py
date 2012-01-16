@@ -1,3 +1,4 @@
+PERFSTATS = False
 COURSEWARE_ENABLED = True
 
 if 'ASKBOT_ENABLED' not in locals():
