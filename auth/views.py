@@ -9,6 +9,7 @@ from models import Registration, UserProfile
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.validators import validate_email, validate_slug
+import random, string
 
 def csrf_token(context):
     csrf_token = context.get('csrf_token', '')
@@ -88,22 +89,25 @@ def change_setting(request):
                                     'language':up.language,
                                     'location':up.location,}))
 
-def create_account(request):
+def create_account(request, post_override=None):
     js={'success':False}
+    
+    post_vars = post_override if post_override else request.POST
+    
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'location', 'language', 'name']:
-        if a not in request.POST:
+        if a not in post_vars:
             js['value']="Error (401 {field}). E-mail us.".format(field=a)
             return HttpResponse(json.dumps(js))
 
 
 
-    if request.POST['honor_code']!=u'true':
+    if post_vars['honor_code']!=u'true':
         js['value']="To enroll, you must follow the honor code.".format(field=a)
         return HttpResponse(json.dumps(js))
 
 
-    if request.POST['terms_of_service']!=u'true':
+    if post_vars['terms_of_service']!=u'true':
         js['value']="You must accept the terms of service.".format(field=a)
         return HttpResponse(json.dumps(js))
 
@@ -113,18 +117,18 @@ def create_account(request):
     # this is a good idea
     # TODO: Check password is sane
     for a in ['username', 'email', 'password', 'terms_of_service', 'honor_code']:
-        if len(request.POST[a])<2:
+        if len(post_vars[a])<2:
             js['value']="{field} is required.".format(field=a)
             return HttpResponse(json.dumps(js))
 
     try:
-        validate_email(request.POST['email'])
+        validate_email(post_vars['email'])
     except:
         js['value']="Valid e-mail is required.".format(field=a)
         return HttpResponse(json.dumps(js))
 
     try:
-        validate_slug(request.POST['username'])
+        validate_slug(post_vars['username'])
     except:
         js['value']="Username should only consist of A-Z and 0-9.".format(field=a)
         return HttpResponse(json.dumps(js))
@@ -132,18 +136,18 @@ def create_account(request):
     
 
     # Confirm username and e-mail are unique. TODO: This should be in a transaction
-    if len(User.objects.filter(username=request.POST['username']))>0:
+    if len(User.objects.filter(username=post_vars['username']))>0:
         js['value']="An account with this username already exists."
         return HttpResponse(json.dumps(js))
 
-    if len(User.objects.filter(email=request.POST['email']))>0:
+    if len(User.objects.filter(email=post_vars['email']))>0:
         js['value']="An account with this e-mail already exists."
         return HttpResponse(json.dumps(js))
 
-    u=User(username=request.POST['username'],
-           email=request.POST['email'],
+    u=User(username=post_vars['username'],
+           email=post_vars['email'],
            is_active=False)
-    u.set_password(request.POST['password'])
+    u.set_password(post_vars['password'])
     r=Registration()
     # TODO: Rearrange so that if part of the process fails, the whole process fails. 
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
@@ -151,12 +155,12 @@ def create_account(request):
     r.register(u)
 
     up=UserProfile(user=u)
-    up.name=request.POST['name']
-    up.language=request.POST['language']
-    up.location=request.POST['location']
+    up.name=post_vars['name']
+    up.language=post_vars['language']
+    up.location=post_vars['location']
     up.save()
 
-    d={'name':request.POST['name'],
+    d={'name':post_vars['name'],
        'key':r.activation_key,
        'site':settings.SITE_NAME}
 
@@ -172,9 +176,34 @@ def create_account(request):
         return HttpResponse(json.dumps(js))
         
     js={'success':True,
-        'value':render_to_string('registration/reg_complete.html', {'email':request.POST['email'], 
+        'value':render_to_string('registration/reg_complete.html', {'email':post_vars['email'], 
                                                                     'csrf':csrf(request)['csrf_token']})}
     return HttpResponse(json.dumps(js), mimetype="application/json")
+    
+def create_random_account(create_account_function):
+    
+    def id_generator(size=6, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
+        return ''.join(random.choice(chars) for x in range(size))
+    
+    def inner_create_random_account(request):
+        post_override= {'username' : "random_" + id_generator(),
+                            'email' : id_generator(size=10, chars=string.ascii_lowercase) + "_lover@mitxtest.com",
+                            'password' : id_generator(),
+                            'location' : id_generator(size=5, chars=string.ascii_uppercase),
+                            'language' : id_generator(size=5, chars=string.ascii_uppercase) + "ish",
+                            'name' : id_generator(size=5, chars=string.ascii_lowercase) + " " + id_generator(size=7, chars=string.ascii_lowercase),
+                            'honor_code' : u'true',
+                            'terms_of_service' : u'true',}
+        
+        print "Creating account: " , post_override
+        
+        return create_account_function(request, post_override = post_override)
+        
+    return inner_create_random_account
+
+if settings.GENERATE_RANDOM_USER_CREDENTIALS:
+    create_account = create_random_account(create_account)
+
 
 def activate_account(request, key):
     r=Registration.objects.filter(activation_key=key)
