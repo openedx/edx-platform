@@ -1,5 +1,6 @@
 COURSEWARE_ENABLED = True
-ASKBOT_ENABLED = False
+if 'TRACK_DIR' not in locals():
+   ASKBOT_ENABLED = True
 if not COURSEWARE_ENABLED:
    ASKBOT_ENABLED = False
 
