@@ -1,19 +1,23 @@
 // Things to abstract out to another file
 
-var close_event_logged = false;
+// We do sync AJAX for just the page close event. 
+// TODO: This should _really_ not be a global. 
+var log_close_event = false; 
 
 function log_close() {
     var d=new Date();
     var t=d.getTime();
-    close_event_logged = "waiting";
+    //close_event_logged = "waiting";
+    log_close_event = true;
     log_event('page_close', {});
+    log_close_event = false;
     // Google Chrome will close without letting the event go through.
     // This causes the page close to be delayed until we've hit the
-    // server.
+    // server. The code below fixes it, but breaks Firefox. 
     // TODO: Check what happens with no network. 
-    while((close_event_logged != "done") && (d.getTime() < t+500)) {
+    /*while((close_event_logged != "done") && (d.getTime() < t+500)) {
 	console.log(close_event_logged);
-    }
+    }*/
 }
 
 window.onbeforeunload = log_close;
@@ -217,19 +221,28 @@ function videoDestroy() {
 }
 
 function log_event(e, d) {
-    $.get("/event", 
-	  {
-	      "event_type" : e, 
-		  "event" : JSON.stringify(d),
-		  "page" : document.URL
-		  },
+    data = {
+	"event_type" : e, 
+	"event" : JSON.stringify(d),
+	"page" : document.URL
+    }
+    $.ajax({type:'GET',
+	    url: '/event',
+	    dataType: 'json',
+	    data: data,
+	    async: !log_close_event, // HACK: See comment on log_close_event
+	    success: function(){},
+	    headers : {'X-CSRFToken':getCookie('csrftoken')}
+	   });
+
+    /*, // Commenting out Chrome bug fix, since it breaks FF
 	  function(data) {
 	      console.log("closing");
 	      if (close_event_logged == "waiting") {
 		  close_event_logged = "done";
 	      console.log("closed");
 	  }
-	  });
+	  });*/
 }
 
 function seek_slide(type,oe,value) {
