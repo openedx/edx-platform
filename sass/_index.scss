@@ -1,0 +1,193 @@
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Oswald '), local('Oswald'), url('http://themes.googleusercontent.com/static/fonts/oswald/v3/qpy-UiLNKP-VfOdbcs6r6-vvDin1pK8aKteLpeZ5c0A.woff') format('woff');
+}
+
+header.announcement {
+  background: $mit-red;
+  border-top: 3px solid darken($mit-red, 10%);
+  color: #fff;
+
+  div {
+    @extend .wrapper;
+    padding: 80px $body-line-height 60px;
+    position: relative;
+    @include box-sizing(border-box);
+
+    nav {
+      position: absolute;
+      top: 20px;
+      right: 0;
+
+      a.login {
+        text-transform: uppercase;
+        color: #fff;
+        font-size: 12px;
+        margin-right: 20px;
+        text-shadow: 0 -1px 0 darken($mit-red, 10%);
+
+        &:hover {
+          color: rgba(#fff, .6);
+        }
+      }
+    }
+
+    section {
+      @extend .clearfix;
+      padding-left: grid-width(3);
+
+      h1 {
+        font-family: "Oswald";
+        font-size: 62px;
+        line-height: 1.2em;
+        margin: 0;
+        text-transform: uppercase;
+        text-shadow: 0 -2px 0 darken($mit-red, 10%);
+      }
+
+      p {
+        line-height: 1.6em;
+        max-width: 700px;
+        margin: 2em 0 0;
+      }
+
+      &.course {
+        padding-left: grid-width(4) + $gw-gutter;
+
+        a.enroll {
+          @include button(#fff);
+          @include inline-block();
+          @include box-shadow(0 1px 0 lighten($mit-red, 10%));
+          margin-top: lh();
+          font-size: 18px;
+          padding: lh(.5);
+          border-color: darken($mit-red, 10%);
+
+          &:hover {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+section.index-content {
+  @extend .main-content;
+  @extend .wrapper;
+  @include box-sizing(border-box);
+  padding: lh();
+
+  section {
+    width: grid-width(6);
+    @extend .clearfix;
+    float: left;
+
+    &.about {
+      margin-right: $gw-gutter;
+    }
+
+    &.about-course {
+      width: grid-width(12);
+      float: none;
+      @extend .clearfix;
+
+      section {
+        width: grid-width(4);
+        margin-right: $gw-gutter;
+
+        &.requirements {
+          margin-right: 0;
+        }
+      }
+    }
+
+    &.staff {
+      @extend .clearfix;
+      border-top: 1px solid #eee;
+      float: none;
+      width: grid-width(12);
+      margin-top: lh();
+      padding-top: lh();
+
+      ul {
+        list-style: none;
+        margin: 0;
+
+        li {
+          width: grid-width(3);
+          list-style: none;
+          float: left;
+          margin-right: $gw-gutter;
+
+          img {
+            float: left;
+            margin: 0 1em 1em 0;
+          }
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+
+    h1 {
+      font-size: 34px;
+      margin-top: 0;
+      font-family: "Oswald";
+    }
+
+    ul {
+      margin: 0 grid-width(1) 1em;
+      list-style: disc outside none;
+
+      li {
+        list-style: disc outside none;
+      }
+    }
+
+    p {
+      line-height: 1.5;
+    }
+
+    a.more-info {
+      // @extend .button;
+      @include button(simple, $mit-red);
+      @include inline-block();
+      margin-top: lh();
+      font-size: 18px;
+      padding: lh(.5);
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  div.secondary {
+    border-top: 1px solid #eee;
+    margin-top: lh();
+    padding-top: lh();
+
+    section {
+      text-align: center;
+      width: auto;
+      float: none;
+
+      a.enroll {
+        @include button(simple, $mit-red);
+        @include inline-block();
+        margin-top: lh();
+        font-size: 18px;
+        padding: lh(.5);
+
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

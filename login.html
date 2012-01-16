@@ -1,16 +1,30 @@
 <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
-  ${ error }
+${ error }
+
 <div id="login_div">
-<table><tr><td>
-<form name="login" action="/login" method="get">
-<tr><td colspan=2 align=center><div id="login_error"></div></td></tr>
-<tr><td align=right>E-mail</td><td><input name="email" id="li_email" type="email" required> </td></tr>
-<tr><td align=right>Password</td><td><input name="password" id="li_password" type="password" required>  </td></tr>
-<tr><td align=right><input name="remember" id="remember"  type="checkbox"></td><td>Remember me  </td></tr>
-<tr><td align=right></td><td align=right><input name="submit" id="login_button" type="button" value="Log in">  </td></tr>
-</form>
-</td></tr></table>
-<div align=center>
-<div id="lost_password"><a class="modal" href="#pwd_reset">Lost password?</a></div>
-</div>
+  <h1>Log in to MITx</h1>
+  <form name="login" action="/login" method="get">
+    <div id="login_error"></div>
+    <ol>
+      <li>
+        <label>E-mail*</label>
+        <input name="email" id="li_email" type="email" required>
+      </li>
+
+      <li>
+        <label>Password*</label>
+        <input name="password" id="li_password" type="password" required>
+      </li>
+
+      <li class="remember">
+        <label><input name="remember" id="remember"  type="checkbox">Remember me</label>
+      </li>
+
+    </ol>
+    <input name="submit" id="login_button" type="button" value="Log in">
+  </form>
+
+  <div class="lost-password">
+    <div id="lost_password"><a class="modal" href="#pwd_reset">Lost password?</a></div>
+  </div>
 </div>
