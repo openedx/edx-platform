@@ -96,7 +96,6 @@ INSTALLED_APPS = (
     'auth',
     'django.contrib.humanize',
     'static_template_view',
-    'textbook',
     'staticbook',
     'simplewiki',
     'track',
