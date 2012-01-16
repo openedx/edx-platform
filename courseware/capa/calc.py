@@ -19,6 +19,9 @@ def evaluator(variables, functions, string):
             "+" : operator.add,
             "-" : operator.sub,
             }
+    # We eliminated extreme ones, since they're rarely used, and potentially
+    # confusing. They may also conflict with variables if we ever allow e.g. 
+    # 5R instead of 5*R
     suffixes={'%':0.01,'k':1e3,'M':1e6,'G':1e9,
               'T':1e12,#'P':1e15,'E':1e18,'Z':1e21,'Y':1e24,
               'c':1e-2,'m':1e-3,'u':1e-6,
@@ -66,16 +69,18 @@ def evaluator(variables, functions, string):
     def func_parse_action(x):
         return [functions[x[0]](x[1])]
 
-    number_suffix=reduce(lambda a,b:a|b, map(Literal,suffixes.keys()), NoMatch())
+    number_suffix=reduce(lambda a,b:a|b, map(Literal,suffixes.keys()), NoMatch()) # SI suffixes and percent
     (dot,minus,plus,times,div,lpar,rpar,exp)=map(Literal,".-+*/()^")
     
     number_part=Word(nums)
-    number=Optional(minus | plus)+number_part+Optional("."+number_part)+ \
+    inner_number = ( number_part+Optional("."+number_part) ) | ("."+number_part) # 0.33 or 7 or .34
+    number=Optional(minus | plus)+ inner_number + \
         Optional(CaselessLiteral("E")+Optional("-")+number_part)+ \
-        Optional(number_suffix)
-    number=number.setParseAction( number_parse_action )
+        Optional(number_suffix) # 0.33k or -17
+    number=number.setParseAction( number_parse_action ) # Convert to number
     
-    expr = Forward()
+    # Predefine recursive variables
+    expr = Forward() 
     factor = Forward()
     
     def sreduce(f, l):
@@ -86,24 +91,28 @@ def evaluator(variables, functions, string):
             return l[0]
         return reduce(f, l)
 
+    # Handle variables passed in. E.g. if we have {'R':0.5}, we make the substitution. 
+    # Special case for no variables because of how we understand PyParsing is put together
     if len(variables)>0:
         varnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), variables.keys()))
         varnames.setParseAction(lambda x:map(lambda y:variables[y], x))
     else:
         varnames=NoMatch()
-    if len(variables)>0:
+    # Same thing for functions. 
+    if len(functions)>0:
         funcnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), functions.keys()))
         function = funcnames+lpar.suppress()+expr+rpar.suppress()
         function.setParseAction(func_parse_action)
     else:
         function = NoMatch()
+
     atom = number | varnames | lpar+expr+rpar | function
-    factor << (atom + ZeroOrMore(exp+atom)).setParseAction(exp_parse_action)
-    paritem = factor + ZeroOrMore(Literal('||')+factor)
+    factor << (atom + ZeroOrMore(exp+atom)).setParseAction(exp_parse_action) # 7^6
+    paritem = factor + ZeroOrMore(Literal('||')+factor) # 5k || 4k
     paritem=paritem.setParseAction(parallel)
-    term = paritem + ZeroOrMore((times|div)+paritem)
+    term = paritem + ZeroOrMore((times|div)+paritem) # 7 * 5 / 4 - 3
     term = term.setParseAction(prod_parse_action)
-    expr << Optional((plus|minus)) + term + ZeroOrMore((plus|minus)+term)
+    expr << Optional((plus|minus)) + term + ZeroOrMore((plus|minus)+term) # -5 + 4 - 3
     expr=expr.setParseAction(sum_parse_action)
     return (expr+stringEnd).parseString(string)[0]
 
@@ -117,4 +126,6 @@ if __name__=='__main__':
     print evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5")
     print evaluator({},{}, "-1")
     print evaluator({},{}, "-(7+5)")
+    print evaluator({},{}, "-0.33")
+    print evaluator({},{}, "-.33")
     print evaluator({},{}, "5+7 QWSEKO")
