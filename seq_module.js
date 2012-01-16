@@ -29,6 +29,7 @@ var ${ id }destroy_functions=["",
 var ${ id }loc = -1;
 
 function ${ id }goto(i) {
+    log_event("seq_goto", {'old':${id}loc, 'new':i,'id':'${id}'});
     if (${ id }loc!=-1)
 	${ id }destroy_functions[ ${ id }loc ]();
     $('#seq_content').html(${ id }contents[i]);
@@ -52,12 +53,14 @@ function ${ id }setup_click(i) {
 
 function ${ id }next() { 
     var i=${ id }loc+1;
+    log_event("seq_next", {'old':${id}loc, 'new':i,'id':'${id}'});
     if(i > ${ len(items) } ) i = ${ len(items) };
     ${ id }goto(i);
 }
 
 function ${ id }prev() { 
     var i=${ id }loc-1;
+    log_event("seq_prev", {'old':${id}loc, 'new':i,'id':'${id}'});
     if (i < 1 ) i = 1;
     ${ id }goto(i);
 }

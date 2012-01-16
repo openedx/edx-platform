@@ -1,4 +1,4 @@
-<%inherit file="main.html" />
+<%inherit file="main.html" /> 
 
 <header class="announcement">
   <div class="anouncement-wrapper">
@@ -6,37 +6,94 @@
     <a class="modal login" href="#login">Log In</a>
   </nav>
 
-    <section>
-      <h1>An MIT Education Anywhere. <br />For free.</h1>
-      <p>MITx is an open learning software available free of cost, so that others &mdash; whether other universities or different educational institutions, such as K&ndash;12 school systems &mdash; can leverage the same software for their online education offerings.</p>
+    <section class="course">
+      <h2>6.002</h2>
+      <h1>Circuits &amp; Electronics</h1>
+      <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, "6.002 Circuits and Electronics" is an on-line adaption of MIT's first undergraduate analog design course. This course will run, free of charge, for students worldwide from February 1, 2012 through July 1, 2012.</p>
+      <a class="modal enroll" href="#enroll">Enroll in 6.002 Circuits &amp; Electronics</a>
     </section>
   </div>
 
 </header>
 
+
 <section class="index-content">
-  <section class="about">
-    <h1>About MITx</h1>
-    <p>MITx is a portfolio of MIT courses through an online interactive learning platform that:</p>
+  <section class="about-course">
+  
+    <section>
+      <h1>About 6.002</h1>
+  
+      <p> 6.002 is designed to serve as a first course in an undergraduate electrical engineering (EE), or electrical engineering and computer science (EECS) curriculum. At MIT, 6.002 is in the core of department subjects required for all undergraduates in EECS.</p>
+  
+      <p> The course introduces engineering in the context of the lumped circuit abstraction. Topics covered include: resistive elements and networks; independent and dependent sources; switches and MOS transistors; digital abstraction; amplifiers; energy storage elements; dynamics of first- and second-order networks; design in the time and frequency domains; and analog and digital circuits and applications. Design and lab exercises are also significant components of the course. 6.002 is worth 4 Engineering Design Points. The 6.002 content was created collaboratively by Profs. Anant Agarwal and Jeffrey H. Lang.</p>
+  
+      <!-- <p> The course uses the textbook Foundations of Analog and Digital Electronic Circuits. Agarwal, Anant, and Jeffrey H. Lang. San Mateo, CA: Morgan Kaufmann Publishers, Elsevier, July 2005. ISBN: 9781558607354. While recommended, the book is not required -- relevant section will be provided electronically as part of the on-line course.</p> -->
+    </section>
+  
+    <section>
+      <h1>6.002 on <a href="/t/mitx_global.html">MITx</a></h1> <!-- Link doesn't need to be here, but there should be some way to get back to main MITx site -->
+
+      <p> Students who successfully complete the course will receive an electronic certificate of accomplishment from MIT. Students will not receive course credit, but students successfully finishing the course will be well-placed to take an exam to pass out of 6.002 should they ever enroll at MIT, and potentially, similar courses at other schools.</p>
+
+      <p> In order to succeed in this course, students must have some background in calculus and differential equations. Since more advanced mathematics will not show up until the second half of the course, the first half of the course will include an optional remedial differential equations component for students with weaker math backgrounds.</p>
+    </section>
+
+    <section class="requirements">
+      <h1> Requirements </h1>
+
+      <p> Students entering the course are expected to know how basic calculus and differential equations, as well as basic linear algebra. In addition, a background in E&amp;M is helpful, although not critical.</p>
+  
+      <p> The course web site was developed and tested primarily with Google Chrome. We support Mozilla Firefox as well. While we will attempt to make it possible to complete the course with Internet Explorer, portions of the web site functionality will be unavailable. The videos require Flash. </p>
+    </section>
+  
+  </section>
+  <section class="staff">
+    <h1>About the course staff</h1>
 
     <ul>
-      <li>organizes and presents course material to enable students to learn at their own pace</li>
-      <li>features interactivity, online laboratories and student-to-student communication</li>
-      <li>allows for the individual assessment of any student&rsquo;s work and allow students who demonstrate their mastery of subjects to earn a certificate of completion awarded by MITx</li>
-      <li>operates on an open-source, scalable software infrastructure in order to make it continuously improving and readily available to other educational institutions.</li>
+      <li>
+        <h2>Anant Agarwal</h2>
+        <p><img src="/static/staff/agarwal-mit-news-small.jpg">The Director of MIT's Computer Science and Artificial Intelligence Laboratory. His research focus is in parallel computer architectures, and he is the founder of several successful startups. Most recently, he founded Tilera, which produces scalable multicore embedded processors. He co-author the course textbook "Foundations of Analog and Digital Electronic Circuits."</p></li>
+
+      <li>
+        <h2>Chris Terman</h2>
+        <p><img src="/static/staff/cjt-small.jpg">The Co-Director MIT CSAIL, and a highly regarded instructor. He is the author of JSim, an educational package for on-line circuit schematic entry and simulation, and XTutor, and on-line question-and-answer tutoring system.</p></li>
+
+      <li>
+        <h2>Gerald Sussman</h2>
+        <p><img src="/static/staff/gjs-small.jpg">A Professor of Electrical Engineering at MIT. He is a well know educator in the computer science community, perhaps best know as the author of Structure and Interpretation of Computer Programs, which is universally acknowledged as one of the top ten textboooks in computer science, or as the creator of Scheme, a popular teaching language. His research spans a range of topics, from artificial intelligence, to physics and chaotic systems, to supercomputer design.</p></li>
+
+      <li>
+        <h2>Piotr Mitros</h2>
+        <p><img src="/static/staff/pmitros-small.jpg">A Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Piotr has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p></li>
     </ul>
 
-    <p>This learning platform will enhance the educational experience of its on-campus students, offering them online tools that supplement and enrich their classroom and laboratory experiences. It will also be host to a virtual community learners around the world.</p>
   </section>
 
-  <section>
-    <h1>Course offering</h1>
-    <h2>6.002 Circuits and Electronics</h2>
-    <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, "6.002 Circuits and Electronics" is an on-line adaption of MIT's first undergraduate analog design course. This course will run, free of charge, for students worldwide from February 1, 2012 through July 1, 2012.</p>
-    <p>
-      <a href="/course_info/" class="more-info">More information about Circuits and Electronics</a>
-    </p>
-  </section>
+  <div class="secondary">
+    <!-- <section class="credits"> -->
+    <!--   <h1> Credits </h1> -->
+
+    <!--   <p> The codebase was made possible by Django, JQuery, JQueryUI, -->
+    <!--     MathJAX, swfobject, askbot, django-simplewiki, pyparsing, and the -->
+    <!--     original FancyBox. Graphic design and css started from a free template -->
+    <!--     from <a href="http://www.dotemplate.com/">dotemplate.com</a>, one of -->
+    <!--     the few, genuinely free template web sites (although you have to -->
+    <!--     e-mail the owner to find that out), and was heavily modified by Piotr -->
+    <!--     Mitros, and later, thoughtbot.</p> -->
+
+    <!--   <p> The system is running in the Amazon cloud, which allows us to hold up to anticipated loads. </p> -->
+    <!-- </section> -->
+
+    <section>
+      <a class="modal enroll" href="#enroll">Enroll in Circuits &amp; Electronics</a>
+    </section>
+  </div>
+</section>
+
+<div style="display:none">
+  <div id="enroll" name="enroll"><%include file="create_account.html" /></div>
+</div>
 
 <div style="display:none">
   <div id="login"><%include file="login.html" /></div>
@@ -49,7 +106,6 @@
 <div style="display:none">
   <div id="reset_done"></div>
 </div>
-</section>
 
 
 <script> 
