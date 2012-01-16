@@ -1,8 +1,5 @@
-PERFSTATS = False
 COURSEWARE_ENABLED = True
-
-if 'ASKBOT_ENABLED' not in locals():
-   ASKBOT_ENABLED = True
+ASKBOT_ENABLED = False
 if not COURSEWARE_ENABLED:
    ASKBOT_ENABLED = False
 
@@ -12,6 +9,9 @@ SITE_NAME = "localhost:8000"
 
 DEFAULT_FROM_EMAIL = 'registration@mitx.mit.edu'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
+
+# For testing the login system
+GENERATE_RANDOM_USER_CREDENTIALS = False
 
 WIKI_REQUIRE_LOGIN_EDIT = True
 WIKI_REQUIRE_LOGIN_VIEW = True
