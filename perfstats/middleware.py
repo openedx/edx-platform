@@ -9,17 +9,17 @@ class ProfileMiddleware:
         print "Process request"
 
     def process_response (self, request, response):
-        totalTime = time.time() - self.t
-        tmpfile = tempfile.NamedTemporaryFile(prefix='sqlprof-t=' + str(totalTime) + "-", delete=False)
+        # totalTime = time.time() - self.t
+        # tmpfile = tempfile.NamedTemporaryFile(prefix='sqlprof-t=' + str(totalTime) + "-", delete=False)
         
-        output = ""
-        for query in connection.queries:
-            output += "Time: " + str(query['time']) + "\nQuery: " + query['sql'] + "\n\n"
+        # output = ""
+        # for query in connection.queries:
+        #     output += "Time: " + str(query['time']) + "\nQuery: " + query['sql'] + "\n\n"
         
-        tmpfile.write(output)
+        # tmpfile.write(output)
         
-        print "SQL Log file: " , tmpfile.name
-        tmpfile.close()
+        # print "SQL Log file: " , tmpfile.name
+        # tmpfile.close()
         
-        print "Process response"
+        # print "Process response"
         return response

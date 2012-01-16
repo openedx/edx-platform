@@ -1,5 +1,7 @@
 COURSEWARE_ENABLED = True
-ASKBOT_ENABLED = True
+
+if 'ASKBOT_ENABLED' not in locals():
+   ASKBOT_ENABLED = True
 if not COURSEWARE_ENABLED:
    ASKBOT_ENABLED = False
 
