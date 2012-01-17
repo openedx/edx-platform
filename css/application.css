@@ -554,6 +554,11 @@ div.course-wrapper {
       float: left;
       width: 640px;
       min-height: 620px; }
+      div.course-wrapper section.course-content div.video-wrapper iframe#html5_player {
+        border: none;
+        display: none;
+        height: 390px;
+        width: 640px; }
       div.course-wrapper section.course-content div.video-wrapper section ul {
         display: inline-block; }
         div.course-wrapper section.course-content div.video-wrapper section ul li {
