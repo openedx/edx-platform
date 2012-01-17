@@ -1,28 +1,10 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 //
 //  Simple schematic capture
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 // Copyright (C) 2011 Massachusetts Institute of Technology
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the "Software"), to deal in
-// the Software without restriction, including without limitation the rights to
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-// of the Software, and to permit persons to whom the Software is furnished to do
-// so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
 
 // add schematics to a document with 
 //
@@ -72,6 +54,12 @@ function add_schematic_handler(other_onload) {
 }
 window.onload = add_schematic_handler(window.onload);
 
+// ask each schematic input widget to update its value field for submission
+function prepare_schematics() {
+    var schematics = document.getElementsByClassName('schematic');
+    for (var i = schematics.length - 1; i >= 0; i--)
+	schematics[i].schematic.update_value();
+}
 
 schematic = (function() {
 	background_style = 'rgb(220,220,220)';
@@ -88,6 +76,7 @@ schematic = (function() {
 	// list of all the defined parts
 	parts_map = {
 	    'g': [Ground, 'Ground connection'],
+	    'L': [Label, 'Node label'],
 	    'v': [VSource, 'Voltage source'],
 	    'i': [ISource, 'Current source'],
 	    'r': [Resistor, 'Resistor'],
@@ -99,10 +88,6 @@ schematic = (function() {
 	    'p': [PFet, 'PFet'],
 	    's': [Probe, 'Scope Probe'],
 	};
-
-	// fix cursor bug in Chrome (default behavior: change to text cursor
-	// whenever a drag is initiated).
-	//document.onselectstart = function() { return false; };
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
@@ -170,16 +155,19 @@ schematic = (function() {
 		}
 
 		if (analyses.indexOf('ac') != -1) {
-		    this.tools['ac'] = this.add_tool('AC','AC Small-Signal Analysis',this.ac_analysis);
+		    this.tools['ac'] = this.add_tool('AC','AC Small-Signal Analysis',this.setup_ac_analysis);
 		    this.enable_tool('ac',true);
 		    this.ac_npts = '5';	// default values for AC Analysis
 		    this.ac_fstart = '10';
 		    this.ac_fstop = '10MEG';
+		    this.ac_source_name = undefined;
 		}
 
 		if (analyses.indexOf('tran') != -1) {
-		    //this.tools['tran'] = this.add_tool('TRAN','Transient Analysis',this.tran_analysis);
-		    //this.enable_tool('tran',true);
+		    this.tools['tran'] = this.add_tool('TRAN','Transient Analysis',this.transient_analysis);
+		    this.enable_tool('tran',true);
+		    this.tran_npts = '100';  // default values for transient analysis
+		    this.tran_tstop = '1';
 		}
 	    }
  
@@ -238,6 +226,9 @@ schematic = (function() {
 	    this.wire = undefined;
 
 	    this.operating_point = undefined;  // result from DC analysis
+	    this.dc_results = undefined;   // saved analysis results for submission
+	    this.ac_results = undefined;   // saved analysis results for submission
+	    this.transient_results = undefined;   // saved analysis results for submission
 
 	    // state of modifier keys
 	    this.ctrlKey = false;
@@ -252,10 +243,12 @@ schematic = (function() {
 	    // set up DOM -- use nested tables to do the layout
 	    var table,tr,td;
 	    table = document.createElement('table');
+	    table.rules = 'none';
 	    if (!this.diagram_only) {
+		table.frame = 'box';
 		table.style.borderStyle = 'solid';
 		table.style.borderWidth = '2px';
-		table.style.padding = '5px';
+		table.style.borderColor = normal_style;
 		table.style.backgroundColor = background_style;
 	    }
 
@@ -264,8 +257,7 @@ schematic = (function() {
 		tr = document.createElement('tr');
 		table.appendChild(tr);
 		td = document.createElement('td');
-		td.colspan = 2;
-		td.vAlign = 'baseline';
+		td.colSpan = 2;
 		tr.appendChild(td);
 		for (var i = 0; i < this.toolbar.length; ++i) {
 		    var tool = this.toolbar[i];
@@ -284,9 +276,13 @@ schematic = (function() {
 	    tr.appendChild(td);
 	    var parts_table = document.createElement('table');
 	    td.appendChild(parts_table);
+	    parts_table.rules = 'none';
+	    parts_table.frame = 'void';
+	    parts_table.cellPadding = '0';
+	    parts_table.cellSpacing = '0';
 
-	    // fill in parts_table here!!!
-	    var parts_per_column = Math.floor(this.height / part_h);
+	    // fill in parts_table
+	    var parts_per_column = Math.floor(this.height / (part_h + 5));  // mysterious extra padding
 	    for (var i = 0; i < parts_per_column; ++i) {
 		tr = document.createElement('tr');
 		parts_table.appendChild(tr);
@@ -302,7 +298,7 @@ schematic = (function() {
 		table.appendChild(tr);
 		td = document.createElement('td');
 		tr.appendChild(td);
-		td.colspan = 2;
+		td.colSpan = 2;
 		td.appendChild(this.status_div);
 	    }
 
@@ -502,9 +498,17 @@ schematic = (function() {
 			this.origin_x = c[1];
 			this.origin_y = c[2];
 			this.scale = c[3];
+			this.ac_npts = c[4];
+			this.ac_fstart = c[5];
+			this.ac_fstop = c[6];
+			this.ac_source_name = c[7];
+			this.tran_npts = c[8];
+			this.tran_tstop = c[9];
 		    } else if (c[0] == 'w') {
 			// wire
 			this.add_wire(c[1][0],c[1][1],c[1][2],c[1][3]);
+		    } else if (c[0] == 'dc' || c[0] == 'ac' || c[0] == 'transient') {
+			// ignore analysis results
 		    } else {
 			// ordinary component
 			//  c := [type, coords, properties, connections]
@@ -520,8 +524,8 @@ schematic = (function() {
 			    part.properties[name] = properties[name];
 
 			// add component to the diagram
-			part.add(this)
-			    }
+			part.add(this);
+		    }
 		}
 	    }
 
@@ -571,7 +575,7 @@ schematic = (function() {
 
 	    // build JSON data structure, convert to string value for
 	    // input field
-	    this.input.value = JSON.stringify(this.json());
+	    this.input.value = JSON.stringify(this.json_with_analyses());
 	}
 
 	// produce a JSON representation of the diagram
@@ -583,7 +587,20 @@ schematic = (function() {
 		json.push(this.components[i].json());
 
 	    // capture the current view parameters
-	    json.push(['view',this.origin_x,this.origin_y,this.scale]);
+	    json.push(['view',this.origin_x,this.origin_y,this.scale,
+		       this.ac_npts,this.ac_fstart,this.ac_fstop,this.ac_source_name,
+		       this.tran_npts,this.tran_tstop]);
+
+	    return json;
+	}
+
+	// produce a JSON representation of the diagram
+	Schematic.prototype.json_with_analyses = function() {
+	    var json = this.json();
+
+	    if (this.dc_results != undefined) json.push(['dc',this.dc_results]);
+	    if (this.ac_results != undefined) json.push(['ac',this.ac_results]);
+	    if (this.transient_results != undefined) json.push(['transient',this.transient_results]);
 
 	    return json;
 	}
@@ -598,6 +615,10 @@ schematic = (function() {
 	    // give all the circuit nodes a name, extract netlist
 	    this.label_connection_points();
 	    var netlist = this.json();
+
+	    // since we've done the heavy lifting, update input field value
+	    // so user can grab diagram if they want
+	    this.input.value = JSON.stringify(netlist);
 
 	    // create a circuit from the netlist
 	    var ckt = new cktsim.Circuit();
@@ -616,6 +637,10 @@ schematic = (function() {
 	    // run the analysis
 	    this.operating_point = ckt.dc();
 
+	    // save a copy of the results for submission
+	    this.dc_results = {};
+	    for (var i in this.operating_point) this.dc_results[i] = this.operating_point[i];
+
 	    // display results on diagram
 	    this.redraw();
 	}
@@ -630,16 +655,18 @@ schematic = (function() {
 	    return result;
 	}
 
-	Schematic.prototype.ac_analysis = function() {
+	// use a dialog to get AC analysis parameters
+	Schematic.prototype.setup_ac_analysis = function() {
 	    this.unselect_all(-1);
 	    this.redraw_background();
 
 	    var npts_lbl = 'Number of points/decade';
 	    var fstart_lbl = 'Starting frequency (Hz)';
 	    var fstop_lbl = 'Ending frequency (Hz)';
+	    var source_name_lbl = 'Name of V or I source for ac'
     
 	    if (this.find_probes().length == 0) {
-		this.message("AC Analysis: there are no scope probes in the diagram!");
+		alert("AC Analysis: there are no scope probes in the diagram!");
 		return;
 	    }
 
@@ -647,6 +674,7 @@ schematic = (function() {
 	    fields[npts_lbl] = build_input('text',10,this.ac_npts);
 	    fields[fstart_lbl] = build_input('text',10,this.ac_fstart);
 	    fields[fstop_lbl] = build_input('text',10,this.ac_fstop);
+	    fields[source_name_lbl] = build_input('text',10,this.ac_source_name);
 
 	    var content = build_table(fields);
 	    content.fields = fields;
@@ -654,26 +682,103 @@ schematic = (function() {
 
 	    this.dialog('AC Analysis',content,function(content) {
 		    var sch = content.sch;
-		    var ckt = sch.extract_circuit();
 
 		    // retrieve parameters, remember for next time
 		    sch.ac_npts = content.fields[npts_lbl].value;
 		    sch.ac_fstart = content.fields[fstart_lbl].value;
 		    sch.ac_fstop = content.fields[fstop_lbl].value;
+		    sch.ac_source_name = content.fields[source_name_lbl].value;
+
+		    sch.ac_analysis(cktsim.parse_number(sch.ac_npts),
+				    cktsim.parse_number(sch.ac_fstart),
+				    cktsim.parse_number(sch.ac_fstop),
+				    sch.ac_source_name);
+		});
+	}
+
+	// perform ac analysis
+	Schematic.prototype.ac_analysis = function(npts,fstart,fstop,ac_source_name) {
+	    // run the analysis
+	    var ckt = this.extract_circuit();
+	    var results = ckt.ac(npts,fstart,fstop,ac_source_name);
+
+	    // save a copy of the results for submission
+	    this.ac_results = {};
+	    for (var i in results) this.ac_results[i] = results[i];
+
+	    if (typeof results == 'string') 
+		this.message(results);
+	    else {
+		var x_values = results['frequencies'];
+
+		// x axis will be a log scale
+		for (var i = x_values.length - 1; i >= 0; --i)
+		    x_values[i] = Math.log(x_values[i])/Math.LN10;
+
+		// set up plot values for each node with a probe
+		var y_values = [];  // list of [color, result_array]
+		var probes = this.find_probes();
+
+		for (var i = probes.length - 1; i >= 0; --i) {
+		    var color = probes[i][0];
+		    var label = probes[i][1];
+		    var v = results[label];
+
+		    // convert values into dB relative to source amplitude
+		    var v_max = 1;
+		    for (var j = v.length - 1; j >= 0; --j)
+			// convert each value to dB relative to max
+			v[j] = 20.0 * Math.log(v[j]/v_max)/Math.LN10;
+
+		    y_values.push([color,v]);
+		}
+
+		// graph the result and display in a window
+		var graph = this.graph(x_values,y_values,'log(Frequency)','dB');
+		this.window('Results of AC Analysis',graph);
+	    }
+	}
+
+	Schematic.prototype.transient_analysis = function() {
+	    this.unselect_all(-1);
+	    this.redraw_background();
+
+	    var npts_lbl = 'Minimum number of timepoints';
+	    var tstop_lbl = 'Stop Time (seconds)';
+    
+	    if (this.find_probes().length == 0) {
+		alert("Transient Analysis: there are no probes in the diagram!");
+		return;
+	    }
+
+	    var fields = new Array();
+	    fields[npts_lbl] = build_input('text',10,this.tran_npts);
+	    fields[tstop_lbl] = build_input('text',10,this.tran_tstop);
+
+	    var content = build_table(fields);
+	    content.fields = fields;
+	    content.sch = this;
+
+	    this.dialog('Transient Analysis',content,function(content) {
+		    var sch = content.sch;
+		    var ckt = sch.extract_circuit();
+
+		    // retrieve parameters, remember for next time
+		    sch.tran_npts = content.fields[npts_lbl].value;
+		    sch.tran_tstop = content.fields[tstop_lbl].value;
 
 		    // run the analysis
-		    var results = ckt.ac(ckt.parse_number(sch.ac_npts),
-					 ckt.parse_number(sch.ac_fstart),
-					 ckt.parse_number(sch.ac_fstop));
+		    var results = ckt.tran(ckt.parse_number(sch.tran_npts), 0,
+					   ckt.parse_number(sch.tran_tstop), false);
+
+		    // save a copy of the results for submission
+		    this.transient_results = {};
+		    for (var i in results) this.transient_results[i] = results[i];
 
 		    if (typeof results == 'string') 
 			sch.message(results);
 		    else {
-			var x_values = results['frequencies'];
-
-			// x axis will be a log scale
-			for (var i = x_values.length - 1; i >= 0; --i)
-			    x_values[i] = Math.log(x_values[i])/Math.LN10;
+			var x_values = results['time'];
 
 			// set up plot values for each node with a probe
 			var y_values = [];  // list of [color, result_array]
@@ -683,28 +788,30 @@ schematic = (function() {
 			    var color = probes[i][0];
 			    var label = probes[i][1];
 			    var v = results[label];
-
-			    // convert values into dB relative to max value
-			    var v_max = -Infinity;
-			    for (var j = v.length - 1; j >= 0; --j) {
-				v[j] = Math.abs(v[j]);
-				if (v[j] > v_max) v_max = v[j];
-			    }
-			    for (var j = v.length - 1; j >= 0; --j)
-				// convert each value to dB relative to max
-				v[j] = 20.0 * Math.log(v[j]/v_max)/Math.LN10;
-
 			    y_values.push([color,v]);
 			}
 
 			// graph the result and display in a window
-			var graph = sch.graph(x_values,y_values,'log(Frequency)','dB');
-			sch.window('Results of AC Analysis',graph);
+			var graph = sch.graph(x_values,y_values,'Time','Voltage');
+			sch.window('Results of Transient Analysis',graph);
 		    }
-		})
+	    })
 	}
 
-	Schematic.prototype.transient_analysis = function() {
+	// external interface for setting the property value of a named component
+	Schematic.prototype.set_property = function(component_name,property,value) {
+	    this.unselect_all(-1);
+
+	    for (var i = this.components.length - 1; i >= 0; --i) {
+		var component = this.components[i];
+		if (component.properties['name'] == component_name) {
+		    component.properties[property] = value.toString();
+		    break;
+		}
+	    }
+
+	    // update diagram
+	    this.redraw_background();
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -720,11 +827,11 @@ schematic = (function() {
 
 	    c.lineCap = 'round';
 
-	    if (!this.diagram_only) {
-		// paint background color
-		c.fillStyle = element_style;
-		c.fillRect(0,0,this.width,this.height);
+	    // paint background color
+	    c.fillStyle = element_style;
+	    c.fillRect(0,0,this.width,this.height);
 
+	    if (!this.diagram_only) {
 		// grid
 		c.strokeStyle = grid_style;
 		var first_x = 0;
@@ -1204,6 +1311,7 @@ schematic = (function() {
 
 	    // div to hold the two buttons
 	    var buttons = document.createElement('div');
+	    buttons.style.textAlign = 'center';
 	    buttons.appendChild(ok_button);
 	    buttons.appendChild(cancel_button);
 	    buttons.style.padding = '5px';
@@ -1315,9 +1423,9 @@ schematic = (function() {
 	    head.addEventListener('mousemove',window_mouse_move,false);
 
 	    // div to hold the content
-	    var body = document.createElement('div');
-	    body.appendChild(content);
-	    win.appendChild(body);
+	    //var body = document.createElement('div');
+	    //body.appendChild(content);
+	    win.appendChild(content);
 	    content.win = win;   // so content can contact us
 
 	    // compute location in top-level div
@@ -1415,7 +1523,6 @@ schematic = (function() {
 	    tool.style.borderWidth = '1px';
 	    tool.style.borderStyle = 'solid';
 	    tool.style.borderColor = background_style;
-	    //tool.style.position = 'absolute';
 	    tool.style.padding = '2px';
 
 	    // set up event processing
@@ -1552,6 +1659,45 @@ schematic = (function() {
 	    return [vmin,vmax,1.0/scale];
 	}
 
+	function engineering_notation(n,nplaces) {
+	    if (n == 0) return("0");
+
+	    var sign = n < 0 ? -1 : 1;
+	    var log10 = Math.log(sign*n)/Math.LN10;
+	    var exp = Math.floor(log10/3);   // powers of 1000
+	    var mantissa = sign*Math.pow(10,log10 - 3*exp);
+
+	    // keep specified number of places following decimal point
+	    var mstring = (mantissa + sign*0.5*Math.pow(10,-nplaces)).toString();
+	    var mlen = mstring.length;
+	    var endindex = mstring.indexOf('.');
+	    if (endindex != -1) {
+		if (nplaces > 0) {
+		    endindex += nplaces + 1;
+		    if (endindex > mlen) endindex = mlen;
+		    while (mstring.charAt(endindex-1) == '0') endindex -= 1;
+		    if (mstring.charAt(endindex-1) == '.') endindex -= 1;
+		}
+		if (endindex < mlen)
+		    mstring = mstring.substring(0,endindex);
+	    }
+
+	    switch(exp) {
+	    case -5:	return mstring+"f";
+	    case -4:	return mstring+"p";
+	    case -3:	return mstring+"n";
+	    case -2:	return mstring+"u";
+	    case -1:	return mstring+"m";
+	    case 0:	return mstring;
+	    case 1:	return mstring+"K";
+	    case 2:	return mstring+"Meg";
+	    case 3:	return mstring+"G";
+	    }
+
+	    // don't have a good suffix, so just print the number
+	    return n.toString();
+	}
+
 	// x_values is an array of x coordinates for each of the plots
 	// y_values is an array of [color, value_array], one entry for each plot
 	Schematic.prototype.graph = function(x_values,y_values,x_legend,y_legend) {
@@ -1622,7 +1768,7 @@ schematic = (function() {
 		c.moveTo(temp,end);
 		c.lineTo(temp,end + tick_length);
 		c.stroke();
-		c.fillText(x.toString(),temp,end + tick_length);
+		c.fillText(engineering_notation(x,2),temp,end + tick_length);
 	    }
 
 	    var y_min = Infinity;
@@ -1664,7 +1810,7 @@ schematic = (function() {
 		c.moveTo(left_margin - tick_length,temp);
 		c.lineTo(left_margin,temp);
 		c.stroke();
-		c.fillText(y.toString(),left_margin - tick_length -2,temp);
+		c.fillText(engineering_notation(y,2),left_margin - tick_length -2,temp);
 	    }
 
 	    // now draw each plot
@@ -2149,7 +2295,7 @@ schematic = (function() {
     
 	Component.prototype.select = function(x,y,shiftKey) {
 	    this.was_previously_selected = this.selected;
-	    if (inside(this.bbox,x,y)) {
+	    if (this.near(x,y)) {
 		this.set_select(shiftKey ? !this.selected : true);
 		return true;
 	    } else return false;
@@ -2168,8 +2314,13 @@ schematic = (function() {
 	    return null;
 	}
 
+	// does mouse click fall on this component?
+	Component.prototype.near = function(x,y) {
+	    return inside(this.bbox,x,y);
+	}
+
 	Component.prototype.edit_properties = function(x,y) {
-	    if (inside(this.bbox,x,y)) {
+	    if (this.near(x,y)) {
 		// make an <input> widget for each property
 		var fields = new Array();
 		for (var i in this.properties)
@@ -2361,14 +2512,6 @@ schematic = (function() {
 	    return false;
 	}
 
-	Wire.prototype.select = function(x,y,shiftKey) {
-	    this.was_previously_selected = this.selected;
-	    if (this.near(x,y)) {
-		this.set_select(shiftKey ? !this.selected : true);
-		return true;
-	    } else return false;
-	}
-
 	// selection rectangle selects wire only if it includes
 	// one of the end points
 	Wire.prototype.select_rect = function(s) {
@@ -2447,6 +2590,41 @@ schematic = (function() {
 	// default action: do nothing
 	Ground.prototype.add_default_labels = function() {
 	    this.connections[0].propagate_label('0');   // canonical label for GND node
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+	//
+	//  Label
+	//
+	////////////////////////////////////////////////////////////////////////////////
+
+	function Label(x,y,rotation,label) {
+	    Component.call(this,'L',x,y,rotation);
+	    this.properties['label'] = label ? label : '???';
+	    this.add_connection(0,0);
+	    this.bounding_box = [-2,0,2,8];
+	    this.update_coords();
+	}
+	Label.prototype = new Component();
+	Label.prototype.constructor = Label;
+
+	Label.prototype.toString = function() {
+	    return '<Label'+' ('+this.x+','+this.y+')>';
+	}
+    
+	Label.prototype.draw = function(c) {
+	    this.draw_line(c,0,0,0,8);
+	    this.draw_text(c,this.properties['label'],0,9,1,property_size);
+	}
+
+	Label.prototype.clone = function(x,y) {
+	    return new Label(x,y,this.rotation,this.properties['label']);
+	}
+
+	// give components a chance to generate a label for their connection(s)
+	// default action: do nothing
+	Label.prototype.add_default_labels = function() {
+	    this.connections[0].propagate_label(this.properties['label']);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -2538,7 +2716,7 @@ schematic = (function() {
 	    this.properties['r'] = r ? r : '1';
 	    this.add_connection(0,0);
 	    this.add_connection(0,48);
-	    this.bounding_box = [-4,0,4,48];
+	    this.bounding_box = [-5,0,5,48];
 	    this.update_coords();
 	}
 	Resistor.prototype = new Component();
@@ -2650,9 +2828,10 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	function Diode(x,y,rotation,name) {
+	function Diode(x,y,rotation,name,area) {
 	    Component.call(this,'d',x,y,rotation);
 	    this.properties['name'] = name;
+	    this.properties['area'] = area ? area : '1';
 	    this.add_connection(0,0);   // anode
 	    this.add_connection(0,48);  // cathode
 	    this.bounding_box = [-8,0,8,48];
@@ -2662,7 +2841,7 @@ schematic = (function() {
 	Diode.prototype.constructor = Diode;
 
 	Diode.prototype.toString = function() {
-	    return '<Diode ('+this.x+','+this.y+')>';
+	    return '<Diode '+this.properties['area']+' ('+this.x+','+this.y+')>';
 	}
     
 	Diode.prototype.draw = function(c) {
@@ -2673,12 +2852,14 @@ schematic = (function() {
 	    this.draw_line(c,-8,32,8,32);
 	    this.draw_line(c,0,32,0,48);
 
+	    if (this.properties['area'])
+		this.draw_text(c,this.properties['area'],10,24,3,property_size);
 	    if (this.properties['name'])
 		this.draw_text(c,this.properties['name'],-10,24,5,property_size);
 	}
 
 	Diode.prototype.clone = function(x,y) {
-	    return new Diode(x,y,this.rotation,this.properties['name']);
+	    return new Diode(x,y,this.rotation,this.properties['name'],this.properties['area']);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -2687,14 +2868,13 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	function NFet(x,y,rotation,name,sw,sl) {
+	function NFet(x,y,rotation,name,w_over_l) {
 	    Component.call(this,'n',x,y,rotation);
 	    this.properties['name'] = name;
-	    this.properties['scaled width'] = sw ? sw : '2';
-	    this.properties['scaled length'] = sl ? sl : '1';
+	    this.properties['W/L'] = w_over_l ? w_over_l : '2';
 	    this.add_connection(0,0);   // drain
-	    this.add_connection(0,48);  // source
 	    this.add_connection(-24,24);  // gate
+	    this.add_connection(0,48);  // source
 	    this.bounding_box = [-24,0,8,48];
 	    this.update_coords();
 	}
@@ -2702,7 +2882,7 @@ schematic = (function() {
 	NFet.prototype.constructor = NFet;
 
 	NFet.prototype.toString = function() {
-	    return '<NFet '+this.properties['scaled width']+'/'+this.properties['scaled length']+' ('+this.x+','+this.y+')>';
+	    return '<NFet '+this.properties['W/L']+' ('+this.x+','+this.y+')>';
 	}
     
 	NFet.prototype.draw = function(c) {
@@ -2715,7 +2895,7 @@ schematic = (function() {
 	    this.draw_line(c,-24,24,-12,24);
 	    this.draw_line(c,-12,16,-12,32);
 
-	    var dim = this.properties['scaled width']+'/'+this.properties['scaled length'];
+	    var dim = this.properties['W/L'];
 	    if (this.properties['name']) {
 		this.draw_text(c,this.properties['name'],2,22,6,property_size);
 		this.draw_text(c,dim,2,26,0,property_size);
@@ -2724,8 +2904,7 @@ schematic = (function() {
 	}
 
 	NFet.prototype.clone = function(x,y) {
-	    return new NFet(x,y,this.rotation,this.properties['name'],
-			    this.properties['scaled width'],this.properties['scaled length']);
+	    return new NFet(x,y,this.rotation,this.properties['name'],this.properties['W/L']);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -2734,14 +2913,13 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	function PFet(x,y,rotation,name,sw,sl) {
+	function PFet(x,y,rotation,name,w_over_l) {
 	    Component.call(this,'p',x,y,rotation);
 	    this.properties['name'] = name;
-	    this.properties['scaled width'] = sw ? sw : '2';
-	    this.properties['scaled length'] = sl ? sl : '1';
+	    this.properties['W/L'] = w_over_l ? w_over_l : '2';
 	    this.add_connection(0,0);   // drain
-	    this.add_connection(0,48);  // source
 	    this.add_connection(-24,24);  // gate
+	    this.add_connection(0,48);  // source
 	    this.bounding_box = [-24,0,8,48];
 	    this.update_coords();
 	}
@@ -2749,7 +2927,7 @@ schematic = (function() {
 	PFet.prototype.constructor = PFet;
 
 	PFet.prototype.toString = function() {
-	    return '<PFet '+this.properties['scaled width']+'/'+this.properties['scaled length']+' ('+this.x+','+this.y+')>';
+	    return '<PFet '+this.properties['W/L']+' ('+this.x+','+this.y+')>';
 	}
     
 	PFet.prototype.draw = function(c) {
@@ -2764,7 +2942,7 @@ schematic = (function() {
 	    this.draw_circle(c,-14,24,2,false);
 	    this.draw_line(c,-12,16,-12,32);
 
-	    var dim = this.properties['scaled width']+'/'+this.properties['scaled length'];
+	    var dim = this.properties['W/L'];
 	    if (this.properties['name']) {
 		this.draw_text(c,this.properties['name'],2,22,6,property_size);
 		this.draw_text(c,dim,2,26,0,property_size);
@@ -2773,8 +2951,7 @@ schematic = (function() {
 	}
 
 	PFet.prototype.clone = function(x,y) {
-	    return new PFet(x,y,this.rotation,this.properties['name'],
-			    this.properties['scaled width'],this.properties['scaled length']);
+	    return new PFet(x,y,this.rotation,this.properties['name'],this.properties['W/L']);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -2783,9 +2960,10 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	function OpAmp(x,y,rotation,name,sw,sl) {
+	function OpAmp(x,y,rotation,name,A) {
 	    Component.call(this,'o',x,y,rotation);
 	    this.properties['name'] = name;
+	    this.properties['A'] = A ? A : '300000';
 	    this.add_connection(0,0);   // +
 	    this.add_connection(0,16);  // -
 	    this.add_connection(48,8);  // output
@@ -2796,7 +2974,7 @@ schematic = (function() {
 	OpAmp.prototype.constructor = OpAmp;
 
 	OpAmp.prototype.toString = function() {
-	    return '<OpAmp ('+this.x+','+this.y+')>';
+	    return '<OpAmp'+this.properties['A']+' ('+this.x+','+this.y+')>';
 	}
     
 	OpAmp.prototype.draw = function(c) {
@@ -2818,7 +2996,7 @@ schematic = (function() {
 	}
 
 	OpAmp.prototype.clone = function(x,y) {
-	    return new OpAmp(x,y,this.rotation,this.properties['name']);
+	    return new OpAmp(x,y,this.rotation,this.properties['name'],this.properties['A']);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -2849,15 +3027,15 @@ schematic = (function() {
 	    this.draw_line(c,0,36,0,48);
 
 	    if (this.type == 'v') {  // voltage source
-		this.draw_text(c,'+',0,12,1,property_size);
-		this.draw_text(c,'\u2013',0,36,7,property_size);  // minus sign
+		//this.draw_text(c,'+',0,12,1,property_size);
+		//this.draw_text(c,'\u2013',0,36,7,property_size);  // minus sign
 		// draw + and -
-		//this.draw_line(c,8,5,8,11);
-		//this.draw_line(c,5,8,11,8);
-		//this.draw_line(c,5,40,11,40);
+		this.draw_line(c,0,15,0,21);
+		this.draw_line(c,-3,18,3,18);
+		this.draw_line(c,-3,30,3,30);
 		// draw V
-		this.draw_line(c,-3,20,0,28);
-		this.draw_line(c,3,20,0,28);
+		//this.draw_line(c,-3,20,0,28);
+		//this.draw_line(c,3,20,0,28);
 	    } else if (this.type == 'i') {  // current source
 		// draw arrow: pos to neg
 		this.draw_line(c,0,16,0,32);
@@ -2897,11 +3075,49 @@ schematic = (function() {
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
+	//  JQuery slider support for setting a component value
+	//
+	///////////////////////////////////////////////////////////////////////////////
+
+	function component_slider(event,ui) {
+	    var sname = $(this).slider("option","schematic");
+
+	    // set value of specified component
+	    var cname = $(this).slider("option","component");
+	    var pname = $(this).slider("option","property");
+	    var suffix = $(this).slider("option","suffix");
+	    if (typeof suffix != "string") suffix = "";
+
+	    var v = ui.value;
+	    $(this).slider("value",v);  // move slider's indicator
+
+	    var choices = $(this).slider("option","choices");
+	    if (choices instanceof Array) v = choices[v];
+
+	    // selector may match several schematics
+	    $("." + sname).each(function(index,element) {
+		    element.schematic.set_property(cname,pname,v.toString() + suffix);
+		})
+
+	    // perform requested analysis
+	    var analysis = $(this).slider("option","analysis");
+	    if (analysis == "dc")
+		$("." + sname).each(function(index,element) {
+			element.schematic.dc_analysis();
+		    })
+
+	    return false;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	//
 	//  Module definition
 	//
 	///////////////////////////////////////////////////////////////////////////////
+
 	var module = {
 	    'Schematic': Schematic,
+	    'component_slider': component_slider,
 	}
 	return module;
     }());

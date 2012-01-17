@@ -1,5 +1,27 @@
 // Things to abstract out to another file
 
+// We do sync AJAX for just the page close event. 
+// TODO: This should _really_ not be a global. 
+var log_close_event = false; 
+
+function log_close() {
+    var d=new Date();
+    var t=d.getTime();
+    //close_event_logged = "waiting";
+    log_close_event = true;
+    log_event('page_close', {});
+    log_close_event = false;
+    // Google Chrome will close without letting the event go through.
+    // This causes the page close to be delayed until we've hit the
+    // server. The code below fixes it, but breaks Firefox. 
+    // TODO: Check what happens with no network. 
+    /*while((close_event_logged != "done") && (d.getTime() < t+500)) {
+	console.log(close_event_logged);
+    }*/
+}
+
+window.onbeforeunload = log_close;
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
@@ -199,23 +221,28 @@ function videoDestroy() {
 }
 
 function log_event(e, d) {
-    //$("#eventlog").append("<br>");
-    //$("#eventlog").append(JSON.stringify(e));
+    data = {
+	"event_type" : e, 
+	"event" : JSON.stringify(d),
+	"page" : document.URL
+    }
+    $.ajax({type:'GET',
+	    url: '/event',
+	    dataType: 'json',
+	    data: data,
+	    async: !log_close_event, // HACK: See comment on log_close_event
+	    success: function(){},
+	    headers : {'X-CSRFToken':getCookie('csrftoken')}
+	   });
 
-    // TODO: Decide if we want seperate tracking server. 
-    // If so, we need to resolve: 
-    // * AJAX from different domain (XMLHttpRequest cannot load http://localhost:7000/userlog. Origin http://localhost:8000 is not allowed by Access-Control-Allow-Origin.)
-    // * Verifying sessions/authentication
-
-    /*window['console'].log(JSON.stringify(e));*/
-    $.get("/event", 
-	  {
-	      "event_type" : e, 
-		  "event" : JSON.stringify(d),
-		  "page" : document.URL
-		  },
+    /*, // Commenting out Chrome bug fix, since it breaks FF
 	  function(data) {
-	  });
+	      console.log("closing");
+	      if (close_event_logged == "waiting") {
+		  close_event_logged = "done";
+	      console.log("closed");
+	  }
+	  });*/
 }
 
 function seek_slide(type,oe,value) {

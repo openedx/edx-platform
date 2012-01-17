@@ -6,31 +6,13 @@
 
 // Copyright (C) 2011 Massachusetts Institute of Technology
 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the "Software"), to deal in
-// the Software without restriction, including without limitation the rights to
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-// of the Software, and to permit persons to whom the Software is furnished to do
-// so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 // create a circuit for simulation using "new cktsim.Circuit()"
 
 // for modified nodal analysis (MNA) stamps see
 // http://www.analog-electronics.eu/analog-electronics/modified-nodal-analysis/modified-nodal-analysis.xhtml
 
 cktsim = (function() {
-
+    
 	///////////////////////////////////////////////////////////////////////////////
 	//
 	//  Circuit
@@ -41,10 +23,12 @@ cktsim = (function() {
 	T_VOLTAGE = 0;
 	T_CURRENT = 1;
 
+        v_newt_lim = 0.3;   // Voltage limited Newton great for Mos/diodes
 	v_abstol = 1e-6;	// criterion for absolute convergence (voltage)
 	i_abstol = 1e-12;	// criterion for absolute convergence (current)
 	min_time_step = 1e-18;	// smallest possible time step
-	max_iterations = 50;	// max iterations before giving up
+	max_dc_iters = 200;	// max iterations before giving pu
+	max_tran_iters = 10;	// max iterations before giving up
 	increase_limit = 4;	// if we converge in this many iterations, increase time step
 	time_step_increase_factor = 2.0;
 	time_step_decrease_factor = 0.3;
@@ -57,9 +41,9 @@ cktsim = (function() {
 
 	    this.devices = [];  // list of devices
 	    this.device_map = new Array();  // map name -> device
-	    this.end_of_timestep = [];   // list of devices to be called at end of each timestep
 
 	    this.finalized = false;
+	    this.diddc = false;
 	    this.node_index = -1;
 	}
 
@@ -88,23 +72,21 @@ cktsim = (function() {
 		    this.devices[i].finalize(this);
 
 		// set up augmented matrix and various temp vectors
-		this.matrix = new Array(this.N);
+		this.matrix = this.make_mat(this.N, this.N+1);
+		this.Gl = this.make_mat(this.N, this.N);  // Matrix for linear conductances
+		this.G = this.make_mat(this.N, this.N);  // Complete conductance matrix
+		this.C = this.make_mat(this.N, this.N);  // Matrix for linear L's and C's
+
 		this.soln_max = new Array(this.N);   // max abs value seen for each unknown
-		this.rtol = new Array(this.N);       // soln_max * reltol
 		this.abstol = new Array(this.N);
 		this.solution = new Array(this.N);
-		for (var i = this.N - 1; i >= 0; --i) {
-		    this.matrix[i] = new Array(this.N + 1);
+		this.rhs = new Array(this.N);
+		for (var i = this.N - 1; i >= 0; --i) {	    
 		    this.soln_max[i] = 0.0;
-		    this.rtol[i] = 0.0;
 		    this.abstol[i] = this.ntypes[i] == T_VOLTAGE ? v_abstol : i_abstol;
 		    this.solution[i] = 0.0;
+		    this.rhs[i] = 0.0;
 		}
-
-		// for backward Euler: coeff0 = 1/timestep, coeff1 = 0
-		// for trapezoidal: coeff0 = 2/timestep, coeff1 = 1
-		this.coeff0 = undefined;
-		this.coeff1 = undefined;
 	    }
 	}
 
@@ -119,7 +101,7 @@ cktsim = (function() {
 		var type = component[0];
 
 		// ignore wires, ground connections, scope probes and view info
-		if (type == 'view' || type == 'w' || type == 'g' || type == 's') continue;
+		if (type == 'view' || type == 'w' || type == 'g' || type == 's' || type == 'L') continue;
 
 		var properties = component[2];
 		var name = properties['name'];
@@ -136,6 +118,8 @@ cktsim = (function() {
 		// process the component
 		if (type == 'r')	// resistor
 		    this.r(connections[0],connections[1],properties['r'],name);
+		else if (type == 'd')	// diode
+		    this.d(connections[0],connections[1],properties['area'],name);
 		else if (type == 'c')   // capacitor
 		    this.c(connections[0],connections[1],properties['c'],name);
 		else if (type == 'l')	// inductor
@@ -147,57 +131,51 @@ cktsim = (function() {
 		else if (type == 'o') 	// op amp
 		    this.opamp(connections[0],connections[1],connections[2],properties['A'],name);
 		else if (type == 'n') 	// n fet
-		    this.fet('n',connections[0],connections[1],connections[2],
-			     properties['sw'],properties['sl'],name);
+		    this.n(connections[0],connections[1],connections[2],
+			   properties['W/L'],name);
 		else if (type == 'p') 	// p fet
-		    this.fet('p',connections[0],connections[1],connections[2],
-			     properties['sw'],properties['sl'],name);
+		    this.p(connections[0],connections[1],connections[2],
+			   properties['W/L'],name);
 	    }
 	}
 
 	// if converges: updates this.solution, this.soln_max, returns iter count
 	// otherwise: return undefined and set this.problem_node
 	// The argument should be a function that sets up the linear system.
-	Circuit.prototype.find_solution = function(load) {
+        Circuit.prototype.find_solution = function(load,maxiters) {
 	    var soln = this.solution;
-	    var old_soln,temp,converged;
+	    var rhs = this.rhs;
+	    var d_sol,temp,converged;
 
 	    // iteratively solve until values convere or iteration limit exceeded
-	    for (var iter = 0; iter < max_iterations; i++) {
+	    for (var iter = 0; iter < maxiters; iter++) {
 		// set up equations
-		this.initialize_linear_system();
-		load(this);
+		// no longer needed this.initialize_linear_system();
+		load(this,soln,rhs);
 
-		// solve for node voltages and branch currents
-		old_soln = soln;
-		soln = solve_linear_system(this.matrix);
+		// Compute the Newton delta
+		d_sol = solve_linear_system(this.matrix,rhs);
 
-		// check convergence: abs(new-old) <= abstol + reltol*max;
+		// Update solution and check convergence.
 		converged = true;
 		for (var i = this.N - 1; i >= 0; --i) {
-		    temp = Math.abs(soln[i] - old_soln);
-		    if (temp > this.abstol[i] + this.rtol[i]) {
+		    // Simple voltage step limiting to encourage Newton convergence
+		    if (this.ntypes[i] == T_VOLTAGE) {
+			d_sol[i] = (d_sol[i] > v_newt_lim) ? v_newt_lim : d_sol[i];
+			d_sol[i] = (d_sol[i] < -v_newt_lim) ? -v_newt_lim : d_sol[i];
+		    }
+		    soln[i] += d_sol[i];
+		    if (Math.abs(soln[i]) > this.soln_max[i])
+			this.soln_max[i] = Math.abs(soln[i]);
+		    thresh = this.abstol[i] + reltol*this.soln_max[i];
+		    if (Math.abs(d_sol[i]) > thresh) {
 			converged = false;
 			this.problem_node = i;
-			break;
 		    }
 		}
-		if (!converged) continue;
-
-		// other convergence checks here?
-
-		// update solution and maximum
-		this.solution = soln;
-		for (var i = this.N - 1; i >= 0; --i) {
-		    temp = Math.abs(soln[i]);
-		    if (temp > this.soln_max[i]) {
-			this.soln_max[i] = temp;
-			this.rtol[i] = temp * reltol;
-		    }
-		}
-		return iter+1;
+		// alert(numeric.prettyPrint(this.solution));
+                if (converged == true) return iter+1;
 	    }
-
 	    // too many iterations
 	    return undefined;
 	}
@@ -206,43 +184,165 @@ cktsim = (function() {
 	Circuit.prototype.dc = function() {
 	    this.finalize();
 
-	    // this function calls load_dc for all devices
-	    function load_dc(ckt) {
+	    // Load up the linear part.
+	    for (var i = this.devices.length - 1; i >= 0; --i) {
+		this.devices[i].load_linear(this)
+	    }
+
+	    // Define f and df/dx for Newton solver
+	    function load_dc(ckt,soln,rhs) {
+		// rhs is initialized to -Gl * soln
+		ckt.matv_mult(ckt.Gl, soln, rhs, -1.0);
+		// G matrix is initialized with linear Gl
+		ckt.copy_mat(ckt.Gl,ckt.G);
+		// Now load up the nonlinear parts of rhs and G
 		for (var i = ckt.devices.length - 1; i >= 0; --i)
-		    ckt.devices[i].load_dc(ckt);
+			ckt.devices[i].load_dc(ckt,soln,rhs);
+		// G matrix is initialized with linear Gl
+		ckt.copy_mat(ckt.G,ckt.matrix);
 	    }
 
 	    // find the operating point
-	    var iterations = this.find_solution(load_dc);
+	    var iterations = this.find_solution(load_dc,max_dc_iters);
 
-	    if (typeof iterations == 'undefined')
-		return 'Node '+this.node_map[this.problem_node]+' did not converge';
+	    if (typeof iterations == 'undefined') {
+		return 'Node '+this.node_map[this.problem_node]+' unconverged';
+	    } else {
+		// Note that a dc solution was computed
+		this.diddc = true;
+		// create solution dictionary
+		var result = new Array();
+		for (var name in this.node_map) {
+		    var index = this.node_map[name];
+		    result[name] = (index == -1) ? 0 : this.solution[index];
+		}
+		return result;
+	    }
+	}
+
+	// Transient analysis (needs work!)
+        Circuit.prototype.tran = function(ntpts, tstart, tstop, no_dc) {
+	    // Standard to do a dc analysis before transient
+	    // Otherwise, do the setup also done in dc.
+	    if ((this.diddc == false) && (no_dc == false)) this.dc();
+	    else {
+		// Allocate matrices and vectors.
+		this.finalize();
+
+		// Load up the linear elements once and for all
+		for (var i = this.devices.length - 1; i >= 0; --i) 
+		    this.devices[i].load_linear(this)
+	    }
+
+	    // Tired of typing this, and using "with" generates hate mail.
+	    var N = this.N;
+
+	    // build array to hold list of results for each variable
+	    // last entry is for timepoints.
+	    var response = new Array(N + 1);
+	    for (var i = N; i >= 0; --i) response[i] = new Array();
+
+	    // Allocate space to put previous charge and current
+	    this.oldc = new Array(this.N);
+	    this.oldq = new Array(this.N);
+	    this.c = new Array(this.N);
+	    this.q = new Array(this.N);
+	    this.alpha0 = 1.0;
+
+	    // Define f and df/dx for Newton solver
+	    function load_tran(ckt,soln,rhs) {
+		// rhs is initialized to -Gl * soln
+		ckt.matv_mult(ckt.Gl, soln, ckt.c,-1.0);
+		// G matrix is initialized with linear Gl
+		ckt.copy_mat(ckt.Gl,ckt.G);
+		// Now load up the nonlinear parts of rhs and G
+		for (var i = ckt.devices.length - 1; i >= 0; --i)
+		    ckt.devices[i].load_tran(ckt,soln,ckt.c,ckt.time);
+
+		// Exploit the fact that storage elements are linear
+		ckt.matv_mult(ckt.C, soln, ckt.q, 1.0);
+		for (var i = ckt.N-1; i >= 0; --i)
+		    rhs[i] = ckt.alpha0 *(ckt.oldq[i] - ckt.q[i]) + ckt.c[i]
+
+		// rhs is initialized to -Gl * soln
+		ckt.matv_mult(ckt.Gl, soln, ckt.c,-1.0);
+
+		// system matrix is G - alpha0 C.
+		ckt.mat_scale_add(ckt.G,ckt.C,ckt.alpha0,ckt.matrix);
+
+	    }
+
+	    this.time = tstart;
+	    var dt = (tstop - tstart)/ntpts;
+
+	    // Initialize this.c and this.q
+	    load_tran(this,this.solution,this.rhs)
+
+	    for(var tindex = 0; tindex < ntpts; tindex++) {
+
+		// Save the just computed solution, and move back q and c.
+		for (var i = this.N - 1; i >= 0; --i) {
+		    response[i].push(this.solution[i]);
+		    this.oldc[i] = this.c[i];
+		    this.oldq[i] = this.q[i];
+		}
+		response[this.N].push(this.time);
+		this.oldtime = this.time;
+
+		if (this.time >= tstop) break;
+		// Pick a timestep and an integration method
+		if (this.time + 1.1*dt > tstop)
+		    this.time = tstop;
+		else
+		    this.time += dt;
+		
+		// Set the timestep
+		this.alpha0 = 1.0/(this.time - this.oldtime);
+
+		// Predict the solution, nah maybe later.
+
+		// Use Newton to compute the solution.
+		var iterations = this.find_solution(load_tran,max_tran_iters);
+
+		if (iterations == undefined)
+		    alert('timestep nonconvergence, try more time points');
+	    }
 
 	    // create solution dictionary
 	    var result = new Array();
 	    for (var name in this.node_map) {
 		var index = this.node_map[name];
-		result[name] = (index == -1) ? 0 : this.solution[index];
+		result[name] = (index == -1) ? 0 : response[index];
 	    }
+	    result['time'] = response[this.N];
 	    return result;
 	}
 
 	// AC analysis: npts/decade for freqs in range [fstart,fstop]
 	// result['frequencies'] = vector of log10(sample freqs)
 	// result['xxx'] = vector of dB(response for node xxx)
-	Circuit.prototype.ac = function(npts,fstart,fstop) {
-	    this.finalize();
+        // NOTE: Normalization removed in schematic.js, jkw.
+        Circuit.prototype.ac = function(npts,fstart,fstop,source_name) {
+	    if (this.diddc == false) this.dc();
 
-	    // this function calls load_ac for all devices
-	    function load_ac(ckt) {
-		for (var i = ckt.devices.length - 1; i >= 0; --i)
-		    ckt.devices[i].load_ac(ckt);
+	    var N = this.N;
+	    var G = this.G;
+	    var C = this.C;
+
+	    // Complex numbers, we're going to need a bigger boat
+	    var matrixac = this.make_mat(2*N, (2*N)+1);
+
+            // Get the source used for ac
+	    if (this.device_map[source_name] === undefined) {
+		alert('AC analysis refers to unknown source ' + source_name);
+		return 'AC analysis failed, unknown source';
 	    }
+	    this.device_map[source_name].load_ac(this,this.rhs);
 
 	    // build array to hold list of results for each node
 	    // last entry is for frequency values
-	    var response = new Array(this.N + 1);
-	    for (var i = this.N; i >= 0; --i) response[i] = new Array();
+	    var response = new Array(N + 1);
+	    for (var i = N; i >= 0; --i) response[i] = new Array();
 
 	    // multiplicative frequency increase between freq points
 	    var delta_f = Math.exp(Math.LN10/npts);
@@ -250,19 +350,34 @@ cktsim = (function() {
 	    var f = fstart;
 	    fstop *= 1.0001;  // capture that last time point!
 	    while (f <= fstop) {
-		this.omega = 2 * Math.PI * f;
+		var omega = 2 * Math.PI * f;
+		response[this.N].push(f);
 
-		// find the operating point
-		var iterations = this.find_solution(load_ac);
+		// Find complex x+jy that sats Gx-omega*Cy=rhs; omega*Cx+Gy=0
+		// Note: solac[0:N-1]=x, solac[N:2N-1]=y
+		for (var i = N-1; i >= 0; --i) 
+		{
+		    // First the rhs, replicated for real and imaginary
+		    matrixac[i][2*N] = this.rhs[i];
+		    matrixac[i+N][2*N] = 0;
 
-		if (typeof iterations == 'undefined')
-		    return 'Node '+this.node_map[this.problem_node]+' did not converge';
-		else {
-		    response[this.N].push(f);
-		    for (var i = this.N - 1; i >= 0; --i)
-			response[i].push(this.solution[i]);
+		    for (var j = N-1; j >= 0; --j) 
+		    { 
+			matrixac[i][j] = G[i][j];
+			matrixac[i+N][j+N] = G[i][j];
+			matrixac[i][j+N] = -omega*C[i][j];
+			matrixac[i+N][j] = omega*C[i][j];
+		    }
 		}
 
+		// Compute the small signal response
+		var solac = solve_linear_system(matrixac);
+
+		// Save just the magnitude for now
+		for (var i = this.N - 1; i >= 0; --i) {
+		    var mag = Math.sqrt(solac[i]*solac[i] + solac[i+N]*solac[i+N]);
+		    response[i].push(mag);
+		}
 		f *= delta_f;    // increment frequency
 	    }
 
@@ -276,6 +391,22 @@ cktsim = (function() {
 	    return result;
 	}
 
+
+        // Helper for adding devices to a circuit, warns on duplicate device names.
+        Circuit.prototype.add_device = function(d,name) {
+	    // Add device to list of devices and to device map
+	    this.devices.push(d);
+	    if (name) {
+		if (this.device_map[name] === undefined) 
+		    this.device_map[name] = d;
+		else {
+		    alert('Warning: two circuit elements share the same name ' + name);
+		    this.device_map[name] = d;
+		}
+	    }
+	    return d;
+	}
+
 	Circuit.prototype.r = function(n1,n2,v,name) {
 	    // try to convert string value into numeric value, barf if we can't
 	    if ((typeof v) == 'string') {
@@ -283,13 +414,25 @@ cktsim = (function() {
 		if (v === undefined) return undefined;
 	    }
 
-	    var d;
 	    if (v != 0) {
-		d = new Resistor(n1,n2,v);
-		this.devices.push(d);
-		if (name) this.device_map[name] = d;
+		var d = new Resistor(n1,n2,v);
+		return this.add_device(d, name);
 	    } else return this.v(n1,n2,0,name);   // zero resistance == 0V voltage source
 	}
+
+	Circuit.prototype.d = function(n1,n2,area,name) {
+	    // try to convert string value into numeric value, barf if we can't
+	    if ((typeof area) == 'string') {
+		area = parse_number(area,undefined);
+		if (area === undefined) return undefined;
+	    }
+
+	    if (area != 0) {
+		var d = new Diode(n1,n2,area);
+		return this.add_device(d, name);
+	    } // zero area diodes discarded.
+	}
+
 
 	Circuit.prototype.c = function(n1,n2,v,name) {
 	    // try to convert string value into numeric value, barf if we can't
@@ -298,9 +441,7 @@ cktsim = (function() {
 		if (v === undefined) return undefined;
 	    }
 	    var d = new Capacitor(n1,n2,v);
-	    this.devices.push(d);
-	    if (name) this.device_map[name] = d;
-	    return d;
+	    return this.add_device(d, name);
 	}
 
 	Circuit.prototype.l = function(n1,n2,v,name) {
@@ -311,25 +452,40 @@ cktsim = (function() {
 	    }
 	    var branch = this.node(undefined,T_CURRENT);
 	    var d = new Inductor(n1,n2,branch,v);
-	    this.devices.push(d);
-	    if (name) this.device_map[name] = d;
-	    return d;
+	    return this.add_device(d, name);
 	}
 
-	Circuit.prototype.v = function(n1,n2,v,name) {
+        Circuit.prototype.v = function(n1,n2,v,name) {
 	    var branch = this.node(undefined,T_CURRENT);
 	    var d = new VSource(n1,n2,branch,v);
-	    this.devices.push(d);
-	    if (name) this.device_map[name] = d;
-	    return d;
+	    return this.add_device(d, name);
 	}
 
 	Circuit.prototype.i = function(n1,n2,v,name) {
 	    var d = new ISource(n1,n2,v);
-	    this.devices.push(d);
-	    if (name) this.device_map[name] = d;
-	    return d;
+	    return this.add_device(d, name);
 	}
+
+        Circuit.prototype.n = function(d,g,s, ratio, name) {
+	    // try to convert string value into numeric value, barf if we can't
+	    if ((typeof ratio) == 'string') {
+		ratio = parse_number(ratio,undefined);
+		if (ratio === undefined) return undefined;
+	    }
+	    var d = new Fet(d,g,s,ratio,name,'n');
+	    return this.add_device(d, name);
+	}
+
+        Circuit.prototype.p = function(d,g,s, ratio, name) {
+	    // try to convert string value into numeric value, barf if we can't
+	    if ((typeof ratio) == 'string') {
+		ratio = parse_number(ratio,undefined);
+		if (ratio === undefined) return undefined;
+	    }
+	    var d = new Fet(d,g,s,ratio,name,'p');
+	    return this.add_device(d, name);
+	}
+
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
@@ -354,36 +510,145 @@ cktsim = (function() {
 	    }
 	}
 
-	// add conductance between two nodes to matrix A.
+        // Allocate an NxM matrix
+        Circuit.prototype.make_mat = function(N,M) {
+	    var mat = new Array(N);	
+	    for (var i = N - 1; i >= 0; --i) {	    
+		mat[i] = new Array(M);
+		for (var j = M - 1; j >= 0; --j) {	    
+		    mat[i][j] = 0.0;
+		}
+	    }
+	    return mat;
+	}
+
+        // Form b = scale*Mx
+        Circuit.prototype.matv_mult = function(M,x,b,scale) {
+	    var n = M.length;
+	    var m = M[0].length;
+	    
+	    if (n != b.length || m != x.length)
+	    { throw 'Rows of M mismatched to b or cols mismatch to x.';
+	    }
+	    for (var i = 0; i < n; i++)
+	    {
+		var temp = 0;
+		for (var j = 0; j < m; j++)
+		{ 
+		    temp += M[i][j]*x[j];
+		}
+		b[i] = scale*temp;  // Recall the neg in the name
+	    }
+	}
+
+        // Form C = A + scale*B
+        Circuit.prototype.mat_scale_add = function(A, B, scale, C) {
+	    var n = A.length;
+	    var m = A[0].length;
+	    
+	    if (n > B.length || m > B[0].length)
+	    { throw 'Row or columns of A to large for B';
+	    }
+	    if (n > C.length || m > C[0].length)
+	    { throw 'Row or columns of A to large for C';
+	    }
+	    for (var i = 0; i < n; i++)
+	    {
+		for (var j = 0; j < m; j++)
+		{ 
+		    C[i][j] = A[i][j] + scale * B[i][j];
+		}
+	    }
+	}
+
+
+        // Copy A -> using the bounds of A
+	Circuit.prototype.copy_mat = function(src,dest) {
+	    var n = src.length;
+	    var m = src[0].length;
+	    if (n > dest.length || m >  dest[0].length)
+	    { throw 'Rows or cols > rows or cols of dest';
+	    }
+
+	    for (var i = 0; i < n; i++)
+	    {
+		for (var j = 0; j < m; j++)
+		{ 
+		    dest[i][j] = src[i][j];
+		}
+	    }
+	}
+
+	// add val component between two nodes to matrix M
 	// Index of -1 refers to ground node
-	Circuit.prototype.add_conductance = function(i,j,g) {
+        Circuit.prototype.add_two_terminal = function(i,j,g,M) {
 	    if (i >= 0) {
-		this.matrix[i][i] += g;
+		M[i][i] += g;
 		if (j >= 0) {
-		    this.matrix[i][j] -= g;
-		    this.matrix[j][i] -= g;
-		    this.matrix[j][j] += g;
+		    M[i][j] -= g;
+		    M[j][i] -= g;
+		    M[j][j] += g;
 		}
 	    } else if (j >= 0)
-		this.matrix[j][j] += g;
+		M[j][j] += g;
 	}
 
-	// add individual conductance to A
-	Circuit.prototype.add_to_A = function(i,j,v) {
+	// add val component between two nodes to matrix M
+	// Index of -1 refers to ground node
+        Circuit.prototype.get_two_terminal = function(i,j,x) {
+	    var xi_minus_xj = 0;
+	    if (i >= 0) xi_minus_xj = x[i];
+	    if (j >= 0) xi_minus_xj -= x[j];
+	    return xi_minus_xj
+	}
+
+        Circuit.prototype.add_conductance_l = function(i,j,g) {
+            this.add_two_terminal(i,j,g, this.Gl)
+	}
+
+        Circuit.prototype.add_conductance = function(i,j,g) {
+            this.add_two_terminal(i,j,g, this.G)
+	}
+
+        Circuit.prototype.add_capacitance = function(i,j,c) {
+            this.add_two_terminal(i,j,c,this.C)
+	}
+
+	// add individual conductance to Gl matrix
+	Circuit.prototype.add_to_Gl = function(i,j,g) {
 	    if (i >=0 && j >= 0)
-		this.matrix[i][j] += v;
+		this.Gl[i][j] += g;
 	}
 
-	// add source info to vector b
-	Circuit.prototype.add_to_b = function(i,v) {
-	    if (i >= 0)	this.matrix[i][this.N] += v;
+	// add individual conductance to Gl matrix
+	Circuit.prototype.add_to_G = function(i,j,g) {
+	    if (i >=0 && j >= 0)
+		this.G[i][j] += g;
 	}
 
-	// solve Ax=b and return vector x given augmented matrix [A | b]
+	// add individual capacitance to C matrix
+	Circuit.prototype.add_to_C = function(i,j,c) {
+	    if (i >=0 && j >= 0)
+		this.C[i][j] += c;
+	}
+
+	// add source info to rhs
+        Circuit.prototype.add_to_rhs = function(i,v,rhs) {
+	    if (i >= 0)	rhs[i] += v;
+	}
+
+	// solve Ax=b and return vector x given augmented matrix M = [A | b]
 	// Uses Gaussian elimination with partial pivoting
-	function solve_linear_system(M) {
+        function solve_linear_system(M,rhs) {
 	    var N = M.length;      // augmented matrix M has N rows, N+1 columns
 	    var temp,i,j;
+
+	    // Copy the rhs in to the last column of M if one is given.
+	    if (rhs != null) {
+		for (var row = 0; row < N ; row++) {
+		    M[row][N] = rhs[row];
+		}
+	    }
 
 	    // gaussian elimination
 	    for (var col = 0; col < N ; col++) {
@@ -447,13 +712,13 @@ cktsim = (function() {
 	Device.prototype.finalize = function() {
 	}
 
-	// reset internal state of the device to initial value
-	Device.prototype.reset = function() {
+        // Load the linear elements in to Gl and C
+        Device.prototype.load_linear = function(ckt) {
 	}
 
 	// load linear system equations for dc analysis
 	// (inductors shorted and capacitors opened)
-	Device.prototype.load_dc = function(ckt) {
+        Device.prototype.load_dc = function(ckt,soln,rhs) {
 	}
 
 	// load linear system equations for tran analysis
@@ -463,11 +728,7 @@ cktsim = (function() {
 	// load linear system equations for ac analysis:
 	// current sources open, voltage sources shorted
 	// linear models at operating point for everyone else
-	Device.prototype.load_ac = function(ckt) {
-	}
-
-	// called with there's an accepted time step
-	Device.prototype.end_of_timestep = function(ckt) {
+	Device.prototype.load_ac = function(ckt,rhs) {
 	}
 
 	// return time of next breakpoint for the device
@@ -616,7 +877,7 @@ cktsim = (function() {
 			else if (s.charAt(index) == 'i' && s.charAt(index+1) == 'l')
 			    result *= 25.4e-6;
 		    } else result *= 1e-3;
-		} else return default_v;
+		}
 	    }
 	    // ignore any remaining chars, eg, 1kohms returns 1000
 	    return result;
@@ -640,7 +901,7 @@ cktsim = (function() {
 	//   value(t) -- compute source value at time t
 	//   inflection_point(t) -- compute time after t when a time point is needed
 	//   dc -- value at time 0
-
+	
 	function parse_source(v) {
 	    // generic parser: parse v as either <value> or <fun>(<value>,...)
 	    var src = new Object();
@@ -731,10 +992,10 @@ cktsim = (function() {
 
 		// return value of source at time t
 		src.value = function(t) {  // closure
-		    if (t < td) return voffset + Math.sin(2*Math.PI*phase);
+		    if (t < td) return voffset + va*Math.sin(2*Math.PI*phase);
 		    else {
 			t -= td;
-			return voffset + Math.sin(2*Math.PI*(freq*(t - td) + phase));
+			return voffset + va*Math.sin(2*Math.PI*(freq*(t - td) + phase));
 		    }
 		}
 
@@ -774,35 +1035,34 @@ cktsim = (function() {
 	//
 	///////////////////////////////////////////////////////////////////////////////
 
-	function VSource(npos,nneg,branch,v) {
+        function VSource(npos,nneg,branch,v) {
 	    Device.call(this);
-
+	    
 	    this.src = parse_source(v);
 	    this.npos = npos;
 	    this.nneg = nneg;
 	    this.branch = branch;
 	}
 	VSource.prototype = new Device();
-	VSource.prototype.construction = VSource;
+	VSource.prototype.constructor = VSource;
 
-	// load linear system equations for dc analysis
-	VSource.prototype.load_dc = function(ckt) {
+	// load linear part for source evaluation
+        VSource.prototype.load_linear = function(ckt) {
 	    // MNA stamp for independent voltage source
-	    ckt.add_to_A(this.branch,this.npos,1.0);
-	    ckt.add_to_A(this.branch,this.nneg,-1.0);
-	    ckt.add_to_A(this.npos,this.branch,1.0);
-	    ckt.add_to_A(this.nneg,this.branch,-1.0);
-	    ckt.add_to_b(this.branch,this.src.dc);
+	    ckt.add_to_Gl(this.branch,this.npos,1.0);
+	    ckt.add_to_Gl(this.branch,this.nneg,-1.0);
+	    ckt.add_to_Gl(this.npos,this.branch,1.0);
+	    ckt.add_to_Gl(this.nneg,this.branch,-1.0);
 	}
 
-	// load linear system equations for tran analysis (just like DC)
-	VSource.prototype.load_tran = function(ckt,soln) {
-	    // MNA stamp for independent voltage source
-	    ckt.add_to_A(this.branch,this.npos,1.0);
-	    ckt.add_to_A(this.branch,this.nneg,-1.0);
-	    ckt.add_to_A(this.npos,this.branch,1.0);
-	    ckt.add_to_A(this.nneg,this.branch,-1.0);
-	    ckt.add_to_b(this.branch,this.src.value(ckt.time));
+	// Source voltage added to b.
+        VSource.prototype.load_dc = function(ckt,soln,rhs) {
+	    ckt.add_to_rhs(this.branch,this.src.dc,rhs);  
+	}
+
+	// Load time-dependent value for voltage source for tran
+        VSource.prototype.load_tran = function(ckt,soln,rhs,time) {
+	    ckt.add_to_rhs(this.branch,this.src.value(time),rhs);  
 	}
 
 	// return time of next breakpoint for the device
@@ -810,9 +1070,9 @@ cktsim = (function() {
 	    return this.src.inflection_point(time);
 	}
 
-	// small signal model: short circuit
-	VSource.prototype.load_ac = function(ckt) {
-	    this.load_dc(ckt);
+	// small signal model ac value
+        VSource.prototype.load_ac = function(ckt,rhs) {
+	    ckt.add_to_rhs(this.branch,1.0,rhs);
 	}
 
 	function ISource(npos,nneg,v) {
@@ -823,24 +1083,24 @@ cktsim = (function() {
 	    this.nneg = nneg;
 	}
 	ISource.prototype = new Device();
-	ISource.prototype.construction = ISource;
+	ISource.prototype.constructor = ISource;
 
 	// load linear system equations for dc analysis
-	ISource.prototype.load_dc = function(ckt) {
-	    var i = this.src.dc;
+	ISource.prototype.load_dc = function(ckt,soln,rhs) {
+	    var is = this.src.dc;
 
 	    // MNA stamp for independent current source
-	    ckt.add_to_b(this.npos,-i);  // current flow into npos
-	    ckt.add_to_b(this.nneg,i);   // and out of nneg
+	    ckt.add_to_rhs(this.npos,-is,rhs);  // current flow into npos
+	    ckt.add_to_rhs(this.nneg,is,rhs);   // and out of nneg
 	}
 
 	// load linear system equations for tran analysis (just like DC)
-	ISource.prototype.load_tran = function(ckt,soln) {
-	    var i = this.src.value(ckt.time);
+        ISource.prototype.load_tran = function(ckt,soln,rhs,time) {
+	    var is = this.src.value(time);
 
 	    // MNA stamp for independent current source
-	    ckt.add_to_b(this.npos,-i);  // current flow into npos
-	    ckt.add_to_b(this.nneg,i);   // and out of nneg
+	    ckt.add_to_rhs(this.npos,-is,rhs);  // current flow into npos
+	    ckt.add_to_rhs(this.nneg,is,rhs);   // and out of nneg
 	}
 
 	// return time of next breakpoint for the device
@@ -850,7 +1110,9 @@ cktsim = (function() {
 
 	// small signal model: open circuit
 	ISource.prototype.load_ac = function(ckt) {
-	    this.load_dc(ckt);
+	    // MNA stamp for independent current source
+	    ckt.add_to_rhs(this.npos,-1.0,rhs);  // current flow into npos
+	    ckt.add_to_rhs(this.nneg,1.0,rhs);   // and out of nneg
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -866,20 +1128,64 @@ cktsim = (function() {
 	    this.g = 1.0/v;
 	}
 	Resistor.prototype = new Device();
-	Resistor.prototype.construction = Resistor;
+	Resistor.prototype.constructor = Resistor;
+
+        Resistor.prototype.load_linear = function(ckt) {
+	    // MNA stamp for admittance g
+	    ckt.add_conductance_l(this.n1,this.n2,this.g);
+	}
 
 	Resistor.prototype.load_dc = function(ckt) {
-	    // MNA stamp for admittance g
-	    ckt.add_conductance(this.n1,this.n2,this.g);
+	    // Nothing to see here, move along.
 	}
 
 	Resistor.prototype.load_tran = function(ckt,soln) {
-	    this.load_dc(ckt);
 	}
 
 	Resistor.prototype.load_ac = function(ckt) {
-	    this.load_dc(ckt);
 	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	//
+	//  Diode
+	//
+	///////////////////////////////////////////////////////////////////////////////
+
+	function Diode(n1,n2,v) {
+	    Device.call(this);
+	    this.anode = n1;
+	    this.cathode = n2;
+	    this.area = v;
+	    this.is = 1.0e-14;
+	    this.ais = this.area * this.is;
+	    this.vt = 2.58e-2;  // 26 millivolts
+	}
+	Diode.prototype = new Device();
+        Diode.prototype.constructor = Diode;
+
+        Diode.prototype.load_linear = function(ckt) {
+	    // Diode is not linear, has no linear piece.
+	}
+
+        Diode.prototype.load_dc = function(ckt,soln,rhs) {
+	    var vd = ckt.get_two_terminal(this.anode, this.cathode, soln);
+	    var temp1 = this.ais * Math.exp(vd / this.vt);
+	    var id = temp1 - this.ais;
+	    var gd = temp1 / this.vt
+
+	    // MNA stamp for independent current source
+	    ckt.add_to_rhs(this.anode,-id,rhs);  // current flows into anode
+	    ckt.add_to_rhs(this.cathode,id,rhs);   // and out of cathode
+	    ckt.add_conductance(this.anode,this.cathode,gd);
+	}
+
+        Diode.prototype.load_tran = function(ckt,soln,rhs,time) {
+	    this.load_dc(ckt,soln,rhs);
+	}
+
+	Diode.prototype.load_ac = function(ckt) {
+	}
+
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
@@ -894,53 +1200,20 @@ cktsim = (function() {
 	    this.value = v;
 	}
 	Capacitor.prototype = new Device();
-	Capacitor.prototype.construction = Capacitor;
+	Capacitor.prototype.constructor = Capacitor;
 
-	// capacitor is modeled as a current source (ieq) in parallel with a conductance (geq)
-
-	Capacitor.prototype.reset = function() {
-	    this.q = 0;		// state variable (charge)
-	    this.i = 0;		// dstate/dt (current)
-	    this.prev_q = 0;	// last iteration
-	    this.prev_i = 0;
+        Capacitor.prototype.load_linear = function(ckt) {
+	    // MNA stamp for capacitance matrix 
+	    ckt.add_capacitance(this.n1,this.n2,this.value);
 	}
 
-	Capacitor.prototype.finalize = function(ckt) {
-	    // call us at the end of each timestep
-	    ckt.end_of_timestep.push(this);
-	}
-
-	Capacitor.prototype.end_of_timestep = function(ckt) {
-	    // update state when timestep is accepted
-	    this.prev_q = this.q;
-	    this.prev_i = this.i;
-	}
-
-	Capacitor.prototype.load_dc = function(ckt) {
-	    // open circuit
-	}
-
-	Capacitor.prototype.load_tran = function(ckt,soln) {
-	    var vcap = ((this.n1 >= 0) ? soln[this.n1] : 0) - ((this.n2 >= 0) ? soln[this.n2] : 0);
-	    this.q = this.value * vcap;   // set charge
-
-	    // integrate
-	    // for backward Euler: coeff0 = 1/timestep, coeff1 = 0
-	    // for trapezoidal: coeff0 = 2/timestep, coeff1 = 1
-	    this.i = ckt.coeff0*(this.q - this.prev_q) - ckt.coeff1*this.prev_i;
-	    var ieq = this.i - ckt.coeff0*this.q;
-	    var geq = ckt.coeff0 * this.value;
-
-	    // MNA stamp for admittance geq
-	    ckt.add_conductance(this.n1,this.n2,geq);
-
-	    // MNA stamp for current source ieq
-	    ckt.add_to_b(this.n1,-ieq);
-	    ckt.add_to_b(this.n2,ieq);
+	Capacitor.prototype.load_dc = function(ckt,soln,rhs) {
 	}
 
 	Capacitor.prototype.load_ac = function(ckt) {
-	    ckt.add_conductance(this.n1,this.n2,ckt.omega * this.value);
+	}
+
+	Capacitor.prototype.load_tran = function(ckt) {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -957,62 +1230,99 @@ cktsim = (function() {
 	    this.value = v;
 	}
 	Inductor.prototype = new Device();
-	Inductor.prototype.construction = Inductor;
+	Inductor.prototype.constructor = Inductor;
 
-	// inductor is modeled as a voltage source (veq) with impedance (geq)
-
-	Inductor.prototype.reset = function() {
-	    this.flux = 0;	// state variable (flux)
-	    this.v = 0;		// dstate/dt (voltage)
-	    this.prev_flux = 0;	// last iteration
-	    this.prev_v = 0;
+        Inductor.prototype.load_linear = function(ckt) {
+	    // MNA stamp for inductor linear part
+	    // L on diag of C because L di/dt = v(n1) - v(n2)
+	    ckt.add_to_Gl(this.n1,this.branch,1);
+	    ckt.add_to_Gl(this.branch,this.n1,1);
+	    ckt.add_to_Gl(this.n2,this.branch,-1);
+	    ckt.add_to_Gl(this.branch,this.n2,-1);
+	    ckt.add_to_C(this.branch,this.branch,this.value)
 	}
 
-	Inductor.prototype.finalize = function(ckt) {
-	    // call us at the end of each timestep
-	    ckt.end_of_timestep.push(this);
-	}
-
-	Inductor.prototype.end_of_timestep = function(ckt) {
-	    // update state when timestep is accepted
-	    this.prev_flux = this.flux;
-	    this.prev_v = this.v;
-	}
-
-	Inductor.prototype.load_dc = function(ckt) {
-	    // short circuit: veq = 0, req = 0
-	    ckt.add_to_A(this.n1,this.branch,1);
-	    ckt.add_to_A(this.branch,this.n1,1);
-	    ckt.add_to_A(this.n2,this.branch,-1);
-	    ckt.add_to_A(this.branch,this.n2,-1);
-	}
-
-	Inductor.prototype.load_tran = function(ckt,soln) {
-	    this.flux = this.value * soln[this.branch];   // set flux
-
-	    // integrate
-	    // for backward Euler: coeff0 = 1/timestep, coeff1 = 0
-	    // for trapezoidal: coeff0 = 2/timestep, coeff1 = 1
-	    this.v = ckt.coeff0*(this.flux - this.prev_flux) - ckt.coeff1*this.prev_v;
-	    var veq = this.v - ckt.coeff0*this.flux;
-	    var req = ckt.coeff0 * this.value;
-
-	    // MNA stamp for voltage source with impedance
-	    ckt.add_to_b(this.branch,veq);
-	    ckt.add_to_A(this.branch,this.branch,-req);
-	    ckt.add_to_A(this.n1,this.branch,1);
-	    ckt.add_to_A(this.branch,this.n1,1);
-	    ckt.add_to_A(this.n2,this.branch,-1);
-	    ckt.add_to_A(this.branch,this.n2,-1);
+	Inductor.prototype.load_dc = function(ckt,soln,rhs) {
+	    // Inductor is a short at dc, so is linear.
 	}
 
 	Inductor.prototype.load_ac = function(ckt) {
-	    ckt.add_to_A(this.branch,this.branch,-ckt.omega * this.value);
-	    ckt.add_to_A(this.n1,this.branch,1);
-	    ckt.add_to_A(this.branch,this.n1,1);
-	    ckt.add_to_A(this.n2,this.branch,-1);
-	    ckt.add_to_A(this.branch,this.n2,-1);
 	}
+
+	Inductor.prototype.load_tran = function(ckt) {
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	//
+	//  Simplified MOS FET with no bulk connection and no body effect.
+	//
+	///////////////////////////////////////////////////////////////////////////////
+
+
+        function Fet(d,g,s,ratio,name,type) {
+	    Device.call(this);
+	    this.d = d;
+	    this.g = g;
+	    this.s = s;
+	    this.name = name;
+	    this.ratio = ratio;
+	    if (type != 'n' && type != 'p')
+	    { throw 'fet type is not n or p';
+	    }
+	    this.type_sign = (type == 'n') ? 1 : -1;
+	    this.vt = 0.5;
+	    this.kp = 20e-6;
+            this.beta = this.kp * this.ratio;
+	    this.lambda = 0.05;
+	}
+	Fet.prototype = new Device();
+        Fet.prototype.constructor = Fet;
+
+        Fet.prototype.load_linear = function(ckt) {
+	    // FET's are nonlinear, just like javascript progammers
+	}
+
+        Fet.prototype.load_dc = function(ckt,soln,rhs) {
+	    var vds = this.type_sign * ckt.get_two_terminal(this.d, this.s, soln);
+	    if (vds < 0) { // Drain and source have swapped roles
+		var temp = this.d;
+		this.d = this.s;
+		this.s = temp;
+		vds = this.type_sign * ckt.get_two_terminal(this.d, this.s, soln);
+	    }
+	    var vgs = this.type_sign * ckt.get_two_terminal(this.g, this.s, soln);
+	    var vgst = vgs - this.vt;
+	    with (this) {
+		var gmgs,ids,gds;
+		if (vgst > 0.0 ) { // vgst < 0, transistor off, no subthreshold here.
+		    if (vgst < vds) { /* Saturation. */
+			gmgs =  beta * (1 + (lambda * vds)) * vgst;
+			ids = type_sign * 0.5 * gmgs * vgst;
+			gds = 0.5 * beta * vgst * vgst * lambda;
+		    } else {  /* Linear region */
+			gmgs =  beta * (1 + lambda * vds);
+			ids = type_sign * gmgs * vds * (vgst - 0.50 * vds);
+			gds = gmgs * (vgst - vds) + beta * lambda * vds * (vgst - 0.5 * vds);
+			gmgs *= vds;
+		    }
+		    ckt.add_to_rhs(d,-ids,rhs);  // current flows into the drain
+		    ckt.add_to_rhs(s, ids,rhs);   // and out the source		    
+		    ckt.add_conductance(d,s,gds);
+		    ckt.add_to_G(s,s, gmgs);
+		    ckt.add_to_G(d,s,-gmgs);
+		    ckt.add_to_G(d,g, gmgs);
+		    ckt.add_to_G(s,g,-gmgs);
+		}
+	    }
+	}
+
+	Fet.prototype.load_tran = function(ckt,soln,rhs) {
+	    this.load_dc(ckt,soln,rhs);
+	}
+
+	Fet.prototype.load_ac = function(ckt) {
+	}
+
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
@@ -1021,6 +1331,7 @@ cktsim = (function() {
 	///////////////////////////////////////////////////////////////////////////////
 	var module = {
 	    'Circuit': Circuit,
+	    'parse_number': parse_number,
 	}
 	return module;
     }());
