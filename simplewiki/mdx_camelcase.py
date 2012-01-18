@@ -104,7 +104,7 @@ class CamelCaseLinks(markdown.inlinepatterns.Pattern):
         if  m.group('escape') == '\\':
             a = etree.Element('a')#doc.createTextNode(m.group('camelcase'))
         else :
-            url = m.group('camelcase')
+            url = m.group('camelcase') + "/"
                              #'%s%s%s'% (self.md.wiki_config['base_url'][0], \
                              #m.group('camelcase'), \
                              #self.md.wiki_config['end_url'][0])
