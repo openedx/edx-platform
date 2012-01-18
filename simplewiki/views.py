@@ -236,7 +236,7 @@ def history(request, wiki_url, page=1):
 
     return render_to_response('simplewiki_history.html', d)
 
-def search_articles(request, wiki_url):
+def search_articles(request):
     if not request.user.is_authenticated():
         return redirect('/')
     # blampe: We should check for the presence of other popular django search
@@ -247,31 +247,33 @@ def search_articles(request, wiki_url):
     
     if request.method == 'POST':
         querystring = request.POST['value'].strip()
-        if querystring:
-            results = Article.objects.all()
-            for queryword in querystring.split():
-                # Basic negation is as fancy as we get right now
-                if queryword[0] == '-' and len(queryword) > 1:
-                    results._search = lambda x: results.exclude(x)
-                    queryword = queryword[1:]
-                else:
-                    results._search = lambda x: results.filter(x)
-                    
-                results = results._search(Q(current_revision__contents__icontains = queryword) | \
-                                          Q(title__icontains = queryword))
-        else:
-            # Need to throttle results by splitting them into pages...
-            results = Article.objects.all()
+    else:
+        querystring = ""
 
-        if results.count() == 1:
-            return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
-        else:        
-            d = {'wiki_search_results': results,
-                	'wiki_search_query': querystring}
-            d.update(csrf(request))
-            return render_to_response('simplewiki_searchresults.html', d)
-    
-    return view(request, wiki_url)
+    if querystring:
+        results = Article.objects.all()
+        for queryword in querystring.split():
+            # Basic negation is as fancy as we get right now
+            if queryword[0] == '-' and len(queryword) > 1:
+                results._search = lambda x: results.exclude(x)
+                queryword = queryword[1:]
+            else:
+                results._search = lambda x: results.filter(x)
+                    
+            results = results._search(Q(current_revision__contents__icontains = queryword) | \
+                                      Q(title__icontains = queryword))
+    else:
+        # Need to throttle results by splitting them into pages...
+        results = Article.objects.all()
+
+    if results.count() == 1:
+        return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
+    else:        
+        d = {'wiki_search_results': results,
+            	'wiki_search_query': querystring}
+        d.update(csrf(request))
+        return render_to_response('simplewiki_searchresults.html', d)
+        
 
 def search_add_related(request, wiki_url):
     if not request.user.is_authenticated():
@@ -350,7 +352,7 @@ def remove_related(request, wiki_url, related_id):
     finally:
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
-def random_article(request, wiki_url):
+def random_article(request):
     if not request.user.is_authenticated():
         return redirect('/')
     from random import randint
@@ -398,7 +400,7 @@ def fetch_from_url(request, url):
 
     path = Article.get_url_reverse(url_path, root)
     if not path:
-        err = not_found(request, '/' + '/'.join(url_path))
+        err = not_found(request, '/'.join([root.slug] + url_path))
     else:
         article = path[-1]
     return (article, path, err)

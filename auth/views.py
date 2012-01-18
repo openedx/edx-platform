@@ -195,7 +195,7 @@ def create_random_account(create_account_function):
                             'honor_code' : u'true',
                             'terms_of_service' : u'true',}
         
-        print "Creating account: " , post_override
+        print "Creating random account: " , post_override
         
         return create_account_function(request, post_override = post_override)
         
