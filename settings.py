@@ -12,9 +12,6 @@ SITE_NAME = "localhost:8000"
 DEFAULT_FROM_EMAIL = 'registration@mitx.mit.edu'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
 
-# For testing the login system
-GENERATE_RANDOM_USER_CREDENTIALS = True
-
 WIKI_REQUIRE_LOGIN_EDIT = True
 WIKI_REQUIRE_LOGIN_VIEW = True
 
