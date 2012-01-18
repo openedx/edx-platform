@@ -10,6 +10,7 @@ from auth.models import UserProfile
 from django.shortcuts import redirect
 
 import StringIO
+import track.views
 
 from django.http import Http404
 
@@ -34,6 +35,11 @@ modx_modules={'problem':capa_module.LoncapaModule,
               'video':video_module.VideoModule,
               'html':html_module.HtmlModule,
               'schematic':schematic_module.SchematicModule}
+
+def make_track_function(request):
+    def f(event_type, event):
+        return track.views.server_track(request, event_type, event, page='x_module')
+    return f
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
@@ -60,7 +66,8 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     instance=modx_modules[module](xml, 
                                   s.module_id, 
                                   ajax_url=ajax_url, 
-                                  state=s.state)
+                                  state=s.state, 
+                                  track_function = make_track_function(request))
     # Let the module handle the AJAX
     ajax_return=instance.handle_ajax(dispatch, request.POST)
     # Save the state back to the database
@@ -153,7 +160,8 @@ def render_x_module(request, xml_module):
     instance=module_class(xml_module.toxml(), 
                           module_id, 
                           ajax_url=ajax_url,
-                          state=state)
+                          state=state, 
+                          track_function = make_track_function(request))
     
     # If instance wasn't already in the database, create it
     if len(s) == 0:
