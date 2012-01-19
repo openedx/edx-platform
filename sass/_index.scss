@@ -65,9 +65,24 @@ header.announcement {
   color: #fff;
   border-bottom: 1px solid #000;
   background: #e3e3e3;
+  @include background-size(cover);
+
+  &.home {
+
+    @media screen and (min-width: 1200px) {
+      background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg");
+    }
+
+    @media screen and (max-width: 1199px) and (min-width: 700px) {
+      background: #e3e3e3 url("/static/images/marketing/shot-1-medium.jpg");
+    }
+
+    // @media screen and (max-width: 699px) {
+    //   background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
+    // }
+  }
 
   &.course {
-    @include background-size(cover);
 
     @media screen and (min-width: 1200px) {
       background: #e3e3e3 url("/static/images/marketing/course-bg-large.jpg");
@@ -151,14 +166,13 @@ header.announcement {
 
           a {
             @extend .button;
-            background-color: #fff;
-            color: #333;
+            background-color: darken($mit-red, 20%);
             display: block;
             padding: lh(.5) lh();
             text-align: center;
 
             &:hover {
-              background-color: rgba(#fff, .8);
+              background-color: darken($mit-red, 10%);
             }
           }
         }
