@@ -16,7 +16,7 @@ function goto_page(n) {
   if(n<10) {
     prefix="00";
   }
-  $("#bookpage").attr("src","/static/book/p"+prefix+n+".jpg");
+  $("#bookpage").attr("src","/static/book/small-p"+prefix+n+".jpg");
 };
 
 function prev_page() {
@@ -56,7 +56,7 @@ function next_page() {
           </ul>
         </nav>
 
-        <img id="bookpage" src="/static/book/p${ "%03i"%(page) }.jpg">
+        <img id="bookpage" src="/static/book/small-p${ "%03i"%(page) }.jpg">
       </section>
     </section>
   </div>
