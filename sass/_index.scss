@@ -1,32 +1,115 @@
 @font-face {
-  font-family: 'Oswald';
+  font-family: 'Open Sans';
   font-style: normal;
-  font-weight: normal;
-  src: local('Oswald '), local('Oswald'), url('http://themes.googleusercontent.com/static/fonts/oswald/v3/qpy-UiLNKP-VfOdbcs6r6-vvDin1pK8aKteLpeZ5c0A.woff') format('woff');
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 800;
+  src: local('Open Sans Extrabold'), local('OpenSans-Extrabold'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/EInbV5DfGHOiMmvb1Xr-hqRDOzjiPcYnFooOUGCOsRk.woff') format('woff');
+}
+
+
+
+// Extends
+//---------------------------------------- //
+.wrapper {
+  @include box-sizing(border-box);
+  margin: 0 auto;
+  max-width: $fg-max-width;
+  min-width: $fg-min-width;
+  padding: lh();
+  width: flex-grid(12);
+}
+
+.clearfix:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+.button {
+  @include border-radius(3px);
+  @include border-radius(3px);
+  @include inline-block();
+  @include transition();
+  background-color: $mit-red;
+  color: #fff;
+  margin: lh() 0 lh(.5);
+  padding: lh(.25) lh(.5);
+  text-decoration: none;
+
+  &:hover {
+    background-color: darken($mit-red, 10%);
+  }
+
+  span {
+    font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
+    font-style: italic;
+  }
+}
+
+
+body {
+  background-color: #fff;
+  color: #444;
+  font: $body-font-size $body-font-family;
 }
 
 header.announcement {
-  background: $mit-red;
-  border-top: 3px solid darken($mit-red, 10%);
   color: #fff;
+  border-bottom: 1px solid #000;
+  background: #e3e3e3;
+
+  &.course {
+    @include background-size(cover);
+
+    @media screen and (min-width: 1200px) {
+      background: #e3e3e3 url("/static/images/marketing/course-bg-large.jpg");
+    }
+
+    @media screen and (max-width: 1199px) and (min-width: 700px) {
+      background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg");
+    }
+
+    @media screen and (max-width: 699px) {
+      background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
+    }
+  }
 
   div {
     @extend .wrapper;
-    padding: 80px $body-line-height 60px;
+    padding: lh(10) lh() lh(3);
     position: relative;
-    @include box-sizing(border-box);
 
     nav {
       position: absolute;
-      top: 20px;
-      right: 0;
+      top: 0;
+      right: lh();
+      @include border-radius(0 0 3px 3px);
+      background: rgba(#000, .7);
+      padding: lh(.5);
+
+      h1 {
+        @include inline-block();
+        margin-right: lh();
+
+        a {
+          font: 800 18px $header-font-family;
+          color: #fff;
+          text-decoration: none;
+        }
+      }
 
       a.login {
-        text-transform: uppercase;
+        text-decoration: none;
         color: #fff;
         font-size: 12px;
-        margin-right: 20px;
-        text-shadow: 0 -1px 0 darken($mit-red, 10%);
 
         &:hover {
           color: rgba(#fff, .6);
@@ -36,38 +119,53 @@ header.announcement {
 
     section {
       @extend .clearfix;
-      padding-left: grid-width(3);
+      @include inline-block();
+      background: $mit-red;
+      margin-left: flex-grid(4) + flex-gutter();
+      padding: lh() lh(1.5);
 
       h1 {
-        font-family: "Oswald";
-        font-size: 62px;
+        @include inline-block();
+        font-family: "Open Sans";
+        font-size: 30px;
+        font-weight: 800;
         line-height: 1.2em;
-        margin: 0;
-        text-transform: uppercase;
-        text-shadow: 0 -2px 0 darken($mit-red, 10%);
+        margin: 0 lh() 0 0;
       }
 
-      p {
-        line-height: 1.6em;
-        max-width: 700px;
-        margin: 2em 0 0;
+      h2 {
+        @include inline-block();
+        font-family: "Open Sans";
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 1.2em;
       }
 
       &.course {
-        padding-left: grid-width(4) + $gw-gutter;
+        section {
+          width: flex-grid(4, 8);
+          margin-right: flex-gutter(8);
+          float: left;
+          margin-left: 0;
+          padding: 0;
 
-        a.enroll {
-          @include button(#fff);
-          @include inline-block();
-          @include box-shadow(0 1px 0 lighten($mit-red, 10%));
-          margin-top: lh();
-          font-size: 18px;
-          padding: lh(.5);
-          border-color: darken($mit-red, 10%);
+          a {
+            @extend .button;
+            background-color: #fff;
+            color: #333;
+            display: block;
+            padding: lh(.5) lh();
+            text-align: center;
 
-          &:hover {
-            text-decoration: none;
+            &:hover {
+              background-color: rgba(#fff, .8);
+            }
           }
+        }
+
+        p {
+          width: flex-grid(4, 8);
+          float: left;
         }
       }
     }
@@ -75,118 +173,241 @@ header.announcement {
 }
 
 section.index-content {
-  @extend .main-content;
   @extend .wrapper;
-  @include box-sizing(border-box);
-  padding: lh();
+  @extend .clearfix;
 
   section {
-    width: grid-width(6);
     @extend .clearfix;
     float: left;
 
-    &.about {
-      margin-right: $gw-gutter;
-    }
-
-    &.about-course {
-      width: grid-width(12);
-      float: none;
-      @extend .clearfix;
-
-      section {
-        width: grid-width(4);
-        margin-right: $gw-gutter;
-
-        &.requirements {
-          margin-right: 0;
-        }
-      }
-    }
-
-    &.staff {
-      @extend .clearfix;
-      border-top: 1px solid #eee;
-      float: none;
-      width: grid-width(12);
-      margin-top: lh();
-      padding-top: lh();
-
-      ul {
-        list-style: none;
-        margin: 0;
-
-        li {
-          width: grid-width(3);
-          list-style: none;
-          float: left;
-          margin-right: $gw-gutter;
-
-          img {
-            float: left;
-            margin: 0 1em 1em 0;
-          }
-
-          &:last-child {
-            margin-right: 0;
-          }
-        }
-      }
-    }
-
     h1 {
-      font-size: 34px;
-      margin-top: 0;
-      font-family: "Oswald";
+      font-size: 24px;
+      font-weight: 800;
+      font-family: "Open Sans";
+      margin-bottom: lh();
+    }
+
+    p {
+      line-height: lh();
+      margin-bottom: lh();
     }
 
     ul {
-      margin: 0 grid-width(1) 1em;
-      list-style: disc outside none;
+      margin: 0;
+      // list-style: disc outside none;
 
-      li {
-        list-style: disc outside none;
+      // li {
+      //   list-style: disc outside none;
+      // }
+    }
+
+    &.about {
+      width: flex-grid(8);
+      margin-right: flex-gutter() / 2;
+      border-right: 1px solid #e5e5e5;
+      padding-right: flex-gutter() / 2;
+
+      section {
+        @extend .clearfix;
+        margin-bottom: lh();
+
+        p {
+          width: flex-grid(4, 8);
+          float: left;
+
+          &:nth-child(odd) {
+            margin-right: flex-gutter(8);
+          }
+        }
+
+        &.features {
+          border-top: 1px solid #E5E5E5;
+          padding-top: lh();
+          margin-bottom: 0;
+
+          h2 {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: lh();
+          }
+
+          p {
+            width: auto;
+
+            strong {
+              font-family: "Open sans";
+              font-weight: 800;
+            }
+
+            a {
+              color: $mit-red;
+              text-decoration: none;
+              @include transition();
+
+              &:hover, &:focus {
+                color: darken($mit-red, 15%);
+              }
+            }
+          }
+
+          ul {
+            margin-bottom: 0;
+
+            li {
+              line-height: lh();
+              width: flex-grid(4, 8);
+              float: left;
+              margin-bottom: lh(.5);
+
+              &:nth-child(odd) {
+                margin-right: flex-gutter(8);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.course, &.staff {
+      width: flex-grid(4);
+
+      h1 {
+        font: normal $body-font-size $body-font-family;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #666;
+        margin-bottom: lh();
+      }
+
+      h2 {
+        font: 800 24px $header-font-family;
+      }
+
+      h3 {
+        font: 400 18px $header-font-family;
+      }
+
+      a {
+        @extend .button;
+      }
+
+      ul {
+        li {
+          img {
+            float: left;
+            margin-right: lh(.5);
+          }
+        }
+      }
+    }
+
+    &.course {
+      h2 {
+        padding-top: lh(5);
+        background: url('/static/images/marketing/circuits-bg.jpg') 0 0 no-repeat;
+        @include background-size(contain);
+
+        @media screen and (max-width: 998px) {
+          background: url('/static/images/marketing/circuits-medium-bg.jpg') 0 0 no-repeat;
+        }
+      }
+    }
+
+
+    // index
+    //---------------------------------------- //
+    &.about-course {
+      width: flex-grid(8);
+      margin-right: flex-gutter() / 2;
+      border-right: 1px solid #e5e5e5;
+      padding-right: flex-gutter() / 2;
+
+      section {
+        width: flex-grid(4, 8);
+
+
+        &.about-info {
+          margin-right: flex-gutter(8);
+        }
+
+        &.requirements {
+          clear: both;
+          width: auto;
+          border-top: 1px solid #E5E5E5;
+          padding-top: lh();
+          margin-bottom: 0;
+
+          p {
+            float: left;
+            width: flex-grid(4, 8);
+            margin-right: flex-gutter(8);
+
+            &:nth-child(odd) {
+              margin-right: 0;
+            }
+          }
+        }
+
+        &.cta {
+          width: 100%;
+
+          a.enroll {
+            @extend .button;
+            padding: lh(.5) lh();
+            display: block;
+            text-align: center;
+            font: 800 18px $header-font-family;
+          }
+        }
+      }
+    }
+  }
+}
+
+footer {
+  @extend .wrapper;
+  @extend .clearfix;
+  padding-top: 0;
+
+  div.footer-wrapper {
+    border-top: 1px solid #e5e5e5;
+    padding: lh() 0;
+    background: url('/static/images/marketing/mit-logo.png') right center no-repeat;
+
+    a {
+      color: #888;
+      text-decoration: none;
+      @include transition();
+
+      &:hover, &:focus {
+        color: #666;
       }
     }
 
     p {
-      line-height: 1.5;
-    }
-
-    a.more-info {
-      // @extend .button;
-      @include button(simple, $mit-red);
       @include inline-block();
-      margin-top: lh();
-      font-size: 18px;
-      padding: lh(.5);
-
-      &:hover {
-        text-decoration: none;
-      }
+      margin-right: lh();
     }
-  }
 
-  div.secondary {
-    border-top: 1px solid #eee;
-    margin-top: lh();
-    padding-top: lh();
+    ul {
+      @include inline-block();
 
-    section {
-      text-align: center;
-      width: auto;
-      float: none;
-
-      a.enroll {
-        @include button(simple, $mit-red);
+      li {
         @include inline-block();
-        margin-top: lh();
-        font-size: 18px;
-        padding: lh(.5);
 
-        &:hover {
-          text-decoration: none;
+        &:after {
+          content: ' |';
+          display: inline;
+          color: #ccc;
         }
+
+        &:last-child {
+          &:after {
+            content: none;
+          }
+        }
+
       }
     }
   }

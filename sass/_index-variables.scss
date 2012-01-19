@@ -1,0 +1,27 @@
+// Variables
+//---------------------------------------- //
+// // grid
+$fg-column: 60px;
+$fg-gutter: 25px;
+$fg-max-columns: 12;
+$fg-max-width: 1400px;
+$fg-min-width: 810px;
+
+$gw-column: 60px;
+$gw-gutter: 25px;
+
+$body-font-family: Georgia, serif;
+$header-font-family: "Open Sans", Helvetica, Arial, sans-serif;
+
+// @media screen and (min-width: 940px) {
+  $body-font-size: 16px;
+// }
+
+
+// @media screen and (max-width: 939px) {
+//   $body-font-size: 14px;
+// }
+
+$lh: golden-ratio($body-font-size, 1);
+
+$mit-red: #990000;
