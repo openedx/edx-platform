@@ -179,6 +179,7 @@ header.announcement {
 
         p {
           width: flex-grid(4, 8);
+          line-height: lh();
           float: left;
         }
       }
