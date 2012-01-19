@@ -21,7 +21,7 @@ ${wiki_error}
 %if wiki_url is not UNDEFINED:
 <p>
 The page you requested could not be found.
-Click <a href="{% url wiki_create wiki_url %}">here</a> to create it.
+Click <a href="${reverse("wiki_create", args=[wiki_url])}">here</a> to create it.
 </p>
 %else:
 <p>

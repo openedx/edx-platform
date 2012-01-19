@@ -89,8 +89,8 @@
 
       <ul class="action">
         <li>
-    	            <div class="wiki_box_title">Search</div>
-    	        <form method="POST" action='${reverse("wiki_search_articles", args=[""])}'>
+    	        <div class="wiki_box_title">Search</div>
+    	        <form method="POST" action='${reverse("wiki_search_articles", args=[])}'>
     	            <div style="display:none">
                 	    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
                 	</div>
@@ -99,8 +99,12 @@
     	        </form>
         </li>
         <li>
-          <input type="button" onclick="javascript:location.href='${reverse("wiki_random", args=["wiki_articleget_url"])}'" value="Random article" class="button" />
+          <input type="button" onclick="javascript:location.href='${reverse("wiki_random", args=[])}'" value="Random article" class="button" />
         </li>
+        <li>
+          <input type="button" onclick="javascript:location.href='${reverse("wiki_list_articles", args=[])}'" value="All articles" class="button" />
+        </li>
+        
 
         <li class="create-article">
           <h3>
