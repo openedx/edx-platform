@@ -48,3 +48,6 @@ def send_feedback(request):
               fail_silently = False
               )
     return HttpResponse(json.dumps({'success':True}))
+
+def info(request):
+    return render_to_response("info.html", {})

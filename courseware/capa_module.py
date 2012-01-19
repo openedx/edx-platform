@@ -108,8 +108,8 @@ class LoncapaModule(XModule):
             
         return html
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state)
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None):
+        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function)
 
         self.attempts = 0
         self.max_attempts = None
@@ -222,21 +222,31 @@ class LoncapaModule(XModule):
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and
             returns a map of correct/incorrect answers'''
+        event_info = dict()
+        event_info['state'] = self.lcp.get_state()
+        event_info['filename'] = self.filename
+
+        answers=dict()
+        # input_resistor_1 ==> resistor_1
+        for key in get:
+            answers['_'.join(key.split('_')[1:])]=get[key]
+
+        event_info['answers']=answers
+
         # Too late. Cannot submit
         if self.closed():
+            event_info['failure']='closed'
+            self.tracker('save_problem_check_fail', event_info)
             print "cp"
             raise Http404
             
         # Problem submitted. Student should reset before checking
         # again.
         if self.lcp.done and self.rerandomize:
+            event_info['failure']='unreset'
+            self.tracker('save_problem_check_fail', event_info)
             print "cpdr"
             raise Http404
-
-        answers=dict()
-        # input_resistor_1 ==> resistor_1
-        for key in get:
-            answers['_'.join(key.split('_')[1:])]=get[key]
 
         try:
             old_state = self.lcp.get_state()
@@ -262,35 +272,56 @@ class LoncapaModule(XModule):
         js=json.dumps({'correct_map' : correct_map,
                        'success' : success})
 
+        event_info['correct_map']=correct_map
+        event_info['success']=success
+
+        self.tracker('save_problem_check', event_info)
+
         return js
 
     def save_problem(self, get):
+        event_info = dict()
+        event_info['state'] = self.lcp.get_state()
+        event_info['filename'] = self.filename
+
+        answers=dict()
+        for key in get:
+            answers['_'.join(key.split('_')[1:])]=get[key]
+        event_info['answers'] = answers
+
         # Too late. Cannot submit
         if self.closed():
-            print "sp"
+            event_info['failure']='closed'
+            self.tracker('save_problem_fail', event_info)
             return "Problem is closed"
             
         # Problem submitted. Student should reset before saving
         # again.
         if self.lcp.done and self.rerandomize:
-            print "spdr"
+            event_info['failure']='done'
+            self.tracker('save_problem_fail', event_info)
             return "Problem needs to be reset prior to save."
 
-        answers=dict()
-        for key in get:
-            answers['_'.join(key.split('_')[1:])]=get[key]
-        
         self.lcp.student_answers=answers
 
+        self.tracker('save_problem_fail', event_info)
         return json.dumps({'success':True})
 
     def reset_problem(self, get):
         ''' Changes problem state to unfinished -- removes student answers, 
             and causes problem to rerender itself. '''
+        event_info = dict()
+        event_info['old_state']=self.lcp.get_state()
+        event_info['filename']=self.filename
+
         if self.closed():
+            event_info['failure']='closed'
+            self.tracker('reset_problem_fail', event_info)
             return "Problem is closed"
             
         if not self.lcp.done:
+            event_info['failure']='not_done'
+            self.tracker('reset_problem_fail', event_info)
             return "Refresh the page and make an attempt before resetting."
 
         self.lcp.done=False
@@ -307,8 +338,7 @@ class LoncapaModule(XModule):
         filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
         self.lcp=LoncapaProblem(filename, self.item_id, self.lcp.get_state())
 
-        event_info = self.lcp.get_state()
-        event_info.update({'filename':filename})
-        #server_track(request, 'reset_problem', event_info)
+        event_info['new_state']=self.lcp.get_state()
+        self.tracker('reset_problem', event_info)
 
         return json.dumps(self.get_problem_html(encapsulate=False))

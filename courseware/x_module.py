@@ -1,3 +1,6 @@
+def dummy_track(event_type, event):
+    pass
+
 class XModule(object):
     ''' Implements a generic learning module. 
         Initialized on access with __init__, first time with state=None, and
@@ -36,10 +39,11 @@ class XModule(object):
             get is a dictionary-like object ''' 
         return ""
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None):
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None):
         ''' In most cases, you must pass state or xml'''
         self.xml=xml
         self.item_id=item_id
         self.ajax_url=ajax_url
         self.track_url=track_url
         self.state=state
+        self.tracker=track_function
