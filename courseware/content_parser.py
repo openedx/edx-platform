@@ -4,9 +4,9 @@ try:
 except: 
     settings = None 
 
-from xml.dom.minidom import parse, parseString
-
 from lxml import etree
+
+import json
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
@@ -56,7 +56,6 @@ def item(l, default="", process=lambda x:x):
     else:
         raise Exception('Malformed XML')
     
-
 def course_file(user):
     # TODO: Cache. Also, return the libxml2 object. 
     return settings.DATA_DIR+UserProfile.objects.get(user=user).courseware
@@ -84,26 +83,26 @@ def module_xml(coursefile, module, id_tag, module_id):
     #return result_set[0].serialize()
 
 def toc_from_xml(coursefile, active_chapter, active_section):
-    dom=parse(coursefile)
+    dom2 = etree.parse(coursefile)
 
-    course = dom.getElementsByTagName('course')[0]
-    name=course.getAttribute("name")
-    chapters = course.getElementsByTagName('chapter')
+    name = dom2.xpath('//course/@name')[0]
+
+    chapters = dom2.xpath('//course[@name=$name]/chapter', name=name)
     ch=list()
     for c in chapters:
-        if c.getAttribute("name") == 'hidden':
+        if c.get('name') == 'hidden':
             continue
         sections=list()
-        for s in c.getElementsByTagName('section'):
-            sections.append({'name':s.getAttribute("name"), 
-                             'time':s.getAttribute("time"), 
-                             'format':s.getAttribute("format"), 
-                             'due':s.getAttribute("due"),
-                             'active':(c.getAttribute("name")==active_chapter and \
-                                           s.getAttribute("name")==active_section)})
-        ch.append({'name':c.getAttribute("name"), 
+        for s in dom2.xpath('//course[@name=$name]/chapter[@name=$chname]/section', name=name, chname=c.get('name')): 
+            sections.append({'name':s.get("name") or "", 
+                             'time':s.get("time") or "", 
+                             'format':s.get("format") or "", 
+                             'due':s.get("due") or "",
+                             'active':(c.get("name")==active_chapter and \
+                                           s.get("name")==active_section)})
+        ch.append({'name':c.get("name"), 
                    'sections':sections,
-                   'active':(c.getAttribute("name")==active_chapter)})
+                   'active':(c.get("name")==active_chapter)})
     return ch
 
 def dom_select(dom, element_type, element_name):
