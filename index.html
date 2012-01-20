@@ -1,16 +1,19 @@
-<%inherit file="main.html" /> 
+<%inherit file="marketing.html" /> 
 
-<header class="announcement">
+<header class="announcement course">
   <div class="anouncement-wrapper">
   <nav>
+    <h1><a href="/t/mitx_global.html">MITx</a></h1>
     <a class="modal login" href="#login">Log In</a>
   </nav>
 
     <section class="course">
-      <h2>6.002</h2>
-      <h1>Circuits &amp; Electronics</h1>
-      <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, "6.002 Circuits and Electronics" is an on-line adaption of MIT's first undergraduate analog design course. This course will run, free of charge, for students worldwide from February 1, 2012 through July 1, 2012.</p>
-      <a class="modal enroll" href="#enroll">Enroll in 6.002 Circuits &amp; Electronics</a>
+      <section>
+        <h1>Circuits &amp; Electronics</h1>
+        <h2>6.002</h2>
+        <a class="modal enroll" href="#enroll">Enroll in 6.002 Circuits <span>&amp;</span> Electronics</a>
+      </section>
+      <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, &ldquo;6.002x Circuits and Electronics&rdquo; is an experimental on-line adaption of MIT's first undergraduate analog design course 6.002. This course will run, free of charge, for students worldwide  from February 21, 2012 through June&nbsp;10,&nbsp;2012.</p>
     </section>
   </div>
 
@@ -20,57 +23,67 @@
 <section class="index-content">
   <section class="about-course">
   
-    <section>
+    <section class="about-info">
       <h1>About 6.002</h1>
   
-      <p> 6.002 is designed to serve as a first course in an undergraduate electrical engineering (EE), or electrical engineering and computer science (EECS) curriculum. At MIT, 6.002 is in the core of department subjects required for all undergraduates in EECS.</p>
-  
-      <p> The course introduces engineering in the context of the lumped circuit abstraction. Topics covered include: resistive elements and networks; independent and dependent sources; switches and MOS transistors; digital abstraction; amplifiers; energy storage elements; dynamics of first- and second-order networks; design in the time and frequency domains; and analog and digital circuits and applications. Design and lab exercises are also significant components of the course. 6.002 is worth 4 Engineering Design Points. The 6.002 content was created collaboratively by Profs. Anant Agarwal and Jeffrey H. Lang.</p>
-  
+      <p>6.002x is designed to serve as a first course in an undergraduate electrical engineering (EE), or electrical engineering and computer science (EECS) curriculum. At MIT, 6.002 is in the core of department subjects required for all undergraduates in EECS.</p>
+
+<p>The course introduces engineering in the context of the lumped circuit abstraction. Topics covered include: resistive elements and networks; independent and dependent sources; switches and MOS transistors; digital abstraction; amplifiers; energy storage elements; dynamics of first- and second-order networks; design in the time and frequency domains; and analog and digital circuits and applications. Design and lab exercises are also significant components of the course. Students should expect to spend approximately 10  hours per week on the course.  The 6.002 content was created collaboratively by Profs. Anant Agarwal and Jeffrey H. Lang.</p>
+
       <!-- <p> The course uses the textbook Foundations of Analog and Digital Electronic Circuits. Agarwal, Anant, and Jeffrey H. Lang. San Mateo, CA: Morgan Kaufmann Publishers, Elsevier, July 2005. ISBN: 9781558607354. While recommended, the book is not required -- relevant section will be provided electronically as part of the on-line course.</p> -->
     </section>
   
-    <section>
-      <h1>6.002 on <a href="/t/mitx_global.html">MITx</a></h1> <!-- Link doesn't need to be here, but there should be some way to get back to main MITx site -->
+    <section class="on-mitx">
+      <h1>6.002 on MITx</h1> <!-- Link doesn't need to be here, but there should be some way to get back to main MITx site -->
 
-      <p> Students who successfully complete the course will receive an electronic certificate of accomplishment from MIT. Students will not receive course credit, but students successfully finishing the course will be well-placed to take an exam to pass out of 6.002 should they ever enroll at MIT, and potentially, similar courses at other schools.</p>
+      <p>Students who successfully complete the course will receive an electronic certificate of accomplishment from MIT. Since this is an experimental version of the course, the certificate will be marked as Beta.</p>
 
-      <p> In order to succeed in this course, students must have some background in calculus and differential equations. Since more advanced mathematics will not show up until the second half of the course, the first half of the course will include an optional remedial differential equations component for students with weaker math backgrounds.</p>
+<p> The course uses the textbook Foundations of Analog and Digital Electronic Circuits. Agarwal, Anant, and Jeffrey H. Lang.  Morgan Kaufmann Publishers, Elsevier, July 2005. ISBN: 9781558607354. While recommended, the book is not required -- relevant sections will be provided electronically as part of the on-line course. The book can be purchased on <a href="http://www.amazon.com/exec/obidos/ASIN/1558607358/ref=nosim" target="_blank">Amazon</a>. Copyright for the book is with Elsevier and the book cannot be printed etc.</p>
     </section>
 
     <section class="requirements">
       <h1> Requirements </h1>
 
-      <p> Students entering the course are expected to know how basic calculus and differential equations, as well as basic linear algebra. In addition, a background in E&amp;M is helpful, although not critical.</p>
+      <p>In order to succeed in this course, students must have taken an  AP level physics course in electricity and magnetism.  Students must know basic calculus and  linear algebra, and have some background in differential equations. Since more advanced mathematics will not show up until the second half of the course, the first half of the course will include an optional remedial differential equations component for students with weaker math backgrounds.</p>
   
-      <p> The course web site was developed and tested primarily with Google Chrome. We support Mozilla Firefox as well. While we will attempt to make it possible to complete the course with Internet Explorer, portions of the web site functionality will be unavailable. The videos require Flash. </p>
+      <p>The course web site was developed and tested primarily with Google Chrome. We support Mozilla Firefox as well. While we will attempt to make it possible to complete the course with Internet Explorer, portions of the web site functionality will be unavailable. The videos require Flash.</p>
     </section>
-  
+
+    <section class="cta">
+      <a class="modal enroll" href="#enroll">Enroll in Circuits &amp; Electronics</a>
+    </section>
+
   </section>
+
   <section class="staff">
     <h1>About the course staff</h1>
 
     <ul>
       <li>
+        <img src="/static/staff/agarwal-mit-news-small.jpg">
         <h2>Anant Agarwal</h2>
-        <p><img src="/static/staff/agarwal-mit-news-small.jpg">The Director of MIT's Computer Science and Artificial Intelligence Laboratory. His research focus is in parallel computer architectures, and he is the founder of several successful startups. Most recently, he founded Tilera, which produces scalable multicore embedded processors. He co-author the course textbook "Foundations of Analog and Digital Electronic Circuits."</p></li>
+        <p>The Director of MIT's Computer Science and Artificial Intelligence Laboratory. His research focus is in parallel computer architectures, and he is the founder of several successful startups. Most recently, he founded Tilera, which produces scalable multicore embedded processors. He co-author the course textbook "Foundations of Analog and Digital Electronic Circuits."</p></li>
 
       <li>
+        <img src="/static/staff/cjt-small.jpg">
         <h2>Chris Terman</h2>
-        <p><img src="/static/staff/cjt-small.jpg">The Co-Director MIT CSAIL, and a highly regarded instructor. He is the author of JSim, an educational package for on-line circuit schematic entry and simulation, and XTutor, and on-line question-and-answer tutoring system.</p></li>
+        <p>The Co-Director MIT CSAIL, and a highly regarded instructor. He is the author of JSim, an educational package for on-line circuit schematic entry and simulation, and XTutor, and on-line question-and-answer tutoring system.</p></li>
 
       <li>
+        <img src="/static/staff/gjs-small.jpg">
         <h2>Gerald Sussman</h2>
-        <p><img src="/static/staff/gjs-small.jpg">A Professor of Electrical Engineering at MIT. He is a well know educator in the computer science community, perhaps best know as the author of Structure and Interpretation of Computer Programs, which is universally acknowledged as one of the top ten textboooks in computer science, or as the creator of Scheme, a popular teaching language. His research spans a range of topics, from artificial intelligence, to physics and chaotic systems, to supercomputer design.</p></li>
+        <p>A Professor of Electrical Engineering at MIT. He is a well know educator in the computer science community, perhaps best know as the author of Structure and Interpretation of Computer Programs, which is universally acknowledged as one of the top ten textboooks in computer science, or as the creator of Scheme, a popular teaching language. His research spans a range of topics, from artificial intelligence, to physics and chaotic systems, to supercomputer design.</p></li>
 
       <li>
+        <img src="/static/staff/pmitros-small.jpg">
         <h2>Piotr Mitros</h2>
-        <p><img src="/static/staff/pmitros-small.jpg">A Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Piotr has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p></li>
+        <p>A Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Piotr has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p></li>
     </ul>
 
   </section>
 
-  <div class="secondary">
+
+  <!-- <div class="secondary"> -->
     <!-- <section class="credits"> -->
     <!--   <h1> Credits </h1> -->
 
@@ -85,10 +98,7 @@
     <!--   <p> The system is running in the Amazon cloud, which allows us to hold up to anticipated loads. </p> -->
     <!-- </section> -->
 
-    <section>
-      <a class="modal enroll" href="#enroll">Enroll in Circuits &amp; Electronics</a>
-    </section>
-  </div>
+  <!-- </div> -->
 </section>
 
 <div style="display:none">
