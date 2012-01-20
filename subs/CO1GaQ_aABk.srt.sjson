@@ -1,0 +1,29 @@
+{
+  "start": [
+    250, 
+    3300, 
+    7990, 
+    13470, 
+    17840, 
+    18740, 
+    21970
+  ], 
+  "end": [
+    3300, 
+    7990, 
+    13470, 
+    17840, 
+    18740, 
+    21970, 
+    23220
+  ], 
+  "text": [
+    "SPEAKER 1: OK, so this is case the V-I relationship is V", 
+    "equals capital V. In this is it's a constant and so the", 
+    "relationship is given by this where V is a constant at", 
+    "capital V volts in respect to the current that is flowing", 
+    "through the element.", 
+    "So here are examples of a couple of elements and their", 
+    "I-V relation."
+  ]
+}
