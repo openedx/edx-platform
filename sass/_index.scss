@@ -68,7 +68,6 @@ header.announcement {
   @include background-size(cover);
 
   &.home {
-
     @media screen and (min-width: 1200px) {
       background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg");
     }
@@ -217,10 +216,11 @@ section.index-content {
     }
 
     &.about {
-      width: flex-grid(8);
-      margin-right: flex-gutter() / 2;
+      @include box-sizing(border-box);
       border-right: 1px solid #e5e5e5;
+      margin-right: flex-gutter();
       padding-right: flex-gutter() / 2;
+      width: flex-grid(8);
 
       section {
         @extend .clearfix;
@@ -333,10 +333,11 @@ section.index-content {
     // index
     //---------------------------------------- //
     &.about-course {
-      width: flex-grid(8);
-      margin-right: flex-gutter() / 2;
+      @include box-sizing(border-box);
       border-right: 1px solid #e5e5e5;
+      margin-right: flex-gutter();
       padding-right: flex-gutter() / 2;
+      width: flex-grid(8);
 
       section {
         width: flex-grid(4, 8);
