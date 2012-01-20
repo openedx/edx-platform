@@ -59,6 +59,19 @@ body {
   background-color: #fff;
   color: #444;
   font: $body-font-size $body-font-family;
+
+#{$all-text-inputs}, textarea {
+  @include box-shadow(0 -1px 0 #fff);
+  @include linear-gradient(#eee, #fff);
+  border: 1px solid #999;
+  font: $body-font-size $body-font-family;
+  padding: 4px;
+  width: 100%;
+
+  &:focus {
+    border-color: $mit-red;
+  }
+}
 }
 
 header.announcement {
@@ -76,9 +89,9 @@ header.announcement {
       background: #e3e3e3 url("/static/images/marketing/shot-1-medium.jpg");
     }
 
-    // @media screen and (max-width: 699px) {
-    //   background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
-    // }
+    div {
+      padding: lh(10) lh() lh(3);
+    }
   }
 
   &.course {
@@ -89,16 +102,21 @@ header.announcement {
 
     @media screen and (max-width: 1199px) and (min-width: 700px) {
       background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg");
+      @include background-size(cover);
     }
 
     @media screen and (max-width: 699px) {
       background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
+      @include background-size(cover);
+    }
+
+    div {
+      padding: lh(4) lh() lh(2);
     }
   }
 
   div {
     @extend .wrapper;
-    padding: lh(10) lh() lh(3);
     position: relative;
 
     nav {
