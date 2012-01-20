@@ -621,8 +621,6 @@ div.book-wrapper {
         float: left; }
       div.book-wrapper section.book nav ul li.next {
         float: right; }
-    div.book-wrapper section.book section.page img {
-      border: 1px solid #dddddd; }
 
 div.profile-wrapper {
   display: table; }
