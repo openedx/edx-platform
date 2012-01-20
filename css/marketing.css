@@ -128,6 +128,25 @@ body {
   background-color: #fff;
   color: #444;
   font: 16px Georgia, serif; }
+  body input[type="email"], body input[type="number"], body input[type="password"], body input[type="search"], body input[type="tel"], body input[type="text"], body input[type="url"], body input[type="color"], body input[type="date"], body input[type="datetime"], body input[type="datetime-local"], body input[type="month"], body input[type="time"], body input[type="week"], body textarea {
+    -webkit-box-shadow: 0 -1px 0 white;
+    -moz-box-shadow: 0 -1px 0 white;
+    -ms-box-shadow: 0 -1px 0 white;
+    -o-box-shadow: 0 -1px 0 white;
+    box-shadow: 0 -1px 0 white;
+    background-color: #eeeeee;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, white));
+    background-image: -webkit-linear-gradient(top, #eeeeee, white);
+    background-image: -moz-linear-gradient(top, #eeeeee, white);
+    background-image: -ms-linear-gradient(top, #eeeeee, white);
+    background-image: -o-linear-gradient(top, #eeeeee, white);
+    background-image: linear-gradient(top, #eeeeee, white);
+    border: 1px solid #999;
+    font: 16px Georgia, serif;
+    padding: 4px;
+    width: 100%; }
+    body input[type="email"]:focus, body input[type="number"]:focus, body input[type="password"]:focus, body input[type="search"]:focus, body input[type="tel"]:focus, body input[type="text"]:focus, body input[type="url"]:focus, body input[type="color"]:focus, body input[type="date"]:focus, body input[type="datetime"]:focus, body input[type="datetime-local"]:focus, body input[type="month"]:focus, body input[type="time"]:focus, body input[type="week"]:focus, body textarea:focus {
+      border-color: #990000; }
 
 header.announcement {
   color: #fff;
@@ -144,17 +163,30 @@ header.announcement {
   @media screen and (max-width: 1199px) {
     header.announcement.home {
       background: #e3e3e3 url("/static/images/marketing/shot-1-medium.jpg"); } }
+  header.announcement.home div {
+    padding: 258.88px 25.888px 77.664px; }
   @media screen and (min-width: 1200px) {
     header.announcement.course {
       background: #e3e3e3 url("/static/images/marketing/course-bg-large.jpg"); } }
   @media screen and (max-width: 1199px) and (min-width: 700px) {
     header.announcement.course {
-      background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg"); } }
+      background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg");
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -ms-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover; } }
   @media screen and (max-width: 699px) {
     header.announcement.course {
-      background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg"); } }
+      background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -ms-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover; } }
+  header.announcement.course div {
+    padding: 103.552px 25.888px 51.776px; }
   header.announcement div {
-    padding: 258.88px 25.888px 77.664px;
     position: relative; }
     header.announcement div nav {
       position: absolute;
