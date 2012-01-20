@@ -89,6 +89,10 @@ schematic = (function() {
 	    's': [Probe, 'Scope Probe'],
 	};
 
+	// global clipboard
+	if (typeof sch_clipboard == 'undefined')
+	    sch_clipboard = [];
+
 	///////////////////////////////////////////////////////////////////////////////
 	//
 	//  Schematic = diagram + parts bin + status area
@@ -104,7 +108,6 @@ schematic = (function() {
 	    if (this.origin_x == undefined) this.origin_x = 0;
 	    this.origin_y = input.getAttribute("origin_y");
 	    if (this.origin_y == undefined) this.origin_y = 0;
-	    this.clipboard = undefined;
 
 	    // use user-supplied list of parts if supplied
 	    // else just populate parts bin with all the parts
@@ -257,6 +260,7 @@ schematic = (function() {
 		tr = document.createElement('tr');
 		table.appendChild(tr);
 		td = document.createElement('td');
+		td.style.verticalAlign = 'top';
 		td.colSpan = 2;
 		tr.appendChild(td);
 		for (var i = 0; i < this.toolbar.length; ++i) {
@@ -267,12 +271,12 @@ schematic = (function() {
 	    
 	    // add canvas and parts bin to DOM
 	    tr = document.createElement('tr');
-	    tr.vAlign = 'top';
 	    table.appendChild(tr);
 	    td = document.createElement('td');
 	    tr.appendChild(td);
 	    td.appendChild(this.canvas);
 	    td = document.createElement('td');
+	    td.style.verticalAlign = 'top';
 	    tr.appendChild(td);
 	    var parts_table = document.createElement('table');
 	    td.appendChild(parts_table);
@@ -306,7 +310,8 @@ schematic = (function() {
 	    this.input.parentNode.insertBefore(table,this.input.nextSibling);
 
 	    // process initial contents of diagram
-	    this.load_schematic(this.input.value);
+	    this.load_schematic(this.input.getAttribute('value'),
+				this.input.getAttribute('initial_value'));
 	}
 
 	part_w = 42;   // size of a parts bin compartment
@@ -421,14 +426,14 @@ schematic = (function() {
 
 	Schematic.prototype.cut = function() {
 	    // clear previous contents
-	    this.clipboard = [];
+	    sch_clipboard = [];
 
 	    // look for selected components, move them to clipboard.
 	    for (var i = this.components.length - 1; i >=0; --i) {
 		var c = this.components[i];
 		if (c.selected) {
 		    c.delete();
-		    this.clipboard.push(c);
+		    sch_clipboard.push(c);
 		}
 	    }
 
@@ -438,13 +443,13 @@ schematic = (function() {
 
 	Schematic.prototype.copy = function() {
 	    // clear previous contents
-	    this.clipboard = [];
+	    sch_clipboard = [];
 
 	    // look for selected components, copy them to clipboard.
 	    for (var i = this.components.length - 1; i >=0; --i) {
 		var c = this.components[i];
 		if (c.selected)
-		    this.clipboard.push(c.clone(c.x,c.y));
+		    sch_clipboard.push(c.clone(c.x,c.y));
 	    }
 	}
 
@@ -453,8 +458,8 @@ schematic = (function() {
 	    // components in the clipboard
 	    var left = undefined;
 	    var top = undefined;
-	    for (var i = this.clipboard.length - 1; i >= 0; --i) {
-		var c = this.clipboard[i];
+	    for (var i = sch_clipboard.length - 1; i >= 0; --i) {
+		var c = sch_clipboard[i];
 		left = left ? Math.min(left,c.x) : c.x;
 		top = top ? Math.min(top,c.y) : c.y;
 	    }
@@ -467,8 +472,8 @@ schematic = (function() {
 
 	    // make clones of components on the clipboard, positioning
 	    // them relative to the cursor
-	    for (var i = this.clipboard.length - 1; i >= 0; --i) {
-		var c = this.clipboard[i];
+	    for (var i = sch_clipboard.length - 1; i >= 0; --i) {
+		var c = sch_clipboard[i];
 		var new_c = c.clone(this.cursor_x + (c.x - left),this.cursor_y + (c.y - top));
 		new_c.set_select(true);
 		new_c.add(this);
@@ -485,8 +490,12 @@ schematic = (function() {
 	////////////////////////////////////////////////////////////////////////////////
 
 	// load diagram from JSON representation
-	Schematic.prototype.load_schematic = function(value) {
-	    if (value) {
+	Schematic.prototype.load_schematic = function(value,initial_value) {
+	    // use default value if no schematic info in value
+	    if (value == undefined || value.indexOf('[') == -1)
+		value = initial_value;
+	    
+	    if (value && value.indexOf('[') != -1) {
 		// convert string value into data structure
 		var json = JSON.parse(value);
 
@@ -507,7 +516,9 @@ schematic = (function() {
 		    } else if (c[0] == 'w') {
 			// wire
 			this.add_wire(c[1][0],c[1][1],c[1][2],c[1][3]);
-		    } else if (c[0] == 'dc' || c[0] == 'ac' || c[0] == 'transient') {
+		    } else if (c[0] == 'dc') {
+			this.dc_results = c[1];
+		    } else if (c[0] == 'ac' || c[0] == 'transient') {
 			// ignore analysis results
 		    } else {
 			// ordinary component
@@ -767,9 +778,17 @@ schematic = (function() {
 		    sch.tran_npts = content.fields[npts_lbl].value;
 		    sch.tran_tstop = content.fields[tstop_lbl].value;
 
+		    // gather a list of nodes that are being probed.  These
+		    // will be added to the list of nodes checked during the
+		    // LTE calculations in transient analysis
+		    var probe_list = sch.find_probes();
+		    var probe_names = new Array(probe_list.length);
+		    for (var i = probe_list.length - 1; i >= 0; --i)
+			probe_names[i] = probe_list[i][1];
+
 		    // run the analysis
 		    var results = ckt.tran(ckt.parse_number(sch.tran_npts), 0,
-					   ckt.parse_number(sch.tran_tstop), false);
+					   ckt.parse_number(sch.tran_tstop), probe_names, false);
 
 		    // save a copy of the results for submission
 		    this.transient_results = {};
@@ -871,7 +890,7 @@ schematic = (function() {
 	    }
 	    this.enable_tool('cut',selections);
 	    this.enable_tool('copy',selections);
-	    this.enable_tool('paste',this.clipboard);
+	    this.enable_tool('paste',sch_clipboard.length > 0);
 
 	    // connection points: draw one at each location
 	    for (var location in this.connection_points) {

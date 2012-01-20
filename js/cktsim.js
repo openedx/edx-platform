@@ -6,6 +6,7 @@
 
 // Copyright (C) 2011 Massachusetts Institute of Technology
 
+
 // create a circuit for simulation using "new cktsim.Circuit()"
 
 // for modified nodal analysis (MNA) stamps see
@@ -30,9 +31,11 @@ cktsim = (function() {
 	max_dc_iters = 200;	// max iterations before giving pu
 	max_tran_iters = 10;	// max iterations before giving up
 	increase_limit = 4;	// if we converge in this many iterations, increase time step
-	time_step_increase_factor = 2.0;
-	time_step_decrease_factor = 0.3;
-	reltol = 0.001;		// convergence criterion relative to max observed value
+	time_step_increase_factor = 2.0;  // How much can lte let timestep grow.
+	lte_step_decrease_factor = 8;    // How much will lte shrink timestep in one iter.
+	nr_step_decrease_factor = 4;     // How much Newton will shink timeste in one iter.
+	reltol = 0.0001;		// convergence criterion relative to max observed value
+        lterel = 4;             // The ratio between lte error and Newton error.
 
 	function Circuit() {
 	    this.node_map = new Array();
@@ -141,16 +144,15 @@ cktsim = (function() {
 
 	// if converges: updates this.solution, this.soln_max, returns iter count
 	// otherwise: return undefined and set this.problem_node
-	// The argument should be a function that sets up the linear system.
+	// Load should compute -f and df/dx (note the sign pattern!)
         Circuit.prototype.find_solution = function(load,maxiters) {
 	    var soln = this.solution;
 	    var rhs = this.rhs;
-	    var d_sol,temp,converged;
+	    var d_sol,converged;
 
 	    // iteratively solve until values convere or iteration limit exceeded
 	    for (var iter = 0; iter < maxiters; iter++) {
 		// set up equations
-		// no longer needed this.initialize_linear_system();
 		load(this,soln,rhs);
 
 		// Compute the Newton delta
@@ -173,7 +175,7 @@ cktsim = (function() {
 			this.problem_node = i;
 		    }
 		}
-		// alert(numeric.prettyPrint(this.solution));
+		//alert(numeric.prettyPrint(this.solution);)
                 if (converged == true) return iter+1;
 	    }
 	    // too many iterations
@@ -189,7 +191,7 @@ cktsim = (function() {
 		this.devices[i].load_linear(this)
 	    }
 
-	    // Define f and df/dx for Newton solver
+	    // Define -f and df/dx for Newton solver
 	    function load_dc(ckt,soln,rhs) {
 		// rhs is initialized to -Gl * soln
 		ckt.matv_mult(ckt.Gl, soln, rhs, -1.0);
@@ -198,7 +200,7 @@ cktsim = (function() {
 		// Now load up the nonlinear parts of rhs and G
 		for (var i = ckt.devices.length - 1; i >= 0; --i)
 			ckt.devices[i].load_dc(ckt,soln,rhs);
-		// G matrix is initialized with linear Gl
+		// G matrix is copied in to the system matrix
 		ckt.copy_mat(ckt.G,ckt.matrix);
 	    }
 
@@ -221,9 +223,80 @@ cktsim = (function() {
 	}
 
 	// Transient analysis (needs work!)
-        Circuit.prototype.tran = function(ntpts, tstart, tstop, no_dc) {
+        Circuit.prototype.tran = function(ntpts, tstart, tstop, probenames, no_dc) {
+
+	    // Define -f and df/dx for Newton solver
+	    function load_tran(ckt,soln,rhs) {
+		// Crnt is initialized to -Gl * soln
+		ckt.matv_mult(ckt.Gl, soln, ckt.c,-1.0);
+		// G matrix is initialized with linear Gl
+		ckt.copy_mat(ckt.Gl,ckt.G);
+		// Now load up the nonlinear parts of crnt and G
+		for (var i = ckt.devices.length - 1; i >= 0; --i)
+		    ckt.devices[i].load_tran(ckt,soln,ckt.c,ckt.time);
+		// Exploit the fact that storage elements are linear
+		ckt.matv_mult(ckt.C, soln, ckt.q, 1.0);
+		// -rhs = c - dqdt
+		for (var i = ckt.N-1; i >= 0; --i) {
+		    var dqdt = ckt.alpha0*ckt.q[i] + ckt.alpha1*ckt.oldq[i] + 
+			ckt.alpha2*ckt.old2q[i];
+		    //alert(numeric.prettyPrint(dqdt));
+		    rhs[i] = ckt.beta0[i]*ckt.c[i] + ckt.beta1[i]*ckt.oldc[i] - dqdt;
+		}
+		// matrix = beta0*G + alpha0*C.
+		ckt.mat_scale_add(ckt.G,ckt.C,ckt.beta0,ckt.alpha0,ckt.matrix);
+	    }
+
+	    var p = new Array(3);
+	    function interp_coeffs(t, t0, t1, t2) {
+		// Poly coefficients
+		var dtt0 = (t - t0);
+		var dtt1 = (t - t1);
+		var dtt2 = (t - t2);
+		var dt0dt1 = (t0 - t1);
+		var dt0dt2 = (t0 - t2);
+		var dt1dt2 = (t1 - t2);
+		p[0] = (dtt1*dtt2)/(dt0dt1 * dt0dt2);
+		p[1] = (dtt0*dtt2)/(-dt0dt1 * dt1dt2);
+		p[2] = (dtt0*dtt1)/(dt0dt2 * dt1dt2);
+		return p;
+	    }
+
+	    function pick_step(ckt, step_index) {
+		var min_shrink_factor = 1.0/lte_step_decrease_factor;
+	        var max_growth_factor = time_step_increase_factor;
+		var N = ckt.N;
+		var p = interp_coeffs(ckt.time, ckt.oldt, ckt.old2t, ckt.old3t);
+		var trapcoeff = 0.5*(ckt.time - ckt.oldt)/(ckt.time - ckt.old3t);
+		var maxlteratio = 0.0;
+		for (var i = ckt.N-1; i >= 0; --i) {
+		    if (ckt.ltecheck[i]) { // Check lte on variable
+			var pred = p[0]*ckt.oldsol[i] + p[1]*ckt.old2sol[i] + p[2]*ckt.old3sol[i];
+			var lte = Math.abs((ckt.solution[i] - pred))*trapcoeff;
+			var lteratio = lte/(lterel*(ckt.abstol[i] + reltol*ckt.soln_max[i]));
+			maxlteratio = Math.max(maxlteratio, lteratio);
+		    }
+		}
+		var new_step;
+		var lte_step_ratio = 1.0/Math.pow(maxlteratio,1/3); // Cube root because trap
+		if (lte_step_ratio < 1.0) { // Shrink the timestep to make lte
+		    lte_step_ratio = Math.max(lte_step_ratio,min_shrink_factor);
+		    new_step = (ckt.time - ckt.oldt)*0.75*lte_step_ratio;
+		    new_step = Math.max(new_step, ckt.min_step);
+		} else {
+		    lte_step_ratio = Math.min(lte_step_ratio, max_growth_factor);
+		    if (lte_step_ratio > 1.2)  /* Increase timestep due to lte. */
+			new_step = (ckt.time - ckt.oldt) * lte_step_ratio / 1.2;
+		    else 
+			new_step = (ckt.time - ckt.oldt);
+		    new_step = Math.min(new_step, ckt.max_step);
+		}
+		return new_step;
+	    }
+	    
 	    // Standard to do a dc analysis before transient
 	    // Otherwise, do the setup also done in dc.
+	    //no_dc = true;
 	    if ((this.diddc == false) && (no_dc == false)) this.dc();
 	    else {
 		// Allocate matrices and vectors.
@@ -242,70 +315,140 @@ cktsim = (function() {
 	    var response = new Array(N + 1);
 	    for (var i = N; i >= 0; --i) response[i] = new Array();
 
-	    // Allocate space to put previous charge and current
-	    this.oldc = new Array(this.N);
+	    // Allocate back vectors for up to a second order method
+	    this.old3sol = new Array(this.N);
+	    this.old3q = new Array(this.N);
+	    this.old2sol = new Array(this.N);
+	    this.old2q = new Array(this.N);
+	    this.oldsol = new Array(this.N);
 	    this.oldq = new Array(this.N);
-	    this.c = new Array(this.N);
 	    this.q = new Array(this.N);
+	    this.oldc = new Array(this.N);
+	    this.c = new Array(this.N);
 	    this.alpha0 = 1.0;
+	    this.alpha1 = 0.0;
+	    this.alpha2 = 0.0;
+	    this.beta0 = new Array(this.N);
+	    this.beta1 = new Array(this.N);
 
-	    // Define f and df/dx for Newton solver
-	    function load_tran(ckt,soln,rhs) {
-		// rhs is initialized to -Gl * soln
-		ckt.matv_mult(ckt.Gl, soln, ckt.c,-1.0);
-		// G matrix is initialized with linear Gl
-		ckt.copy_mat(ckt.Gl,ckt.G);
-		// Now load up the nonlinear parts of rhs and G
-		for (var i = ckt.devices.length - 1; i >= 0; --i)
-		    ckt.devices[i].load_tran(ckt,soln,ckt.c,ckt.time);
+	    // Mark the algebraic rows (useful for trap)
+	    this.ar = this.zero_row(this.C);
 
-		// Exploit the fact that storage elements are linear
-		ckt.matv_mult(ckt.C, soln, ckt.q, 1.0);
-		for (var i = ckt.N-1; i >= 0; --i)
-		    rhs[i] = ckt.alpha0 *(ckt.oldq[i] - ckt.q[i]) + ckt.c[i]
+	    // Non-algebraic variables and probe variables get lte
+	    this.ltecheck = new Array(this.N);
+	    for (var i = N; i >= 0; --i) 
+		this.ltecheck[i] = (this.ar[i] == 0);
 
-		// rhs is initialized to -Gl * soln
-		ckt.matv_mult(ckt.Gl, soln, ckt.c,-1.0);
+	    for (var name in this.node_map) {
+		var index = this.node_map[name];
+		for (var i = probenames.length; i >= 0; --i) {
+		    if (name == probenames[i]) {
+			this.ltecheck[index] = true;
+			break;
+		    }
+		}
+	    }
+	
+	    this.time = tstart;
+	    this.max_step = (tstop - tstart)/ntpts;
+	    this.min_step = this.max_step/1e8;
+	    var new_step = this.max_step/1e6;
+	    this.oldt = this.time - new_step;
 
-		// system matrix is G - alpha0 C.
-		ckt.mat_scale_add(ckt.G,ckt.C,ckt.alpha0,ckt.matrix);
-
+	    // Initialize old crnts, charges, and solutions.
+	    load_tran(this,this.solution,this.rhs)
+	    for (var i = N-1; i >= 0; --i) {
+		this.old3sol[i] = this.solution[i];
+		this.old2sol[i] = this.solution[i];
+		this.oldsol[i] = this.solution[i];
+		this.old3q[i] = this.q[i]; 
+		this.old2q[i] = this.q[i]; 
+		this.oldq[i] = this.q[i]; 
+		this.oldc[i] = this.c[i]; 
 	    }
 
-	    this.time = tstart;
-	    var dt = (tstop - tstart)/ntpts;
-
-	    // Initialize this.c and this.q
-	    load_tran(this,this.solution,this.rhs)
-
-	    for(var tindex = 0; tindex < ntpts; tindex++) {
-
+	    var step_index = -2;  // Start with two pseudo-Euler steps
+	    var beta0,beta1;
+	    while (this.time <= tstop) {
 		// Save the just computed solution, and move back q and c.
 		for (var i = this.N - 1; i >= 0; --i) {
-		    response[i].push(this.solution[i]);
+		    if (step_index >= 0)
+			response[i].push(this.solution[i]);
 		    this.oldc[i] = this.c[i];
+		    this.old3sol[i] = this.old2sol[i];
+		    this.old2sol[i] = this.oldsol[i];
+		    this.oldsol[i] = this.solution[i];
+		    this.old3q[i] = this.oldq[i];
+		    this.old2q[i] = this.oldq[i];
 		    this.oldq[i] = this.q[i];
+
 		}
-		response[this.N].push(this.time);
-		this.oldtime = this.time;
 
-		if (this.time >= tstop) break;
-		// Pick a timestep and an integration method
-		if (this.time + 1.1*dt > tstop)
-		    this.time = tstop;
-		else
-		    this.time += dt;
+		if (step_index < 0) {  // Take a prestep using BE
+		    this.old3t = this.old2t - (this.oldt-this.old2t)
+		    this.old2t = this.oldt - (tstart-this.oldt)
+		    this.oldt = tstart - (this.time - this.oldt);
+		    this.time = tstart;
+		    beta0 = 1.0;  
+		    beta1 = 0.0;		
+		} else {  // Take a regular step
+		    // Save the time, and rotate time wheel
+		    response[this.N].push(this.time);
+		    this.old3t = this.old2t;
+		    this.old2t = this.oldt;
+		    this.oldt = this.time;
+		    // Make sure we come smoothly in to the interval end.
+		    if (this.time >= tstop) break;  // We're done.
+		    else if(this.time + new_step > tstop)
+			this.time = tstop;
+		    else if(this.time + 1.5*new_step > tstop)
+			this.time += (2/3)*(tstop - this.time);
+		    else
+			this.time += new_step;
+		    // Trapezoidal rule betas
+		    beta0 = 0.5;
+		    beta1 = 0.5;		
+		}
+
+		// Keep track of step index.
+		step_index += 1;
+
+		// For trap rule, turn off current avging for algebraic eqns
+		for (var i = this.N - 1; i >= 0; --i) {
+		    this.beta0[i] = beta0 + this.ar[i]*beta1;
+		    this.beta1[i] = (1.0 - this.ar[i])*beta1;
+		}
 		
-		// Set the timestep
-		this.alpha0 = 1.0/(this.time - this.oldtime);
+		// Loop to find NR converging timestep with okay LTE
+		while (true) {
+		    // Set the timestep coefficients (alpha2 is for bdf2).
+		    this.alpha0 = 1.0/(this.time - this.oldt);
+		    this.alpha1 = -this.alpha0;
+		    this.alpha2 = 0;
 
-		// Predict the solution, nah maybe later.
+		    // Use Newton to compute the solution.
+		    var iterations = this.find_solution(load_tran,max_tran_iters);
 
-		// Use Newton to compute the solution.
-		var iterations = this.find_solution(load_tran,max_tran_iters);
-
-		if (iterations == undefined)
-		    alert('timestep nonconvergence, try more time points');
+		    // If NR succeeds and stepsize is at min, accept and newstep=maxgrowth*minstep.
+		    // Else if Newton Fails, shrink step by a factor and try again
+		    // Else LTE picks new step, if bigger accept current step and go on.
+		    if ((iterations != undefined) && 
+			(step_index <= 0 || (this.time-this.oldt) < (1+reltol)*this.min_step)) {
+			if (step_index > 0) new_step = time_step_increase_factor*this.min_step;
+			break;
+		    } else if (iterations == undefined) {  // NR nonconvergence, shrink by factor
+			//alert('timestep nonconvergence');
+			this.time = this.oldt + 
+			    (this.time - this.oldt)/nr_step_decrease_factor;
+		    } else {  // Check the LTE and shrink step if needed.
+			new_step = pick_step(this, step_index);
+			if (new_step < (1.0 - reltol)*(this.time - this.oldt)) {
+			   this.time = this.oldt + new_step;  // Try again
+			}
+			else
+			    break;  // LTE okay, new_step for next step
+		    }
+		}
 	    }
 
 	    // create solution dictionary
@@ -355,14 +498,12 @@ cktsim = (function() {
 
 		// Find complex x+jy that sats Gx-omega*Cy=rhs; omega*Cx+Gy=0
 		// Note: solac[0:N-1]=x, solac[N:2N-1]=y
-		for (var i = N-1; i >= 0; --i) 
-		{
+		for (var i = N-1; i >= 0; --i) {
 		    // First the rhs, replicated for real and imaginary
 		    matrixac[i][2*N] = this.rhs[i];
 		    matrixac[i+N][2*N] = 0;
 
-		    for (var j = N-1; j >= 0; --j) 
-		    { 
+		    for (var j = N-1; j >= 0; --j) {
 			matrixac[i][j] = G[i][j];
 			matrixac[i+N][j+N] = G[i][j];
 			matrixac[i][j+N] = -omega*C[i][j];
@@ -486,7 +627,6 @@ cktsim = (function() {
 	    return this.add_device(d, name);
 	}
 
-
 	///////////////////////////////////////////////////////////////////////////////
 	//
 	//  Support for creating and solving a system of linear equations
@@ -500,15 +640,6 @@ cktsim = (function() {
 
 	// Knowns (A and b) are stored in an augmented matrix M = [A | b]
 	// Matrix is stored as an array of arrays: M[row][col].
-
-	// set augmented matrix to zero
-	Circuit.prototype.initialize_linear_system = function() {
-	    for (var i = this.N - 1; i >= 0; --i) {
-		var row = this.matrix[i];
-		for (var j = this.N; j >= 0; --j)   // N+1 entries
-		    row[j] = 0;
-	    }
-	}
 
         // Allocate an NxM matrix
         Circuit.prototype.make_mat = function(N,M) {
@@ -528,55 +659,62 @@ cktsim = (function() {
 	    var m = M[0].length;
 	    
 	    if (n != b.length || m != x.length)
-	    { throw 'Rows of M mismatched to b or cols mismatch to x.';
-	    }
-	    for (var i = 0; i < n; i++)
-	    {
+		throw 'Rows of M mismatched to b or cols mismatch to x.';
+
+	    for (var i = 0; i < n; i++) {
 		var temp = 0;
-		for (var j = 0; j < m; j++)
-		{ 
-		    temp += M[i][j]*x[j];
-		}
+		for (var j = 0; j < m; j++) temp += M[i][j]*x[j];
 		b[i] = scale*temp;  // Recall the neg in the name
 	    }
 	}
 
-        // Form C = A + scale*B
-        Circuit.prototype.mat_scale_add = function(A, B, scale, C) {
+        // C = scalea*A + scaleb*B, scalea, scaleb eithers numbers or arrays (row scaling)
+        Circuit.prototype.mat_scale_add = function(A, B, scalea, scaleb, C) {
 	    var n = A.length;
 	    var m = A[0].length;
 	    
 	    if (n > B.length || m > B[0].length)
-	    { throw 'Row or columns of A to large for B';
-	    }
+		throw 'Row or columns of A to large for B';
 	    if (n > C.length || m > C[0].length)
-	    { throw 'Row or columns of A to large for C';
-	    }
-	    for (var i = 0; i < n; i++)
-	    {
-		for (var j = 0; j < m; j++)
-		{ 
-		    C[i][j] = A[i][j] + scale * B[i][j];
-		}
-	    }
+		throw 'Row or columns of A to large for C';
+	    if ((typeof scalea == 'number') && (typeof scaleb == 'number'))
+		for (var i = 0; i < n; i++)
+		    for (var j = 0; j < m; j++)
+			C[i][j] = scalea*A[i][j] + scaleb*B[i][j];
+	    else if ((typeof scaleb == 'number') && (scalea instanceof Array))
+		for (var i = 0; i < n; i++)
+		    for (var j = 0; j < m; j++)
+			C[i][j] = scalea[i]*A[i][j] + scaleb*B[i][j];
+	    else if ((typeof scaleb instanceof Array) && (scalea instanceof Array))
+		for (var i = 0; i < n; i++)
+		    for (var j = 0; j < m; j++)
+			C[i][j] = scalea[i]*A[i][j] + scaleb[i]*B[i][j];
+	    else
+		throw 'scalea and scaleb must be scalars or Arrays';
 	}
 
-
+        // Returns a vector of ones and zeros, ones denote zero rows in M
+        Circuit.prototype.zero_row = function(M) {
+	    var N = M.length
+	    var one_if_zero = new Array(N);
+	    for (var i = N-1; i >= 0; i--)
+		if ((Math.max.apply(Math, M[i]) == 0)
+		    && (Math.min.apply(Math, M[i]) == 0))
+		    one_if_zero[i] = 1.0;
+		else one_if_zero[i] = 0.0;
+	    return one_if_zero;
+	}
+	    
         // Copy A -> using the bounds of A
 	Circuit.prototype.copy_mat = function(src,dest) {
 	    var n = src.length;
 	    var m = src[0].length;
 	    if (n > dest.length || m >  dest[0].length)
-	    { throw 'Rows or cols > rows or cols of dest';
-	    }
+		throw 'Rows or cols > rows or cols of dest';
 
 	    for (var i = 0; i < n; i++)
-	    {
 		for (var j = 0; j < m; j++)
-		{ 
 		    dest[i][j] = src[i][j];
-		}
-	    }
 	}
 
 	// add val component between two nodes to matrix M
@@ -645,9 +783,8 @@ cktsim = (function() {
 
 	    // Copy the rhs in to the last column of M if one is given.
 	    if (rhs != null) {
-		for (var row = 0; row < N ; row++) {
+		for (var row = 0; row < N ; row++)
 		    M[row][N] = rhs[row];
-		}
 	    }
 
 	    // gaussian elimination
@@ -891,11 +1028,8 @@ cktsim = (function() {
 	//
 	///////////////////////////////////////////////////////////////////////////////
 
-	// argument is a string describing the source's value:
-	//  <value> or dc(<value>)  -- constant value
-	//  pulse(<vinit>,<vpulse>,<tdelay>,<trise>,<tfall>,<t_width>,<t_period>)
-	//  sin(<voffset>,<vamplitude>,<hz>,<tdelay>,<phase_offset_degrees>)
-	//  pwl(<time>,<value>,...)  -- piecewise linear: time,value pairs
+	// argument is a string describing the source's value (see comments for details)
+	// source types: dc,step,square,triangle,sin,pulse,pwl,pwlr
 
 	// returns an object with the following attributes:
 	//   value(t) -- compute source value at time t
@@ -935,17 +1069,59 @@ cktsim = (function() {
 	    }
 
 	    // post-processing for constant sources
+	    // dc(v)
 	    if (src.fun == 'dc') {
 		var value = src.args[0];
 		if (value === undefined) value = 0;
 		src.value = function(t) { return value; }  // closure
 	    }
 
+	    // post-processing for step sources
+	    // step(v_init,v_plateau,t_delay,t_rise,t_fall)
+	    else if (src.fun == 'step') {
+		var v1 = arg_value(src.args,0,0);  // default init value: 0V
+		var v2 = arg_value(src.args,1,1);  // default plateau value: 1V
+		var td = Math.max(0,arg_value(src.args,2,0));  // time step starts
+		var tr = Math.abs(arg_value(src.args,3,1e-9));  // default rise time: 1ns
+		pwl_source(src,[td,v1,td+tr,v2],false);
+	    }
+
+	    // post-processing for square wave
+	    // square(v_init,v_plateau,t_period)
+	    else if (src.fun == 'square') {
+		var v1 = arg_value(src.args,0,0);  // default init value: 0V
+		var v2 = arg_value(src.args,1,1);  // default plateau value: 1V
+		var freq = Math.abs(arg_value(src.args,2,1));  // default frequency: 1s
+
+		var per = freq == 0 ? Infinity : 1/freq;
+		var t_change = 0.01 * per;   // rise and fall time
+		var t_pw = 0.49 * per;  // half the cycle minus rise and fall time
+		pwl_source(src,[0,v1,t_change,v2,t_change+t_pw,v2,t_change+t_pw+t_change,v1,per,v1],true);
+	    }
+
+	    // post-processing for triangle
+	    // triangle(v_init,v_plateua,t_period)
+	    else if (src.fun == 'triangle') {
+		var v1 = arg_value(src.args,0,0);  // default init value: 0V
+		var v2 = arg_value(src.args,1,1);  // default plateau value: 1V
+		var freq = Math.abs(arg_value(src.args,2,1));  // default frequency: 1s
+
+		var per = freq == 0 ? Infinity : 1/freq;
+		pwl_source(src,[0,v1,per/2,v2,per,v1],true);
+	    }
+
+	    // post-processing for pwl and pwlr sources
+	    // pwl[r](t1,v1,t2,v2,...)
+	    else if (src.fun == 'pwl' || src.fun == 'pwlr') {
+		pwl_source(src,src.args,src.fun == 'pwlr');
+	    }
+
 	    // post-processing for pulsed sources
+	    // pulse(v_init,v_plateau,t_delay,t_rise,t_fall,t_width,t_period)
 	    else if (src.fun == 'pulse') {
 		var v1 = arg_value(src.args,0,0);  // default init value: 0V
 		var v2 = arg_value(src.args,1,1);  // default plateau value: 1V
-		var td = Math.min(0,arg_value(src.args,2,0));  // time pulse starts
+		var td = Math.max(0,arg_value(src.args,2,0));  // time pulse starts
 
 		var tr = Math.abs(arg_value(src.args,3,1e-9));  // default rise time: 1ns
 		var tf = Math.abs(arg_value(src.args,4,1e-9));  // default rise time: 1ns
@@ -957,35 +1133,16 @@ cktsim = (function() {
 		var t3 = t2 + pw;  // time when v2 -> v1 transition starts
 		var t4 = t3 + tf;  // time when v2 -> v1 transition ends
 
-		// return value of source at time t
-		src.value = function(t) {	// closure
-		    var tmod = Math.fmod(t,per);
-		    if (tmod < t1) return v1;
-		    else if (tmod < t2) return v1 + (v2-v1)*(tmod-t1)/(t2-t1);
-		    else if (tmod < t3) return v2;
-		    else if (tmod < t4) return v2 + (v1-v2)*(tmod-t3)/(t4-t3);
-		    else return v1;
-		}
-
-		// return time of next inflection point after time t
-		src.inflection_point = function(t) {	// closure
-		    var tstart = per * Math.floor(t/per);
-		    var tmod = t - tstart;
-		    if (tmod < t1) return tstart + t1;
-		    else if (t < t2) return tstart + t2;
-		    else if (t < t3) return tstart + t3;
-		    else if (t < t4) return tstart + t4;
-		    else return tstart + per + t1;
-		}
+		pwl_source(src,[t1,v1,t2,v2,t3,v2,t4,v1,per,v1],true);
 	    }
 
 	    // post-processing for sinusoidal sources
+	    // sin(v_offset,v_amplitude,freq_hz,t_delay,phase_offset_degrees)
 	    else if (src.fun == 'sin') {
-		var degrees_to_radians = 2*Math.PI/360.0;
 		var voffset = arg_value(src.args,0,0);  // default offset voltage: 0V
 		var va = arg_value(src.args,1,1);  // default amplitude: -1V to 1V
-		var freq = arg_value(src.args,2,1);  // default frequency: 1Hz
-		var td = Math.min(0,arg_value(src.args,3,0));  // default time delay: 0sec
+		var freq = Math.abs(arg_value(src.args,2,1));  // default frequency: 1Hz
+		var td = Math.max(0,arg_value(src.args,3,0));  // default time delay: 0sec
 		var phase = arg_value(src.args,4,0);  // default phase offset: 0 degrees
 
 		phase /= 360.0;
@@ -994,8 +1151,8 @@ cktsim = (function() {
 		src.value = function(t) {  // closure
 		    if (t < td) return voffset + va*Math.sin(2*Math.PI*phase);
 		    else {
-			t -= td;
-			return voffset + va*Math.sin(2*Math.PI*(freq*(t - td) + phase));
+			var val = voffset + va*Math.sin(2*Math.PI*(freq*(t - td) + phase));
+			return val;
 		    }
 		}
 
@@ -1012,6 +1169,48 @@ cktsim = (function() {
 	    // object has all the necessary info to compute the source value and inflection points
 	    src.dc = src.value(0);   // DC value is value at time 0
 	    return src;
+	}
+
+	function pwl_source(src,tv_pairs,repeat) {
+	    var nvals = tv_pairs.length;
+	    if (nvals % 2 == 1) npts -= 1;  // make sure it's even!
+
+	    if (nvals <= 2) {
+		// handle degenerate case
+		src.value = function(t) { return nvals == 2 ? tv_pairs[1] : 0; }
+		src.inflection_point = function(t) { return undefined; }
+	    } else {
+		src.value = function(t) { // closure
+		    if (repeat)
+			// make time periodic if values are to be repeated
+			t = Math.fmod(t,tv_pairs[nvals-2]);
+		    var last_t = tv_pairs[0];
+		    var last_v = tv_pairs[1];
+		    if (t > last_t) {
+			var next_t,next_v;
+			for (var i = 2; i < nvals; i += 2) {
+			    next_t = tv_pairs[i];
+			    next_v = tv_pairs[i+1];
+			    if (next_t > last_t)  // defend against bogus tv pairs
+				if (t < next_t)
+				    return last_v + (next_v - last_v)*(t - last_t)/(next_t - last_t);
+			    last_t = next_t;
+			    last_v = next_v;
+			}
+		    }
+		    return last_v;
+		}
+		src.inflection_point = function(t) {  // closure
+		    if (repeat)
+			// make time periodic if values are to be repeated
+			t = Math.fmod(t,tv_pairs[nvals-2]);
+		    for (var i = 0; i < nvals; i += 2) {
+			var next_t = tv_pairs[i];
+			if (t < next_t) return next_t;
+		    }
+		    return undefined;
+		}
+	    }
 	}
 
 	// helper function: return args[index] if present, else default_v
