@@ -1,9 +1,12 @@
-from django.conf import settings
+try: 
+    from django.conf import settings
+    from auth.models import UserProfile
+except: 
+    settings = None 
+
 from xml.dom.minidom import parse, parseString
 
 from lxml import etree
-
-from auth.models import UserProfile
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
@@ -15,7 +18,9 @@ def xpath(xml, query_string, **args):
     ''' Safe xpath query into an xml tree:
         * xml is the tree.
         * query_string is the query
-        * args are the parameters. Substitute for {params}. '''
+        * args are the parameters. Substitute for {params}. 
+        We should remove this with the move to lxml. 
+        We should also use lxml argument passing. '''
     doc = etree.fromstring(xml)
     print type(doc)
     def escape(x):
@@ -31,6 +36,14 @@ def xpath(xml, query_string, **args):
     print args
     results = doc.xpath(query_string.format(**args))
     return results
+
+def xpath_remove(tree, path):
+    ''' Remove all items matching path from lxml tree.  Works in
+        place.'''
+    items = tree.xpath(path)
+    for item in items: 
+        item.getparent().remove(item)
+    return tree
 
 if __name__=='__main__':
     print xpath('<html><problem name="Bob"></problem></html>', '/{search}/problem[@name="{name}"]', search='html', name="Bob")
