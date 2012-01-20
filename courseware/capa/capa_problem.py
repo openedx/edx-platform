@@ -11,11 +11,12 @@ import calc, eia
 from util import contextualize_text
 
 from inputtypes import textline, schematic
-from responsetypes import numericalresponse, formularesponse, customresponse
+from responsetypes import numericalresponse, formularesponse, customresponse, schematicresponse
 
 response_types = {'numericalresponse':numericalresponse, 
                   'formularesponse':formularesponse,
-                  'customresponse':customresponse}
+                  'customresponse':customresponse,
+                  'schematicresponse':schematicresponse}
 entry_types = ['textline', 'schematic']
 response_properties = ["responseparam", "answer"]
 # How to convert from original XML to HTML
@@ -23,6 +24,7 @@ response_properties = ["responseparam", "answer"]
 html_transforms = {'problem': {'tag':'div'},
                    "numericalresponse": {'tag':'span'}, 
                    "customresponse": {'tag':'span'}, 
+                   "schematicresponse": {'tag':'span'}, 
                    "formularesponse": {'tag':'span'}, 
                    "text": {'tag':'span'}}
 
@@ -36,7 +38,7 @@ global_context={'random':random,
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["responseparam", "answer", "script"]
 # These should be removed from HTML output, but keeping subelements
-html_skip = ["numericalresponse", "customresponse", "formularesponse", "text"]
+html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formularesponse", "text"]
 # These should be transformed
 html_special_response = {"textline":textline.render,
                          "schematic":schematic.render}
