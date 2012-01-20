@@ -3,9 +3,6 @@ import sys
 
 import djcelery
 
-import askbot
-import site
-
 COURSEWARE_ENABLED = True
 ASKBOT_ENABLED = True
 
@@ -179,6 +176,10 @@ if 'ASKBOT_EXTRA_SKINS_DIR' not in locals():
     ASKBOT_EXTRA_SKINS_DIR = BASE_DIR+'/askbot-devel/askbot/skins'
 if 'ASKBOT_DIR' not in locals():
     ASKBOT_DIR = BASE_DIR+'/askbot-devel'
+
+sys.path.append(ASKBOT_DIR)
+import askbot
+import site
 
 STATICFILES_DIRS = STATICFILES_DIRS + ( ASKBOT_DIR+'/askbot/skins',)
 
