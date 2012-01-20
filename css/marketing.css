@@ -253,10 +253,15 @@ section.index-content section {
   section.index-content section ul {
     margin: 0; }
   section.index-content section.about {
-    width: 65.829%;
-    margin-right: 1.256%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
     border-right: 1px solid #e5e5e5;
-    padding-right: 1.256%; }
+    margin-right: 2.513%;
+    padding-right: 1.256%;
+    width: 65.829%; }
     section.index-content section.about section {
       margin-bottom: 25.888px; }
       section.index-content section.about section p {
@@ -339,10 +344,15 @@ section.index-content section {
       section.index-content section.course h2 {
         background: url("/static/images/marketing/circuits-medium-bg.jpg") 0 0 no-repeat; } }
   section.index-content section.about-course {
-    width: 65.829%;
-    margin-right: 1.256%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
     border-right: 1px solid #e5e5e5;
-    padding-right: 1.256%; }
+    margin-right: 2.513%;
+    padding-right: 1.256%;
+    width: 65.829%; }
     section.index-content section.about-course section {
       width: 48.092%; }
       section.index-content section.about-course section.about-info {
