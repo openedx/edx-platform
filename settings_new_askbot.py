@@ -201,7 +201,7 @@ MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'askbot.middleware.view_log.ViewLogMiddleware',
     'askbot.middleware.spaceless.SpacelessMiddleware',
-    'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+   # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
 )
 
 FILE_UPLOAD_TEMP_DIR = os.path.join(os.path.dirname(__file__), 'tmp').replace('\\','/')
