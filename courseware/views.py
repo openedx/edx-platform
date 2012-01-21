@@ -133,8 +133,6 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     module=render_module(request, module)
 
-    print "Here",module['init_js']
-    
     if 'init_js' not in module:
         module['init_js']=''
 
