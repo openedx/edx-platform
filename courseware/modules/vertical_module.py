@@ -28,11 +28,6 @@ class VerticalModule(XModule):
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
         xmltree=etree.fromstring(xml)
-        self.filename = None
-        filename_l=xmltree.xpath("/html/@filename")
-        if len(filename_l)>0:
-            self.filename=str(filename_l[0])
-
         self.contents=[(e.get("name"),self.render_function(meta, e)) \
                       for e in xmltree]
         self.init_js_text="".join([e[1]['init_js'] for e in self.contents if 'init_js' in e[1]])

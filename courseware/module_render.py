@@ -21,6 +21,7 @@ import courseware.modules.video_module
 import courseware.modules.vertical_module
 import courseware.modules.html_module
 import courseware.modules.schematic_module
+import courseware.modules.seq_module
 
 from models import StudentModule
 
@@ -40,6 +41,7 @@ modx_modules={'problem':courseware.modules.capa_module.LoncapaModule,
               'video':courseware.modules.video_module.VideoModule,
               'html':courseware.modules.html_module.HtmlModule,
               'vertical':courseware.modules.vertical_module.VerticalModule,
+              'sequential':courseware.modules.seq_module.SequentialModule,
               'schematic':courseware.modules.schematic_module.SchematicModule}
 
 def make_track_function(request):
@@ -82,52 +84,6 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     s.save()
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
-
-def seq_module(request, module):
-    ''' Layout module which lays out content in a temporal sequence
-    '''
-    def j(m): 
-        # jsonify contents so it can be embedded in a js array
-        # We also need to split </script> tags so they don't break
-        # mid-string
-        if 'init_js' not in m: m['init_js']=""
-        if 'type' not in m: m['init_js']=""
-        content=json.dumps(m['content']) 
-        content=content.replace('</script>', '<"+"/script>') 
-
-        return {'content':content, 
-                "destroy_js":m['destroy_js'], 
-                'init_js':m['init_js'], 
-                'type':m['type']}
-    contents=[(e.get("name"),j(render_module(request, e))) \
-              for e in module]
-     
-    js=""
-
-    iid=uuid.uuid1().hex
-
-    params={'items':contents,
-            'id':"seq"}
-
-    # TODO/BUG: Destroy JavaScript should only be called for the active view
-    # This calls it for all the views
-    # 
-    # To fix this, we'd probably want to have some way of assigning unique
-    # IDs to sequences. 
-    destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
-
-    if module.tag == 'sequential':
-        return {'init_js':js+render_to_string('seq_module.js',params),
-                "destroy_js":destroy_js,
-                'content':render_to_string('seq_module.html',params), 
-                'type':'sequential'}
-    if module.tag == 'tab':
-        params['id'] = 'tab'
-        return {'init_js':js+render_to_string('tab_module.js',params),
-                "destroy_js":destroy_js,
-                'content':render_to_string('tab_module.html',params), 
-                'type':'tab'}
-
 
 def render_x_module(request, xml_module):
     ''' Generic module for extensions. This renders to HTML. '''
@@ -172,20 +128,8 @@ def render_x_module(request, xml_module):
 
     return content
 
-module_types={'video':render_x_module,
-              'html':render_x_module,
-              'tab':seq_module,
-              'vertical':render_x_module,
-              'sequential':seq_module,
-              'problem':render_x_module,
-              'schematic':render_x_module
-              }
-
 def render_module(request, module):
     ''' Generic dispatch for internal modules. '''
     if module==None :
         return {"content":""}
-    if str(module.tag) in module_types:
-        return module_types[module.tag](request, module)
-    print "rm404"
-    raise Http404
+    return render_x_module(request, module)
