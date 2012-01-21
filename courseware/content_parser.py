@@ -57,13 +57,13 @@ def item(l, default="", process=lambda x:x):
         raise Exception('Malformed XML')
     
 def course_file(user):
-    # TODO: Cache. Also, return the libxml2 object. 
-    return settings.DATA_DIR+UserProfile.objects.get(user=user).courseware
+    # TODO: Cache. 
+    return etree.parse(settings.DATA_DIR+UserProfile.objects.get(user=user).courseware)
 
 def module_xml(coursefile, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes
         module occurs once in courseware XML file.. '''
-    doc = etree.parse(coursefile)
+    doc = coursefile
 
     # Sanitize input
     if not module.isalnum():
@@ -82,9 +82,7 @@ def module_xml(coursefile, module, id_tag, module_id):
     return etree.tostring(result_set[0])
     #return result_set[0].serialize()
 
-def toc_from_xml(coursefile, active_chapter, active_section):
-    dom = etree.parse(coursefile)
-
+def toc_from_xml(dom, active_chapter, active_section):
     name = dom.xpath('//course/@name')[0]
 
     chapters = dom.xpath('//course[@name=$name]/chapter', name=name)
