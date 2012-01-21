@@ -46,8 +46,8 @@ class VideoModule(XModule):
     def get_destroy_js(self):
         return "videoDestroy();"
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function)
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
+        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
         print state
         if state!=None and "time" not in json.loads(state):
             self.video_time = 0

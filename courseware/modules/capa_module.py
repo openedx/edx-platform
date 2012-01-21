@@ -108,8 +108,8 @@ class LoncapaModule(XModule):
             
         return html
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function)
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
+        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
 
         self.attempts = 0
         self.max_attempts = None

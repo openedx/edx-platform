@@ -18,6 +18,7 @@ import urllib
 
 import courseware.modules.capa_module
 import courseware.modules.video_module
+import courseware.modules.vertical_module
 import courseware.modules.html_module
 import courseware.modules.schematic_module
 
@@ -38,6 +39,7 @@ import uuid
 modx_modules={'problem':courseware.modules.capa_module.LoncapaModule, 
               'video':courseware.modules.video_module.VideoModule,
               'html':courseware.modules.html_module.HtmlModule,
+              'vertical':courseware.modules.vertical_module.VerticalModule,
               'schematic':courseware.modules.schematic_module.SchematicModule}
 
 def make_track_function(request):
@@ -80,19 +82,6 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     s.save()
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
-
-def vertical_module(request, module):
-    ''' Layout module which lays out content vertically. 
-    '''
-    contents=[(e.get("name"),render_module(request, e)) \
-              for e in module]
-    init_js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
-    destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
-
-    return {'init_js':init_js, 
-            'destroy_js':destroy_js, 
-            'content':render_to_string('vert_module.html',{'items':contents}), 
-            'type':'vertical'}
 
 def seq_module(request, module):
     ''' Layout module which lays out content in a temporal sequence
@@ -163,7 +152,9 @@ def render_x_module(request, xml_module):
                           module_id, 
                           ajax_url=ajax_url,
                           state=state, 
-                          track_function = make_track_function(request))
+                          track_function = make_track_function(request), 
+                          render_function = render_module, 
+                          meta = request)
     
     # If instance wasn't already in the database, create it
     if len(s) == 0:
@@ -184,7 +175,7 @@ def render_x_module(request, xml_module):
 module_types={'video':render_x_module,
               'html':render_x_module,
               'tab':seq_module,
-              'vertical':vertical_module,
+              'vertical':render_x_module,
               'sequential':seq_module,
               'problem':render_x_module,
               'schematic':render_x_module

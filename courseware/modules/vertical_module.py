@@ -7,23 +7,23 @@ import json
 from django.conf import settings
 from djangomako.shortcuts import render_to_response, render_to_string
 
-class HtmlModule(XModule):
-    id_attribute = 'filename'
+class VerticalModule(XModule):
+    id_attribute = 'id'
 
     def get_state(self):
         return json.dumps({ })
 
     def get_xml_tags():
-        return "html"
+        return "vertical"
         
     def get_html(self):
-        if self.filename!=None:
-            return render_to_string(self.filename, {'id': self.item_id})
-        else: 
-            xmltree=etree.fromstring(self.xml)
-            textlist=[xmltree.text]+[etree.tostring(i) for i in xmltree]+[xmltree.tail]
-            textlist=[i for i in textlist if type(i)==str]
-            return "".join(textlist)
+        return render_to_string('vert_module.html',{'items':self.contents})
+
+    def get_init_js(self):
+        return self.init_js_text
+
+    def get_destroy_js(self):
+        return self.destroy_js_text
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
@@ -32,3 +32,8 @@ class HtmlModule(XModule):
         filename_l=xmltree.xpath("/html/@filename")
         if len(filename_l)>0:
             self.filename=str(filename_l[0])
+
+        self.contents=[(e.get("name"),self.render_function(meta, e)) \
+                      for e in xmltree]
+        self.init_js_text="".join([e[1]['init_js'] for e in self.contents if 'init_js' in e[1]])
+        self.destroy_js_text="".join([e[1]['destroy_js'] for e in self.contents if 'destroy_js' in e[1]])
