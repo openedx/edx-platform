@@ -7,12 +7,18 @@ except:
 from lxml import etree
 
 import json
+import hashlib
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
 
 TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
+
+def fasthash(string):
+    m = hashlib.new("md4")
+    m.update(string)
+    return m.hexdigest()
 
 def xpath(xml, query_string, **args):
     ''' Safe xpath query into an xml tree:
@@ -55,10 +61,32 @@ def item(l, default="", process=lambda x:x):
         return process(l[0])
     else:
         raise Exception('Malformed XML')
+
+def id_tag(course):
+    ''' Tag all course elements with unique IDs '''
+    default_ids = {'video':'youtube',
+                   'problem':'filename',
+                   'sequential':'id',
+                   'html':'filename',
+                   'vertical':'id', 
+                   'tab':'id',
+                   'schematic':'id'}
     
+    # Tag elements with unique IDs
+    elements = course.xpath("|".join(['//'+c for c in default_ids]))
+    for elem in elements:
+        if elem.get('id'):
+            pass
+        elif elem.get(default_ids[elem.tag]):
+            elem.set('id', elem.get(default_ids[elem.tag]))
+        else:
+            elem.set('id', fasthash(etree.tostring(elem)))    
+
 def course_file(user):
     # TODO: Cache. 
-    return etree.parse(settings.DATA_DIR+UserProfile.objects.get(user=user).courseware)
+    tree = etree.parse(settings.DATA_DIR+UserProfile.objects.get(user=user).courseware)
+    id_tag(tree)
+    return tree
 
 def module_xml(coursefile, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes
