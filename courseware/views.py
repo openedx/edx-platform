@@ -171,9 +171,6 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     cf = content_parser.course_file(request.user)
     dom=etree.parse(cf)
-    #dom_course=content_parser.dom_select(dom, 'course', course)
-    #dom_chapter=content_parser.dom_select(dom_course, 'chapter', chapter)
-    #dom_section=content_parser.dom_select(dom_chapter, 'section', section)
     dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
                            course=course, chapter=chapter, section=section)
     if len(dom_module) == 0:

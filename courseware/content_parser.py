@@ -105,12 +105,3 @@ def toc_from_xml(coursefile, active_chapter, active_section):
                    'active':(c.get("name")==active_chapter)})
     return ch
 
-def dom_select(dom, element_type, element_name):
-    if dom==None:
-        return None
-    elements=dom.getElementsByTagName(element_type)
-    for e in elements:
-        if e.getAttribute("name")==element_name:
-            return e
-    return None
-
