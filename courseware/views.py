@@ -31,6 +31,8 @@ import uuid
 
 from module_render import *
 
+from lxml import etree
+
 template_imports={'urllib':urllib}
 
 def profile(request):
@@ -39,20 +41,23 @@ def profile(request):
     if not request.user.is_authenticated():
         return redirect('/')
 
-    dom=parse(content_parser.course_file(request.user))
+    dom=etree.parse(content_parser.course_file(request.user))
     hw=[]
-    course = dom.getElementsByTagName('course')[0]
-    chapters = course.getElementsByTagName('chapter')
+    course = dom.xpath('//course/@name')[0]
+    chapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
     responses=StudentModule.objects.filter(student=request.user)
 
     for c in chapters:
-        for s in c.getElementsByTagName('section'):
-            problems=s.getElementsByTagName('problem')
+        chname=c.get('name')
+        for s in dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section', 
+                           course=course, chname=chname):
+            problems=dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section[@name=$section]//problem', 
+                           course=course, chname=chname, section=s.get('name'))
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    id = p.getAttribute('filename')
+                    id = p.get('filename')
                     correct = 0
                     for response in responses:
                         if response.module_id == id:
@@ -60,11 +65,11 @@ def profile(request):
                                 correct=response.grade
                             else:
                                 correct=0
-                    total=capa_module.LoncapaModule(p.toxml(), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    total=capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     scores.append((int(correct),total))
-                score={'course':course.getAttribute('name'),
-                       'section':s.getAttribute("name"),
-                       'chapter':c.getAttribute("name"),
+                score={'course':course,
+                       'section':s.get("name"),
+                       'chapter':c.get("name"),
                        'scores':scores,
                        }
                 hw.append(score)

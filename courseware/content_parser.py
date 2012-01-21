@@ -83,17 +83,17 @@ def module_xml(coursefile, module, id_tag, module_id):
     #return result_set[0].serialize()
 
 def toc_from_xml(coursefile, active_chapter, active_section):
-    dom2 = etree.parse(coursefile)
+    dom = etree.parse(coursefile)
 
-    name = dom2.xpath('//course/@name')[0]
+    name = dom.xpath('//course/@name')[0]
 
-    chapters = dom2.xpath('//course[@name=$name]/chapter', name=name)
+    chapters = dom.xpath('//course[@name=$name]/chapter', name=name)
     ch=list()
     for c in chapters:
         if c.get('name') == 'hidden':
             continue
         sections=list()
-        for s in dom2.xpath('//course[@name=$name]/chapter[@name=$chname]/section', name=name, chname=c.get('name')): 
+        for s in dom.xpath('//course[@name=$name]/chapter[@name=$chname]/section', name=name, chname=c.get('name')): 
             sections.append({'name':s.get("name") or "", 
                              'time':s.get("time") or "", 
                              'format':s.get("format") or "", 
