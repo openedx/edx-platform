@@ -29,6 +29,9 @@ from django.conf import settings
 
 import content_parser
 
+import sys
+
+from lxml import etree
 import uuid
 
 modx_modules={'problem':capa_module.LoncapaModule, 
@@ -80,9 +83,8 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 def vertical_module(request, module):
     ''' Layout module which lays out content vertically. 
     '''
-    contents=[(e.getAttribute("name"),render_module(request, e)) \
-              for e in module.childNodes \
-              if e.nodeType==1]
+    contents=[(e.get("name"),render_module(request, e)) \
+              for e in module]
     init_js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
     destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
 
@@ -107,9 +109,8 @@ def seq_module(request, module):
                 "destroy_js":m['destroy_js'], 
                 'init_js':m['init_js'], 
                 'type':m['type']}
-    contents=[(e.getAttribute("name"),j(render_module(request, e))) \
-              for e in module.childNodes \
-              if e.nodeType==1]
+    contents=[(e.get("name"),j(render_module(request, e))) \
+              for e in module]
      
     js=""
 
@@ -125,12 +126,12 @@ def seq_module(request, module):
     # IDs to sequences. 
     destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
 
-    if module.nodeName == 'sequential':
+    if module.tag == 'sequential':
         return {'init_js':js+render_to_string('seq_module.js',params),
                 "destroy_js":destroy_js,
                 'content':render_to_string('seq_module.html',params), 
                 'type':'sequential'}
-    if module.nodeName == 'tab':
+    if module.tag == 'tab':
         params['id'] = 'tab'
         return {'init_js':js+render_to_string('tab_module.js',params),
                 "destroy_js":destroy_js,
@@ -141,9 +142,9 @@ def seq_module(request, module):
 def render_x_module(request, xml_module):
     ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
-    module_type=xml_module.nodeName
+    module_type=xml_module.tag
     module_class=modx_modules[module_type]
-    module_id=xml_module.getAttribute(module_class.id_attribute)
+    module_id=xml_module.get(module_class.id_attribute) or "" # TODO: remove or ""
 
     # Grab state from database
     s = StudentModule.objects.filter(student=request.user, 
@@ -157,7 +158,7 @@ def render_x_module(request, xml_module):
 
     # Create a new instance
     ajax_url = '/modx/'+module_type+'/'+module_id+'/'
-    instance=module_class(xml_module.toxml(), 
+    instance=module_class(etree.tostring(xml_module), 
                           module_id, 
                           ajax_url=ajax_url,
                           state=state, 
@@ -190,9 +191,9 @@ module_types={'video':render_x_module,
 
 def render_module(request, module):
     ''' Generic dispatch for internal modules. '''
-    if module==None:
+    if module==None :
         return {"content":""}
-    if str(module.localName) in module_types:
-        return module_types[module.localName](request, module)
+    if str(module.tag) in module_types:
+        return module_types[module.tag](request, module)
     print "rm404"
     raise Http404

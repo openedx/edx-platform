@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.template import Context, loader
 from djangomako.shortcuts import render_to_response, render_to_string
-from xml.dom.minidom import parse, parseString
 import json, os, sys
 from django.core.context_processors import csrf
 
@@ -32,6 +31,9 @@ import uuid
 from module_render import *
 
 from lxml import etree
+
+etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                         remove_comments = True))
 
 template_imports={'urllib':urllib}
 
@@ -114,6 +116,7 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     # Fixes URLs -- we don't get funny encoding characters from spaces
     # so they remain readable
+    ## TODO: Properly replace underscores
     course=course.replace("_"," ")
     chapter=chapter.replace("_"," ")
     section=section.replace("_"," ")
@@ -132,6 +135,51 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
         module=[e for e in dom_section.childNodes if e.nodeType==1][0]
     else:
         module=None
+
+    accordion=render_accordion(request, course, chapter, section)
+
+    module=render_module(request, module)
+
+    if 'init_js' not in module:
+        module['init_js']=''
+
+    context={'init':accordion['init_js']+module['init_js'],
+             'accordion':accordion['content'],
+             'content':module['content'],
+             'csrf':csrf(request)['csrf_token']}
+    return render_to_response('courseware.html', context)
+
+
+
+def index(request, course="6.002 Spring 2012", chapter="Using the System", section="Hints"): 
+    ''' Displays courseware accordion, and any associated content. 
+    ''' 
+    if not settings.COURSEWARE_ENABLED or not request.user.is_authenticated():
+        return redirect('/')
+
+    # Fixes URLs -- we don't get funny encoding characters from spaces
+    # so they remain readable
+    ## TODO: Properly replace underscores
+    course=course.replace("_"," ")
+    chapter=chapter.replace("_"," ")
+    section=section.replace("_"," ")
+
+    # HACK: Force course to 6.002 for now
+    # Without this, URLs break
+    if course!="6.002 Spring 2012":
+        return redirect('/')
+
+    cf = content_parser.course_file(request.user)
+    dom=etree.parse(cf)
+    #dom_course=content_parser.dom_select(dom, 'course', course)
+    #dom_chapter=content_parser.dom_select(dom_course, 'chapter', chapter)
+    #dom_section=content_parser.dom_select(dom_chapter, 'section', section)
+    dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
+                           course=course, chapter=chapter, section=section)
+    if len(dom_module) == 0:
+        module = None
+    else:
+        module = dom_module[0]
 
     accordion=render_accordion(request, course, chapter, section)
 
