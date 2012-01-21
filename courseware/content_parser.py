@@ -52,7 +52,8 @@ def xpath_remove(tree, path):
     return tree
 
 if __name__=='__main__':
-    print xpath('<html><problem name="Bob"></problem></html>', '/{search}/problem[@name="{name}"]', search='html', name="Bob")
+    print xpath('<html><problem name="Bob"></problem></html>', '/{search}/problem[@name="{name}"]', 
+                search='html', name="Bob")
 
 def item(l, default="", process=lambda x:x):
     if len(l)==0:

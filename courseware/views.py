@@ -13,11 +13,6 @@ import StringIO
 
 from django.http import Http404
 
-import urllib
-
-import capa_module
-import video_module
-
 from models import StudentModule
 
 import urllib

@@ -16,10 +16,10 @@ from django.http import Http404
 
 import urllib
 
-import capa_module
-import video_module
-import html_module
-import schematic_module
+import courseware.modules.capa_module
+import courseware.modules.video_module
+import courseware.modules.html_module
+import courseware.modules.schematic_module
 
 from models import StudentModule
 
@@ -34,10 +34,11 @@ import sys
 from lxml import etree
 import uuid
 
-modx_modules={'problem':capa_module.LoncapaModule, 
-              'video':video_module.VideoModule,
-              'html':html_module.HtmlModule,
-              'schematic':schematic_module.SchematicModule}
+## TODO: Add registration mechanism
+modx_modules={'problem':courseware.modules.capa_module.LoncapaModule, 
+              'video':courseware.modules.video_module.VideoModule,
+              'html':courseware.modules.html_module.HtmlModule,
+              'schematic':courseware.modules.schematic_module.SchematicModule}
 
 def make_track_function(request):
     def f(event_type, event):

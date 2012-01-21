@@ -2,14 +2,14 @@ import random, numpy, math, scipy, sys, StringIO, os, struct, json
 from x_module import XModule
 import sys
 
-from capa.capa_problem import LoncapaProblem
+from courseware.capa.capa_problem import LoncapaProblem
 from django.http import Http404
 
 import dateutil
 import dateutil.parser
 import datetime
 
-import content_parser
+import courseware.content_parser as content_parser
 
 from lxml import etree
 
