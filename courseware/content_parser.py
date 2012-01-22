@@ -18,7 +18,7 @@ TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 def fasthash(string):
     m = hashlib.new("md4")
     m.update(string)
-    return m.hexdigest()
+    return "id"+m.hexdigest()
 
 def xpath(xml, query_string, **args):
     ''' Safe xpath query into an xml tree:

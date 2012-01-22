@@ -1,5 +1,6 @@
 from x_module import XModule
 from lxml import etree
+from django.http import Http404
 
 import json
 
@@ -13,7 +14,7 @@ class SequentialModule(XModule):
     id_attribute = 'id'
 
     def get_state(self):
-        return json.dumps({ })
+        return json.dumps({ 'position':self.position })
 
     def get_xml_tags():
         return ["sequential", 'tab']
@@ -27,9 +28,23 @@ class SequentialModule(XModule):
     def get_destroy_js(self):
         return self.destroy_js
 
+    def handle_ajax(self, dispatch, get):
+        print "GET", get
+        print "DISPATCH", dispatch
+        if dispatch=='goto_position':
+            self.position = int(get['position'])
+            return json.dumps({'success':True})
+        raise Http404()
+
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
         xmltree=etree.fromstring(xml)
+
+        self.position = 1
+
+        if state!=None:
+            state = json.loads(state)
+            if 'position' in state: self.position = int(state['position'])
 
         def j(m): 
             ''' jsonify contents so it can be embedded in a js array
@@ -51,7 +66,8 @@ class SequentialModule(XModule):
         js=""
 
         params={'items':contents,
-                'id':"seq"}
+                'id':item_id,
+                'position': self.position}
 
         # TODO/BUG: Destroy JavaScript should only be called for the active view
         # This calls it for all the views

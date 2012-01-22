@@ -52,11 +52,12 @@ def make_track_function(request):
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
     # Grab the student information for the module from the database
+    print module, request.user, id
     s = StudentModule.objects.filter(module_type=module, 
                                      student=request.user, 
                                      module_id=id)
     if len(s) == 0:
-        print "ls404"
+        print "ls404", module, request.user, id
         raise Http404
 
     s=s[0]
@@ -75,12 +76,15 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                   s.module_id, 
                                   ajax_url=ajax_url, 
                                   state=s.state, 
-                                  track_function = make_track_function(request))
+                                  track_function = make_track_function(request), 
+                                  render_function = render_module, 
+                                  meta = request)
     # Let the module handle the AJAX
     ajax_return=instance.handle_ajax(dispatch, request.POST)
     # Save the state back to the database
     s.state=instance.get_state()
-    s.grade=instance.get_score()['score']
+    if instance.get_score() != None: 
+        s.grade=instance.get_score()['score']
     s.save()
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
