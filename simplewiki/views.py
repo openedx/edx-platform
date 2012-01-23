@@ -51,7 +51,7 @@ def root_redirect(request):
         err = not_found(request, 'mainpage')
         return err
 
-    return HttpResponseRedirect(reverse('wiki_view', args=(root.slug,)))
+    return HttpResponseRedirect(reverse('wiki_view', args=(root.get_url())))
 
 def create(request, wiki_url):
     if not request.user.is_authenticated():
