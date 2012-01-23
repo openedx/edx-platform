@@ -220,6 +220,8 @@ class Revision(models.Model):
     counter = models.IntegerField(verbose_name=_('Revision#'), default=1, editable=False)
     previous_revision = models.ForeignKey('self', blank=True, null=True, editable=False)
     
+    deleted = models.IntegerField(verbose_name=_('Deleted group'), default=0)
+    
     def get_user(self):
         return self.revision_user if self.revision_user else _('Anonymous')
     
