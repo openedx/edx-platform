@@ -94,7 +94,7 @@ def render_x_module(request, xml_module):
     # Check if problem has an instance in DB
     module_type=xml_module.tag
     module_class=modx_modules[module_type]
-    module_id=xml_module.get(module_class.id_attribute) or "" # TODO: remove or ""
+    module_id=xml_module.get('id') #module_class.id_attribute) or "" 
 
     # Grab state from database
     s = StudentModule.objects.filter(student=request.user, 

@@ -79,7 +79,9 @@ def id_tag(course):
         if elem.get('id'):
             pass
         elif elem.get(default_ids[elem.tag]):
-            elem.set('id', elem.get(default_ids[elem.tag]))
+            new_id = elem.get(default_ids[elem.tag]) # Convert to alphanumeric
+            new_id = "".join([a for a in new_id if a.isalnum()])
+            elem.set('id', new_id)
         else:
             elem.set('id', fasthash(etree.tostring(elem)))    
 
