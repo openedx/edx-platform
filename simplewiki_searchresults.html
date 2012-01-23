@@ -16,11 +16,7 @@
 
 <%block name="wiki_body">
 	%for article in wiki_search_results:
-		%if article is not UNDEFINED:
-			<a href="${reverse("wiki_view", args=[article.get_url()])}">${article.get_url()}</a><br/>
-		%else:
-			<a href="${reverse("wiki_view", args=[''])}">/</a><br/>
-		%endif
+		<a href="${reverse("wiki_view", args=[article.get_url()])}">${article.get_url()}</a><br/>
 	%endfor
 	
 	%if not wiki_search_results: 
