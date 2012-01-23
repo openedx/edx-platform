@@ -35,7 +35,7 @@ def profile(request):
     
     log.info("Profile called")
     logging.info("Now the root")
-    logging.getLogger("tracking").info("something")
+    logging.getLogger("tracking").info("this should be unformatted")
 
     dom=content_parser.course_file(request.user)
     hw=[]
