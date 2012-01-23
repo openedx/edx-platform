@@ -1,31 +1,26 @@
-from django.http import HttpResponse
-from django.template import Context, loader
-from djangomako.shortcuts import render_to_response, render_to_string
-import json, os, sys
-from django.core.context_processors import csrf
-
-from django.template import Context
-from django.contrib.auth.models import User
-from auth.models import UserProfile
-from django.shortcuts import redirect
-
+import json
+import logging
+import os
+import sys
 import StringIO
-
-from django.http import Http404
-
-from models import StudentModule
-
 import urllib
-
-from django.conf import settings
-
-import content_parser
-
 import uuid
 
-from module_render import *
-
+from django.conf import settings
+from django.core.context_processors import csrf
+from django.contrib.auth.models import User
+from django.http import HttpResponse, Http404
+from django.shortcuts import redirect
+from django.template import Context, loader
+from djangomako.shortcuts import render_to_response, render_to_string
 from lxml import etree
+
+from auth.models import UserProfile
+from models import StudentModule
+from module_render import *
+import content_parser
+
+log = logging.getLogger("mitx.courseware")
 
 etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
                                          remove_comments = True))
@@ -37,6 +32,10 @@ def profile(request):
         We need to allow the user to change some of these settings .'''
     if not request.user.is_authenticated():
         return redirect('/')
+    
+    log.info("Profile called")
+    logging.info("Now the root")
+    logging.getLogger("tracking").info("this should be unformatted")
 
     dom=content_parser.course_file(request.user)
     hw=[]
@@ -62,7 +61,7 @@ def profile(request):
                                 correct=response.grade
                             else:
                                 correct=0
-                    total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    total=capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     scores.append((int(correct),total))
                 score={'course':course,
                        'section':s.get("name"),
