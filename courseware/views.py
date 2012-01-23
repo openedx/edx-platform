@@ -20,6 +20,8 @@ from models import StudentModule
 from module_render import *
 import content_parser
 
+log = logging.getLogger("mitx.courseware")
+
 etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
                                          remove_comments = True))
 
@@ -30,7 +32,11 @@ def profile(request):
         We need to allow the user to change some of these settings .'''
     if not request.user.is_authenticated():
         return redirect('/')
-   
+    
+    log.info("Profile called")
+    logging.info("Now the root")
+    logging.getLogger("tracking").info("something")
+
     dom=content_parser.course_file(request.user)
     hw=[]
     course = dom.xpath('//course/@name')[0]
