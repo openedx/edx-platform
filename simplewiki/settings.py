@@ -89,7 +89,6 @@ WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
                             'abbr',
                             'toc',
                             'mathjax',
-                            'camelcase', # CamelCase-style wikilinks
                             'video',      # In-line embedding for YouTube, etc.
                             'circuit' 
                             ])
