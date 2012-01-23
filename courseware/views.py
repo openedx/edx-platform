@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.template import Context, loader
 from djangomako.shortcuts import render_to_response, render_to_string
-from xml.dom.minidom import parse, parseString
 import json, os, sys
 from django.core.context_processors import csrf
 
@@ -13,11 +12,6 @@ from django.shortcuts import redirect
 import StringIO
 
 from django.http import Http404
-
-import urllib
-
-import capa_module
-import video_module
 
 from models import StudentModule
 
@@ -31,6 +25,11 @@ import uuid
 
 from module_render import *
 
+from lxml import etree
+
+etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                         remove_comments = True))
+
 template_imports={'urllib':urllib}
 
 def profile(request):
@@ -39,20 +38,23 @@ def profile(request):
     if not request.user.is_authenticated():
         return redirect('/')
 
-    dom=parse(content_parser.course_file(request.user))
+    dom=content_parser.course_file(request.user)
     hw=[]
-    course = dom.getElementsByTagName('course')[0]
-    chapters = course.getElementsByTagName('chapter')
+    course = dom.xpath('//course/@name')[0]
+    chapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
     responses=StudentModule.objects.filter(student=request.user)
 
     for c in chapters:
-        for s in c.getElementsByTagName('section'):
-            problems=s.getElementsByTagName('problem')
+        chname=c.get('name')
+        for s in dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section', 
+                           course=course, chname=chname):
+            problems=dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section[@name=$section]//problem', 
+                           course=course, chname=chname, section=s.get('name'))
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    id = p.getAttribute('filename')
+                    id = p.get('filename')
                     correct = 0
                     for response in responses:
                         if response.module_id == id:
@@ -60,11 +62,11 @@ def profile(request):
                                 correct=response.grade
                             else:
                                 correct=0
-                    total=capa_module.LoncapaModule(p.toxml(), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     scores.append((int(correct),total))
-                score={'course':course.getAttribute('name'),
-                       'section':s.getAttribute("name"),
-                       'chapter':c.getAttribute("name"),
+                score={'course':course,
+                       'section':s.get("name"),
+                       'chapter':c.get("name"),
                        'scores':scores,
                        }
                 hw.append(score)
@@ -109,6 +111,7 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     # Fixes URLs -- we don't get funny encoding characters from spaces
     # so they remain readable
+    ## TODO: Properly replace underscores
     course=course.replace("_"," ")
     chapter=chapter.replace("_"," ")
     section=section.replace("_"," ")
@@ -118,15 +121,13 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     if course!="6.002 Spring 2012":
         return redirect('/')
 
-    cf = content_parser.course_file(request.user)
-    dom=parse(cf)
-    dom_course=content_parser.dom_select(dom, 'course', course)
-    dom_chapter=content_parser.dom_select(dom_course, 'chapter', chapter)
-    dom_section=content_parser.dom_select(dom_chapter, 'section', section)
-    if dom_section!=None:
-        module=[e for e in dom_section.childNodes if e.nodeType==1][0]
+    dom = content_parser.course_file(request.user)
+    dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
+                           course=course, chapter=chapter, section=section)
+    if len(dom_module) == 0:
+        module = None
     else:
-        module=None
+        module = dom_module[0]
 
     accordion=render_accordion(request, course, chapter, section)
 
@@ -134,6 +135,8 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     if 'init_js' not in module:
         module['init_js']=''
+
+    
 
     context={'init':accordion['init_js']+module['init_js'],
              'accordion':accordion['content'],

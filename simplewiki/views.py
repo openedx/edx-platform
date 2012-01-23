@@ -48,7 +48,7 @@ def root_redirect(request):
     try:
         root = Article.get_root()
     except:
-        err = not_found(request, 'mainpage')
+        err = not_found(request, '/')
         return err
 
     return HttpResponseRedirect(reverse('wiki_view', args=(root.get_url())))
@@ -92,7 +92,7 @@ def create(request, wiki_url):
         #except ShouldHaveExactlyOneRootSlug, (e):
     except:
         if Article.objects.filter(parent=None).count() > 0:
-            return HttpResponseRedirect(reverse('wiki_view', args=('',)))
+            return HttpResponseRedirect(reverse('wiki_view', args=('/',)))
         # Root not found...
         path = []
         url_path = [""]
@@ -380,7 +380,7 @@ def fetch_from_url(request, url):
     try:
         root = Article.get_root()
     except:
-        err = not_found(request, '')
+        err = not_found(request, '/')
         return (article, path, err)
 
     if url_path and root.slug == url_path[0]:

@@ -8,7 +8,12 @@ from django.shortcuts import redirect
 from django.core.context_processors import csrf
 
 #valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
-valid_templates=['mitx_global.html', 'index.html']
+valid_templates=['mitx_global.html', 
+                 'index.html', 
+                 'tos.html', 
+                 'privacy.html', 
+                 'honor.html', 
+                 'copyright.html']
 
 def index(request, template): 
     csrf_token = csrf(request)['csrf_token']

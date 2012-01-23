@@ -1,4 +1,4 @@
-import random, numpy, math, scipy
+import random, numpy, math, scipy, json
 from util import contextualize_text
 from calc import evaluator
 import random, math
@@ -63,7 +63,6 @@ class customresponse(object):
         # be handled by capa_problem
         return {}
 
-
 class formularesponse(object):
     def __init__(self, xml, context):
         self.xml = xml
@@ -114,3 +113,28 @@ class formularesponse(object):
 
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
+
+class schematicresponse(object):
+    def __init__(self, xml, context):
+        self.xml = xml
+        self.answer_ids = xml.xpath('//*[@id=$id]//schematic/@id',
+                                    id=xml.get('id'))
+        self.context = context
+        answer = xml.xpath('//*[@id=$id]//answer',
+                           id=xml.get('id'))[0]
+        answer_src = answer.get('src')
+        if answer_src != None:
+            self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
+        else:
+            self.code = answer.text
+
+    def grade(self, student_answers):
+        submission = [json.loads(student_answers[k]) for k in sorted(self.answer_ids)]
+        self.context.update({'submission':submission})
+        exec self.code in global_context, self.context
+        return  zip(sorted(self.answer_ids), self.context['correct'])
+
+    def get_answers(self):
+        # Since this is explicitly specified in the problem, this will 
+        # be handled by capa_problem
+        return {}

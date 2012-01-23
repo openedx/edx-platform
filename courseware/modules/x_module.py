@@ -39,11 +39,13 @@ class XModule(object):
             get is a dictionary-like object ''' 
         return ""
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None):
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
         ''' In most cases, you must pass state or xml'''
-        self.xml=xml
-        self.item_id=item_id
-        self.ajax_url=ajax_url
-        self.track_url=track_url
-        self.state=state
-        self.tracker=track_function
+        self.xml = xml
+        self.item_id = item_id
+        self.ajax_url = ajax_url
+        self.track_url = track_url
+        self.state = state
+        self.tracker = track_function
+        self.render_function = render_function
+        self.meta = meta

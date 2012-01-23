@@ -16,10 +16,12 @@ from django.http import Http404
 
 import urllib
 
-import capa_module
-import video_module
-import html_module
-import schematic_module
+import courseware.modules.capa_module
+import courseware.modules.video_module
+import courseware.modules.vertical_module
+import courseware.modules.html_module
+import courseware.modules.schematic_module
+import courseware.modules.seq_module
 
 from models import StudentModule
 
@@ -29,12 +31,18 @@ from django.conf import settings
 
 import content_parser
 
+import sys
+
+from lxml import etree
 import uuid
 
-modx_modules={'problem':capa_module.LoncapaModule, 
-              'video':video_module.VideoModule,
-              'html':html_module.HtmlModule,
-              'schematic':schematic_module.SchematicModule}
+## TODO: Add registration mechanism
+modx_modules={'problem':courseware.modules.capa_module.LoncapaModule, 
+              'video':courseware.modules.video_module.VideoModule,
+              'html':courseware.modules.html_module.HtmlModule,
+              'vertical':courseware.modules.vertical_module.VerticalModule,
+              'sequential':courseware.modules.seq_module.SequentialModule,
+              'schematic':courseware.modules.schematic_module.SchematicModule}
 
 def make_track_function(request):
     def f(event_type, event):
@@ -44,11 +52,12 @@ def make_track_function(request):
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
     # Grab the student information for the module from the database
+    print module, request.user, id
     s = StudentModule.objects.filter(module_type=module, 
                                      student=request.user, 
                                      module_id=id)
     if len(s) == 0:
-        print "ls404"
+        print "ls404", module, request.user, id
         raise Http404
 
     s=s[0]
@@ -67,83 +76,25 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                   s.module_id, 
                                   ajax_url=ajax_url, 
                                   state=s.state, 
-                                  track_function = make_track_function(request))
+                                  track_function = make_track_function(request), 
+                                  render_function = render_module, 
+                                  meta = request)
     # Let the module handle the AJAX
     ajax_return=instance.handle_ajax(dispatch, request.POST)
     # Save the state back to the database
     s.state=instance.get_state()
-    s.grade=instance.get_score()['score']
+    if instance.get_score() != None: 
+        s.grade=instance.get_score()['score']
     s.save()
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
 
-def vertical_module(request, module):
-    ''' Layout module which lays out content vertically. 
-    '''
-    contents=[(e.getAttribute("name"),render_module(request, e)) \
-              for e in module.childNodes \
-              if e.nodeType==1]
-    init_js="".join([e[1]['init_js'] for e in contents if 'init_js' in e[1]])
-    destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
-
-    return {'init_js':init_js, 
-            'destroy_js':destroy_js, 
-            'content':render_to_string('vert_module.html',{'items':contents}), 
-            'type':'vertical'}
-
-def seq_module(request, module):
-    ''' Layout module which lays out content in a temporal sequence
-    '''
-    def j(m): 
-        # jsonify contents so it can be embedded in a js array
-        # We also need to split </script> tags so they don't break
-        # mid-string
-        if 'init_js' not in m: m['init_js']=""
-        if 'type' not in m: m['init_js']=""
-        content=json.dumps(m['content']) 
-        content=content.replace('</script>', '<"+"/script>') 
-
-        return {'content':content, 
-                "destroy_js":m['destroy_js'], 
-                'init_js':m['init_js'], 
-                'type':m['type']}
-    contents=[(e.getAttribute("name"),j(render_module(request, e))) \
-              for e in module.childNodes \
-              if e.nodeType==1]
-     
-    js=""
-
-    iid=uuid.uuid1().hex
-
-    params={'items':contents,
-            'id':"seq"}
-
-    # TODO/BUG: Destroy JavaScript should only be called for the active view
-    # This calls it for all the views
-    # 
-    # To fix this, we'd probably want to have some way of assigning unique
-    # IDs to sequences. 
-    destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
-
-    if module.nodeName == 'sequential':
-        return {'init_js':js+render_to_string('seq_module.js',params),
-                "destroy_js":destroy_js,
-                'content':render_to_string('seq_module.html',params), 
-                'type':'sequential'}
-    if module.nodeName == 'tab':
-        params['id'] = 'tab'
-        return {'init_js':js+render_to_string('tab_module.js',params),
-                "destroy_js":destroy_js,
-                'content':render_to_string('tab_module.html',params), 
-                'type':'tab'}
-
-
 def render_x_module(request, xml_module):
     ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
-    module_type=xml_module.nodeName
+    module_type=xml_module.tag
     module_class=modx_modules[module_type]
-    module_id=xml_module.getAttribute(module_class.id_attribute)
+    module_id=xml_module.get('id') #module_class.id_attribute) or "" 
 
     # Grab state from database
     s = StudentModule.objects.filter(student=request.user, 
@@ -157,11 +108,13 @@ def render_x_module(request, xml_module):
 
     # Create a new instance
     ajax_url = '/modx/'+module_type+'/'+module_id+'/'
-    instance=module_class(xml_module.toxml(), 
+    instance=module_class(etree.tostring(xml_module), 
                           module_id, 
                           ajax_url=ajax_url,
                           state=state, 
-                          track_function = make_track_function(request))
+                          track_function = make_track_function(request), 
+                          render_function = render_module, 
+                          meta = request)
     
     # If instance wasn't already in the database, create it
     if len(s) == 0:
@@ -179,20 +132,8 @@ def render_x_module(request, xml_module):
 
     return content
 
-module_types={'video':render_x_module,
-              'html':render_x_module,
-              'tab':seq_module,
-              'vertical':vertical_module,
-              'sequential':seq_module,
-              'problem':render_x_module,
-              'schematic':render_x_module
-              }
-
 def render_module(request, module):
     ''' Generic dispatch for internal modules. '''
-    if module==None:
+    if module==None :
         return {"content":""}
-    if str(module.localName) in module_types:
-        return module_types[module.localName](request, module)
-    print "rm404"
-    raise Http404
+    return render_x_module(request, module)
