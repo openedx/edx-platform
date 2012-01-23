@@ -21,9 +21,7 @@ class Article(models.Model):
     title = models.CharField(max_length=512, verbose_name=_('Article title'),
                              blank=False)
     slug = models.SlugField(max_length=100, verbose_name=_('slug'),
-                            help_text=_('Letters, numbers, underscore and hyphen.'
-                                        ' Do not use reserved words \'create\','
-                                        ' \'history\' and \'edit\'.'),
+                            help_text=_('Letters, numbers, underscore and hyphen.'),
                             blank=True)
     created_by = models.ForeignKey(User, verbose_name=_('Created by'), blank=True, null=True)
     created_on = models.DateTimeField(auto_now_add = 1)
@@ -50,16 +48,17 @@ class Article(models.Model):
         except the very first time the wiki is loaded, in which
         case the user is prompted to create this article."""
         try:
-            return Article.objects.filter(parent__exact = None)[0]
+            return Article.objects.filter(slug__exact = "")[0]
         except:
             raise ShouldHaveExactlyOneRootSlug()
 
     def get_url(self):
         """Return the Wiki URL for an article"""
-        if self.parent:
-            return self.parent.get_url() + '/' + self.slug
-        else:
-            return self.slug
+        url = self.slug + "/"
+        if (self.parent):
+            url = self.parent.get_url() + url
+            
+        return url
 
     def get_abs_url(self):
         """Return the absolute path for an article. This is necessary in cases
@@ -247,7 +246,8 @@ class Revision(models.Model):
 
         # Create pre-parsed contents - no need to parse on-the-fly
         ext = WIKI_MARKDOWN_EXTENSIONS
-        ext += ["wikilinks(base_url=%s/)" % reverse('wiki_view', args=('',))]
+        # TODO: Replace with a real wikilinks module
+        # ext += ["wikilinks(base_url=%s/)" % reverse('wiki_view', args=('',))]
         self.contents_parsed = markdown(self.contents,
                                         extensions=ext,
                                         safe_mode='escape',)

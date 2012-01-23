@@ -43,27 +43,15 @@ def view(request, wiki_url):
     return render_to_response('simplewiki_view.html', d)
 
 def root_redirect(request):
-    """
-    Reason for redirecting:
-    The root article needs to to have a specific slug
-    in the URL, otherwise pattern matching in urls.py will get confused.
-    I've tried various methods to avoid this, but depending on Django/Python
-    versions, regexps have been greedy in two different ways.. so I just
-    skipped having problematic URLs like '/wiki/_edit' for editing the main page.
-    #benjaoming
-    """
     if not request.user.is_authenticated():
         return redirect('/')
     try:
         root = Article.get_root()
-        if root.slug == "":
-            root.slug = "Home"
-            root.save()
     except:
-        err = not_found(request, 'mainpage')
+        err = not_found(request, '/')
         return err
 
-    return HttpResponseRedirect(reverse('wiki_view', args=(root.slug,)))
+    return HttpResponseRedirect(reverse('wiki_view', args=(root.get_url())))
 
 def create(request, wiki_url):
     if not request.user.is_authenticated():
@@ -104,7 +92,7 @@ def create(request, wiki_url):
         #except ShouldHaveExactlyOneRootSlug, (e):
     except:
         if Article.objects.filter(parent=None).count() > 0:
-            return HttpResponseRedirect(reverse('wiki_view', args=('',)))
+            return HttpResponseRedirect(reverse('wiki_view', args=('/',)))
         # Root not found...
         path = []
         url_path = [""]
@@ -266,7 +254,7 @@ def search_articles(request):
         # Need to throttle results by splitting them into pages...
         results = Article.objects.all()
 
-    if results.count() == 1:
+    if results.count() == 1 and querystring:
         return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
     else:        
         d = {'wiki_search_results': results,
@@ -392,7 +380,7 @@ def fetch_from_url(request, url):
     try:
         root = Article.get_root()
     except:
-        err = not_found(request, '')
+        err = not_found(request, '/')
         return (article, path, err)
 
     if url_path and root.slug == url_path[0]:
@@ -400,7 +388,7 @@ def fetch_from_url(request, url):
 
     path = Article.get_url_reverse(url_path, root)
     if not path:
-        err = not_found(request, '/'.join([root.slug] + url_path))
+        err = not_found(request, '/' + '/'.join(url_path))
     else:
         article = path[-1]
     return (article, path, err)
