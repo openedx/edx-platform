@@ -30,6 +30,10 @@ var ${ id }loc = -1;
 
 function ${ id }goto(i) {
     log_event("seq_goto", {'old':${id}loc, 'new':i,'id':'${id}'});
+
+    postJSON('/modx/sequential/${ id }/goto_position',
+	     {'position' : i });
+
     if (${ id }loc!=-1)
 	${ id }destroy_functions[ ${ id }loc ]();
     $('#seq_content').html(${ id }contents[i]);
@@ -72,5 +76,5 @@ $(function() {
 	}
         $('#${ id }next').click(function(eo) { ${ id }next();});
         $('#${ id }prev').click(function(eo) { ${ id }prev();});
-	${ id }goto(1);
+	${ id }goto( ${ position } );
     });
