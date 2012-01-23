@@ -1,41 +1,53 @@
-<%inherit file="main.html" />
+<%inherit file="marketing.html" />
 
-<header class="announcement">
+<header class="announcement home">
   <div class="anouncement-wrapper">
   <nav>
     <a class="modal login" href="#login">Log In</a>
   </nav>
 
     <section>
-      <h1>An MIT Education Anywhere. <br />For free.</h1>
-      <p>MITx is an open learning software available free of cost, so that others &mdash; whether other universities or different educational institutions, such as K&ndash;12 school systems &mdash; can leverage the same software for their online education offerings.</p>
+      <h1>MITx</h1>
+      <h2>An MIT Education Anywhere. For free.</h2>
     </section>
   </div>
-
 </header>
 
 <section class="index-content">
   <section class="about">
-    <h1>About MITx</h1>
-    <p>MITx is a portfolio of MIT courses through an online interactive learning platform that:</p>
+    <h1>MITx is MIT&rsquo;s online learning initiative.</h1>
 
-    <ul>
-      <li>organizes and presents course material to enable students to learn at their own pace</li>
-      <li>features interactivity, online laboratories and student-to-student communication</li>
-      <li>allows for the individual assessment of any student&rsquo;s work and allow students who demonstrate their mastery of subjects to earn a certificate of completion awarded by MITx</li>
-      <li>operates on an open-source, scalable software infrastructure in order to make it continuously improving and readily available to other educational institutions.</li>
-    </ul>
+    <section class="intro">
+      <p>This learning platform will enhance the educational experience of its on-campus students, offering them online tools that supplement and enrich their classroom and laboratory experiences. It will also be host to a virtual community of learners around the world.</p>
+      <p>The first course offered by MITx in an experimental prototype form is 6.002x Circuits and Electronics. Watch this space for the next set of courses that will become available in Fall 2012.</p>
+    </section>
 
-    <p>This learning platform will enhance the educational experience of its on-campus students, offering them online tools that supplement and enrich their classroom and laboratory experiences. It will also be host to a virtual community learners around the world.</p>
+    <section class="features">
+      <h2>It will offer a portfolio of MIT courses for free on an online learning platform that:</h2>
+
+      <ul>
+        <li>organizes and presents course material to enable students to learn at their own pace</li>
+        <li>features interactivity, online laboratories and student-to-student communication</li>
+        <li>allows for the individual assessment of any student&rsquo;s work and allow students who demonstrate their mastery of subjects to earn a certificate of completion awarded by MITx</li>
+        <li>operates on an open-source, scalable software infrastructure in order to make it continuously improving and readily available to other educational institutions.</li>
+      </ul>
+
+      <p><strong>Press &amp; links:</strong> <a href="http://www.boston.com/news/local/massachusetts/articles/2011/12/19/mit_to_launch_online_only_graded_courses_free_to_all/?page=full" target="_blank">Boston Globe</a>, <a href="http://www.nytimes.com/2011/12/19/education/mit-expands-free-online-courses-offering-certificates.html?_r=3&hpw=" target="_blank">New York Times</a>,  <a href="http://web.mit.edu/newsoffice/2011/mitx-education-initiative-1219.html" target="_blank">MIT Press Release</a>, <a href="http://web.mit.edu/newsoffice/2011/mitx-faq-1219" target="_blank">MITx FAQ</a></p>
+    </section>
   </section>
 
-  <section>
-    <h1>Course offering</h1>
-    <h2>6.002 Circuits and Electronics</h2>
-    <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, "6.002 Circuits and Electronics" is an on-line adaption of MIT's first undergraduate analog design course. This course will run, free of charge, for students worldwide from February 1, 2012 through July 1, 2012.</p>
+  <section class="course">
+    <hgroup>
+      <h1>Spring 2012 Course offering</h1>
+      <h2>Circuits and Electronics</h2>
+      <h3>6.002x</h3>
+    </hgroup>
+
     <p>
-      <a href="/" class="more-info">More information about Circuits and Electronics</a>
+      <a href="/" class="more-info">More information <span>&amp;</span> Enroll</a>
     </p>
+
+    <p>Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, &ldquo;6.002 Circuits and Electronics&rdwuo; is an on-line adaption of MIT's first undergraduate analog design course. This prototype course will run, free of charge, for students worldwide from February 21, 2012 through June 10, 2012. Students will be given the opportunity to demonstrate their mastery of the material and earn a certificate from MITx.</p>
   </section>
 
 <div style="display:none">
@@ -52,7 +64,8 @@
 </section>
 
 
-<script> 
+<script>
+
 $(function() {
 /* Set up FancyBox pop-ups */
 
@@ -122,5 +135,4 @@ $(function() {
 
    /*$("sregion"+$("[id^=spinner_]")[1].id.substring(7)) */
 });
-
 </script>
