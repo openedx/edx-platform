@@ -52,9 +52,21 @@ blockquote, q {
 
 @font-face {
   font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: local("Open Sans Italic"), local("OpenSans-Italic"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff") format("woff"); }
+
+@font-face {
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: 800;
   src: local("Open Sans Extrabold"), local("OpenSans-Extrabold"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/EInbV5DfGHOiMmvb1Xr-hqRDOzjiPcYnFooOUGCOsRk.woff") format("woff"); }
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 800;
+  src: local("Open Sans Extrabold Italic"), local("OpenSans-ExtraboldItalic"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxsBo4hlZyBvkZICS3KpNonM.woff") format("woff"); }
 
 .wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, section.index-content, footer {
   -webkit-box-sizing: border-box;
@@ -132,7 +144,8 @@ blockquote, q {
   color: #fff;
   margin: 25.888px 0 12.944px;
   padding: 6.472px 12.944px;
-  text-decoration: none; }
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased; }
   .button:hover, header.announcement div section.course section a:hover, section.index-content section.course a:hover, section.index-content section.staff a:hover, section.index-content section.about-course section.cta a.enroll:hover {
     background-color: #660000; }
   .button span, header.announcement div section.course section a span, section.index-content section.course a span, section.index-content section.staff a span, section.index-content section.about-course section.cta a.enroll span {
@@ -147,6 +160,8 @@ body {
     font: 800 24px "Open Sans", Helvetica, Arial, sans-serif; }
   body li {
     margin-bottom: 25.888px; }
+  body em {
+    font-style: italic; }
   body input[type="email"], body input[type="number"], body input[type="password"], body input[type="search"], body input[type="tel"], body input[type="text"], body input[type="url"], body input[type="color"], body input[type="date"], body input[type="datetime"], body input[type="datetime-local"], body input[type="month"], body input[type="time"], body input[type="week"], body textarea {
     -webkit-box-shadow: 0 -1px 0 white;
     -moz-box-shadow: 0 -1px 0 white;
@@ -175,7 +190,8 @@ header.announcement {
   background-size: cover;
   background: #333;
   border-bottom: 1px solid #000;
-  color: #fff; }
+  color: #fff;
+  -webkit-font-smoothing: antialiased; }
   @media screen and (min-width: 1200px) {
     header.announcement.home {
       background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg"); } }
@@ -228,7 +244,7 @@ header.announcement {
         *vertical-align: auto;
         margin-right: 25.888px; }
         header.announcement div nav h1 a {
-          font: 800 18px "Open Sans", Helvetica, Arial, sans-serif;
+          font: italic 800 18px "Open Sans", Helvetica, Arial, sans-serif;
           color: #fff;
           text-decoration: none; }
       header.announcement div nav a.login {
