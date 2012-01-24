@@ -20,7 +20,7 @@ from lxml import etree
 from auth.models import UserProfile
 from models import StudentModule
 from module_render import * # TODO: Clean up
-import content_parser
+import courseware.content_parser
 
 log = logging.getLogger("mitx.courseware")
 
