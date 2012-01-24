@@ -1,54 +1,55 @@
 <%inherit file="main.html" />
 
 <script>
-var loc=true; // Activate on clicks? Not if already clicked. 
+var loc=true; // Activate on clicks? Not if already clicked.
 var lang=true;
 $(function() {
-        $("#change_location").click(function() {
-           log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
+      $("#change_location").click(function() {
+         log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
 
-           if(loc) {
-             $("#description").html('<div style="color:#FF0000">'+
-                                    "Preferred format is city, state, country (so for us, "+
-                                    "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
-                                    "as much or as little detail as you want. </div>");
+         if(loc) {
+           $("#description").html('<div>'+
+                                  "Preferred format is city, state, country (so for us, "+
+                                  "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
+                                  "as much or as little detail as you want. </div>");
 
-             loc=false;
-             $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
-                                     '<input type="button" id="change_loc_button" value="Change" />');
-             $("#change_loc_button").click(function() {
-                postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
-                  $("#location_sub").text(json.location);
-                  loc=true;
-                  $("#description").html("");
-                 log_event("profile", {"type":"location_change", "new":json.location});
-                });
-             });
-           }
-        });
+           loc=false;
 
-        $("#change_language").click(function() {
-           log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
+           $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
+                                   '<input type="button" id="change_loc_button" value="Change" />');
+           $("#change_loc_button").click(function() {
+              postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
+                $("#location_sub").text(json.location);
+                loc=true;
+                $("#description").html("");
+               log_event("profile", {"type":"location_change", "new":json.location});
+              });
+           });
+         }
+      });
 
-           if(lang) {
-             lang=false;
-             $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
-                                     '<input type="button" id="change_lang_button" value="Change" />');
-             $("#change_lang_button").click(function() {
-                postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
-                  $("#language_sub").text(json.language);
-                  lang=true;
-                  $("#description").html("");
-                 log_event("profile", {"type":"language_change", "new":json.language});
-                });
-             });
-           }
-        });
+      $("#change_language").click(function() {
+         log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
 
-        $('#change_password').click(function(){
-          $('.modal').trigger('click');
-            log_event("profile", {"type":"password_show"});
-        });
+         if(lang) {
+           lang=false;
+           $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
+                                   '<input type="button" id="change_lang_button" value="Change" />');
+           $("#change_lang_button").click(function() {
+              postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
+                $("#language_sub").text(json.language);
+                lang=true;
+                $("#description").html("");
+               log_event("profile", {"type":"language_change", "new":json.language});
+              });
+           });
+         }
+      });
+
+      $('#change_password').click(function(){
+        $('.modal').trigger('click');
+          log_event("profile", {"type":"password_show"});
+      });
 
     $('#pwd_reset_button').click(function() {
       $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
@@ -72,8 +73,12 @@ $(function() {
       <ul>
         <li>Forum name: ${username}</li>
         <li>E-mail: ${email}</li>
-        <li><a href="" id="change_location">Location: ${location}</a></li>
-        <li><a href="" id="change_language">Language: ${language}</a></li>
+        <li>
+          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Change</a>
+        </li>
+        <li>
+          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Change</a>
+        </li>
       </ul>
 
       <!-- <div><a class="modal" href="#change_password_pop">Reset password</a></div> -->
