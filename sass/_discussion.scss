@@ -1,3 +1,108 @@
-secondaryHeader {
+.secondary-nav {
   @extend .topbar;
+  margin: 0;
+  padding: 15px 0;
+
+  nav {
+    @extend .clearfix;
+    @extend .wrapper;
+    @include box-sizing(border-box);
+    padding: 0 $body-line-height;
+
+    div {
+      float: left;
+
+      &.question-filter {
+        font-size:16px;
+        margin-top: 4px;
+        width: grid-width(4);
+
+        ul {
+          @include border-radius(35px);
+          background: darken(#F6EFD4, 20%);
+          display: inline;
+          margin: 0 0 0 10px;
+          padding: $body-line-height/4 20px;
+
+          li {
+            display: inline-block;
+            list-style: none;
+            margin-right: 10px;
+
+            &:last-child {
+              margin-right: 0;
+            }
+
+            a {
+              text-transform: capitalize;
+              text-shadow: none;
+              font-size: 14px;
+
+              &.on {
+                font-weight: bold;
+              }
+            }
+          }
+        }
+      }
+
+      &.search-box {
+        margin-left:2%;
+        text-align:right;
+        width: grid-width(8);
+      }
+
+    }
+  }
+}
+
+.content-wrapper {
+  @extend .clearfix;
+  @extend .wrapper;
+  @include box-shadow(0 1px 0 #fff);
+  @include box-sizing(border-box);
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: 0;
+
+  .discussion-content {
+    /*@extend .content;*/
+    @include box-sizing(border-box);
+    display: table-cell;
+    padding: $gw-gutter;
+    vertical-align: top;
+    width: grid-width(9);
+  }
+
+  aside {
+    @extend .sidebar;
+    width: grid-width(2.5);
+    padding: $gw-gutter;
+
+    h2 {
+      font-size: 16px;
+    }
+
+    h3 {
+      border-bottom: 0;
+      box-shadow: none;
+    }
+
+    input[type="text"] {
+      width: 68%;
+    }
+
+    #displayTagFilterControl {
+      margin-top: 10px;
+    }
+  }
+}
+
+.footer-wrapper {
+  @extend .clearfix;
+  @extend .wrapper;
+  @include box-shadow(0 1px 0 #fff);
+  @include box-sizing(border-box);
+  border-top: 0;
+  padding: 0 $gw-gutter/2;
 }
