@@ -7,11 +7,24 @@
 
 @font-face {
   font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Open Sans Italic'), local('OpenSans-Italic'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: 800;
   src: local('Open Sans Extrabold'), local('OpenSans-Extrabold'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/EInbV5DfGHOiMmvb1Xr-hqRDOzjiPcYnFooOUGCOsRk.woff') format('woff');
 }
 
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 800;
+  src: local('Open Sans Extrabold Italic'), local('OpenSans-ExtraboldItalic'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxsBo4hlZyBvkZICS3KpNonM.woff') format('woff');
+}
 // Extends
 //---------------------------------------- //
 .wrapper {
@@ -97,6 +110,10 @@ body {
     margin-bottom: lh();
   }
 
+  em {
+    font-style: italic;
+  }
+
   #{$all-text-inputs}, textarea {
     @include box-shadow(0 -1px 0 #fff);
     @include linear-gradient(#eee, #fff);
@@ -170,7 +187,7 @@ header.announcement {
         margin-right: lh();
 
         a {
-          font: 800 18px $header-font-family;
+          font: italic 800 18px $header-font-family;
           color: #fff;
           text-decoration: none;
         }

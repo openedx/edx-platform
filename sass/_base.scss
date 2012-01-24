@@ -11,12 +11,13 @@ h2 {
   text-transform: uppercase;
 }
 
-h3 {
-  
-}
-
 p {
   margin-bottom: $body-line-height;
+}
+
+em {
+  font-style: italic;
+  font-family: Georgia, serif;
 }
 
 #{$all-text-inputs}, textarea {

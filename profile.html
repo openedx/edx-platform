@@ -48,7 +48,7 @@ $(function() {
 
       $('#change_password').click(function(){
         $('.modal').trigger('click');
-          log_event("profile", {"type":"password_show"});
+        log_event("profile", {"type":"password_show"});
       });
 
     $('#pwd_reset_button').click(function() {
@@ -58,7 +58,7 @@ $(function() {
          log_event("profile", {"type":"password_send"});
       });
     });
-})
+});
 
 </script>
 
@@ -82,15 +82,13 @@ $(function() {
       </ul>
 
       <!-- <div><a class="modal" href="#change_password_pop">Reset password</a></div> -->
-      <!-- hidden trigger for password -->
 
       <div id="change_password_pop">
         <h2>Password reset</h2>
+        <p>We'll e-mail you a password reset link at ${email}. Follow the link in the email to reset your password.</p>
 
-        <p>We'll e-mail you a password reset link at ${email}.</p>
         <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
-
-        <input type="button" id="pwd_reset_button" value="Reset Password" />
+        <input type="submit" id="pwd_reset_button" value="Reset Password" />
       </div>
 
     </section>

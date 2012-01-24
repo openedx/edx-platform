@@ -29,6 +29,11 @@ html {
           float: left;
           color: #000;
           text-shadow: 0 1px 0 lighten($mit-red, 10%);
+
+          em {
+            @include inline-block();
+            padding-right: lh();
+          }
         }
 
         nav {
@@ -44,7 +49,7 @@ html {
             margin: 0;
 
             li {
-              margin-right: $body-line-height;
+              margin-right: lh();
               display: inline-block;
               margin-bottom: 0;
 
