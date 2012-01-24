@@ -20,12 +20,15 @@ class SequentialModule(XModule):
         return ["sequential", 'tab']
         
     def get_html(self):
+        self.render()
         return self.content
 
     def get_init_js(self):
+        self.render()
         return self.init_js
 
     def get_destroy_js(self):
+        self.render()
         return self.destroy_js
 
     def handle_ajax(self, dispatch, get):
@@ -36,16 +39,9 @@ class SequentialModule(XModule):
             return json.dumps({'success':True})
         raise Http404()
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
-        xmltree=etree.fromstring(xml)
-
-        self.position = 1
-
-        if state!=None:
-            state = json.loads(state)
-            if 'position' in state: self.position = int(state['position'])
-
+    def render(self):
+        if self.rendered:
+            return
         def j(m): 
             ''' jsonify contents so it can be embedded in a js array
             We also need to split </script> tags so they don't break
@@ -60,13 +56,13 @@ class SequentialModule(XModule):
                     'init_js':m['init_js'], 
                     'type':m['type']}
 
-        contents=[(e.get("name"),j(render_function(e))) \
-                      for e in xmltree]
+        self.contents=[(e.get("name"),j(self.render_function(e))) \
+                      for e in self.xmltree]
      
         js=""
 
-        params={'items':contents,
-                'id':item_id,
+        params={'items':self.contents,
+                'id':self.item_id,
                 'position': self.position}
 
         # TODO/BUG: Destroy JavaScript should only be called for the active view
@@ -74,14 +70,29 @@ class SequentialModule(XModule):
         # 
         # To fix this, we'd probably want to have some way of assigning unique
         # IDs to sequences. 
-        destroy_js="".join([e[1]['destroy_js'] for e in contents if 'destroy_js' in e[1]])
-        
-        if xmltree.tag == 'sequential':
+        destroy_js="".join([e[1]['destroy_js'] for e in self.contents if 'destroy_js' in e[1]])
+
+        if self.xmltree.tag == 'sequential':
             self.init_js=js+render_to_string('seq_module.js',params)
             self.destroy_js=destroy_js
             self.content=render_to_string('seq_module.html',params)
-        if xmltree.tag == 'tab':
+        if self.xmltree.tag == 'tab':
             params['id'] = 'tab'
             self.init_js=js+render_to_string('tab_module.js',params)
             self.destroy_js=destroy_js
             self.content=render_to_string('tab_module.html',params)
+        self.rendered = True
+        
+
+
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
+        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
+        self.xmltree=etree.fromstring(xml)
+
+        self.position = 1
+
+        if state!=None:
+            state = json.loads(state)
+            if 'position' in state: self.position = int(state['position'])
+
+        self.rendered = False
