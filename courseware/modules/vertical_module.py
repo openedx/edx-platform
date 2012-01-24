@@ -25,10 +25,10 @@ class VerticalModule(XModule):
     def get_destroy_js(self):
         return self.destroy_js_text
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
         xmltree=etree.fromstring(xml)
-        self.contents=[(e.get("name"),self.render_function(meta, e)) \
+        self.contents=[(e.get("name"),self.render_function(e)) \
                       for e in xmltree]
         self.init_js_text="".join([e[1]['init_js'] for e in self.contents if 'init_js' in e[1]])
         self.destroy_js_text="".join([e[1]['destroy_js'] for e in self.contents if 'destroy_js' in e[1]])

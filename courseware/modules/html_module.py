@@ -25,7 +25,7 @@ class HtmlModule(XModule):
             textlist=[i for i in textlist if type(i)==str]
             return "".join(textlist)
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
         xmltree=etree.fromstring(xml)
         self.filename = None

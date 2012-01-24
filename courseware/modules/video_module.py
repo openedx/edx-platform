@@ -51,7 +51,7 @@ class VideoModule(XModule):
     def get_destroy_js(self):
         return "videoDestroy(\""+self.item_id+"\");"
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
         self.youtube = etree.XML(xml).get('youtube')
         self.position = 0

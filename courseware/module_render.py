@@ -4,6 +4,7 @@ from djangomako.shortcuts import render_to_response, render_to_string
 import json, os, sys
 from django.core.context_processors import csrf
 
+from django.db import connection
 from django.template import Context
 from django.contrib.auth.models import User
 from auth.models import UserProfile
@@ -44,6 +45,16 @@ modx_modules={'problem':courseware.modules.capa_module.LoncapaModule,
               'sequential':courseware.modules.seq_module.SequentialModule,
               'schematic':courseware.modules.schematic_module.SchematicModule}
 
+def object_cache(cache, user, module_type, module_id):
+    # We don't look up on user -- all queries include user
+    # Additional lookup would require a DB hit the way Django 
+    # is broken. 
+    for o in cache: 
+        if o.module_type == module_type and \
+                o.module_id == module_id:
+            return o
+    return None
+
 def make_track_function(request):
     def f(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
@@ -52,7 +63,6 @@ def make_track_function(request):
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
     # Grab the student information for the module from the database
-    print module, request.user, id
     s = StudentModule.objects.filter(module_type=module, 
                                      student=request.user, 
                                      module_id=id)
@@ -77,8 +87,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                   ajax_url=ajax_url, 
                                   state=s.state, 
                                   track_function = make_track_function(request), 
-                                  render_function = render_module, 
-                                  meta = request)
+                                  render_function = None)
     # Let the module handle the AJAX
     ajax_return=instance.handle_ajax(dispatch, request.POST)
     # Save the state back to the database
@@ -89,7 +98,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
 
-def render_x_module(request, xml_module):
+def render_x_module(user, request, xml_module, module_object_preload):
     ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
     module_type=xml_module.tag
@@ -97,13 +106,16 @@ def render_x_module(request, xml_module):
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
 
     # Grab state from database
-    s = StudentModule.objects.filter(student=request.user, 
-                                     module_id=module_id, 
-                                     module_type = module_type)
-    if len(s) == 0: # If nothing in the database...
+    s = object_cache(module_object_preload, 
+                     user, 
+                     module_type, 
+                     module_id)#student=request.user, 
+                     #module_id=module_id, 
+                     #module_type = module_type)
+    if s == None: # If nothing in the database...
         state=None
     else:
-        smod = s[0]
+        smod = s
         state = smod.state
 
     # Create a new instance
@@ -113,27 +125,25 @@ def render_x_module(request, xml_module):
                           ajax_url=ajax_url,
                           state=state, 
                           track_function = make_track_function(request), 
-                          render_function = render_module, 
-                          meta = request)
+                                  render_function = lambda x: render_module(user, request, x, module_object_preload))
     
     # If instance wasn't already in the database, create it
-    if len(s) == 0:
-        smod=StudentModule(student=request.user, 
+    if s == None:
+        smod=StudentModule(student=user, 
                            module_type = module_type,
                            module_id=module_id, 
                            state=instance.get_state())
+        smod.save() # This may be optional (at least in the case of no instance in the dB)
     # Grab content
     content = {'content':instance.get_html(), 
                "destroy_js":instance.get_destroy_js(),
                'init_js':instance.get_init_js(), 
                'type':module_type}
 
-    smod.save() # This may be optional (at least in the case of no instance in the dB)
-
     return content
 
-def render_module(request, module):
+def render_module(user, request, module, module_object_preload):
     ''' Generic dispatch for internal modules. '''
     if module==None :
         return {"content":""}
-    return render_x_module(request, module)
+    return render_x_module(user, request, module, module_object_preload)

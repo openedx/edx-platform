@@ -1,2 +1,2 @@
 ASKBOT_ENABLED = False
-execfile("settings.py")
+execfile("settings_old_askbot.py")

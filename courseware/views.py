@@ -13,6 +13,8 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.template import Context, loader
 from djangomako.shortcuts import render_to_response, render_to_string
+from django.db import connection
+
 from lxml import etree
 
 from auth.models import UserProfile
@@ -105,7 +107,8 @@ def render_accordion(request,course,chapter,section):
 def index(request, course="6.002 Spring 2012", chapter="Using the System", section="Hints"): 
     ''' Displays courseware accordion, and any associated content. 
     ''' 
-    if not settings.COURSEWARE_ENABLED or not request.user.is_authenticated():
+    user = request.user
+    if not settings.COURSEWARE_ENABLED or not user.is_authenticated():
         return redirect('/')
 
     # Fixes URLs -- we don't get funny encoding characters from spaces
@@ -120,7 +123,7 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     if course!="6.002 Spring 2012":
         return redirect('/')
 
-    dom = content_parser.course_file(request.user)
+    dom = content_parser.course_file(user)
     dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
                            course=course, chapter=chapter, section=section)
     if len(dom_module) == 0:
@@ -130,17 +133,21 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     accordion=render_accordion(request, course, chapter, section)
 
-    module=render_module(request, module)
+    module_ids = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]//@id", 
+                           course=course, chapter=chapter, section=section)
+
+    module_object_preload = StudentModule.objects.filter(student=user, 
+                                                         module_id__in=module_ids)
+
+    module=render_module(user, request, module, module_object_preload)
 
     if 'init_js' not in module:
         module['init_js']=''
-
-    
 
     context={'init':accordion['init_js']+module['init_js'],
              'accordion':accordion['content'],
              'content':module['content'],
              'csrf':csrf(request)['csrf_token']}
-    return render_to_response('courseware.html', context)
 
-
+    result = render_to_response('courseware.html', context)
+    return result

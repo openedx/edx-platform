@@ -36,7 +36,7 @@ class SequentialModule(XModule):
             return json.dumps({'success':True})
         raise Http404()
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
+    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
         xmltree=etree.fromstring(xml)
 
@@ -60,7 +60,7 @@ class SequentialModule(XModule):
                     'init_js':m['init_js'], 
                     'type':m['type']}
 
-        contents=[(e.get("name"),j(render_function(meta, e))) \
+        contents=[(e.get("name"),j(render_function(e))) \
                       for e in xmltree]
      
         js=""
