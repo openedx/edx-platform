@@ -5,7 +5,7 @@ from lxml import etree
 from lxml.etree import Element
 import copy
 from mako.template import Template
-from content_parser import xpath_remove
+from courseware.content_parser import xpath_remove
 import calc, eia
 
 from util import contextualize_text

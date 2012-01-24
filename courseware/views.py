@@ -20,7 +20,7 @@ from lxml import etree
 from auth.models import UserProfile
 from models import StudentModule
 from module_render import * # TODO: Clean up
-import courseware.content_parser
+import courseware.content_parser as content_parser
 
 log = logging.getLogger("mitx.courseware")
 
@@ -63,7 +63,7 @@ def profile(request):
                                 correct=response.grade
                             else:
                                 correct=0
-                    total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    total=modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     scores.append((int(correct),total))
                 score={'course':course,
                        'section':s.get("name"),
