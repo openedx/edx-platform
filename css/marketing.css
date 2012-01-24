@@ -537,6 +537,15 @@ div#fancybox-wrap {
           div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li label {
             display: block;
             font-weight: bold; }
+          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li ul {
+            list-style: disc outside none;
+            margin: 12.944px 0 25.888px 25.888px; }
+            div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li ul li {
+              list-style: disc outside none;
+              margin-bottom: 12.944px;
+              color: #666;
+              font-size: 14px;
+              float: none; }
           div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="email"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="number"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="password"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="search"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="tel"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="text"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="url"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="color"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="date"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="datetime"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="datetime-local"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="month"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="time"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="week"] {
             width: 100%;
             -webkit-box-sizing: border-box;

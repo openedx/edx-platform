@@ -56,7 +56,7 @@ blockquote, q {
   font-weight: bold;
   src: local("Droid Sans Bold"), local("DroidSans-Bold"), url("http://themes.googleusercontent.com/static/fonts/droidsans/v3/EFpQQyG9GqCrobXxL-KRMXbFhgvWbfSbdVg11QabG8w.woff") format("woff"); }
 
-.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after {
+.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, secondaryHeader:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after {
   content: ".";
   display: block;
   height: 0;
@@ -195,16 +195,16 @@ blockquote, q {
       .sidebar h3.active a, div.course-wrapper div#accordion h3.active a, div.book-wrapper ul#booknav h3.active a, div.wiki-wrapper div#wiki_panel h3.active a, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active a, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"] a, div.wiki-wrapper div#wiki_panel input.active[type="button"] a {
         color: #000; }
 
-.topbar, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header {
+.topbar, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header, secondaryHeader {
   background: #F6EFD4;
   border-bottom: 1px solid #eddfaa;
   margin: -22.652px -22.652px 22.652px;
   font-size: 12px;
   text-shadow: 0 1px 0 #fff; }
-  .topbar a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a {
+  .topbar a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, secondaryHeader a {
     text-transform: uppercase;
     color: #292309; }
-    .topbar a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover {
+    .topbar a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, secondaryHeader a:hover {
       color: #7e691a; }
 
 h1 {
@@ -401,6 +401,15 @@ div#fancybox-wrap {
           div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li label {
             display: block;
             font-weight: bold; }
+          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li ul {
+            list-style: disc outside none;
+            margin: 11.326px 0 22.652px 22.652px; }
+            div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li ul li {
+              list-style: disc outside none;
+              margin-bottom: 11.326px;
+              color: #666;
+              font-size: 14px;
+              float: none; }
           div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="email"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="number"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="password"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="search"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="tel"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="text"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="url"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="color"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="date"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="datetime"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="datetime-local"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="month"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="time"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="week"] {
             width: 100%;
             -webkit-box-sizing: border-box;
@@ -621,6 +630,8 @@ div.book-wrapper {
         float: left; }
       div.book-wrapper section.book nav ul li.next {
         float: right; }
+    div.book-wrapper section.book section.page img {
+      border: 1px solid #dddddd; }
 
 div.profile-wrapper {
   display: table; }
@@ -818,6 +829,17 @@ section.activation {
   max-width: 600px;
   padding: 22.652px;
   margin-top: 22.652px; }
+
+section.help.main-content {
+  padding: 22.652px; }
+  section.help.main-content p {
+    max-width: 700px; }
+  section.help.main-content dl {
+    margin-bottom: 22.652px; }
+    section.help.main-content dl dd, section.help.main-content dl dt {
+      margin-bottom: 11.326px; }
+    section.help.main-content dl dt {
+      font-weight: bold; }
 
 /*
 ----------------------------------------------------------------------------------------
