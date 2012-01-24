@@ -52,11 +52,23 @@ blockquote, q {
 
 @font-face {
   font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: local("Open Sans Italic"), local("OpenSans-Italic"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff") format("woff"); }
+
+@font-face {
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: 800;
   src: local("Open Sans Extrabold"), local("OpenSans-Extrabold"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/EInbV5DfGHOiMmvb1Xr-hqRDOzjiPcYnFooOUGCOsRk.woff") format("woff"); }
 
-.wrapper, header.announcement div, section.index-content, footer {
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 800;
+  src: local("Open Sans Extrabold Italic"), local("OpenSans-ExtraboldItalic"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxsBo4hlZyBvkZICS3KpNonM.woff") format("woff"); }
+
+.wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, section.index-content, footer {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -68,7 +80,22 @@ blockquote, q {
   padding: 25.888px;
   width: 100%; }
 
-.clearfix:after, header.announcement div section:after, section.index-content:after, section.index-content section:after, section.index-content section.about section:after, footer:after {
+.subpage > div, section.copyright > div, section.tos > div, section.privacy-policy > div, section.honor-code > div {
+  padding-left: 34.171%; }
+  .subpage > div p, section.copyright > div p, section.tos > div p, section.privacy-policy > div p, section.honor-code > div p {
+    margin-bottom: 25.888px; }
+  .subpage > div h1, section.copyright > div h1, section.tos > div h1, section.privacy-policy > div h1, section.honor-code > div h1 {
+    margin-bottom: 12.944px; }
+  .subpage > div h2, section.copyright > div h2, section.tos > div h2, section.privacy-policy > div h2, section.honor-code > div h2 {
+    font: 18px "Open Sans", Helvetica, Arial, sans-serif;
+    color: #000;
+    margin-bottom: 12.944px; }
+  .subpage > div ul, section.copyright > div ul, section.tos > div ul, section.privacy-policy > div ul, section.honor-code > div ul {
+    list-style: disc outside none; }
+    .subpage > div ul li, section.copyright > div ul li, section.tos > div ul li, section.privacy-policy > div ul li, section.honor-code > div ul li {
+      list-style: disc outside none; }
+
+.clearfix:after, .subpage:after, section.copyright:after, section.tos:after, section.privacy-policy:after, section.honor-code:after, header.announcement div section:after, section.index-content:after, section.index-content section:after, section.index-content section.about section:after, footer:after {
   content: ".";
   display: block;
   height: 0;
@@ -117,7 +144,8 @@ blockquote, q {
   color: #fff;
   margin: 25.888px 0 12.944px;
   padding: 6.472px 12.944px;
-  text-decoration: none; }
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased; }
   .button:hover, header.announcement div section.course section a:hover, section.index-content section.course a:hover, section.index-content section.staff a:hover, section.index-content section.about-course section.cta a.enroll:hover {
     background-color: #660000; }
   .button span, header.announcement div section.course section a span, section.index-content section.course a span, section.index-content section.staff a span, section.index-content section.about-course section.cta a.enroll span {
@@ -128,6 +156,12 @@ body {
   background-color: #fff;
   color: #444;
   font: 16px Georgia, serif; }
+  body h1 {
+    font: 800 24px "Open Sans", Helvetica, Arial, sans-serif; }
+  body li {
+    margin-bottom: 25.888px; }
+  body em {
+    font-style: italic; }
   body input[type="email"], body input[type="number"], body input[type="password"], body input[type="search"], body input[type="tel"], body input[type="text"], body input[type="url"], body input[type="color"], body input[type="date"], body input[type="datetime"], body input[type="datetime-local"], body input[type="month"], body input[type="time"], body input[type="week"], body textarea {
     -webkit-box-shadow: 0 -1px 0 white;
     -moz-box-shadow: 0 -1px 0 white;
@@ -149,14 +183,15 @@ body {
       border-color: #990000; }
 
 header.announcement {
-  color: #fff;
-  border-bottom: 1px solid #000;
-  background: #e3e3e3;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -ms-background-size: cover;
   -o-background-size: cover;
-  background-size: cover; }
+  background-size: cover;
+  background: #333;
+  border-bottom: 1px solid #000;
+  color: #fff;
+  -webkit-font-smoothing: antialiased; }
   @media screen and (min-width: 1200px) {
     header.announcement.home {
       background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg"); } }
@@ -209,7 +244,7 @@ header.announcement {
         *vertical-align: auto;
         margin-right: 25.888px; }
         header.announcement div nav h1 a {
-          font: 800 18px "Open Sans", Helvetica, Arial, sans-serif;
+          font: italic 800 18px "Open Sans", Helvetica, Arial, sans-serif;
           color: #fff;
           text-decoration: none; }
       header.announcement div nav a.login {
@@ -537,6 +572,15 @@ div#fancybox-wrap {
           div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li label {
             display: block;
             font-weight: bold; }
+          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li ul {
+            list-style: disc outside none;
+            margin: 12.944px 0 25.888px 25.888px; }
+            div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li ul li {
+              list-style: disc outside none;
+              margin-bottom: 12.944px;
+              color: #666;
+              font-size: 14px;
+              float: none; }
           div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="email"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="number"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="password"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="search"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="tel"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="text"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="url"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="color"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="date"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="datetime"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="datetime-local"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="month"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="time"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="week"] {
             width: 100%;
             -webkit-box-sizing: border-box;
