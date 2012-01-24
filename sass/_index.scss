@@ -72,6 +72,7 @@
   margin: lh() 0 lh(.5);
   padding: lh(.25) lh(.5);
   text-decoration: none;
+  -webkit-font-smoothing: antialiased;
 
   &:hover {
     background-color: darken($mit-red, 10%);
@@ -83,7 +84,6 @@
   }
 }
 
-
 body {
   background-color: #fff;
   color: #444;
@@ -92,7 +92,6 @@ body {
   h1 {
     font: 800 24px $header-font-family;
   }
-
 
   li {
     margin-bottom: lh();
@@ -117,6 +116,7 @@ header.announcement {
   background: #333;
   border-bottom: 1px solid #000;
   color: #fff;
+  -webkit-font-smoothing: antialiased;
 
   &.home {
     @media screen and (min-width: 1200px) {
