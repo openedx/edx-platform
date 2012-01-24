@@ -4,6 +4,7 @@ div#fancybox-overlay {
 
 div#fancybox-wrap {
   width: auto  !important;
+
   div#fancybox-outer {
     background: none;
     max-width: 600px;
@@ -71,6 +72,19 @@ div#fancybox-wrap {
               font-weight: bold;
             }
 
+            ul {
+              list-style: disc outside none;
+              margin: lh(.5) 0 lh() lh();
+
+              li {
+                list-style: disc outside none;
+                margin-bottom: lh(.5);
+                color: #666;
+                font-size: 14px;
+                float: none;
+              }
+            }
+
             #{$all-text-inputs} {
               width: 100%;
               @include box-sizing(border-box);
@@ -88,6 +102,7 @@ div#fancybox-wrap {
           padding: lh(.5);
         }
       }
+
 
       div#login {
         min-width: 300px;

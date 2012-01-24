@@ -3,7 +3,7 @@
 
   <h1>Enroll in 6.002 Circuits &amp; Electronics</h1>
   <form name="login"  method="get">
-    <% if 'error' in locals(): e = error %>
+    <fieldset><% if 'error' in locals(): e = error %>
 
     <div id="enroll_error" name="enroll_error"></div>
 
@@ -58,11 +58,15 @@
 
       <li class="honor-code">
         <label>
-          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code" required />I agree to: Not engage in any activities that would dishonestly improve my results, or improve or hurt those of others. Never post answers to problems. Maintain only one account.
-        </label>
+          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code" required />I agree to the Honor code.         </label>
+        <ul>
+          <li>Not engage in any activities that would dishonestly improve my results, or improve or hurt those of others.</li>
+          <li>Never post answers to problems.</li>
+          <li>Maintain only one account.</li>
+        </ul>
       </li>
 
     </ol>
     <input name="create_account_button" id="create_account_button" type="button" value="Create Account">
-  </form>
+</fieldset>  </form>
 </div>
