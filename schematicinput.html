@@ -1,10 +1,10 @@
 <span>
-<input type="hidden" class="schematic" height="${height}" width="${width}" name="input_${id}" id="input_${id}" value="" />
-<div id="hidden_${id}" style="display:none">
-${value}
-</div>
+<input type="hidden" class="schematic" height="${height}" width="${width}" parts="${parts}" analyses="${analyses}" name="input_${id}" id="input_${id}" value="" initial_value=""/>
+<div id="value_${id}" style="display:none">${value}</div>
+<div id="initial_value_${id}" style="display:none">${initial_value}</div>
 <script>
-$("#input_${id}").attr("value",$("#hidden_${id}").text())
+$("#input_${id}").attr("value",$("#value_${id}").text());
+$("#input_${id}").attr("initial_value",$("#initial_value_${id}").text());
 </script>
 <span id="answer_${id}"></span>
 % if state == 'unsubmitted':

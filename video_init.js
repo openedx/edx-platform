@@ -30,7 +30,7 @@ function good() {
 
 ajax_video=good;
 
-loadNewVideo(streams["1.0"], ${ video_time });
+loadNewVideo(streams["1.0"], ${ position });
 
 function add_speed(key, stream) {
     var id = 'speed_' + stream;
