@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.validators import validate_email, validate_slug
 import random, string
+from django.db import connection
 
 def csrf_token(context):
     csrf_token = context.get('csrf_token', '')
@@ -37,9 +38,9 @@ def index(request):
 #                                                  'csrf': csrf_token }) 
 
 def login_user(request, error=""):
-    print request.POST
+#    print request.POST
     if 'email' not in request.POST or 'password' not in request.POST:
-        print "X"
+#        print "X"
         return render_to_response('login.html', {'error':error.replace('+',' ')})
     email = request.POST['email']
     password = request.POST['password']
@@ -58,19 +59,21 @@ def login_user(request, error=""):
         login(request, user)
         if request.POST['remember'] == 'true':
             request.session.set_expiry(None) # or change to 604800 for 7 days
-            print "recall"
+#            print "recall"
         else:
             request.session.set_expiry(0)
-        print "close"
-
-
+        #print "close"
+#        print len(connection.queries), connection.queries
         return HttpResponse(json.dumps({'success':True}))
+
+#    print len(connection.queries), connection.queries
 
     return HttpResponse(json.dumps({'success':False, 
                                     'error': 'Account not active. Check your e-mail.'}))
 
 def logout_user(request):
     logout(request)
+#    print len(connection.queries), connection.queries
     return redirect('/')
 
 def change_setting(request):
@@ -78,10 +81,10 @@ def change_setting(request):
         return redirect('/')
     up=UserProfile.objects.get(user=request.user)
     if 'location' in request.POST:
-        print "loc"
+#        print "loc"
         up.location=request.POST['location']
     if 'language' in request.POST:
-        print "lang"
+#        print "lang"
         up.language=request.POST['language']
     up.save()
 
@@ -170,7 +173,8 @@ def create_account(request, post_override=None):
     message = render_to_string('activation_email.txt',d)
 
     try:
-        res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        if not settings.GENERATE_RANDOM_USER_CREDENTIALS:
+            res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         js['value']=str(sys.exc_info())
         return HttpResponse(json.dumps(js))
@@ -178,6 +182,7 @@ def create_account(request, post_override=None):
     js={'success':True,
         'value':render_to_string('registration/reg_complete.html', {'email':post_vars['email'], 
                                                                     'csrf':csrf(request)['csrf_token']})}
+#    print len(connection.queries), connection.queries
     return HttpResponse(json.dumps(js), mimetype="application/json")
     
 def create_random_account(create_account_function):
@@ -187,7 +192,7 @@ def create_random_account(create_account_function):
     
     def inner_create_random_account(request):
         post_override= {'username' : "random_" + id_generator(),
-                            'email' : id_generator(size=10, chars=string.ascii_lowercase) + "_lover@mitxtest.com",
+                            'email' : id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
                             'password' : id_generator(),
                             'location' : id_generator(size=5, chars=string.ascii_uppercase),
                             'language' : id_generator(size=5, chars=string.ascii_uppercase) + "ish",
@@ -195,7 +200,7 @@ def create_random_account(create_account_function):
                             'honor_code' : u'true',
                             'terms_of_service' : u'true',}
         
-        print "Creating random account: " , post_override
+#        print "Creating random account: " , post_override
         
         return create_account_function(request, post_override = post_override)
         
@@ -204,12 +209,13 @@ def create_random_account(create_account_function):
 if settings.GENERATE_RANDOM_USER_CREDENTIALS:
     create_account = create_random_account(create_account)
 
-
 def activate_account(request, key):
     r=Registration.objects.filter(activation_key=key)
     if len(r)==1:
         r[0].activate()
-        return render_to_response("activation_complete.html",{'csrf':csrf(request)['csrf_token']})
+        resp = render_to_response("activation_complete.html",{'csrf':csrf(request)['csrf_token']})
+#        print len(connection.queries), connection.queries
+        return resp
     if len(r)==0:
         return render_to_response("activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
     return HttpResponse("Unknown error. Please e-mail us to let us know how it happened.")

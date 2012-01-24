@@ -1,1 +1,1 @@
-settings_new_askbot.py
+settings_no_askbot.py
