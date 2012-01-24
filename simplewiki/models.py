@@ -220,12 +220,24 @@ class Revision(models.Model):
     counter = models.IntegerField(verbose_name=_('Revision#'), default=1, editable=False)
     previous_revision = models.ForeignKey('self', blank=True, null=True, editable=False)
     
+    # Deleted has three values. 0 is normal, non-deleted. 1 is if it was deleted by a normal user. It should
+    # be a NEW revision, so that it appears in the history. 2 is a special flag that can be applied or removed
+    # from a normal revision. It means it has been admin-deleted, and can only been seen by an admin. It doesn't
+    # show up in the history.
     deleted = models.IntegerField(verbose_name=_('Deleted group'), default=0)
     
     def get_user(self):
         return self.revision_user if self.revision_user else _('Anonymous')
+        
+    def adminSetDeleted(self, deleted):
+        self.deleted = deleted
+        super(Revision, self).save()
     
     def save(self, **kwargs):
+        #Really, the only time this should not happen is when the revision is being marked as deleted
+        print "kwargs" , kwargs, not ('is_deletion_modification' in kwargs and kwars['is_deletion_modification'])
+        print "save was just called"
+        
         # Check if contents have changed... if not, silently ignore save
         if self.article and self.article.current_revision:
             if self.article.current_revision.contents == self.contents:
