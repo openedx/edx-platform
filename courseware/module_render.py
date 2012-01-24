@@ -43,6 +43,7 @@ modx_modules={'problem':courseware.modules.capa_module.LoncapaModule,
               'html':courseware.modules.html_module.HtmlModule,
               'vertical':courseware.modules.vertical_module.VerticalModule,
               'sequential':courseware.modules.seq_module.SequentialModule,
+              'tab':courseware.modules.seq_module.SequentialModule,
               'schematic':courseware.modules.schematic_module.SchematicModule}
 
 def object_cache(cache, user, module_type, module_id):
