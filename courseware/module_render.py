@@ -106,12 +106,18 @@ def render_x_module(user, request, xml_module, module_object_preload):
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
 
     # Grab state from database
-    s = object_cache(module_object_preload, 
-                     user, 
-                     module_type, 
-                     module_id)#student=request.user, 
-                     #module_id=module_id, 
-                     #module_type = module_type)
+    #s = object_cache(module_object_preload, 
+    #                 user, 
+    #                 module_type, 
+    #                 module_id)
+    s = StudentModule.objects.filter(student=request.user, 
+                                     module_id=module_id, 
+                                     module_type = module_type)
+    if len(s) == 0: 
+        s=None
+    else:
+        s=s[0]
+
     if s == None: # If nothing in the database...
         state=None
     else:
