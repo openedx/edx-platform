@@ -1,0 +1,19 @@
+section.help.main-content {
+  padding: lh();
+
+  p {
+    max-width: 700px;
+  }
+
+  dl {
+    margin-bottom: lh();
+
+    dd, dt {
+      margin-bottom: lh(.5);
+    }
+
+    dt {
+      font-weight: bold;
+    }
+  }
+}
