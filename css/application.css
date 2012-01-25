@@ -48,14 +48,14 @@ blockquote, q {
   font-weight: bold;
   src: local("Droid Sans Bold"), local("DroidSans-Bold"), url("http://themes.googleusercontent.com/static/fonts/droidsans/v3/EFpQQyG9GqCrobXxL-KRMXbFhgvWbfSbdVg11QabG8w.woff") format("woff"); }
 
-.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, .secondary-nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, .secondary-nav nav:after, .content-wrapper:after, .footer-wrapper:after {
+.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot .content-wrapper:after, body.askbot footer .footer-wrapper:after {
   content: ".";
   display: block;
   height: 0;
   clear: both;
   visibility: hidden; }
 
-.wrapper, html body div.header-wrapper header, html body section.main-content, html footer, section.activation, .secondary-nav nav, .content-wrapper, .footer-wrapper {
+.wrapper, html body div.header-wrapper header, html body section.main-content, html footer, section.activation, body.askbot .secondary-nav nav, body.askbot .content-wrapper, body.askbot footer .footer-wrapper {
   margin: 0 auto;
   max-width: 1235px;
   width: 100%;
@@ -111,7 +111,7 @@ blockquote, q {
   vertical-align: top;
   width: 74.494%; }
 
-.sidebar, div.course-wrapper div#accordion, div.book-wrapper ul#booknav, div.wiki-wrapper div#wiki_panel, .content-wrapper aside {
+.sidebar, div.course-wrapper div#accordion, div.book-wrapper ul#booknav, div.wiki-wrapper div#wiki_panel, body.askbot .content-wrapper aside {
   -webkit-box-shadow: inset -1px 0 0 #f6f6f6;
   -moz-box-shadow: inset -1px 0 0 #f6f6f6;
   -ms-box-shadow: inset -1px 0 0 #f6f6f6;
@@ -125,7 +125,7 @@ blockquote, q {
   vertical-align: top;
   width: 23.482%;
   position: relative; }
-  .sidebar h3, div.course-wrapper div#accordion h3, div.book-wrapper ul#booknav h3, div.wiki-wrapper div#wiki_panel h3, .content-wrapper aside h3, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .sidebar input[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"], div.wiki-wrapper div#wiki_panel input[type="button"], .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] {
+  .sidebar h3, div.course-wrapper div#accordion h3, div.book-wrapper ul#booknav h3, div.wiki-wrapper div#wiki_panel h3, body.askbot .content-wrapper aside h3, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .sidebar input[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"], div.wiki-wrapper div#wiki_panel input[type="button"], body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input[type="button"] {
     -webkit-box-shadow: 0 1px 0 #eeeeee;
     -moz-box-shadow: 0 1px 0 #eeeeee;
     -ms-box-shadow: 0 1px 0 #eeeeee;
@@ -138,7 +138,7 @@ blockquote, q {
     font-weight: normal;
     margin: 0;
     overflow: hidden; }
-    .sidebar h3 a, div.course-wrapper div#accordion h3 a, div.book-wrapper ul#booknav h3 a, div.wiki-wrapper div#wiki_panel h3 a, .content-wrapper aside h3 a, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] a, div.wiki-wrapper div#wiki_panel input[type="button"] a, .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] a {
+    .sidebar h3 a, div.course-wrapper div#accordion h3 a, div.book-wrapper ul#booknav h3 a, div.wiki-wrapper div#wiki_panel h3 a, body.askbot .content-wrapper aside h3 a, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] a, div.wiki-wrapper div#wiki_panel input[type="button"] a, body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input[type="button"] a {
       -webkit-transition-property: all;
       -moz-transition-property: all;
       -ms-transition-property: all;
@@ -164,16 +164,16 @@ blockquote, q {
       font-size: 14px;
       padding: 7px 7px 7px 30px;
       text-decoration: none; }
-      .sidebar h3 a:hover, div.course-wrapper div#accordion h3 a:hover, div.book-wrapper ul#booknav h3 a:hover, div.wiki-wrapper div#wiki_panel h3 a:hover, .content-wrapper aside h3 a:hover, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] a:hover, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] a:hover, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] a:hover {
+      .sidebar h3 a:hover, div.course-wrapper div#accordion h3 a:hover, div.book-wrapper ul#booknav h3 a:hover, div.wiki-wrapper div#wiki_panel h3 a:hover, body.askbot .content-wrapper aside h3 a:hover, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] a:hover, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] a:hover, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input[type="button"] a:hover {
         -webkit-box-shadow: 0 1px 0 white;
         -moz-box-shadow: 0 1px 0 white;
         -ms-box-shadow: 0 1px 0 white;
         -o-box-shadow: 0 1px 0 white;
         box-shadow: 0 1px 0 white;
         background: #efefef; }
-    .sidebar h3 span.ui-icon, div.course-wrapper div#accordion h3 span.ui-icon, div.book-wrapper ul#booknav h3 span.ui-icon, div.wiki-wrapper div#wiki_panel h3 span.ui-icon, .content-wrapper aside h3 span.ui-icon, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] span.ui-icon, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] span.ui-icon, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] span.ui-icon {
+    .sidebar h3 span.ui-icon, div.course-wrapper div#accordion h3 span.ui-icon, div.book-wrapper ul#booknav h3 span.ui-icon, div.wiki-wrapper div#wiki_panel h3 span.ui-icon, body.askbot .content-wrapper aside h3 span.ui-icon, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] span.ui-icon, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] span.ui-icon, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input[type="button"] span.ui-icon {
       background-image: url(images/ui-icons_454545_256x240.png); }
-    .sidebar h3.active, div.course-wrapper div#accordion h3.active, div.book-wrapper ul#booknav h3.active, div.wiki-wrapper div#wiki_panel h3.active, .content-wrapper aside h3.active, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active, .content-wrapper aside div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion .content-wrapper aside h3.ui-accordion-header.ui-state-active, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], .content-wrapper aside div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"], .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], .content-wrapper aside div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"], .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"], div.wiki-wrapper div#wiki_panel input.active[type="button"], .content-wrapper aside div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel .content-wrapper aside input.active[type="button"] {
+    .sidebar h3.active, div.course-wrapper div#accordion h3.active, div.book-wrapper ul#booknav h3.active, div.wiki-wrapper div#wiki_panel h3.active, body.askbot .content-wrapper aside h3.active, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active, body.askbot .content-wrapper aside div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion body.askbot .content-wrapper aside h3.ui-accordion-header.ui-state-active, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], body.askbot .content-wrapper aside div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"], .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion body.askbot .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"], .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"], div.wiki-wrapper div#wiki_panel input.active[type="button"], body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input.active[type="button"] {
       -webkit-box-shadow: none;
       -moz-box-shadow: none;
       -ms-box-shadow: none;
@@ -184,19 +184,19 @@ blockquote, q {
       border-bottom: 1px solid #bbb;
       color: #000;
       font-weight: bold; }
-      .sidebar h3.active a, div.course-wrapper div#accordion h3.active a, div.book-wrapper ul#booknav h3.active a, div.wiki-wrapper div#wiki_panel h3.active a, .content-wrapper aside h3.active a, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active a, .content-wrapper aside div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion .content-wrapper aside h3.ui-accordion-header.ui-state-active a, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, .content-wrapper aside div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, .content-wrapper aside div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"] a, div.wiki-wrapper div#wiki_panel input.active[type="button"] a, .content-wrapper aside div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel .content-wrapper aside input.active[type="button"] a {
+      .sidebar h3.active a, div.course-wrapper div#accordion h3.active a, div.book-wrapper ul#booknav h3.active a, div.wiki-wrapper div#wiki_panel h3.active a, body.askbot .content-wrapper aside h3.active a, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active a, body.askbot .content-wrapper aside div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion body.askbot .content-wrapper aside h3.ui-accordion-header.ui-state-active a, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, body.askbot .content-wrapper aside div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion body.askbot .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"] a, div.wiki-wrapper div#wiki_panel input.active[type="button"] a, body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input.active[type="button"] a {
         color: #000; }
 
-.topbar, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header, .secondary-nav {
+.topbar, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header, body.askbot .secondary-nav nav {
   background: #F6EFD4;
   border-bottom: 1px solid #eddfaa;
   margin: -22.652px -22.652px 22.652px;
   font-size: 12px;
   text-shadow: 0 1px 0 #fff; }
-  .topbar a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, .secondary-nav a {
+  .topbar a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav a {
     text-transform: uppercase;
     color: #292309; }
-    .topbar a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, .secondary-nav a:hover {
+    .topbar a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav a:hover {
       color: #7e691a; }
 
 h1 {
@@ -846,23 +846,25 @@ section.help.main-content {
     section.help.main-content dl dt {
       font-weight: bold; }
 
-.secondary-nav {
-  margin: 0;
-  padding: 15px 0; }
-  .secondary-nav nav {
+body.askbot .secondary-nav {
+  margin: 0; }
+  body.askbot .secondary-nav nav {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 0 22.652px; }
-    .secondary-nav nav div {
+    border: 1px solid #eddfaa;
+    border-top: 0;
+    margin: 0 auto;
+    padding: 22.652px; }
+    body.askbot .secondary-nav nav div {
       float: left; }
-      .secondary-nav nav div.question-filter {
+      body.askbot .secondary-nav nav div.question-filter {
         font-size: 16px;
         margin-top: 4px;
         width: 31.984%; }
-        .secondary-nav nav div.question-filter ul {
+        body.askbot .secondary-nav nav div.question-filter ul {
           -webkit-border-radius: 35px;
           -moz-border-radius: 35px;
           -ms-border-radius: 35px;
@@ -872,24 +874,23 @@ section.help.main-content {
           display: inline;
           margin: 0 0 0 10px;
           padding: 5.663px 20px; }
-          .secondary-nav nav div.question-filter ul li {
+          body.askbot .secondary-nav nav div.question-filter ul li {
             display: inline-block;
             list-style: none;
             margin-right: 10px; }
-            .secondary-nav nav div.question-filter ul li:last-child {
+            body.askbot .secondary-nav nav div.question-filter ul li:last-child {
               margin-right: 0; }
-            .secondary-nav nav div.question-filter ul li a {
+            body.askbot .secondary-nav nav div.question-filter ul li a {
               text-transform: capitalize;
               text-shadow: none;
               font-size: 14px; }
-              .secondary-nav nav div.question-filter ul li a.on {
+              body.askbot .secondary-nav nav div.question-filter ul li a.on {
                 font-weight: bold; }
-      .secondary-nav nav div.search-box {
+      body.askbot .secondary-nav nav div.search-box {
         margin-left: 2%;
         text-align: right;
         width: 65.992%; }
-
-.content-wrapper {
+body.askbot .content-wrapper {
   -webkit-box-shadow: 0 1px 0 white;
   -moz-box-shadow: 0 1px 0 white;
   -ms-box-shadow: 0 1px 0 white;
@@ -903,7 +904,7 @@ section.help.main-content {
   background: #fff;
   border: 1px solid #ccc;
   border-top: 0; }
-  .content-wrapper .discussion-content {
+  body.askbot .content-wrapper .discussion-content {
     /*@extend .content;*/
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -914,42 +915,37 @@ section.help.main-content {
     padding: 2.024%;
     vertical-align: top;
     width: 74.494%; }
-  .content-wrapper aside {
+  body.askbot .content-wrapper aside {
     width: 19.231%;
     padding: 2.024%; }
-    .content-wrapper aside h2 {
+    body.askbot .content-wrapper aside h2 {
       font-size: 16px; }
-    .content-wrapper aside h3, .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] {
+    body.askbot .content-wrapper aside h3, body.askbot .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel body.askbot .content-wrapper aside input[type="button"] {
       border-bottom: 0;
       box-shadow: none; }
-    .content-wrapper aside input[type="text"] {
+    body.askbot .content-wrapper aside input[type="text"] {
       width: 68%; }
-    .content-wrapper aside #displayTagFilterControl {
+    body.askbot .content-wrapper aside #displayTagFilterControl {
       margin-top: 10px; }
+body.askbot footer {
+  margin: 0 auto;
+  padding: 0; }
+  body.askbot footer .footer-wrapper {
+    -webkit-box-shadow: 0 1px 0 white;
+    -moz-box-shadow: 0 1px 0 white;
+    -ms-box-shadow: 0 1px 0 white;
+    -o-box-shadow: 0 1px 0 white;
+    box-shadow: 0 1px 0 white;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #000;
+    border-top: 0;
+    padding: 1.012%; }
 
-.footer-wrapper {
-  -webkit-box-shadow: 0 1px 0 white;
-  -moz-box-shadow: 0 1px 0 white;
-  -ms-box-shadow: 0 1px 0 white;
-  -o-box-shadow: 0 1px 0 white;
-  box-shadow: 0 1px 0 white;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
-  box-sizing: border-box;
-  border-top: 0;
-  padding: 0 1.012%; }
-
-/*body {
-  background: #FFF;
-  font-size: 14px;
-  line-height: 150%;
-  margin: 0;
-  padding: 0;
-  color: #000;
-  font-family: Arial; }*/
-.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, .secondary-nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, .secondary-nav nav:after, .content-wrapper:after, .footer-wrapper:after, .paginator:after {
+.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot .content-wrapper:after, body.askbot footer .footer-wrapper:after, .paginator:after {
   clear: both;
   content: ".";
   display: block;
@@ -2966,17 +2962,6 @@ ins {
     color: #fb7321;
     text-decoration: underline;
     font-weight: bold; }
-
-#ground {
-  width: 100%;
-  clear: both;
-  border-top: 1px solid #000;
-  padding: 6px 0 0 0;
-  background: #16160f;
-  font-size: 16px;
-  font-family: 'Yanone Kaffeesatz',sans-serif; }
-  #ground p {
-    margin-bottom: 0; }
 
 .footer-links {
   color: #EEE;
