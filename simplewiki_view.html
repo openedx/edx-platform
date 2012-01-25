@@ -3,7 +3,7 @@
 <%inherit file="simplewiki_base.html"/>
 
 <%block name="wiki_page_title">
-  ${ wiki_article.title }
+  ${ wiki_article.title } ${'<span style="color: red;">- Deleted Revision!</span>' if wiki_current_revision_deleted else ''}
 </%block>
 
 <%block name="wiki_body">
