@@ -35,12 +35,19 @@ div#fancybox-wrap {
       form {
         text-align: left;
 
-        div#enroll_error {
-          padding-bottom: lh();
-          color: #DF8B2C;
+        div#enroll_error, div#login_error {
+          margin-bottom: lh();
+          background-color: #F50200;
+          color: #fff;
           text-transform: uppercase;
           letter-spacing: 1px;
           font-weight: bold;
+          -webkit-font-smoothing: antialiased;
+          padding: lh(.2);
+
+          &:empty {
+            padding: 0;
+          }
         }
 
         label {
