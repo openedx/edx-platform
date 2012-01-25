@@ -65,17 +65,41 @@ body.askbot {
       width: 100%;
 
       .discussion-content {
-        /*@extend .content;*/
         @include box-sizing(border-box);
         display: table-cell;
         padding: $gw-gutter;
         vertical-align: top;
         width: grid-width(9);
+
+        .order-sort {
+          @include border-radius(35px);
+          background-color: lighten(#F6EFD4, 5%) ;
+          height: 30px;
+          float: right;
+          font-size: 16px;
+          margin: 3px 0;
+          padding: 0 20px;
+
+          a {
+            color: darken(#F6EFD4, 50%);
+
+            &:before {
+              content: '|';
+              color: darken(#F6EFD4, 10%);
+              font-size: 22px;
+            }
+
+            &:hover {
+              text-decoration: none;
+              color: darken(#F6EFD4, 70%);
+            }
+          }
+        }
       }
 
       aside {
         @extend .sidebar;
-        width: grid-width(2.5);
+        width: grid-width(3);
         padding: $gw-gutter;
 
         h2 {
