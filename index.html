@@ -4,14 +4,14 @@
   <div class="anouncement-wrapper">
   <nav>
     <h1><a href="/t/mitx_global.html">MITx</a></h1>
-    <a class="modal login" href="#login">Log In</a>
+    <a class="" rel="leanModal" href="#login">Log In</a>
   </nav>
 
     <section class="course">
       <section>
         <h1>Circuits &amp; Electronics</h1>
         <h2>6.002</h2>
-        <a class="modal enroll" href="#enroll">Enroll in 6.002 Circuits <span>&amp;</span> Electronics</a>
+        <a class="enroll" rel="leanModal" href="#enroll">Enroll in 6.002 Circuits <span>&amp;</span> Electronics</a>
       </section>
       <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, &ldquo;6.002x Circuits and Electronics&rdquo; is an experimental on-line adaption of MIT's first undergraduate analog design course 6.002. This course will run, free of charge, for students worldwide  from February 21, 2012 through June&nbsp;10,&nbsp;2012.</p>
     </section>
@@ -50,7 +50,7 @@
     </section>
 
     <section class="cta">
-      <a class="modal enroll" href="#enroll">Enroll in Circuits &amp; Electronics</a>
+      <a class="enroll" rel="leanModal" href="#enroll">Enroll in Circuits &amp; Electronics</a>
     </section>
 
   </section>
@@ -101,21 +101,10 @@
   <!-- </div> -->
 </section>
 
-<div style="display:none">
-  <div id="enroll" name="enroll"><%include file="create_account.html" /></div>
-</div>
-
-<div style="display:none">
-  <div id="login"><%include file="login.html" /></div>
-</div>
-
-<div style="display:none">
-  <div id="pwd_reset"><%include file="password_reset_form.html" /></div>
-</div>
-
-<div style="display:none">
-  <div id="reset_done"></div>
-</div>
+  <div id="enroll" class="leanModal_box" name="enroll"><%include file="create_account.html" /></div>
+  <div id="login" class="leanModal_box"><%include file="login.html" /></div>
+  <div id="pwd_reset" class="leanModal_box"><%include file="password_reset_form.html" /></div>
+  <div id="reset_done" class="leanModal_box"></div>
 
 
 <script> 

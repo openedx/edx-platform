@@ -1,0 +1,126 @@
+#lean_overlay {
+  position: fixed;
+  z-index:100;
+  top: 0px;
+  left: 0px;
+  height:100%;
+  width:100%;
+  background: #000;
+  display: none;
+}
+
+div.leanModal_box {
+	@include border-radius(3px);
+	@include box-shadow(0 0 6px #000);
+	@include box-sizing(border-box);
+	display: none;
+	border: none;
+	max-width: 600px;
+	background: #fff;
+	padding: lh(2);
+
+	h1 {
+		font-size: 24px;
+    margin-top: 0;
+    font-family: "Oswald";
+		padding-bottom: lh();
+    border-bottom: 1px solid #eee;
+    margin-bottom: lh();
+  }
+
+  form {
+		text-align: left;
+
+    div#enroll_error {
+			padding-bottom: lh();
+      color: #DF8B2C;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: bold;
+    }
+
+    ol {
+			li {
+				margin-bottom: lh();
+        width: grid-width(6);
+        float: left;
+
+        &:nth-child(odd) {
+          margin-right: $gw-gutter;
+        }
+
+        &.terms, &.remember {
+				  float: none;
+          width: auto;
+          clear: both;
+          padding-top: lh();
+          border-top: 1px solid #eee;
+        }
+
+        &.honor-code {
+					width: auto;
+          float: none;
+				}
+
+        label {
+          display: block;
+          font-weight: bold;
+        }
+
+        #{$all-text-inputs}, textarea {
+					width: 100%;
+          @include box-sizing(border-box);
+				}
+
+        input[type="checkbox"] {
+					margin-right: 10px;
+        }
+      }
+    }
+
+    input[type="button"] {
+			@include button($mit-red);
+      font-size: 18px;
+      padding: lh(.5);
+    }
+  }
+
+	div#login {
+		min-width: 300px;
+
+		ol {
+			li {
+				width: auto;
+				float: none;
+			}
+		}
+	}
+
+	div.lost-password {
+		text-align: left;
+		margin-top: lh();
+
+		a {
+			color: #999;
+			
+			&:hover {
+				color: #444;
+			}
+		}
+	}
+}
+
+div#feedback_div{
+	form{
+		ol {
+			li {
+				float: none;
+				width: 100%;
+				
+				textarea#feedback_message {
+					height: 100px;
+				}
+			}
+		}
+	}
+}
