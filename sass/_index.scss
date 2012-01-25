@@ -85,6 +85,7 @@
   margin: lh() 0 lh(.5);
   padding: lh(.25) lh(.5);
   text-decoration: none;
+  font-style: normal;
   -webkit-font-smoothing: antialiased;
 
   &:hover {
@@ -112,6 +113,16 @@ body {
 
   em {
     font-style: italic;
+  }
+
+  a {
+    color: $mit-red;
+    font-style: italic;
+    text-decoration: none;
+
+    &:hover, &:focus {
+      color: darken($mit-red, 10%);
+    }
   }
 
   #{$all-text-inputs}, textarea {
@@ -197,6 +208,7 @@ header.announcement {
         text-decoration: none;
         color: #fff;
         font-size: 12px;
+        font-style: normal;
 
         &:hover {
           color: rgba(#fff, .6);
@@ -381,6 +393,8 @@ section.index-content {
       }
 
       ul {
+        list-style: none;
+
         li {
           img {
             float: left;
