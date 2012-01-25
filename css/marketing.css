@@ -472,138 +472,143 @@ footer {
         footer div.footer-wrapper ul li:last-child:after {
           content: none; }
 
-div#fancybox-overlay {
-  background: #333 !important; }
+#lean_overlay {
+  position: fixed;
+  z-index: 100;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  background: #000;
+  display: none; }
 
-div#fancybox-wrap {
-  width: auto  !important; }
-  div#fancybox-wrap div#fancybox-outer {
-    background: none;
-    max-width: 600px; }
-    div#fancybox-wrap div#fancybox-outer div.fancybox-bg {
-      display: none;
-      background: none; }
-    div#fancybox-wrap div#fancybox-outer div#fancybox-content {
+div.leanModal_box {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 0 6px black;
+  -moz-box-shadow: 0 0 6px black;
+  -ms-box-shadow: 0 0 6px black;
+  -o-box-shadow: 0 0 6px black;
+  box-shadow: 0 0 6px black;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  display: none;
+  border: none;
+  max-width: 600px;
+  background: #fff;
+  padding: 51.776px; }
+  div.leanModal_box h1 {
+    font-size: 24px;
+    margin-top: 0;
+    font-family: "Oswald";
+    padding-bottom: 25.888px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 25.888px; }
+  div.leanModal_box form {
+    text-align: left; }
+    div.leanModal_box form div#enroll_error {
+      padding-bottom: 25.888px;
+      color: #DF8B2C;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: bold; }
+    div.leanModal_box form ol li {
+      margin-bottom: 25.888px;
+      width: 485px;
+      float: left; }
+      div.leanModal_box form ol li:nth-child(odd) {
+        margin-right: 25px; }
+      div.leanModal_box form ol li.terms, div.leanModal_box form ol li.remember {
+        float: none;
+        width: auto;
+        clear: both;
+        padding-top: 25.888px;
+        border-top: 1px solid #eee; }
+      div.leanModal_box form ol li.honor-code {
+        width: auto;
+        float: none; }
+      div.leanModal_box form ol li label {
+        display: block;
+        font-weight: bold; }
+      div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li input[type="number"], div.leanModal_box form ol li input[type="password"], div.leanModal_box form ol li input[type="search"], div.leanModal_box form ol li input[type="tel"], div.leanModal_box form ol li input[type="text"], div.leanModal_box form ol li input[type="url"], div.leanModal_box form ol li input[type="color"], div.leanModal_box form ol li input[type="date"], div.leanModal_box form ol li input[type="datetime"], div.leanModal_box form ol li input[type="datetime-local"], div.leanModal_box form ol li input[type="month"], div.leanModal_box form ol li input[type="time"], div.leanModal_box form ol li input[type="week"], div.leanModal_box form ol li textarea {
+        width: 100%;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -o-box-sizing: border-box;
+        box-sizing: border-box; }
+      div.leanModal_box form ol li input[type="checkbox"] {
+        margin-right: 10px; }
+    div.leanModal_box form input[type="button"] {
+      border: 1px solid #520000;
       -webkit-border-radius: 3px;
       -moz-border-radius: 3px;
       -ms-border-radius: 3px;
       -o-border-radius: 3px;
       border-radius: 3px;
-      -webkit-box-shadow: 0 0 6px black;
-      -moz-box-shadow: 0 0 6px black;
-      -ms-box-shadow: 0 0 6px black;
-      -o-box-shadow: 0 0 6px black;
-      box-shadow: 0 0 6px black;
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      -ms-box-sizing: border-box;
-      -o-box-sizing: border-box;
-      box-sizing: border-box;
-      background: #fff;
-      border: none;
-      padding: 51.776px;
-      max-width: 600px;
-      width: auto !important; }
-      div#fancybox-wrap div#fancybox-outer div#fancybox-content h1 {
-        font-size: 24px;
-        margin-top: 0;
-        font-family: "Oswald";
-        padding-bottom: 25.888px;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 25.888px; }
-      div#fancybox-wrap div#fancybox-outer div#fancybox-content form {
-        text-align: left; }
-        div#fancybox-wrap div#fancybox-outer div#fancybox-content form div#enroll_error {
-          padding-bottom: 25.888px;
-          color: #DF8B2C;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          font-weight: bold; }
-        div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li {
-          margin-bottom: 25.888px;
-          width: 485px;
-          float: left; }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li:nth-child(odd) {
-            margin-right: 25px; }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li.terms, div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li.remember {
-            float: none;
-            width: auto;
-            clear: both;
-            padding-top: 25.888px;
-            border-top: 1px solid #eee; }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li.honor-code {
-            width: auto;
-            float: none; }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li label {
-            display: block;
-            font-weight: bold; }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="email"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="number"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="password"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="search"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="tel"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="text"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="url"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="color"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="date"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="datetime"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="datetime-local"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="month"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="time"], div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="week"] {
-            width: 100%;
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            -ms-box-sizing: border-box;
-            -o-box-sizing: border-box;
-            box-sizing: border-box; }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content form ol li input[type="checkbox"] {
-            margin-right: 10px; }
-        div#fancybox-wrap div#fancybox-outer div#fancybox-content form input[type="button"] {
-          border: 1px solid #520000;
-          -webkit-border-radius: 3px;
-          -moz-border-radius: 3px;
-          -ms-border-radius: 3px;
-          -o-border-radius: 3px;
-          border-radius: 3px;
-          -webkit-box-shadow: inset 0 1px 0 0 #dc0909;
-          -moz-box-shadow: inset 0 1px 0 0 #dc0909;
-          -ms-box-shadow: inset 0 1px 0 0 #dc0909;
-          -o-box-shadow: inset 0 1px 0 0 #dc0909;
-          box-shadow: inset 0 1px 0 0 #dc0909;
-          color: white;
-          display: inline;
-          font-size: 11px;
-          font-weight: bold;
-          background-color: #990000;
-          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #990000), color-stop(100%, #610000));
-          background-image: -webkit-linear-gradient(top, #990000, #610000);
-          background-image: -moz-linear-gradient(top, #990000, #610000);
-          background-image: -ms-linear-gradient(top, #990000, #610000);
-          background-image: -o-linear-gradient(top, #990000, #610000);
-          background-image: linear-gradient(top, #990000, #610000);
-          padding: 6px 18px 7px;
-          text-shadow: 0 1px 0 #3d0000;
-          -webkit-background-clip: padding-box;
-          font-size: 18px;
-          padding: 12.944px; }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content form input[type="button"]:hover {
-            -webkit-box-shadow: inset 0 1px 0 0 #ac0606;
-            -moz-box-shadow: inset 0 1px 0 0 #ac0606;
-            -ms-box-shadow: inset 0 1px 0 0 #ac0606;
-            -o-box-shadow: inset 0 1px 0 0 #ac0606;
-            box-shadow: inset 0 1px 0 0 #ac0606;
-            cursor: pointer;
-            background-color: #7d0303;
-            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7d0303), color-stop(100%, #520000));
-            background-image: -webkit-linear-gradient(top, #7d0303, #520000);
-            background-image: -moz-linear-gradient(top, #7d0303, #520000);
-            background-image: -ms-linear-gradient(top, #7d0303, #520000);
-            background-image: -o-linear-gradient(top, #7d0303, #520000);
-            background-image: linear-gradient(top, #7d0303, #520000); }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content form input[type="button"]:active {
-            border: 1px solid #520000;
-            -webkit-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
-            -moz-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
-            -ms-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
-            -o-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
-            box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee; }
-      div#fancybox-wrap div#fancybox-outer div#fancybox-content div#login {
-        min-width: 300px; }
-        div#fancybox-wrap div#fancybox-outer div#fancybox-content div#login ol li {
-          width: auto;
-          float: none; }
-      div#fancybox-wrap div#fancybox-outer div#fancybox-content div.lost-password {
-        text-align: left;
-        margin-top: 25.888px; }
-        div#fancybox-wrap div#fancybox-outer div#fancybox-content div.lost-password a {
-          color: #999; }
-          div#fancybox-wrap div#fancybox-outer div#fancybox-content div.lost-password a:hover {
-            color: #444; }
+      -webkit-box-shadow: inset 0 1px 0 0 #dc0909;
+      -moz-box-shadow: inset 0 1px 0 0 #dc0909;
+      -ms-box-shadow: inset 0 1px 0 0 #dc0909;
+      -o-box-shadow: inset 0 1px 0 0 #dc0909;
+      box-shadow: inset 0 1px 0 0 #dc0909;
+      color: white;
+      display: inline;
+      font-size: 11px;
+      font-weight: bold;
+      background-color: #990000;
+      background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #990000), color-stop(100%, #610000));
+      background-image: -webkit-linear-gradient(top, #990000, #610000);
+      background-image: -moz-linear-gradient(top, #990000, #610000);
+      background-image: -ms-linear-gradient(top, #990000, #610000);
+      background-image: -o-linear-gradient(top, #990000, #610000);
+      background-image: linear-gradient(top, #990000, #610000);
+      padding: 6px 18px 7px;
+      text-shadow: 0 1px 0 #3d0000;
+      -webkit-background-clip: padding-box;
+      font-size: 18px;
+      padding: 12.944px; }
+      div.leanModal_box form input[type="button"]:hover {
+        -webkit-box-shadow: inset 0 1px 0 0 #ac0606;
+        -moz-box-shadow: inset 0 1px 0 0 #ac0606;
+        -ms-box-shadow: inset 0 1px 0 0 #ac0606;
+        -o-box-shadow: inset 0 1px 0 0 #ac0606;
+        box-shadow: inset 0 1px 0 0 #ac0606;
+        cursor: pointer;
+        background-color: #7d0303;
+        background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7d0303), color-stop(100%, #520000));
+        background-image: -webkit-linear-gradient(top, #7d0303, #520000);
+        background-image: -moz-linear-gradient(top, #7d0303, #520000);
+        background-image: -ms-linear-gradient(top, #7d0303, #520000);
+        background-image: -o-linear-gradient(top, #7d0303, #520000);
+        background-image: linear-gradient(top, #7d0303, #520000); }
+      div.leanModal_box form input[type="button"]:active {
+        border: 1px solid #520000;
+        -webkit-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
+        -moz-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
+        -ms-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
+        -o-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
+        box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee; }
+  div.leanModal_box div#login {
+    min-width: 300px; }
+    div.leanModal_box div#login ol li {
+      width: auto;
+      float: none; }
+  div.leanModal_box div.lost-password {
+    text-align: left;
+    margin-top: 25.888px; }
+    div.leanModal_box div.lost-password a {
+      color: #999; }
+      div.leanModal_box div.lost-password a:hover {
+        color: #444; }
+
+div#feedback_div form ol li {
+  float: none;
+  width: 100%; }
+  div#feedback_div form ol li textarea#feedback_message {
+    height: 100px; }
