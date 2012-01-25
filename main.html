@@ -12,6 +12,7 @@
   <script type="text/javascript" src="/static/lib/jquery-ui-1.8.16.custom.min.js"></script>
   <script type="text/javascript" src="/static/lib//swfobject/swfobject.js"></script>
   <script type="text/javascript" src="/static/lib/jquery.treeview.js"></script>
+	<script type="text/javascript" src="/static/lib/jquery.leanModal.min.js"></script>
   <script type="text/javascript" src="/static/js/video_player.js"></script>
   <script type="text/javascript" src="/static/js/schematic.js"></script>
   <script type="text/javascript" src="/static/js/cktsim.js"></script>
@@ -31,15 +32,11 @@
   </script>
   <script type="text/javascript" src="/static/lib/mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
-<script>
-$(function() {
-// Set up FancyBox pop-ups
-	$("a.modal").fancybox({
-		'hideOnContentClick': false
-	});
-});
-</script>
-
+	<script type="text/javascript">
+		$(function(){
+			$("a[rel*=leanModal]").leanModal();
+		});
+	</script>
 <%block name="headextra"/>
 
 </head>
@@ -54,38 +51,34 @@ $(function() {
     <p> Copyright (c). 2011. MIT. <a href=http://creativecommons.org/licenses/by-sa/3.0/>Some rights reserved.</a></p>
 
     <ul>
-      <li><a href="#feedback_div" class="modal">Feedback</a></li>
-      <li><a href="#calculator_div" class="modal">Calculator</a></li>
+      <li><a href="#feedback_div" rel="leanModal">Feedback</a></li>
+      <li><a href="#calculator_div" rel="leanModal">Calculator</a></li>
       <li><a href="/s/help.html">Help</a></li>
       <li><a href="/logout">Log out</a></li>
     </ul>
   </footer>
 
-  <div style="display:none">
-    <div id="feedback_div">
-      Found a bug? Got an idea for improving our system? Let us know. 
+    <div id="feedback_div" class="leanModal_box">
+      <p>Found a bug? Got an idea for improving our system? Let us know.</p> 
 
       <form>
         <ol>
-          <li><label>Subject:</label> <input id="feedback_subject" size=40></li>
-          <li><label>Feedback: </label><textarea id="feedback_message" cols="40" rows="5"></textarea></li>
+          <li><label>Subject:</label> <input type="text" id="feedback_subject"></li>
+          <li><label>Feedback: </label><textarea id="feedback_message"></textarea></li>
           <li><input id="feedback_button" type="button" value="Submit"></li>
         </ol>
       </form>
 
     </div>
-  </div>
 
-  <div style="display:none">
-    <div id="calculator_div">
-      <input id="calculator_input" > 
+    <div id="calculator_div" class="leanModal_box"> 
+      <input type="text" id="calculator_input"> 
       <input id="calculator_button" type=button value="=&gt;">
-      <input id="calculator_output" readonly>
+      <input type="text" id="calculator_output" readonly>
 
-      <p>Supported operations: ^ * / + - || ()</p>
       <p>Supported suffixes: %kMGTcmunp</p>
+      <p>Supported operations: ^ * / + - || ()</p>
     </div>
-  </div>
 
 <script>
   // Feedback form
