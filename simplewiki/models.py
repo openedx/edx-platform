@@ -85,6 +85,8 @@ class Article(models.Model):
     
     def can_read(self, user):
         """ Check read permissions and return True/False."""
+        if user.is_superuser:
+            return True
         if self.permissions:
             perms = self.permissions.can_read.all()
             return perms.count() == 0 or (user in perms)
@@ -93,6 +95,8 @@ class Article(models.Model):
 
     def can_write(self, user):
         """ Check write permissions and return True/False."""
+        if user.is_superuser:
+            return True
         if self.permissions:
             perms = self.permissions.can_write.all()
             return perms.count() == 0 or (user in perms)
@@ -101,6 +105,8 @@ class Article(models.Model):
 
     def can_write_l(self, user):
         """Check write permissions and locked status"""
+        if user.is_superuser:
+            return True
         return not self.locked and self.can_write(user)
 
     def can_attach(self, user):
@@ -220,13 +226,25 @@ class Revision(models.Model):
     counter = models.IntegerField(verbose_name=_('Revision#'), default=1, editable=False)
     previous_revision = models.ForeignKey('self', blank=True, null=True, editable=False)
     
+    # Deleted has three values. 0 is normal, non-deleted. 1 is if it was deleted by a normal user. It should
+    # be a NEW revision, so that it appears in the history. 2 is a special flag that can be applied or removed
+    # from a normal revision. It means it has been admin-deleted, and can only been seen by an admin. It doesn't
+    # show up in the history.
+    deleted = models.IntegerField(verbose_name=_('Deleted group'), default=0)
+    
     def get_user(self):
         return self.revision_user if self.revision_user else _('Anonymous')
+        
+    # Called after the deleted fied has been changed (between 0 and 2). This bypasses the normal checks put in
+    # save that update the revision or reject the save if contents haven't changed    
+    def adminSetDeleted(self, deleted):
+        self.deleted = deleted
+        super(Revision, self).save()
     
     def save(self, **kwargs):
         # Check if contents have changed... if not, silently ignore save
         if self.article and self.article.current_revision:
-            if self.article.current_revision.contents == self.contents:
+            if self.deleted == 0 and self.article.current_revision.contents == self.contents:
                 return
             else:
                 import datetime
@@ -242,7 +260,8 @@ class Revision(models.Model):
                 self.counter = previous_revision[0].counter + 1
         else:
             self.counter = 1
-        self.previous_revision = self.article.current_revision
+        if (self.article.current_revision and self.article.current_revision.deleted == 0):
+            self.previous_revision = self.article.current_revision
 
         # Create pre-parsed contents - no need to parse on-the-fly
         ext = WIKI_MARKDOWN_EXTENSIONS
@@ -274,6 +293,10 @@ class Revision(models.Model):
         super(Revision, self).delete(**kwargs)
     
     def get_diff(self):
+        if (self.deleted == 1):
+            yield "Article Deletion"
+            return
+        
         if self.previous_revision:
             previous = self.previous_revision.contents.splitlines(1)
         else:
