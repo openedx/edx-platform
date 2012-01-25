@@ -27,30 +27,32 @@ ${ wiki_article.title }
     <tbody>
 		<% loopCount = 0 %>
         %for revision in wiki_history:
-			<% loopCount += 1 %>
-            <tr style="border-top: 1px" ${'class="dark"' if (loopCount % 2) == 0 else ''}>
-                <td width="15px">
-                    <input  type="radio" name="revision" id="${revision.id}" value="${revision.id}"${"checked" if wiki_article.current_revision.id == revision.id else ""}/>
-                    <label for="${revision.id}">
-                        ${ revision }
-                        %if revision.previous_revision:
-                            %if not revision.counter == revision.previous_revision.counter + 1:
-                                <br/>(based on ${revision.previous_revision})
-                            %endif
-                        %endif
-                    </label>
-                </td>
-                <td>
-				${ revision.revision_text if revision.revision_text else "<i>None</i>" }</td>
-                <td class="diff">
-				%for x in revision.get_diff():
-				${x|h}<br/>
-				%endfor </td>
-                <td>${revision.get_user}
-                    <br/>
-					${revision.revision_date.strftime("%b %d, %Y, %I:%M %p")}
-                </td>
-            </tr>
+			%if revision.deleted < 2 or show_delete_revision:
+				<% loopCount += 1 %>
+	            <tr style="border-top: 1px" class="${'dark ' if (loopCount % 2) == 0 else ''}${'deleted ' if (revision.deleted==2) else ''}" >
+	                <td width="15px">
+	                    <input  type="radio" name="revision" id="${revision.id}" value="${revision.id}"${"checked" if wiki_article.current_revision.id == revision.id else ""}/>
+	                    <label for="${revision.id}">
+	                        ${ revision }
+	                        %if revision.previous_revision:
+	                            %if not revision.counter == revision.previous_revision.counter + 1:
+	                                <br/>(based on ${revision.previous_revision})
+	                            %endif
+	                        %endif
+	                    </label>
+	                </td>
+	                <td>
+					${ revision.revision_text if revision.revision_text else "<i>None</i>" }</td>
+	                <td class="diff">
+					%for x in revision.get_diff():
+					${x|h}<br/>
+					%endfor </td>
+	                <td>${revision.get_user()}
+	                    <br/>
+						${revision.revision_date.strftime("%b %d, %Y, %I:%M %p")}
+	                </td>
+	            </tr>
+			%endif
         %endfor
     </tbody>
     %if wiki_prev_page or wiki_next_page:
@@ -68,10 +70,15 @@ ${ wiki_article.title }
         </tfoot>
     %endif
 </table>
-<input type="submit" value="Change revision"
+<input type="submit" name="change" value="Change revision"
 %if not wiki_write:
 	disabled="true"
 %endif
 />
+%if show_delete_revision:
+<input type="submit" name="delete" value="Delete revision"/>
+<input type="submit" name="restore" value="Restore revision"/>
+<input type="submit" name="delete_all" value="Delete all revisions">
+%endif
 </form>
 </%block>

@@ -18,85 +18,66 @@ ${wiki_error}
 %endif
 
 %if wiki_err_notfound is not UNDEFINED:
-%if wiki_url is not UNDEFINED:
-<p>
-The page you requested could not be found.
-Click <a href="${reverse("wiki_create", args=[wiki_url])}">here</a> to create it.
-</p>
-%else:
-<p>
-Or maybe rather: Congratulations! It seems that there's no root
-article, which is probably because you just installed simple-wiki
-and your installation is working. Now you can create the root article.
-Click <a href="{% url wiki_create "" %}">here</a> to create it.
-</p>
-%endif
+	%if wiki_url is not UNDEFINED:
+		<p>
+		The page you requested could not be found.
+		Click <a href="${reverse("wiki_create", args=[wiki_url])}">here</a> to create it.
+		</p>
+	%else:
+		<p>
+		Or maybe rather: Congratulations! It seems that there's no root
+		article, which is probably because you just installed simple-wiki
+		and your installation is working. Now you can create the root article.
+		Click <a href="{% url wiki_create "" %}">here</a> to create it.
+		</p>
+	%endif
 %else:
 %if wiki_err_noparent is not UNDEFINED:
-<p>
-You cannot create this page, because its parent
-does not exist. Click <a href="${reverse("wiki_create", args=[wiki_url_parent])}">here</a>
-to create it.
-</p>
+	<p>
+	You cannot create this page, because its parent
+	does not exist. Click <a href="${reverse("wiki_create", args=[wiki_url_parent])}">here</a>
+	to create it.
+	</p>
 %else:
-
-%if wiki_err_keyword is not UNDEFINED:
-<p>
-The page you're trying to create <b>${wiki_url}</b> starts with <b>_</b>, which is reserved for internal use.
-</p>
+%if wiki_err_keyword is not UNDEFINED and wiki_err_keyword:
+	<p>
+	The page you're trying to create <b>${wiki_url}</b> starts with <b>_</b>, which is reserved for internal use.
+	</p>
+%elif wiki_err_locked is not UNDEFINED and wiki_err_locked:
+	<p>
+	The article you are trying to modify is locked.
+	</p>
+%elif wiki_err_noread is not UNDEFINED and wiki_err_noread:
+	<p>
+	You do not have access to read this article.
+	</p>
+%elif wiki_err_nowrite is not UNDEFINED and wiki_err_nowrite:
+	<p>
+	You do not have access to edit this article.
+	</p>
+%elif wiki_err_noanon is not UNDEFINED and wiki_err_noanon:
+	<p>
+	Anonymous attachments are not allowed. Try logging in.
+	</p>
+%elif wiki_err_create is not UNDEFINED and wiki_err_create:
+	<p>
+	You do not have access to create this article.
+	</p>
+%elif wiki_err_encode is not UNDEFINED and wiki_err_encode:
+	<p>
+	The url you requested could not be handled by the wiki.
+	Probably you used a bad character in the URL.
+	Only use digits, English letters, underscore and dash. For instance
+	/wiki/An_Article-1
+	</p>
+%elif wiki_err_deleted is not UNDEFINED and wiki_err_deleted:
+	<p>
+	The article you tried to access has been deleted. You may be able to restore it to an earlier version in <a href="${reverse("wiki_history", args=[wiki_article.get_url(),1])}">history</a>, or create a new version <a href="${reverse("wiki_edit", args=[wiki_article.get_url()])}">edit</a>.
+	</p>
 %else:
-
-%if wiki_err_locked is not UNDEFINED:
-<p>
-The article you are trying to modify is locked.
-</p>
-%else:
-
-%if wiki_err_noread is not UNDEFINED:
-<p>
-You do not have access to read this article.
-</p>
-%else:
-
-%if wiki_err_nowrite is not UNDEFINED:
-<p>
-You do not have access to edit this article.
-</p>
-%else:
-
-%if wiki_err_noanon is not UNDEFINED:
-<p>
-Anonymous attachments are not allowed. Try logging in.
-</p>
-%else:
-
-%if wiki_err_create is not UNDEFINED:
-<p>
-You do not have access to create this article.
-</p>
-%else:
-
-%if wiki_err_encode is not UNDEFINED:
-<p>
-The url you requested could not be handled by the wiki.
-Probably you used a bad character in the URL.
-Only use digits, English letters, underscore and dash. For instance
-/wiki/An_Article-1
-</p>
-
-
-%else:
-<p>
-An error has occured.
-</p>
-
-
-%endif
-%endif
-%endif
-%endif
-%endif
-%endif
+	<p>
+	An error has occured.
+	</p>
 %endif
 %endif
 %endif
