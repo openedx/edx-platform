@@ -35,10 +35,6 @@ def profile(request):
     if not request.user.is_authenticated():
         return redirect('/')
     
-    log.info("Profile called")
-    logging.info("Now the root")
-    logging.getLogger("tracking").info("this should be unformatted")
-
     dom=content_parser.course_file(request.user)
     hw=[]
     course = dom.xpath('//course/@name')[0]
