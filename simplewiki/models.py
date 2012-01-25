@@ -260,7 +260,7 @@ class Revision(models.Model):
                 self.counter = previous_revision[0].counter + 1
         else:
             self.counter = 1
-        if (self.article.current_revision.deleted == 0):
+        if (self.article.current_revision and self.article.current_revision.deleted == 0):
             self.previous_revision = self.article.current_revision
 
         # Create pre-parsed contents - no need to parse on-the-fly
