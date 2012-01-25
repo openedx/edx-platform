@@ -1,48 +1,90 @@
-html, body, div, span, applet, object, iframe,
+/* 
+html5doctor.com Reset Stylesheet
+v1.6.1
+Last Updated: 2010-09-17
+Author: Richard Clark - http://richclarkdesign.com 
+Twitter: @rich_clark
+*/
+html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, font, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td {
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
   margin: 0;
   padding: 0;
   border: 0;
   outline: 0;
-  font-weight: inherit;
-  font-style: inherit;
   font-size: 100%;
-  font-family: inherit;
-  vertical-align: baseline; }
-
-/* remember to define focus styles! */
-:focus {
-  outline: 0; }
+  vertical-align: baseline;
+  background: transparent; }
 
 body {
-  line-height: 1;
-  color: black;
-  background: white; }
+  line-height: 1; }
 
-ol, ul {
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+nav ul {
   list-style: none; }
 
-/* tables still need 'cellspacing="0"' in the markup */
-table {
-  border-collapse: separate;
-  border-spacing: 0; }
-
-caption, th, td {
-  text-align: left;
-  font-weight: normal; }
+blockquote, q {
+  quotes: none; }
 
 blockquote:before, blockquote:after,
 q:before, q:after {
-  content: ""; }
+  content: '';
+  content: none; }
 
-blockquote, q {
-  quotes: "" ""; }
+a {
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+/* change colours to suit your needs */
+ins {
+  background-color: #ff9;
+  color: #000;
+  text-decoration: none; }
+
+/* change colours to suit your needs */
+mark {
+  background-color: #ff9;
+  color: #000;
+  font-style: italic;
+  font-weight: bold; }
+
+del {
+  text-decoration: line-through; }
+
+abbr[title], dfn[title] {
+  border-bottom: 1px dotted;
+  cursor: help; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* change border colour to suit your needs */
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #cccccc;
+  margin: 1em 0;
+  padding: 0; }
+
+input, select {
+  vertical-align: middle; }
 
 @font-face {
   font-family: 'Open Sans';
@@ -52,11 +94,23 @@ blockquote, q {
 
 @font-face {
   font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: local("Open Sans Italic"), local("OpenSans-Italic"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff") format("woff"); }
+
+@font-face {
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: 800;
   src: local("Open Sans Extrabold"), local("OpenSans-Extrabold"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/EInbV5DfGHOiMmvb1Xr-hqRDOzjiPcYnFooOUGCOsRk.woff") format("woff"); }
 
-.wrapper, header.announcement div, section.index-content, footer {
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 800;
+  src: local("Open Sans Extrabold Italic"), local("OpenSans-ExtraboldItalic"), url("http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxsBo4hlZyBvkZICS3KpNonM.woff") format("woff"); }
+
+.wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, section.index-content, footer {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -68,7 +122,22 @@ blockquote, q {
   padding: 25.888px;
   width: 100%; }
 
-.clearfix:after, header.announcement div section:after, section.index-content:after, section.index-content section:after, section.index-content section.about section:after, footer:after {
+.subpage > div, section.copyright > div, section.tos > div, section.privacy-policy > div, section.honor-code > div {
+  padding-left: 34.171%; }
+  .subpage > div p, section.copyright > div p, section.tos > div p, section.privacy-policy > div p, section.honor-code > div p {
+    margin-bottom: 25.888px; }
+  .subpage > div h1, section.copyright > div h1, section.tos > div h1, section.privacy-policy > div h1, section.honor-code > div h1 {
+    margin-bottom: 12.944px; }
+  .subpage > div h2, section.copyright > div h2, section.tos > div h2, section.privacy-policy > div h2, section.honor-code > div h2 {
+    font: 18px "Open Sans", Helvetica, Arial, sans-serif;
+    color: #000;
+    margin-bottom: 12.944px; }
+  .subpage > div ul, section.copyright > div ul, section.tos > div ul, section.privacy-policy > div ul, section.honor-code > div ul {
+    list-style: disc outside none; }
+    .subpage > div ul li, section.copyright > div ul li, section.tos > div ul li, section.privacy-policy > div ul li, section.honor-code > div ul li {
+      list-style: disc outside none; }
+
+.clearfix:after, .subpage:after, section.copyright:after, section.tos:after, section.privacy-policy:after, section.honor-code:after, header.announcement div section:after, section.index-content:after, section.index-content section:after, section.index-content section.about section:after, footer:after {
   content: ".";
   display: block;
   height: 0;
@@ -117,7 +186,9 @@ blockquote, q {
   color: #fff;
   margin: 25.888px 0 12.944px;
   padding: 6.472px 12.944px;
-  text-decoration: none; }
+  text-decoration: none;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased; }
   .button:hover, header.announcement div section.course section a:hover, section.index-content section.course a:hover, section.index-content section.staff a:hover, section.index-content section.about-course section.cta a.enroll:hover {
     background-color: #660000; }
   .button span, header.announcement div section.course section a span, section.index-content section.course a span, section.index-content section.staff a span, section.index-content section.about-course section.cta a.enroll span {
@@ -128,6 +199,18 @@ body {
   background-color: #fff;
   color: #444;
   font: 16px Georgia, serif; }
+  body h1 {
+    font: 800 24px "Open Sans", Helvetica, Arial, sans-serif; }
+  body li {
+    margin-bottom: 25.888px; }
+  body em {
+    font-style: italic; }
+  body a {
+    color: #990000;
+    font-style: italic;
+    text-decoration: none; }
+    body a:hover, body a:focus {
+      color: #660000; }
   body input[type="email"], body input[type="number"], body input[type="password"], body input[type="search"], body input[type="tel"], body input[type="text"], body input[type="url"], body input[type="color"], body input[type="date"], body input[type="datetime"], body input[type="datetime-local"], body input[type="month"], body input[type="time"], body input[type="week"], body textarea {
     -webkit-box-shadow: 0 -1px 0 white;
     -moz-box-shadow: 0 -1px 0 white;
@@ -149,43 +232,27 @@ body {
       border-color: #990000; }
 
 header.announcement {
-  color: #fff;
+  background: #333;
   border-bottom: 1px solid #000;
-  background: #e3e3e3;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -ms-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover; }
-  @media screen and (min-width: 1200px) {
-    header.announcement.home {
-      background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg"); } }
-  @media screen and (max-width: 1199px) {
-    header.announcement.home {
-      background: #e3e3e3 url("/static/images/marketing/shot-1-medium.jpg"); } }
-  header.announcement.home div {
-    padding: 258.88px 25.888px 77.664px; }
-  @media screen and (min-width: 1200px) {
-    header.announcement.course {
-      background: #e3e3e3 url("/static/images/marketing/course-bg-large.jpg"); } }
-  @media screen and (max-width: 1199px) and (min-width: 700px) {
-    header.announcement.course {
-      background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg");
-      -webkit-background-size: cover;
-      -moz-background-size: cover;
-      -ms-background-size: cover;
-      -o-background-size: cover;
-      background-size: cover; } }
-  @media screen and (max-width: 699px) {
-    header.announcement.course {
-      background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
-      -webkit-background-size: cover;
-      -moz-background-size: cover;
-      -ms-background-size: cover;
-      -o-background-size: cover;
-      background-size: cover; } }
-  header.announcement.course div {
-    padding: 103.552px 25.888px 51.776px; }
+  color: #fff;
+  -webkit-font-smoothing: antialiased; }
+  header.announcement.home {
+    background: #e3e3e3 url("/static/images/marketing/shot-1-medium.jpg"); }
+    @media screen and (min-width: 1200px) {
+      header.announcement.home {
+        background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg"); } }
+    header.announcement.home div {
+      padding: 258.88px 25.888px 77.664px; }
+  header.announcement.course {
+    background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg"); }
+    @media screen and (min-width: 1200px) {
+      header.announcement.course {
+        background: #e3e3e3 url("/static/images/marketing/course-bg-large.jpg"); } }
+    @media screen and (max-width: 1199px) and (min-width: 700px) {
+      header.announcement.course {
+        background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg"); } }
+    header.announcement.course div {
+      padding: 103.552px 25.888px 51.776px; }
   header.announcement div {
     position: relative; }
     header.announcement div nav {
@@ -197,6 +264,7 @@ header.announcement {
       -ms-border-radius: 0 0 3px 3px;
       -o-border-radius: 0 0 3px 3px;
       border-radius: 0 0 3px 3px;
+      background: #333;
       background: rgba(0, 0, 0, 0.7);
       padding: 12.944px; }
       header.announcement div nav h1 {
@@ -209,13 +277,14 @@ header.announcement {
         *vertical-align: auto;
         margin-right: 25.888px; }
         header.announcement div nav h1 a {
-          font: 800 18px "Open Sans", Helvetica, Arial, sans-serif;
+          font: italic 800 18px "Open Sans", Helvetica, Arial, sans-serif;
           color: #fff;
           text-decoration: none; }
       header.announcement div nav a.login {
         text-decoration: none;
         color: #fff;
-        font-size: 12px; }
+        font-size: 12px;
+        font-style: normal; }
         header.announcement div nav a.login:hover {
           color: rgba(255, 255, 255, 0.6); }
     header.announcement div section {
@@ -311,7 +380,8 @@ section.index-content section {
           color: #666;
           margin-bottom: 25.888px; }
         section.index-content section.about section.features p {
-          width: auto; }
+          width: auto;
+          clear: both; }
           section.index-content section.about section.features p strong {
             font-family: "Open sans";
             font-weight: 800; }
@@ -361,9 +431,11 @@ section.index-content section {
       font: 800 24px "Open Sans", Helvetica, Arial, sans-serif; }
     section.index-content section.course h3, section.index-content section.staff h3 {
       font: 400 18px "Open Sans", Helvetica, Arial, sans-serif; }
-    section.index-content section.course ul li img, section.index-content section.staff ul li img {
-      float: left;
-      margin-right: 12.944px; }
+    section.index-content section.course ul, section.index-content section.staff ul {
+      list-style: none; }
+      section.index-content section.course ul li img, section.index-content section.staff ul li img {
+        float: left;
+        margin-right: 12.944px; }
   section.index-content section.course h2 {
     padding-top: 129.44px;
     background: url("/static/images/marketing/circuits-bg.jpg") 0 0 no-repeat;

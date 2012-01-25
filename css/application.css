@@ -1,48 +1,90 @@
-html, body, div, span, applet, object, iframe,
+/* 
+html5doctor.com Reset Stylesheet
+v1.6.1
+Last Updated: 2010-09-17
+Author: Richard Clark - http://richclarkdesign.com 
+Twitter: @rich_clark
+*/
+html, body, div, span, object, iframe,
 h1, h2, h3, div.wiki-wrapper div#wiki_panel input[type="button"], h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, font, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td {
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
   margin: 0;
   padding: 0;
   border: 0;
   outline: 0;
-  font-weight: inherit;
-  font-style: inherit;
   font-size: 100%;
-  font-family: inherit;
-  vertical-align: baseline; }
-
-/* remember to define focus styles! */
-:focus {
-  outline: 0; }
+  vertical-align: baseline;
+  background: transparent; }
 
 body {
-  line-height: 1;
-  color: black;
-  background: white; }
+  line-height: 1; }
 
-ol, ul {
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+nav ul {
   list-style: none; }
 
-/* tables still need 'cellspacing="0"' in the markup */
-table {
-  border-collapse: separate;
-  border-spacing: 0; }
-
-caption, th, td {
-  text-align: left;
-  font-weight: normal; }
+blockquote, q {
+  quotes: none; }
 
 blockquote:before, blockquote:after,
 q:before, q:after {
-  content: ""; }
+  content: '';
+  content: none; }
 
-blockquote, q {
-  quotes: "" ""; }
+a {
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+/* change colours to suit your needs */
+ins {
+  background-color: #ff9;
+  color: #000;
+  text-decoration: none; }
+
+/* change colours to suit your needs */
+mark {
+  background-color: #ff9;
+  color: #000;
+  font-style: italic;
+  font-weight: bold; }
+
+del {
+  text-decoration: line-through; }
+
+abbr[title], dfn[title] {
+  border-bottom: 1px dotted;
+  cursor: help; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* change border colour to suit your needs */
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #cccccc;
+  margin: 1em 0;
+  padding: 0; }
+
+input, select {
+  vertical-align: middle; }
 
 @font-face {
   font-family: 'Droid Sans';
@@ -56,14 +98,14 @@ blockquote, q {
   font-weight: bold;
   src: local("Droid Sans Bold"), local("DroidSans-Bold"), url("http://themes.googleusercontent.com/static/fonts/droidsans/v3/EFpQQyG9GqCrobXxL-KRMXbFhgvWbfSbdVg11QabG8w.woff") format("woff"); }
 
-.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, secondaryHeader:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after {
+.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, .secondary-nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, .secondary-nav nav:after, .content-wrapper:after, .footer-wrapper:after {
   content: ".";
   display: block;
   height: 0;
   clear: both;
   visibility: hidden; }
 
-.wrapper, html body div.header-wrapper header, html body section.main-content, html footer, section.activation {
+.wrapper, html body div.header-wrapper header, html body section.main-content, html footer, section.activation, .secondary-nav nav, .content-wrapper, .footer-wrapper {
   margin: 0 auto;
   max-width: 1235px;
   width: 100%;
@@ -119,7 +161,7 @@ blockquote, q {
   vertical-align: top;
   width: 74.494%; }
 
-.sidebar, div.course-wrapper div#accordion, div.book-wrapper ul#booknav, div.wiki-wrapper div#wiki_panel {
+.sidebar, div.course-wrapper div#accordion, div.book-wrapper ul#booknav, div.wiki-wrapper div#wiki_panel, .content-wrapper aside {
   -webkit-box-shadow: inset -1px 0 0 #f6f6f6;
   -moz-box-shadow: inset -1px 0 0 #f6f6f6;
   -ms-box-shadow: inset -1px 0 0 #f6f6f6;
@@ -133,7 +175,7 @@ blockquote, q {
   vertical-align: top;
   width: 23.482%;
   position: relative; }
-  .sidebar h3, div.course-wrapper div#accordion h3, div.book-wrapper ul#booknav h3, div.wiki-wrapper div#wiki_panel h3, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .sidebar input[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"], div.wiki-wrapper div#wiki_panel input[type="button"] {
+  .sidebar h3, div.course-wrapper div#accordion h3, div.book-wrapper ul#booknav h3, div.wiki-wrapper div#wiki_panel h3, .content-wrapper aside h3, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .sidebar input[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"], div.wiki-wrapper div#wiki_panel input[type="button"], .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] {
     -webkit-box-shadow: 0 1px 0 #eeeeee;
     -moz-box-shadow: 0 1px 0 #eeeeee;
     -ms-box-shadow: 0 1px 0 #eeeeee;
@@ -146,7 +188,7 @@ blockquote, q {
     font-weight: normal;
     margin: 0;
     overflow: hidden; }
-    .sidebar h3 a, div.course-wrapper div#accordion h3 a, div.book-wrapper ul#booknav h3 a, div.wiki-wrapper div#wiki_panel h3 a, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] a, div.wiki-wrapper div#wiki_panel input[type="button"] a {
+    .sidebar h3 a, div.course-wrapper div#accordion h3 a, div.book-wrapper ul#booknav h3 a, div.wiki-wrapper div#wiki_panel h3 a, .content-wrapper aside h3 a, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] a, div.wiki-wrapper div#wiki_panel input[type="button"] a, .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] a, div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] a {
       -webkit-transition-property: all;
       -moz-transition-property: all;
       -ms-transition-property: all;
@@ -172,16 +214,16 @@ blockquote, q {
       font-size: 14px;
       padding: 7px 7px 7px 30px;
       text-decoration: none; }
-      .sidebar h3 a:hover, div.course-wrapper div#accordion h3 a:hover, div.book-wrapper ul#booknav h3 a:hover, div.wiki-wrapper div#wiki_panel h3 a:hover, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] a:hover, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] a:hover, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel input[type="button"] a:hover {
+      .sidebar h3 a:hover, div.course-wrapper div#accordion h3 a:hover, div.book-wrapper ul#booknav h3 a:hover, div.wiki-wrapper div#wiki_panel h3 a:hover, .content-wrapper aside h3 a:hover, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] a:hover, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] a:hover, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] a:hover, div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] a:hover {
         -webkit-box-shadow: 0 1px 0 white;
         -moz-box-shadow: 0 1px 0 white;
         -ms-box-shadow: 0 1px 0 white;
         -o-box-shadow: 0 1px 0 white;
         box-shadow: 0 1px 0 white;
         background: #efefef; }
-    .sidebar h3 span.ui-icon, div.course-wrapper div#accordion h3 span.ui-icon, div.book-wrapper ul#booknav h3 span.ui-icon, div.wiki-wrapper div#wiki_panel h3 span.ui-icon, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] span.ui-icon, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] span.ui-icon, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon {
+    .sidebar h3 span.ui-icon, div.course-wrapper div#accordion h3 span.ui-icon, div.book-wrapper ul#booknav h3 span.ui-icon, div.wiki-wrapper div#wiki_panel h3 span.ui-icon, .content-wrapper aside h3 span.ui-icon, .sidebar div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel .sidebar input[type="button"] span.ui-icon, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input[type="button"] span.ui-icon, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"] span.ui-icon, div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] span.ui-icon {
       background-image: url(images/ui-icons_454545_256x240.png); }
-    .sidebar h3.active, div.course-wrapper div#accordion h3.active, div.book-wrapper ul#booknav h3.active, div.wiki-wrapper div#wiki_panel h3.active, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"], div.wiki-wrapper div#wiki_panel input.active[type="button"] {
+    .sidebar h3.active, div.course-wrapper div#accordion h3.active, div.book-wrapper ul#booknav h3.active, div.wiki-wrapper div#wiki_panel h3.active, .content-wrapper aside h3.active, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active, .content-wrapper aside div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion .content-wrapper aside h3.ui-accordion-header.ui-state-active, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], .content-wrapper aside div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"], .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], .content-wrapper aside div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"], .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"], div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"], div.wiki-wrapper div#wiki_panel input.active[type="button"], .content-wrapper aside div.wiki-wrapper div#wiki_panel input.active[type="button"], div.wiki-wrapper div#wiki_panel .content-wrapper aside input.active[type="button"] {
       -webkit-box-shadow: none;
       -moz-box-shadow: none;
       -ms-box-shadow: none;
@@ -192,19 +234,19 @@ blockquote, q {
       border-bottom: 1px solid #bbb;
       color: #000;
       font-weight: bold; }
-      .sidebar h3.active a, div.course-wrapper div#accordion h3.active a, div.book-wrapper ul#booknav h3.active a, div.wiki-wrapper div#wiki_panel h3.active a, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active a, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"] a, div.wiki-wrapper div#wiki_panel input.active[type="button"] a {
+      .sidebar h3.active a, div.course-wrapper div#accordion h3.active a, div.book-wrapper ul#booknav h3.active a, div.wiki-wrapper div#wiki_panel h3.active a, .content-wrapper aside h3.active a, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active a, .content-wrapper aside div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion .content-wrapper aside h3.ui-accordion-header.ui-state-active a, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, .content-wrapper aside div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, .content-wrapper aside div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .content-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"] a, div.wiki-wrapper div#wiki_panel input.active[type="button"] a, .content-wrapper aside div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel .content-wrapper aside input.active[type="button"] a {
         color: #000; }
 
-.topbar, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header, secondaryHeader {
+.topbar, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header, .secondary-nav {
   background: #F6EFD4;
   border-bottom: 1px solid #eddfaa;
   margin: -22.652px -22.652px 22.652px;
   font-size: 12px;
   text-shadow: 0 1px 0 #fff; }
-  .topbar a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, secondaryHeader a {
+  .topbar a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, .secondary-nav a {
     text-transform: uppercase;
     color: #292309; }
-    .topbar a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, secondaryHeader a:hover {
+    .topbar a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, .secondary-nav a:hover {
       color: #7e691a; }
 
 h1 {
@@ -220,6 +262,10 @@ h2 {
 
 p {
   margin-bottom: 22.652px; }
+
+em {
+  font-style: italic;
+  font-family: Georgia, serif; }
 
 input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"], textarea {
   -webkit-box-shadow: 0 -1px 0 white;
@@ -279,6 +325,15 @@ html {
           float: left;
           color: #000;
           text-shadow: 0 1px 0 #bf4040; }
+          html body div.header-wrapper header h1 em {
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto;
+            padding-right: 22.652px; }
         html body div.header-wrapper header nav {
           float: left;
           display: block;
@@ -839,6 +894,2696 @@ section.activation {
   padding: 22.652px;
   margin-top: 22.652px; }
 
+section.help.main-content {
+  padding: 22.652px; }
+  section.help.main-content p {
+    max-width: 700px; }
+  section.help.main-content dl {
+    margin-bottom: 22.652px; }
+    section.help.main-content dl dd, section.help.main-content dl dt {
+      margin-bottom: 11.326px; }
+    section.help.main-content dl dt {
+      font-weight: bold; }
+
+.secondary-nav {
+  margin: 0;
+  padding: 15px 0; }
+  .secondary-nav nav {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 22.652px; }
+    .secondary-nav nav div {
+      float: left; }
+      .secondary-nav nav div.question-filter {
+        font-size: 16px;
+        margin-top: 4px;
+        width: 31.984%; }
+        .secondary-nav nav div.question-filter ul {
+          -webkit-border-radius: 35px;
+          -moz-border-radius: 35px;
+          -ms-border-radius: 35px;
+          -o-border-radius: 35px;
+          border-radius: 35px;
+          background: #e4d080;
+          display: inline;
+          margin: 0 0 0 10px;
+          padding: 5.663px 20px; }
+          .secondary-nav nav div.question-filter ul li {
+            display: inline-block;
+            list-style: none;
+            margin-right: 10px; }
+            .secondary-nav nav div.question-filter ul li:last-child {
+              margin-right: 0; }
+            .secondary-nav nav div.question-filter ul li a {
+              text-transform: capitalize;
+              text-shadow: none;
+              font-size: 14px; }
+              .secondary-nav nav div.question-filter ul li a.on {
+                font-weight: bold; }
+      .secondary-nav nav div.search-box {
+        margin-left: 2%;
+        text-align: right;
+        width: 65.992%; }
+
+.content-wrapper {
+  -webkit-box-shadow: 0 1px 0 white;
+  -moz-box-shadow: 0 1px 0 white;
+  -ms-box-shadow: 0 1px 0 white;
+  -o-box-shadow: 0 1px 0 white;
+  box-shadow: 0 1px 0 white;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-top: 0; }
+  .content-wrapper .discussion-content {
+    /*@extend .content;*/
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table-cell;
+    padding: 2.024%;
+    vertical-align: top;
+    width: 74.494%; }
+  .content-wrapper aside {
+    width: 19.231%;
+    padding: 2.024%; }
+    .content-wrapper aside h2 {
+      font-size: 16px; }
+    .content-wrapper aside h3, .content-wrapper aside div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .content-wrapper aside input[type="button"] {
+      border-bottom: 0;
+      box-shadow: none; }
+    .content-wrapper aside input[type="text"] {
+      width: 68%; }
+    .content-wrapper aside #displayTagFilterControl {
+      margin-top: 10px; }
+
+.footer-wrapper {
+  -webkit-box-shadow: 0 1px 0 white;
+  -moz-box-shadow: 0 1px 0 white;
+  -ms-box-shadow: 0 1px 0 white;
+  -o-box-shadow: 0 1px 0 white;
+  box-shadow: 0 1px 0 white;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  border-top: 0;
+  padding: 0 1.012%; }
+
+/*body {
+  background: #FFF;
+  font-size: 14px;
+  line-height: 150%;
+  margin: 0;
+  padding: 0;
+  color: #000;
+  font-family: Arial; }*/
+.clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, .secondary-nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, .secondary-nav nav:after, .content-wrapper:after, .footer-wrapper:after, .paginator:after {
+  clear: both;
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden; }
+
+.badges a {
+  color: #763333;
+  text-decoration: underline; }
+
+a:hover {
+  text-decoration: underline; }
+
+.badge-context-toggle.active, div.course-wrapper div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"] {
+  cursor: pointer;
+  text-decoration: underline; }
+
+body.user-messages {
+  margin-top: 2.4em; }
+
+.left {
+  float: left; }
+
+.right {
+  float: right; }
+
+.clean {
+  clear: both; }
+
+.center {
+  margin: 0 auto;
+  padding: 0; }
+
+.notify {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 100;
+  padding: 0;
+  text-align: center;
+  background-color: #f5dd69;
+  border-top: #fff 1px solid;
+  font-family: 'Yanone Kaffeesatz',sans-serif; }
+  .notify p.notification {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    font-size: 16px;
+    color: #424242; }
+
+#closeNotify {
+  position: absolute;
+  right: 5px;
+  top: 7px;
+  color: #735005;
+  text-decoration: none;
+  line-height: 18px;
+  background: -6px -5px url(../images/sprites.png) no-repeat;
+  cursor: pointer;
+  width: 20px;
+  height: 20px; }
+  #closeNotify:hover {
+    background: -26px -5px url(../images/sprites.png) no-repeat; }
+
+#header {
+  margin-top: 0px;
+  background: #16160f;
+  font-family: 'Yanone Kaffeesatz',sans-serif; }
+
+/*.content-wrapper {
+  width: 960px;
+  margin: auto;
+  position: relative; }*/
+#logo img {
+  padding: 5px 0px 5px 0px;
+  height: 75px;
+  width: auto;
+  float: left; }
+
+#userToolsNav {
+  height: 20px;
+  padding-bottom: 5px; }
+  #userToolsNav a {
+    height: 35px;
+    text-align: right;
+    margin-left: 20px;
+    text-decoration: underline;
+    color: #d0e296;
+    font-size: 16px; }
+    #userToolsNav a:first-child {
+      margin-left: 0; }
+    #userToolsNav a#ab-responses {
+      margin-left: 3px; }
+  #userToolsNav .user-info, #userToolsNav .user-micro-info {
+    color: #b5b593; }
+  #userToolsNav a img {
+    vertical-align: middle;
+    margin-bottom: 2px; }
+  #userToolsNav .user-info a {
+    margin: 0;
+    text-decoration: none; }
+
+#metaNav {
+  float: right; }
+  #metaNav a {
+    color: #e2e2ae;
+    padding: 0px 0px 0px 35px;
+    height: 25px;
+    line-height: 30px;
+    margin: 5px 0px 0px 10px;
+    font-size: 18px;
+    font-weight: 100;
+    text-decoration: none;
+    display: block;
+    float: left; }
+    #metaNav a:hover {
+      text-decoration: underline; }
+    #metaNav a.on {
+      font-weight: bold;
+      color: #FFF;
+      text-decoration: none; }
+    #metaNav a.special {
+      font-size: 18px;
+      color: #B02B2C;
+      font-weight: bold;
+      text-decoration: none; }
+      #metaNav a.special:hover {
+        text-decoration: underline; }
+  #metaNav #navTags {
+    background: -50px -5px url(../images/sprites.png) no-repeat; }
+  #metaNav #navUsers {
+    background: -125px -5px url(../images/sprites.png) no-repeat; }
+  #metaNav #navBadges {
+    background: -210px -5px url(../images/sprites.png) no-repeat; }
+
+#header.with-logo #userToolsNav {
+  position: absolute;
+  bottom: 0;
+  right: 0px; }
+#header.without-logo #userToolsNav {
+  float: left;
+  margin-top: 7px; }
+#header.without-logo #metaNav {
+  margin-bottom: 7px; }
+
+/*#secondaryHeader {
+  height: 55px;
+  background: #e9e9e1;
+  border-bottom: #d3d3c2 1px solid;
+  border-top: #fcfcfc 1px solid;
+  margin-bottom: 10px;
+  font-family: 'Yanone Kaffeesatz',sans-serif;
+  #homeButton {
+    border-right: #afaf9e 1px solid;
+    background: -6px -36px url(../images/sprites.png) no-repeat;
+    height: 55px;
+    width: 43px;
+    display: block;
+    float: left;
+    &:hover {
+      background: -51px -36px url(../images/sprites.png) no-repeat; } }
+  #scopeWrapper {
+    width: 688px;
+    float: left;
+    a {
+      display: block;
+      float: left; }
+    .scope-selector {
+      font-size: 21px;
+      color: #5a5a4b;
+      height: 55px;
+      line-height: 55px;
+      margin-left: 24px; }
+    .on {
+      background: url(../images/scopearrow.png) no-repeat center bottom; }
+    .ask-message {
+      font-size: 24px; } } }*/
+#searchBar {
+  display: inline-block;
+  background-color: #fff;
+  width: 412px;
+  border: 1px solid #c9c9b5;
+  float: right;
+  height: 42px;
+  margin: 6px 0px 0px 15px; }
+  #searchBar .searchInput, #searchBar .searchInputCancelable {
+    font-size: 30px;
+    height: 40px;
+    font-weight: 300;
+    background: #FFF;
+    border: 0px;
+    color: #484848;
+    padding-left: 10px;
+    font-family: Arial;
+    vertical-align: middle; }
+  #searchBar .searchInput {
+    width: 352px; }
+  #searchBar .searchInputCancelable {
+    width: 317px; }
+  #searchBar .logoutsearch {
+    width: 337px; }
+  #searchBar .searchBtn {
+    font-size: 10px;
+    color: #666;
+    background-color: #eee;
+    height: 42px;
+    border: #FFF 1px solid;
+    line-height: 22px;
+    text-align: center;
+    float: right;
+    margin: 0px;
+    width: 48px;
+    background: -98px -36px url(../images/sprites.png) no-repeat;
+    cursor: pointer; }
+    #searchBar .searchBtn:hover {
+      background: -146px -36px url(../images/sprites.png) no-repeat; }
+  #searchBar .cancelSearchBtn {
+    font-size: 30px;
+    color: #ce8888;
+    background: #fff;
+    height: 42px;
+    border: 0px;
+    border-left: #deded0 1px solid;
+    text-align: center;
+    width: 35px;
+    cursor: pointer; }
+    #searchBar .cancelSearchBtn:hover {
+      color: #d84040; }
+
+body.anon #searchBar {
+  width: 500px; }
+  body.anon #searchBar .searchInput {
+    width: 440px; }
+  body.anon #searchBar .searchInputCancelable {
+    width: 405px; }
+
+#askButton {
+  background: url(../images/bigbutton.png) repeat-x bottom;
+  line-height: 44px;
+  text-align: center;
+  width: 200px;
+  height: 42px;
+  font-size: 23px;
+  color: #4a757f;
+  margin-top: 7px;
+  float: right;
+  text-transform: uppercase;
+  border-radius: 5px;
+  -ms-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  -webkit-box-shadow: 1px 1px 2px #636363;
+  -moz-box-shadow: 1px 1px 2px #636363;
+  box-shadow: 1px 1px 2px #636363; }
+  #askButton:hover {
+    text-decoration: none;
+    background: url(../images/bigbutton.png) repeat-x top;
+    text-shadow: 0px 1px 0px #c6d9dd;
+    -moz-text-shadow: 0px 1px 0px #c6d9dd;
+    -webkit-text-shadow: 0px 1px 0px #c6d9dd; }
+
+/*#ContentLeft {
+  width: 730px;
+  float: left;
+  position: relative;
+  padding-bottom: 10px; }
+
+#ContentRight {
+  width: 200px;
+  float: right;
+  padding: 0 0px 10px 0px; }*/
+#ContentFull {
+  float: left;
+  width: 960px; }
+
+.box {
+  /*background: #fff;*/
+  /*padding: 4px 0px 10px 0px;*/
+  /*width: 200px;*/
+  /*.inputs {
+    #interestingTagInput, #ignoredTagInput {
+      width: 153px;
+      padding-left: 5px;
+      border: #c9c9b5 1px solid;
+      height: 25px; }
+    #interestingTagAdd, #ignoredTagAdd {
+      background: url(../images/small-button-blue.png) repeat-x top;
+      border: 0;
+      color: #4a757f;
+      font-weight: bold;
+      font-size: 12px;
+      width: 30px;
+      height: 27px;
+      margin-top: -2px;
+      cursor: pointer;
+      border-radius: 4px;
+      -ms-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -webkit-border-radius: 4px;
+      -khtml-border-radius: 4px;
+      text-shadow: 0px 1px 0px #e6f6fa;
+      -moz-text-shadow: 0px 1px 0px #e6f6fa;
+      -webkit-text-shadow: 0px 1px 0px #e6f6fa;
+      -webkit-box-shadow: 1px 1px 2px #808080;
+      -moz-box-shadow: 1px 1px 2px #808080;
+      box-shadow: 1px 1px 2px #808080; }
+    #interestingTagAdd:hover, #ignoredTagAdd:hover {
+      background: url(../images/small-button-blue.png) repeat-x bottom; } }*/ }
+  .box p {
+    margin-bottom: 4px; }
+    .box p.info-box-follow-up-links {
+      text-align: right;
+      margin: 0; }
+  .box h2 {
+    padding-left: 0;
+    /*background: #eceeeb;*/
+    height: 30px;
+    line-height: 30px;
+    /*text-align: right;*/
+    /*font-size: 18px !important;*/
+    font-weight: normal;
+    color: #656565;
+    /*padding-right: 10px;*/
+    /*margin-bottom: 10px;*/
+    /*font-family: 'Yanone Kaffeesatz',sans-serif;*/ }
+  .box h3, .box div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .box input[type="button"] {
+    /*color: #4a757f;*/
+    /*font-size: 18px;*/
+    text-align: left;
+    font-weight: normal;
+    /*font-family: 'Yanone Kaffeesatz',sans-serif;*/
+    padding-left: 0px; }
+  .box .contributorback {
+    background: #eceeeb url(../images/contributorsback.png) no-repeat center left; }
+  .box label {
+    color: #707070;
+    font-size: 15px;
+    display: block;
+    float: right;
+    text-align: left;
+    font-family: 'Yanone Kaffeesatz',sans-serif;
+    width: 80px;
+    margin-right: 18px; }
+  .box #displayTagFilterControl label {
+    width: 160px; }
+  .box ul {
+    margin-left: 22px; }
+  .box li {
+    list-style-type: disc;
+    font-size: 13px;
+    line-height: 20px;
+    margin-bottom: 10px;
+    color: #707070; }
+  .box ul.tags {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    line-height: 170%;
+    display: block; }
+  .box #displayTagFilterControl p label {
+    color: #707070;
+    font-size: 15px; }
+  .box img.gravatar {
+    margin: 1px; }
+  .box a.followed, .box a.follow {
+    background: url(../images/medium-button.png) top repeat-x;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    border: 0;
+    font-family: 'Yanone Kaffeesatz',sans-serif;
+    color: #4a757f;
+    font-weight: normal;
+    font-size: 21px;
+    margin-top: 3px;
+    display: block;
+    width: 120px;
+    text-decoration: none;
+    border-radius: 4px;
+    -ms-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    -webkit-box-shadow: 1px 1px 2px #636363;
+    -moz-box-shadow: 1px 1px 2px #636363;
+    box-shadow: 1px 1px 2px #636363;
+    margin: 0 auto;
+    padding: 0; }
+  .box a.followed:hover, .box a.follow:hover {
+    text-decoration: none;
+    background: url(../images/medium-button.png) bottom repeat-x;
+    text-shadow: 0px 1px 0px #c6d9dd;
+    -moz-text-shadow: 0px 1px 0px #c6d9dd;
+    -webkit-text-shadow: 0px 1px 0px #c6d9dd; }
+  .box a.followed div.unfollow {
+    display: none; }
+  .box a.followed:hover div {
+    display: none; }
+    .box a.followed:hover div.unfollow {
+      display: inline;
+      color: #a05736; }
+  .box .favorite-number {
+    padding: 5px 0 0 5px;
+    font-size: 100%;
+    font-family: Arial;
+    font-weight: bold;
+    color: #777;
+    text-align: center; }
+  .box .notify-sidebar #question-subscribe-sidebar {
+    margin: 7px 0 0 3px; }
+
+.statsWidget p {
+  color: #707070;
+  font-size: 16px;
+  border-bottom: #cccccc 1px solid;
+  font-size: 13px; }
+  .statsWidget p strong {
+    float: right;
+    padding-right: 10px; }
+
+.questions-related {
+  word-wrap: break-word; }
+  .questions-related p {
+    line-height: 20px;
+    padding: 4px 0px 4px 0px;
+    font-size: 16px;
+    font-weight: normal;
+    border-bottom: #cccccc 1px solid; }
+  .questions-related a {
+    font-size: 13px; }
+
+#tips li {
+  color: #707070;
+  font-size: 13px;
+  list-style-image: url(../images/tips.png); }
+#tips a {
+  font-size: 16px; }
+
+#markdownHelp li {
+  color: #707070;
+  font-size: 13px; }
+#markdownHelp a {
+  font-size: 16px; }
+
+.tabBar {
+  background-color: #eff5f6;
+  height: 30px;
+  margin-bottom: 3px;
+  margin-top: 3px;
+  float: right;
+  font-family: Georgia,serif;
+  font-size: 16px;
+  border-radius: 5px;
+  -ms-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -khtml-border-radius: 5px; }
+  .tabBar h2 {
+    float: left; }
+
+.tabsA, .tabsC {
+  float: right;
+  position: relative;
+  display: block;
+  height: 20px; }
+
+.tabsA {
+  float: right; }
+
+.tabsC {
+  float: left; }
+
+.tabsA a, .tabsC a {
+  border-left: 1px solid #d0e1e4;
+  color: #7ea9b3;
+  display: block;
+  float: left;
+  height: 20px;
+  line-height: 20px;
+  padding: 4px 7px 4px 7px;
+  text-decoration: none; }
+
+.tabsA a.on, .tabsC a.on, .tabsA a:hover, .tabsC a:hover {
+  color: #4a757f; }
+
+.tabsA .label, .tabsC .label {
+  float: left;
+  color: #646464;
+  margin-top: 4px;
+  margin-right: 5px; }
+
+.main-page .tabsA .label {
+  margin-left: 8px; }
+
+.tabsB a {
+  background: #eee;
+  border: 1px solid #eee;
+  color: #777;
+  display: block;
+  float: left;
+  height: 22px;
+  line-height: 28px;
+  margin: 5px 0px 0 4px;
+  padding: 0 11px 0 11px;
+  text-decoration: none; }
+
+.tabsC .first {
+  border: none; }
+
+.rss {
+  float: right;
+  font-size: 16px;
+  color: #f57900;
+  margin: 5px 0px 3px 7px;
+  width: 52px;
+  padding-left: 2px;
+  padding-top: 3px;
+  background: white url(../images/feed-icon-small.png) no-repeat center right;
+  float: right;
+  font-family: Georgia,serif;
+  font-size: 16px; }
+  .rss:hover {
+    color: #F4A731 !important; }
+
+#questionCount {
+  font-weight: bold;
+  font-size: 23px;
+  color: #7ea9b3;
+  width: 200px;
+  float: left;
+  margin-bottom: 8px;
+  padding-top: 6px;
+  font-family: 'Yanone Kaffeesatz',sans-serif; }
+
+#listSearchTags {
+  float: left;
+  margin-top: 3px;
+  color: #707070;
+  font-size: 16px;
+  font-family: 'Yanone Kaffeesatz',sans-serif; }
+
+ul#searchTags {
+  margin-left: 10px;
+  float: right;
+  padding-top: 2px; }
+
+.search-tips {
+  font-size: 16px;
+  line-height: 17px;
+  color: #707070;
+  margin: 5px 0 10px 0;
+  padding: 0px;
+  float: left;
+  font-family: 'Yanone Kaffeesatz',sans-serif; }
+  .search-tips a {
+    text-decoration: underline;
+    color: #1b79bd; }
+
+#question-list {
+  float: left;
+  position: relative;
+  background-color: #FFF;
+  padding: 0;
+  width: 100%; }
+
+.short-summary {
+  position: relative;
+  filter: inherit;
+  padding: 10px;
+  border-bottom: 1px solid #DDDBCE;
+  margin-bottom: 1px;
+  overflow: hidden;
+  width: 710px;
+  float: left;
+  background: url(../images/summary-background.png) repeat-x; }
+  .short-summary h2 {
+    font-size: 24px;
+    font-weight: normal;
+    line-height: 26px;
+    padding-left: 0;
+    margin-bottom: 6px;
+    display: block;
+    font-family: 'Yanone Kaffeesatz',sans-serif; }
+  .short-summary a {
+    color: #464646; }
+  .short-summary .userinfo {
+    text-align: right;
+    line-height: 16px;
+    font-family: Arial;
+    padding-right: 4px; }
+    .short-summary .userinfo .relativetime {
+      font-size: 11px;
+      clear: both;
+      font-weight: normal;
+      color: #555; }
+  .short-summary span.anonymous {
+    font-size: 11px;
+    clear: both;
+    font-weight: normal;
+    color: #555; }
+  .short-summary .userinfo a {
+    font-weight: bold;
+    font-size: 11px; }
+  .short-summary .counts {
+    float: right;
+    margin: 4px 0 0 5px;
+    font-family: 'Yanone Kaffeesatz',sans-serif; }
+    .short-summary .counts .item-count {
+      padding: 0px 5px 0px 5px;
+      font-size: 25px;
+      font-family: 'Yanone Kaffeesatz',sans-serif; }
+    .short-summary .counts .votes div, .short-summary .counts .views div, .short-summary .counts .answers div, .short-summary .counts .favorites div {
+      margin-top: 3px;
+      font-size: 14px;
+      line-height: 14px;
+      color: #646464; }
+  .short-summary .tags {
+    margin-top: 0; }
+  .short-summary .votes, .short-summary .answers, .short-summary .favorites, .short-summary .views {
+    text-align: center;
+    margin: 0 3px;
+    padding: 8px 2px 0px 2px;
+    width: 51px;
+    float: right;
+    height: 44px;
+    border: #dbdbd4 1px solid; }
+  .short-summary .votes {
+    background: url(../images/vote-background.png) repeat-x; }
+  .short-summary .answers {
+    background: url(../images/answers-background.png) repeat-x; }
+  .short-summary .views {
+    background: url(../images/view-background.png) repeat-x; }
+  .short-summary .no-votes .item-count {
+    color: #b1b5b6; }
+  .short-summary .some-votes .item-count {
+    color: #4a757f; }
+  .short-summary .no-answers .item-count {
+    color: #b1b5b6; }
+  .short-summary .some-answers .item-count {
+    color: #eab243; }
+  .short-summary .no-views .item-count {
+    color: #b1b5b6; }
+  .short-summary .some-views .item-count {
+    color: #d33f00; }
+  .short-summary .accepted .item-count {
+    background: url(../images/accept.png) no-repeat top right;
+    display: block;
+    text-align: center;
+    width: 40px;
+    color: #eab243; }
+  .short-summary .some-favorites .item-count {
+    background: #338333;
+    color: #d0f5a9; }
+  .short-summary .no-favorites .item-count {
+    background: #eab243;
+    color: yellow; }
+
+.evenMore {
+  font-size: 13px;
+  color: #707070;
+  padding: 15px 0px 10px 0px;
+  clear: both; }
+  .evenMore a {
+    text-decoration: underline;
+    color: #1b79bd; }
+
+.pager {
+  margin-top: 10px;
+  margin-bottom: 16px; }
+
+.pagesize {
+  margin-top: 10px;
+  margin-bottom: 16px;
+  float: right; }
+
+.paginator {
+  padding: 5px 0 10px 0;
+  font-size: 13px;
+  margin-bottom: 10px; }
+  .paginator .prev a, .paginator .next a {
+    background-color: #fff;
+    color: #777;
+    padding: 2px 4px 3px 4px; }
+    .paginator .prev a:visited, .paginator .next a:visited {
+      background-color: #fff;
+      color: #777;
+      padding: 2px 4px 3px 4px; }
+  .paginator a {
+    color: #7ea9b3; }
+  .paginator .prev {
+    margin-right: .5em; }
+  .paginator .next {
+    margin-left: .5em; }
+  .paginator .page a {
+    padding: .25em;
+    background-color: #fff;
+    margin: 0em .25em;
+    color: #ff; }
+    .paginator .page a:visited {
+      padding: .25em;
+      background-color: #fff;
+      margin: 0em .25em;
+      color: #ff; }
+  .paginator .curr {
+    padding: .25em;
+    background-color: #fff;
+    margin: 0em .25em;
+    color: #ff;
+    background-color: #8ebcc7;
+    color: #fff;
+    font-weight: bold; }
+  .paginator .next a, .paginator .prev a {
+    color: #7ea9b3; }
+  .paginator .page a:hover, .paginator .curr a:hover, .paginator .prev a:hover, .paginator .next a:hover {
+    color: #8C8C8C;
+    background-color: #E1E1E1;
+    text-decoration: none; }
+  .paginator .text {
+    color: #777;
+    padding: .3em; }
+  .paginator .paginator-container-left {
+    padding: 5px 0 10px 0; }
+
+.tag-size-1 {
+  font-size: 12px; }
+
+.tag-size-2 {
+  font-size: 13px; }
+
+.tag-size-3 {
+  font-size: 14px; }
+
+.tag-size-4 {
+  font-size: 15px; }
+
+.tag-size-5 {
+  font-size: 16px; }
+
+.tag-size-6 {
+  font-size: 17px; }
+
+.tag-size-7 {
+  font-size: 18px; }
+
+.tag-size-8 {
+  font-size: 19px; }
+
+.tag-size-9 {
+  font-size: 20px; }
+
+.tag-size-10 {
+  font-size: 21px; }
+
+ul.tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 170%;
+  display: block; }
+  ul.tags.marked-tags {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    line-height: 170%;
+    display: block; }
+ul#related-tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 170%;
+  display: block; }
+ul.tags li {
+  float: left;
+  display: block;
+  margin: 0 8px 0 0;
+  padding: 0;
+  height: 20px; }
+
+.wildcard-tags {
+  clear: both; }
+
+ul.tags.marked-tags li, .wildcard-tags ul.tags li {
+  margin-bottom: 5px; }
+
+#tagSelector div.inputs {
+  clear: both;
+  float: none;
+  margin-bottom: 10px; }
+
+.tags-page ul.tags li {
+  width: 160px;
+  margin: 5px; }
+
+ul#ab-user-tags li {
+  width: 160px;
+  margin: 5px; }
+ul#related-tags li {
+  margin: 0 5px 8px 0;
+  float: left;
+  clear: left; }
+
+.tag-left {
+  cursor: pointer;
+  display: block;
+  float: left;
+  height: 17px;
+  margin: 0 5px 0 0;
+  padding: 0;
+  -webkit-box-shadow: 0px 0px 5px #d3d6d7;
+  -moz-box-shadow: 0px 0px 5px #d3d6d7;
+  box-shadow: 0px 0px 5px #d3d6d7; }
+
+.tag-right {
+  background: #f3f6f6;
+  border: #fff 1px solid;
+  border-top: #fff 2px solid;
+  outline: #cfdbdb 1px solid;
+  display: block;
+  float: left;
+  height: 17px;
+  line-height: 17px;
+  font-weight: normal;
+  font-size: 11px;
+  padding: 0px 8px 0px 8px;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  font-family: Arial;
+  color: #717179; }
+
+.deletable-tag {
+  margin-right: 3px;
+  white-space: nowrap;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  -moz-border-radius-bottomright: 4px;
+  -webkit-border-bottom-right-radius: 4px;
+  -webkit-border-top-right-radius: 4px; }
+
+.tags a.tag-right, .tags span.tag-right {
+  color: #585858;
+  text-decoration: none; }
+.tags a:hover {
+  color: #1A1A1A; }
+
+.users-page h1, .tags-page h1 {
+  float: left; }
+
+.main-page h1 {
+  margin-right: 5px; }
+
+.delete-icon {
+  margin-top: -1px;
+  float: left;
+  height: 21px;
+  width: 18px;
+  display: block;
+  line-height: 20px;
+  text-align: center;
+  background: #bbcdcd;
+  cursor: default;
+  color: #fff;
+  border-top: #cfdbdb 1px solid;
+  font-family: Arial;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  -moz-border-radius-bottomright: 4px;
+  -webkit-border-bottom-right-radius: 4px;
+  -webkit-border-top-right-radius: 4px;
+  text-shadow: 0px 1px 0px #7ea0a0;
+  -moz-text-shadow: 0px 1px 0px #7ea0a0;
+  -webkit-text-shadow: 0px 1px 0px #7ea0a0; }
+  .delete-icon:hover {
+    background: #b32f2f; }
+
+.tag-number {
+  font-weight: normal;
+  float: left;
+  font-size: 16px;
+  color: #5d5d5d; }
+
+.badges .tag-number {
+  float: none;
+  display: inline;
+  padding-right: 15px; }
+
+.section-title {
+  color: #7ea9b3;
+  font-family: 'Yanone Kaffeesatz',sans-serif;
+  font-weight: bold;
+  font-size: 24px; }
+
+#fmask {
+  margin-bottom: 30px;
+  width: 100%; }
+
+#askFormBar {
+  display: inline-block;
+  padding: 4px 7px 5px 0px;
+  margin-top: 0px; }
+  #askFormBar p {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    color: #525252;
+    line-height: 1.4; }
+  #askFormBar .questionTitleInput {
+    font-size: 24px;
+    line-height: 24px;
+    height: 36px;
+    margin: 0px;
+    padding: 0px 0 0 5px;
+    border: #cce6ec 3px solid;
+    width: 725px; }
+
+.ask-page div#question-list, .edit-question-page div#question-list {
+  float: none;
+  border-bottom: #f0f0ec 1px solid;
+  float: left;
+  margin-bottom: 10px; }
+
+.ask-page div#question-list a, .edit-question-page div#question-list a {
+  line-height: 30px; }
+
+.ask-page div#question-list h2, .edit-question-page div#question-list h2 {
+  font-size: 13px;
+  padding-bottom: 0;
+  color: #1b79bd;
+  border-top: #f0f0ec 1px solid;
+  border-left: #f0f0ec 1px solid;
+  height: 30px;
+  line-height: 30px;
+  font-weight: normal; }
+
+.ask-page div#question-list span, .edit-question-page div#question-list span {
+  width: 28px;
+  height: 26px;
+  line-height: 26px;
+  text-align: center;
+  margin-right: 10px;
+  float: left;
+  display: block;
+  color: #fff;
+  background: #b8d0d5;
+  border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px; }
+
+.ask-page label, .edit-question-page label {
+  color: #525252;
+  font-size: 13px; }
+
+.ask-page #id_tags, .edit-question-page #id_tags {
+  border: #cce6ec 3px solid;
+  height: 25px;
+  padding-left: 5px;
+  width: 395px;
+  font-size: 14px; }
+
+.title-desc {
+  color: #707070;
+  font-size: 13px; }
+
+#fmanswer input.submit, .ask-page input.submit, .edit-question-page input.submit {
+  float: left;
+  background: url(../images/medium-button.png) top repeat-x;
+  height: 34px;
+  border: 0;
+  font-family: 'Yanone Kaffeesatz',sans-serif;
+  color: #4a757f;
+  font-weight: normal;
+  font-size: 21px;
+  margin-top: 3px;
+  border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  -webkit-box-shadow: 1px 1px 2px #636363;
+  -moz-box-shadow: 1px 1px 2px #636363;
+  box-shadow: 1px 1px 2px #636363;
+  margin-right: 7px; }
+
+#fmanswer input.submit:hover, .ask-page input.submit:hover, .edit-question-page input.submit:hover {
+  text-decoration: none;
+  background: url(../images/medium-button.png) bottom repeat-x;
+  text-shadow: 0px 1px 0px #c6d9dd;
+  -moz-text-shadow: 0px 1px 0px #c6d9dd;
+  -webkit-text-shadow: 0px 1px 0px #c6d9dd; }
+
+#editor {
+  font-size: 100%;
+  min-height: 200px;
+  line-height: 18px;
+  margin: 0;
+  border-left: #cce6ec 3px solid;
+  border-bottom: #cce6ec 3px solid;
+  border-right: #cce6ec 3px solid;
+  border-top: 0;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 710px; }
+
+#id_title {
+  width: 100%; }
+
+.wmd-preview {
+  margin: 3px 0 5px 0;
+  padding: 6px;
+  background-color: #F5F5F5;
+  min-height: 20px;
+  overflow: auto;
+  font-size: 13px;
+  font-family: Arial; }
+  .wmd-preview p {
+    margin-bottom: 14px;
+    line-height: 1.4;
+    font-size: 14px; }
+  .wmd-preview pre {
+    background-color: #E7F1F8; }
+  .wmd-preview blockquote {
+    background-color: #eee; }
+  .wmd-preview IMG {
+    max-width: 600px; }
+
+.preview-toggle {
+  width: 100%;
+  color: #b6a475;
+  text-align: left; }
+  .preview-toggle span:hover {
+    cursor: pointer; }
+
+.after-editor {
+  margin-top: 15px;
+  margin-bottom: 15px; }
+
+.checkbox {
+  margin-left: 5px;
+  font-weight: normal;
+  cursor: help; }
+
+.question-options {
+  margin-top: 1px;
+  color: #666;
+  line-height: 13px;
+  margin-bottom: 5px; }
+  .question-options label {
+    vertical-align: text-bottom; }
+
+.edit-content-html {
+  border-top: 1px dotted #D8D2A9;
+  border-bottom: 1px dotted #D8D2A9;
+  margin: 5px 0 5px 0; }
+
+.edit-question-page, #fmedit, .wmd-preview {
+  color: #525252; }
+
+.edit-question-page #id_revision, #fmedit #id_revision, .wmd-preview #id_revision {
+  font-size: 14px;
+  margin-top: 5px;
+  margin-bottom: 5px; }
+
+.edit-question-page #id_title, #fmedit #id_title, .wmd-preview #id_title {
+  font-size: 24px;
+  line-height: 24px;
+  height: 36px;
+  margin: 0px;
+  padding: 0px 0 0 5px;
+  border: #cce6ec 3px solid;
+  width: 725px;
+  margin-bottom: 10px; }
+
+.edit-question-page #id_summary, #fmedit #id_summary, .wmd-preview #id_summary {
+  border: #cce6ec 3px solid;
+  height: 25px;
+  padding-left: 5px;
+  width: 395px;
+  font-size: 14px; }
+
+.edit-question-page .title-desc, #fmedit .title-desc, .wmd-preview .title-desc {
+  margin-bottom: 10px; }
+
+.question-page h1 {
+  padding-top: 0px;
+  font-family: 'Yanone Kaffeesatz',sans-serif; }
+  .question-page h1 a {
+    color: #464646;
+    font-size: 30px;
+    font-weight: normal;
+    line-height: 1; }
+.question-page p.rss {
+  float: none;
+  clear: both;
+  padding: 3px 0 0 23px;
+  font-size: 15px;
+  width: 110px;
+  background-position: center left;
+  margin-left: 0px !important; }
+  .question-page p.rss a {
+    font-family: 'Yanone Kaffeesatz',sans-serif;
+    vertical-align: top; }
+.question-page .question-content {
+  float: right;
+  width: 682px;
+  margin-bottom: 10px; }
+.question-page #question-table {
+  float: left;
+  border-top: #f0f0f0 1px solid;
+  margin: 6px 0 6px 0;
+  border-spacing: 0px;
+  width: 670px;
+  padding-right: 10px; }
+.question-page .answer-table {
+  margin: 6px 0 6px 0;
+  border-spacing: 0px;
+  width: 670px;
+  padding-right: 10px;
+  margin-top: 0px;
+  border-bottom: 1px solid #D4D4D4;
+  float: right; }
+  .question-page .answer-table td {
+    width: 20px;
+    vertical-align: top; }
+.question-page #question-table td {
+  width: 20px;
+  vertical-align: top; }
+.question-page .question-body, .question-page .answer-body {
+  overflow: auto;
+  margin-top: 10px;
+  font-family: Arial;
+  color: #4b4b4b; }
+.question-page .question-body p, .question-page .answer-body p {
+  margin-bottom: 14px;
+  line-height: 1.4;
+  font-size: 14px;
+  padding: 0px 5px 5px 0px; }
+.question-page .question-body a, .question-page .answer-body a {
+  color: #1b79bd; }
+.question-page .question-body li, .question-page .answer-body li {
+  margin-bottom: 7px; }
+.question-page .question-body IMG, .question-page .answer-body IMG {
+  max-width: 600px; }
+.question-page .post-update-info-container {
+  float: right;
+  width: 175px; }
+.question-page .post-update-info {
+  background: white url(../images/background-user-info.png) repeat-x bottom;
+  float: right;
+  font-size: 9px;
+  font-family: Arial;
+  width: 158px;
+  padding: 4px;
+  margin: 0px 0px 5px 5px;
+  line-height: 14px;
+  border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  -webkit-box-shadow: 0px 2px 1px #bfbfbf;
+  -moz-box-shadow: 0px 2px 1px #bfbfbf;
+  box-shadow: 0px 2px 1px #bfbfbf; }
+  .question-page .post-update-info p {
+    line-height: 13px;
+    font-size: 11px;
+    margin: 0 0 2px 1px;
+    padding: 0; }
+  .question-page .post-update-info a {
+    color: #444; }
+  .question-page .post-update-info .gravatar {
+    float: left;
+    margin-right: 4px; }
+  .question-page .post-update-info p.tip {
+    color: #444;
+    line-height: 13px;
+    font-size: 10px; }
+.question-page .post-controls {
+  font-size: 11px;
+  line-height: 12px;
+  min-width: 200px;
+  padding-left: 5px;
+  text-align: right;
+  clear: left;
+  float: right;
+  margin-top: 10px;
+  margin-bottom: 8px; }
+  .question-page .post-controls a {
+    color: #777;
+    padding: 0px 3px 3px 22px;
+    cursor: pointer;
+    border: none;
+    font-size: 12px;
+    font-family: Arial;
+    text-decoration: none;
+    height: 18px;
+    display: block;
+    float: right;
+    line-height: 18px;
+    margin-top: -2px;
+    margin-left: 4px; }
+    .question-page .post-controls a:hover {
+      background-color: #f5f0c9;
+      border-radius: 3px;
+      -ms-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      -khtml-border-radius: 3px; }
+  .question-page .post-controls .sep {
+    color: #ccc;
+    float: right;
+    height: 18px;
+    font-size: 18px; }
+  .question-page .post-controls .question-delete {
+    background: url(../images/delete.png) no-repeat center left;
+    padding-left: 16px; }
+.question-page .answer-controls .question-delete {
+  background: url(../images/delete.png) no-repeat center left;
+  padding-left: 16px; }
+.question-page .post-controls .question-flag, .question-page .answer-controls .question-flag {
+  background: url(../images/flag.png) no-repeat center left; }
+.question-page .post-controls .question-edit, .question-page .answer-controls .question-edit {
+  background: url(../images/edit2.png) no-repeat center left; }
+.question-page .post-controls .question-retag, .question-page .answer-controls .question-retag {
+  background: url(../images/retag.png) no-repeat center left; }
+.question-page .post-controls .question-close, .question-page .answer-controls .question-close {
+  background: url(../images/close.png) no-repeat center left; }
+.question-page .post-controls .permant-link, .question-page .answer-controls .permant-link {
+  background: url(../images/link.png) no-repeat center left; }
+.question-page .tabBar {
+  width: 100%; }
+.question-page #questionCount {
+  float: left;
+  font-family: 'Yanone Kaffeesatz',sans-serif;
+  line-height: 15px; }
+.question-page .question-img-upvote, .question-page .question-img-downvote, .question-page .answer-img-upvote, .question-page .answer-img-downvote {
+  width: 25px;
+  height: 20px;
+  cursor: pointer; }
+.question-page .question-img-upvote, .question-page .answer-img-upvote {
+  background: url(../images/vote-arrow-up-new.png) no-repeat; }
+.question-page .question-img-downvote, .question-page .answer-img-downvote {
+  background: url(../images/vote-arrow-down-new.png) no-repeat; }
+.question-page .question-img-upvote:hover, .question-page .question-img-upvote.on {
+  background: url(../images/vote-arrow-up-on-new.png) no-repeat; }
+.question-page .answer-img-upvote:hover, .question-page .answer-img-upvote.on {
+  background: url(../images/vote-arrow-up-on-new.png) no-repeat; }
+.question-page .question-img-downvote:hover, .question-page .question-img-downvote.on {
+  background: url(../images/vote-arrow-down-on-new.png) no-repeat; }
+.question-page .answer-img-downvote:hover, .question-page .answer-img-downvote.on {
+  background: url(../images/vote-arrow-down-on-new.png) no-repeat; }
+.question-page #fmanswer_button {
+  margin: 8px 0px; }
+.question-page .question-img-favorite:hover {
+  background: url(../images/vote-favorite-on.png); }
+.question-page div.comments {
+  padding: 0; }
+.question-page #comment-title {
+  font-weight: bold;
+  font-size: 23px;
+  color: #7ea9b3;
+  width: 200px;
+  float: left;
+  font-family: 'Yanone Kaffeesatz',sans-serif; }
+.question-page .comments {
+  font-size: 12px;
+  clear: both; }
+  .question-page .comments div.controls {
+    clear: both;
+    float: left;
+    width: 100%;
+    margin: 3px 0 20px 5px; }
+  .question-page .comments .controls a {
+    color: #988e4c;
+    padding: 0 3px 2px 22px;
+    font-family: Arial;
+    font-size: 13px;
+    background: url(../images/comment.png) no-repeat center left; }
+    .question-page .comments .controls a:hover {
+      background-color: #f5f0c9;
+      text-decoration: none; }
+  .question-page .comments .button, .question-page .comments input[type="submit"], .question-page .comments input[type="button"], .question-page .comments button {
+    color: #988e4c;
+    font-size: 11px;
+    padding: 3px;
+    cursor: pointer; }
+  .question-page .comments a {
+    background-color: inherit;
+    color: #1b79bd;
+    padding: 0; }
+  .question-page .comments form.post-comments {
+    margin: 3px 26px 0 42px; }
+    .question-page .comments form.post-comments textarea {
+      font-size: 13px;
+      line-height: 1.3; }
+  .question-page .comments textarea {
+    height: 42px;
+    width: 100%;
+    margin: 7px 0 5px 1px;
+    font-family: Arial;
+    outline: none;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 140%;
+    padding-left: 2px;
+    padding-top: 3px;
+    border: #cce6ec 3px solid; }
+  .question-page .comments input {
+    margin-left: 10px;
+    margin-top: 1px;
+    vertical-align: top;
+    width: 100px; }
+  .question-page .comments button {
+    background: url(../images/small-button-blue.png) repeat-x top;
+    border: 0;
+    color: #4a757f;
+    font-family: Arial;
+    font-size: 13px;
+    width: 100px;
+    font-weight: bold;
+    height: 27px;
+    line-height: 25px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    -ms-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -khtml-border-radius: 4px;
+    text-shadow: 0px 1px 0px #e6f6fa;
+    -moz-text-shadow: 0px 1px 0px #e6f6fa;
+    -webkit-text-shadow: 0px 1px 0px #e6f6fa;
+    -webkit-box-shadow: 1px 1px 2px #808080;
+    -moz-box-shadow: 1px 1px 2px #808080;
+    box-shadow: 1px 1px 2px #808080; }
+    .question-page .comments button:hover {
+      background: url(../images/small-button-blue.png) bottom repeat-x;
+      text-shadow: 0px 1px 0px #c6d9dd;
+      -moz-text-shadow: 0px 1px 0px #c6d9dd;
+      -webkit-text-shadow: 0px 1px 0px #c6d9dd; }
+  .question-page .comments .counter {
+    display: inline-block;
+    width: 245px;
+    float: right;
+    color: #b6a475 !important;
+    vertical-align: top;
+    font-family: Arial;
+    float: right;
+    text-align: right; }
+  .question-page .comments .comment {
+    border-bottom: 1px solid #edeeeb;
+    clear: both;
+    margin: 0;
+    margin-top: 8px;
+    padding-bottom: 4px;
+    overflow: auto;
+    font-family: Arial;
+    font-size: 11px;
+    min-height: 25px;
+    background: white url(../images/comment-background.png) bottom repeat-x;
+    border-radius: 5px;
+    -ms-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px; }
+  .question-page .comments div.comment:hover {
+    background-color: #efefef; }
+  .question-page .comments a.author {
+    background-color: inherit;
+    color: #1b79bd;
+    padding: 0; }
+    .question-page .comments a.author:hover {
+      text-decoration: underline; }
+  .question-page .comments span.delete-icon {
+    background: url(../images/close-small.png) no-repeat;
+    border: 0;
+    width: 14px;
+    height: 14px; }
+    .question-page .comments span.delete-icon:hover {
+      border: #BC564B 2px solid;
+      border-radius: 10px;
+      -ms-border-radius: 10px;
+      -moz-border-radius: 10px;
+      -webkit-border-radius: 10px;
+      -khtml-border-radius: 10px;
+      margin: -3px 0px 0px -2px; }
+  .question-page .comments .content, .question-page .comments div.wiki-wrapper section.wiki-body, div.wiki-wrapper .question-page .comments section.wiki-body {
+    margin-bottom: 7px; }
+  .question-page .comments .comment-votes {
+    float: left;
+    width: 37px;
+    line-height: 130%;
+    padding: 6px 5px 6px 3px; }
+  .question-page .comments .comment-body {
+    line-height: 1.3;
+    margin: 3px 26px 0 46px;
+    padding: 5px 3px;
+    color: #666;
+    font-size: 13px; }
+    .question-page .comments .comment-body .edit {
+      padding-left: 6px; }
+    .question-page .comments .comment-body p {
+      font-size: 13px;
+      line-height: 1.3;
+      margin-bottom: 3px;
+      padding: 0; }
+  .question-page .comments .comment-delete {
+    float: right;
+    width: 14px;
+    line-height: 130%;
+    padding: 8px 6px; }
+  .question-page .comments .upvote {
+    margin: 0px;
+    padding-right: 17px;
+    padding-top: 2px;
+    text-align: right;
+    height: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #777; }
+    .question-page .comments .upvote.upvoted {
+      color: #d64000; }
+    .question-page .comments .upvote.hover {
+      background: url(../images/go-up-grey.png) no-repeat;
+      background-position: right 1px; }
+    .question-page .comments .upvote:hover {
+      background: url(../images/go-up-orange.png) no-repeat;
+      background-position: right 1px; }
+  .question-page .comments .help-text {
+    float: right;
+    text-align: right;
+    color: gray;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    line-height: 50%; }
+.question-page #questionTools {
+  font-size: 22px;
+  margin-top: 11px;
+  text-align: left; }
+.question-page .question-status {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  padding: 20px;
+  background-color: #fef7cc;
+  text-align: center;
+  border: #e1c04a 1px solid; }
+  .question-page .question-status h3, .question-page .question-status div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .question-page .question-status input[type="button"] {
+    font-size: 20px;
+    color: #707070;
+    font-weight: normal; }
+.question-page .vote-buttons {
+  float: left;
+  text-align: center;
+  padding-top: 2px;
+  margin: 10px 10px 0px 3px; }
+  .question-page .vote-buttons IMG {
+    cursor: pointer; }
+.question-page .vote-number {
+  font-family: 'Yanone Kaffeesatz',sans-serif;
+  padding: 0px 0 5px 0;
+  font-size: 25px;
+  font-weight: bold;
+  color: #777; }
+.question-page .vote-buttons .notify-sidebar {
+  text-align: left;
+  width: 120px; }
+  .question-page .vote-buttons .notify-sidebar label {
+    vertical-align: top; }
+.question-page .tabBar-answer {
+  margin-bottom: 15px;
+  padding-left: 7px;
+  width: 723px;
+  margin-top: 10px; }
+.question-page .answer .vote-buttons {
+  float: left; }
+.question-page .accepted-answer {
+  background-color: #f7fecc;
+  border-bottom-color: #9BD59B; }
+  .question-page .accepted-answer .vote-buttons {
+    width: 27px;
+    margin-right: 10px;
+    margin-top: 10px; }
+.question-page .answer .post-update-info a {
+  color: #444444; }
+.question-page .answered {
+  background: #CCC;
+  color: #999; }
+.question-page .answered-accepted {
+  background: #DCDCDC;
+  color: #763333; }
+  .question-page .answered-accepted strong {
+    color: #E1E818; }
+.question-page .answered-by-owner {
+  background: #F1F1FF; }
+  .question-page .answered-by-owner .comments {
+    background-color: #E6ECFF; }
+    .question-page .answered-by-owner .comments .button, .question-page .answered-by-owner .comments input[type="submit"], .question-page .answered-by-owner .comments input[type="button"], .question-page .answered-by-owner .comments button {
+      background-color: #E6ECFF; }
+  .question-page .answered-by-owner .vote-buttons {
+    margin-right: 10px; }
+.question-page .answer-img-accept:hover {
+  background: url(../images/vote-accepted-on.png); }
+.question-page .answer-body a {
+  color: #1b79bd; }
+.question-page .answer-body li {
+  margin-bottom: 0.7em; }
+.question-page #fmanswer {
+  color: #707070;
+  line-height: 1.2;
+  margin-top: 10px; }
+  .question-page #fmanswer h2 {
+    font-family: 'Yanone Kaffeesatz',sans-serif;
+    color: #7ea9b3;
+    font-size: 24px; }
+  .question-page #fmanswer label {
+    font-size: 13px; }
+.question-page .message {
+  padding: 5px;
+  margin: 0px 0 10px 0; }
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  textarea {
+    padding-left: 3px !important; } }
+.facebook-share.icon, .twitter-share.icon, .linkedin-share.icon, .identica-share.icon {
+  background: url(../images/socialsprite.png) no-repeat;
+  display: block;
+  text-indent: -100em;
+  height: 25px;
+  width: 25px;
+  margin-bottom: 3px; }
+
+.facebook-share.icon:hover, .twitter-share.icon:hover, .linkedin-share.icon:hover, .identica-share.icon:hover {
+  opacity: 0.8;
+  filter: alpha(opacity=80); }
+
+.facebook-share.icon {
+  background-position: -26px 0px; }
+
+.identica-share.icon {
+  background-position: -78px 0px; }
+
+.twitter-share.icon {
+  margin-top: 10px;
+  background-position: 0px 0px; }
+
+.linkedin-share.icon {
+  background-position: -52px 0px; }
+
+.openid-signin, .meta, .users-page, .user-profile-edit-page {
+  font-size: 13px;
+  line-height: 1.3;
+  color: #525252; }
+
+.openid-signin p, .meta p, .users-page p, .user-profile-edit-page p {
+  font-size: 13px;
+  color: #707070;
+  line-height: 1.3;
+  font-family: Arial;
+  color: #525252;
+  margin-bottom: 12px; }
+
+.openid-signin h2, .meta h2, .users-page h2, .user-profile-edit-page h2 {
+  color: #525252;
+  padding-left: 0px;
+  font-size: 16px; }
+
+.openid-signin form, .meta form, .users-page form, .user-profile-edit-page form, .user-profile-page form {
+  margin-bottom: 15px; }
+
+.openid-signin input[type="text"], .meta input[type="text"], .users-page input[type="text"], .user-profile-edit-page input[type="text"], .user-profile-page input[type="text"], .openid-signin input[type="password"], .meta input[type="password"], .users-page input[type="password"], .user-profile-edit-page input[type="password"], .user-profile-page input[type="password"], .openid-signin select, .meta select, .users-page select, .user-profile-edit-page select, .user-profile-page select {
+  border: #cce6ec 3px solid;
+  height: 25px;
+  padding-left: 5px;
+  width: 395px;
+  font-size: 14px; }
+
+.openid-signin select, .meta select, .users-page select, .user-profile-edit-page select, .user-profile-page select {
+  width: 405px;
+  height: 30px; }
+
+.openid-signin textarea, .meta textarea, .users-page textarea, .user-profile-edit-page textarea, .user-profile-page textarea {
+  border: #cce6ec 3px solid;
+  padding-left: 5px;
+  padding-top: 5px;
+  width: 395px;
+  font-size: 14px; }
+
+.openid-signin input.submit, .meta input.submit, .users-page input.submit, .user-profile-edit-page input.submit, .user-profile-page input.submit {
+  background: url(../images/small-button-blue.png) repeat-x top;
+  border: 0;
+  color: #4a757f;
+  font-weight: bold;
+  font-size: 13px;
+  font-family: Arial;
+  height: 26px;
+  margin: 5px 0px;
+  width: 100px;
+  cursor: pointer;
+  border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  text-shadow: 0px 1px 0px #e6f6fa;
+  -moz-text-shadow: 0px 1px 0px #e6f6fa;
+  -webkit-text-shadow: 0px 1px 0px #e6f6fa;
+  -webkit-box-shadow: 1px 1px 2px #808080;
+  -moz-box-shadow: 1px 1px 2px #808080;
+  box-shadow: 1px 1px 2px #808080; }
+
+.openid-signin input.submit:hover, .meta input.submit:hover, .users-page input.submit:hover, .user-profile-edit-page input.submit:hover, .user-profile-page input.submit:hover {
+  background: url(../images/small-button-blue.png) repeat-x bottom;
+  text-decoration: none; }
+
+.openid-signin .cancel, .meta .cancel, .users-page .cancel, .user-profile-edit-page .cancel, .user-profile-page .cancel {
+  background: url(../images/small-button-cancel.png) repeat-x top !important;
+  color: #525252 !important; }
+
+.openid-signin .cancel:hover, .meta .cancel:hover, .users-page .cancel:hover, .user-profile-edit-page .cancel:hover, .user-profile-page .cancel:hover {
+  background: url(../images/small-button-cancel.png) repeat-x bottom !important; }
+
+#email-input-fs, #local_login_buttons, #password-fs, #openid-fs {
+  margin-top: 10px; }
+
+#email-input-fs #id_email, #local_login_buttons #id_email, #password-fs #id_email, #openid-fs #id_email, #email-input-fs #id_username, #local_login_buttons #id_username, #password-fs #id_username, #openid-fs #id_username, #email-input-fs #id_password, #local_login_buttons #id_password, #password-fs #id_password, #openid-fs #id_password {
+  font-size: 12px;
+  line-height: 20px;
+  height: 20px;
+  margin: 0px;
+  padding: 0px 0 0 5px;
+  border: #cce6ec 3px solid;
+  width: 200px; }
+
+#email-input-fs .submit-b, #local_login_buttons .submit-b, #password-fs .submit-b, #openid-fs .submit-b {
+  background: url(../images/small-button-blue.png) repeat-x top;
+  border: 0;
+  color: #4a757f;
+  font-weight: bold;
+  font-size: 13px;
+  font-family: Arial;
+  height: 24px;
+  margin-top: -2px;
+  padding-left: 10px;
+  padding-right: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  text-shadow: 0px 1px 0px #e6f6fa;
+  -moz-text-shadow: 0px 1px 0px #e6f6fa;
+  -webkit-text-shadow: 0px 1px 0px #e6f6fa;
+  -webkit-box-shadow: 1px 1px 2px #808080;
+  -moz-box-shadow: 1px 1px 2px #808080;
+  box-shadow: 1px 1px 2px #808080; }
+
+#email-input-fs .submit-b:hover, #local_login_buttons .submit-b:hover, #password-fs .submit-b:hover, #openid-fs .submit-b:hover {
+  background: url(../images/small-button-blue.png) repeat-x bottom; }
+
+.openid-input {
+  background: url(../images/openid.gif) no-repeat;
+  padding-left: 15px;
+  cursor: pointer; }
+
+.openid-login-input {
+  background-position: center left;
+  background: url(../images/openid.gif) no-repeat 0% 50%;
+  padding: 5px 5px 5px 15px;
+  cursor: pointer;
+  font-family: Trebuchet MS;
+  font-weight: 300;
+  font-size: 150%;
+  width: 500px; }
+
+.openid-login-submit {
+  height: 40px;
+  width: 80px;
+  line-height: 40px;
+  cursor: pointer;
+  border: 1px solid #777;
+  font-weight: bold;
+  font-size: 120%; }
+
+.tabBar-user {
+  width: 375px; }
+
+.user {
+  padding: 5px;
+  line-height: 140%;
+  width: 166px;
+  border: #eee 1px solid;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px; }
+  .user .user-micro-info {
+    color: #525252; }
+  .user ul {
+    margin: 0;
+    list-style-type: none; }
+  .user .thumb {
+    clear: both;
+    float: left;
+    margin-right: 4px;
+    display: inline; }
+
+.tabBar-tags {
+  width: 270px;
+  margin-bottom: 15px; }
+
+a.medal {
+  font-size: 17px;
+  line-height: 250%;
+  margin-right: 5px;
+  color: #333;
+  text-decoration: none;
+  background: url(../images/medala.gif) no-repeat;
+  border-left: 1px solid #EEE;
+  border-top: 1px solid #EEE;
+  border-bottom: 1px solid #CCC;
+  border-right: 1px solid #CCC;
+  padding: 4px 12px 4px 6px; }
+a:hover.medal {
+  color: #333;
+  text-decoration: none;
+  background: url(../images/medala_on.gif) no-repeat;
+  border-left: 1px solid #E7E296;
+  border-top: 1px solid #E7E296;
+  border-bottom: 1px solid #D1CA3D;
+  border-right: 1px solid #D1CA3D; }
+
+#award-list .user {
+  float: left;
+  margin: 5px; }
+
+.tabBar-profile {
+  width: 100%;
+  margin-bottom: 15px;
+  float: left; }
+
+.user-profile-page {
+  font-size: 13px;
+  color: #525252; }
+  .user-profile-page p {
+    font-size: 13px;
+    line-height: 1.3;
+    color: #525252; }
+  .user-profile-page .avatar img {
+    border: #eee 1px solid;
+    padding: 5px; }
+  .user-profile-page h2 {
+    padding: 10px 0px 10px 0px;
+    font-family: 'Yanone Kaffeesatz',sans-serif; }
+
+.user-details {
+  font-size: 13px; }
+  .user-details h3, .user-details div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .user-details input[type="button"] {
+    font-size: 16px; }
+
+.user-about {
+  background-color: #EEEEEE;
+  height: 200px;
+  line-height: 20px;
+  overflow: auto;
+  padding: 10px;
+  width: 90%; }
+  .user-about p {
+    font-size: 13px; }
+
+.follow-toggle, .submit {
+  border: 0 !important;
+  color: #4a757f;
+  font-weight: bold;
+  font-size: 12px;
+  height: 26px;
+  line-height: 26px;
+  margin-top: -2px;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: 'Yanone Kaffeesatz',sans-serif;
+  background: url(../images/small-button-blue.png) repeat-x top;
+  border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  text-shadow: 0px 1px 0px #e6f6fa;
+  -moz-text-shadow: 0px 1px 0px #e6f6fa;
+  -webkit-text-shadow: 0px 1px 0px #e6f6fa;
+  -webkit-box-shadow: 1px 1px 2px #808080;
+  -moz-box-shadow: 1px 1px 2px #808080;
+  box-shadow: 1px 1px 2px #808080; }
+
+.follow-toggle:hover, .submit:hover {
+  background: url(../images/small-button-blue.png) repeat-x bottom;
+  text-decoration: none !important; }
+
+.follow-toggle .follow {
+  font-color: #000;
+  font-style: normal; }
+.follow-toggle .unfollow div.unfollow-red {
+  display: none; }
+.follow-toggle .unfollow:hover div.unfollow-red {
+  display: inline;
+  color: #fff;
+  font-weight: bold;
+  color: #A05736; }
+.follow-toggle .unfollow:hover div.unfollow-green {
+  display: none; }
+
+.count {
+  font-family: 'Yanone Kaffeesatz',sans-serif;
+  font-size: 200%;
+  font-weight: 700;
+  color: #777777; }
+
+.scoreNumber {
+  font-family: 'Yanone Kaffeesatz',sans-serif;
+  font-size: 35px;
+  font-weight: 800;
+  color: #777;
+  line-height: 40px;
+  margin-top: 3px; }
+
+.vote-count {
+  font-family: Arial;
+  font-size: 160%;
+  font-weight: 700;
+  color: #777; }
+
+.answer-summary {
+  display: block;
+  clear: both;
+  padding: 3px; }
+
+.answer-votes {
+  background-color: #EEEEEE;
+  color: #555555;
+  float: left;
+  font-family: Arial;
+  font-size: 15px;
+  font-weight: bold;
+  height: 17px;
+  padding: 2px 4px 5px;
+  text-align: center;
+  text-decoration: none;
+  width: 20px;
+  margin-right: 10px;
+  border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px; }
+
+.karma-summary {
+  padding: 5px;
+  font-size: 13px; }
+  .karma-summary h3, .karma-summary div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .karma-summary input[type="button"] {
+    text-align: center;
+    font-weight: bold;
+    padding: 5px; }
+
+.karma-diagram {
+  width: 477px;
+  height: 300px;
+  float: left;
+  margin-right: 10px; }
+
+.karma-details {
+  float: right;
+  width: 450px;
+  height: 250px;
+  overflow-y: auto;
+  word-wrap: break-word; }
+  .karma-details p {
+    margin-bottom: 10px; }
+
+.karma-gained {
+  font-weight: bold;
+  background: #eee;
+  width: 25px;
+  margin-right: 5px;
+  color: green;
+  padding: 3px;
+  display: block;
+  float: left;
+  text-align: center;
+  border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px; }
+
+.karma-lost {
+  font-weight: bold;
+  background: #eee;
+  width: 25px;
+  color: red;
+  padding: 3px;
+  display: block;
+  margin-right: 5px;
+  float: left;
+  text-align: center;
+  border-radius: 3px;
+  -ms-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px; }
+
+.submit-row {
+  margin-bottom: 10px; }
+
+.revision {
+  margin: 10px 0 10px 0;
+  font-size: 13px;
+  color: #525252; }
+  .revision p {
+    font-size: 13px;
+    line-height: 1.3;
+    color: #525252; }
+  .revision h3, .revision div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .revision input[type="button"] {
+    font-family: 'Yanone Kaffeesatz',sans-serif;
+    font-size: 21px;
+    padding-left: 0px; }
+  .revision .header {
+    background-color: #F5F5F5;
+    padding: 5px;
+    cursor: pointer; }
+  .revision .author {
+    background-color: #e9f3f5; }
+  .revision .summary {
+    padding: 5px 0 10px 0; }
+    .revision .summary span {
+      background-color: #fde785;
+      padding: 6px;
+      border-radius: 4px;
+      -ms-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -webkit-border-radius: 4px;
+      -khtml-border-radius: 4px;
+      display: inline;
+      -webkit-box-shadow: 1px 1px 4px #cfb852;
+      -moz-box-shadow: 1px 1px 4px #cfb852;
+      box-shadow: 1px 1px 4px #cfb852; }
+  .revision .answerbody {
+    padding: 10px 0 5px 10px; }
+  .revision .revision-mark {
+    width: 150px;
+    text-align: left;
+    display: inline-block;
+    font-size: 11px;
+    overflow: hidden; }
+    .revision .revision-mark .gravatar {
+      float: left;
+      margin-right: 4px;
+      padding-top: 5px; }
+  .revision .revision-number {
+    font-size: 300%;
+    font-weight: bold;
+    font-family: sans-serif; }
+
+del {
+  color: #C34719; }
+  del .post-tag {
+    color: #C34719; }
+
+ins {
+  background-color: #E6F0A2; }
+  ins .post-tag, ins p {
+    background-color: #E6F0A2; }
+
+.vote-notification {
+  z-index: 1;
+  cursor: pointer;
+  display: none;
+  position: absolute;
+  font-family: Arial;
+  font-size: 14px;
+  font-weight: normal;
+  color: white;
+  background-color: #8e0000;
+  text-align: center;
+  padding-bottom: 10px;
+  -webkit-box-shadow: 0px 2px 4px #370000;
+  -moz-box-shadow: 0px 2px 4px #370000;
+  box-shadow: 0px 2px 4px #370000;
+  border-radius: 4px;
+  -ms-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px; }
+  .vote-notification h3, .vote-notification div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .vote-notification input[type="button"] {
+    background: url(../images/notification.png) repeat-x top;
+    padding: 10px 10px 10px 10px;
+    font-size: 13px;
+    margin-bottom: 5px;
+    border-top: #8e0000 1px solid;
+    color: #fff;
+    font-weight: normal;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    -moz-border-radius-topright: 4px;
+    -moz-border-radius-topleft: 4px;
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px; }
+  .vote-notification a {
+    color: #fb7321;
+    text-decoration: underline;
+    font-weight: bold; }
+
+#ground {
+  width: 100%;
+  clear: both;
+  border-top: 1px solid #000;
+  padding: 6px 0 0 0;
+  background: #16160f;
+  font-size: 16px;
+  font-family: 'Yanone Kaffeesatz',sans-serif; }
+  #ground p {
+    margin-bottom: 0; }
+
+.footer-links {
+  color: #EEE;
+  text-align: left;
+  width: 500px;
+  float: left; }
+  .footer-links a {
+    color: #e7e8a8; }
+
+.powered-link {
+  width: 500px;
+  float: left;
+  text-align: left; }
+  .powered-link a {
+    color: #8ebcc7; }
+
+.copyright {
+  color: #616161;
+  width: 450px;
+  float: right;
+  text-align: right; }
+  .copyright a {
+    color: #8ebcc7; }
+  .copyright img.license-logo {
+    margin: 6px 0px 20px 10px;
+    float: right; }
+
+.notify-me {
+  float: left; }
+
+span.text-counter {
+  margin-right: 20px; }
+span.form-error {
+  color: #990000;
+  font-weight: normal;
+  margin-left: 5px; }
+
+p.form-item {
+  margin: 0px; }
+
+.deleted {
+  background: #F4E7E7 none repeat scroll 0 0; }
+
+.form-row {
+  line-height: 25px; }
+
+table.form-as-table {
+  margin-top: 5px; }
+  table.form-as-table ul {
+    list-style-type: none;
+    display: inline; }
+  table.form-as-table li {
+    display: inline; }
+  table.form-as-table td {
+    text-align: right; }
+  table.form-as-table th {
+    text-align: left;
+    font-weight: normal; }
+table.ab-subscr-form, table.ab-tag-filter-form {
+  width: 45em; }
+
+.submit-row {
+  line-height: 30px;
+  padding-top: 10px;
+  display: block;
+  clear: both; }
+
+.errors {
+  line-height: 20px;
+  color: red; }
+
+.error {
+  color: darkred;
+  margin: 0;
+  font-size: 10px; }
+
+label.retag-error {
+  color: darkred;
+  padding-left: 5px;
+  font-size: 10px; }
+
+.fieldset {
+  border: none;
+  margin-top: 10px;
+  padding: 10px; }
+
+span.form-error {
+  color: #990000;
+  font-size: 90%;
+  font-weight: normal;
+  margin-left: 5px; }
+
+.favorites-empty {
+  width: 32px;
+  height: 45px;
+  float: left; }
+
+.user-info-table {
+  margin-bottom: 10px;
+  border-spacing: 0; }
+
+.user-stats-table .narrow {
+  width: 660px; }
+
+.narrow .summary h3, .narrow .summary div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .narrow .summary input[type="button"] {
+  padding: 0px;
+  margin: 0px; }
+
+.relativetime {
+  font-weight: bold;
+  text-decoration: none; }
+
+.narrow .tags {
+  float: left; }
+
+.user-action-1 {
+  font-weight: bold;
+  color: #333; }
+
+.user-action-2 {
+  font-weight: bold;
+  color: #CCC; }
+
+.user-action-3, .user-action-4 {
+  color: #333; }
+
+.user-action-5, .user-action-6 {
+  color: darkred; }
+
+.user-action-7 {
+  color: #333; }
+
+.user-action-8 {
+  padding: 3px;
+  font-weight: bold;
+  background-color: #CCC;
+  color: #763333; }
+
+.revision-summary {
+  background-color: #FFFE9B;
+  padding: 2px; }
+
+.question-title-link a {
+  font-weight: bold;
+  color: #0077CC; }
+
+.answer-title-link a {
+  color: #333; }
+
+.post-type-1 a, .post-type-3 a, .post-type-5 a {
+  font-weight: bold; }
+
+.post-type-2 a, .post-type-4 a, .post-type-6 a, .post-type-8 a {
+  color: #333; }
+
+.hilite, .hilite1 {
+  background-color: #ff0; }
+
+.hilite2 {
+  background-color: #f0f; }
+
+.hilite3 {
+  background-color: #0ff; }
+
+.gold, .badge1 {
+  color: #FFCC00; }
+
+.silver, .badge2 {
+  color: #CCCCCC; }
+
+.bronze, .badge3 {
+  color: #CC9933; }
+
+.score {
+  font-weight: 800;
+  color: #333; }
+
+a.comment {
+  background: #EEE;
+  color: #993300;
+  padding: 5px; }
+a.offensive {
+  color: #999; }
+
+.message h1 {
+  padding-top: 0px;
+  font-size: 15px; }
+.message p {
+  margin-bottom: 0px; }
+
+p.space-above {
+  margin-top: 10px; }
+
+.warning {
+  color: red; }
+
+button::-moz-focus-inner {
+  padding: 0;
+  border: none; }
+
+.submit {
+  cursor: pointer;
+  background-color: #D4D0C8;
+  height: 30px;
+  border: 1px solid #777777;
+  font-weight: bold;
+  font-size: 120%; }
+  .submit:hover {
+    text-decoration: underline; }
+  .submit.small {
+    margin-right: 5px;
+    height: 20px;
+    font-weight: normal;
+    font-size: 12px;
+    padding: 1px 5px; }
+    .submit.small:hover {
+      text-decoration: none; }
+
+.question-page a.submit {
+  display: -moz-inline-stack;
+  display: inline-block;
+  line-height: 30px;
+  padding: 0 5px;
+  *display: inline; }
+
+.noscript {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 100;
+  padding: 5px 0;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: 120%;
+  font-weight: Bold;
+  color: #FFFFFF;
+  background-color: #AE0000; }
+
+.big {
+  font-size: 14px; }
+
+.strong {
+  font-weight: bold; }
+
+.orange {
+  color: #d64000;
+  font-weight: bold; }
+
+.grey {
+  color: #808080; }
+
+.about div {
+  padding: 10px 5px 10px 5px;
+  border-top: 1px dashed #aaaaaa; }
+
+.highlight {
+  background-color: #FFF8C6; }
+
+.nomargin {
+  margin: 0; }
+
+.margin-bottom {
+  margin-bottom: 10px; }
+
+.margin-top {
+  margin-top: 10px; }
+
+.inline-block {
+  display: inline-block; }
+
+.action-status {
+  margin: 0;
+  border: none;
+  text-align: center;
+  line-height: 10px;
+  font-size: 12px;
+  padding: 0; }
+  .action-status span {
+    padding: 3px 5px 3px 5px;
+    background-color: #fff380;
+    font-weight: normal;
+    -moz-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    -webkit-border-radius: 5px; }
+
+.list-table td {
+  vertical-align: top; }
+
+table.form-as-table .errorlist {
+  display: block;
+  margin: 0;
+  padding: 0 0 0 5px;
+  text-align: left;
+  font-size: 10px;
+  color: darkred; }
+table.form-as-table input {
+  display: inline;
+  margin-left: 4px; }
+table.form-as-table th {
+  vertical-align: bottom;
+  padding-bottom: 4px; }
+
+.form-row-vertical {
+  margin-top: 8px;
+  display: block; }
+  .form-row-vertical label {
+    margin-bottom: 3px;
+    display: block; }
+
+.text-align-right {
+  text-align: center; }
+
+ul.form-horizontal-rows {
+  list-style: none;
+  margin: 0; }
+  ul.form-horizontal-rows li {
+    position: relative;
+    height: 40px; }
+  ul.form-horizontal-rows label {
+    display: inline-block; }
+  ul.form-horizontal-rows ul.errorlist {
+    list-style: none;
+    color: darkred;
+    font-size: 10px;
+    line-height: 10px;
+    position: absolute;
+    top: 2px;
+    left: 180px;
+    text-align: left;
+    margin: 0; }
+    ul.form-horizontal-rows ul.errorlist li {
+      height: 10px; }
+  ul.form-horizontal-rows label {
+    position: absolute;
+    left: 0px;
+    bottom: 6px;
+    margin: 0px;
+    line-height: 12px;
+    font-size: 12px; }
+  ul.form-horizontal-rows li input {
+    position: absolute;
+    bottom: 0px;
+    left: 180px;
+    margin: 0px; }
+
+.narrow .summary {
+  float: left; }
+
+.user-profile-tool-links {
+  font-weight: bold;
+  vertical-align: top; }
+
+ul.post-tags {
+  margin-left: 3px; }
+  ul.post-tags li {
+    margin-top: 4px;
+    margin-bottom: 3px; }
+ul.post-retag {
+  margin-bottom: 0px;
+  margin-left: 5px; }
+
+#question-controls .tags {
+  margin: 0 0 3px 0; }
+
+#tagSelector {
+  padding-bottom: 2px;
+  margin-bottom: 0; }
+
+#related-tags {
+  padding-left: 3px; }
+
+#hideIgnoredTagsControl {
+  margin: 5px 0 0 0; }
+  #hideIgnoredTagsControl label {
+    font-size: 12px;
+    color: #666; }
+
+#hideIgnoredTagsCb {
+  margin: 0 2px 0 1px; }
+
+#recaptcha_widget_div {
+  width: 318px;
+  float: left;
+  clear: both; }
+
+p.signup_p {
+  margin: 20px 0px 0px 0px; }
+
+.simple-subscribe-options ul {
+  list-style: none;
+  list-style-position: outside;
+  margin: 0; }
+
+.wmd-preview a {
+  color: #1b79bd; }
+.wmd-preview li {
+  margin-bottom: 7px;
+  font-size: 14px; }
+
+.search-result-summary {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 22px;
+  margin: 0px 0px 0px 0px;
+  padding: 2px 0 0 0;
+  float: left; }
+
+.faq-rep-item {
+  text-align: right;
+  padding-right: 5px; }
+
+.user-info-table .gravatar {
+  margin: 0; }
+
+#responses {
+  clear: both;
+  line-height: 18px;
+  margin-bottom: 15px; }
+  #responses div.face {
+    float: left;
+    text-align: center;
+    width: 54px;
+    padding: 3px;
+    overflow: hidden; }
+
+.response-parent {
+  margin-top: 18px; }
+  .response-parent strong {
+    font-size: 20px; }
+
+.re {
+  min-height: 57px;
+  clear: both;
+  margin-top: 10px; }
+
+#responses input {
+  float: left; }
+
+#re_tools {
+  margin-bottom: 10px; }
+
+#re_sections {
+  margin-bottom: 6px; }
+  #re_sections .on {
+    font-weight: bold; }
+
+.avatar-page ul {
+  list-style: none; }
+.avatar-page li {
+  display: inline; }
+
+.user-profile-page .avatar p {
+  margin-bottom: 0px; }
+.user-profile-page .tabBar a#stats {
+  margin-left: 0; }
+.user-profile-page img.gravatar {
+  margin: 2px 0 3px 0; }
+.user-profile-page h3, .user-profile-page div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel .user-profile-page input[type="button"] {
+  padding: 0;
+  margin-top: -3px; }
+
+.userList {
+  font-size: 13px; }
+
+img.flag {
+  border: 1px solid #eee;
+  vertical-align: text-top; }
+
+.main-page img.flag {
+  vertical-align: text-bottom; }
+
+a.edit {
+  padding-left: 3px;
+  color: #145bff; }
+
+.str {
+  color: #080; }
+
+.kwd {
+  color: #008; }
+
+.com {
+  color: #800; }
+
+.typ {
+  color: #606; }
+
+.lit {
+  color: #066; }
+
+.pun {
+  color: #660; }
+
+.pln {
+  color: #000; }
+
+.tag {
+  color: #008; }
+
+.atn {
+  color: #606; }
+
+.atv {
+  color: #080; }
+
+.dec {
+  color: #606; }
+
+pre.prettyprint {
+  clear: both;
+  padding: 3px;
+  border: 0px solid #888; }
+
+@media print {
+  .str {
+    color: #060; }
+
+  .kwd {
+    color: #006;
+    font-weight: bold; }
+
+  .com {
+    color: #600;
+    font-style: italic; }
+
+  .typ {
+    color: #404;
+    font-weight: bold; }
+
+  .lit {
+    color: #044; }
+
+  .pun {
+    color: #440; }
+
+  .pln {
+    color: #000; }
+
+  .tag {
+    color: #006;
+    font-weight: bold; }
+
+  .atn {
+    color: #404; }
+
+  .atv {
+    color: #060; } }
 /*
 ----------------------------------------------------------------------------------------
 
