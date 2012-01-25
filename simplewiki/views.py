@@ -154,7 +154,7 @@ def edit(request, wiki_url):
             if request.POST.__contains__('delete'):
                 if (article.current_revision.deleted == 1): #This article has already been deleted. Redirect
                     return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
-                new_revision.contents = "Article Deletion Revision\n==="
+                new_revision.contents = ""
                 new_revision.deleted = 1
             elif not new_revision.get_diff():
                 return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
@@ -189,6 +189,7 @@ def history(request, wiki_url, page=1):
 
     perm_err = check_permissions(request, article, check_read=True, check_deleted=False)
     if perm_err:
+        print "returned error " , perm_err
         return perm_err
 
     page_size = 10
@@ -215,14 +216,15 @@ def history(request, wiki_url, page=1):
                     if (revision.deleted == 0):
                          revision.adminSetDeleted(2)
                 elif request.POST.__contains__('restore') and request.user.is_superuser:
-                    print "revision.deleted: " , revision.deleted
                     if (revision.deleted == 2):
-                        print "save was just called"
                         revision.adminSetDeleted(0)
-                        print "revison.deleted is now " , revision.deleted
                 elif request.POST.__contains__('delete_all') and request.user.is_superuser:
                     Revision.objects.filter(article__exact = article, deleted = 0).update(deleted = 2)
-                    
+                elif request.POST.__contains__('lock_article'):
+                    print "changing locked article " , article.locked
+                    article.locked = not article.locked
+                    print "changed locked article " , article.locked
+                    article.save()
             except:
                 pass
             finally:
@@ -289,7 +291,6 @@ def search_articles(request):
     if request.user.is_superuser:
         results = results.order_by('current_revision__deleted')
     else:
-        print "tried to filter"
         results = results.filter(current_revision__deleted = 0)
 
     if results.count() == 1 and querystring:
@@ -442,6 +443,7 @@ def check_permissions(request, article, check_read=False, check_write=False, che
     deleted_err = check_deleted and not (article.current_revision.deleted == 0)
     if (request.user.is_superuser):
         deleted_err = False
+        locked_err = False
     
     if read_err or write_err or locked_err or deleted_err:
         d = {'wiki_article': article,
