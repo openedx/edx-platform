@@ -76,9 +76,10 @@ ${ wiki_article.title }
 %endif
 />
 %if show_delete_revision:
-<input type="submit" name="delete" value="Delete revision"/>
-<input type="submit" name="restore" value="Restore revision"/>
-<input type="submit" name="delete_all" value="Delete all revisions">
+<input type="submit" name="delete" value="Admin Delete revision"/>
+<input type="submit" name="restore" value="Admin Restore revision"/>
+<input type="submit" name="delete_all" value="Admin Delete all revisions">
+<input type="submit" name="lock_article" value="${'Lock Article' if not wiki_article.locked else 'Unlock Article'}">
 %endif
 </form>
 </%block>
