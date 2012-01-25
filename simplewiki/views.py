@@ -32,7 +32,7 @@ def view(request, wiki_url):
     if err:
         return err
     
-    perm_err = check_permissions(request, article, check_read=True)
+    perm_err = check_permissions(request, article, check_read=True, check_deleted=True)
     if perm_err:
         return perm_err
     d = {'wiki_article': article,
@@ -81,7 +81,7 @@ def create(request, wiki_url):
             d.update(csrf(request))
             return render_to_response('simplewiki_error.html', d)
         
-        perm_err = check_permissions(request, path[-1], check_locked=False, check_write=True)
+        perm_err = check_permissions(request, path[-1], check_locked=False, check_write=True, check_deleted=True)
         if perm_err:
             return perm_err
         # Ensure doesn't already exist
@@ -136,7 +136,7 @@ def edit(request, wiki_url):
         return err
 
     # Check write permissions
-    perm_err = check_permissions(request, article, check_write=True, check_locked=True)
+    perm_err = check_permissions(request, article, check_write=True, check_locked=True, check_deleted=False)
     if perm_err:
         return perm_err
 
@@ -187,7 +187,7 @@ def history(request, wiki_url, page=1):
     if err:
         return err
 
-    perm_err = check_permissions(request, article, check_read=True)
+    perm_err = check_permissions(request, article, check_read=True, check_deleted=False)
     if perm_err:
         return perm_err
 
@@ -285,12 +285,18 @@ def search_articles(request):
     else:
         # Need to throttle results by splitting them into pages...
         results = Article.objects.all()
+        
+    if request.user.is_superuser:
+        results = results.order_by('current_revision__deleted')
+    else:
+        print "tried to filter"
+        results = results.filter(current_revision__deleted = 0)
 
     if results.count() == 1 and querystring:
         return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
     else:        
         d = {'wiki_search_results': results,
-            	'wiki_search_query': querystring}
+            	'wiki_search_query': querystring,}
         d.update(csrf(request))
         return render_to_response('simplewiki_searchresults.html', d)
         
@@ -426,13 +432,15 @@ def fetch_from_url(request, url):
     return (article, path, err)
 
 
-def check_permissions(request, article, check_read=False, check_write=False, check_locked=False, check_deleted=True):
+def check_permissions(request, article, check_read=False, check_write=False, check_locked=False, check_deleted=False):    
     read_err = check_read and not article.can_read(request.user)
+    
     write_err = check_write and not article.can_write(request.user)
+    
     locked_err = check_locked and article.locked
     
     deleted_err = check_deleted and not (article.current_revision.deleted == 0)
-    if request.user.is_superuser:
+    if (request.user.is_superuser):
         deleted_err = False
     
     if read_err or write_err or locked_err or deleted_err:
