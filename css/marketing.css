@@ -578,45 +578,56 @@ div.leanModal_box {
   div.leanModal_box h1 {
     font-size: 24px;
     margin-top: 0;
-    font-family: "Oswald";
     padding-bottom: 25.888px;
     border-bottom: 1px solid #eee;
     margin-bottom: 25.888px; }
   div.leanModal_box form {
     text-align: left; }
-    div.leanModal_box form div#enroll_error {
-      padding-bottom: 25.888px;
-      color: #DF8B2C;
-      text-transform: uppercase;
+    div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error {
+      -webkit-font-smoothing: antialiased;
+      background-color: #F50200;
+      color: #fff;
+      font-weight: bold;
       letter-spacing: 1px;
-      font-weight: bold; }
-    div.leanModal_box form ol li {
       margin-bottom: 25.888px;
-      width: 485px;
-      float: left; }
-      div.leanModal_box form ol li:nth-child(odd) {
-        margin-right: 25px; }
-      div.leanModal_box form ol li.terms, div.leanModal_box form ol li.remember {
-        float: none;
-        width: auto;
-        clear: both;
-        padding-top: 25.888px;
-        border-top: 1px solid #eee; }
-      div.leanModal_box form ol li.honor-code {
-        width: auto;
-        float: none; }
-      div.leanModal_box form ol li label {
-        display: block;
-        font-weight: bold; }
-      div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li input[type="number"], div.leanModal_box form ol li input[type="password"], div.leanModal_box form ol li input[type="search"], div.leanModal_box form ol li input[type="tel"], div.leanModal_box form ol li input[type="text"], div.leanModal_box form ol li input[type="url"], div.leanModal_box form ol li input[type="color"], div.leanModal_box form ol li input[type="date"], div.leanModal_box form ol li input[type="datetime"], div.leanModal_box form ol li input[type="datetime-local"], div.leanModal_box form ol li input[type="month"], div.leanModal_box form ol li input[type="time"], div.leanModal_box form ol li input[type="week"], div.leanModal_box form ol li textarea {
-        width: 100%;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        -ms-box-sizing: border-box;
-        -o-box-sizing: border-box;
-        box-sizing: border-box; }
-      div.leanModal_box form ol li input[type="checkbox"] {
-        margin-right: 10px; }
+      padding: 5.178px;
+      text-transform: uppercase; }
+      div.leanModal_box form div#enroll_error:empty, div.leanModal_box form div#login_error:empty {
+        padding: 0; }
+    div.leanModal_box form ol {
+      list-style: none; }
+      div.leanModal_box form ol li {
+        margin-bottom: 12.944px; }
+        div.leanModal_box form ol li.terms, div.leanModal_box form ol li.remember {
+          float: none;
+          width: auto;
+          clear: both;
+          padding-top: 25.888px;
+          border-top: 1px solid #eee; }
+        div.leanModal_box form ol li.honor-code {
+          width: auto;
+          float: none; }
+        div.leanModal_box form ol li label {
+          display: block;
+          font-weight: bold; }
+        div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li input[type="number"], div.leanModal_box form ol li input[type="password"], div.leanModal_box form ol li input[type="search"], div.leanModal_box form ol li input[type="tel"], div.leanModal_box form ol li input[type="text"], div.leanModal_box form ol li input[type="url"], div.leanModal_box form ol li input[type="color"], div.leanModal_box form ol li input[type="date"], div.leanModal_box form ol li input[type="datetime"], div.leanModal_box form ol li input[type="datetime-local"], div.leanModal_box form ol li input[type="month"], div.leanModal_box form ol li input[type="time"], div.leanModal_box form ol li input[type="week"], div.leanModal_box form ol li textarea {
+          width: 100%;
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          -ms-box-sizing: border-box;
+          -o-box-sizing: border-box;
+          box-sizing: border-box; }
+        div.leanModal_box form ol li input[type="checkbox"] {
+          margin-right: 10px; }
+        div.leanModal_box form ol li ul {
+          list-style: disc outside none;
+          margin: 12.944px 0 25.888px 25.888px; }
+          div.leanModal_box form ol li ul li {
+            list-style: disc outside none;
+            margin-bottom: 12.944px;
+            color: #666;
+            font-size: 14px;
+            float: none; }
     div.leanModal_box form input[type="button"] {
       border: 1px solid #520000;
       -webkit-border-radius: 3px;
@@ -666,18 +677,25 @@ div.leanModal_box {
         -ms-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
         -o-box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee;
         box-shadow: inset 0 0 8px 4px #420000, inset 0 0 8px 4px #420000, 0 1px 1px 0 #eeeeee; }
-  div.leanModal_box div#login {
-    min-width: 300px; }
-    div.leanModal_box div#login ol li {
-      width: auto;
-      float: none; }
-  div.leanModal_box div.lost-password {
-    text-align: left;
-    margin-top: 25.888px; }
-    div.leanModal_box div.lost-password a {
-      color: #999; }
-      div.leanModal_box div.lost-password a:hover {
-        color: #444; }
+
+div#login {
+  min-width: 400px; }
+  div#login ol li {
+    width: auto;
+    float: none; }
+
+div.lost-password {
+  text-align: left;
+  margin-top: 25.888px; }
+  div.lost-password a {
+    color: #999; }
+    div.lost-password a:hover {
+      color: #444; }
+
+div#pwd_reset p {
+  margin-bottom: 25.888px; }
+div#pwd_reset input[type="email"] {
+  margin-bottom: 25.888px; }
 
 div#feedback_div form ol li {
   float: none;
