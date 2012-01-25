@@ -72,7 +72,7 @@ ${wiki_error}
 	</p>
 %elif wiki_err_deleted is not UNDEFINED and wiki_err_deleted:
 	<p>
-	The article you tried to access has been deleted. You may be able to restore it to an earlier version in <a href="${reverse("wiki_history", args=[wiki_article.get_url(),1])}">history</a>, or create a new version <a href="${reverse("wiki_edit", args=[wiki_article.get_url()])}">edit</a>.
+	The article you tried to access has been deleted. You may be able to restore it to an earlier version in its <a href="${reverse("wiki_history", args=[wiki_article.get_url(),1])}">history</a>, or <a href="${reverse("wiki_edit", args=[wiki_article.get_url()])}">create a new version</a>.
 	</p>
 %else:
 	<p>
