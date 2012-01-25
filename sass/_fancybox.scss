@@ -27,7 +27,6 @@ div#fancybox-wrap {
       h1 {
         font-size: 24px;
         margin-top: 0;
-        font-family: "Oswald";
         padding-bottom: lh();
         border-bottom: 1px solid #eee;
         margin-bottom: lh();
@@ -44,20 +43,25 @@ div#fancybox-wrap {
           font-weight: bold;
         }
 
+        label {
+          display: block;
+          font-weight: bold;
+        }
+
+        #{$all-text-inputs} {
+          width: 100%;
+          @include box-sizing(border-box);
+        }
+
+        input[type="checkbox"] {
+          margin-right: 10px;
+        }
+
         ol {
           li {
             margin-bottom: lh();
-            width: grid-width(6);
-            float: left;
-
-            &:nth-child(odd) {
-              margin-right: $gw-gutter;
-            }
 
             &.terms, &.remember {
-              float: none;
-              width: auto;
-              clear: both;
               padding-top: lh();
               border-top: 1px solid #eee;
             }
@@ -67,10 +71,6 @@ div#fancybox-wrap {
               float: none;
             }
 
-            label {
-              display: block;
-              font-weight: bold;
-            }
 
             ul {
               list-style: disc outside none;
@@ -83,15 +83,6 @@ div#fancybox-wrap {
                 font-size: 14px;
                 float: none;
               }
-            }
-
-            #{$all-text-inputs} {
-              width: 100%;
-              @include box-sizing(border-box);
-            }
-
-            input[type="checkbox"] {
-              margin-right: 10px;
             }
           }
         }
@@ -121,9 +112,20 @@ div#fancybox-wrap {
 
         a {
           color: #999;
+
           &:hover {
             color: #444;
           }
+        }
+      }
+
+      div#pwd_reset {
+        p {
+          margin-bottom: lh();
+        }
+
+        input[type="email"] {
+          margin-bottom: lh();
         }
       }
     }
