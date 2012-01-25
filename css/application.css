@@ -16,19 +16,11 @@ table, caption, tbody, tfoot, thead, tr, th, td {
   font-family: inherit;
   vertical-align: baseline; }
 
-/* remember to define focus styles! */
-:focus {
-  outline: 0; }
-
 body {
   line-height: 1;
   color: black;
   background: white; }
 
-ol, ul {
-  list-style: none; }
-
-/* tables still need 'cellspacing="0"' in the markup */
 table {
   border-collapse: separate;
   border-spacing: 0; }
@@ -957,95 +949,6 @@ section.help.main-content {
   padding: 0;
   color: #000;
   font-family: Arial; }*/
-div {
-  margin: 0 auto;
-  padding: 0; }
-
-h1, h2, h3, div.wiki-wrapper div#wiki_panel input[type="button"], h4, h5, h6, ul, li, dl, dt, dd, form, img, p {
-  margin: 0;
-  padding: 0;
-  border: none; }
-
-label {
-  vertical-align: middle; }
-
-hr {
-  border: none;
-  border-top: 1px dashed #ccccce; }
-
-input, select {
-  vertical-align: middle;
-  font-family: Trebuchet MS, "segoe ui", Helvetica, Tahoma, Verdana, MingLiu, PMingLiu, Arial, sans-serif;
-  margin-left: 0px; }
-
-textarea:focus, input:focus {
-  outline: none; }
-
-iframe {
-  border: none; }
-
-p {
-  font-size: 14px;
-  line-height: 140%;
-  margin-bottom: 6px; }
-
-a {
-  color: #1b79bd;
-  text-decoration: none;
-  cursor: pointer; }
-
-h2 {
-  font-size: 21px;
-  padding: 3px 0 3px 5px; }
-
-h3, div.wiki-wrapper div#wiki_panel input[type="button"] {
-  font-size: 19px;
-  padding: 3px 0 3px 5px; }
-
-ul {
-  list-style: disc;
-  margin-left: 20px;
-  padding-left: 0px;
-  margin-bottom: 1em; }
-
-ol {
-  list-style: decimal;
-  margin-left: 30px;
-  margin-bottom: 1em;
-  padding-left: 0px; }
-
-td ul {
-  vertical-align: middle; }
-
-li input {
-  margin: 3px 3px 4px 3px; }
-
-pre {
-  font-family: Consolas, Monaco, Liberation Mono, Lucida Console, Monospace;
-  font-size: 100%;
-  margin-bottom: 10px;
-  background-color: #F5F5F5;
-  padding-left: 5px;
-  padding-top: 5px;
-  padding-bottom: 20px; }
-
-code {
-  font-family: Consolas, Monaco, Liberation Mono, Lucida Console, Monospace;
-  font-size: 100%; }
-
-blockquote {
-  margin-bottom: 10px;
-  margin-right: 15px;
-  padding: 10px 0px 1px 10px;
-  background-color: #F5F5F5; }
-
-* html .clearfix, * html .topbar, * html div.book-wrapper section.book nav, div.book-wrapper section.book * html nav, * html div.wiki-wrapper section.wiki-body header, div.wiki-wrapper section.wiki-body * html header, * html .secondary-nav, * html body div.header-wrapper header, * html body div.header-wrapper header nav ul, * html body section.main-content, * html footer, * html div.course-wrapper section.course-content ol.vert-mod li, div.course-wrapper section.course-content ol.vert-mod * html li, * html div.book-wrapper section.book nav ul, div.book-wrapper section.book nav * html ul, * html div.wiki-wrapper div#wiki_panel div#wiki_create_form, div.wiki-wrapper div#wiki_panel * html div#wiki_create_form, * html .secondary-nav nav, .secondary-nav * html nav, * html .content-wrapper, * html .footer-wrapper, * html .paginator {
-  height: 1;
-  overflow: visible; }
-
-+ html .clearfix, + html .topbar, + html div.book-wrapper section.book nav, div.book-wrapper section.book + html nav, + html div.wiki-wrapper section.wiki-body header, div.wiki-wrapper section.wiki-body + html header, + html .secondary-nav, + html html body div.header-wrapper header, html body div.header-wrapper + html header, + html html body div.header-wrapper header nav ul, html body div.header-wrapper header nav + html ul, + html html body section.main-content, html body + html section.main-content, + html html footer, html + html footer, + html div.course-wrapper section.course-content ol.vert-mod li, div.course-wrapper section.course-content ol.vert-mod + html li, + html div.book-wrapper section.book nav ul, div.book-wrapper section.book nav + html ul, + html div.wiki-wrapper div#wiki_panel div#wiki_create_form, div.wiki-wrapper div#wiki_panel + html div#wiki_create_form, + html .secondary-nav nav, .secondary-nav + html nav, + html .content-wrapper, + html .footer-wrapper, + html .paginator {
-  min-height: 1%; }
-
 .clearfix:after, .topbar:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, .secondary-nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, .secondary-nav nav:after, .content-wrapper:after, .footer-wrapper:after, .paginator:after {
   clear: both;
   content: ".";
@@ -1063,10 +966,6 @@ a:hover {
 .badge-context-toggle.active, div.course-wrapper div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"] {
   cursor: pointer;
   text-decoration: underline; }
-
-h1 {
-  font-size: 24px;
-  padding: 10px 0 5px 0px; }
 
 body.user-messages {
   margin-top: 2.4em; }

@@ -16,19 +16,11 @@ table, caption, tbody, tfoot, thead, tr, th, td {
   font-family: inherit;
   vertical-align: baseline; }
 
-/* remember to define focus styles! */
-:focus {
-  outline: 0; }
-
 body {
   line-height: 1;
   color: black;
   background: white; }
 
-ol, ul {
-  list-style: none; }
-
-/* tables still need 'cellspacing="0"' in the markup */
 table {
   border-collapse: separate;
   border-spacing: 0; }
@@ -145,6 +137,7 @@ blockquote, q {
   margin: 25.888px 0 12.944px;
   padding: 6.472px 12.944px;
   text-decoration: none;
+  font-style: normal;
   -webkit-font-smoothing: antialiased; }
   .button:hover, header.announcement div section.course section a:hover, section.index-content section.course a:hover, section.index-content section.staff a:hover, section.index-content section.about-course section.cta a.enroll:hover {
     background-color: #660000; }
@@ -162,6 +155,12 @@ body {
     margin-bottom: 25.888px; }
   body em {
     font-style: italic; }
+  body a {
+    color: #990000;
+    font-style: italic;
+    text-decoration: none; }
+    body a:hover, body a:focus {
+      color: #660000; }
   body input[type="email"], body input[type="number"], body input[type="password"], body input[type="search"], body input[type="tel"], body input[type="text"], body input[type="url"], body input[type="color"], body input[type="date"], body input[type="datetime"], body input[type="datetime-local"], body input[type="month"], body input[type="time"], body input[type="week"], body textarea {
     -webkit-box-shadow: 0 -1px 0 white;
     -moz-box-shadow: 0 -1px 0 white;
@@ -250,7 +249,8 @@ header.announcement {
       header.announcement div nav a.login {
         text-decoration: none;
         color: #fff;
-        font-size: 12px; }
+        font-size: 12px;
+        font-style: normal; }
         header.announcement div nav a.login:hover {
           color: rgba(255, 255, 255, 0.6); }
     header.announcement div section {
@@ -396,9 +396,11 @@ section.index-content section {
       font: 800 24px "Open Sans", Helvetica, Arial, sans-serif; }
     section.index-content section.course h3, section.index-content section.staff h3 {
       font: 400 18px "Open Sans", Helvetica, Arial, sans-serif; }
-    section.index-content section.course ul li img, section.index-content section.staff ul li img {
-      float: left;
-      margin-right: 12.944px; }
+    section.index-content section.course ul, section.index-content section.staff ul {
+      list-style: none; }
+      section.index-content section.course ul li img, section.index-content section.staff ul li img {
+        float: left;
+        margin-right: 12.944px; }
   section.index-content section.course h2 {
     padding-top: 129.44px;
     background: url("/static/images/marketing/circuits-bg.jpg") 0 0 no-repeat;
