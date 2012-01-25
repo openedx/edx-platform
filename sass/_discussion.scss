@@ -59,44 +59,41 @@ body.askbot {
     }
   }
 
-  .content-wrapper {
-    @extend .clearfix;
-    @extend .wrapper;
-    @include box-shadow(0 1px 0 #fff);
-    @include box-sizing(border-box);
-    background: #fff;
-    border: 1px solid #ccc;
-    border-top: 0;
+  .main-content {
+    .discussion-wrapper {
+      display: table;
+      width: 100%;
 
-    .discussion-content {
-      /*@extend .content;*/
-      @include box-sizing(border-box);
-      display: table-cell;
-      padding: $gw-gutter;
-      vertical-align: top;
-      width: grid-width(9);
-    }
-
-    aside {
-      @extend .sidebar;
-      width: grid-width(2.5);
-      padding: $gw-gutter;
-
-      h2 {
-        font-size: 16px;
+      .discussion-content {
+        /*@extend .content;*/
+        @include box-sizing(border-box);
+        display: table-cell;
+        padding: $gw-gutter;
+        vertical-align: top;
+        width: grid-width(9);
       }
 
-      h3 {
-        border-bottom: 0;
-        box-shadow: none;
-      }
+      aside {
+        @extend .sidebar;
+        width: grid-width(2.5);
+        padding: $gw-gutter;
 
-      input[type="text"] {
-        width: 68%;
-      }
+        h2 {
+          font-size: 16px;
+        }
 
-      #displayTagFilterControl {
-        margin-top: 10px;
+        h3 {
+          border-bottom: 0;
+          box-shadow: none;
+        }
+
+        input[type="text"] {
+          width: 68%;
+        }
+
+        #displayTagFilterControl {
+          margin-top: 10px;
+        }
       }
     }
   }
