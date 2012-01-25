@@ -32,12 +32,13 @@ def view(request, wiki_url):
     if err:
         return err
     
-    perm_err = check_permissions(request, article, check_read=True)
+    perm_err = check_permissions(request, article, check_read=True, check_deleted=True)
     if perm_err:
         return perm_err
     d = {'wiki_article': article,
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
+            'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
 			}
     d.update(csrf(request))
     return render_to_response('simplewiki_view.html', d)
@@ -80,7 +81,7 @@ def create(request, wiki_url):
             d.update(csrf(request))
             return render_to_response('simplewiki_error.html', d)
         
-        perm_err = check_permissions(request, path[-1], check_locked=False, check_write=True)
+        perm_err = check_permissions(request, path[-1], check_locked=False, check_write=True, check_deleted=True)
         if perm_err:
             return perm_err
         # Ensure doesn't already exist
@@ -135,7 +136,7 @@ def edit(request, wiki_url):
         return err
 
     # Check write permissions
-    perm_err = check_permissions(request, article, check_write=True, check_locked=True)
+    perm_err = check_permissions(request, article, check_write=True, check_locked=True, check_deleted=False)
     if perm_err:
         return perm_err
 
@@ -149,9 +150,15 @@ def edit(request, wiki_url):
         if f.is_valid():
             new_revision = f.save(commit=False)
             new_revision.article = article
-            # Check that something has actually been changed...
-            if not new_revision.get_diff():
-                return (None, HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),))))
+            
+            if request.POST.__contains__('delete'):
+                if (article.current_revision.deleted == 1): #This article has already been deleted. Redirect
+                    return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
+                new_revision.contents = ""
+                new_revision.deleted = 1
+            elif not new_revision.get_diff():
+                return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
+            
             if not request.user.is_anonymous():
                 new_revision.revision_user = request.user
             new_revision.save()
@@ -160,7 +167,9 @@ def edit(request, wiki_url):
                 new_revision.article.save()
             return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
     else:
-        f = EditForm({'contents': article.current_revision.contents, 'title': article.title})
+        startContents = article.current_revision.contents if (article.current_revision.deleted == 0) else 'Headline\n===\n\n'
+        
+        f = EditForm({'contents': startContents, 'title': article.title})
     d = {'wiki_form': f,
         	'wiki_write': True,
         	'wiki_article': article,
@@ -178,8 +187,9 @@ def history(request, wiki_url, page=1):
     if err:
         return err
 
-    perm_err = check_permissions(request, article, check_read=True)
+    perm_err = check_permissions(request, article, check_read=True, check_deleted=False)
     if perm_err:
+        print "returned error " , perm_err
         return perm_err
 
     page_size = 10
@@ -192,18 +202,41 @@ def history(request, wiki_url, page=1):
     history = Revision.objects.filter(article__exact = article).order_by('-counter')
     
     if request.method == 'POST':
-        if request.POST.__contains__('revision'):
+        if request.POST.__contains__('revision'): #They selected a version, but they can be either deleting or changing the version
             perm_err = check_permissions(request, article, check_write=True, check_locked=True)
             if perm_err:
                 return perm_err
             try:
                 r = int(request.POST['revision'])
-                article.current_revision = Revision.objects.get(id=r)
-                article.save()
+                revision = Revision.objects.get(id=r)
+                if request.POST.__contains__('change'):
+                    article.current_revision = revision
+                    article.save()
+                elif request.POST.__contains__('delete') and request.user.is_superuser:
+                    if (revision.deleted == 0):
+                         revision.adminSetDeleted(2)
+                elif request.POST.__contains__('restore') and request.user.is_superuser:
+                    if (revision.deleted == 2):
+                        revision.adminSetDeleted(0)
+                elif request.POST.__contains__('delete_all') and request.user.is_superuser:
+                    Revision.objects.filter(article__exact = article, deleted = 0).update(deleted = 2)
+                elif request.POST.__contains__('lock_article'):
+                    print "changing locked article " , article.locked
+                    article.locked = not article.locked
+                    print "changed locked article " , article.locked
+                    article.save()
             except:
                 pass
             finally:
                 return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
+                # 
+                # 
+                # <input type="submit" name="delete" value="Delete revision"/>
+                # <input type="submit" name="restore" value="Restore revision"/>
+                # <input type="submit" name="delete_all" value="Delete all revisions">
+                # %else:
+                # <input type="submit" name="delete_article" value="Delete all revisions">
+                # 
     
     page_count = (history.count()+(page_size-1)) / page_size
     if p > page_count:
@@ -219,7 +252,8 @@ def history(request, wiki_url, page=1):
 	        'wiki_write': article.can_write_l(request.user),
 	        'wiki_attachments_write': article.can_attach(request.user),
 	        'wiki_article': article,
-	        'wiki_history': history[beginItem:beginItem+page_size],}
+	        'wiki_history': history[beginItem:beginItem+page_size],
+            'show_delete_revision' : request.user.is_superuser,}
     d.update(csrf(request))
 
     return render_to_response('simplewiki_history.html', d)
@@ -253,12 +287,17 @@ def search_articles(request):
     else:
         # Need to throttle results by splitting them into pages...
         results = Article.objects.all()
+        
+    if request.user.is_superuser:
+        results = results.order_by('current_revision__deleted')
+    else:
+        results = results.filter(current_revision__deleted = 0)
 
     if results.count() == 1 and querystring:
         return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
     else:        
         d = {'wiki_search_results': results,
-            	'wiki_search_query': querystring}
+            	'wiki_search_query': querystring,}
         d.update(csrf(request))
         return render_to_response('simplewiki_searchresults.html', d)
         
@@ -394,16 +433,24 @@ def fetch_from_url(request, url):
     return (article, path, err)
 
 
-def check_permissions(request, article, check_read=False, check_write=False, check_locked=False):
+def check_permissions(request, article, check_read=False, check_write=False, check_locked=False, check_deleted=False):    
     read_err = check_read and not article.can_read(request.user)
+    
     write_err = check_write and not article.can_write(request.user)
+    
     locked_err = check_locked and article.locked
-
-    if read_err or write_err or locked_err:
+    
+    deleted_err = check_deleted and not (article.current_revision.deleted == 0)
+    if (request.user.is_superuser):
+        deleted_err = False
+        locked_err = False
+    
+    if read_err or write_err or locked_err or deleted_err:
         d = {'wiki_article': article,
 	            'wiki_err_noread': read_err,
 	            'wiki_err_nowrite': write_err,
-	            'wiki_err_locked': locked_err,}
+	            'wiki_err_locked': locked_err,
+                'wiki_err_deleted': deleted_err,}
         d.update(csrf(request))
         # TODO: Make this a little less jarring by just displaying an error
         #       on the current page? (no such redirect happens for an anon upload yet)
