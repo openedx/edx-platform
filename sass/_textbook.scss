@@ -1,10 +1,10 @@
 div.book-wrapper {
-  display: table;
+  @extend .table-wrapper;
 
   ul#booknav {
     @extend .sidebar;
     @include box-sizing(border-box);
-    padding: $body-line-height;
+    padding: lh();
 
     li {
       ul {
@@ -14,11 +14,7 @@ div.book-wrapper {
   }
 
   section.book {
-    @include box-sizing(border-box);
-    padding: $body-line-height;
-    vertical-align: top;
-    width: grid-width(9) + $gw-gutter;
-    display: table-cell;
+    @extend .content;
 
     nav {
       @extend .topbar;
@@ -42,6 +38,8 @@ div.book-wrapper {
     section.page {
       img {
         border: 1px solid $border-color;
+        max-width: 100%;
+        min-width: 100%;
       }
     }
   }

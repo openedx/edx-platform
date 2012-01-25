@@ -8,9 +8,15 @@
 
 .wrapper {
   margin: 0 auto;
-  max-width: $max-width;
-  width: grid-width(12);
+  max-width: $fg-max-width;
+  min-width: $fg-min-width;
+  width: flex-grid(12);
   text-align: left;
+
+  div.table-wrapper {
+    display: table;
+    width: flex-grid(12);
+  }
 }
 
 .button {
@@ -34,20 +40,21 @@
 .content {
   @include box-sizing(border-box);
   display: table-cell;
-  padding: $body-line-height;
+  padding: lh();
   vertical-align: top;
-  width: grid-width(9);
+  width: flex-grid(9) + flex-gutter();
 }
 
 .sidebar {
   @include box-shadow( inset -1px 0 0 #f6f6f6);
+  @include box-sizing(border-box);
   background: #e3e3e3;
   border-right: 1px solid #d3d3d3;
   display: table-cell;
   font-family: $body-font-family;
   text-shadow: 0 1px 0 #f1f1f1;
   vertical-align: top;
-  width: grid-width(3);
+  width: flex-grid(3);
   position: relative;
 
   h3 {

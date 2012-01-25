@@ -1,6 +1,5 @@
 div.course-wrapper {
-  display: table;
-  width: 100%;
+  @extend .table-wrapper;
 
   div#accordion {
     @extend .sidebar;
@@ -69,11 +68,7 @@ div.course-wrapper {
   }
 
   section.course-content {
-    @include box-sizing(border-box);
-    display: table-cell;
-    padding: $gw-gutter;
-    vertical-align: top;
-    width: grid-width(9);
+    @extend .content;
 
     ol.vert-mod {
       li {
