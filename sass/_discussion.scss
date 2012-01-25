@@ -95,12 +95,35 @@ body.askbot {
             }
           }
         }
+
+        .tabula-rasa {
+          @include border-radius(5px);
+          background-color: #f6f6f6;
+          color: #888;
+          margin: 10px auto;
+          padding: 20px;
+          text-align: center;
+          width: grid-width(5);
+
+          &:first-child {
+            margin-top: 70px;
+          }
+
+          a {
+            text-decoration: none;
+            color: #888;
+            font-weight: bold;
+          }
+        }
       }
 
       aside {
         @extend .sidebar;
-        width: grid-width(3);
+        @include box-shadow(inset 1px 0 0 #f6f6f6);
+        border-left: 1px solid #d3d3d3;
+        border-right: 1px solid #f6f6f6;
         padding: $gw-gutter;
+        width: grid-width(3);
 
         h2 {
           font-size: 16px;
