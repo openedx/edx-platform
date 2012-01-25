@@ -16,7 +16,8 @@
 
 <%block name="wiki_body">
 	%for article in wiki_search_results:
-		<a href="${reverse("wiki_view", args=[article.get_url()])}">${article.get_url()}</a><br/>
+	<% article_deleted = not article.current_revision.deleted == 0 %>
+		<a href="${reverse("wiki_view", args=[article.get_url()])}">${article.get_url()} ${'(Deleted)' if article_deleted else ''}</a><br/>
 	%endfor
 	
 	%if not wiki_search_results: 
