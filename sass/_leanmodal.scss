@@ -10,47 +10,49 @@
 }
 
 div.leanModal_box {
-	@include border-radius(3px);
-	@include box-shadow(0 0 6px #000);
-	@include box-sizing(border-box);
-	display: none;
-	border: none;
-	max-width: 600px;
-	background: #fff;
-	padding: lh(2);
+  @include border-radius(3px);
+  @include box-shadow(0 0 6px #000);
+  @include box-sizing(border-box);
+  display: none;
+  border: none;
+  max-width: 600px;
+  background: #fff;
+  padding: lh(2);
 
-	h1 {
-		font-size: 24px;
+  h1 {
+    font-size: 24px;
     margin-top: 0;
-    font-family: "Oswald";
-		padding-bottom: lh();
+    padding-bottom: lh();
     border-bottom: 1px solid #eee;
     margin-bottom: lh();
   }
 
   form {
-		text-align: left;
+    text-align: left;
 
-    div#enroll_error {
-			padding-bottom: lh();
-      color: #DF8B2C;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    div#enroll_error, div#login_error {
+      -webkit-font-smoothing: antialiased;
+      background-color: #F50200;
+      color: #fff;
       font-weight: bold;
+      letter-spacing: 1px;
+      margin-bottom: lh();
+      padding: lh(.2);
+      text-transform: uppercase;
+
+      &:empty {
+        padding: 0;
+      }
     }
 
     ol {
-			li {
-				margin-bottom: lh();
-        width: grid-width(6);
-        float: left;
+      list-style: none;
 
-        &:nth-child(odd) {
-          margin-right: $gw-gutter;
-        }
+      li {
+        margin-bottom: lh(.5);
 
         &.terms, &.remember {
-				  float: none;
+          float: none;
           width: auto;
           clear: both;
           padding-top: lh();
@@ -58,9 +60,9 @@ div.leanModal_box {
         }
 
         &.honor-code {
-					width: auto;
+          width: auto;
           float: none;
-				}
+        }
 
         label {
           display: block;
@@ -68,59 +70,82 @@ div.leanModal_box {
         }
 
         #{$all-text-inputs}, textarea {
-					width: 100%;
+          width: 100%;
           @include box-sizing(border-box);
-				}
+        }
 
         input[type="checkbox"] {
-					margin-right: 10px;
+          margin-right: 10px;
+        }
+
+        ul {
+          list-style: disc outside none;
+          margin: lh(.5) 0 lh() lh();
+
+          li {
+            list-style: disc outside none;
+            margin-bottom: lh(.5);
+            color: #666;
+            font-size: 14px;
+            float: none;
+          }
         }
       }
     }
 
     input[type="button"] {
-			@include button($mit-red);
+      @include button($mit-red);
       font-size: 18px;
       padding: lh(.5);
     }
   }
+}
 
-	div#login {
-		min-width: 300px;
+div#login {
+  min-width: 400px;
 
-		ol {
-			li {
-				width: auto;
-				float: none;
-			}
-		}
-	}
+  ol {
+    li {
+      width: auto;
+      float: none;
+    }
+  }
+}
 
-	div.lost-password {
-		text-align: left;
-		margin-top: lh();
+div.lost-password {
+  text-align: left;
+  margin-top: lh();
 
-		a {
-			color: #999;
-			
-			&:hover {
-				color: #444;
-			}
-		}
-	}
+  a {
+    color: #999;
+
+    &:hover {
+      color: #444;
+    }
+  }
+}
+
+div#pwd_reset {
+  p {
+    margin-bottom: lh();
+  }
+
+  input[type="email"] {
+    margin-bottom: lh();
+  }
 }
 
 div#feedback_div{
-	form{
-		ol {
-			li {
-				float: none;
-				width: 100%;
-				
-				textarea#feedback_message {
-					height: 100px;
-				}
-			}
-		}
-	}
+  form{
+    ol {
+      li {
+        float: none;
+        width: 100%;
+
+        textarea#feedback_message {
+          height: 100px;
+        }
+      }
+    }
+  }
 }

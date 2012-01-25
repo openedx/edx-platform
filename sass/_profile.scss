@@ -3,9 +3,9 @@ div.profile-wrapper {
 
   section.user-info {
     @include box-sizing(border-box);
-    margin-right: $gw-gutter;
+    margin-right: flex-gutter();
     padding: $body-line-height;
-    width: grid-width(6);
+    width: flex-grid(6);
     background: #e3e3e3;
     border-right: 1px solid #d3d3d3;
     text-shadow: 0 1px 0 #f6f6f6;
@@ -14,9 +14,9 @@ div.profile-wrapper {
 
   section.course-info {
     @include box-sizing(border-box);
-    padding: $body-line-height;
-    width: grid-width(6);
     display: table-cell;
+    padding: $body-line-height;
+    width: flex-grid(6);
 
     ul {
       li {

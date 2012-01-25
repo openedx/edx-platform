@@ -1,3 +1,15 @@
+// Flexible grid
+@function flex-grid($columns, $container-columns: $fg-max-columns) {
+  $width: $columns * $fg-column + ($columns - 1) * $fg-gutter;
+  $container-width: $container-columns * $fg-column + ($container-columns - 1) * $fg-gutter;
+  @return percentage($width / $container-width);
+}
+
+// Flexible grid gutter
+@function flex-gutter($container-columns: $fg-max-columns, $gutter: $fg-gutter) {
+  $container-width: $container-columns * $fg-column + ($container-columns - 1) * $fg-gutter;
+  @return percentage($gutter / $container-width);
+}
 // Percentage of container calculator
 @function perc($width, $container-width: $max-width) {
   @return percentage($width / $container-width);
@@ -24,6 +36,13 @@ $max-width: ($columns * $column-width) + (($columns - 1) * $gutter-width);
 $gw-column: perc($column-width);
 $gw-gutter: perc($gutter-width);
 $body-line-height: golden-ratio($body-font-size, 1);
+
+//Flexible grid
+$fg-column: $column-width;
+$fg-gutter: $gutter-width;
+$fg-max-columns: $columns;
+$fg-max-width: 1400px;
+$fg-min-width: 810px;
 
 // color
 $light-gray: #ddd;
