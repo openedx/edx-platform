@@ -7,13 +7,24 @@
 
 @font-face {
   font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Open Sans Italic'), local('OpenSans-Italic'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: 800;
   src: local('Open Sans Extrabold'), local('OpenSans-Extrabold'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/EInbV5DfGHOiMmvb1Xr-hqRDOzjiPcYnFooOUGCOsRk.woff') format('woff');
 }
 
-
-
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 800;
+  src: local('Open Sans Extrabold Italic'), local('OpenSans-ExtraboldItalic'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxsBo4hlZyBvkZICS3KpNonM.woff') format('woff');
+}
 // Extends
 //---------------------------------------- //
 .wrapper {
@@ -23,6 +34,37 @@
   min-width: $fg-min-width;
   padding: lh();
   width: flex-grid(12);
+}
+
+.subpage {
+  @extend .clearfix;
+  @extend .wrapper;
+
+  > div {
+    padding-left: flex-grid(4) + flex-gutter();
+
+    p {
+      margin-bottom: lh();
+    }
+
+    h1 {
+      margin-bottom: lh(.5);
+    }
+
+    h2 {
+      font: 18px $header-font-family;
+      color: #000;
+      margin-bottom: lh(.5);
+    }
+
+    ul {
+      list-style: disc outside none;
+
+      li {
+        list-style: disc outside none;
+      }
+    }
+  }
 }
 
 .clearfix:after {
@@ -43,6 +85,8 @@
   margin: lh() 0 lh(.5);
   padding: lh(.25) lh(.5);
   text-decoration: none;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
 
   &:hover {
     background-color: darken($mit-red, 10%);
@@ -54,40 +98,63 @@
   }
 }
 
-
 body {
   background-color: #fff;
   color: #444;
   font: $body-font-size $body-font-family;
 
-#{$all-text-inputs}, textarea {
-  @include box-shadow(0 -1px 0 #fff);
-  @include linear-gradient(#eee, #fff);
-  border: 1px solid #999;
-  font: $body-font-size $body-font-family;
-  padding: 4px;
-  width: 100%;
-
-  &:focus {
-    border-color: $mit-red;
+  h1 {
+    font: 800 24px $header-font-family;
   }
-}
+
+  li {
+    margin-bottom: lh();
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  a {
+    color: $mit-red;
+    font-style: italic;
+    text-decoration: none;
+
+    &:hover, &:focus {
+      color: darken($mit-red, 10%);
+    }
+  }
+
+  #{$all-text-inputs}, textarea {
+    @include box-shadow(0 -1px 0 #fff);
+    @include linear-gradient(#eee, #fff);
+    border: 1px solid #999;
+    font: $body-font-size $body-font-family;
+    padding: 4px;
+    width: 100%;
+
+    &:focus {
+      border-color: $mit-red;
+    }
+  }
 }
 
 header.announcement {
-  color: #fff;
+  // @include background-size(cover);
+  background: #333;
   border-bottom: 1px solid #000;
-  background: #e3e3e3;
-  @include background-size(cover);
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
 
   &.home {
+    background: #e3e3e3 url("/static/images/marketing/shot-1-medium.jpg");
+
     @media screen and (min-width: 1200px) {
       background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg");
     }
 
-    @media screen and (max-width: 1199px) {
-      background: #e3e3e3 url("/static/images/marketing/shot-1-medium.jpg");
-    }
+    // @media screen and (max-width: 1199px) {
+    // }
 
     div {
       padding: lh(10) lh() lh(3);
@@ -95,6 +162,7 @@ header.announcement {
   }
 
   &.course {
+    background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
 
     @media screen and (min-width: 1200px) {
       background: #e3e3e3 url("/static/images/marketing/course-bg-large.jpg");
@@ -102,12 +170,6 @@ header.announcement {
 
     @media screen and (max-width: 1199px) and (min-width: 700px) {
       background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg");
-      @include background-size(cover);
-    }
-
-    @media screen and (max-width: 699px) {
-      background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
-      @include background-size(cover);
     }
 
     div {
@@ -124,6 +186,7 @@ header.announcement {
       top: 0;
       right: lh();
       @include border-radius(0 0 3px 3px);
+      background: #333;
       background: rgba(#000, .7);
       padding: lh(.5);
 
@@ -132,7 +195,7 @@ header.announcement {
         margin-right: lh();
 
         a {
-          font: 800 18px $header-font-family;
+          font: italic 800 18px $header-font-family;
           color: #fff;
           text-decoration: none;
         }
@@ -142,6 +205,7 @@ header.announcement {
         text-decoration: none;
         color: #fff;
         font-size: 12px;
+        font-style: normal;
 
         &:hover {
           color: rgba(#fff, .6);
@@ -267,6 +331,7 @@ section.index-content {
 
           p {
             width: auto;
+            clear: both;
 
             strong {
               font-family: "Open sans";
@@ -326,6 +391,8 @@ section.index-content {
       }
 
       ul {
+        list-style: none;
+
         li {
           img {
             float: left;
@@ -397,6 +464,10 @@ section.index-content {
       }
     }
   }
+}
+
+section.copyright, section.tos, section.privacy-policy, section.honor-code {
+  @extend .subpage;
 }
 
 footer {

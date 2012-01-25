@@ -84,7 +84,7 @@
         if (wiki_article is not UNDEFINED):
         	baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
         else:
-        	baseURL = reverse("wiki_view", args=[""])
+        	baseURL = reverse("wiki_view", args=["/"])
     %>
 
       <ul class="action">
@@ -113,14 +113,14 @@
 
           <div id="wiki_create_form">
             <%
-              theaction = "this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '')+'/_create/'"
+              theaction = "this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '')"
               if (wiki_article is not UNDEFINED):
-                baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
+                baseURL = reverse("wiki_create", args=[wiki_article.get_url()])
               else:
-                baseURL = reverse("wiki_view", args=[""])
+                baseURL = reverse("wiki_create", args=["/"])
             %>
 
-            <form method="GET" onsubmit="this.action='${baseURL + "/' + " + theaction};">
+            <form method="GET" onsubmit="this.action='${baseURL + "' + " + theaction};">
 
               <div>
                 <label for="id_wiki_article_name">Title of article</label>

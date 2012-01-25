@@ -4,6 +4,7 @@ div#fancybox-overlay {
 
 div#fancybox-wrap {
   width: auto  !important;
+
   div#fancybox-outer {
     background: none;
     max-width: 600px;
@@ -26,7 +27,6 @@ div#fancybox-wrap {
       h1 {
         font-size: 24px;
         margin-top: 0;
-        font-family: "Oswald";
         padding-bottom: lh();
         border-bottom: 1px solid #eee;
         margin-bottom: lh();
@@ -35,28 +35,40 @@ div#fancybox-wrap {
       form {
         text-align: left;
 
-        div#enroll_error {
-          padding-bottom: lh();
-          color: #DF8B2C;
+        div#enroll_error, div#login_error {
+          margin-bottom: lh();
+          background-color: #F50200;
+          color: #fff;
           text-transform: uppercase;
           letter-spacing: 1px;
           font-weight: bold;
+          -webkit-font-smoothing: antialiased;
+          padding: lh(.2);
+
+          &:empty {
+            padding: 0;
+          }
+        }
+
+        label {
+          display: block;
+          font-weight: bold;
+        }
+
+        #{$all-text-inputs} {
+          width: 100%;
+          @include box-sizing(border-box);
+        }
+
+        input[type="checkbox"] {
+          margin-right: 10px;
         }
 
         ol {
           li {
             margin-bottom: lh();
-            width: grid-width(6);
-            float: left;
-
-            &:nth-child(odd) {
-              margin-right: $gw-gutter;
-            }
 
             &.terms, &.remember {
-              float: none;
-              width: auto;
-              clear: both;
               padding-top: lh();
               border-top: 1px solid #eee;
             }
@@ -66,18 +78,18 @@ div#fancybox-wrap {
               float: none;
             }
 
-            label {
-              display: block;
-              font-weight: bold;
-            }
 
-            #{$all-text-inputs} {
-              width: 100%;
-              @include box-sizing(border-box);
-            }
+            ul {
+              list-style: disc outside none;
+              margin: lh(.5) 0 lh() lh();
 
-            input[type="checkbox"] {
-              margin-right: 10px;
+              li {
+                list-style: disc outside none;
+                margin-bottom: lh(.5);
+                color: #666;
+                font-size: 14px;
+                float: none;
+              }
             }
           }
         }
@@ -88,6 +100,7 @@ div#fancybox-wrap {
           padding: lh(.5);
         }
       }
+
 
       div#login {
         min-width: 300px;
@@ -106,9 +119,20 @@ div#fancybox-wrap {
 
         a {
           color: #999;
+
           &:hover {
             color: #444;
           }
+        }
+      }
+
+      div#pwd_reset {
+        p {
+          margin-bottom: lh();
+        }
+
+        input[type="email"] {
+          margin-bottom: lh();
         }
       }
     }
