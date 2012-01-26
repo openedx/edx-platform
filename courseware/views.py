@@ -134,6 +134,7 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     module_object_preload = list(StudentModule.objects.filter(student=user, 
                                                               module_id__in=module_ids))
+    
 
     module=render_module(user, request, module, module_object_preload)
 

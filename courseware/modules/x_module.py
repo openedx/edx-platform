@@ -1,3 +1,5 @@
+import courseware.progress
+
 def dummy_track(event_type, event):
     pass
 
@@ -12,6 +14,9 @@ class XModule(object):
         ''' Tags in the courseware file guaranteed to correspond to the module '''
         return []
         
+    def get_completion(self):
+        return courseware.progress.completion()
+    
     def get_state(self):
         return ""
 
