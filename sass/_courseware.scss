@@ -119,55 +119,87 @@ div.course-wrapper {
         &.seq_problem_inactive {
           width: 14px;
           background: url('/static/images/problem-icon.png') 13px 13px no-repeat;
+          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 10%));
+
+          &:hover {
+            background-color: lighten(#F6EFD4, 3%);
+          }
         }
 
         &.seq_problem_visited {
           width: 14px;
           background: shade(#F6EFD4, 4%) url('/static/images/problem-icon.png') -57px 13px no-repeat;
+          &:hover {
+            background-color: #F6EFD4;
+          }
         }
 
         &.seq_problem_active {
           width: 14px;
           background: #FFFBEB url('/static/images/problem-icon.png') -22px 13px no-repeat;
-          border-right: 1px solid #D8CFA8;
-          border-left: 1px solid #D8CFA8;
+          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%), inset 1px 0 0 darken(#F6EFD4, 20%));
+
+          &:hover {
+            background-color: #F6EFD4;
+          }
         }
 
         //video
         &.seq_video_inactive {
           width: 14px;
           background: url('/static/images/video-icon.png') 13px 15px no-repeat;
+          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 10%));
+
+          &:hover {
+            background-color: lighten(#F6EFD4, 3%);
+          }
         }
 
         &.seq_video_visited {
           width: 14px;
           background: shade(#F6EFD4, 4%) url('/static/images/video-icon.png') -64px 15px no-repeat;
+          &:hover {
+            background-color: #F6EFD4;
+          }
         }
 
         &.seq_video_active {
           width: 14px;
           background: #FFFBEB url('/static/images/video-icon.png') -25px 15px no-repeat;
-          border-right: 1px solid #D8CFA8;
-          border-left: 1px solid #D8CFA8;
+          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%),inset 1px 0 0 darken(#F6EFD4, 20%));
+          &:hover {
+            background-color: #F6EFD4;
+          }
         }
 
 
         //vertical
         &.seq_vertical_inactive {
           width: 14px;
-          background: url('/static/images/vertical-icon.png') 13px 15px no-repeat;
+          background: url('/static/images/vertical-icon.png') -82px 15px no-repeat;
+          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 10%));
+
+          &:hover {
+            background-color: lighten(#F6EFD4, 3%);
+          }
         }
 
         &.seq_vertical_visited {
           width: 14px;
-          background: shade(#F6EFD4, 4%) url('/static/images/vertical-icon.png') -82px 15px no-repeat;
+          background: shade(#F6EFD4, 4%) url('/static/images/vertical-icon.png') 13px 15px no-repeat;
+          &:hover {
+            background-color: #F6EFD4;
+          }
         }
 
         &.seq_vertical_active {
           width: 14px;
           background: #FFFBEB url('/static/images/vertical-icon.png') -35px 15px no-repeat;
-          border-right: 1px solid #D8CFA8;
-          border-left: 1px solid #D8CFA8;
+          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%), inset 1px 0 0 darken(#F6EFD4, 20%));
+
+          &:hover {
+            background-color: #F6EFD4;
+          }
         }
 
         &.prev, &.next {
