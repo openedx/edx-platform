@@ -1,22 +1,51 @@
 form#wiki_revision {
+  float: left;
+  width: flex-grid(7, 9);
+  margin-right: flex-gutter(9);
+	
+	
   label {
     display: block;
     margin-bottom: 7px ;
   }
 
+
   textarea {
     @include box-sizing(border-box);
     margin-bottom: 20px;
-    min-height: 300px;
+    min-height: 450px;
     width: 100%;
   }
 
   input[type="text"] {
+    display: block;
     width: 50%;
   }
 
+  #submit_delete {
+    float: right;
+  }
+  
   input[type="submit"] {
-    display: block;
     margin-top: 20px;
+  }
+}
+
+#wiki_edit_instructions {
+  float: left;
+  width: flex-grid(2, 9);
+      
+  .markdown-example {
+    background-color: $light-gray;
+    padding-top: 5px;
+    padding-right: 2px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+        
+    margin-top: 5px;
+    margin-bottom: 7px;
+    margin-left: 5px;
+        
+    line-height: 1.0;
   }
 }

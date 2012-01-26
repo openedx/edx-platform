@@ -11,34 +11,11 @@ ${ wiki_article.title }
   <div style="display:none">
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
   </div>
-
   ${wiki_form}
-
-  <input type="submit" name="edit" value="Edit article" />
-  <input type="submit" name="delete" value="Delete article" />
+  <input type="submit" id="submit_edit" name="edit" value="Edit article" />
+  <input type="submit" id="submit_delete" name="delete" value="Delete article" />
 </form>
 
-<div id="wiki_edit_instructions">
-  This wiki uses <strong>Markdown</strong> for styling. There are several <a href="http://daringfireball.net/projects/markdown/basics">useful</a> <a href="http://greg.vario.us/doc/markdown.txt">guides</a> <a href="http://www.lowendtalk.com/discussion/6/miniature-markdown-guide">online</a>.
-  <br>
-  <br>MITx Additions:
-  <p class="markdown-example">circuit:basic</p>
-  <p class="markdown-example"><span>$</span>LaTeX Math Expression<span>$</span></p>
-  To create a new wiki article, create a link to it. Clicking the link gives you the creation page.  
-  <p class="markdown-example">[Article](/wiki/view/Article/Child/)</p>
-  Other useful examples:<br>
-  <p class="markdown-example">[Link](http://google.com)</p>
-  <p class="markdown-example">Huge Header
-  <br>====</p>
-  <p class="markdown-example">Smaller Header
-  <br>-------</p>
-  <p class="markdown-example">*emphasis* or _emphasis_</p>
-  <p class="markdown-example">**strong** or __strong__</p>
-  <p class="markdown-example">- Unordered List
-  <br>&nbsp&nbsp- Sub Item 1
-  <br>&nbsp&nbsp- Sub Item 2</p>
-  <p class="markdown-example">1. Ordered
-  <br>2. List</p>
-</div>
+<%include file="simplewiki_instructions.html"/>
 
 </%block>

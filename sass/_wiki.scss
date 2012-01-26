@@ -78,31 +78,6 @@ div.wiki-wrapper {
   section.wiki-body {
     @extend .content;
     
-    form#wiki_revision {
-      float: left;
-      width: flex-grid(7, 9);
-      margin-right: flex-gutter(9);
-    }
-  
-    #wiki_edit_instructions {
-      float: left;
-      width: flex-grid(2, 9);
-      
-      .markdown-example {
-        background-color: $light-gray;
-        padding-top: 5px;
-        padding-right: 2px;
-        padding-bottom: 5px;
-        padding-left: 5px;
-        
-        margin-top: 5px;
-        margin-bottom: 7px;
-        margin-left: 5px;
-        
-        line-height: 1.0;
-      }
-    }
-    
     header {
       @extend .topbar;
 
