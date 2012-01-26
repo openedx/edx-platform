@@ -1,18 +1,5 @@
 <%inherit file="marketing.html" />
 
-<header class="announcement home">
-  <div class="anouncement-wrapper">
-  <nav>
-    <a class="modal login" href="#login">Log In</a>
-  </nav>
-
-    <section>
-      <h1><em>MITx</em></h1>
-      <h2>An MIT Education Anywhere. For free.</h2>
-    </section>
-  </div>
-</header>
-
 <section class="index-content">
   <section class="about">
     <h1><em>MITx</em> is MIT&rsquo;s online learning initiative.</h1>
@@ -49,29 +36,14 @@
 
     <p>Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, &ldquo;6.002 Circuits and Electronics&rdwuo; is an on-line adaption of MIT's first undergraduate analog design course. This prototype course will run, free of charge, for students worldwide from February 21, 2012 through June 10, 2012. Students will be given the opportunity to demonstrate their mastery of the material and earn a certificate from <em>MITx</em>.</p>
   </section>
-
-<div style="display:none">
-  <div id="login"><%include file="login.html" /></div>
-</div>
-
-<div style="display:none">
-  <div id="pwd_reset"><%include file="password_reset_form.html" /></div>
-</div>
-
-<div style="display:none">
-  <div id="reset_done"></div>
-</div>
 </section>
-
-
 <script>
 
 $(function() {
-/* Set up FancyBox pop-ups */
 
     // TODO: Clean up as per http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
 
-    /* Handles when the user hits 'enroll'. Grabs form data. Does AJAX. 
+    /* Handles when the user hits 'enroll'. Grabs form data. Does AJAX.
             Either shows error, or shows success. */
 
     $('#create_account_button').click(function() {
@@ -94,34 +66,6 @@ $(function() {
              }
         );
     });
-
-    /* Handles when the user tries to log in. Grabs form data. Does AJAX. 
-            Either shows error, or redirects. */
-    $('#login_button').click(function() {
-      var submit_data={};
-      $.each($("[id^=li_]"), function(index,value){
-        submit_data[value.name]=value.value;
-      });
-      submit_data["remember"] = ($('#remember').attr("checked")? true : false);
-
-    postJSON('/login',
-           submit_data,
-           function(json) {
-               if(json.success) {
-                  location.href="/courseware";
-               } else {
-                  $('#login_error').html("Invalid Login");
-               }
-             }
-        );
-    });
-
-    $('#pwd_reset_button').click(function() {
-        $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
-          "email"  : $('#id_email').val()}, function(data){
-          $('#pwd_reset').html(data);
-          });
-        });
 
     /* Activate stupid spinner drop-downs in enrollment form */
     var spinner_array=$("[id^=spinner_]");

@@ -12,23 +12,41 @@
   <!-- Warning: Do not upgrade FancyBox. V2.0 is under a non-free CC license -->
   <script type="text/javascript" src="/static/lib/fancybox/jquery.fancybox-1.3.4.js"></script>
   <link rel="stylesheet" href="/static/lib/fancybox/jquery.fancybox-1.3.4.css">
-	<script type="text/javascript" src="/static/lib/jquery.leanModal.min.js"></script>
+  <script type="text/javascript" src="/static/lib/jquery.leanModal.min.js"></script>
   <script type="text/javascript" src="/static/lib//swfobject/swfobject.js"></script>
   <script type="text/javascript" src="/static/lib/jquery.treeview.js"></script>
   <script type="text/javascript" src="/static/js/video_player.js"></script>
   <!-- <script type="text/javascript" src="/static/js/schematic.js"></script> -->
 
-	<script type="text/javascript">
-		$(function(){
-			$("a[rel*=leanModal]").leanModal();
-		});
-	</script>
+  <script type="text/javascript">
+    $(function(){
+      $("a[rel*=leanModal]").leanModal();
+    });
+  </script>
 
 <%block name="headextra"/>
 
 </head>
 
 <body>
+  <%block name="header">
+  <header class="announcement">
+    <div class="anouncement-wrapper">
+    <%block name="header_nav">
+    <nav>
+      <h1><a href="/t/mitx_global.html">MITx</a></h1>
+      <a rel="leanModal" class="login" href="#login">Log In</a>
+    </nav>
+    </%block>
+    <%block name="header_text">
+      <section>
+        <h1>MITx</h1>
+        <h2>An MIT Education Anywhere. For free.</h2>
+      </section>
+     </%block>
+    </div>
+  </header>
+  </%block>
 
   ${self.body()}
   <%block name="bodyextra"/>
@@ -39,63 +57,48 @@
       <p> Copyright (c). 2011. MIT. <a href="/t/copyright.html">Some rights reserved.</a></p>
 
       <ul>
-        <li><a href="/t/tos.html">Terms of service</a></li>
+        <li><a href="/t/tos.html">Terms of Service</a></li>
         <li><a href="/t/privacy.html">Privacy Policy</a></li>
         <li><a href="/t/honor.html">Honor Code</a></li>
       </ul>
     </div>
   </footer>
 
-  <div style="display:none">
-    <div id="feedback_div">
-      Found a bug? Got an idea for improving our system? Let us know. 
-
-      <form>
-        <ol>
-          <li><label>Subject:</label> <input id="feedback_subject" size=40></li>
-          <li><label>Feedback: </label><textarea id="feedback_message" cols="40" rows="5"></textarea></li>
-          <li><input id="feedback_button" type="button" value="Submit"></li>
-        </ol>
-      </form>
-
-    </div>
-  </div>
-
-  <div style="display:none">
-    <div id="calculator_div">
-      <input id="calculator_input" > 
-      <input id="calculator_button" type=button value="=&gt;">
-      <input id="calculator_output" readonly>
-
-      <p>Supported operations: ^ * / + - || ()</p>
-      <p>Supported suffixes: %kMGTcmunp</p>
-    </div>
-  </div>
+  <div id="login" class="leanModal_box"><%include file="login.html" /></div>
+  <div id="pwd_reset" class="leanModal_box"><%include file="password_reset_form.html" /></div>
+  <div id="reset_done" class="leanModal_box"></div>
 
 <script>
-  // Feedback form
-$(function() {
-    $("#feedback_button").click(function(){
-      postJSON("/send_feedback", {"subject":$("#feedback_subject").attr("value"),
-        "url":document.URL,
-        "message":$("#feedback_message").attr("value")},
-        function(data){
-        $("#feedback_subject").attr("value","");
-        $("#feedback_message").attr("value","");
-        $("#feedback_div").html("Feedback submitted. Thank you");
-        });
-      });
+$(document).ready(function(){
+    /* Handles when the user tries to log in. Grabs form data. Does AJAX.
+       Either shows error, or redirects. */
+  $('#login_button').click(function() {
+    var submit_data={};
+    $.each($("[id^=li_]"), function(index,value){
+      submit_data[value.name]=value.value;
     });
+    submit_data["remember"] = ($('#remember').attr("checked")? true : false);
 
-// Calculator
-$(function() {
-    $("#calculator_button").click(function(){
-      $.getJSON("/calculate", {"equation":$("#calculator_input").attr("value")},
-        function(data){
-        $("#calculator_output").attr("value",data.result);
-        });
-      });
+    postJSON('/login',
+      submit_data,
+      function(json) {
+        if(json.success) {
+          location.href="/courseware";
+        } else {
+          $('#login_error').html("Invalid Login");
+        }
+      }
+    );
+  });
+
+  $('#pwd_reset_button').click(function() {
+    $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
+      "email"  : $('#id_email').val()}, function(data){
+        $('#pwd_reset').html(data);
     });
+  });
+
+});
 </script>
 
 </body>
