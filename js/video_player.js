@@ -80,12 +80,12 @@ function change_video_speed(speed, youtube_id) {
 
 function caption_at(index) {
     if (captions==0)
-	return "&nbsp;";
+	return "";
 
     text_array=captions.text
 
     if ((index>=text_array.length) || (index < 0))
-	return "&nbsp;";
+	return "";
     return text_array[index];
 }
 
