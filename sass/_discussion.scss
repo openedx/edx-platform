@@ -18,7 +18,7 @@ body.askbot {
         &.question-filter {
           font-size:16px;
           margin-top: 4px;
-          width: grid-width(4);
+          width: flex-grid(4);
 
           ul {
             @include border-radius(35px);
@@ -52,26 +52,30 @@ body.askbot {
         &.search-box {
           margin-left:2%;
           text-align:right;
-          width: grid-width(8);
+          width: flex-grid(8);
+
+          input[type="text"] {
+            margin-right: 6px;
+            width: flex-grid(2,8);
+          }
         }
 
       }
     }
   }
 
-  .main-content {
-    .discussion-wrapper {
-      display: table;
-      width: 100%;
+  section.main-content {
+    div.discussion-wrapper {
+      @extend .table-wrapper;
 
-      .discussion-content {
+      div.discussion-content {
         @include box-sizing(border-box);
         display: table-cell;
         padding: $gw-gutter;
         vertical-align: top;
-        width: grid-width(9);
+        width: flex-grid(9);
 
-        .order-sort {
+        div.order-sort {
           @include border-radius(35px);
           background-color: lighten(#F6EFD4, 5%) ;
           height: 30px;
@@ -95,12 +99,38 @@ body.askbot {
             }
           }
         }
+
+        p.tabula-rasa {
+          @include border-radius(5px);
+          background-color: #f6f6f6;
+          color: #888;
+          margin: 10px auto;
+          padding: 20px;
+          text-align: center;
+          width: flex-grid(5);
+
+          &:first-child {
+            margin-top: 70px;
+          }
+          &:last-child {
+            margin-bottom: 70px;
+          }
+
+          a {
+            text-decoration: none;
+            color: #888;
+            font-weight: bold;
+          }
+        }
       }
 
       aside {
         @extend .sidebar;
-        width: grid-width(3);
+        @include box-shadow(inset 1px 0 0 #f6f6f6);
+        border-left: 1px solid #d3d3d3;
+        border-right: 1px solid #f6f6f6;
         padding: $gw-gutter;
+        width: flex-grid(3);
 
         h2 {
           font-size: 16px;
@@ -112,7 +142,7 @@ body.askbot {
         }
 
         input[type="text"] {
-          width: 68%;
+          width: 76%;
         }
 
         #displayTagFilterControl {
@@ -126,7 +156,7 @@ body.askbot {
     margin: 0 auto;
     padding: 0;
 
-    .footer-wrapper {
+    div.footer-wrapper {
       @extend .clearfix;
       @extend .wrapper;
       @include box-shadow(0 1px 0 #fff);
