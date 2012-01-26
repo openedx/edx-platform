@@ -417,17 +417,17 @@ body.anon #searchBar {
     padding-left: 0px; }
   .contributorback {
     background: #eceeeb url(../images/contributorsback.png) no-repeat center left; }
-  label {
-    color: #707070;
-    font-size: 15px;
-    display: block;
-    float: right;
-    text-align: left;
-    font-family: 'Yanone Kaffeesatz',sans-serif;
-    width: 80px;
-    margin-right: 18px; }
-  #displayTagFilterControl label {
-    width: 160px; }
+  // label {
+  //   color: #707070;
+  //   font-size: 15px;
+  //   display: block;
+  //   float: right;
+  //   text-align: left;
+  //   font-family: 'Yanone Kaffeesatz',sans-serif;
+  //   width: 80px;
+  //   margin-right: 18px; }
+  // #displayTagFilterControl label {
+  //   width: 160px; }
   ul {
     margin-left: 22px; }
   li {
@@ -640,15 +640,15 @@ body.anon #searchBar {
   // &:hover {
   //   color: #F4A731 !important; } }
 
-#questionCount {
-  font-weight: bold;
-  font-size: 23px;
-  color: #7ea9b3;
-  width: 200px;
-  float: left;
-  margin-bottom: 8px;
-  padding-top: 6px;
-  font-family: 'Yanone Kaffeesatz',sans-serif; }
+// #questionCount {
+//   font-weight: bold;
+//   font-size: 23px;
+//   color: #7ea9b3;
+//   width: 200px;
+//   float: left;
+//   margin-bottom: 8px;
+//   padding-top: 6px;
+//   font-family: 'Yanone Kaffeesatz',sans-serif; }
 
 #listSearchTags {
   float: left;
@@ -2679,29 +2679,29 @@ pre.prettyprint {
   padding: 3px;
   border: 0px solid #888; }
 
-@media print {
-  .str {
-    color: #060; }
-  .kwd {
-    color: #006;
-    font-weight: bold; }
-  .com {
-    color: #600;
-    font-style: italic; }
-  .typ {
-    color: #404;
-    font-weight: bold; }
-  .lit {
-    color: #044; }
-  .pun {
-    color: #440; }
-  .pln {
-    color: #000; }
-  .tag {
-    color: #006;
-    font-weight: bold; }
-  .atn {
-    color: #404; }
-  .atv {
-    color: #060; } }
+// @media print {
+//   .str {
+//     color: #060; }
+//   .kwd {
+//     color: #006;
+//     font-weight: bold; }
+//   .com {
+//     color: #600;
+//     font-style: italic; }
+//   .typ {
+//     color: #404;
+//     font-weight: bold; }
+//   .lit {
+//     color: #044; }
+//   .pun {
+//     color: #440; }
+//   .pln {
+//     color: #000; }
+//   .tag {
+//     color: #006;
+//     font-weight: bold; }
+//   .atn {
+//     color: #404; }
+//   .atv {
+//     color: #060; } }
 
