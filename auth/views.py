@@ -58,7 +58,7 @@ def login_user(request, error=""):
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
-        log.warning("Login failed - Unknown password for {0} is invalid".format(email))
+        log.warning("Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success':False, 
                                         'error': 'Invalid login'}))
 
