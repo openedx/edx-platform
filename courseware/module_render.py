@@ -111,13 +111,6 @@ def render_x_module(user, request, xml_module, module_object_preload):
                      user, 
                      module_type, 
                      module_id)
-    # s = StudentModule.objects.filter(student=request.user, 
-    #                                  module_id=module_id, 
-    #                                  module_type = module_type)
-    # if len(s) == 0: 
-    #     s=None
-    # else:
-    #     s=s[0]
 
     if s == None: # If nothing in the database...
         state=None
@@ -132,7 +125,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
                           ajax_url=ajax_url,
                           state=state, 
                           track_function = make_track_function(request), 
-                                  render_function = lambda x: render_module(user, request, x, module_object_preload))
+                          render_function = lambda x: render_module(user, request, x, module_object_preload))
     
     # If instance wasn't already in the database, create it
     if s == None:

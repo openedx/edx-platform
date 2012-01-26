@@ -1,6 +1,11 @@
 class completion(object):
-    def __init__(self, d=None):
-        self.dict = dict()
+    def __init__(self, **d):
+        self.dict = dict({'duration_total':0,
+                          'duration_watched':0,
+                          'done':True,
+                          'questions_correct':0,
+                          'questions_incorrect':0,
+                          'questions_total':0})
         if d: 
             self.dict.update(d)
 
@@ -11,9 +16,23 @@ class completion(object):
         self.dict[key] = value
 
     def __add__(self, other):
-        result = dict()
-        dict.update(self.dict)
-        dict.update(other.dict)
+        result = dict(self.dict)
+        for item in ['duration_total',
+                     'duration_watched',
+                     'done',
+                     'questions_correct',
+                     'questions_incorrect',
+                     'questions_total']:
+            result[item] = result[item]+other.dict[item]
+        return completion(**result)
 
     def __contains__(self, key):
-        pass
+        return key in dict
+
+    def __repr__(self):
+        return repr(self.dict)
+
+if __name__ == '__main__':
+    dict1=completion(duration_total=5)
+    dict2=completion(duration_total=7)
+    print dict1+dict2
