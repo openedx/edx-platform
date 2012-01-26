@@ -1,4 +1,8 @@
-import views, json
+import json
+
+from django.conf import settings
+
+import views
 
 class TrackMiddleware:
     def process_request (self, request):
