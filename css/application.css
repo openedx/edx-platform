@@ -729,23 +729,43 @@ div.profile-wrapper {
       display: inline-block;
       padding-right: 1em; }
 
-form#wiki_revision label {
-  display: block;
-  margin-bottom: 7px; }
-form#wiki_revision textarea {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
-  box-sizing: border-box;
-  margin-bottom: 20px;
-  min-height: 300px;
-  width: 100%; }
-form#wiki_revision input[type="text"] {
-  width: 50%; }
-form#wiki_revision input[type="submit"] {
-  display: block;
-  margin-top: 20px; }
+form#wiki_revision {
+  float: left;
+  width: 77.174%;
+  margin-right: 2.717%; }
+  form#wiki_revision label {
+    display: block;
+    margin-bottom: 7px; }
+  form#wiki_revision textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    min-height: 450px;
+    width: 100%; }
+  form#wiki_revision input[type="text"] {
+    display: block;
+    width: 50%; }
+  form#wiki_revision #submit_delete {
+    float: right; }
+  form#wiki_revision input[type="submit"] {
+    margin-top: 20px; }
+
+#wiki_edit_instructions {
+  float: left;
+  width: 20.109%; }
+  #wiki_edit_instructions .markdown-example {
+    background-color: #dddddd;
+    padding-top: 5px;
+    padding-right: 2px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    margin-top: 5px;
+    margin-bottom: 7px;
+    margin-left: 5px;
+    line-height: 1.0; }
 
 div.wiki-wrapper {
   display: table;
@@ -818,23 +838,6 @@ div.wiki-wrapper {
         div.wiki-wrapper div#wiki_panel div#wiki_create_form ul li#cancel {
           float: right;
           margin-top: 10px; }
-  div.wiki-wrapper section.wiki-body form#wiki_revision {
-    float: left;
-    width: 77.174%;
-    margin-right: 2.717%; }
-  div.wiki-wrapper section.wiki-body #wiki_edit_instructions {
-    float: left;
-    width: 20.109%; }
-    div.wiki-wrapper section.wiki-body #wiki_edit_instructions .markdown-example {
-      background-color: #dddddd;
-      padding-top: 5px;
-      padding-right: 2px;
-      padding-bottom: 5px;
-      padding-left: 5px;
-      margin-top: 5px;
-      margin-bottom: 7px;
-      margin-left: 5px;
-      line-height: 1.0; }
   div.wiki-wrapper section.wiki-body header p {
     float: left;
     padding: 15px;
