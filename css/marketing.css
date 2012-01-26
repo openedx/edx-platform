@@ -199,6 +199,8 @@ body {
   background-color: #fff;
   color: #444;
   font: 16px Georgia, serif; }
+  body :focus {
+    outline-color: #ccc; }
   body h1 {
     font: 800 24px "Open Sans", Helvetica, Arial, sans-serif; }
   body li {
@@ -266,7 +268,7 @@ header.announcement {
       border-radius: 0 0 3px 3px;
       background: #333;
       background: rgba(0, 0, 0, 0.7);
-      padding: 12.944px; }
+      padding: 12.944px 25.888px; }
       header.announcement div nav h1 {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
@@ -275,18 +277,21 @@ header.announcement {
         zoom: 1;
         *display: inline;
         *vertical-align: auto;
-        margin-right: 25.888px; }
+        margin-right: 12.944px; }
         header.announcement div nav h1 a {
           font: italic 800 18px "Open Sans", Helvetica, Arial, sans-serif;
           color: #fff;
           text-decoration: none; }
+          header.announcement div nav h1 a:hover, header.announcement div nav h1 a:focus {
+            color: #990000; }
       header.announcement div nav a.login {
         text-decoration: none;
         color: #fff;
         font-size: 12px;
-        font-style: normal; }
-        header.announcement div nav a.login:hover {
-          color: rgba(255, 255, 255, 0.6); }
+        font-style: normal;
+        font-family: "Open Sans", Helvetica, Arial, sans-serif; }
+        header.announcement div nav a.login:hover, header.announcement div nav a.login:focus {
+          color: #990000; }
     header.announcement div section {
       display: -moz-inline-box;
       -moz-box-orient: vertical;
