@@ -44,7 +44,7 @@ function ${ id }goto(i) {
     ${ id }loc=i;
     //$('#tt_'+i).attr("style", "background-color:red");
     $('#tt_'+i).removeClass();
-    $('#tt_'+i).addClass("seq_active");
+    $('#tt_'+i).addClass("seq_"+${ id }types[${ id }loc]+"_active");
 
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 }

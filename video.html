@@ -1,11 +1,13 @@
 
 <div class="video-wrapper">
-  <div id="ytapiplayer">
+  <div class="video-player">
+    <div id="ytapiplayer">
+    </div>
+    
+    <!-- TODO(Ernie/Kyle) move styles to css -->
+    <iframe id="html5_player" type="text/html" frameborder="0">
+    </iframe>
   </div>
-  
-  <!-- TODO(Ernie/Kyle) move styles to css -->
-  <iframe id="html5_player" type="text/html" frameborder="0">
-  </iframe>
   
   <section class="video-controls">
     <ul>
@@ -18,8 +20,6 @@
     <div id="video_speeds"></div>
   </section>
 </div>
-
-
 
 <ol class="subtitles">
   <li id=stt_n5><div id=std_n7 onclick="title_seek(-7);"></div></li>
