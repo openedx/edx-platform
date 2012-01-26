@@ -1,6 +1,10 @@
 div.course-wrapper {
   @extend .table-wrapper;
 
+  ul, ol {
+    list-style: none;
+  }
+
   div#accordion {
     @extend .sidebar;
 
@@ -110,89 +114,6 @@ div.course-wrapper {
         min-width: 30px;
         min-height: 30px;
         padding: 0 10px;
-      }
-    }
-
-    div.video-wrapper {
-      float: left;
-      width: 640px;
-      min-height: 620px;
-
-      iframe#html5_player {
-        border: none;
-        display: none;
-        height: 390px;
-        width:  640px;
-      }
-
-      section {
-        ul {
-          display: inline-block;
-
-          li {
-            margin-top: 5px;
-            display: inline-block;
-            cursor: pointer;
-            border: 0;
-            padding: 0;
-
-            div {
-              &:empty {
-                display: none;
-              }
-            }
-          }
-        }
-
-        div#slider {
-          margin: -14px 0 10px 60px;
-        }
-
-        div#vidtime {
-          float: left;
-        }
-
-        div#video_speeds {
-          float: right;
-          cursor: pointer;
-
-          span {
-            &:hover {
-              color: $mit-red;
-            }
-          }
-        }
-      }
-    }
-
-    ol.subtitles {
-      width: 220px;
-      margin-left: 20px;
-      float: left;
-
-      li {
-        margin-bottom: 0px;
-        cursor: pointer;
-        border: 0;
-        padding: 0;
-        color: #666;
-
-        &.current {
-          background-color: #f3f3f3;
-          color: #333;
-        }
-
-        &:hover {
-          color: $mit-red;
-        }
-				
-				div {
-					margin-bottom: 8px;
-				}
-
-				div:empty {
-					margin-bottom: 0px;
-				}
       }
     }
   }
