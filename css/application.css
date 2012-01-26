@@ -899,6 +899,8 @@ div.wiki-wrapper {
     border-bottom: 1px solid #ccc; }
   div.wiki-wrapper section.wiki-body p {
     line-height: 1.6em; }
+  div.wiki-wrapper section.wiki-body #wiki_history_table tr.dark {
+    background-color: #dddddd; }
 
 section.activation {
   -webkit-box-shadow: 0 1px 0 white;
