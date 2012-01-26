@@ -1,10 +1,6 @@
 <%inherit file="marketing.html" /> 
 
-<%block name="header">
-<header class="announcement course">
-  <div class="anouncement-wrapper">
-    ${parent.header_nav()}
-
+<%block name="header_text">
     <section class="course">
       <section>
         <h1>Circuits &amp; Electronics</h1>
@@ -13,9 +9,8 @@
       </section>
       <p> Taught by Anant Agarwal, with Gerald Sussman, Piotr Mitros, and Chris Terman, &ldquo;6.002x Circuits and Electronics&rdquo; is an experimental on-line adaption of MIT's first undergraduate analog design course 6.002. This course will run, free of charge, for students worldwide  from February 21, 2012 through June&nbsp;10,&nbsp;2012.</p>
     </section>
-  </div>
-</header>
 </%block>
+<%block name="header_class">course</%block>
 
 <section class="index-content">
   <section class="about-course">
