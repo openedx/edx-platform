@@ -1,5 +1,5 @@
 div.profile-wrapper {
-  display: table;
+  @extend .table-wrapper;
 
   section.user-info {
     @include box-sizing(border-box);

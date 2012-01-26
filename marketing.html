@@ -15,11 +15,15 @@
   <script type="text/javascript" src="/static/js/video_player.js"></script>
   <!-- <script type="text/javascript" src="/static/js/schematic.js"></script> -->
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
-    });
-  </script>
+  <!--[if lt IE 9]>
+  <script src="/static/js/html5shiv.js"></script>
+  <![endif]-->
+
+	<script type="text/javascript">
+		$(function(){
+			$("a[rel*=leanModal]").leanModal();
+		});
+	</script>
 
 <%block name="headextra"/>
 
