@@ -8,8 +8,8 @@ div.wiki-wrapper {
 
     input[type="button"] {
       @extend h3;
-      color: lighten($text-color, 10%);
       @include transition();
+      color: lighten($text-color, 10%);
       font-size: $body-font-size;
       margin: 0  !important;
       padding: 7px 7px 7px 30px;
@@ -77,7 +77,7 @@ div.wiki-wrapper {
 
   section.wiki-body {
     @extend .content;
-    
+
     header {
       @extend .topbar;
 
@@ -91,6 +91,7 @@ div.wiki-wrapper {
 
       ul {
         float: right;
+        list-style: none;
 
         li {
           float: left;
@@ -108,7 +109,7 @@ div.wiki-wrapper {
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 15px;
+            padding: lh(.75);
             margin: 0;
 
             &:hover {

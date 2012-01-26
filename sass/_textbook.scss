@@ -18,17 +18,25 @@ div.book-wrapper {
 
     nav {
       @extend .topbar;
+      @extend .clearfix;
 
       ul {
         @extend .clearfix;
-        li {
-          padding: 15px;
 
+        li {
           &.last {
             float: left;
+            display: block;
+
+            a {
+              @include box-shadow(inset -1px 0 0 lighten(#f6efd4, 5%));
+              border-right: 1px solid darken(#f6efd4, 20%);
+              border-left: 0;
+            }
           }
 
           &.next {
+            display: block;
             float: right;
           }
         }

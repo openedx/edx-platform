@@ -106,14 +106,32 @@ div.course-wrapper {
 
     ol.sequence-nav {
       margin-bottom: $body-line-height;
+      @extend .topbar;
 
       li {
         border: none;
         cursor: pointer;
         display: table-cell;
-        min-width: 30px;
-        min-height: 30px;
-        padding: 0 10px;
+        padding: lh(.75);
+        float: left;
+
+        &.prev, &.next {
+          @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
+          background: darken(#F6EFD4, 5%);
+          border-left: 1px solid darken(#f6efd4, 20%);
+          color: darken(#F6EFD4, 80%);
+          float: right;
+          letter-spacing: 1px;
+          padding: lh(.75);
+          text-transform: uppercase;
+
+          &:hover {
+            text-decoration: none;
+            color: darken(#F6EFD4, 60%);
+            text-decoration: none;
+            background: none;
+          }
+        }
       }
     }
   }
