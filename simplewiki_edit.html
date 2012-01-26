@@ -8,13 +8,14 @@ ${ wiki_article.title }
 
 <%block name="wiki_body">
 <form method="POST" id="wiki_revision">
-	<div style="display:none">
-	    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-	</div>
-
+  <div style="display:none">
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+  </div>
   ${wiki_form}
-
-  <input type="submit" name="edit" value="Edit article" />
-  <input type="submit" name="delete" value="Delete article" />
+  <input type="submit" id="submit_edit" name="edit" value="Edit article" />
+  <input type="submit" id="submit_delete" name="delete" value="Delete article" />
 </form>
+
+<%include file="simplewiki_instructions.html"/>
+
 </%block>
