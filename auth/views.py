@@ -74,8 +74,10 @@ def login_user(request, error=""):
             log.critical("Login failed - Could not create session. Is memcached running?")
             log.exception(e)
 
+        log.info("Login success - {0} ({1})".format(username, email))
         return HttpResponse(json.dumps({'success':True}))
 
+    log.warning("Login failed - Account not active for user {0}".format(username))
     return HttpResponse(json.dumps({'success':False, 
                                     'error': 'Account not active. Check your e-mail.'}))
 
