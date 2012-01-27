@@ -1,14 +1,12 @@
 form#wiki_revision {
   float: left;
-  width: flex-grid(7, 9);
+  width: flex-grid(6, 9);
   margin-right: flex-gutter(9);
-	
 	
   label {
     display: block;
     margin-bottom: 7px ;
   }
-
 
   textarea {
     @include box-sizing(border-box);
@@ -33,8 +31,8 @@ form#wiki_revision {
 
 #wiki_edit_instructions {
   float: left;
-  width: flex-grid(2, 9);
-      
+  width: flex-grid(3, 9);
+
   .markdown-example {
     background-color: $light-gray;
     padding-top: 5px;

@@ -9,20 +9,21 @@
   <script type="text/javascript" src="/static/lib/jquery-1.6.2.min.js"></script>
   <script type="text/javascript" src="/static/lib/jquery-ui-1.8.16.custom.min.js"></script>
 
-  <!-- Warning: Do not upgrade FancyBox. V2.0 is under a non-free CC license -->
-  <script type="text/javascript" src="/static/lib/fancybox/jquery.fancybox-1.3.4.js"></script>
-  <link rel="stylesheet" href="/static/lib/fancybox/jquery.fancybox-1.3.4.css">
   <script type="text/javascript" src="/static/lib/jquery.leanModal.min.js"></script>
   <script type="text/javascript" src="/static/lib//swfobject/swfobject.js"></script>
   <script type="text/javascript" src="/static/lib/jquery.treeview.js"></script>
   <script type="text/javascript" src="/static/js/video_player.js"></script>
   <!-- <script type="text/javascript" src="/static/js/schematic.js"></script> -->
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
-    });
-  </script>
+  <!--[if lt IE 9]>
+  <script src="/static/js/html5shiv.js"></script>
+  <![endif]-->
+
+	<script type="text/javascript">
+		$(function(){
+			$("a[rel*=leanModal]").leanModal();
+		});
+	</script>
 
 <%block name="headextra"/>
 
@@ -30,7 +31,7 @@
 
 <body>
   <%block name="header">
-  <header class="announcement">
+  <header class="announcement <%block name="header_class"/>">
     <div class="anouncement-wrapper">
     <%block name="header_nav">
     <nav>

@@ -103,6 +103,10 @@ body {
   color: #444;
   font: $body-font-size $body-font-family;
 
+  :focus {
+    outline-color: #ccc;
+  }
+
   h1 {
     font: 800 24px $header-font-family;
   }
@@ -158,6 +162,17 @@ header.announcement {
 
     div {
       padding: lh(10) lh() lh(3);
+
+      //hide login link for homepage
+      nav {
+        h1 {
+          margin-right: 0;
+        }
+
+        a.login {
+          display: none;
+        }
+      }
     }
   }
 
@@ -188,16 +203,20 @@ header.announcement {
       @include border-radius(0 0 3px 3px);
       background: #333;
       background: rgba(#000, .7);
-      padding: lh(.5);
+      padding: lh(.5) lh();
 
       h1 {
         @include inline-block();
-        margin-right: lh();
+        margin-right: lh(.5);
 
         a {
           font: italic 800 18px $header-font-family;
           color: #fff;
           text-decoration: none;
+
+          &:hover, &:focus {
+            color: #999;
+          }
         }
       }
 
@@ -206,9 +225,10 @@ header.announcement {
         color: #fff;
         font-size: 12px;
         font-style: normal;
+        font-family: $header-font-family;
 
-        &:hover {
-          color: rgba(#fff, .6);
+        &:hover, &:focus {
+          color: #999;
         }
       }
     }
