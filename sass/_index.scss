@@ -162,6 +162,17 @@ header.announcement {
 
     div {
       padding: lh(10) lh() lh(3);
+
+      //hide login link for homepage
+      nav {
+        h1 {
+          margin-right: 0;
+        }
+
+        a.login {
+          display: none;
+        }
+      }
     }
   }
 
@@ -204,7 +215,7 @@ header.announcement {
           text-decoration: none;
 
           &:hover, &:focus {
-            color: $mit-red;
+            color: #999;
           }
         }
       }
@@ -217,7 +228,7 @@ header.announcement {
         font-family: $header-font-family;
 
         &:hover, &:focus {
-          color: $mit-red;
+          color: #999;
         }
       }
     }
