@@ -88,37 +88,28 @@ def id_tag(course):
         else:
             elem.set('id', fasthash(etree.tostring(elem)))
             
-def due_tag(course):
-    # The primary purpose of this tagging is to make sure that each problem
-    # inherits the due date from the section that it is in. We also make
-    # sure that each section has a due date. If it does not, it inherits
-    # the last section's due date. This is to make sure that the sections
-    # are in chronological order. It is an exception to have a later section
-    # due before an earlier one.
+def due_tag(element, parent_due_date=None):
+    ''' This call is to pass down due dates. If an element has a due date,
+    all of the elements children will inherit this due date (unless the element
+    has a due date of its own). This is called recursively'''
         
-    # How are due dates handled for different time zones? What _time_ are things due?
-    
-    # First, we grab the first due date to occur. This is our starting date.
-    firstSectionDue = course.xpath("//section[@due]")[0]
-    # I tried adding [1] to the end of the query string to select the first,
-    # but it didn't work. Is this not supported in etree?
-    
-    # All new dates must be further than currentDate
-    currentDate = firstSectionDue.get('due')
-    
-    sections = course.xpath("//section")
-    for section in sections:
-        existingDate = section.get('due')
-        if existingDate:
-            #TODO: Make sure existing date is further into the future than currentDate
-            currentDate = existingDate
+    if (parent_due_date == None): #This is the entry call. Select all due elements
+        all_due_elements = element.xpath("//*[@due]")
+        for due_element in all_due_elements:
+            due_date = due_element.get('due')
+            for child_element in due_element:
+                due_tag(child_element, due_date)
+    else:
+        #The hack below is because we would get _ContentOnlyELements from the
+        #iterator that can't have due dates set. We can't find API for it
+        if not element.get('due') and type(element) == etree._Element:
+            element.set('due', parent_due_date)
+            due_date = parent_due_date
         else:
-            section.set('due', currentDate)
-        
-        problems=course.xpath('//section[@name=$section]//problem', section=section.get('name'))
-        
-        for problem in problems:
-            problem.set('due', currentDate)
+            due_date = element.get('due')
+            
+        for child_element in element:
+            due_tag(child_element, due_date)
             
 def course_file(user):
     # TODO: Cache. 
