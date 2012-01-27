@@ -74,6 +74,10 @@ ${wiki_error}
 	<p>
 	The article you tried to access has been deleted. You may be able to restore it to an earlier version in its <a href="${reverse("wiki_history", args=[wiki_article.get_url(),1])}">history</a>, or <a href="${reverse("wiki_edit", args=[wiki_article.get_url()])}">create a new version</a>.
 	</p>
+%elif wiki_err_norevision is not UNDEFINED:
+	<p>
+	This article does not contain revision ${wiki_err_norevision | h}.
+	</p>
 %else:
 	<p>
 	An error has occured.
