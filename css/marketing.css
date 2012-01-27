@@ -245,6 +245,10 @@ header.announcement {
         background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg"); } }
     header.announcement.home div {
       padding: 258.88px 25.888px 77.664px; }
+      header.announcement.home div nav h1 {
+        margin-right: 0; }
+      header.announcement.home div nav a.login {
+        display: none; }
   header.announcement.course {
     background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg"); }
     @media screen and (min-width: 1200px) {
@@ -283,7 +287,7 @@ header.announcement {
           color: #fff;
           text-decoration: none; }
           header.announcement div nav h1 a:hover, header.announcement div nav h1 a:focus {
-            color: #990000; }
+            color: #999; }
       header.announcement div nav a.login {
         text-decoration: none;
         color: #fff;
@@ -291,7 +295,7 @@ header.announcement {
         font-style: normal;
         font-family: "Open Sans", Helvetica, Arial, sans-serif; }
         header.announcement div nav a.login:hover, header.announcement div nav a.login:focus {
-          color: #990000; }
+          color: #999; }
     header.announcement div section {
       display: -moz-inline-box;
       -moz-box-orient: vertical;

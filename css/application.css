@@ -98,7 +98,7 @@ input, select {
   font-weight: bold;
   src: local("Droid Sans Bold"), local("DroidSans-Bold"), url("http://themes.googleusercontent.com/static/fonts/droidsans/v3/EFpQQyG9GqCrobXxL-KRMXbFhgvWbfSbdVg11QabG8w.woff") format("woff"); }
 
-.clearfix:after, .topbar:after, div.course-wrapper section.course-content ol.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
+.clearfix:after, .topbar:after, div.course-wrapper section.course-content ol.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod > li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
   content: ".";
   display: block;
   height: 0;
@@ -622,7 +622,7 @@ div.course-wrapper div#accordion ul.ui-accordion-content {
     font-weight: bold; }
   div.course-wrapper div#accordion ul.ui-accordion-content li a {
     text-decoration: none;
-    margin-bottom: 22.652px;
+    margin-bottom: 11.326px;
     display: block; }
     div.course-wrapper div#accordion ul.ui-accordion-content li a:hover {
       color: #666; }
@@ -630,14 +630,15 @@ div.course-wrapper div#accordion ul.ui-accordion-content {
       margin-bottom: 0; }
       div.course-wrapper div#accordion ul.ui-accordion-content li a p.subtitle {
         color: #666; }
-div.course-wrapper section.course-content ol.vert-mod li {
-  border-top: 1px solid #eee;
+div.course-wrapper section.course-content ol.vert-mod > li {
   border-bottom: 1px solid #eee;
   padding: 15px 0; }
-  div.course-wrapper section.course-content ol.vert-mod li h2 {
+  div.course-wrapper section.course-content ol.vert-mod > li:last-child {
+    border-bottom: none; }
+  div.course-wrapper section.course-content ol.vert-mod > li h2 {
     margin-top: 0;
     margin-bottom: 15px; }
-  div.course-wrapper section.course-content ol.vert-mod li input[type="text"] {
+  div.course-wrapper section.course-content ol.vert-mod > li input[type="text"] {
     display: inline-block;
     margin: 8px 4px 4px 10px; }
 div.course-wrapper section.course-content ol.sequence-nav {
@@ -858,9 +859,130 @@ div.profile-wrapper section.course-info {
     display: inline-block;
     padding-right: 1em; }
 
+section.wiki-body div#wiki_article html, section.wiki-body div#wiki_article address,
+section.wiki-body div#wiki_article blockquote,
+section.wiki-body div#wiki_article body, section.wiki-body div#wiki_article dd, section.wiki-body div#wiki_article div,
+section.wiki-body div#wiki_article dl, section.wiki-body div#wiki_article dt, section.wiki-body div#wiki_article fieldset, section.wiki-body div#wiki_article form,
+section.wiki-body div#wiki_article frame, section.wiki-body div#wiki_article frameset,
+section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4,
+section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article noframes,
+section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article p, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article center,
+section.wiki-body div#wiki_article dir, section.wiki-body div#wiki_article hr, section.wiki-body div#wiki_article menu, section.wiki-body div#wiki_article pre {
+  display: block;
+  unicode-bidi: embed; }
+section.wiki-body div#wiki_article li {
+  display: list-item; }
+section.wiki-body div#wiki_article head {
+  display: none; }
+section.wiki-body div#wiki_article table {
+  display: table; }
+section.wiki-body div#wiki_article tr {
+  display: table-row; }
+section.wiki-body div#wiki_article thead {
+  display: table-header-group; }
+section.wiki-body div#wiki_article tbody {
+  display: table-row-group; }
+section.wiki-body div#wiki_article tfoot {
+  display: table-footer-group; }
+section.wiki-body div#wiki_article col {
+  display: table-column; }
+section.wiki-body div#wiki_article colgroup {
+  display: table-column-group; }
+section.wiki-body div#wiki_article td, section.wiki-body div#wiki_article th {
+  display: table-cell; }
+section.wiki-body div#wiki_article caption {
+  display: table-caption; }
+section.wiki-body div#wiki_article th {
+  font-weight: bolder;
+  text-align: center; }
+section.wiki-body div#wiki_article caption {
+  text-align: center; }
+section.wiki-body div#wiki_article h1 {
+  font-size: 2.4em;
+  margin: .67em 0;
+  letter-spacing: 0px; }
+section.wiki-body div#wiki_article h2 {
+  text-transform: none;
+  font-size: 2em;
+  margin: .75em 0;
+  letter-spacing: 0px; }
+section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel section.wiki-body div#wiki_article input[type="button"] {
+  font-size: 1.75em;
+  margin: .83em 0; }
+section.wiki-body div#wiki_article h4 {
+  font-size: 1.25em; }
+section.wiki-body div#wiki_article h4, section.wiki-body div#wiki_article p,
+section.wiki-body div#wiki_article blockquote, section.wiki-body div#wiki_article ul,
+section.wiki-body div#wiki_article fieldset, section.wiki-body div#wiki_article form,
+section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article dl, section.wiki-body div#wiki_article dir,
+section.wiki-body div#wiki_article menu {
+  margin: 1.12em 0; }
+section.wiki-body div#wiki_article h5 {
+  font-size: 1.25em;
+  margin: 1.5em 0; }
+section.wiki-body div#wiki_article h6 {
+  font-size: 1em;
+  margin: 1.67em 0; }
+section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div.wiki-wrapper div#wiki_panel input[type="button"], div.wiki-wrapper div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4,
+section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article b,
+section.wiki-body div#wiki_article strong {
+  font-weight: bolder; }
+section.wiki-body div#wiki_article blockquote {
+  padding: 10px 20px;
+  background: #e3e3e3;
+  border-left: 4px solid; }
+section.wiki-body div#wiki_article i, section.wiki-body div#wiki_article cite, section.wiki-body div#wiki_article em,
+section.wiki-body div#wiki_article var, section.wiki-body div#wiki_article address {
+  font-style: italic; }
+section.wiki-body div#wiki_article pre, section.wiki-body div#wiki_article tt, section.wiki-body div#wiki_article code,
+section.wiki-body div#wiki_article kbd, section.wiki-body div#wiki_article samp {
+  font-family: monospace; }
+section.wiki-body div#wiki_article pre {
+  white-space: pre; }
+section.wiki-body div#wiki_article button, section.wiki-body div#wiki_article textarea,
+section.wiki-body div#wiki_article input, section.wiki-body div#wiki_article select {
+  display: inline-block; }
+section.wiki-body div#wiki_article big {
+  font-size: 1.17em; }
+section.wiki-body div#wiki_article small, section.wiki-body div#wiki_article sub, section.wiki-body div#wiki_article sup {
+  font-size: .83em; }
+section.wiki-body div#wiki_article sub {
+  vertical-align: sub; }
+section.wiki-body div#wiki_article sup {
+  vertical-align: super; }
+section.wiki-body div#wiki_article table {
+  border-spacing: 2px; }
+section.wiki-body div#wiki_article thead, section.wiki-body div#wiki_article tbody,
+section.wiki-body div#wiki_article tfoot {
+  vertical-align: middle; }
+section.wiki-body div#wiki_article td, section.wiki-body div#wiki_article th, section.wiki-body div#wiki_article tr {
+  vertical-align: inherit; }
+section.wiki-body div#wiki_article s, section.wiki-body div#wiki_article strike, section.wiki-body div#wiki_article del {
+  text-decoration: line-through; }
+section.wiki-body div#wiki_article hr {
+  height: 1px;
+  background: #999;
+  border: none; }
+section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article dir,
+section.wiki-body div#wiki_article menu, section.wiki-body div#wiki_article dd {
+  margin-left: 40px; }
+section.wiki-body div#wiki_article ol {
+  list-style-type: decimal; }
+section.wiki-body div#wiki_article ol ul, section.wiki-body div#wiki_article ul ol,
+section.wiki-body div#wiki_article ul ul, section.wiki-body div#wiki_article ol ol {
+  margin-top: 0;
+  margin-bottom: 0; }
+section.wiki-body div#wiki_article u, section.wiki-body div#wiki_article ins {
+  text-decoration: underline; }
+section.wiki-body div#wiki_article br:before {
+  content: "\A";
+  white-space: pre-line; }
+section.wiki-body div#wiki_article center {
+  text-align: center; }
+
 form#wiki_revision {
   float: left;
-  width: 77.174%;
+  width: 65.761%;
   margin-right: 2.717%; }
   form#wiki_revision label {
     display: block;
@@ -884,7 +1006,7 @@ form#wiki_revision {
 
 #wiki_edit_instructions {
   float: left;
-  width: 20.109%; }
+  width: 31.522%; }
   #wiki_edit_instructions .markdown-example {
     background-color: #dddddd;
     padding-top: 5px;
@@ -925,7 +1047,7 @@ div.wiki-wrapper {
       color: #4d4d4d;
       font-size: 14px;
       margin: 0  !important;
-      padding: 7px 7px 7px 30px;
+      padding: 7px 22.652px;
       text-align: left;
       width: 100%; }
       div.wiki-wrapper div#wiki_panel input[type="button"]:hover {
@@ -935,20 +1057,18 @@ div.wiki-wrapper {
         -o-box-shadow: 0 1px 0 white;
         box-shadow: 0 1px 0 white;
         background: #efefef; }
-    div.wiki-wrapper div#wiki_panel ul li.create-article {
-      position: relative; }
-      div.wiki-wrapper div#wiki_panel ul li.create-article h3, div.wiki-wrapper div#wiki_panel ul li.create-article input[type="button"] {
-        position: relative; }
-        div.wiki-wrapper div#wiki_panel ul li.create-article h3:before, div.wiki-wrapper div#wiki_panel ul li.create-article input[type="button"]:before {
-          background: blue url(images/ui-icons_454545_256x240.png) -32px -16px no-repeat;
-          display: block;
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 16px;
-          height: 16px; }
-        div.wiki-wrapper div#wiki_panel ul li.create-article h3:hover:before, div.wiki-wrapper div#wiki_panel ul li.create-article input[type="button"]:hover:before {
-          background-image: url(images/ui-icons_454545_256x240.png) -64px -16px no-repeat; }
+    div.wiki-wrapper div#wiki_panel ul li.search {
+      -webkit-box-shadow: 0 1px 0 #eeeeee;
+      -moz-box-shadow: 0 1px 0 #eeeeee;
+      -ms-box-shadow: 0 1px 0 #eeeeee;
+      -o-box-shadow: 0 1px 0 #eeeeee;
+      box-shadow: 0 1px 0 #eeeeee;
+      border-bottom: 1px solid #d3d3d3;
+      padding: 7px 22.652px; }
+      div.wiki-wrapper div#wiki_panel ul li.search label {
+        display: none; }
+    div.wiki-wrapper div#wiki_panel ul li.create-article h3 a, div.wiki-wrapper div#wiki_panel ul li.create-article input[type="button"] a {
+      padding: 7px 22.652px; }
     div.wiki-wrapper div#wiki_panel div#wiki_create_form {
       padding: 15px;
       background: #d6d6d6;
@@ -962,11 +1082,13 @@ div.wiki-wrapper {
         -ms-box-sizing: border-box;
         -o-box-sizing: border-box;
         box-sizing: border-box; }
-      div.wiki-wrapper div#wiki_panel div#wiki_create_form ul li {
-        float: left; }
-        div.wiki-wrapper div#wiki_panel div#wiki_create_form ul li#cancel {
-          float: right;
-          margin-top: 10px; }
+      div.wiki-wrapper div#wiki_panel div#wiki_create_form ul {
+        list-style: none; }
+        div.wiki-wrapper div#wiki_panel div#wiki_create_form ul li {
+          float: left; }
+          div.wiki-wrapper div#wiki_panel div#wiki_create_form ul li#cancel {
+            float: right;
+            margin-top: 10px; }
   div.wiki-wrapper section.wiki-body header p {
     float: left;
     padding: 15px;
