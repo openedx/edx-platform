@@ -36,12 +36,44 @@ def view(request, wiki_url):
     if perm_err:
         return perm_err
     d = {'wiki_article': article,
+            'wiki_article_revision':article.current_revision,
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
             'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
 			}
     d.update(csrf(request))
     return render_to_response('simplewiki_view.html', d)
+    
+def view_revision(request, revision_number, wiki_url, revision=None):
+    if not request.user.is_authenticated():
+        return redirect('/')
+    
+    (article, path, err) = fetch_from_url(request, wiki_url)
+    if err:
+        return err
+    
+    try:
+        revision = Revision.objects.get(counter=int(revision_number), article=article)
+    except:
+        d = {'wiki_article': article,
+	            'wiki_err_norevision': revision_number,}
+        d.update(csrf(request))
+        return render_to_response('simplewiki_error.html', d)
+        
+    
+    perm_err = check_permissions(request, article, check_read=True, check_deleted=True, revision=revision)
+    if perm_err:
+        return perm_err
+        
+    d = {'wiki_article': article,
+            'wiki_article_revision':revision,
+			'wiki_write': article.can_write_l(request.user),
+			'wiki_attachments_write': article.can_attach(request.user),
+            'wiki_current_revision_deleted' : not (revision.deleted == 0),
+			}
+    d.update(csrf(request))
+    return render_to_response('simplewiki_view.html', d)
+
 
 def root_redirect(request):
     if not request.user.is_authenticated():
@@ -206,12 +238,18 @@ def history(request, wiki_url, page=1):
             perm_err = check_permissions(request, article, check_write=True, check_locked=True)
             if perm_err:
                 return perm_err
+                
+            redirectURL = reverse('wiki_view', args=(article.get_url(),))
             try:
                 r = int(request.POST['revision'])
                 revision = Revision.objects.get(id=r)
                 if request.POST.__contains__('change'):
                     article.current_revision = revision
                     article.save()
+                elif request.POST.__contains__('view'):
+                    redirectURL = reverse('wiki_view_revision', args=(revision.counter, article.get_url(),))
+                
+                #The rese of these are admin functions
                 elif request.POST.__contains__('delete') and request.user.is_superuser:
                     if (revision.deleted == 0):
                          revision.adminSetDeleted(2)
@@ -228,7 +266,7 @@ def history(request, wiki_url, page=1):
             except:
                 pass
             finally:
-                return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
+                return HttpResponseRedirect(redirectURL)
                 # 
                 # 
                 # <input type="submit" name="delete" value="Delete revision"/>
@@ -433,14 +471,16 @@ def fetch_from_url(request, url):
     return (article, path, err)
 
 
-def check_permissions(request, article, check_read=False, check_write=False, check_locked=False, check_deleted=False):    
+def check_permissions(request, article, check_read=False, check_write=False, check_locked=False, check_deleted=False, revision = None):    
     read_err = check_read and not article.can_read(request.user)
     
     write_err = check_write and not article.can_write(request.user)
     
     locked_err = check_locked and article.locked
     
-    deleted_err = check_deleted and not (article.current_revision.deleted == 0)
+    if revision == None:
+        revision = article.current_revision
+    deleted_err = check_deleted and not (revision.deleted == 0)
     if (request.user.is_superuser):
         deleted_err = False
         locked_err = False

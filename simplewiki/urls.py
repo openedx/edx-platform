@@ -3,6 +3,7 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('',
     url(r'^$', 'simplewiki.views.root_redirect', name='wiki_root'),
     url(r'^view(/[a-zA-Z\d/_-]*)/?$', 'simplewiki.views.view', name='wiki_view'),
+    url(r'^view_revision/([0-9]*)(/[a-zA-Z\d/_-]*)/?$', 'simplewiki.views.view_revision', name='wiki_view_revision'),
     url(r'^edit(/[a-zA-Z\d/_-]*)/?$', 'simplewiki.views.edit', name='wiki_edit'),
     url(r'^create(/[a-zA-Z\d/_-]*)/?$', 'simplewiki.views.create', name='wiki_create'),
     url(r'^history(/[a-zA-Z\d/_-]*)/([0-9]*)/?$', 'simplewiki.views.history', name='wiki_history'),
