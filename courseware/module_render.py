@@ -33,9 +33,13 @@ from django.conf import settings
 import courseware.content_parser as content_parser
 
 import sys
+import logging
 
 from lxml import etree
 import uuid
+
+
+log = logging.getLogger("mitx.courseware")
 
 ## TODO: Add registration mechanism
 modx_modules={'problem':courseware.modules.capa_module.LoncapaModule, 
@@ -64,11 +68,10 @@ def make_track_function(request):
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
     # Grab the student information for the module from the database
-    s = StudentModule.objects.filter(module_type=module, 
-                                     student=request.user, 
+    s = StudentModule.objects.filter(student=request.user, 
                                      module_id=id)
     if len(s) == 0:
-        print "ls404", module, request.user, id
+        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
         raise Http404
 
     s=s[0]

@@ -20,6 +20,7 @@ from lxml import etree
 from auth.models import UserProfile
 from models import StudentModule
 from module_render import * # TODO: Clean up
+from module_render import modx_dispatch
 import courseware.content_parser as content_parser
 
 log = logging.getLogger("mitx.courseware")
@@ -45,6 +46,11 @@ def profile(request):
     chapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
     responses=StudentModule.objects.filter(student=request.user)
+    response_by_id = {}
+    for response in responses:
+        response_by_id[response.module_id] = response
+        
+    print response_by_id
 
     for c in chapters:
         chname=c.get('name')
@@ -55,14 +61,15 @@ def profile(request):
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    id = p.get('filename')
+                    id = p.get('id')
                     correct = 0
-                    for response in responses:
-                        if response.module_id == id:
-                            if response.grade!=None:
-                                correct=response.grade
-                            else:
-                                correct=0
+                    if id in response_by_id:
+                        response = response_by_id[id]
+                        if response.grade!=None:
+                            correct=response.grade
+                    else:
+                        print "Couldn't find id " + id
+                    
                     total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     scores.append((int(correct),total))
                 score={'course':course,
@@ -71,7 +78,7 @@ def profile(request):
                        'scores':scores,
                        }
                 hw.append(score)
-
+    
     user_info=UserProfile.objects.get(user=request.user)
 
     context={'name':user_info.name,

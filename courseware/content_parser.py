@@ -82,40 +82,47 @@ def id_tag(course):
         if elem.get('id'):
             pass
         elif elem.get(default_ids[elem.tag]):
-            new_id = elem.get(default_ids[elem.tag]) # Convert to alphanumeric
-            new_id = "".join([a for a in new_id if a.isalnum()])
+            new_id = elem.get(default_ids[elem.tag]) 
+            new_id = "".join([a for a in new_id if a.isalnum()]) # Convert to alphanumeric
+            # Without this, a conflict may occur between an hmtl or youtube id
+            new_id = default_ids[elem.tag] + new_id
             elem.set('id', new_id)
         else:
             elem.set('id', fasthash(etree.tostring(elem)))
             
-def due_tag(element, parent_due_date=None):
-    ''' This call is to pass down due dates. If an element has a due date,
-    all of the elements children will inherit this due date (unless the element
-    has a due date of its own). This is called recursively'''
-        
-    if (parent_due_date == None): #This is the entry call. Select all due elements
-        all_due_elements = element.xpath("//*[@due]")
-        for due_element in all_due_elements:
-            due_date = due_element.get('due')
-            for child_element in due_element:
-                due_tag(child_element, due_date)
+def propogate_downward_tag(element, attribute_name, parent_attribute = None):
+    ''' This call is to pass down an attribute to all children. If an element
+    has this attribute, it will be "inherited" by all of its children. If a
+    child (A) already has that attribute, A will keep the same attribute and
+    all of A's children will inherit A's attribute. This is a recursive call.'''
+    
+    if (parent_attribute == None): #This is the entry call. Select all due elements
+        all_attributed_elements = element.xpath("//*[@" + attribute_name +"]")
+        for attributed_element in all_attributed_elements:
+            attribute_value = attributed_element.get(attribute_name)
+            for child_element in attributed_element:
+                propogate_downward_tag(child_element, attribute_name, attribute_value)
     else:
-        #The hack below is because we would get _ContentOnlyELements from the
-        #iterator that can't have due dates set. We can't find API for it
-        if not element.get('due') and type(element) == etree._Element:
-            element.set('due', parent_due_date)
-            due_date = parent_due_date
-        else:
-            due_date = element.get('due')
+        '''The hack below is because we would get _ContentOnlyELements from the
+        iterator that can't have due dates set. We can't find API for it. If we
+        ever have an element which subclasses BaseElement, we will not tag it'''
+        if not element.get(attribute_name) and type(element) == etree._Element:
+            element.set(attribute_name, parent_attribute)
             
-        for child_element in element:
-            due_tag(child_element, due_date)
+            for child_element in element:
+                propogate_downward_tag(child_element, attribute_name, parent_attribute)
+        else:
+            #This element would have already been found by Xpath, so we return
+            #for now and trust that this element will get its turn to propogate
+            #to its children later.
+            return
             
 def course_file(user):
     # TODO: Cache. 
     tree = etree.parse(settings.DATA_DIR+UserProfile.objects.get(user=user).courseware)
     id_tag(tree)
-    due_tag(tree)
+    propogate_downward_tag(tree, "due")
+    propogate_downward_tag(tree, "graded")
     return tree
 
 def module_xml(coursefile, module, id_tag, module_id):
