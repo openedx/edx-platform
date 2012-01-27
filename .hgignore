@@ -1,6 +1,7 @@
 syntax: glob
 *.pyc
 *~
+*.DS_Store
 database.sqlite
 courseware/static/js/mathjax/*
 db.newaskbot
