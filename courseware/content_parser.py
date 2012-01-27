@@ -8,12 +8,15 @@ from lxml import etree
 
 import json
 import hashlib
+import logging
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
 
 TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
+
+log = logging.getLogger("mitx.courseware")
 
 def fasthash(string):
     m = hashlib.new("md4")
@@ -83,12 +86,45 @@ def id_tag(course):
             new_id = "".join([a for a in new_id if a.isalnum()])
             elem.set('id', new_id)
         else:
-            elem.set('id', fasthash(etree.tostring(elem)))    
-
+            elem.set('id', fasthash(etree.tostring(elem)))
+            
+def due_tag(course):
+    # The primary purpose of this tagging is to make sure that each problem
+    # inherits the due date from the section that it is in. We also make
+    # sure that each section has a due date. If it does not, it inherits
+    # the last section's due date. This is to make sure that the sections
+    # are in chronological order. It is an exception to have a later section
+    # due before an earlier one.
+        
+    # How are due dates handled for different time zones? What _time_ are things due?
+    
+    # First, we grab the first due date to occur. This is our starting date.
+    firstSectionDue = course.xpath("//section[@due]")[0]
+    # I tried adding [1] to the end of the query string to select the first,
+    # but it didn't work. Is this not supported in etree?
+    
+    # All new dates must be further than currentDate
+    currentDate = firstSectionDue.get('due')
+    
+    sections = course.xpath("//section")
+    for section in sections:
+        existingDate = section.get('due')
+        if existingDate:
+            #TODO: Make sure existing date is further into the future than currentDate
+            currentDate = existingDate
+        else:
+            section.set('due', currentDate)
+        
+        problems=course.xpath('//section[@name=$section]//problem', section=section.get('name'))
+        
+        for problem in problems:
+            problem.set('due', currentDate)
+            
 def course_file(user):
     # TODO: Cache. 
     tree = etree.parse(settings.DATA_DIR+UserProfile.objects.get(user=user).courseware)
     id_tag(tree)
+    due_tag(tree)
     return tree
 
 def module_xml(coursefile, module, id_tag, module_id):
