@@ -155,7 +155,7 @@ LOGGING = {
             'stream' : sys.stderr,
         },
         'app' : {
-            'level' : 'INFO',
+            'level' : 'DEBUG' if DEBUG else 'INFO',
             'class' : 'logging.handlers.TimedRotatingFileHandler',
             'formatter' : 'standard',
             'filename' : LOG_DIR + '/mitx.log', # temporary location for proof of concept
