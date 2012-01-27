@@ -44,6 +44,7 @@ cktsim = (function() {
 
 	    this.devices = [];  // list of devices
 	    this.device_map = new Array();  // map name -> device
+	    this.voltage_sources = [];  // list of voltage sources
 
 	    this.finalized = false;
 	    this.diddc = false;
@@ -104,10 +105,14 @@ cktsim = (function() {
 		var type = component[0];
 
 		// ignore wires, ground connections, scope probes and view info
-		if (type == 'view' || type == 'w' || type == 'g' || type == 's' || type == 'L') continue;
+		if (type == 'view' || type == 'w' || type == 'g' || type == 's' || type == 'L') {
+		    continue;
+		}
 
 		var properties = component[2];
 		var name = properties['name'];
+		if (name==undefined || name=='')
+		    name = '_' + properties['_json_'].toString();
 
 		// convert node names to circuit indicies
 		var connections = component[3];
@@ -134,11 +139,9 @@ cktsim = (function() {
 		else if (type == 'o') 	// op amp
 		    this.opamp(connections[0],connections[1],connections[2],properties['A'],name);
 		else if (type == 'n') 	// n fet
-		    this.n(connections[0],connections[1],connections[2],
-			   properties['W/L'],name);
+		    this.n(connections[0],connections[1],connections[2],properties['W/L'],name);
 		else if (type == 'p') 	// p fet
-		    this.p(connections[0],connections[1],connections[2],
-			   properties['W/L'],name);
+		    this.p(connections[0],connections[1],connections[2],properties['W/L'],name);
 	    }
 	}
 
@@ -214,9 +217,15 @@ cktsim = (function() {
 		this.diddc = true;
 		// create solution dictionary
 		var result = new Array();
+		// capture node voltages
 		for (var name in this.node_map) {
 		    var index = this.node_map[name];
 		    result[name] = (index == -1) ? 0 : this.solution[index];
+		}
+		// capture branch currents from voltage sources
+		for (var i = this.voltage_sources.length - 1; i >= 0; --i) {
+		    var v = this.voltage_sources[i];
+		    result['I('+v.name+')'] = this.solution[v.branch];
 		}
 		return result;
 	    }
@@ -457,6 +466,12 @@ cktsim = (function() {
 		var index = this.node_map[name];
 		result[name] = (index == -1) ? 0 : response[index];
 	    }
+	    // capture branch currents from voltage sources
+	    for (var i = this.voltage_sources.length - 1; i >= 0; --i) {
+		var v = this.voltage_sources[i];
+		result['I('+v.name+')'] = response[v.branch];
+	    }
+
 	    result['time'] = response[this.N];
 	    return result;
 	}
@@ -537,6 +552,7 @@ cktsim = (function() {
         Circuit.prototype.add_device = function(d,name) {
 	    // Add device to list of devices and to device map
 	    this.devices.push(d);
+	    d.name = name;
 	    if (name) {
 		if (this.device_map[name] === undefined) 
 		    this.device_map[name] = d;
@@ -599,6 +615,7 @@ cktsim = (function() {
         Circuit.prototype.v = function(n1,n2,v,name) {
 	    var branch = this.node(undefined,T_CURRENT);
 	    var d = new VSource(n1,n2,branch,v);
+	    this.voltage_sources.push(d);
 	    return this.add_device(d, name);
 	}
 
@@ -1029,9 +1046,11 @@ cktsim = (function() {
 	///////////////////////////////////////////////////////////////////////////////
 
 	// argument is a string describing the source's value (see comments for details)
-	// source types: dc,step,square,triangle,sin,pulse,pwl,pwlr
+	// source types: dc,step,square,triangle,sin,pulse,pwl,pwl_repeating
 
 	// returns an object with the following attributes:
+	//   fun -- name of source function
+	//   args -- list of argument values
 	//   value(t) -- compute source value at time t
 	//   inflection_point(t) -- compute time after t when a time point is needed
 	//   dc -- value at time 0
@@ -1071,32 +1090,35 @@ cktsim = (function() {
 	    // post-processing for constant sources
 	    // dc(v)
 	    if (src.fun == 'dc') {
-		var value = src.args[0];
-		if (value === undefined) value = 0;
-		src.value = function(t) { return value; }  // closure
+		var v = arg_value(src.args,0,0);
+		src.args = [v];
+		src.value = function(t) { return v; }  // closure
 	    }
 
 	    // post-processing for step sources
-	    // step(v_init,v_plateau,t_delay,t_rise,t_fall)
+	    // step(v_init,v_plateau,t_delay,t_rise)
 	    else if (src.fun == 'step') {
 		var v1 = arg_value(src.args,0,0);  // default init value: 0V
 		var v2 = arg_value(src.args,1,1);  // default plateau value: 1V
 		var td = Math.max(0,arg_value(src.args,2,0));  // time step starts
 		var tr = Math.abs(arg_value(src.args,3,1e-9));  // default rise time: 1ns
+		src.args = [v1,v2,td,tr];  // remember any defaulted values
 		pwl_source(src,[td,v1,td+tr,v2],false);
 	    }
 
 	    // post-processing for square wave
-	    // square(v_init,v_plateau,t_period)
+	    // square(v_init,v_plateau,freq)
 	    else if (src.fun == 'square') {
 		var v1 = arg_value(src.args,0,0);  // default init value: 0V
 		var v2 = arg_value(src.args,1,1);  // default plateau value: 1V
-		var freq = Math.abs(arg_value(src.args,2,1));  // default frequency: 1s
+		var freq = Math.abs(arg_value(src.args,2,1));  // default frequency: 1Hz
+		src.args = [v1,v2,freq];  // remember any defaulted values
 
 		var per = freq == 0 ? Infinity : 1/freq;
 		var t_change = 0.01 * per;   // rise and fall time
 		var t_pw = 0.49 * per;  // half the cycle minus rise and fall time
-		pwl_source(src,[0,v1,t_change,v2,t_change+t_pw,v2,t_change+t_pw+t_change,v1,per,v1],true);
+		pwl_source(src,[0,v1,t_change,v2,t_change+t_pw,
+				v2,t_change+t_pw+t_change,v1,per,v1],true);
 	    }
 
 	    // post-processing for triangle
@@ -1105,6 +1127,7 @@ cktsim = (function() {
 		var v1 = arg_value(src.args,0,0);  // default init value: 0V
 		var v2 = arg_value(src.args,1,1);  // default plateau value: 1V
 		var freq = Math.abs(arg_value(src.args,2,1));  // default frequency: 1s
+		src.args = [v1,v2,freq];  // remember any defaulted values
 
 		var per = freq == 0 ? Infinity : 1/freq;
 		pwl_source(src,[0,v1,per/2,v2,per,v1],true);
@@ -1112,8 +1135,8 @@ cktsim = (function() {
 
 	    // post-processing for pwl and pwlr sources
 	    // pwl[r](t1,v1,t2,v2,...)
-	    else if (src.fun == 'pwl' || src.fun == 'pwlr') {
-		pwl_source(src,src.args,src.fun == 'pwlr');
+	    else if (src.fun == 'pwl' || src.fun == 'pwl_repeating') {
+		pwl_source(src,src.args,src.fun == 'pwl_repeating');
 	    }
 
 	    // post-processing for pulsed sources
@@ -1122,18 +1145,18 @@ cktsim = (function() {
 		var v1 = arg_value(src.args,0,0);  // default init value: 0V
 		var v2 = arg_value(src.args,1,1);  // default plateau value: 1V
 		var td = Math.max(0,arg_value(src.args,2,0));  // time pulse starts
-
 		var tr = Math.abs(arg_value(src.args,3,1e-9));  // default rise time: 1ns
 		var tf = Math.abs(arg_value(src.args,4,1e-9));  // default rise time: 1ns
 		var pw = Math.abs(arg_value(src.args,5,1e9));  // default pulse width: "infinite"
 		var per = Math.abs(arg_value(src.args,6,1e9));  // default period: "infinite"
+		src.args = [v1,v2,td,tr,tf,pw,per];
 
 		var t1 = td;       // time when v1 -> v2 transition starts
 		var t2 = t1 + tr;  // time when v1 -> v2 transition ends
 		var t3 = t2 + pw;  // time when v2 -> v1 transition starts
 		var t4 = t3 + tf;  // time when v2 -> v1 transition ends
 
-		pwl_source(src,[t1,v1,t2,v2,t3,v2,t4,v1,per,v1],true);
+		pwl_source(src,[t1,v1, t2,v2, t3,v2, t4,v1, per,v1],true);
 	    }
 
 	    // post-processing for sinusoidal sources
@@ -1144,16 +1167,14 @@ cktsim = (function() {
 		var freq = Math.abs(arg_value(src.args,2,1));  // default frequency: 1Hz
 		var td = Math.max(0,arg_value(src.args,3,0));  // default time delay: 0sec
 		var phase = arg_value(src.args,4,0);  // default phase offset: 0 degrees
+		src.args = [voffset,va,freq,td,phase];
 
 		phase /= 360.0;
 
 		// return value of source at time t
 		src.value = function(t) {  // closure
 		    if (t < td) return voffset + va*Math.sin(2*Math.PI*phase);
-		    else {
-			var val = voffset + va*Math.sin(2*Math.PI*(freq*(t - td) + phase));
-			return val;
-		    }
+		    else return voffset + va*Math.sin(2*Math.PI*(freq*(t - td) + phase));
 		}
 
 		// return time of next inflection point after time t
@@ -1163,9 +1184,6 @@ cktsim = (function() {
 		}
 	    }
 	
-	    // to do:
-	    // post-processing for piece-wise linear sources
-
 	    // object has all the necessary info to compute the source value and inflection points
 	    src.dc = src.value(0);   // DC value is value at time 0
 	    return src;
@@ -1531,6 +1549,7 @@ cktsim = (function() {
 	var module = {
 	    'Circuit': Circuit,
 	    'parse_number': parse_number,
+	    'parse_source': parse_source,
 	}
 	return module;
     }());

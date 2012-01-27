@@ -594,8 +594,9 @@ schematic = (function() {
 	    var json = [];
 
 	    // output all the components/wires in the diagram
-	    for (var i = this.components.length - 1; i >=0; --i)
-		json.push(this.components[i].json());
+	    var n = this.components.length;
+	    for (var i = 0; i < n; i++)
+		json.push(this.components[i].json(i));
 
 	    // capture the current view parameters
 	    json.push(['view',this.origin_x,this.origin_y,this.scale,
@@ -932,6 +933,10 @@ schematic = (function() {
 		    // for each electrical node
 		    for (var location in this.connection_points)
 			(this.connection_points[location])[0].display_voltage(c,temp);
+
+		    // let components display branch current info if available
+		    for (var i = this.components.length - 1; i >= 0; --i)
+			this.components[i].display_current(c,temp)
 		}
 	    }
 	    
@@ -978,9 +983,6 @@ schematic = (function() {
 	Schematic.prototype.draw_text = function(c,text,x,y,size) {
 	    c.font = size*this.scale+'pt sans-serif'
 	    c.fillText(text,(x - this.origin_x) * this.scale,(y - this.origin_y) * this.scale);
-	}
-
-	HTMLCanvasElement.prototype.totalOffset = function(){
 	}
 
 	// add method to canvas to compute relative coords for event
@@ -1678,8 +1680,9 @@ schematic = (function() {
 	    return [vmin,vmax,1.0/scale];
 	}
 
-	function engineering_notation(n,nplaces) {
+	function engineering_notation(n,nplaces,trim) {
 	    if (n == 0) return("0");
+	    if (trim == undefined) trim = true;
 
 	    var sign = n < 0 ? -1 : 1;
 	    var log10 = Math.log(sign*n)/Math.LN10;
@@ -1694,8 +1697,10 @@ schematic = (function() {
 		if (nplaces > 0) {
 		    endindex += nplaces + 1;
 		    if (endindex > mlen) endindex = mlen;
-		    while (mstring.charAt(endindex-1) == '0') endindex -= 1;
-		    if (mstring.charAt(endindex-1) == '.') endindex -= 1;
+		    if (trim) {
+			while (mstring.charAt(endindex-1) == '0') endindex -= 1;
+			if (mstring.charAt(endindex-1) == '.') endindex -= 1;
+		    }
 		}
 		if (endindex < mlen)
 		    mstring = mstring.substring(0,endindex);
@@ -1717,6 +1722,9 @@ schematic = (function() {
 	    return n.toString();
 	}
 
+	var grid_pattern = [1,2];
+	var cursor_pattern = [5,5];
+
 	// x_values is an array of x coordinates for each of the plots
 	// y_values is an array of [color, value_array], one entry for each plot
 	Schematic.prototype.graph = function(x_values,y_values,x_legend,y_legend) {
@@ -1727,7 +1735,6 @@ schematic = (function() {
 	    var right_margin = 25;
 	    var bottom_margin = 45;
 	    var tick_length = 5;
-	    var pattern = [1,2];
 
 	    var w = pwidth + left_margin + right_margin;
 	    var h = pheight + top_margin + bottom_margin;
@@ -1735,7 +1742,7 @@ schematic = (function() {
 	    var canvas = document.createElement('canvas');
 	    canvas.width = w;
 	    canvas.height = h;
-	    
+
 	    // the graph itself will be drawn here and this image will be copied
 	    // onto canvas, where it can be overlayed with mouse cursors, etc.
 	    var bg_image = document.createElement('canvas');
@@ -1779,7 +1786,7 @@ schematic = (function() {
 		    c.moveTo(temp,top_margin);
 		    c.lineTo(temp,end);
 		} else 
-		    c.dashedLineTo(temp,top_margin,temp,end,pattern);
+		    c.dashedLineTo(temp,top_margin,temp,end,grid_pattern);
 		c.stroke();
 
 		// tick mark
@@ -1821,7 +1828,7 @@ schematic = (function() {
 		    c.moveTo(left_margin,temp);
 		    c.lineTo(left_margin + pwidth,temp);
 		} else 
-		    c.dashedLineTo(left_margin,temp,left_margin + pwidth,temp,pattern);
+		    c.dashedLineTo(left_margin,temp,left_margin + pwidth,temp,grid_pattern);
 		c.stroke();
 
 		// tick mark
@@ -1864,6 +1871,27 @@ schematic = (function() {
 	    c.fillText(y_legend,0,0);
 	    c.restore();
 
+	    // save info need for interactions with the graph
+	    canvas.x_values = x_values;
+	    canvas.y_values = y_values;
+	    canvas.x_legend = x_legend;
+	    canvas.y_legend = y_legend;
+	    canvas.x_min = x_min;
+	    canvas.x_scale = x_scale;
+	    canvas.y_min = y_min;
+	    canvas.y_scale = y_scale;
+	    canvas.left_margin = left_margin;
+	    canvas.top_margin = top_margin;
+	    canvas.pwidth = pwidth;
+	    canvas.pheight = pheight;
+	    canvas.tick_length = tick_length;
+
+	    canvas.cursor_x = undefined;
+	    canvas.sch = this;
+
+	    // do something useful when user mouses over graph
+	    canvas.addEventListener('mousemove',graph_mouse_move,false);
+
 	    // return our masterpiece
 	    redraw_plot(canvas);
 	    return canvas;
@@ -1883,9 +1911,73 @@ schematic = (function() {
 	    return min;
 	}
 
-	function redraw_plot(canvas) {
-	    var c = canvas.getContext('2d');
-	    c.drawImage(canvas.bg_image,0,0);
+	function redraw_plot(graph) {
+	    var c = graph.getContext('2d');
+	    c.drawImage(graph.bg_image,0,0);
+
+	    if (graph.cursor_x != undefined) {
+		// draw dashed vertical marker that follows mouse
+		var x = graph.left_margin + graph.cursor_x;
+		var end_y = graph.top_margin + graph.pheight + graph.tick_length;
+		c.strokeStyle = grid_style;
+		c.lineWidth = 1;
+		c.beginPath();
+		c.dashedLineTo(x,graph.top_margin,x,end_y,cursor_pattern);
+		c.stroke();
+
+		// add x label at bottom of marker
+		var graph_x = graph.cursor_x/graph.x_scale + graph.x_min;
+		c.font = '10pt sans-serif';
+		c.textAlign = 'center';
+		c.textBaseline = 'top';
+		c.fillStyle = background_style;
+		c.fillText('\u2588\u2588\u2588\u2588\u2588',x,end_y);
+		c.fillStyle = normal_style;
+		c.fillText(engineering_notation(graph_x,3,false),x,end_y);
+
+		// compute which points marker is between
+		var x_values = graph.x_values;
+		var len = x_values.length;
+		var index = 0;
+		while (index < len && graph_x >= x_values[index]) index += 1;
+		var x1 = (index == 0) ? x_values[0] : x_values[index-1];
+		var x2 = x_values[index];
+
+		// for each plot, interpolate and output value at intersection with marker
+		c.textAlign = 'left';
+		var tx = graph.left_margin + 4;
+		var ty = graph.top_margin;
+		for (var plot = 0; plot < graph.y_values.length; plot++) {
+		    var values = graph.y_values[plot][1];
+
+		    // interpolate signal value at graph_x using values[index-1] and values[index]
+		    var y1 = (index == 0) ? values[0] : values[index-1];
+		    var y2 = values[index];
+		    var y = y1;
+		    if (graph_x != x1) y += (graph_x - x1)*(y2 - y1)/(x2 - x1);
+
+		    // annotate plot with value of signal at marker
+		    c.fillStyle = element_style;
+		    c.fillText('\u2588\u2588\u2588\u2588\u2588',tx-3,ty);
+		    c.fillStyle = probe_colors_rgb[graph.y_values[plot][0]];
+		    c.fillText(engineering_notation(y,3,false),tx,ty);
+		    ty += 14;
+		}
+	    }
+	}
+
+	function graph_mouse_move(event) {
+	    if (!event) event = window.event;
+	    var g = (window.event) ? event.srcElement : event.target;
+
+	    g.relMouseCoords(event);
+	    // not sure yet where the 3,-3 offset correction comes from (borders? padding?)
+	    var gx = g.mouse_x - g.left_margin - 3;
+	    var gy = g.pheight - (g.mouse_y - g.top_margin) + 3;
+	    if (gx >= 0 && gx <= g.pwidth && gy >=0 && gy <= g.pheight) g.cursor_x = gx;
+	    else g.cursor_x = undefined;
+
+	    redraw_plot(g);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -2112,7 +2204,9 @@ schematic = (function() {
 	    this.connections = [];
 	}
 
-	Component.prototype.json = function() {
+	Component.prototype.json = function(index) {
+	    this.properties['_json_'] = index; // remember where we are in the JSON list
+
 	    var props = {};
 	    for (var p in this.properties) props[p] = this.properties[p];
 
@@ -2343,7 +2437,9 @@ schematic = (function() {
 		// make an <input> widget for each property
 		var fields = new Array();
 		for (var i in this.properties)
-		    fields[i] = build_input('text',10,this.properties[i]);
+		    // underscore at beginning of property name => system property
+		    if (i.charAt(0) != '_')
+			fields[i] = build_input('text',10,this.properties[i]);
 
 		var content = build_table(fields);
 		content.fields = fields;
@@ -2381,6 +2477,10 @@ schematic = (function() {
 		if (!cp.label)
 		    cp.propagate_label(this.sch.get_next_label());
 	    }
+	}
+
+	// default behavior: nothing to display for DC analysis
+	Component.prototype.display_current = function(c,vmap) {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -2507,7 +2607,7 @@ schematic = (function() {
 	    return '<Wire ('+this.x+','+this.y+') ('+(this.x+this.dx)+','+(this.y+this.dy)+')>';
 	}
     
-	Wire.prototype.json = function() {
+	Wire.prototype.json = function(index) {
 	    var json = ['w',[this.x, this.y, this.x+this.dx, this.y+this.dy]];
 	    return json;
 	}
@@ -3024,14 +3124,18 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
+	
 	function Source(x,y,rotation,name,type,value) {
 	    Component.call(this,type,x,y,rotation);
 	    this.properties['name'] = name;
-	    this.properties['value'] = value ? value : '1';
+	    if (value == undefined) value = 'dc(1)';
+	    this.properties['value'] = value;
 	    this.add_connection(0,0);
 	    this.add_connection(0,48);
 	    this.bounding_box = [-12,0,12,48];
 	    this.update_coords();
+
+	    this.content = document.createElement('div');  // used by edit_properties
 	}
 	Source.prototype = new Component();
 	Source.prototype.constructor = Source;
@@ -3068,9 +3172,140 @@ schematic = (function() {
 		this.draw_text(c,this.properties['value'],13,24,3,property_size);
 	}
 
-	Source.prototype.clone = function(x,y) {
-	    return new Source(x,y,this.rotation,this.properties['name'],this.type,this.properties['value']);
+	// map source function name to labels for each source parameter
+	source_functions = {
+	    'dc': ['DC value'],
+
+	    'step': ['Initial value',
+		     'Plateau value',
+		     'Delay until step (secs)',
+		     'Rise time (secs)'],
+
+	    'square': ['Initial value',
+		       'Plateau value',
+		       'Frequency (Hz)'],
+
+	    'triangle': ['Initial value',
+			 'Plateau value',
+			 'Frequency (Hz)'],
+
+	    'pwl': ['Comma-separated list of alternating times and values'],
+
+	    'pwl_repeating': ['Comma-separated list of alternating times and values'],
+
+	    'pulse': ['Initial value',
+		      'Plateau value',
+		      'Delay until pulse (secs)',
+		      'Time for first transition (secs)',
+		      'Time for second transition (secs)',
+		      'Pulse width (secs)',
+		      'Period (secs)'],
+
+	    'sin': ['Offset value',
+		    'Amplitude',
+		    'Frequency (Hz)',
+		    'Delay until sin starts (secs)',
+		    'Phase offset (degrees)'],
 	}
+
+	// build property editor div
+	Source.prototype.build_content = function(src) {
+	    // make an <input> widget for each property
+	    var fields = []
+	    fields['name'] = build_input('text',10,this.properties['name']);
+
+	    if (src == undefined) {
+		fields['value'] = this.properties['value'];
+	    } else {
+		// fancy version: add select tag for source type
+		var src_types = [];
+		for (var t in source_functions) src_types.push(t);
+		var type_select = build_select(src_types,src.fun);
+		type_select.component = this;
+		type_select.addEventListener('change',source_type_changed,false)
+		fields['type'] = type_select;
+
+		if (src.fun == 'pwl' || src.run == 'pwl_repeating') {
+		    var v = '';
+		    var first = true;
+		    for (var i = 0; i < src.args.length; i++) {
+			if (first) first = false;
+			else v += ',';
+			v += engineering_notation(src.args[i],3);
+			if (i % 2 == 0) v += 's';
+		    }
+		    fields[source_functions[src.fun][0]] = build_input('text',30,v);
+		} else {
+		    // followed separate input tag for each parameter
+		    var labels = source_functions[src.fun];
+		    for (var i = 0; i < labels.length; i++) {
+			var v = engineering_notation(src.args[i],3);
+			fields[labels[i]] = build_input('text',10,v);
+		    }
+		}
+	    }
+
+	    var div = this.content;
+	    if (div.hasChildNodes())
+		div.removeChild(div.firstChild);  // remove table of input fields
+	    div.appendChild(build_table(fields));
+	    div.fields = fields;
+	    div.component = this;
+	    return div;
+	}
+
+	function source_type_changed(event) {
+	    if (!event) event = window.event;
+	    var select = (window.event) ? event.srcElement : event.target;
+
+	    // see where to get source parameters from
+	    var type = select.options[select.selectedIndex].value;
+	    var src = undefined;
+	    if (this.src != undefined && type == this.src.fun)
+		src = this.src;
+	    else if (typeof cktsim != 'undefined')
+		src = cktsim.parse_source(type+'()');
+
+	    select.component.build_content(src);
+	}
+
+	Source.prototype.edit_properties = function(x,y) {
+	    if (this.near(x,y)) {
+		this.src = undefined;
+		if (typeof cktsim != 'undefined')
+		    this.src = cktsim.parse_source(this.properties['value']);
+		var content = this.build_content(this.src);
+
+		this.sch.dialog('Edit Properties',content,function(content) {
+			var c = content.component;
+			var fields = content.fields;
+
+			var first = true;
+			var value = '';
+			for (var label in fields) {
+			    if (label == 'name') 
+				c.properties['name'] = fields['name'].value;
+			    else if (label == 'value')  {
+				// if unknown source type
+				value = fields['value'].value;
+				c.sch.redraw_background();
+				return;
+			    } else if (label == 'type') {
+				var select = fields['type'];
+				value = select.options[select.selectedIndex].value + '(';
+			    } else {
+				if (first) first = false;
+				else value += ',';
+				value += fields[label].value;
+			    }
+			}
+			c.properties['value'] = value + ')';
+			c.sch.redraw_background();
+		    });
+		return true;
+	    } else return false;
+	}
+
 
 	function VSource(x,y,rotation,name,value) {
 	    Source.call(this,x,y,rotation,name,'v',value);
@@ -3081,6 +3316,32 @@ schematic = (function() {
 	VSource.prototype.toString = Source.prototype.toString;
 	VSource.prototype.draw = Source.prototype.draw;
 	VSource.prototype.clone = Source.prototype.clone;
+	VSource.prototype.build_content = Source.prototype.build_content;
+	VSource.prototype.edit_properties = Source.prototype.edit_properties;
+
+	// display current for DC analysis
+	VSource.prototype.display_current = function(c,vmap) {
+	    var name = this.properties['name'];
+	    var label = 'I(' + (name ? name : '_' + this.properties['_json_']) + ')';
+	    var v = vmap[label];
+	    if (v != undefined) {
+		// first draw some solid blocks in the background
+		c.globalAlpha = 0.85;
+		this.draw_text(c,'\u2588\u2588\u2588',0,24,4,annotation_size,element_style);
+		c.globalAlpha = 1.0;
+
+		// display the node voltage at this connection point
+		var i = engineering_notation(v,2) + 'A';
+		this.draw_text(c,i,0,24,4,annotation_size,annotation_style);
+
+		// only display each current once
+		delete vmap[label];
+	    }
+	}
+
+	VSource.prototype.clone = function(x,y) {
+	    return new VSource(x,y,this.rotation,this.properties['name'],this.properties['value']);
+	}
 
 	function ISource(x,y,rotation,name,value) {
 	    Source.call(this,x,y,rotation,name,'i',value);
@@ -3091,6 +3352,12 @@ schematic = (function() {
 	ISource.prototype.toString = Source.prototype.toString;
 	ISource.prototype.draw = Source.prototype.draw;
 	ISource.prototype.clone = Source.prototype.clone;
+	ISource.prototype.build_content = Source.prototype.build_content;
+	ISource.prototype.edit_properties = Source.prototype.edit_properties;
+
+	ISource.prototype.clone = function(x,y) {
+	    return new ISource(x,y,this.rotation,this.properties['name'],this.properties['value']);
+	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
