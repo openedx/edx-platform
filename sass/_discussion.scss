@@ -75,31 +75,6 @@ body.askbot {
         vertical-align: top;
         width: flex-grid(9);
 
-        div.order-sort {
-          @include border-radius(35px);
-          background-color: lighten(#F6EFD4, 5%) ;
-          height: 30px;
-          float: right;
-          font-size: 16px;
-          margin: 3px 0;
-          padding: 0 20px;
-
-          a {
-            color: darken(#F6EFD4, 50%);
-
-            &:before {
-              content: '|';
-              color: darken(#F6EFD4, 10%);
-              font-size: 22px;
-            }
-
-            &:hover {
-              text-decoration: none;
-              color: darken(#F6EFD4, 70%);
-            }
-          }
-        }
-
         p.tabula-rasa {
           @include border-radius(5px);
           background-color: #f6f6f6;

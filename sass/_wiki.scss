@@ -8,11 +8,11 @@ div.wiki-wrapper {
 
     input[type="button"] {
       @extend h3;
-      color: lighten($text-color, 10%);
       @include transition();
+      color: lighten($text-color, 10%);
       font-size: $body-font-size;
       margin: 0  !important;
-      padding: 7px 7px 7px 30px;
+      padding: 7px lh();
       text-align: left;
       width: 100%;
 
@@ -24,31 +24,26 @@ div.wiki-wrapper {
 
     ul {
       li {
+        &.search {
+          @include box-shadow(0 1px 0 #eee);
+          border-bottom: 1px solid #d3d3d3;
+          padding: 7px lh();
+
+          label {
+            display: none;
+          }
+        }
+
         &.create-article {
-          position: relative;
-
           h3 {
-            position: relative;
-
-            &:before {
-              background: blue  url(images/ui-icons_454545_256x240.png) -32px -16px no-repeat;
-              display: block;
-              position: absolute;
-              top: 0;
-              right: 0;
-              width: 16px;
-              height: 16px;
-            }
-
-            &:hover {
-              &:before {
-                background-image: url(images/ui-icons_454545_256x240.png) -64px -16px no-repeat;
-              }
+            a {
+              padding: 7px lh();
             }
           }
         }
       }
     }
+
     div#wiki_create_form {
       @extend .clearfix;
       padding: 15px;
@@ -63,6 +58,8 @@ div.wiki-wrapper {
       }
 
       ul {
+        list-style: none;
+
         li {
           float: left;
 
@@ -77,7 +74,7 @@ div.wiki-wrapper {
 
   section.wiki-body {
     @extend .content;
-    
+
     header {
       @extend .topbar;
 
@@ -91,6 +88,7 @@ div.wiki-wrapper {
 
       ul {
         float: right;
+        list-style: none;
 
         li {
           float: left;
@@ -108,7 +106,7 @@ div.wiki-wrapper {
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 15px;
+            padding: lh(.75);
             margin: 0;
 
             &:hover {
@@ -128,6 +126,12 @@ div.wiki-wrapper {
 
     p {
       line-height: 1.6em;
+    }
+
+    #wiki_history_table {
+      tr.dark {
+        background-color: $light-gray;
+      }
     }
   }
 }

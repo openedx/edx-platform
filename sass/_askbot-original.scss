@@ -662,116 +662,116 @@ ul#searchTags {
   float: right;
   padding-top: 2px; }
 
-.search-tips {
-  font-size: 16px;
-  line-height: 17px;
-  color: #707070;
-  margin: 5px 0 10px 0;
-  padding: 0px;
-  float: left;
-  font-family: 'Yanone Kaffeesatz',sans-serif;
-  a {
-    text-decoration: underline;
-    color: #1b79bd; } }
+// .search-tips {
+//   font-size: 16px;
+//   line-height: 17px;
+//   color: #707070;
+//   margin: 5px 0 10px 0;
+//   padding: 0px;
+//   float: left;
+//   font-family: 'Yanone Kaffeesatz',sans-serif;
+//   a {
+//     text-decoration: underline;
+//     color: #1b79bd; } }
 
-#question-list {
-  float: left;
-  position: relative;
-  background-color: #FFF;
-  padding: 0;
-  width: 100%; }
+// #question-list {
+//   float: left;
+//   position: relative;
+//   background-color: #FFF;
+//   padding: 0;
+//   width: 100%; }
 
-.short-summary {
-  position: relative;
-  filter: inherit;
-  padding: 10px;
-  border-bottom: 1px solid #DDDBCE;
-  margin-bottom: 1px;
-  overflow: hidden;
-  width: 710px;
-  float: left;
-  background: url(../images/summary-background.png) repeat-x;
-  h2 {
-    font-size: 24px;
-    font-weight: normal;
-    line-height: 26px;
-    padding-left: 0;
-    margin-bottom: 6px;
-    display: block;
-    font-family: 'Yanone Kaffeesatz',sans-serif; }
-  a {
-    color: #464646; }
-  .userinfo {
-    text-align: right;
-    line-height: 16px;
-    font-family: Arial;
-    padding-right: 4px;
-    .relativetime {
-      font-size: 11px;
-      clear: both;
-      font-weight: normal;
-      color: #555; } }
-  span.anonymous {
-    font-size: 11px;
-    clear: both;
-    font-weight: normal;
-    color: #555; }
-  .userinfo a {
-    font-weight: bold;
-    font-size: 11px; }
-  .counts {
-    float: right;
-    margin: 4px 0 0 5px;
-    font-family: 'Yanone Kaffeesatz',sans-serif;
-    .item-count {
-      padding: 0px 5px 0px 5px;
-      font-size: 25px;
-      font-family: 'Yanone Kaffeesatz',sans-serif; }
-    .votes div, .views div, .answers div, .favorites div {
-      margin-top: 3px;
-      font-size: 14px;
-      line-height: 14px;
-      color: #646464; } }
-  .tags {
-    margin-top: 0; }
-  .votes, .answers, .favorites, .views {
-    text-align: center;
-    margin: 0 3px;
-    padding: 8px 2px 0px 2px;
-    width: 51px;
-    float: right;
-    height: 44px;
-    border: #dbdbd4 1px solid; }
-  .votes {
-    background: url(../images/vote-background.png) repeat-x; }
-  .answers {
-    background: url(../images/answers-background.png) repeat-x; }
-  .views {
-    background: url(../images/view-background.png) repeat-x; }
-  .no-votes .item-count {
-    color: #b1b5b6; }
-  .some-votes .item-count {
-    color: #4a757f; }
-  .no-answers .item-count {
-    color: #b1b5b6; }
-  .some-answers .item-count {
-    color: #eab243; }
-  .no-views .item-count {
-    color: #b1b5b6; }
-  .some-views .item-count {
-    color: #d33f00; }
-  .accepted .item-count {
-    background: url(../images/accept.png) no-repeat top right;
-    display: block;
-    text-align: center;
-    width: 40px;
-    color: #eab243; }
-  .some-favorites .item-count {
-    background: #338333;
-    color: #d0f5a9; }
-  .no-favorites .item-count {
-    background: #eab243;
-    color: yellow; } }
+// .short-summary {
+//   position: relative;
+//   filter: inherit;
+//   padding: 10px;
+//   border-bottom: 1px solid #DDDBCE;
+//   margin-bottom: 1px;
+//   overflow: hidden;
+//   width: 710px;
+//   float: left;
+//   background: url(../images/summary-background.png) repeat-x;
+//   h2 {
+//     font-size: 24px;
+//     font-weight: normal;
+//     line-height: 26px;
+//     padding-left: 0;
+//     margin-bottom: 6px;
+//     display: block;
+//     font-family: 'Yanone Kaffeesatz',sans-serif; }
+//   a {
+//     color: #464646; }
+//   .userinfo {
+//     text-align: right;
+//     line-height: 16px;
+//     font-family: Arial;
+//     padding-right: 4px;
+//     .relativetime {
+//       font-size: 11px;
+//       clear: both;
+//       font-weight: normal;
+//       color: #555; } }
+//   span.anonymous {
+//     font-size: 11px;
+//     clear: both;
+//     font-weight: normal;
+//     color: #555; }
+//   .userinfo a {
+//     font-weight: bold;
+//     font-size: 11px; }
+//   .counts {
+//     float: right;
+//     margin: 4px 0 0 5px;
+//     font-family: 'Yanone Kaffeesatz',sans-serif;
+//     .item-count {
+//       padding: 0px 5px 0px 5px;
+//       font-size: 25px;
+//       font-family: 'Yanone Kaffeesatz',sans-serif; }
+//     .votes div, .views div, .answers div, .favorites div {
+//       margin-top: 3px;
+//       font-size: 14px;
+//       line-height: 14px;
+//       color: #646464; } }
+//   .tags {
+//     margin-top: 0; }
+//   .votes, .answers, .favorites, .views {
+//     text-align: center;
+//     margin: 0 3px;
+//     padding: 8px 2px 0px 2px;
+//     width: 51px;
+//     float: right;
+//     height: 44px;
+//     border: #dbdbd4 1px solid; }
+//   .votes {
+//     background: url(../images/vote-background.png) repeat-x; }
+//   .answers {
+//     background: url(../images/answers-background.png) repeat-x; }
+//   .views {
+//     background: url(../images/view-background.png) repeat-x; }
+//   .no-votes .item-count {
+//     color: #b1b5b6; }
+//   .some-votes .item-count {
+//     color: #4a757f; }
+//   .no-answers .item-count {
+//     color: #b1b5b6; }
+//   .some-answers .item-count {
+//     color: #eab243; }
+//   .no-views .item-count {
+//     color: #b1b5b6; }
+//   .some-views .item-count {
+//     color: #d33f00; }
+//   .accepted .item-count {
+//     background: url(../images/accept.png) no-repeat top right;
+//     display: block;
+//     text-align: center;
+//     width: 40px;
+//     color: #eab243; }
+//   .some-favorites .item-count {
+//     background: #338333;
+//     color: #d0f5a9; }
+//   .no-favorites .item-count {
+//     background: #eab243;
+//     color: yellow; } }
 
 // .evenMore {
 //   font-size: 13px;
@@ -869,31 +869,31 @@ ul#searchTags {
 .tag-size-10 {
   font-size: 21px; }
 
-ul {
-  &.tags {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    line-height: 170%;
-    display: block;
-    &.marked-tags {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      line-height: 170%;
-      display: block; } }
-  &#related-tags {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    line-height: 170%;
-    display: block; }
-  &.tags li {
-    float: left;
-    display: block;
-    margin: 0 8px 0 0;
-    padding: 0;
-    height: 20px; } }
+// ul {
+//   &.tags {
+//     list-style: none;
+//     margin: 0;
+//     padding: 0;
+//     line-height: 170%;
+//     display: block;
+//     &.marked-tags {
+//       list-style: none;
+//       margin: 0;
+//       padding: 0;
+//       line-height: 170%;
+//       display: block; } }
+//   &#related-tags {
+//     list-style: none;
+//     margin: 0;
+//     padding: 0;
+//     line-height: 170%;
+//     display: block; }
+//   &.tags li {
+//     float: left;
+//     display: block;
+//     margin: 0 8px 0 0;
+//     padding: 0;
+//     height: 20px; } }
 
 .wildcard-tags {
   clear: both; }
@@ -919,35 +919,35 @@ ul {
     float: left;
     clear: left; } }
 
-.tag-left {
-  cursor: pointer;
-  display: block;
-  float: left;
-  height: 17px;
-  margin: 0 5px 0 0;
-  padding: 0;
-  -webkit-box-shadow: 0px 0px 5px #d3d6d7;
-  -moz-box-shadow: 0px 0px 5px #d3d6d7;
-  box-shadow: 0px 0px 5px #d3d6d7; }
+// .tag-left {
+//   cursor: pointer;
+//   display: block;
+//   float: left;
+//   height: 17px;
+//   margin: 0 5px 0 0;
+//   padding: 0;
+//   -webkit-box-shadow: 0px 0px 5px #d3d6d7;
+//   -moz-box-shadow: 0px 0px 5px #d3d6d7;
+//   box-shadow: 0px 0px 5px #d3d6d7; }
 
-.tag-right {
-  background: #f3f6f6;
-  border: #fff 1px solid;
-  border-top: #fff 2px solid;
-  outline: #cfdbdb 1px solid;
-  display: block;
-  float: left;
-  height: 17px;
-  line-height: 17px;
-  font-weight: normal;
-  font-size: 11px;
-  padding: 0px 8px 0px 8px;
-  text-decoration: none;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  font-family: Arial;
-  color: #717179; }
+// .tag-right {
+//   background: #f3f6f6;
+//   border: #fff 1px solid;
+//   border-top: #fff 2px solid;
+//   outline: #cfdbdb 1px solid;
+//   display: block;
+//   float: left;
+//   height: 17px;
+//   line-height: 17px;
+//   font-weight: normal;
+//   font-size: 11px;
+//   padding: 0px 8px 0px 8px;
+//   text-decoration: none;
+//   text-align: center;
+//   white-space: nowrap;
+//   vertical-align: middle;
+//   font-family: Arial;
+//   color: #717179; }
 
 .deletable-tag {
   margin-right: 3px;
@@ -2563,13 +2563,13 @@ p.signup_p {
     margin-bottom: 7px;
     font-size: 14px; } }
 
-.search-result-summary {
-  font-weight: bold;
-  font-size: 18px;
-  line-height: 22px;
-  margin: 0px 0px 0px 0px;
-  padding: 2px 0 0 0;
-  float: left; }
+// .search-result-summary {
+//   font-weight: bold;
+//   font-size: 18px;
+//   line-height: 22px;
+//   margin: 0px 0px 0px 0px;
+//   padding: 2px 0 0 0;
+//   float: left; }
 
 .faq-rep-item {
   text-align: right;

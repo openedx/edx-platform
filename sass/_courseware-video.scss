@@ -1,0 +1,105 @@
+section.course-content {
+
+  div.video-wrapper {
+    float: left;
+    width: flex-grid(6, 9);
+
+    margin-right: flex-gutter(9);
+
+    div.video-player {
+      position: relative;
+      padding-bottom: 56.25%;
+      padding-top: 30px;
+      height: 0;
+      overflow: hidden;
+
+      object {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      iframe#html5_player {
+        border: none;
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    section {
+      ul {
+        display: inline-block;
+
+        li {
+          margin-top: 5px;
+          display: inline-block;
+          cursor: pointer;
+          border: 0;
+          padding: 0;
+
+          div {
+            &:empty {
+              display: none;
+            }
+          }
+        }
+      }
+
+      div#slider {
+        margin: -14px 0 10px 60px;
+      }
+
+      div#vidtime {
+        float: left;
+      }
+
+      div#video_speeds {
+        float: right;
+        cursor: pointer;
+
+        span {
+          &:hover {
+            color: $mit-red;
+          }
+        }
+      }
+    }
+  }
+
+  ol.subtitles {
+    float: left;
+    width: flex-grid(3, 9);
+
+    li {
+      margin-bottom: 0px;
+      cursor: pointer;
+      border: 0;
+      padding: 0;
+      color: #666;
+
+      &.current {
+        background-color: #f3f3f3;
+        color: #333;
+      }
+
+      &:hover {
+        color: $mit-red;
+      }
+
+      div {
+        margin-bottom: 8px;
+      }
+
+      div:empty {
+        margin-bottom: 0px;
+      }
+    }
+  }
+
+}

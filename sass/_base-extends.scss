@@ -109,11 +109,18 @@
   @extend .clearfix;
 
   a {
-    text-transform: uppercase;
+    @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
+    background: darken(#F6EFD4, 5%);
+    border-left: 1px solid darken(#f6efd4, 20%);
     color: darken(#F6EFD4, 80%);
+    padding: lh(.75);
+    text-transform: uppercase;
+    display: block;
 
     &:hover {
       color: darken(#F6EFD4, 60%);
+      text-decoration: none;
+      background: none;
     }
   }
 }

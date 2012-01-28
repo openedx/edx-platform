@@ -1,107 +1,11 @@
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Open Sans'), local('OpenSans'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: 400;
-  src: local('Open Sans Italic'), local('OpenSans-Italic'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 800;
-  src: local('Open Sans Extrabold'), local('OpenSans-Extrabold'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/EInbV5DfGHOiMmvb1Xr-hqRDOzjiPcYnFooOUGCOsRk.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: 800;
-  src: local('Open Sans Extrabold Italic'), local('OpenSans-ExtraboldItalic'), url('http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxsBo4hlZyBvkZICS3KpNonM.woff') format('woff');
-}
-// Extends
-//---------------------------------------- //
-.wrapper {
-  @include box-sizing(border-box);
-  margin: 0 auto;
-  max-width: $fg-max-width;
-  min-width: $fg-min-width;
-  padding: lh();
-  width: flex-grid(12);
-}
-
-.subpage {
-  @extend .clearfix;
-  @extend .wrapper;
-
-  > div {
-    padding-left: flex-grid(4) + flex-gutter();
-
-    p {
-      margin-bottom: lh();
-    }
-
-    h1 {
-      margin-bottom: lh(.5);
-    }
-
-    h2 {
-      font: 18px $header-font-family;
-      color: #000;
-      margin-bottom: lh(.5);
-    }
-
-    ul {
-      list-style: disc outside none;
-
-      li {
-        list-style: disc outside none;
-      }
-    }
-  }
-}
-
-.clearfix:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-
-.button {
-  @include border-radius(3px);
-  @include border-radius(3px);
-  @include inline-block();
-  @include transition();
-  background-color: $mit-red;
-  color: #fff;
-  margin: lh() 0 lh(.5);
-  padding: lh(.25) lh(.5);
-  text-decoration: none;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-
-  &:hover {
-    background-color: darken($mit-red, 10%);
-  }
-
-  span {
-    font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
-    font-style: italic;
-  }
-}
-
 body {
   background-color: #fff;
   color: #444;
   font: $body-font-size $body-font-family;
+
+  :focus {
+    outline-color: #ccc;
+  }
 
   h1 {
     font: 800 24px $header-font-family;
@@ -140,17 +44,17 @@ body {
 }
 
 header.announcement {
-  // @include background-size(cover);
+  @include background-size(cover);
   background: #333;
   border-bottom: 1px solid #000;
   color: #fff;
   -webkit-font-smoothing: antialiased;
 
   &.home {
-    background: #e3e3e3 url("/static/images/marketing/shot-1-medium.jpg");
+    background: #e3e3e3 url("/static/images/marketing/shot-5-medium.jpg");
 
     @media screen and (min-width: 1200px) {
-      background: #e3e3e3 url("/static/images/marketing/shot-1-large.jpg");
+      background: #e3e3e3 url("/static/images/marketing/shot-5-large.jpg");
     }
 
     // @media screen and (max-width: 1199px) {
@@ -158,6 +62,17 @@ header.announcement {
 
     div {
       padding: lh(10) lh() lh(3);
+
+      //hide login link for homepage
+      nav {
+        h1 {
+          margin-right: 0;
+        }
+
+        a.login {
+          display: none;
+        }
+      }
     }
   }
 
@@ -188,16 +103,20 @@ header.announcement {
       @include border-radius(0 0 3px 3px);
       background: #333;
       background: rgba(#000, .7);
-      padding: lh(.5);
+      padding: lh(.5) lh();
 
       h1 {
         @include inline-block();
-        margin-right: lh();
+        margin-right: lh(.5);
 
         a {
           font: italic 800 18px $header-font-family;
           color: #fff;
           text-decoration: none;
+
+          &:hover, &:focus {
+            color: #999;
+          }
         }
       }
 
@@ -206,9 +125,10 @@ header.announcement {
         color: #fff;
         font-size: 12px;
         font-style: normal;
+        font-family: $header-font-family;
 
-        &:hover {
-          color: rgba(#fff, .6);
+        &:hover, &:focus {
+          color: #999;
         }
       }
     }

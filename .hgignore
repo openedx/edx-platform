@@ -4,3 +4,4 @@ syntax: glob
 *.scssc
 *.swp
 *.orig
+*.DS_Store

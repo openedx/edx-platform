@@ -4,12 +4,37 @@ div.book-wrapper {
   ul#booknav {
     @extend .sidebar;
     @include box-sizing(border-box);
-    padding: lh();
+
+    a {
+      color: #000;
+
+      &:hover {
+        color: #666;
+      }
+    }
 
     li {
+      background: none;
+      padding-left: 30px;
+
+      div.hitarea {
+        margin-left: -22px;
+
+        &:hover {
+          opacity: 0.6;
+          filter: alpha(opacity=60);
+        }
+      }
+
       ul {
         background: none;
       }
+    }
+
+    > li {
+      border-bottom: 1px solid #d3d3d3;
+      @include box-shadow(0 1px 0 #eee);
+      padding: 7px 7px 7px 30px;
     }
   }
 
@@ -18,17 +43,25 @@ div.book-wrapper {
 
     nav {
       @extend .topbar;
+      @extend .clearfix;
 
       ul {
         @extend .clearfix;
-        li {
-          padding: 15px;
 
+        li {
           &.last {
             float: left;
+            display: block;
+
+            a {
+              @include box-shadow(inset -1px 0 0 lighten(#f6efd4, 5%));
+              border-right: 1px solid darken(#f6efd4, 20%);
+              border-left: 0;
+            }
           }
 
           &.next {
+            display: block;
             float: right;
           }
         }

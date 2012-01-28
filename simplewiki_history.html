@@ -60,17 +60,18 @@ ${ wiki_article.title }
             <tr>
                 <td colspan="4">
                     %if wiki_prev_page:
-                        <a href="${reverse("wiki_history", args=[wiki_article.get_url(), wiki_prev_page])}">trans "Previous page"</a>
+                        <a href="${reverse("wiki_history", args=[wiki_article.get_url(), wiki_prev_page])}">Previous page</a>
                     %endif
                     %if wiki_next_page:
-                        <a href="${reverse("wiki_history", args=[wiki_article.get_url(), wiki_next_page])}">"Next page"</a>
+                        <a href="${reverse("wiki_history", args=[wiki_article.get_url(), wiki_next_page])}">Next page</a>
                     %endif
                 </td>
             </tr>
         </tfoot>
     %endif
 </table>
-<input type="submit" name="change" value="Change revision"
+<input type="submit" name="view" value="View revision"/>
+<input type="submit" name="change" value="Change to revision"
 %if not wiki_write:
 	disabled="true"
 %endif

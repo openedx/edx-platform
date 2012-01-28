@@ -1,16 +1,16 @@
 var streams=${ streams }
-var params = { allowScriptAccess: "always", bgcolor: "#cccccc", wmode: "transparent" };
+var params = { allowScriptAccess: "always", bgcolor: "#cccccc", wmode: "transparent", allowFullScreen: "true" };
 var atts = { id: "myytplayer" };
 
 // If the user doesn't have flash, use the HTML5 Video instead. YouTube's
-// iFrame API which supports HTML5 is still developmental so it is not default 
+// iFrame API which supports HTML5 is still developmental so it is not default
 if (swfobject.hasFlashPlayerVersion("10.1")){
-  swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer?wmode=transparent", 
-        "ytapiplayer", "640", "385", "8", null, null, params, atts);  
+  swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer?wmode=transparent",
+        "ytapiplayer", "640", "385", "8", null, null, params, atts);
 } else {
 
   //end of this URL may need &origin=http://..... once pushed to production to prevent XSS
-  $("#html5_player").attr("src", "http://www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1");
+  $("#html5_player").attr("src", "http://www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1&controls=0");
   $("#html5_player").show();
 
   var tag = document.createElement('script');
@@ -18,6 +18,7 @@ if (swfobject.hasFlashPlayerVersion("10.1")){
   var firstScriptTag = document.getElementsByTagName('script')[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+  // Make sure the callback is called once API ready, YT seems to be buggy
   loadHTML5Video();
 }
 var captions=0;
@@ -25,7 +26,7 @@ $("#slider").slider({slide:function(event,ui){seek_slide('slide',event.originalE
                      stop:function(event,ui){seek_slide('stop',event.originalEvent,ui.value);}});
 
 function good() {
-    	window['console'].log(ytplayer.getCurrentTime());
+    window['console'].log(ytplayer.getCurrentTime());
 }
 
 ajax_video=good;
@@ -36,8 +37,8 @@ function add_speed(key, stream) {
     var id = 'speed_' + stream;
     $("#video_speeds").append(' <span id="'+id+'">'+key+'X</span>');
     $("#"+id).click(function(){
-	    change_video_speed(key, stream);
-	});
+      change_video_speed(key, stream);
+    });
 }
 
 var l=[]
@@ -57,4 +58,3 @@ l.sort(sort_by_value);
 for(var i=0; i<l.length; i++) {
     add_speed(l[i], streams[l[i]])
 }
-
