@@ -8,7 +8,9 @@ from django.conf import settings
 global_context={'random':random,
                 'numpy':numpy,
                 'math':math,
-                'scipy':scipy}
+                'scipy':scipy, 
+                'calc':calc, 
+                'eia':eia}
 
 class numericalresponse(object):
     def __init__(self, xml, context):
