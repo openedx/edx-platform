@@ -3,6 +3,8 @@ from util import contextualize_text
 from calc import evaluator
 import random, math
 from django.conf import settings
+import eia
+import calc
 
 # TODO: Should be the same object as in capa_problem
 global_context={'random':random,
