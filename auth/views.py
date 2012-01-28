@@ -1,18 +1,19 @@
+import json
 import logging
+import random
+import string
 
-from djangomako.shortcuts import render_to_response, render_to_string
-from django.contrib.auth.models import User
-from django.shortcuts import redirect
+from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-import json
-from models import Registration, UserProfile
-from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.validators import validate_email, validate_slug
-import random, string
 from django.db import connection
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from djangomako.shortcuts import render_to_response, render_to_string
+from models import Registration, UserProfile
 
 log = logging.getLogger("mitx.auth")
 

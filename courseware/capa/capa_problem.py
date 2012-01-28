@@ -1,17 +1,23 @@
-import random, numpy, math, scipy
-import struct, os
+import copy
+import math
+import numpy
+import os
+import random
 import re
+import scipy
+import struct
+
 from lxml import etree
 from lxml.etree import Element
-import copy
+
 from mako.template import Template
-from courseware.content_parser import xpath_remove
-import calc, eia
 
 from util import contextualize_text
-
 from inputtypes import textline, schematic
 from responsetypes import numericalresponse, formularesponse, customresponse, schematicresponse
+
+import calc
+import eia
 
 response_types = {'numericalresponse':numericalresponse, 
                   'formularesponse':formularesponse,
@@ -52,12 +58,14 @@ class LoncapaProblem(object):
         self.done = False
         self.filename = filename
 
-        if id!=None:
+        if id:
             self.problem_id = id
         else:
-            self.problem_id = filename
+            print "NO ID"
+            raise Exception("This should never happen (183)")
+            #self.problem_id = filename
 
-        if state!=None:
+        if state:
             if 'seed' in state:
                 self.seed = state['seed']
             if 'student_answers' in state:
@@ -68,7 +76,7 @@ class LoncapaProblem(object):
                 self.done = state['done']
 
         # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
-        if self.seed == None:
+        if not self.seed:
             self.seed=struct.unpack('i', os.urandom(4))[0]
 
         ## Parse XML file
@@ -102,7 +110,7 @@ class LoncapaProblem(object):
         for key in self.correct_map:
             if self.correct_map[key] == u'correct':
                 correct += 1
-        if self.student_answers == None or len(self.student_answers)==0:
+        if (not self.student_answers) or len(self.student_answers)==0:
             return {'score':0,
                     'total':self.get_max_score()}
         else:
@@ -132,7 +140,7 @@ class LoncapaProblem(object):
 
         for entry in problems_simple.xpath("//"+"|//".join(response_properties+entry_types)):
             answer = entry.get('correct_answer')
-            if answer != None:
+            if answer:
                 answer_map[entry.get('id')] = contextualize_text(answer, self.context)
 
         return answer_map
@@ -162,7 +170,7 @@ class LoncapaProblem(object):
                 status = self.correct_map[problemtree.get('id')]
 
             value = ""
-            if self.student_answers != None and problemtree.get('id') in self.student_answers:
+            if self.student_answers and problemtree.get('id') in self.student_answers:
                 value = self.student_answers[problemtree.get('id')]
 
             return html_special_response[problemtree.tag](problemtree, value, status) #TODO
@@ -170,7 +178,7 @@ class LoncapaProblem(object):
         tree=Element(problemtree.tag)
         for item in problemtree:
             subitems = self.extract_html(item)
-            if subitems != None: 
+            if subitems: 
                 for subitem in subitems:
                     tree.append(subitem)
         for (key,value) in problemtree.items():

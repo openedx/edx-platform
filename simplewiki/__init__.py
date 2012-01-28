@@ -1,6 +1,7 @@
 # Source: django-simplewiki. GPL license. 
 
-import sys, os
+import os
+import sys
 
 # allow mdx_* parsers to be just dropped in the simplewiki folder
 module_path = os.path.abspath(os.path.dirname(__file__))

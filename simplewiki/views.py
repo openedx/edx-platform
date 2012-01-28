@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
 import types
-from django.core.urlresolvers import get_callable
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotAllowed
-from django.utils import simplejson
-from djangomako.shortcuts import render_to_response, render_to_string
-from django.shortcuts import get_object_or_404 
-from django.template import RequestContext, Context, loader
-from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+
 from django.conf import settings
-from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
-
-from django.template import Context
+from django.core.urlresolvers import get_callable
+from django.core.urlresolvers import reverse
+from django.db.models import Q
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotAllowed
 from django.http import HttpResponse
-
-import djangomako.middleware
-from mako.template import Template
+from django.shortcuts import get_object_or_404 
+from django.shortcuts import redirect
+from django.template import Context
+from django.template import RequestContext, Context, loader
+from django.utils import simplejson
+from django.utils.translation import ugettext_lazy as _
+from djangomako.shortcuts import render_to_response, render_to_string
 from mako.lookup import TemplateLookup
+from mako.template import Template
+import djangomako.middleware
 
-from models import *
+from models import * # TODO: Clean up
 from settings import *
 
 def view(request, wiki_url):

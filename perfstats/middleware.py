@@ -1,7 +1,11 @@
-import views, json, tempfile, time
+import json
+import tempfile
+import time
+
 from django.conf import settings
 from django.db import connection
 
+import views
 
 class ProfileMiddleware:    
     def process_request (self, request):

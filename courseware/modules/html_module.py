@@ -1,11 +1,11 @@
-from x_module import XModule
-from lxml import etree
-
 import json
 
 ## TODO: Abstract out from Django
 from django.conf import settings
 from djangomako.shortcuts import render_to_response, render_to_string
+
+from x_module import XModule
+from lxml import etree
 
 class HtmlModule(XModule):
     id_attribute = 'filename'

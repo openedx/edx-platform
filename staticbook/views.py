@@ -1,9 +1,10 @@
 # Create your views here.
-from djangomako.shortcuts import render_to_response, render_to_string
-from django.shortcuts import redirect
 import os
+
 from django.conf import settings
 from django.http import Http404
+from django.shortcuts import redirect
+from djangomako.shortcuts import render_to_response, render_to_string
 
 def index(request, page=0): 
     if not request.user.is_authenticated():

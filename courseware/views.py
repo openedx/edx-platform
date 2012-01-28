@@ -19,8 +19,9 @@ from lxml import etree
 
 from auth.models import UserProfile
 from models import StudentModule
-from module_render import * # TODO: Clean up
+from module_render import render_module, modx_dispatch
 import courseware.content_parser as content_parser
+import courseware.modules.capa_module
 
 log = logging.getLogger("mitx.courseware")
 

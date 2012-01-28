@@ -1,10 +1,11 @@
-import logging
 import json
+import logging
+
+from lxml import etree
 
 ## TODO: Abstract out from Django
 from django.conf import settings
 from djangomako.shortcuts import render_to_response, render_to_string
-from lxml import etree
 
 from x_module import XModule
 

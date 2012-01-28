@@ -1,12 +1,14 @@
-from django.utils.translation import ugettext_lazy as _
-from django.db import models
-from django.db.models import signals
-from django.contrib.auth.models import User
-from markdown import markdown
-from django import forms
-from django.core.urlresolvers import reverse
 import difflib
 import os
+
+from django import forms
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.db import models
+from django.db.models import signals
+from django.utils.translation import ugettext_lazy as _
+from markdown import markdown
+
 from settings import *
 
 class ShouldHaveExactlyOneRootSlug(Exception):

@@ -1,8 +1,7 @@
-from django.conf.urls.defaults import patterns, include, url
-import django.contrib.auth.views
 from django.conf import settings
+from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
-import perfstats
+import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin

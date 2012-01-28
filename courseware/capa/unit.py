@@ -1,6 +1,8 @@
 import math
-from numpy import eye, array
 import operator
+
+from numpy import eye, array
+
 from pyparsing import Word, alphas, nums, oneOf, Literal
 from pyparsing import ZeroOrMore, OneOrMore, StringStart
 from pyparsing import StringEnd, Optional, Forward

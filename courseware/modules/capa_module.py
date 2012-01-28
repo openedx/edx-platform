@@ -1,21 +1,27 @@
-import random, numpy, math, scipy, sys, StringIO, os, struct, json
-from x_module import XModule
-import sys
-
-from courseware.capa.capa_problem import LoncapaProblem
-from django.http import Http404
-
+import StringIO
+import datetime
 import dateutil
 import dateutil.parser
-import datetime
-
-import courseware.content_parser as content_parser
+import json
+import math
+import numpy
+import os
+import random
+import scipy
+import struct
+import sys
+import traceback
 
 from lxml import etree
 
 ## TODO: Abstract out from Django
 from django.conf import settings
 from djangomako.shortcuts import render_to_response, render_to_string
+from django.http import Http404
+
+from x_module import XModule
+from courseware.capa.capa_problem import LoncapaProblem
+import courseware.content_parser as content_parser
 
 class LoncapaModule(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
@@ -231,6 +237,8 @@ class LoncapaModule(XModule):
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
 
+        print "XXX", answers, get
+
         event_info['answers']=answers
 
         # Too late. Cannot submit
@@ -255,6 +263,7 @@ class LoncapaModule(XModule):
             correct_map = self.lcp.grade_answers(answers)
         except: 
             self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
+            traceback.print_exc()
             print {'error':sys.exc_info(),
                    'answers':answers, 
                    'seed':self.lcp.seed, 
