@@ -155,7 +155,7 @@ LOGGING = {
             'stream' : sys.stderr,
         },
         'app' : {
-            'level' : 'INFO',
+            'level' : 'DEBUG' if DEBUG else 'INFO',
             'class' : 'logging.handlers.TimedRotatingFileHandler',
             'formatter' : 'standard',
             'filename' : LOG_DIR + '/mitx.log', # temporary location for proof of concept
@@ -262,6 +262,7 @@ site.addsitedir(os.path.join(os.path.dirname(askbot.__file__), 'deps'))
 TEMPLATE_LOADERS = TEMPLATE_LOADERS + ('askbot.skins.loaders.filesystem_load_template_source',)
 
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
+    'util.middleware.ExceptionLoggingMiddleware',
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
     'askbot.middleware.forum_mode.ForumModeMiddleware',
     'askbot.middleware.cancel.CancelActionMiddleware',

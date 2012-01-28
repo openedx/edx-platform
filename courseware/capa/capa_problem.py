@@ -133,7 +133,7 @@ class LoncapaProblem(object):
         for entry in problems_simple.xpath("//"+"|//".join(response_properties+entry_types)):
             answer = entry.get('correct_answer')
             if answer != None:
-                answer_map[entry.get('id')] = contextualize_text(answer, self.context())
+                answer_map[entry.get('id')] = contextualize_text(answer, self.context)
 
         return answer_map
 
