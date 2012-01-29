@@ -90,12 +90,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-<<<<<<< local
-    'djangomako.middleware.MakoMiddleware',
-    'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
-=======
     'mitxmako.middleware.MakoMiddleware',
->>>>>>> other
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
