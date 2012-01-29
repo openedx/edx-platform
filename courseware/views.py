@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.template import Context, loader
-from djangomako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
 from django.db import connection
 
 from lxml import etree

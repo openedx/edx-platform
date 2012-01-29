@@ -15,10 +15,10 @@ from django.template import Context
 from django.template import RequestContext, Context, loader
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
-from djangomako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
 from mako.lookup import TemplateLookup
 from mako.template import Template
-import djangomako.middleware
+import mitxmako.middleware
 
 from models import * # TODO: Clean up
 from settings import *

@@ -3,7 +3,7 @@
 # List of valid templates is explicitly managed for (short-term)
 # security reasons.
 
-from djangomako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
 from django.shortcuts import redirect
 from django.core.context_processors import csrf
 

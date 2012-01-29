@@ -3,6 +3,9 @@ import sys
 
 import djcelery
 
+LIB_URL = '/static/lib/'
+BOOK_URL = '/static/book/'
+
 # Our parent dir (mitx_all) is the BASE_DIR
 BASE_DIR = os.path.abspath(os.path.join(__file__, "..", ".."))
 
@@ -85,7 +88,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'djangomako.middleware.MakoMiddleware',
+    'mitxmako.middleware.MakoMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 

@@ -8,7 +8,7 @@ circuit:name becomes the circuit.
 
 import simplewiki.settings as settings
 
-from djangomako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
 
 import markdown
 try:

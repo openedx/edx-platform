@@ -1,7 +1,7 @@
 from lxml.etree import Element
 from lxml import etree
 
-from djangomako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
 
 class textline(object):
     @staticmethod

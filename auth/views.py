@@ -12,7 +12,7 @@ from django.core.validators import validate_email, validate_slug
 from django.db import connection
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from djangomako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
 from models import Registration, UserProfile
 
 log = logging.getLogger("mitx.auth")
