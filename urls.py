@@ -44,6 +44,7 @@ if settings.COURSEWARE_ENABLED:
     url(r'^change_setting$', 'auth.views.change_setting'),
     url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
     url(r'^book/(?P<page>[^/]*)$', 'staticbook.views.index'), 
+    url(r'^book-shifted/(?P<page>[^/]*)$', 'staticbook.views.index_shifted'), 
     url(r'^book*$', 'staticbook.views.index'), 
 #    url(r'^course_info/$', 'auth.views.courseinfo'),
 #    url(r'^show_circuit/(?P<circuit>[^/]*)$', 'circuit.views.show_circuit'),
