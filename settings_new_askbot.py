@@ -3,6 +3,9 @@ import sys
 
 import djcelery
 
+LIB_URL = '/static/lib/'
+BOOK_URL = '/static/book/'
+
 # Our parent dir (mitx_all) is the BASE_DIR
 BASE_DIR = os.path.abspath(os.path.join(__file__, "..", ".."))
 
@@ -87,8 +90,12 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
+<<<<<<< local
     'djangomako.middleware.MakoMiddleware',
     'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+=======
+    'mitxmako.middleware.MakoMiddleware',
+>>>>>>> other
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
@@ -110,6 +117,7 @@ INSTALLED_APPS = (
     'track',
     'circuit',
     'perfstats',
+    'util',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
