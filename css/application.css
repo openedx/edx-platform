@@ -284,21 +284,23 @@ input, select {
   font-size: 12px;
   text-shadow: 0 1px 0 #fff; }
   .topbar a, div.course-wrapper section.course-content ol.sequence-nav a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav a {
-    -webkit-box-shadow: inset 1px 0 0 #faf7e9;
-    -moz-box-shadow: inset 1px 0 0 #faf7e9;
-    -ms-box-shadow: inset 1px 0 0 #faf7e9;
-    -o-box-shadow: inset 1px 0 0 #faf7e9;
-    box-shadow: inset 1px 0 0 #faf7e9;
-    background: #f2e7bf;
-    border-left: 1px solid #e4d080;
-    color: #292309;
-    padding: 16.989px;
-    text-transform: uppercase;
-    display: block; }
+    color: #292309; }
     .topbar a:hover, div.course-wrapper section.course-content ol.sequence-nav a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav a:hover {
       color: #7e691a;
-      text-decoration: none;
-      background: none; }
+      text-decoration: none; }
+    .topbar a.block-link, div.course-wrapper section.course-content ol.sequence-nav a.block-link, div.book-wrapper section.book nav a.block-link, div.wiki-wrapper section.wiki-body header a.block-link, body.askbot .secondary-nav nav a.block-link, .topbar div.course-wrapper section.course-content ol.sequence-nav a, div.course-wrapper section.course-content ol.sequence-nav .topbar a, div.course-wrapper section.course-content ol.sequence-nav a, div.book-wrapper section.book nav div.course-wrapper section.course-content ol.sequence-nav a, div.course-wrapper section.course-content ol.sequence-nav div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header div.course-wrapper section.course-content ol.sequence-nav a, div.course-wrapper section.course-content ol.sequence-nav div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav div.course-wrapper section.course-content ol.sequence-nav a, div.course-wrapper section.course-content ol.sequence-nav body.askbot .secondary-nav nav a, .topbar div.book-wrapper section.book nav a, div.book-wrapper section.book nav .topbar a, div.course-wrapper section.course-content ol.sequence-nav div.book-wrapper section.book nav a, div.book-wrapper section.book nav div.course-wrapper section.course-content ol.sequence-nav a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav div.book-wrapper section.book nav a, div.book-wrapper section.book body.askbot .secondary-nav nav a, .topbar div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header .topbar a, div.course-wrapper section.course-content ol.sequence-nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header div.course-wrapper section.course-content ol.sequence-nav a, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header body.askbot .secondary-nav nav a {
+      -webkit-box-shadow: inset 1px 0 0 #faf7e9;
+      -moz-box-shadow: inset 1px 0 0 #faf7e9;
+      -ms-box-shadow: inset 1px 0 0 #faf7e9;
+      -o-box-shadow: inset 1px 0 0 #faf7e9;
+      box-shadow: inset 1px 0 0 #faf7e9;
+      background: #f2e7bf;
+      border-left: 1px solid #e4d080;
+      padding: 16.989px;
+      text-transform: uppercase;
+      display: block; }
+      .topbar a.block-link:hover, div.course-wrapper section.course-content ol.sequence-nav a.block-link:hover, div.book-wrapper section.book nav a.block-link:hover, div.wiki-wrapper section.wiki-body header a.block-link:hover, body.askbot .secondary-nav nav a.block-link:hover, .topbar div.course-wrapper section.course-content ol.sequence-nav a:hover, div.course-wrapper section.course-content ol.sequence-nav .topbar a:hover, div.course-wrapper section.course-content ol.sequence-nav a:hover, div.book-wrapper section.book nav div.course-wrapper section.course-content ol.sequence-nav a:hover, div.course-wrapper section.course-content ol.sequence-nav div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header div.course-wrapper section.course-content ol.sequence-nav a:hover, div.course-wrapper section.course-content ol.sequence-nav div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav div.course-wrapper section.course-content ol.sequence-nav a:hover, div.course-wrapper section.course-content ol.sequence-nav body.askbot .secondary-nav nav a:hover, .topbar div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav .topbar a:hover, div.course-wrapper section.course-content ol.sequence-nav div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav div.course-wrapper section.course-content ol.sequence-nav a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav div.book-wrapper section.book nav a:hover, div.book-wrapper section.book body.askbot .secondary-nav nav a:hover, .topbar div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header .topbar a:hover, div.course-wrapper section.course-content ol.sequence-nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header div.course-wrapper section.course-content ol.sequence-nav a:hover, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header body.askbot .secondary-nav nav a:hover {
+        background: none; }
 
 :focus {
   outline-color: #ccc; }
@@ -661,7 +663,8 @@ div.course-wrapper div#accordion ul.ui-accordion-content {
   div.course-wrapper div#accordion ul.ui-accordion-content li a {
     text-decoration: none;
     margin-bottom: 11.326px;
-    display: block; }
+    display: block;
+    color: #000; }
     div.course-wrapper div#accordion ul.ui-accordion-content li a:hover {
       color: #666; }
     div.course-wrapper div#accordion ul.ui-accordion-content li a p {
