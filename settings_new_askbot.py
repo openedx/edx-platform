@@ -4,9 +4,9 @@ import sys
 import djcelery
 
 LIB_URL = '/static/lib/'
-LIB_URL = 'http://mitxstatic.s3-website-us-east-1.amazonaws.com/js/'
+LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/'
 BOOK_URL = '/static/book/'
-BOOK_URL = 'http://mitxstatic.s3-website-us-east-1.amazonaws.com/book_images/'
+BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'
 
 # Our parent dir (mitx_all) is the BASE_DIR
 BASE_DIR = os.path.abspath(os.path.join(__file__, "..", ".."))
