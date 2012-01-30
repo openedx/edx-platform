@@ -28,14 +28,14 @@ urlpatterns = ('',
     url(r'^password_reset_done/$',django.contrib.auth.views.password_reset_done,
         name='auth_password_reset_done'),
     url(r'^send_feedback$', 'util.views.send_feedback'),
-    url(r'^courseware/$', 'courseware.views.index'),
 )
 
 if settings.PERFSTATS:
    urlpatterns=urlpatterns + (url(r'^reprofile$','perfstats.views.end_profile'),)
 
 if settings.COURSEWARE_ENABLED:
-   urlpatterns=urlpatterns + (url(r'^wiki/', include('simplewiki.urls')),
+   urlpatterns=urlpatterns + (    url(r'^courseware/$', 'courseware.views.index'),
+url(r'^wiki/', include('simplewiki.urls')),
    url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index'),
     url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index'),
     url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index'),

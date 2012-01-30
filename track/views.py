@@ -19,15 +19,25 @@ def user_track(request):
     except: 
         username = "anonymous"
 
+    try: 
+        scookie = request.META['HTTP_COOKIE']
+    except: 
+        scookie = ""
+
+    try: 
+        agent = request.META['HTTP_USER_AGENT']
+    except: 
+        agent = ''
+
     # TODO: Move a bunch of this into log_event
     event = {
         "username" : username,
-        "session" : request.META['HTTP_COOKIE'],
+        "session" : scookie, 
         "ip" : request.META['REMOTE_ADDR'],
         "event_source" : "browser",
         "event_type" : request.GET['event_type'], 
         "event" : request.GET['event'],
-        "agent" : request.META['HTTP_USER_AGENT'],
+        "agent" : agent,
         "page" : request.GET['page'],
         }
     log_event(event)
@@ -39,13 +49,18 @@ def server_track(request, event_type, event, page=None):
     except: 
         username = "anonymous"
 
+    try: 
+        agent = request.META['HTTP_USER_AGENT']
+    except: 
+        agent = ''
+
     event = {
         "username" : username, 
         "ip" : request.META['REMOTE_ADDR'],
         "event_source" : "server",
         "event_type" : event_type, 
         "event" : event,
-        "agent" : request.META['HTTP_USER_AGENT'],
+        "agent" : agent,
         "page" : page,
         }
     log_event(event)
