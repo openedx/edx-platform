@@ -46,7 +46,8 @@ def profile(request):
     for response in responses:
         response_by_id[response.module_id] = response
         
-    print response_by_id
+        
+    totalScores = {}
 
     for c in chapters:
         chname=c.get('name')
@@ -63,19 +64,34 @@ def profile(request):
                         response = response_by_id[id]
                         if response.grade!=None:
                             correct=response.grade
-                    else:
-                        print "Couldn't find id " + id
                     
                     total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
-                    scores.append((int(correct),total))
+                    scores.append((int(correct),total, ( True if s.get('graded') == "True" else False ) ))
+                    
+                    
+                section_total = (sum([score[0] for score in scores]), 
+                                sum([score[1] for score in scores]))
+                
+                graded_total = (sum([score[0] for score in scores if score[2]]), 
+                                sum([score[1] for score in scores if score[2]]))
+                
+                #Add the graded total to totalScores
+                if s.get('format') and graded_total[1] > 0:
+                    format_scores = totalScores[ s.get('format') ] if s.get('format') in totalScores else []
+                    format_scores.append( graded_total )
+                    totalScores[ s.get('format') ] = format_scores
+                
                 score={'course':course,
                        'section':s.get("name"),
                        'chapter':c.get("name"),
                        'scores':scores,
+                       'section_total' : section_total,
                        }
                 hw.append(score)
     
     user_info=UserProfile.objects.get(user=request.user)
+    
+    print "totalScores" , totalScores
 
     context={'name':user_info.name,
              'username':request.user.username,
