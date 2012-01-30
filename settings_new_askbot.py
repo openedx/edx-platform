@@ -176,8 +176,6 @@ LOGGING = {
             'filename' : '{0}/mitx.err.{1}.log'.format(LOG_DIR, pid),
             'encoding' : 'utf-8',
         },
-        # We should actually use this for tracking:
-        #   http://pypi.python.org/pypi/ConcurrentLogHandler/0.8.2
         'tracking' : {
             'level' : 'INFO',
             'class' : 'logging.handlers.WatchedFileHandler',
