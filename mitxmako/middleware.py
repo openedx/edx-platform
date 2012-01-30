@@ -17,6 +17,7 @@ import tempfile
 from django.template import RequestContext
 
 requestcontext = None
+lookup = None
 
 class MakoMiddleware(object):
     def __init__(self):
