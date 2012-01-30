@@ -1,14 +1,15 @@
+import os
+
+from django.contrib.auth.decorators import login_required
+from django.core.servers.basehttp import FileWrapper
+from django.db.models.fields.files import FieldFile
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, Http404
 from django.template import loader, Context
-from django.db.models.fields.files import FieldFile
-from django.core.servers.basehttp import FileWrapper
-from django.contrib.auth.decorators import login_required
 
-from settings import *
+from settings import * # TODO: Clean up
 from models import Article, ArticleAttachment, get_attachment_filepath
 from views import not_found, check_permissions, get_url_path, fetch_from_url
 
-import os
 from simplewiki.settings import WIKI_ALLOW_ANON_ATTACHMENTS
 
 

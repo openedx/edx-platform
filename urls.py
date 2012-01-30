@@ -1,8 +1,7 @@
-from django.conf.urls.defaults import patterns, include, url
-import django.contrib.auth.views
 from django.conf import settings
+from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
-import perfstats
+import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -19,7 +18,7 @@ urlpatterns = ('',
     url(r'^activate/(?P<key>[^/]*)$', 'auth.views.activate_account'),
     url(r'^$', 'auth.views.index'),
     url(r'^password_reset/$', 'django.contrib.auth.views.password_reset', 
-        dict(from_email='6002-admin@mit.edu'),name='auth_password_reset'),
+        dict(from_email='registration@mitx.mit.edu'),name='auth_password_reset'),
     url(r'^password_change/$',django.contrib.auth.views.password_change,name='auth_password_change'),
     url(r'^password_change_done/$',django.contrib.auth.views.password_change_done,name='auth_password_change_done'),
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',django.contrib.auth.views.password_reset_confirm,
@@ -29,14 +28,14 @@ urlpatterns = ('',
     url(r'^password_reset_done/$',django.contrib.auth.views.password_reset_done,
         name='auth_password_reset_done'),
     url(r'^send_feedback$', 'util.views.send_feedback'),
-    url(r'^courseware/$', 'courseware.views.index'),
 )
 
 if settings.PERFSTATS:
    urlpatterns=urlpatterns + (url(r'^reprofile$','perfstats.views.end_profile'),)
 
 if settings.COURSEWARE_ENABLED:
-   urlpatterns=urlpatterns + (url(r'^wiki/', include('simplewiki.urls')),
+   urlpatterns=urlpatterns + (    url(r'^courseware/$', 'courseware.views.index'),
+url(r'^wiki/', include('simplewiki.urls')),
    url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index'),
     url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index'),
     url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index'),
@@ -45,6 +44,7 @@ if settings.COURSEWARE_ENABLED:
     url(r'^change_setting$', 'auth.views.change_setting'),
     url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
     url(r'^book/(?P<page>[^/]*)$', 'staticbook.views.index'), 
+    url(r'^book-shifted/(?P<page>[^/]*)$', 'staticbook.views.index_shifted'), 
     url(r'^book*$', 'staticbook.views.index'), 
 #    url(r'^course_info/$', 'auth.views.courseinfo'),
 #    url(r'^show_circuit/(?P<circuit>[^/]*)$', 'circuit.views.show_circuit'),

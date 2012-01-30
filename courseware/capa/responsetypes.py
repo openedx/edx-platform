@@ -1,14 +1,23 @@
-import random, numpy, math, scipy, json
-from util import contextualize_text
+import json
+import math
+import numpy
+import random
+import scipy
+
 from calc import evaluator
-import random, math
 from django.conf import settings
+from util import contextualize_text
+
+import calc
+import eia
 
 # TODO: Should be the same object as in capa_problem
 global_context={'random':random,
                 'numpy':numpy,
                 'math':math,
-                'scipy':scipy}
+                'scipy':scipy, 
+                'calc':calc, 
+                'eia':eia}
 
 class numericalresponse(object):
     def __init__(self, xml, context):

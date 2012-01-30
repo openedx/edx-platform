@@ -26,7 +26,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-   ('Piotr Mitros', 'pmitros@csail.mit.edu'),
+   ('Piotr Mitros', 'staff@csail.mit.edu'),
 )
 
 MANAGERS = ADMINS
@@ -81,7 +81,7 @@ MIDDLEWARE_CLASSES = (
    'django.contrib.auth.middleware.AuthenticationMiddleware',
    'django.contrib.messages.middleware.MessageMiddleware',
    'track.middleware.TrackMiddleware',
-   'djangomako.middleware.MakoMiddleware',
+   'mitxmako.middleware.MakoMiddleware',
    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 

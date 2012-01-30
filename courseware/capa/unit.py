@@ -1,14 +1,19 @@
 import math
 import operator
 
+from numpy import eye, array
+
 from pyparsing import Word, alphas, nums, oneOf, Literal
 from pyparsing import ZeroOrMore, OneOrMore, StringStart
 from pyparsing import StringEnd, Optional, Forward
 from pyparsing import CaselessLiteral, Group, StringEnd
 from pyparsing import NoMatch, stringEnd
 
+base_units = ['meter', 'gram', 'second', 'ampere', 'kelvin', 'mole', 'cd']
+unit_vectors = dict([(base_units[i], eye(len(base_units))[:,i]) for i in range(len(base_units))])
 
-def evaluator(variables, functions, string):
+
+def unit_evaluator(unit_string, units=unit_map):
     ''' Evaluate an expression. Variables are passed as a dictionary
     from string to value. Unary functions are passed as a dictionary
     from string to function '''
@@ -17,13 +22,8 @@ def evaluator(variables, functions, string):
     ops = { "^" : operator.pow,
             "*" : operator.mul,
             "/" : operator.truediv,
-            "+" : operator.add,
-            "-" : operator.sub,
             }
-    # We eliminated extreme ones, since they're rarely used, and potentially
-    # confusing. They may also conflict with variables if we ever allow e.g. 
-    # 5R instead of 5*R
-    suffixes={'%':0.01,'k':1e3,'M':1e6,'G':1e9,
+    prefixes={'%':0.01,'k':1e3,'M':1e6,'G':1e9,
               'T':1e12,#'P':1e15,'E':1e18,'Z':1e21,'Y':1e24,
               'c':1e-2,'m':1e-3,'u':1e-6,
               'n':1e-9,'p':1e-12}#,'f':1e-15,'a':1e-18,'z':1e-21,'y':1e-24}

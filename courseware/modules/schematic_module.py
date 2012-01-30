@@ -1,10 +1,10 @@
-from x_module import XModule
-
 import json
 
 ## TODO: Abstract out from Django
 from django.conf import settings
-from djangomako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
+
+from x_module import XModule
 
 class SchematicModule(XModule):
     id_attribute = 'id'

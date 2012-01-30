@@ -1,24 +1,26 @@
-from djangomako.shortcuts import render_to_response, render_to_string
-from django.shortcuts import redirect
+import json
 import os
+
+import xml.etree.ElementTree
+
 from django.conf import settings
 from django.http import Http404
-from models import ServerCircuit
-import json
-import xml.etree.ElementTree
 from django.http import HttpResponse
+from django.shortcuts import redirect
+from mitxmako.shortcuts import render_to_response, render_to_string
+
+from models import ServerCircuit
 
 def circuit_line(circuit):
+    ''' Returns string for an appropriate input element for a circuit. 
+        TODO: Rename. '''
     if not circuit.isalnum():
         raise Http404()
     try:
         sc = ServerCircuit.objects.get(name=circuit)
         schematic = sc.schematic
-        print "Got"
     except:
         schematic = ''
-        print "not got"
-    print "X", schematic
 
     circuit_line = xml.etree.ElementTree.Element('input')
     circuit_line.set('type', 'hidden')

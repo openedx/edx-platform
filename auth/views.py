@@ -1,16 +1,21 @@
-from djangomako.shortcuts import render_to_response, render_to_string
-from django.contrib.auth.models import User
-from django.shortcuts import redirect
+import json
+import logging
+import random
+import string
+
+from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-import json
-from models import Registration, UserProfile
-from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.validators import validate_email, validate_slug
-import random, string
 from django.db import connection
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from mitxmako.shortcuts import render_to_response, render_to_string
+from models import Registration, UserProfile
+
+log = logging.getLogger("mitx.auth")
 
 def csrf_token(context):
     csrf_token = context.get('csrf_token', '')
@@ -37,37 +42,43 @@ def index(request):
 #         return render_to_response('courseinfo.html', {'error' : '',
 #                                                  'csrf': csrf_token }) 
 
+# Need different levels of logging
 def login_user(request, error=""):
-#    print request.POST
     if 'email' not in request.POST or 'password' not in request.POST:
-#        print "X"
         return render_to_response('login.html', {'error':error.replace('+',' ')})
+
     email = request.POST['email']
     password = request.POST['password']
     try:
-        user=User.objects.get(email=email)
+        user = User.objects.get(email=email)
     except User.DoesNotExist:
+        log.warning("Login failed - Unknown user email: {0}".format(email))
         return HttpResponse(json.dumps({'success':False, 
                                         'error': 'Invalid login'})) # TODO: User error message
 
-    username=user.username
-    user=authenticate(username=username, password=password)
+    username = user.username
+    user = authenticate(username=username, password=password)
     if user is None:
+        log.warning("Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success':False, 
                                         'error': 'Invalid login'}))
+
     if user is not None and user.is_active:
-        login(request, user)
-        if request.POST['remember'] == 'true':
-            request.session.set_expiry(None) # or change to 604800 for 7 days
-#            print "recall"
-        else:
-            request.session.set_expiry(0)
-        #print "close"
-#        print len(connection.queries), connection.queries
+        try:
+            login(request, user)
+            if request.POST['remember'] == 'true':
+                request.session.set_expiry(None) # or change to 604800 for 7 days
+                log.debug("Setting user session to never expire")
+            else:
+                request.session.set_expiry(0)
+        except Exception as e:
+            log.critical("Login failed - Could not create session. Is memcached running?")
+            log.exception(e)
+
+        log.info("Login success - {0} ({1})".format(username, email))
         return HttpResponse(json.dumps({'success':True}))
 
-#    print len(connection.queries), connection.queries
-
+    log.warning("Login failed - Account not active for user {0}".format(username))
     return HttpResponse(json.dumps({'success':False, 
                                     'error': 'Account not active. Check your e-mail.'}))
 

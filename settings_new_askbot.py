@@ -3,12 +3,16 @@ import sys
 
 import djcelery
 
+LIB_URL = '/static/lib/'
+LIB_URL = 'http://mitxstatic.s3-website-us-east-1.amazonaws.com/js/'
+BOOK_URL = '/static/book/'
+BOOK_URL = 'http://mitxstatic.s3-website-us-east-1.amazonaws.com/book_images/'
+
 # Our parent dir (mitx_all) is the BASE_DIR
 BASE_DIR = os.path.abspath(os.path.join(__file__, "..", ".."))
 
 COURSEWARE_ENABLED = True
 ASKBOT_ENABLED = True
-
 CSRF_COOKIE_DOMAIN = '127.0.0.1'
 
 # Defaults to be overridden
@@ -34,7 +38,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('Piotr Mitros', 'pmitros@csail.mit.edu'),
+    ('Piotr Mitros', 'staff@csail.mit.edu'),
 )
 
 MANAGERS = ADMINS
@@ -55,87 +59,6 @@ USE_I18N = True
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
 USE_L10N = True
-
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters' : {
-        'standard' : {
-            'format' : '%(levelname)s %(asctime)s PID:%(process)d %(name)s %(filename)s:%(lineno)d %(message)s',
-        },
-        'raw' : {
-            'format' : '%(message)s',
-        }
-    },
-    'handlers' : {
-        'console' : {
-            'level' : 'DEBUG' if DEBUG else 'INFO',
-            'class' : 'logging.StreamHandler',
-            'formatter' : 'standard',
-            'stream' : sys.stdout,
-        },
-        'console_err' : {
-            'level' : 'ERROR',
-            'class' : 'logging.StreamHandler',
-            'formatter' : 'standard',
-            'stream' : sys.stderr,
-        },
-        # 'app' : {
-        #     'level' : 'INFO',
-        #     'class' : 'logging.handlers.TimedRotatingFileHandler',
-        #     'formatter' : 'standard',
-        #     'filename' : '/tmp/mitx.log', # temporary location for proof of concept
-        #     'when' : 'midnight',
-        #     'utc' : True,
-        #     'encoding' : 'utf-8',
-        # },
-
-        # We should actually use this for tracking:
-        #   http://pypi.python.org/pypi/ConcurrentLogHandler/0.8.2
-        'tracking' : {
-            'level' : 'INFO',
-            'class' : 'logging.handlers.TimedRotatingFileHandler',
-            'formatter' : 'raw',
-            'filename' : BASE_DIR + '/track_dir/tracking.log',
-            'when' : 'midnight',
-            'utc' : True,
-            'encoding' : 'utf-8',
-        },
-        'mail_admins' : {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-        },
-    },
-    'loggers' : {
-        'django.request': {
-            'handlers': ['mail_admins', 'console', 'console_err'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'tracking' : {
-            'handlers' : ['tracking'],
-            'level' : 'DEBUG',
-            'propagate' : False,
-        },
-        'root' : {
-            'handlers' : ['console', 'console_err'],
-            'level' : 'DEBUG',
-            'propagate' : False
-        },
-        'mitx' : {
-            'handlers' : ['console', 'console_err'],
-            'level' : 'DEBUG',
-            'propagate' : False
-        },
-    }
-}
-
-
 
 STATIC_URL = '/static/'
 
@@ -166,7 +89,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'djangomako.middleware.MakoMiddleware',
+    'mitxmako.middleware.MakoMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
@@ -188,6 +111,7 @@ INSTALLED_APPS = (
     'track',
     'circuit',
     'perfstats',
+    'util',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -201,8 +125,93 @@ TRACK_MAX_EVENT = 1000
 # Maximum length of log file before starting a new one. 
 MAXLOG = 500
 
+LOG_DIR = "/tmp/"
+
 # Make sure we execute correctly regardless of where we're called from
 execfile(os.path.join(BASE_DIR, "settings.py"))
+
+# A sample logging configuration. The only tangible logging
+# performed by this configuration is to send an email to
+# the site admins on every HTTP 500 error.
+# See http://docs.djangoproject.com/en/dev/topics/logging for
+# more details on how to customize your logging configuration.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters' : {
+        'standard' : {
+            'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
+        },
+        'raw' : {
+            'format' : '%(message)s',
+        }
+    },
+    'handlers' : {
+        'console' : {
+            'level' : 'DEBUG' if DEBUG else 'INFO',
+            'class' : 'logging.StreamHandler',
+            'formatter' : 'standard',
+            'stream' : sys.stdout,
+        },
+        'console_err' : {
+            'level' : 'ERROR',
+            'class' : 'logging.StreamHandler',
+            'formatter' : 'standard',
+            'stream' : sys.stderr,
+        },
+        'app' : {
+            'level' : 'DEBUG' if DEBUG else 'INFO',
+            'class' : 'logging.handlers.WatchedFileHandler',
+            'formatter' : 'standard',
+            'filename' : LOG_DIR + '/mitx.log', # temporary location for proof of concept
+            'encoding' : 'utf-8',
+        },
+        'app_err' : {
+            'level' : 'WARNING',
+            'class' : 'logging.handlers.WatchedFileHandler',
+            'formatter' : 'standard',
+            'filename' : LOG_DIR + '/mitx.err.log', # temporary location for proof of concept
+            'encoding' : 'utf-8',
+        },
+        # We should actually use this for tracking:
+        #   http://pypi.python.org/pypi/ConcurrentLogHandler/0.8.2
+        'tracking' : {
+            'level' : 'INFO',
+            'class' : 'logging.handlers.WatchedFileHandler',
+            'formatter' : 'raw',
+            'filename' : LOG_DIR + '/tracking.log',
+            'encoding' : 'utf-8',
+        },
+        'mail_admins' : {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+    },
+    'loggers' : {
+        'django' : {
+            'handlers' : ['console', 'mail_admins', 'app_err'],
+            'propagate' : True,
+            'level' : 'INFO'
+        },
+        'tracking' : {
+            'handlers' : ['console', 'tracking'],
+            'level' : 'DEBUG',
+            'propagate' : False,
+        },
+        'root' : {
+            'handlers' : ['console', 'app', 'app_err'],
+            'level' : 'DEBUG',
+            'propagate' : False
+        },
+        'mitx' : {
+            'handlers' : ['console', 'app', 'app_err'],
+            'level' : 'DEBUG',
+            'propagate' : False
+        },
+    }
+}
+
+
 
 if PERFSTATS :
     MIDDLEWARE_CLASSES = ( 'perfstats.middleware.ProfileMiddleware',) + MIDDLEWARE_CLASSES
@@ -252,6 +261,7 @@ site.addsitedir(os.path.join(os.path.dirname(askbot.__file__), 'deps'))
 TEMPLATE_LOADERS = TEMPLATE_LOADERS + ('askbot.skins.loaders.filesystem_load_template_source',)
 
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
+    'util.middleware.ExceptionLoggingMiddleware',
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
     'askbot.middleware.forum_mode.ForumModeMiddleware',
     'askbot.middleware.cancel.CancelActionMiddleware',
@@ -312,3 +322,4 @@ BROKER_TRANSPORT = "djkombu.transport.DatabaseTransport"
 CELERY_ALWAYS_EAGER = True
 
 djcelery.setup_loader()
+

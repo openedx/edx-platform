@@ -1,8 +1,9 @@
 # Source: django-simplewiki. GPL license. 
 
-from django.contrib import admin
 from django import forms
+from django.contrib import admin
 from django.utils.translation import ugettext as _
+
 from models import Article, Revision, Permission, ArticleAttachment
 
 class RevisionInline(admin.TabularInline):

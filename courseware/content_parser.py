@@ -1,14 +1,14 @@
-try: 
+import json
+import hashlib
+import logging
+
+from lxml import etree
+
+try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
     from auth.models import UserProfile
 except: 
     settings = None 
-
-from lxml import etree
-
-import json
-import hashlib
-import logging
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 

@@ -1,43 +1,36 @@
-from django.http import HttpResponse
-from django.template import Context, loader
-from djangomako.shortcuts import render_to_response, render_to_string
-import json, os, sys
-from django.core.context_processors import csrf
-
-from django.db import connection
-from django.template import Context
-from django.contrib.auth.models import User
-from auth.models import UserProfile
-from django.shortcuts import redirect
-
 import StringIO
-import track.views
-
-from django.http import Http404
-
+import json
+import os
+import sys
+import sys
 import urllib
+import uuid
 
-import courseware.modules.capa_module
-import courseware.modules.video_module
-import courseware.modules.vertical_module
-import courseware.modules.html_module
-import courseware.modules.schematic_module
-import courseware.modules.seq_module
-
-from models import StudentModule
-
-import urllib
+from lxml import etree
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.context_processors import csrf
+from django.db import connection
+from django.http import Http404
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.template import Context
+from django.template import Context, loader
+from mitxmako.shortcuts import render_to_response, render_to_string
+
+from auth.models import UserProfile
+from models import StudentModule
+import track.views
 
 import courseware.content_parser as content_parser
 
-import sys
-import logging
-
-from lxml import etree
-import uuid
-
+import courseware.modules.capa_module
+import courseware.modules.html_module
+import courseware.modules.schematic_module
+import courseware.modules.seq_module
+import courseware.modules.vertical_module
+import courseware.modules.video_module
 
 log = logging.getLogger("mitx.courseware")
 
@@ -96,7 +89,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     ajax_return=instance.handle_ajax(dispatch, request.POST)
     # Save the state back to the database
     s.state=instance.get_state()
-    if instance.get_score() != None: 
+    if not instance.get_score(): 
         s.grade=instance.get_score()['score']
     s.save()
     # Return whatever the module wanted to return to the client/caller
@@ -110,22 +103,14 @@ def render_x_module(user, request, xml_module, module_object_preload):
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
 
     # Grab state from database
-    s = object_cache(module_object_preload, 
-                     user, 
-                     module_type, 
-                     module_id)
-    # s = StudentModule.objects.filter(student=request.user, 
-    #                                  module_id=module_id, 
-    #                                  module_type = module_type)
-    # if len(s) == 0: 
-    #     s=None
-    # else:
-    #     s=s[0]
+    smod = object_cache(module_object_preload, 
+                        user, 
+                        module_type, 
+                        module_id)
 
-    if s == None: # If nothing in the database...
+    if not smod: # If nothing in the database...
         state=None
     else:
-        smod = s
         state = smod.state
 
     # Create a new instance
@@ -135,10 +120,10 @@ def render_x_module(user, request, xml_module, module_object_preload):
                           ajax_url=ajax_url,
                           state=state, 
                           track_function = make_track_function(request), 
-                                  render_function = lambda x: render_module(user, request, x, module_object_preload))
+                          render_function = lambda x: render_module(user, request, x, module_object_preload))
     
     # If instance wasn't already in the database, create it
-    if s == None:
+    if not smod:
         smod=StudentModule(student=user, 
                            module_type = module_type,
                            module_id=module_id, 

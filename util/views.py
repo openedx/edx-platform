@@ -1,21 +1,22 @@
-from djangomako.shortcuts import render_to_response, render_to_string
-from django.shortcuts import redirect
-from django.contrib.auth.models import User
-from django.http import HttpResponse
-import json
-from django.conf import settings
-from django.core.context_processors import csrf
-from django.http import Http404
-import courseware.capa.calc
-from django.core.mail import send_mail
-from django.conf import settings
 import datetime
+import json
 import sys
+
+from django.conf import settings
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.context_processors import csrf
+from django.core.mail import send_mail
+from django.http import Http404
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from mitxmako.shortcuts import render_to_response, render_to_string
+
+import courseware.capa.calc
 import track.views
 
 def calculate(request):
-#    if not request.user.is_authenticated():
-#        raise Http404
+    ''' Calculator in footer of every page. '''
     equation = request.GET['equation']
     try: 
         result = courseware.capa.calc.evaluator({}, {}, equation)
@@ -27,8 +28,7 @@ def calculate(request):
     return HttpResponse(json.dumps({'result':result}))
 
 def send_feedback(request):
-#    if not request.user.is_authenticated():
-#        raise Http404
+    ''' Feeback mechanism in footer of every page. '''
     try: 
         username = request.user.username
     except: 
@@ -50,4 +50,5 @@ def send_feedback(request):
     return HttpResponse(json.dumps({'success':True}))
 
 def info(request):
+    ''' Info page (link from main header) '''
     return render_to_response("info.html", {})

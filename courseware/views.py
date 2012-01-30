@@ -12,16 +12,16 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.template import Context, loader
-from djangomako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
 from django.db import connection
 
 from lxml import etree
 
 from auth.models import UserProfile
 from models import StudentModule
-from module_render import * # TODO: Clean up
-from module_render import modx_dispatch
+from module_render import render_module, modx_dispatch
 import courseware.content_parser as content_parser
+import courseware.modules.capa_module
 
 log = logging.getLogger("mitx.courseware")
 
@@ -36,10 +36,6 @@ def profile(request):
     if not request.user.is_authenticated():
         return redirect('/')
     
-    log.info("Profile called")
-    logging.info("Now the root")
-    logging.getLogger("tracking").info("this should be unformatted")
-
     dom=content_parser.course_file(request.user)
     hw=[]
     course = dom.xpath('//course/@name')[0]
@@ -145,6 +141,7 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     module_object_preload = list(StudentModule.objects.filter(student=user, 
                                                               module_id__in=module_ids))
+    
 
     module=render_module(user, request, module, module_object_preload)
 

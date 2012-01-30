@@ -1,8 +1,9 @@
 from django import template
-from django.template.defaultfilters import stringfilter
-from simplewiki.settings import *
 from django.conf import settings
+from django.template.defaultfilters import stringfilter
 from django.utils.http import urlquote  as django_urlquote
+
+from simplewiki.settings import *
 
 register = template.Library()
 
