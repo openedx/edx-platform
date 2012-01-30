@@ -135,6 +135,9 @@ execfile(os.path.join(BASE_DIR, "settings.py"))
 # the site admins on every HTTP 500 error.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+
+pid = os.getpid()
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -163,23 +166,21 @@ LOGGING = {
             'level' : 'DEBUG' if DEBUG else 'INFO',
             'class' : 'logging.handlers.WatchedFileHandler',
             'formatter' : 'standard',
-            'filename' : LOG_DIR + '/mitx.log', # temporary location for proof of concept
+            'filename' : '{0}/mitx.{1}.log'.format(LOG_DIR, pid),
             'encoding' : 'utf-8',
         },
         'app_err' : {
             'level' : 'WARNING',
             'class' : 'logging.handlers.WatchedFileHandler',
             'formatter' : 'standard',
-            'filename' : LOG_DIR + '/mitx.err.log', # temporary location for proof of concept
+            'filename' : '{0}/mitx.err.{1}.log'.format(LOG_DIR, pid),
             'encoding' : 'utf-8',
         },
-        # We should actually use this for tracking:
-        #   http://pypi.python.org/pypi/ConcurrentLogHandler/0.8.2
         'tracking' : {
             'level' : 'INFO',
             'class' : 'logging.handlers.WatchedFileHandler',
             'formatter' : 'raw',
-            'filename' : LOG_DIR + '/tracking.log',
+            'filename' : '{0}/tracking.{1}.log'.format(LOG_DIR, pid),
             'encoding' : 'utf-8',
         },
         'mail_admins' : {
