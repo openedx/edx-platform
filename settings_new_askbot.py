@@ -161,31 +161,25 @@ LOGGING = {
         },
         'app' : {
             'level' : 'DEBUG' if DEBUG else 'INFO',
-            'class' : 'logging.handlers.TimedRotatingFileHandler',
+            'class' : 'logging.handlers.WatchedFileHandler',
             'formatter' : 'standard',
             'filename' : LOG_DIR + '/mitx.log', # temporary location for proof of concept
-            'when' : 'midnight',
-            'utc' : True,
             'encoding' : 'utf-8',
         },
         'app_err' : {
-            'level' : 'ERROR',
-            'class' : 'logging.handlers.TimedRotatingFileHandler',
+            'level' : 'WARNING',
+            'class' : 'logging.handlers.WatchedFileHandler',
             'formatter' : 'standard',
             'filename' : LOG_DIR + '/mitx.err.log', # temporary location for proof of concept
-            'when' : 'midnight',
-            'utc' : True,
             'encoding' : 'utf-8',
         },
         # We should actually use this for tracking:
         #   http://pypi.python.org/pypi/ConcurrentLogHandler/0.8.2
         'tracking' : {
             'level' : 'INFO',
-            'class' : 'logging.handlers.TimedRotatingFileHandler',
+            'class' : 'logging.handlers.WatchedFileHandler',
             'formatter' : 'raw',
             'filename' : LOG_DIR + '/tracking.log',
-            'when' : 'midnight',
-            'utc' : True,
             'encoding' : 'utf-8',
         },
         'mail_admins' : {
@@ -195,7 +189,7 @@ LOGGING = {
     },
     'loggers' : {
         'django' : {
-            'handlers' : ['console', 'mail_admins'],
+            'handlers' : ['console', 'mail_admins', 'app_err'],
             'propagate' : True,
             'level' : 'INFO'
         },
