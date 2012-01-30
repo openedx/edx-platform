@@ -129,7 +129,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, div.course-wrapper section.course-content ol.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod > li:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
+.clearfix:after, .topbar:after, div.course-wrapper section.course-content ol.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
   content: ".";
   display: block;
   height: 0;
@@ -808,25 +808,89 @@ section.course-content div.video-wrapper {
       left: 0;
       width: 100%;
       height: 100%; }
-  section.course-content div.video-wrapper section ul {
-    display: inline-block; }
-    section.course-content div.video-wrapper section ul li {
-      margin-top: 5px;
-      display: inline-block;
-      cursor: pointer;
-      border: 0;
-      padding: 0; }
-      section.course-content div.video-wrapper section ul li div:empty {
-        display: none; }
-  section.course-content div.video-wrapper section div#slider {
-    margin: -14px 0 10px 60px; }
-  section.course-content div.video-wrapper section div#vidtime {
-    float: left; }
-  section.course-content div.video-wrapper section div#video_speeds {
-    float: right;
-    cursor: pointer; }
-    section.course-content div.video-wrapper section div#video_speeds span:hover {
-      color: #993333; }
+  section.course-content div.video-wrapper section.video-controls {
+    background: #333;
+    border: 1px solid #000;
+    color: #ccc; }
+    section.course-content div.video-wrapper section.video-controls div#slider {
+      -webkit-border-radius: 0;
+      -moz-border-radius: 0;
+      -ms-border-radius: 0;
+      -o-border-radius: 0;
+      border-radius: 0;
+      -webkit-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
+      -moz-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
+      -ms-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
+      -o-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
+      box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
+      background: #c2c2c2;
+      border: none;
+      border-bottom: 1px solid #000;
+      height: 22px; }
+      section.course-content div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        -ms-border-radius: 0;
+        -o-border-radius: 0;
+        border-radius: 0;
+        background: #993333 url(/static/images/slider-handle.png) center center no-repeat;
+        border: 0;
+        border-right: 1px solid #4d1919;
+        border-left: 1px solid #4d1919;
+        cursor: pointer;
+        height: 22px;
+        margin: 0;
+        top: 0;
+        width: 22px; }
+    section.course-content div.video-wrapper section.video-controls ul.vcr {
+      float: left;
+      margin-right: 22.652px; }
+      section.course-content div.video-wrapper section.video-controls ul.vcr li {
+        float: left; }
+        section.course-content div.video-wrapper section.video-controls ul.vcr li a {
+          -webkit-box-shadow: 1px 0 0 #555555;
+          -moz-box-shadow: 1px 0 0 #555555;
+          -ms-box-shadow: 1px 0 0 #555555;
+          -o-box-shadow: 1px 0 0 #555555;
+          box-shadow: 1px 0 0 #555555;
+          border-right: 1px solid #000;
+          display: block;
+          cursor: pointer;
+          height: 14px;
+          padding: 16.989px 22.652px;
+          text-indent: -9999px;
+          width: 14px; }
+          section.course-content div.video-wrapper section.video-controls ul.vcr li a.play {
+            background: url("/static/images/play-icon.png") center center no-repeat; }
+            section.course-content div.video-wrapper section.video-controls ul.vcr li a.play:hover {
+              background-color: #444; }
+          section.course-content div.video-wrapper section.video-controls ul.vcr li a.pause {
+            background: url("/static/images/pause-icon.png") center center no-repeat; }
+            section.course-content div.video-wrapper section.video-controls ul.vcr li a.pause:hover {
+              background-color: #444; }
+    section.course-content div.video-wrapper section.video-controls div#vidtime {
+      float: left;
+      font-weight: bold;
+      line-height: 46px;
+      -webkit-font-smoothing: antialiased; }
+    section.course-content div.video-wrapper section.video-controls div.speeds {
+      float: right;
+      line-height: 46px;
+      margin-right: 22.652px;
+      -webkit-font-smoothing: antialiased; }
+      section.course-content div.video-wrapper section.video-controls div.speeds div#video_speeds {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        font-weight: bold; }
+        section.course-content div.video-wrapper section.video-controls div.speeds div#video_speeds span {
+          cursor: pointer; }
+          section.course-content div.video-wrapper section.video-controls div.speeds div#video_speeds span:hover {
+            color: #993333; }
 section.course-content ol.subtitles {
   float: left;
   width: 31.522%; }
