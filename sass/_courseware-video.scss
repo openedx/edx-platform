@@ -62,7 +62,7 @@ section.course-content {
         background: #c2c2c2;
         border: none;
         border-bottom: 1px solid #000;
-        height: 22px;
+        height: 20px;
 
         a.ui-slider-handle {
           @include border-radius(0);
@@ -71,10 +71,10 @@ section.course-content {
           border-right: 1px solid darken($mit-red, 20%);
           border-left: 1px solid darken($mit-red, 20%);
           cursor: pointer;
-          height: 22px;
+          height: 20px;
           margin: 0;
           top: 0;
-          width: 22px;
+          width: 20px;
         }
       }
 
