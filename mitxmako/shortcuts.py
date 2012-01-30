@@ -16,6 +16,9 @@ from django.template import Context
 from django.http import HttpResponse
 
 import middleware
+from django.conf import settings
+
+from mitxmako.middleware import requestcontext
 
 def render_to_string(template_name, dictionary, context_instance=None):
     context_instance = context_instance or Context(dictionary)
@@ -23,6 +26,8 @@ def render_to_string(template_name, dictionary, context_instance=None):
     context_instance.update(dictionary or {})
     # collapse context_instance to a single dictionary for mako
     context_dictionary = {}
+    context_instance['settings'] = settings
+    context_instance['request_context'] = requestcontext
     for d in context_instance:
         context_dictionary.update(d)
     # fetch and render template

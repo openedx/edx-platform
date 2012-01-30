@@ -14,6 +14,9 @@
 
 from mako.lookup import TemplateLookup
 import tempfile
+from django.template import RequestContext
+
+requestcontext = None
 
 class MakoMiddleware(object):
     def __init__(self):
@@ -38,4 +41,8 @@ class MakoMiddleware(object):
                                 )
         import mitxmako
         mitxmako.lookup = lookup
-    
+
+    def process_request (self, request):
+        global requestcontext
+        requestcontext = RequestContext(request)
+#        print requestcontext
