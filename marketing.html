@@ -61,14 +61,14 @@ function postJSON(url, data, callback) {
   <%block name="header">
   <header class="announcement <%block name="header_class"/>">
     <div class="anouncement-wrapper">
-% if settings.COURSEWARE_ENABLED:
     <%block name="header_nav">
     <nav>
       <h1><a href="http://mitx.mit.edu/">MITx</a></h1>
+% if settings.COURSEWARE_ENABLED:
       <a rel="leanModal" class="login" href="#login">Log In</a>
+% endif
     </nav>
     </%block>
-% endif
 
     <%block name="header_text">
       <section>
@@ -96,7 +96,9 @@ function postJSON(url, data, callback) {
     </div>
   </footer>
 
+% if settings.COURSEWARE_ENABLED:
   <div id="login" class="leanModal_box"><%include file="login.html" /></div>
+% endif
   <div id="pwd_reset" class="leanModal_box"><%include file="password_reset_form.html" /></div>
   <div id="reset_done" class="leanModal_box"></div>
 
