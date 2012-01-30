@@ -13,7 +13,9 @@ BASE_DIR = os.path.abspath(os.path.join(__file__, "..", ".."))
 
 COURSEWARE_ENABLED = True
 ASKBOT_ENABLED = True
-
+ASKBOT_FILE_UPLOAD_DIR = ""
+ASKBOT_FILE_UPLOAD_DIR = ""
+ASKBOT_UPLOADED_FILES_URL = ""
 CSRF_COOKIE_DOMAIN = '127.0.0.1'
 
 # Defaults to be overridden
