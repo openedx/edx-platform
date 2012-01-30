@@ -65,6 +65,7 @@ div.course-wrapper {
           text-decoration: none;
           margin-bottom: lh(.5);
           display: block;
+          color: #000;
 
           &:hover {
             color: #666;
@@ -110,6 +111,10 @@ div.course-wrapper {
     ol.sequence-nav {
       margin-bottom: $body-line-height;
       @extend .topbar;
+
+      a {
+        @extend .block-link;
+      }
 
       li {
         border: none;

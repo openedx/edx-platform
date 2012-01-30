@@ -46,6 +46,10 @@ div.book-wrapper {
       @extend .topbar;
       @extend .clearfix;
 
+      a {
+        @extend .block-link;
+      }
+
       ul {
         @extend .clearfix;
 
