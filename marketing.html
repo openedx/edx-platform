@@ -3,15 +3,15 @@
 <head>
   <%block name="title"><title>MITX 6.002</title></%block>
 
-  <!--link rel="stylesheet" href="/static/lib/jquery.treeview.css" type="text/css" media="all" /-->
+  <!--link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" /-->
   <link rel="stylesheet" href="/static/css/marketing.css" type="text/css" media="all" />
 
-  <script type="text/javascript" src="/static/lib/jquery-1.6.2.min.js"></script>
-  <script type="text/javascript" src="/static/lib/jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
 
-  <script type="text/javascript" src="/static/lib/jquery.leanModal.min.js"></script>
-  <!--script type="text/javascript" src="/static/lib//swfobject/swfobject.js"></script-->
-  <!--script type="text/javascript" src="/static/lib/jquery.treeview.js"></script-->
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery.leanModal.min.js"></script>
+  <!--script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script-->
+  <!--script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script-->
   <!--script type="text/javascript" src="/static/js/video_player.js"></script-->
   <!-- <script type="text/javascript" src="/static/js/schematic.js"></script> -->
 
@@ -61,12 +61,15 @@ function postJSON(url, data, callback) {
   <%block name="header">
   <header class="announcement <%block name="header_class"/>">
     <div class="anouncement-wrapper">
+% if settings.COURSEWARE_ENABLED:
     <%block name="header_nav">
     <nav>
       <h1><a href="http://mitx.mit.edu/">MITx</a></h1>
       <a rel="leanModal" class="login" href="#login">Log In</a>
     </nav>
     </%block>
+% endif
+
     <%block name="header_text">
       <section>
         <h1>MITx</h1>
