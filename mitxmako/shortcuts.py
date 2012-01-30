@@ -15,7 +15,7 @@
 from django.template import Context
 from django.http import HttpResponse
 
-import middleware
+import mitxmako.middleware as middleware
 from django.conf import settings
 
 from mitxmako.middleware import requestcontext
