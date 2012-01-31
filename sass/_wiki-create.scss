@@ -21,7 +21,12 @@ form#wiki_revision {
   }
 
   #submit_delete {
+    @include box-shadow(none);
+    background: none;
+    border: none;
+    color: #999;
     float: right;
+    text-decoration: underline;
   }
   
   input[type="submit"] {
