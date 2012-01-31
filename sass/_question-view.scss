@@ -4,6 +4,35 @@ div.question-header {
     float: left;
     width: flex-grid(1,9);
     margin-right: flex-gutter(9);
+
+    ul li {
+      background-position: center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      font-weight: bold;
+      height: 20px;
+      list-style: none;
+      padding: 10px;
+      text-align: center;
+      width: 25px;
+
+      &.question-img-upvote, &.answer-img-upvote  {
+        background-image: url(/static/images/askbot/vote-arrow-up-new.png);
+        background-color: #F6EFD4;
+
+        &:hover, &.on {
+          background-image: url(/static/images/askbot/vote-arrow-up-on-new.png);
+        }
+      }
+
+      &.question-img-downvote, &.answer-img-downvote  {
+        background-image: url(/static/images/askbot/vote-arrow-down-new.png);
+
+        &:hover, &.on {
+          background-image: url(/static/images/askbot/vote-arrow-down-on-new.png);
+        }
+      }
+    }
   }
 
   div.question-container {
@@ -68,3 +97,5 @@ div.question-header {
     }
   }
 }
+
+
