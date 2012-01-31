@@ -247,6 +247,10 @@ section.index-content {
             letter-spacing: 1px;
             color: #666;
             margin-bottom: lh();
+
+            span {
+              text-transform: none;
+            }
           }
 
           p {
