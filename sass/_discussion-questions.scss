@@ -74,10 +74,6 @@ ul.question-list {
           font-weight: normal;
           margin: 0px 0 15px 0;
           text-transform: none;
-
-          a {
-            color: #000;
-          }
         }
 
         div.user-info {
@@ -158,3 +154,41 @@ div.search-tips {
 .search-result-summary {
 }
 
+div.post-update-info {
+  @include box-sizing(border-box);
+  @include border-radius(5px);
+  background:lighten(#F6EFD4, 5%);
+  padding: 10px;
+
+  a {
+    color:$mit-red ;
+  }
+
+  div.change-date {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  div.avatar {
+    display: inline-block;
+    float: left;
+    margin-right: 3px;
+
+    img.gravatar {
+      background: white;
+      border: 1px solid darken(#F6EFD4, 10%);
+      margin-right: 5px;
+      padding: 3px ;
+      vertical-align: bottom;
+    }
+  }
+
+  div.user-meta {
+    display: inline-block;
+    width: 60%;
+
+    span.user-badges {
+      display: block;
+    }
+  }
+}
