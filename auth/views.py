@@ -5,12 +5,12 @@ import string
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
-from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.validators import validate_email, validate_slug
 from django.db import connection
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from models import Registration, UserProfile
@@ -230,3 +230,17 @@ def activate_account(request, key):
     if len(r)==0:
         return render_to_response("activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
     return HttpResponse("Unknown error. Please e-mail us to let us know how it happened.")
+
+def password_reset(request):
+    ''' Attempts to send a password reset e-mail. '''
+    if request.method != "POST":
+        raise Http404
+    form = PasswordResetForm(request.POST)
+    if form.is_valid():
+        form.save( use_https = request.is_secure(), 
+                   from_email = settings.DEFAULT_FROM_EMAIL, 
+                   request = request )
+        return HttpResponse(json.dumps({'success':True})) 
+    else: 
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error': 'Invalid e-mail'})) 
