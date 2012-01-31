@@ -247,6 +247,10 @@ section.index-content {
             letter-spacing: 1px;
             color: #666;
             margin-bottom: lh();
+
+            span {
+              text-transform: none;
+            }
           }
 
           p {
@@ -354,7 +358,7 @@ section.index-content {
 
         &.requirements {
           clear: both;
-          width: auto;
+          width: 100%;
           border-top: 1px solid #E5E5E5;
           padding-top: lh();
           margin-bottom: 0;
