@@ -412,6 +412,8 @@ section.index-content section {
           letter-spacing: 1px;
           color: #666;
           margin-bottom: 25.888px; }
+          section.index-content section.about section.features h2 span {
+            text-transform: none; }
         section.index-content section.about section.features p {
           width: auto;
           clear: both; }
@@ -496,7 +498,7 @@ section.index-content section {
         margin-right: 3.817%; }
       section.index-content section.about-course section.requirements {
         clear: both;
-        width: auto;
+        width: 100%;
         border-top: 1px solid #E5E5E5;
         padding-top: 25.888px;
         margin-bottom: 0; }
