@@ -1,5 +1,6 @@
 import os
 import sys
+import tempfile
 
 import djcelery
 
@@ -134,9 +135,13 @@ TRACK_MAX_EVENT = 1000
 MAXLOG = 500
 
 LOG_DIR = "/tmp/"
+MAKO_MODULE_DIR = None
 
 # Make sure we execute correctly regardless of where we're called from
 execfile(os.path.join(BASE_DIR, "settings.py"))
+
+if MAKO_MODULE_DIR == None:
+    MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

@@ -14,6 +14,14 @@ class UserProfile(models.Model):
     meta = models.TextField(blank=True) # JSON dictionary for future expansion
     courseware = models.TextField(blank=True, default='course.xml')
 
+# class UserTestGroup(models.Model):
+#     ''' Group used for user tests. 
+#     E.g. groupname = 'metacognition' and groupsection = ['A','B']
+#     '''
+#     groupname = models.TextField(blank=True)
+#     groupsection = models.TextField(blank=True)
+#     user = models.ManyToManyField(User)
+
 class Registration(models.Model):
     ''' Allows us to wait for e-mail before user is registered. A
         registration profile is created when the user creates an 

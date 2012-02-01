@@ -3,6 +3,7 @@ import hashlib
 
 from lxml import etree
 from mako.template import Template
+from mako.lookup import TemplateLookup
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
@@ -88,12 +89,17 @@ def id_tag(course):
         else:
             elem.set('id', fasthash(etree.tostring(elem)))    
 
+template_lookup = TemplateLookup(directories = [settings.DATA_DIR], 
+                                 module_directory = settings.MAKO_MODULE_DIR)
+
 def course_file(user):
     # TODO: Cache. 
-    filename = settings.DATA_DIR+UserProfile.objects.get(user=user).courseware
-    data_template = Template(filename=filename)
+    filename = UserProfile.objects.get(user=user).courseware
+    data_template = template_lookup.get_template(filename)
 
-    tree = etree.XML(data_template.render())
+    options = {'dev_content':True}
+
+    tree = etree.XML(data_template.render(**options))
     id_tag(tree)
     return tree
 
