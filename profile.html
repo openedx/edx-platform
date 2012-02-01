@@ -1,5 +1,9 @@
 <%inherit file="main.html" />
 
+<%!
+  import json
+%>
+
 <script>
 var loc=true; // Activate on clicks? Not if already clicked.
 var lang=true;
@@ -95,14 +99,45 @@ $(function() {
 
     <section class="course-info">
       <h1>Course Progress</h1>
+    
+    <div id="homework-detail-graph" style="width:550px;height:200px;"></div>
+    
+    <script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.min.js"></script>
+    <script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.stack.js"></script>
+    <script>
+    $(function () {
+      
 
+      var homeworkData = ${ json.dumps( [[i + 1, percentage] for i,percentage in enumerate(homework_percentages)] ) };
+      var labData = ${ json.dumps( [[i + 13, percentage] for i,percentage in enumerate(lab_percentages)] ) };
+      
+      var data = [
+        //{label: 'Homework Total', data: [ [0.5,0.8] ], bars: {barWidth: 12, align: 'left'} },
+        {label: 'Homework', data: homeworkData, color: 0},
+        //{label: 'Lab Total', data: [ [12.5,0.9] ], bars: {barWidth: 12, align: 'left'}},
+        {label: 'Labs', data: labData, color: 1},
+        {label: 'Midterm', data: [[25,0.87]], color: 2},
+        {label: 'Final', data: [[26,0.65]], color: 3},
+      ];
+      var options = {
+        series: {lines: {show: false, steps: false },
+        bars: {show: true, barWidth: 0.6, align: 'center',},},
+        xaxis: {ticks: [[1,'1'], [2,'2'], [3,'3'], [4,'4'], [5,'5']]},
+      };
+
+      $.plot($("#homework-detail-graph"), data, options);
+      
+    });
+    </script>
+    
+    
       <!-- <div id="description"></div> -->
 
       <ol>
         % for hw in homeworks:
         <li>
           <h2>${ hw['chapter'] }</h2>
-          <h3>${ hw['section'] }</h3>
+          <h3>${hw['format']} - ${ hw['section'] } ${"({0}/{1})".format( hw['section_total'][0], hw['section_total'][1] )}</h3> 
 
           <ul>
             % for score in hw['scores']:
