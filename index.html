@@ -85,7 +85,8 @@ $(function() {
     /* Handles when the user hits 'enroll'. Grabs form data. Does AJAX.
             Either shows error, or shows success. */
 
-    $('#create_account_button').click(function() {
+    $('form#enroll_form').submit(function(e) {
+      e.preventDefault();
       var submit_data={};
       $.each($("[id^=ca_]"), function(index,value){
         submit_data[value.name]=value.value;

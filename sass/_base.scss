@@ -41,6 +41,14 @@ em {
   }
 }
 
+a:link, a:visited {
+  text-decoration:none;
+}
+
+a:hover {
+  text-decoration:underline;
+}
+
 input[type="submit"], input[type="button"], button {
   @extend .button;
 }
