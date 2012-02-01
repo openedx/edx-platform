@@ -76,29 +76,55 @@ def profile(request):
                                 sum([score[1] for score in scores if score[2]]))
                 
                 #Add the graded total to totalScores
-                if s.get('format') and graded_total[1] > 0:
-                    format_scores = totalScores[ s.get('format') ] if s.get('format') in totalScores else []
+                format = s.get('format') if s.get('format') else ""
+                if format and graded_total[1] > 0:
+                    format_scores = totalScores[ format ] if format in totalScores else []
                     format_scores.append( graded_total )
-                    totalScores[ s.get('format') ] = format_scores
+                    totalScores[ format ] = format_scores
                 
                 score={'course':course,
                        'section':s.get("name"),
                        'chapter':c.get("name"),
                        'scores':scores,
                        'section_total' : section_total,
+                       'format' : format,
                        }
                 hw.append(score)
     
-    user_info=UserProfile.objects.get(user=request.user)
     
-    print "totalScores" , totalScores
-
+    #Figure the homework scores
+    print totalScores
+    homeworkScores = totalScores['Homework'] if 'Homework' in totalScores else []
+    homeworkPercentages = []
+    for i in range(12):
+        if i < len(homeworkScores):
+            percentage = homeworkScores[i][0] / float(homeworkScores[i][1])
+        else:
+            percentage = 0
+        homeworkPercentages.append(percentage)
+    
+    labScores = totalScores['Lab'] if 'Lab' in totalScores else []
+    labPercentages = []
+    for i in range(12):
+        if i < len(labScores):
+            percentage = labScores[i][0] / float(labScores[i][1])
+        else:
+            percentage = 0
+        labPercentages.append(percentage)
+    
+    
+    
+        
+    
+    user_info=UserProfile.objects.get(user=request.user)
     context={'name':user_info.name,
              'username':request.user.username,
              'location':user_info.location,
              'language':user_info.language,
              'email':request.user.email,
-             'homeworks':hw, 
+             'homeworks':hw,
+             'homework_percentages' : homeworkPercentages,
+             'lab_percentages' : labPercentages,
              'csrf':csrf(request)['csrf_token']
              }
     return render_to_response('profile.html', context)
