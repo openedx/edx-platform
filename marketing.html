@@ -19,11 +19,11 @@
   <script src="/static/js/html5shiv.js"></script>
   <![endif]-->
 
-	<script type="text/javascript">
-		$(function(){
-			$("a[rel*=leanModal]").leanModal();
-		});
-	</script>
+  <script type="text/javascript">
+    $(function(){
+      $("a[rel*=leanModal]").leanModal();
+    });
+  </script>
 
 <%block name="headextra"/>
 
@@ -66,14 +66,15 @@
   </footer>
 
   <div id="login" class="leanModal_box"><%include file="login.html" /></div>
-  <div id="pwd_reset" class="leanModal_box"><%include file="password_reset_form.html" /></div>
+  <div id="pwd_reset" class="leanModal_box"><%include file="registration/password_reset_form.html" /></div>
   <div id="reset_done" class="leanModal_box"></div>
 
 <script>
 $(document).ready(function(){
     /* Handles when the user tries to log in. Grabs form data. Does AJAX.
        Either shows error, or redirects. */
-  $('#login_button').click(function() {
+  $('form#login_form').submit(function(e) {
+    e.preventDefault();
     var submit_data={};
     $.each($("[id^=li_]"), function(index,value){
       submit_data[value.name]=value.value;
@@ -92,11 +93,21 @@ $(document).ready(function(){
     );
   });
 
-  $('#pwd_reset_button').click(function() {
-    $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
-      "email"  : $('#id_email').val()}, function(data){
-        $('#pwd_reset').html(data);
-    });
+
+  $('form#pwd_reset_form').submit(function(e) {
+    e.preventDefault();
+    var submit_data = {};
+    submit_data['email'] = $('#id_email').val();
+    postJSON('/password_reset/',
+      submit_data,
+      function(json){
+        if (json.success) {
+          $('#pwd_reset').html(json.value);
+        } else {
+          $('#pwd_error').html(json.error);
+        }
+      }
+    );
   });
 
 });

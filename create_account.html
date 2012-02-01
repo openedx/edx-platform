@@ -2,7 +2,7 @@
 <div name="enroll_form" id="enroll_form">
 
   <h1>Enroll in 6.002 Circuits &amp; Electronics</h1>
-  <form name="login"  method="get">
+  <form name="enroll" id="enroll_form"  method="get">
     <fieldset><% if 'error' in locals(): e = error %>
 
     <div id="enroll_error" name="enroll_error"></div>
@@ -67,6 +67,6 @@
       </li>
 
     </ol>
-    <input name="create_account_button" id="create_account_button" type="button" value="Create Account">
+    <input name="create_account_button" id="create_account_button" type="submit" value="Create Account">
 </fieldset>  </form>
 </div>

@@ -93,7 +93,7 @@ div.leanModal_box {
       }
     }
 
-    input[type="button"] {
+    input[type="button"], input[type="submit"] {
       @include button($mit-red);
       font-size: 18px;
       padding: lh(.5);
