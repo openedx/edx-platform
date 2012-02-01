@@ -123,7 +123,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'courseware.registration': {
-            'Meta': {'object_name': 'Registration', 'db_table': "'auth_userprofile'"},
+            'Meta': {'object_name': 'Registration', 'db_table': "'auth_registration'"},
             'activation_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})

@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -55,7 +57,7 @@ class Registration(models.Model):
         account, but that account is inactive. Once the user clicks
         on the activation key, it becomes active. '''
     class Meta:
-        db_table = "auth_userprofile"
+        db_table = "auth_registration"
 
     user = models.ForeignKey(User, unique=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
