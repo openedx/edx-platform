@@ -129,7 +129,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, div.course-wrapper section.course-content ol.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
   content: ".";
   display: block;
   height: 0;
@@ -191,22 +191,32 @@ input, select {
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box;
+  -webkit-box-shadow: inset 0 0 2px 3px #f3f3f3;
+  -moz-box-shadow: inset 0 0 2px 3px #f3f3f3;
+  -ms-box-shadow: inset 0 0 2px 3px #f3f3f3;
+  -o-box-shadow: inset 0 0 2px 3px #f3f3f3;
+  box-shadow: inset 0 0 2px 3px #f3f3f3;
   display: table-cell;
   padding: 22.652px;
   vertical-align: top;
   width: 76.518%; }
 
 .sidebar, div.course-wrapper div#accordion, div.book-wrapper ul#booknav, div.wiki-wrapper div#wiki_panel, body.askbot section.main-content div.discussion-wrapper aside {
-  -webkit-box-shadow: inset -1px 0 0 #f6f6f6;
-  -moz-box-shadow: inset -1px 0 0 #f6f6f6;
-  -ms-box-shadow: inset -1px 0 0 #f6f6f6;
-  -o-box-shadow: inset -1px 0 0 #f6f6f6;
-  box-shadow: inset -1px 0 0 #f6f6f6;
+  -webkit-box-shadow: inset 0 0 0 1px #f6f6f6;
+  -moz-box-shadow: inset 0 0 0 1px #f6f6f6;
+  -ms-box-shadow: inset 0 0 0 1px #f6f6f6;
+  -o-box-shadow: inset 0 0 0 1px #f6f6f6;
+  box-shadow: inset 0 0 0 1px #f6f6f6;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box;
+  -webkit-border-radius: 4px 0 0 4px;
+  -moz-border-radius: 4px 0 0 4px;
+  -ms-border-radius: 4px 0 0 4px;
+  -o-border-radius: 4px 0 0 4px;
+  border-radius: 4px 0 0 4px;
   background: #e3e3e3;
   border-right: 1px solid #d3d3d3;
   display: table-cell;
@@ -277,18 +287,23 @@ input, select {
       .sidebar h3.active a, div.course-wrapper div#accordion h3.active a, div.book-wrapper ul#booknav h3.active a, div.wiki-wrapper div#wiki_panel h3.active a, body.askbot section.main-content div.discussion-wrapper aside h3.active a, .sidebar div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion .sidebar h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.book-wrapper ul#booknav div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel h3.ui-accordion-header.ui-state-active a, body.askbot section.main-content div.discussion-wrapper aside div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active a, div.course-wrapper div#accordion body.askbot section.main-content div.discussion-wrapper aside h3.ui-accordion-header.ui-state-active a, .sidebar div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, body.askbot section.main-content div.discussion-wrapper aside div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel body.askbot section.main-content div.discussion-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, body.askbot section.main-content div.discussion-wrapper aside div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion body.askbot section.main-content div.discussion-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel .sidebar input.active[type="button"] a, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.active[type="button"] a, div.book-wrapper ul#booknav div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"] a, div.wiki-wrapper div#wiki_panel input.active[type="button"] a, body.askbot section.main-content div.discussion-wrapper aside div.wiki-wrapper div#wiki_panel input.active[type="button"] a, div.wiki-wrapper div#wiki_panel body.askbot section.main-content div.discussion-wrapper aside input.active[type="button"] a {
         color: #000; }
 
-.topbar, div.course-wrapper section.course-content ol.sequence-nav, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header, body.askbot .secondary-nav nav {
+.topbar, nav.sequence-nav, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header, body.askbot .secondary-nav nav {
   background: #F6EFD4;
   border-bottom: 1px solid #eddfaa;
   margin: -22.652px -22.652px 22.652px;
   font-size: 12px;
-  text-shadow: 0 1px 0 #fff; }
-  .topbar a, div.course-wrapper section.course-content ol.sequence-nav a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav a {
+  text-shadow: 0 1px 0 #fff;
+  -webkit-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
+  -moz-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
+  -ms-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
+  -o-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
+  box-shadow: inset 0 1px 0 white, inset 1px 0 0 white; }
+  .topbar a, nav.sequence-nav a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav a {
     color: #292309; }
-    .topbar a:hover, div.course-wrapper section.course-content ol.sequence-nav a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav a:hover {
+    .topbar a:hover, nav.sequence-nav a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav a:hover {
       color: #7e691a;
       text-decoration: none; }
-    .topbar a.block-link, div.course-wrapper section.course-content ol.sequence-nav a.block-link, div.book-wrapper section.book nav a.block-link, div.wiki-wrapper section.wiki-body header a.block-link, body.askbot .secondary-nav nav a.block-link, .topbar div.course-wrapper section.course-content ol.sequence-nav a, div.course-wrapper section.course-content ol.sequence-nav .topbar a, div.course-wrapper section.course-content ol.sequence-nav a, div.book-wrapper section.book nav div.course-wrapper section.course-content ol.sequence-nav a, div.course-wrapper section.course-content ol.sequence-nav div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header div.course-wrapper section.course-content ol.sequence-nav a, div.course-wrapper section.course-content ol.sequence-nav div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav div.course-wrapper section.course-content ol.sequence-nav a, div.course-wrapper section.course-content ol.sequence-nav body.askbot .secondary-nav nav a, .topbar div.book-wrapper section.book nav a, div.book-wrapper section.book nav .topbar a, div.course-wrapper section.course-content ol.sequence-nav div.book-wrapper section.book nav a, div.book-wrapper section.book nav div.course-wrapper section.course-content ol.sequence-nav a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav div.book-wrapper section.book nav a, div.book-wrapper section.book body.askbot .secondary-nav nav a, .topbar div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header .topbar a, div.course-wrapper section.course-content ol.sequence-nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header div.course-wrapper section.course-content ol.sequence-nav a, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header body.askbot .secondary-nav nav a {
+    .topbar a.block-link, nav.sequence-nav a.block-link, div.book-wrapper section.book nav a.block-link, div.wiki-wrapper section.wiki-body header a.block-link, body.askbot .secondary-nav nav a.block-link, .topbar nav.sequence-nav ol a, nav.sequence-nav ol .topbar a, nav.sequence-nav ol a, div.book-wrapper section.book nav.sequence-nav ol a, div.wiki-wrapper section.wiki-body header nav.sequence-nav ol a, nav.sequence-nav ol div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav.sequence-nav ol a, .topbar div.book-wrapper section.book nav a, div.book-wrapper section.book nav .topbar a, div.book-wrapper section.book nav.sequence-nav a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav div.book-wrapper section.book nav a, div.book-wrapper section.book body.askbot .secondary-nav nav a, .topbar div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header .topbar a, nav.sequence-nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header nav.sequence-nav a, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a, body.askbot .secondary-nav nav div.wiki-wrapper section.wiki-body header a, div.wiki-wrapper section.wiki-body header body.askbot .secondary-nav nav a {
       -webkit-box-shadow: inset 1px 0 0 #faf7e9;
       -moz-box-shadow: inset 1px 0 0 #faf7e9;
       -ms-box-shadow: inset 1px 0 0 #faf7e9;
@@ -299,7 +314,7 @@ input, select {
       padding: 16.989px;
       text-transform: uppercase;
       display: block; }
-      .topbar a.block-link:hover, div.course-wrapper section.course-content ol.sequence-nav a.block-link:hover, div.book-wrapper section.book nav a.block-link:hover, div.wiki-wrapper section.wiki-body header a.block-link:hover, body.askbot .secondary-nav nav a.block-link:hover, .topbar div.course-wrapper section.course-content ol.sequence-nav a:hover, div.course-wrapper section.course-content ol.sequence-nav .topbar a:hover, div.course-wrapper section.course-content ol.sequence-nav a:hover, div.book-wrapper section.book nav div.course-wrapper section.course-content ol.sequence-nav a:hover, div.course-wrapper section.course-content ol.sequence-nav div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header div.course-wrapper section.course-content ol.sequence-nav a:hover, div.course-wrapper section.course-content ol.sequence-nav div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav div.course-wrapper section.course-content ol.sequence-nav a:hover, div.course-wrapper section.course-content ol.sequence-nav body.askbot .secondary-nav nav a:hover, .topbar div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav .topbar a:hover, div.course-wrapper section.course-content ol.sequence-nav div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav div.course-wrapper section.course-content ol.sequence-nav a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav div.book-wrapper section.book nav a:hover, div.book-wrapper section.book body.askbot .secondary-nav nav a:hover, .topbar div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header .topbar a:hover, div.course-wrapper section.course-content ol.sequence-nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header div.course-wrapper section.course-content ol.sequence-nav a:hover, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header body.askbot .secondary-nav nav a:hover {
+      .topbar a.block-link:hover, nav.sequence-nav a.block-link:hover, div.book-wrapper section.book nav a.block-link:hover, div.wiki-wrapper section.wiki-body header a.block-link:hover, body.askbot .secondary-nav nav a.block-link:hover, .topbar nav.sequence-nav ol a:hover, nav.sequence-nav ol .topbar a:hover, nav.sequence-nav ol a:hover, div.book-wrapper section.book nav.sequence-nav ol a:hover, div.wiki-wrapper section.wiki-body header nav.sequence-nav ol a:hover, nav.sequence-nav ol div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav.sequence-nav ol a:hover, .topbar div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav .topbar a:hover, div.book-wrapper section.book nav.sequence-nav a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav div.book-wrapper section.book nav a:hover, div.book-wrapper section.book body.askbot .secondary-nav nav a:hover, .topbar div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header .topbar a:hover, nav.sequence-nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header nav.sequence-nav a:hover, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover, body.askbot .secondary-nav nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header body.askbot .secondary-nav nav a:hover {
         background: none; }
 
 :focus {
@@ -344,6 +359,12 @@ input[type="email"], input[type="number"], input[type="password"], input[type="s
   input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="color"]:focus, input[type="date"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, textarea:focus {
     border-color: #993333; }
 
+a:link, a:visited {
+  text-decoration: none; }
+
+a:hover {
+  text-decoration: underline; }
+
 html {
   margin-top: 0; }
   html body {
@@ -351,7 +372,7 @@ html {
     font: 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
     text-align: center;
     margin: 0;
-    background: #f6f6f6; }
+    background: #f4f4f4; }
     html body div.header-wrapper {
       -webkit-box-shadow: inset 0 -1px 2px #732626;
       -moz-box-shadow: inset 0 -1px 2px #732626;
@@ -375,7 +396,7 @@ html {
           font-size: 20px;
           font-weight: 800;
           margin: 0 22.652px 0 0;
-          padding: 17px 22.652px 17px 0;
+          padding: 17px 22.652px 14px 0;
           text-shadow: 0 1px 0 #bf4040;
           line-height: 22.652px; }
         html body div.header-wrapper header nav {
@@ -388,17 +409,17 @@ html {
           html body div.header-wrapper header nav h2 {
             float: left;
             margin: 0 22.652px 0 0;
-            padding: 19px 22.652px 12px 0;
+            padding: 19px 22.652px 9px 0;
             line-height: 22.652px;
             border-right: 1px solid #862d2d; }
             html body div.header-wrapper header nav h2 a {
-              color: #fff; }
+              color: #fff;
+              text-decoration: none; }
               html body div.header-wrapper header nav h2 a:hover {
-                color: rgba(255, 255, 255, 0.7);
-                text-decoration: none; }
+                color: rgba(255, 255, 255, 0.7); }
           html body div.header-wrapper header nav ul {
             display: inline-block;
-            padding: 19px 0 12px;
+            padding: 19px 0 9px;
             margin: 0; }
             html body div.header-wrapper header nav ul li {
               margin-right: 22.652px;
@@ -406,33 +427,35 @@ html {
               margin-bottom: 0;
               line-height: 22.652px; }
               html body div.header-wrapper header nav ul li a {
-                color: #fff; }
+                color: #fff;
+                text-decoration: none; }
                 html body div.header-wrapper header nav ul li a:hover {
                   color: rgba(255, 255, 255, 0.7);
                   background-color: none;
                   text-decoration: none; }
     html body section.main-content {
-      -webkit-box-shadow: 0 0 4px #dddddd;
-      -moz-box-shadow: 0 0 4px #dddddd;
-      -ms-box-shadow: 0 0 4px #dddddd;
-      -o-box-shadow: 0 0 4px #dddddd;
-      box-shadow: 0 0 4px #dddddd;
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       -ms-box-sizing: border-box;
       -o-box-sizing: border-box;
       box-sizing: border-box;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -ms-border-radius: 4px;
+      -o-border-radius: 4px;
+      border-radius: 4px;
+      overflow: hidden;
       background: #fff;
       border-bottom: 1px solid #bbb; }
       @media screen and (min-width: 1400px) {
         html body section.main-content {
-          margin-top: 11.326px;
-          -webkit-border-radius: 3px;
-          -moz-border-radius: 3px;
-          -ms-border-radius: 3px;
-          -o-border-radius: 3px;
-          border-radius: 3px;
-          border: 1px solid #bbb; } }
+          -webkit-box-shadow: 0 0 4px #dfdfdf;
+          -moz-box-shadow: 0 0 4px #dfdfdf;
+          -ms-box-shadow: 0 0 4px #dfdfdf;
+          -o-box-shadow: 0 0 4px #dfdfdf;
+          box-shadow: 0 0 4px #dfdfdf;
+          border: 1px solid #bbb;
+          margin-top: 11.326px; } }
     html body img {
       max-width: 100%;
       height: auto; }
@@ -541,7 +564,7 @@ div.leanModal_box {
             color: #666;
             font-size: 14px;
             float: none; }
-    div.leanModal_box form input[type="button"] {
+    div.leanModal_box form input[type="button"], div.leanModal_box form input[type="submit"] {
       border: 1px solid #691b1b;
       -webkit-border-radius: 3px;
       -moz-border-radius: 3px;
@@ -569,7 +592,7 @@ div.leanModal_box {
       -webkit-background-clip: padding-box;
       font-size: 18px;
       padding: 11.326px; }
-      div.leanModal_box form input[type="button"]:hover {
+      div.leanModal_box form input[type="button"]:hover, div.leanModal_box form input[type="submit"]:hover {
         -webkit-box-shadow: inset 0 1px 0 0 #a44141;
         -moz-box-shadow: inset 0 1px 0 0 #a44141;
         -ms-box-shadow: inset 0 1px 0 0 #a44141;
@@ -583,7 +606,7 @@ div.leanModal_box {
         background-image: -ms-linear-gradient(top, #823030, #691c1c);
         background-image: -o-linear-gradient(top, #823030, #691c1c);
         background-image: linear-gradient(top, #823030, #691c1c); }
-      div.leanModal_box form input[type="button"]:active {
+      div.leanModal_box form input[type="button"]:active, div.leanModal_box form input[type="submit"]:active {
         border: 1px solid #691b1b;
         -webkit-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
         -moz-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
@@ -661,7 +684,7 @@ div.course-wrapper div#accordion ul.ui-accordion-content {
   font-size: 12px;
   margin: 0;
   overflow: hidden; }
-  div.course-wrapper div#accordion ul.ui-accordion-content li.active {
+  div.course-wrapper div#accordion ul.ui-accordion-content li.active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_video_active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_vertical_active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_problem_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_problem_active {
     font-weight: bold; }
   div.course-wrapper div#accordion ul.ui-accordion-content li a {
     text-decoration: none;
@@ -674,118 +697,97 @@ div.course-wrapper div#accordion ul.ui-accordion-content {
       margin-bottom: 0; }
       div.course-wrapper div#accordion ul.ui-accordion-content li a p.subtitle {
         color: #666; }
-div.course-wrapper section.course-content ol.vert-mod > li {
-  border-bottom: 1px solid #eee;
-  padding: 15px 0; }
-  div.course-wrapper section.course-content ol.vert-mod > li:last-child {
-    border-bottom: none; }
-  div.course-wrapper section.course-content ol.vert-mod > li h2 {
-    margin-top: 0;
-    margin-bottom: 15px; }
-  div.course-wrapper section.course-content ol.vert-mod > li input[type="text"] {
-    display: inline-block;
-    margin: 8px 4px 4px 10px; }
-div.course-wrapper section.course-content ol.sequence-nav {
+div.course-wrapper section.course-content p {
   margin-bottom: 22.652px; }
-  div.course-wrapper section.course-content ol.sequence-nav li {
-    border: none;
-    cursor: pointer;
+  div.course-wrapper section.course-content p:empty {
+    display: none;
+    margin-bottom: 0; }
+div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li {
+  position: relative; }
+  div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    width: 20.109%;
+    padding-right: 2.717%;
+    border-right: 1px dotted #ccc;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
     display: table-cell;
-    padding: 16.989px;
-    float: left; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_problem_inactive {
-      width: 14px;
-      background: url("/static/images/problem-icon.png") 13px 13px no-repeat;
-      -webkit-box-shadow: inset -1px 0 0 #eddfaa;
-      -moz-box-shadow: inset -1px 0 0 #eddfaa;
-      -ms-box-shadow: inset -1px 0 0 #eddfaa;
-      -o-box-shadow: inset -1px 0 0 #eddfaa;
-      box-shadow: inset -1px 0 0 #eddfaa; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_problem_inactive:hover {
-        background-color: #f9f4e1; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_problem_visited {
-      width: 14px;
-      background: #ece5cb url("/static/images/problem-icon.png") -57px 13px no-repeat; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_problem_visited:hover {
-        background-color: #F6EFD4; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_problem_active {
-      width: 14px;
-      background: #fffbeb url("/static/images/problem-icon.png") -22px 13px no-repeat;
-      -webkit-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -moz-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -ms-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -o-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_problem_active:hover {
-        background-color: #F6EFD4; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_video_inactive {
-      width: 14px;
-      background: url("/static/images/video-icon.png") 13px 15px no-repeat;
-      -webkit-box-shadow: inset -1px 0 0 #eddfaa;
-      -moz-box-shadow: inset -1px 0 0 #eddfaa;
-      -ms-box-shadow: inset -1px 0 0 #eddfaa;
-      -o-box-shadow: inset -1px 0 0 #eddfaa;
-      box-shadow: inset -1px 0 0 #eddfaa; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_video_inactive:hover {
-        background-color: #f9f4e1; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_video_visited {
-      width: 14px;
-      background: #ece5cb url("/static/images/video-icon.png") -81px 15px no-repeat; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_video_visited:hover {
-        background-color: #F6EFD4; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_video_active {
-      width: 14px;
-      background: #fffbeb url("/static/images/video-icon.png") -32px 15px no-repeat;
-      -webkit-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -moz-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -ms-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -o-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_video_active:hover {
-        background-color: #F6EFD4; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_vertical_inactive {
-      width: 14px;
-      background: url("/static/images/vertical-icon.png") -82px 15px no-repeat;
-      -webkit-box-shadow: inset -1px 0 0 #eddfaa;
-      -moz-box-shadow: inset -1px 0 0 #eddfaa;
-      -ms-box-shadow: inset -1px 0 0 #eddfaa;
-      -o-box-shadow: inset -1px 0 0 #eddfaa;
-      box-shadow: inset -1px 0 0 #eddfaa; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_vertical_inactive:hover {
-        background-color: #f9f4e1; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_vertical_visited {
-      width: 14px;
-      background: #ece5cb url("/static/images/vertical-icon.png") 13px 15px no-repeat; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_vertical_visited:hover {
-        background-color: #F6EFD4; }
-    div.course-wrapper section.course-content ol.sequence-nav li.seq_vertical_active {
-      width: 14px;
-      background: #fffbeb url("/static/images/vertical-icon.png") -35px 15px no-repeat;
-      -webkit-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -moz-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -ms-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      -o-box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080;
-      box-shadow: inset -1px 0 0 #e4d080, inset 1px 0 0 #e4d080; }
-      div.course-wrapper section.course-content ol.sequence-nav li.seq_vertical_active:hover {
-        background-color: #F6EFD4; }
-    div.course-wrapper section.course-content ol.sequence-nav li.prev, div.course-wrapper section.course-content ol.sequence-nav li.next {
-      -webkit-box-shadow: inset 1px 0 0 #faf7e9;
-      -moz-box-shadow: inset 1px 0 0 #faf7e9;
-      -ms-box-shadow: inset 1px 0 0 #faf7e9;
-      -o-box-shadow: inset 1px 0 0 #faf7e9;
-      box-shadow: inset 1px 0 0 #faf7e9;
-      background: #f2e7bf;
-      border-left: 1px solid #e4d080;
-      color: #292309;
-      float: right;
-      letter-spacing: 1px;
-      padding: 16.989px;
-      text-transform: uppercase; }
-      div.course-wrapper section.course-content ol.sequence-nav li.prev:hover, div.course-wrapper section.course-content ol.sequence-nav li.next:hover {
-        text-decoration: none;
-        color: #7e691a;
-        text-decoration: none;
-        background: none; }
+    vertical-align: top; }
+    @media screen and (max-width:910px) {
+      div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+        display: block;
+        width: auto; } }
+  div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+    display: table-cell;
+    width: 77.174%;
+    padding-left: 2.717%; }
+    @media screen and (max-width:910px) {
+      div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+        display: block;
+        width: auto; } }
+    div.course-wrapper section.course-content .problem-set section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.unanswered {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("/static/images/unanswered-icon.png") center center no-repeat;
+      height: 14px;
+      position: relative;
+      top: 4px;
+      width: 14px; }
+    div.course-wrapper section.course-content .problem-set section.problem span.correct, div.course-wrapper section.course-content section.problems-wrapper section.problem span.correct, div.course-wrapper section.course-content div#seq_content section.problem span.correct, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.correct {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("/static/images/correct-icon.png") center center no-repeat;
+      height: 20px;
+      position: relative;
+      top: 6px;
+      width: 25px; }
+    div.course-wrapper section.course-content .problem-set section.problem span.incorrect, div.course-wrapper section.course-content section.problems-wrapper section.problem span.incorrect, div.course-wrapper section.course-content div#seq_content section.problem span.incorrect, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.incorrect {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("/static/images/incorrect-icon.png") center center no-repeat;
+      height: 20px;
+      width: 20px;
+      position: relative;
+      top: 6px; }
+  div.course-wrapper section.course-content .problem-set div > span, div.course-wrapper section.course-content section.problems-wrapper div > span, div.course-wrapper section.course-content div#seq_content div > span, div.course-wrapper section.course-content ol.vert-mod > li div > span {
+    display: block;
+    margin-bottom: 11.326px; }
+  div.course-wrapper section.course-content .problem-set input[type="text"], div.course-wrapper section.course-content section.problems-wrapper input[type="text"], div.course-wrapper section.course-content div#seq_content input[type="text"], div.course-wrapper section.course-content ol.vert-mod > li input[type="text"] {
+    display: inline-block; }
+  div.course-wrapper section.course-content .problem-set center, div.course-wrapper section.course-content section.problems-wrapper center, div.course-wrapper section.course-content div#seq_content center, div.course-wrapper section.course-content ol.vert-mod > li center {
+    display: block;
+    margin: 22.652px 0;
+    border: 1px solid #ccc;
+    padding: 22.652px; }
+  div.course-wrapper section.course-content .problem-set section.action, div.course-wrapper section.course-content section.problems-wrapper section.action, div.course-wrapper section.course-content div#seq_content section.action, div.course-wrapper section.course-content ol.vert-mod > li section.action {
+    margin-top: 22.652px; }
+div.course-wrapper section.course-content ol.vert-mod > li {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 15px;
+  padding: 0 0 15px; }
+  div.course-wrapper section.course-content ol.vert-mod > li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0; }
 
 section.course-content div.video-wrapper {
   float: left;
@@ -891,13 +893,22 @@ section.course-content div.video-wrapper {
         *vertical-align: auto;
         font-weight: bold; }
         section.course-content div.video-wrapper section.video-controls div.speeds div#video_speeds span {
-          cursor: pointer; }
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          cursor: pointer;
+          margin-bottom: 0; }
           section.course-content div.video-wrapper section.video-controls div.speeds div#video_speeds span:hover {
             color: #993333; }
 section.course-content ol.subtitles {
   float: left;
   width: 31.522%;
-  min-height: 570px; }
+  height: 530px;
+  overflow: hidden; }
   section.course-content ol.subtitles li {
     margin-bottom: 0px;
     cursor: pointer;
@@ -913,6 +924,84 @@ section.course-content ol.subtitles {
       margin-bottom: 8px; }
     section.course-content ol.subtitles li div:empty {
       margin-bottom: 0px; }
+
+nav.sequence-nav {
+  margin-bottom: 22.652px; }
+  nav.sequence-nav ol .inactive, nav.sequence-nav ol li.seq_video_inactive, nav.sequence-nav ol li.seq_vertical_inactive, nav.sequence-nav ol li.seq_problem_inactive {
+    background-repeat: no-repeat; }
+    nav.sequence-nav ol .inactive:hover, nav.sequence-nav ol li.seq_video_inactive:hover, nav.sequence-nav ol li.seq_vertical_inactive:hover, nav.sequence-nav ol li.seq_problem_inactive:hover {
+      background-color: #f9f4e1; }
+  nav.sequence-nav ol .visited, nav.sequence-nav ol li.seq_video_visited, nav.sequence-nav ol li.seq_vertical_visited, nav.sequence-nav ol li.seq_problem_visited {
+    background-color: #ddd7be;
+    background-repeat: no-repeat;
+    border-color: #ddd7be; }
+    nav.sequence-nav ol .visited:hover, nav.sequence-nav ol li.seq_video_visited:hover, nav.sequence-nav ol li.seq_vertical_visited:hover, nav.sequence-nav ol li.seq_problem_visited:hover {
+      background-color: #F6EFD4; }
+  nav.sequence-nav ol .active, nav.sequence-nav ol div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
+    -webkit-box-shadow: 0 1px 0 white;
+    -moz-box-shadow: 0 1px 0 white;
+    -ms-box-shadow: 0 1px 0 white;
+    -o-box-shadow: 0 1px 0 white;
+    box-shadow: 0 1px 0 white;
+    background-color: #fff;
+    background-repeat: no-repeat; }
+    nav.sequence-nav ol .active:hover, nav.sequence-nav ol div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active:hover, div.course-wrapper div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active:hover, nav.sequence-nav ol div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"]:hover, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"]:hover, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li.seq_video_active:hover, nav.sequence-nav ol li.seq_vertical_active:hover, nav.sequence-nav ol li.seq_problem_active:hover {
+      background-color: #fff; }
+  nav.sequence-nav ol li {
+    border: none;
+    border-right: 1px solid #eddfaa;
+    -webkit-box-shadow: 1px 0 0 white;
+    -moz-box-shadow: 1px 0 0 white;
+    -ms-box-shadow: 1px 0 0 white;
+    -o-box-shadow: 1px 0 0 white;
+    box-shadow: 1px 0 0 white;
+    cursor: pointer;
+    display: table-cell;
+    padding: 16.989px;
+    float: left;
+    width: 18px; }
+    nav.sequence-nav ol li.seq_video_inactive {
+      background-image: url("/static/images/video-icon.png");
+      background-position: 13px 15px; }
+    nav.sequence-nav ol li.seq_video_visited {
+      background-image: url("/static/images/video-icon.png");
+      background-position: -81px 15px; }
+    nav.sequence-nav ol li.seq_video_active {
+      background-image: url("/static/images/video-icon.png");
+      background-position: -32px 15px; }
+    nav.sequence-nav ol li.seq_vertical_inactive, nav.sequence-nav ol li.seq_problem_inactive {
+      background-image: url("/static/images/vertical-icon.png");
+      background-position: -82px 15px; }
+    nav.sequence-nav ol li.seq_vertical_visited, nav.sequence-nav ol li.seq_problem_visited {
+      background-image: url("/static/images/vertical-icon.png");
+      background-position: 13px 15px; }
+    nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
+      background-image: url("/static/images/vertical-icon.png");
+      background-position: -35px 15px; }
+  nav.sequence-nav ul {
+    float: right;
+    margin-right: 1px; }
+    nav.sequence-nav ul li {
+      float: left; }
+      nav.sequence-nav ul li.prev, nav.sequence-nav ul li.next {
+        -webkit-box-shadow: inset 1px 0 0 #faf7e9;
+        -moz-box-shadow: inset 1px 0 0 #faf7e9;
+        -ms-box-shadow: inset 1px 0 0 #faf7e9;
+        -o-box-shadow: inset 1px 0 0 #faf7e9;
+        box-shadow: inset 1px 0 0 #faf7e9;
+        background: #f2e7bf;
+        border-left: 1px solid #e4d080;
+        color: #292309;
+        float: right;
+        letter-spacing: 1px;
+        padding: 16.989px;
+        text-transform: uppercase;
+        cursor: pointer; }
+        nav.sequence-nav ul li.prev:hover, nav.sequence-nav ul li.next:hover {
+          text-decoration: none;
+          color: #7e691a;
+          text-decoration: none;
+          background: none; }
 
 div.book-wrapper ul#booknav {
   -webkit-box-sizing: border-box;
@@ -1329,7 +1418,7 @@ section.help.main-content {
   color: #763333;
   text-decoration: underline; }
 
-.badge-context-toggle.active, div.course-wrapper div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"] {
+.badge-context-toggle.active, div.course-wrapper div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.badge-context-toggle.seq_video_active, nav.sequence-nav ol li.badge-context-toggle.seq_vertical_active, nav.sequence-nav ol li.badge-context-toggle.seq_problem_active {
   cursor: pointer;
   text-decoration: underline; }
 
@@ -3420,237 +3509,3 @@ div.question-header div.question-container {
       display: inline-block;
       float: left;
       width: 20.123%; }
-
-/*
-----------------------------------------------------------------------------------------
-
-Copyright 2010 - Thierry Ruiz - www.dotemplate.com - All rights reserved.
-
-THIS TEMPLATE IS FREE AS LONG AS YOU KEEP THE LINK TO WWW.DOTEMPLATE.COM IN THE FOOTER
-TO REMOVE THE LINK, PLEASE MAKE A 10 DOLLARS DONATION at www.dotemplate.com/#donate
-
-pmitros donated $10
-
-Colors: 
-Light blue: bddeff
-      Blue: 7fbcfd
-Very dark blue: #031634
-
-Dark blue: #023063;
-Dark Greenish: #7a994c;
-Greenish: #adcc80;
-Very light greenish: #dae5c9;
-Bright orange: #fa720a;
-
-----------------------------------------------------------------------------------------
-*/
-h1 {
-  clear: both; }
-
-h2 {
-  clear: both; }
-
-h3, div.wiki-wrapper div#wiki_panel input[type="button"] {
-  font-size: 1em;
-  margin: 20px 0 5px 0;
-  clear: both; }
-
-a:link, a:visited {
-  text-decoration: none; }
-
-a:hover {
-  text-decoration: underline; }
-
-#wrapper {
-  background: transparent url(images/css/page-vbg.jpg) repeat-y scroll 50% 0px;
-  margin: 0 auto;
-  width: 100%; }
-
-#topWrapper {
-  width: 100%;
-  height: 100px;
-  background-image: url(images/css/topWrapper-bg.jpg);
-  background-position: center top;
-  background-repeat: repeat-x; }
-
-#topBanner {
-  width: 800px;
-  margin: 0 auto;
-  height: 100px;
-  background-image: url(images/css/topBanner.jpg);
-  background-repeat: no-repeat; }
-
-#topnav {
-  background: transparent url("images/css/hmenu.jpg") repeat-x top left;
-  height: 20px;
-  margin: 0 auto;
-  text-align: center;
-  width: 800px; }
-  #topnav ul {
-    display: table;
-    margin: 0 auto;
-    padding: 0;
-    list-style-type: none;
-    position: relative;
-    height: 20px;
-    text-transform: uppercase;
-    font-size: 0.9em;
-    font-family: Arial,sans-serif; }
-    #topnav ul li {
-      display: block;
-      float: left;
-      margin: 0;
-      padding: 0;
-      background: transparent url("images/css/hmenu.jpg") repeat-x top left; }
-      #topnav ul li a {
-        display: block;
-        float: left;
-        color: #031634;
-        text-decoration: none;
-        padding: 0px 50px;
-        line-height: 20px;
-        font-weight: bold; }
-
-#topnav ul li a:hover, #topnav li#current a {
-  color: #7a994c;
-  background: transparent url("images/css/hmenu-sel.jpg") repeat-x top left; }
-
-#bg {
-  margin: 0 auto;
-  padding: 0;
-  background: transparent;
-  background-image: url(images/css/hat.jpg);
-  background-repeat: no-repeat;
-  background-position: center top; }
-
-#header {
-  margin: 0 auto;
-  min-height: 0px;
-  height: 0px;
-  width: 800px; }
-
-#page {
-  background: transparent url(images/css/page-bg.jpg) no-repeat center top; }
-
-#container {
-  margin: 0 auto;
-  width: 800px; }
-
-#content {
-  width: 780px;
-  margin: 0 auto;
-  text-align: left;
-  min-height: 800px; }
-
-#content p {
-  text-align: justify; }
-
-#footerWrapper {
-  margin: 0 auto;
-  height: 10px;
-  padding: 0;
-  background: transparent url(images/css/footerWrapper-bg.jpg) no-repeat scroll center top; }
-
-#footer {
-  margin: 0 auto;
-  padding: 0;
-  width: 800px;
-  height: 10px; }
-
-#sidebar ul.vmenu {
-  list-style: none;
-  text-align: left;
-  margin: 7px 0px 8px 0px;
-  padding: 0;
-  text-decoration: none;
-  border-top: 1px solid #eeeeee; }
-
-#sidebar ul.vmenu li {
-  list-style: none;
-  padding: 4px 0 4px 0px;
-  margin: 0 2px;
-  border-bottom: 1px solid #eeeeee; }
-
-#sidebar ul.vmenu li a {
-  text-decoration: none;
-  color: #023063; }
-
-#sidebar ul.vmenu li a:hover {
-  color: #adcc80; }
-
-#sidebar ul.vmenu ul {
-  margin: 0 0 0 5px;
-  padding: 0; }
-
-#sidebar ul.vmenu ul li {
-  border: none; }
-
-#hide_acc {
-  min-height: 600; }
-
-#mainblock {
-  border: 0;
-  padding: 0;
-  margin: 0;
-  width: 200;
-  min-height: 600px;
-  margin-left: 276px;
-  margin-right: 0px; }
-
-.bordered {
-  border: 1px solid #AAAAAA;
-  border-style: dotted; }
-
-.seq_problem_visited {
-  background-color: #ccccaa; }
-
-.seq_video_visited {
-  background-color: #ccaacc; }
-
-.seq_html_visited {
-  background-color: #caaccc; }
-
-.seq_tab_visited {
-  background-color: #aacccc; }
-
-.seq_vertical_visited {
-  background-color: #acaccc; }
-
-.seq_sequential_visited {
-  background-color: #cacacc; }
-
-.seq_problem_visited {
-  background-color: #ccacac; }
-
-.seq_schematic_visited {
-  background-color: #cccaca; }
-
-.seq_problem_inactive {
-  background-color: #aaaa99; }
-
-.seq_video_inactive {
-  background-color: #aa99aa; }
-
-.seq_video_inactive {
-  background-color: #aaa99a; }
-
-.seq_html_inactive {
-  background-color: #a99aaa; }
-
-.seq_tab_inactive {
-  background-color: #99aaaa; }
-
-.seq_vertical_inactive {
-  background-color: #9a9aab; }
-
-.seq_sequential_inactive {
-  background-color: #a9a9aa; }
-
-.seq_problem_inactive {
-  background-color: #aa9a9a; }
-
-.seq_schematic_inactive {
-  background-color: #aaa9a9; }
-
-.seq_active {
-  background-color: red; }

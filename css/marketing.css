@@ -663,7 +663,7 @@ div.leanModal_box {
             color: #666;
             font-size: 14px;
             float: none; }
-    div.leanModal_box form input[type="button"] {
+    div.leanModal_box form input[type="button"], div.leanModal_box form input[type="submit"] {
       border: 1px solid #691b1b;
       -webkit-border-radius: 3px;
       -moz-border-radius: 3px;
@@ -691,7 +691,7 @@ div.leanModal_box {
       -webkit-background-clip: padding-box;
       font-size: 18px;
       padding: 12.944px; }
-      div.leanModal_box form input[type="button"]:hover {
+      div.leanModal_box form input[type="button"]:hover, div.leanModal_box form input[type="submit"]:hover {
         -webkit-box-shadow: inset 0 1px 0 0 #a44141;
         -moz-box-shadow: inset 0 1px 0 0 #a44141;
         -ms-box-shadow: inset 0 1px 0 0 #a44141;
@@ -705,7 +705,7 @@ div.leanModal_box {
         background-image: -ms-linear-gradient(top, #823030, #691c1c);
         background-image: -o-linear-gradient(top, #823030, #691c1c);
         background-image: linear-gradient(top, #823030, #691c1c); }
-      div.leanModal_box form input[type="button"]:active {
+      div.leanModal_box form input[type="button"]:active, div.leanModal_box form input[type="submit"]:active {
         border: 1px solid #691b1b;
         -webkit-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
         -moz-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
