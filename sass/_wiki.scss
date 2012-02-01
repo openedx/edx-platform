@@ -78,6 +78,10 @@ div.wiki-wrapper {
     header {
       @extend .topbar;
 
+      a {
+        @extend .block-link;
+      }
+
       p {
         float: left;
         padding: 15px;

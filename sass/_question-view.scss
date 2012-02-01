@@ -1,0 +1,101 @@
+div.question-header {
+  div.vote-buttons {
+    display: inline-block;
+    float: left;
+    width: flex-grid(1,9);
+    margin-right: flex-gutter(9);
+
+    ul li {
+      background-position: center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      font-weight: bold;
+      height: 20px;
+      list-style: none;
+      padding: 10px;
+      text-align: center;
+      width: 25px;
+
+      &.question-img-upvote, &.answer-img-upvote  {
+        background-image: url(/static/images/askbot/vote-arrow-up-new.png);
+        background-color: #F6EFD4;
+
+        &:hover, &.on {
+          background-image: url(/static/images/askbot/vote-arrow-up-on-new.png);
+        }
+      }
+
+      &.question-img-downvote, &.answer-img-downvote  {
+        background-image: url(/static/images/askbot/vote-arrow-down-new.png);
+
+        &:hover, &.on {
+          background-image: url(/static/images/askbot/vote-arrow-down-on-new.png);
+        }
+      }
+    }
+  }
+
+  div.question-container {
+    display: inline-block;
+    float: left;
+    width: flex-grid(8,9);
+
+    h1 {
+      margin-top: 0;
+    }
+
+    div.meta-bar {
+      border-bottom: 1px solid #eee;
+      display: block;
+      margin: 20px 0 10px;
+      overflow: hidden;
+      padding-bottom: 15px;
+
+
+      div.tag-list {
+        display: inline-block;
+        float:left;
+        width: flex-grid(4,8);
+        margin-right: flex-gutter(8);
+      }
+
+      div.question-actions {
+        display: inline-block;
+        float:left;
+        text-align: right;
+        width: flex-grid(4,8);
+
+        a {
+          color: darken(#F6EFD4, 50%);
+
+          &.question-delete {
+            color: $mit-red;
+          }
+        }
+
+        span.sep {
+          color: darken(#F6EFD4, 10%);
+        }
+      }
+    }
+
+    div.question-content {
+      overflow: hidden;
+
+      div.question-body {
+        display: inline-block;
+        float: left;
+        margin-right: flex-gutter(8);
+        width: flex-grid(6.2,8);
+      }
+
+      div.post-update-info {
+        display: inline-block;
+        float: left;
+        width: flex-grid(1.8,8);
+      }
+    }
+  }
+}
+
+

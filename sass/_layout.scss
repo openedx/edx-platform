@@ -6,12 +6,13 @@ html {
     font: $body-font-size $body-font-family;
     text-align: center;
     margin: 0;
-    background: #f3f3f3;
+    background: #f6f6f6;
 
     div.header-wrapper {
-      @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%), 0 1px 1px #ccc);
-      @include linear-gradient(lighten($mit-red, 5%), darken($mit-red, 5%));
-      border-bottom: 1px solid darken($mit-red, 10%);
+      // @include linear-gradient(lighten($mit-red, 5%), darken($mit-red, 5%));
+      @include box-shadow(inset 0 -1px 2px darken($mit-red, 10%));
+      background: $mit-red;
+      border-bottom: 1px solid #fff;
 
       header {
         @extend .clearfix;
@@ -21,37 +22,53 @@ html {
 
         h1 {
           border-right: 1px solid darken($mit-red, 5%);
-          font-size: $body-font-size;
-          font-weight: bold;
-          margin: 0 $gw-gutter 0 0;
-          padding: 15px $gw-gutter 15px 0;
+          color: #000;
           display: block;
           float: left;
-          color: #000;
+          font-size: 20px;
+          font-weight: 800;
+          margin: 0 lh() 0 0;
+          padding: 17px lh() 17px 0;
           text-shadow: 0 1px 0 lighten($mit-red, 10%);
-
-          em {
-            @include inline-block();
-            padding-right: lh();
-          }
+          line-height: lh();
         }
 
         nav {
           float: left;
           display: block;
           margin: 0;
+          padding: 0;
           text-shadow: 0 -1px 0 darken($mit-red, 10%);
+          -webkit-font-smoothing: antialiased;
+
+          h2 {
+            float: left;
+            margin: 0 lh() 0 0;
+            padding: 19px lh() 12px 0;
+            line-height: lh();
+            border-right: 1px solid darken($mit-red, 5%);
+
+            a {
+              color: #fff;
+
+              &:hover {
+                color: rgba(#fff, .7);
+                text-decoration: none;
+              }
+            }
+          }
 
           ul {
             @extend .clearfix;
             display: inline-block;
-            padding: 15px 0;
+            padding: 19px 0 12px;
             margin: 0;
 
             li {
               margin-right: lh();
               display: inline-block;
               margin-bottom: 0;
+              line-height: lh();
 
               a {
                 color: #fff;
@@ -71,11 +88,16 @@ html {
     section.main-content {
       @extend .clearfix;
       @extend .wrapper;
-      @include box-shadow(0 1px 0 #fff);
+      @include box-shadow(0 0 4px #ddd);
       @include box-sizing(border-box);
       background: #fff;
-      border: 1px solid #ccc;
-      border-top: 0;
+      border-bottom: 1px solid #bbb;
+
+      @media screen and (min-width: 1400px) {
+      margin-top: lh(.5);
+      @include border-radius(3px);
+      border: 1px solid #bbb;
+      }
     }
 
     img {

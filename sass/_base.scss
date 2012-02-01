@@ -2,6 +2,12 @@
   outline-color: #ccc;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  a {
+    color: #000;
+  }
+}
+
 h1 {
   font-size:1.6em;
   margin:20px 0 10px 0;
@@ -21,7 +27,6 @@ p {
 
 em {
   font-style: italic;
-  font-family: Georgia, serif;
 }
 
 #{$all-text-inputs}, textarea {

@@ -65,6 +65,7 @@ div.course-wrapper {
           text-decoration: none;
           margin-bottom: lh(.5);
           display: block;
+          color: #000;
 
           &:hover {
             color: #666;
@@ -110,6 +111,10 @@ div.course-wrapper {
     ol.sequence-nav {
       margin-bottom: $body-line-height;
       @extend .topbar;
+
+      a {
+        @extend .block-link;
+      }
 
       li {
         border: none;
@@ -160,7 +165,7 @@ div.course-wrapper {
 
         &.seq_video_visited {
           width: 14px;
-          background: shade(#F6EFD4, 4%) url('/static/images/video-icon.png') -64px 15px no-repeat;
+          background: shade(#F6EFD4, 4%) url('/static/images/video-icon.png') -81px 15px no-repeat;
           &:hover {
             background-color: #F6EFD4;
           }
@@ -168,7 +173,7 @@ div.course-wrapper {
 
         &.seq_video_active {
           width: 14px;
-          background: #FFFBEB url('/static/images/video-icon.png') -25px 15px no-repeat;
+          background: #FFFBEB url('/static/images/video-icon.png') -32px 15px no-repeat;
           @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%),inset 1px 0 0 darken(#F6EFD4, 20%));
           &:hover {
             background-color: #F6EFD4;

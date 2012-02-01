@@ -3,16 +3,16 @@
 <head>
   <%block name="title"><title>MITX 6.002</title></%block>
 
-  <link rel="stylesheet" href="/static/lib/jquery.treeview.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
   <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all" />
   <link href="/static/css/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css"/>
   <link href="/static/css/print.css" rel="stylesheet" type="text/css" media="print"/>
 
-  <script type="text/javascript" src="/static/lib/jquery-1.6.2.min.js"></script>
-  <script type="text/javascript" src="/static/lib/jquery-ui-1.8.16.custom.min.js"></script>
-  <script type="text/javascript" src="/static/lib//swfobject/swfobject.js"></script>
-  <script type="text/javascript" src="/static/lib/jquery.treeview.js"></script>
-  <script type="text/javascript" src="/static/lib/jquery.leanModal.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery.leanModal.min.js"></script>
   <script type="text/javascript" src="/static/js/video_player.js"></script>
   <script type="text/javascript" src="/static/js/schematic.js"></script>
   <script type="text/javascript" src="/static/js/cktsim.js"></script>
@@ -27,7 +27,7 @@
       displayMath: [["\\[","\\]"]]}
     });
   </script>
-  <script type="text/javascript" src="/static/lib/mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
   <script type="text/javascript">
     $(function(){

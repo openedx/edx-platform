@@ -42,7 +42,7 @@
       tex2jax: {inlineMath: [ ['$','$'], ["\\(","\\)"]],
                 displayMath: [ ['$$','$$'], ["\\[","\\]"]]}
     });
-  </script> <script type="text/javascript" src="/static/lib/mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script> 
+  </script> <script type="text/javascript" src="${ settings.LIB_URL }mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script> 
   <script>
   $(function(){
   $.ajaxSetup ({
@@ -54,7 +54,7 @@
      id = $(this).attr("id");
      name = id.substring(17);
      //alert(name);
-     $("#"+id).load("/edit_circuit/"+name);
+     $("#"+id).load("/edit_circuit/"+name, function(){update_schematics();});
      f=this;
   });
 
@@ -65,7 +65,7 @@
       $(this).parent().toggleClass("active");
   });
 
-  update_schematics();});
+  });
   </script>
 
 

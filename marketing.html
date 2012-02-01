@@ -3,16 +3,19 @@
 <head>
   <%block name="title"><title>MITX 6.002</title></%block>
 
-  <link rel="stylesheet" href="/static/lib/jquery.treeview.css" type="text/css" media="all" />
+  <!--link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" /-->
   <link rel="stylesheet" href="/static/css/marketing.css" type="text/css" media="all" />
+  <!--[if lt IE 8]>
+  <link rel="stylesheet" href="/static/css/marketing-ie.css" type="text/css" media="all" />
+  <![endif]-->
 
-  <script type="text/javascript" src="/static/lib/jquery-1.6.2.min.js"></script>
-  <script type="text/javascript" src="/static/lib/jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
 
-  <script type="text/javascript" src="/static/lib/jquery.leanModal.min.js"></script>
-  <script type="text/javascript" src="/static/lib//swfobject/swfobject.js"></script>
-  <script type="text/javascript" src="/static/lib/jquery.treeview.js"></script>
-  <script type="text/javascript" src="/static/js/video_player.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery.leanModal.min.js"></script>
+  <!--script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script-->
+  <!--script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script-->
+  <!--script type="text/javascript" src="/static/js/video_player.js"></script-->
   <!-- <script type="text/javascript" src="/static/js/schematic.js"></script> -->
 
   <!--[if lt IE 9]>
@@ -27,6 +30,34 @@
 
 <%block name="headextra"/>
 
+<script type="text/javascript">
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+	var cookies = document.cookie.split(';');
+	for (var i = 0; i < cookies.length; i++) {
+	    var cookie = jQuery.trim(cookies[i]);
+	    // Does this cookie string begin with the name we want?
+	    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+		cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		break;
+	    }
+	}
+    }
+    return cookieValue;
+}
+
+function postJSON(url, data, callback) {
+    $.ajax({type:'POST',
+	    url: url,
+		dataType: 'json',
+		data: data,
+		success: callback,
+		headers : {'X-CSRFToken':getCookie('csrftoken')}
+  });
+}
+</script>
+
 </head>
 
 <body>
@@ -35,14 +66,17 @@
     <div class="anouncement-wrapper">
     <%block name="header_nav">
     <nav>
-      <h1><a href="/t/mitx_global.html">MITx</a></h1>
+      <h1><a href="http://mitx.mit.edu/">MITx</a></h1>
+% if settings.COURSEWARE_ENABLED:
       <a rel="leanModal" class="login" href="#login">Log In</a>
+% endif
     </nav>
     </%block>
+
     <%block name="header_text">
       <section>
-        <h1>MITx</h1>
-        <h2>An MIT Education Anywhere. For free.</h2>
+        <h1><em>MITx</em></h1>
+        <h2>MIT&rsquo;s new online learning initiative</h2>
       </section>
      </%block>
     </div>
@@ -65,7 +99,9 @@
     </div>
   </footer>
 
+% if settings.COURSEWARE_ENABLED:
   <div id="login" class="leanModal_box"><%include file="login.html" /></div>
+% endif
   <div id="pwd_reset" class="leanModal_box"><%include file="password_reset_form.html" /></div>
   <div id="reset_done" class="leanModal_box"></div>
 
