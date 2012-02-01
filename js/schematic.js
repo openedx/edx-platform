@@ -1714,7 +1714,7 @@ schematic = (function() {
 	    case -1:	return mstring+"m";
 	    case 0:	return mstring;
 	    case 1:	return mstring+"K";
-	    case 2:	return mstring+"Meg";
+	    case 2:	return mstring+"M";
 	    case 3:	return mstring+"G";
 	    }
 
