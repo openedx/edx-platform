@@ -3,6 +3,10 @@ import sys
 
 import djcelery
 
+# Configuration option for when we want to grab server error pages
+STATIC_GRAB = False
+DEV_CONTENT = True
+
 LIB_URL = '/static/lib/'
 LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/'
 BOOK_URL = '/static/book/'

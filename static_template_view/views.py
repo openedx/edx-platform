@@ -6,6 +6,7 @@
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.shortcuts import redirect
 from django.core.context_processors import csrf
+from django.conf import settings
 
 #valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
 valid_templates=['mitx_global.html', 
@@ -13,7 +14,15 @@ valid_templates=['mitx_global.html',
                  'tos.html', 
                  'privacy.html', 
                  'honor.html', 
-                 'copyright.html']
+                 'copyright.html', 
+                 '404.html']
+
+print "!!",settings.__dict__
+
+if settings.STATIC_GRAB: 
+    valid_templates = valid_templates+['server-down.html',
+                                       'server-error.html'
+                                       'server-overloaded.html']
 
 def index(request, template): 
     csrf_token = csrf(request)['csrf_token']

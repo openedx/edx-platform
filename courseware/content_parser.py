@@ -2,6 +2,7 @@ import json
 import hashlib
 
 from lxml import etree
+from mako.template import Template
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
@@ -89,7 +90,10 @@ def id_tag(course):
 
 def course_file(user):
     # TODO: Cache. 
-    tree = etree.parse(settings.DATA_DIR+UserProfile.objects.get(user=user).courseware)
+    filename = settings.DATA_DIR+UserProfile.objects.get(user=user).courseware
+    data_template = Template(filename=filename)
+
+    tree = etree.XML(data_template.render())
     id_tag(tree)
     return tree
 
