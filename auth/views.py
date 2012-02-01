@@ -13,7 +13,7 @@ from django.db import connection
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
-from models import Registration, UserProfile
+from courseware.models import Registration, UserProfile
 
 log = logging.getLogger("mitx.auth")
 
