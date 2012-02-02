@@ -41,12 +41,24 @@ em {
   }
 }
 
-a:link, a:visited {
-  text-decoration:none;
-}
+a {
+  color: $mit-red;
 
-a:hover {
-  text-decoration:underline;
+  &:link {
+    color: $mit-red;
+  }
+
+  &:visited {
+    color: darken($mit-red, 10%);
+  }
+
+  &:link, &:visited {
+    text-decoration:none;
+  }
+
+  &:hover, &:focus {
+    text-decoration:underline;
+  }
 }
 
 input[type="submit"], input[type="button"], button {

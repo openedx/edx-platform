@@ -122,6 +122,14 @@ html {
 
       a {
         color: #444;
+
+        &:link, &:visited {
+          color: #444;
+        }
+
+        &:hover, &:focus {
+          color: #000;
+        }
       }
     }
 
@@ -134,6 +142,14 @@ html {
 
         a {
           color: #444;
+
+        &:link, &:visited {
+          color: #444;
+        }
+
+        &:hover, &:focus {
+          color: #000;
+        }
         }
       }
     }
