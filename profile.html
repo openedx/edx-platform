@@ -1,63 +1,12 @@
 <%inherit file="main.html" />
 
-
-<%include file="navigation.html" />
-
-<section class="main-content">
-  <div class="profile-wrapper">
-
-    <section class="course-info">
-      <h1>Course Progress</h1>
-
-      <ol>
-        % for hw in homeworks:
-        <li>
-          <h2>${ hw['chapter'] }</h2>
-
-          <div class="scores">
-            <h3>${ hw['section'] }</h3>
-
-            <ul>
-              % for score in hw['scores']:
-              <li>${ score[0] }/${ score[1] }</li>
-              % endfor
-            </ul>
-          </div>
-        </li>
-        % endfor
-      </ol>
-    </section>
-
-    <section class="user-info">
-
-      <h1>${name}</h1>
-
-      <ul>
-        <li>Forum name: <strong>${username}</strong></li>
-        <li>E-mail: <strong>${email}</strong></li>
-        <li>
-          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Change</a>
-        </li>
-        <li>
-          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Change</a>
-        </li>
-      </ul>
-
-      <!-- <div><a class="modal" href="#change_password_pop">Reset password</a></div> -->
-
-      <div id="change_password_pop">
-        <h2>Password change</h2>
-        <p>We'll e-mail you a password reset link at ${email}. Follow
-        the link in the confirmation email to change your
-        password.</p>
-
-        <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
-        <input type="submit" id="pwd_reset_button" value="Reset Password" />
-      </div>
-
-    </section>
-  </div>
-</section>
+<%block name="headextra">
+<script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.min.js"></script>
+<script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.stack.js"></script>
+<script language="javascript" type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.symbol.js"></script>
+<script>
+<%include file="profile_graphs.js"/>
+</script>
 
 <script>
 var loc=true; // Activate on clicks? Not if already clicked.
@@ -124,5 +73,68 @@ $(function() {
       });
     });
 });
-
 </script>
+</%block>
+
+
+<%include file="navigation.html" />
+
+<section class="main-content">
+  <div class="profile-wrapper">
+
+    <section class="course-info">
+      <h1>Course Progress</h1>
+
+      <div id="grade-detail-graph" style="width:650px;height:200px;"></div>
+      <!-- <div id="grade-overview-graph" style="width:650px;height:130px;"></div> -->
+
+      <ol>
+        % for hw in homeworks:
+        <li>
+          <h2>${ hw['chapter'] }</h2>
+
+          <div class="scores">
+            <h3>${ hw['section'] } ${"({0}/{1})".format( hw['section_total'][0], hw['section_total'][1] )}</h3>
+
+            <ul>
+              % for score in hw['scores']:
+              <li>${ score[0] }/${ score[1] }</li>
+              % endfor
+            </ul>
+          </div>
+        </li>
+        % endfor
+      </ol>
+    </section>
+
+    <section class="user-info">
+
+      <h1>${name}</h1>
+
+      <ul>
+        <li>Forum name: <strong>${username}</strong></li>
+        <li>E-mail: <strong>${email}</strong></li>
+        <li>
+          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Change</a>
+        </li>
+        <li>
+          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Change</a>
+        </li>
+      </ul>
+
+      <!-- <div><a class="modal" href="#change_password_pop">Reset password</a></div> -->
+
+      <div id="change_password_pop">
+        <h2>Password change</h2>
+        <p>We'll e-mail you a password reset link at ${email}. Follow
+        the link in the confirmation email to change your
+        password.</p>
+
+        <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
+        <input type="submit" id="pwd_reset_button" value="Reset Password" />
+      </div>
+
+    </section>
+  </div>
+</section>
+
