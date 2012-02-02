@@ -238,10 +238,11 @@ def password_reset(request):
         raise Http404
     form = PasswordResetForm(request.POST)
     if form.is_valid():
-        form.save( use_https = request.is_secure(), 
-                   from_email = settings.DEFAULT_FROM_EMAIL, 
+        form.save( use_https = request.is_secure(),
+                   from_email = settings.DEFAULT_FROM_EMAIL,
                    request = request )
-        return HttpResponse(json.dumps({'success':True})) 
-    else: 
-        return HttpResponse(json.dumps({'success':False, 
-                                        'error': 'Invalid e-mail'})) 
+        return HttpResponse(json.dumps({'success':True,
+                                        'value': render_to_string('registration/password_reset_done.html', {})}))
+    else:
+        return HttpResponse(json.dumps({'success':False,
+                                        'error': 'Invalid e-mail'}))
