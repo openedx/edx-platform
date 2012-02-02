@@ -322,6 +322,25 @@ INSTALLED_APPS = INSTALLED_APPS + (
     'followit',
 )
 
+# askbot livesettings
+LIVESETTINGS_OPTIONS = {
+    1: {
+        'SETTINGS' : {
+            'MIN_REP' : {
+                'MIN_REP_TO_VOTE_UP' : 1,
+            },
+            'SOCIAL_SHARING' : {
+                'ENABLE_SHARING_TWITTER' : False,
+                'ENABLE_SHARING_FACEBOOK' : False,
+                'ENABLE_SHARING_LINKEDIN' : False,
+                'ENABLE_SHARING_IDENTICA' : False,
+                'ENABLE_SHARING_GOOGLE' : False,
+            }
+        }
+    },
+}
+
+
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 ASKBOT_URL = 'discussion/'
 LOGIN_REDIRECT_URL = '/'
