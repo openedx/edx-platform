@@ -21,11 +21,11 @@ class UserProfile(models.Model):
     # Sanitize all fields. 
     # This is not visible to other users, but could introduce holes later
     user = models.ForeignKey(User, unique=True, db_index=True)
-    name = models.TextField(blank=True, db_index=True)
-    language = models.TextField(blank=True, db_index=True)
-    location = models.TextField(blank=True, db_index=True)
-    meta = models.TextField(blank=True) # JSON dictionary for future expansion
-    courseware = models.TextField(blank=True, default='course.xml')
+    name = models.CharField(blank=True, max_length=255, db_index=True)
+    language = models.CharField(blank=True, max_length=255, db_index=True)
+    location = models.CharField(blank=True, max_length=255, db_index=True)
+    meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
+    courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
 
 class Registration(models.Model):

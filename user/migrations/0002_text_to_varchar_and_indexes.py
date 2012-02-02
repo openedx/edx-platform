@@ -8,11 +8,26 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        # Changing field 'UserProfile.name'
+        db.alter_column('auth_userprofile', 'name', self.gf('django.db.models.fields.CharField')(max_length=255))
+
         # Adding index on 'UserProfile', fields ['name']
         db.create_index('auth_userprofile', ['name'])
 
+        # Changing field 'UserProfile.language'
+        db.alter_column('auth_userprofile', 'language', self.gf('django.db.models.fields.CharField')(max_length=255))
+
         # Adding index on 'UserProfile', fields ['language']
         db.create_index('auth_userprofile', ['language'])
+
+        # Changing field 'UserProfile.courseware'
+        db.alter_column('auth_userprofile', 'courseware', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'UserProfile.meta'
+        db.alter_column('auth_userprofile', 'meta', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'UserProfile.location'
+        db.alter_column('auth_userprofile', 'location', self.gf('django.db.models.fields.CharField')(max_length=255))
 
         # Adding index on 'UserProfile', fields ['location']
         db.create_index('auth_userprofile', ['location'])
@@ -28,6 +43,21 @@ class Migration(SchemaMigration):
 
         # Removing index on 'UserProfile', fields ['name']
         db.delete_index('auth_userprofile', ['name'])
+
+        # Changing field 'UserProfile.name'
+        db.alter_column('auth_userprofile', 'name', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'UserProfile.language'
+        db.alter_column('auth_userprofile', 'language', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'UserProfile.courseware'
+        db.alter_column('auth_userprofile', 'courseware', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'UserProfile.meta'
+        db.alter_column('auth_userprofile', 'meta', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'UserProfile.location'
+        db.alter_column('auth_userprofile', 'location', self.gf('django.db.models.fields.TextField')())
 
 
     models = {
@@ -100,12 +130,12 @@ class Migration(SchemaMigration):
         },
         'user.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
-            'courseware': ('django.db.models.fields.TextField', [], {'default': "'course.xml'", 'blank': 'True'}),
+            'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'language': ('django.db.models.fields.TextField', [], {'db_index': 'True', 'blank': 'True'}),
-            'location': ('django.db.models.fields.TextField', [], {'db_index': 'True', 'blank': 'True'}),
-            'meta': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'name': ('django.db.models.fields.TextField', [], {'db_index': 'True', 'blank': 'True'}),
+            'language': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
+            'location': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
+            'meta': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }
