@@ -47,7 +47,7 @@ def profile(request):
         response_by_id[response.module_id] = response
         
         
-    totalScores = {}
+    total_scores = {}
 
     for c in chapters:
         chname=c.get('name')
@@ -75,12 +75,12 @@ def profile(request):
                 graded_total = (sum([score[0] for score in scores if score[2]]), 
                                 sum([score[1] for score in scores if score[2]]))
                 
-                #Add the graded total to totalScores
+                #Add the graded total to total_scores
                 format = s.get('format') if s.get('format') else ""
                 if format and graded_total[1] > 0:
-                    format_scores = totalScores[ format ] if format in totalScores else []
+                    format_scores = total_scores[ format ] if format in total_scores else []
                     format_scores.append( graded_total )
-                    totalScores[ format ] = format_scores
+                    total_scores[ format ] = format_scores
                 
                 score={'course':course,
                        'section':s.get("name"),
@@ -92,29 +92,50 @@ def profile(request):
                 hw.append(score)
     
     
-    #Figure the homework scores
-    print totalScores
-    homeworkScores = totalScores['Homework'] if 'Homework' in totalScores else []
-    homeworkPercentages = []
-    for i in range(12):
-        if i < len(homeworkScores):
-            percentage = homeworkScores[i][0] / float(homeworkScores[i][1])
-        else:
-            percentage = 0
-        homeworkPercentages.append(percentage)
     
-    labScores = totalScores['Lab'] if 'Lab' in totalScores else []
-    labPercentages = []
-    for i in range(12):
-        if i < len(labScores):
-            percentage = labScores[i][0] / float(labScores[i][1])
-        else:
-            percentage = 0
-        labPercentages.append(percentage)
-    
-    
-    
+    def totalWithDrops(scores, drop_count):
+        sorted_scores = sorted( enumerate(scores), key=lambda x: -x[1]['percentage'] ) #Note that this key will sort the list descending
+        dropped_indices = [score[0] for score in sorted_scores[-drop_count:]] # A list of the indices of the dropped scores
+        aggregate_score = 0
+        for index, score in enumerate(scores):
+            if index not in dropped_indices:
+                aggregate_score += score['percentage']
         
+        aggregate_score /= len(scores) - drop_count
+        
+        return aggregate_score, dropped_indices
+        
+    #Figure the homework scores
+    homework_scores = total_scores['Homework'] if 'Homework' in total_scores else []
+    homework_percentages = []
+    for i in range(12):
+        if i < len(homework_scores):
+            percentage = homework_scores[i][0] / float(homework_scores[i][1])
+            summary = "{:.0%} ({}/{})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
+        else:
+            percentage = 0
+            summary = "0% (?/?)"
+        summary = "Homework {} - {}".format(i + 1, summary)
+        
+        homework_percentages.append( {'percentage': percentage, 'summary': summary} )
+    homework_total, homework_dropped_indices = totalWithDrops(homework_percentages, 2)
+    
+    #Figure the lab scores
+    lab_scores = total_scores['Lab'] if 'Lab' in total_scores else []
+    lab_percentages = []
+    for i in range(12):
+        if i < len(lab_scores):
+            percentage = lab_scores[i][0] / float(lab_scores[i][1])
+            summary = "{:.0%} ({}/{})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
+        else:
+            percentage = 0
+            summary = "0% (?/?)"
+        summary = "Lab {} - {}".format(i + 1, summary)
+        lab_percentages.append( {'percentage': percentage, 'summary': summary} )
+    lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
+    
+    midterm_score = (130, 150)
+    final_score = (225, 300)
     
     user_info=UserProfile.objects.get(user=request.user)
     context={'name':user_info.name,
@@ -123,8 +144,14 @@ def profile(request):
              'language':user_info.language,
              'email':request.user.email,
              'homeworks':hw,
-             'homework_percentages' : homeworkPercentages,
-             'lab_percentages' : labPercentages,
+             'homework_percentages' : homework_percentages,
+             'homework_total' : homework_total,
+             'homework_dropped_indices' : homework_dropped_indices,
+             'lab_percentages' : lab_percentages,
+             'lab_total' : lab_total,
+             'lab_dropped_indices' : lab_dropped_indices,
+             'midterm_score' : midterm_score,
+             'final_score' : final_score,
              'csrf':csrf(request)['csrf_token']
              }
     return render_to_response('profile.html', context)
