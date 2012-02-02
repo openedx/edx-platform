@@ -100,7 +100,7 @@ $(function() {
     <section class="course-info">
       <h1>Course Progress</h1>
     
-    <div id="homework-detail-graph" style="width:650px;height:200px;"></div>
+    <div id="grade-detail-graph" style="width:650px;height:200px;"></div>
     <br/>
     <br/>
     <div id="grade-overview-graph" style="width:650px;height:150px;"></div>
@@ -110,13 +110,27 @@ $(function() {
     <script language="javascript" type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.symbol.js"></script>
     <script>
     $(function () {
+      function showTooltip(x, y, contents) {
+        $('<div id="tooltip">' + contents + '</div>').css( {
+          position: 'absolute',
+          display: 'none',
+          top: y + 5,
+          left: x + 5,
+          border: '1px solid #fdd',
+          padding: '2px',
+          'background-color': '#fee',
+          opacity: 0.90
+        }).appendTo("body").fadeIn(200);
+      }
+      
+      /* -------------------------------- Grade detail graph -------------------------------- */
       var colors = [$.color.parse("#E8B800"), $.color.parse("#A0CEFA"), $.color.parse("#BD3738"), $.color.parse("#429A2E")];
       var series = [];
       var ticks = []; //These are the indices and x-axis labels for the data
       var bottomTicks = []; //Labels on the bottom
-      var tooltips = {}; //This an dictionary mapping from 'section' -> array of tooltips
+      var detail_tooltips = {}; //This an dictionary mapping from 'section' -> array of detail_tooltips
       var droppedScores = []; //These are the datapoints to indicate assignments which aren't factored into the total score
-      tooltips['Dropped Scores'] = [];
+      detail_tooltips['Dropped Scores'] = [];
       <%
       tickIndex = 1
       sectionSpacer = 0.5
@@ -130,11 +144,11 @@ $(function() {
           });
           ticks = ticks.concat( ${ json.dumps( [[i + tickIndex, str(i + 1)] for i,score in enumerate(section['subscores'])] ) } );
           bottomTicks.push( [ ${tickIndex + len(section['subscores'])/2}, "${section['category']}" ] );
-          tooltips["${section['category']}"] = ${ json.dumps([score['summary'] for score in section['subscores']]  ) };
+          detail_tooltips["${section['category']}"] = ${ json.dumps([score['summary'] for score in section['subscores']]  ) };
           
           droppedScores = droppedScores.concat(${ json.dumps( [[tickIndex + index, 0.05] for index in section['dropped_indices']]) });
           <% dropExplanation = "The lowest {} {} scores are dropped".format( len(section['dropped_indices']), section['category'] ) %>
-          tooltips['Dropped Scores'] = tooltips['Dropped Scores'].concat( ${json.dumps( [dropExplanation] * len(section['dropped_indices']) )} );
+          detail_tooltips['Dropped Scores'] = detail_tooltips['Dropped Scores'].concat( ${json.dumps( [dropExplanation] * len(section['dropped_indices']) )} );
           
           <% tickIndex += len(section['subscores']) + sectionSpacer %>
           
@@ -144,7 +158,7 @@ $(function() {
             color: colors[${sectionIndex}].toString(),
           });
           ticks = ticks.concat( [ [${tickIndex}, "Total"] ] );
-          tooltips["${section['category']} Total"] = [ "${section['totalscore']['summary']}" ];
+          detail_tooltips["${section['category']} Total"] = [ "${section['totalscore']['summary']}" ];
           <% tickIndex += 1 + sectionSpacer %>
           
         %else: ##This is for sections like midterm or final, which have no smaller components
@@ -158,7 +172,7 @@ $(function() {
           ticks = ticks.concat( [ [${tickIndex}, "${section['category']}"] ] );
           %endif
           
-          tooltips["${section['category']}"] = [ "${section['totalscore']['summary']}" ];
+          detail_tooltips["${section['category']}"] = [ "${section['totalscore']['summary']}" ];
 
           <% tickIndex += 1 + sectionSpacer %>
         %endif
@@ -180,15 +194,44 @@ $(function() {
         legend: {show: false},
       };
 
-      $.plot($("#homework-detail-graph"), series, options);
+      $.plot($("#grade-detail-graph"), series, options);
+      
+      var previousPoint = null;
+      $("#grade-detail-graph").bind("plothover", function (event, pos, item) {
+        $("#x").text(pos.x.toFixed(2));
+        $("#y").text(pos.y.toFixed(2));
+        if (item) {
+          if (previousPoint != item.dataIndex) {
+            previousPoint = item.dataIndex;
+            
+            $("#tooltip").remove();
+            
+            if (item.series.label in detail_tooltips) {
+              var series_tooltips = detail_tooltips[item.series.label];
+              if (item.dataIndex < series_tooltips.length) {
+                var x = item.datapoint[0].toFixed(2), y = item.datapoint[1].toFixed(2);
+                
+                showTooltip(item.pageX, item.pageY, series_tooltips[item.dataIndex]);
+              }
+            }
+
+          }
+        } else {
+          $("#tooltip").remove();
+          previousPoint = null;            
+        }
+      });
       
       
-      series = []
-      ticks = []
-      var markings = []
+      /* ------------------------------- Grade overview graph ------------------------------- */
+      series = [];
+      ticks = [];
+      var markings = [];
+      var overview_tooltips = {};
       <%
       totalWeight = 0.0
       sectionIndex = 0
+      totalScore = 0.0
       %>
       %for section in grade_summary:
         series.push({label: "${section['category']}",
@@ -198,9 +241,12 @@ $(function() {
           ticks.push( [${totalWeight + section['weight'] * 0.5}, "${'{} - {:.0%}'.format(section['category'], section['weight'])}" ] );
           
           markings.push({xaxis: {from: ${totalWeight}, to: ${totalWeight + section['weight']} }, color:colors[${sectionIndex}].scale("a", 0.3).toString() });
+          
+          overview_tooltips["${section['category']}"] = [ "${section['totalscore']['summary']}" ];
         <%
         sectionIndex += 1
         totalWeight += section['weight']
+        totalScore += section['totalscore']['score'] * section['weight']
         %>
       %endfor
       
@@ -219,34 +265,25 @@ $(function() {
           legend: {show: false},
       };
 
-      $.plot($("#grade-overview-graph"), series, options);
+      var $gradeOverviewGraph = $("#grade-overview-graph");
+      var plot = $.plot($gradeOverviewGraph, series, options);
+      
+      //Put the percent on the graph
+      var o = plot.pointOffset({x: ${totalScore}, y: 1 });
+      $gradeOverviewGraph.append('<div style="position:absolute;left:' + (o.left + 4) + 'px;top:' + (o.top - 7) + 'px">${"{:.0%}".format(totalScore)}</div>');
       
       
-      function showTooltip(x, y, contents) {
-        $('<div id="tooltip">' + contents + '</div>').css( {
-          position: 'absolute',
-          display: 'none',
-          top: y + 5,
-          left: x + 5,
-          border: '1px solid #fdd',
-          padding: '2px',
-          'background-color': '#fee',
-          opacity: 0.90
-        }).appendTo("body").fadeIn(200);
-      }
-      
-      var previousPoint = null;
-      $("#homework-detail-graph").bind("plothover", function (event, pos, item) {
+      $("#grade-overview-graph").bind("plothover", function (event, pos, item) {
         $("#x").text(pos.x.toFixed(2));
         $("#y").text(pos.y.toFixed(2));
         if (item) {
-          if (previousPoint != item.dataIndex) {
-            previousPoint = item.dataIndex;
+          if (previousPoint != (item.dataIndex, item.seriesIndex)) {
+            previousPoint = (item.dataIndex, item.seriesIndex);
             
             $("#tooltip").remove();
             
-            if (item.series.label in tooltips) {
-              var series_tooltips = tooltips[item.series.label];
+            if (item.series.label in overview_tooltips) {
+              var series_tooltips = overview_tooltips[item.series.label];
               if (item.dataIndex < series_tooltips.length) {
                 var x = item.datapoint[0].toFixed(2), y = item.datapoint[1].toFixed(2);
                 
@@ -260,6 +297,7 @@ $(function() {
           previousPoint = null;            
         }
       });
+      
       
       
     });
