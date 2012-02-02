@@ -94,7 +94,7 @@ $(function() {
           <h2>${ hw['chapter'] }</h2>
 
           <div class="scores">
-            <h3>${ hw['section'] }</h3>
+            <h3>${ hw['section'] } ${"({0}/{1})".format( hw['section_total'][0], hw['section_total'][1] )}</h3>
 
             <ul>
               % for score in hw['scores']:
