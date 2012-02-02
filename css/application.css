@@ -3512,13 +3512,22 @@ div.question-header div.question-container {
     width: 100%; }
     div.question-header div.question-container div.comments-container div.comments-content {
       font-size: 13px; }
+<<<<<<< local
       div.question-header div.question-container div.comments-container div.comments-content .block {
+=======
+      div.question-header div.question-container div.comments-container div.comments-content div.comment {
+>>>>>>> other
         border-bottom: 1px solid #ddd;
         border-top: 1px solid #fff;
         padding: 15px 0;
         display: block; }
+<<<<<<< local
         div.question-header div.question-container div.comments-container div.comments-content .block:first-child {
+=======
+        div.question-header div.question-container div.comments-container div.comments-content div.comment:first-child {
+>>>>>>> other
           border-top: 0; }
+<<<<<<< local
       div.question-header div.question-container div.comments-container div.comments-content div.comment:first-child {
         border-top: 0; }
       div.question-header div.question-container div.comments-container div.comments-content div.comment:last-child {
@@ -3561,6 +3570,23 @@ div.question-header div.question-container {
           div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit {
             font-size: 12px;
             padding: 2px 10px; }
+=======
+        div.question-header div.question-container div.comments-container div.comments-content div.comment:last-child {
+          margin-bottom: 20px; }
+        div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-votes {
+          display: inline; }
+          div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-votes .upvote {
+            background: #ccc;
+            display: inline-block;
+            margin: 0px;
+            padding-right: 17px;
+            padding-top: 2px;
+            height: 20px;
+            color: #777;
+            width: 20px; }
+        div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-delete {
+          display: inline; }
+>>>>>>> other
     div.question-header div.question-container div.comments-container #edit-comment-form {
       margin: 10px 0;
       min-height: 100px;
