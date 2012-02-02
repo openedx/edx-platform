@@ -8,14 +8,15 @@
 @import "leanmodal";
 
 // pages
-@import "courseware", "courseware-video";
+@import "courseware", "courseware-video", "courseware-sequence-nav";
 @import "textbook";
+@import "info";
 @import "profile";
 @import "wiki-basic-html", "wiki-create", "wiki";
 @import "activation";
 @import "help";
-@import "askbot-original", "discussion", "discussion-questions", "discussion-tags", "question-view" ;
+@import "askbot-original", "discussion", "discussion-questions", "discussion-tags", "question-view" , "discussion-answers";
 
 // left over
-@import "theme";
-@import "local";
+// @import "theme";
+// @import "local";

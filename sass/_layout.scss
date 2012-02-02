@@ -6,7 +6,7 @@ html {
     font: $body-font-size $body-font-family;
     text-align: center;
     margin: 0;
-    background: #f6f6f6;
+    background: #f4f4f4; //#f3f1e5
 
     div.header-wrapper {
       // @include linear-gradient(lighten($mit-red, 5%), darken($mit-red, 5%));
@@ -28,7 +28,7 @@ html {
           font-size: 20px;
           font-weight: 800;
           margin: 0 lh() 0 0;
-          padding: 17px lh() 17px 0;
+          padding: 17px lh() 14px 0;
           text-shadow: 0 1px 0 lighten($mit-red, 10%);
           line-height: lh();
         }
@@ -44,16 +44,16 @@ html {
           h2 {
             float: left;
             margin: 0 lh() 0 0;
-            padding: 19px lh() 12px 0;
+            padding: 19px lh() 9px 0;
             line-height: lh();
             border-right: 1px solid darken($mit-red, 5%);
 
             a {
               color: #fff;
+              text-decoration: none;
 
               &:hover {
                 color: rgba(#fff, .7);
-                text-decoration: none;
               }
             }
           }
@@ -61,7 +61,7 @@ html {
           ul {
             @extend .clearfix;
             display: inline-block;
-            padding: 19px 0 12px;
+            padding: 19px 0 9px;
             margin: 0;
 
             li {
@@ -72,6 +72,7 @@ html {
 
               a {
                 color: #fff;
+                text-decoration: none;
 
                 &:hover {
                   color: rgba(#fff, .7);
@@ -88,15 +89,17 @@ html {
     section.main-content {
       @extend .clearfix;
       @extend .wrapper;
-      @include box-shadow(0 0 4px #ddd);
       @include box-sizing(border-box);
+      @include border-radius(4px);
+      overflow: hidden;
       background: #fff;
       border-bottom: 1px solid #bbb;
 
       @media screen and (min-width: 1400px) {
-      margin-top: lh(.5);
-      @include border-radius(3px);
-      border: 1px solid #bbb;
+        // @include border-radius(3px);
+        @include box-shadow(0 0 4px #dfdfdf);
+        border: 1px solid #bbb;
+        margin-top: lh(.5);
       }
     }
 
@@ -119,6 +122,14 @@ html {
 
       a {
         color: #444;
+
+        &:link, &:visited {
+          color: #444;
+        }
+
+        &:hover, &:focus {
+          color: #000;
+        }
       }
     }
 
@@ -131,6 +142,14 @@ html {
 
         a {
           color: #444;
+
+        &:link, &:visited {
+          color: #444;
+        }
+
+        &:hover, &:focus {
+          color: #000;
+        }
         }
       }
     }

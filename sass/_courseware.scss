@@ -86,146 +86,115 @@ div.course-wrapper {
   section.course-content {
     @extend .content;
 
-    ol.vert-mod {
-     > li {
-        @extend .clearfix;
-        border-bottom: 1px solid #eee;
-        padding: 15px 0;
+    p {
+      margin-bottom: lh();
 
-        &:last-child {
-          border-bottom: none;
-        }
-
-        h2 {
-          margin-top: 0;
-          margin-bottom: 15px;
-        }
-
-        input[type="text"] {
-          display: inline-block;
-          margin: 8px 4px 4px 10px;
-        }
+      &:empty {
+        display: none;
+        margin-bottom: 0;
       }
     }
 
-    ol.sequence-nav {
-      margin-bottom: $body-line-height;
-      @extend .topbar;
+    .problem-set {
+      position: relative;
+      @extend .clearfix;
 
-      a {
-        @extend .block-link;
+      h2 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        width: flex-grid(2, 9);
+        padding-right: flex-gutter(9);
+        border-right: 1px dotted #ccc;
+        @include box-sizing(border-box);
+        display: table-cell;
+        vertical-align: top;
+
+        @media screen and (max-width:910px) {
+          display: block;
+          width: auto;
+        }
       }
 
-      li {
-        border: none;
-        cursor: pointer;
+      section.problem {
         display: table-cell;
-        padding: lh(.75);
-        float: left;
+        width: flex-grid(7, 9);
+        padding-left: flex-gutter(9);
 
-        //problem
-        &.seq_problem_inactive {
-          width: 14px;
-          background: url('/static/images/problem-icon.png') 13px 13px no-repeat;
-          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 10%));
-
-          &:hover {
-            background-color: lighten(#F6EFD4, 3%);
-          }
+        @media screen and (max-width:910px) {
+          display: block;
+          width: auto;
         }
 
-        &.seq_problem_visited {
-          width: 14px;
-          background: shade(#F6EFD4, 4%) url('/static/images/problem-icon.png') -57px 13px no-repeat;
-          &:hover {
-            background-color: #F6EFD4;
+        span {
+          &.unanswered {
+            @include inline-block();
+            background: url('/static/images/unanswered-icon.png') center center no-repeat;
+            height: 14px;
+            position: relative;
+            top: 4px;
+            width: 14px;
+          }
+
+          &.correct {
+            @include inline-block();
+            background: url('/static/images/correct-icon.png') center center no-repeat;
+            height: 20px;
+            position: relative;
+            top: 6px;
+            width: 25px;
+          }
+
+          &.incorrect {
+            @include inline-block();
+            background: url('/static/images/incorrect-icon.png') center center no-repeat;
+            height: 20px;
+            width: 20px;
+            position: relative;
+            top: 6px;
           }
         }
+      }
 
-        &.seq_problem_active {
-          width: 14px;
-          background: #FFFBEB url('/static/images/problem-icon.png') -22px 13px no-repeat;
-          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%), inset 1px 0 0 darken(#F6EFD4, 20%));
-
-          &:hover {
-            background-color: #F6EFD4;
-          }
+      div {
+        > span {
+          display: block;
+          margin-bottom: lh(.5);
         }
+      }
 
-        //video
-        &.seq_video_inactive {
-          width: 14px;
-          background: url('/static/images/video-icon.png') 13px 15px no-repeat;
-          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 10%));
+      input[type="text"] {
+        display: inline-block;
+      }
 
-          &:hover {
-            background-color: lighten(#F6EFD4, 3%);
-          }
-        }
+      center {
+        display: block;
+        margin: lh() 0;
+        border: 1px solid #ccc;
+        padding: lh();
+      }
 
-        &.seq_video_visited {
-          width: 14px;
-          background: shade(#F6EFD4, 4%) url('/static/images/video-icon.png') -81px 15px no-repeat;
-          &:hover {
-            background-color: #F6EFD4;
-          }
-        }
-
-        &.seq_video_active {
-          width: 14px;
-          background: #FFFBEB url('/static/images/video-icon.png') -32px 15px no-repeat;
-          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%),inset 1px 0 0 darken(#F6EFD4, 20%));
-          &:hover {
-            background-color: #F6EFD4;
-          }
-        }
+      section.action {
+        margin-top: lh();
+      }
+    }
 
 
-        //vertical
-        &.seq_vertical_inactive {
-          width: 14px;
-          background: url('/static/images/vertical-icon.png') -82px 15px no-repeat;
-          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 10%));
+    section.problems-wrapper, div#seq_content {
+      @extend .problem-set;
+    }
 
-          &:hover {
-            background-color: lighten(#F6EFD4, 3%);
-          }
-        }
+    ol.vert-mod {
+     > li {
+        @extend .clearfix;
+        @extend .problem-set;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 15px;
+        padding: 0 0 15px;
 
-        &.seq_vertical_visited {
-          width: 14px;
-          background: shade(#F6EFD4, 4%) url('/static/images/vertical-icon.png') 13px 15px no-repeat;
-          &:hover {
-            background-color: #F6EFD4;
-          }
-        }
-
-        &.seq_vertical_active {
-          width: 14px;
-          background: #FFFBEB url('/static/images/vertical-icon.png') -35px 15px no-repeat;
-          @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%), inset 1px 0 0 darken(#F6EFD4, 20%));
-
-          &:hover {
-            background-color: #F6EFD4;
-          }
-        }
-
-        &.prev, &.next {
-          @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
-          background: darken(#F6EFD4, 5%);
-          border-left: 1px solid darken(#f6efd4, 20%);
-          color: darken(#F6EFD4, 80%);
-          float: right;
-          letter-spacing: 1px;
-          padding: lh(.75);
-          text-transform: uppercase;
-
-          &:hover {
-            text-decoration: none;
-            color: darken(#F6EFD4, 60%);
-            text-decoration: none;
-            background: none;
-          }
+        &:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
         }
       }
     }
