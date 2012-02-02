@@ -9,6 +9,10 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 
 from x_module import XModule
 
+# HACK: This shouldn't be hard-coded to two types
+# OBSOLETE: This obsoletes 'type'
+class_priority = ['video', 'problem']
+
 class SequentialModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -55,10 +59,21 @@ class SequentialModule(XModule):
             return {'content':content, 
                     "destroy_js":m['destroy_js'], 
                     'init_js':m['init_js'], 
-                    'type':m['type']}
+                    'type': m['type']}
+
+
+        ## Returns a set of all types of all sub-children
+        child_classes = [set([i.tag for i in e.iter()]) for e in self.xmltree]
 
         self.contents=[(e.get("name"),j(self.render_function(e))) \
                       for e in self.xmltree]
+
+        for (content, element_class) in zip(self.contents, child_classes):
+            new_class = 'other'
+            for c in class_priority:
+                if c in element_class: 
+                    new_class = c
+            content[1]['type'] = new_class
      
         js=""
 

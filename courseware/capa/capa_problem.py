@@ -1,4 +1,5 @@
 import copy
+import logging
 import math
 import numpy
 import os
@@ -18,6 +19,8 @@ from responsetypes import numericalresponse, formularesponse, customresponse, sc
 
 import calc
 import eia
+
+log = logging.getLogger("mitx.courseware")
 
 response_types = {'numericalresponse':numericalresponse, 
                   'formularesponse':formularesponse,
@@ -80,6 +83,7 @@ class LoncapaProblem(object):
             self.seed=struct.unpack('i', os.urandom(4))[0]
 
         ## Parse XML file
+        log.debug(u"LoncapaProblem() opening file {0}".format(filename))
         file_text = open(filename).read()
         # Convert startouttext and endouttext to proper <text></text>
         # TODO: Do with XML operations

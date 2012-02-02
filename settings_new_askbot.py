@@ -1,12 +1,17 @@
 import os
 import sys
+import tempfile
 
 import djcelery
 
+# Configuration option for when we want to grab server error pages
+STATIC_GRAB = False
+DEV_CONTENT = True
+
 LIB_URL = '/static/lib/'
-LIB_URL = 'http://mitxstatic.s3-website-us-east-1.amazonaws.com/js/'
+LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/'
 BOOK_URL = '/static/book/'
-BOOK_URL = 'http://mitxstatic.s3-website-us-east-1.amazonaws.com/book_images/'
+BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'
 
 # Our parent dir (mitx_all) is the BASE_DIR
 BASE_DIR = os.path.abspath(os.path.join(__file__, "..", ".."))
@@ -33,6 +38,10 @@ HTTPS = 'on'
 
 MEDIA_URL = ''
 MEDIA_ROOT = ''
+
+# Needed for Askbot
+# Deployed machines: Move to S3
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -103,7 +112,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'courseware',
-    'auth',
+    'student',
     'django.contrib.humanize',
     'static_template_view',
     'staticbook',
@@ -126,9 +135,13 @@ TRACK_MAX_EVENT = 1000
 MAXLOG = 500
 
 LOG_DIR = "/tmp/"
+MAKO_MODULE_DIR = None
 
 # Make sure we execute correctly regardless of where we're called from
 execfile(os.path.join(BASE_DIR, "settings.py"))
+
+if MAKO_MODULE_DIR == None:
+    MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -251,12 +264,14 @@ import site
 
 STATICFILES_DIRS = STATICFILES_DIRS + ( ASKBOT_DIR+'/askbot/skins',)
 
-# Needed for Askbot
-# Critical TODO: Move to S3
-MEDIA_URL = '/discussion/upfiles/'
-MEDIA_ROOT = ASKBOT_DIR+'/askbot/upfiles'
-
 ASKBOT_ROOT = os.path.dirname(askbot.__file__)
+
+# Needed for Askbot
+# Deployed machines: Move to S3
+if MEDIA_ROOT == '':
+    MEDIA_ROOT = ASKBOT_DIR+'/askbot/upfiles'
+if MEDIA_URL == '':
+    MEDIA_URL = '/discussion/upfiles/'
 
 site.addsitedir(os.path.join(os.path.dirname(askbot.__file__), 'deps'))
 TEMPLATE_LOADERS = TEMPLATE_LOADERS + ('askbot.skins.loaders.filesystem_load_template_source',)
@@ -281,7 +296,6 @@ FILE_UPLOAD_HANDLERS = (
 ASKBOT_ALLOWED_UPLOAD_FILE_TYPES = ('.jpg', '.jpeg', '.gif', '.bmp', '.png', '.tiff')
 ASKBOT_MAX_UPLOAD_FILE_SIZE = 1024 * 1024 #result in bytes
 #   ASKBOT_FILE_UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'askbot', 'upfiles')
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 PROJECT_ROOT = os.path.dirname(__file__)
 
@@ -307,6 +321,31 @@ INSTALLED_APPS = INSTALLED_APPS + (
     'djkombu',
     'followit',
 )
+
+# askbot livesettings
+LIVESETTINGS_OPTIONS = {
+    1: {
+        'SETTINGS' : {
+            'MIN_REP' : {
+                'MIN_REP_TO_VOTE_UP' : 1,
+            },
+            'SOCIAL_SHARING' : {
+                'ENABLE_SHARING_TWITTER' : False,
+                'ENABLE_SHARING_FACEBOOK' : False,
+                'ENABLE_SHARING_LINKEDIN' : False,
+                'ENABLE_SHARING_IDENTICA' : False,
+                'ENABLE_SHARING_GOOGLE' : False,
+            },
+            'USER_SETTINGS' : {
+                'EDITABLE_SCREEN_NAME' : False,
+                'EDITABLE_EMAIL' : False,
+                'ALLOW_ADD_REMOVE_LOGIN_METHODS' : False,
+                'ENABLE_GRAVATAR' : False,
+            }
+        }
+    },
+}
+
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 ASKBOT_URL = 'discussion/'

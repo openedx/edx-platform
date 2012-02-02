@@ -3,10 +3,12 @@ import hashlib
 import logging
 
 from lxml import etree
+from mako.template import Template
+from mako.lookup import TemplateLookup
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
-    from auth.models import UserProfile
+    from student.models import UserProfile
 except: 
     settings = None 
 
@@ -116,10 +118,18 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
             #for now and trust that this element will get its turn to propogate
             #to its children later.
             return
-            
+
+template_lookup = TemplateLookup(directories = [settings.DATA_DIR], 
+                                 module_directory = settings.MAKO_MODULE_DIR)
+
 def course_file(user):
     # TODO: Cache. 
-    tree = etree.parse(settings.DATA_DIR+UserProfile.objects.get(user=user).courseware)
+    filename = UserProfile.objects.get(user=user).courseware
+    data_template = template_lookup.get_template(filename)
+
+    options = {'dev_content':True}
+
+    tree = etree.XML(data_template.render(**options))
     id_tag(tree)
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")
