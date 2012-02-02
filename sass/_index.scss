@@ -255,20 +255,16 @@ section.index-content {
             &.intro-video {
               width: flex-grid(4, 8);
 
-              div.video-wrapper {
-                position: relative;
-                padding-bottom: 56.25%;
-                padding-top: 30px;
-                height: 0;
-                overflow: hidden;
+              a {
+                display: block;
                 width: 100%;
 
-                iframe {
-                  position: absolute;
-                  top: 0;
-                  left: 0;
+                img {
                   width: 100%;
-                  height: 100%;
+                }
+
+                span {
+                  display: none;
                 }
               }
             }

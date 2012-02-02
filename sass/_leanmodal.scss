@@ -15,7 +15,6 @@ div.leanModal_box {
   @include box-sizing(border-box);
   display: none;
   border: none;
-  max-width: 600px;
   background: #fff;
   padding: lh(2);
 
@@ -25,6 +24,10 @@ div.leanModal_box {
     padding-bottom: lh();
     border-bottom: 1px solid #eee;
     margin-bottom: lh();
+  }
+
+  &#enroll {
+    max-width: 600px;
   }
 
   form {
