@@ -13,9 +13,10 @@ from django.db import connection
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
-from courseware.models import Registration, UserProfile
 
-log = logging.getLogger("mitx.auth")
+from models import Registration, UserProfile
+
+log = logging.getLogger("mitx.user")
 
 def csrf_token(context):
     csrf_token = context.get('csrf_token', '')

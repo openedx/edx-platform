@@ -9,8 +9,6 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in mitx/courseware/migrations/
 
 """
-import uuid
-
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -46,41 +44,4 @@ class StudentModule(models.Model):
     def __unicode__(self):
         return self.module_type+'/'+self.student.username+"/"+self.module_id+'/'+str(self.state)[:20]
 
-
-class UserProfile(models.Model):
-    class Meta:
-        db_table = "auth_userprofile"
-
-    ## CRITICAL TODO/SECURITY
-    # Sanitize all fields. 
-    # This is not visible to other users, but could introduce holes later
-    user = models.ForeignKey(User, unique=True, db_index=True)
-    name = models.TextField(blank=True, db_index=True)
-    language = models.TextField(blank=True, db_index=True)
-    location = models.TextField(blank=True, db_index=True)
-    meta = models.TextField(blank=True) # JSON dictionary for future expansion
-    courseware = models.TextField(blank=True, default='course.xml')
-
-
-class Registration(models.Model):
-    ''' Allows us to wait for e-mail before user is registered. A
-        registration profile is created when the user creates an 
-        account, but that account is inactive. Once the user clicks
-        on the activation key, it becomes active. '''
-    class Meta:
-        db_table = "auth_registration"
-
-    user = models.ForeignKey(User, unique=True)
-    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
-
-    def register(self, user):
-        # MINOR TODO: Switch to crypto-secure key
-        self.activation_key=uuid.uuid4().hex
-        self.user=user
-        self.save()
-
-    def activate(self):
-        self.user.is_active = True
-        self.user.save()
-        self.delete()
 

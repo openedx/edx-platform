@@ -7,7 +7,7 @@ from mako.lookup import TemplateLookup
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
-    from models import UserProfile
+    from user.models import UserProfile
 except: 
     settings = None 
 

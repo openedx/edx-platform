@@ -112,7 +112,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'courseware',
-    'auth',
+    'user',
     'django.contrib.humanize',
     'static_template_view',
     'staticbook',
