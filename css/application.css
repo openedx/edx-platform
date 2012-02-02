@@ -508,7 +508,6 @@ div.leanModal_box {
   box-sizing: border-box;
   display: none;
   border: none;
-  max-width: 600px;
   background: #fff;
   padding: 45.304px; }
   div.leanModal_box h1 {
@@ -517,6 +516,8 @@ div.leanModal_box {
     padding-bottom: 22.652px;
     border-bottom: 1px solid #eee;
     margin-bottom: 22.652px; }
+  div.leanModal_box#enroll {
+    max-width: 600px; }
   div.leanModal_box form {
     text-align: left; }
     div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error {
@@ -3385,40 +3386,6 @@ ul.question-list {
 div.search-tips {
   display: block; }
 
-div.post-update-info {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -o-border-radius: 5px;
-  border-radius: 5px;
-  background: #faf7e9;
-  padding: 10px; }
-  div.post-update-info a {
-    color: #993333; }
-  div.post-update-info div.change-date {
-    font-size: 12px;
-    margin-bottom: 10px; }
-  div.post-update-info div.avatar {
-    display: inline-block;
-    float: left;
-    margin-right: 3px; }
-    div.post-update-info div.avatar img.gravatar {
-      background: white;
-      border: 1px solid #eddfaa;
-      margin-right: 5px;
-      padding: 3px;
-      vertical-align: bottom; }
-  div.post-update-info div.user-meta {
-    display: inline-block;
-    width: 60%; }
-    div.post-update-info div.user-meta span.user-badges {
-      display: block; }
-
 ul.tags {
   list-style: none; }
   ul.tags li, ul.tags a {
@@ -3449,8 +3416,8 @@ ul.tags {
 div.question-header div.vote-buttons {
   display: inline-block;
   float: left;
-  width: 8.696%;
-  margin-right: 2.717%; }
+  margin-right: 2.717%;
+  width: 5.272%; }
   div.question-header div.vote-buttons ul li {
     background-position: center;
     background-repeat: no-repeat;
@@ -3460,28 +3427,34 @@ div.question-header div.vote-buttons {
     list-style: none;
     padding: 10px;
     text-align: center;
-    width: 25px; }
+    width: 70%; }
+    div.question-header div.vote-buttons ul li.post-vote {
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -ms-border-radius: 4px;
+      -o-border-radius: 4px;
+      border-radius: 4px;
+      background-color: #f9f4e1; }
     div.question-header div.vote-buttons ul li.question-img-upvote, div.question-header div.vote-buttons ul li.answer-img-upvote {
-      background-image: url(/static/images/askbot/vote-arrow-up-new.png);
-      background-color: #F6EFD4; }
+      background-image: url(/static/images/askbot/vote-arrow-up.png); }
       div.question-header div.vote-buttons ul li.question-img-upvote:hover, div.question-header div.vote-buttons ul li.question-img-upvote.on, div.question-header div.vote-buttons ul li.answer-img-upvote:hover, div.question-header div.vote-buttons ul li.answer-img-upvote.on {
-        background-image: url(/static/images/askbot/vote-arrow-up-on-new.png); }
+        background-color: #d1e3a8; }
     div.question-header div.vote-buttons ul li.question-img-downvote, div.question-header div.vote-buttons ul li.answer-img-downvote {
-      background-image: url(/static/images/askbot/vote-arrow-down-new.png); }
+      background-image: url(/static/images/askbot/vote-arrow-down.png); }
       div.question-header div.vote-buttons ul li.question-img-downvote:hover, div.question-header div.vote-buttons ul li.question-img-downvote.on, div.question-header div.vote-buttons ul li.answer-img-downvote:hover, div.question-header div.vote-buttons ul li.answer-img-downvote.on {
-        background-image: url(/static/images/askbot/vote-arrow-down-on-new.png); }
+        background-color: #eac6ad; }
 div.question-header div.question-container {
   display: inline-block;
   float: left;
-  width: 88.587%; }
+  width: 92.011%; }
   div.question-header div.question-container h1 {
     margin-top: 0; }
   div.question-header div.question-container div.meta-bar {
     border-bottom: 1px solid #eee;
     display: block;
-    margin: 20px 0 10px;
+    margin: 10px 0;
     overflow: hidden;
-    padding-bottom: 15px; }
+    padding: 5px 0 10px; }
     div.question-header div.question-container div.meta-bar div.tag-list {
       display: inline-block;
       float: left;
@@ -3505,7 +3478,95 @@ div.question-header div.question-container {
       float: left;
       margin-right: 3.067%;
       width: 76.81%; }
-    div.question-header div.question-container div.question-content div.post-update-info {
+    div.question-header div.question-container div.question-content div.post-update-container {
       display: inline-block;
       float: left;
       width: 20.123%; }
+      div.question-header div.question-container div.question-content div.post-update-container div.post-update-info {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -o-box-sizing: border-box;
+        box-sizing: border-box;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        -ms-border-radius: 5px;
+        -o-border-radius: 5px;
+        border-radius: 5px;
+        background: #faf7e9;
+        padding: 10px;
+        margin-bottom: 10px; }
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info:last-child {
+          margin-bottom: 0; }
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info.revision {
+          text-align: center;
+          background: #fcfaf2; }
+          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info.revision a {
+            color: black; }
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info a {
+          color: #993333; }
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.change-date {
+          font-size: 12px;
+          margin-bottom: 10px; }
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.avatar {
+          display: inline-block;
+          float: left;
+          margin-right: 3px; }
+          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.avatar img.gravatar {
+            background: white;
+            border: 1px solid #eddfaa;
+            margin-right: 5px;
+            padding: 3px;
+            vertical-align: bottom; }
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.user-meta {
+          display: inline-block;
+          width: 60%; }
+          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.user-meta span.user-badges {
+            display: block; }
+  div.question-header div.question-container div.comments-container {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #f7f7f7;
+    padding: 3%;
+    display: inline-block;
+    margin: 15px 0 0;
+    padding: 3%;
+    width: 100%; }
+    div.question-header div.question-container div.comments-container div.comments-content {
+      font-size: 13px; }
+      div.question-header div.question-container div.comments-container div.comments-content div.comment {
+        border-bottom: 1px solid #ddd;
+        border-top: 1px solid #fff;
+        padding: 15px 0;
+        display: block; }
+        div.question-header div.question-container div.comments-container div.comments-content div.comment:first-child {
+          border-top: 0; }
+        div.question-header div.question-container div.comments-container div.comments-content div.comment:last-child {
+          margin-bottom: 20px; }
+        div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-votes {
+          display: inline; }
+          div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-votes .upvote {
+            background: #ccc;
+            display: inline-block;
+            margin: 0px;
+            padding-right: 17px;
+            padding-top: 2px;
+            height: 20px;
+            color: #777;
+            width: 20px; }
+        div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-delete {
+          display: inline; }
+    div.question-header div.question-container div.comments-container #edit-comment-form {
+      margin: 10px 0;
+      min-height: 100px;
+      width: 99%;
+      resize: vertical; }
+    div.question-header div.question-container div.comments-container .counter {
+      color: #888;
+      display: block;
+      float: right;
+      margin-top: 5px;
+      text-align: right; }
