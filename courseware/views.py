@@ -19,7 +19,7 @@ from lxml import etree
 
 from module_render import render_module, modx_dispatch
 from models import StudentModule
-from user.models import UserProfile
+from student.models import UserProfile
 
 import courseware.content_parser as content_parser
 import courseware.modules.capa_module

@@ -18,7 +18,7 @@ class Migration(SchemaMigration):
             ('meta', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('courseware', self.gf('django.db.models.fields.TextField')(default='course.xml', blank=True)),
         ))
-        db.send_create_signal('user', ['UserProfile'])
+        db.send_create_signal('student', ['UserProfile'])
 
         # Adding model 'Registration'
         db.create_table('auth_registration', (
@@ -26,7 +26,7 @@ class Migration(SchemaMigration):
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
             ('activation_key', self.gf('django.db.models.fields.CharField')(unique=True, max_length=32, db_index=True)),
         ))
-        db.send_create_signal('user', ['Registration'])
+        db.send_create_signal('student', ['Registration'])
 
 
     def backwards(self, orm):
@@ -100,13 +100,13 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'user.registration': {
+        'student.registration': {
             'Meta': {'object_name': 'Registration', 'db_table': "'auth_registration'"},
             'activation_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
-        'user.userprofile': {
+        'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
             'courseware': ('django.db.models.fields.TextField', [], {'default': "'course.xml'", 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -118,4 +118,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['user']
+    complete_apps = ['student']

@@ -20,7 +20,7 @@ from django.template import Context, loader
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 from models import StudentModule
-from user.models import UserProfile
+from student.models import UserProfile
 import track.views
 
 import courseware.content_parser as content_parser
