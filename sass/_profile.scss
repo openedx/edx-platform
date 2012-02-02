@@ -2,23 +2,32 @@ div.profile-wrapper {
   @extend .table-wrapper;
 
   section.user-info {
-    @include box-sizing(border-box);
-    margin-right: flex-gutter();
-    padding: $body-line-height;
-    width: flex-grid(6);
-    background: #e3e3e3;
-    border-right: 1px solid #d3d3d3;
-    text-shadow: 0 1px 0 #f6f6f6;
-    display: table-cell;
+    @extend .sidebar;
+    padding: lh();
+
+    ul {
+      list-style: none;
+
+      li {
+        margin-bottom: lh(.5);
+      }
+    }
+
+    div #change_password_pop {
+      border-top: 1px;
+    }
   }
 
   section.course-info {
-    @include box-sizing(border-box);
-    display: table-cell;
-    padding: $body-line-height;
-    width: flex-grid(6);
+    @extend .content;
+
+    ol {
+      list-style: none;
+    }
 
     ul {
+      list-style: none;
+
       li {
         display: inline-block;
         padding-right: 1em;
