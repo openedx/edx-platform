@@ -46,13 +46,13 @@ class LoncapaModule(XModule):
 
     def get_html(self):
         return render_to_string('problem_ajax.html', 
-                              {'id':self.filename, 
+                              {'id':self.item_id, 
                                'ajax_url':self.ajax_url,
                                })
 
     def get_init_js(self):
         return render_to_string('problem.js', 
-                              {'id':self.filename, 
+                              {'id':self.item_id, 
                                'ajax_url':self.ajax_url,
                                })
 
@@ -100,7 +100,7 @@ class LoncapaModule(XModule):
 
         html=render_to_string('problem.html', 
                               {'problem' : content, 
-                               'id' : self.filename, 
+                               'id' : self.item_id, 
                                'check_button' : check_button,
                                'reset_button' : reset_button,
                                'save_button' : save_button,

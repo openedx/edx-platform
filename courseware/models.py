@@ -24,7 +24,7 @@ class StudentModule(models.Model):
     module_id = models.CharField(max_length=255, db_index=True) # Filename for homeworks, etc. 
     student = models.ForeignKey(User, db_index=True)
     class Meta:
-        unique_together = (('student', 'module_id', 'module_type'),)
+        unique_together = (('student', 'module_id'),)
 
     ## Internal state of the object
     state = models.TextField(null=True, blank=True)

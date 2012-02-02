@@ -43,6 +43,12 @@ def profile(request):
     chapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
     responses=StudentModule.objects.filter(student=request.user)
+    response_by_id = {}
+    for response in responses:
+        response_by_id[response.module_id] = response
+        
+        
+    total_scores = {}
 
     for c in chapters:
         chname=c.get('name')
@@ -53,31 +59,124 @@ def profile(request):
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    id = p.get('filename')
+                    id = p.get('id')
                     correct = 0
-                    for response in responses:
-                        if response.module_id == id:
-                            if response.grade!=None:
-                                correct=response.grade
-                            else:
-                                correct=0
+                    if id in response_by_id:
+                        response = response_by_id[id]
+                        if response.grade!=None:
+                            correct=response.grade
+                    
                     total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
-                    scores.append((int(correct),total))
+                    scores.append((int(correct),total, ( True if s.get('graded') == "True" else False ) ))
+                    
+                    
+                section_total = (sum([score[0] for score in scores]), 
+                                sum([score[1] for score in scores]))
+                
+                graded_total = (sum([score[0] for score in scores if score[2]]), 
+                                sum([score[1] for score in scores if score[2]]))
+                
+                #Add the graded total to total_scores
+                format = s.get('format') if s.get('format') else ""
+                if format and graded_total[1] > 0:
+                    format_scores = total_scores[ format ] if format in total_scores else []
+                    format_scores.append( graded_total )
+                    total_scores[ format ] = format_scores
+                
                 score={'course':course,
                        'section':s.get("name"),
                        'chapter':c.get("name"),
                        'scores':scores,
+                       'section_total' : section_total,
+                       'format' : format,
                        }
                 hw.append(score)
-
+    
+    
+    
+    def totalWithDrops(scores, drop_count):
+        sorted_scores = sorted( enumerate(scores), key=lambda x: -x[1]['percentage'] ) #Note that this key will sort the list descending
+        dropped_indices = [score[0] for score in sorted_scores[-drop_count:]] # A list of the indices of the dropped scores
+        aggregate_score = 0
+        for index, score in enumerate(scores):
+            if index not in dropped_indices:
+                aggregate_score += score['percentage']
+        
+        aggregate_score /= len(scores) - drop_count
+        
+        return aggregate_score, dropped_indices
+        
+    #Figure the homework scores
+    homework_scores = total_scores['Homework'] if 'Homework' in total_scores else []
+    homework_percentages = []
+    for i in range(12):
+        if i < len(homework_scores):
+            percentage = homework_scores[i][0] / float(homework_scores[i][1])
+            summary = "{:.0%} ({}/{})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
+        else:
+            percentage = 0
+            summary = "0% (?/?)"
+        summary = "Homework {} - {}".format(i + 1, summary)
+        
+        homework_percentages.append( {'percentage': percentage, 'summary': summary} )
+    homework_total, homework_dropped_indices = totalWithDrops(homework_percentages, 2)
+    
+    #Figure the lab scores
+    lab_scores = total_scores['Lab'] if 'Lab' in total_scores else []
+    lab_percentages = []
+    for i in range(12):
+        if i < len(lab_scores):
+            percentage = lab_scores[i][0] / float(lab_scores[i][1])
+            summary = "{:.0%} ({}/{})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
+        else:
+            percentage = 0
+            summary = "0% (?/?)"
+        summary = "Lab {} - {}".format(i + 1, summary)
+        lab_percentages.append( {'percentage': percentage, 'summary': summary} )
+    lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
+    
+    midterm_score = (120, 150)
+    midterm_percentage = midterm_score[0] / float(midterm_score[1])
+    
+    final_score = (200, 300)
+    final_percentage = final_score[0] / float(final_score[1])
+    
+    grade_summary = [
+        {
+            'category': 'Homework',
+            'subscores' : homework_percentages,
+            'dropped_indices' : homework_dropped_indices,
+            'totalscore' : {'score' : homework_total, 'summary' : "Homework Average - {:.0%}".format(homework_total)},
+            'weight' : 0.15,
+        },
+        {
+            'category': 'Labs',
+            'subscores' : lab_percentages,
+            'dropped_indices' : lab_dropped_indices,
+            'totalscore' : {'score' : lab_total, 'summary' : "Lab Average - {:.0%}".format(lab_total)},
+            'weight' : 0.15,
+        },
+        {
+            'category': 'Midterm',
+            'totalscore' : {'score' : midterm_percentage, 'summary' : "Midterm - {:.0%} ({}/{})".format(midterm_percentage, midterm_score[0], midterm_score[1])},
+            'weight' : 0.30,
+        },
+        {
+            'category': 'Final',
+            'totalscore' : {'score' : final_percentage, 'summary' : "Final - {:.0%} ({}/{})".format(final_percentage, final_score[0], final_score[1])},
+            'weight' : 0.40,
+        }
+    ]
+    
+    
     user_info=UserProfile.objects.get(user=request.user)
-
     context={'name':user_info.name,
              'username':request.user.username,
              'location':user_info.location,
              'language':user_info.language,
              'email':request.user.email,
-             'homeworks':hw, 
+             'homeworks':hw,
+             'grade_summary' : grade_summary,
              'csrf':csrf(request)['csrf_token']
              }
     return render_to_response('profile.html', context)
