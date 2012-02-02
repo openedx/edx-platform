@@ -403,6 +403,24 @@ section.index-content section {
         float: left; }
         section.index-content section.about section p:nth-child(odd) {
           margin-right: 3.817%; }
+      section.index-content section.about section.intro section {
+        margin-bottom: 0; }
+        section.index-content section.about section.intro section.intro-text {
+          margin-right: 3.817%;
+          width: 48.092%; }
+          section.index-content section.about section.intro section.intro-text p {
+            margin-right: 0;
+            width: auto;
+            float: none; }
+        section.index-content section.about section.intro section.intro-video {
+          width: 48.092%; }
+          section.index-content section.about section.intro section.intro-video a {
+            display: block;
+            width: 100%; }
+            section.index-content section.about section.intro section.intro-video a img {
+              width: 100%; }
+            section.index-content section.about section.intro section.intro-video a span {
+              display: none; }
       section.index-content section.about section.features {
         border-top: 1px solid #E5E5E5;
         padding-top: 25.888px;
@@ -607,7 +625,6 @@ div.leanModal_box {
   box-sizing: border-box;
   display: none;
   border: none;
-  max-width: 600px;
   background: #fff;
   padding: 51.776px; }
   div.leanModal_box h1 {
@@ -616,6 +633,8 @@ div.leanModal_box {
     padding-bottom: 25.888px;
     border-bottom: 1px solid #eee;
     margin-bottom: 25.888px; }
+  div.leanModal_box#enroll {
+    max-width: 600px; }
   div.leanModal_box form {
     text-align: left; }
     div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error {
