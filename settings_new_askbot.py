@@ -1,5 +1,6 @@
 import os
 import sys
+import tempfile
 
 import djcelery
 
@@ -111,7 +112,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'courseware',
-    'auth',
+    'student',
     'django.contrib.humanize',
     'static_template_view',
     'staticbook',
@@ -134,9 +135,13 @@ TRACK_MAX_EVENT = 1000
 MAXLOG = 500
 
 LOG_DIR = "/tmp/"
+MAKO_MODULE_DIR = None
 
 # Make sure we execute correctly regardless of where we're called from
 execfile(os.path.join(BASE_DIR, "settings.py"))
+
+if MAKO_MODULE_DIR == None:
+    MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -316,6 +321,25 @@ INSTALLED_APPS = INSTALLED_APPS + (
     'djkombu',
     'followit',
 )
+
+# askbot livesettings
+LIVESETTINGS_OPTIONS = {
+    1: {
+        'SETTINGS' : {
+            'MIN_REP' : {
+                'MIN_REP_TO_VOTE_UP' : 1,
+            },
+            'SOCIAL_SHARING' : {
+                'ENABLE_SHARING_TWITTER' : False,
+                'ENABLE_SHARING_FACEBOOK' : False,
+                'ENABLE_SHARING_LINKEDIN' : False,
+                'ENABLE_SHARING_IDENTICA' : False,
+                'ENABLE_SHARING_GOOGLE' : False,
+            }
+        }
+    },
+}
+
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 ASKBOT_URL = 'discussion/'

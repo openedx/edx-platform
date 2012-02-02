@@ -19,8 +19,8 @@ from django.template import Context
 from django.template import Context, loader
 from mitxmako.shortcuts import render_to_response, render_to_string
 
-from auth.models import UserProfile
 from models import StudentModule
+from student.models import UserProfile
 import track.views
 
 import courseware.content_parser as content_parser
