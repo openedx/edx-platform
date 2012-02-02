@@ -335,6 +335,12 @@ LIVESETTINGS_OPTIONS = {
                 'ENABLE_SHARING_LINKEDIN' : False,
                 'ENABLE_SHARING_IDENTICA' : False,
                 'ENABLE_SHARING_GOOGLE' : False,
+            },
+            'USER_SETTINGS' : {
+                'EDITABLE_SCREEN_NAME' : False,
+                'EDITABLE_EMAIL' : False,
+                'ALLOW_ADD_REMOVE_LOGIN_METHODS' : False,
+                'ENABLE_GRAVATAR' : False,
             }
         }
     },
