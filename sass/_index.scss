@@ -237,6 +237,44 @@ section.index-content {
           }
         }
 
+        &.intro {
+          section {
+            margin-bottom: 0;
+
+            &.intro-text {
+              margin-right: flex-gutter(8);
+              width: flex-grid(4, 8);
+
+              p {
+                margin-right: 0;
+                width: auto;
+                float: none;
+              }
+            }
+
+            &.intro-video {
+              width: flex-grid(4, 8);
+
+              div.video-wrapper {
+                position: relative;
+                padding-bottom: 56.25%;
+                padding-top: 30px;
+                height: 0;
+                overflow: hidden;
+                width: 100%;
+
+                iframe {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                }
+              }
+            }
+          }
+        }
+
         &.features {
           border-top: 1px solid #E5E5E5;
           padding-top: lh();
