@@ -1,0 +1,277 @@
+div.question-header {
+  div.vote-buttons {
+    display: inline-block;
+    float: left;
+    margin-right: flex-gutter(9);
+    width: flex-grid(0.7,9);
+
+    ul {
+      li {
+        background-position: center;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        font-weight: bold;
+        height: 20px;
+        list-style: none;
+        padding: 10px;
+        text-align: center;
+        width: 70%;
+
+        &.post-vote {
+          @include border-radius(4px);
+          background-color: lighten(#F6EFD4, 3%);
+        }
+
+        &.question-img-upvote, &.answer-img-upvote  {
+          background-image: url(/static/images/askbot/vote-arrow-up.png);
+
+          &:hover, &.on {
+            background-color:#d1e3a8;
+          }
+        }
+
+        &.question-img-downvote, &.answer-img-downvote  {
+          background-image: url(/static/images/askbot/vote-arrow-down.png);
+
+          &:hover, &.on {
+            background-color:#eac6ad;
+          }
+        }
+      }
+    }
+  }
+
+  div.question-container {
+    display: inline-block;
+    float: left;
+    width: flex-grid(8.3,9);
+
+    h1 {
+      margin-top: 0;
+    }
+
+    div.meta-bar {
+      border-bottom: 1px solid #eee;
+      display: block;
+      margin: 10px 0;
+      overflow: hidden;
+      padding: 5px 0 10px;
+
+
+      div.tag-list {
+        display: inline-block;
+        float:left;
+        width: flex-grid(4,8);
+        margin-right: flex-gutter(8);
+      }
+
+      div.question-actions {
+        display: inline-block;
+        float:left;
+        text-align: right;
+        width: flex-grid(4,8);
+
+        a {
+          color: darken(#F6EFD4, 50%);
+
+          &.question-delete {
+            color: $mit-red;
+          }
+        }
+
+        span.sep {
+          color: darken(#F6EFD4, 10%);
+        }
+      }
+    }
+
+    div.question-content {
+      overflow: hidden;
+
+      div.question-body {
+        display: inline-block;
+        float: left;
+        margin-right: flex-gutter(8);
+        width: flex-grid(6.2,8);
+      }
+
+      div.post-update-container {
+        display: inline-block;
+        float: left;
+        width: flex-grid(1.8,8);
+
+        div.post-update-info {
+          @include box-sizing(border-box);
+          @include border-radius(5px);
+          background:lighten(#F6EFD4, 5%);
+          padding: 10px;
+          margin-bottom: 10px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          &.revision {
+            text-align: center;
+            background:lighten(#F6EFD4, 7%);
+
+            a {
+              color: black;
+            }
+          }
+
+          a {
+            color:$mit-red ;
+          }
+
+          div.change-date {
+            font-size: 12px;
+            margin-bottom: 10px;
+          }
+
+          div.avatar {
+            display: inline-block;
+            float: left;
+            margin-right: 3px;
+
+            img.gravatar {
+              background: white;
+              border: 1px solid darken(#F6EFD4, 10%);
+              margin-right: 5px;
+              padding: 3px ;
+              vertical-align: bottom;
+            }
+          }
+
+          div.user-meta {
+            display: inline-block;
+            width: 60%;
+
+            span.user-badges {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+
+    div.comments-container {
+      @include box-sizing(border-box);
+      background: lighten(#efefef, 3%);
+      padding: 3%;
+      display: inline-block;
+      margin: 15px 0 0;
+      padding: 3%;
+      width: 100%;
+
+      div.comments-content {
+        font-size: 13px;
+
+        .block {
+          border-bottom: 1px solid #ddd;
+          border-top: 1px solid #fff;
+          padding: 15px 0;
+          display: block;
+
+           &:first-child {
+            border-top: 0;
+          }
+          // &:only-of-type {
+          //   border: 0;
+          // }
+        }
+
+        form.post-comments {
+        }
+
+        div.comment {
+          &:first-child {
+            border-top: 0;
+          }
+
+          &:last-child {
+            margin-bottom: 20px;
+          }
+
+          aside.comment-controls {
+            background: none;
+            border: none;
+            display: inline-block;
+            margin-top: -8px;
+            padding:0 2% 0 0;
+            text-align: center;
+            width: 5%;
+
+            div {
+              background: none;
+              opacity: 0.6;
+
+              &:hover {
+                opacity: 1;
+              }
+            }
+
+            div.comment-votes {
+                @include transform(rotate(-90deg));
+                width: 16px;
+
+              a.upvote {
+                cursor: pointer;
+                font-size: 25px;
+                text-decoration: none;
+              }
+            }
+
+            div.comment-delete {
+              // display: inline;
+              color: $mit-red;
+              cursor: pointer;
+              font-size: 15px;
+            }
+          }
+
+          div.comment-body {
+            display: inline-block;
+            width: 95%;
+
+            div.comment-meta {
+              text-align: right;
+
+              a.author {
+                font-weight: bold;
+              }
+
+              a.edit {
+                @extend .button;
+                font-size: 12px;
+                padding: 2px 10px;
+                // @include border-radius(2px);
+                // background: #eee;
+                // color: #555;
+                // cursor: pointer;
+                // padding: 1px 10px;
+                // text-decoration: none;
+              }
+            }
+          }
+        }
+      }
+
+      #edit-comment-form {
+        margin: 10px 0;
+        min-height: 100px;
+        width: 99%;
+        resize: vertical;
+      }
+      .counter {
+        color: #888;
+        display: block;
+        float: right;
+        margin-top: 5px;
+        text-align: right;
+      }
+    }
+  }
+}
+
+

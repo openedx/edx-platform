@@ -1,28 +1,92 @@
 div.profile-wrapper {
   @extend .table-wrapper;
+  color: #000;
 
   section.user-info {
-    @include box-sizing(border-box);
-    margin-right: flex-gutter();
-    padding: $body-line-height;
-    width: flex-grid(6);
-    background: #e3e3e3;
-    border-right: 1px solid #d3d3d3;
-    text-shadow: 0 1px 0 #f6f6f6;
-    display: table-cell;
+    @extend .sidebar;
+    @include border-radius(0px 4px 0px 4px);
+    border-left: 1px solid #d3d3d3;
+    border-right: 0;
+
+    h1 {
+      padding: lh();
+    }
+
+    ul {
+      list-style: none;
+
+      li {
+        @include transition();
+        color: lighten($text-color, 10%);
+        display: block;
+        text-decoration: none;
+        @include box-shadow(0 1px 0 #eee);
+        padding: 7px lh();
+        border-bottom: 1px solid #d3d3d3;
+
+        div#location_sub, div#language_sub {
+          font-weight: bold;
+          @include inline-block();
+
+          input {
+            margin: lh(.5) 0;
+          }
+
+          &:empty {
+            padding: 0;
+          }
+        }
+
+        div#description {
+          font-size: 12px;
+        }
+      }
+    }
+
+    div#change_password_pop {
+      padding: 7px lh();
+      color: #4D4D4D;
+    }
   }
 
   section.course-info {
-    @include box-sizing(border-box);
-    display: table-cell;
-    padding: $body-line-height;
-    width: flex-grid(6);
+    @extend .content;
 
-    ul {
-      li {
-        display: inline-block;
-        padding-right: 1em;
+    ol {
+      list-style: none;
+
+      > li {
+        border-bottom: 1px solid #e3e3e3;
+        padding: lh() 0;
+        @extend .clearfix;
+
+        h2 {
+          float: left;
+          padding: 0;
+          margin: 0;
+          width: flex-grid(2, 9);
+          margin-right: flex-gutter(9);
+        }
+
+        div.scores {
+          float: left;
+          width: flex-grid(7, 9);
+
+          h3 {
+            color: #666;
+          }
+
+          ul {
+            list-style: none;
+
+            li {
+              display: inline-block;
+              padding-right: 1em;
+            }
+          }
+        }
       }
     }
+
   }
 }

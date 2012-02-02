@@ -1,90 +1,119 @@
 <%inherit file="main.html" />
 
 <%block name="headextra">
-  <script>
-  var loc=true; // Activate on clicks? Not if already clicked.
-  var lang=true;
-  $(function() {
-        $("#change_location").click(function() {
-           log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
+<script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.js"></script>
+<script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.stack.js"></script>
+<script language="javascript" type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.symbol.js"></script>
+<script>
+<%include file="profile_graphs.js"/>
+</script>
 
-           if(loc) {
-             $("#description").html('<div>'+
-                                    "Preferred format is city, state, country (so for us, "+
-                                    "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
-                                    "as much or as little detail as you want. </div>");
+<script>
+var loc=true; // Activate on clicks? Not if already clicked.
+var lang=true;
+$(function() {
+      $("#change_location").click(function() {
+         $(this).hide();
 
-             loc=false;
+         log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
 
-             $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
-                                     '<input type="button" id="change_loc_button" value="Change" />');
-             $("#change_loc_button").click(function() {
-                postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
-                  $("#location_sub").text(json.location);
-                  loc=true;
-                  $("#description").html("");
-                 log_event("profile", {"type":"location_change", "new":json.location});
-                });
-             });
-           }
-        });
+         if(loc) {
+           $("#description").html('<div>'+
+                                  "Preferred format is city, state, country (so for us, "+
+                                  "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
+                                  "as much or as little detail as you want. </div>");
 
-        $("#change_language").click(function() {
-           log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
+           loc=false;
 
-           if(lang) {
-             lang=false;
-             $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
-                                     '<input type="button" id="change_lang_button" value="Change" />');
-             $("#change_lang_button").click(function() {
-                postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
-                  $("#language_sub").text(json.language);
-                  lang=true;
-                  $("#description").html("");
-                 log_event("profile", {"type":"language_change", "new":json.language});
-                });
-             });
-           }
-        });
+           $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
+                                   '<input type="button" id="change_loc_button" value="Change" />');
+           $("#change_loc_button").click(function() {
+             $("#change_location").show();
 
-        $('#change_password').click(function(){
-          $('.modal').trigger('click');
-          log_event("profile", {"type":"password_show"});
-        });
-
-      $('#pwd_reset_button').click(function() {
-        $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
-                      "email"  : $('#id_email').val()}, function(data){
-           $('#pwd_reset').html(data);
-           log_event("profile", {"type":"password_send"});
-        });
+              postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
+                $("#location_sub").text(json.location);
+                loc=true;
+                $("#description").html("");
+               log_event("profile", {"type":"location_change", "new":json.location});
+              });
+           });
+         }
       });
-  });
 
-  </script>
+      $("#change_language").click(function() {
+         $(this).hide();
+         log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
 
-  <script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.js"></script>
-  <script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.stack.js"></script>
-  <script language="javascript" type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.symbol.js"></script>
-  <script>
-  <%include file="profile_graphs.js"/>
-  </script>
+         if(lang) {
+           lang=false;
+           $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
+                                   '<input type="button" id="change_lang_button" value="Change" />');
+           $("#change_lang_button").click(function() {
+             $("#change_language").show();
+              postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
+                $("#language_sub").text(json.language);
+                lang=true;
+                $("#description").html("");
+               log_event("profile", {"type":"language_change", "new":json.language});
+              });
+           });
+         }
+      });
+
+      $('#change_password').click(function(){
+        $('.modal').trigger('click');
+        log_event("profile", {"type":"password_show"});
+      });
+
+    $('#pwd_reset_button').click(function() {
+      $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
+                    "email"  : $('#id_email').val()}, function(data){
+         $('#pwd_reset').html(data);
+         log_event("profile", {"type":"password_send"});
+      });
+    });
+});
+</script>
 </%block>
-    
-
 
 
 <%include file="navigation.html" />
 
 <section class="main-content">
   <div class="profile-wrapper">
+
+    <section class="course-info">
+      <h1>Course Progress</h1>
+
+      <div id="grade-detail-graph" style="width:650px;height:200px;"></div>
+      <!-- <div id="grade-overview-graph" style="width:650px;height:130px;"></div> -->
+
+      <ol>
+        % for hw in homeworks:
+        <li>
+          <h2>${ hw['chapter'] }</h2>
+
+          <div class="scores">
+            <h3>${ hw['section'] }</h3>
+
+            <ul>
+              % for score in hw['scores']:
+              <li>${ score[0] }/${ score[1] }</li>
+              % endfor
+            </ul>
+          </div>
+        </li>
+        % endfor
+      </ol>
+    </section>
+
     <section class="user-info">
 
       <h1>${name}</h1>
 
       <ul>
-        <li>Forum name: ${username}</li>
-        <li>E-mail: ${email}</li>
+        <li>Forum name: <strong>${username}</strong></li>
+        <li>E-mail: <strong>${email}</strong></li>
         <li>
           Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Change</a>
         </li>
@@ -96,37 +125,16 @@
       <!-- <div><a class="modal" href="#change_password_pop">Reset password</a></div> -->
 
       <div id="change_password_pop">
-        <h2>Password reset</h2>
-        <p>We'll e-mail you a password reset link at ${email}. Follow the link in the email to reset your password.</p>
+        <h2>Password change</h2>
+        <p>We'll e-mail you a password reset link at ${email}. Follow
+        the link in the confirmation email to change your
+        password.</p>
 
         <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
         <input type="submit" id="pwd_reset_button" value="Reset Password" />
       </div>
 
     </section>
-
-    <section class="course-info">
-      <h1>Course Progress</h1>
-    
-    <div id="grade-detail-graph" style="width:650px;height:200px;"></div>
-    <!-- <div id="grade-overview-graph" style="width:650px;height:130px;"></div> -->
-    
-      <!-- <div id="description"></div> -->
-
-      <ol>
-        % for hw in homeworks:
-        <li>
-          <h2>${ hw['chapter'] }</h2>
-          <h3>${hw['format']} - ${ hw['section'] } ${"({0}/{1})".format( hw['section_total'][0], hw['section_total'][1] )}</h3> 
-
-          <ul>
-            % for score in hw['scores']:
-            <li>${ score[0] }/${ score[1] }</li>
-            % endfor
-          </ul>
-        </li>
-        % endfor
-      </ol>
-    </section>
   </div>
 </section>
+

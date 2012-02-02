@@ -5,11 +5,14 @@
 
   <!--link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" /-->
   <link rel="stylesheet" href="/static/css/marketing.css" type="text/css" media="all" />
+  <!--[if lt IE 8]>
+  <link rel="stylesheet" href="/static/css/marketing-ie.css" type="text/css" media="all" />
+  <![endif]-->
 
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
 
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery.leanModal.min.js"></script>
+  <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script>
   <!--script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script-->
   <!--script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script-->
   <!--script type="text/javascript" src="/static/js/video_player.js"></script-->
@@ -19,11 +22,11 @@
   <script src="/static/js/html5shiv.js"></script>
   <![endif]-->
 
-	<script type="text/javascript">
-		$(function(){
-			$("a[rel*=leanModal]").leanModal();
-		});
-	</script>
+  <script type="text/javascript">
+    $(function(){
+      $("a[rel*=leanModal]").leanModal();
+    });
+  </script>
 
 <%block name="headextra"/>
 
@@ -72,8 +75,8 @@ function postJSON(url, data, callback) {
 
     <%block name="header_text">
       <section>
-        <h1>MITx</h1>
-        <h2>An MIT Education Anywhere. For free.</h2>
+        <h1><em>MITx</em></h1>
+        <h2>MIT&rsquo;s new online learning initiative</h2>
       </section>
      </%block>
     </div>
@@ -106,7 +109,8 @@ function postJSON(url, data, callback) {
 $(document).ready(function(){
     /* Handles when the user tries to log in. Grabs form data. Does AJAX.
        Either shows error, or redirects. */
-  $('#login_button').click(function() {
+  $('form#login_form').submit(function(e) {
+    e.preventDefault();
     var submit_data={};
     $.each($("[id^=li_]"), function(index,value){
       submit_data[value.name]=value.value;
@@ -125,11 +129,21 @@ $(document).ready(function(){
     );
   });
 
-  $('#pwd_reset_button').click(function() {
-    $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
-      "email"  : $('#id_email').val()}, function(data){
-        $('#pwd_reset').html(data);
-    });
+
+  $('form#pwd_reset_form').submit(function(e) {
+    e.preventDefault();
+    var submit_data = {};
+    submit_data['email'] = $('#id_email').val();
+    postJSON('/password_reset/',
+      submit_data,
+      function(json){
+        if (json.success) {
+          $('#pwd_reset').html(json.value);
+        } else {
+          $('#pwd_error').html(json.error);
+        }
+      }
+    );
   });
 
 });

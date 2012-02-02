@@ -3,7 +3,6 @@ section.course-content {
   div.video-wrapper {
     float: left;
     width: flex-grid(6, 9);
-
     margin-right: flex-gutter(9);
 
     div.video-player {
@@ -32,40 +31,114 @@ section.course-content {
       }
     }
 
-    section {
-      ul {
-        display: inline-block;
+    // ul {
+    //   float: left;
+
+    //   li {
+    //     margin-top: 5px;
+    //     display: inline-block;
+    //     cursor: pointer;
+    //     border: 0;
+    //     padding: 0;
+
+    //     div {
+    //       &:empty {
+    //         display: none;
+    //       }
+    //     }
+    //   }
+    // }
+
+    section.video-controls {
+      @extend .clearfix;
+      background: #333;
+      border: 1px solid #000;
+      color: #ccc;
+
+      div#slider {
+        @extend .clearfix;
+        @include border-radius(0);
+        @include box-shadow(inset 0 1px 0 #eee, 0 1px 0 #555);
+        background: #c2c2c2;
+        border: none;
+        border-bottom: 1px solid #000;
+        height: 20px;
+
+        a.ui-slider-handle {
+          @include border-radius(0);
+          background: $mit-red url(/static/images/slider-handle.png) center center no-repeat;
+          border: 0;
+          border-right: 1px solid darken($mit-red, 20%);
+          border-left: 1px solid darken($mit-red, 20%);
+          cursor: pointer;
+          height: 20px;
+          margin: 0;
+          top: 0;
+          width: 20px;
+        }
+      }
+
+      ul.vcr {
+        float: left;
+        margin-right: lh();
 
         li {
-          margin-top: 5px;
-          display: inline-block;
-          cursor: pointer;
-          border: 0;
-          padding: 0;
+          float: left;
 
-          div {
-            &:empty {
-              display: none;
+          a {
+            @include box-shadow(1px 0 0 #555);
+            border-right: 1px solid #000;
+            display: block;
+            cursor: pointer;
+            height: 14px;
+            padding: lh(.75) lh();
+            text-indent: -9999px;
+            width: 14px;
+
+            &.play {
+              background: url('/static/images/play-icon.png') center center no-repeat;
+
+              &:hover {
+                background-color: #444;
+              }
+            }
+
+            &.pause {
+              background: url('/static/images/pause-icon.png') center center no-repeat;
+
+              &:hover {
+                background-color: #444;
+              }
             }
           }
         }
       }
 
-      div#slider {
-        margin: -14px 0 10px 60px;
-      }
-
       div#vidtime {
         float: left;
+        font-weight: bold;
+        line-height: 46px; //height of play pause buttons
+        -webkit-font-smoothing: antialiased;
       }
 
-      div#video_speeds {
+      div.speeds {
         float: right;
-        cursor: pointer;
+        line-height: 46px; //height of play pause buttons
+        margin-right: lh();
+        -webkit-font-smoothing: antialiased;
 
-        span {
-          &:hover {
-            color: $mit-red;
+        div#video_speeds {
+          @include inline-block();
+          font-weight: bold;
+
+          span {
+            @include inline-block();
+            cursor: pointer;
+            margin-bottom: 0;
+
+            &:hover {
+              color: $mit-red;
+            }
           }
         }
       }
@@ -75,6 +148,8 @@ section.course-content {
   ol.subtitles {
     float: left;
     width: flex-grid(3, 9);
+    height: 530px;
+    overflow: hidden;
 
     li {
       margin-bottom: 0px;

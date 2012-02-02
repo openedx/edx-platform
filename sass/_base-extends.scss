@@ -39,6 +39,7 @@
 
 .content {
   @include box-sizing(border-box);
+  @include box-shadow(inset 0 0 2px 3px #f3f3f3);
   display: table-cell;
   padding: lh();
   vertical-align: top;
@@ -46,8 +47,9 @@
 }
 
 .sidebar {
-  @include box-shadow( inset -1px 0 0 #f6f6f6);
+  @include box-shadow( inset 0 0 0 1px #f6f6f6);
   @include box-sizing(border-box);
+  @include border-radius(4px 0 0 4px);
   background: #e3e3e3;
   border-right: 1px solid #d3d3d3;
   display: table-cell;
@@ -106,6 +108,7 @@
   margin: (-$body-line-height) (-$body-line-height) $body-line-height;
   font-size: 12px;
   text-shadow: 0 1px 0 #fff;
+  @include box-shadow(inset 0 1px 0 #fff, inset 1px 0 0 #fff);
   @extend .clearfix;
 
   a {

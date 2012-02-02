@@ -10,7 +10,7 @@ div.question-controls {
 
   div.question-count {
     margin-right: flex-gutter();
-    width: flex-grid(5.5,9);
+    width: flex-grid(5,9);
 
     h1 {
       margin-top: 0;
@@ -19,7 +19,7 @@ div.question-controls {
 
   div.question-sort {
     vertical-align: bottom;
-    width: flex-grid(3.5,9);
+    width: flex-grid(4,9);
 
     nav {
       @include border-radius(35px);
@@ -28,10 +28,14 @@ div.question-controls {
       float: right;
       font-size: 16px;
       margin: 3px 0;
-      padding: 0 20px;
+      padding:0px 20px 5px;
 
       a {
-        color: darken(#F6EFD4, 50%);
+        color: darken(#F6EFD4, 50%); 
+
+        &.on span{
+          font-weight: bold;
+        }
 
         &:before {
           content: '|';
@@ -74,10 +78,6 @@ ul.question-list {
           font-weight: normal;
           margin: 0px 0 15px 0;
           text-transform: none;
-
-          a {
-            color: #000;
-          }
         }
 
         div.user-info {
@@ -157,4 +157,3 @@ div.search-tips {
 
 .search-result-summary {
 }
-

@@ -10,13 +10,13 @@ ul.tags {
     display: inline;
     font-size: 12px;
     margin-left: 15px;
-    padding: 5px 10px 5px 5px;
+    padding: 3px 10px 5px 5px;
 
     &:before {
      content:"";
      position:absolute;
      top:0;
-     left:-12px;
+     left:-11px;
      width:0;
      height:0;
      border-color:transparent #eee transparent transparent;

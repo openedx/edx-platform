@@ -8,19 +8,26 @@
   </div>
 
   <section class="video-controls">
-       <ul>
-        <li><span class="ui-icon ui-icon-play" onclick="play();"></span></li>
-        <li><span class="ui-icon ui-icon-pause" onclick="pause();"></span></li>
-      </ul>
     <div id="slider"></div>
-    <div id="vidtime">0:00/0:00</div>
-    <div id="video_speeds"></div>
+
+    <section>
+      <ul class="vcr">
+        <li><a class="play" onclick="play();">Play</a></li>
+        <li><a class="pause" onclick="pause();">Pause</a></li>
+      </ul>
+
+      <div id="vidtime">0:00/0:00</div>
+
+      <div class="speeds">
+        Speed: <div id="video_speeds"></div>
+      </div>
+    </section>
   </section>
 
 </div>
 
 <ol class="subtitles">
-  <li id="stt_n5"><div id="std_n7" onclick="title_seek(-7);"></div></li>
+  <!-- <li id="stt_n5"><div id="std_n7" onclick="title_seek(-7);"></div></li> -->
   <li id="stt_n4"><div id="std_n6" onclick="title_seek(-6);"></div></li>
   <li id="stt_n4"><div id="std_n5" onclick="title_seek(-5);"></div></li>
   <li id="stt_n4"><div id="std_n4" onclick="title_seek(-4);"></div></li>
@@ -35,5 +42,5 @@
   <li id="stt_p5"><div id="std_p5" onclick="title_seek( 5);"></div></li>
   <li id="stt_p6"><div id="std_p7" onclick="title_seek( 6);"></div></li>
   <li id="stt_p6"><div id="std_p7" onclick="title_seek( 7);"></div></li>
-  <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li>
+  <!-- <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li> -->
 </ol>

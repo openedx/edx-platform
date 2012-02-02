@@ -21,7 +21,13 @@ form#wiki_revision {
   }
 
   #submit_delete {
+    @include box-shadow(none);
+    background: none;
+    border: none;
+    color: #999;
     float: right;
+    text-decoration: underline;
+    font-weight: normal;
   }
   
   input[type="submit"] {
@@ -32,18 +38,25 @@ form#wiki_revision {
 #wiki_edit_instructions {
   float: left;
   width: flex-grid(3, 9);
+  margin-top: lh();
+  color: #666;
+
+  &:hover {
+    color: #333;
+  }
 
   .markdown-example {
-    background-color: $light-gray;
-    padding-top: 5px;
-    padding-right: 2px;
-    padding-bottom: 5px;
-    padding-left: 5px;
-        
-    margin-top: 5px;
-    margin-bottom: 7px;
-    margin-left: 5px;
-        
+    background-color: #e3e3e3;
+    text-shadow: 0 1px 0 #fff;
+
+    padding: {
+      top: 5px;
+      right: 2px;
+      bottom: 5px;
+      left: 5px;
+    }
+
+    margin: 5px 0 7px;
     line-height: 1.0;
   }
 }

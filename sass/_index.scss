@@ -237,6 +237,40 @@ section.index-content {
           }
         }
 
+        &.intro {
+          section {
+            margin-bottom: 0;
+
+            &.intro-text {
+              margin-right: flex-gutter(8);
+              width: flex-grid(4, 8);
+
+              p {
+                margin-right: 0;
+                width: auto;
+                float: none;
+              }
+            }
+
+            &.intro-video {
+              width: flex-grid(4, 8);
+
+              a {
+                display: block;
+                width: 100%;
+
+                img {
+                  width: 100%;
+                }
+
+                span {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
+
         &.features {
           border-top: 1px solid #E5E5E5;
           padding-top: lh();
@@ -247,6 +281,10 @@ section.index-content {
             letter-spacing: 1px;
             color: #666;
             margin-bottom: lh();
+
+            span {
+              text-transform: none;
+            }
           }
 
           p {
@@ -354,7 +392,7 @@ section.index-content {
 
         &.requirements {
           clear: both;
-          width: auto;
+          width: 100%;
           border-top: 1px solid #E5E5E5;
           padding-top: lh();
           margin-bottom: 0;
