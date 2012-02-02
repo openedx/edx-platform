@@ -906,7 +906,6 @@ cktsim = (function() {
 	// scale factors (eg, 1k = 1000.0 = 1e3).
 	// return default if argument couldn't be interpreted as a number
 	function parse_number(s,default_v) {
-	    s = s.toLowerCase();  // make life simple for ourselves
 	    var slen = s.length;
 	    var multiplier = 1;
 	    var result = 0;
@@ -929,18 +928,20 @@ cktsim = (function() {
 	    else if (s.charAt(index) == '0') {
 		index += 1;
 		if (index >= slen) return 0;
-		if (s.charAt(index) == 'x') { // hex
+		if (s.charAt(index) == 'x' || s.charAt(index) == 'X') { // hex
 		    while (true) {
 			index += 1;
 			if (index >= slen) break;
 			if (s.charAt(index) >= '0' && s.charAt(index) <= '9')
 			    result = result*16 + ord(s.charAt(index)) - ord('0');
+			else if (s.charAt(index) >= 'A' && s.charAt(index) <= 'F')
+			    result = result*16 + ord(s.charAt(index)) - ord('A') + 10;
 			else if (s.charAt(index) >= 'a' && s.charAt(index) <= 'f')
 			    result = result*16 + ord(s.charAt(index)) - ord('a') + 10;
 			else break;
 		    }
 		    return result*multiplier;
-		} else if (s.charAt(index) == 'b') {  // binary
+		} else if (s.charAt(index) == 'b' || s.charAt(index) == 'B') {  // binary
 		    while (true) {
 			index += 1;
 			if (index >= slen) break;
@@ -997,7 +998,7 @@ cktsim = (function() {
 	    if (index < slen) {
 		var scale = s.charAt(index);
 		index += 1;
-		if (scale == 'e') {
+		if (scale == 'e' || scale == 'E') {
 		    var exponent = 0;
 		    multiplier = 10.0;
 		    if (index < slen) {
@@ -1017,21 +1018,15 @@ cktsim = (function() {
 			exponent -= 1;
 			result *= multiplier;
 		    }
-		} else if (scale == 't') result *= 1e12;
-		else if (scale == 'g') result *= 1e9;
-		else if (scale == 'k') result *= 1e3;
-		else if (scale == 'u') result *= 1e-6;
-		else if (scale == 'n') result *= 1e-9;
-		else if (scale == 'p') result *= 1e-12;
-		else if (scale == 'f') result *= 1e-15;
-		else if (scale == 'm') {
-		    if (index+1 < slen) {
-			if (s.charAt(index) == 'e' && s.charAt(index+1) == 'g')
-			    result *= 1e6;
-			else if (s.charAt(index) == 'i' && s.charAt(index+1) == 'l')
-			    result *= 25.4e-6;
-		    } else result *= 1e-3;
-		}
+		} else if (scale == 't' || scale == 'T') result *= 1e12;
+		else if (scale == 'g' || scale == 'G') result *= 1e9;
+		else if (scale == 'M') result *= 1e6;
+		else if (scale == 'k' || scale == 'K') result *= 1e3;
+		else if (scale == 'm') result *= 1e-3;
+		else if (scale == 'u' || scale == 'U') result *= 1e-6;
+		else if (scale == 'n' || scale == 'N') result *= 1e-9;
+		else if (scale == 'p' || scale == 'P') result *= 1e-12;
+		else if (scale == 'f' || scale == 'F') result *= 1e-15;
 	    }
 	    // ignore any remaining chars, eg, 1kohms returns 1000
 	    return result;
