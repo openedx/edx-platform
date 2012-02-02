@@ -135,7 +135,38 @@ def profile(request):
     lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
     
     midterm_score = (130, 150)
+    midterm_percentage = midterm_score[0] / float(midterm_score[1])
+    
     final_score = (225, 300)
+    final_percentage = final_score[0] / float(final_score[1])
+    
+    grade_summary = [
+        {
+            'category': 'Homework',
+            'subscores' : homework_percentages,
+            'dropped_indices' : homework_dropped_indices,
+            'totalscore' : {'score' : homework_total, 'summary' : "Homework Average - {:.0%}".format(homework_total)},
+            'weight' : 0.15,
+        },
+        {
+            'category': 'Labs',
+            'subscores' : lab_percentages,
+            'dropped_indices' : lab_dropped_indices,
+            'totalscore' : {'score' : lab_total, 'summary' : "Lab Average - {:.0%}".format(lab_total)},
+            'weight' : 0.15,
+        },
+        {
+            'category': 'Midterm',
+            'totalscore' : {'score' : midterm_percentage, 'summary' : "Midterm - {:.0%} ({}/{})".format(midterm_percentage, midterm_score[0], midterm_score[1])},
+            'weight' : 0.30,
+        },
+        {
+            'category': 'Final',
+            'totalscore' : {'score' : final_percentage, 'summary' : "Final - {:.0%} ({}/{})".format(final_percentage, final_score[0], final_score[1])},
+            'weight' : 0.40,
+        }
+    ]
+    
     
     user_info=UserProfile.objects.get(user=request.user)
     context={'name':user_info.name,
@@ -144,14 +175,7 @@ def profile(request):
              'language':user_info.language,
              'email':request.user.email,
              'homeworks':hw,
-             'homework_percentages' : homework_percentages,
-             'homework_total' : homework_total,
-             'homework_dropped_indices' : homework_dropped_indices,
-             'lab_percentages' : lab_percentages,
-             'lab_total' : lab_total,
-             'lab_dropped_indices' : lab_dropped_indices,
-             'midterm_score' : midterm_score,
-             'final_score' : final_score,
+             'grade_summary' : grade_summary,
              'csrf':csrf(request)['csrf_token']
              }
     return render_to_response('profile.html', context)
