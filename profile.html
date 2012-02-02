@@ -64,8 +64,9 @@ var loc=true; // Activate on clicks? Not if already clicked.
 var lang=true;
 $(function() {
       $("#change_location").click(function() {
+         $(this).hide();
+
          log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
-         $("#change-location").hide();
 
          if(loc) {
            $("#description").html('<div>'+
@@ -78,7 +79,8 @@ $(function() {
            $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
                                    '<input type="button" id="change_loc_button" value="Change" />');
            $("#change_loc_button").click(function() {
-             $("#change-location").show();
+             $("#change_location").show();
+
               postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
                 $("#location_sub").text(json.location);
                 loc=true;
@@ -90,6 +92,7 @@ $(function() {
       });
 
       $("#change_language").click(function() {
+         $(this).hide();
          log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
 
          if(lang) {
@@ -97,6 +100,7 @@ $(function() {
            $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
                                    '<input type="button" id="change_lang_button" value="Change" />');
            $("#change_lang_button").click(function() {
+             $("#change_language").show();
               postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
                 $("#language_sub").text(json.language);
                 lang=true;

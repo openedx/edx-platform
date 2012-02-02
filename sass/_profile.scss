@@ -23,11 +23,29 @@ div.profile-wrapper {
         @include box-shadow(0 1px 0 #eee);
         padding: 7px lh();
         border-bottom: 1px solid #d3d3d3;
+
+        div#location_sub, div#language_sub {
+          font-weight: bold;
+          @include inline-block();
+
+          input {
+            margin: lh(.5) 0;
+          }
+
+          &:empty {
+            padding: 0;
+          }
+        }
+
+        div#description {
+          font-size: 12px;
+        }
       }
     }
 
     div#change_password_pop {
       padding: 7px lh();
+      color: #4D4D4D;
     }
   }
 
