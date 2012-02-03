@@ -1,5 +1,9 @@
 <%inherit file="main.html" />
 
+<%!
+    from django.core.urlresolvers import reverse
+%>
+
 <%block name="headextra">
 <script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="${ settings.LIB_URL }flot/jquery.flot.stack.js"></script>
@@ -86,16 +90,27 @@ $(function() {
       <h1>Course Progress</h1>
 
       <div id="grade-detail-graph" style="width:650px;height:200px;"></div>
-      <!-- <div id="grade-overview-graph" style="width:650px;height:130px;"></div> -->
-
+      <div id="grade-overview-graph" style="width:650px;height:130px;"></div>
+      
       <ol>
+        <%
+        lastChapter = None
+        %>
         % for hw in homeworks:
         <li>
-          <h2>${ hw['chapter'] }</h2>
+          %if hw['chapter'] != lastChapter:
+          <h2><a href="${reverse('courseware_chapter', args=format_url_params([hw['course'], hw['chapter']])) }">
+          ${ hw['chapter'] }</a></h2>
+          <% lastChapter = hw['chapter'] %>
+          %else:
+          <h2>-</h2>
+          %endif
 
           <div class="scores">
-            <h3>${ hw['section'] } ${"({0}/{1})".format( hw['section_total'][0], hw['section_total'][1] )}</h3>
-
+            <h3><a href="${reverse('courseware_section', args=format_url_params([hw['course'], hw['chapter'], hw['section']])) }">
+            ${ hw['section'] }</a> ${"({0}/{1})".format( hw['section_total'][0], hw['section_total'][1] )}</h3>
+            
+            
             <ul>
               % for score in hw['scores']:
               <li>${ score[0] }/${ score[1] }</li>
