@@ -93,8 +93,10 @@ $(function () {
                   {yaxis: {from: 0.6, to: 0.7 }, color: "#FFF2E3"}, ] },
     legend: {show: false},
   };
-
-  $.plot($("#grade-detail-graph"), series, options);
+  
+  if ($("#grade-detail-graph").length > 0) {
+    $.plot($("#grade-detail-graph"), series, options);
+  }
       
   var previousPoint = null;
   $("#grade-detail-graph").bind("plothover", function (event, pos, item) {
@@ -167,36 +169,37 @@ $(function () {
   };
 
   var $gradeOverviewGraph = $("#grade-overview-graph");
-  var plot = $.plot($gradeOverviewGraph, series, options);
+  if ($gradeOverviewGraph.length > 0) {
+    var plot = $.plot($gradeOverviewGraph, series, options);
+  
+    //Put the percent on the graph
+    var o = plot.pointOffset({x: ${totalScore}, y: 1 });
+    $gradeOverviewGraph.append('<div style="position:absolute;left:' + (o.left + 4) + 'px;top:' + (o.top - 10) + 'px">${"{:.0%}".format(totalScore)}</div>');
       
-  //Put the percent on the graph
-  var o = plot.pointOffset({x: ${totalScore}, y: 1 });
-  $gradeOverviewGraph.append('<div style="position:absolute;left:' + (o.left + 4) + 'px;top:' + (o.top - 10) + 'px">${"{:.0%}".format(totalScore)}</div>');
       
-      
-  $("#grade-overview-graph").bind("plothover", function (event, pos, item) {
-    $("#x").text(pos.x.toFixed(2));
-    $("#y").text(pos.y.toFixed(2));
-    if (item) {
-      if (previousPoint != (item.dataIndex, item.seriesIndex)) {
-        previousPoint = (item.dataIndex, item.seriesIndex);
+    $gradeOverviewGraph.bind("plothover", function (event, pos, item) {
+      $("#x").text(pos.x.toFixed(2));
+      $("#y").text(pos.y.toFixed(2));
+      if (item) {
+        if (previousPoint != (item.dataIndex, item.seriesIndex)) {
+          previousPoint = (item.dataIndex, item.seriesIndex);
             
-        $("#tooltip").remove();
+          $("#tooltip").remove();
             
-        if (item.series.label in overview_tooltips) {
-          var series_tooltips = overview_tooltips[item.series.label];
-          if (item.dataIndex < series_tooltips.length) {
-            var x = item.datapoint[0].toFixed(2), y = item.datapoint[1].toFixed(2);
+          if (item.series.label in overview_tooltips) {
+            var series_tooltips = overview_tooltips[item.series.label];
+            if (item.dataIndex < series_tooltips.length) {
+              var x = item.datapoint[0].toFixed(2), y = item.datapoint[1].toFixed(2);
                 
-            showTooltip(item.pageX, item.pageY, series_tooltips[item.dataIndex]);
+              showTooltip(item.pageX, item.pageY, series_tooltips[item.dataIndex]);
+            }
           }
-        }
 
+        }
+      } else {
+        $("#tooltip").remove();
+        previousPoint = null;            
       }
-    } else {
-      $("#tooltip").remove();
-      previousPoint = null;            
-    }
-  });
-      
+    });
+  }
 });
