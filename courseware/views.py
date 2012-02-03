@@ -67,7 +67,7 @@ def profile(request):
                             correct=response.grade
                     
                     total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
-                    scores.append((int(correct),total, ( True if s.get('graded') == "True" else False ) ))
+                    scores.append((int(correct),total, ( True if s.get('graded') == "true" else False ) ))
                     
                     
                 section_total = (sum([score[0] for score in scores]), 
