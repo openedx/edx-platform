@@ -328,6 +328,7 @@ LIVESETTINGS_OPTIONS = {
         'SETTINGS' : {
             'MIN_REP' : {
                 'MIN_REP_TO_VOTE_UP' : 1,
+                'MIN_REP_TO_UPLOAD_FILES' : 1,
             },
             'SOCIAL_SHARING' : {
                 'ENABLE_SHARING_TWITTER' : False,
