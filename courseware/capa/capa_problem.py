@@ -193,6 +193,12 @@ class LoncapaProblem(object):
 
         if problemtree.tag in html_transforms:
             tree.tag=html_transforms[problemtree.tag]['tag']
+            # Reset attributes. Otherwise, we get metadata in HTML
+            # (e.g. answers) 
+            # TODO: We should remove and not zero them.
+            # I'm not sure how to do that quickly with lxml
+            for k in tree.keys():
+                tree.set(k,"")
 
         # TODO: Fix. This loses Element().tail
         #if problemtree.tag in html_skip:
