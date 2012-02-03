@@ -107,10 +107,17 @@ $(function() {
 
           <div class="scores">
             <h3><a href="${reverse('courseware_section', args=format_url_params([hw['course'], hw['chapter'], hw['section']])) }">
-            ${ hw['section'] }</a> ${"({0}/{1})".format( hw['section_total'][0], hw['section_total'][1] )}</h3>
-            
+            <%
+            earned = hw['section_total'][0]
+            total = hw['section_total'][1]
+            percentageString = "{:.0%}".format( float(earned)/total) if earned > 0 else ""
+            %>
+            ${ hw['section'] }</a> ${"({}/{}) {}".format( earned, total, percentageString )}</h3>
             
             <ul>
+              %if len(hw['scores']) > 0:
+              Problem Scores:
+              %endif
               % for score in hw['scores']:
               <li>${ score[0] }/${ score[1] }</li>
               % endfor
