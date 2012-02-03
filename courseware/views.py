@@ -95,8 +95,10 @@ def profile(request):
     
     
     def totalWithDrops(scores, drop_count):
-        sorted_scores = sorted( enumerate(scores), key=lambda x: -x[1]['percentage'] ) #Note that this key will sort the list descending
-        dropped_indices = [score[0] for score in sorted_scores[-drop_count:]] # A list of the indices of the dropped scores
+        #Note that this key will sort the list descending
+        sorted_scores = sorted( enumerate(scores), key=lambda x: -x[1]['percentage'] )
+        # A list of the indices of the dropped scores
+        dropped_indices = [score[0] for score in sorted_scores[-drop_count:]] 
         aggregate_score = 0
         for index, score in enumerate(scores):
             if index not in dropped_indices:
@@ -176,16 +178,18 @@ def profile(request):
              'language':user_info.language,
              'email':request.user.email,
              'homeworks':hw,
+             'format_url_params' : format_url_params,
              'grade_summary' : grade_summary,
              'csrf':csrf(request)['csrf_token']
              }
     return render_to_response('profile.html', context)
 
+def format_url_params(params):
+    return [ urllib.quote(string.replace(' ','_')) for string in params ]
+
 def render_accordion(request,course,chapter,section):
     ''' Draws navigation bar. Takes current position in accordion as
         parameter. Returns (initialization_javascript, content)'''
-    def format_string(string):
-        return urllib.quote(string.replace(' ','_'))
 
     toc=content_parser.toc_from_xml(content_parser.course_file(request.user), chapter, section)
     active_chapter=1
@@ -195,7 +199,7 @@ def render_accordion(request,course,chapter,section):
     context=dict([['active_chapter',active_chapter],
                   ['toc',toc], 
                   ['course_name',course],
-                  ['format_string',format_string],
+                  ['format_url_params',format_url_params],
                   ['csrf',csrf(request)['csrf_token']]] + \
                      template_imports.items())
     return {'init_js':render_to_string('accordion_init.js',context), 
