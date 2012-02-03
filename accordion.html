@@ -1,3 +1,7 @@
+<%!
+    from django.core.urlresolvers import reverse
+%>
+
 <%def name="make_chapter(chapter)">
   <h3><a href="#">${chapter['name']}</a></h3>
 
@@ -9,7 +13,7 @@
           % endif
         >
 
-          <a href='/courseware/${format_string(course_name)}/${format_string(chapter['name'])}/${format_string(section['name'])}'>
+          <a href="${reverse('courseware_section', args=format_url_params([course_name, chapter['name'], section['name']]))}">
             <p>${section['name']}</p>
 
             <p class="subtitle">
