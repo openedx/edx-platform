@@ -17,13 +17,16 @@ class HtmlModule(XModule):
         return "html"
         
     def get_html(self):
-        if self.filename!=None:
-            return render_to_string(self.filename, {'id': self.item_id})
-        else: 
+        if self.filename==None:
             xmltree=etree.fromstring(self.xml)
             textlist=[xmltree.text]+[etree.tostring(i) for i in xmltree]+[xmltree.tail]
             textlist=[i for i in textlist if type(i)==str]
             return "".join(textlist)
+        try: 
+            filename=settings.DATA_DIR+"html/"+self.filename+".xml"
+            return open(filename).read()
+        except: # For backwards compatibility. TODO: Remove
+            return render_to_string(self.filename, {'id': self.item_id})
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
