@@ -137,11 +137,13 @@ def profile(request):
         lab_percentages.append( {'percentage': percentage, 'summary': summary} )
     lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
     
-    midterm_score = (120, 150)
-    midterm_percentage = midterm_score[0] / float(midterm_score[1])
     
-    final_score = (200, 300)
-    final_percentage = final_score[0] / float(final_score[1])
+    #TODO: Pull this data about the midterm and final from the databse. It should be exactly similar to above, but we aren't sure how exams will be done yet.
+    midterm_score = ('?', '?')
+    midterm_percentage = 0
+    
+    final_score = ('?', '?')
+    final_percentage = 0
     
     grade_summary = [
         {
