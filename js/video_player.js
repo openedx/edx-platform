@@ -48,6 +48,17 @@ function postJSON(url, data, callback) {
   });
 }
 
+function postJSONAsync(url, data, callback) {
+    $.ajax({type:'POST',
+	    url: url,
+		dataType: 'json',
+		data: data,
+		success: callback,
+		headers : {'X-CSRFToken':getCookie('csrftoken')},
+		async:true
+		});
+}
+
 // For easy embedding of CSRF in forms
 $(function() {
     $('#csrfmiddlewaretoken').attr("value", getCookie('csrftoken'))
@@ -212,7 +223,10 @@ function onPlayerStateChange(event) {
 
 var switched_tab = false; // switch to true when we destroy so we know to call onYouTubePlayerAPIReady()
 // clear pings to video status when we switch to a different sequence tab with ajax
-function videoDestroy() {
+function videoDestroy(id) {
+    postJSON('/modx/video/'+id+'/goto_position',
+	     {'position' :  ytplayer.getCurrentTime()});
+
     load_id = 0;
     clearInterval(updateytplayerInfoInterval);
     clearInterval(ajax_videoInterval);
@@ -318,6 +332,8 @@ function loadNewVideo(id, startSeconds) {
     catch(e) {
 	window['console'].log(JSON.stringify(e));
     }
+    $("#slider").slider("option","value",startSeconds);
+    //seekTo(startSeconds);
 }
 
 function cueNewVideo(id, startSeconds) {
