@@ -1,7 +1,9 @@
-import json
 import hashlib
+import json
 import logging
+import re
 
+from datetime import timedelta
 from lxml import etree
 from mako.template import Template
 from mako.lookup import TemplateLookup
@@ -19,6 +21,20 @@ TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
 
 log = logging.getLogger("mitx.courseware")
+
+
+timedelta_regex = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+
+def parse_timedelta(time_str):
+    parts = timedelta_regex.match(time_str)
+    if not parts:
+        return
+    parts = parts.groupdict()
+    time_params = {}
+    for (name, param) in parts.iteritems():
+        if param:
+            time_params[name] = int(param)
+    return timedelta(**time_params)
 
 def fasthash(string):
     m = hashlib.new("md4")
@@ -98,7 +114,7 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
     child (A) already has that attribute, A will keep the same attribute and
     all of A's children will inherit A's attribute. This is a recursive call.'''
     
-    if (parent_attribute == None): #This is the entry call. Select all due elements
+    if (parent_attribute == None): #This is the entry call. Select all elements with this attribute
         all_attributed_elements = element.xpath("//*[@" + attribute_name +"]")
         for attributed_element in all_attributed_elements:
             attribute_value = attributed_element.get(attribute_name)
@@ -106,7 +122,7 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
                 propogate_downward_tag(child_element, attribute_name, attribute_value)
     else:
         '''The hack below is because we would get _ContentOnlyELements from the
-        iterator that can't have due dates set. We can't find API for it. If we
+        iterator that can't have attributes set. We can't find API for it. If we
         ever have an element which subclasses BaseElement, we will not tag it'''
         if not element.get(attribute_name) and type(element) == etree._Element:
             element.set(attribute_name, parent_attribute)
@@ -133,6 +149,7 @@ def course_file(user):
     id_tag(tree)
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")
+    propogate_downward_tag(tree, "graceperiod")
     return tree
 
 def module_xml(coursefile, module, id_tag, module_id):
@@ -170,7 +187,7 @@ def toc_from_xml(dom, active_chapter, active_section):
             sections.append({'name':s.get("name") or "", 
                              'time':s.get("time") or "", 
                              'format':s.get("format") or "", 
-                             'due':s.get("due") or "",
+                             'due':s.get("display_due_date") or "",
                              'active':(c.get("name")==active_chapter and \
                                            s.get("name")==active_section)})
         ch.append({'name':c.get("name"), 

@@ -119,18 +119,26 @@ class LoncapaModule(XModule):
 
         self.attempts = 0
         self.max_attempts = None
-        self.due_date = None
-
+        
         dom2 = etree.fromstring(xml)
 
         self.explanation=content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
         self.explain_available=content_parser.item(dom2.xpath('/problem/@explain_available'))
 
-        self.due_date=content_parser.item(dom2.xpath('/problem/@due'))
-        if len(self.due_date)>0:
-            self.due_date=dateutil.parser.parse(self.due_date)
+        display_due_date_string=content_parser.item(dom2.xpath('/problem/@due'))
+        if len(display_due_date_string)>0:
+            self.display_due_date=dateutil.parser.parse(display_due_date_string)
         else:
-            self.due_date=None
+            self.display_due_date=None
+        
+        
+        grace_period_string = content_parser.item(dom2.xpath('/problem/@graceperiod'))
+        if len(grace_period_string)>0 and self.display_due_date:
+            self.grace_period = content_parser.parse_timedelta(grace_period_string)
+            self.close_date = self.display_due_date + self.grace_period
+        else:
+            self.grace_period = None
+            self.close_date = self.display_due_date
             
         self.max_attempts=content_parser.item(dom2.xpath('/problem/@attempts'))
         if len(self.max_attempts)>0:
@@ -166,7 +174,7 @@ class LoncapaModule(XModule):
     def handle_ajax(self, dispatch, get):
         if dispatch=='problem_get':
             response = self.get_problem(get)
-        elif False: #self.due_date > 
+        elif False: #self.close_date > 
             return json.dumps({"error":"Past due date"})
         elif dispatch=='problem_check': 
             response = self.check_problem(get)
@@ -184,7 +192,7 @@ class LoncapaModule(XModule):
         ''' Is the student still allowed to submit answers? '''
         if self.attempts == self.max_attempts:
             return True
-        if self.due_date != None and datetime.datetime.utcnow() > self.due_date:
+        if self.close_date != None and datetime.datetime.utcnow() > self.close_date:
             return True
 
         return False
