@@ -13,6 +13,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.template import Context, loader
 from mitxmako.shortcuts import render_to_response, render_to_string
+#from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import connection
 
 from lxml import etree

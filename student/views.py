@@ -15,6 +15,7 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 from models import Registration, UserProfile
+from django_future.csrf import ensure_csrf_cookie
 
 log = logging.getLogger("mitx.user")
 
@@ -24,7 +25,7 @@ def csrf_token(context):
         return ''
     return u'<div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token)
 
-
+@ensure_csrf_cookie
 def index(request):
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect('/courseware')
@@ -44,6 +45,7 @@ def index(request):
 #                                                  'csrf': csrf_token }) 
 
 # Need different levels of logging
+@ensure_csrf_cookie
 def login_user(request, error=""):
     if 'email' not in request.POST or 'password' not in request.POST:
         return render_to_response('login.html', {'error':error.replace('+',' ')})
@@ -83,11 +85,13 @@ def login_user(request, error=""):
     return HttpResponse(json.dumps({'success':False, 
                                     'error': 'Account not active. Check your e-mail.'}))
 
+@ensure_csrf_cookie
 def logout_user(request):
     logout(request)
 #    print len(connection.queries), connection.queries
     return redirect('/')
 
+@ensure_csrf_cookie
 def change_setting(request):
     if not request.user.is_authenticated():
         return redirect('/')
@@ -104,6 +108,7 @@ def change_setting(request):
                                     'language':up.language,
                                     'location':up.location,}))
 
+@ensure_csrf_cookie
 def create_account(request, post_override=None):
     js={'success':False}
     
@@ -221,6 +226,7 @@ def create_random_account(create_account_function):
 if settings.GENERATE_RANDOM_USER_CREDENTIALS:
     create_account = create_random_account(create_account)
 
+@ensure_csrf_cookie
 def activate_account(request, key):
     r=Registration.objects.filter(activation_key=key)
     if len(r)==1:
@@ -232,6 +238,7 @@ def activate_account(request, key):
         return render_to_response("activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
     return HttpResponse("Unknown error. Please e-mail us to let us know how it happened.")
 
+@ensure_csrf_cookie
 def password_reset(request):
     ''' Attempts to send a password reset e-mail. '''
     if request.method != "POST":
