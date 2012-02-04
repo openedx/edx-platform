@@ -101,8 +101,6 @@ def profile(request):
                        }
                 hw.append(score)
     
-    
-    
     def totalWithDrops(scores, drop_count):
         #Note that this key will sort the list descending
         sorted_scores = sorted( enumerate(scores), key=lambda x: -x[1]['percentage'] )
@@ -123,11 +121,11 @@ def profile(request):
     for i in range(12):
         if i < len(homework_scores):
             percentage = homework_scores[i][0] / float(homework_scores[i][1])
-            summary = "{:.0%} ({}/{})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
+            summary = "{0:.0%} ({1}/{2})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
         else:
             percentage = 0
             summary = "0% (?/?)"
-        summary = "Homework {} - {}".format(i + 1, summary)
+        summary = "Homework {0} - {1}".format(i + 1, summary)
         
         homework_percentages.append( {'percentage': percentage, 'summary': summary} )
     homework_total, homework_dropped_indices = totalWithDrops(homework_percentages, 2)
@@ -138,11 +136,11 @@ def profile(request):
     for i in range(12):
         if i < len(lab_scores):
             percentage = lab_scores[i][0] / float(lab_scores[i][1])
-            summary = "{:.0%} ({}/{})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
+            summary = "{0:.0%} ({1}/{2})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
         else:
             percentage = 0
             summary = "0% (?/?)"
-        summary = "Lab {} - {}".format(i + 1, summary)
+        summary = "Lab {0} - {1}".format(i + 1, summary)
         lab_percentages.append( {'percentage': percentage, 'summary': summary} )
     lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
     
@@ -159,24 +157,24 @@ def profile(request):
             'category': 'Homework',
             'subscores' : homework_percentages,
             'dropped_indices' : homework_dropped_indices,
-            'totalscore' : {'score' : homework_total, 'summary' : "Homework Average - {:.0%}".format(homework_total)},
+            'totalscore' : {'score' : homework_total, 'summary' : "Homework Average - {0:.0%}".format(homework_total)},
             'weight' : 0.15,
         },
         {
             'category': 'Labs',
             'subscores' : lab_percentages,
             'dropped_indices' : lab_dropped_indices,
-            'totalscore' : {'score' : lab_total, 'summary' : "Lab Average - {:.0%}".format(lab_total)},
+            'totalscore' : {'score' : lab_total, 'summary' : "Lab Average - {0:.0%}".format(lab_total)},
             'weight' : 0.15,
         },
         {
             'category': 'Midterm',
-            'totalscore' : {'score' : midterm_percentage, 'summary' : "Midterm - {:.0%} ({}/{})".format(midterm_percentage, midterm_score[0], midterm_score[1])},
+            'totalscore' : {'score' : midterm_percentage, 'summary' : "Midterm - {0:.0%} ({1}/{2})".format(midterm_percentage, midterm_score[0], midterm_score[1])},
             'weight' : 0.30,
         },
         {
             'category': 'Final',
-            'totalscore' : {'score' : final_percentage, 'summary' : "Final - {:.0%} ({}/{})".format(final_percentage, final_score[0], final_score[1])},
+            'totalscore' : {'score' : final_percentage, 'summary' : "Final - {0:.0%} ({1}/{2})".format(final_percentage, final_score[0], final_score[1])},
             'weight' : 0.40,
         }
     ]
