@@ -47,7 +47,7 @@ $(function () {
       detail_tooltips["${section['category']}"] = ${ json.dumps([score['summary'] for score in section['subscores']]  ) };
           
       droppedScores = droppedScores.concat(${ json.dumps( [[tickIndex + index, 0.05] for index in section['dropped_indices']]) });
-      <% dropExplanation = "The lowest {} {} scores are dropped".format( len(section['dropped_indices']), section['category'] ) %>
+      <% dropExplanation = "The lowest {0} {1} scores are dropped".format( len(section['dropped_indices']), section['category'] ) %>
       detail_tooltips['Dropped Scores'] = detail_tooltips['Dropped Scores'].concat( ${json.dumps( [dropExplanation] * len(section['dropped_indices']) )} );
           
       <% tickIndex += len(section['subscores']) + sectionSpacer %>

@@ -110,9 +110,9 @@ $(function() {
             <%
             earned = hw['section_total'][0]
             total = hw['section_total'][1]
-            percentageString = "{:.0%}".format( float(earned)/total) if earned > 0 else ""
+            percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 else ""
             %>
-            ${ hw['section'] }</a> ${"({}/{}) {}".format( earned, total, percentageString )}</h3>
+            ${ hw['section'] }</a> ${"({0}/{1}) {2}".format( earned, total, percentageString )}</h3>
             ${hw['subtitle']}
             % if 'due' in hw and hw['due']!="":
               due ${hw['due']}
