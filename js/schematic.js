@@ -634,9 +634,10 @@ schematic = (function() {
 
 	    // create a circuit from the netlist
 	    var ckt = new cktsim.Circuit();
-	    ckt.load_netlist(netlist);
-
-	    return ckt;
+	    if (ckt.load_netlist(netlist))
+		return ckt;
+	    else
+		return null;
 	}
 
 	Schematic.prototype.dc_analysis = function() {
@@ -645,6 +646,7 @@ schematic = (function() {
 	    this.redraw_background();
 
 	    var ckt = this.extract_circuit();
+	    if (ckt === null) return;
     
 	    // run the analysis
 	    this.operating_point = ckt.dc();
@@ -712,6 +714,7 @@ schematic = (function() {
 	Schematic.prototype.ac_analysis = function(npts,fstart,fstop,ac_source_name) {
 	    // run the analysis
 	    var ckt = this.extract_circuit();
+	    if (ckt === null) return;
 	    var results = ckt.ac(npts,fstart,fstop,ac_source_name);
 
 	    // save a copy of the results for submission
@@ -731,11 +734,28 @@ schematic = (function() {
 		var y_values = [];  // list of [color, result_array]
 		var probes = this.find_probes();
 
+		var probe_maxv = [];
+		var probe_color = [];
+
+		// Check for proble with near zero transfer function and warn
+		for (var i = probes.length - 1; i >= 0; --i) {
+		    probe_color[i] = probes[i][0];
+		    var label = probes[i][1];
+		    var v = results[label];
+		    probe_maxv[i] = array_max(v); // magnitudes always > 0
+		}
+		var all_max = array_max(probe_maxv);
+		for (var i = probes.length - 1; i >= 0; --i) {
+		    if ((probe_maxv[i] / all_max) < 1.0e-10) {
+			alert('Near zero ac response, remove ' + probe_color[i] + ' probe');
+			return;
+		    }
+		}
+
 		for (var i = probes.length - 1; i >= 0; --i) {
 		    var color = probes[i][0];
 		    var label = probes[i][1];
 		    var v = results[label];
-
 		    // convert values into dB relative to source amplitude
 		    var v_max = 1;
 		    for (var j = v.length - 1; j >= 0; --j)
@@ -774,6 +794,8 @@ schematic = (function() {
 	    this.dialog('Transient Analysis',content,function(content) {
 		    var sch = content.sch;
 		    var ckt = sch.extract_circuit();
+		    if (ckt === null) return;
+
 
 		    // retrieve parameters, remember for next time
 		    sch.tran_npts = content.fields[npts_lbl].value;
@@ -1943,25 +1965,27 @@ schematic = (function() {
 		var x1 = (index == 0) ? x_values[0] : x_values[index-1];
 		var x2 = x_values[index];
 
-		// for each plot, interpolate and output value at intersection with marker
-		c.textAlign = 'left';
-		var tx = graph.left_margin + 4;
-		var ty = graph.top_margin;
-		for (var plot = 0; plot < graph.y_values.length; plot++) {
-		    var values = graph.y_values[plot][1];
+		if (x2 != undefined) {
+		    // for each plot, interpolate and output value at intersection with marker
+		    c.textAlign = 'left';
+		    var tx = graph.left_margin + 4;
+		    var ty = graph.top_margin;
+		    for (var plot = 0; plot < graph.y_values.length; plot++) {
+			var values = graph.y_values[plot][1];
 
-		    // interpolate signal value at graph_x using values[index-1] and values[index]
-		    var y1 = (index == 0) ? values[0] : values[index-1];
-		    var y2 = values[index];
-		    var y = y1;
-		    if (graph_x != x1) y += (graph_x - x1)*(y2 - y1)/(x2 - x1);
+			// interpolate signal value at graph_x using values[index-1] and values[index]
+			var y1 = (index == 0) ? values[0] : values[index-1];
+			var y2 = values[index];
+			var y = y1;
+			if (graph_x != x1) y += (graph_x - x1)*(y2 - y1)/(x2 - x1);
 
-		    // annotate plot with value of signal at marker
-		    c.fillStyle = element_style;
-		    c.fillText('\u2588\u2588\u2588\u2588\u2588',tx-3,ty);
-		    c.fillStyle = probe_colors_rgb[graph.y_values[plot][0]];
-		    c.fillText(engineering_notation(y,3,false),tx,ty);
-		    ty += 14;
+			// annotate plot with value of signal at marker
+			c.fillStyle = element_style;
+			c.fillText('\u2588\u2588\u2588\u2588\u2588',tx-3,ty);
+			c.fillStyle = probe_colors_rgb[graph.y_values[plot][0]];
+			c.fillText(engineering_notation(y,3,false),tx,ty);
+			ty += 14;
+		    }
 		}
 	    }
 	}
@@ -3086,7 +3110,8 @@ schematic = (function() {
 	    this.add_connection(0,0);   // +
 	    this.add_connection(0,16);  // -
 	    this.add_connection(48,8);  // output
-	    this.bounding_box = [0,-8,48,24];
+	    this.add_connection(24,32);  // ground
+	    this.bounding_box = [0,-8,48,32];
 	    this.update_coords();
 	}
 	OpAmp.prototype = new Component();
@@ -3104,7 +3129,9 @@ schematic = (function() {
 	    // inputs and output
 	    this.draw_line(c,0,0,8,0);
 	    this.draw_line(c,0,16,8,16);
+	    this.draw_text(c,'gnd',37,18,property_size);
 	    this.draw_line(c,40,8,48,8);
+	    this.draw_line(c,24,16,24,32);
 	    // + and -
 	    this.draw_line(c,10,0,16,0);
 	    this.draw_line(c,13,-3,13,3);
@@ -3175,6 +3202,9 @@ schematic = (function() {
 	// map source function name to labels for each source parameter
 	source_functions = {
 	    'dc': ['DC value'],
+
+	    'impulse': ['Height',
+			'Width (secs)'],
 
 	    'step': ['Initial value',
 		     'Plateau value',

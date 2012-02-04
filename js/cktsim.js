@@ -97,9 +97,11 @@ cktsim = (function() {
 	// load circuit from JSON netlist (see schematic.js)
 	Circuit.prototype.load_netlist = function(netlist) {
 	    // set up mapping for ground node always called '0' in JSON netlist
-	    this.node_map['0'] = this.gnd_node();
+	    var gnd_label = '0';
+	    this.node_map[gnd_label] = this.gnd_node();
 
 	    // process each component in the JSON netlist (see schematic.js for format)
+	    var found_ground = false;
 	    for (var i = netlist.length - 1; i >= 0; --i) {
 		var component = netlist[i];
 		var type = component[0];
@@ -118,6 +120,7 @@ cktsim = (function() {
 		var connections = component[3];
 		for (var j = connections.length - 1; j >= 0; --j) {
 		    var node = connections[j];
+		    if(node == gnd_label) found_ground = true;
 		    var index = this.node_map[node];
 		    if (index == undefined) index = this.node(node,T_VOLTAGE);
 		    connections[j] = index;
@@ -137,12 +140,18 @@ cktsim = (function() {
 		else if (type == 'i') 	// current source
 		    this.i(connections[0],connections[1],properties['value'],name);
 		else if (type == 'o') 	// op amp
-		    this.opamp(connections[0],connections[1],connections[2],properties['A'],name);
+		    this.opamp(connections[0],connections[1],connections[2],connections[3],properties['A'],name);
 		else if (type == 'n') 	// n fet
 		    this.n(connections[0],connections[1],connections[2],properties['W/L'],name);
 		else if (type == 'p') 	// p fet
 		    this.p(connections[0],connections[1],connections[2],properties['W/L'],name);
 	    }
+	    if(found_ground == false) { // No ground on schematic
+		alert('Please make at least one connection to ground  (inverted T symbol)');
+		return false;
+	    }
+	    return true;
+	    
 	}
 
 	// if converges: updates this.solution, this.soln_max, returns iter count
@@ -187,6 +196,8 @@ cktsim = (function() {
 
 	// DC analysis
 	Circuit.prototype.dc = function() {
+
+	    // Allocation matrices for linear part, etc.
 	    this.finalize();
 
 	    // Load up the linear part.
@@ -621,6 +632,17 @@ cktsim = (function() {
 
 	Circuit.prototype.i = function(n1,n2,v,name) {
 	    var d = new ISource(n1,n2,v);
+	    return this.add_device(d, name);
+	}
+
+        Circuit.prototype.opamp = function(np,nn,no,ng,A,name) {
+	    // try to convert string value into numeric value, barf if we can't
+	    if ((typeof A) == 'string') {
+		ratio = parse_number(A,undefined);
+		if (A === undefined) return undefined;
+	    }
+	    var branch = this.node(undefined,T_CURRENT);
+	    var d = new Opamp(np,nn,no,ng,branch,A,name);
 	    return this.add_device(d, name);
 	}
 
@@ -1090,6 +1112,15 @@ cktsim = (function() {
 		src.value = function(t) { return v; }  // closure
 	    }
 
+	    // post-processing for impulse sources
+	    // impulse(height,width)
+	    else if (src.fun == 'impulse') {
+		var h = arg_value(src.args,0,1);  // default height: 1
+		var w = Math.abs(arg_value(src.args,2,1e-9));  // default width: 1ns
+		src.args = [h,w];  // remember any defaulted values
+		pwl_source(src,[0,0,w/2,h,w,0],false);
+	    }
+
 	    // post-processing for step sources
 	    // step(v_init,v_plateau,t_delay,t_rise)
 	    else if (src.fun == 'step') {
@@ -1263,8 +1294,8 @@ cktsim = (function() {
 	    // MNA stamp for independent voltage source
 	    ckt.add_to_Gl(this.branch,this.npos,1.0);
 	    ckt.add_to_Gl(this.branch,this.nneg,-1.0);
-	    ckt.add_to_Gl(this.npos,this.branch,1.0);
-	    ckt.add_to_Gl(this.nneg,this.branch,-1.0);
+	    ckt.add_to_Gl(this.npos,this.branch,-1.0);
+	    ckt.add_to_Gl(this.nneg,this.branch,1.0);
 	}
 
 	// Source voltage added to b.
@@ -1448,9 +1479,9 @@ cktsim = (function() {
 	    // MNA stamp for inductor linear part
 	    // L on diag of C because L di/dt = v(n1) - v(n2)
 	    ckt.add_to_Gl(this.n1,this.branch,1);
-	    ckt.add_to_Gl(this.branch,this.n1,1);
+	    ckt.add_to_Gl(this.branch,this.n1,-1);
 	    ckt.add_to_Gl(this.n2,this.branch,-1);
-	    ckt.add_to_Gl(this.branch,this.n2,-1);
+	    ckt.add_to_Gl(this.branch,this.n2,1);
 	    ckt.add_to_C(this.branch,this.branch,this.value)
 	}
 
@@ -1463,6 +1494,51 @@ cktsim = (function() {
 
 	Inductor.prototype.load_tran = function(ckt) {
 	}
+
+
+
+	///////////////////////////////////////////////////////////////////////////////
+	//
+	//  Simple Voltage-Controlled Voltage Source Op Amp model 
+	//
+	///////////////////////////////////////////////////////////////////////////////
+
+        function Opamp(np,nn,no,ng,branch,A,name) {
+	    Device.call(this);
+	    this.np = np;
+	    this.nn = nn;
+	    this.no = no;
+	    this.ng = ng;
+	    this.branch = branch;
+	    this.gain = A;
+	    this.name = name;
+	}
+
+	Opamp.prototype = new Device();
+        Opamp.prototype.constructor = Opamp;
+        
+        Opamp.prototype.load_linear = function(ckt) {
+            // MNA stamp for VCVS: 1/A(v(no) - v(ng)) - (v(np)-v(nn))) = 0.
+	    var invA = 1.0/this.gain;
+	    ckt.add_to_Gl(this.no,this.branch,1);
+	    ckt.add_to_Gl(this.ng,this.branch,-1);
+	    ckt.add_to_Gl(this.branch,this.no,-invA);
+	    ckt.add_to_Gl(this.branch,this.ng,invA);
+	    ckt.add_to_Gl(this.branch,this.np,1);
+	    ckt.add_to_Gl(this.branch,this.nn,-1);
+	}
+
+	Opamp.prototype.load_dc = function(ckt,soln,rhs) {
+	    // Op-amp is linear.
+	}
+
+	Opamp.prototype.load_ac = function(ckt) {
+	}
+
+	Opamp.prototype.load_tran = function(ckt) {
+	}
+
+
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
