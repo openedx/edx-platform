@@ -113,7 +113,7 @@ schematic = (function() {
 	    // else just populate parts bin with all the parts
 	    this.edits_allowed = true;
 	    var parts = input.getAttribute('parts');
-	    if (parts == undefined) {
+	    if (parts == undefined || parts == 'None') {
 		parts = new Array();
 		for (var p in parts_map) parts.push(p);
 	    } else if (parts == '') {
@@ -133,7 +133,8 @@ schematic = (function() {
 	    // use user-supplied list of analyses, otherwise provide them all
 	    // analyses="" means no analyses
 	    var analyses = input.getAttribute('analyses');
-	    if (analyses == undefined) analyses = ['dc','ac','tran'];
+	    if (analyses == undefined || analyses == 'None')
+		analyses = ['dc','ac','tran'];
 	    else if (analyses == '') analyses = [];
 	    else analyses = analyses.split(',');
 
