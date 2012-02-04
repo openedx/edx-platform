@@ -1339,6 +1339,7 @@ schematic = (function() {
 	    ok_button.appendChild(document.createTextNode('OK'));
 	    ok_button.dialog = dialog;   // for the handler to use
 	    ok_button.addEventListener('click',dialog_okay,false);
+	    ok_button.style.display = 'inline';
 	    ok_button.style.border = '1px solid';
 	    ok_button.style.padding = '5px';
 	    ok_button.style.margin = '10px';
@@ -1348,6 +1349,7 @@ schematic = (function() {
 	    cancel_button.appendChild(document.createTextNode('Cancel'));
 	    cancel_button.dialog = dialog;   // for the handler to use
 	    cancel_button.addEventListener('click',dialog_cancel,false);
+	    cancel_button.style.display = 'inline';
 	    cancel_button.style.border = '1px solid';
 	    cancel_button.style.padding = '5px';
 	    cancel_button.style.margin = '10px';
