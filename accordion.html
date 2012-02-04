@@ -19,10 +19,6 @@
             <p class="subtitle">
               ${section['format']}
 
-              % if 'time' in section and section['time']!="":
-                (${int(section['time'])/60} min)
-              % endif
-
               % if 'due' in section and section['due']!="":
                 due ${section['due']}
               % endif

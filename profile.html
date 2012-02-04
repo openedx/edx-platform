@@ -113,14 +113,22 @@ $(function() {
             percentageString = "{:.0%}".format( float(earned)/total) if earned > 0 else ""
             %>
             ${ hw['section'] }</a> ${"({}/{}) {}".format( earned, total, percentageString )}</h3>
+            ${hw['subtitle']}
+            % if 'due' in hw and hw['due']!="":
+              due ${hw['due']}
+            % endif
             
             <ul>
               %if len(hw['scores']) > 0:
-              Problem Scores:
+                %if hw['graded']:
+                  Problem Scores:
+                %else:
+                  Practice Scores:
+                %endif
+                % for score in hw['scores']:
+                  <li>${ score[0] }/${ score[1] }</li>
+                % endfor
               %endif
-              % for score in hw['scores']:
-              <li>${ score[0] }/${ score[1] }</li>
-              % endfor
             </ul>
           </div>
         </li>
