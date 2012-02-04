@@ -3,6 +3,7 @@ import datetime
 import dateutil
 import dateutil.parser
 import json
+import logging
 import math
 import numpy
 import os
@@ -22,6 +23,8 @@ from django.http import Http404
 from x_module import XModule
 from courseware.capa.capa_problem import LoncapaProblem
 import courseware.content_parser as content_parser
+
+log = logging.getLogger("mitx.courseware")
 
 class LoncapaModule(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
@@ -128,6 +131,7 @@ class LoncapaModule(XModule):
         display_due_date_string=content_parser.item(dom2.xpath('/problem/@due'))
         if len(display_due_date_string)>0:
             self.display_due_date=dateutil.parser.parse(display_due_date_string)
+            log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
         else:
             self.display_due_date=None
         
@@ -136,6 +140,7 @@ class LoncapaModule(XModule):
         if len(grace_period_string)>0 and self.display_due_date:
             self.grace_period = content_parser.parse_timedelta(grace_period_string)
             self.close_date = self.display_due_date + self.grace_period
+            log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
         else:
             self.grace_period = None
             self.close_date = self.display_due_date

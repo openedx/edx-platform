@@ -59,6 +59,8 @@ def profile(request):
                            course=course, chname=chname):
             problems=dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section[@name=$section]//problem', 
                            course=course, chname=chname, section=s.get('name'))
+                           
+            graded = True if s.get('graded') == "true" else False
             scores=[]
             if len(problems)>0:
                 for p in problems:
@@ -70,7 +72,7 @@ def profile(request):
                             correct=response.grade
                     
                     total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
-                    scores.append((int(correct),total, ( True if s.get('graded') == "true" else False ) ))
+                    scores.append((int(correct),total, graded ))
                     
                     
                 section_total = (sum([score[0] for score in scores]), 
@@ -81,6 +83,7 @@ def profile(request):
                 
                 #Add the graded total to total_scores
                 format = s.get('format') if s.get('format') else ""
+                subtitle = s.get('subtitle') if s.get('subtitle') else format
                 if format and graded_total[1] > 0:
                     format_scores = total_scores[ format ] if format in total_scores else []
                     format_scores.append( graded_total )
@@ -92,6 +95,9 @@ def profile(request):
                        'scores':scores,
                        'section_total' : section_total,
                        'format' : format,
+                       'subtitle' : subtitle,
+                       'due' : s.get("due") or "",
+                       'graded' : graded,
                        }
                 hw.append(score)
     

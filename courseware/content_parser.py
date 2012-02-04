@@ -185,9 +185,8 @@ def toc_from_xml(dom, active_chapter, active_section):
         sections=list()
         for s in dom.xpath('//course[@name=$name]/chapter[@name=$chname]/section', name=name, chname=c.get('name')): 
             sections.append({'name':s.get("name") or "", 
-                             'time':s.get("time") or "", 
-                             'format':s.get("format") or "", 
-                             'due':s.get("display_due_date") or "",
+                             'format':s.get("subtitle") if s.get("subtitle") else s.get("format") or "", 
+                             'due':s.get("due") or "",
                              'active':(c.get("name")==active_chapter and \
                                            s.get("name")==active_section)})
         ch.append({'name':c.get("name"), 
