@@ -90,7 +90,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     ajax_return=instance.handle_ajax(dispatch, request.POST)
     # Save the state back to the database
     s.state=instance.get_state()
-    if not instance.get_score(): 
+    if instance.get_score(): 
         s.grade=instance.get_score()['score']
     s.save()
     # Return whatever the module wanted to return to the client/caller

@@ -1,5 +1,8 @@
+import copy
 import math
 import operator
+
+import numpy
 
 from pyparsing import Word, alphas, nums, oneOf, Literal
 from pyparsing import ZeroOrMore, OneOrMore, StringStart
@@ -7,11 +10,32 @@ from pyparsing import StringEnd, Optional, Forward
 from pyparsing import CaselessLiteral, Group, StringEnd
 from pyparsing import NoMatch, stringEnd
 
+default_functions = {'sin' : numpy.sin, 
+                     'cos' : numpy.cos, 
+                     'tan' : numpy.tan, 
+                     'sqrt': numpy.sqrt,
+                     'log10':numpy.log10, 
+                     'log2':numpy.log2, 
+                     'ln': numpy.log,
+                     'arccos':numpy.arccos,
+                     'arcsin':numpy.arcsin,
+                     'arctan':numpy.arctan, 
+                     'abs':numpy.abs
+                     }
+default_variables = {'j':numpy.complex(0,1), 
+                     'e':numpy.complex(numpy.e)
+                     }
+
 
 def evaluator(variables, functions, string):
     ''' Evaluate an expression. Variables are passed as a dictionary
     from string to value. Unary functions are passed as a dictionary
     from string to function '''
+    all_variables = copy.copy(default_variables)
+    all_variables.update(variables)
+    all_functions = copy.copy(default_functions)
+    all_functions.update(functions)
+    
     if string.strip() == "":
         return float('nan')
     ops = { "^" : operator.pow,
@@ -38,7 +62,7 @@ def evaluator(variables, functions, string):
     def number_parse_action(x): # [ '7' ] ->  [ 7 ]
         return [super_float("".join(x))]
     def exp_parse_action(x): # [ 2 ^ 3 ^ 2 ] -> 512
-        x = [e for e in x if type(e) == float] # Ignore ^
+        x = [e for e in x if type(e) in [float, numpy.float64, numpy.complex]] # Ignore ^
         x.reverse()
         x=reduce(lambda a,b:b**a, x)
         return x
@@ -68,7 +92,7 @@ def evaluator(variables, functions, string):
                 prod=op(prod, e)
         return prod
     def func_parse_action(x):
-        return [functions[x[0]](x[1])]
+        return [all_functions[x[0]](x[1])]
 
     number_suffix=reduce(lambda a,b:a|b, map(Literal,suffixes.keys()), NoMatch()) # SI suffixes and percent
     (dot,minus,plus,times,div,lpar,rpar,exp)=map(Literal,".-+*/()^")
@@ -94,14 +118,14 @@ def evaluator(variables, functions, string):
 
     # Handle variables passed in. E.g. if we have {'R':0.5}, we make the substitution. 
     # Special case for no variables because of how we understand PyParsing is put together
-    if len(variables)>0:
-        varnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), variables.keys()))
-        varnames.setParseAction(lambda x:map(lambda y:variables[y], x))
+    if len(all_variables)>0:
+        varnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), all_variables.keys()))
+        varnames.setParseAction(lambda x:map(lambda y:all_variables[y], x))
     else:
         varnames=NoMatch()
     # Same thing for functions. 
-    if len(functions)>0:
-        funcnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), functions.keys()))
+    if len(all_functions)>0:
+        funcnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), all_functions.keys()))
         function = funcnames+lpar.suppress()+expr+rpar.suppress()
         function.setParseAction(func_parse_action)
     else:
@@ -119,7 +143,7 @@ def evaluator(variables, functions, string):
 
 if __name__=='__main__':
     variables={'R1':2.0, 'R3':4.0}
-    functions={'sin':math.sin, 'cos':math.cos}
+    functions={'sin':numpy.sin, 'cos':numpy.cos}
     print "X",evaluator(variables, functions, "10000||sin(7+5)-6k")
     print "X",evaluator(variables, functions, "13")
     print evaluator({'R1': 2.0, 'R3':4.0}, {}, "13")

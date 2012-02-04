@@ -13,7 +13,9 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.template import Context, loader
 from mitxmako.shortcuts import render_to_response, render_to_string
+#from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import connection
+from django.views.decorators.cache import cache_control
 
 from lxml import etree
 
@@ -31,6 +33,7 @@ etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
 
 template_imports={'urllib':urllib}
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile(request):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
@@ -207,6 +210,7 @@ def render_accordion(request,course,chapter,section):
     return {'init_js':render_to_string('accordion_init.js',context), 
             'content':render_to_string('accordion.html',context)}
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course="6.002 Spring 2012", chapter="Using the System", section="Hints"): 
     ''' Displays courseware accordion, and any associated content. 
     ''' 

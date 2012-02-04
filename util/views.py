@@ -25,7 +25,7 @@ def calculate(request):
                  'equation':equation}
         track.views.server_track(request, 'error:calc', event, page='calc')
         return HttpResponse(json.dumps({'result':'Invalid syntax'}))
-    return HttpResponse(json.dumps({'result':result}))
+    return HttpResponse(json.dumps({'result':str(result)}))
 
 def send_feedback(request):
     ''' Feeback mechanism in footer of every page. '''
