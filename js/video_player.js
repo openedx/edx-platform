@@ -297,7 +297,7 @@ function onytplayerStateChange(newState) {
 }
 
 function onPlayerError(errorCode) {
-    alert("An error occured: " + errorCode);
+    //    alert("An error occured: " + errorCode);
 }
 
 function updateytplayerInfo() {
