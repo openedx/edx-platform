@@ -817,8 +817,8 @@ schematic = (function() {
 					   ckt.parse_number(sch.tran_tstop), probe_names, false);
 
 		    // save a copy of the results for submission
-		    this.transient_results = {};
-		    for (var i in results) this.transient_results[i] = results[i];
+		    sch.transient_results = {};
+		    for (var i in results) sch.transient_results[i] = results[i];
 
 		    if (typeof results == 'string') 
 			sch.message(results);
