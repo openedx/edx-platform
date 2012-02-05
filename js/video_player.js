@@ -224,8 +224,8 @@ function onPlayerStateChange(event) {
 var switched_tab = false; // switch to true when we destroy so we know to call onYouTubePlayerAPIReady()
 // clear pings to video status when we switch to a different sequence tab with ajax
 function videoDestroy(id) {
-    postJSON('/modx/video/'+id+'/goto_position',
-	     {'position' :  ytplayer.getCurrentTime()});
+//    postJSON('/modx/video/'+id+'/goto_position',
+//	     {'position' :  ytplayer.getCurrentTime()});
 
     load_id = 0;
     clearInterval(updateytplayerInfoInterval);
@@ -332,7 +332,7 @@ function loadNewVideo(id, startSeconds) {
     catch(e) {
 	window['console'].log(JSON.stringify(e));
     }
-    $("#slider").slider("option","value",startSeconds);
+    //$("#slider").slider("option","value",startSeconds);
     //seekTo(startSeconds);
 }
 
