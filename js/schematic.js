@@ -194,7 +194,6 @@ schematic = (function() {
 		this.canvas.style.borderStyle = 'solid';
 		this.canvas.style.borderWidth = '1px';
 		this.canvas.style.borderColor = grid_style;
-		//this.canvas.style.position = 'absolute';
 		this.canvas.style.outline = 'none';
 	    }
 
@@ -274,6 +273,9 @@ schematic = (function() {
 	    tr = document.createElement('tr');
 	    table.appendChild(tr);
 	    td = document.createElement('td');
+	    td.style.position = 'relative';  // so we can position subwindows
+	    td.style.left = '0';
+	    td.style.top = '0';
 	    tr.appendChild(td);
 	    td.appendChild(this.canvas);
 	    td = document.createElement('td');
@@ -1233,6 +1235,7 @@ schematic = (function() {
     
 	    // just redraw dynamic components
 	    sch.redraw();
+	    //sch.message(sch.canvas.page_x + ',' + sch.canvas.page_y + ';' + sch.canvas.mouse_x + ',' + sch.canvas.mouse_y + ';' + sch.cursor_x + ',' + sch.cursor_y);
 
 	    return false;
 	}
@@ -1474,9 +1477,9 @@ schematic = (function() {
 	    win.appendChild(content);
 	    content.win = win;   // so content can contact us
 
-	    // compute location in top-level div
-	    win.left = this.canvas.page_x;
-	    win.top = this.canvas.page_y;
+	    // compute location relative to canvas
+	    win.left = this.canvas.mouse_x;
+	    win.top = this.canvas.mouse_y;
 
 	    // add to DOM
 	    win.style.background = 'white';
@@ -1486,7 +1489,8 @@ schematic = (function() {
 	    win.style.top = win.top + 'px';
 	    win.style.border = '2px solid';
 
-	    this.input.parentNode.insertBefore(win,this.input.nextSibling);
+	    this.canvas.parentNode.insertBefore(win,this.canvas);
+	    //this.input.parentNode.insertBefore(win,this.input.nextSibling);
 	}
 
 	// close the window
@@ -1631,7 +1635,10 @@ schematic = (function() {
 	    if (!event) event = window.event;
 	    var tool = (window.event) ? event.srcElement : event.target;
 
-	    if (tool.enabled) tool.callback.call(tool.sch);
+	    if (tool.enabled) {
+		tool.sch.canvas.relMouseCoords(event);  // so we can position pop-up window correctly
+		tool.callback.call(tool.sch);
+	    }
 	}
 
 	cut_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQu8MhJqz1g5qs7lxv2gRkQfuWomarXEgDRHjJhf3YtyRav0xcfcFgR0nhB5OwTAQA7';
