@@ -782,7 +782,7 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
     box-sizing: border-box;
     display: table-cell;
     vertical-align: top; }
-    @media screen and (max-width:1020px) {
+    @media screen and (max-width:1120px) {
       div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
         display: block;
         width: auto;
@@ -791,7 +791,7 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
     display: table-cell;
     width: 77.174%;
     padding-left: 2.717%; }
-    @media screen and (max-width:1020px) {
+    @media screen and (max-width:1120px) {
       div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
         display: block;
         width: auto;
@@ -850,7 +850,7 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
 div.course-wrapper section.course-content section.problems-wrapper {
   display: table;
   width: 100%; }
-  @media screen and (max-width:1020px) {
+  @media screen and (max-width:1120px) {
     div.course-wrapper section.course-content section.problems-wrapper {
       display: block;
       width: auto; } }
