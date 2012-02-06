@@ -146,7 +146,7 @@ input, select {
     display: table;
     width: 100%; }
 
-.button, input[type="submit"], input[type="button"], button, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit {
+.button, input[type="submit"], input[type="button"], button, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit {
   -webkit-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
   -moz-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
   -ms-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
@@ -170,7 +170,7 @@ input, select {
   font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
   cursor: pointer;
   -webkit-font-smoothing: antialiased; }
-  .button:hover, input[type="submit"]:hover, input[type="button"]:hover, button:hover, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, .button:focus, input[type="submit"]:focus, input[type="button"]:focus, button:focus, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus {
+  .button:hover, input[type="submit"]:hover, input[type="button"]:hover, button:hover, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, .button:focus, input[type="submit"]:focus, input[type="button"]:focus, button:focus, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus {
     -webkit-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
     -moz-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
     -ms-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
@@ -698,7 +698,7 @@ div.course-wrapper div#accordion ul.ui-accordion-content {
   font-size: 12px;
   margin: 0;
   overflow: hidden; }
-  div.course-wrapper div#accordion ul.ui-accordion-content li.active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_video_active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_vertical_active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_problem_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_problem_active {
+  div.course-wrapper div#accordion ul.ui-accordion-content li.active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_video_active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_other_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_other_active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_vertical_active, div.course-wrapper div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_problem_active, nav.sequence-nav ol div.course-wrapper div#accordion ul.ui-accordion-content li.seq_problem_active {
     font-weight: bold; }
   div.course-wrapper div#accordion ul.ui-accordion-content li a {
     text-decoration: none;
@@ -731,7 +731,7 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
     box-sizing: border-box;
     display: table-cell;
     vertical-align: top; }
-    @media screen and (max-width:910px) {
+    @media screen and (max-width:980px) {
       div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
         display: block;
         width: auto; } }
@@ -941,81 +941,94 @@ section.course-content ol.subtitles {
 
 nav.sequence-nav {
   margin-bottom: 22.652px; }
-  nav.sequence-nav ol .inactive, nav.sequence-nav ol li.seq_video_inactive, nav.sequence-nav ol li.seq_vertical_inactive, nav.sequence-nav ol li.seq_problem_inactive {
-    background-repeat: no-repeat; }
-    nav.sequence-nav ol .inactive:hover, nav.sequence-nav ol li.seq_video_inactive:hover, nav.sequence-nav ol li.seq_vertical_inactive:hover, nav.sequence-nav ol li.seq_problem_inactive:hover {
-      background-color: #f9f4e1; }
-  nav.sequence-nav ol .visited, nav.sequence-nav ol li.seq_video_visited, nav.sequence-nav ol li.seq_vertical_visited, nav.sequence-nav ol li.seq_problem_visited {
-    background-color: #ddd7be;
-    background-repeat: no-repeat;
-    border-color: #ddd7be; }
-    nav.sequence-nav ol .visited:hover, nav.sequence-nav ol li.seq_video_visited:hover, nav.sequence-nav ol li.seq_vertical_visited:hover, nav.sequence-nav ol li.seq_problem_visited:hover {
-      background-color: #F6EFD4; }
-  nav.sequence-nav ol .active, nav.sequence-nav ol div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
-    -webkit-box-shadow: 0 1px 0 white;
-    -moz-box-shadow: 0 1px 0 white;
-    -ms-box-shadow: 0 1px 0 white;
-    -o-box-shadow: 0 1px 0 white;
-    box-shadow: 0 1px 0 white;
-    background-color: #fff;
-    background-repeat: no-repeat; }
-    nav.sequence-nav ol .active:hover, nav.sequence-nav ol div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active:hover, div.course-wrapper div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active:hover, nav.sequence-nav ol div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"]:hover, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"]:hover, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li.seq_video_active:hover, nav.sequence-nav ol li.seq_vertical_active:hover, nav.sequence-nav ol li.seq_problem_active:hover {
-      background-color: #fff; }
-  nav.sequence-nav ol li {
-    border: none;
-    border-right: 1px solid #eddfaa;
-    -webkit-box-shadow: 1px 0 0 white;
-    -moz-box-shadow: 1px 0 0 white;
-    -ms-box-shadow: 1px 0 0 white;
-    -o-box-shadow: 1px 0 0 white;
-    box-shadow: 1px 0 0 white;
-    cursor: pointer;
-    display: table-cell;
-    padding: 16.989px;
+  nav.sequence-nav ol {
+    display: table-row;
     float: left;
-    width: 18px; }
-    nav.sequence-nav ol li.seq_video_inactive {
-      background-image: url("/static/images/video-icon.png");
-      background-position: 13px 15px; }
-    nav.sequence-nav ol li.seq_video_visited {
-      background-image: url("/static/images/video-icon.png");
-      background-position: -81px 15px; }
-    nav.sequence-nav ol li.seq_video_active {
-      background-image: url("/static/images/video-icon.png");
-      background-position: -32px 15px; }
-    nav.sequence-nav ol li.seq_vertical_inactive, nav.sequence-nav ol li.seq_problem_inactive {
-      background-image: url("/static/images/vertical-icon.png");
-      background-position: -82px 15px; }
-    nav.sequence-nav ol li.seq_vertical_visited, nav.sequence-nav ol li.seq_problem_visited {
-      background-image: url("/static/images/vertical-icon.png");
-      background-position: 13px 15px; }
-    nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
-      background-image: url("/static/images/vertical-icon.png");
-      background-position: -35px 15px; }
+    width: 84.905%; }
+    nav.sequence-nav ol .inactive, nav.sequence-nav ol li.seq_video_inactive, nav.sequence-nav ol li.seq_other_inactive, nav.sequence-nav ol li.seq_vertical_inactive, nav.sequence-nav ol li.seq_problem_inactive {
+      background-repeat: no-repeat; }
+      nav.sequence-nav ol .inactive:hover, nav.sequence-nav ol li.seq_video_inactive:hover, nav.sequence-nav ol li.seq_other_inactive:hover, nav.sequence-nav ol li.seq_vertical_inactive:hover, nav.sequence-nav ol li.seq_problem_inactive:hover {
+        background-color: #f9f4e1; }
+    nav.sequence-nav ol .visited, nav.sequence-nav ol li.seq_video_visited, nav.sequence-nav ol li.seq_other_visited, nav.sequence-nav ol li.seq_vertical_visited, nav.sequence-nav ol li.seq_problem_visited {
+      background-color: #ddd7be;
+      background-repeat: no-repeat;
+      border-color: #ddd7be; }
+      nav.sequence-nav ol .visited:hover, nav.sequence-nav ol li.seq_video_visited:hover, nav.sequence-nav ol li.seq_other_visited:hover, nav.sequence-nav ol li.seq_vertical_visited:hover, nav.sequence-nav ol li.seq_problem_visited:hover {
+        background-color: #F6EFD4; }
+    nav.sequence-nav ol .active, nav.sequence-nav ol div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol li.seq_other_active, nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
+      -webkit-box-shadow: 0 1px 0 white;
+      -moz-box-shadow: 0 1px 0 white;
+      -ms-box-shadow: 0 1px 0 white;
+      -o-box-shadow: 0 1px 0 white;
+      box-shadow: 0 1px 0 white;
+      background-color: #fff;
+      background-repeat: no-repeat; }
+      nav.sequence-nav ol .active:hover, nav.sequence-nav ol div.course-wrapper div#accordion h3.ui-accordion-header.ui-state-active:hover, div.course-wrapper div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active:hover, nav.sequence-nav ol div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"]:hover, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.ui-accordion-header.ui-state-active[type="button"]:hover, div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li.seq_video_active:hover, nav.sequence-nav ol li.seq_other_active:hover, nav.sequence-nav ol li.seq_vertical_active:hover, nav.sequence-nav ol li.seq_problem_active:hover {
+        background-color: #fff; }
+    nav.sequence-nav ol li {
+      -webkit-box-shadow: 1px 0 0 white;
+      -moz-box-shadow: 1px 0 0 white;
+      -ms-box-shadow: 1px 0 0 white;
+      -o-box-shadow: 1px 0 0 white;
+      box-shadow: 1px 0 0 white;
+      background-position: center center;
+      border: none;
+      border-right: 1px solid #eddfaa;
+      cursor: pointer;
+      display: table-cell;
+      padding: 14px 14px;
+      width: 18px; }
+      nav.sequence-nav ol li.seq_video_inactive {
+        background-image: url("/static/images/sequence-nav/video-icon-normal.png"); }
+      nav.sequence-nav ol li.seq_video_visited {
+        background-image: url("/static/images/sequence-nav/video-icon-visited.png"); }
+      nav.sequence-nav ol li.seq_video_active {
+        background-image: url("/static/images/sequence-nav/video-icon-current.png"); }
+      nav.sequence-nav ol li.seq_other_inactive {
+        background-image: url("/static/images/sequence-nav/document-icon-normal.png"); }
+      nav.sequence-nav ol li.seq_other_visited {
+        background-image: url("/static/images/sequence-nav/document-icon-visited.png"); }
+      nav.sequence-nav ol li.seq_other_active {
+        background-image: url("/static/images/sequence-nav/document-icon-current.png"); }
+      nav.sequence-nav ol li.seq_vertical_inactive, nav.sequence-nav ol li.seq_problem_inactive {
+        background-image: url("/static/images/sequence-nav/list-icon-normal.png"); }
+      nav.sequence-nav ol li.seq_vertical_visited, nav.sequence-nav ol li.seq_problem_visited {
+        background-image: url("/static/images/sequence-nav/list-icon-visited.png"); }
+      nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
+        background-image: url("/static/images/sequence-nav/list-icon-current.png"); }
   nav.sequence-nav ul {
     float: right;
-    margin-right: 1px; }
-    nav.sequence-nav ul li {
-      float: left; }
-      nav.sequence-nav ul li.prev, nav.sequence-nav ul li.next {
-        -webkit-box-shadow: inset 1px 0 0 #faf7e9;
-        -moz-box-shadow: inset 1px 0 0 #faf7e9;
-        -ms-box-shadow: inset 1px 0 0 #faf7e9;
-        -o-box-shadow: inset 1px 0 0 #faf7e9;
-        box-shadow: inset 1px 0 0 #faf7e9;
-        background: #f2e7bf;
-        border-left: 1px solid #e4d080;
-        color: #292309;
-        float: right;
-        letter-spacing: 1px;
-        padding: 16.989px;
-        text-transform: uppercase;
-        cursor: pointer; }
-        nav.sequence-nav ul li.prev:hover, nav.sequence-nav ul li.next:hover {
-          text-decoration: none;
-          color: #7e691a;
-          text-decoration: none;
-          background: none; }
+    margin-right: 1px;
+    width: 14.402%;
+    display: table-row; }
+    nav.sequence-nav ul li.prev, nav.sequence-nav ul li.next {
+      -webkit-box-shadow: inset 1px 0 0 #faf7e9;
+      -moz-box-shadow: inset 1px 0 0 #faf7e9;
+      -ms-box-shadow: inset 1px 0 0 #faf7e9;
+      -o-box-shadow: inset 1px 0 0 #faf7e9;
+      box-shadow: inset 1px 0 0 #faf7e9;
+      background-color: #f2e7bf;
+      background-position: center center;
+      background-repeat: no-repeat;
+      border-left: 1px solid #e4d080;
+      cursor: pointer;
+      display: table-cell;
+      padding: 14px;
+      text-indent: -9999px;
+      width: 72px; }
+      nav.sequence-nav ul li.prev:hover, nav.sequence-nav ul li.next:hover {
+        text-decoration: none;
+        color: #7e691a;
+        text-decoration: none;
+        background-color: none; }
+    nav.sequence-nav ul li.prev {
+      background-image: url("/static/images/sequence-nav/previous-icon.png"); }
+      nav.sequence-nav ul li.prev:hover {
+        background-color: none; }
+    nav.sequence-nav ul li.next {
+      background-image: url("/static/images/sequence-nav/next-icon.png"); }
+      nav.sequence-nav ul li.next:hover {
+        background-color: none; }
 
 div.book-wrapper ul#booknav {
   -webkit-box-sizing: border-box;
@@ -1542,7 +1555,7 @@ section.help.main-content {
   color: #763333;
   text-decoration: underline; }
 
-.badge-context-toggle.active, div.course-wrapper div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.badge-context-toggle.seq_video_active, nav.sequence-nav ol li.badge-context-toggle.seq_vertical_active, nav.sequence-nav ol li.badge-context-toggle.seq_problem_active {
+.badge-context-toggle.active, div.course-wrapper div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, div.course-wrapper div#accordion div.wiki-wrapper div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div.wiki-wrapper div#wiki_panel div.course-wrapper div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.badge-context-toggle.seq_video_active, nav.sequence-nav ol li.badge-context-toggle.seq_other_active, nav.sequence-nav ol li.badge-context-toggle.seq_vertical_active, nav.sequence-nav ol li.badge-context-toggle.seq_problem_active {
   cursor: pointer;
   text-decoration: underline; }
 
@@ -3372,22 +3385,22 @@ body.askbot footer {
     border-top: 0;
     padding: 1.012%; }
 
-div.question-controls {
+div.question-controls, div.answer-controls {
   display: block;
   margin-bottom: 30px;
   overflow: hidden;
   width: 100%; }
-  div.question-controls div {
+  div.question-controls div, div.answer-controls div {
     display: inline-block; }
-  div.question-controls div.question-count {
+  div.question-controls div.question-count, div.answer-controls div.question-count, div.question-controls div.answer-controls div.answer-count, div.answer-controls div.question-controls div.answer-count, div.answer-controls div.answer-count {
     margin-right: 2.024%;
-    width: 60.054%; }
-    div.question-controls div.question-count h1 {
+    width: 54.348%; }
+    div.question-controls div.question-count h1, div.answer-controls div.question-count h1, div.question-controls div.answer-controls div.answer-count h1, div.answer-controls div.question-controls div.answer-count h1, div.answer-controls div.answer-count h1 {
       margin-top: 0; }
-  div.question-controls div.question-sort {
+  div.question-controls div.question-sort, div.answer-controls div.question-sort, div.question-controls div.answer-controls div.answer-sort, div.answer-controls div.question-controls div.answer-sort, div.answer-controls div.answer-sort {
     vertical-align: bottom;
-    width: 37.228%; }
-    div.question-controls div.question-sort nav {
+    width: 42.935%; }
+    div.question-controls div.question-sort nav, div.answer-controls div.question-sort nav, div.question-controls div.answer-controls div.answer-sort nav, div.answer-controls div.question-controls div.answer-sort nav, div.answer-controls div.answer-sort nav {
       -webkit-border-radius: 35px;
       -moz-border-radius: 35px;
       -ms-border-radius: 35px;
@@ -3398,14 +3411,16 @@ div.question-controls {
       float: right;
       font-size: 16px;
       margin: 3px 0;
-      padding: 0 20px; }
-      div.question-controls div.question-sort nav a {
+      padding: 0px 20px 5px; }
+      div.question-controls div.question-sort nav a, div.answer-controls div.question-sort nav a, div.question-controls div.answer-controls div.answer-sort nav a, div.answer-controls div.question-controls div.answer-sort nav a, div.answer-controls div.answer-sort nav a {
         color: #a88d23; }
-        div.question-controls div.question-sort nav a:before {
+        div.question-controls div.question-sort nav a.on span, div.answer-controls div.question-sort nav a.on span, div.question-controls div.answer-controls div.answer-sort nav a.on span, div.answer-controls div.question-controls div.answer-sort nav a.on span, div.answer-controls div.answer-sort nav a.on span {
+          font-weight: bold; }
+        div.question-controls div.question-sort nav a:before, div.answer-controls div.question-sort nav a:before, div.question-controls div.answer-controls div.answer-sort nav a:before, div.answer-controls div.question-controls div.answer-sort nav a:before, div.answer-controls div.answer-sort nav a:before {
           content: '|';
           color: #eddfaa;
           font-size: 22px; }
-        div.question-controls div.question-sort nav a:hover {
+        div.question-controls div.question-sort nav a:hover, div.answer-controls div.question-sort nav a:hover, div.question-controls div.answer-controls div.answer-sort nav a:hover, div.answer-controls div.question-controls div.answer-sort nav a:hover, div.answer-controls div.answer-sort nav a:hover {
           text-decoration: none;
           color: #544611; }
 
@@ -3419,7 +3434,7 @@ ul.question-list {
       background: #fdfcf6; }
     ul.question-list li.single-question div {
       display: inline-block; }
-      ul.question-list li.single-question div.question-body {
+      ul.question-list li.single-question div.question-body, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body {
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         -ms-box-sizing: border-box;
@@ -3428,19 +3443,19 @@ ul.question-list {
         margin-right: 2.024%;
         padding-left: 10px;
         width: 60.054%; }
-        ul.question-list li.single-question div.question-body h2 {
+        ul.question-list li.single-question div.question-body h2, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h2, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h2 {
           font-size: 16px;
           font-weight: normal;
           margin: 0px 0 15px 0;
           text-transform: none; }
-        ul.question-list li.single-question div.question-body div.user-info {
+        ul.question-list li.single-question div.question-body div.user-info, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info {
           display: inline-block;
           vertical-align: top; }
-          ul.question-list li.single-question div.question-body div.user-info span.relative-time {
+          ul.question-list li.single-question div.question-body div.user-info span.relative-time, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info span.relative-time, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info span.relative-time {
             font-weight: normal; }
-          ul.question-list li.single-question div.question-body div.user-info a {
+          ul.question-list li.single-question div.question-body div.user-info a, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info a, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info a {
             color: #993333; }
-        ul.question-list li.single-question div.question-body ul.tags {
+        ul.question-list li.single-question div.question-body ul.tags, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body ul.tags, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body ul.tags {
           display: inline-block; }
       ul.question-list li.single-question div.question-meta {
         width: 37.228%; }
@@ -3511,12 +3526,12 @@ ul.tags {
       border-style: solid;
       border-width: 12px 12px 12px 0; }
 
-div.question-header div.vote-buttons {
+div.question-header div.vote-buttons, div.answer-block div.vote-buttons {
   display: inline-block;
   float: left;
   margin-right: 2.717%;
   width: 5.272%; }
-  div.question-header div.vote-buttons ul li {
+  div.question-header div.vote-buttons ul li, div.answer-block div.vote-buttons ul li {
     background-position: center;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -3526,61 +3541,61 @@ div.question-header div.vote-buttons {
     padding: 10px;
     text-align: center;
     width: 70%; }
-    div.question-header div.vote-buttons ul li.post-vote {
+    div.question-header div.vote-buttons ul li.post-vote, div.answer-block div.vote-buttons ul li.post-vote {
       -webkit-border-radius: 4px;
       -moz-border-radius: 4px;
       -ms-border-radius: 4px;
       -o-border-radius: 4px;
       border-radius: 4px;
       background-color: #f9f4e1; }
-    div.question-header div.vote-buttons ul li.question-img-upvote, div.question-header div.vote-buttons ul li.answer-img-upvote {
+    div.question-header div.vote-buttons ul li.question-img-upvote, div.answer-block div.vote-buttons ul li.question-img-upvote, div.question-header div.vote-buttons ul li.answer-img-upvote, div.answer-block div.vote-buttons ul li.answer-img-upvote {
       background-image: url(/static/images/askbot/vote-arrow-up.png); }
-      div.question-header div.vote-buttons ul li.question-img-upvote:hover, div.question-header div.vote-buttons ul li.question-img-upvote.on, div.question-header div.vote-buttons ul li.answer-img-upvote:hover, div.question-header div.vote-buttons ul li.answer-img-upvote.on {
+      div.question-header div.vote-buttons ul li.question-img-upvote:hover, div.answer-block div.vote-buttons ul li.question-img-upvote:hover, div.question-header div.vote-buttons ul li.question-img-upvote.on, div.answer-block div.vote-buttons ul li.question-img-upvote.on, div.question-header div.vote-buttons ul li.answer-img-upvote:hover, div.answer-block div.vote-buttons ul li.answer-img-upvote:hover, div.question-header div.vote-buttons ul li.answer-img-upvote.on, div.answer-block div.vote-buttons ul li.answer-img-upvote.on {
         background-color: #d1e3a8; }
-    div.question-header div.vote-buttons ul li.question-img-downvote, div.question-header div.vote-buttons ul li.answer-img-downvote {
+    div.question-header div.vote-buttons ul li.question-img-downvote, div.answer-block div.vote-buttons ul li.question-img-downvote, div.question-header div.vote-buttons ul li.answer-img-downvote, div.answer-block div.vote-buttons ul li.answer-img-downvote {
       background-image: url(/static/images/askbot/vote-arrow-down.png); }
-      div.question-header div.vote-buttons ul li.question-img-downvote:hover, div.question-header div.vote-buttons ul li.question-img-downvote.on, div.question-header div.vote-buttons ul li.answer-img-downvote:hover, div.question-header div.vote-buttons ul li.answer-img-downvote.on {
+      div.question-header div.vote-buttons ul li.question-img-downvote:hover, div.answer-block div.vote-buttons ul li.question-img-downvote:hover, div.question-header div.vote-buttons ul li.question-img-downvote.on, div.answer-block div.vote-buttons ul li.question-img-downvote.on, div.question-header div.vote-buttons ul li.answer-img-downvote:hover, div.answer-block div.vote-buttons ul li.answer-img-downvote:hover, div.question-header div.vote-buttons ul li.answer-img-downvote.on, div.answer-block div.vote-buttons ul li.answer-img-downvote.on {
         background-color: #eac6ad; }
-div.question-header div.question-container {
+div.question-header div.question-container, div.answer-block div.question-container, div.question-header div.answer-block div.answer-container, div.answer-block div.question-header div.answer-container, div.answer-block div.answer-container {
   display: inline-block;
   float: left;
   width: 92.011%; }
-  div.question-header div.question-container h1 {
+  div.question-header div.question-container h1, div.answer-block div.question-container h1, div.question-header div.answer-block div.answer-container h1, div.answer-block div.question-header div.answer-container h1, div.answer-block div.answer-container h1 {
     margin-top: 0; }
-  div.question-header div.question-container div.meta-bar {
+  div.question-header div.question-container div.meta-bar, div.answer-block div.question-container div.meta-bar, div.question-header div.answer-block div.answer-container div.meta-bar, div.answer-block div.question-header div.answer-container div.meta-bar, div.answer-block div.answer-container div.meta-bar {
     border-bottom: 1px solid #eee;
     display: block;
     margin: 10px 0;
     overflow: hidden;
     padding: 5px 0 10px; }
-    div.question-header div.question-container div.meta-bar div.tag-list {
+    div.question-header div.question-container div.meta-bar div.tag-list, div.answer-block div.question-container div.meta-bar div.tag-list, div.question-header div.answer-block div.answer-container div.meta-bar div.tag-list, div.answer-block div.question-header div.answer-container div.meta-bar div.tag-list, div.answer-block div.answer-container div.meta-bar div.tag-list {
       display: inline-block;
       float: left;
       width: 48.466%;
       margin-right: 3.067%; }
-    div.question-header div.question-container div.meta-bar div.question-actions {
+    div.question-header div.question-container div.meta-bar div.question-actions, div.answer-block div.question-container div.meta-bar div.question-actions, div.question-header div.answer-block div.answer-container div.meta-bar div.question-actions, div.answer-block div.question-header div.answer-container div.meta-bar div.question-actions, div.answer-block div.answer-container div.meta-bar div.question-actions, div.question-header div.question-container div.answer-block div.meta-bar div.answer-actions, div.answer-block div.question-header div.question-container div.meta-bar div.answer-actions, div.answer-block div.question-container div.meta-bar div.answer-actions, div.question-header div.answer-block div.answer-container div.meta-bar div.answer-actions, div.answer-block div.question-header div.answer-container div.meta-bar div.answer-actions, div.answer-block div.answer-container div.meta-bar div.answer-actions {
       display: inline-block;
       float: left;
       text-align: right;
       width: 48.466%; }
-      div.question-header div.question-container div.meta-bar div.question-actions a {
+      div.question-header div.question-container div.meta-bar div.question-actions a, div.answer-block div.question-container div.meta-bar div.question-actions a, div.question-header div.answer-block div.answer-container div.meta-bar div.question-actions a, div.answer-block div.question-header div.answer-container div.meta-bar div.question-actions a, div.answer-block div.answer-container div.meta-bar div.question-actions a, div.question-header div.question-container div.answer-block div.meta-bar div.answer-actions a, div.answer-block div.question-header div.question-container div.meta-bar div.answer-actions a, div.answer-block div.question-container div.meta-bar div.answer-actions a, div.question-header div.answer-block div.answer-container div.meta-bar div.answer-actions a, div.answer-block div.question-header div.answer-container div.meta-bar div.answer-actions a, div.answer-block div.answer-container div.meta-bar div.answer-actions a {
         color: #a88d23; }
-        div.question-header div.question-container div.meta-bar div.question-actions a.question-delete {
+        div.question-header div.question-container div.meta-bar div.question-actions a.question-delete, div.answer-block div.question-container div.meta-bar div.question-actions a.question-delete, div.question-header div.answer-block div.answer-container div.meta-bar div.question-actions a.question-delete, div.answer-block div.question-header div.answer-container div.meta-bar div.question-actions a.question-delete, div.answer-block div.answer-container div.meta-bar div.question-actions a.question-delete, div.question-header div.question-container div.answer-block div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-header div.question-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-container div.meta-bar div.answer-actions a.question-delete, div.question-header div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-header div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete {
           color: #993333; }
-      div.question-header div.question-container div.meta-bar div.question-actions span.sep {
+      div.question-header div.question-container div.meta-bar div.question-actions span.sep, div.answer-block div.question-container div.meta-bar div.question-actions span.sep, div.question-header div.answer-block div.answer-container div.meta-bar div.question-actions span.sep, div.answer-block div.question-header div.answer-container div.meta-bar div.question-actions span.sep, div.answer-block div.answer-container div.meta-bar div.question-actions span.sep, div.question-header div.question-container div.answer-block div.meta-bar div.answer-actions span.sep, div.answer-block div.question-header div.question-container div.meta-bar div.answer-actions span.sep, div.answer-block div.question-container div.meta-bar div.answer-actions span.sep, div.question-header div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.question-header div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep {
         color: #eddfaa; }
-  div.question-header div.question-container div.question-content {
+  div.question-header div.question-container div.question-content, div.answer-block div.question-container div.question-content, div.question-header div.answer-block div.answer-container div.question-content, div.answer-block div.question-header div.answer-container div.question-content, div.answer-block div.answer-container div.question-content, div.question-header div.question-container div.answer-block div.answer-container div.answer-content, div.answer-block div.answer-container div.question-header div.question-container div.answer-content, div.answer-block div.question-container div.answer-container div.answer-content, div.answer-block div.answer-container div.question-container div.answer-content, div.question-header div.answer-block div.answer-container div.answer-content, div.answer-block div.question-header div.answer-container div.answer-content, div.answer-block div.answer-container div.answer-content {
     overflow: hidden; }
-    div.question-header div.question-container div.question-content div.question-body {
+    div.question-header div.question-container div.question-content div.question-body, div.answer-block div.question-container div.question-content div.question-body, div.question-header div.answer-block div.answer-container div.question-content div.question-body, div.answer-block div.question-header div.answer-container div.question-content div.question-body, div.answer-block div.answer-container div.question-content div.question-body, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.question-body, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.question-body, div.answer-block div.question-container div.answer-container div.answer-content div.question-body, div.answer-block div.answer-container div.question-container div.answer-content div.question-body, div.question-header div.answer-block div.answer-container div.answer-content div.question-body, div.answer-block div.question-header div.answer-container div.answer-content div.question-body, div.answer-block div.answer-container div.answer-content div.question-body, div.question-header div.question-container div.question-content div.answer-block div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content div.question-header div.question-container div.question-content div.answer-body, div.answer-block div.question-container div.question-content div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content div.question-container div.question-content div.answer-body, div.question-header div.answer-block div.answer-container div.question-content div.answer-content div.answer-body, div.question-header div.answer-block div.answer-container div.answer-content div.question-content div.answer-body, div.answer-block div.question-header div.answer-container div.question-content div.answer-content div.answer-body, div.answer-block div.question-header div.answer-container div.answer-content div.question-content div.answer-body, div.answer-block div.answer-container div.question-content div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content div.question-content div.answer-body, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.answer-body, div.answer-block div.question-container div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.question-container div.answer-content div.answer-body, div.question-header div.answer-block div.answer-container div.answer-content div.answer-body, div.answer-block div.question-header div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content div.answer-body {
       display: inline-block;
       float: left;
       margin-right: 3.067%;
       width: 76.81%; }
-    div.question-header div.question-container div.question-content div.post-update-container {
+    div.question-header div.question-container div.question-content div.post-update-container, div.answer-block div.question-container div.question-content div.post-update-container, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container, div.answer-block div.answer-container div.question-content div.post-update-container, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container, div.answer-block div.answer-container div.answer-content div.post-update-container {
       display: inline-block;
       float: left;
       width: 20.123%; }
-      div.question-header div.question-container div.question-content div.post-update-container div.post-update-info {
+      div.question-header div.question-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info {
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         -ms-box-sizing: border-box;
@@ -3594,34 +3609,34 @@ div.question-header div.question-container {
         background: #faf7e9;
         padding: 10px;
         margin-bottom: 10px; }
-        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info:last-child {
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info:last-child, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info:last-child, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info:last-child, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info:last-child, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info:last-child, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info:last-child, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info:last-child, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info:last-child, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info:last-child, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info:last-child, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info:last-child, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info:last-child {
           margin-bottom: 0; }
-        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info.revision {
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info.revision, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info.revision, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info.revision, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info.revision, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info.revision, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info.revision, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info.revision, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info.revision, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info.revision, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info.revision, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info.revision, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info.revision {
           text-align: center;
           background: #fcfaf2; }
-          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info.revision a {
+          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info.revision a, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info.revision a, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info.revision a, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info.revision a, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info.revision a, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info.revision a, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info.revision a, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info.revision a, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info.revision a, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info.revision a, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info.revision a, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info.revision a {
             color: black; }
-        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info a {
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info a, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info a, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info a, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info a, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info a, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info a, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info a, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info a, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info a, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info a, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info a, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info a {
           color: #993333; }
-        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.change-date {
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.change-date, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info div.change-date, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.change-date, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info div.change-date, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.change-date, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.change-date, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info div.change-date, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info div.change-date, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info div.change-date, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.change-date, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info div.change-date, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.change-date {
           font-size: 12px;
           margin-bottom: 10px; }
-        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.avatar {
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.avatar, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info div.avatar, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.avatar, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info div.avatar, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.avatar, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info div.avatar, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info div.avatar, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar {
           display: inline-block;
           float: left;
           margin-right: 3px; }
-          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.avatar img.gravatar {
+          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar img.gravatar, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.avatar img.gravatar {
             background: white;
             border: 1px solid #eddfaa;
             margin-right: 5px;
             padding: 3px;
             vertical-align: bottom; }
-        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.user-meta {
+        div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.user-meta, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info div.user-meta, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.user-meta, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info div.user-meta, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.user-meta, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info div.user-meta, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info div.user-meta, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta {
           display: inline-block;
           width: 60%; }
-          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.user-meta span.user-badges {
+          div.question-header div.question-container div.question-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta span.user-badges, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info div.user-meta span.user-badges {
             display: block; }
-  div.question-header div.question-container div.comments-container {
+  div.question-header div.question-container div.comments-container, div.answer-block div.question-container div.comments-container, div.question-header div.answer-block div.answer-container div.comments-container, div.answer-block div.question-header div.answer-container div.comments-container, div.answer-block div.answer-container div.comments-container {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
@@ -3633,46 +3648,20 @@ div.question-header div.question-container {
     margin: 15px 0 0;
     padding: 3%;
     width: 100%; }
-    div.question-header div.question-container div.comments-container div.comments-content {
+    div.question-header div.question-container div.comments-container div.comments-content, div.answer-block div.question-container div.comments-container div.comments-content, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content, div.answer-block div.answer-container div.comments-container div.comments-content {
       font-size: 13px; }
-<<<<<<< local
-=======
-<<<<<<< local
->>>>>>> other
-      div.question-header div.question-container div.comments-container div.comments-content .block {
-<<<<<<< local
-=======
-=======
-      div.question-header div.question-container div.comments-container div.comments-content div.comment {
->>>>>>> other
->>>>>>> other
+      div.question-header div.question-container div.comments-container div.comments-content .block, div.answer-block div.question-container div.comments-container div.comments-content .block, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block, div.answer-block div.answer-container div.comments-container div.comments-content .block {
         border-bottom: 1px solid #ddd;
         border-top: 1px solid #fff;
         padding: 15px 0;
         display: block; }
-<<<<<<< local
-=======
-<<<<<<< local
->>>>>>> other
-        div.question-header div.question-container div.comments-container div.comments-content .block:first-child {
-<<<<<<< local
-=======
-=======
-        div.question-header div.question-container div.comments-container div.comments-content div.comment:first-child {
->>>>>>> other
->>>>>>> other
+        div.question-header div.question-container div.comments-container div.comments-content .block:first-child, div.answer-block div.question-container div.comments-container div.comments-content .block:first-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child {
           border-top: 0; }
-<<<<<<< local
-        div.question-header div.question-container div.comments-container div.comments-content .block:only-of-type {
-          border: 0; }
-=======
-<<<<<<< local
->>>>>>> other
-      div.question-header div.question-container div.comments-container div.comments-content div.comment:first-child {
+      div.question-header div.question-container div.comments-container div.comments-content div.comment:first-child, div.answer-block div.question-container div.comments-container div.comments-content div.comment:first-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment:first-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment:first-child, div.answer-block div.answer-container div.comments-container div.comments-content div.comment:first-child {
         border-top: 0; }
-      div.question-header div.question-container div.comments-container div.comments-content div.comment:last-child {
+      div.question-header div.question-container div.comments-container div.comments-content div.comment:last-child, div.answer-block div.question-container div.comments-container div.comments-content div.comment:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment:last-child, div.answer-block div.answer-container div.comments-container div.comments-content div.comment:last-child {
         margin-bottom: 20px; }
-      div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls {
+      div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls {
         background: none;
         border: none;
         display: inline-block;
@@ -3680,64 +3669,73 @@ div.question-header div.question-container {
         padding: 0 2% 0 0;
         text-align: center;
         width: 5%; }
-        div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div {
+        div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div {
           background: none;
           opacity: 0.6; }
-          div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover {
+          div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover {
             opacity: 1; }
-        div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes {
+        div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes {
           -webkit-transform: rotate(-90deg);
           -moz-transform: rotate(-90deg);
           -ms-transform: rotate(-90deg);
           -o-transform: rotate(-90deg);
           transform: rotate(-90deg);
           width: 16px; }
-          div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote {
+          div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote {
             cursor: pointer;
             font-size: 25px;
-            text-decoration: none; }
-        div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete {
+            text-decoration: none;
+            color: green; }
+        div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls hr, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls hr, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls hr, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls hr, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls hr {
+          margin: 0; }
+        div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete {
           color: #993333;
           cursor: pointer;
           font-size: 15px; }
-      div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body {
+        div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit {
+          -webkit-transform: rotate(50deg);
+          -moz-transform: rotate(50deg);
+          -ms-transform: rotate(50deg);
+          -o-transform: rotate(50deg);
+          transform: rotate(50deg);
+          cursor: pointer;
+          font-size: 16px; }
+          div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit a.edit-icon, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit a.edit-icon, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit a.edit-icon, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit a.edit-icon, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-edit a.edit-icon {
+            color: #555;
+            text-decoration: none; }
+      div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body {
         display: inline-block;
         width: 95%; }
-        div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta {
+        div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta {
           text-align: right; }
-          div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author {
+          div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author {
             font-weight: bold; }
-          div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit {
+          div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit {
             font-size: 12px;
             padding: 2px 10px; }
-<<<<<<< local
-=======
-=======
-        div.question-header div.question-container div.comments-container div.comments-content div.comment:last-child {
-          margin-bottom: 20px; }
-        div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-votes {
-          display: inline; }
-          div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-votes .upvote {
-            background: #ccc;
-            display: inline-block;
-            margin: 0px;
-            padding-right: 17px;
-            padding-top: 2px;
-            height: 20px;
-            color: #777;
-            width: 20px; }
-        div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-delete {
-          display: inline; }
->>>>>>> other
->>>>>>> other
-    div.question-header div.question-container div.comments-container #edit-comment-form {
+    div.question-header div.question-container div.comments-container #edit-comment-form, div.answer-block div.question-container div.comments-container #edit-comment-form, div.question-header div.answer-block div.answer-container div.comments-container #edit-comment-form, div.answer-block div.question-header div.answer-container div.comments-container #edit-comment-form, div.answer-block div.answer-container div.comments-container #edit-comment-form {
       margin: 10px 0;
       min-height: 100px;
       width: 99%;
       resize: vertical; }
-    div.question-header div.question-container div.comments-container .counter {
+    div.question-header div.question-container div.comments-container .counter, div.answer-block div.question-container div.comments-container .counter, div.question-header div.answer-block div.answer-container div.comments-container .counter, div.answer-block div.question-header div.answer-container div.comments-container .counter, div.answer-block div.answer-container div.comments-container .counter {
       color: #888;
       display: block;
       float: right;
       margin-top: 5px;
       text-align: right; }
+
+div.answer-controls {
+  display: inline-block;
+  margin-top: 20px;
+  margin-bottom: 0; }
+
+div.answer-block {
+  border-top: #ddd 1px solid;
+  display: inline-block;
+  float: left;
+  margin: 20px 0;
+  padding-top: 20px;
+  width: 100%; }
+  div.answer-block img.answer-img-accept {
+    margin: 10px 0px 10px 16px; }
