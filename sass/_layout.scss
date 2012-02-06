@@ -20,33 +20,29 @@ html {
         @include box-sizing(border-box);
         padding: 0 $body-line-height;
 
-        h1 {
-          border-right: 1px solid darken($mit-red, 5%);
-          color: #000;
-          display: block;
+        hgroup {
           float: left;
-          font-size: 20px;
-          font-weight: 800;
-          margin: 0 lh() 0 0;
-          padding: 17px lh() 14px 0;
-          text-shadow: 0 1px 0 lighten($mit-red, 10%);
-          line-height: lh();
-        }
+          @extend .clearfix;
 
-        nav {
-          float: left;
-          display: block;
-          margin: 0;
-          padding: 0;
-          text-shadow: 0 -1px 0 darken($mit-red, 10%);
-          -webkit-font-smoothing: antialiased;
+          h1 {
+            border-right: 1px solid darken($mit-red, 5%);
+            color: darken($mit-red, 20%);
+            font-size: 20px;
+            font-weight: 800;
+            margin: 0 lh() 0 0;
+            padding: 17px lh() 14px 0;
+            text-shadow: 0 1px 0 lighten($mit-red, 10%);
+            line-height: lh();
+            @include inline-block();
+          }
 
           h2 {
-            float: left;
+            @include inline-block();
             margin: 0 lh() 0 0;
             padding: 19px lh() 9px 0;
             line-height: lh();
             border-right: 1px solid darken($mit-red, 5%);
+            -webkit-font-smoothing: antialiased;
 
             a {
               color: #fff;
@@ -57,6 +53,34 @@ html {
               }
             }
           }
+
+          @media screen and (max-width: 920px) {
+            border-bottom: 1px solid darken($mit-red, 5%);
+            display: block;
+            float: none;
+
+            h1 {
+              float: left;
+              border: 0;
+            }
+
+            h2 {
+              float: right;
+              border: 0;
+              margin-right: 0;
+              padding-right: 0;
+            }
+          }
+        }
+
+        nav {
+          float: left;
+          display: block;
+          margin: 0;
+          padding: 0;
+          text-shadow: 0 -1px 0 darken($mit-red, 10%);
+          -webkit-font-smoothing: antialiased;
+
 
           ul {
             @extend .clearfix;
