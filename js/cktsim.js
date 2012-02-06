@@ -96,9 +96,15 @@ cktsim = (function() {
 
 	// load circuit from JSON netlist (see schematic.js)
 	Circuit.prototype.load_netlist = function(netlist) {
-	    // set up mapping for ground node always called '0' in JSON netlist
-	    var gnd_label = '0';
-	    this.node_map[gnd_label] = this.gnd_node();
+	    // set up mapping for all ground connections
+	    for (var i = netlist.length - 1; i >= 0; --i) {
+		var component = netlist[i];
+		var type = component[0];
+		if (type == 'g') {
+		    var connections = component[3];
+		    this.node_map[connections[0]] = this.gnd_node();
+		}
+	    }
 
 	    // process each component in the JSON netlist (see schematic.js for format)
 	    var found_ground = false;
@@ -120,9 +126,9 @@ cktsim = (function() {
 		var connections = component[3];
 		for (var j = connections.length - 1; j >= 0; --j) {
 		    var node = connections[j];
-		    if(node == gnd_label) found_ground = true;
 		    var index = this.node_map[node];
 		    if (index == undefined) index = this.node(node,T_VOLTAGE);
+		    else if (index == this.gnd_node()) found_ground = true;
 		    connections[j] = index;
 		}
 
@@ -146,7 +152,8 @@ cktsim = (function() {
 		else if (type == 'p') 	// p fet
 		    this.p(connections[0],connections[1],connections[2],properties['W/L'],name);
 	    }
-	    if(found_ground == false) { // No ground on schematic
+
+	    if (!found_ground) { // No ground on schematic
 		alert('Please make at least one connection to ground  (inverted T symbol)');
 		return false;
 	    }
