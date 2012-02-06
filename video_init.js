@@ -9,8 +9,7 @@ if (swfobject.hasFlashPlayerVersion("10.1")){
         "ytapiplayer", "640", "385", "8", null, null, params, atts);
 } else {
 
-  //end of this URL may need &origin=http://..... once pushed to production to prevent XSS
-  $("#html5_player").attr("src", "http://www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1&controls=0&origin=https://6002xint.mitx.mit.edu");
+  $("#html5_player").attr("src", "http://www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1&controls=0&origin=" + document.domain);
   $("#html5_player").show();
 
   var tag = document.createElement('script');
