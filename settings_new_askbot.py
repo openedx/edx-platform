@@ -39,6 +39,13 @@ HTTPS = 'on'
 MEDIA_URL = ''
 MEDIA_ROOT = ''
 
+# S3BotoStorage insists on a timeout for uploaded assets. We should make it 
+# permanent instead, but rather than trying to figure out exactly where that
+# setting is, I'm just bumping the expiration time to something absurd (100 
+# years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
+# in the global settings.py
+AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60 # 10 years
+
 # Needed for Askbot
 # Deployed machines: Move to S3
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
