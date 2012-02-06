@@ -176,9 +176,9 @@ div.question-header {
            &:first-child {
             border-top: 0;
           }
-          &:only-of-type {
-            border: 0;
-          }
+          // &:only-of-type {
+          //   border: 0;
+          // }
         }
 
         form.post-comments {

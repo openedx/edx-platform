@@ -1,17 +1,18 @@
+<%page args="active_page" />
 <div class="header-wrapper">
   <header>
     <h1><em>MITx</em></h1>
 
-    <nav>
+    <nav class="${active_page}">
       <h2><a href="/courseware">Circuits and Electronics</a></h2>
 
       <ul class="coursenav">
-        <li><a href="/courseware">Courseware</a></li>
-        <li><a href="/info">Course Info</a></li>
-        <li><a href="/book">Textbook</a></li>
-        <li><a href="/discussion">Discussion</a></li>
-        <li><a href="/wiki">Wiki</a></li>
-        <li><a href="/profile">Profile</a></li>
+        <li class="courseware"><a href="/courseware">Courseware</a></li>
+        <li class="info"><a href="/info">Course Info</a></li>
+        <li class="book"><a href="/book">Textbook</a></li>
+        <li class="discussion"><a href="/discussion">Discussion</a></li>
+        <li class="wiki"><a href="/wiki">Wiki</a></li>
+        <li class="profile"><a href="/profile">Profile</a></li>
       </ul>
     </nav>
   </header>
