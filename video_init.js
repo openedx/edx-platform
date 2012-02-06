@@ -10,7 +10,7 @@ if (swfobject.hasFlashPlayerVersion("10.1")){
 } else {
 
   //end of this URL may need &origin=http://..... once pushed to production to prevent XSS
-  $("#html5_player").attr("src", "http://www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1&controls=0");
+  $("#html5_player").attr("src", document.location.protocol +  "//www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1&controls=0");
   $("#html5_player").show();
 
   var tag = document.createElement('script');
