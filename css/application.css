@@ -129,7 +129,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.profile-wrapper section.course-info ol > li:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header hgroup:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.profile-wrapper section.course-info ol > li:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
   content: ".";
   display: block;
   height: 0;
@@ -393,17 +393,55 @@ html {
         -o-box-sizing: border-box;
         box-sizing: border-box;
         padding: 0 22.652px; }
-        html body div.header-wrapper header h1 {
-          border-right: 1px solid #862d2d;
-          color: #000;
-          display: block;
-          float: left;
-          font-size: 20px;
-          font-weight: 800;
-          margin: 0 22.652px 0 0;
-          padding: 17px 22.652px 14px 0;
-          text-shadow: 0 1px 0 #bf4040;
-          line-height: 22.652px; }
+        html body div.header-wrapper header hgroup {
+          float: left; }
+          html body div.header-wrapper header hgroup h1 {
+            border-right: 1px solid #862d2d;
+            color: #4d1919;
+            font-size: 20px;
+            font-weight: 800;
+            margin: 0 22.652px 0 0;
+            padding: 17px 22.652px 14px 0;
+            text-shadow: 0 1px 0 #bf4040;
+            line-height: 22.652px;
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto; }
+          html body div.header-wrapper header hgroup h2 {
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto;
+            margin: 0 22.652px 0 0;
+            padding: 19px 22.652px 9px 0;
+            line-height: 22.652px;
+            border-right: 1px solid #862d2d;
+            -webkit-font-smoothing: antialiased; }
+            html body div.header-wrapper header hgroup h2 a {
+              color: #fff;
+              text-decoration: none; }
+              html body div.header-wrapper header hgroup h2 a:hover {
+                color: rgba(255, 255, 255, 0.7); }
+          @media screen and (max-width: 920px) {
+            html body div.header-wrapper header hgroup {
+              border-bottom: 1px solid #862d2d;
+              display: block;
+              float: none; }
+              html body div.header-wrapper header hgroup h1 {
+                float: left;
+                border: 0; }
+              html body div.header-wrapper header hgroup h2 {
+                float: right;
+                border: 0;
+                margin-right: 0;
+                padding-right: 0; } }
         html body div.header-wrapper header nav {
           float: left;
           display: block;
@@ -411,17 +449,6 @@ html {
           padding: 0;
           text-shadow: 0 -1px 0 #732626;
           -webkit-font-smoothing: antialiased; }
-          html body div.header-wrapper header nav h2 {
-            float: left;
-            margin: 0 22.652px 0 0;
-            padding: 19px 22.652px 9px 0;
-            line-height: 22.652px;
-            border-right: 1px solid #862d2d; }
-            html body div.header-wrapper header nav h2 a {
-              color: #fff;
-              text-decoration: none; }
-              html body div.header-wrapper header nav h2 a:hover {
-                color: rgba(255, 255, 255, 0.7); }
           html body div.header-wrapper header nav ul {
             display: inline-block;
             padding: 19px 0 9px;
@@ -1059,6 +1086,8 @@ div.book-wrapper ul#booknav {
     -o-box-shadow: 0 1px 0 #eeeeee;
     box-shadow: 0 1px 0 #eeeeee;
     padding: 7px 7px 7px 30px; }
+div.book-wrapper section.book nav a {
+  padding: 14px; }
 div.book-wrapper section.book nav ul li.last {
   float: left;
   display: block; }
@@ -1073,10 +1102,11 @@ div.book-wrapper section.book nav ul li.last {
 div.book-wrapper section.book nav ul li.next {
   display: block;
   float: right; }
-div.book-wrapper section.book section.page img {
-  border: 1px solid #dddddd;
-  max-width: 100%;
-  min-width: 100%; }
+div.book-wrapper section.book section.page {
+  text-align: center; }
+  div.book-wrapper section.book section.page img {
+    border: 1px solid #dddddd;
+    max-width: 100%; }
 
 div.info-wrapper section.handouts {
   -webkit-border-radius: 0px 4px 0px 4px;
