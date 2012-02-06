@@ -41,7 +41,7 @@ class VideoModule(XModule):
         return render_to_string('video.html',{'streams':self.video_list(),
                                               'id':self.item_id,
                                               'position':self.position, 
-                                              'title':self.title})
+                                              'name':self.name})
 
     def get_init_js(self):
         '''JavaScript code to be run when problem is shown. Be aware
@@ -59,7 +59,7 @@ class VideoModule(XModule):
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
         self.youtube = etree.XML(xml).get('youtube')
-        self.title = etree.XML(xml).get('title')
+        self.name = etree.XML(xml).get('name')
         self.position = 0
         if state != None:
             state = json.loads(state)
