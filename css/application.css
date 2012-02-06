@@ -435,10 +435,12 @@ html {
               display: block;
               float: none; }
               html body div.header-wrapper header hgroup h1 {
-                float: left;
-                border: 0; }
-              html body div.header-wrapper header hgroup h2 {
                 float: right;
+                border: 0;
+                margin-right: 0;
+                padding-right: 0; }
+              html body div.header-wrapper header hgroup h2 {
+                float: left;
                 border: 0;
                 margin-right: 0;
                 padding-right: 0; } }
@@ -1572,14 +1574,37 @@ section.activation {
 
 section.help.main-content {
   padding: 22.652px; }
+  section.help.main-content h1 {
+    margin-top: 0;
+    margin-bottom: 22.652px;
+    padding-bottom: 22.652px;
+    border-bottom: 1px solid #ddd; }
   section.help.main-content p {
     max-width: 700px; }
-  section.help.main-content dl {
-    margin-bottom: 22.652px; }
-    section.help.main-content dl dd, section.help.main-content dl dt {
-      margin-bottom: 11.326px; }
-    section.help.main-content dl dt {
-      font-weight: bold; }
+  section.help.main-content h2 {
+    margin-top: 0; }
+  section.help.main-content section.self-help {
+    margin-bottom: 22.652px;
+    margin-right: 2.024%;
+    float: left;
+    width: 48.988%; }
+    section.help.main-content section.self-help ul {
+      margin-left: 4.132%; }
+      section.help.main-content section.self-help ul li {
+        margin-bottom: 11.326px; }
+  section.help.main-content section.help-email {
+    float: left;
+    width: 48.988%; }
+    section.help.main-content section.help-email dl {
+      margin-bottom: 22.652px;
+      display: block; }
+      section.help.main-content section.help-email dl dd {
+        margin-bottom: 22.652px; }
+      section.help.main-content section.help-email dl dt {
+        font-weight: bold;
+        float: left;
+        clear: left;
+        width: 30.579%; }
 
 .badges a {
   color: #763333;
