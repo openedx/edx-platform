@@ -219,7 +219,12 @@ div.question-header {
                 cursor: pointer;
                 font-size: 25px;
                 text-decoration: none;
+                color: green;
               }
+            }
+
+            hr {
+              margin: 0;
             }
 
             div.comment-delete {
@@ -227,6 +232,16 @@ div.question-header {
               color: $mit-red;
               cursor: pointer;
               font-size: 15px;
+            }
+
+            div.comment-edit {
+              @include transform(rotate(50deg));
+              cursor: pointer;
+              font-size: 16px;
+              a.edit-icon {
+                color: #555;
+                text-decoration: none;
+              }
             }
           }
 
