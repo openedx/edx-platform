@@ -129,7 +129,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header hgroup:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.profile-wrapper section.course-info ol > li:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, body.askbot .secondary-nav nav:after, html body div.header-wrapper header:after, html body div.header-wrapper header hgroup:after, html body div.header-wrapper header nav ul:after, html body section.main-content:after, html footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.profile-wrapper section.course-info ol > li:after, div.wiki-wrapper div#wiki_panel div#wiki_create_form:after, body.askbot footer div.footer-wrapper:after {
   content: ".";
   display: block;
   height: 0;
@@ -560,9 +560,30 @@ div.leanModal_box {
     margin-bottom: 22.652px; }
   div.leanModal_box#enroll {
     max-width: 600px; }
+    div.leanModal_box#enroll ol li {
+      width: 239px;
+      float: left; }
+      div.leanModal_box#enroll ol li.email, div.leanModal_box#enroll ol li.username, div.leanModal_box#enroll ol li.location {
+        margin-right: 20px; }
+      div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
+        width: auto;
+        float: none; }
+      div.leanModal_box#enroll ol li div.tip {
+        display: none; }
+      div.leanModal_box#enroll ol li:hover div.tip {
+        display: block;
+        line-height: 22.652px;
+        position: absolute;
+        background: #333;
+        color: #fff;
+        width: 239px;
+        margin: 0 0 0 -10px;
+        padding: 10px;
+        -webkit-font-smoothing: antialiased;
+        font-size: 16px; }
   div.leanModal_box form {
     text-align: left; }
-    div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error {
+    div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error, div.leanModal_box form div#pwd_error {
       -webkit-font-smoothing: antialiased;
       background-color: #F50200;
       color: #fff;
@@ -571,10 +592,11 @@ div.leanModal_box {
       margin-bottom: 22.652px;
       padding: 4.53px;
       text-transform: uppercase; }
-      div.leanModal_box form div#enroll_error:empty, div.leanModal_box form div#login_error:empty {
+      div.leanModal_box form div#enroll_error:empty, div.leanModal_box form div#login_error:empty, div.leanModal_box form div#pwd_error:empty {
         padding: 0; }
     div.leanModal_box form ol {
-      list-style: none; }
+      list-style: none;
+      margin-bottom: 22.652px; }
       div.leanModal_box form ol li {
         margin-bottom: 11.326px; }
         div.leanModal_box form ol li.terms, div.leanModal_box form ol li.remember {
@@ -1504,6 +1526,8 @@ div.wiki-wrapper {
           div.wiki-wrapper div#wiki_panel div#wiki_create_form ul li#cancel {
             float: right;
             margin-top: 10px; }
+  div.wiki-wrapper section.wiki-body header:empty {
+    display: none !important; }
   div.wiki-wrapper section.wiki-body header p {
     float: left;
     padding: 15px;
@@ -1555,7 +1579,7 @@ div.wiki-wrapper {
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 16.989px;
+        padding: 14px;
         margin: 0; }
         div.wiki-wrapper section.wiki-body header ul li input[type="button"]:hover {
           background: none; }
