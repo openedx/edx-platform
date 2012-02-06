@@ -60,12 +60,14 @@ html {
             float: none;
 
             h1 {
-              float: left;
+              float: right;
               border: 0;
+              margin-right: 0;
+              padding-right: 0;
             }
 
             h2 {
-              float: right;
+              float: left;
               border: 0;
               margin-right: 0;
               padding-right: 0;
