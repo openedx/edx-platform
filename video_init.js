@@ -9,14 +9,14 @@ if (swfobject.hasFlashPlayerVersion("10.1")){
         "ytapiplayer", "640", "385", "8", null, null, params, atts);
 } else {
 
-  $("#html5_player").attr("src", "http://www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1&controls=0&origin=" + document.domain);
+  //end of this URL may need &origin=http://..... once pushed to production to prevent XSS
+  $("#html5_player").attr("src", document.location.protocol +  "//www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1&controls=0");
   $("#html5_player").show();
 
   var tag = document.createElement('script');
   tag.src = "http://www.youtube.com/player_api";
   var firstScriptTag = document.getElementsByTagName('script')[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
   // Make sure the callback is called once API ready, YT seems to be buggy
   loadHTML5Video();
 }
