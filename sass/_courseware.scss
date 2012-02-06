@@ -109,9 +109,10 @@ div.course-wrapper {
         display: table-cell;
         vertical-align: top;
 
-        @media screen and (max-width:980px) {
+        @media screen and (max-width:1020px) {
           display: block;
           width: auto;
+          border-right: 0;
         }
       }
 
@@ -120,9 +121,10 @@ div.course-wrapper {
         width: flex-grid(7, 9);
         padding-left: flex-gutter(9);
 
-        @media screen and (max-width:910px) {
+        @media screen and (max-width:1020px) {
           display: block;
           width: auto;
+          padding: 0;
         }
 
         span {
@@ -186,6 +188,11 @@ div.course-wrapper {
     section.problems-wrapper {
       display: table;
       width: 100%;
+
+      @media screen and (max-width:1020px) {
+        display: block;
+        width: auto;
+      }
     }
 
     ol.vert-mod {

@@ -47,8 +47,8 @@ nav.sequence-nav {
       border-right: 1px solid darken(#F6EFD4, 10%);
       cursor: pointer;
       display: table-cell;
-      padding: 14px 14px;
-      width: 18px;
+      padding: 14px 4px;
+      width: 28px;
 
       // @media screen and (max-width: 800px) {
       //   padding: 12px 8px;
@@ -124,9 +124,9 @@ nav.sequence-nav {
         border-left: 1px solid darken(#f6efd4, 20%);
         cursor: pointer;
         display: table-cell;
-        padding: 14px;
+        padding: 14px 4px;
         text-indent: -9999px;
-        width: 72px;
+        width: 82px;
 
         &:hover {
           text-decoration: none;
