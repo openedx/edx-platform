@@ -23,7 +23,7 @@ class Command(BaseCommand):
                 print "==============> Invalid (non-alphanumeric) filename", filename
                 check = False
         print "Confirming all modules render. Nothing should print during this step. "
-        for module in course.xpath('//problem|//html|//video'):
+        for module in course.xpath('//problem|//html|//video|//vertical|//sequential|/tab'):
             module_class=mitx.courseware.module_render.modx_modules[module.tag]
             # TODO: Abstract this out in render_module.py
             try: 
@@ -44,6 +44,9 @@ class Command(BaseCommand):
                 etree.parse(sections_dir+'/'+f)
         else:
             print "Skipping check of include files -- no section includes dir ("+sections_dir+")"
+        # TODO: print "Checking course properly annotated with preprocess.py"
+        
+            
         if check:
             print 'Courseware passes all checks!'
         else: 
