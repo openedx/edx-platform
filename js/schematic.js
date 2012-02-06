@@ -113,7 +113,7 @@ schematic = (function() {
 	    // else just populate parts bin with all the parts
 	    this.edits_allowed = true;
 	    var parts = input.getAttribute('parts');
-	    if (parts == undefined) {
+	    if (parts == undefined || parts == 'None') {
 		parts = new Array();
 		for (var p in parts_map) parts.push(p);
 	    } else if (parts == '') {
@@ -133,7 +133,8 @@ schematic = (function() {
 	    // use user-supplied list of analyses, otherwise provide them all
 	    // analyses="" means no analyses
 	    var analyses = input.getAttribute('analyses');
-	    if (analyses == undefined) analyses = ['dc','ac','tran'];
+	    if (analyses == undefined || analyses == 'None')
+		analyses = ['dc','ac','tran'];
 	    else if (analyses == '') analyses = [];
 	    else analyses = analyses.split(',');
 
@@ -193,7 +194,6 @@ schematic = (function() {
 		this.canvas.style.borderStyle = 'solid';
 		this.canvas.style.borderWidth = '1px';
 		this.canvas.style.borderColor = grid_style;
-		//this.canvas.style.position = 'absolute';
 		this.canvas.style.outline = 'none';
 	    }
 
@@ -273,6 +273,9 @@ schematic = (function() {
 	    tr = document.createElement('tr');
 	    table.appendChild(tr);
 	    td = document.createElement('td');
+	    td.style.position = 'relative';  // so we can position subwindows
+	    td.style.left = '0';
+	    td.style.top = '0';
 	    tr.appendChild(td);
 	    td.appendChild(this.canvas);
 	    td = document.createElement('td');
@@ -634,9 +637,10 @@ schematic = (function() {
 
 	    // create a circuit from the netlist
 	    var ckt = new cktsim.Circuit();
-	    ckt.load_netlist(netlist);
-
-	    return ckt;
+	    if (ckt.load_netlist(netlist))
+		return ckt;
+	    else
+		return null;
 	}
 
 	Schematic.prototype.dc_analysis = function() {
@@ -645,6 +649,7 @@ schematic = (function() {
 	    this.redraw_background();
 
 	    var ckt = this.extract_circuit();
+	    if (ckt === null) return;
     
 	    // run the analysis
 	    this.operating_point = ckt.dc();
@@ -712,6 +717,7 @@ schematic = (function() {
 	Schematic.prototype.ac_analysis = function(npts,fstart,fstop,ac_source_name) {
 	    // run the analysis
 	    var ckt = this.extract_circuit();
+	    if (ckt === null) return;
 	    var results = ckt.ac(npts,fstart,fstop,ac_source_name);
 
 	    // save a copy of the results for submission
@@ -731,11 +737,28 @@ schematic = (function() {
 		var y_values = [];  // list of [color, result_array]
 		var probes = this.find_probes();
 
+		var probe_maxv = [];
+		var probe_color = [];
+
+		// Check for proble with near zero transfer function and warn
+		for (var i = probes.length - 1; i >= 0; --i) {
+		    probe_color[i] = probes[i][0];
+		    var label = probes[i][1];
+		    var v = results[label];
+		    probe_maxv[i] = array_max(v); // magnitudes always > 0
+		}
+		var all_max = array_max(probe_maxv);
+		for (var i = probes.length - 1; i >= 0; --i) {
+		    if ((probe_maxv[i] / all_max) < 1.0e-10) {
+			alert('Near zero ac response, remove ' + probe_color[i] + ' probe');
+			return;
+		    }
+		}
+
 		for (var i = probes.length - 1; i >= 0; --i) {
 		    var color = probes[i][0];
 		    var label = probes[i][1];
 		    var v = results[label];
-
 		    // convert values into dB relative to source amplitude
 		    var v_max = 1;
 		    for (var j = v.length - 1; j >= 0; --j)
@@ -774,6 +797,8 @@ schematic = (function() {
 	    this.dialog('Transient Analysis',content,function(content) {
 		    var sch = content.sch;
 		    var ckt = sch.extract_circuit();
+		    if (ckt === null) return;
+
 
 		    // retrieve parameters, remember for next time
 		    sch.tran_npts = content.fields[npts_lbl].value;
@@ -792,8 +817,8 @@ schematic = (function() {
 					   ckt.parse_number(sch.tran_tstop), probe_names, false);
 
 		    // save a copy of the results for submission
-		    this.transient_results = {};
-		    for (var i in results) this.transient_results[i] = results[i];
+		    sch.transient_results = {};
+		    for (var i in results) sch.transient_results[i] = results[i];
 
 		    if (typeof results == 'string') 
 			sch.message(results);
@@ -1210,6 +1235,7 @@ schematic = (function() {
     
 	    // just redraw dynamic components
 	    sch.redraw();
+	    //sch.message(sch.canvas.page_x + ',' + sch.canvas.page_y + ';' + sch.canvas.mouse_x + ',' + sch.canvas.mouse_y + ';' + sch.cursor_x + ',' + sch.cursor_y);
 
 	    return false;
 	}
@@ -1317,6 +1343,7 @@ schematic = (function() {
 	    ok_button.appendChild(document.createTextNode('OK'));
 	    ok_button.dialog = dialog;   // for the handler to use
 	    ok_button.addEventListener('click',dialog_okay,false);
+	    ok_button.style.display = 'inline';
 	    ok_button.style.border = '1px solid';
 	    ok_button.style.padding = '5px';
 	    ok_button.style.margin = '10px';
@@ -1326,6 +1353,7 @@ schematic = (function() {
 	    cancel_button.appendChild(document.createTextNode('Cancel'));
 	    cancel_button.dialog = dialog;   // for the handler to use
 	    cancel_button.addEventListener('click',dialog_cancel,false);
+	    cancel_button.style.display = 'inline';
 	    cancel_button.style.border = '1px solid';
 	    cancel_button.style.padding = '5px';
 	    cancel_button.style.margin = '10px';
@@ -1449,9 +1477,9 @@ schematic = (function() {
 	    win.appendChild(content);
 	    content.win = win;   // so content can contact us
 
-	    // compute location in top-level div
-	    win.left = this.canvas.page_x;
-	    win.top = this.canvas.page_y;
+	    // compute location relative to canvas
+	    win.left = this.canvas.mouse_x;
+	    win.top = this.canvas.mouse_y;
 
 	    // add to DOM
 	    win.style.background = 'white';
@@ -1461,7 +1489,8 @@ schematic = (function() {
 	    win.style.top = win.top + 'px';
 	    win.style.border = '2px solid';
 
-	    this.input.parentNode.insertBefore(win,this.input.nextSibling);
+	    this.canvas.parentNode.insertBefore(win,this.canvas);
+	    //this.input.parentNode.insertBefore(win,this.input.nextSibling);
 	}
 
 	// close the window
@@ -1606,7 +1635,10 @@ schematic = (function() {
 	    if (!event) event = window.event;
 	    var tool = (window.event) ? event.srcElement : event.target;
 
-	    if (tool.enabled) tool.callback.call(tool.sch);
+	    if (tool.enabled) {
+		tool.sch.canvas.relMouseCoords(event);  // so we can position pop-up window correctly
+		tool.callback.call(tool.sch);
+	    }
 	}
 
 	cut_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQu8MhJqz1g5qs7lxv2gRkQfuWomarXEgDRHjJhf3YtyRav0xcfcFgR0nhB5OwTAQA7';
@@ -1943,25 +1975,27 @@ schematic = (function() {
 		var x1 = (index == 0) ? x_values[0] : x_values[index-1];
 		var x2 = x_values[index];
 
-		// for each plot, interpolate and output value at intersection with marker
-		c.textAlign = 'left';
-		var tx = graph.left_margin + 4;
-		var ty = graph.top_margin;
-		for (var plot = 0; plot < graph.y_values.length; plot++) {
-		    var values = graph.y_values[plot][1];
+		if (x2 != undefined) {
+		    // for each plot, interpolate and output value at intersection with marker
+		    c.textAlign = 'left';
+		    var tx = graph.left_margin + 4;
+		    var ty = graph.top_margin;
+		    for (var plot = 0; plot < graph.y_values.length; plot++) {
+			var values = graph.y_values[plot][1];
 
-		    // interpolate signal value at graph_x using values[index-1] and values[index]
-		    var y1 = (index == 0) ? values[0] : values[index-1];
-		    var y2 = values[index];
-		    var y = y1;
-		    if (graph_x != x1) y += (graph_x - x1)*(y2 - y1)/(x2 - x1);
+			// interpolate signal value at graph_x using values[index-1] and values[index]
+			var y1 = (index == 0) ? values[0] : values[index-1];
+			var y2 = values[index];
+			var y = y1;
+			if (graph_x != x1) y += (graph_x - x1)*(y2 - y1)/(x2 - x1);
 
-		    // annotate plot with value of signal at marker
-		    c.fillStyle = element_style;
-		    c.fillText('\u2588\u2588\u2588\u2588\u2588',tx-3,ty);
-		    c.fillStyle = probe_colors_rgb[graph.y_values[plot][0]];
-		    c.fillText(engineering_notation(y,3,false),tx,ty);
-		    ty += 14;
+			// annotate plot with value of signal at marker
+			c.fillStyle = element_style;
+			c.fillText('\u2588\u2588\u2588\u2588\u2588',tx-3,ty);
+			c.fillStyle = probe_colors_rgb[graph.y_values[plot][0]];
+			c.fillText(engineering_notation(y,3,false),tx,ty);
+			ty += 14;
+		    }
 		}
 	    }
 	}
@@ -3086,7 +3120,8 @@ schematic = (function() {
 	    this.add_connection(0,0);   // +
 	    this.add_connection(0,16);  // -
 	    this.add_connection(48,8);  // output
-	    this.bounding_box = [0,-8,48,24];
+	    this.add_connection(24,32);  // ground
+	    this.bounding_box = [0,-8,48,32];
 	    this.update_coords();
 	}
 	OpAmp.prototype = new Component();
@@ -3104,7 +3139,9 @@ schematic = (function() {
 	    // inputs and output
 	    this.draw_line(c,0,0,8,0);
 	    this.draw_line(c,0,16,8,16);
+	    this.draw_text(c,'gnd',37,18,property_size);
 	    this.draw_line(c,40,8,48,8);
+	    this.draw_line(c,24,16,24,32);
 	    // + and -
 	    this.draw_line(c,10,0,16,0);
 	    this.draw_line(c,13,-3,13,3);
@@ -3175,6 +3212,9 @@ schematic = (function() {
 	// map source function name to labels for each source parameter
 	source_functions = {
 	    'dc': ['DC value'],
+
+	    'impulse': ['Height',
+			'Width (secs)'],
 
 	    'step': ['Initial value',
 		     'Plateau value',
