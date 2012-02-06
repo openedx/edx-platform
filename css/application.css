@@ -397,7 +397,7 @@ html {
           float: left; }
           html body div.header-wrapper header hgroup h1 {
             border-right: 1px solid #862d2d;
-            color: #4d1919;
+            color: #391313;
             font-size: 20px;
             font-weight: 800;
             margin: 0 22.652px 0 0;
@@ -760,18 +760,20 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
     box-sizing: border-box;
     display: table-cell;
     vertical-align: top; }
-    @media screen and (max-width:980px) {
+    @media screen and (max-width:1020px) {
       div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
         display: block;
-        width: auto; } }
+        width: auto;
+        border-right: 0; } }
   div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
     display: table-cell;
     width: 77.174%;
     padding-left: 2.717%; }
-    @media screen and (max-width:910px) {
+    @media screen and (max-width:1020px) {
       div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
         display: block;
-        width: auto; } }
+        width: auto;
+        padding: 0; } }
     div.course-wrapper section.course-content .problem-set section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.unanswered, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-bullet, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-bullet, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-bullet, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-bullet {
       display: -moz-inline-box;
       -moz-box-orient: vertical;
@@ -826,6 +828,10 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
 div.course-wrapper section.course-content section.problems-wrapper {
   display: table;
   width: 100%; }
+  @media screen and (max-width:1020px) {
+    div.course-wrapper section.course-content section.problems-wrapper {
+      display: block;
+      width: auto; } }
 div.course-wrapper section.course-content ol.vert-mod > li {
   border-bottom: 1px solid #ddd;
   margin-bottom: 15px;
@@ -877,22 +883,28 @@ section.course-content div.video-wrapper {
       background: #c2c2c2;
       border: none;
       border-bottom: 1px solid #000;
-      height: 20px; }
+      height: 14px; }
       section.course-content div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
-        -webkit-border-radius: 0;
-        -moz-border-radius: 0;
-        -ms-border-radius: 0;
-        -o-border-radius: 0;
-        border-radius: 0;
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        -ms-border-radius: 20px;
+        -o-border-radius: 20px;
+        border-radius: 20px;
+        -webkit-box-shadow: inset 0 1px 0 #bf4040;
+        -moz-box-shadow: inset 0 1px 0 #bf4040;
+        -ms-box-shadow: inset 0 1px 0 #bf4040;
+        -o-box-shadow: inset 0 1px 0 #bf4040;
+        box-shadow: inset 0 1px 0 #bf4040;
         background: #993333 url(/static/images/slider-handle.png) center center no-repeat;
         border: 0;
-        border-right: 1px solid #4d1919;
-        border-left: 1px solid #4d1919;
+        border: 1px solid #4d1919;
         cursor: pointer;
         height: 20px;
-        margin: 0;
-        top: 0;
+        margin-left: -10px;
+        top: -4px;
         width: 20px; }
+        section.course-content div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus {
+          outline: none; }
     section.course-content div.video-wrapper section.video-controls ul.vcr {
       float: left;
       margin-right: 22.652px; }
@@ -1008,8 +1020,8 @@ nav.sequence-nav {
       border-right: 1px solid #eddfaa;
       cursor: pointer;
       display: table-cell;
-      padding: 14px 14px;
-      width: 18px; }
+      padding: 14px 4px;
+      width: 28px; }
       nav.sequence-nav ol li.seq_video_inactive {
         background-image: url("/static/images/sequence-nav/video-icon-normal.png"); }
       nav.sequence-nav ol li.seq_video_visited {
@@ -1045,9 +1057,9 @@ nav.sequence-nav {
       border-left: 1px solid #e4d080;
       cursor: pointer;
       display: table-cell;
-      padding: 14px;
+      padding: 14px 4px;
       text-indent: -9999px;
-      width: 72px; }
+      width: 82px; }
       nav.sequence-nav ul li.prev:hover, nav.sequence-nav ul li.next:hover {
         text-decoration: none;
         color: #7e691a;
