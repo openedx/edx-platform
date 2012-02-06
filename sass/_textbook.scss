@@ -20,6 +20,8 @@ div.book-wrapper {
       div.hitarea {
         margin-left: -22px;
         background-image: url('/static/images/treeview-default.gif');
+        position: relative;
+        top: 4px;
 
         &:hover {
           opacity: 0.6;
