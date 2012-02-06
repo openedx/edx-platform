@@ -772,7 +772,7 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
       div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
         display: block;
         width: auto; } }
-    div.course-wrapper section.course-content .problem-set section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.unanswered {
+    div.course-wrapper section.course-content .problem-set section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.unanswered, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-bullet, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-bullet, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-bullet, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-bullet {
       display: -moz-inline-box;
       -moz-box-orient: vertical;
       display: inline-block;
@@ -785,7 +785,7 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
       position: relative;
       top: 4px;
       width: 14px; }
-    div.course-wrapper section.course-content .problem-set section.problem span.correct, div.course-wrapper section.course-content section.problems-wrapper section.problem span.correct, div.course-wrapper section.course-content div#seq_content section.problem span.correct, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.correct {
+    div.course-wrapper section.course-content .problem-set section.problem span.correct, div.course-wrapper section.course-content section.problems-wrapper section.problem span.correct, div.course-wrapper section.course-content div#seq_content section.problem span.correct, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.correct, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-check, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-check, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-check, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-check {
       display: -moz-inline-box;
       -moz-box-orient: vertical;
       display: inline-block;
@@ -798,7 +798,7 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
       position: relative;
       top: 6px;
       width: 25px; }
-    div.course-wrapper section.course-content .problem-set section.problem span.incorrect, div.course-wrapper section.course-content section.problems-wrapper section.problem span.incorrect, div.course-wrapper section.course-content div#seq_content section.problem span.incorrect, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.incorrect {
+    div.course-wrapper section.course-content .problem-set section.problem span.incorrect, div.course-wrapper section.course-content section.problems-wrapper section.problem span.incorrect, div.course-wrapper section.course-content div#seq_content section.problem span.incorrect, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.incorrect, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-close, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-close, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-close, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-close {
       display: -moz-inline-box;
       -moz-box-orient: vertical;
       display: inline-block;
@@ -823,6 +823,9 @@ div.course-wrapper section.course-content .problem-set, div.course-wrapper secti
     padding: 22.652px; }
   div.course-wrapper section.course-content .problem-set section.action, div.course-wrapper section.course-content section.problems-wrapper section.action, div.course-wrapper section.course-content div#seq_content section.action, div.course-wrapper section.course-content ol.vert-mod > li section.action {
     margin-top: 22.652px; }
+div.course-wrapper section.course-content section.problems-wrapper {
+  display: table;
+  width: 100%; }
 div.course-wrapper section.course-content ol.vert-mod > li {
   border-bottom: 1px solid #ddd;
   margin-bottom: 15px;
