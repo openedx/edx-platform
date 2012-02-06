@@ -1111,7 +1111,9 @@ div.book-wrapper ul#booknav {
     padding-left: 30px; }
     div.book-wrapper ul#booknav li div.hitarea {
       margin-left: -22px;
-      background-image: url("/static/images/treeview-default.gif"); }
+      background-image: url("/static/images/treeview-default.gif");
+      position: relative;
+      top: 4px; }
       div.book-wrapper ul#booknav li div.hitarea:hover {
         opacity: 0.6;
         filter: alpha(opacity=60); }
