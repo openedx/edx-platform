@@ -28,12 +28,49 @@ div.leanModal_box {
 
   &#enroll {
     max-width: 600px;
+
+    ol {
+      @extend .clearfix;
+
+      li {
+        width: 239px;
+        float: left;
+
+        &.email, &.username, &.location {
+          margin-right: 20px;
+        }
+
+        &.terms, &.honor-code {
+          width: auto;
+          float: none;
+        }
+
+        div.tip {
+          display: none;
+        }
+
+        &:hover {
+          div.tip {
+            display: block;
+            line-height: lh();
+            position: absolute;
+            background: #333;
+            color: #fff;
+            width: 239px;
+            margin: 0 0 0 -10px;
+            padding: 10px;
+            -webkit-font-smoothing: antialiased;
+            font-size: 16px;
+          }
+        }
+      }
+    }
   }
 
   form {
     text-align: left;
 
-    div#enroll_error, div#login_error {
+    div#enroll_error, div#login_error, div#pwd_error {
       -webkit-font-smoothing: antialiased;
       background-color: #F50200;
       color: #fff;
@@ -50,6 +87,7 @@ div.leanModal_box {
 
     ol {
       list-style: none;
+      margin-bottom: lh();
 
       li {
         margin-bottom: lh(.5);

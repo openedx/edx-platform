@@ -9,56 +9,52 @@
 
     <ol>
 
-      <li>
+      <li class="email">
         <label>E-mail*</label>
         <input name="email" id="ca_email" type="email" required />
       </li>
 
-      <li>
+      <li class="password">
         <label>Password*</label>
         <input name="password" id="ca_password" type="password" required />
       </li>
 
-      <li>
+      <li class="username">
         <label>Username (public)* <span class="ui-icon ui-icon-help" id="spinner_nick" style="display:inline-block;"></span></label>
         <input name="username" id="ca_username" type="text" required /> 
 
-        <div style="display:none" id="sregion_nick">Nickname you'd like to use on forums. We recommend some variant of your real name (e.g. first name, last initial), but we allow you to be fully anonymous as well. </div>
+        <div id="sregion_nick" class="tip">Nickname you'd like to use on forums.</div>
       </li>
 
-
-      <li>
-        <label>Full name* <span class="ui-icon ui-icon-help" id="spinner_name" style="display:inline-block;"></span></label>
+      <li class="full-name">
+        <label>Full name<span class="ui-icon ui-icon-help" id="spinner_name" style="display:inline-block;"></span></label>
         <input name="name" id="ca_name" type="text" />
 
-        <div style="display:none" id="sregion_name">If you would like us to give you a certificate of completion at the end, we need your full legal name, as you would like it to appear on the certificate (e.g. &quot;John Smith, Jr&quot;). Otherwise, feel free to leave it blank. </div>
+        <div class="tip" id="sregion_name">If you would like us to give you a certificate of completion at the end, we need your full legal name, as you would like it to appear on the certificate (e.g. &quot;John Smith, Jr&quot;).</div>
       </li>
 
-      <li>
+      <li class="location">
         <label>Location <span class="ui-icon ui-icon-help" id="spinner_location" style="display:inline-block;"></span></label>
         <input name="location" id="ca_location" type="text" />
 
-        <div style="display:none" id="sregion_location">Preferred format is city, state, country (so for us, &quot;Cambridge, Massachusetts, USA&quot;). We'd eventually like to group people into study groups. Studies show that geographic proximity helps. It'll also help us understand efforts needed for internationalization, low bandwidth, cultural issues, etc. We may also use statistics from this to help us raise money. </div>
-
+        <div id="sregion_location" class="tip">Preferred format is city, state, country (so for us, &quot;Cambridge, Massachusetts, USA&quot;).</div>
       </li>
 
-      <li>
+      <li class="language">
         <label>Preferred Language <span class="ui-icon ui-icon-help" id="spinner_language" style="display:inline-block;"></span></label>
 
         <input name="language" id="ca_language" type="text" />
 
-        <div style="display:none" id="sregion_language">Please let us know what language you'd most like to see the content in (even if not your native). We're working on translations and internationalization. This will help us know what languages and regions to focus on. </div>
+        <div id="sregion_language" class="tip">Please let us know what language you'd most like to see the content in (even if not your native). We're working on translations and internationalization.</div>
       </li>
 
       <li class="terms">
-        <label>
-          <input name="terms_of_service" id="cb_terms_of_service" type="checkbox" value="terms_of_service" required />I agree to the Terms of Service
-        </label>
+        <label> <input name="terms_of_service" id="cb_terms_of_service" type="checkbox" value="terms_of_service" required />I agree to the Terms of Service*</label>
       </li>
 
       <li class="honor-code">
         <label>
-          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code" required />I agree to the Honor code.         </label>
+          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code" required />I agree to the Honor code.*</label>
         <ul>
           <li>Not engage in any activities that would dishonestly improve my results, or improve or hurt those of others.</li>
           <li>Never post answers to problems.</li>
