@@ -126,7 +126,7 @@ div.course-wrapper {
         }
 
         span {
-          &.unanswered {
+          &.unanswered, &.ui-icon-bullet {
             @include inline-block();
             background: url('/static/images/unanswered-icon.png') center center no-repeat;
             height: 14px;
@@ -135,7 +135,7 @@ div.course-wrapper {
             width: 14px;
           }
 
-          &.correct {
+          &.correct, &.ui-icon-check {
             @include inline-block();
             background: url('/static/images/correct-icon.png') center center no-repeat;
             height: 20px;
@@ -144,7 +144,7 @@ div.course-wrapper {
             width: 25px;
           }
 
-          &.incorrect {
+          &.incorrect, &.ui-icon-close {
             @include inline-block();
             background: url('/static/images/incorrect-icon.png') center center no-repeat;
             height: 20px;
@@ -181,6 +181,11 @@ div.course-wrapper {
 
     section.problems-wrapper, div#seq_content {
       @extend .problem-set;
+    }
+
+    section.problems-wrapper {
+      display: table;
+      width: 100%;
     }
 
     ol.vert-mod {
