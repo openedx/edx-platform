@@ -158,15 +158,22 @@ if MAKO_MODULE_DIR == None:
 # more details on how to customize your logging configuration.
 
 pid = os.getpid()
-hostname = platform.node()
+hostname = platform.node().split(".")[0]
+SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
+
+handlers = ['console']
+if not DEBUG:
+    handlers.append('syslogger')
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters' : {
         'standard' : {
-            'format' : '%(asctime)s %(levelname)s [' + hostname + \
-                       ' %(process)d] [%(name)s] %(filename)s:%(lineno)d - %(message)s',
+            'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
+        },
+        'syslog_format' : {
+            'format' : '[%(name)s] %(levelname)s [PID:%(process)d] [%(filename)s:%(lineno)d] - %(message)s',
         },
         'raw' : {
             'format' : '%(message)s',
@@ -185,26 +192,11 @@ LOGGING = {
             'formatter' : 'standard',
             'stream' : sys.stderr,
         },
-        'app' : {
-            'level' : 'DEBUG' if DEBUG else 'INFO',
-            'class' : 'logging.handlers.WatchedFileHandler',
-            'formatter' : 'standard',
-            'filename' : '{0}/mitx.{1}.log'.format(LOG_DIR, pid),
-            'encoding' : 'utf-8',
-        },
-        'app_err' : {
-            'level' : 'WARNING',
-            'class' : 'logging.handlers.WatchedFileHandler',
-            'formatter' : 'standard',
-            'filename' : '{0}/mitx.err.{1}.log'.format(LOG_DIR, pid),
-            'encoding' : 'utf-8',
-        },
-        'tracking' : {
+        'syslogger' : {
             'level' : 'INFO',
-            'class' : 'logging.handlers.WatchedFileHandler',
-            'formatter' : 'raw',
-            'filename' : '{0}/tracking.{1}.log'.format(LOG_DIR, pid),
-            'encoding' : 'utf-8',
+            'class' : 'logging.handlers.SysLogHandler',
+            'address' : SYSLOG_ADDRESS,
+            'formatter' : 'syslog_format',
         },
         'mail_admins' : {
             'level': 'ERROR',
@@ -213,22 +205,22 @@ LOGGING = {
     },
     'loggers' : {
         'django' : {
-            'handlers' : ['console', 'mail_admins', 'app_err'],
+            'handlers' : handlers + ['mail_admins'],
             'propagate' : True,
             'level' : 'INFO'
         },
         'tracking' : {
-            'handlers' : ['console', 'tracking'],
+            'handlers' : handlers,
             'level' : 'DEBUG',
             'propagate' : False,
         },
         'root' : {
-            'handlers' : ['console', 'app', 'app_err'],
+            'handlers' : handlers,
             'level' : 'DEBUG',
             'propagate' : False
         },
         'mitx' : {
-            'handlers' : ['console', 'app', 'app_err'],
+            'handlers' : handlers,
             'level' : 'DEBUG',
             'propagate' : False
         },
