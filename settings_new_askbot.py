@@ -173,7 +173,7 @@ LOGGING = {
             'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
         },
         'syslog_format' : {
-            'format' : '[%(name)s] %(levelname)s [PID:%(process)d] [%(filename)s:%(lineno)d] - %(message)s',
+            'format' : '[%(name)s] %(levelname)s [' + hostname + ' %(process)d] [%(filename)s:%(lineno)d] - %(message)s',
         },
         'raw' : {
             'format' : '%(message)s',
