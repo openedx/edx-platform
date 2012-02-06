@@ -1,4 +1,5 @@
 import os
+import platform
 import sys
 import tempfile
 
@@ -157,13 +158,15 @@ if MAKO_MODULE_DIR == None:
 # more details on how to customize your logging configuration.
 
 pid = os.getpid()
+hostname = platform.node()
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters' : {
         'standard' : {
-            'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
+            'format' : '%(asctime)s %(levelname)s [' + hostname + \
+                       ' %(process)d] [%(name)s] %(filename)s:%(lineno)d - %(message)s',
         },
         'raw' : {
             'format' : '%(message)s',
