@@ -83,7 +83,7 @@ class LoncapaProblem(object):
             self.seed=struct.unpack('i', os.urandom(4))[0]
 
         ## Parse XML file
-        log.debug(u"LoncapaProblem() opening file {0}".format(filename))
+        #log.debug(u"LoncapaProblem() opening file {0}".format(filename))
         file_text = open(filename).read()
         # Convert startouttext and endouttext to proper <text></text>
         # TODO: Do with XML operations

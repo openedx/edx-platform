@@ -131,7 +131,7 @@ class LoncapaModule(XModule):
         display_due_date_string=content_parser.item(dom2.xpath('/problem/@due'))
         if len(display_due_date_string)>0:
             self.display_due_date=dateutil.parser.parse(display_due_date_string)
-            log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
+            #log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
         else:
             self.display_due_date=None
         
@@ -140,7 +140,7 @@ class LoncapaModule(XModule):
         if len(grace_period_string)>0 and self.display_due_date:
             self.grace_period = content_parser.parse_timedelta(grace_period_string)
             self.close_date = self.display_due_date + self.grace_period
-            log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
+            #log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
         else:
             self.grace_period = None
             self.close_date = self.display_due_date
