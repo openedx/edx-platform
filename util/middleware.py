@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponseServerError
 
 log = logging.getLogger("mitx")
 
@@ -12,4 +12,4 @@ class ExceptionLoggingMiddleware(object):
     if not settings.TEMPLATE_DEBUG:
         def process_exception(self, request, exception):
             log.exception(exception)
-            return HttpResponse("Server Error - Please try again later.")
+            return HttpResponseServerError("Server Error - Please try again later.")
