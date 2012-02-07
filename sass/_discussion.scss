@@ -1,3 +1,24 @@
+// Base extends (Merge with main stylesheet later)
+.light-button {
+  @include box-shadow(inset 0 1px 0 #fff);
+  @include linear-gradient(#fff, lighten(#888, 40%));
+  @include border-radius(3px);
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  color: #666;
+  font: normal $body-font-size $body-font-family;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-font-smoothing: antialiased;
+
+  &:hover, &:focus {
+    @include linear-gradient(#fff, lighten(#888, 30%));
+    border: 1px solid #ccc;
+    text-decoration: none;
+  }
+}
+
+// Layout
 body.askbot {
   .secondary-nav {
     margin: 0;

@@ -157,7 +157,7 @@ div.question-header {
 
     div.comments-container {
       @include box-sizing(border-box);
-      background: lighten(#efefef, 3%);
+      // background: lighten(#efefef, 3%);
       padding: 3%;
       display: inline-block;
       margin: 15px 0 0;
@@ -166,21 +166,23 @@ div.question-header {
 
       div.comments-content {
         font-size: 13px;
+        background: lighten(#efefef, 4%);
 
-        .block {
+        div.block {
           border-top: 1px solid #ddd;
-          padding: 15px 0;
+          padding: 15px;
           display: block;
 
           &:first-child {
             border-top: 0;
           }
-          &:last-child {
-            border-bottom: 1px solid #ddd;
-          }
+          // &:last-child {
+          //   border-bottom: 1px solid #ddd;
+          // }
         }
 
         form.post-comments {
+          padding: 15px;
         }
 
         div.comment {
@@ -259,12 +261,6 @@ div.question-header {
                 @extend .button;
                 font-size: 12px;
                 padding: 2px 10px;
-                // @include border-radius(2px);
-                // background: #eee;
-                // color: #555;
-                // cursor: pointer;
-                // padding: 1px 10px;
-                // text-decoration: none;
               }
             }
           }
@@ -283,6 +279,11 @@ div.question-header {
         float: right;
         margin-top: 5px;
         text-align: right;
+      }
+
+      div.controls {
+        border-top: 1px dashed #ddd;
+        padding: 15px 0;
       }
     }
   }

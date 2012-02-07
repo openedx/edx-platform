@@ -1,0 +1,28 @@
+form.answer-form {
+  @include box-sizing(border-box);
+  border-top: 1px solid #ddd;
+  overflow: hidden;
+  padding-left: flex-grid(1.1);
+  // padding-top: 20px;
+
+  textarea {
+    @include box-sizing(border-box);
+    margin-top: 15px;
+    resize: vertical;
+    width: 99%;
+  }
+
+  span.form-error {
+    display: block;
+    font-weight: bold;
+    padding: 10px 0;
+  }
+
+  div.preview-toggle{
+    padding: 15px 0;
+    width: auto;
+    a {
+    @extend .light-button;
+    }
+  }
+}
