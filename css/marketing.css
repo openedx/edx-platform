@@ -635,27 +635,22 @@ div.leanModal_box {
     margin-bottom: 25.888px; }
   div.leanModal_box#enroll {
     max-width: 600px; }
-    div.leanModal_box#enroll ol li {
-      width: 239px;
-      float: left; }
-      div.leanModal_box#enroll ol li.email, div.leanModal_box#enroll ol li.username, div.leanModal_box#enroll ol li.location {
-        margin-right: 20px; }
-      div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
-        width: auto;
-        float: none; }
-      div.leanModal_box#enroll ol li div.tip {
-        display: none; }
-      div.leanModal_box#enroll ol li:hover div.tip {
-        display: block;
-        line-height: 25.888px;
-        position: absolute;
-        background: #333;
-        color: #fff;
-        width: 239px;
-        margin: 0 0 0 -10px;
-        padding: 10px;
-        -webkit-font-smoothing: antialiased;
-        font-size: 16px; }
+    div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
+      width: auto;
+      float: none; }
+    div.leanModal_box#enroll ol li div.tip {
+      display: none; }
+    div.leanModal_box#enroll ol li:hover div.tip {
+      display: block;
+      line-height: 25.888px;
+      position: absolute;
+      background: #333;
+      color: #fff;
+      width: 500px;
+      margin: 0 0 0 -10px;
+      padding: 10px;
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px; }
   div.leanModal_box form {
     text-align: left; }
     div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error, div.leanModal_box form div#pwd_error {
