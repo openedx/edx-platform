@@ -490,12 +490,12 @@ cktsim = (function() {
 		result['I('+v.name+')'] = response[v.branch];
 	    }
 
-	    result['time'] = response[this.N];
+	    result['_time_'] = response[this.N];
 	    return result;
 	}
 
 	// AC analysis: npts/decade for freqs in range [fstart,fstop]
-	// result['frequencies'] = vector of log10(sample freqs)
+	// result['_frequencies_'] = vector of log10(sample freqs)
 	// result['xxx'] = vector of dB(response for node xxx)
         // NOTE: Normalization removed in schematic.js, jkw.
         Circuit.prototype.ac = function(npts,fstart,fstop,source_name) {
@@ -561,7 +561,7 @@ cktsim = (function() {
 		var index = this.node_map[name];
 		result[name] = (index == -1) ? 0 : response[index];
 	    }
-	    result['frequencies'] = response[this.N];
+	    result['_frequencies_'] = response[this.N];
 	    return result;
 	}
 

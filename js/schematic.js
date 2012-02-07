@@ -141,6 +141,15 @@ schematic = (function() {
 	    if (parts.length == 0 && analyses.length == 0) this.diagram_only = true;
 	    else this.diagram_only = false;
 
+	    // see what we need to submit.  Expecting attribute of the form
+	    // submit_analyses="{'tran':[[node_name,t1,t2,t3],...],
+	    //                   'ac':[[node_name,f1,f2,...],...]}"
+	    var submit = input.getAttribute('submit_analyses');
+	    if (submit && submit.indexOf('{') != -1)
+		this.submit_analyses = JSON.parse(submit);
+	    else
+		this.submit_analyses = undefined;
+
 	    // toolbar
 	    this.tools = new Array();
 	    this.toolbar = [];
@@ -521,8 +530,10 @@ schematic = (function() {
 			this.add_wire(c[1][0],c[1][1],c[1][2],c[1][3]);
 		    } else if (c[0] == 'dc') {
 			this.dc_results = c[1];
-		    } else if (c[0] == 'ac' || c[0] == 'transient') {
-			// ignore analysis results
+		    } else if (c[0] == 'transient') {
+			this.transient_results = c[1];
+		    } else if (c[0] == 'ac') {
+			this.ac_results = c[1];
 		    } else {
 			// ordinary component
 			//  c := [type, coords, properties, connections]
@@ -720,14 +731,35 @@ schematic = (function() {
 	    if (ckt === null) return;
 	    var results = ckt.ac(npts,fstart,fstop,ac_source_name);
 
-	    // save a copy of the results for submission
-	    this.ac_results = {};
-	    for (var i in results) this.ac_results[i] = results[i];
-
 	    if (typeof results == 'string') 
 		this.message(results);
 	    else {
-		var x_values = results['frequencies'];
+		if (this.submit_analyses != undefined) {
+		    var submit = this.submit_analyses['ac'];
+		    if (submit != undefined) {
+			// save a copy of the results for submission
+			sch.ac_results = {};
+			var freqs = results['_frequencies_'];
+
+			// save requested values for each requested node
+			for (var j = 0; j < submit.length; j++) {
+			    var flist = submit[j];    // [node_name,f1,f2,...]
+			    var node = flist[0];
+			    var values = results[node];
+			    var fvlist = [];
+			    // for each requested freq, interpolate response value
+			    for (var k = 1; k < flist.length; k++) {
+				var f = flist[k];
+				var v = interpolate(f,freqs,values);
+				fvlist.push([f,v == undefined ? 'undefined' : v]);
+			    }
+			    // save results as list of [f,response] paris
+			    this.ac_results[node] = fvlist;
+			}
+		    }
+		}
+
+		var x_values = results['_frequencies_'];
 
 		// x axis will be a log scale
 		for (var i = x_values.length - 1; i >= 0; --i)
@@ -740,7 +772,7 @@ schematic = (function() {
 		var probe_maxv = [];
 		var probe_color = [];
 
-		// Check for proble with near zero transfer function and warn
+		// Check for probe with near zero transfer function and warn
 		for (var i = probes.length - 1; i >= 0; --i) {
 		    probe_color[i] = probes[i][0];
 		    var label = probes[i][1];
@@ -816,14 +848,35 @@ schematic = (function() {
 		    var results = ckt.tran(ckt.parse_number(sch.tran_npts), 0,
 					   ckt.parse_number(sch.tran_tstop), probe_names, false);
 
-		    // save a copy of the results for submission
-		    sch.transient_results = {};
-		    for (var i in results) sch.transient_results[i] = results[i];
-
 		    if (typeof results == 'string') 
 			sch.message(results);
 		    else {
-			var x_values = results['time'];
+			if (sch.submit_analyses != undefined) {
+			    var submit = sch.submit_analyses['tran'];
+			    if (submit != undefined) {
+				// save a copy of the results for submission
+				sch.transient_results = {};
+				var times = results['_time_'];
+
+				// save requested values for each requested node
+				for (var j = 0; j < submit.length; j++) {
+				    var tlist = submit[j];    // [node_name,t1,t2,...]
+				    var node = tlist[0];
+				    var values = results[node];
+				    var tvlist = [];
+				    // for each requested time, interpolate waveform value
+				    for (var k = 1; k < tlist.length; k++) {
+					var t = tlist[k];
+					var v = interpolate(t,times,values);
+					tvlist.push([t,v == undefined ? 'undefined' : v]);
+				    }
+				    // save results as list of [t,value] pairs
+				    sch.transient_results[node] = tvlist;
+				}
+			    }
+			}
+
+			var x_values = results['_time_'];
 
 			// set up plot values for each node with a probe
 			var y_values = [];  // list of [color, result_array]
@@ -841,6 +894,27 @@ schematic = (function() {
 			sch.window('Results of Transient Analysis',graph);
 		    }
 	    })
+	}
+
+	// t is the time at which we want a value
+	// times is a list of timepoints from the simulation
+	function interpolate(t,times,values) {
+	    if (values == undefined) return undefined;
+
+	    for (var i = 0; i < times.length; i++)
+		if (t < times[i]) {
+		    // t falls between times[i-1] and times[i]
+		    var t1 = (i == 0) ? times[0] : times[i-1];
+		    var t2 = times[i];
+
+		    if (t2 == undefined) return undefined;
+
+		    var v1 = (i == 0) ? values[0] : values[i-1];
+		    var v2 = values[i];
+		    var v = v1;
+		    if (t != t1) v += (t - t1)*(v2 - v1)/(t2 - t1);
+		    return v;
+		}
 	}
 
 	// external interface for setting the property value of a named component
