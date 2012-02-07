@@ -34,7 +34,7 @@ loadNewVideo(streams["1.0"], ${ position });
 
 function add_speed(key, stream) {
     var id = 'speed_' + stream;
-    $("#video_speeds").append(' <span id="'+id+'">'+key+'X</span>');
+    $("#video_speeds").append(' <span id="'+id+'">'+key+'x</span>');
     $("#"+id).click(function(){
       change_video_speed(key, stream);
     });
@@ -57,3 +57,16 @@ l.sort(sort_by_value);
 for(var i=0; i<l.length; i++) {
     add_speed(l[i], streams[l[i]])
 }
+
+//toggle video play/pause. the HTML assumes video is always autoplayed
+//initially since it starts with class "pause". may want to set that in
+//javascript
+$("#video_control").click(function(){
+  if ($(this).hasClass("play")){
+    play();
+    $(this).removeClass().addClass("pause");
+  } else {
+    pause();
+    $(this).removeClass().addClass("play");
+  }
+});
