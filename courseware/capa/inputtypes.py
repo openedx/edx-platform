@@ -20,6 +20,7 @@ class schematic(object):
         parts = element.get('parts')
         analyses = element.get('analyses')
         initial_value = element.get('initial_value')
+        submit_analyses = element.get('submit_analyses')
         context = {
             'id':eid,
             'value':value,
@@ -29,6 +30,7 @@ class schematic(object):
             'height':height,
             'parts':parts,
             'analyses':analyses,
+            'submit_analyses':submit_analyses,
             }
         html=render_to_string("schematicinput.html", context)
         return etree.XML(html)
