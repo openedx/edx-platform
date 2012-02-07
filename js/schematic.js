@@ -282,11 +282,13 @@ schematic = (function() {
 	    tr = document.createElement('tr');
 	    table.appendChild(tr);
 	    td = document.createElement('td');
-	    td.style.position = 'relative';  // so we can position subwindows
 	    td.style.left = '0';
 	    td.style.top = '0';
 	    tr.appendChild(td);
-	    td.appendChild(this.canvas);
+	    var wrapper = document.createElement('div');
+	    wrapper.style.position = 'relative';  // so we can position subwindows
+	    wrapper.appendChild(this.canvas);
+	    td.appendChild(wrapper);
 	    td = document.createElement('td');
 	    td.style.verticalAlign = 'top';
 	    tr.appendChild(td);
