@@ -2250,36 +2250,6 @@ ul#related-tags li {
 #id_title {
   width: 100%; }
 
-.wmd-preview {
-  margin: 3px 0 5px 0;
-  padding: 6px;
-  background-color: #F5F5F5;
-  min-height: 20px;
-  overflow: auto;
-  font-size: 13px;
-  font-family: Arial; }
-  .wmd-preview p {
-    margin-bottom: 14px;
-    line-height: 1.4;
-    font-size: 14px; }
-  .wmd-preview pre {
-    background-color: #E7F1F8; }
-  .wmd-preview blockquote {
-    background-color: #eee; }
-  .wmd-preview IMG {
-    max-width: 600px; }
-
-.preview-toggle {
-  width: 100%;
-  color: #b6a475;
-  text-align: left; }
-  .preview-toggle span:hover {
-    cursor: pointer; }
-
-.after-editor {
-  margin-top: 15px;
-  margin-bottom: 15px; }
-
 .checkbox {
   margin-left: 5px;
   font-weight: normal;
@@ -2392,33 +2362,6 @@ ul#related-tags li {
   padding-top: 5px;
   width: 395px;
   font-size: 14px; }
-
-.openid-signin input.submit, .meta input.submit, .users-page input.submit, .user-profile-edit-page input.submit, .user-profile-page input.submit {
-  background: url(../images/small-button-blue.png) repeat-x top;
-  border: 0;
-  color: #4a757f;
-  font-weight: bold;
-  font-size: 13px;
-  font-family: Arial;
-  height: 26px;
-  margin: 5px 0px;
-  width: 100px;
-  cursor: pointer;
-  border-radius: 4px;
-  -ms-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  text-shadow: 0px 1px 0px #e6f6fa;
-  -moz-text-shadow: 0px 1px 0px #e6f6fa;
-  -webkit-text-shadow: 0px 1px 0px #e6f6fa;
-  -webkit-box-shadow: 1px 1px 2px #808080;
-  -moz-box-shadow: 1px 1px 2px #808080;
-  box-shadow: 1px 1px 2px #808080; }
-
-.openid-signin input.submit:hover, .meta input.submit:hover, .users-page input.submit:hover, .user-profile-edit-page input.submit:hover, .user-profile-page input.submit:hover {
-  background: url(../images/small-button-blue.png) repeat-x bottom;
-  text-decoration: none; }
 
 .openid-signin .cancel, .meta .cancel, .users-page .cancel, .user-profile-edit-page .cancel, .user-profile-page .cancel {
   background: url(../images/small-button-cancel.png) repeat-x top !important;
@@ -2577,47 +2520,6 @@ a:hover.medal {
   width: 90%; }
   .user-about p {
     font-size: 13px; }
-
-.follow-toggle, .submit {
-  border: 0 !important;
-  color: #4a757f;
-  font-weight: bold;
-  font-size: 12px;
-  height: 26px;
-  line-height: 26px;
-  margin-top: -2px;
-  font-size: 15px;
-  cursor: pointer;
-  font-family: 'Yanone Kaffeesatz',sans-serif;
-  background: url(../images/small-button-blue.png) repeat-x top;
-  border-radius: 4px;
-  -ms-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  -khtml-border-radius: 4px;
-  text-shadow: 0px 1px 0px #e6f6fa;
-  -moz-text-shadow: 0px 1px 0px #e6f6fa;
-  -webkit-text-shadow: 0px 1px 0px #e6f6fa;
-  -webkit-box-shadow: 1px 1px 2px #808080;
-  -moz-box-shadow: 1px 1px 2px #808080;
-  box-shadow: 1px 1px 2px #808080; }
-
-.follow-toggle:hover, .submit:hover {
-  background: url(../images/small-button-blue.png) repeat-x bottom;
-  text-decoration: none !important; }
-
-.follow-toggle .follow {
-  font-color: #000;
-  font-style: normal; }
-.follow-toggle .unfollow div.unfollow-red {
-  display: none; }
-.follow-toggle .unfollow:hover div.unfollow-red {
-  display: inline;
-  color: #fff;
-  font-weight: bold;
-  color: #A05736; }
-.follow-toggle .unfollow:hover div.unfollow-green {
-  display: none; }
 
 .count {
   font-family: 'Yanone Kaffeesatz',sans-serif;
@@ -3017,24 +2919,6 @@ p.space-above {
 button::-moz-focus-inner {
   padding: 0;
   border: none; }
-
-.submit {
-  cursor: pointer;
-  background-color: #D4D0C8;
-  height: 30px;
-  border: 1px solid #777777;
-  font-weight: bold;
-  font-size: 120%; }
-  .submit:hover {
-    text-decoration: underline; }
-  .submit.small {
-    margin-right: 5px;
-    height: 20px;
-    font-weight: normal;
-    font-size: 12px;
-    padding: 1px 5px; }
-    .submit.small:hover {
-      text-decoration: none; }
 
 .question-page a.submit {
   display: -moz-inline-stack;
@@ -3840,7 +3724,8 @@ div.answer-block {
 div.answer-own {
   border-top: 1px solid #eee;
   overflow: hidden;
-  padding-left: 8.178%; }
+  padding-left: 8.178%;
+  padding-top: 10px; }
 
 form.answer-form {
   -webkit-box-sizing: border-box;
@@ -3867,6 +3752,26 @@ form.answer-form {
   form.answer-form div.preview-toggle {
     padding: 15px 0;
     width: auto; }
+  form.answer-form .wmd-preview {
+    margin: 3px 0 15px 0;
+    padding: 10px;
+    background-color: #F5F5F5;
+    min-height: 20px;
+    overflow: auto;
+    font-size: 13px;
+    font-family: Arial; }
+    form.answer-form .wmd-preview p {
+      margin-bottom: 14px;
+      line-height: 1.4;
+      font-size: 14px; }
+    form.answer-form .wmd-preview pre {
+      background-color: #E7F1F8; }
+    form.answer-form .wmd-preview blockquote {
+      background-color: #eee; }
+
+input.after-editor {
+  margin-bottom: 20px;
+  margin-right: 10px; }
 
 #wmd-button-bar {
   background: url(static/images/askbot/editor-toolbar-background.png) repeat-x bottom;
