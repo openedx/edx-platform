@@ -3744,12 +3744,13 @@ div.question-header div.question-container, div.answer-block div.question-contai
     div.question-header div.question-container div.comments-container div.comments-content, div.answer-block div.question-container div.comments-container div.comments-content, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content, div.answer-block div.answer-container div.comments-container div.comments-content {
       font-size: 13px; }
       div.question-header div.question-container div.comments-container div.comments-content .block, div.answer-block div.question-container div.comments-container div.comments-content .block, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block, div.answer-block div.answer-container div.comments-container div.comments-content .block {
-        border-bottom: 1px solid #ddd;
-        border-top: 1px solid #fff;
+        border-top: 1px solid #ddd;
         padding: 15px 0;
         display: block; }
         div.question-header div.question-container div.comments-container div.comments-content .block:first-child, div.answer-block div.question-container div.comments-container div.comments-content .block:first-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child {
           border-top: 0; }
+        div.question-header div.question-container div.comments-container div.comments-content .block:last-child, div.answer-block div.question-container div.comments-container div.comments-content .block:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block:last-child, div.answer-block div.answer-container div.comments-container div.comments-content .block:last-child {
+          border-bottom: 1px solid #ddd; }
       div.question-header div.question-container div.comments-container div.comments-content div.comment:first-child, div.answer-block div.question-container div.comments-container div.comments-content div.comment:first-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment:first-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment:first-child, div.answer-block div.answer-container div.comments-container div.comments-content div.comment:first-child {
         border-top: 0; }
       div.question-header div.question-container div.comments-container div.comments-content div.comment:last-child, div.answer-block div.question-container div.comments-container div.comments-content div.comment:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment:last-child, div.answer-block div.answer-container div.comments-container div.comments-content div.comment:last-child {
@@ -3832,3 +3833,8 @@ div.answer-block {
   width: 100%; }
   div.answer-block img.answer-img-accept {
     margin: 10px 0px 10px 16px; }
+
+div.answer-own {
+  border-top: 1px solid #eee;
+  overflow: hidden;
+  padding-left: 8.178%; }
