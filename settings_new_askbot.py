@@ -210,7 +210,7 @@ LOGGING = {
             'level' : 'INFO'
         },
         'tracking' : {
-            'handlers' : handlers,
+            'handlers' : [], # handlers,
             'level' : 'DEBUG',
             'propagate' : False,
         },

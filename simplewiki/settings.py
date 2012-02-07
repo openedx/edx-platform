@@ -75,7 +75,7 @@ WIKI_CONTEXT_PREPROCESSORS = getattr(settings, 'SIMPLE_WIKI_CONTEXT_PREPROCESSOR
 
 # List of extensions to be used by Markdown. Custom extensions (i.e., with file
 # names of mdx_*.py) can be dropped into the simplewiki (or project) directory
-# and then added to this list to be utilized. Wikilinks is always enabled.
+# and then added to this list to be utilized. Wiki is enabled automatically.
 #
 # For more information, see
 # http://www.freewisdom.org/projects/python-markdown/Available_Extensions
@@ -90,7 +90,7 @@ WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
                             'toc',
                             'mathjax',
                             'video',      # In-line embedding for YouTube, etc.
-                            'circuit' 
+                            'circuit',
                             ])
 
 

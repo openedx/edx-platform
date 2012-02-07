@@ -75,68 +75,67 @@ except:
     from markdown import etree
 
 
-class CamelCaseExtension(markdown.Extension):
+class WikiPathExtension(markdown.Extension):
     def __init__(self, configs):
         # set extension defaults
         self.config = {
                         'base_url' : ['/', 'String to append to beginning or URL.'],
                         'end_url' : ['/', 'String to append to end of URL.'],
-                        'html_class' : ['wikilink', 'CSS hook. Leave blank for none.']
+                        'html_class' : ['wikipath', 'CSS hook. Leave blank for none.']
         }
         
         # Override defaults with user settings
         for key, value in configs :
             # self.config[key][0] = value
             self.setConfig(key, value)
-    
-    def add_inline(self, md, name, klass, re):
-        pattern = klass(re)
-        pattern.md = md
-        pattern.ext = self
-        md.inlinePatterns.add(name, pattern, "<reference")
-    
+                
+                
     def extendMarkdown(self, md, md_globals):
-        self.add_inline(md, 'camel', CamelCaseLinks, 
-                  r'''(?P<escape>\\|\b)(?P<camelcase>([A-Z]+[a-z-_]+){2,})(?:"")?\b''')
-
-class CamelCaseLinks(markdown.inlinepatterns.Pattern):
-    def handleMatch(self, m) :
-        if  m.group('escape') == '\\':
-            a = etree.Element('a')#doc.createTextNode(m.group('camelcase'))
-        else :
-            url = m.group('camelcase') + "/"
-                             #'%s%s%s'% (self.md.wiki_config['base_url'][0], \
-                             #m.group('camelcase'), \
-                             #self.md.wiki_config['end_url'][0])
-            label = m.group('camelcase').replace('_', ' ')
-            a = etree.Element('a')
-            a.set('href', url)
-            a.text = label
-        a.set('class', 'wikilink')
-        return a
-    
-class CamelCasePreprocessor(markdown.preprocessors.Preprocessor) :
-    
-    def run(self, lines) :
-        '''
-        Updates WikiLink Extension configs with Meta Data.
-        Passes "lines" through unchanged.
+        self.md = md
         
-        Run as a preprocessor because must run after the 
-        MetaPreprocessor runs and only needs to run once.
-        '''
+        # append to end of inline patterns
+        WIKI_RE =  r'\[(?P<linkTitle>.+?)\]\(wiki:(?P<wikiTitle>[a-zA-Z\d/_-]*)\)'
+        wikiPathPattern = WikiPath(WIKI_RE, self.getConfigs())
+        wikiPathPattern.md = md
+        md.inlinePatterns.add('wikipath', wikiPathPattern, "<reference")
+
+class WikiPath(markdown.inlinepatterns.Pattern):
+    def __init__(self, pattern, config):
+        markdown.inlinepatterns.Pattern.__init__(self, pattern)
+        self.config = config
+    
+    def handleMatch(self, m) :
+        article_title = m.group('wikiTitle')
+        if article_title.startswith("/"):
+            article_title = article_title[1:]
+        
+        url = self.config['base_url'] + article_title
+        label = m.group('linkTitle')
+        a = etree.Element('a')
+        a.set('href', url)
+        a.text = label
+        
+        if self.config['html_class']:
+            a.set('class', self.config['html_class'])
+            
+        return a
+        
+    def _getMeta(self):
+        """ Return meta data or config data. """
+        base_url = self.config['base_url']
+        end_url = self.config['end_url']
+        html_class = self.config['html_class']
         if hasattr(self.md, 'Meta'):
             if self.md.Meta.has_key('wiki_base_url'):
-                self.md.wiki_config['base_url'][0] = self.md.Meta['wiki_base_url'][0]
+                base_url = self.md.Meta['wiki_base_url'][0]
             if self.md.Meta.has_key('wiki_end_url'):
-                self.md.wiki_config['end_url'][0] = self.md.Meta['wiki_end_url'][0]
+                end_url = self.md.Meta['wiki_end_url'][0]
             if self.md.Meta.has_key('wiki_html_class'):
-                self.md.wiki_config['html_class'][0] = self.md.Meta['wiki_html_class'][0]
-        
-        return lines
+                html_class = self.md.Meta['wiki_html_class'][0]
+        return base_url, end_url, html_class
 
 def makeExtension(configs=None) :
-    return CamelCaseExtension(configs=configs)
+    return WikiPathExtension(configs=configs)
 
 if __name__ == "__main__":
     import doctest
