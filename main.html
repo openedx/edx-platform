@@ -69,20 +69,22 @@
     </div>
 
     <div id="calculator_div" class="leanModal_box">
-      <input type="text" id="calculator_input">
-      <input id="calculator_button" type=button value="=&gt;">
-      <input type="text" id="calculator_output" readonly>
+      <form id="calculator">
+        <input type="text" id="calculator_input">
+        <input id="calculator_button" type="submit" value="=&gt;">
+        <input type="text" id="calculator_output" readonly>
+      </form>
 
 <table>      <tr><td align="right">Suffixes</td><td>&nbsp;:&nbsp;</td><td align="left"> %kMGTcmunp</td></tr>
       <tr><td align="right">Operations</td><td>&nbsp;:&nbsp;</td><td align="left"> ^ * / + - ()</td></tr>
       <tr><td align="right">Functions</td><td>&nbsp;:&nbsp;</td><td align="left"> sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </td></tr>
       <tr><td align="right">Constants</td><td>&nbsp;:&nbsp;</td><td align="left"> e</td></tr>
       <!--p> Unsupported: ||, j </p
-Students won't know what parallel means at this time. 
-Complex numbers aren't well tested in the courseware, so we would prefer to not expose them. 
-If you read the comments in the source, feel free to use them. If you run into a bug, please 
-let us know. But we can't officially support them right now. 
---> 
+Students won't know what parallel means at this time.
+Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.
+If you read the comments in the source, feel free to use them. If you run into a bug, please
+let us know. But we can't officially support them right now.
+-->
 </table>
     </div>
 
@@ -103,7 +105,8 @@ $(function() {
 
 // Calculator
 $(function() {
-    $("#calculator_button").click(function(){
+    $("form#calculator").submit(function(e){
+      e.preventDefault();
       $.getJSON("/calculate", {"equation":$("#calculator_input").attr("value")},
         function(data){
         $("#calculator_output").attr("value",data.result);
