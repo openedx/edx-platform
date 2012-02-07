@@ -1161,7 +1161,14 @@ div.info-wrapper section.handouts {
     padding: 0 22.652px; }
   div.info-wrapper section.handouts ol {
     list-style: none; }
+    div.info-wrapper section.handouts ol li h2 {
+      padding: 7px 22.652px; }
     div.info-wrapper section.handouts ol li a {
+      -webkit-box-shadow: 0 1px 0 #eeeeee;
+      -moz-box-shadow: 0 1px 0 #eeeeee;
+      -ms-box-shadow: 0 1px 0 #eeeeee;
+      -o-box-shadow: 0 1px 0 #eeeeee;
+      box-shadow: 0 1px 0 #eeeeee;
       -webkit-transition-property: all;
       -moz-transition-property: all;
       -ms-transition-property: all;
@@ -1182,16 +1189,11 @@ div.info-wrapper section.handouts {
       -ms-transition-delay: 0;
       -o-transition-delay: 0;
       transition-delay: 0;
+      border-bottom: 1px solid #d3d3d3;
       color: #4d4d4d;
       display: block;
-      text-decoration: none;
-      -webkit-box-shadow: 0 1px 0 #eeeeee;
-      -moz-box-shadow: 0 1px 0 #eeeeee;
-      -ms-box-shadow: 0 1px 0 #eeeeee;
-      -o-box-shadow: 0 1px 0 #eeeeee;
-      box-shadow: 0 1px 0 #eeeeee;
       padding: 7px 22.652px;
-      border-bottom: 1px solid #d3d3d3; }
+      text-decoration: none; }
       div.info-wrapper section.handouts ol li a:hover {
         -webkit-box-shadow: 0 1px 0 white;
         -moz-box-shadow: 0 1px 0 white;
