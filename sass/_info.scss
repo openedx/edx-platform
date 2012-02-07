@@ -19,14 +19,18 @@ div.info-wrapper {
       list-style: none;
 
       li {
+        h2 {
+          padding: 7px lh();
+        }
+
         a {
+          @include box-shadow(0 1px 0 #eee);
           @include transition();
+          border-bottom: 1px solid #d3d3d3;
           color: lighten($text-color, 10%);
           display: block;
-          text-decoration: none;
-          @include box-shadow(0 1px 0 #eee);
           padding: 7px lh();
-          border-bottom: 1px solid #d3d3d3;
+          text-decoration: none;
 
           &:hover {
             @include box-shadow(0 1px 0 #fff);
