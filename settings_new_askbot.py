@@ -210,7 +210,7 @@ LOGGING = {
             'level' : 'INFO'
         },
         'tracking' : {
-            'handlers' : handlers,
+            'handlers' : [] if DEBUG else ['syslogger'], # handlers,
             'level' : 'DEBUG',
             'propagate' : False,
         },
