@@ -43,3 +43,9 @@ div.answer-block {
     }
   }
 }
+
+div.answer-own {
+  border-top: 1px solid #eee;
+  overflow:hidden;
+  padding-left: flex-grid(1.2);
+}
