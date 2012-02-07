@@ -5,10 +5,10 @@ $("#accordion").accordion({
 });
 
 $("#open_close_accordion").click(function(){
-  if ($("#accordion").hasClass("closed")){
-    $("#accordion").removeClass("closed");
+  if ($(".course-wrapper").hasClass("closed")){
+    $(".course-wrapper").removeClass("closed");
   } else {
-    $("#accordion").addClass("closed");
+    $(".course-wrapper").addClass("closed");
   }
 });
 

@@ -7,11 +7,24 @@ div.course-wrapper {
 
   div#accordion {
     @extend .sidebar;
+    @include transition( all, .5s, $ease-in-out-quad);
 
     div#open_close_accordion {
+      h2 {
+        display: inline-block;
+      }
+
+      a {
+        text-indent: -9999px;
+        display: inline-block;
+        background: red;
+        width: 16px;
+        height: 16px;
+      }
     }
 
     h3 {
+      @include transition( all, .5s, $ease-in-out-quad);
       overflow: hidden;
       margin: 0;
 
@@ -77,6 +90,7 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
+    @include transition( all, .5s, $ease-in-out-quad);
 
     p {
       margin-bottom: lh();
@@ -202,5 +216,37 @@ div.course-wrapper {
         }
       }
     }
+  }
+
+  &.closed {
+
+    div#accordion {
+      width: flex-grid(.5);
+
+      div#open_close_accordion {
+        h2 {
+          position: relative;
+          left: -100%;
+        }
+      }
+
+      h3, ul, li {
+        position: relative;
+        left: -100%;
+      }
+    }
+
+    section.course-content {
+      width: flex-grid(11.5) + flex-gutter();
+    }
+
+    // div#accordion {
+    //   left: -(flex-grid(2.7));
+    // }
+
+    // section.course-content {
+    //   left: -(flex-grid(2.7));
+    //   position: relative;
+    // }
   }
 }
