@@ -78,6 +78,10 @@ div.wiki-wrapper {
     header {
       @extend .topbar;
 
+      &:empty {
+        display: none !important;
+      }
+
       a {
         @extend .block-link;
       }
@@ -110,7 +114,7 @@ div.wiki-wrapper {
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: lh(.75);
+            padding: 14px;
             margin: 0;
 
             &:hover {

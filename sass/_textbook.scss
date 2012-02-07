@@ -20,6 +20,8 @@ div.book-wrapper {
       div.hitarea {
         margin-left: -22px;
         background-image: url('/static/images/treeview-default.gif');
+        position: relative;
+        top: 4px;
 
         &:hover {
           opacity: 0.6;
@@ -48,6 +50,7 @@ div.book-wrapper {
 
       a {
         @extend .block-link;
+        padding: 14px;
       }
 
       ul {
@@ -74,10 +77,11 @@ div.book-wrapper {
     }
 
     section.page {
+      text-align: center;
+
       img {
         border: 1px solid $border-color;
         max-width: 100%;
-        min-width: 100%;
       }
     }
   }

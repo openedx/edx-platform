@@ -41,6 +41,26 @@ em {
   }
 }
 
+a {
+  color: $mit-red;
+
+  &:link {
+    color: $mit-red;
+  }
+
+  &:visited {
+    color: darken($mit-red, 10%);
+  }
+
+  &:link, &:visited {
+    text-decoration:none;
+  }
+
+  &:hover, &:focus {
+    text-decoration:underline;
+  }
+}
+
 input[type="submit"], input[type="button"], button {
   @extend .button;
 }

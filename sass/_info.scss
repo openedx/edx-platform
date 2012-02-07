@@ -1,0 +1,43 @@
+div.info-wrapper {
+  @extend .table-wrapper;
+
+  section.updates {
+    @extend .content;
+  }
+
+  section.handouts {
+    @extend .sidebar;
+    @include border-radius(0px 4px 0px 4px);
+    border-right: 0;
+    border-left: 1px solid #d3d3d3;
+
+    h1 {
+      padding: 0 lh();
+    }
+
+    ol {
+      list-style: none;
+
+      li {
+        h2 {
+          padding: 0 lh();
+        }
+
+        a {
+          @include box-shadow(0 1px 0 #eee);
+          @include transition();
+          border-bottom: 1px solid #d3d3d3;
+          color: lighten($text-color, 10%);
+          display: block;
+          padding: 7px lh();
+          text-decoration: none;
+
+          &:hover {
+            @include box-shadow(0 1px 0 #fff);
+            background: #efefef;
+          }
+        }
+      }
+    }
+  }
+}

@@ -10,7 +10,7 @@ div.question-controls {
 
   div.question-count {
     margin-right: flex-gutter();
-    width: flex-grid(5.5,9);
+    width: flex-grid(5,9);
 
     h1 {
       margin-top: 0;
@@ -19,7 +19,7 @@ div.question-controls {
 
   div.question-sort {
     vertical-align: bottom;
-    width: flex-grid(3.5,9);
+    width: flex-grid(4,9);
 
     nav {
       @include border-radius(35px);
@@ -28,10 +28,14 @@ div.question-controls {
       float: right;
       font-size: 16px;
       margin: 3px 0;
-      padding: 0 20px;
+      padding:0px 20px 5px;
 
       a {
-        color: darken(#F6EFD4, 50%);
+        color: darken(#F6EFD4, 50%); 
+
+        &.on span{
+          font-weight: bold;
+        }
 
         &:before {
           content: '|';
@@ -152,43 +156,4 @@ div.search-tips {
 }
 
 .search-result-summary {
-}
-
-div.post-update-info {
-  @include box-sizing(border-box);
-  @include border-radius(5px);
-  background:lighten(#F6EFD4, 5%);
-  padding: 10px;
-
-  a {
-    color:$mit-red ;
-  }
-
-  div.change-date {
-    font-size: 12px;
-    margin-bottom: 10px;
-  }
-
-  div.avatar {
-    display: inline-block;
-    float: left;
-    margin-right: 3px;
-
-    img.gravatar {
-      background: white;
-      border: 1px solid darken(#F6EFD4, 10%);
-      margin-right: 5px;
-      padding: 3px ;
-      vertical-align: bottom;
-    }
-  }
-
-  div.user-meta {
-    display: inline-block;
-    width: 60%;
-
-    span.user-badges {
-      display: block;
-    }
-  }
 }

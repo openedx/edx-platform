@@ -1,23 +1,25 @@
 <h2>${ problem['name'] }</h2>
 
-  <p> ${ problem['html'] } </p>
+<section class="problem">
+  ${ problem['html'] }
 
   <section class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }">
 
     % if check_button:
-      <input id="check_${ id }" type="button" value="Check ${ attempts }" >
+    <input id="check_${ id }" type="button" value="Check ${ attempts }" >
     % endif
     % if reset_button:
-      <input id="reset_${ id }" type="button" value="Reset ${ attempts }" >
+    <input id="reset_${ id }" type="button" value="Reset ${ attempts }" >
     % endif
     % if save_button:
-      <input id="save_${ id }" type="button" value="Save" >
+    <input id="save_${ id }" type="button" value="Save" >
     % endif
     % if answer_available:
-      <input id="show_${ id }" type="button" value="Show Answer" >
+    <input id="show_${ id }" type="button" value="Show Answer" >
     % endif
     % if explain :
-      <a href="/courseware/6.002_Spring_2012/${ explain }" class="new-page">Explanation</a>
+    <a href="/courseware/6.002_Spring_2012/${ explain }" class="new-page">Explanation</a>
     % endif
   </section>
+</section>

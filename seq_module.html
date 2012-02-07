@@ -1,12 +1,15 @@
-<ol class="sequence-nav">
+<nav class="sequence-nav">
+  <ol>
+    % for t in range(1,1+len(items)):
+    <li class="seq_inactive" id="tt_${ t }">&nbsp;</li>
+    % endfor
+  </ol>
 
-  % for t in range(1,1+len(items)):
-  <li class="seq_inactive" id="tt_${ t }">&nbsp;</li>
-  % endfor
-
-  <li id="${ id }next" class="next">Next</li>
-  <li id="${ id }prev" class="prev">Previous</li>
-</ol>
+  <ul>
+    <li id="${ id }prev" class="prev">Previous</li>
+    <li id="${ id }next" class="next">Next</li>
+  </ul>
+</nav>
 
 
 <!-- <td colspan=${ len(items) }> -->

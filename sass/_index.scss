@@ -237,6 +237,40 @@ section.index-content {
           }
         }
 
+        &.intro {
+          section {
+            margin-bottom: 0;
+
+            &.intro-text {
+              margin-right: flex-gutter(8);
+              width: flex-grid(4, 8);
+
+              p {
+                margin-right: 0;
+                width: auto;
+                float: none;
+              }
+            }
+
+            &.intro-video {
+              width: flex-grid(4, 8);
+
+              a {
+                display: block;
+                width: 100%;
+
+                img {
+                  width: 100%;
+                }
+
+                span {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
+
         &.features {
           border-top: 1px solid #E5E5E5;
           padding-top: lh();
