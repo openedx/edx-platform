@@ -39,6 +39,7 @@ def view(request, wiki_url):
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
             'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
+            'wiki_title' : article.title + " - MITX 6.002 Wiki"
 			}
     d.update(csrf(request))
     return render_to_response('simplewiki_view.html', d)
@@ -204,6 +205,7 @@ def edit(request, wiki_url):
     d = {'wiki_form': f,
         	'wiki_write': True,
         	'wiki_article': article,
+            'wiki_title' : article.title,
         	'wiki_attachments_write': article.can_attach(request.user),
         	}
     d.update(csrf(request))
@@ -289,6 +291,7 @@ def history(request, wiki_url, page=1):
 	        'wiki_write': article.can_write_l(request.user),
 	        'wiki_attachments_write': article.can_attach(request.user),
 	        'wiki_article': article,
+            'wiki_title': article.title,
 	        'wiki_history': history[beginItem:beginItem+page_size],
             'show_delete_revision' : request.user.is_superuser,}
     d.update(csrf(request))
