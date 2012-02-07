@@ -33,12 +33,6 @@ div.leanModal_box {
       @extend .clearfix;
 
       li {
-        width: 239px;
-        float: left;
-
-        &.email, &.username, &.location {
-          margin-right: 20px;
-        }
 
         &.terms, &.honor-code {
           width: auto;
@@ -56,7 +50,7 @@ div.leanModal_box {
             position: absolute;
             background: #333;
             color: #fff;
-            width: 239px;
+            width: 500px;
             margin: 0 0 0 -10px;
             padding: 10px;
             -webkit-font-smoothing: antialiased;
