@@ -1162,7 +1162,7 @@ div.info-wrapper section.handouts {
   div.info-wrapper section.handouts ol {
     list-style: none; }
     div.info-wrapper section.handouts ol li h2 {
-      padding: 7px 22.652px; }
+      padding: 0 22.652px; }
     div.info-wrapper section.handouts ol li a {
       -webkit-box-shadow: 0 1px 0 #eeeeee;
       -moz-box-shadow: 0 1px 0 #eeeeee;
