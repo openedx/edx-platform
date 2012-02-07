@@ -3,10 +3,12 @@
 
   <div id="value_${id}" style="display:none">${value}</div>
   <div id="initial_value_${id}" style="display:none">${initial_value}</div>
+  <div id="submit_value_${id}" style="display:none">${submit_analyses}</div>
 
   <script>
     $("#input_${id}").attr("value",$("#value_${id}").text());
     $("#input_${id}").attr("initial_value",$("#initial_value_${id}").text());
+    $("#input_${id}").attr("submit_analyses",$("#submit_value_${id}").text());
   </script>
 
   <span id="answer_${id}"></span>
