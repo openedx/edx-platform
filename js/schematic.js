@@ -1180,7 +1180,7 @@ schematic = (function() {
 	    if (code == 16) sch.shiftKey = false;
 	    else if (code == 17) sch.ctrlKey = false;
 	    else if (code == 18) sch.altKey = false;
-	    else if (code == 91) sch.commandKey = false;
+	    else if (code == 91) sch.cmdKey = false;
 	}
 
 	function schematic_mouse_enter(event) {
