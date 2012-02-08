@@ -323,7 +323,7 @@ cktsim = (function() {
 	    
 	    // Standard to do a dc analysis before transient
 	    // Otherwise, do the setup also done in dc.
-	    //no_dc = true;
+	    no_dc = true;
 	    if ((this.diddc == false) && (no_dc == false)) this.dc();
 	    else {
 		// Allocate matrices and vectors.
@@ -394,9 +394,10 @@ cktsim = (function() {
 		this.oldc[i] = this.c[i]; 
 	    }
 
-	    var step_index = -2;  // Start with two pseudo-Euler steps
+	    
 	    var beta0,beta1;
-	    while (this.time <= tstop) {
+	    // Start with two pseudo-Euler steps, maximum 50000 steps
+	    for(var step_index = -3; step_index < 50000; step_index++) {
 		// Save the just computed solution, and move back q and c.
 		for (var i = this.N - 1; i >= 0; --i) {
 		    if (step_index >= 0)
@@ -436,9 +437,6 @@ cktsim = (function() {
 		    beta0 = 0.5;
 		    beta1 = 0.5;		
 		}
-
-		// Keep track of step index.
-		step_index += 1;
 
 		// For trap rule, turn off current avging for algebraic eqns
 		for (var i = this.N - 1; i >= 0; --i) {
@@ -1301,8 +1299,8 @@ cktsim = (function() {
 	    // MNA stamp for independent voltage source
 	    ckt.add_to_Gl(this.branch,this.npos,1.0);
 	    ckt.add_to_Gl(this.branch,this.nneg,-1.0);
-	    ckt.add_to_Gl(this.npos,this.branch,-1.0);
-	    ckt.add_to_Gl(this.nneg,this.branch,1.0);
+	    ckt.add_to_Gl(this.npos,this.branch,1.0);
+	    ckt.add_to_Gl(this.nneg,this.branch,-1.0);
 	}
 
 	// Source voltage added to b.
@@ -1486,8 +1484,8 @@ cktsim = (function() {
 	    // MNA stamp for inductor linear part
 	    // L on diag of C because L di/dt = v(n1) - v(n2)
 	    ckt.add_to_Gl(this.n1,this.branch,1);
-	    ckt.add_to_Gl(this.branch,this.n1,-1);
 	    ckt.add_to_Gl(this.n2,this.branch,-1);
+	    ckt.add_to_Gl(this.branch,this.n1,-1);
 	    ckt.add_to_Gl(this.branch,this.n2,1);
 	    ckt.add_to_C(this.branch,this.branch,this.value)
 	}
@@ -1529,10 +1527,10 @@ cktsim = (function() {
 	    var invA = 1.0/this.gain;
 	    ckt.add_to_Gl(this.no,this.branch,1);
 	    ckt.add_to_Gl(this.ng,this.branch,-1);
-	    ckt.add_to_Gl(this.branch,this.no,-invA);
-	    ckt.add_to_Gl(this.branch,this.ng,invA);
-	    ckt.add_to_Gl(this.branch,this.np,1);
-	    ckt.add_to_Gl(this.branch,this.nn,-1);
+	    ckt.add_to_Gl(this.branch,this.no,invA);
+	    ckt.add_to_Gl(this.branch,this.ng,-invA);
+	    ckt.add_to_Gl(this.branch,this.np,-1);
+	    ckt.add_to_Gl(this.branch,this.nn,1);
 	}
 
 	Opamp.prototype.load_dc = function(ckt,soln,rhs) {
