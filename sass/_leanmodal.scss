@@ -26,10 +26,12 @@ div.leanModal_box {
     width: 14px;
     height: 14px;
     z-index: 2;
-    color: #000;
+    color: #aaa;
+    font-style: normal;
 
     &:hover{
       text-decoration: none;
+      color: $mit-red;
     }
   }
 
