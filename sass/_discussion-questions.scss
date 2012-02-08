@@ -10,7 +10,7 @@ div.question-controls {
 
   div.question-count {
     margin-right: flex-gutter();
-    width: flex-grid(5,9);
+    width: flex-grid(4,9);
 
     h1 {
       margin-top: 0;
@@ -19,7 +19,7 @@ div.question-controls {
 
   div.question-sort {
     vertical-align: bottom;
-    width: flex-grid(4,9);
+    width: flex-grid(5,9);
 
     nav {
       @include border-radius(35px);
@@ -31,7 +31,7 @@ div.question-controls {
       padding:0px 20px 5px;
 
       a {
-        color: darken(#F6EFD4, 50%); 
+        color: darken(#F6EFD4, 50%);
 
         &.on span{
           font-weight: bold;

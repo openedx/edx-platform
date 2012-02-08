@@ -1,8 +1,9 @@
 div.answer-controls {
+  @include box-sizing(border-box);
   @extend div.question-controls;
   display: inline-block;
-  margin-top: 20px;
-  margin-bottom: 0;
+  margin: 20px 0;
+  padding-left: flex-grid(1.1);
 
   div.answer-sort {
     @extend div.question-sort;
@@ -18,7 +19,6 @@ div.answer-block {
   border-top: #ddd 1px solid;
   display: inline-block;
   float: left;
-  margin: 20px 0;
   padding-top: 20px;
   width: 100%;
 
@@ -42,4 +42,15 @@ div.answer-block {
       @extend div.question-actions;
     }
   }
+
+  div.answered-by-owner {
+    color: darken($mit-red, 10%);
+  }
+}
+
+div.answer-own {
+  border-top: 1px solid #eee;
+  overflow:hidden;
+  padding-left: flex-grid(1.2);
+  padding-top: 10px;
 }

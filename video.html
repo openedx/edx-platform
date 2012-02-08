@@ -1,4 +1,4 @@
-% if name != None: 
+% if name is not UNDEFINED and name != None: 
 <h1> ${name} </h1>
 % endif
 <div class="video-wrapper">
@@ -15,8 +15,7 @@
 
     <section>
       <ul class="vcr">
-        <li><a class="play" onclick="play();">Play</a></li>
-        <li><a class="pause" onclick="pause();">Pause</a></li>
+        <li><a id="video_control" class="pause">Pause</a></li>
       </ul>
 
       <div id="vidtime">0:00/0:00</div>
