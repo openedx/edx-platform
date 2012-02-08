@@ -635,9 +635,11 @@ div.leanModal_box {
     width: 14px;
     height: 14px;
     z-index: 2;
-    color: #000; }
+    color: #aaa;
+    font-style: normal; }
     div.leanModal_box a.modal_close:hover {
-      text-decoration: none; }
+      text-decoration: none;
+      color: #993333; }
   div.leanModal_box h1 {
     font-size: 24px;
     margin-top: 0;
