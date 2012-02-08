@@ -72,7 +72,7 @@ $(function() {
     $('#pwd_reset_button').click(function() {
       $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
                     "email"  : $('#id_email').val()}, function(data){
-         $('#pwd_reset').html(data);
+         $("#password_reset_complete_link").click();
          log_event("profile", {"type":"password_send"});
       });
     });
@@ -155,9 +155,7 @@ $(function() {
 
       <div id="change_password_pop">
         <h2>Password change</h2>
-        <p>We'll e-mail you a password reset link at ${email}. Follow
-        the link in the confirmation email to change your
-        password.</p>
+        <p>We'll e-mail a password reset link to ${email}.</p>
 
         <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
         <input type="submit" id="pwd_reset_button" value="Reset Password" />
@@ -167,3 +165,8 @@ $(function() {
   </div>
 </section>
 
+      <div id="password_reset_complete" class="leanModal_box">
+      <a href="#password_reset_complete" rel="leanModal" id="password_reset_complete_link"></a>
+        <h1>Password Reset Email Sent</h1>
+        An email has been sent to ${email}. Follow the link in the email to change your password.
+      </div>
