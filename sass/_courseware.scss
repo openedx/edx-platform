@@ -20,14 +20,21 @@ div.course-wrapper {
       }
 
       a {
-        text-indent: -9999px;
-        background: red;
         width: 16px;
+        text-indent: -9999px;
         height: 16px;
         position: absolute;
         padding: 8px;
         top: 12px;
-        right: 0;
+        right: -1px;
+        border: 1px solid #D3D3D3;
+        background: #eee url('/static/images/slide-left-icon.png') center center no-repeat;
+        @include box-shadow(0 0 0 1px #fff);
+        @include border-radius(3px 0 0 3px);
+
+        &:hover {
+          background-color: white;
+        }
       }
     }
 
@@ -230,8 +237,13 @@ div.course-wrapper {
 
   &.closed {
     section.course-index {
-      width: flex-grid(.5);
+      width: flex-grid(.6);
+      padding-left: 4px;
+
     div#open_close_accordion {
+      a {
+        background-image: url('/static/images/slide-right-icon.png');
+      }
 
       h2 {
         visibility: hidden;
