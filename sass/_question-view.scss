@@ -160,7 +160,7 @@ div.question-header {
       // background: lighten(#efefef, 3%);
       padding: 3%;
       display: inline-block;
-      margin: 15px 0 0;
+      // margin: 15px 0 0;
       padding: 3%;
       width: 100%;
 
@@ -282,8 +282,14 @@ div.question-header {
       }
 
       div.controls {
-        border-top: 1px dashed #ddd;
-        padding: 15px 0;
+        // padding: 15px 0;
+        background: lighten(#eeeeee, 4%);
+        text-align: right;
+        a {
+          display: inline-block;
+          font-size: 12px;
+          margin: 10px 10px 10px 0;
+        }
       }
     }
   }

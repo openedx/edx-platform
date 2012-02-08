@@ -42,6 +42,10 @@ div.answer-block {
       @extend div.question-actions;
     }
   }
+
+  div.answered-by-owner {
+    color: darken($mit-red, 10%);
+  }
 }
 
 div.answer-own {
