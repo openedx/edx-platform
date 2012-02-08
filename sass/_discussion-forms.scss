@@ -12,8 +12,19 @@ form.answer-form {
     width: 99%;
   }
 
-  span.form-error {
-    display: block;
+  div.form-item {
+    margin: 25px 0;
+
+    label {
+      display: block;
+      margin-bottom: -5px;
+    }
+  }
+
+  span.form-error, label.form-error {
+    color: #990000;
+    display: inline;
+    font-size: 90%;
     font-weight: bold;
     padding: 10px 0;
   }
@@ -50,7 +61,24 @@ form.answer-form {
     }
   }
 }
+
 input.after-editor {
   margin-bottom: 20px;
   margin-right: 10px;
 }
+
+form.question-form {
+  @extend .answer-form;
+  border: none;
+  padding: 0;
+  margin-top: -15px;
+
+  input[type="text"] {
+    width: flex-grid(6);
+  }
+
+  input[type="checkbox"] {
+    margin-top: 10px;
+  }
+}
+
