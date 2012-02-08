@@ -44,7 +44,7 @@ div.answer-block {
   }
 
   div.answered-by-owner {
-    color: darken($mit-red, 10%);
+    color: darken($mit-red, 20%);
   }
 }
 
@@ -53,4 +53,20 @@ div.answer-own {
   overflow:hidden;
   padding-left: flex-grid(1.2);
   padding-top: 10px;
+}
+
+div.answer-actions {
+  text-align: right;
+  margin: 0;
+  padding: 0;
+
+  span.sep {
+    color: #ddd;
+  }
+  a {
+    text-decoration: none;
+  }
+  a.question-edit, a.permant-link {
+    color: #999;
+  }
 }
