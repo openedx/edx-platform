@@ -627,12 +627,24 @@ div.leanModal_box {
   border: none;
   background: #fff;
   padding: 51.776px; }
+  div.leanModal_box a.modal_close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: block;
+    width: 14px;
+    height: 14px;
+    z-index: 2;
+    color: #000; }
+    div.leanModal_box a.modal_close:hover {
+      text-decoration: none; }
   div.leanModal_box h1 {
     font-size: 24px;
     margin-top: 0;
     padding-bottom: 25.888px;
     border-bottom: 1px solid #eee;
-    margin-bottom: 25.888px; }
+    margin-bottom: 25.888px;
+    text-align: left; }
   div.leanModal_box#enroll {
     max-width: 600px; }
     div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {

@@ -6,8 +6,13 @@
  
             var defaults = {
                 top: 100,
-                overlay: 0.5
+                overlay: 0.5,
+                closeButton:'.modal_close'
             }
+            
+            var overlay = $("<div id='lean_overlay'></div>");
+            
+            $("body").append(overlay);
                  
             options =  $.extend(defaults, options);
  
@@ -17,15 +22,18 @@
                
                 $(this).click(function(e) {
               
-          	  	var overlay = $("<div id='lean_overlay'></div>");
-              
               	var modal_id = $(this).attr("href");
 
         $(".leanModal_box").css({ 'display' : 'none' });
 
 				$("body").append(overlay);
-                
+        $(".leanModal_box").append("<a class=\"modal_close\" href=\"#\">&#10006;</a>");
+
 				$("#lean_overlay").click(function() { 
+                     close_modal(modal_id);                    
+                });
+                
+                $(o.closeButton).click(function() { 
                      close_modal(modal_id);                    
                 });
                          	
