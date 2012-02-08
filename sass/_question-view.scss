@@ -213,14 +213,29 @@ div.question-header {
             }
 
             div.comment-votes {
-                @include transform(rotate(-90deg));
                 width: 16px;
 
               a.upvote {
+                background: url(../images/askbot/comment-vote-up.png) no-repeat 5px;
                 cursor: pointer;
-                font-size: 25px;
-                text-decoration: none;
                 color: green;
+                display: block;
+                margin-bottom: 6px;
+                margin-top: 5px;
+                overflow: hidden;
+                text-decoration: none;
+                text-indent: -9999px; 
+                width: 20px;
+              }
+
+              a.upvoted {
+                @include border-radius(3px);
+                background: #D1E3A8;
+                color: green;
+                font-weight: bold;
+                margin-top: 10px;
+                padding: 2px;
+                text-indent: 0px;
               }
             }
 
