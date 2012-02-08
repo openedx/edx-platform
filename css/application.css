@@ -2175,28 +2175,6 @@ ul#related-tags li {
   font-weight: bold;
   font-size: 24px; }
 
-#fmask {
-  margin-bottom: 30px;
-  width: 100%; }
-
-#askFormBar {
-  display: inline-block;
-  padding: 4px 7px 5px 0px;
-  margin-top: 0px; }
-  #askFormBar p {
-    margin: 0 0 5px 0;
-    font-size: 14px;
-    color: #525252;
-    line-height: 1.4; }
-  #askFormBar .questionTitleInput {
-    font-size: 24px;
-    line-height: 24px;
-    height: 36px;
-    margin: 0px;
-    padding: 0px 0 0 5px;
-    border: #cce6ec 3px solid;
-    width: 725px; }
-
 .ask-page div#question-list, .edit-question-page div#question-list {
   float: none;
   border-bottom: #f0f0ec 1px solid;
@@ -2236,19 +2214,9 @@ ul#related-tags li {
   color: #525252;
   font-size: 13px; }
 
-.ask-page #id_tags, .edit-question-page #id_tags {
-  border: #cce6ec 3px solid;
-  height: 25px;
-  padding-left: 5px;
-  width: 395px;
-  font-size: 14px; }
-
 .title-desc {
   color: #707070;
   font-size: 13px; }
-
-#id_title {
-  width: 100%; }
 
 .checkbox {
   margin-left: 5px;
@@ -2752,10 +2720,6 @@ ins {
 
 span.text-counter {
   margin-right: 20px; }
-span.form-error {
-  color: #990000;
-  font-weight: normal;
-  margin-left: 5px; }
 
 p.form-item {
   margin: 0px; }
@@ -2805,12 +2769,6 @@ label.retag-error {
   border: none;
   margin-top: 10px;
   padding: 10px; }
-
-span.form-error {
-  color: #990000;
-  font-size: 90%;
-  font-weight: normal;
-  margin-left: 5px; }
 
 .favorites-empty {
   width: 32px;
@@ -3208,7 +3166,7 @@ pre.prettyprint {
   padding: 3px;
   border: 0px solid #888; }
 
-.light-button, form.answer-form div.preview-toggle a {
+.light-button, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a {
   -webkit-box-shadow: inset 0 1px 0 white;
   -moz-box-shadow: inset 0 1px 0 white;
   -ms-box-shadow: inset 0 1px 0 white;
@@ -3233,7 +3191,7 @@ pre.prettyprint {
   text-decoration: none;
   cursor: pointer;
   -webkit-font-smoothing: antialiased; }
-  .light-button:hover, form.answer-form div.preview-toggle a:hover, .light-button:focus, form.answer-form div.preview-toggle a:focus {
+  .light-button:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, .light-button:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus {
     background-color: white;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #d5d5d5));
     background-image: -webkit-linear-gradient(top, white, #d5d5d5);
@@ -3617,7 +3575,6 @@ div.question-header div.question-container, div.answer-block div.question-contai
     box-sizing: border-box;
     padding: 3%;
     display: inline-block;
-    margin: 15px 0 0;
     padding: 3%;
     width: 100%; }
     div.question-header div.question-container div.comments-container div.comments-content, div.answer-block div.question-container div.comments-container div.comments-content, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content, div.answer-block div.answer-container div.comments-container div.comments-content {
@@ -3649,17 +3606,30 @@ div.question-header div.question-container, div.answer-block div.question-contai
           div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div:hover {
             opacity: 1; }
         div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes {
-          -webkit-transform: rotate(-90deg);
-          -moz-transform: rotate(-90deg);
-          -ms-transform: rotate(-90deg);
-          -o-transform: rotate(-90deg);
-          transform: rotate(-90deg);
           width: 16px; }
           div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvote {
+            background: url(../images/askbot/comment-vote-up.png) no-repeat 2px;
             cursor: pointer;
-            font-size: 25px;
+            color: green;
+            display: block;
+            margin-bottom: 6px;
+            margin-top: 5px;
+            overflow: hidden;
             text-decoration: none;
-            color: green; }
+            text-indent: -9999px;
+            width: 20px; }
+          div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvoted, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvoted, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvoted, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvoted, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-votes a.upvoted {
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            -ms-border-radius: 3px;
+            -o-border-radius: 3px;
+            border-radius: 3px;
+            background: #D1E3A8;
+            color: green;
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 2px;
+            text-indent: 0px; }
         div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls hr, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls hr, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls hr, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls hr, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls hr {
           margin: 0; }
         div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls div.comment-delete {
@@ -3699,8 +3669,12 @@ div.question-header div.question-container, div.answer-block div.question-contai
       margin-top: 5px;
       text-align: right; }
     div.question-header div.question-container div.comments-container div.controls, div.answer-block div.question-container div.comments-container div.controls, div.question-header div.answer-block div.answer-container div.comments-container div.controls, div.answer-block div.question-header div.answer-container div.comments-container div.controls, div.answer-block div.answer-container div.comments-container div.controls {
-      border-top: 1px dashed #ddd;
-      padding: 15px 0; }
+      background: #f8f8f8;
+      text-align: right; }
+      div.question-header div.question-container div.comments-container div.controls a, div.answer-block div.question-container div.comments-container div.controls a, div.question-header div.answer-block div.answer-container div.comments-container div.controls a, div.answer-block div.question-header div.answer-container div.comments-container div.controls a, div.answer-block div.answer-container div.comments-container div.controls a {
+        display: inline-block;
+        font-size: 12px;
+        margin: 10px 10px 10px 0; }
 
 div.answer-controls {
   -webkit-box-sizing: border-box;
@@ -3720,6 +3694,8 @@ div.answer-block {
   width: 100%; }
   div.answer-block img.answer-img-accept {
     margin: 10px 0px 10px 16px; }
+  div.answer-block div.answered-by-owner {
+    color: #4d1919; }
 
 div.answer-own {
   border-top: 1px solid #eee;
@@ -3727,7 +3703,7 @@ div.answer-own {
   padding-left: 8.178%;
   padding-top: 10px; }
 
-form.answer-form {
+form.answer-form, form.question-form {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -3736,7 +3712,7 @@ form.answer-form {
   border-top: 1px solid #ddd;
   overflow: hidden;
   padding-left: 7.328%; }
-  form.answer-form textarea {
+  form.answer-form textarea, form.question-form textarea {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
@@ -3745,14 +3721,21 @@ form.answer-form {
     margin-top: 15px;
     resize: vertical;
     width: 99%; }
-  form.answer-form span.form-error {
-    display: block;
+  form.answer-form div.form-item, form.question-form div.form-item {
+    margin: 25px 0; }
+    form.answer-form div.form-item label, form.question-form div.form-item label {
+      display: block;
+      margin-bottom: -5px; }
+  form.answer-form span.form-error, form.question-form span.form-error, form.answer-form label.form-error, form.question-form label.form-error {
+    color: #990000;
+    display: inline;
+    font-size: 90%;
     font-weight: bold;
     padding: 10px 0; }
-  form.answer-form div.preview-toggle {
+  form.answer-form div.preview-toggle, form.question-form div.preview-toggle {
     padding: 15px 0;
     width: auto; }
-  form.answer-form .wmd-preview {
+  form.answer-form .wmd-preview, form.question-form .wmd-preview {
     margin: 3px 0 15px 0;
     padding: 10px;
     background-color: #F5F5F5;
@@ -3760,18 +3743,27 @@ form.answer-form {
     overflow: auto;
     font-size: 13px;
     font-family: Arial; }
-    form.answer-form .wmd-preview p {
+    form.answer-form .wmd-preview p, form.question-form .wmd-preview p {
       margin-bottom: 14px;
       line-height: 1.4;
       font-size: 14px; }
-    form.answer-form .wmd-preview pre {
+    form.answer-form .wmd-preview pre, form.question-form .wmd-preview pre {
       background-color: #E7F1F8; }
-    form.answer-form .wmd-preview blockquote {
+    form.answer-form .wmd-preview blockquote, form.question-form .wmd-preview blockquote {
       background-color: #eee; }
 
 input.after-editor {
   margin-bottom: 20px;
   margin-right: 10px; }
+
+form.question-form {
+  border: none;
+  padding: 0;
+  margin-top: -15px; }
+  form.question-form input[type="text"] {
+    width: 48.988%; }
+  form.question-form input[type="checkbox"] {
+    margin-top: 10px; }
 
 #wmd-button-bar {
   background: url(static/images/askbot/editor-toolbar-background.png) repeat-x bottom;
