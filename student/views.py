@@ -230,9 +230,11 @@ if settings.GENERATE_RANDOM_USER_CREDENTIALS:
 def activate_account(request, key):
     r=Registration.objects.filter(activation_key=key)
     if len(r)==1:
-        r[0].activate()
-        resp = render_to_response("activation_complete.html",{'csrf':csrf(request)['csrf_token']})
-#        print len(connection.queries), connection.queries
+        if not r[0].user.is_active:
+            r[0].activate()
+            resp = render_to_response("activation_complete.html",{'csrf':csrf(request)['csrf_token']})
+            return resp
+        resp = render_to_response("activation_active.html",{'csrf':csrf(request)['csrf_token']})
         return resp
     if len(r)==0:
         return render_to_response("activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
