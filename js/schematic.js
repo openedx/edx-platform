@@ -1777,12 +1777,22 @@ schematic = (function() {
 	// given a range of values, return a new range [vmin',vmax'] where the limits
 	// have been chosen "nicely".  Taken from matplotlib.ticker.LinearLocator
 	function view_limits(vmin,vmax) {
+	    // deal with degenerate case...
+	    if (vmin == vmax) {
+		if (vmin == 0) { vmin = -0.5; vmax = 0.5; }
+		else {
+		    vmin = vmin > 0 ? 0.9*vmin : 1.1*vmin;
+		    vmax = vmax > 0 ? 1.1*vmax : 0.9*vmax;
+		}
+	    }
+
 	    var log_range = Math.log(vmax - vmin)/Math.LN10;
 	    var exponent = Math.floor(log_range);
 	    //if (log_range - exponent < 0.5) exponent -= 1;
 	    var scale = Math.pow(10,-exponent);
 	    vmin = Math.floor(scale*vmin)/scale;
 	    vmax = Math.ceil(scale*vmax)/scale;
+
 	    return [vmin,vmax,1.0/scale];
 	}
 
