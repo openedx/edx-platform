@@ -22,7 +22,35 @@ form.answer-form {
     padding: 15px 0;
     width: auto;
     a {
-    @extend .light-button;
+      @extend .light-button;
     }
   }
+
+  .wmd-preview {
+    margin: 3px 0 15px 0;
+    padding: 10px;
+    background-color: #F5F5F5;
+    min-height: 20px;
+    overflow: auto;
+    font-size: 13px;
+    font-family: Arial;
+
+    p {
+      margin-bottom: 14px;
+      line-height: 1.4;
+      font-size: 14px;
+    }
+
+    pre {
+      background-color: #E7F1F8;
+    }
+
+    blockquote {
+      background-color: #eee;
+    }
+  }
+}
+input.after-editor {
+  margin-bottom: 20px;
+  margin-right: 10px;
 }
