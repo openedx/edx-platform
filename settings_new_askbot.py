@@ -210,7 +210,7 @@ LOGGING = {
             'level' : 'INFO'
         },
         'tracking' : {
-            'handlers' : [], # handlers,
+            'handlers' : [] if DEBUG else ['syslogger'], # handlers,
             'level' : 'DEBUG',
             'propagate' : False,
         },
@@ -328,6 +328,17 @@ INSTALLED_APPS = INSTALLED_APPS + (
 LIVESETTINGS_OPTIONS = {
     1: {
         'SETTINGS' : {
+            'FORUM_DATA_RULES' : {
+                'MIN_TITLE_LENGTH' : 1,
+                'MIN_QUESTION_BODY_LENGTH' : 1,
+                'MIN_ANSWER_BODY_LENGTH' : 1,
+
+                # 'ENABLE_VIDEO_EMBEDDING' : True,
+                #
+                # Enabling video requires forked version of markdown
+                # pip uninstall markdown2
+                # pip install -e git+git://github.com/andryuha/python-markdown2.git#egg=markdown2
+            },
             'MIN_REP' : {
                 'MIN_REP_TO_VOTE_UP' : 1,
                 'MIN_REP_TO_UPLOAD_FILES' : 1,
