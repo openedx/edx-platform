@@ -65,14 +65,17 @@ div.leanModal_box {
     text-align: left;
 
     div#enroll_error, div#login_error, div#pwd_error {
+      $error-color: #333;
       -webkit-font-smoothing: antialiased;
-      background-color: #F50200;
+      background-color: $error-color;
+      border: darken($error-color, 20%);
       color: #fff;
+      text-shadow: 0 1px 0 darken($error-color, 10%);
+      font-family: "Open sans";
       font-weight: bold;
       letter-spacing: 1px;
-      margin-bottom: lh();
-      padding: lh(.2);
-      text-transform: uppercase;
+      margin: (-(lh())) (-(lh())) lh();
+      padding: lh(.5);
 
       &:empty {
         padding: 0;
