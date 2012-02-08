@@ -5,92 +5,102 @@ div.course-wrapper {
     list-style: none;
   }
 
-  div#accordion {
+  .tran {
+    @include transition( all, .2s, $ease-in-out-quad);
+  }
+
+  section.course-index {
     @extend .sidebar;
-    @include transition( all, .5s, $ease-in-out-quad);
+    position: relative;
+    @extend .tran;
 
     div#open_close_accordion {
       h2 {
-        display: inline-block;
+        padding: 0 lh();
       }
 
       a {
         text-indent: -9999px;
-        display: inline-block;
         background: red;
         width: 16px;
         height: 16px;
+        position: absolute;
+        padding: 8px;
+        top: 12px;
+        right: 0;
       }
     }
 
-    h3 {
-      @include transition( all, .5s, $ease-in-out-quad);
-      overflow: hidden;
-      margin: 0;
+    div#accordion {
 
-      &:last-child {
-        @include box-shadow(none);
-      }
+      h3 {
+        overflow: hidden;
+        margin: 0;
 
-      &.ui-accordion-header {
-        color: #000;
-
-        a {
-          font-size: $body-font-size;
-          color: lighten($text-color, 10%);
+        &:last-child {
+          @include box-shadow(none);
         }
 
-        &.ui-state-hover {
-          border: none;
-          border-bottom: 1px solid #d3d3d3;
-        }
-
-        &.ui-state-active {
-          @extend .active;
-        }
-      }
-    }
-
-    ul.ui-accordion-content {
-      @include border-radius(0);
-      @include box-shadow( inset -1px 0 0 #e6e6e6);
-      background: #d6d6d6;
-      border: none;
-      border-bottom: 1px solid #c3c3c3;
-      font-size: 12px;
-      margin: 0;
-      overflow: hidden;
-
-      li {
-        &.active {
-          font-weight: bold;
-        }
-
-        a {
-          text-decoration: none;
-          margin-bottom: lh(.5);
-          display: block;
+        &.ui-accordion-header {
           color: #000;
 
-          &:hover {
-            color: #666;
+          a {
+            font-size: $body-font-size;
+            color: lighten($text-color, 10%);
           }
 
-          p {
-            margin-bottom: 0;
+          &.ui-state-hover {
+            border: none;
+            border-bottom: 1px solid #d3d3d3;
+          }
 
-            &.subtitle {
+          &.ui-state-active {
+            @extend .active;
+          }
+        }
+      }
+
+      ul.ui-accordion-content {
+        @include border-radius(0);
+        @include box-shadow( inset -1px 0 0 #e6e6e6);
+        background: #d6d6d6;
+        border: none;
+        border-bottom: 1px solid #c3c3c3;
+        font-size: 12px;
+        margin: 0;
+        overflow: hidden;
+
+        li {
+          &.active {
+            font-weight: bold;
+          }
+
+          a {
+            text-decoration: none;
+            margin-bottom: lh(.5);
+            display: block;
+            color: #000;
+
+            &:hover {
               color: #666;
+            }
+
+            p {
+              margin-bottom: 0;
+
+              &.subtitle {
+                color: #666;
+              }
             }
           }
         }
       }
     }
   }
+  
 
   section.course-content {
     @extend .content;
-    @include transition( all, .5s, $ease-in-out-quad);
 
     p {
       margin-bottom: lh();
@@ -219,34 +229,26 @@ div.course-wrapper {
   }
 
   &.closed {
-
-    div#accordion {
+    section.course-index {
       width: flex-grid(.5);
+    div#open_close_accordion {
 
-      div#open_close_accordion {
-        h2 {
-          position: relative;
-          left: -100%;
-        }
+      h2 {
+        visibility: hidden;
+        width: 10px;
+        padding: 0;
       }
+    }
 
-      h3, ul, li {
-        position: relative;
-        left: -100%;
+      div#accordion {
+        visibility: hidden;
+        width: 10px;
+        padding: 0;
       }
     }
 
     section.course-content {
       width: flex-grid(11.5) + flex-gutter();
     }
-
-    // div#accordion {
-    //   left: -(flex-grid(2.7));
-    // }
-
-    // section.course-content {
-    //   left: -(flex-grid(2.7));
-    //   position: relative;
-    // }
   }
 }
