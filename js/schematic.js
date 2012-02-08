@@ -71,7 +71,7 @@ schematic = (function() {
 	annotation_style = 'rgb(255,64,64)';  // color for diagram annotations
 
 	property_size = 5;  // point size for Component property text
-	annotation_size = 7;  // point size for diagram annotations
+	annotation_size = 6;  // point size for diagram annotations
 
 	// list of all the defined parts
 	parts_map = {
@@ -282,13 +282,11 @@ schematic = (function() {
 	    tr = document.createElement('tr');
 	    table.appendChild(tr);
 	    td = document.createElement('td');
-	    td.style.left = '0';
-	    td.style.top = '0';
 	    tr.appendChild(td);
 	    var wrapper = document.createElement('div');
+	    td.appendChild(wrapper);
 	    wrapper.style.position = 'relative';  // so we can position subwindows
 	    wrapper.appendChild(this.canvas);
-	    td.appendChild(wrapper);
 	    td = document.createElement('td');
 	    td.style.verticalAlign = 'top';
 	    tr.appendChild(td);
@@ -3192,7 +3190,7 @@ schematic = (function() {
 	function OpAmp(x,y,rotation,name,A) {
 	    Component.call(this,'o',x,y,rotation);
 	    this.properties['name'] = name;
-	    this.properties['A'] = A ? A : '300000';
+	    this.properties['A'] = A ? A : '30000';
 	    this.add_connection(0,0);   // +
 	    this.add_connection(0,16);  // -
 	    this.add_connection(48,8);  // output
@@ -3274,9 +3272,9 @@ schematic = (function() {
 		//this.draw_line(c,3,20,0,28);
 	    } else if (this.type == 'i') {  // current source
 		// draw arrow: pos to neg
-		this.draw_line(c,0,16,0,32);
-		this.draw_line(c,-3,24,0,32);
-		this.draw_line(c,3,24,0,32);
+		this.draw_line(c,0,15,0,32);
+		this.draw_line(c,-3,26,0,32);
+		this.draw_line(c,3,26,0,32);
 	    }
 
 	    if (this.properties['name'])
@@ -3442,14 +3440,16 @@ schematic = (function() {
 	    var v = vmap[label];
 	    if (v != undefined) {
 		// first draw some solid blocks in the background
-		c.globalAlpha = 0.85;
-		this.draw_text(c,'\u2588\u2588\u2588',0,24,4,annotation_size,element_style);
+		c.globalAlpha = 0.5;
+		this.draw_text(c,'\u2588\u2588\u2588',-8,8,4,annotation_size,element_style);
 		c.globalAlpha = 1.0;
 
-		// display the node voltage at this connection point
+		// display the element current 
 		var i = engineering_notation(v,2) + 'A';
-		this.draw_text(c,i,0,24,4,annotation_size,annotation_style);
-
+		this.draw_text(c,i,-3,5,5,annotation_size,annotation_style);
+		// draw arrow for current
+		this.draw_line(c,-3,4,0,8);
+		this.draw_line(c,3,4,0,8);
 		// only display each current once
 		delete vmap[label];
 	    }
