@@ -16,7 +16,6 @@ class WikiPathExtension(markdown.Extension):
         # set extension defaults
         self.config = {
                         'base_url' : ['/', 'String to append to beginning or URL.'],
-                        'end_url' : ['/', 'String to append to end of URL.'],
                         'html_class' : ['wikipath', 'CSS hook. Leave blank for none.']
         }
         
@@ -31,7 +30,7 @@ class WikiPathExtension(markdown.Extension):
         
         # append to end of inline patterns
         WIKI_RE =  r'\[(?P<linkTitle>.+?)\]\(wiki:(?P<wikiTitle>[a-zA-Z\d/_-]*)\)'
-        wikiPathPattern = WikiPath(WIKI_RE, self.getConfigs())
+        wikiPathPattern = WikiPath(WIKI_RE, self.config)
         wikiPathPattern.md = md
         md.inlinePatterns.add('wikipath', wikiPathPattern, "<reference")
 
@@ -45,30 +44,27 @@ class WikiPath(markdown.inlinepatterns.Pattern):
         if article_title.startswith("/"):
             article_title = article_title[1:]
         
-        url = self.config['base_url'] + article_title
+        url = self.config['base_url'][0] + article_title
         label = m.group('linkTitle')
         a = etree.Element('a')
         a.set('href', url)
         a.text = label
         
-        if self.config['html_class']:
-            a.set('class', self.config['html_class'])
+        if self.config['html_class'][0]:
+            a.set('class', self.config['html_class'][0])
             
         return a
         
     def _getMeta(self):
         """ Return meta data or config data. """
-        base_url = self.config['base_url']
-        end_url = self.config['end_url']
-        html_class = self.config['html_class']
+        base_url = self.config['base_url'][0]
+        html_class = self.config['html_class'][0]
         if hasattr(self.md, 'Meta'):
             if self.md.Meta.has_key('wiki_base_url'):
                 base_url = self.md.Meta['wiki_base_url'][0]
-            if self.md.Meta.has_key('wiki_end_url'):
-                end_url = self.md.Meta['wiki_end_url'][0]
             if self.md.Meta.has_key('wiki_html_class'):
                 html_class = self.md.Meta['wiki_html_class'][0]
-        return base_url, end_url, html_class
+        return base_url, html_class
 
 def makeExtension(configs=None) :
     return WikiPathExtension(configs=configs)

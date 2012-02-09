@@ -267,7 +267,7 @@ class Revision(models.Model):
 
         # Create pre-parsed contents - no need to parse on-the-fly
         ext = WIKI_MARKDOWN_EXTENSIONS
-        #ext += ["wikipath(base_url=%s)" % reverse('wiki_view', args=('/',))]
+        ext += ["wikipath(base_url=%s)" % reverse('wiki_view', args=('/',))]
         print ext
         self.contents_parsed = markdown(self.contents,
                                         extensions=ext,
