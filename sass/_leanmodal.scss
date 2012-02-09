@@ -202,3 +202,52 @@ div#feedback_div{
     }
   }
 }
+
+div#calculator_div {
+  max-width: 500px;
+
+  form {
+    padding-bottom: lh();
+    margin-bottom: lh();
+    border-bottom: 1px solid #ddd;
+
+    input#calculator_input {
+      width: 400px;
+    }
+
+    input#calculator_button {
+      background: 0;
+      color: $mit-red;
+      border: 0;
+      @include box-shadow(none);
+      padding: 0;
+      text-shadow: none;
+
+      &:hover {
+        color: #333;
+      }
+    }
+
+    input#calculator_output {
+      border: 0;
+      background: 0;
+      padding: lh(.35);
+      width: 60px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
+
+  dl {
+    dt {
+      float: left;
+      clear: both;
+      padding-right: lh(.5);
+      font-weight: bold;
+    }
+
+    dd {
+      float: left;
+    }
+  }
+}
