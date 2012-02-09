@@ -169,11 +169,6 @@ input, select {
   -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
-  border-radius: 3px;
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
@@ -202,14 +197,21 @@ input, select {
   -o-transition-delay: 0;
   transition-delay: 0;
   background-color: #993333;
+  border: 1px solid #732626;
   color: #fff;
   margin: 25.888px 0 12.944px;
   padding: 6.472px 12.944px;
   text-decoration: none;
   font-style: normal;
+  -webkit-box-shadow: inset 0 1px 0 #b83d3d;
+  -moz-box-shadow: inset 0 1px 0 #b83d3d;
+  -ms-box-shadow: inset 0 1px 0 #b83d3d;
+  -o-box-shadow: inset 0 1px 0 #b83d3d;
+  box-shadow: inset 0 1px 0 #b83d3d;
   -webkit-font-smoothing: antialiased; }
   .button:hover, header.announcement div section.course section a:hover, section.index-content section.course a:hover, section.index-content section.staff a:hover, section.index-content section.about-course section.cta a.enroll:hover {
-    background-color: #732626; }
+    background-color: #732626;
+    border-color: #4d1919; }
   .button span, header.announcement div section.course section a span, section.index-content section.course a span, section.index-content section.staff a span, section.index-content section.about-course section.cta a.enroll span {
     font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
     font-style: italic; }
@@ -363,12 +365,19 @@ header.announcement {
         margin-left: 0;
         padding: 0; }
         header.announcement div section.course section a {
+          -webkit-box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
+          -moz-box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
+          -ms-box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
+          -o-box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
+          box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
           background-color: #4d1919;
           display: block;
           padding: 12.944px 25.888px;
+          border-color: #260d0d;
           text-align: center; }
           header.announcement div section.course section a:hover {
-            background-color: #732626; }
+            background-color: #732626;
+            border-color: #4d1919; }
       header.announcement div section.course p {
         width: 48.092%;
         line-height: 25.888px;
@@ -527,10 +536,17 @@ section.index-content section {
           section.index-content section.about-course section.requirements p:nth-child(odd) {
             margin-right: 0; }
       section.index-content section.about-course section.cta {
-        width: 100%; }
+        width: 100%;
+        text-align: center; }
         section.index-content section.about-course section.cta a.enroll {
-          padding: 12.944px 25.888px;
-          display: block;
+          padding: 12.944px 51.776px;
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
           text-align: center;
           font: 800 18px "Open Sans", Helvetica, Arial, sans-serif; }
 
@@ -669,13 +685,15 @@ div.leanModal_box {
     text-align: left; }
     div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error, div.leanModal_box form div#pwd_error {
       -webkit-font-smoothing: antialiased;
-      background-color: #F50200;
+      background-color: #333333;
+      border: black;
       color: #fff;
+      text-shadow: 0 1px 0 #1a1a1a;
+      font-family: "Open sans";
       font-weight: bold;
       letter-spacing: 1px;
-      margin-bottom: 25.888px;
-      padding: 5.178px;
-      text-transform: uppercase; }
+      margin: -25.888px -25.888px 25.888px;
+      padding: 12.944px; }
       div.leanModal_box form div#enroll_error:empty, div.leanModal_box form div#login_error:empty, div.leanModal_box form div#pwd_error:empty {
         padding: 0; }
     div.leanModal_box form ol {
@@ -765,6 +783,14 @@ div.leanModal_box {
 
 div#login {
   min-width: 400px; }
+  div#login header {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 25.888px;
+    padding-bottom: 25.888px; }
+    div#login header h1 {
+      border-bottom: 0;
+      padding-bottom: 0;
+      margin-bottom: 6.472px; }
   div#login ol li {
     width: auto;
     float: none; }
