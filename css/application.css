@@ -713,6 +713,42 @@ div#feedback_div form ol li {
   div#feedback_div form ol li textarea#feedback_message {
     height: 100px; }
 
+div#calculator_div {
+  max-width: 500px; }
+  div#calculator_div form {
+    padding-bottom: 22.652px;
+    margin-bottom: 22.652px;
+    border-bottom: 1px solid #ddd; }
+    div#calculator_div form input#calculator_input {
+      width: 400px; }
+    div#calculator_div form input#calculator_button {
+      background: 0;
+      color: #993333;
+      border: 0;
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      -ms-box-shadow: none;
+      -o-box-shadow: none;
+      box-shadow: none;
+      padding: 0;
+      text-shadow: none; }
+      div#calculator_div form input#calculator_button:hover {
+        color: #333; }
+    div#calculator_div form input#calculator_output {
+      border: 0;
+      background: 0;
+      padding: 7.928px;
+      width: 60px;
+      font-size: 24px;
+      font-weight: bold; }
+  div#calculator_div dl dt {
+    float: left;
+    clear: both;
+    padding-right: 11.326px;
+    font-weight: bold; }
+  div#calculator_div dl dd {
+    float: left; }
+
 div.course-wrapper ul, div.course-wrapper ol {
   list-style: none; }
 div.course-wrapper div#accordion div#open_close_accordion {
