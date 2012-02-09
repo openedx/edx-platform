@@ -341,6 +341,16 @@ LIVESETTINGS_OPTIONS = {
             },
             'MIN_REP' : {
                 'MIN_REP_TO_VOTE_UP' : 1,
+                'MIN_REP_TO_VOTE_DOWN' : 1,
+                'MIN_REP_TO_ANSWER_OWN_QUESTION' : 1,
+                'MIN_REP_TO_ACCEPT_OWN_ANSWER' : 1,
+                'MIN_REP_TO_FLAG_OFFENSIVE' : 1,
+                'MIN_REP_TO_LEAVE_COMMENTS' : 1,
+                'MIN_REP_TO_CLOSE_OWN_QUESTIONS' : 1,
+                'MIN_REP_TO_RETAG_OTHERS_QUESTIONS' : 1,
+                'MIN_REP_TO_REOPEN_OWN_QUESTIONS' : 1,
+                'MIN_REP_TO_EDIT_WIKI' : 1,
+                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 100,
                 'MIN_REP_TO_UPLOAD_FILES' : 1,
             },
             'SOCIAL_SHARING' : {
