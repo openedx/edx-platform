@@ -102,7 +102,7 @@ $(function() {
                if(json.success) {
                   $('#enroll').html(json.value);
                } else {
-                  $('#enroll_error').html(json.value);
+                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
                }
              }
         );
