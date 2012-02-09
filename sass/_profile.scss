@@ -9,7 +9,8 @@ div.profile-wrapper {
     border-right: 0;
 
     h1 {
-      padding: lh();
+      padding:0 lh();
+      font-size: 18px;
     }
 
     ul {
@@ -51,6 +52,10 @@ div.profile-wrapper {
 
   section.course-info {
     @extend .content;
+
+    > h1 {
+      @extend .top-header;
+    }
 
     ol {
       list-style: none;

@@ -3,37 +3,88 @@ div.info-wrapper {
 
   section.updates {
     @extend .content;
-  }
 
-  section.handouts {
-    @extend .sidebar;
-    @include border-radius(0px 4px 0px 4px);
-    border-right: 0;
-    border-left: 1px solid #d3d3d3;
+    > h1 {
+      @extend .top-header;
+    }
 
-    h1 {
-      padding: 0 lh();
+    > p {
+      margin-bottom: lh();
     }
 
     ol {
       list-style: none;
 
       li {
+        padding-bottom: lh(.5);
+        margin-bottom: lh(.5);
+        @extend .clearfix;
+        border-bottom: 1px solid #e3e3e3;
+
         h2 {
-          padding: 0 lh();
+          float: left;
+          width: flex-grid(2, 9);
+          margin: 0 flex-gutter() 0 0;
+        }
+
+        p {
+          float: left;
+          width: flex-grid(7, 9);
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  section.handouts {
+    @extend .sidebar;
+    @include border-radius(0 4px 4px 0);
+    border-right: 0;
+    border-left: 1px solid #d3d3d3;
+
+    h1 {
+      padding: 0 lh();
+      font-size: 18px;
+    }
+
+    ol {
+      list-style: none;
+
+      li {
+        @include box-shadow(0 1px 0 #eee);
+        border-bottom: 1px solid #d3d3d3;
+        @extend .clearfix;
+
+        p {
+          padding: 7px lh();
+          margin: 0;
+          text-transform: none;
+          letter-spacing: 0;
+          font-size: $body-font-size;
+
+          &:hover {
+            background: #efefef;
+          }
+
+          a {
+            display: inline;
+            padding: 0;
+
+            &:hover {
+              text-decoration: underline;
+              background: none;
+            }
+          }
         }
 
         a {
-          @include box-shadow(0 1px 0 #eee);
           @include transition();
-          border-bottom: 1px solid #d3d3d3;
           color: lighten($text-color, 10%);
           display: block;
           padding: 7px lh();
           text-decoration: none;
 
           &:hover {
-            @include box-shadow(0 1px 0 #fff);
             background: #efefef;
           }
         }

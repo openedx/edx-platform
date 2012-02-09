@@ -10,6 +10,7 @@
       <p>6.002x (Circuits and Electronics) is an experimental on-line adaptation of MIT&rsquo;s first undergraduate analog design course: 6.002. This course will run, free of charge, for students worldwide from March 1, 2012 through June 8, 2012.</p>
     </section>
 </%block>
+
 <%block name="header_class">course</%block>
 
 <section class="index-content">
@@ -101,7 +102,7 @@ $(function() {
                if(json.success) {
                   $('#enroll').html(json.value);
                } else {
-                  $('#enroll_error').html(json.value);
+                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
                }
              }
         );
