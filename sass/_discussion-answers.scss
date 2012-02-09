@@ -54,3 +54,19 @@ div.answer-own {
   padding-left: flex-grid(1.2);
   padding-top: 10px;
 }
+
+div.answer-actions {
+  text-align: right;
+  margin: 0;
+  padding: 0;
+
+  span.sep {
+    color: #ddd;
+  }
+  a {
+    text-decoration: none;
+  }
+  a.question-edit, a.permant-link {
+    color: #999;
+  }
+}

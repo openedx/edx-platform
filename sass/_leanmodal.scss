@@ -18,12 +18,30 @@ div.leanModal_box {
   background: #fff;
   padding: lh(2);
 
+  a.modal_close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: block;
+    width: 14px;
+    height: 14px;
+    z-index: 2;
+    color: #aaa;
+    font-style: normal;
+
+    &:hover{
+      text-decoration: none;
+      color: $mit-red;
+    }
+  }
+
   h1 {
     font-size: 24px;
     margin-top: 0;
     padding-bottom: lh();
     border-bottom: 1px solid #eee;
     margin-bottom: lh();
+    text-align: left;
   }
 
   &#enroll {
@@ -184,6 +202,55 @@ div#feedback_div{
           height: 100px;
         }
       }
+    }
+  }
+}
+
+div#calculator_div {
+  max-width: 500px;
+
+  form {
+    padding-bottom: lh();
+    margin-bottom: lh();
+    border-bottom: 1px solid #ddd;
+
+    input#calculator_input {
+      width: 400px;
+    }
+
+    input#calculator_button {
+      background: 0;
+      color: $mit-red;
+      border: 0;
+      @include box-shadow(none);
+      padding: 0;
+      text-shadow: none;
+
+      &:hover {
+        color: #333;
+      }
+    }
+
+    input#calculator_output {
+      border: 0;
+      background: 0;
+      padding: lh(.35);
+      width: 60px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
+
+  dl {
+    dt {
+      float: left;
+      clear: both;
+      padding-right: lh(.5);
+      font-weight: bold;
+    }
+
+    dd {
+      float: left;
     }
   }
 }

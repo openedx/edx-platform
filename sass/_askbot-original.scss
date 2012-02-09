@@ -1014,27 +1014,27 @@ ul {
   font-weight: bold;
   font-size: 24px; }
 
-#fmask {
-  margin-bottom: 30px;
-  width: 100%; }
+// #fmask {
+//   margin-bottom: 30px;
+//   width: 100%; }
 
-#askFormBar {
-  display: inline-block;
-  padding: 4px 7px 5px 0px;
-  margin-top: 0px;
-  p {
-    margin: 0 0 5px 0;
-    font-size: 14px;
-    color: #525252;
-    line-height: 1.4; }
-  .questionTitleInput {
-    font-size: 24px;
-    line-height: 24px;
-    height: 36px;
-    margin: 0px;
-    padding: 0px 0 0 5px;
-    border: #cce6ec 3px solid;
-    width: 725px; } }
+// #askFormBar {
+//   display: inline-block;
+//   padding: 4px 7px 5px 0px;
+//   margin-top: 0px;
+//   p {
+//     margin: 0 0 5px 0;
+//     font-size: 14px;
+//     color: #525252;
+//     line-height: 1.4; }
+//   .questionTitleInput {
+//     font-size: 24px;
+//     line-height: 24px;
+//     height: 36px;
+//     margin: 0px;
+//     padding: 0px 0 0 5px;
+//     border: #cce6ec 3px solid;
+//     width: 725px; } }
 
 .ask-page div#question-list, .edit-question-page div#question-list {
   float: none;
@@ -1075,12 +1075,12 @@ ul {
   color: #525252;
   font-size: 13px; }
 
-.ask-page #id_tags, .edit-question-page #id_tags {
-  border: #cce6ec 3px solid;
-  height: 25px;
-  padding-left: 5px;
-  width: 395px;
-  font-size: 14px; }
+// .ask-page #id_tags, .edit-question-page #id_tags {
+//   border: #cce6ec 3px solid;
+//   height: 25px;
+//   padding-left: 5px;
+//   width: 395px;
+//   font-size: 14px; }
 
 .title-desc {
   color: #707070;
@@ -1126,8 +1126,8 @@ ul {
 //   margin-bottom: 10px;
 //   width: 710px; }
 
-#id_title {
-  width: 100%; }
+// #id_title {
+//   width: 100%; }
 
 // .wmd-preview {
 //   margin: 3px 0 5px 0;
@@ -2192,10 +2192,11 @@ ins {
 span {
   &.text-counter {
     margin-right: 20px; }
-  &.form-error {
-    color: #990000;
-    font-weight: normal;
-    margin-left: 5px; } }
+  // &.form-error {
+  //   color: #990000;
+  //   font-weight: normal;
+  //   margin-left: 5px; }
+  }
 
 p.form-item {
   margin: 0px; }
@@ -2247,11 +2248,11 @@ label.retag-error {
   margin-top: 10px;
   padding: 10px; }
 
-span.form-error {
-  color: #990000;
-  font-size: 90%;
-  font-weight: normal;
-  margin-left: 5px; }
+// span.form-error {
+//   color: #990000;
+//   font-size: 90%;
+//   font-weight: normal;
+//   margin-left: 5px; }
 
 .favorites-empty {
   width: 32px;
