@@ -160,6 +160,18 @@ div.leanModal_box {
 div#login {
   min-width: 400px;
 
+  header {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: lh();
+    padding-bottom: lh();
+
+    h1 {
+      border-bottom: 0;
+      padding-bottom: 0;
+      margin-bottom: lh(.25);
+    }
+  }
+
   ol {
     li {
       width: auto;
@@ -208,6 +220,7 @@ div#feedback_div{
 
 div#calculator_div {
   max-width: 500px;
+
 
   form {
     padding-bottom: lh();

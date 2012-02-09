@@ -167,16 +167,16 @@ header.announcement {
 
           a {
             @extend .button;
-            @include box-shadow(inset 0 1px 0 darken($mit-red, 5%), 0 1px 0 lighten($mit-red, 5%));
-            background-color: darken($mit-red, 10%);
+            @include box-shadow(inset 0 1px 0 darken($mit-red, 10%), 0 1px 0 lighten($mit-red, 5%));
+            background-color: darken($mit-red, 20%);
             display: block;
             padding: lh(.5) lh();
-            border-color: darken($mit-red, 20%);
+            border-color: darken($mit-red, 30%);
             text-align: center;
 
             &:hover {
-              background-color: darken($mit-red, 20%);
-              border-color: darken($mit-red, 30%);
+              background-color: darken($mit-red, 10%);
+              border-color: darken($mit-red, 20%);
             }
           }
         }
@@ -417,7 +417,7 @@ section.index-content {
 
           a.enroll {
             @extend .button;
-            padding: lh(.5) lh(1.5);
+            padding: lh(.5) lh(2);
             @include inline-block();
             text-align: center;
             font: 800 18px $header-font-family;
