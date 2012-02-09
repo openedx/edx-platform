@@ -70,3 +70,11 @@ $("#video_control").click(function(){
     $(this).removeClass().addClass("play");
   }
 });
+// space bar to pause video
+$(".video-wrapper").keyup(function(e){
+  active = document.activeElement;
+  if (e.which == 32) {
+    e.preventDefault();
+    $("#video_control").click();
+  }
+});
