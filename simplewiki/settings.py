@@ -85,7 +85,7 @@ WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
                             'headerid',
                             'fenced_code',
                             'def_list',
-                            'codehilite',
+                            #'codehilite', #This was throwing errors
                             'abbr',
                             'toc',
                             'mathjax',

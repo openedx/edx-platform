@@ -311,9 +311,17 @@ def search_articles(request):
         querystring = request.POST['value'].strip()
     else:
         querystring = ""
+        
+        
+    results = Article.objects.all()
+    
+    if request.user.is_superuser:
+        results = results.order_by('current_revision__deleted')
+    else:
+        results = results.filter(current_revision__deleted = 0)
+    
 
     if querystring:
-        results = Article.objects.all()
         for queryword in querystring.split():
             # Basic negation is as fancy as we get right now
             if queryword[0] == '-' and len(queryword) > 1:
@@ -324,18 +332,15 @@ def search_articles(request):
                     
             results = results._search(Q(current_revision__contents__icontains = queryword) | \
                                       Q(title__icontains = queryword))
-    else:
-        # Need to throttle results by splitting them into pages...
-        results = Article.objects.all()
         
-    if request.user.is_superuser:
-        results = results.order_by('current_revision__deleted')
-    else:
-        results = results.filter(current_revision__deleted = 0)
+    results.select_related('current_revision__deleted')
+        
+    print [(article.title.lower(), article.get_url()) for article in results]
+    results = sorted(results, key=lambda article: (article.current_revision.deleted, article.get_url().lower()) )
 
-    if results.count() == 1 and querystring:
+    if len(results) == 1 and querystring:
         return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
-    else:        
+    else:
         d = {'wiki_search_results': results,
             	'wiki_search_query': querystring,}
         d.update(csrf(request))
