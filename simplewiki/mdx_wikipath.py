@@ -1,6 +1,24 @@
 #!/usr/bin/env python
 
-# THIS ONLY WORKS WITH MARKDOWN 2.1.0
+'''
+Wikipath Extension for Python-Markdown
+======================================
+
+Converts [Link Name](wiki:ArticleName) to relative links pointing to article.  Requires Python-Markdown 2.0+
+
+Basic usage:
+
+    >>> import markdown
+    >>> text = "Some text with a [Link Name](wiki:ArticleName)."
+    >>> html = markdown.markdown(text, ['wikipath(base_url="/wiki/view/")'])
+    >>> html
+    u'<p>Some text with a <a class="wikipath" href="/wiki/view/ArticleName/">Link Name</a>.</p>'
+
+Dependencies:
+* [Python 2.3+](http://python.org)
+* [Markdown 2.0+](http://www.freewisdom.org/projects/python-markdown/)
+'''
+
 
 import markdown
 try:
