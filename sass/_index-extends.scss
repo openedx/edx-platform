@@ -14,6 +14,10 @@
   > div {
     padding-left: flex-grid(4) + flex-gutter();
 
+    @media screen and (max-width: 940px) {
+      padding-left: 0;
+    }
+
     p {
       margin-bottom: lh();
     }

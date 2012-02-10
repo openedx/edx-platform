@@ -123,6 +123,7 @@ body.askbot {
       aside {
         @extend .sidebar;
         @include box-shadow(inset 1px 0 0 #f6f6f6);
+        @include border-radius(0 4px 4px 0);
         border-left: 1px solid #d3d3d3;
         border-right: 1px solid #f6f6f6;
         padding: $gw-gutter;
@@ -148,18 +149,18 @@ body.askbot {
     }
   }
 
-  footer {
-    margin: 0 auto;
-    padding: 0;
+  // footer {
+  //   margin: 0 auto;
+  //   padding: 0;
 
-    div.footer-wrapper {
-      @extend .clearfix;
-      @extend .wrapper;
-      @include box-shadow(0 1px 0 #fff);
-      @include box-sizing(border-box);
-      background-color: #000;
-      border-top: 0;
-      padding: $gw-gutter/2;
-    }
-  }
+  //   div.footer-wrapper {
+  //     @extend .clearfix;
+  //     @extend .wrapper;
+  //     @include box-shadow(0 1px 0 #fff);
+  //     @include box-sizing(border-box);
+  //     background-color: #000;
+  //     border-top: 0;
+  //     padding: $gw-gutter/2;
+  //   }
+  // }
 }

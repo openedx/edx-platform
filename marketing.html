@@ -100,7 +100,6 @@ function postJSON(url, data, callback) {
 
 % if settings.COURSEWARE_ENABLED:
   <div id="login" class="leanModal_box"><%include file="login.html" /></div>
-  <div id="enroll" class="leanModal_box" name="enroll"><%include file="create_account.html" /></div>
 % endif
   <div id="pwd_reset" class="leanModal_box"><%include file="password_reset_form.html" /></div>
   <div id="reset_done" class="leanModal_box"></div>
@@ -142,7 +141,7 @@ $(document).ready(function(){
         if (json.success) {
           $('#pwd_reset').html(json.value);
         } else {
-          $('#pwd_error').html(json.error);
+          $('#pwd_error').html(json.error).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
         }
       }
     );
