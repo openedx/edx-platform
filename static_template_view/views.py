@@ -9,8 +9,7 @@ from django.core.context_processors import csrf
 from django.conf import settings
 
 #valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
-valid_templates=['mitx_global.html', 
-                 'index.html', 
+valid_templates=['index.html', 
                  'tos.html', 
                  'privacy.html', 
                  'honor.html', 
@@ -22,7 +21,12 @@ print "!!",settings.__dict__
 if settings.STATIC_GRAB: 
     valid_templates = valid_templates+['server-down.html',
                                        'server-error.html'
-                                       'server-overloaded.html']
+                                       'server-overloaded.html', 
+                                       'mitx_global.html', 
+                                       'mitx-overview.html', 
+                                       '6002x-faq.html',
+                                       '6002x-press-release.html'
+                                       ]
 
 def index(request, template): 
     csrf_token = csrf(request)['csrf_token']
