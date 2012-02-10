@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import random
 import sys
 import StringIO
 import urllib
@@ -125,6 +126,13 @@ def profile(request):
         else:
             percentage = 0
             summary = "0% (?/?)"
+        
+        if settings.GENERATE_PROFILE_SCORES:
+            points_possible = random.randrange(10, 50)
+            points_earned = random.randrange(5, points_possible)
+            percentage = points_earned / float(points_possible)
+            summary = "{0:.0%} ({1}/{2})".format( percentage, points_earned, points_possible )
+        
         summary = "Homework {0} - {1}".format(i + 1, summary)
         
         homework_percentages.append( {'percentage': percentage, 'summary': summary} )
@@ -140,6 +148,13 @@ def profile(request):
         else:
             percentage = 0
             summary = "0% (?/?)"
+        
+        if settings.GENERATE_PROFILE_SCORES:
+            points_possible = random.randrange(10, 50)
+            points_earned = random.randrange(5, points_possible)
+            percentage = points_earned / float(points_possible)
+            summary = "{0:.0%} ({1}/{2})".format( percentage, points_earned, points_possible )
+            
         summary = "Lab {0} - {1}".format(i + 1, summary)
         lab_percentages.append( {'percentage': percentage, 'summary': summary} )
     lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
@@ -151,6 +166,14 @@ def profile(request):
     
     final_score = ('?', '?')
     final_percentage = 0
+    
+    if settings.GENERATE_PROFILE_SCORES:
+        midterm_score = (random.randrange(50, 150), 150)
+        midterm_percentage = midterm_score[0] / float(midterm_score[1])
+        
+        final_score = (random.randrange(100, 250), 300)
+        final_percentage = final_score[0] / float(final_score[1])
+        
     
     grade_summary = [
         {

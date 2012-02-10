@@ -14,6 +14,9 @@ LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/'
 BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'
 
+# Feature Flags. These should be set to false until they are ready to deploy, and then eventually flag mechanisms removed
+GENERATE_PROFILE_SCORES = False # If this is true, random scores will be generated for the purpose of debugging the profile graphs
+
 # Our parent dir (mitx_all) is the BASE_DIR
 BASE_DIR = os.path.abspath(os.path.join(__file__, "..", ".."))
 
