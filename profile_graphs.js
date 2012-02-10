@@ -16,7 +16,7 @@ $(function () {
     }).appendTo("body").fadeIn(200);
   }
       
-  /* -------------------------------- Grade detail graph -------------------------------- */
+  /* -------------------------------- Grade detail bars -------------------------------- */
   var colors = [$.color.parse("#E8B800"), $.color.parse("#A0CEFA"), $.color.parse("#BD3738"), $.color.parse("#429A2E")];
   //var colors = [$.color.parse("#1B2045"), $.color.parse("#557a00"), $.color.parse("#F5600"), $.color.parse("#FEBA2C")];
   //var colors = [$.color.parse("#E7C856"), $.color.parse("#CD462E"), $.color.parse("#B01732"), $.color.parse("#41192A")];
@@ -82,9 +82,39 @@ $(function () {
   //Alwasy be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "red", xaxis: 2} );
       
+      
+  /* ----------------------------- Grade overviewew bar -------------------------*/
+  <%
+  totalWeight = 0.0
+  sectionIndex = 0
+  totalScore = 0.0
+  %>
+  %for section in grade_summary:
+    <%
+    weighted_score = section['totalscore']['score'] * section['weight']
+    summary_text = "{0} - {1:.0%} of possible {2:.0%}".format(section['category'], weighted_score, section['weight'])
+    %>
+    %if section['totalscore']['score'] > 0:
+      series.push({label: "${section['category']} - Weighted",
+        data: [[${tickIndex}, ${weighted_score}]],
+        color: colors[${sectionIndex}].toString(),
+      }); 
+    %endif
+     
+    detail_tooltips["${section['category']} - Weighted"] = [ "${summary_text}" ];
+    <%
+    sectionIndex += 1
+    totalWeight += section['weight']
+    totalScore += section['totalscore']['score'] * section['weight']
+    %>
+  %endfor
+  <% tickIndex += 1 + sectionSpacer %>
+  
+  
   var options = {
-    series: {lines: {show: false, steps: false },
-    bars: {show: true, barWidth: 0.6, align: 'center', lineWidth: 1},},
+    series: {stack: true,
+              lines: {show: false, steps: false },
+              bars: {show: true, barWidth: 0.6, align: 'center', lineWidth: 1},},
     xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}},
     xaxes: [{ticks: ticks}, {ticks: bottomTicks}],
     yaxis: {ticks: [[1, "100%"], [0.87, "A 87%"], [0.7, "B 70%"], [0.6, "C 60%"], [0, "0%"]], min: 0.0, max: 1.0, labelWidth: 50},
@@ -103,8 +133,8 @@ $(function () {
     $("#x").text(pos.x.toFixed(2));
     $("#y").text(pos.y.toFixed(2));
     if (item) {
-      if (previousPoint != item.dataIndex) {
-        previousPoint = item.dataIndex;
+      if (previousPoint != (item.dataIndex, item.seriesIndex)) {
+        previousPoint = (item.dataIndex, item.seriesIndex);
             
         $("#tooltip").remove();
             
