@@ -88,15 +88,16 @@ $(function () {
   totalWeight = 0.0
   sectionIndex = 0
   totalScore = 0.0
+  overviewBarX = tickIndex
   %>
   %for section in grade_summary:
     <%
     weighted_score = section['totalscore']['score'] * section['weight']
-    summary_text = "{0} - {1:.0%} of possible {2:.0%}".format(section['category'], weighted_score, section['weight'])
+    summary_text = "{0} - {1:.0%} of a possible {2:.0%}".format(section['category'], weighted_score, section['weight'])
     %>
     %if section['totalscore']['score'] > 0:
       series.push({label: "${section['category']} - Weighted",
-        data: [[${tickIndex}, ${weighted_score}]],
+        data: [[${overviewBarX}, ${weighted_score}]],
         color: colors[${sectionIndex}].toString(),
       }); 
     %endif
@@ -124,9 +125,16 @@ $(function () {
     legend: {show: false},
   };
   
-  if ($("#grade-detail-graph").length > 0) {
-    $.plot($("#grade-detail-graph"), series, options);
+  var $grade_detail_graph = $("#grade-detail-graph");
+  if ($grade_detail_graph.length > 0) {
+    var plot = $.plot($grade_detail_graph, series, options);
+    
+    var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
+    $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{:.0%}".format(totalScore)}</div>');
   }
+  
+
+  
       
   var previousPoint = null;
   $("#grade-detail-graph").bind("plothover", function (event, pos, item) {
