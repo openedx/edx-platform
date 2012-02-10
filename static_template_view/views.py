@@ -16,8 +16,6 @@ valid_templates=['index.html',
                  'copyright.html', 
                  '404.html']
 
-print "!!",settings.__dict__
-
 if settings.STATIC_GRAB: 
     valid_templates = valid_templates+['server-down.html',
                                        'server-error.html'
