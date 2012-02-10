@@ -196,7 +196,7 @@ function onYouTubePlayerAPIReady() {
       'onStateChange': onPlayerStateChange
     }
   });
-  updateytplayerInfoInterval = setInterval(updateytplayerInfo, 500);
+  updateytplayerInfoInterval = setInterval(updateHTML5ytplayerInfo, 200);
   ajax_videoInterval = setInterval(ajax_video, 5000);
 }
 
@@ -300,15 +300,32 @@ function onPlayerError(errorCode) {
     //    alert("An error occured: " + errorCode);
 }
 
-function updateytplayerInfo() {
-    if(ytplayer.getPlayerState()!=3) {
-	$("#slider").slider("option","max",ytplayer.getDuration());
-	$("#slider").slider("option","value",ytplayer.getCurrentTime());
+// Currently duplicated to check for if video control changed by clicking the video for HTML5
+// Hacky b/c of lack of control over YT player
+function updateHTML5ytplayerInfo() {
+    var player_state = getPlayerState();
+    if(player_state != 3) {
+      $("#slider").slider("option","max",ytplayer.getDuration());
+      $("#slider").slider("option","value",ytplayer.getCurrentTime());
     }
-    if (getPlayerState() == 1){
-	update_captions(getCurrentTime());
+    if (player_state == 1){
+      update_captions(getCurrentTime());
     }
+    if (player_state == 1 && $("#video_control").hasClass("play"))
+      $("#video_control").removeClass().addClass("pause");
+    else if (player_state == 2 && $("#video_control").hasClass("pause"))
+      $("#video_control").removeClass().addClass("play");
+}
 
+function updateytplayerInfo() {
+    var player_state = getPlayerState();
+    if(player_state != 3) {
+      $("#slider").slider("option","max",ytplayer.getDuration());
+      $("#slider").slider("option","value",ytplayer.getCurrentTime());
+    }
+    if (player_state == 1){
+      update_captions(getCurrentTime());
+    }
        // updateHTML("videoduration", getDuration());
     //    updateHTML("videotime", getCurrentTime());
     //    updateHTML("startbytes", getStartBytes());
