@@ -143,6 +143,9 @@ input, select {
 
 .subpage > div, section.copyright > div, section.tos > div, section.privacy-policy > div, section.honor-code > div {
   padding-left: 34.171%; }
+  @media screen and (max-width: 940px) {
+    .subpage > div, section.copyright > div, section.tos > div, section.privacy-policy > div, section.honor-code > div {
+      padding-left: 0; } }
   .subpage > div p, section.copyright > div p, section.tos > div p, section.privacy-policy > div p, section.honor-code > div p {
     margin-bottom: 25.888px; }
   .subpage > div h1, section.copyright > div h1, section.tos > div h1, section.privacy-policy > div h1, section.honor-code > div h1 {
