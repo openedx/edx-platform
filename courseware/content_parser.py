@@ -92,7 +92,8 @@ def id_tag(course):
                    'html':'filename',
                    'vertical':'id', 
                    'tab':'id',
-                   'schematic':'id'}
+                   'schematic':'id',
+                   'book' : 'id'}
     
     # Tag elements with unique IDs
     elements = course.xpath("|".join(['//'+c for c in default_ids]))
@@ -143,7 +144,7 @@ def course_file(user):
     filename = UserProfile.objects.get(user=user).courseware
     data_template = template_lookup.get_template(filename)
 
-    options = {'dev_content':True}
+    options = {'dev_content':settings.DEV_CONTENT}
 
     tree = etree.XML(data_template.render(**options))
     id_tag(tree)

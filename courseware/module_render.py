@@ -30,6 +30,7 @@ import courseware.modules.capa_module
 import courseware.modules.html_module
 import courseware.modules.schematic_module
 import courseware.modules.seq_module
+import courseware.modules.template_module
 import courseware.modules.vertical_module
 import courseware.modules.video_module
 
@@ -43,6 +44,9 @@ modx_modules={'problem':courseware.modules.capa_module.LoncapaModule,
               'sequential':courseware.modules.seq_module.SequentialModule,
               'tab':courseware.modules.seq_module.SequentialModule,
               'schematic':courseware.modules.schematic_module.SchematicModule}
+
+for f in os.listdir(settings.DATA_DIR+'/custom_tags'):
+    modx_modules[f] = courseware.modules.template_module.TemplateModule
 
 def object_cache(cache, user, module_type, module_id):
     # We don't look up on user -- all queries include user
