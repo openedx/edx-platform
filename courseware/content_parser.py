@@ -8,6 +8,8 @@ from lxml import etree
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
+#import courseware.modules
+
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
     from student.models import UserProfile
@@ -94,7 +96,12 @@ def id_tag(course):
                    'tab':'id',
                    'schematic':'id',
                    'book' : 'id'}
-    
+#    TODO:     
+#    alt_ids = courseware.modules.get_default_ids()
+
+#    print default_ids, alt_ids
+#    print default_ids == alt_ids
+
     # Tag elements with unique IDs
     elements = course.xpath("|".join(['//'+c for c in default_ids]))
     for elem in elements:

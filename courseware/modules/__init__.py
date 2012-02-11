@@ -11,6 +11,8 @@ import template_module
 import vertical_module
 import video_module
 
+from courseware import content_parser
+
 # Import all files in modules directory, excluding backups (# and . in name) 
 # and __init__
 #
@@ -47,3 +49,9 @@ def get_module_id(tag):
 
 def get_valid_tags():
     return modx_modules.keys()
+
+def get_default_ids():
+    tags = get_valid_tags()
+    ids = map(get_module_id, tags)
+    return dict(zip(tags, ids))
+

@@ -12,7 +12,7 @@ from x_module import XModule
 log = logging.getLogger("mitx.courseware.modules")
 
 class Module(XModule):
-    #id_attribute = 'youtube'
+    id_attribute = 'youtube'
     video_time = 0
 
     def handle_ajax(self, dispatch, get):
