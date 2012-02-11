@@ -10,7 +10,8 @@ class XModule(object):
     '''
     id_attribute='name' # An attribute guaranteed to be unique
 
-    def get_xml_tags():
+    @classmethod
+    def get_xml_tags(c):
         ''' Tags in the courseware file guaranteed to correspond to the module '''
         return []
         

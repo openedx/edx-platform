@@ -7,14 +7,15 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from x_module import XModule
 from lxml import etree
 
-class HtmlModule(XModule):
+class Module(XModule):
     id_attribute = 'filename'
 
     def get_state(self):
         return json.dumps({ })
 
-    def get_xml_tags():
-        return "html"
+    @classmethod
+    def get_xml_tags(c):
+        return ["html"]
         
     def get_html(self):
         if self.filename==None:
