@@ -1,16 +1,12 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+import unittest
+import courseware.modules
 
-Replace this with more appropriate tests for your application.
-"""
+class ModelsTest(unittest.TestCase):
+    def setUp(self):
+        pass
 
-from django.test import TestCase
+    def test_get_module_class(self):
+        vc = courseware.modules.get_module_class('video')
+        vc_str = "<class 'courseware.modules.video_module.Module'>"
+        self.assertEqual(str(vc), vc_str)
 
-
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)

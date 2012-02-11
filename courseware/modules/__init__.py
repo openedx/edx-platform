@@ -34,5 +34,16 @@ for module in modx_module_list:
         modx_modules[tag] = module.Module
 
 def get_module_class(tag):
+    ''' Given an XML tag (e.g. 'video'), return 
+    the associated module (e.g. video_module.Module). 
+    '''
     return modx_modules[tag]
 
+def get_module_id(tag):
+    ''' Given an XML tag (e.g. 'video'), return 
+    the default ID for that module (e.g. 'youtube_id')
+    '''
+    return modx_modules[tag].id_attribute
+
+def get_valid_tags():
+    return modx_modules.keys()
