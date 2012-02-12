@@ -55,7 +55,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('Piotr Mitros', 'staff@csail.mit.edu'),
+    ('MITx Admins', 'admin@mitx.mit.edu'),
 )
 
 MANAGERS = ADMINS
