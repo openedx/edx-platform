@@ -1,7 +1,7 @@
 <!-- TODO: Add pattern field to username. See HTML5 cookbook, page 84 for details-->
 <div name="enroll_form" id="enroll_form">
 
-  <h1>Enroll in 6.002 Circuits &amp; Electronics</h1>
+  <h1>Enroll in 6.002x Circuits &amp; Electronics</h1>
   <form name="enroll" id="enroll_form"  method="get">
     <fieldset><% if 'error' in locals(): e = error %>
 
@@ -27,8 +27,8 @@
       </li>
 
       <li class="full-name">
-        <label>Full name<span class="ui-icon ui-icon-help" id="spinner_name" style="display:inline-block;"></span></label>
-        <input name="name" id="ca_name" type="text" />
+        <label>Full name*<span class="ui-icon ui-icon-help" id="spinner_name" style="display:inline-block;"></span></label>
+        <input name="name" id="ca_name" type="text" required />
 
         <div class="tip" id="sregion_name">If you would like us to give you a certificate of completion at the end, we need your full legal name, as you would like it to appear on the certificate (e.g. &quot;John Smith, Jr&quot;).</div>
       </li>
@@ -49,16 +49,17 @@
       </li>
 
       <li class="terms">
-        <label> <input name="terms_of_service" id="cb_terms_of_service" type="checkbox" value="terms_of_service" required />I agree to the Terms of Service*</label>
+        <label> <input name="terms_of_service" id="cb_terms_of_service" type="checkbox" value="terms_of_service" required />I agree to the <a href="/t/tos.html">Terms of Service</a>*</label>
       </li>
 
       <li class="honor-code">
         <label>
-          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code" required />I agree to the Honor code.*</label>
+          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code" required />I agree to the <a href="/t/honor.html">Honor Code</a>, summarized as:*</label>
         <ul>
+	  <li>Complete all mid-terms and final exams with only my own work.</li>
+          <li>Maintain only one account, and not share the username or password.</li>
           <li>Not engage in any activities that would dishonestly improve my results, or improve or hurt those of others.</li>
-          <li>Never post answers to problems.</li>
-          <li>Maintain only one account.</li>
+          <li>Never post answers to problems that are being used to assess student performance.</li>
         </ul>
       </li>
 
