@@ -136,9 +136,15 @@ def create_account(request, post_override=None):
     # TODO: Confirm e-mail is not from a generic domain (mailinator, etc.)? Not sure if 
     # this is a good idea
     # TODO: Check password is sane
-    for a in ['username', 'email', 'password', 'terms_of_service', 'honor_code']:
+    for a in ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']:
         if len(post_vars[a])<2:
-            js['value']="{field} is required.".format(field=a)
+            error_str = {'username' : 'Username of length 2 or greater', 
+                         'email' : 'Properly formatted e-mail',
+                         'name' : 'Your legal name ',
+                         'password': 'Valid password ',
+                         'terms_of_service': 'Accepting Terms of Service',
+                         'honor_code': 'Agreeing to the Honor Code'}
+            js['value']="{field} is required.".format(field=error_str[a])
             return HttpResponse(json.dumps(js))
 
     try:
