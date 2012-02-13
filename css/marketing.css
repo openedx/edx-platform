@@ -147,7 +147,8 @@ input, select {
     .subpage > div, section.copyright > div, section.tos > div, section.privacy-policy > div, section.honor-code > div {
       padding-left: 0; } }
   .subpage > div p, section.copyright > div p, section.tos > div p, section.privacy-policy > div p, section.honor-code > div p {
-    margin-bottom: 25.888px; }
+    margin-bottom: 25.888px;
+    line-height: 25.888px; }
   .subpage > div h1, section.copyright > div h1, section.tos > div h1, section.privacy-policy > div h1, section.honor-code > div h1 {
     margin-bottom: 12.944px; }
   .subpage > div h2, section.copyright > div h2, section.tos > div h2, section.privacy-policy > div h2, section.honor-code > div h2 {
@@ -157,7 +158,8 @@ input, select {
   .subpage > div ul, section.copyright > div ul, section.tos > div ul, section.privacy-policy > div ul, section.honor-code > div ul {
     list-style: disc outside none; }
     .subpage > div ul li, section.copyright > div ul li, section.tos > div ul li, section.privacy-policy > div ul li, section.honor-code > div ul li {
-      list-style: disc outside none; }
+      list-style: disc outside none;
+      line-height: 25.888px; }
 
 .clearfix:after, .subpage:after, section.copyright:after, section.tos:after, section.privacy-policy:after, section.honor-code:after, header.announcement div section:after, section.index-content:after, section.index-content section:after, section.index-content section.about section:after, footer:after, div.leanModal_box#enroll ol:after {
   content: ".";
