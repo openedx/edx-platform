@@ -790,6 +790,7 @@ schematic = (function() {
 		for (var i = probes.length - 1; i >= 0; --i) {
 		    var color = probes[i][0];
 		    var label = probes[i][1];
+		    var offset = cktsim.parse_number(probes[i][2]);
 		    var v = results[label];
 		    // convert values into dB relative to source amplitude
 		    var v_max = 1;
@@ -797,7 +798,7 @@ schematic = (function() {
 			// convert each value to dB relative to max
 			v[j] = 20.0 * Math.log(v[j]/v_max)/Math.LN10;
 
-		    y_values.push([color,v]);
+		    y_values.push([color,offset,v]);
 		}
 
 		// graph the result and display in a window
@@ -885,8 +886,9 @@ schematic = (function() {
 			for (var i = probes.length - 1; i >= 0; --i) {
 			    var color = probes[i][0];
 			    var label = probes[i][1];
+			    var offset = cktsim.parse_number(probes[i][2]);
 			    var v = results[label];
-			    y_values.push([color,v]);
+			    y_values.push([color,offset,v]);
 			}
 
 			// graph the result and display in a window
@@ -1917,10 +1919,11 @@ schematic = (function() {
 	    var y_max = -Infinity;
 	    var plot;
 	    for (plot = y_values.length - 1; plot >= 0; --plot) {
-		var values = y_values[plot][1];
-		var temp = array_min(values);
+		var values = y_values[plot][2];
+		var offset = y_values[plot][1];
+		var temp = array_min(values) + offset;
 		if (temp < y_min) y_min = temp;
-		temp = array_max(values);
+		temp = array_max(values) + offset;
 		if (temp > y_max) y_max = temp;
 	    }
 	    var y_limits = view_limits(y_min,y_max);
@@ -1960,15 +1963,16 @@ schematic = (function() {
 	    c.lineWidth = 3;
 	    for (plot = y_values.length - 1; plot >= 0; --plot) {
 		c.strokeStyle = probe_colors_rgb[y_values[plot][0]];
-		var values = y_values[plot][1];
+		var values = y_values[plot][2];
+		var offset = y_values[plot][1];
 
 		c.beginPath();
 		x = plot_x(x_values[0]);
-		y = plot_y(values[0]);
+		y = plot_y(values[0] + offset);
 		c.moveTo(x,y);
 		for (var i = 1; i < x_values.length; i++) {
 		    x = plot_x(x_values[i]);
-		    y = plot_y(values[i]);
+		    y = plot_y(values[i] + offset);
 		    c.lineTo(x,y);
 		}
 		c.stroke();
@@ -2002,7 +2006,8 @@ schematic = (function() {
 	    canvas.pheight = pheight;
 	    canvas.tick_length = tick_length;
 
-	    canvas.cursor_x = undefined;
+	    canvas.cursor1_x = undefined;
+	    canvas.cursor2_x = undefined;
 	    canvas.sch = this;
 
 	    // do something useful when user mouses over graph
@@ -2027,13 +2032,69 @@ schematic = (function() {
 	    return min;
 	}
 
+	function plot_cursor(c,graph,cursor_x,left_margin) {
+	    // draw dashed vertical marker that follows mouse
+	    var x = graph.left_margin + cursor_x;
+	    var end_y = graph.top_margin + graph.pheight + graph.tick_length;
+	    c.strokeStyle = grid_style;
+	    c.lineWidth = 1;
+	    c.beginPath();
+	    c.dashedLineTo(x,graph.top_margin,x,end_y,cursor_pattern);
+	    c.stroke();
+
+	    // add x label at bottom of marker
+	    var graph_x = cursor_x/graph.x_scale + graph.x_min;
+	    c.font = '10pt sans-serif';
+	    c.textAlign = 'center';
+	    c.textBaseline = 'top';
+	    c.fillStyle = background_style;
+	    c.fillText('\u2588\u2588\u2588\u2588\u2588',x,end_y);
+	    c.fillStyle = normal_style;
+	    c.fillText(engineering_notation(graph_x,3,false),x,end_y);
+
+	    // compute which points marker is between
+	    var x_values = graph.x_values;
+	    var len = x_values.length;
+	    var index = 0;
+	    while (index < len && graph_x >= x_values[index]) index += 1;
+	    var x1 = (index == 0) ? x_values[0] : x_values[index-1];
+	    var x2 = x_values[index];
+
+	    if (x2 != undefined) {
+		// for each plot, interpolate and output value at intersection with marker
+		c.textAlign = 'left';
+		var tx = graph.left_margin + left_margin;
+		var ty = graph.top_margin;
+		for (var plot = 0; plot < graph.y_values.length; plot++) {
+		    var values = graph.y_values[plot][2];
+		    
+		    // interpolate signal value at graph_x using values[index-1] and values[index]
+		    var y1 = (index == 0) ? values[0] : values[index-1];
+		    var y2 = values[index];
+		    var y = y1;
+		    if (graph_x != x1) y += (graph_x - x1)*(y2 - y1)/(x2 - x1);
+		    
+		    // annotate plot with value of signal at marker
+		    c.fillStyle = element_style;
+		    c.fillText('\u2588\u2588\u2588\u2588\u2588',tx-3,ty);
+		    c.fillStyle = probe_colors_rgb[graph.y_values[plot][0]];
+		    c.fillText(engineering_notation(y,3,false),tx,ty);
+		    ty += 14;
+		}
+	    }
+	}
+
 	function redraw_plot(graph) {
 	    var c = graph.getContext('2d');
 	    c.drawImage(graph.bg_image,0,0);
 
-	    if (graph.cursor_x != undefined) {
+	    if (graph.cursor1_x != undefined) plot_cursor(c,graph,graph.cursor1_x,4);
+	    if (graph.cursor2_x != undefined) plot_cursor(c,graph,graph.cursor2_x,30);
+
+	    /*
+	    if (graph.cursor1_x != undefined) {
 		// draw dashed vertical marker that follows mouse
-		var x = graph.left_margin + graph.cursor_x;
+		var x = graph.left_margin + graph.cursor1_x;
 		var end_y = graph.top_margin + graph.pheight + graph.tick_length;
 		c.strokeStyle = grid_style;
 		c.lineWidth = 1;
@@ -2042,7 +2103,7 @@ schematic = (function() {
 		c.stroke();
 
 		// add x label at bottom of marker
-		var graph_x = graph.cursor_x/graph.x_scale + graph.x_min;
+		var graph_x = graph.cursor1_x/graph.x_scale + graph.x_min;
 		c.font = '10pt sans-serif';
 		c.textAlign = 'center';
 		c.textBaseline = 'top';
@@ -2082,6 +2143,7 @@ schematic = (function() {
 		    }
 		}
 	    }
+	    */
 	}
 
 	function graph_mouse_move(event) {
@@ -2092,8 +2154,13 @@ schematic = (function() {
 	    // not sure yet where the 3,-3 offset correction comes from (borders? padding?)
 	    var gx = g.mouse_x - g.left_margin - 3;
 	    var gy = g.pheight - (g.mouse_y - g.top_margin) + 3;
-	    if (gx >= 0 && gx <= g.pwidth && gy >=0 && gy <= g.pheight) g.cursor_x = gx;
-	    else g.cursor_x = undefined;
+	    if (gx >= 0 && gx <= g.pwidth && gy >=0 && gy <= g.pheight) {
+		//g.sch.message('button: '+event.button+', which: '+event.which);
+		g.cursor1_x = gx;
+	    } else {
+		g.cursor1_x = undefined;
+		g.cursor2_x = undefined;
+	    }
 
 	    redraw_plot(g);
 	}
@@ -2880,10 +2947,11 @@ schematic = (function() {
 	    'black': 'rgb(0,0,0)',
 	};
 
-	function Probe(x,y,rotation,color) {
+	function Probe(x,y,rotation,color,offset) {
 	    Component.call(this,'s',x,y,rotation);
 	    this.add_connection(0,0);
 	    this.properties['color'] = color ? color : 'cyan';
+	    this.properties['offset'] = (offset==undefined || offset=='') ? '0' : offset;
 	    this.bounding_box = [0,0,27,-21];
 	    this.update_coords();
 	}
@@ -2915,13 +2983,14 @@ schematic = (function() {
 	}
 
 	Probe.prototype.clone = function(x,y) {
-	    return new Probe(x,y,this.rotation,this.properties['color']);
+	    return new Probe(x,y,this.rotation,this.properties['color'],this.properties['offset']);
 	}
 
 	Probe.prototype.edit_properties = function(x,y) {
 	    if (inside(this.bbox,x,y)) {
 		var fields = new Array();
 		fields['Plot color'] = build_select(probe_colors,this.properties['color']);
+		fields['Plot offset'] = build_input('text',10,this.properties['offset']);
 
 		var content = build_table(fields);
 		content.fields = fields;
@@ -2930,6 +2999,7 @@ schematic = (function() {
 		this.sch.dialog('Edit Properties',content,function(content) {
 			var color_choice = content.fields['Plot color'];
 			content.component.properties['color'] = probe_colors[color_choice.selectedIndex];
+			content.component.properties['offset'] = content.fields['Plot offset'].value;
 			content.component.sch.redraw_background();
 		    });
 		return true;
@@ -2938,7 +3008,10 @@ schematic = (function() {
 
 	// return [color, node_label] for this probe
 	Probe.prototype.probe_info = function() {
-	    return [this.properties['color'],this.connections[0].label];
+	    var color = this.properties['color'];
+	    var offset = this.properties['offset'];
+	    if (offset==undefined || offset=="") offset = '0';
+	    return [color,this.connections[0].label,offset];
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
