@@ -800,6 +800,8 @@ div.course-wrapper section.course-index {
     box-shadow: 0 1px 0 #eeeeee;
     border-bottom: 1px solid #d3d3d3;
     padding: 0 22.652px 4px; }
+    div.course-wrapper section.course-index div#open_close_accordion h2 {
+      padding-right: 20px; }
     div.course-wrapper section.course-index div#open_close_accordion a {
       width: 16px;
       text-indent: -9999px;
