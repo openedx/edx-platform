@@ -32,23 +32,14 @@ def index(request):
     else:
         csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done. 
-        return render_to_response('index.html', {'error' : '',
-                                                 'csrf': csrf_token }) 
+        return render_to_response('index.html', {'csrf': csrf_token }) 
                                                  
-# def courseinfo(request):
-#     if request.user.is_authenticated():
-#         return redirect('/courseware')
-#     else:
-#         csrf_token = csrf(request)['csrf_token']
-#         # TODO: Clean up how 'error' is done. 
-#         return render_to_response('courseinfo.html', {'error' : '',
-#                                                  'csrf': csrf_token }) 
-
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):
     if 'email' not in request.POST or 'password' not in request.POST:
-        return render_to_response('login.html', {'error':error.replace('+',' ')})
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error': 'Invalid login'})) # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
