@@ -52,7 +52,7 @@ div.profile-wrapper {
   section.course-info {
     @extend .content;
 
-    ol {
+    > ol {
       list-style: none;
 
       > li {
@@ -68,21 +68,35 @@ div.profile-wrapper {
           margin-right: flex-gutter(9);
         }
 
-        div.scores {
+        ol.sections {
           float: left;
+          list-style: none;
           width: flex-grid(7, 9);
+
+         > li {
+           border-bottom: 1px solid #e3e3e3;
+           padding: lh() 0;
+
+           &:first-child {
+             padding-top: 0;
+           }
+
+           &:last-child {
+             border-bottom: 0;
+           }
 
           h3 {
             color: #666;
           }
 
-          ul {
+          ol {
             list-style: none;
 
             li {
               display: inline-block;
               padding-right: 1em;
             }
+          }
           }
         }
       }
