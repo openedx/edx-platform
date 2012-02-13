@@ -19,6 +19,10 @@ div.course-wrapper {
     border-bottom: 1px solid #d3d3d3;
       padding: 0 lh() 4px;
 
+      h2 {
+        padding-right: 20px;
+      }
+
       a {
         width: 16px;
         text-indent: -9999px;
