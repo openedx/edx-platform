@@ -15,9 +15,9 @@ div.course-wrapper {
     @extend .tran;
 
     div#open_close_accordion {
-      h2 {
-        padding: 0 lh();
-      }
+    @include box-shadow(0 1px 0 #eee);
+    border-bottom: 1px solid #d3d3d3;
+      padding: 0 lh() 4px;
 
       a {
         width: 16px;
