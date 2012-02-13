@@ -12,7 +12,7 @@
       </section>
 
     <section class="intro-video">
-      <a rel="leanModal" href="#video-overlay"><img src="/static/images/video-image.png" alt="" /><span> Watch intro video</span></a>
+      <a id="video-overlay-link" rel="leanModal" href="#video-overlay"><img src="/static/images/video-image.png" id="video-img" alt="" /><span> Watch intro video</span></a>
     </section>
 
     </section>
@@ -48,11 +48,31 @@
 </section>
 
 <div id="video-overlay" class="leanModal_box">
-  <iframe width="560" height="315" src="http://www.youtube.com/embed/p2Q6BrNhdh8?rel=0" frameborder="0" allowfullscreen></iframe>
+  <iframe id="player" type="text/html" width="560" height="390" src="http://www.youtube.com/embed/p2Q6BrNhdh8?enablejsapi=1" frameborder="0">
+  </iframe>
 </div>
 <script>
 
+var player;
+function onYouTubePlayerAPIReady() {
+  player = new YT.Player('player', {
+  });
+}
+
 $(function() {
+
+    var tag = document.createElement('script');
+    tag.src = "http://www.youtube.com/player_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    $("a#video-overlay-link").click(function(){
+      player.playVideo();
+      $("a.modal_close, #lean_overlay").click(function(){
+        player.pauseVideo();
+      });
+    });
+
 
     // TODO: Clean up as per http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
 
@@ -89,7 +109,7 @@ $(function() {
           });
         })
 
-
    /*$("sregion"+$("[id^=spinner_]")[1].id.substring(7)) */
 });
+
 </script>
