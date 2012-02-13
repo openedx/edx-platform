@@ -17,17 +17,21 @@ from courseware import content_parser
 # and __init__
 #
 # Stick them in a list
-modx_module_list = []
+# modx_module_list = []
 
-for f in os.listdir(os.path.dirname(__file__)):
-    if f!='__init__.py' and \
-            f[-3:] == ".py" and \
-            "." not in f[:-3] \
-            and '#' not in f:
-        mod_path = 'courseware.modules.'+f[:-3]
-        mod = __import__(mod_path, fromlist = "courseware.modules")
-        if 'Module' in mod.__dict__:
-            modx_module_list.append(mod)
+# for f in os.listdir(os.path.dirname(__file__)):
+#     if f!='__init__.py' and \
+#             f[-3:] == ".py" and \
+#             "." not in f[:-3] \
+#             and '#' not in f:
+#         mod_path = 'courseware.modules.'+f[:-3]
+#         mod = __import__(mod_path, fromlist = "courseware.modules")
+#         if 'Module' in mod.__dict__:
+#             modx_module_list.append(mod)
+
+#print modx_module_list
+modx_module_list = [capa_module,  html_module,  schematic_module,  seq_module,  template_module,  vertical_module,  video_module]
+#print modx_module_list
 
 # Convert list to a dictionary for lookup by tag
 modx_modules = {}
