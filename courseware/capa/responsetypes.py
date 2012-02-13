@@ -19,6 +19,19 @@ global_context={'random':random,
                 'calc':calc, 
                 'eia':eia}
 
+
+def compare_with_tolerance(v1, v2, tol):
+    ''' Compare v1 to v2 with maximum tolerance tol
+    tol is relative if it ends in %; otherwise, it is absolute
+    '''
+    relative = "%" in tol
+    if relative: 
+        tolerance = evaluator(dict(),dict(),tol[:-1]) * 0.01
+        tolerance = tolerance * max(abs(v1), abs(v2))
+    else: 
+        tolerance = evaluator(dict(),dict(),tol)
+    return abs(v1-v2) <= tolerance
+
 class numericalresponse(object):
     def __init__(self, xml, context):
         self.xml = xml
@@ -27,16 +40,15 @@ class numericalresponse(object):
         self.tolerance = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                                    id=xml.get('id'))[0]
         self.tolerance = contextualize_text(self.tolerance, context)
-        self.tolerance = evaluator(dict(),dict(),self.tolerance)
         self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                    id=xml.get('id'))[0]
 
     def grade(self, student_answers):
         ''' Display HTML for a numeric response '''
         student_answer = student_answers[self.answer_id]
-        error = abs(evaluator(dict(),dict(),student_answer) - self.correct_answer)
-        allowed_error = abs(self.correct_answer*self.tolerance)
-        if error <= allowed_error:
+        correct = compare_with_tolerance (evaluator(dict(),dict(),student_answer), self.correct_answer, self.tolerance)
+
+        if correct:
             return {self.answer_id:'correct'}
         else:
             return {self.answer_id:'incorrect'}
@@ -80,7 +92,6 @@ class formularesponse(object):
         self.tolerance = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                                    id=xml.get('id'))[0]
         self.tolerance = contextualize_text(self.tolerance, context)
-        self.tolerance = evaluator(dict(),dict(),self.tolerance)
         self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                    id=xml.get('id'))[0]
         self.context = context
@@ -105,7 +116,7 @@ class formularesponse(object):
             student_result = evaluator(student_variables,dict(),student_answers[self.answer_id])
             if math.isnan(student_result) or math.isinf(student_result):
                 return {self.answer_id:"incorrect"}
-            if abs( student_result - instructor_result ) > self.tolerance:
+            if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
                 return {self.answer_id:"incorrect"}
  
         return {self.answer_id:"correct"}
