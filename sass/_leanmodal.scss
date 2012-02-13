@@ -18,12 +18,30 @@ div.leanModal_box {
   background: #fff;
   padding: lh(2);
 
+  a.modal_close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: block;
+    width: 14px;
+    height: 14px;
+    z-index: 2;
+    color: #aaa;
+    font-style: normal;
+
+    &:hover{
+      text-decoration: none;
+      color: $mit-red;
+    }
+  }
+
   h1 {
     font-size: 24px;
     margin-top: 0;
     padding-bottom: lh();
     border-bottom: 1px solid #eee;
     margin-bottom: lh();
+    text-align: left;
   }
 
   &#enroll {
@@ -65,14 +83,17 @@ div.leanModal_box {
     text-align: left;
 
     div#enroll_error, div#login_error, div#pwd_error {
+      $error-color: #333;
       -webkit-font-smoothing: antialiased;
-      background-color: #F50200;
+      background-color: $error-color;
+      border: darken($error-color, 20%);
       color: #fff;
+      text-shadow: 0 1px 0 darken($error-color, 10%);
+      font-family: "Open sans";
       font-weight: bold;
       letter-spacing: 1px;
-      margin-bottom: lh();
-      padding: lh(.2);
-      text-transform: uppercase;
+      margin: (-(lh())) (-(lh())) lh();
+      padding: lh(.5);
 
       &:empty {
         padding: 0;
@@ -139,6 +160,18 @@ div.leanModal_box {
 div#login {
   min-width: 400px;
 
+  header {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: lh();
+    padding-bottom: lh();
+
+    h1 {
+      border-bottom: 0;
+      padding-bottom: 0;
+      margin-bottom: lh(.25);
+    }
+  }
+
   ol {
     li {
       width: auto;
@@ -181,6 +214,56 @@ div#feedback_div{
           height: 100px;
         }
       }
+    }
+  }
+}
+
+div#calculator_div {
+  max-width: 500px;
+
+
+  form {
+    padding-bottom: lh();
+    margin-bottom: lh();
+    border-bottom: 1px solid #ddd;
+
+    input#calculator_input {
+      width: 400px;
+    }
+
+    input#calculator_button {
+      background: 0;
+      color: $mit-red;
+      border: 0;
+      @include box-shadow(none);
+      padding: 0;
+      text-shadow: none;
+
+      &:hover {
+        color: #333;
+      }
+    }
+
+    input#calculator_output {
+      border: 0;
+      background: 0;
+      padding: lh(.35);
+      width: 60px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
+
+  dl {
+    dt {
+      float: left;
+      clear: both;
+      padding-right: lh(.5);
+      font-weight: bold;
+    }
+
+    dd {
+      float: left;
     }
   }
 }

@@ -58,15 +58,23 @@ for(var i=0; i<l.length; i++) {
     add_speed(l[i], streams[l[i]])
 }
 
-//toggle video play/pause. the HTML assumes video is always autoplayed
-//initially since it starts with class "pause". may want to set that in
-//javascript
-$("#video_control").click(function(){
-  if ($(this).hasClass("play")){
+function toggleVideo(){
+  if ($("#video_control").hasClass("play")){
     play();
-    $(this).removeClass().addClass("pause");
+    $("#video_control").removeClass().addClass("pause");
   } else {
     pause();
-    $(this).removeClass().addClass("play");
+    $("#video_control").removeClass().addClass("play");
+  }
+}
+
+$("#video_control").click(toggleVideo);
+
+// space bar to pause video
+$(".video-wrapper").keyup(function(e){
+  active = document.activeElement;
+  if (e.which == 32) {
+    e.preventDefault();
+    $("#video_control").click();
   }
 });
