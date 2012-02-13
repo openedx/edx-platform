@@ -60,10 +60,8 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     ajax_url = '/modx/'+module+'/'+id+'/'
 
-    id_tag=courseware.modules.get_module_class(module.id_attribute)
-
     # Grab the XML corresponding to the request from course.xml
-    xml = content_parser.module_xml(content_parser.course_file(request.user), module, id_tag, id)
+    xml = content_parser.module_xml(content_parser.course_file(request.user), module, 'id', id)
 
     # Create the module
     instance=courseware.modules.get_module_class(module)(xml, 

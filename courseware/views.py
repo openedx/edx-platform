@@ -71,7 +71,7 @@ def profile(request):
                         if response.grade!=None:
                             correct=response.grade
                     
-                    total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    total=courseware.modules.capa_module.Module(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     scores.append((int(correct),total, graded ))
                     
                     
