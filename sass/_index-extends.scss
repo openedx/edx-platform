@@ -41,6 +41,14 @@
         line-height: lh();
       }
     }
+
+    dl {
+      margin-bottom: lh();
+
+      dd {
+        margin-bottom: lh(.5);
+      }
+    }
   }
 }
 
