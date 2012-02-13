@@ -68,7 +68,9 @@ function postJSON(url, data, callback) {
     <nav>
       <h1><a href="http://mitx.mit.edu/">MITx</a></h1>
 % if settings.COURSEWARE_ENABLED:
+<%block name="login_area">
       <a rel="leanModal" class="login" href="#login">Log In</a>
+</%block>
 % endif
     </nav>
     </%block>
