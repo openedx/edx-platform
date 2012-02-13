@@ -26,8 +26,8 @@ def compare_with_tolerance(v1, v2, tol):
     '''
     relative = "%" in tol
     if relative: 
-        tolerance = evaluator(dict(),dict(),tol[:-1]) * 0.01
-        tolerance = tolerance * max(abs(v1), abs(v2))
+        tolerance_rel = evaluator(dict(),dict(),tol[:-1]) * 0.01
+        tolerance = tolerance_rel * max(abs(v1), abs(v2))
     else: 
         tolerance = evaluator(dict(),dict(),tol)
     return abs(v1-v2) <= tolerance
@@ -37,9 +37,9 @@ class numericalresponse(object):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         self.correct_answer = float(self.correct_answer)
-        self.tolerance = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+        self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                                    id=xml.get('id'))[0]
-        self.tolerance = contextualize_text(self.tolerance, context)
+        self.tolerance = contextualize_text(self.tolerance_xml, context)
         self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                    id=xml.get('id'))[0]
 
@@ -89,9 +89,9 @@ class formularesponse(object):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         self.samples = contextualize_text(xml.get('samples'), context)
-        self.tolerance = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+        self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                                    id=xml.get('id'))[0]
-        self.tolerance = contextualize_text(self.tolerance, context)
+        self.tolerance = contextualize_text(self.tolerance_xml, context)
         self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                    id=xml.get('id'))[0]
         self.context = context
