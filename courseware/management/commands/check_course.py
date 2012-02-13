@@ -41,6 +41,7 @@ class Command(BaseCommand):
         if os.path.exists(sections_dir):
             print "Checking all section includes are valid XML"
             for f in os.listdir(sections_dir):
+                print f
                 etree.parse(sections_dir+'/'+f)
         else:
             print "Skipping check of include files -- no section includes dir ("+sections_dir+")"

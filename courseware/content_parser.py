@@ -49,7 +49,7 @@ def xpath(xml, query_string, **args):
         We should remove this with the move to lxml. 
         We should also use lxml argument passing. '''
     doc = etree.fromstring(xml)
-    print type(doc)
+    #print type(doc)
     def escape(x):
         # TODO: This should escape the string. For now, we just assume it's made of valid characters. 
         # Couldn't figure out how to escape for lxml in a few quick Googles
@@ -60,7 +60,7 @@ def xpath(xml, query_string, **args):
         return x
 
     args=dict( ((k, escape(args[k])) for k in args) )
-    print args
+    #print args
     results = doc.xpath(query_string.format(**args))
     return results
 
@@ -86,14 +86,20 @@ def item(l, default="", process=lambda x:x):
 
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
-    default_ids = {'video':'youtube',
+    old_ids = {'video':'youtube',
                    'problem':'filename',
                    'sequential':'id',
                    'html':'filename',
                    'vertical':'id', 
                    'tab':'id',
-                   'schematic':'id'}
-    
+                   'schematic':'id',
+                   'book' : 'id'}
+    import courseware.modules
+    default_ids = courseware.modules.get_default_ids()
+
+    #print default_ids, old_ids
+    #print default_ids == old_ids
+
     # Tag elements with unique IDs
     elements = course.xpath("|".join(['//'+c for c in default_ids]))
     for elem in elements:
@@ -143,7 +149,7 @@ def course_file(user):
     filename = UserProfile.objects.get(user=user).courseware
     data_template = template_lookup.get_template(filename)
 
-    options = {'dev_content':True}
+    options = {'dev_content':settings.DEV_CONTENT}
 
     tree = etree.XML(data_template.render(**options))
     id_tag(tree)

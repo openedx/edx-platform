@@ -26,23 +26,9 @@ import track.views
 
 import courseware.content_parser as content_parser
 
-import courseware.modules.capa_module
-import courseware.modules.html_module
-import courseware.modules.schematic_module
-import courseware.modules.seq_module
-import courseware.modules.vertical_module
-import courseware.modules.video_module
+import courseware.modules
 
 log = logging.getLogger("mitx.courseware")
-
-## TODO: Add registration mechanism
-modx_modules={'problem':courseware.modules.capa_module.LoncapaModule, 
-              'video':courseware.modules.video_module.VideoModule,
-              'html':courseware.modules.html_module.HtmlModule,
-              'vertical':courseware.modules.vertical_module.VerticalModule,
-              'sequential':courseware.modules.seq_module.SequentialModule,
-              'tab':courseware.modules.seq_module.SequentialModule,
-              'schematic':courseware.modules.schematic_module.SchematicModule}
 
 def object_cache(cache, user, module_type, module_id):
     # We don't look up on user -- all queries include user
@@ -74,18 +60,18 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     ajax_url = '/modx/'+module+'/'+id+'/'
 
-    id_tag=modx_modules[module].id_attribute
+    id_tag=courseware.modules.get_module_class(module.id_attribute)
 
     # Grab the XML corresponding to the request from course.xml
     xml = content_parser.module_xml(content_parser.course_file(request.user), module, id_tag, id)
 
     # Create the module
-    instance=modx_modules[module](xml, 
-                                  s.module_id, 
-                                  ajax_url=ajax_url, 
-                                  state=s.state, 
-                                  track_function = make_track_function(request), 
-                                  render_function = None)
+    instance=courseware.modules.get_module_class(module)(xml, 
+                                                         s.module_id, 
+                                                         ajax_url=ajax_url, 
+                                                         state=s.state, 
+                                                         track_function = make_track_function(request), 
+                                                         render_function = None)
     # Let the module handle the AJAX
     ajax_return=instance.handle_ajax(dispatch, request.POST)
     # Save the state back to the database
@@ -100,7 +86,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
     ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
     module_type=xml_module.tag
-    module_class=modx_modules[module_type]
+    module_class=courseware.modules.get_module_class(module_type)
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
 
     # Grab state from database

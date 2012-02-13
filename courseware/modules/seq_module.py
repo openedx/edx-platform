@@ -13,7 +13,7 @@ from x_module import XModule
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
 
-class SequentialModule(XModule):
+class Module(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     id_attribute = 'id'
@@ -21,7 +21,8 @@ class SequentialModule(XModule):
     def get_state(self):
         return json.dumps({ 'position':self.position })
 
-    def get_xml_tags():
+    @classmethod
+    def get_xml_tags(c):
         return ["sequential", 'tab']
         
     def get_html(self):

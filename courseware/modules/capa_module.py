@@ -26,15 +26,18 @@ import courseware.content_parser as content_parser
 
 log = logging.getLogger("mitx.courseware")
 
-class LoncapaModule(XModule):
+class Module(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
     meant to be refactored out, but it seems to be serving a useful
     prupose now. We can e.g .destroy and create the capa_problem on a
     reset. 
     '''
-    xml_tags = ["problem"]
+
     id_attribute = "filename"
 
+    @classmethod
+    def get_xml_tags(c):
+        return ["problem"]
 
     def get_state(self):
         state = self.lcp.get_state()

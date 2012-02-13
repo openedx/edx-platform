@@ -8,9 +8,10 @@ class XModule(object):
         Initialized on access with __init__, first time with state=None, and
         then with state
     '''
-    id_attribute='name' # An attribute guaranteed to be unique
+    id_attribute='id' # An attribute guaranteed to be unique
 
-    def get_xml_tags():
+    @classmethod
+    def get_xml_tags(c):
         ''' Tags in the courseware file guaranteed to correspond to the module '''
         return []
         
