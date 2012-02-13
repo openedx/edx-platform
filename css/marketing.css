@@ -271,9 +271,6 @@ header.announcement {
   -webkit-font-smoothing: antialiased; }
   header.announcement.home {
     background: #e3e3e3 url("/static/images/marketing/shot-5-medium.jpg"); }
-    @media screen and (min-width: 1200px) {
-      header.announcement.home {
-        background: #e3e3e3 url("/static/images/marketing/shot-5-large.jpg"); } }
     header.announcement.home div {
       padding: 258.88px 25.888px 77.664px; }
       header.announcement.home div nav h1 {
