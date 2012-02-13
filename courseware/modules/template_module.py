@@ -25,5 +25,5 @@ class Module(XModule):
         xmltree = etree.fromstring(xml)
         filename = xmltree.tag
         params = dict(xmltree.items())
-        print params
+#        print params
         self.html = render_to_string('custom_tags/'+filename, params)
