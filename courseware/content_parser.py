@@ -8,8 +8,6 @@ from lxml import etree
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
-#import courseware.modules
-
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
     from student.models import UserProfile
@@ -51,7 +49,7 @@ def xpath(xml, query_string, **args):
         We should remove this with the move to lxml. 
         We should also use lxml argument passing. '''
     doc = etree.fromstring(xml)
-    print type(doc)
+    #print type(doc)
     def escape(x):
         # TODO: This should escape the string. For now, we just assume it's made of valid characters. 
         # Couldn't figure out how to escape for lxml in a few quick Googles
@@ -62,7 +60,7 @@ def xpath(xml, query_string, **args):
         return x
 
     args=dict( ((k, escape(args[k])) for k in args) )
-    print args
+    #print args
     results = doc.xpath(query_string.format(**args))
     return results
 
@@ -88,7 +86,7 @@ def item(l, default="", process=lambda x:x):
 
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
-    default_ids = {'video':'youtube',
+    old_ids = {'video':'youtube',
                    'problem':'filename',
                    'sequential':'id',
                    'html':'filename',
@@ -96,11 +94,11 @@ def id_tag(course):
                    'tab':'id',
                    'schematic':'id',
                    'book' : 'id'}
-#    TODO:     
-#    alt_ids = courseware.modules.get_default_ids()
+    import courseware.modules
+    default_ids = courseware.modules.get_default_ids()
 
-#    print default_ids, alt_ids
-#    print default_ids == alt_ids
+    #print default_ids, old_ids
+    #print default_ids == old_ids
 
     # Tag elements with unique IDs
     elements = course.xpath("|".join(['//'+c for c in default_ids]))
