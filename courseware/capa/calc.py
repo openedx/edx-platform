@@ -1,4 +1,5 @@
 import copy
+import logging
 import math
 import operator
 
@@ -27,10 +28,15 @@ default_variables = {'j':numpy.complex(0,1),
                      }
 
 
+log = logging.getLogger("mitx.courseware.capa")
+
 def evaluator(variables, functions, string):
     ''' Evaluate an expression. Variables are passed as a dictionary
     from string to value. Unary functions are passed as a dictionary
     from string to function '''
+    log.debug(u"Evaluating: {0} with vars: {1}, funcs: {2}"
+              .format(string, variables, functions))
+
     all_variables = copy.copy(default_variables)
     all_variables.update(variables)
     all_functions = copy.copy(default_functions)
