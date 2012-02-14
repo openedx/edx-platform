@@ -30,19 +30,10 @@ div.question-list-header {
     div.question-sort {
       float: right;
       margin-left: flex-gutter();
-      // width: flex-grid(3,9);
-
-      // @media screen and (max-width: 1300px) {
-      //   width: 100%;
-      // }
 
       nav {
         @extend .action-link;
         float: right;
-
-        // @media screen and (max-width: 1300px) {
-        //   float: left;
-        // }
 
         a {
           &.on span{
@@ -61,14 +52,25 @@ div.question-list-header {
 
   section.question-tags-list {
     display: block;
-    min-height: 40px;
+    min-height: 26px;
     overflow: hidden;
+    padding-top:5px;
     width: 100%;
 
-    div.tags-list {
-      padding-top:8px;
+    div {
       display: inline-block;
       float: left;
+    }
+
+    div.back {
+      margin-right: 10px;
+
+      a {
+        color: #555;
+      }
+    }
+
+    div.tags-list {
 
       ul.tags {
         display: inline;
