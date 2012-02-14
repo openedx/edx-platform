@@ -974,12 +974,14 @@ div.course-wrapper section.course-content ol.vert-mod > li {
 div.course-wrapper.closed section.course-index {
   width: 3.077%;
   padding-left: 4px; }
-  div.course-wrapper.closed section.course-index div#open_close_accordion a {
-    background-image: url("/static/images/slide-right-icon.png"); }
-  div.course-wrapper.closed section.course-index div#open_close_accordion h2 {
-    visibility: hidden;
-    width: 10px;
+  div.course-wrapper.closed section.course-index div#open_close_accordion {
     padding: 0; }
+    div.course-wrapper.closed section.course-index div#open_close_accordion a {
+      background-image: url("/static/images/slide-right-icon.png"); }
+    div.course-wrapper.closed section.course-index div#open_close_accordion h2 {
+      visibility: hidden;
+      width: 10px;
+      padding: 0; }
   div.course-wrapper.closed section.course-index div#accordion {
     visibility: hidden;
     width: 10px;
