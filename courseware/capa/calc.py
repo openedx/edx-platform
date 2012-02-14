@@ -1,4 +1,5 @@
 import copy
+import logging
 import math
 import operator
 
@@ -26,11 +27,19 @@ default_variables = {'j':numpy.complex(0,1),
                      'e':numpy.complex(numpy.e)
                      }
 
+log = logging.getLogger("mitx.courseware.capa")
 
 def evaluator(variables, functions, string):
     ''' Evaluate an expression. Variables are passed as a dictionary
     from string to value. Unary functions are passed as a dictionary
-    from string to function '''
+    from string to function. Variables must be floats.
+
+    TODO: Fix it so we can pass integers and complex numbers in variables dict
+    '''
+    # log.debug("variables: {0}".format(variables))
+    # log.debug("functions: {0}".format(functions))
+    # log.debug("string: {0}".format(string))
+
     all_variables = copy.copy(default_variables)
     all_variables.update(variables)
     all_functions = copy.copy(default_functions)
@@ -150,7 +159,9 @@ if __name__=='__main__':
     print "X",evaluator(variables, functions, "10000||sin(7+5)-6k")
     print "X",evaluator(variables, functions, "13")
     print evaluator({'R1': 2.0, 'R3':4.0}, {}, "13")
-    # 
+
+    print evaluator({'e1':1,'e2':1.0,'R3':7,'V0':5,'R5':15,'I1':1,'R4':6}, {},"e2")
+
     print evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5")
     print evaluator({},{}, "-1")
     print evaluator({},{}, "-(7+5)")
