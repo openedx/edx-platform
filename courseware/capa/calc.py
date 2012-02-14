@@ -1,4 +1,5 @@
 import copy
+import logging
 import math
 import operator
 
@@ -26,11 +27,19 @@ default_variables = {'j':numpy.complex(0,1),
                      'e':numpy.complex(numpy.e)
                      }
 
+log = logging.getLogger("mitx.courseware.capa")
 
 def evaluator(variables, functions, string):
     ''' Evaluate an expression. Variables are passed as a dictionary
     from string to value. Unary functions are passed as a dictionary
-    from string to function '''
+    from string to function. Variables must be floats.
+
+    TODO: Fix it so we can pass integers and complex numbers in variables dict
+    '''
+    # log.debug("variables: {0}".format(variables))
+    # log.debug("functions: {0}".format(functions))
+    # log.debug("string: {0}".format(string))
+
     all_variables = copy.copy(default_variables)
     all_variables.update(variables)
     all_functions = copy.copy(default_functions)
@@ -119,7 +128,10 @@ def evaluator(variables, functions, string):
     # Handle variables passed in. E.g. if we have {'R':0.5}, we make the substitution. 
     # Special case for no variables because of how we understand PyParsing is put together
     if len(all_variables)>0:
-        varnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), all_variables.keys()))
+        # We sort the list so that var names (like "e2") match before 
+        # mathematical constants (like "e"). This is kind of a hack.
+        all_variables_keys = sorted(all_variables.keys(), key=len, reverse=True)
+        varnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), all_variables_keys))
         varnames.setParseAction(lambda x:map(lambda y:all_variables[y], x))
     else:
         varnames=NoMatch()
@@ -147,7 +159,9 @@ if __name__=='__main__':
     print "X",evaluator(variables, functions, "10000||sin(7+5)-6k")
     print "X",evaluator(variables, functions, "13")
     print evaluator({'R1': 2.0, 'R3':4.0}, {}, "13")
-    # 
+
+    print evaluator({'e1':1,'e2':1.0,'R3':7,'V0':5,'R5':15,'I1':1,'R4':6}, {},"e2")
+
     print evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5")
     print evaluator({},{}, "-1")
     print evaluator({},{}, "-(7+5)")
