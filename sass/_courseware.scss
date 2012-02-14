@@ -245,6 +245,8 @@ div.course-wrapper {
       padding-left: 4px;
 
     div#open_close_accordion {
+      padding: 0;
+
       a {
         background-image: url('/static/images/slide-right-icon.png');
       }

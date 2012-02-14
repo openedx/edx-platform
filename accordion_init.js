@@ -4,7 +4,7 @@ $("#accordion").accordion({
   autoHeight: false,
 });
 
-$("#open_close_accordion").click(function(){
+$("#open_close_accordion a").click(function(){
   if ($(".course-wrapper").hasClass("closed")){
     $(".course-wrapper").removeClass("closed");
   } else {
