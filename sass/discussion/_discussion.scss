@@ -38,9 +38,9 @@ body.askbot {
       div.discussion-content {
         @include box-sizing(border-box);
         display: table-cell;
-        padding: $gw-gutter;
+        padding: lh();
         vertical-align: top;
-        width: flex-grid(9);
+        width: flex-grid(9) + flex-gutter();
 
         p.tabula-rasa {
           @include border-radius(5px);
@@ -72,7 +72,7 @@ body.askbot {
         @include border-radius(0 4px 4px 0);
         border-left: 1px solid #d3d3d3;
         border-right: 1px solid #f6f6f6;
-        padding: $gw-gutter;
+        padding: lh();
         width: flex-grid(3);
 
         h2 {
