@@ -1,0 +1,75 @@
+div.wiki-wrapper {
+  display: table;
+  width: 100%;
+
+  section.wiki-body {
+    @extend .content;
+
+    header {
+      @extend .topbar;
+
+      &:empty {
+        display: none !important;
+      }
+
+      a {
+        @extend .block-link;
+      }
+
+      p {
+        float: left;
+        padding: 15px;
+        margin-bottom: 0;
+        color: darken(#F6EFD4, 55%);
+        line-height: 1em;
+      }
+
+      ul {
+        float: right;
+        list-style: none;
+
+        li {
+          float: left;
+
+          input[type="button"] {
+            @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
+            @include border-radius(0);
+            @include transition();
+            background: darken(#F6EFD4, 5%);
+            border: 0;
+            border-left: 1px solid darken(#f6efd4, 20%);
+            color: darken(#F6EFD4, 80%);
+            text-shadow: none;
+            font-weight: normal;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 14px;
+            margin: 0;
+
+            &:hover {
+              background: none;
+            }
+          }
+        }
+      }
+    }
+
+    h1.wiki-title {
+      font-weight: bold;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    p {
+      line-height: 1.6em;
+    }
+
+    #wiki_history_table {
+      tr.dark {
+        background-color: $light-gray;
+      }
+    }
+  }
+}
