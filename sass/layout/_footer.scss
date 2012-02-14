@@ -1,0 +1,45 @@
+footer {
+  @extend .clearfix;
+  @extend .wrapper;
+  @include box-sizing(border-box);
+  color: #777;
+  margin-top: $body-line-height;
+  padding: 0 $body-line-height;
+
+  p {
+    float: left;
+
+    a {
+      color: #444;
+
+      &:link, &:visited {
+        color: #444;
+      }
+
+      &:hover, &:focus {
+        color: #000;
+      }
+    }
+  }
+
+  ul {
+    float: right;
+
+    li {
+      display: inline-block;
+      margin-right: 20px;
+
+      a {
+        color: #444;
+
+        &:link, &:visited {
+          color: #444;
+        }
+
+        &:hover, &:focus {
+          color: #000;
+        }
+      }
+    }
+  }
+}
