@@ -119,7 +119,10 @@ def evaluator(variables, functions, string):
     # Handle variables passed in. E.g. if we have {'R':0.5}, we make the substitution. 
     # Special case for no variables because of how we understand PyParsing is put together
     if len(all_variables)>0:
-        varnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), all_variables.keys()))
+        # We sort the list so that var names (like "e2") match before 
+        # mathematical constants (like "e"). This is kind of a hack.
+        all_variables_keys = sorted(all_variables.keys(), key=len, reverse=True)
+        varnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), all_variables_keys))
         varnames.setParseAction(lambda x:map(lambda y:all_variables[y], x))
     else:
         varnames=NoMatch()
