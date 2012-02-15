@@ -5,8 +5,16 @@ div.course-wrapper {
     list-style: none;
   }
 
+  .tran {
+    @include transition( all, .2s, $ease-in-out-quad);
+  }
+
   section.course-content {
     @extend .content;
+
+    h1 {
+      @extend .top-header;
+    }
 
     p {
       margin-bottom: lh();
@@ -14,6 +22,12 @@ div.course-wrapper {
       &:empty {
         display: none;
         margin-bottom: 0;
+      }
+    }
+
+    ul {
+      li {
+        margin-bottom: lh(.5);
       }
     }
 
@@ -102,7 +116,6 @@ div.course-wrapper {
       }
     }
 
-
     section.problems-wrapper, div#seq_content {
       @extend .problem-set;
     }
@@ -117,8 +130,17 @@ div.course-wrapper {
       }
     }
 
+    div#seq_content {
+      h1 {
+        background: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+    }
+
     ol.vert-mod {
-     > li {
+      > li {
         @extend .clearfix;
         @extend .problem-set;
         border-bottom: 1px solid #ddd;
@@ -131,6 +153,36 @@ div.course-wrapper {
           padding-bottom: 0;
         }
       }
+    }
+  }
+
+  &.closed {
+    section.course-index {
+      width: flex-grid(.6);
+
+      div#open_close_accordion {
+        padding: 0;
+
+        a {
+          background-image: url('/static/images/slide-right-icon.png');
+        }
+
+        h2 {
+          visibility: hidden;
+          width: 10px;
+          padding: 0;
+        }
+      }
+
+      div#accordion {
+        visibility: hidden;
+        width: 10px;
+        padding: 0;
+      }
+    }
+
+    section.course-content {
+      width: flex-grid(11.5) + flex-gutter();
     }
   }
 }
