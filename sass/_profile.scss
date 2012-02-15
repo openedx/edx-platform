@@ -59,28 +59,34 @@ div.profile-wrapper {
 
     > ol {
       list-style: none;
+      border-top: 1px solid #e3e3e3;
+      margin-top: lh();
 
       > li {
         border-bottom: 1px solid #e3e3e3;
         padding: lh() 0;
+        width: 100%;
+        display: table;
         @extend .clearfix;
 
         h2 {
-          float: left;
+          display: table-cell;
           padding: 0;
           margin: 0;
           width: flex-grid(2, 9);
-          margin-right: flex-gutter(9);
+          padding-right: flex-gutter(9);
+          border-right: 1px dotted #ccc;
+          @include box-sizing(border-box);
         }
 
         ol.sections {
-          float: left;
+          padding-left: flex-gutter(9);
+          display: table-cell;
           list-style: none;
           width: flex-grid(7, 9);
 
          > li {
-           border-bottom: 1px solid #e3e3e3;
-           padding: lh() 0;
+           padding:0 0 lh() 0;
 
            &:first-child {
              padding-top: 0;
