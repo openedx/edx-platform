@@ -22,7 +22,6 @@ section.course-index {
       right: -1px;
       border: 1px solid #D3D3D3;
       background: #eee url('/static/images/slide-left-icon.png') center center no-repeat;
-      @include box-shadow(inset 0 0 0 1px #fff);
       @include border-radius(3px 0 0 3px);
 
       &:hover {

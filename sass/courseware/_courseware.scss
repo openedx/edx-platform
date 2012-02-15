@@ -12,6 +12,11 @@ div.course-wrapper {
   section.course-content {
     @extend .content;
 
+    h1 {
+      @extend .top-header;
+      background: none;
+    }
+
     p {
       margin-bottom: lh();
 
