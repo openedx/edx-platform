@@ -1,74 +1,96 @@
-div#accordion {
+section.course-index {
   @extend .sidebar;
+  position: relative;
+  @extend .tran;
 
   div#open_close_accordion {
-    position: absolute;
-    right: 0px;
-    width: 20px;
-    height: 20px;
-    background: #ccc;
-    border: 1px solid black;
-    right: -22px;
-    top: 5px;
-  }
+    @include box-shadow(0 1px 0 #eee);
+    border-bottom: 1px solid #d3d3d3;
+    padding: 0 lh();
 
-  h3 {
-    overflow: hidden;
-    margin: 0;
-
-    &:last-child {
-      @include box-shadow(none);
+    h2 {
+      padding-right: 20px;
     }
 
-    &.ui-accordion-header {
-      color: #000;
+    a {
+      width: 16px;
+      text-indent: -9999px;
+      height: 16px;
+      position: absolute;
+      padding: 8px;
+      top: 12px;
+      right: -1px;
+      border: 1px solid #D3D3D3;
+      background: #eee url('/static/images/slide-left-icon.png') center center no-repeat;
+      @include box-shadow(inset 0 0 0 1px #fff);
+      @include border-radius(3px 0 0 3px);
 
-      a {
-        font-size: $body-font-size;
-        color: lighten($text-color, 10%);
-      }
-
-      &.ui-state-hover {
-        border: none;
-        border-bottom: 1px solid #d3d3d3;
-      }
-
-      &.ui-state-active {
-        @extend .active;
+      &:hover {
+        background-color: white;
       }
     }
   }
 
-  ul.ui-accordion-content {
-    @include border-radius(0);
-    @include box-shadow( inset -1px 0 0 #e6e6e6);
-    background: #d6d6d6;
-    border: none;
-    border-bottom: 1px solid #c3c3c3;
-    font-size: 12px;
-    margin: 0;
-    overflow: hidden;
+  div#accordion {
 
-    li {
-      &.active {
-        font-weight: bold;
+    h3 {
+      overflow: hidden;
+      margin: 0;
+
+      &:last-child {
+        @include box-shadow(none);
       }
 
-      a {
-        text-decoration: none;
-        margin-bottom: lh(.5);
-        display: block;
+      &.ui-accordion-header {
         color: #000;
 
-        &:hover {
-          color: #666;
+        a {
+          font-size: $body-font-size;
+          color: lighten($text-color, 10%);
         }
 
-        p {
-          margin-bottom: 0;
+        &.ui-state-hover {
+          border: none;
+          border-bottom: 1px solid #d3d3d3;
+        }
 
-          &.subtitle {
+        &.ui-state-active {
+          @extend .active;
+        }
+      }
+    }
+
+    ul.ui-accordion-content {
+      @include border-radius(0);
+      @include box-shadow( inset -1px 0 0 #e6e6e6);
+      background: #d6d6d6;
+      border: none;
+      border-bottom: 1px solid #c3c3c3;
+      font-size: 12px;
+      margin: 0;
+      overflow: hidden;
+
+      li {
+        &.active {
+          font-weight: bold;
+        }
+
+        a {
+          text-decoration: none;
+          margin-bottom: lh(.5);
+          display: block;
+          color: #000;
+
+          &:hover {
             color: #666;
+          }
+
+          p {
+            margin-bottom: 0;
+
+            &.subtitle {
+              color: #666;
+            }
           }
         }
       }
