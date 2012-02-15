@@ -71,6 +71,7 @@ div.header-wrapper {
       margin: 0;
       padding: 0;
       text-shadow: 0 -1px 0 darken($mit-red, 10%);
+      max-height: 52px; //fix for firefox
       -webkit-font-smoothing: antialiased;
 
 
