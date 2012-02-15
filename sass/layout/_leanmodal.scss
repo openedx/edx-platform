@@ -221,7 +221,6 @@ div#feedback_div{
 div#calculator_div {
   max-width: 500px;
 
-
   form {
     padding-bottom: lh();
     margin-bottom: lh();
@@ -246,11 +245,12 @@ div#calculator_div {
 
     input#calculator_output {
       border: 0;
-      background: 0;
+      background: none;
       padding: lh(.35);
-      width: 60px;
       font-size: 24px;
+      width: 378px;
       font-weight: bold;
+      margin-top: 4px;
     }
   }
 
