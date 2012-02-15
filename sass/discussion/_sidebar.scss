@@ -1,0 +1,55 @@
+div.discussion-wrapper aside {
+  @extend .sidebar;
+  @include box-shadow(inset 1px 0 0 #f6f6f6);
+  @include border-radius(0 4px 4px 0);
+  border-left: 1px solid #d3d3d3;
+  border-right: 1px solid #f6f6f6;
+  padding: lh();
+  width: flex-grid(3);
+
+  h2 {
+    font-size: 16px;
+  }
+
+  h3 {
+    border-bottom: 0;
+    box-shadow: none;
+  }
+
+  input[type="text"] {
+    width: 76%;
+  }
+
+  #displayTagFilterControl {
+    margin-top: 10px;
+  }
+
+  div.search-box {
+    input {
+      display: inline;
+    }
+    input[type='submit'] {
+      @include box-shadow(none);
+      opacity: 0.5;
+      background: url(/static/images/askbot/search-icon.png) no-repeat center;
+      border: 0;
+      margin-left: 3px;
+      position: absolute;
+      text-indent: -9999px;
+      width: 24px;
+
+      &:hover {
+        opacity: 0.9;
+      }
+
+      &:focus {
+        opacity: 1;
+      }
+    }
+
+    input#keywords {
+      padding-left: 30px;
+    }
+  }
+}
+

@@ -1,0 +1,233 @@
+section.index-content {
+  @extend .wrapper;
+  @extend .clearfix;
+
+  section {
+    @extend .clearfix;
+    float: left;
+
+    h1 {
+      font-size: 800 24px "Open Sans";
+      margin-bottom: lh();
+    }
+
+    p {
+      line-height: lh();
+      margin-bottom: lh();
+    }
+
+    ul {
+      margin: 0;
+    }
+
+    &.about {
+      @include box-sizing(border-box);
+      border-right: 1px solid #e5e5e5;
+      margin-right: flex-gutter();
+      padding-right: flex-gutter() / 2;
+      width: flex-grid(8);
+
+      section {
+        @extend .clearfix;
+        margin-bottom: lh();
+
+        p {
+          width: flex-grid(4, 8);
+          float: left;
+
+          &:nth-child(odd) {
+            margin-right: flex-gutter(8);
+          }
+        }
+
+        &.intro {
+          section {
+            margin-bottom: 0;
+
+            &.intro-text {
+              margin-right: flex-gutter(8);
+              width: flex-grid(4, 8);
+
+              p {
+                margin-right: 0;
+                width: auto;
+                float: none;
+              }
+            }
+
+            &.intro-video {
+              width: flex-grid(4, 8);
+
+              a {
+                display: block;
+                width: 100%;
+
+                img {
+                  width: 100%;
+                }
+
+                span {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
+
+        &.features {
+          border-top: 1px solid #E5E5E5;
+          padding-top: lh();
+          margin-bottom: 0;
+
+          h2 {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: lh();
+
+            span {
+              text-transform: none;
+            }
+          }
+
+          p {
+            width: auto;
+            clear: both;
+
+            strong {
+              font-family: "Open sans";
+              font-weight: 800;
+            }
+
+            a {
+              color: $mit-red;
+              text-decoration: none;
+              @include transition();
+
+              &:hover, &:focus {
+                color: darken($mit-red, 15%);
+              }
+            }
+          }
+
+          ul {
+            margin-bottom: 0;
+
+            li {
+              line-height: lh();
+              width: flex-grid(4, 8);
+              float: left;
+              margin-bottom: lh(.5);
+
+              &:nth-child(odd) {
+                margin-right: flex-gutter(8);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.course, &.staff {
+      width: flex-grid(4);
+
+      h1 {
+        font: normal $body-font-size $body-font-family;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #666;
+        margin-bottom: lh();
+      }
+
+      h2 {
+        font: 800 24px $header-font-family;
+      }
+
+      h3 {
+        font: 400 18px $header-font-family;
+      }
+
+      a {
+        @extend .button;
+      }
+
+      ul {
+        list-style: none;
+
+        li {
+          img {
+            float: left;
+            margin-right: lh(.5);
+          }
+        }
+      }
+    }
+
+    &.course {
+      h2 {
+        padding-top: lh(5);
+        background: url('/static/images/marketing/circuits-bg.jpg') 0 0 no-repeat;
+        @include background-size(contain);
+
+        @media screen and (max-width: 998px) {
+          background: url('/static/images/marketing/circuits-medium-bg.jpg') 0 0 no-repeat;
+        }
+      }
+    }
+
+
+    // index
+    //---------------------------------------- //
+    &.about-course {
+      @include box-sizing(border-box);
+      border-right: 1px solid #e5e5e5;
+      margin-right: flex-gutter();
+      padding-right: flex-gutter() / 2;
+      width: flex-grid(8);
+
+      section {
+        width: flex-grid(4, 8);
+
+
+        &.about-info {
+          margin-right: flex-gutter(8);
+        }
+
+        &.requirements {
+          clear: both;
+          width: 100%;
+          border-top: 1px solid #E5E5E5;
+          padding-top: lh();
+          margin-bottom: 0;
+
+          p {
+            float: left;
+            width: flex-grid(4, 8);
+            margin-right: flex-gutter(8);
+
+            &:nth-child(odd) {
+              margin-right: 0;
+            }
+          }
+        }
+
+        &.cta {
+          width: 100%;
+          text-align: center;
+
+          a.enroll {
+            @extend .button;
+            padding: lh(.5) lh(2);
+            @include inline-block();
+            text-align: center;
+            font: 800 18px $header-font-family;
+          }
+        }
+      }
+    }
+  }
+}
+
+section.copyright, section.tos, section.privacy-policy, section.honor-code {
+  @extend .subpage;
+}

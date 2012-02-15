@@ -13,15 +13,17 @@ $gw-gutter: 25px;
 $body-font-family: Georgia, serif;
 $header-font-family: "Open Sans", Helvetica, Arial, sans-serif;
 
-// @media screen and (min-width: 940px) {
-  $body-font-size: 16px;
+$body-font-size: 16px;
+
+// @media screen and (min-width:1200px) {
+//   $body-font-size: 18px;
 // }
 
-
-// @media screen and (max-width: 939px) {
+// @media screen and (max-width:890px) {
 //   $body-font-size: 14px;
 // }
 
+$body-line-height: golden-ratio($body-font-size, 1);
 $lh: golden-ratio($body-font-size, 1);
 
 // Colors
