@@ -844,11 +844,12 @@ div#calculator_div {
         color: #333; }
     div#calculator_div form input#calculator_output {
       border: 0;
-      background: 0;
+      background: none;
       padding: 9.061px;
-      width: 60px;
       font-size: 24px;
-      font-weight: bold; }
+      width: 378px;
+      font-weight: bold;
+      margin-top: 4px; }
   div#calculator_div dl dt {
     float: left;
     clear: both;
