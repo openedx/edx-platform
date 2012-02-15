@@ -122,7 +122,7 @@ div.course-wrapper {
     }
 
     ol.vert-mod {
-     > li {
+      > li {
         @extend .clearfix;
         @extend .problem-set;
         border-bottom: 1px solid #ddd;
@@ -142,19 +142,19 @@ div.course-wrapper {
     section.course-index {
       width: flex-grid(.6);
 
-    div#open_close_accordion {
-      padding: 0;
-
-      a {
-        background-image: url('/static/images/slide-right-icon.png');
-      }
-
-      h2 {
-        visibility: hidden;
-        width: 10px;
+      div#open_close_accordion {
         padding: 0;
+
+        a {
+          background-image: url('/static/images/slide-right-icon.png');
+        }
+
+        h2 {
+          visibility: hidden;
+          width: 10px;
+          padding: 0;
+        }
       }
-    }
 
       div#accordion {
         visibility: hidden;
