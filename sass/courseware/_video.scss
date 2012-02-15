@@ -88,6 +88,7 @@ section.course-content {
 
         li {
           float: left;
+          margin-bottom: 0;
 
           a {
             @include box-shadow(1px 0 0 #555);

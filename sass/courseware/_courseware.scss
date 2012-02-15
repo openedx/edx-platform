@@ -14,7 +14,6 @@ div.course-wrapper {
 
     h1 {
       @extend .top-header;
-      background: none;
     }
 
     p {
@@ -23,6 +22,12 @@ div.course-wrapper {
       &:empty {
         display: none;
         margin-bottom: 0;
+      }
+    }
+
+    ul {
+      li {
+        margin-bottom: lh(.5);
       }
     }
 
@@ -111,7 +116,6 @@ div.course-wrapper {
       }
     }
 
-
     section.problems-wrapper, div#seq_content {
       @extend .problem-set;
     }
@@ -123,6 +127,15 @@ div.course-wrapper {
       @media screen and (max-width:1120px) {
         display: block;
         width: auto;
+      }
+    }
+
+    div#seq_content {
+      h1 {
+        background: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
       }
     }
 
