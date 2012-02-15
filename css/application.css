@@ -146,7 +146,7 @@ input, select {
     display: table;
     width: 100%; }
 
-h1.top-header, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info > h1 {
+h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info > h1 {
   margin: -22.652px -22.652px 22.652px;
   padding: 22.652px;
   background: #f3f3f3;
@@ -2284,6 +2284,8 @@ div.course-wrapper section.course-content p {
   div.course-wrapper section.course-content p:empty {
     display: none;
     margin-bottom: 0; }
+div.course-wrapper section.course-content ul li {
+  margin-bottom: 11.326px; }
 div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li {
   position: relative; }
   div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
@@ -2371,6 +2373,11 @@ div.course-wrapper section.course-content section.problems-wrapper {
     div.course-wrapper section.course-content section.problems-wrapper {
       display: block;
       width: auto; } }
+div.course-wrapper section.course-content div#seq_content h1 {
+  background: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none; }
 div.course-wrapper section.course-content ol.vert-mod > li {
   border-bottom: 1px solid #ddd;
   margin-bottom: 15px;
@@ -2418,11 +2425,6 @@ section.course-index {
       right: -1px;
       border: 1px solid #D3D3D3;
       background: #eeeeee url("/static/images/slide-left-icon.png") center center no-repeat;
-      -webkit-box-shadow: inset 0 0 0 1px white;
-      -moz-box-shadow: inset 0 0 0 1px white;
-      -ms-box-shadow: inset 0 0 0 1px white;
-      -o-box-shadow: inset 0 0 0 1px white;
-      box-shadow: inset 0 0 0 1px white;
       -webkit-border-radius: 3px 0 0 3px;
       -moz-border-radius: 3px 0 0 3px;
       -ms-border-radius: 3px 0 0 3px;
@@ -2546,7 +2548,8 @@ section.course-content div.video-wrapper {
       float: left;
       margin-right: 22.652px; }
       section.course-content div.video-wrapper section.video-controls ul.vcr li {
-        float: left; }
+        float: left;
+        margin-bottom: 0; }
         section.course-content div.video-wrapper section.video-controls ul.vcr li a {
           -webkit-box-shadow: 1px 0 0 #555555;
           -moz-box-shadow: 1px 0 0 #555555;
