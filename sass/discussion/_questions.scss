@@ -72,30 +72,6 @@ div.question-list-header {
 
     div.tags-list {
 
-      ul.tags {
-        display: inline;
-
-        li {
-          span.delete-icon, div.delete-icon {
-            @include border-radius(0 4px 4px 0);
-            background: #555;
-            color: #eee;
-            cursor: pointer;
-            float: none;
-            display: inline;
-            clear: none;
-            left: 10px;
-            padding: 3px 6px;
-            position: relative;
-            top: 1px;
-            opacity: 0.5;
-
-            &:hover {
-              opacity: 1;
-            }
-          }
-        }
-      }
     }
   }
 }
