@@ -2403,82 +2403,81 @@ div.course-wrapper.closed section.course-index {
 div.course-wrapper.closed section.course-content {
   width: 97.773%; }
 
-section.course-index {
+section.course-index div#open_close_accordion {
+  -webkit-box-shadow: 0 1px 0 #eeeeee;
+  -moz-box-shadow: 0 1px 0 #eeeeee;
+  -ms-box-shadow: 0 1px 0 #eeeeee;
+  -o-box-shadow: 0 1px 0 #eeeeee;
+  box-shadow: 0 1px 0 #eeeeee;
+  border-bottom: 1px solid #d3d3d3;
+  padding: 0 22.652px;
   position: relative; }
-  section.course-index div#open_close_accordion {
-    -webkit-box-shadow: 0 1px 0 #eeeeee;
-    -moz-box-shadow: 0 1px 0 #eeeeee;
-    -ms-box-shadow: 0 1px 0 #eeeeee;
-    -o-box-shadow: 0 1px 0 #eeeeee;
-    box-shadow: 0 1px 0 #eeeeee;
-    border-bottom: 1px solid #d3d3d3;
-    padding: 0 22.652px; }
-    section.course-index div#open_close_accordion h2 {
-      padding-right: 20px; }
-    section.course-index div#open_close_accordion a {
-      width: 16px;
-      text-indent: -9999px;
-      height: 16px;
-      position: absolute;
-      padding: 8px;
-      top: 12px;
-      right: -1px;
-      border: 1px solid #D3D3D3;
-      background: #eeeeee url("/static/images/slide-left-icon.png") center center no-repeat;
-      -webkit-border-radius: 3px 0 0 3px;
-      -moz-border-radius: 3px 0 0 3px;
-      -ms-border-radius: 3px 0 0 3px;
-      -o-border-radius: 3px 0 0 3px;
-      border-radius: 3px 0 0 3px; }
-      section.course-index div#open_close_accordion a:hover {
-        background-color: white; }
-  section.course-index div#accordion h3, section.course-index div#accordion div#wiki_panel input[type="button"], div#wiki_panel section.course-index div#accordion input[type="button"] {
-    overflow: hidden;
-    margin: 0; }
-    section.course-index div#accordion h3:last-child, section.course-index div#accordion div#wiki_panel input[type="button"]:last-child, div#wiki_panel section.course-index div#accordion input[type="button"]:last-child {
-      -webkit-box-shadow: none;
-      -moz-box-shadow: none;
-      -ms-box-shadow: none;
-      -o-box-shadow: none;
-      box-shadow: none; }
-    section.course-index div#accordion h3.ui-accordion-header, section.course-index div#accordion div#wiki_panel input.ui-accordion-header[type="button"], div#wiki_panel section.course-index div#accordion input.ui-accordion-header[type="button"] {
-      color: #000; }
-      section.course-index div#accordion h3.ui-accordion-header a, section.course-index div#accordion div#wiki_panel input.ui-accordion-header[type="button"] a, div#wiki_panel section.course-index div#accordion input.ui-accordion-header[type="button"] a {
-        font-size: 14px;
-        color: #4d4d4d; }
-      section.course-index div#accordion h3.ui-accordion-header.ui-state-hover, section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-hover[type="button"], div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-hover[type="button"] {
-        border: none;
-        border-bottom: 1px solid #d3d3d3; }
-  section.course-index div#accordion ul.ui-accordion-content {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    -ms-border-radius: 0;
-    -o-border-radius: 0;
-    border-radius: 0;
-    -webkit-box-shadow: inset -1px 0 0 #e6e6e6;
-    -moz-box-shadow: inset -1px 0 0 #e6e6e6;
-    -ms-box-shadow: inset -1px 0 0 #e6e6e6;
-    -o-box-shadow: inset -1px 0 0 #e6e6e6;
-    box-shadow: inset -1px 0 0 #e6e6e6;
-    background: #d6d6d6;
-    border: none;
-    border-bottom: 1px solid #c3c3c3;
-    font-size: 12px;
-    margin: 0;
-    overflow: hidden; }
-    section.course-index div#accordion ul.ui-accordion-content li.active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_video_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_other_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_other_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_vertical_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_problem_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_problem_active {
-      font-weight: bold; }
-    section.course-index div#accordion ul.ui-accordion-content li a {
-      text-decoration: none;
-      margin-bottom: 11.326px;
-      display: block;
-      color: #000; }
-      section.course-index div#accordion ul.ui-accordion-content li a:hover {
+  section.course-index div#open_close_accordion h2 {
+    padding-right: 20px; }
+  section.course-index div#open_close_accordion a {
+    width: 16px;
+    text-indent: -9999px;
+    height: 16px;
+    position: absolute;
+    padding: 8px;
+    top: -12px;
+    right: -1px;
+    border: 1px solid #D3D3D3;
+    background: #eeeeee url("/static/images/slide-left-icon.png") center center no-repeat;
+    -webkit-border-radius: 3px 0 0 3px;
+    -moz-border-radius: 3px 0 0 3px;
+    -ms-border-radius: 3px 0 0 3px;
+    -o-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px; }
+    section.course-index div#open_close_accordion a:hover {
+      background-color: white; }
+section.course-index div#accordion h3, section.course-index div#accordion div#wiki_panel input[type="button"], div#wiki_panel section.course-index div#accordion input[type="button"] {
+  overflow: hidden;
+  margin: 0; }
+  section.course-index div#accordion h3:last-child, section.course-index div#accordion div#wiki_panel input[type="button"]:last-child, div#wiki_panel section.course-index div#accordion input[type="button"]:last-child {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -ms-box-shadow: none;
+    -o-box-shadow: none;
+    box-shadow: none; }
+  section.course-index div#accordion h3.ui-accordion-header, section.course-index div#accordion div#wiki_panel input.ui-accordion-header[type="button"], div#wiki_panel section.course-index div#accordion input.ui-accordion-header[type="button"] {
+    color: #000; }
+    section.course-index div#accordion h3.ui-accordion-header a, section.course-index div#accordion div#wiki_panel input.ui-accordion-header[type="button"] a, div#wiki_panel section.course-index div#accordion input.ui-accordion-header[type="button"] a {
+      font-size: 14px;
+      color: #4d4d4d; }
+    section.course-index div#accordion h3.ui-accordion-header.ui-state-hover, section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-hover[type="button"], div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-hover[type="button"] {
+      border: none;
+      border-bottom: 1px solid #d3d3d3; }
+section.course-index div#accordion ul.ui-accordion-content {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: inset -1px 0 0 #e6e6e6;
+  -moz-box-shadow: inset -1px 0 0 #e6e6e6;
+  -ms-box-shadow: inset -1px 0 0 #e6e6e6;
+  -o-box-shadow: inset -1px 0 0 #e6e6e6;
+  box-shadow: inset -1px 0 0 #e6e6e6;
+  background: #d6d6d6;
+  border: none;
+  border-bottom: 1px solid #c3c3c3;
+  font-size: 12px;
+  margin: 0;
+  overflow: hidden; }
+  section.course-index div#accordion ul.ui-accordion-content li.active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_video_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_other_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_other_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_vertical_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_problem_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_problem_active {
+    font-weight: bold; }
+  section.course-index div#accordion ul.ui-accordion-content li a {
+    text-decoration: none;
+    margin-bottom: 11.326px;
+    display: block;
+    color: #000; }
+    section.course-index div#accordion ul.ui-accordion-content li a:hover {
+      color: #666; }
+    section.course-index div#accordion ul.ui-accordion-content li a p {
+      margin-bottom: 0; }
+      section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
         color: #666; }
-      section.course-index div#accordion ul.ui-accordion-content li a p {
-        margin-bottom: 0; }
-        section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
-          color: #666; }
 
 section.course-content div.video-wrapper {
   float: left;
