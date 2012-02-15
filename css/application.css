@@ -484,6 +484,7 @@ div.header-wrapper {
       margin: 0;
       padding: 0;
       text-shadow: 0 -1px 0 #732626;
+      max-height: 52px;
       -webkit-font-smoothing: antialiased; }
       div.header-wrapper header nav ul {
         display: inline-block;
@@ -755,11 +756,12 @@ div#calculator_div {
         color: #333; }
     div#calculator_div form input#calculator_output {
       border: 0;
-      background: 0;
+      background: none;
       padding: 7.928px;
       width: 60px;
       font-size: 24px;
-      font-weight: bold; }
+      font-weight: bold;
+      margin-top: 4px; }
   div#calculator_div dl dt {
     float: left;
     clear: both;
