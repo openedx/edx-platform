@@ -20,6 +20,7 @@
 
     p {
       margin-bottom: lh();
+      line-height: lh();
     }
 
     h1 {
@@ -37,6 +38,15 @@
 
       li {
         list-style: disc outside none;
+        line-height: lh();
+      }
+    }
+
+    dl {
+      margin-bottom: lh();
+
+      dd {
+        margin-bottom: lh(.5);
       }
     }
   }
