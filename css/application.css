@@ -129,7 +129,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info ol > li:after, div#wiki_panel div#wiki_create_form:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
   content: ".";
   display: block;
   height: 0;
@@ -2908,27 +2908,45 @@ div.profile-wrapper {
     div.profile-wrapper section.user-info div#change_password_pop {
       padding: 7px 22.652px;
       color: #4D4D4D; }
-  div.profile-wrapper section.course-info ol {
-    list-style: none; }
-    div.profile-wrapper section.course-info ol > li {
+  div.profile-wrapper section.course-info > ol {
+    list-style: none;
+    border-top: 1px solid #e3e3e3;
+    margin-top: 22.652px; }
+    div.profile-wrapper section.course-info > ol > li {
       border-bottom: 1px solid #e3e3e3;
-      padding: 22.652px 0; }
-      div.profile-wrapper section.course-info ol > li h2 {
-        float: left;
+      padding: 22.652px 0;
+      width: 100%;
+      display: table; }
+      div.profile-wrapper section.course-info > ol > li h2 {
+        display: table-cell;
         padding: 0;
         margin: 0;
         width: 20.109%;
-        margin-right: 2.717%; }
-      div.profile-wrapper section.course-info ol > li div.scores {
-        float: left;
+        padding-right: 2.717%;
+        border-right: 1px dotted #ccc;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -o-box-sizing: border-box;
+        box-sizing: border-box; }
+      div.profile-wrapper section.course-info > ol > li ol.sections {
+        padding-left: 2.717%;
+        display: table-cell;
+        list-style: none;
         width: 77.174%; }
-        div.profile-wrapper section.course-info ol > li div.scores h3, div.profile-wrapper section.course-info ol > li div.scores div#wiki_panel input[type="button"], div#wiki_panel div.profile-wrapper section.course-info ol > li div.scores input[type="button"] {
-          color: #666; }
-        div.profile-wrapper section.course-info ol > li div.scores ul {
-          list-style: none; }
-          div.profile-wrapper section.course-info ol > li div.scores ul li {
-            display: inline-block;
-            padding-right: 1em; }
+        div.profile-wrapper section.course-info > ol > li ol.sections > li {
+          padding: 0 0 22.652px 0; }
+          div.profile-wrapper section.course-info > ol > li ol.sections > li:first-child {
+            padding-top: 0; }
+          div.profile-wrapper section.course-info > ol > li ol.sections > li:last-child {
+            border-bottom: 0; }
+          div.profile-wrapper section.course-info > ol > li ol.sections > li h3, div.profile-wrapper section.course-info > ol > li ol.sections > li div#wiki_panel input[type="button"], div#wiki_panel div.profile-wrapper section.course-info > ol > li ol.sections > li input[type="button"] {
+            color: #666; }
+          div.profile-wrapper section.course-info > ol > li ol.sections > li ol {
+            list-style: none; }
+            div.profile-wrapper section.course-info > ol > li ol.sections > li ol li {
+              display: inline-block;
+              padding-right: 1em; }
 
 section.wiki-body div#wiki_article html, section.wiki-body div#wiki_article address,
 section.wiki-body div#wiki_article blockquote,
