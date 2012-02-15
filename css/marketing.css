@@ -129,7 +129,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, section.index-content, footer {
+.wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, footer, section.index-content {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -165,7 +165,7 @@ input, select {
     .subpage > div dl dd, section.copyright > div dl dd, section.tos > div dl dd, section.privacy-policy > div dl dd, section.honor-code > div dl dd {
       margin-bottom: 12.944px; }
 
-.clearfix:after, .subpage:after, section.copyright:after, section.tos:after, section.privacy-policy:after, section.honor-code:after, header.announcement div section:after, section.index-content:after, section.index-content section:after, section.index-content section.about section:after, footer:after, div.leanModal_box#enroll ol:after {
+.clearfix:after, .subpage:after, section.copyright:after, section.tos:after, section.privacy-policy:after, section.honor-code:after, header.announcement div section:after, footer:after, section.index-content:after, section.index-content section:after, section.index-content section.about section:after, div.leanModal_box#enroll ol:after {
   content: ".";
   display: block;
   height: 0;
@@ -392,12 +392,73 @@ header.announcement {
         line-height: 25.888px;
         float: left; }
 
+footer {
+  padding-top: 0; }
+  footer div.footer-wrapper {
+    border-top: 1px solid #e5e5e5;
+    padding: 25.888px 0;
+    background: url("/static/images/marketing/mit-logo.png") right center no-repeat; }
+    footer div.footer-wrapper a {
+      color: #888;
+      text-decoration: none;
+      -webkit-transition-property: all;
+      -moz-transition-property: all;
+      -ms-transition-property: all;
+      -o-transition-property: all;
+      transition-property: all;
+      -webkit-transition-duration: 0.15s;
+      -moz-transition-duration: 0.15s;
+      -ms-transition-duration: 0.15s;
+      -o-transition-duration: 0.15s;
+      transition-duration: 0.15s;
+      -webkit-transition-timing-function: ease-out;
+      -moz-transition-timing-function: ease-out;
+      -ms-transition-timing-function: ease-out;
+      -o-transition-timing-function: ease-out;
+      transition-timing-function: ease-out;
+      -webkit-transition-delay: 0;
+      -moz-transition-delay: 0;
+      -ms-transition-delay: 0;
+      -o-transition-delay: 0;
+      transition-delay: 0; }
+      footer div.footer-wrapper a:hover, footer div.footer-wrapper a:focus {
+        color: #666; }
+    footer div.footer-wrapper p {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      margin-right: 25.888px; }
+    footer div.footer-wrapper ul {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
+      footer div.footer-wrapper ul li {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto; }
+        footer div.footer-wrapper ul li:after {
+          content: ' |';
+          display: inline;
+          color: #ccc; }
+        footer div.footer-wrapper ul li:last-child:after {
+          content: none; }
+
 section.index-content section {
   float: left; }
   section.index-content section h1 {
-    font-size: 24px;
-    font-weight: 800;
-    font-family: "Open Sans";
+    font-size: 800 24px "Open Sans";
     margin-bottom: 25.888px; }
   section.index-content section p {
     line-height: 25.888px;
@@ -558,69 +619,6 @@ section.index-content section {
           *vertical-align: auto;
           text-align: center;
           font: 800 18px "Open Sans", Helvetica, Arial, sans-serif; }
-
-footer {
-  padding-top: 0; }
-  footer div.footer-wrapper {
-    border-top: 1px solid #e5e5e5;
-    padding: 25.888px 0;
-    background: url("/static/images/marketing/mit-logo.png") right center no-repeat; }
-    footer div.footer-wrapper a {
-      color: #888;
-      text-decoration: none;
-      -webkit-transition-property: all;
-      -moz-transition-property: all;
-      -ms-transition-property: all;
-      -o-transition-property: all;
-      transition-property: all;
-      -webkit-transition-duration: 0.15s;
-      -moz-transition-duration: 0.15s;
-      -ms-transition-duration: 0.15s;
-      -o-transition-duration: 0.15s;
-      transition-duration: 0.15s;
-      -webkit-transition-timing-function: ease-out;
-      -moz-transition-timing-function: ease-out;
-      -ms-transition-timing-function: ease-out;
-      -o-transition-timing-function: ease-out;
-      transition-timing-function: ease-out;
-      -webkit-transition-delay: 0;
-      -moz-transition-delay: 0;
-      -ms-transition-delay: 0;
-      -o-transition-delay: 0;
-      transition-delay: 0; }
-      footer div.footer-wrapper a:hover, footer div.footer-wrapper a:focus {
-        color: #666; }
-    footer div.footer-wrapper p {
-      display: -moz-inline-box;
-      -moz-box-orient: vertical;
-      display: inline-block;
-      vertical-align: baseline;
-      zoom: 1;
-      *display: inline;
-      *vertical-align: auto;
-      margin-right: 25.888px; }
-    footer div.footer-wrapper ul {
-      display: -moz-inline-box;
-      -moz-box-orient: vertical;
-      display: inline-block;
-      vertical-align: baseline;
-      zoom: 1;
-      *display: inline;
-      *vertical-align: auto; }
-      footer div.footer-wrapper ul li {
-        display: -moz-inline-box;
-        -moz-box-orient: vertical;
-        display: inline-block;
-        vertical-align: baseline;
-        zoom: 1;
-        *display: inline;
-        *vertical-align: auto; }
-        footer div.footer-wrapper ul li:after {
-          content: ' |';
-          display: inline;
-          color: #ccc; }
-        footer div.footer-wrapper ul li:last-child:after {
-          content: none; }
 
 #lean_overlay {
   position: fixed;
@@ -846,11 +844,12 @@ div#calculator_div {
         color: #333; }
     div#calculator_div form input#calculator_output {
       border: 0;
-      background: 0;
+      background: none;
       padding: 9.061px;
-      width: 60px;
       font-size: 24px;
-      font-weight: bold; }
+      width: 378px;
+      font-weight: bold;
+      margin-top: 4px; }
   div#calculator_div dl dt {
     float: left;
     clear: both;
