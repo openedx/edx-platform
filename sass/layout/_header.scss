@@ -1,0 +1,104 @@
+div.header-wrapper {
+  // @include linear-gradient(lighten($mit-red, 5%), darken($mit-red, 5%));
+  @include box-shadow(inset 0 -1px 2px darken($mit-red, 10%));
+  background: $mit-red;
+  border-bottom: 1px solid #fff;
+
+  header {
+    @extend .clearfix;
+    @extend .wrapper;
+    @include box-sizing(border-box);
+    padding: 0 $body-line-height;
+
+    hgroup {
+      @extend .clearfix;
+      float: left;
+
+      h1 {
+        border-right: 1px solid darken($mit-red, 5%);
+        color: darken($mit-red, 25%);
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0 lh() 0 0;
+        padding: 17px lh() 14px 0;
+        text-shadow: 0 1px 0 lighten($mit-red, 10%);
+        line-height: lh();
+        @include inline-block();
+      }
+
+      h2 {
+        @include inline-block();
+        margin: 0 lh() 0 0;
+        padding: 19px lh() 9px 0;
+        line-height: lh();
+        border-right: 1px solid darken($mit-red, 5%);
+        -webkit-font-smoothing: antialiased;
+
+        a {
+          color: #fff;
+          text-decoration: none;
+
+          &:hover {
+            color: rgba(#fff, .7);
+          }
+        }
+      }
+
+      @media screen and (max-width: 920px) {
+        border-bottom: 1px solid darken($mit-red, 5%);
+        display: block;
+        float: none;
+
+        h1 {
+          float: right;
+          border: 0;
+          margin-right: 0;
+          padding-right: 0;
+        }
+
+        h2 {
+          float: left;
+          border: 0;
+          margin-right: 0;
+          padding-right: 0;
+        }
+      }
+    }
+
+    nav {
+      float: left;
+      display: block;
+      margin: 0;
+      padding: 0;
+      text-shadow: 0 -1px 0 darken($mit-red, 10%);
+      max-height: 52px; //fix for firefox
+      -webkit-font-smoothing: antialiased;
+
+
+      ul {
+        @extend .clearfix;
+        display: inline-block;
+        padding: 19px 0 9px;
+        margin: 0;
+
+        li {
+          margin-right: lh();
+          display: inline-block;
+          margin-bottom: 0;
+          line-height: lh();
+
+          a {
+            color: #fff;
+            text-decoration: none;
+
+            &:hover {
+              color: rgba(#fff, .7);
+              background-color: none;
+              text-decoration: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}

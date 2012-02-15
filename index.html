@@ -1,4 +1,4 @@
-<%inherit file="marketing.html" /> 
+<%inherit file="marketing.html" />
 
 <%block name="header_text">
     <section class="course">
@@ -7,7 +7,7 @@
         <h2>6.002x</h2>
         <a class="enroll" rel="leanModal" href="#enroll">Enroll in 6.002x Circuits <span>&amp;</span> Electronics</a>
       </section>
-      <p>6.002x (Circuits and Electronics) is an experimental on-line adaptation of MIT&rsquo;s first undergraduate analog design course: 6.002. This course will run, free of charge, for students worldwide from March 1, 2012 through June 8, 2012.</p>
+      <p>6.002x (Circuits and Electronics) is an experimental on-line adaptation of MIT&rsquo;s first undergraduate analog design course: 6.002. This course will run, free of charge, for students worldwide from March 5, 2012 through June 8, 2012.</p>
     </section>
 </%block>
 
@@ -31,7 +31,7 @@
 
       <p>If you successfully complete the course, you will receive an electronic certificate of accomplishment from <em>MITx</em>. This certificate will indicate that you earned it from <em>MITx&rsquo;s</em> pilot course. In this prototype version, <em>MITx</em> will not require that you be tested in a testing center or otherwise have your identity certified in order to receive this certificate.</p>
 
-<p>The course uses the textbook Foundations of Analog and Digital Electronic Circuits, by Anant Agarwal and Jeffrey H. Lang. Morgan Kaufmann Publishers, Elsevier, July 2005.  While recommended, the book is not required: relevant sections will be provided electronically as part of the online course for personal use in connection with this course only. The copyright for the book is owned by Elsevier. The book can be purchased on <a href="http://www.amazon.com/exec/obidos/ASIN/1558607358/ref=nosim" target="_blank">Amazon</a>.</p>
+<p>The course uses the textbook Foundations of Analog and Digital Electronic Circuits, by Anant Agarwal and Jeffrey H. Lang. Morgan Kaufmann Publishers, Elsevier, July 2005.  While recommended, the book is not required: relevant sections will be provided electronically as part of the online course for personal use in connection with this course only. The copyright for the book is owned by Elsevier. The book can be purchased on <a href="http://www.amazon.com/exec/obidos/ASIN/1558607358/ref=nosim/mitopencourse-20" target="_blank">Amazon</a>.</p>
     </section>
 
     <section class="requirements">
@@ -102,7 +102,7 @@ $(function() {
                if(json.success) {
                   $('#enroll').html(json.value);
                } else {
-                  $('#enroll_error').html(json.value);
+                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
                }
              }
         );

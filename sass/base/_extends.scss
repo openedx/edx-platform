@@ -19,6 +19,13 @@
   }
 }
 
+h1.top-header {
+  margin: (-(lh())) (-(lh())) lh();
+  padding: lh();
+  background: #f3f3f3;
+  border-bottom: 1px solid #e3e3e3;
+}
+
 .button {
   @include box-shadow(inset 0 1px 0 lighten(#888, 10%), 0 0 3px #ccc);
   @include linear-gradient(lighten(#888, 5%), darken(#888, 5%));

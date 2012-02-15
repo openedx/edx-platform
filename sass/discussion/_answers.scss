@@ -44,7 +44,11 @@ div.answer-block {
   }
 
   div.answered-by-owner {
-    color: darken($mit-red, 20%);
+    color: $mit-red;
+
+    div.comments-container {
+      color: #555;
+    }
   }
 }
 
@@ -65,6 +69,7 @@ div.answer-actions {
   }
   a {
     text-decoration: none;
+    cursor: pointer;
   }
   a.question-edit, a.permant-link {
     color: #999;
