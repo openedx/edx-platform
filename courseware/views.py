@@ -41,19 +41,19 @@ def profile(request):
         return redirect('/')
     
     dom=content_parser.course_file(request.user)
-    hw=[]
     course = dom.xpath('//course/@name')[0]
-    chapters = dom.xpath('//course[@name=$course]/chapter', course=course)
+    xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
     responses=StudentModule.objects.filter(student=request.user)
     response_by_id = {}
     for response in responses:
         response_by_id[response.module_id] = response
-        
-        
+    
+    
     total_scores = {}
-
-    for c in chapters:
+    chapters=[]
+    for c in xmlChapters:
+        sections = []
         chname=c.get('name')
         for s in dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section', 
                            course=course, chname=chname):
@@ -89,9 +89,7 @@ def profile(request):
                     format_scores.append( graded_total )
                     total_scores[ format ] = format_scores
                 
-                score={'course':course,
-                       'section':s.get("name"),
-                       'chapter':c.get("name"),
+                score={'section':s.get("name"),
                        'scores':scores,
                        'section_total' : section_total,
                        'format' : format,
@@ -99,7 +97,12 @@ def profile(request):
                        'due' : s.get("due") or "",
                        'graded' : graded,
                        }
-                hw.append(score)
+                sections.append(score)
+        
+        chapters.append({'course':course,
+                         'chapter' : c.get("name"),
+                         'sections' : sections,})
+                         
     
     def totalWithDrops(scores, drop_count):
         #Note that this key will sort the list descending
@@ -186,7 +189,7 @@ def profile(request):
              'location':user_info.location,
              'language':user_info.language,
              'email':request.user.email,
-             'homeworks':hw,
+             'chapters':chapters,
              'format_url_params' : format_url_params,
              'grade_summary' : grade_summary,
              'csrf':csrf(request)['csrf_token']
