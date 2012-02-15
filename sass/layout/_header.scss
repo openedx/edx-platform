@@ -28,10 +28,11 @@ div.header-wrapper {
 
       h2 {
         @include inline-block();
-        margin: 0 lh() 0 0;
+        margin: 0;
         padding: 19px lh() 9px 0;
         line-height: lh();
-        border-right: 1px solid darken($mit-red, 5%);
+        text-transform: none;
+        letter-spacing: 0;
         -webkit-font-smoothing: antialiased;
 
         a {
@@ -73,16 +74,16 @@ div.header-wrapper {
       text-shadow: 0 -1px 0 darken($mit-red, 10%);
       max-height: 52px; //fix for firefox
       -webkit-font-smoothing: antialiased;
-
+      background: #501016;
+      margin-top: 10px;
+      @include border-radius(3px 3px 0 0);
 
       ul {
         @extend .clearfix;
         display: inline-block;
-        padding: 19px 0 9px;
         margin: 0;
 
         li {
-          margin-right: lh();
           display: inline-block;
           margin-bottom: 0;
           line-height: lh();
@@ -90,6 +91,9 @@ div.header-wrapper {
           a {
             color: #fff;
             text-decoration: none;
+            padding: 12px lh() 6px;
+            display: block;
+            font-weight: bold;
 
             &:hover {
               color: rgba(#fff, .7);
