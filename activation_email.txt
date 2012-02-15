@@ -6,4 +6,5 @@ into your web browser's address bar:
 http://${ site }/activate/${ key }
 
 If you didn't request this, you don't need to do anything; you won't
-receive any more email from us. 
+receive any more email from us. Please do not reply to this e-mail; if
+you require assistance, check the help section of the MITx web site.
