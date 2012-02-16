@@ -91,49 +91,45 @@ $(function() {
 
       <div id="grade-detail-graph" style="width:650px;height:200px;"></div>
             
-      <ol>
-        <%
-        lastChapter = None
-        %>
-        % for hw in homeworks:
+      <ol class="chapters">
+        %for chapter in chapters:
+        %if not chapter['chapter'] == "hidden":
         <li>
-          %if hw['chapter'] != lastChapter:
-          <h2><a href="${reverse('courseware_chapter', args=format_url_params([hw['course'], hw['chapter']])) }">
-          ${ hw['chapter'] }</a></h2>
-          <% lastChapter = hw['chapter'] %>
-          %else:
-          <h2>-</h2>
-          %endif
-
-          <div class="scores">
-            <h3><a href="${reverse('courseware_section', args=format_url_params([hw['course'], hw['chapter'], hw['section']])) }">
-            <%
-            earned = hw['section_total'][0]
-            total = hw['section_total'][1]
-            percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 else ""
-            %>
-            ${ hw['section'] }</a> ${"({0}/{1}) {2}".format( earned, total, percentageString )}</h3>
-            ${hw['subtitle']}
-            % if 'due' in hw and hw['due']!="":
-              due ${hw['due']}
-            % endif
-            
-            <ul>
-              %if len(hw['scores']) > 0:
-                %if hw['graded']:
-                  Problem Scores:
-                %else:
-                  Practice Scores:
-                %endif
-                % for score in hw['scores']:
-                  <li>${ score[0] }/${ score[1] }</li>
-                % endfor
+          <h2><a href="${reverse('courseware_chapter', args=format_url_params([chapter['course'], chapter['chapter']])) }">
+          ${ chapter['chapter'] }</a></h2>
+        
+          <ol class="sections">
+            %for section in chapter['sections']:
+            <li>
+              <%
+              earned = section['section_total'][0]
+              total = section['section_total'][1]
+              percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 else ""
+              %>
+              
+              <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">
+              ${ section['section'] }</a> ${"({0}/{1}) {2}".format( earned, total, percentageString )}</h3>
+              ${section['subtitle']}
+              %if 'due' in section and section['due']!="":
+                due ${section['due']}
               %endif
-            </ul>
-          </div>
-        </li>
-        % endfor
-      </ol>
+              
+              %if len(section['scores']) > 0:
+                <ol class="scores">
+                  ${ "Problem Scores: " if section['graded'] else "Practice Scores: "}
+                  %for score in section['scores']:
+                    <li class="score">${ score[0] }/${ score[1] }</li>
+                  %endfor
+                </ol>
+              %endif
+              
+            </li> <!--End section-->
+            %endfor
+          </ol> <!--End sections-->
+        </li> <!--End chapter-->
+        %endif
+        %endfor
+      </ol> <!--End chapters-->
     </section>
 
     <section class="user-info">
