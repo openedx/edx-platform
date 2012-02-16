@@ -1,16 +1,36 @@
 div.answer-controls {
   @include box-sizing(border-box);
-  @extend div.question-controls;
   display: inline-block;
-  margin: 20px 0;
+  margin: 0 0 15px;
   padding-left: flex-grid(1.1);
-
-  div.answer-sort {
-    @extend div.question-sort;
-  }
+  width: 100%;
 
   div.answer-count {
-    @extend div.question-count;
+    display: inline-block;
+    float: left;
+  }
+
+  div.answer-sort {
+    float: right;
+    margin-left: flex-gutter();
+
+    nav {
+      @extend .action-link;
+      float: right;
+      margin-top: 25px;
+
+      a {
+        &.on span{
+          font-weight: bold;
+        }
+
+        &:before {
+          content: '|';
+          color: darken(#F6EFD4, 10%);
+          font-size: 22px;
+        }
+      }
+    }
   }
 }
 
@@ -44,10 +64,41 @@ div.answer-block {
   }
 
   div.answered-by-owner {
-    color: $mit-red;
+    p {
+      font-style: italic;
+      color: #656565;
+    }
 
     div.comments-container {
       color: #555;
+    }
+  }
+}
+
+div.paginator {
+  @extend div.answer-block;
+  text-align: center;
+  padding: 20px 0;
+
+  span {
+    @include border-radius(3px);
+    background: #eee;
+    margin: 0 5px;
+    padding: 4px 10px;
+
+    &.curr {
+      background: none;
+      color: $mit-red;
+      font-weight: bold;
+    }
+
+    &.next, &.prev {
+      @extend .light-button;
+    }
+
+    a {
+      color: #555;
+      text-decoration: none;
     }
   }
 }
@@ -60,18 +111,28 @@ div.answer-own {
 }
 
 div.answer-actions {
-  text-align: right;
+  border-left: 3px solid darken(#F6EFD4, 10%);
   margin: 0;
-  padding: 0;
+  padding:8px 8px 8px 0;
+  text-align: right;
+  background:lighten(#F6EFD4, 5%);
 
   span.sep {
     color: #ddd;
   }
+
   a {
-    text-decoration: none;
     cursor: pointer;
+    text-decoration: none;
+
+    &.question-delete {
+      color: $mit-red;
+    }
+
+    &.question-edit, &.permant-link {
+      color: darken(#F6EFD4, 45%);;
+    }
+
   }
-  a.question-edit, a.permant-link {
-    color: #999;
-  }
+
 }

@@ -107,9 +107,9 @@ div.discussion-wrapper aside {
 
     input#clear {
       @include box-shadow(none);
-      @include border-radius(5px);
+      @include border-radius(15px);
       border: none;
-      background: $mit-red;
+      background: #bbb;
       color: #fff;
       display: inline;
       font-size: 10px;
@@ -162,6 +162,3 @@ div.discussion-wrapper aside {
     }
   }
 }
-
-
-
