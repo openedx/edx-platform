@@ -17,6 +17,11 @@ html {
       background: #fff;
       border-bottom: 1px solid #bbb;
 
+      @media print {
+        border-bottom: 0;
+        @include border-radius(none);
+      }
+
       @media screen and (min-width: 1400px) {
         // @include border-radius(3px);
         @include box-shadow(0 0 4px #dfdfdf);

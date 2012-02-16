@@ -50,6 +50,12 @@ div.course-wrapper {
           width: auto;
           border-right: 0;
         }
+
+        @media print {
+          display: block;
+          width: auto;
+          border-right: 0;
+        }
       }
 
       section.problem {
@@ -61,6 +67,16 @@ div.course-wrapper {
           display: block;
           width: auto;
           padding: 0;
+        }
+
+        @media print {
+          display: block;
+          width: auto;
+          padding: 0;
+
+          canvas, img {
+            page-break-inside: avoid;
+          }
         }
 
         span {
