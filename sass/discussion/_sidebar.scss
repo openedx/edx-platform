@@ -132,17 +132,6 @@ div.discussion-wrapper aside {
     }
   }
 
-  // div.favorite-number {
-  //   color: #777;
-  //   font-weight: normal;
-  //   margin-bottom: 12px;
-  //   margin-top: 5px;
-  //   text-align: center;
-  // }
-
-  div.notify-sidebar {
-    // margin: 10px 0;
-  }
 
   div.question-stats {
     ul {
@@ -162,6 +151,14 @@ div.discussion-wrapper aside {
           padding-right: 10px;
         }
       }
+    }
+  }
+
+  div.markdown ul li {
+    margin: 20px 0;
+
+    ol li {
+      margin: 0;
     }
   }
 }
