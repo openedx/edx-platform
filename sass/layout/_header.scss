@@ -1,5 +1,4 @@
 div.header-wrapper {
-  // @include linear-gradient(lighten($mit-red, 5%), darken($mit-red, 5%));
  @include box-shadow(inset 0 -4px 6px darken($mit-red, 5%));
   background: $mit-red;
   border-bottom: 1px solid #fff;
@@ -65,19 +64,12 @@ div.header-wrapper {
         h1 {
           float: left;
           border: 0;
-          // margin-right: 0;
-          // padding-right: 0;
-
-          // &:after {
-          //   display: none;
-          // }
         }
 
         h2 {
           float: left;
           border: 0;
           margin-right: 0;
-          padding-right: 0;
         }
       }
     }
@@ -117,7 +109,6 @@ div.header-wrapper {
             &:hover {
               color: rgba(#fff, .7);
               background-color: none;
-              text-decoration: none;
             }
           }
         }
