@@ -4,6 +4,10 @@ div.header-wrapper {
   background: $mit-red;
   border-bottom: 1px solid #fff;
 
+  @media print {
+    display: none;
+  }
+
   header {
     @extend .clearfix;
     @extend .wrapper;
