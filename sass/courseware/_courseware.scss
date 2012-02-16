@@ -5,86 +5,16 @@ div.course-wrapper {
     list-style: none;
   }
 
-  div#accordion {
-    @extend .sidebar;
-
-    div#open_close_accordion {
-      position: absolute;
-      right: 0px;
-      width: 20px;
-      height: 20px;
-      background: #ccc;
-      border: 1px solid black;
-      right: -22px;
-      top: 5px;
-    }
-		
-    h3 {
-      overflow: hidden;
-      margin: 0;
-
-      &:last-child {
-        @include box-shadow(none);
-      }
-
-      &.ui-accordion-header {
-        color: #000;
-
-        a {
-          font-size: $body-font-size;
-          color: lighten($text-color, 10%);
-        }
-
-        &.ui-state-hover {
-          border: none;
-          border-bottom: 1px solid #d3d3d3;
-        }
-
-        &.ui-state-active {
-          @extend .active;
-        }
-      }
-    }
-
-    ul.ui-accordion-content {
-      @include border-radius(0);
-      @include box-shadow( inset -1px 0 0 #e6e6e6);
-      background: #d6d6d6;
-      border: none;
-      border-bottom: 1px solid #c3c3c3;
-      font-size: 12px;
-      margin: 0;
-      overflow: hidden;
-
-      li {
-        &.active {
-          font-weight: bold;
-        }
-
-        a {
-          text-decoration: none;
-          margin-bottom: lh(.5);
-          display: block;
-          color: #000;
-
-          &:hover {
-            color: #666;
-          }
-
-          p {
-            margin-bottom: 0;
-
-            &.subtitle {
-              color: #666;
-            }
-          }
-        }
-      }
-    }
+  .tran {
+    @include transition( all, .2s, $ease-in-out-quad);
   }
 
   section.course-content {
     @extend .content;
+
+    h1 {
+      @extend .top-header;
+    }
 
     p {
       margin-bottom: lh();
@@ -92,6 +22,12 @@ div.course-wrapper {
       &:empty {
         display: none;
         margin-bottom: 0;
+      }
+    }
+
+    ul {
+      li {
+        margin-bottom: lh(.5);
       }
     }
 
@@ -180,7 +116,6 @@ div.course-wrapper {
       }
     }
 
-
     section.problems-wrapper, div#seq_content {
       @extend .problem-set;
     }
@@ -195,8 +130,17 @@ div.course-wrapper {
       }
     }
 
+    div#seq_content {
+      h1 {
+        background: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+    }
+
     ol.vert-mod {
-     > li {
+      > li {
         @extend .clearfix;
         @extend .problem-set;
         border-bottom: 1px solid #ddd;
@@ -209,6 +153,36 @@ div.course-wrapper {
           padding-bottom: 0;
         }
       }
+    }
+  }
+
+  &.closed {
+    section.course-index {
+      width: flex-grid(.6);
+
+      div#open_close_accordion {
+        padding: 0;
+
+        a {
+          background-image: url('/static/images/slide-right-icon.png');
+        }
+
+        h2 {
+          visibility: hidden;
+          width: 10px;
+          padding: 0;
+        }
+      }
+
+      div#accordion {
+        visibility: hidden;
+        width: 10px;
+        padding: 0;
+      }
+    }
+
+    section.course-content {
+      width: flex-grid(11.5) + flex-gutter();
     }
   }
 }

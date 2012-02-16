@@ -1,22 +1,16 @@
 @import "bourbon/bourbon";
-@import "reset";
-@import "font-face";
 
 // Base layout
-@import "base-variables", "base-extends", "base";
-@import "layout";
-@import "leanmodal";
+@import "base/reset", "base/font-face";
+@import "base/variables", "base/functions", "base/extends", "base/base";
+@import "layout/layout", "layout/header", "layout/footer", "layout/leanmodal";
+@import "jquery-ui-1.8.16.custom";
 
 // pages
-@import "courseware", "courseware-video", "courseware-sequence-nav";
+@import "courseware/courseware", "courseware/sidebar", "courseware/video", "courseware/sequence-nav";
 @import "textbook";
 @import "info";
 @import "profile";
-@import "wiki-basic-html", "wiki-create", "wiki";
-@import "activation";
+@import "wiki/basic-html", "wiki/sidebar", "wiki/create", "wiki/wiki";
 @import "help";
-@import "askbot-original", "discussion", "discussion-questions", "discussion-tags", "question-view" , "discussion-answers", "discussion-forms", "form-wmd-toolbar";
-
-// left over
-// @import "theme";
-// @import "local";
+@import "discussion/askbot-original", "discussion/discussion","discussion/sidebar", "discussion/questions", "discussion/tags", "discussion/question-view" , "discussion/answers", "discussion/forms", "discussion/form-wmd-toolbar";

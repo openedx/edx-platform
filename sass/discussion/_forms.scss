@@ -73,6 +73,10 @@ form.question-form {
   padding: 0;
   margin-top: -15px;
 
+  h1 a {
+    float: right;
+  }
+
   input[type="text"] {
     width: flex-grid(6);
   }

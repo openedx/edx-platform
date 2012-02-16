@@ -1,0 +1,178 @@
+div.header-wrapper {
+ @include box-shadow(inset 0 -4px 6px darken($mit-red, 5%));
+  background: $mit-red;
+  border-bottom: 1px solid #fff;
+
+  header {
+    @extend .clearfix;
+    @extend .wrapper;
+    @include box-sizing(border-box);
+    padding: 0 $body-line-height;
+
+    hgroup {
+      @extend .clearfix;
+      float: left;
+      padding-top: 13px;
+      min-width: flex-grid(3);
+
+      h1 {
+        @include inline-block();
+        color: darken($mit-red, 25%);
+        font-size: 18px;
+        font-weight: 800;
+        line-height: lh();
+        margin: 0;
+        padding: 0 lh(.5) 0 0;
+        text-shadow: 0 1px 0 lighten($mit-red, 10%);
+
+        &:after {
+          color: darken($mit-red, 10%);
+          content: "•";
+          display: inline-block;
+          font-size: 10px;
+          letter-spacing: -2px;
+          padding-left: lh(.5);
+          text-shadow: 0;
+        }
+      }
+
+      h2 {
+        @include inline-block();
+        margin: 0;
+        font-size: 16px;
+        padding: 0 lh() 0px 0;
+        text-transform: none;
+        letter-spacing: 0;
+        text-shadow: 0 -1px 0 darken($mit-red, 10%);
+        -webkit-font-smoothing: antialiased;
+
+        a {
+          color: #fff;
+          text-decoration: none;
+
+          &:hover {
+            color: rgba(#fff, .7);
+          }
+        }
+      }
+
+
+      @media screen and (max-width: 900px) {
+        display: block;
+        float: none;
+
+        h1 {
+          float: left;
+          border: 0;
+        }
+
+        h2 {
+          float: left;
+          border: 0;
+          margin-right: 0;
+        }
+      }
+    }
+
+    nav {
+      -webkit-font-smoothing: antialiased;
+      @include border-radius(3px 3px 0 0);
+      @include box-shadow(inset 0 0 0 1px darken(#501016, 5%), inset 0 2px 0 lighten(#501016, 5%));
+      background: #501016;
+      border-bottom: 1px solid darken(#501016, 10%);
+      display: block;
+      float: left;
+      margin: 5px 0 0;
+      padding: 0;
+      text-shadow: 0 -1px 0 darken($mit-red, 10%);
+
+      ul {
+        @extend .clearfix;
+        margin: 0;
+
+        li {
+          line-height: lh();
+          margin-bottom: 0;
+          float: left;
+
+          a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px lh() 8px;
+            display: block;
+            font-weight: bold;
+
+            @media screen and (max-width: 1020px) {
+              padding: 10px lh(.7) 8px;
+            }
+
+            &:hover {
+              color: rgba(#fff, .7);
+              background-color: none;
+            }
+          }
+        }
+      }
+
+      @media screen and (max-width: 900px) {
+        width: 100%;
+        float: none;
+
+        ul {
+          li {
+            padding: auto;
+            display: table-cell;
+            width: 16.6666666667%;
+            text-align: center;
+          }
+        }
+      }
+
+      .active {
+        background: #F4F4F4;
+        color: #333;
+        text-shadow: 0 1px 0 #fff;
+        border: 1px solid darken(#501016, 10%);
+        border-bottom: 0;
+        @include box-shadow(0 2px 0 #f4f4f4, inset 0 1px 0 #fff);
+        @include border-radius(3px 3px 0 0);
+      }
+
+      &.courseware {
+        li.courseware a {
+          @extend .active;
+        }
+      }
+
+      &.book {
+        li.book a {
+          @extend .active;
+        }
+      }
+
+      &.info {
+        li.info a {
+          @extend .active;
+        }
+      }
+
+      &.discussion {
+        li.discussion a {
+          @extend .active;
+        }
+      }
+
+      &.wiki {
+        li.wiki a {
+          @extend .active;
+        }
+      }
+
+      &.profile {
+        li.profile a {
+          @extend .active;
+        }
+      }
+    }
+  }
+}

@@ -36,6 +36,8 @@ h1.top-header {
   font: bold $body-font-size $body-font-family;
   cursor: pointer;
   -webkit-font-smoothing: antialiased;
+  text-shadow: none;
+  text-decoration: none;
 
   &:hover, &:focus {
     @include box-shadow(inset 0 1px 0 lighten(#888, 20%), 0 0 3px #ccc);
@@ -106,6 +108,10 @@ h1.top-header {
         color: #000;
       }
     }
+  }
+
+  a.button {
+    text-decoration: none;
   }
 }
 
