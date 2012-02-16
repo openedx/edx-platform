@@ -4,6 +4,7 @@ import math
 import operator
 
 import numpy
+import scipy.constants
 
 from pyparsing import Word, alphas, nums, oneOf, Literal
 from pyparsing import ZeroOrMore, OneOrMore, StringStart
@@ -24,7 +25,12 @@ default_functions = {'sin' : numpy.sin,
                      'abs':numpy.abs
                      }
 default_variables = {'j':numpy.complex(0,1), 
-                     'e':numpy.complex(numpy.e)
+                     'e':numpy.e,
+                     'pi':numpy.pi, 
+                     'k':scipy.constants.k,
+                     'c':scipy.constants.c, 
+                     'T':298.15,
+                     'q':scipy.constants.e
                      }
 
 log = logging.getLogger("mitx.courseware.capa")
