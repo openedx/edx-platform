@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* 
 html5doctor.com Reset Stylesheet
 v1.6.1
@@ -129,7 +130,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info ol > li:after, div#wiki_panel div#wiki_create_form:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
   content: ".";
   display: block;
   height: 0;
@@ -175,7 +176,9 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   color: #fff;
   font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
   cursor: pointer;
-  -webkit-font-smoothing: antialiased; }
+  -webkit-font-smoothing: antialiased;
+  text-shadow: none;
+  text-decoration: none; }
   .button:hover, input[type="submit"]:hover, input[type="button"]:hover, button:hover, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, .button:focus, input[type="submit"]:focus, input[type="button"]:focus, button:focus, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus {
     -webkit-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
     -moz-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
@@ -292,6 +295,8 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
       font-weight: bold; }
       .sidebar h3.active a, section.course-index h3.active a, div.book-wrapper ul#booknav h3.active a, div.info-wrapper section.handouts h3.active a, div.profile-wrapper section.user-info h3.active a, div#wiki_panel h3.active a, div.discussion-wrapper aside h3.active a, .sidebar section.course-index div#accordion h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion .sidebar h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion h3.ui-accordion-header.ui-state-active a, div.book-wrapper ul#booknav section.course-index div#accordion h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion div.book-wrapper ul#booknav h3.ui-accordion-header.ui-state-active a, div.info-wrapper section.handouts section.course-index div#accordion h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion div.info-wrapper section.handouts h3.ui-accordion-header.ui-state-active a, div.profile-wrapper section.user-info section.course-index div#accordion h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion div.profile-wrapper section.user-info h3.ui-accordion-header.ui-state-active a, div#wiki_panel section.course-index div#accordion h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion div#wiki_panel h3.ui-accordion-header.ui-state-active a, div.discussion-wrapper aside section.course-index div#accordion h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion div.discussion-wrapper aside h3.ui-accordion-header.ui-state-active a, .sidebar section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, section.course-index div#accordion div#wiki_panel .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, section.course-index div#accordion div#wiki_panel div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.info-wrapper section.handouts section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, section.course-index div#accordion div#wiki_panel div.info-wrapper section.handouts input.ui-accordion-header.ui-state-active[type="button"] a, div.profile-wrapper section.user-info section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, section.course-index div#accordion div#wiki_panel div.profile-wrapper section.user-info input.ui-accordion-header.ui-state-active[type="button"] a, section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, div.discussion-wrapper aside section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"] a, section.course-index div#accordion div#wiki_panel div.discussion-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div#wiki_panel section.course-index div#accordion .sidebar input.ui-accordion-header.ui-state-active[type="button"] a, div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.book-wrapper ul#booknav div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div#wiki_panel section.course-index div#accordion div.book-wrapper ul#booknav input.ui-accordion-header.ui-state-active[type="button"] a, div.info-wrapper section.handouts div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div#wiki_panel section.course-index div#accordion div.info-wrapper section.handouts input.ui-accordion-header.ui-state-active[type="button"] a, div.profile-wrapper section.user-info div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div#wiki_panel section.course-index div#accordion div.profile-wrapper section.user-info input.ui-accordion-header.ui-state-active[type="button"] a, div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div.discussion-wrapper aside div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"] a, div#wiki_panel section.course-index div#accordion div.discussion-wrapper aside input.ui-accordion-header.ui-state-active[type="button"] a, .sidebar div#wiki_panel input.active[type="button"] a, div#wiki_panel .sidebar input.active[type="button"] a, section.course-index div#wiki_panel input.active[type="button"] a, div#wiki_panel section.course-index input.active[type="button"] a, div.book-wrapper ul#booknav div#wiki_panel input.active[type="button"] a, div#wiki_panel div.book-wrapper ul#booknav input.active[type="button"] a, div.info-wrapper section.handouts div#wiki_panel input.active[type="button"] a, div#wiki_panel div.info-wrapper section.handouts input.active[type="button"] a, div.profile-wrapper section.user-info div#wiki_panel input.active[type="button"] a, div#wiki_panel div.profile-wrapper section.user-info input.active[type="button"] a, div#wiki_panel input.active[type="button"] a, div.discussion-wrapper aside div#wiki_panel input.active[type="button"] a, div#wiki_panel div.discussion-wrapper aside input.active[type="button"] a {
         color: #000; }
+  .sidebar a.button, section.course-index a.button, div.book-wrapper ul#booknav a.button, div.info-wrapper section.handouts a.button, div.profile-wrapper section.user-info a.button, div#wiki_panel a.button, div.discussion-wrapper aside a.button, .sidebar div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta .sidebar a.edit, section.course-index div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta section.course-index a.edit, div.book-wrapper ul#booknav div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.book-wrapper ul#booknav a.edit, div.info-wrapper section.handouts div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.info-wrapper section.handouts a.edit, div.profile-wrapper section.user-info div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.profile-wrapper section.user-info a.edit, div#wiki_panel div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div#wiki_panel a.edit, div.discussion-wrapper aside div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside a.edit, .sidebar div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta .sidebar a.edit, section.course-index div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta section.course-index a.edit, div.book-wrapper ul#booknav div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.book-wrapper ul#booknav a.edit, div.info-wrapper section.handouts div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.info-wrapper section.handouts a.edit, div.profile-wrapper section.user-info div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.profile-wrapper section.user-info a.edit, div#wiki_panel div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div#wiki_panel a.edit, div.discussion-wrapper aside div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside a.edit, .sidebar div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta .sidebar a.edit, section.course-index div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta section.course-index a.edit, div.book-wrapper ul#booknav div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.book-wrapper ul#booknav a.edit, div.info-wrapper section.handouts div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.info-wrapper section.handouts a.edit, div.profile-wrapper section.user-info div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.profile-wrapper section.user-info a.edit, div#wiki_panel div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div#wiki_panel a.edit, div.discussion-wrapper aside div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside a.edit, .sidebar div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta .sidebar a.edit, section.course-index div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta section.course-index a.edit, div.book-wrapper ul#booknav div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.book-wrapper ul#booknav a.edit, div.info-wrapper section.handouts div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.info-wrapper section.handouts a.edit, div.profile-wrapper section.user-info div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.profile-wrapper section.user-info a.edit, div#wiki_panel div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div#wiki_panel a.edit, div.discussion-wrapper aside div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside a.edit, .sidebar div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta .sidebar a.edit, section.course-index div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta section.course-index a.edit, div.book-wrapper ul#booknav div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.book-wrapper ul#booknav a.edit, div.info-wrapper section.handouts div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.info-wrapper section.handouts a.edit, div.profile-wrapper section.user-info div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.profile-wrapper section.user-info a.edit, div#wiki_panel div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div#wiki_panel a.edit, div.discussion-wrapper aside div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside a.edit {
+    text-decoration: none; }
 
 .topbar, nav.sequence-nav, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header {
   background: #F6EFD4;
@@ -394,30 +399,31 @@ html {
       -ms-box-sizing: border-box;
       -o-box-sizing: border-box;
       box-sizing: border-box;
-      -webkit-border-radius: 4px;
-      -moz-border-radius: 4px;
-      -ms-border-radius: 4px;
-      -o-border-radius: 4px;
-      border-radius: 4px;
       overflow: hidden;
       background: #fff;
-      border-bottom: 1px solid #bbb; }
+      border-bottom: 1px solid #bbb;
+      margin-top: 3px;
+      -webkit-box-shadow: 0 0 4px #dfdfdf;
+      -moz-box-shadow: 0 0 4px #dfdfdf;
+      -ms-box-shadow: 0 0 4px #dfdfdf;
+      -o-box-shadow: 0 0 4px #dfdfdf;
+      box-shadow: 0 0 4px #dfdfdf;
+      border: 1px solid #bbb; }
       @media screen and (min-width: 1400px) {
         html body section.main-content {
-          -webkit-box-shadow: 0 0 4px #dfdfdf;
-          -moz-box-shadow: 0 0 4px #dfdfdf;
-          -ms-box-shadow: 0 0 4px #dfdfdf;
-          -o-box-shadow: 0 0 4px #dfdfdf;
-          box-shadow: 0 0 4px #dfdfdf;
-          border: 1px solid #bbb;
+          -webkit-border-radius: 4px;
+          -moz-border-radius: 4px;
+          -ms-border-radius: 4px;
+          -o-border-radius: 4px;
+          border-radius: 4px;
           margin-top: 11.326px; } }
 
 div.header-wrapper {
-  -webkit-box-shadow: inset 0 -1px 2px #732626;
-  -moz-box-shadow: inset 0 -1px 2px #732626;
-  -ms-box-shadow: inset 0 -1px 2px #732626;
-  -o-box-shadow: inset 0 -1px 2px #732626;
-  box-shadow: inset 0 -1px 2px #732626;
+  -webkit-box-shadow: inset 0 -4px 6px #862d2d;
+  -moz-box-shadow: inset 0 -4px 6px #862d2d;
+  -ms-box-shadow: inset 0 -4px 6px #862d2d;
+  -o-box-shadow: inset 0 -4px 6px #862d2d;
+  box-shadow: inset 0 -4px 6px #862d2d;
   background: #993333;
   border-bottom: 1px solid #fff; }
   div.header-wrapper header {
@@ -428,23 +434,32 @@ div.header-wrapper {
     box-sizing: border-box;
     padding: 0 22.652px; }
     div.header-wrapper header hgroup {
-      float: left; }
+      float: left;
+      padding-top: 13px;
+      min-width: 23.482%; }
       div.header-wrapper header hgroup h1 {
-        border-right: 1px solid #862d2d;
-        color: #391313;
-        font-size: 20px;
-        font-weight: 800;
-        margin: 0 22.652px 0 0;
-        padding: 17px 22.652px 14px 0;
-        text-shadow: 0 1px 0 #bf4040;
-        line-height: 22.652px;
         display: -moz-inline-box;
         -moz-box-orient: vertical;
         display: inline-block;
         vertical-align: baseline;
         zoom: 1;
         *display: inline;
-        *vertical-align: auto; }
+        *vertical-align: auto;
+        color: #391313;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 22.652px;
+        margin: 0;
+        padding: 0 11.326px 0 0;
+        text-shadow: 0 1px 0 #bf4040; }
+        div.header-wrapper header hgroup h1:after {
+          color: #732626;
+          content: "•";
+          display: inline-block;
+          font-size: 10px;
+          letter-spacing: -2px;
+          padding-left: 11.326px;
+          text-shadow: 0; }
       div.header-wrapper header hgroup h2 {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
@@ -453,55 +468,91 @@ div.header-wrapper {
         zoom: 1;
         *display: inline;
         *vertical-align: auto;
-        margin: 0 22.652px 0 0;
-        padding: 19px 22.652px 9px 0;
-        line-height: 22.652px;
-        border-right: 1px solid #862d2d;
+        margin: 0;
+        font-size: 16px;
+        padding: 0 22.652px 0px 0;
+        text-transform: none;
+        letter-spacing: 0;
+        text-shadow: 0 -1px 0 #732626;
         -webkit-font-smoothing: antialiased; }
         div.header-wrapper header hgroup h2 a {
           color: #fff;
           text-decoration: none; }
           div.header-wrapper header hgroup h2 a:hover {
             color: rgba(255, 255, 255, 0.7); }
-      @media screen and (max-width: 920px) {
+      @media screen and (max-width: 900px) {
         div.header-wrapper header hgroup {
-          border-bottom: 1px solid #862d2d;
           display: block;
           float: none; }
           div.header-wrapper header hgroup h1 {
-            float: right;
-            border: 0;
-            margin-right: 0;
-            padding-right: 0; }
+            float: left;
+            border: 0; }
           div.header-wrapper header hgroup h2 {
             float: left;
             border: 0;
-            margin-right: 0;
-            padding-right: 0; } }
+            margin-right: 0; } }
     div.header-wrapper header nav {
-      float: left;
+      -webkit-font-smoothing: antialiased;
+      -webkit-border-radius: 3px 3px 0 0;
+      -moz-border-radius: 3px 3px 0 0;
+      -ms-border-radius: 3px 3px 0 0;
+      -o-border-radius: 3px 3px 0 0;
+      border-radius: 3px 3px 0 0;
+      -webkit-box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
+      -moz-box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
+      -ms-box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
+      -o-box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
+      box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
+      background: #501016;
+      border-bottom: 1px solid #26080a;
       display: block;
-      margin: 0;
+      float: left;
+      margin: 5px 0 0;
       padding: 0;
-      text-shadow: 0 -1px 0 #732626;
-      max-height: 52px;
-      -webkit-font-smoothing: antialiased; }
+      text-shadow: 0 -1px 0 #732626; }
       div.header-wrapper header nav ul {
-        display: inline-block;
-        padding: 19px 0 9px;
         margin: 0; }
         div.header-wrapper header nav ul li {
-          margin-right: 22.652px;
-          display: inline-block;
+          line-height: 22.652px;
           margin-bottom: 0;
-          line-height: 22.652px; }
+          float: left; }
           div.header-wrapper header nav ul li a {
             color: #fff;
-            text-decoration: none; }
+            text-decoration: none;
+            padding: 10px 22.652px 8px;
+            display: block;
+            font-weight: bold; }
+            @media screen and (max-width: 1020px) {
+              div.header-wrapper header nav ul li a {
+                padding: 10px 15.856px 8px; } }
             div.header-wrapper header nav ul li a:hover {
               color: rgba(255, 255, 255, 0.7);
-              background-color: none;
-              text-decoration: none; }
+              background-color: none; }
+      @media screen and (max-width: 900px) {
+        div.header-wrapper header nav {
+          width: 100%;
+          float: none; }
+          div.header-wrapper header nav ul li {
+            padding: auto;
+            display: table-cell;
+            width: 16.6666666667%;
+            text-align: center; } }
+      div.header-wrapper header nav .active, div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion div.header-wrapper header nav h3.ui-accordion-header.ui-state-active, div.header-wrapper header nav section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel div.header-wrapper header nav input.ui-accordion-header.ui-state-active[type="button"], div.header-wrapper header nav div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion div.header-wrapper header nav input.ui-accordion-header.ui-state-active[type="button"], div.header-wrapper header nav.sequence-nav ol li.seq_video_active, div.header-wrapper header nav.sequence-nav ol li.seq_other_active, div.header-wrapper header nav.sequence-nav ol li.seq_vertical_active, div.header-wrapper header nav.sequence-nav ol li.seq_problem_active {
+        background: #F4F4F4;
+        color: #333;
+        text-shadow: 0 1px 0 #fff;
+        border: 1px solid #26080a;
+        border-bottom: 0;
+        -webkit-box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
+        -moz-box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
+        -ms-box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
+        -o-box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
+        box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
+        -webkit-border-radius: 3px 3px 0 0;
+        -moz-border-radius: 3px 3px 0 0;
+        -ms-border-radius: 3px 3px 0 0;
+        -o-border-radius: 3px 3px 0 0;
+        border-radius: 3px 3px 0 0; }
 
 footer {
   -webkit-box-sizing: border-box;
@@ -2638,7 +2689,7 @@ nav.sequence-nav {
       border-color: #ddd7be; }
       nav.sequence-nav ol .visited:hover, nav.sequence-nav ol li.seq_video_visited:hover, nav.sequence-nav ol li.seq_other_visited:hover, nav.sequence-nav ol li.seq_vertical_visited:hover, nav.sequence-nav ol li.seq_problem_visited:hover {
         background-color: #F6EFD4; }
-    nav.sequence-nav ol .active, nav.sequence-nav ol section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol li.seq_other_active, nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
+    nav.sequence-nav ol .active, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.courseware li.courseware nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.book li.book nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.info li.info nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.discussion li.discussion nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.wiki li.wiki nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav.profile li.profile nav.sequence-nav ol a, nav.sequence-nav ol section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol li.seq_other_active, nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
       -webkit-box-shadow: 0 1px 0 white;
       -moz-box-shadow: 0 1px 0 white;
       -ms-box-shadow: 0 1px 0 white;
@@ -2646,7 +2697,7 @@ nav.sequence-nav {
       box-shadow: 0 1px 0 white;
       background-color: #fff;
       background-repeat: no-repeat; }
-      nav.sequence-nav ol .active:hover, nav.sequence-nav ol section.course-index div#accordion h3.ui-accordion-header.ui-state-active:hover, section.course-index div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active:hover, nav.sequence-nav ol section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"]:hover, section.course-index div#accordion div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"]:hover, div#wiki_panel section.course-index div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li.seq_video_active:hover, nav.sequence-nav ol li.seq_other_active:hover, nav.sequence-nav ol li.seq_vertical_active:hover, nav.sequence-nav ol li.seq_problem_active:hover {
+      nav.sequence-nav ol .active:hover, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a:hover, div.header-wrapper header nav.courseware li.courseware nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.book li.book a:hover, div.header-wrapper header nav.book li.book nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.info li.info a:hover, div.header-wrapper header nav.info li.info nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a:hover, div.header-wrapper header nav.discussion li.discussion nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a:hover, div.header-wrapper header nav.wiki li.wiki nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a:hover, div.header-wrapper header nav.profile li.profile nav.sequence-nav ol a:hover, nav.sequence-nav ol section.course-index div#accordion h3.ui-accordion-header.ui-state-active:hover, section.course-index div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active:hover, nav.sequence-nav ol section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"]:hover, section.course-index div#accordion div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"]:hover, div#wiki_panel section.course-index div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li.seq_video_active:hover, nav.sequence-nav ol li.seq_other_active:hover, nav.sequence-nav ol li.seq_vertical_active:hover, nav.sequence-nav ol li.seq_problem_active:hover {
         background-color: #fff; }
     nav.sequence-nav ol li {
       -webkit-box-shadow: 1px 0 0 white;
@@ -2908,27 +2959,45 @@ div.profile-wrapper {
     div.profile-wrapper section.user-info div#change_password_pop {
       padding: 7px 22.652px;
       color: #4D4D4D; }
-  div.profile-wrapper section.course-info ol {
-    list-style: none; }
-    div.profile-wrapper section.course-info ol > li {
+  div.profile-wrapper section.course-info > ol {
+    list-style: none;
+    border-top: 1px solid #e3e3e3;
+    margin-top: 22.652px; }
+    div.profile-wrapper section.course-info > ol > li {
       border-bottom: 1px solid #e3e3e3;
-      padding: 22.652px 0; }
-      div.profile-wrapper section.course-info ol > li h2 {
-        float: left;
+      padding: 22.652px 0;
+      width: 100%;
+      display: table; }
+      div.profile-wrapper section.course-info > ol > li h2 {
+        display: table-cell;
         padding: 0;
         margin: 0;
         width: 20.109%;
-        margin-right: 2.717%; }
-      div.profile-wrapper section.course-info ol > li div.scores {
-        float: left;
+        padding-right: 2.717%;
+        border-right: 1px dotted #ccc;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -o-box-sizing: border-box;
+        box-sizing: border-box; }
+      div.profile-wrapper section.course-info > ol > li ol.sections {
+        padding-left: 2.717%;
+        display: table-cell;
+        list-style: none;
         width: 77.174%; }
-        div.profile-wrapper section.course-info ol > li div.scores h3, div.profile-wrapper section.course-info ol > li div.scores div#wiki_panel input[type="button"], div#wiki_panel div.profile-wrapper section.course-info ol > li div.scores input[type="button"] {
-          color: #666; }
-        div.profile-wrapper section.course-info ol > li div.scores ul {
-          list-style: none; }
-          div.profile-wrapper section.course-info ol > li div.scores ul li {
-            display: inline-block;
-            padding-right: 1em; }
+        div.profile-wrapper section.course-info > ol > li ol.sections > li {
+          padding: 0 0 22.652px 0; }
+          div.profile-wrapper section.course-info > ol > li ol.sections > li:first-child {
+            padding-top: 0; }
+          div.profile-wrapper section.course-info > ol > li ol.sections > li:last-child {
+            border-bottom: 0; }
+          div.profile-wrapper section.course-info > ol > li ol.sections > li h3, div.profile-wrapper section.course-info > ol > li ol.sections > li div#wiki_panel input[type="button"], div#wiki_panel div.profile-wrapper section.course-info > ol > li ol.sections > li input[type="button"] {
+            color: #666; }
+          div.profile-wrapper section.course-info > ol > li ol.sections > li ol {
+            list-style: none; }
+            div.profile-wrapper section.course-info > ol > li ol.sections > li ol li {
+              display: inline-block;
+              padding-right: 1em; }
 
 section.wiki-body div#wiki_article html, section.wiki-body div#wiki_article address,
 section.wiki-body div#wiki_article blockquote,
@@ -3279,7 +3348,7 @@ section.help.main-content {
   color: #763333;
   text-decoration: underline; }
 
-.badge-context-toggle.active, section.course-index div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, section.course-index div#accordion div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.badge-context-toggle.seq_video_active, nav.sequence-nav ol li.badge-context-toggle.seq_other_active, nav.sequence-nav ol li.badge-context-toggle.seq_vertical_active, nav.sequence-nav ol li.badge-context-toggle.seq_problem_active {
+.badge-context-toggle.active, div.header-wrapper header nav.courseware li.courseware a.badge-context-toggle, div.header-wrapper header nav.book li.book a.badge-context-toggle, div.header-wrapper header nav.info li.info a.badge-context-toggle, div.header-wrapper header nav.discussion li.discussion a.badge-context-toggle, div.header-wrapper header nav.wiki li.wiki a.badge-context-toggle, div.header-wrapper header nav.profile li.profile a.badge-context-toggle, section.course-index div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, section.course-index div#accordion div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.badge-context-toggle.seq_video_active, nav.sequence-nav ol li.badge-context-toggle.seq_other_active, nav.sequence-nav ol li.badge-context-toggle.seq_vertical_active, nav.sequence-nav ol li.badge-context-toggle.seq_problem_active {
   cursor: pointer;
   text-decoration: underline; }
 
@@ -3296,14 +3365,14 @@ body.user-messages {
   text-align: center;
   background-color: #f5dd69;
   border-top: #fff 1px solid;
-  font-family: 'Yanone Kaffeesatz',sans-serif; }
+  font-family: 'yanone kaffeesatz',sans-serif; }
   .notify p.notification {
     margin-top: 6px;
     margin-bottom: 6px;
     font-size: 16px;
     color: #424242; }
 
-#closeNotify {
+#closenotify {
   position: absolute;
   right: 5px;
   top: 7px;
@@ -3314,13 +3383,13 @@ body.user-messages {
   cursor: pointer;
   width: 20px;
   height: 20px; }
-  #closeNotify:hover {
+  #closenotify:hover {
     background: -26px -5px url(../images/sprites.png) no-repeat; }
 
 #header {
   margin-top: 0px;
   background: #16160f;
-  font-family: 'Yanone Kaffeesatz',sans-serif; }
+  font-family: 'yanone kaffeesatz',sans-serif; }
 
 /*.content-wrapper {
   width: 960px;
@@ -3332,32 +3401,32 @@ body.user-messages {
   width: auto;
   float: left; }
 
-#userToolsNav {
+#usertoolsnav {
   height: 20px;
   padding-bottom: 5px; }
-  #userToolsNav a {
+  #usertoolsnav a {
     height: 35px;
     text-align: right;
     margin-left: 20px;
     text-decoration: underline;
     color: #d0e296;
     font-size: 16px; }
-    #userToolsNav a:first-child {
+    #usertoolsnav a:first-child {
       margin-left: 0; }
-    #userToolsNav a#ab-responses {
+    #usertoolsnav a#ab-responses {
       margin-left: 3px; }
-  #userToolsNav .user-info, #userToolsNav .user-micro-info {
+  #usertoolsnav .user-info, #usertoolsnav .user-micro-info {
     color: #b5b593; }
-  #userToolsNav a img {
+  #usertoolsnav a img {
     vertical-align: middle;
     margin-bottom: 2px; }
-  #userToolsNav .user-info a {
+  #usertoolsnav .user-info a {
     margin: 0;
     text-decoration: none; }
 
-#metaNav {
+#metanav {
   float: right; }
-  #metaNav a {
+  #metanav a {
     color: #e2e2ae;
     padding: 0px 0px 0px 35px;
     height: 25px;
@@ -3368,27 +3437,27 @@ body.user-messages {
     text-decoration: none;
     display: block;
     float: left; }
-    #metaNav a:hover {
+    #metanav a:hover {
       text-decoration: underline; }
-    #metaNav a.on {
+    #metanav a.on {
       font-weight: bold;
-      color: #FFF;
+      color: #fff;
       text-decoration: none; }
-    #metaNav a.special {
+    #metanav a.special {
       font-size: 18px;
-      color: #B02B2C;
+      color: #b02b2c;
       font-weight: bold;
       text-decoration: none; }
-      #metaNav a.special:hover {
+      #metanav a.special:hover {
         text-decoration: underline; }
-  #metaNav #navTags {
+  #metanav #navtags {
     background: -50px -5px url(../images/sprites.png) no-repeat; }
-  #metaNav #navUsers {
+  #metanav #navusers {
     background: -125px -5px url(../images/sprites.png) no-repeat; }
-  #metaNav #navBadges {
+  #metanav #navbadges {
     background: -210px -5px url(../images/sprites.png) no-repeat; }
 
-#searchBar {
+#searchbar {
   display: inline-block;
   background-color: #fff;
   width: 412px;
@@ -3396,28 +3465,28 @@ body.user-messages {
   float: right;
   height: 42px;
   margin: 6px 0px 0px 15px; }
-  #searchBar .searchInput, #searchBar .searchInputCancelable {
+  #searchbar .searchinput, #searchbar .searchinputcancelable {
     font-size: 30px;
     height: 40px;
     font-weight: 300;
-    background: #FFF;
+    background: #fff;
     border: 0px;
     color: #484848;
     padding-left: 10px;
-    font-family: Arial;
+    font-family: arial;
     vertical-align: middle; }
-  #searchBar .searchInput {
+  #searchbar .searchinput {
     width: 352px; }
-  #searchBar .searchInputCancelable {
+  #searchbar .searchinputcancelable {
     width: 317px; }
-  #searchBar .logoutsearch {
+  #searchbar .logoutsearch {
     width: 337px; }
-  #searchBar .searchBtn {
+  #searchbar .searchbtn {
     font-size: 10px;
     color: #666;
     background-color: #eee;
     height: 42px;
-    border: #FFF 1px solid;
+    border: #fff 1px solid;
     line-height: 22px;
     text-align: center;
     float: right;
@@ -3425,9 +3494,9 @@ body.user-messages {
     width: 48px;
     background: -98px -36px url(../images/sprites.png) no-repeat;
     cursor: pointer; }
-    #searchBar .searchBtn:hover {
+    #searchbar .searchbtn:hover {
       background: -146px -36px url(../images/sprites.png) no-repeat; }
-  #searchBar .cancelSearchBtn {
+  #searchbar .cancelsearchbtn {
     font-size: 30px;
     color: #ce8888;
     background: #fff;
@@ -3437,17 +3506,17 @@ body.user-messages {
     text-align: center;
     width: 35px;
     cursor: pointer; }
-    #searchBar .cancelSearchBtn:hover {
+    #searchbar .cancelsearchbtn:hover {
       color: #d84040; }
 
-body.anon #searchBar {
+body.anon #searchbar {
   width: 500px; }
-  body.anon #searchBar .searchInput {
+  body.anon #searchbar .searchinput {
     width: 440px; }
-  body.anon #searchBar .searchInputCancelable {
+  body.anon #searchbar .searchinputcancelable {
     width: 405px; }
 
-#askButton {
+#askbutton {
   background: url(../images/bigbutton.png) repeat-x bottom;
   line-height: 44px;
   text-align: center;
@@ -3466,24 +3535,24 @@ body.anon #searchBar {
   -webkit-box-shadow: 1px 1px 2px #636363;
   -moz-box-shadow: 1px 1px 2px #636363;
   box-shadow: 1px 1px 2px #636363; }
-  #askButton:hover {
+  #askbutton:hover {
     text-decoration: none;
     background: url(../images/bigbutton.png) repeat-x top;
     text-shadow: 0px 1px 0px #c6d9dd;
     -moz-text-shadow: 0px 1px 0px #c6d9dd;
     -webkit-text-shadow: 0px 1px 0px #c6d9dd; }
 
-/*#ContentLeft {
+/*#contentleft {
   width: 730px;
   float: left;
   position: relative;
   padding-bottom: 10px; }
 
-#ContentRight {
+#contentright {
   width: 200px;
   float: right;
   padding: 0 0px 10px 0px; }*/
-#ContentFull {
+#contentfull {
   float: left;
   width: 960px; }
 
@@ -3492,12 +3561,12 @@ body.anon #searchBar {
   /*padding: 4px 0px 10px 0px;*/
   /*width: 200px;*/
   /*.inputs {
-    #interestingTagInput, #ignoredTagInput {
+    #interestingtaginput, #ignoredtaginput {
       width: 153px;
       padding-left: 5px;
       border: #c9c9b5 1px solid;
       height: 25px; }
-    #interestingTagAdd, #ignoredTagAdd {
+    #interestingtagadd, #ignoredtagadd {
       background: url(../images/small-button-blue.png) repeat-x top;
       border: 0;
       color: #4a757f;
@@ -3518,132 +3587,13 @@ body.anon #searchBar {
       -webkit-box-shadow: 1px 1px 2px #808080;
       -moz-box-shadow: 1px 1px 2px #808080;
       box-shadow: 1px 1px 2px #808080; }
-    #interestingTagAdd:hover, #ignoredTagAdd:hover {
+    #interestingtagadd:hover, #ignoredtagadd:hover {
       background: url(../images/small-button-blue.png) repeat-x bottom; } }*/ }
   .box p {
     margin-bottom: 4px; }
     .box p.info-box-follow-up-links {
       text-align: right;
       margin: 0; }
-  .box h2 {
-    padding-left: 0;
-    /*background: #eceeeb;*/
-    height: 30px;
-    line-height: 30px;
-    /*text-align: right;*/
-    /*font-size: 18px !important;*/
-    font-weight: normal;
-    color: #656565;
-    /*padding-right: 10px;*/
-    /*margin-bottom: 10px;*/
-    /*font-family: 'Yanone Kaffeesatz',sans-serif;*/ }
-  .box h3, .box div#wiki_panel input[type="button"], div#wiki_panel .box input[type="button"] {
-    /*color: #4a757f;*/
-    /*font-size: 18px;*/
-    text-align: left;
-    font-weight: normal;
-    /*font-family: 'Yanone Kaffeesatz',sans-serif;*/
-    padding-left: 0px; }
-  .box .contributorback {
-    background: #eceeeb url(../images/contributorsback.png) no-repeat center left; }
-  .box ul {
-    margin-left: 22px; }
-  .box li {
-    list-style-type: disc;
-    font-size: 13px;
-    line-height: 20px;
-    margin-bottom: 10px;
-    color: #707070; }
-  .box ul.tags {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    line-height: 170%;
-    display: block; }
-  .box #displayTagFilterControl p label {
-    color: #707070;
-    font-size: 15px; }
-  .box img.gravatar {
-    margin: 1px; }
-  .box a.followed, .box a.follow {
-    background: url(../images/medium-button.png) top repeat-x;
-    height: 34px;
-    line-height: 34px;
-    text-align: center;
-    border: 0;
-    font-family: 'Yanone Kaffeesatz',sans-serif;
-    color: #4a757f;
-    font-weight: normal;
-    font-size: 21px;
-    margin-top: 3px;
-    display: block;
-    width: 120px;
-    text-decoration: none;
-    border-radius: 4px;
-    -ms-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -khtml-border-radius: 4px;
-    -webkit-box-shadow: 1px 1px 2px #636363;
-    -moz-box-shadow: 1px 1px 2px #636363;
-    box-shadow: 1px 1px 2px #636363;
-    margin: 0 auto;
-    padding: 0; }
-  .box a.followed:hover, .box a.follow:hover {
-    text-decoration: none;
-    background: url(../images/medium-button.png) bottom repeat-x;
-    text-shadow: 0px 1px 0px #c6d9dd;
-    -moz-text-shadow: 0px 1px 0px #c6d9dd;
-    -webkit-text-shadow: 0px 1px 0px #c6d9dd; }
-  .box a.followed div.unfollow {
-    display: none; }
-  .box a.followed:hover div {
-    display: none; }
-    .box a.followed:hover div.unfollow {
-      display: inline;
-      color: #a05736; }
-  .box .favorite-number {
-    padding: 5px 0 0 5px;
-    font-size: 100%;
-    font-family: Arial;
-    font-weight: bold;
-    color: #777;
-    text-align: center; }
-  .box .notify-sidebar #question-subscribe-sidebar {
-    margin: 7px 0 0 3px; }
-
-.statsWidget p {
-  color: #707070;
-  font-size: 16px;
-  border-bottom: #cccccc 1px solid;
-  font-size: 13px; }
-  .statsWidget p strong {
-    float: right;
-    padding-right: 10px; }
-
-.questions-related {
-  word-wrap: break-word; }
-  .questions-related p {
-    line-height: 20px;
-    padding: 4px 0px 4px 0px;
-    font-size: 16px;
-    font-weight: normal;
-    border-bottom: #cccccc 1px solid; }
-  .questions-related a {
-    font-size: 13px; }
-
-#tips li {
-  color: #707070;
-  font-size: 13px;
-  list-style-image: url(../images/tips.png); }
-#tips a {
-  font-size: 16px; }
-
-#markdownHelp li {
-  color: #707070;
-  font-size: 13px; }
-#markdownHelp a {
-  font-size: 16px; }
 
 .pager {
   margin-top: 10px;
@@ -3693,106 +3643,14 @@ body.anon #searchBar {
   .paginator .next a, .paginator .prev a {
     color: #7ea9b3; }
   .paginator .page a:hover, .paginator .curr a:hover, .paginator .prev a:hover, .paginator .next a:hover {
-    color: #8C8C8C;
-    background-color: #E1E1E1;
+    color: #8c8c8c;
+    background-color: #e1e1e1;
     text-decoration: none; }
   .paginator .text {
     color: #777;
     padding: .3em; }
   .paginator .paginator-container-left {
     padding: 5px 0 10px 0; }
-
-.tag-size-1 {
-  font-size: 12px; }
-
-.tag-size-2 {
-  font-size: 13px; }
-
-.tag-size-3 {
-  font-size: 14px; }
-
-.tag-size-4 {
-  font-size: 15px; }
-
-.tag-size-5 {
-  font-size: 16px; }
-
-.tag-size-6 {
-  font-size: 17px; }
-
-.tag-size-7 {
-  font-size: 18px; }
-
-.tag-size-8 {
-  font-size: 19px; }
-
-.tag-size-9 {
-  font-size: 20px; }
-
-.tag-size-10 {
-  font-size: 21px; }
-
-.wildcard-tags {
-  clear: both; }
-
-ul.tags.marked-tags li, .wildcard-tags ul.tags li {
-  margin-bottom: 5px; }
-
-#tagSelector div.inputs {
-  clear: both;
-  float: none;
-  margin-bottom: 10px; }
-
-.tags-page ul.tags li {
-  width: 160px;
-  margin: 5px; }
-
-ul#ab-user-tags li {
-  width: 160px;
-  margin: 5px; }
-ul#related-tags li {
-  margin: 0 5px 8px 0;
-  float: left;
-  clear: left; }
-
-.deletable-tag {
-  margin-right: 3px;
-  white-space: nowrap;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  -moz-border-radius-topright: 4px;
-  -moz-border-radius-bottomright: 4px;
-  -webkit-border-bottom-right-radius: 4px;
-  -webkit-border-top-right-radius: 4px; }
-
-.tags a.tag-right, .tags span.tag-right {
-  color: #585858;
-  text-decoration: none; }
-.tags a:hover {
-  color: #1A1A1A; }
-
-.users-page h1, .tags-page h1 {
-  float: left; }
-
-.main-page h1 {
-  margin-right: 5px; }
-
-.tag-number {
-  font-weight: normal;
-  float: left;
-  font-size: 16px;
-  color: #5d5d5d; }
-
-.badges .tag-number {
-  float: none;
-  display: inline;
-  padding-right: 15px; }
-
-.section-title {
-  color: #7ea9b3;
-  font-family: 'Yanone Kaffeesatz',sans-serif;
-  font-weight: bold;
-  font-size: 24px; }
 
 .ask-page div#question-list, .edit-question-page div#question-list {
   float: none;
@@ -3850,39 +3708,6 @@ ul#related-tags li {
   .question-options label {
     vertical-align: text-bottom; }
 
-.edit-content-html {
-  border-top: 1px dotted #D8D2A9;
-  border-bottom: 1px dotted #D8D2A9;
-  margin: 5px 0 5px 0; }
-
-.edit-question-page, #fmedit, .wmd-preview {
-  color: #525252; }
-
-.edit-question-page #id_revision, #fmedit #id_revision, .wmd-preview #id_revision {
-  font-size: 14px;
-  margin-top: 5px;
-  margin-bottom: 5px; }
-
-.edit-question-page #id_title, #fmedit #id_title, .wmd-preview #id_title {
-  font-size: 24px;
-  line-height: 24px;
-  height: 36px;
-  margin: 0px;
-  padding: 0px 0 0 5px;
-  border: #cce6ec 3px solid;
-  width: 725px;
-  margin-bottom: 10px; }
-
-.edit-question-page #id_summary, #fmedit #id_summary, .wmd-preview #id_summary {
-  border: #cce6ec 3px solid;
-  height: 25px;
-  padding-left: 5px;
-  width: 395px;
-  font-size: 14px; }
-
-.edit-question-page .title-desc, #fmedit .title-desc, .wmd-preview .title-desc {
-  margin-bottom: 10px; }
-
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   textarea {
     padding-left: 3px !important; } }
@@ -3920,7 +3745,7 @@ ul#related-tags li {
   font-size: 13px;
   color: #707070;
   line-height: 1.3;
-  font-family: Arial;
+  font-family: arial;
   color: #525252;
   margin-bottom: 12px; }
 
@@ -3975,7 +3800,7 @@ ul#related-tags li {
   color: #4a757f;
   font-weight: bold;
   font-size: 13px;
-  font-family: Arial;
+  font-family: arial;
   height: 24px;
   margin-top: -2px;
   padding-left: 10px;
@@ -4006,7 +3831,7 @@ ul#related-tags li {
   background: url(../images/openid.gif) no-repeat 0% 50%;
   padding: 5px 5px 5px 15px;
   cursor: pointer;
-  font-family: Trebuchet MS;
+  font-family: trebuchet ms;
   font-weight: 300;
   font-size: 150%;
   width: 500px; }
@@ -4020,7 +3845,7 @@ ul#related-tags li {
   font-weight: bold;
   font-size: 120%; }
 
-.tabBar-user {
+.tabbar-user {
   width: 375px; }
 
 .user {
@@ -4045,10 +3870,6 @@ ul#related-tags li {
     margin-right: 4px;
     display: inline; }
 
-.tabBar-tags {
-  width: 270px;
-  margin-bottom: 15px; }
-
 a.medal {
   font-size: 17px;
   line-height: 250%;
@@ -4056,25 +3877,25 @@ a.medal {
   color: #333;
   text-decoration: none;
   background: url(../images/medala.gif) no-repeat;
-  border-left: 1px solid #EEE;
-  border-top: 1px solid #EEE;
-  border-bottom: 1px solid #CCC;
-  border-right: 1px solid #CCC;
+  border-left: 1px solid #eee;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
   padding: 4px 12px 4px 6px; }
 a:hover.medal {
   color: #333;
   text-decoration: none;
   background: url(../images/medala_on.gif) no-repeat;
-  border-left: 1px solid #E7E296;
-  border-top: 1px solid #E7E296;
-  border-bottom: 1px solid #D1CA3D;
-  border-right: 1px solid #D1CA3D; }
+  border-left: 1px solid #e7e296;
+  border-top: 1px solid #e7e296;
+  border-bottom: 1px solid #d1ca3d;
+  border-right: 1px solid #d1ca3d; }
 
 #award-list .user {
   float: left;
   margin: 5px; }
 
-.tabBar-profile {
+.tabbar-profile {
   width: 100%;
   margin-bottom: 15px;
   float: left; }
@@ -4091,7 +3912,7 @@ a:hover.medal {
     padding: 5px; }
   .user-profile-page h2 {
     padding: 10px 0px 10px 0px;
-    font-family: 'Yanone Kaffeesatz',sans-serif; }
+    font-family: 'yanone kaffeesatz',sans-serif; }
 
 .user-details {
   font-size: 13px; }
@@ -4099,7 +3920,7 @@ a:hover.medal {
     font-size: 16px; }
 
 .user-about {
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   height: 200px;
   line-height: 20px;
   overflow: auto;
@@ -4109,13 +3930,13 @@ a:hover.medal {
     font-size: 13px; }
 
 .count {
-  font-family: 'Yanone Kaffeesatz',sans-serif;
+  font-family: 'yanone kaffeesatz',sans-serif;
   font-size: 200%;
   font-weight: 700;
   color: #777777; }
 
-.scoreNumber {
-  font-family: 'Yanone Kaffeesatz',sans-serif;
+.scorenumber {
+  font-family: 'yanone kaffeesatz',sans-serif;
   font-size: 35px;
   font-weight: 800;
   color: #777;
@@ -4123,7 +3944,7 @@ a:hover.medal {
   margin-top: 3px; }
 
 .vote-count {
-  font-family: Arial;
+  font-family: arial;
   font-size: 160%;
   font-weight: 700;
   color: #777; }
@@ -4134,10 +3955,10 @@ a:hover.medal {
   padding: 3px; }
 
 .answer-votes {
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   color: #555555;
   float: left;
-  font-family: Arial;
+  font-family: arial;
   font-size: 15px;
   font-weight: bold;
   height: 17px;
@@ -4219,11 +4040,11 @@ a:hover.medal {
     line-height: 1.3;
     color: #525252; }
   .revision h3, .revision div#wiki_panel input[type="button"], div#wiki_panel .revision input[type="button"] {
-    font-family: 'Yanone Kaffeesatz',sans-serif;
+    font-family: 'yanone kaffeesatz',sans-serif;
     font-size: 21px;
     padding-left: 0px; }
   .revision .header {
-    background-color: #F5F5F5;
+    background-color: #f5f5f5;
     padding: 5px;
     cursor: pointer; }
   .revision .author {
@@ -4259,22 +4080,17 @@ a:hover.medal {
     font-weight: bold;
     font-family: sans-serif; }
 
-del {
-  color: #C34719; }
-  del .post-tag {
-    color: #C34719; }
-
 ins {
-  background-color: #E6F0A2; }
+  background-color: #e6f0a2; }
   ins .post-tag, ins p {
-    background-color: #E6F0A2; }
+    background-color: #e6f0a2; }
 
 .vote-notification {
   z-index: 1;
   cursor: pointer;
   display: none;
   position: absolute;
-  font-family: Arial;
+  font-family: arial;
   font-size: 14px;
   font-weight: normal;
   color: white;
@@ -4309,7 +4125,7 @@ ins {
     font-weight: bold; }
 
 .footer-links {
-  color: #EEE;
+  color: #eee;
   text-align: left;
   width: 500px;
   float: left; }
@@ -4344,7 +4160,7 @@ p.form-item {
   margin: 0px; }
 
 .deleted {
-  background: #F4E7E7 none repeat scroll 0 0; }
+  background: #f4e7e7 none repeat scroll 0 0; }
 
 .form-row {
   line-height: 25px; }
@@ -4409,16 +4225,13 @@ label.retag-error {
   font-weight: bold;
   text-decoration: none; }
 
-.narrow .tags {
-  float: left; }
-
 .user-action-1 {
   font-weight: bold;
   color: #333; }
 
 .user-action-2 {
   font-weight: bold;
-  color: #CCC; }
+  color: #ccc; }
 
 .user-action-3, .user-action-4 {
   color: #333; }
@@ -4432,16 +4245,16 @@ label.retag-error {
 .user-action-8 {
   padding: 3px;
   font-weight: bold;
-  background-color: #CCC;
+  background-color: #ccc;
   color: #763333; }
 
 .revision-summary {
-  background-color: #FFFE9B;
+  background-color: #fffe9b;
   padding: 2px; }
 
 .question-title-link a {
   font-weight: bold;
-  color: #0077CC; }
+  color: #0077cc; }
 
 .answer-title-link a {
   color: #333; }
@@ -4462,20 +4275,20 @@ label.retag-error {
   background-color: #0ff; }
 
 .gold, .badge1 {
-  color: #FFCC00; }
+  color: #ffcc00; }
 
 .silver, .badge2 {
-  color: #CCCCCC; }
+  color: #cccccc; }
 
 .bronze, .badge3 {
-  color: #CC9933; }
+  color: #cc9933; }
 
 .score {
   font-weight: 800;
   color: #333; }
 
 a.comment {
-  background: #EEE;
+  background: #eee;
   color: #993300;
   padding: 5px; }
 a.offensive {
@@ -4514,9 +4327,9 @@ button::-moz-focus-inner {
   text-align: center;
   font-family: sans-serif;
   font-size: 120%;
-  font-weight: Bold;
-  color: #FFFFFF;
-  background-color: #AE0000; }
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #ae0000; }
 
 .big {
   font-size: 14px; }
@@ -4536,7 +4349,7 @@ button::-moz-focus-inner {
   border-top: 1px dashed #aaaaaa; }
 
 .highlight {
-  background-color: #FFF8C6; }
+  background-color: #fff8c6; }
 
 .nomargin {
   margin: 0; }
@@ -4632,32 +4445,13 @@ ul.form-horizontal-rows {
   font-weight: bold;
   vertical-align: top; }
 
-ul.post-tags {
-  margin-left: 3px; }
-  ul.post-tags li {
-    margin-top: 4px;
-    margin-bottom: 3px; }
-ul.post-retag {
-  margin-bottom: 0px;
-  margin-left: 5px; }
-
-#question-controls .tags {
-  margin: 0 0 3px 0; }
-
-#tagSelector {
-  padding-bottom: 2px;
-  margin-bottom: 0; }
-
-#related-tags {
-  padding-left: 3px; }
-
-#hideIgnoredTagsControl {
+#hideignoredtagscontrol {
   margin: 5px 0 0 0; }
-  #hideIgnoredTagsControl label {
+  #hideignoredtagscontrol label {
     font-size: 12px;
     color: #666; }
 
-#hideIgnoredTagsCb {
+#hideignoredtagscb {
   margin: 0 2px 0 1px; }
 
 #recaptcha_widget_div {
@@ -4725,7 +4519,7 @@ p.signup_p {
 
 .user-profile-page .avatar p {
   margin-bottom: 0px; }
-.user-profile-page .tabBar a#stats {
+.user-profile-page .tabbar a#stats {
   margin-left: 0; }
 .user-profile-page img.gravatar {
   margin: 2px 0 3px 0; }
@@ -4733,7 +4527,7 @@ p.signup_p {
   padding: 0;
   margin-top: -3px; }
 
-.userList {
+.userlist {
   font-size: 13px; }
 
 img.flag {
@@ -4767,9 +4561,6 @@ a.edit {
 
 .pln {
   color: #000; }
-
-.tag {
-  color: #008; }
 
 .atn {
   color: #606; }
@@ -4874,15 +4665,76 @@ div.discussion-wrapper aside {
   padding: 22.652px;
   width: 23.482%; }
   div.discussion-wrapper aside h2 {
-    font-size: 16px; }
+    color: #4D4D4D; }
+    div.discussion-wrapper aside h2.first {
+      margin-top: 0px; }
   div.discussion-wrapper aside h3, div.discussion-wrapper aside div#wiki_panel input[type="button"], div#wiki_panel div.discussion-wrapper aside input[type="button"] {
     border-bottom: 0;
     box-shadow: none; }
   div.discussion-wrapper aside input[type="text"] {
     width: 76%; }
+  div.discussion-wrapper aside div.box {
+    -webkit-box-shadow: 0 1px 0 #eeeeee;
+    -moz-box-shadow: 0 1px 0 #eeeeee;
+    -ms-box-shadow: 0 1px 0 #eeeeee;
+    -o-box-shadow: 0 1px 0 #eeeeee;
+    box-shadow: 0 1px 0 #eeeeee;
+    border-bottom: 1px solid #d3d3d3;
+    display: block;
+    padding-bottom: 20px;
+    overflow: hidden; }
+    div.discussion-wrapper aside div.box:last-child {
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      -ms-box-shadow: none;
+      -o-box-shadow: none;
+      box-shadow: none;
+      border: 0; }
+    div.discussion-wrapper aside div.box.contributors a {
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      border: 1px solid #aaa;
+      cursor: pointer;
+      display: inline-block;
+      margin-right: 6px;
+      position: relative; }
+      div.discussion-wrapper aside div.box.contributors a:before {
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+        border-radius: 3px;
+        -webkit-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
+        -moz-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
+        -ms-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
+        -o-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
+        box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
+        top: 1px;
+        left: 1px;
+        bottom: 1px;
+        right: 1px;
+        content: '';
+        position: absolute; }
+    div.discussion-wrapper aside div.box.contributors img.gravatar {
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px; }
+    div.discussion-wrapper aside div.box.tag-selector ul {
+      margin-bottom: 10px;
+      display: block; }
   div.discussion-wrapper aside #displayTagFilterControl {
     margin-top: 10px; }
   div.discussion-wrapper aside div.search-box input {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
     display: inline; }
   div.discussion-wrapper aside div.search-box input[type='submit'] {
     -webkit-box-shadow: none;
@@ -4902,7 +4754,63 @@ div.discussion-wrapper aside {
     div.discussion-wrapper aside div.search-box input[type='submit']:focus {
       opacity: 1; }
   div.discussion-wrapper aside div.search-box input#keywords {
-    padding-left: 30px; }
+    padding-left: 30px;
+    padding-right: 30px;
+    width: 100%; }
+  div.discussion-wrapper aside div.search-box input#clear {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -ms-box-shadow: none;
+    -o-box-shadow: none;
+    box-shadow: none;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+    border: none;
+    background: #993333;
+    color: #fff;
+    display: inline;
+    font-size: 10px;
+    margin-left: -25px;
+    padding: 2px 5px; }
+  div.discussion-wrapper aside div.follow-buttons {
+    margin-top: 20px;
+    display: block; }
+    div.discussion-wrapper aside div.follow-buttons a.button, div.discussion-wrapper aside div.follow-buttons div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+      -o-box-sizing: border-box;
+      box-sizing: border-box;
+      display: block;
+      text-align: center;
+      width: 100%; }
+  div.discussion-wrapper aside div.question-stats ul {
+    color: #777; }
+    div.discussion-wrapper aside div.question-stats ul li {
+      -webkit-box-shadow: 0 1px 0 #eeeeee;
+      -moz-box-shadow: 0 1px 0 #eeeeee;
+      -ms-box-shadow: 0 1px 0 #eeeeee;
+      -o-box-shadow: 0 1px 0 #eeeeee;
+      box-shadow: 0 1px 0 #eeeeee;
+      border-bottom: 1px solid #d3d3d3;
+      padding: 7px 0; }
+      div.discussion-wrapper aside div.question-stats ul li:last-child {
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        -ms-box-shadow: none;
+        -o-box-shadow: none;
+        box-shadow: none;
+        border: 0; }
+      div.discussion-wrapper aside div.question-stats ul li strong {
+        float: right;
+        padding-right: 10px; }
+  div.discussion-wrapper aside div.markdown ul li {
+    margin: 20px 0; }
+    div.discussion-wrapper aside div.markdown ul li ol li {
+      margin: 0; }
 
 div.question-list-header {
   display: block;
@@ -4946,27 +4854,6 @@ div.question-list-header {
       margin-right: 10px; }
       div.question-list-header section.question-tags-list div.back a {
         color: #555; }
-    div.question-list-header section.question-tags-list div.tags-list ul.tags {
-      display: inline; }
-      div.question-list-header section.question-tags-list div.tags-list ul.tags li span.delete-icon, div.question-list-header section.question-tags-list div.tags-list ul.tags li div.delete-icon {
-        -webkit-border-radius: 0 4px 4px 0;
-        -moz-border-radius: 0 4px 4px 0;
-        -ms-border-radius: 0 4px 4px 0;
-        -o-border-radius: 0 4px 4px 0;
-        border-radius: 0 4px 4px 0;
-        background: #555;
-        color: #eee;
-        cursor: pointer;
-        float: none;
-        display: inline;
-        clear: none;
-        left: 10px;
-        padding: 3px 6px;
-        position: relative;
-        top: 1px;
-        opacity: 0.5; }
-        div.question-list-header section.question-tags-list div.tags-list ul.tags li span.delete-icon:hover, div.question-list-header section.question-tags-list div.tags-list ul.tags li div.delete-icon:hover {
-          opacity: 1; }
 
 ul.question-list, div#question-list {
   width: 100%; }
@@ -5041,7 +4928,8 @@ ul.question-list, div#question-list {
               font-size: 12px; }
 
 ul.tags {
-  list-style: none; }
+  list-style: none;
+  display: inline; }
   ul.tags li, ul.tags a {
     position: relative; }
   ul.tags li {
@@ -5052,20 +4940,56 @@ ul.tags {
     border-radius: 4px;
     background: #eee;
     color: #555;
-    display: inline;
+    display: inline-block;
     font-size: 12px;
     margin-left: 15px;
-    padding: 3px 10px 5px 5px; }
+    padding: 3px 10px 5px 5px;
+    margin-bottom: 5px; }
     ul.tags li:before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -11px;
-      width: 0;
-      height: 0;
       border-color: transparent #eee transparent transparent;
       border-style: solid;
-      border-width: 12px 12px 12px 0; }
+      border-width: 12px 12px 12px 0;
+      content: "";
+      height: 0;
+      left: -11px;
+      position: absolute;
+      top: 0;
+      width: 0; }
+    ul.tags li span.delete-icon, ul.tags li div.delete-icon {
+      -webkit-border-radius: 0 4px 4px 0;
+      -moz-border-radius: 0 4px 4px 0;
+      -ms-border-radius: 0 4px 4px 0;
+      -o-border-radius: 0 4px 4px 0;
+      border-radius: 0 4px 4px 0;
+      background: #555;
+      clear: none;
+      color: #eee;
+      cursor: pointer;
+      display: inline;
+      float: none;
+      left: 10px;
+      opacity: 0.5;
+      padding: 3px 6px;
+      position: relative;
+      top: 1px; }
+      ul.tags li span.delete-icon:hover, ul.tags li div.delete-icon:hover {
+        opacity: 1; }
+    ul.tags li a {
+      color: #555;
+      text-decoration: none; }
+
+span.tag-number {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  background: #555;
+  font-size: 10px;
+  margin: 0 3px;
+  padding: 2px 5px;
+  color: #eee;
+  opacity: 0.5; }
 
 div.question-header div.vote-buttons, div.answer-block div.vote-buttons {
   display: inline-block;
@@ -5384,6 +5308,8 @@ form.question-form {
   border: none;
   padding: 0;
   margin-top: -15px; }
+  form.question-form h1 a {
+    float: right; }
   form.question-form input[type="text"] {
     width: 48.988%; }
   form.question-form input[type="checkbox"] {
