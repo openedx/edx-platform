@@ -12,15 +12,15 @@ html {
       @extend .clearfix;
       @extend .wrapper;
       @include box-sizing(border-box);
-      @include border-radius(4px);
       overflow: hidden;
       background: #fff;
       border-bottom: 1px solid #bbb;
-
-      @media screen and (min-width: 1400px) {
-        // @include border-radius(3px);
+      margin-top: 3px;
         @include box-shadow(0 0 4px #dfdfdf);
         border: 1px solid #bbb;
+
+      @media screen and (min-width: 1400px) {
+        @include border-radius(4px);
         margin-top: lh(.5);
       }
     }
