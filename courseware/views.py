@@ -33,6 +33,22 @@ etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
 
 template_imports={'urllib':urllib}
 
+def get_grade(request, problem, cache):
+    id = problem.get('id')
+    correct = 0
+    if id in cache:
+        response = cache[id]
+        if response.grade!=None:
+            correct=response.grade
+        if response.max_grade != None:
+            total = response.max_grade
+        else:
+            total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+            response.max_grade = total
+            response.save()
+
+    return (correct, total)
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile(request):
     ''' User profile. Show username, location, etc, as well as grades .
@@ -59,28 +75,30 @@ def profile(request):
                            course=course, chname=chname):
             problems=dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section[@name=$section]//problem', 
                            course=course, chname=chname, section=s.get('name'))
-                           
+
             graded = True if s.get('graded') == "true" else False
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    id = p.get('id')
-                    correct = 0
-                    if id in response_by_id:
-                        response = response_by_id[id]
-                        if response.grade!=None:
-                            correct=response.grade
-                    
-                    total=courseware.modules.capa_module.Module(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    (correct,total) = get_grade(request, p, response_by_id)
+                    # id = p.get('id')
+                    # correct = 0
+                    # if id in response_by_id:
+                    #     response = response_by_id[id]
+                    #     if response.grade!=None:
+                    #         correct=response.grade
+
+                    # total=courseware.modules.capa_module.Module(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    # print correct, total
                     scores.append((int(correct),total, graded ))
-                    
-                    
+
+
                 section_total = (sum([score[0] for score in scores]), 
                                 sum([score[1] for score in scores]))
-                
+
                 graded_total = (sum([score[0] for score in scores if score[2]]), 
                                 sum([score[1] for score in scores if score[2]]))
-                
+
                 #Add the graded total to total_scores
                 format = s.get('format') if s.get('format') else ""
                 subtitle = s.get('subtitle') if s.get('subtitle') else format
@@ -88,7 +106,7 @@ def profile(request):
                     format_scores = total_scores[ format ] if format in total_scores else []
                     format_scores.append( graded_total )
                     total_scores[ format ] = format_scores
-                
+
                 score={'section':s.get("name"),
                        'scores':scores,
                        'section_total' : section_total,
@@ -98,7 +116,7 @@ def profile(request):
                        'graded' : graded,
                        }
                 sections.append(score)
-        
+
         chapters.append({'course':course,
                          'chapter' : c.get("name"),
                          'sections' : sections,})
