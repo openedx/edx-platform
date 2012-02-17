@@ -11,6 +11,7 @@ from mako.lookup import TemplateLookup
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
     from student.models import UserProfile
+    from student.models import UserTestGroup
 except: 
     settings = None 
 
@@ -149,7 +150,11 @@ def course_file(user):
     filename = UserProfile.objects.get(user=user).courseware
     data_template = template_lookup.get_template(filename)
 
-    options = {'dev_content':settings.DEV_CONTENT}
+    # TODO: Rewrite in Django
+    groups = [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
+
+    options = {'dev_content':settings.DEV_CONTENT, 
+               'groups' : groups}
 
     tree = etree.XML(data_template.render(**options))
     id_tag(tree)
