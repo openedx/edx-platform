@@ -16,7 +16,7 @@ $(function () {
     }).appendTo("body").fadeIn(200);
   }
       
-  /* -------------------------------- Grade detail graph -------------------------------- */
+  /* -------------------------------- Grade detail bars -------------------------------- */
   var colors = [$.color.parse("#E8B800"), $.color.parse("#A0CEFA"), $.color.parse("#BD3738"), $.color.parse("#429A2E")];
   //var colors = [$.color.parse("#1B2045"), $.color.parse("#557a00"), $.color.parse("#F5600"), $.color.parse("#FEBA2C")];
   //var colors = [$.color.parse("#E7C856"), $.color.parse("#CD462E"), $.color.parse("#B01732"), $.color.parse("#41192A")];
@@ -42,7 +42,7 @@ $(function () {
         data: ${ json.dumps( [[i + tickIndex, score['percentage']] for i,score in enumerate(section['subscores'])] ) },
         color: colors[${sectionIndex}].toString(),
       });
-      ticks = ticks.concat( ${ json.dumps( [[i + tickIndex, str(i + 1)] for i,score in enumerate(section['subscores'])] ) } );
+      ticks = ticks.concat( ${ json.dumps( [[i + tickIndex, score['label'] ] for i,score in enumerate(section['subscores'])] ) } );
       bottomTicks.push( [ ${tickIndex + len(section['subscores'])/2}, "${section['category']}" ] );
       detail_tooltips["${section['category']}"] = ${ json.dumps([score['summary'] for score in section['subscores']]  ) };
           
@@ -57,8 +57,8 @@ $(function () {
         data: [[${tickIndex}, ${section['totalscore']['score']}]],
         color: colors[${sectionIndex}].toString(),
       });
-      ticks = ticks.concat( [ [${tickIndex}, "Total"] ] );
-      detail_tooltips["${section['category']} Total"] = [ "${section['totalscore']['summary']}" ];
+      ticks = ticks.concat( [ [${tickIndex}, "${section['totallabel']}"] ] );
+      detail_tooltips["${section['category']} Average"] = [ "${section['totalscore']['summary']}" ];
       <% tickIndex += 1 + sectionSpacer %>
           
     %else: ##This is for sections like midterm or final, which have no smaller components
@@ -66,12 +66,8 @@ $(function () {
         data: [[${tickIndex}, ${section['totalscore']['score']}]],
         color: colors[${sectionIndex}].toString(),
       });
-      %if section['category'] == "Midterm":
-      bottomTicks = bottomTicks.concat( [ [${tickIndex}, "${section['category']}"] ] );
-      %else:
-      ticks = ticks.concat( [ [${tickIndex}, "${section['category']}"] ] );
-      %endif
-          
+      ticks = ticks.concat( [ [${tickIndex}," ${section['totallabel']}"] ] );
+      
       detail_tooltips["${section['category']}"] = [ "${section['totalscore']['summary']}" ];
 
       <% tickIndex += 1 + sectionSpacer %>
@@ -80,13 +76,45 @@ $(function () {
   %endfor
       
   //Alwasy be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
-  series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "red", xaxis: 2} );
+  series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "red"} );
       
+      
+  /* ----------------------------- Grade overviewew bar -------------------------*/
+  <%
+  totalWeight = 0.0
+  sectionIndex = 0
+  totalScore = 0.0
+  overviewBarX = tickIndex
+  %>
+  %for section in grade_summary:
+    <%
+    weighted_score = section['totalscore']['score'] * section['weight']
+    summary_text = "{0} - {1:.1%} of a possible {2:.0%}".format(section['category'], weighted_score, section['weight'])
+    %>
+    %if section['totalscore']['score'] > 0:
+      series.push({label: "${section['category']} - Weighted",
+        data: [[${overviewBarX}, ${weighted_score}]],
+        color: colors[${sectionIndex}].toString(),
+      }); 
+    %endif
+     
+    detail_tooltips["${section['category']} - Weighted"] = [ "${summary_text}" ];
+    <%
+    sectionIndex += 1
+    totalWeight += section['weight']
+    totalScore += section['totalscore']['score'] * section['weight']
+    %>
+  %endfor
+  ticks = ticks.concat( [ [${overviewBarX}, "Total"] ] );
+  
+  <% tickIndex += 1 + sectionSpacer %>
+  
+  
   var options = {
-    series: {lines: {show: false, steps: false },
-    bars: {show: true, barWidth: 0.6, align: 'center', lineWidth: 1},},
-    xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}},
-    xaxes: [{ticks: ticks}, {ticks: bottomTicks}],
+    series: {stack: true,
+              lines: {show: false, steps: false },
+              bars: {show: true, barWidth: 0.6, align: 'center', lineWidth: 1},},
+    xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 90},
     yaxis: {ticks: [[1, "100%"], [0.87, "A 87%"], [0.7, "B 70%"], [0.6, "C 60%"], [0, "0%"]], min: 0.0, max: 1.0, labelWidth: 50},
     grid: { hoverable: true, clickable: true, borderWidth: 1,
       markings: [ {yaxis: {from: 0.87, to: 1 }, color: "#EBFFD5"}, {yaxis: {from: 0.7, to: 0.87 }, color: "#E6FFFF"}, 
@@ -94,17 +122,42 @@ $(function () {
     legend: {show: false},
   };
   
-  if ($("#grade-detail-graph").length > 0) {
-    $.plot($("#grade-detail-graph"), series, options);
+  var $grade_detail_graph = $("#grade-detail-graph");
+  if ($grade_detail_graph.length > 0) {
+    var plot = $.plot($grade_detail_graph, series, options);
+    
+    var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
+    $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{:.0%}".format(totalScore)}</div>');
+    
+    // //Rotate the x-axis labels
+    // var rotateValue = "rotate(-60deg)";
+    // var rotateOrigin = "bottom left";
+    // $("#grade-detail-graph .x1Axis .tickLabel").css( {
+    //   '-webkit-transform': rotateValue,
+    //   '-moz-transform': rotateValue,
+    //   '-ms-transform': rotateValue,
+    //   '-o-transform': rotateValue,
+    //   'transform': rotateValue,
+    //   
+    //   '-webkit-transform-origin': rotateOrigin,
+    //   '-moz-transform-origin': rotateOrigin,
+    //   '-ms-transform-origin': rotateOrigin,
+    //   '-o-transform-origin': rotateOrigin,
+    //   
+    //   'text-align' : 'left',
+    // });
   }
+  
+
+  
       
   var previousPoint = null;
   $("#grade-detail-graph").bind("plothover", function (event, pos, item) {
     $("#x").text(pos.x.toFixed(2));
     $("#y").text(pos.y.toFixed(2));
     if (item) {
-      if (previousPoint != item.dataIndex) {
-        previousPoint = item.dataIndex;
+      if (previousPoint != (item.dataIndex, item.seriesIndex)) {
+        previousPoint = (item.dataIndex, item.seriesIndex);
             
         $("#tooltip").remove();
             
