@@ -105,7 +105,7 @@ $(function () {
     totalScore += section['totalscore']['score'] * section['weight']
     %>
   %endfor
-  ticks = ticks.concat( [ [${overviewBarX}, "Totals"] ] );
+  ticks = ticks.concat( [ [${overviewBarX}, "Total"] ] );
   
   <% tickIndex += 1 + sectionSpacer %>
   
