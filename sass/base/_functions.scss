@@ -20,4 +20,3 @@
 @function lh($amount: 1) {
   @return $body-line-height * $amount;
 }
-

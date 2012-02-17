@@ -2,7 +2,7 @@
   @include box-sizing(border-box);
   margin: 0 auto;
   max-width: $fg-max-width;
-  min-width: $fg-min-width;
+  // min-width: $fg-min-width;
   padding: lh();
   width: flex-grid(12);
 }
