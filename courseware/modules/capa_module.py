@@ -94,6 +94,10 @@ class Module(XModule):
         if self.max_attempts != None: 
             attempts_str = " ({a}/{m})".format(a=self.attempts, m=self.max_attempts)
 
+        # We don't need a "save" button if infinite number of attempts and non-randomized
+        if self.max_attempts == None and self.rerandomize == False:
+            save_button = False
+
         # Check if explanation is available, and if so, give a link
         explain=""
         if self.lcp.done and self.explain_available=='attempted':
