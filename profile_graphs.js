@@ -127,7 +127,7 @@ $(function () {
     var plot = $.plot($grade_detail_graph, series, options);
     
     var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
-    $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{:.0%}".format(totalScore)}</div>');
+    $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
     
     // //Rotate the x-axis labels
     // var rotateValue = "rotate(-60deg)";
