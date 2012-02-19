@@ -38,28 +38,31 @@ def get_grade(request, problem, cache):
     ## HACK: assumes max score is fixed per problem
     id = problem.get('id')
     correct = 0
-    if id in cache:
-        response = cache[id]
-        if response.grade!=None:
-            correct=response.grade
-    if id in cache and response.max_grade != None:
-            total = response.max_grade
-    elif id in cache and response.max_grade == None: 
-        total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
-        response.max_grade = total
-        response.save()
-    else: # if id not in cache 
-        total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
-        module = StudentModule(module_type = 'problem', 
+    
+    # If the ID is not in the cache, add the item
+    if id not in cache: 
+        module = StudentModule(module_type = 'problem',  # TODO: Move into StudentModule.__init__?
                                module_id = id,
                                student = request.user, 
                                state = None, 
                                grade = 0,
-                               max_grade = total,
+                               max_grade = None,
                                done = 'i')
-        total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
-        module.save()
         cache[id] = module
+
+    # Grab the # correct from cache
+    if id in cache:
+        response = cache[id]
+        if response.grade!=None:
+            correct=response.grade
+        
+    # Grab max grade from cache, or if it doesn't exist, compute and save to DB
+    if id in cache and response.max_grade != None:
+        total = response.max_grade
+    else:
+        total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
+        response.max_grade = total
+        response.save()
 
     return (correct, total)
 
@@ -255,6 +258,7 @@ def profile(request):
              'grade_summary' : grade_summary,
              'csrf':csrf(request)['csrf_token']
              }
+
     return render_to_response('profile.html', context)
 
 def format_url_params(params):
