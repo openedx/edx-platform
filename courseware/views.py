@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import random
 import sys
 import StringIO
 import urllib
@@ -161,9 +162,17 @@ def profile(request):
         else:
             percentage = 0
             summary = "0% (?/?)"
-        summary = "Homework {0} - {1}".format(i + 1, summary)
         
-        homework_percentages.append( {'percentage': percentage, 'summary': summary} )
+        if settings.GENERATE_PROFILE_SCORES:
+            points_possible = random.randrange(10, 50)
+            points_earned = random.randrange(5, points_possible)
+            percentage = points_earned / float(points_possible)
+            summary = "{0:.0%} ({1}/{2})".format( percentage, points_earned, points_possible )
+        
+        summary = "Homework {0} - {1}".format(i + 1, summary)
+        label = "HW {0:02d}".format(i + 1)
+        
+        homework_percentages.append( {'percentage': percentage, 'summary': summary, 'label' : label} )
     homework_total, homework_dropped_indices = totalWithDrops(homework_percentages, 2)
     
     #Figure the lab scores
@@ -176,8 +185,17 @@ def profile(request):
         else:
             percentage = 0
             summary = "0% (?/?)"
+        
+        if settings.GENERATE_PROFILE_SCORES:
+            points_possible = random.randrange(10, 50)
+            points_earned = random.randrange(5, points_possible)
+            percentage = points_earned / float(points_possible)
+            summary = "{0:.0%} ({1}/{2})".format( percentage, points_earned, points_possible )
+            
         summary = "Lab {0} - {1}".format(i + 1, summary)
-        lab_percentages.append( {'percentage': percentage, 'summary': summary} )
+        label = "Lab {0:02d}".format(i + 1)
+                
+        lab_percentages.append( {'percentage': percentage, 'summary': summary, 'label' : label} )
     lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
     
     
@@ -188,12 +206,21 @@ def profile(request):
     final_score = ('?', '?')
     final_percentage = 0
     
+    if settings.GENERATE_PROFILE_SCORES:
+        midterm_score = (random.randrange(50, 150), 150)
+        midterm_percentage = midterm_score[0] / float(midterm_score[1])
+        
+        final_score = (random.randrange(100, 300), 300)
+        final_percentage = final_score[0] / float(final_score[1])
+        
+    
     grade_summary = [
         {
             'category': 'Homework',
             'subscores' : homework_percentages,
             'dropped_indices' : homework_dropped_indices,
             'totalscore' : {'score' : homework_total, 'summary' : "Homework Average - {0:.0%}".format(homework_total)},
+            'totallabel' : 'HW Avg',
             'weight' : 0.15,
         },
         {
@@ -201,16 +228,19 @@ def profile(request):
             'subscores' : lab_percentages,
             'dropped_indices' : lab_dropped_indices,
             'totalscore' : {'score' : lab_total, 'summary' : "Lab Average - {0:.0%}".format(lab_total)},
+            'totallabel' : 'Lab Avg',
             'weight' : 0.15,
         },
         {
             'category': 'Midterm',
             'totalscore' : {'score' : midterm_percentage, 'summary' : "Midterm - {0:.0%} ({1}/{2})".format(midterm_percentage, midterm_score[0], midterm_score[1])},
+            'totallabel' : 'Midterm',
             'weight' : 0.30,
         },
         {
             'category': 'Final',
             'totalscore' : {'score' : final_percentage, 'summary' : "Final - {0:.0%} ({1}/{2})".format(final_percentage, final_score[0], final_score[1])},
+            'totallabel' : 'Final',
             'weight' : 0.40,
         }
     ]
