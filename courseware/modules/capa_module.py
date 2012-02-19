@@ -21,7 +21,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from django.http import Http404
 
 from x_module import XModule
-from courseware.capa.capa_problem import LoncapaProblem
+from courseware.capa.capa_problem import LoncapaProblem, StudentInputError
 import courseware.content_parser as content_parser
 
 log = logging.getLogger("mitx.courseware")
@@ -277,22 +277,27 @@ class Module(XModule):
             lcp_id = self.lcp.problem_id
             filename = self.lcp.filename
             correct_map = self.lcp.grade_answers(answers)
+        except StudentInputError as inst: 
+            self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
+            traceback.print_exc()
+#            print {'error':sys.exc_info(),
+#                   'answers':answers, 
+#                   'seed':self.lcp.seed, 
+#                   'filename':self.lcp.filename}
+            return json.dumps({'success':inst.message})
         except: 
             self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
             traceback.print_exc()
-            print {'error':sys.exc_info(),
-                   'answers':answers, 
-                   'seed':self.lcp.seed, 
-                   'filename':self.lcp.filename}
-            return json.dumps({'success':'syntax'})
+            return json.dumps({'success':'Unknown Error'})
+            
 
         self.attempts = self.attempts + 1
         self.lcp.done=True
 
-        success = 'finished'
+        success = 'correct'
         for i in correct_map:
             if correct_map[i]!='correct':
-                success = 'errors'
+                success = 'incorrect'
 
         js=json.dumps({'correct_map' : correct_map,
                        'success' : success})

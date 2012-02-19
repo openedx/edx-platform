@@ -32,8 +32,22 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(abs(calc.evaluator(variables, functions, "k*T/q-0.025"))<0.001)
         exception_happened = False
         try: 
-            evaluator({},{}, "5+7 QWSEKO")
+            calc.evaluator({},{}, "5+7 QWSEKO")
         except:
             exception_happened = True
         self.assertTrue(exception_happened)
-            
+
+        try: 
+            calc.evaluator({'r1':5},{}, "r1+r2")
+        except calc.UndefinedVariable:
+            pass
+        
+        self.assertEqual(calc.evaluator(variables, functions, "r1*r3"), 8.0)
+
+        exception_happened = False
+        try: 
+            calc.evaluator(variables, functions, "r1*r3", cs=True)
+        except:
+            exception_happened = True
+        self.assertTrue(exception_happened)
+

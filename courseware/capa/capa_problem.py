@@ -15,7 +15,7 @@ from mako.template import Template
 
 from util import contextualize_text
 from inputtypes import textline, schematic
-from responsetypes import numericalresponse, formularesponse, customresponse, schematicresponse
+from responsetypes import numericalresponse, formularesponse, customresponse, schematicresponse, StudentInputError
 
 import calc
 import eia
