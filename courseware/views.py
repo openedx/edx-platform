@@ -34,18 +34,33 @@ etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
 template_imports={'urllib':urllib}
 
 def get_grade(request, problem, cache):
+    ## HACK: assumes max score is fixed per problem
     id = problem.get('id')
     correct = 0
+    print ",",
     if id in cache:
+        print "In cache"
         response = cache[id]
         if response.grade!=None:
             correct=response.grade
-        if response.max_grade != None:
+    if id in cache and response.max_grade != None:
             total = response.max_grade
-        else:
-            total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
-            response.max_grade = total
-            response.save()
+    else: #if id in cache and response.max_grade == None: 
+        total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
+    #     response.max_grade = total
+    #     response.save()
+    # else: # if id not in cache 
+    #     total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
+    #     module = StudentModule(module_type = 'problem', 
+    #                            module_id = id,
+    #                            student = request.user, 
+    #                            state = None, 
+    #                            grade = 0,
+    #                            max_grade = total,
+    #                            done = 'i')
+    #     total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
+    #     module.save()
+    #     cache[id] = module
 
     return (correct, total)
 
