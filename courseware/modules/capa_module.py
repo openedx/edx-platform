@@ -175,7 +175,7 @@ class Module(XModule):
             self.attempts=state['attempts']
 
         self.filename=content_parser.item(dom2.xpath('/problem/@filename'))
-        filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
+        filename=settings.DATA_DIR+"/problems/"+self.filename+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
         self.lcp=LoncapaProblem(filename, self.item_id, state)
 
