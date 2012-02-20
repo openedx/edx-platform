@@ -718,6 +718,8 @@ section.index-content section.staff h1 {
   display: none; }
 
 div.leanModal_box {
+  background: #fff;
+  border: none;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -734,28 +736,26 @@ div.leanModal_box {
   -o-box-sizing: border-box;
   box-sizing: border-box;
   display: none;
-  border: none;
-  background: #fff;
   padding: 51.776px; }
 div.leanModal_box a.modal_close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: block;
-  width: 14px;
-  height: 14px;
-  z-index: 2;
   color: #aaa;
-  font-style: normal; }
+  display: block;
+  font-style: normal;
+  height: 14px;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 14px;
+  z-index: 2; }
 div.leanModal_box a.modal_close:hover {
   text-decoration: none;
   color: #993333; }
 div.leanModal_box h1 {
+  border-bottom: 1px solid #eee;
   font-size: 24px;
+  margin-bottom: 25.888px;
   margin-top: 0;
   padding-bottom: 25.888px;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 25.888px;
   text-align: left; }
 div.leanModal_box#enroll {
   max-width: 600px; }
@@ -767,29 +767,29 @@ div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code 
 div.leanModal_box#enroll ol li div.tip {
   display: none; }
 div.leanModal_box#enroll ol li:hover div.tip {
-  display: block;
-  line-height: 25.888px;
-  position: absolute;
   background: #333;
   color: #fff;
-  width: 500px;
+  display: block;
+  font-size: 16px;
+  line-height: 25.888px;
   margin: 0 0 0 -10px;
   padding: 10px;
+  position: absolute;
   -webkit-font-smoothing: antialiased;
-  font-size: 16px; }
+  width: 500px; }
 div.leanModal_box form {
   text-align: left; }
 div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error, div.leanModal_box form div#pwd_error {
-  -webkit-font-smoothing: antialiased;
   background-color: #333333;
   border: black;
   color: #fff;
-  text-shadow: 0 1px 0 #1a1a1a;
   font-family: "Open sans";
   font-weight: bold;
   letter-spacing: 1px;
   margin: -25.888px -25.888px 25.888px;
-  padding: 12.944px; }
+  padding: 12.944px;
+  text-shadow: 0 1px 0 #1a1a1a;
+  -webkit-font-smoothing: antialiased; }
 div.leanModal_box form div#enroll_error:empty, div.leanModal_box form div#login_error:empty, div.leanModal_box form div#pwd_error:empty {
   padding: 0; }
 div.leanModal_box form ol {
@@ -798,11 +798,11 @@ div.leanModal_box form ol {
 div.leanModal_box form ol li {
   margin-bottom: 12.944px; }
 div.leanModal_box form ol li.terms, div.leanModal_box form ol li.remember {
-  float: none;
-  width: auto;
+  border-top: 1px solid #eee;
   clear: both;
+  float: none;
   padding-top: 25.888px;
-  border-top: 1px solid #eee; }
+  width: auto; }
 div.leanModal_box form ol li.honor-code {
   width: auto;
   float: none; }
@@ -822,11 +822,11 @@ div.leanModal_box form ol li ul {
   list-style: disc outside none;
   margin: 12.944px 0 25.888px 25.888px; }
 div.leanModal_box form ol li ul li {
-  list-style: disc outside none;
-  margin-bottom: 12.944px;
   color: #666;
+  float: none;
   font-size: 14px;
-  float: none; }
+  list-style: disc outside none;
+  margin-bottom: 12.944px; }
 div.leanModal_box form input[type="button"], div.leanModal_box form input[type="submit"] {
   border: 1px solid #691b1b;
   -webkit-border-radius: 3px;

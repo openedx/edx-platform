@@ -6,7 +6,7 @@ Last Updated: 2010-09-17
 Author: Richard Clark - http://richclarkdesign.com 
 Twitter: @rich_clark
 */
-html, body, div, span, object, iframe, h1, h2, body.user-profile-page section.user-info h1, h3, div#wiki_panel input[type="button"], h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
+html, body, div, span, object, iframe, h1, h2, body.user-profile-page section.user-info header section h1, h3, div#wiki_panel input[type="button"], h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
   margin: 0;
   padding: 0;
   border: 0;
@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, body.user-profile-page section.user-info header:after {
   content: ".";
   display: block;
   height: 0;
@@ -318,14 +318,14 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
 :focus {
   outline-color: #ccc; }
 
-h1 a, h2 a, body.user-profile-page section.user-info h1 a, h3 a, div#wiki_panel input[type="button"] a, h4 a, h5 a, h6 a {
+h1 a, h2 a, body.user-profile-page section.user-info header section h1 a, h3 a, div#wiki_panel input[type="button"] a, h4 a, h5 a, h6 a {
   color: #000; }
 
 h1 {
   font-size: 1.6em;
   margin: 20px 0 10px 0; }
 
-h2, body.user-profile-page section.user-info h1 {
+h2, body.user-profile-page section.user-info header section h1 {
   font-size: 14px;
   font-weight: bold;
   letter-spacing: 1px;
@@ -447,7 +447,7 @@ div.header-wrapper header hgroup h1:after {
   letter-spacing: -2px;
   padding-left: 11.326px;
   text-shadow: 0; }
-div.header-wrapper header hgroup h2, div.header-wrapper header hgroup body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.header-wrapper header hgroup h1 {
+div.header-wrapper header hgroup h2, div.header-wrapper body.user-profile-page section.user-info header hgroup section h1, body.user-profile-page section.user-info div.header-wrapper header hgroup section h1, div.header-wrapper body.user-profile-page section.user-info header section hgroup h1, body.user-profile-page section.user-info div.header-wrapper header section hgroup h1 {
   font-size: 16px;
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -462,10 +462,10 @@ div.header-wrapper header hgroup h2, div.header-wrapper header hgroup body.user-
   text-shadow: 0 -1px 0 #732626;
   text-transform: none;
   -webkit-font-smoothing: antialiased; }
-div.header-wrapper header hgroup h2 a, div.header-wrapper header hgroup body.user-profile-page section.user-info h1 a, body.user-profile-page section.user-info div.header-wrapper header hgroup h1 a {
+div.header-wrapper header hgroup h2 a, div.header-wrapper body.user-profile-page section.user-info header hgroup section h1 a, body.user-profile-page section.user-info div.header-wrapper header hgroup section h1 a, div.header-wrapper body.user-profile-page section.user-info header section hgroup h1 a, body.user-profile-page section.user-info div.header-wrapper header section hgroup h1 a {
   color: #fff;
   text-decoration: none; }
-div.header-wrapper header hgroup h2 a:hover, div.header-wrapper header hgroup body.user-profile-page section.user-info h1 a:hover, body.user-profile-page section.user-info div.header-wrapper header hgroup h1 a:hover {
+div.header-wrapper header hgroup h2 a:hover, div.header-wrapper body.user-profile-page section.user-info header hgroup section h1 a:hover, body.user-profile-page section.user-info div.header-wrapper header hgroup section h1 a:hover, div.header-wrapper body.user-profile-page section.user-info header section hgroup h1 a:hover, body.user-profile-page section.user-info div.header-wrapper header section hgroup h1 a:hover {
   color: rgba(255, 255, 255, 0.7); }
 @media screen and (max-width: 900px) {
   div.header-wrapper header hgroup {
@@ -474,7 +474,7 @@ div.header-wrapper header hgroup h2 a:hover, div.header-wrapper header hgroup bo
   div.header-wrapper header hgroup h1 {
     border: 0;
     float: left; }
-  div.header-wrapper header hgroup h2, div.header-wrapper header hgroup body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.header-wrapper header hgroup h1 {
+  div.header-wrapper header hgroup h2, div.header-wrapper body.user-profile-page section.user-info header hgroup section h1, body.user-profile-page section.user-info div.header-wrapper header hgroup section h1, div.header-wrapper body.user-profile-page section.user-info header section hgroup h1, body.user-profile-page section.user-info div.header-wrapper header section hgroup h1 {
     border: 0;
     float: left;
     margin-right: 0; } }
@@ -581,6 +581,8 @@ footer ul li a:hover, footer ul li a:focus {
   display: none; }
 
 div.leanModal_box {
+  background: #fff;
+  border: none;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -597,28 +599,26 @@ div.leanModal_box {
   -o-box-sizing: border-box;
   box-sizing: border-box;
   display: none;
-  border: none;
-  background: #fff;
   padding: 45.304px; }
 div.leanModal_box a.modal_close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: block;
-  width: 14px;
-  height: 14px;
-  z-index: 2;
   color: #aaa;
-  font-style: normal; }
+  display: block;
+  font-style: normal;
+  height: 14px;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 14px;
+  z-index: 2; }
 div.leanModal_box a.modal_close:hover {
   text-decoration: none;
   color: #993333; }
 div.leanModal_box h1 {
+  border-bottom: 1px solid #eee;
   font-size: 24px;
+  margin-bottom: 22.652px;
   margin-top: 0;
   padding-bottom: 22.652px;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 22.652px;
   text-align: left; }
 div.leanModal_box#enroll {
   max-width: 600px; }
@@ -630,29 +630,29 @@ div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code 
 div.leanModal_box#enroll ol li div.tip {
   display: none; }
 div.leanModal_box#enroll ol li:hover div.tip {
-  display: block;
-  line-height: 22.652px;
-  position: absolute;
   background: #333;
   color: #fff;
-  width: 500px;
+  display: block;
+  font-size: 16px;
+  line-height: 22.652px;
   margin: 0 0 0 -10px;
   padding: 10px;
+  position: absolute;
   -webkit-font-smoothing: antialiased;
-  font-size: 16px; }
+  width: 500px; }
 div.leanModal_box form {
   text-align: left; }
 div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error, div.leanModal_box form div#pwd_error {
-  -webkit-font-smoothing: antialiased;
   background-color: #333333;
   border: black;
   color: #fff;
-  text-shadow: 0 1px 0 #1a1a1a;
   font-family: "Open sans";
   font-weight: bold;
   letter-spacing: 1px;
   margin: -22.652px -22.652px 22.652px;
-  padding: 11.326px; }
+  padding: 11.326px;
+  text-shadow: 0 1px 0 #1a1a1a;
+  -webkit-font-smoothing: antialiased; }
 div.leanModal_box form div#enroll_error:empty, div.leanModal_box form div#login_error:empty, div.leanModal_box form div#pwd_error:empty {
   padding: 0; }
 div.leanModal_box form ol {
@@ -661,11 +661,11 @@ div.leanModal_box form ol {
 div.leanModal_box form ol li {
   margin-bottom: 11.326px; }
 div.leanModal_box form ol li.terms, div.leanModal_box form ol li.remember {
-  float: none;
-  width: auto;
+  border-top: 1px solid #eee;
   clear: both;
+  float: none;
   padding-top: 22.652px;
-  border-top: 1px solid #eee; }
+  width: auto; }
 div.leanModal_box form ol li.honor-code {
   width: auto;
   float: none; }
@@ -685,11 +685,11 @@ div.leanModal_box form ol li ul {
   list-style: disc outside none;
   margin: 11.326px 0 22.652px 22.652px; }
 div.leanModal_box form ol li ul li {
-  list-style: disc outside none;
-  margin-bottom: 11.326px;
   color: #666;
+  float: none;
   font-size: 14px;
-  float: none; }
+  list-style: disc outside none;
+  margin-bottom: 11.326px; }
 div.leanModal_box form input[type="button"], div.leanModal_box form input[type="submit"] {
   border: 1px solid #691b1b;
   -webkit-border-radius: 3px;
@@ -2326,7 +2326,7 @@ div.course-wrapper section.course-content ul li {
   margin-bottom: 11.326px; }
 div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li {
   position: relative; }
-div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2, div.course-wrapper section.course-content .problem-set body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper section.course-content .problem-set h1, div.course-wrapper section.course-content section.problems-wrapper body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper section.course-content section.problems-wrapper h1, div.course-wrapper section.course-content div#seq_content body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper section.course-content div#seq_content h1, div.course-wrapper section.course-content ol.vert-mod > li body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper section.course-content ol.vert-mod > li h1 {
+div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2, div.course-wrapper body.user-profile-page section.user-info header section.course-content .problem-set h1, body.user-profile-page section.user-info header div.course-wrapper section.course-content .problem-set h1, div.course-wrapper section.course-content body.user-profile-page section.user-info header section.problems-wrapper h1, body.user-profile-page section.user-info header div.course-wrapper section.course-content section.problems-wrapper h1, div.course-wrapper body.user-profile-page section.user-info header section.course-content div#seq_content h1, body.user-profile-page section.user-info header div.course-wrapper section.course-content div#seq_content h1, div.course-wrapper body.user-profile-page section.user-info header section.course-content ol.vert-mod > li h1, body.user-profile-page section.user-info header div.course-wrapper section.course-content ol.vert-mod > li h1 {
   margin-top: 0;
   margin-bottom: 15px;
   width: 20.109%;
@@ -2340,7 +2340,7 @@ div.course-wrapper section.course-content .problem-set h2, div.course-wrapper se
   display: table-cell;
   vertical-align: top; }
 @media screen and (max-width:1120px) {
-  div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2, div.course-wrapper section.course-content .problem-set body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper section.course-content .problem-set h1, div.course-wrapper section.course-content section.problems-wrapper body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper section.course-content section.problems-wrapper h1, div.course-wrapper section.course-content div#seq_content body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper section.course-content div#seq_content h1, div.course-wrapper section.course-content ol.vert-mod > li body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper section.course-content ol.vert-mod > li h1 {
+  div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2, div.course-wrapper body.user-profile-page section.user-info header section.course-content .problem-set h1, body.user-profile-page section.user-info header div.course-wrapper section.course-content .problem-set h1, div.course-wrapper section.course-content body.user-profile-page section.user-info header section.problems-wrapper h1, body.user-profile-page section.user-info header div.course-wrapper section.course-content section.problems-wrapper h1, div.course-wrapper body.user-profile-page section.user-info header section.course-content div#seq_content h1, body.user-profile-page section.user-info header div.course-wrapper section.course-content div#seq_content h1, div.course-wrapper body.user-profile-page section.user-info header section.course-content ol.vert-mod > li h1, body.user-profile-page section.user-info header div.course-wrapper section.course-content ol.vert-mod > li h1 {
     display: block;
     width: auto;
     border-right: 0; } }
@@ -2430,7 +2430,7 @@ div.course-wrapper.closed section.course-index div#open_close_accordion {
   padding: 0; }
 div.course-wrapper.closed section.course-index div#open_close_accordion a {
   background-image: url("/static/images/slide-right-icon.png"); }
-div.course-wrapper.closed section.course-index div#open_close_accordion h2, div.course-wrapper.closed section.course-index div#open_close_accordion body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.course-wrapper.closed section.course-index div#open_close_accordion h1 {
+div.course-wrapper.closed section.course-index div#open_close_accordion h2, div.course-wrapper.closed body.user-profile-page section.user-info header section.course-index div#open_close_accordion h1, body.user-profile-page section.user-info header div.course-wrapper.closed section.course-index div#open_close_accordion h1 {
   visibility: hidden;
   width: 10px;
   padding: 0; }
@@ -2450,7 +2450,7 @@ section.course-index div#open_close_accordion {
   border-bottom: 1px solid #d3d3d3;
   padding: 0 22.652px;
   position: relative; }
-section.course-index div#open_close_accordion h2, section.course-index div#open_close_accordion body.user-profile-page section.user-info h1, body.user-profile-page section.user-info section.course-index div#open_close_accordion h1 {
+section.course-index div#open_close_accordion h2, body.user-profile-page section.user-info header section.course-index div#open_close_accordion h1 {
   padding-right: 20px; }
 section.course-index div#open_close_accordion a {
   width: 16px;
@@ -2817,7 +2817,7 @@ div.info-wrapper section.updates ol li {
   padding-bottom: 11.326px;
   margin-bottom: 11.326px;
   border-bottom: 1px solid #e3e3e3; }
-div.info-wrapper section.updates ol li h2, div.info-wrapper section.updates ol li body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.info-wrapper section.updates ol li h1 {
+div.info-wrapper section.updates ol li h2, div.info-wrapper body.user-profile-page section.user-info header section.updates ol li h1, body.user-profile-page section.user-info header div.info-wrapper section.updates ol li h1 {
   float: left;
   width: 20.109%;
   margin: 0 2.024% 0 0; }
@@ -2960,7 +2960,7 @@ div.profile-wrapper section.course-info > ol > li {
   padding: 22.652px 0;
   width: 100%;
   display: table; }
-div.profile-wrapper section.course-info > ol > li h2, div.profile-wrapper section.course-info > ol > li body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.profile-wrapper section.course-info > ol > li h1 {
+div.profile-wrapper section.course-info > ol > li h2, div.profile-wrapper body.user-profile-page section.user-info header section.course-info > ol > li h1, body.user-profile-page section.user-info header div.profile-wrapper section.course-info > ol > li h1 {
   display: table-cell;
   padding: 0;
   margin: 0;
@@ -2991,7 +2991,7 @@ div.profile-wrapper section.course-info > ol > li ol.sections > li ol li {
   display: inline-block;
   padding-right: 1em; }
 
-section.wiki-body div#wiki_article html, section.wiki-body div#wiki_article address, section.wiki-body div#wiki_article blockquote, section.wiki-body div#wiki_article body, section.wiki-body div#wiki_article dd, section.wiki-body div#wiki_article div, section.wiki-body div#wiki_article dl, section.wiki-body div#wiki_article dt, section.wiki-body div#wiki_article fieldset, section.wiki-body div#wiki_article form, section.wiki-body div#wiki_article frame, section.wiki-body div#wiki_article frameset, section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, section.wiki-body div#wiki_article body.user-profile-page section.user-info h1, body.user-profile-page section.user-info section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div#wiki_panel input[type="button"], div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4, section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article noframes, section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article p, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article center, section.wiki-body div#wiki_article dir, section.wiki-body div#wiki_article hr, section.wiki-body div#wiki_article menu, section.wiki-body div#wiki_article pre {
+section.wiki-body div#wiki_article html, section.wiki-body div#wiki_article address, section.wiki-body div#wiki_article blockquote, section.wiki-body div#wiki_article body, section.wiki-body div#wiki_article dd, section.wiki-body div#wiki_article div, section.wiki-body div#wiki_article dl, section.wiki-body div#wiki_article dt, section.wiki-body div#wiki_article fieldset, section.wiki-body div#wiki_article form, section.wiki-body div#wiki_article frame, section.wiki-body div#wiki_article frameset, section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, body.user-profile-page section.user-info header section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div#wiki_panel input[type="button"], div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4, section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article noframes, section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article p, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article center, section.wiki-body div#wiki_article dir, section.wiki-body div#wiki_article hr, section.wiki-body div#wiki_article menu, section.wiki-body div#wiki_article pre {
   display: block;
   unicode-bidi: embed; }
 section.wiki-body div#wiki_article li {
@@ -3025,7 +3025,7 @@ section.wiki-body div#wiki_article h1 {
   font-size: 2.4em;
   margin: .67em 0;
   letter-spacing: 0px; }
-section.wiki-body div#wiki_article h2, section.wiki-body div#wiki_article body.user-profile-page section.user-info h1, body.user-profile-page section.user-info section.wiki-body div#wiki_article h1 {
+section.wiki-body div#wiki_article h2, body.user-profile-page section.user-info header section.wiki-body div#wiki_article h1 {
   text-transform: none;
   font-size: 2em;
   margin: .75em 0;
@@ -3043,7 +3043,7 @@ section.wiki-body div#wiki_article h5 {
 section.wiki-body div#wiki_article h6 {
   font-size: 1em;
   margin: 1.67em 0; }
-section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, section.wiki-body div#wiki_article body.user-profile-page section.user-info h1, body.user-profile-page section.user-info section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div#wiki_panel input[type="button"], div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4, section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article b, section.wiki-body div#wiki_article strong {
+section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, body.user-profile-page section.user-info header section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div#wiki_panel input[type="button"], div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4, section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article b, section.wiki-body div#wiki_article strong {
   font-weight: bolder; }
 section.wiki-body div#wiki_article blockquote {
   padding: 10px 20px;
@@ -3291,7 +3291,7 @@ section.help.main-content h1 {
   border-bottom: 1px solid #ddd; }
 section.help.main-content p {
   max-width: 700px; }
-section.help.main-content h2, section.help.main-content body.user-profile-page section.user-info h1, body.user-profile-page section.user-info section.help.main-content h1 {
+section.help.main-content h2, body.user-profile-page section.user-info header section.help.main-content h1 {
   margin-top: 0; }
 section.help.main-content section.self-help {
   margin-bottom: 22.652px;
@@ -3315,10 +3315,6 @@ section.help.main-content section.help-email dl dt {
   float: left;
   clear: left;
   width: 30.579%; }
-
-.badges a {
-  color: #763333;
-  text-decoration: underline; }
 
 .badge-context-toggle.active, div.header-wrapper header nav.courseware li.courseware a.badge-context-toggle, div.header-wrapper header nav.book li.book a.badge-context-toggle, div.header-wrapper header nav.info li.info a.badge-context-toggle, div.header-wrapper header nav.discussion li.discussion a.badge-context-toggle, div.header-wrapper header nav.wiki li.wiki a.badge-context-toggle, div.header-wrapper header nav.profile li.profile a.badge-context-toggle, section.course-index div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, section.course-index div#accordion div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.badge-context-toggle.seq_video_active, nav.sequence-nav ol li.badge-context-toggle.seq_other_active, nav.sequence-nav ol li.badge-context-toggle.seq_vertical_active, nav.sequence-nav ol li.badge-context-toggle.seq_problem_active {
   cursor: pointer;
@@ -3630,7 +3626,7 @@ body.anon #searchbar .searchinputcancelable {
   color: #525252;
   margin-bottom: 12px; }
 
-.openid-signin h2, .openid-signin body.user-profile-page section.user-info h1, body.user-profile-page section.user-info .openid-signin h1, .meta h2, .meta body.user-profile-page section.user-info h1, body.user-profile-page section.user-info .meta h1, .users-page h2, .users-page body.user-profile-page section.user-info h1, body.user-profile-page section.user-info .users-page h1, .user-profile-edit-page h2, .user-profile-edit-page body.user-profile-page section.user-info h1, body.user-profile-page section.user-info .user-profile-edit-page h1 {
+.openid-signin h2, .openid-signin body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section .openid-signin h1, .meta h2, .meta body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section .meta h1, .users-page h2, .users-page body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section .users-page h1, .user-profile-edit-page h2, .user-profile-edit-page body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section .user-profile-edit-page h1 {
   color: #525252;
   padding-left: 0px;
   font-size: 16px; }
@@ -3750,27 +3746,6 @@ body.anon #searchbar .searchinputcancelable {
   float: left;
   margin-right: 4px;
   display: inline; }
-
-a.medal {
-  font-size: 17px;
-  line-height: 250%;
-  margin-right: 5px;
-  color: #333;
-  text-decoration: none;
-  background: url(../images/medala.gif) no-repeat;
-  border-left: 1px solid #eee;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  padding: 4px 12px 4px 6px; }
-a:hover.medal {
-  color: #333;
-  text-decoration: none;
-  background: url(../images/medala_on.gif) no-repeat;
-  border-left: 1px solid #e7e296;
-  border-top: 1px solid #e7e296;
-  border-bottom: 1px solid #d1ca3d;
-  border-right: 1px solid #d1ca3d; }
 
 #award-list .user {
   float: left;
@@ -3946,45 +3921,6 @@ ins {
   background-color: #e6f0a2; }
 ins .post-tag, ins p {
   background-color: #e6f0a2; }
-
-.vote-notification {
-  z-index: 1;
-  cursor: pointer;
-  display: none;
-  position: absolute;
-  font-family: arial;
-  font-size: 14px;
-  font-weight: normal;
-  color: white;
-  background-color: #8e0000;
-  text-align: center;
-  padding-bottom: 10px;
-  -webkit-box-shadow: 0px 2px 4px #370000;
-  -moz-box-shadow: 0px 2px 4px #370000;
-  box-shadow: 0px 2px 4px #370000;
-  border-radius: 4px;
-  -ms-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  -khtml-border-radius: 4px; }
-.vote-notification h3, .vote-notification div#wiki_panel input[type="button"], div#wiki_panel .vote-notification input[type="button"] {
-  background: url(../images/notification.png) repeat-x top;
-  padding: 10px 10px 10px 10px;
-  font-size: 13px;
-  margin-bottom: 5px;
-  border-top: #8e0000 1px solid;
-  color: #fff;
-  font-weight: normal;
-  border-top-right-radius: 4px;
-  border-top-left-radius: 4px;
-  -moz-border-radius-topright: 4px;
-  -moz-border-radius-topleft: 4px;
-  -webkit-border-top-left-radius: 4px;
-  -webkit-border-top-right-radius: 4px; }
-.vote-notification a {
-  color: #fb7321;
-  text-decoration: underline;
-  font-weight: bold; }
 
 .footer-links {
   color: #eee;
@@ -4511,9 +4447,9 @@ div.discussion-wrapper aside {
   border-right: 1px solid #f6f6f6;
   padding: 22.652px;
   width: 23.482%; }
-div.discussion-wrapper aside h2, div.discussion-wrapper aside body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.discussion-wrapper aside h1 {
+div.discussion-wrapper aside h2, div.discussion-wrapper aside body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section div.discussion-wrapper aside h1 {
   color: #4D4D4D; }
-div.discussion-wrapper aside h2.first, div.discussion-wrapper aside body.user-profile-page section.user-info h1.first, body.user-profile-page section.user-info div.discussion-wrapper aside h1.first {
+div.discussion-wrapper aside h2.first, div.discussion-wrapper aside body.user-profile-page section.user-info header section h1.first, body.user-profile-page section.user-info header section div.discussion-wrapper aside h1.first {
   margin-top: 0px; }
 div.discussion-wrapper aside h3, div.discussion-wrapper aside div#wiki_panel input[type="button"], div#wiki_panel div.discussion-wrapper aside input[type="button"] {
   border-bottom: 0;
@@ -4710,7 +4646,7 @@ ul.question-list li.single-question, div#question-list li.single-question {
   list-style: none;
   padding: 10px 0; }
 ul.question-list li.single-question:hover, div#question-list li.single-question:hover {
-  background: #fdfcf6; }
+  background: #fbfbfb; }
 ul.question-list li.single-question div, div#question-list li.single-question div {
   display: inline-block; }
 ul.question-list li.single-question div.question-body, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body, div#question-list li.single-question div.question-body, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body {
@@ -4722,7 +4658,7 @@ ul.question-list li.single-question div.question-body, ul.question-list li.singl
   margin-right: 2.024%;
   padding-left: 10px;
   width: 60.054%; }
-ul.question-list li.single-question div.question-body h2, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h2, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h2, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body h2, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h2, ul.question-list li.single-question div.question-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info ul.question-list li.single-question div.question-body h1, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h1, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h1, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body h1, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h1, div#question-list li.single-question div.question-body h2, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h2, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body h2, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body h2, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body h2, div#question-list li.single-question div.question-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div#question-list li.single-question div.question-body h1, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h1, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body h1, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body h1, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body body.user-profile-page section.user-info h1, body.user-profile-page section.user-info div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body h1 {
+ul.question-list li.single-question div.question-body h2, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h2, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h2, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body h2, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h2, ul.question-list li.single-question div.question-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section ul.question-list li.single-question div.question-body h1, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h1, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h1, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body h1, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body h1, div#question-list li.single-question div.question-body h2, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h2, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body h2, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body h2, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body h2, div#question-list li.single-question div.question-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section div#question-list li.single-question div.question-body h1, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body h1, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body h1, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body h1, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body body.user-profile-page section.user-info header section h1, body.user-profile-page section.user-info header section div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body h1 {
   font-size: 16px;
   font-weight: bold;
   margin: 0px 0 15px 0;
@@ -4741,28 +4677,27 @@ ul.question-list li.single-question div.question-meta, div#question-list li.sing
 ul.question-list li.single-question div.question-meta ul, div#question-list li.single-question div.question-meta ul {
   text-align: right; }
 ul.question-list li.single-question div.question-meta ul li, div#question-list li.single-question div.question-meta ul li {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
-  border-radius: 3px;
+  background-color: white;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #f5f5f5));
+  background-image: -webkit-linear-gradient(top, white, #f5f5f5);
+  background-image: -moz-linear-gradient(top, white, #f5f5f5);
+  background-image: -ms-linear-gradient(top, white, #f5f5f5);
+  background-image: -o-linear-gradient(top, white, #f5f5f5);
+  background-image: linear-gradient(top, white, #f5f5f5);
+  border: 1px solid #eee;
   display: inline-block;
   height: 60px;
   margin-right: 10px;
   width: 60px; }
-ul.question-list li.single-question div.question-meta ul li.views, div#question-list li.single-question div.question-meta ul li.views {
-  background: #faf7e9; }
-ul.question-list li.single-question div.question-meta ul li.answers, div#question-list li.single-question div.question-meta ul li.answers {
-  background: #F6EFD4; }
-ul.question-list li.single-question div.question-meta ul li.votes, div#question-list li.single-question div.question-meta ul li.votes {
-  background: #f2e7bf; }
+ul.question-list li.single-question div.question-meta ul li:hover span, ul.question-list li.single-question div.question-meta ul li:hover div, div#question-list li.single-question div.question-meta ul li:hover span, div#question-list li.single-question div.question-meta ul li:hover div {
+  color: #555; }
 ul.question-list li.single-question div.question-meta ul li span, ul.question-list li.single-question div.question-meta ul li div, div#question-list li.single-question div.question-meta ul li span, div#question-list li.single-question div.question-meta ul li div {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box;
-  color: #7e691a;
+  color: #888;
   display: block;
   text-align: center; }
 ul.question-list li.single-question div.question-meta ul li span, div#question-list li.single-question div.question-meta ul li span {
@@ -4786,35 +4721,40 @@ ul.tags {
 ul.tags li, ul.tags a {
   position: relative; }
 ul.tags li {
+  background: #eee;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
-  background: #eee;
+  -webkit-box-shadow: 1px 1px 0px #bbbbbb;
+  -moz-box-shadow: 1px 1px 0px #bbbbbb;
+  -ms-box-shadow: 1px 1px 0px #bbbbbb;
+  -o-box-shadow: 1px 1px 0px #bbbbbb;
+  box-shadow: 1px 1px 0px #bbbbbb;
   color: #555;
   display: inline-block;
   font-size: 12px;
+  margin-bottom: 5px;
   margin-left: 15px;
-  padding: 3px 10px 5px 5px;
-  margin-bottom: 5px; }
+  padding: 3px 10px 5px 5px; }
 ul.tags li:before {
   border-color: transparent #eee transparent transparent;
   border-style: solid;
   border-width: 12px 12px 12px 0;
   content: "";
   height: 0;
-  left: -11px;
+  left: -10px;
   position: absolute;
   top: 0;
   width: 0; }
 ul.tags li span.delete-icon, ul.tags li div.delete-icon {
+  background: #555;
   -webkit-border-radius: 0 4px 4px 0;
   -moz-border-radius: 0 4px 4px 0;
   -ms-border-radius: 0 4px 4px 0;
   -o-border-radius: 0 4px 4px 0;
   border-radius: 0 4px 4px 0;
-  background: #555;
   clear: none;
   color: #eee;
   cursor: pointer;
@@ -4832,17 +4772,7 @@ ul.tags li a {
   text-decoration: none; }
 
 span.tag-number {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
-  border-radius: 3px;
-  background: #555;
-  font-size: 10px;
-  margin: 0 3px;
-  padding: 2px 5px;
-  color: #eee;
-  opacity: 0.5; }
+  display: none; }
 
 div.question-header div.vote-buttons, div.answer-block div.vote-buttons, div.paginator div.vote-buttons {
   display: inline-block;
@@ -5047,6 +4977,17 @@ div.question-header div.question-container div.comments-container div.controls a
   display: inline-block;
   font-size: 12px;
   margin: 10px 10px 10px 0; }
+
+div.question-status {
+  background: #993333;
+  clear: both;
+  color: #fff;
+  display: block;
+  padding: 10px 0 10px 7.5%; }
+div.question-status h3, div.question-status div#wiki_panel input[type="button"], div#wiki_panel div.question-status input[type="button"] {
+  font-weight: normal; }
+div.question-status a {
+  color: #eee; }
 
 div.answer-controls {
   -webkit-box-sizing: border-box;
@@ -5356,8 +5297,75 @@ form.question-form input[type="checkbox"] {
   font-size: 1em;
   font-weight: bold; }
 
-body.user-profile-page section.user-info h1 {
+.vote-notification {
+  background-color: #7e2a2a;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0px 2px 9px #aaaaaa;
+  -moz-box-shadow: 0px 2px 9px #aaaaaa;
+  -ms-box-shadow: 0px 2px 9px #aaaaaa;
+  -o-box-shadow: 0px 2px 9px #aaaaaa;
+  box-shadow: 0px 2px 9px #aaaaaa;
+  color: white;
+  cursor: pointer;
+  display: none;
+  font-size: 14px;
+  font-weight: normal;
+  padding-bottom: 10px;
+  position: absolute;
+  text-align: center; }
+.vote-notification h3, .vote-notification div#wiki_panel input[type="button"], div#wiki_panel .vote-notification input[type="button"] {
+  background: #993333;
+  padding: 10px 10px 10px 10px;
+  font-size: 13px;
+  margin-bottom: 5px;
+  border-bottom: #5b0000 1px solid;
+  -webkit-box-shadow: 0 1px 0 #bf4040;
+  -moz-box-shadow: 0 1px 0 #bf4040;
+  -ms-box-shadow: 0 1px 0 #bf4040;
+  -o-box-shadow: 0 1px 0 #bf4040;
+  box-shadow: 0 1px 0 #bf4040;
+  color: #fff;
+  font-weight: normal;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  -ms-border-radius: 4px 4px 0 0;
+  -o-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0; }
+.vote-notification a {
+  color: #fb7321;
+  text-decoration: underline;
+  font-weight: bold; }
+
+body.user-profile-page section.user-info header section {
+  float: left;
+  width: 63.793%;
+  margin-right: 8.621%; }
+body.user-profile-page section.user-info header section h1 {
   margin-top: 0; }
+body.user-profile-page section.user-info header p.karma {
+  float: left;
+  width: 27.586%;
+  border: 1px solid #D3D3D3;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  -moz-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  -ms-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  -o-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  background: #eee;
+  text-align: center;
+  padding: 11.326px 0; }
+body.user-profile-page section.user-info header p.karma strong {
+  display: block;
+  font-style: 20px; }
 body.user-profile-page ul.sub-info {
   border-top: 1px solid #ddd;
   margin-top: 22.652px;
@@ -5377,7 +5385,53 @@ body.user-profile-page ul.sub-info > li:first-child {
 body.user-profile-page ul.sub-info > li:last-child {
   border-right: 0;
   padding-right: 0; }
-body.user-profile-page ul.sub-info > li h2, body.user-profile-page ul.sub-info > li section.user-info h1, body.user-profile-page section.user-info ul.sub-info > li h1 {
+body.user-profile-page ul.sub-info > li h2, body.user-profile-page ul.sub-info > li section.user-info header section h1, body.user-profile-page section.user-info header section ul.sub-info > li h1 {
   margin-top: 0; }
+body.user-profile-page ul.sub-info > li span.tag-number {
+  display: none; }
+body.user-profile-page ul.sub-info ul {
+  list-style: none; }
 body.user-profile-page ul.sub-info ul.user-stats-table {
   list-style: none; }
+body.user-profile-page ul.sub-info ul.vote-buttons {
+  list-style: none; }
+body.user-profile-page ul.sub-info ul.vote-buttons li {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  background-color: #f9f4e1;
+  background-position: 10px center;
+  background-repeat: no-repeat;
+  height: 20px;
+  padding: 10px 10px 10px 40px;
+  display: inline-block; }
+body.user-profile-page ul.sub-info ul.vote-buttons li.up {
+  background-image: url(/static/images/askbot/vote-arrow-up.png);
+  margin-right: 6px; }
+body.user-profile-page ul.sub-info ul.vote-buttons li.down {
+  background-image: url(/static/images/askbot/vote-arrow-down.png); }
+body.user-profile-page ul.sub-info ul.badges {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  background-color: #e3e3e3;
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto; }
+body.user-profile-page ul.sub-info ul.badges a {
+  border: 0;
+  background: none;
+  text-transform: uppercase;
+  color: #292309;
+  font-size: 12px;
+  padding: 10px;
+  text-shadow: 0 1px 0 #fff;
+  display: block; }
