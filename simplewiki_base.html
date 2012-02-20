@@ -65,35 +65,29 @@
 
   });
   </script>
-
-
-<%block name="bodyextra">
+  
   <%block name="wiki_head"/>
+  
 </%block>
 
+<%block name="bodyextra">
 <%include file="navigation.html" args="active_page='wiki'" />
 
 <section class="main-content">
   <div class="wiki-wrapper">
-      <%block name="wiki_panel">
-
+    <%block name="wiki_panel">
     <div id="wiki_panel">
-    <%
-        if (wiki_article is not UNDEFINED):
-        	baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
-        else:
-        	baseURL = reverse("wiki_view", args=["/"])
-    %>
-
+      <%
+          if (wiki_article is not UNDEFINED):
+          	baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
+          else:
+          	baseURL = reverse("wiki_view", args=["/"])
+      %>
       <ul class="action">
-        <!-- <li> -->
-        <!--   <input type="button" onclick="javascript:location.href='${reverse("wiki_random", args=[])}'" value="Random article" class="button" /> -->
-        <!-- </li> -->
         <li>
           <input type="button" onclick="javascript:location.href='${reverse("wiki_list_articles", args=[])}'" value="All articles" class="button" />
         </li>
         
-
         <li class="create-article">
           <h3>
             <a href="#" id="create-article"/>Create Article</a>

@@ -47,6 +47,10 @@ div.leanModal_box {
   &#enroll {
     max-width: 600px;
 
+    p.ie-warning {
+      display: none;
+    }
+
     ol {
       @extend .clearfix;
 

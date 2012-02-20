@@ -15,6 +15,10 @@ header.announcement {
     div {
       padding: lh(10) lh() lh(3);
 
+      @media screen and (max-width:780px) {
+        padding: lh(2.5) lh() lh(2);
+      }
+
       //hide login link for homepage
       nav {
         h1 {
@@ -41,7 +45,12 @@ header.announcement {
 
     div {
       padding: lh(4) lh() lh(2);
+
+      @media screen and (max-width:780px) {
+        padding: lh(2.5) lh() lh(2);
+      }
     }
+
   }
 
   div {
@@ -60,6 +69,7 @@ header.announcement {
       h1 {
         @include inline-block();
         margin-right: lh(.5);
+
 
         a {
           font: italic 800 18px $header-font-family;
@@ -87,43 +97,53 @@ header.announcement {
 
     section {
       @extend .clearfix;
-      @include inline-block();
       background: $mit-red;
+      @include inline-block();
       margin-left: flex-grid(4) + flex-gutter();
       padding: lh() lh(1.5);
 
+      @media screen and (max-width: 780px) {
+        margin-left: 0;
+      }
+
       h1 {
-        @include inline-block();
         font-family: "Open Sans";
         font-size: 30px;
         font-weight: 800;
+        @include inline-block();
         line-height: 1.2em;
         margin: 0 lh() 0 0;
       }
 
       h2 {
-        @include inline-block();
         font-family: "Open Sans";
         font-size: 24px;
         font-weight: 400;
+        @include inline-block();
         line-height: 1.2em;
       }
 
       &.course {
         section {
-          width: flex-grid(4, 8);
-          margin-right: flex-gutter(8);
           float: left;
           margin-left: 0;
+          margin-right: flex-gutter(8);
           padding: 0;
+          width: flex-grid(4, 8);
+
+          @media screen and (max-width: 780px) {
+            float: none;
+            width: 100%;
+            margin-right: 0;
+          }
 
           a {
             @extend .button;
-            @include box-shadow(inset 0 1px 0 darken($mit-red, 10%), 0 1px 0 lighten($mit-red, 5%));
             background-color: darken($mit-red, 20%);
+            border-color: darken($mit-red, 30%);
+            @include box-shadow(inset 0 1px 0 darken($mit-red, 10%), 0 1px 0 lighten($mit-red, 5%));
             display: block;
             padding: lh(.5) lh();
-            border-color: darken($mit-red, 30%);
             text-align: center;
 
             &:hover {
@@ -137,6 +157,11 @@ header.announcement {
           width: flex-grid(4, 8);
           line-height: lh();
           float: left;
+
+          @media screen and (max-width: 780px) {
+            float: none;
+            width: 100%;
+          }
         }
       }
     }
