@@ -100,12 +100,10 @@ div.question-header {
         display: inline-block;
         float: left;
         width: flex-grid(1.8,8);
+        border-left: 1px dotted #CCC;
 
         div.post-update-info {
           @include box-sizing(border-box);
-          // @include border-radius(5px);
-          // background:lighten(#F6EFD4, 5%);
-          border-left: 3px solid darken(#F6EFD4, 10%);
           padding: 10px;
           margin-bottom: 10px;
 
@@ -131,20 +129,6 @@ div.question-header {
             margin-bottom: 2px;
           }
 
-          // div.avatar {
-          //   display: inline-block;
-          //   float: left;
-          //   margin-right: 3px;
-
-          //   img.gravatar {
-          //     background: white;
-          //     border: 1px solid darken(#F6EFD4, 10%);
-          //     margin-right: 5px;
-          //     padding: 3px ;
-          //     vertical-align: bottom;
-          //   }
-          // }
-
           div.user-meta {
             display: inline-block;
 
@@ -163,10 +147,8 @@ div.question-header {
 
     div.comments-container {
       @include box-sizing(border-box);
-      // background: lighten(#efefef, 3%);
       padding: 3%;
       display: inline-block;
-      // margin: 15px 0 0;
       padding: 3%;
       width: 100%;
 
@@ -182,9 +164,6 @@ div.question-header {
           &:first-child {
             border-top: 0;
           }
-          // &:last-child {
-          //   border-bottom: 1px solid #ddd;
-          // }
         }
 
         form.post-comments {
