@@ -1,0 +1,138 @@
+div.answer-controls {
+  @include box-sizing(border-box);
+  display: inline-block;
+  margin: 0 0 15px;
+  padding-left: flex-grid(1.1);
+  width: 100%;
+
+  div.answer-count {
+    display: inline-block;
+    float: left;
+  }
+
+  div.answer-sort {
+    float: right;
+    margin-left: flex-gutter();
+
+    nav {
+      @extend .action-link;
+      float: right;
+      margin-top: 25px;
+
+      a {
+        &.on span{
+          font-weight: bold;
+        }
+
+        &:before {
+          content: '|';
+          color: darken(#F6EFD4, 10%);
+          font-size: 22px;
+        }
+      }
+    }
+  }
+}
+
+div.answer-block {
+  @extend div.question-header;
+  border-top: #ddd 1px solid;
+  display: inline-block;
+  float: left;
+  padding-top: 20px;
+  width: 100%;
+
+  img.answer-img-accept {
+    margin: 10px 0px 10px 16px;
+  }
+  div.answer-container {
+    @extend div.question-container;
+
+    div.answer-content {
+      @extend div.question-content;
+
+      div.answer-body {
+        @extend div.question-body;
+      }
+    }
+  }
+
+  div.meta-bar {
+    div.answer-actions {
+      @extend div.question-actions;
+    }
+  }
+
+  div.answered-by-owner {
+    p {
+      font-style: italic;
+      color: #656565;
+    }
+
+    div.comments-container {
+      color: #555;
+    }
+  }
+}
+
+div.paginator {
+  @extend div.answer-block;
+  text-align: center;
+  padding: 20px 0;
+
+  span {
+    @include border-radius(3px);
+    background: #eee;
+    margin: 0 5px;
+    padding: 4px 10px;
+
+    &.curr {
+      background: none;
+      color: $mit-red;
+      font-weight: bold;
+    }
+
+    &.next, &.prev {
+      @extend .light-button;
+    }
+
+    a {
+      color: #555;
+      text-decoration: none;
+    }
+  }
+}
+
+div.answer-own {
+  border-top: 1px solid #eee;
+  overflow:hidden;
+  padding-left: flex-grid(1.2);
+  padding-top: 10px;
+}
+
+div.answer-actions {
+  border-left: 3px solid darken(#F6EFD4, 10%);
+  margin: 0;
+  padding:8px 8px 8px 0;
+  text-align: right;
+  background:lighten(#F6EFD4, 5%);
+
+  span.sep {
+    color: #ddd;
+  }
+
+  a {
+    cursor: pointer;
+    text-decoration: none;
+
+    &.question-delete {
+      color: $mit-red;
+    }
+
+    &.question-edit, &.permant-link {
+      color: darken(#F6EFD4, 45%);;
+    }
+
+  }
+
+}

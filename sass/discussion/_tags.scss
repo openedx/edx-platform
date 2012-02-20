@@ -1,0 +1,63 @@
+ul.tags {
+  list-style: none;
+  display: inline;
+  li, a {
+    position: relative;
+  }
+  li {
+    @include border-radius(4px);
+    background: #eee;
+    color: #555;
+    display: inline-block;
+    font-size: 12px;
+    margin-left: 15px;
+    padding: 3px 10px 5px 5px;
+    margin-bottom: 5px;
+
+    &:before {
+     border-color:transparent #eee transparent transparent;
+     border-style:solid;
+     border-width:12px 12px 12px 0;
+     content:"";
+     height:0;
+     left:-11px;
+     position:absolute;
+     top:0;
+     width:0;
+    }
+
+    span.delete-icon, div.delete-icon {
+      @include border-radius(0 4px 4px 0);
+      background: #555;
+      clear: none;
+      color: #eee;
+      cursor: pointer;
+      display: inline;
+      float: none;
+      left: 10px;
+      opacity: 0.5;
+      padding: 3px 6px;
+      position: relative;
+      top: 1px;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    a {
+      color: #555;
+      text-decoration: none;
+    }
+  }
+}
+
+span.tag-number {
+  @include border-radius(3px);
+  background: #555;
+  font-size: 10px;
+  margin: 0 3px;
+  padding: 2px 5px;
+  color: #eee;
+  opacity: 0.5;
+}

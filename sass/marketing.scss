@@ -1,7 +1,6 @@
 @import "bourbon/bourbon";
-@import "reset";
-@import "font-face";
+@import "base/reset", "base/font-face", "base/functions";
 
 // pages
-@import "index-functions", "index-variables", "index-extends", "index";
-@import "leanmodal";
+@import "index/variables", "index/extends", "index/base", "index/header", "index/footer", "index/index";
+@import "layout/leanmodal";

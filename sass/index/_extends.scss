@@ -2,7 +2,7 @@
   @include box-sizing(border-box);
   margin: 0 auto;
   max-width: $fg-max-width;
-  min-width: $fg-min-width;
+  // min-width: $fg-min-width;
   padding: lh();
   width: flex-grid(12);
 }
@@ -20,6 +20,7 @@
 
     p {
       margin-bottom: lh();
+      line-height: lh();
     }
 
     h1 {
@@ -37,6 +38,15 @@
 
       li {
         list-style: disc outside none;
+        line-height: lh();
+      }
+    }
+
+    dl {
+      margin-bottom: lh();
+
+      dd {
+        margin-bottom: lh(.5);
       }
     }
   }
