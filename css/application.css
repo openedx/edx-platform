@@ -2798,6 +2798,11 @@ div.book-wrapper section.book nav ul li.last a {
 div.book-wrapper section.book nav ul li.next {
   display: block;
   float: right; }
+div.book-wrapper section.book nav.bottom-nav {
+  margin-top: 22.652px;
+  margin-bottom: -22.652px;
+  border-bottom: 0;
+  border-top: 1px solid #EDDFAA; }
 div.book-wrapper section.book section.page {
   text-align: center; }
 div.book-wrapper section.book section.page img {
