@@ -1,0 +1,46 @@
+body.user-profile-page {
+  section.user-info {
+    // @extend .sidebar;
+    h1 {
+      @extend h2;
+      margin-top: 0;
+    }
+  }
+
+  section.questions {
+    h1 {
+      @extend .top-header;
+    }
+  }
+
+  ul.sub-info {
+    border-top: 1px solid #ddd;
+    margin-top: lh();
+    list-style: none;
+
+    > li {
+      width: flex-grid(2.25, 9);
+      display: table-cell;
+      padding: (flex-gutter(9)/2);
+      border-right: 1px solid #ddd;
+      @include box-sizing(border-box);
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:last-child {
+        border-right: 0;
+        padding-right: 0;
+      }
+
+      h2 {
+        margin-top: 0;
+      }
+    }
+
+    ul.user-stats-table {
+      list-style: none;
+    }
+  }
+}
