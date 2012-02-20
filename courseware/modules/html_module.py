@@ -24,7 +24,7 @@ class Module(XModule):
             textlist=[i for i in textlist if type(i)==str]
             return "".join(textlist)
         try: 
-            filename=settings.DATA_DIR+"html/"+self.filename+".xml"
+            filename=settings.DATA_DIR+"html/"+self.filename
             return open(filename).read()
         except: # For backwards compatibility. TODO: Remove
             return render_to_string(self.filename, {'id': self.item_id})
