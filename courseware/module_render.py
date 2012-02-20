@@ -60,8 +60,6 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     ajax_url = '/modx/'+module+'/'+id+'/'
 
-    # id_tag=courseware.modules.get_module_class(module)
-
     # Grab the XML corresponding to the request from course.xml
     xml = content_parser.module_xml(content_parser.course_file(request.user), module, 'id', id)
 
@@ -118,7 +116,10 @@ def render_x_module(user, request, xml_module, module_object_preload):
         smod.save() # This may be optional (at least in the case of no instance in the dB)
         module_object_preload.append(smod)
     # Grab content
-    content = {'content':instance.get_html(), 
+    content = instance.get_html()
+    if user.is_staff:
+        content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module)})
+    content = {'content':content, 
                "destroy_js":instance.get_destroy_js(),
                'init_js':instance.get_init_js(), 
                'type':module_type}

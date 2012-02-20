@@ -14,7 +14,8 @@ valid_templates=['index.html',
                  'privacy.html', 
                  'honor.html', 
                  'copyright.html', 
-                 '404.html']
+                 '404.html',
+                 'mitx_help.html']
 
 if settings.STATIC_GRAB: 
     valid_templates = valid_templates+['server-down.html',

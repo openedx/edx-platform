@@ -27,6 +27,9 @@ class ModelsTest(unittest.TestCase):
         self.assertEqual(calc.evaluator({},{}, "-1"), -1)
         self.assertEqual(calc.evaluator({},{}, "-0.33"), -.33)
         self.assertEqual(calc.evaluator({},{}, "-.33"), -.33)
+        self.assertEqual(calc.evaluator(variables, functions, "R1*R3"), 8.0)
+        self.assertTrue(abs(calc.evaluator(variables, functions, "sin(e)-0.41"))<0.01)
+        self.assertTrue(abs(calc.evaluator(variables, functions, "k*T/q-0.025"))<0.001)
         exception_happened = False
         try: 
             evaluator({},{}, "5+7 QWSEKO")
