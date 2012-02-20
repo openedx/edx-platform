@@ -99,7 +99,8 @@ SITE_ID = 1
 SITE_NAME = "localhost:8000"
 CSRF_COOKIE_DOMAIN = '127.0.0.1'
 HTTPS = 'on'
-ROOT_URLCONF = 'mitxweb.urls'
+#ROOT_URLCONF = 'mitxweb.urls'
+ROOT_URLCONF = 'mitx.urls'
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
