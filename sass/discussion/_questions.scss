@@ -86,7 +86,7 @@ ul.question-list, div#question-list {
     padding: 10px 0;
 
     &:hover {
-      background: lighten(#F6EFD4, 8%);
+      background: #fbfbfb;
     }
 
     div {
@@ -131,27 +131,31 @@ ul.question-list, div#question-list {
           text-align: right;
 
           li {
-            @include border-radius(3px);
+            @include linear-gradient(#fff, #f5f5f5);
+            border: 1px solid #eee;
             display: inline-block;
             height:60px;
             margin-right: 10px;
             width: 60px;
 
+            &:hover {
+              span, div {
+                color: #555;
+              }
+            }
+
             &.views {
-              background: lighten(#F6EFD4, 5%);
             }
 
             &.answers {
-              background: #F6EFD4;
             }
 
             &.votes {
-              background: darken(#F6EFD4, 5%);
             }
 
             span, div {
               @include box-sizing(border-box);
-              color: darken(#F6EFD4, 60%);
+              color: #888;
               display: block;
               text-align: center;
             }

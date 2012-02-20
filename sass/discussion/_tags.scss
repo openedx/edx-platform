@@ -1,18 +1,21 @@
 ul.tags {
   list-style: none;
   display: inline;
+
   li, a {
     position: relative;
   }
+
   li {
-    @include border-radius(4px);
     background: #eee;
+    @include border-radius(4px);
+    @include box-shadow(1px 1px 0px #bbb);
     color: #555;
     display: inline-block;
     font-size: 12px;
+    margin-bottom: 5px;
     margin-left: 15px;
     padding: 3px 10px 5px 5px;
-    margin-bottom: 5px;
 
     &:before {
      border-color:transparent #eee transparent transparent;
@@ -20,15 +23,15 @@ ul.tags {
      border-width:12px 12px 12px 0;
      content:"";
      height:0;
-     left:-11px;
+     left:-10px;
      position:absolute;
      top:0;
      width:0;
     }
 
     span.delete-icon, div.delete-icon {
-      @include border-radius(0 4px 4px 0);
       background: #555;
+      @include border-radius(0 4px 4px 0);
       clear: none;
       color: #eee;
       cursor: pointer;
@@ -53,11 +56,12 @@ ul.tags {
 }
 
 span.tag-number {
-  @include border-radius(3px);
-  background: #555;
-  font-size: 10px;
-  margin: 0 3px;
-  padding: 2px 5px;
-  color: #eee;
-  opacity: 0.5;
+  display: none;
+  // @include border-radius(3px);
+  // background: #555;
+  // font-size: 10px;
+  // margin: 0 3px;
+  // padding: 2px 5px;
+  // color: #eee;
+  // opacity: 0.5;
 }
