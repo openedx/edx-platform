@@ -61,6 +61,12 @@ sys.path.append(PROJECT_ROOT / 'lib')
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files
 MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
+MAKO_TEMPLATES = {}
+MAKO_TEMPLATES['course'] = [DATA_DIR]
+MAKO_TEMPLATES['sections'] = [DATA_DIR+'/sections']
+MAKO_TEMPLATES['custom_tags'] = [DATA_DIR+'/custom_tags']
+MAKO_TEMPLATES['main'] = [ENV_ROOT+'/templates/']
+
 TEXTBOOK_DIR = ENV_ROOT / "books" / "circuits_agarwal_lang"
 
 # FIXME ???????? -- 
