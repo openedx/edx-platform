@@ -295,4 +295,18 @@ div.question-header {
   }
 }
 
+div.question-status {
+  background: $mit-red;
+  clear:both;
+  color: #fff;
+  display: block;
+  padding: 10px 0 10px 7.5%;
 
+  h3 {
+  font-weight: normal;
+  }
+
+  a {
+    color: #eee;
+  }
+}
