@@ -3,8 +3,9 @@ import math
 import numpy
 import random
 import scipy
+import traceback
 
-from calc import evaluator
+from calc import evaluator, UndefinedVariable
 from django.conf import settings
 from util import contextualize_text
 
@@ -84,6 +85,9 @@ class customresponse(object):
         # be handled by capa_problem
         return {}
 
+class StudentInputError(Exception):
+    pass
+
 class formularesponse(object):
     def __init__(self, xml, context):
         self.xml = xml
@@ -95,6 +99,17 @@ class formularesponse(object):
         self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                    id=xml.get('id'))[0]
         self.context = context
+        ts = xml.get('type')
+        if ts == None:
+            typeslist = []
+        else:
+            typeslist = ts.split(',')
+        if 'ci' in typeslist: # Case insensitive
+            self.case_sensitive = False
+        elif 'cs' in typeslist: # Case sensitive
+            self.case_sensitive = True
+        else: # Default
+            self.case_sensitive = False
 
 
     def grade(self, student_answers):
@@ -113,7 +128,16 @@ class formularesponse(object):
                 instructor_variables[str(var)] = value
                 student_variables[str(var)] = value
             instructor_result = evaluator(instructor_variables,dict(),self.correct_answer)
-            student_result = evaluator(student_variables,dict(),student_answers[self.answer_id])
+            try: 
+                #print student_variables,dict(),student_answers[self.answer_id]
+                student_result = evaluator(student_variables,dict(),
+                                           student_answers[self.answer_id], 
+                                           cs = self.case_sensitive)
+            except UndefinedVariable as uv:
+                raise StudentInputError('Undefined: '+uv.message)
+            except:
+                #traceback.print_exc()
+                raise StudentInputError("Syntax Error")
             if math.isnan(student_result) or math.isinf(student_result):
                 return {self.answer_id:"incorrect"}
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
