@@ -73,6 +73,12 @@ div.answer-block {
       color: #555;
     }
   }
+
+  div.deleted {
+    p {
+      color: $mit-red;
+    }
+  }
 }
 
 div.paginator {
