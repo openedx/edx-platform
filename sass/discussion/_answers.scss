@@ -17,7 +17,7 @@ div.answer-controls {
     nav {
       @extend .action-link;
       float: right;
-      margin-top: 25px;
+      margin-top: 34px;
 
       a {
         &.on span{
@@ -27,7 +27,7 @@ div.answer-controls {
         &:before {
           content: '|';
           color: darken(#F6EFD4, 10%);
-          font-size: 22px;
+          font-size: 16px;
         }
       }
     }
@@ -73,6 +73,12 @@ div.answer-block {
       color: #555;
     }
   }
+
+  div.deleted {
+    p {
+      color: $mit-red;
+    }
+  }
 }
 
 div.paginator {
@@ -111,14 +117,13 @@ div.answer-own {
 }
 
 div.answer-actions {
-  border-left: 3px solid darken(#F6EFD4, 10%);
   margin: 0;
   padding:8px 8px 8px 0;
   text-align: right;
-  background:lighten(#F6EFD4, 5%);
+  border-top: 1px solid #efefef;
 
   span.sep {
-    color: #ddd;
+    color: #EDDFAA;
   }
 
   a {

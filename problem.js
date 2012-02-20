@@ -13,11 +13,15 @@ function ${ id }_load() {
     postJSON('/modx/problem/${ id }/problem_check',
     submit_data,
     function(json) {
-
-      if(json['success'] == 'syntax')
-      alert('Syntax error');
-      else
-      ${ id }_load();
+      switch(json.success) {
+      case 'incorrect': // Worked, but answer not 
+      case 'correct':
+	  ${ id }_load();
+      //alert("!!"+json.success);  
+          break;
+      default:
+        alert(json.success);  
+      }
     });
     log_event('problem_check', submit_data);
   });
