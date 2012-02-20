@@ -107,9 +107,9 @@
 //   height: 0;
 //   visibility: hidden; }
 
-.badges a {
-  color: #763333;
-  text-decoration: underline; }
+// .badges a {
+//   color: #763333;
+//   text-decoration: underline; }
 
 // a:hover {
 //   text-decoration: underline; }
@@ -1846,27 +1846,27 @@ body.anon #searchbar {
 //   width: 270px;
 //   margin-bottom: 15px; }
 
-a {
-  &.medal {
-    font-size: 17px;
-    line-height: 250%;
-    margin-right: 5px;
-    color: #333;
-    text-decoration: none;
-    background: url(../images/medala.gif) no-repeat;
-    border-left: 1px solid #eee;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    padding: 4px 12px 4px 6px; }
-  &:hover.medal {
-    color: #333;
-    text-decoration: none;
-    background: url(../images/medala_on.gif) no-repeat;
-    border-left: 1px solid #e7e296;
-    border-top: 1px solid #e7e296;
-    border-bottom: 1px solid #d1ca3d;
-    border-right: 1px solid #d1ca3d; } }
+// a {
+//   &.medal {
+//     font-size: 17px;
+//     line-height: 250%;
+//     margin-right: 5px;
+//     color: #333;
+//     text-decoration: none;
+//     background: url(../images/medala.gif) no-repeat;
+//     border-left: 1px solid #eee;
+//     border-top: 1px solid #eee;
+//     border-bottom: 1px solid #ccc;
+//     border-right: 1px solid #ccc;
+//     padding: 4px 12px 4px 6px; }
+//   &:hover.medal {
+//     color: #333;
+//     text-decoration: none;
+//     background: url(../images/medala_on.gif) no-repeat;
+//     border-left: 1px solid #e7e296;
+//     border-top: 1px solid #e7e296;
+//     border-bottom: 1px solid #d1ca3d;
+//     border-right: 1px solid #d1ca3d; } }
 
 #award-list .user {
   float: left;
