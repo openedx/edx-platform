@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import os
 import re
 
 from datetime import timedelta
@@ -141,12 +142,15 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
             #to its children later.
             return
 
+def user_groups(user):
+    # TODO: Rewrite in Django
+    return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
+
 def course_file(user):
     # TODO: Cache. 
     filename = UserProfile.objects.get(user=user).courseware
 
-    # TODO: Rewrite in Django
-    groups = [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
+    groups = user_groups(user)
 
     options = {'dev_content':settings.DEV_CONTENT, 
                'groups' : groups}
@@ -157,6 +161,24 @@ def course_file(user):
     propogate_downward_tag(tree, "graded")
     propogate_downward_tag(tree, "graceperiod")
     return tree
+
+def section_file(user, section):
+    filename = section+".xml"
+
+    if filename not in os.listdir(settings.DATA_DIR + '/sections/'):
+        print filename+" not in "+str(os.listdir(settings.DATA_DIR + '/sections/'))
+        return None
+
+    options = {'dev_content':settings.DEV_CONTENT, 
+               'groups' : user_groups(user)}
+
+    tree = etree.XML(render_to_string(filename, options, namespace = 'sections'))
+    id_tag(tree)
+    propogate_downward_tag(tree, "due")
+    propogate_downward_tag(tree, "graded")
+    propogate_downward_tag(tree, "graceperiod")
+    return tree
+
 
 def module_xml(coursefile, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes
