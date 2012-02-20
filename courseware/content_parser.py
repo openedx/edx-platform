@@ -5,13 +5,12 @@ import re
 
 from datetime import timedelta
 from lxml import etree
-from mako.template import Template
-from mako.lookup import TemplateLookup
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
     from student.models import UserProfile
     from student.models import UserTestGroup
+    from mitxmako.shortcuts import render_to_response, render_to_string
 except: 
     settings = None 
 
@@ -142,13 +141,9 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
             #to its children later.
             return
 
-template_lookup = TemplateLookup(directories = [settings.DATA_DIR], 
-                                 module_directory = settings.MAKO_MODULE_DIR)
-
 def course_file(user):
     # TODO: Cache. 
     filename = UserProfile.objects.get(user=user).courseware
-    data_template = template_lookup.get_template(filename)
 
     # TODO: Rewrite in Django
     groups = [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
@@ -156,7 +151,7 @@ def course_file(user):
     options = {'dev_content':settings.DEV_CONTENT, 
                'groups' : groups}
 
-    tree = etree.XML(data_template.render(**options))
+    tree = etree.XML(render_to_string(filename, options, namespace = 'course'))
     id_tag(tree)
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")

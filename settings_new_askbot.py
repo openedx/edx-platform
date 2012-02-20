@@ -148,11 +148,10 @@ MAXLOG = 500
 LOG_DIR = "/tmp/"
 MAKO_MODULE_DIR = None
 
+MAKO_TEMPLATES = {}
+
 # Make sure we execute correctly regardless of where we're called from
 execfile(os.path.join(BASE_DIR, "settings.py"))
-
-if MAKO_MODULE_DIR == None:
-    MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -387,6 +386,18 @@ ASKBOT_CSS_DEVEL = True
 # Celery Settings
 BROKER_TRANSPORT = "djkombu.transport.DatabaseTransport"
 CELERY_ALWAYS_EAGER = True
+
+ot = MAKO_TEMPLATES
+MAKO_TEMPLATES['course'] = [DATA_DIR]
+MAKO_TEMPLATES['sections'] = [DATA_DIR+'/sections']
+MAKO_TEMPLATES['custom_tags'] = [DATA_DIR+'/custom_tags']
+MAKO_TEMPLATES['main'] = [BASE_DIR+'/templates/']
+
+
+MAKO_TEMPLATES.update(ot)
+
+if MAKO_MODULE_DIR == None:
+    MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 
 djcelery.setup_loader()
 
