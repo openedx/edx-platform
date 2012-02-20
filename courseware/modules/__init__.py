@@ -33,16 +33,24 @@ from courseware import content_parser
 modx_module_list = [capa_module,  html_module,  schematic_module,  seq_module,  template_module,  vertical_module,  video_module]
 #print modx_module_list
 
-# Convert list to a dictionary for lookup by tag
 modx_modules = {}
-for module in modx_module_list:
-    for tag in module.Module.get_xml_tags():
-        modx_modules[tag] = module.Module
+
+# Convert list to a dictionary for lookup by tag
+def update_modules():
+    global modx_modules
+    modx_modules = dict()
+    for module in modx_module_list:
+        for tag in module.Module.get_xml_tags():
+            modx_modules[tag] = module.Module
+
+update_modules()
 
 def get_module_class(tag):
     ''' Given an XML tag (e.g. 'video'), return 
     the associated module (e.g. video_module.Module). 
     '''
+    if tag not in modx_modules:
+        update_modules()
     return modx_modules[tag]
 
 def get_module_id(tag):
