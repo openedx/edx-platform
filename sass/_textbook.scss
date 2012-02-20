@@ -74,6 +74,13 @@ div.book-wrapper {
           }
         }
       }
+
+      &.bottom-nav {
+        margin-top: lh();
+        margin-bottom: -(lh());
+        border-bottom: 0;
+        border-top: 1px solid #EDDFAA;
+      }
     }
 
     section.page {
