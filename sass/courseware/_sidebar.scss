@@ -2,34 +2,6 @@ section.course-index {
   @extend .sidebar;
   @extend .tran;
 
-  div#open_close_accordion {
-    @include box-shadow(0 1px 0 #eee);
-    border-bottom: 1px solid #d3d3d3;
-    padding: 0 lh();
-    position: relative;
-
-    h2 {
-      padding-right: 20px;
-    }
-
-    a {
-      width: 16px;
-      text-indent: -9999px;
-      height: 16px;
-      position: absolute;
-      padding: 8px;
-      top: -12px;
-      right: -1px;
-      border: 1px solid #D3D3D3;
-      background: #eee url('/static/images/slide-left-icon.png') center center no-repeat;
-      @include border-radius(3px 0 0 3px);
-
-      &:hover {
-        background-color: white;
-      }
-    }
-  }
-
   div#accordion {
 
     h3 {

@@ -9,8 +9,10 @@ div.profile-wrapper {
     border-right: 0;
 
     h1 {
-      padding:0 lh();
+      padding: lh(.5) lh();
       font-size: 18px;
+      margin: 0 ;
+      @extend .bottom-border;
     }
 
     ul {
