@@ -66,28 +66,34 @@ class Module(XModule):
         ## Returns a set of all types of all sub-children
         child_classes = [set([i.tag for i in e.iter()]) for e in self.xmltree]
 
-        self.contents=[(e.get("name"),j(self.render_function(e))) \
-                      for e in self.xmltree]
+        self.titles = json.dumps(["\n".join([i.get("name").strip() for i in e.iter() if i.get("name") != None]) \
+                           for e in self.xmltree])
+
+        self.contents = [j(self.render_function(e)) \
+                             for e in self.xmltree]
+
+        print self.titles
 
         for (content, element_class) in zip(self.contents, child_classes):
             new_class = 'other'
             for c in class_priority:
                 if c in element_class: 
                     new_class = c
-            content[1]['type'] = new_class
+            content['type'] = new_class
      
         js=""
 
         params={'items':self.contents,
                 'id':self.item_id,
-                'position': self.position}
+                'position': self.position,
+                'titles':self.titles}
 
         # TODO/BUG: Destroy JavaScript should only be called for the active view
         # This calls it for all the views
         # 
         # To fix this, we'd probably want to have some way of assigning unique
         # IDs to sequences. 
-        destroy_js="".join([e[1]['destroy_js'] for e in self.contents if 'destroy_js' in e[1]])
+        destroy_js="".join([e['destroy_js'] for e in self.contents if 'destroy_js' in e])
 
         if self.xmltree.tag == 'sequential':
             self.init_js=js+render_to_string('seq_module.js',params)
