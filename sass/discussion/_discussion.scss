@@ -62,14 +62,52 @@ body.askbot {
             margin-bottom: 70px;
           }
 
-          // span, a {
-          //   text-decoration: none;
-          //   color: #888;
-          //   font-weight: bold;
-          // }
         }
       }
     }
   }
 
 }
+
+// Autocomplete
+
+.acInput {
+  width: 200px;
+}
+.acResults {
+  background-color: #fff;
+  border: 1px solid #ababab;
+  overflow: hidden;
+  padding: 0px;
+  @include box-shadow(0 2px 2px #bbb);
+
+  ul {
+    list-style-position: outside;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  li {
+    cursor: pointer;
+    display: block;
+    font: menu;
+    margin: 0px;
+    overflow: hidden;
+    padding: 5px 10px;
+    text-align: left;
+    border-top: 1px solid #eee;
+    width: 100%;
+  }
+}
+
+.acLoading {
+  background : url('../images/indicator.gif') right center no-repeat;
+}
+
+.acSelect {
+  background-color: $mit-red;
+  color: #fff;
+}
+
