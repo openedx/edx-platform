@@ -1,0 +1,273 @@
+#lean_overlay {
+  position: fixed;
+  z-index:100;
+  top: 0px;
+  left: 0px;
+  height:100%;
+  width:100%;
+  background: #000;
+  display: none;
+}
+
+div.leanModal_box {
+  background: #fff;
+  border: none;
+  @include border-radius(3px);
+  @include box-shadow(0 0 6px #000);
+  @include box-sizing(border-box);
+  display: none;
+  padding: lh(2);
+
+  a.modal_close {
+    color: #aaa;
+    display: block;
+    font-style: normal;
+    height: 14px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    width: 14px;
+    z-index: 2;
+
+    &:hover{
+      text-decoration: none;
+      color: $mit-red;
+    }
+  }
+
+  h1 {
+    border-bottom: 1px solid #eee;
+    font-size: 24px;
+    margin-bottom: lh();
+    margin-top: 0;
+    padding-bottom: lh();
+    text-align: left;
+  }
+
+  &#enroll {
+    max-width: 600px;
+
+    p.ie-warning {
+      display: none;
+    }
+
+    ol {
+      @extend .clearfix;
+
+      li {
+
+        &.terms, &.honor-code {
+          width: auto;
+          float: none;
+        }
+
+        div.tip {
+          display: none;
+        }
+
+        &:hover {
+          div.tip {
+            background: #333;
+            color: #fff;
+            display: block;
+            font-size: 16px;
+            line-height: lh();
+            margin: 0 0 0 -10px;
+            padding: 10px;
+            position: absolute;
+            -webkit-font-smoothing: antialiased;
+            width: 500px;
+          }
+        }
+      }
+    }
+  }
+
+  form {
+    text-align: left;
+
+    div#enroll_error, div#login_error, div#pwd_error {
+      $error-color: #333;
+      background-color: $error-color;
+      border: darken($error-color, 20%);
+      color: #fff;
+      font-family: "Open sans";
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin: (-(lh())) (-(lh())) lh();
+      padding: lh(.5);
+      text-shadow: 0 1px 0 darken($error-color, 10%);
+      -webkit-font-smoothing: antialiased;
+
+      &:empty {
+        padding: 0;
+      }
+    }
+
+    ol {
+      list-style: none;
+      margin-bottom: lh();
+
+      li {
+        margin-bottom: lh(.5);
+
+        &.terms, &.remember {
+          border-top: 1px solid #eee;
+          clear: both;
+          float: none;
+          padding-top: lh();
+          width: auto;
+        }
+
+        &.honor-code {
+          width: auto;
+          float: none;
+        }
+
+        label {
+          display: block;
+          font-weight: bold;
+        }
+
+        #{$all-text-inputs}, textarea {
+          width: 100%;
+          @include box-sizing(border-box);
+        }
+
+        input[type="checkbox"] {
+          margin-right: 10px;
+        }
+
+        ul {
+          list-style: disc outside none;
+          margin: lh(.5) 0 lh() lh();
+
+          li {
+            color: #666;
+            float: none;
+            font-size: 14px;
+            list-style: disc outside none;
+            margin-bottom: lh(.5);
+          }
+        }
+      }
+    }
+
+    input[type="button"], input[type="submit"] {
+      @include button($mit-red);
+      font-size: 18px;
+      padding: lh(.5);
+    }
+  }
+}
+
+div#login {
+  min-width: 400px;
+
+  header {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: lh();
+    padding-bottom: lh();
+
+    h1 {
+      border-bottom: 0;
+      padding-bottom: 0;
+      margin-bottom: lh(.25);
+    }
+  }
+
+  ol {
+    li {
+      width: auto;
+      float: none;
+    }
+  }
+}
+
+div.lost-password {
+  text-align: left;
+  margin-top: lh();
+
+  a {
+    color: #999;
+
+    &:hover {
+      color: #444;
+    }
+  }
+}
+
+div#pwd_reset {
+  p {
+    margin-bottom: lh();
+  }
+
+  input[type="email"] {
+    margin-bottom: lh();
+  }
+}
+
+div#feedback_div{
+  form{
+    ol {
+      li {
+        float: none;
+        width: 100%;
+
+        textarea#feedback_message {
+          height: 100px;
+        }
+      }
+    }
+  }
+}
+
+div#calculator_div {
+  max-width: 500px;
+
+  form {
+    padding-bottom: lh();
+    margin-bottom: lh();
+    border-bottom: 1px solid #ddd;
+
+    input#calculator_input {
+      width: 400px;
+    }
+
+    input#calculator_button {
+      background: 0;
+      color: $mit-red;
+      border: 0;
+      @include box-shadow(none);
+      padding: 0;
+      text-shadow: none;
+
+      &:hover {
+        color: #333;
+      }
+    }
+
+    input#calculator_output {
+      border: 0;
+      background: none;
+      padding: lh(.35);
+      font-size: 24px;
+      width: 378px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+  }
+
+  dl {
+    dt {
+      float: left;
+      clear: both;
+      padding-right: lh(.5);
+      font-weight: bold;
+    }
+
+    dd {
+      float: left;
+    }
+  }
+}

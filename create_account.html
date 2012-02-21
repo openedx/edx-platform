@@ -1,7 +1,10 @@
 <!-- TODO: Add pattern field to username. See HTML5 cookbook, page 84 for details-->
 <div name="enroll_form" id="enroll_form">
 
-  <h1>Enroll in 6.002 Circuits &amp; Electronics</h1>
+  <h1>Enroll in 6.002x Circuits &amp; Electronics</h1>
+
+  <p class="ie-warning"> Enrollment requires a modern web browser with JavaScript enabled. You don't have this. You can&rsquo;t enroll without upgrading, since you couldn&rsquo;t take the course without upgrading. Feel free to download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Mozilla Firefox</a> or <a href="http://support.google.com/chrome/bin/answer.py?hl=en&answer=95346">Google Chrome</a>, for free, to enroll and take this course.</p>
+
   <form name="enroll" id="enroll_form"  method="get">
     <fieldset><% if 'error' in locals(): e = error %>
 
@@ -11,26 +14,26 @@
 
       <li class="email">
         <label>E-mail*</label>
-        <input name="email" id="ca_email" type="email" required />
+        <input name="email" id="ca_email" type="email" />
       </li>
 
       <li class="password">
         <label>Password*</label>
-        <input name="password" id="ca_password" type="password" required />
+        <input name="password" id="ca_password" type="password"  />
       </li>
 
       <li class="username">
         <label>Username (public)* <span class="ui-icon ui-icon-help" id="spinner_nick" style="display:inline-block;"></span></label>
-        <input name="username" id="ca_username" type="text" required /> 
+        <input name="username" id="ca_username" type="text"  /> 
 
         <div id="sregion_nick" class="tip">Nickname you'd like to use on forums.</div>
       </li>
 
       <li class="full-name">
-        <label>Full name<span class="ui-icon ui-icon-help" id="spinner_name" style="display:inline-block;"></span></label>
-        <input name="name" id="ca_name" type="text" />
+        <label>Full name*<span class="ui-icon ui-icon-help" id="spinner_name" style="display:inline-block;"></span></label>
+        <input name="name" id="ca_name" type="text"  />
 
-        <div class="tip" id="sregion_name">If you would like us to give you a certificate of completion at the end, we need your full legal name, as you would like it to appear on the certificate (e.g. &quot;John Smith, Jr&quot;).</div>
+        <div class="tip" id="sregion_name">If you successfully complete the course, you will receive an electronic certificate of accomplishment from <i>MITx</i> with this name on it.</div>
       </li>
 
       <li class="location">
@@ -49,16 +52,17 @@
       </li>
 
       <li class="terms">
-        <label> <input name="terms_of_service" id="cb_terms_of_service" type="checkbox" value="terms_of_service" required />I agree to the Terms of Service*</label>
+        <label> <input name="terms_of_service" id="cb_terms_of_service" type="checkbox" value="terms_of_service"  />I agree to the <a href="/t/tos.html">Terms of Service</a>*</label>
       </li>
 
       <li class="honor-code">
         <label>
-          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code" required />I agree to the Honor code.*</label>
+          <input name="honor_code" id="cb_honor_code" type="checkbox" value="honor_code"  />I agree to the <a href="/t/honor.html">Honor Code</a>, summarized as:*</label>
         <ul>
+	  <li>Complete all mid-terms and final exams with only my own work.</li>
+          <li>Maintain only one account, and not share the username or password.</li>
           <li>Not engage in any activities that would dishonestly improve my results, or improve or hurt those of others.</li>
-          <li>Never post answers to problems.</li>
-          <li>Maintain only one account.</li>
+          <li>Not post answers to problems that are being used to assess student performance.</li>
         </ul>
       </li>
 

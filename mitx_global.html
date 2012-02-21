@@ -12,7 +12,7 @@
       </section>
 
     <section class="intro-video">
-      <a rel="leanModal" href="#video-overlay"><img src="/static/images/video-image.png" alt="" /><span> Watch intro video</span></a>
+      <a id="video-overlay-link" rel="leanModal" href="#video-overlay"><img src="/static/images/video-image.png" id="video-img" alt="Link to MITx introduction video" /><span> Watch intro video</span></a>
     </section>
 
     </section>
@@ -27,7 +27,7 @@
         <li>operates on an open-source, scalable software infrastructure in order to make it continuously improving and readily available to other educational institutions, such as universities and K-12 school systems.</li>
       </ul>
 
-      <p><strong>Press &amp; links:</strong> <a href="http://www.boston.com/news/local/massachusetts/articles/2011/12/19/mit_to_launch_online_only_graded_courses_free_to_all/?page=full" target="_blank">Boston Globe</a>, <a href="http://www.nytimes.com/2011/12/19/education/mit-expands-free-online-courses-offering-certificates.html?_r=3&hpw=" target="_blank">New York Times</a>,  <a href="http://web.mit.edu/newsoffice/2011/mitx-education-initiative-1219.html" target="_blank">MIT Press Release</a>, <a href="http://web.mit.edu/newsoffice/2011/mitx-faq-1219" target="_blank"><em>MITx</em> FAQ</a></p>
+      <p><strong>Press &amp; links:</strong> <a href="/6002x-press-release.html">6.002x Press Release</a>, <a href="/6002x-faq.html">6.002x FAQ</a>, <a href="/mitx-overview.html">MITx overview</a>, <a href="http://www.boston.com/news/local/massachusetts/articles/2011/12/19/mit_to_launch_online_only_graded_courses_free_to_all/?page=full" target="_blank">Boston Globe</a>, <a href="http://www.nytimes.com/2011/12/19/education/mit-expands-free-online-courses-offering-certificates.html?_r=3&hpw=" target="_blank">New York Times</a>, <a href="http://web.mit.edu/newsoffice/2011/mitx-education-initiative-1219.html" target="_blank">MIT Press Release</a>, <a href="http://web.mit.edu/newsoffice/2011/mitx-faq-1219" target="_blank"><em>MITx</em> FAQ</a>, <a href="http://ocw.mit.edu/index.htm" target="_blank">OpenCourseWare</a></p>
     </section>
 
   </section>
@@ -40,19 +40,39 @@
     </hgroup>
 
     <p>
-      <a href="http://6002x.mitx.mit.edu/" class="more-info">More information <span>&amp;</span> Enroll</a>
+      <a href="http://6002x.mitx.mit.edu/" class="more-info">More information <span>&amp;</span> Enroll <span class="arrow">&#8227;</span></a>
     </p>
 
-    <p>Taught by Anant Agarwal, with Gerald Sussman and Piotr Mitros, 6.002x (Circuits and Electronics) is an on-line adaption of 6.002, MIT&rsquo;s first undergraduate analog design course. This prototype course will run, free of charge, for students worldwide from March 1, 2012 through June 8, 2012. Students will be given the opportunity to demonstrate their mastery of the material and earn a certificate from <em>MITx</em>.</p>
+    <p>Taught by Anant Agarwal, with Gerald Sussman and Piotr Mitros, 6.002x (Circuits and Electronics) is an on-line adaption of 6.002, MIT&rsquo;s first undergraduate analog design course. This prototype course will run, free of charge, for students worldwide from March 5, 2012 through June 8, 2012. Students will be given the opportunity to demonstrate their mastery of the material and earn a certificate from <em>MITx</em>.</p>
   </section>
 </section>
 
 <div id="video-overlay" class="leanModal_box">
-  <iframe width="560" height="315" src="http://www.youtube.com/embed/p2Q6BrNhdh8?rel=0" frameborder="0" allowfullscreen></iframe>
+  <iframe id="player" type="text/html" width="560" height="390" src="http://www.youtube.com/embed/p2Q6BrNhdh8?enablejsapi=1" frameborder="0">
+  </iframe>
 </div>
 <script>
 
+var player;
+function onYouTubePlayerAPIReady() {
+  player = new YT.Player('player', {
+  });
+}
+
 $(function() {
+
+    var tag = document.createElement('script');
+    tag.src = "http://www.youtube.com/player_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    $("a#video-overlay-link").click(function(){
+      player.playVideo();
+      $("a.modal_close, #lean_overlay").click(function(){
+        player.pauseVideo();
+      });
+    });
+
 
     // TODO: Clean up as per http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
 
@@ -89,7 +109,7 @@ $(function() {
           });
         })
 
-
    /*$("sregion"+$("[id^=spinner_]")[1].id.substring(7)) */
 });
+
 </script>

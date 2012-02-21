@@ -1,0 +1,75 @@
+// Base extends (Merge with main stylesheet later)
+.light-button {
+  @include box-shadow(inset 0 1px 0 #fff);
+  @include linear-gradient(#fff, lighten(#888, 40%));
+  @include border-radius(3px);
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  color: #666;
+  font: normal $body-font-size $body-font-family;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-font-smoothing: antialiased;
+
+  &:hover, &:focus {
+    @include linear-gradient(#fff, lighten(#888, 30%));
+    border: 1px solid #ccc;
+    text-decoration: none;
+  }
+
+}
+.action-link {
+  a {
+    color: darken(#F6EFD4, 50%);
+
+    &:hover {
+      text-decoration: none;
+      color: darken(#F6EFD4, 70%);
+    }
+  }
+}
+
+// Layout
+body.askbot {
+
+  section.main-content {
+    div.discussion-wrapper {
+      @extend .table-wrapper;
+
+      div.discussion-content {
+        @include box-sizing(border-box);
+        display: table-cell;
+        padding: lh();
+        vertical-align: top;
+        width: flex-grid(9) + flex-gutter();
+
+        .tabula-rasa {
+          @extend .light-button;
+          @include border-radius(5px);
+          display: block;
+          margin: 10px auto;
+          padding: 20px;
+          text-align: center;
+          width: flex-grid(5);
+          text-decoration: none;
+          color: #888;
+          font-weight: bold;
+
+          &:first-child {
+            margin-top: 70px;
+          }
+          &:last-child {
+            margin-bottom: 70px;
+          }
+
+          // span, a {
+          //   text-decoration: none;
+          //   color: #888;
+          //   font-weight: bold;
+          // }
+        }
+      }
+    }
+  }
+
+}
