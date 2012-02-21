@@ -1,6 +1,6 @@
 div.question-list-header {
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 0px;
   overflow: hidden;
   width: flex-grid(9,9);
   @extend h1.top-header;
@@ -103,10 +103,10 @@ ul.question-list, div#question-list {
       background: #F3F3F3;
 
       ul.tags li {
-        background: #fff;
+        background: #ddd;
 
         &:before {
-          border-color: transparent #fff transparent transparent;
+          border-color: transparent #ddd transparent transparent;
         }
       }
     }
@@ -207,9 +207,18 @@ ul.question-list, div#question-list {
 
   div.post-own-question {
     padding: 11px;
+    margin-top: 10px;
+    color: #888;
+    text-align: center;
 
     a {
       font-weight: bold;
+      @extend .light-button;
+      padding: 20px;
+      display: block;
+      margin: 10px auto;
+          text-align: center;
+          width: flex-grid(5);
     }
   }
 }
