@@ -19,6 +19,11 @@ ${ wiki_article.title }
         return "You have made changes to the article that have not been saved yet.";
       }
     };
+    
+    $("#submit_edit").click(function() {
+      $("#id_contents").data('initial_contents', $("#id_contents").val());
+    });
+    
   });
 </script>
 </%block>
