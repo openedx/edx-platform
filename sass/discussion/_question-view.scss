@@ -147,14 +147,13 @@ div.question-header {
 
     div.comments-container {
       @include box-sizing(border-box);
-      padding: 3%;
       display: inline-block;
-      padding: 3%;
+      padding: 0 0 3% 0;
       width: 100%;
 
       div.comments-content {
         font-size: 13px;
-        background: lighten(#efefef, 4%);
+        background: #efefef;
 
         div.block {
           border-top: 1px solid #ddd;
@@ -283,7 +282,7 @@ div.question-header {
 
       div.controls {
         // padding: 15px 0;
-        background: lighten(#eeeeee, 4%);
+        background: #efefef ;
         text-align: right;
         a {
           display: inline-block;
