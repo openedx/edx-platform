@@ -68,6 +68,13 @@ h1.top-header {
   width: flex-grid(3);
   position: relative;
 
+  h1, h2 {
+   font-size: 18px;
+   text-transform: none;
+   font-weight: 800;
+   letter-spacing: 0;
+  }
+
   h3 {
     @include box-shadow(0 1px 0 #eee);
     background: none;
@@ -110,10 +117,40 @@ h1.top-header {
     }
   }
 
+  header#open_close_accordion {
+    @include box-shadow(0 1px 0 #eee);
+    border-bottom: 1px solid #d3d3d3;
+    padding: lh(.5) lh();
+    position: relative;
+
+    h2 {
+      padding-right: 20px;
+      margin: 0;
+    }
+
+    a {
+      width: 16px;
+      text-indent: -9999px;
+      height: 16px;
+      position: absolute;
+      padding: 8px;
+      top: 6px;
+      right: -1px;
+      border: 1px solid #D3D3D3;
+      background: #eee url('/static/images/slide-left-icon.png') center center no-repeat;
+      @include border-radius(3px 0 0 3px);
+
+      &:hover {
+        background-color: white;
+      }
+    }
+  }
+
   a.button {
     text-decoration: none;
   }
 }
+
 
 .topbar {
   background: #F6EFD4;
@@ -145,4 +182,8 @@ h1.top-header {
       }
     }
   }
+}
+
+.tran {
+  @include transition( all, .2s, $ease-in-out-quad);
 }

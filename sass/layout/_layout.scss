@@ -11,13 +11,13 @@ html {
     section.main-content {
       @extend .clearfix;
       @extend .wrapper;
-      @include box-sizing(border-box);
-      overflow: hidden;
       background: #fff;
+      border: 1px solid #bbb;
       border-bottom: 1px solid #bbb;
+      @include box-shadow(0 0 4px #dfdfdf);
+      @include box-sizing(border-box);
       margin-top: 3px;
-        @include box-shadow(0 0 4px #dfdfdf);
-        border: 1px solid #bbb;
+      overflow: hidden;
 
       @media screen and (min-width: 1400px) {
         @include border-radius(4px);
