@@ -20,11 +20,11 @@
 }
 .action-link {
   a {
-    color: darken(#F6EFD4, 50%);
+    color: $mit-red;
 
     &:hover {
       text-decoration: none;
-      color: darken(#F6EFD4, 70%);
+      color: darken($mit-red, 20%);
     }
   }
 }
@@ -70,7 +70,6 @@ body.askbot {
 }
 
 // Autocomplete
-
 .acInput {
   width: 200px;
 }
@@ -110,4 +109,3 @@ body.askbot {
   background-color: $mit-red;
   color: #fff;
 }
-

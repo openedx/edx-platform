@@ -3,6 +3,7 @@ div.question-list-header {
   margin-bottom: 15px;
   overflow: hidden;
   width: flex-grid(9,9);
+  @extend h1.top-header;
 
   section.question-list-meta  {
     display: block;
@@ -14,6 +15,9 @@ div.question-list-header {
       float: left;
     }
 
+    h1 {
+      margin: 0;
+    }
     span.label {
       color: #555;
     }
@@ -43,7 +47,7 @@ div.question-list-header {
 
           &:before {
             content: '|';
-            color: darken(#F6EFD4, 10%);
+            color: #ccc;
             font-size: 16px;
           }
         }
@@ -54,8 +58,7 @@ div.question-list-header {
   section.question-tags-list {
     display: block;
     min-height: 26px;
-    overflow: hidden;
-    padding-top:5px;
+    padding-top:15px;
     width: 100%;
 
     div {
@@ -65,6 +68,7 @@ div.question-list-header {
 
     div.back {
       margin-right: 10px;
+      margin-top: 4px;
 
       a {
         color: #555;
@@ -74,6 +78,14 @@ div.question-list-header {
     div.tags-list {
 
     }
+
+    ul.tags li {
+      background: #fff;
+
+      &:before {
+        border-color: transparent #fff transparent transparent;
+      }
+    }
   }
 }
 
@@ -81,12 +93,26 @@ ul.question-list, div#question-list {
   width: flex-grid(9,9);
 
   li.single-question {
-    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
     list-style: none;
-    padding: 10px 0;
+    padding: 10px 3%;
+    margin-left: -3%;
+    width: 100%;
 
     &:hover {
-      background: #fbfbfb;
+      background: #F3F3F3;
+
+      ul.tags li {
+        background: #fff;
+
+        &:before {
+          border-color: transparent #fff transparent transparent;
+        }
+      }
+    }
+
+    &:first-child {
+      border-top: 0;
     }
 
     div {
@@ -132,7 +158,7 @@ ul.question-list, div#question-list {
 
           li {
             @include linear-gradient(#fff, #f5f5f5);
-            border: 1px solid #eee;
+            border: 1px solid #ddd;
             display: inline-block;
             height:60px;
             margin-right: 10px;
@@ -180,8 +206,7 @@ ul.question-list, div#question-list {
   }
 
   div.post-own-question {
-    border-top: 1px solid #efefef;
-    padding: 10px;
+    padding: 11px;
 
     a {
       font-weight: bold;
