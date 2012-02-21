@@ -23,8 +23,10 @@ import platform
 import sys
 import tempfile
 
-from path import path
 import djcelery
+from path import path
+
+from askbotsettings import LIVESETTINGS_OPTIONS
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
@@ -258,51 +260,6 @@ LOGIN_URL = '/'
 ALLOW_UNICODE_SLUGS = False
 ASKBOT_USE_STACKEXCHANGE_URLS = False # mimic url scheme of stackexchange
 ASKBOT_CSS_DEVEL = True
-
-LIVESETTINGS_OPTIONS = {
-    1: {
-        'SETTINGS' : {
-            'FORUM_DATA_RULES' : {
-                'MIN_TITLE_LENGTH' : 1,
-                'MIN_QUESTION_BODY_LENGTH' : 1,
-                'MIN_ANSWER_BODY_LENGTH' : 1,
-
-                # 'ENABLE_VIDEO_EMBEDDING' : True,
-                #
-                # Enabling video requires forked version of markdown
-                # pip uninstall markdown2
-                # pip install -e git+git://github.com/andryuha/python-markdown2.git#egg=markdown2
-            },
-            'MIN_REP' : {
-                'MIN_REP_TO_VOTE_UP' : 1,
-                'MIN_REP_TO_VOTE_DOWN' : 1,
-                'MIN_REP_TO_ANSWER_OWN_QUESTION' : 1,
-                'MIN_REP_TO_ACCEPT_OWN_ANSWER' : 1,
-                'MIN_REP_TO_FLAG_OFFENSIVE' : 1,
-                'MIN_REP_TO_LEAVE_COMMENTS' : 1,
-                'MIN_REP_TO_CLOSE_OWN_QUESTIONS' : 1,
-                'MIN_REP_TO_RETAG_OTHERS_QUESTIONS' : 1,
-                'MIN_REP_TO_REOPEN_OWN_QUESTIONS' : 1,
-                'MIN_REP_TO_EDIT_WIKI' : 1,
-                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 100,
-                'MIN_REP_TO_UPLOAD_FILES' : 1,
-            },
-            'SOCIAL_SHARING' : {
-                'ENABLE_SHARING_TWITTER' : False,
-                'ENABLE_SHARING_FACEBOOK' : False,
-                'ENABLE_SHARING_LINKEDIN' : False,
-                'ENABLE_SHARING_IDENTICA' : False,
-                'ENABLE_SHARING_GOOGLE' : False,
-            },
-            'USER_SETTINGS' : {
-                'EDITABLE_SCREEN_NAME' : False,
-                'EDITABLE_EMAIL' : False,
-                'ALLOW_ADD_REMOVE_LOGIN_METHODS' : False,
-                'ENABLE_GRAVATAR' : False,
-            },
-        },
-    },
-}
 
 # Celery Settings
 BROKER_TRANSPORT = "djkombu.transport.DatabaseTransport"

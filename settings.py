@@ -5,6 +5,8 @@ import tempfile
 
 import djcelery
 
+from settings2.askbotsettings import LIVESETTINGS_OPTIONS
+
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
 DEV_CONTENT = True
@@ -318,60 +320,13 @@ INSTALLED_APPS = INSTALLED_APPS + (
     'south',
     'askbot.deps.livesettings',
     'askbot',
-    #'keyedcache', # TODO: Main askbot tree has this installed, but we get intermittent errors if we include it. 
+    'keyedcache', # TODO: Main askbot tree has this installed, but we get intermittent errors if we include it. 
     'robots',
     'django_countries',
     'djcelery',
     'djkombu',
     'followit',
 )
-
-# askbot livesettings
-LIVESETTINGS_OPTIONS = {
-    1: {
-        'SETTINGS' : {
-            'FORUM_DATA_RULES' : {
-                'MIN_TITLE_LENGTH' : 1,
-                'MIN_QUESTION_BODY_LENGTH' : 1,
-                'MIN_ANSWER_BODY_LENGTH' : 1,
-
-                # 'ENABLE_VIDEO_EMBEDDING' : True,
-                #
-                # Enabling video requires forked version of markdown
-                # pip uninstall markdown2
-                # pip install -e git+git://github.com/andryuha/python-markdown2.git#egg=markdown2
-            },
-            'MIN_REP' : {
-                'MIN_REP_TO_VOTE_UP' : 1,
-                'MIN_REP_TO_VOTE_DOWN' : 1,
-                'MIN_REP_TO_ANSWER_OWN_QUESTION' : 1,
-                'MIN_REP_TO_ACCEPT_OWN_ANSWER' : 1,
-                'MIN_REP_TO_FLAG_OFFENSIVE' : 1,
-                'MIN_REP_TO_LEAVE_COMMENTS' : 1,
-                'MIN_REP_TO_CLOSE_OWN_QUESTIONS' : 1,
-                'MIN_REP_TO_RETAG_OTHERS_QUESTIONS' : 1,
-                'MIN_REP_TO_REOPEN_OWN_QUESTIONS' : 1,
-                'MIN_REP_TO_EDIT_WIKI' : 1,
-                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 100,
-                'MIN_REP_TO_UPLOAD_FILES' : 1,
-            },
-            'SOCIAL_SHARING' : {
-                'ENABLE_SHARING_TWITTER' : False,
-                'ENABLE_SHARING_FACEBOOK' : False,
-                'ENABLE_SHARING_LINKEDIN' : False,
-                'ENABLE_SHARING_IDENTICA' : False,
-                'ENABLE_SHARING_GOOGLE' : False,
-            },
-            'USER_SETTINGS' : {
-                'EDITABLE_SCREEN_NAME' : False,
-                'EDITABLE_EMAIL' : False,
-                'ALLOW_ADD_REMOVE_LOGIN_METHODS' : False,
-                'ENABLE_GRAVATAR' : False,
-            }
-        }
-    },
-}
-
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 ASKBOT_URL = 'discussion/'
