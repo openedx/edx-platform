@@ -155,6 +155,7 @@ def course_xml_process(tree):
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")
     propogate_downward_tag(tree, "graceperiod")
+    return tree
 
 def course_file(user):
     ''' Given a user, return course.xml
