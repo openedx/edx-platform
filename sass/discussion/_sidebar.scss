@@ -31,15 +31,26 @@ div.discussion-wrapper aside {
   }
 
   div.box {
-    @extend .bottom-border;
-    @extend .clearfix;
     display: block;
-    margin: 0 (-(lh()));
-    padding: lh(.5) lh();
+    margin: lh(.5) 0;
 
     &:last-child {
       @include box-shadow(none);
       border: 0;
+    }
+
+    h2 {
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: 14px;
+      letter-spacing: 1px;
+
+      &:not(.first) {
+        @include box-shadow(inset 0 1px 0 #eee);
+        border-top: 1px solid #d3d3d3;
+        margin: 0 (-(lh())) 0;
+        padding: lh(.5) lh();
+      }
     }
 
     &.contributors {
@@ -165,11 +176,10 @@ div.discussion-wrapper aside {
   div.question-stats {
     ul {
       color: #777;
+      list-style: none;
 
       li {
-        @include box-shadow(0 1px 0 #eee);
-        border-bottom: 1px solid #d3d3d3;
-        padding: 7px 0;
+        padding: 7px 0 0;
 
         &:last-child {
           @include box-shadow(none);
