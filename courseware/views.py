@@ -71,8 +71,8 @@ def profile(request):
                         response = response_by_id[id]
                         if response.grade!=None:
                             correct=response.grade
-                    
-                    total=courseware.modules.capa_module.Module(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    total=courseware.modules.capa_module.Module(etree.tostring(p), "id").max_score() 
                     scores.append((int(correct),total, graded ))
                     
                     
@@ -246,6 +246,40 @@ def render_accordion(request,course,chapter,section):
                      template_imports.items())
     return {'init_js':render_to_string('accordion_init.js',context), 
             'content':render_to_string('accordion.html',context)}
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def render_section(request, section):
+    ''' TODO: Consolidate with index 
+    '''
+    user = request.user
+    if not settings.COURSEWARE_ENABLED or not user.is_authenticated():
+        return redirect('/')
+
+#    try: 
+    dom = content_parser.section_file(user, section)
+    #except:
+     #   raise Http404
+
+    accordion=render_accordion(request, '', '', '')
+
+    module_ids = dom.xpath("//@id")
+    
+    module_object_preload = list(StudentModule.objects.filter(student=user, 
+                                                              module_id__in=module_ids))
+    
+    module=render_module(user, request, dom, module_object_preload)
+
+    if 'init_js' not in module:
+        module['init_js']=''
+
+    context={'init':accordion['init_js']+module['init_js'],
+             'accordion':accordion['content'],
+             'content':module['content'],
+             'csrf':csrf(request)['csrf_token']}
+
+    result = render_to_response('courseware.html', context)
+    return result
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course="6.002 Spring 2012", chapter="Using the System", section="Hints"): 
