@@ -81,7 +81,7 @@ class Module(XModule):
 
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions. 
-        if self.lcp.done and self.rerandomize:
+        if self.lcp.done and self.rerandomize == "always":
             #print "!"
             check_button = False
             save_button = False
@@ -95,7 +95,7 @@ class Module(XModule):
             attempts_str = " ({a}/{m})".format(a=self.attempts, m=self.max_attempts)
 
         # We don't need a "save" button if infinite number of attempts and non-randomized
-        if self.max_attempts == None and self.rerandomize == False:
+        if self.max_attempts == None and self.rerandomize != "always":
             save_button = False
 
         # Check if explanation is available, and if so, give a link
@@ -164,12 +164,12 @@ class Module(XModule):
             self.show_answer="closed"
 
         self.rerandomize=content_parser.item(dom2.xpath('/problem/@rerandomize'))
-        if self.rerandomize=="":
-            self.rerandomize=True
-        elif self.rerandomize=="false":
-            self.rerandomize=False
-        elif self.rerandomize=="true":
-            self.rerandomize=True
+        if self.rerandomize=="" or self.rerandomize=="always" or self.rerandomize=="true":
+            self.rerandomize="always"
+        elif self.rerandomize=="false" or self.rerandomize=="per_student":
+            self.rerandomize="per_student"
+        elif self.rerandomize=="never":
+            self.rerandomize="never"
         else:
             raise Exception("Invalid rerandomize attribute "+self.rerandomize)
 
@@ -181,7 +181,11 @@ class Module(XModule):
         self.filename=content_parser.item(dom2.xpath('/problem/@filename'))
         filename=settings.DATA_DIR+"/problems/"+self.filename+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
-        self.lcp=LoncapaProblem(filename, self.item_id, state)
+        if self.rerandomize == 'Never':
+            seed = 1
+        else:
+            seed = None
+        self.lcp=LoncapaProblem(filename, self.item_id, state, seed = seed)
 
     def handle_ajax(self, dispatch, get):
         if dispatch=='problem_get':
@@ -270,7 +274,7 @@ class Module(XModule):
             
         # Problem submitted. Student should reset before checking
         # again.
-        if self.lcp.done and self.rerandomize:
+        if self.lcp.done and self.rerandomize == "always":
             event_info['failure']='unreset'
             self.tracker('save_problem_check_fail', event_info)
             print "cpdr"
@@ -331,7 +335,7 @@ class Module(XModule):
             
         # Problem submitted. Student should reset before saving
         # again.
-        if self.lcp.done and self.rerandomize:
+        if self.lcp.done and self.rerandomize == "always":
             event_info['failure']='done'
             self.tracker('save_problem_fail', event_info)
             return "Problem needs to be reset prior to save."
@@ -364,7 +368,7 @@ class Module(XModule):
         self.lcp.student_answers = dict()
 
 
-        if self.rerandomize:
+        if self.rerandomize == "always":
             self.lcp.context=dict()
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None

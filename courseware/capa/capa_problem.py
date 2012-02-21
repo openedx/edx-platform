@@ -53,7 +53,7 @@ html_special_response = {"textline":textline.render,
                          "schematic":schematic.render}
 
 class LoncapaProblem(object):
-    def __init__(self, filename, id=None, state=None):
+    def __init__(self, filename, id=None, state=None, seed=None):
         ## Initialize class variables from state
         self.seed = None
         self.student_answers = dict()
@@ -77,6 +77,9 @@ class LoncapaProblem(object):
                 self.correct_map = state['correct_map']
             if 'done' in state:
                 self.done = state['done']
+
+        if seed != None:
+            self.seed = seed
 
         # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
         if not self.seed:
