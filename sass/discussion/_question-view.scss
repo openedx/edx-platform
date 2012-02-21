@@ -72,7 +72,7 @@ div.question-header {
         width: flex-grid(4,8);
 
         a {
-          color: darken(#F6EFD4, 50%);
+          // color: darken(#F6EFD4, 50%);
 
           &.question-delete {
             color: $mit-red;
@@ -80,7 +80,7 @@ div.question-header {
         }
 
         span.sep {
-          color: darken(#F6EFD4, 10%);
+          color: #ccc;
         }
       }
     }
@@ -275,7 +275,7 @@ div.question-header {
       }
       .counter {
         color: #888;
-        display: block;
+        display: none;
         float: right;
         margin-top: 5px;
         text-align: right;

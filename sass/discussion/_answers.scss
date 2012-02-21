@@ -26,7 +26,7 @@ div.answer-controls {
 
         &:before {
           content: '|';
-          color: darken(#F6EFD4, 10%);
+          color: #ccc;
           font-size: 16px;
         }
       }
@@ -131,11 +131,11 @@ div.answer-actions {
     text-decoration: none;
 
     &.question-delete {
-      color: $mit-red;
+      // color: $mit-red;
     }
 
     &.question-edit, &.permant-link {
-      color: darken(#F6EFD4, 45%);;
+      // color: darken(#F6EFD4, 45%);;
     }
 
   }

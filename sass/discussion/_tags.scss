@@ -9,7 +9,7 @@ ul.tags {
   li {
     background: #eee;
     @include border-radius(4px);
-    @include box-shadow(1px 1px 0px #bbb);
+    @include box-shadow(0px 1px 0px #ccc);
     color: #555;
     display: inline-block;
     font-size: 12px;
@@ -39,7 +39,7 @@ ul.tags {
       float: none;
       left: 10px;
       opacity: 0.5;
-      padding: 3px 6px;
+      padding: 4px 6px;
       position: relative;
       top: 1px;
 
