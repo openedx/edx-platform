@@ -3,15 +3,19 @@ body.user-profile-page {
     // @extend .sidebar;
     header {
       @extend .clearfix;
+      border-bottom: 1px solid #d3d3d3;
+      @include box-shadow(0 1px 0 #eee);
+      padding: 0 lh();
+      margin: 0 (-(lh())) lh();
+
       section {
         float: left;
         width: flex-grid(2, 3);
         margin-right: flex-gutter(3);
 
-      h1 {
-        @extend h2;
-        margin-top: 0;
-      }
+        h1 {
+          margin-top: 0;
+        }
       }
 
       p.karma {

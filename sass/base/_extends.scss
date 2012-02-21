@@ -10,8 +10,8 @@
   margin: 0 auto;
   max-width: $fg-max-width;
   min-width: $fg-min-width;
-  width: flex-grid(12);
   text-align: left;
+  width: flex-grid(12);
 
   div.table-wrapper {
     display: table;
@@ -20,24 +20,24 @@
 }
 
 h1.top-header {
-  margin: (-(lh())) (-(lh())) lh();
-  padding: lh();
   background: #f3f3f3;
   border-bottom: 1px solid #e3e3e3;
+  margin: (-(lh())) (-(lh())) lh();
+  padding: lh();
 }
 
 .button {
-  @include box-shadow(inset 0 1px 0 lighten(#888, 10%), 0 0 3px #ccc);
-  @include linear-gradient(lighten(#888, 5%), darken(#888, 5%));
-  @include border-radius(3px);
   border: 1px solid darken(#888, 10%);
-  padding: 4px 8px;
+  @include border-radius(3px);
+  @include box-shadow(inset 0 1px 0 lighten(#888, 10%), 0 0 3px #ccc);
   color: #fff;
-  font: bold $body-font-size $body-font-family;
   cursor: pointer;
-  -webkit-font-smoothing: antialiased;
-  text-shadow: none;
+  font: bold $body-font-size $body-font-family;
+  @include linear-gradient(lighten(#888, 5%), darken(#888, 5%));
+  padding: 4px 8px;
   text-decoration: none;
+  text-shadow: none;
+  -webkit-font-smoothing: antialiased;
 
   &:hover, &:focus {
     @include box-shadow(inset 0 1px 0 lighten(#888, 20%), 0 0 3px #ccc);
@@ -47,8 +47,8 @@ h1.top-header {
 }
 
 .content {
-  @include box-sizing(border-box);
   @include box-shadow(inset 0 0 2px 3px #f3f3f3);
+  @include box-sizing(border-box);
   display: table-cell;
   padding: lh();
   vertical-align: top;
@@ -56,39 +56,51 @@ h1.top-header {
 }
 
 .sidebar {
+  background: #e3e3e3;
+  @include border-radius(4px 0 0 4px);
+  border-right: 1px solid #d3d3d3;
   @include box-shadow( inset 0 0 0 1px #f6f6f6);
   @include box-sizing(border-box);
-  @include border-radius(4px 0 0 4px);
-  background: #e3e3e3;
-  border-right: 1px solid #d3d3d3;
   display: table-cell;
   font-family: $body-font-family;
+  position: relative;
   text-shadow: 0 1px 0 #f1f1f1;
   vertical-align: top;
   width: flex-grid(3);
-  position: relative;
+
+  h1, h2 {
+   font-size: 18px;
+   font-weight: 800;
+   letter-spacing: 0;
+   text-transform: none;
+  }
+
+  .bottom-border {
+    @include box-shadow(0 1px 0 #eee);
+    border-bottom: 1px solid #d3d3d3;
+  }
 
   h3 {
-    @include box-shadow(0 1px 0 #eee);
-    background: none;
     border: none;
     border-bottom: 1px solid #d3d3d3;
+    @extend .bottom-border;
+    background: none;
     color: #000;
     font-weight: normal;
     margin: 0;
     overflow: hidden;
 
     a {
-      @include transition();
       color: lighten($text-color, 10%);
       display: block;
       font-size: $body-font-size;
       padding: 7px 7px 7px 30px;
       text-decoration: none;
+      @include transition();
 
       &:hover {
-        @include box-shadow(0 1px 0 #fff);
         background: #efefef;
+        @include box-shadow(0 1px 0 #fff);
       }
     }
 
@@ -97,15 +109,44 @@ h1.top-header {
     }
 
     &.active {
-      @include box-shadow(none);
       background: none;
       border: 0;
       border-bottom: 1px solid #bbb;
+      @include box-shadow(none);
       color: #000;
       font-weight: bold;
 
       a {
         color: #000;
+      }
+    }
+  }
+
+  header#open_close_accordion {
+    border-bottom: 1px solid #d3d3d3;
+    @include box-shadow(0 1px 0 #eee);
+    padding: lh(.5) lh();
+    position: relative;
+
+    h2 {
+      padding-right: 20px;
+      margin: 0;
+    }
+
+    a {
+      background: #eee url('/static/images/slide-left-icon.png') center center no-repeat;
+      border: 1px solid #D3D3D3;
+      @include border-radius(3px 0 0 3px);
+      height: 16px;
+      padding: 8px;
+      position: absolute;
+      right: -1px;
+      text-indent: -9999px;
+      top: 6px;
+      width: 16px;
+
+      &:hover {
+        background-color: white;
       }
     }
   }
@@ -116,13 +157,13 @@ h1.top-header {
 }
 
 .topbar {
+  @extend .clearfix;
   background: #F6EFD4;
   border-bottom: 1px solid darken(#F6EFD4, 10%);
-  margin: (-$body-line-height) (-$body-line-height) $body-line-height;
-  font-size: 12px;
-  text-shadow: 0 1px 0 #fff;
   @include box-shadow(inset 0 1px 0 #fff, inset 1px 0 0 #fff);
-  @extend .clearfix;
+  font-size: 12px;
+  margin: (-$body-line-height) (-$body-line-height) $body-line-height;
+  text-shadow: 0 1px 0 #fff;
 
   a {
     color: darken(#F6EFD4, 80%);
@@ -133,16 +174,20 @@ h1.top-header {
     }
 
     &.block-link {
-      @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
       background: darken(#F6EFD4, 5%);
       border-left: 1px solid darken(#f6efd4, 20%);
+      @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
+      display: block;
       padding: lh(.75);
       text-transform: uppercase;
-      display: block;
 
       &:hover {
         background: none;
       }
     }
   }
+}
+
+.tran {
+  @include transition( all, .2s, $ease-in-out-quad);
 }

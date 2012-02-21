@@ -77,6 +77,7 @@
   <div class="wiki-wrapper">
     <%block name="wiki_panel">
     <div id="wiki_panel">
+    <h2>Course Wiki</h2>
       <%
           if (wiki_article is not UNDEFINED):
           	baseURL = reverse("wiki_view", args=[wiki_article.get_url()])

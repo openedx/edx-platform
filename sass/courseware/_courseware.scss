@@ -5,10 +5,6 @@ div.course-wrapper {
     list-style: none;
   }
 
-  .tran {
-    @include transition( all, .2s, $ease-in-out-quad);
-  }
-
   section.course-content {
     @extend .content;
 
@@ -160,7 +156,7 @@ div.course-wrapper {
     section.course-index {
       width: flex-grid(.6);
 
-      div#open_close_accordion {
+      header#open_close_accordion {
         padding: 0;
 
         a {

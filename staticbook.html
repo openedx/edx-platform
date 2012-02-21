@@ -1,4 +1,6 @@
 <%inherit file="main.html" />
+
+<%block name="js_extra">
 <script>
 var page=${ page };
 
@@ -32,18 +34,35 @@ function next_page() {
   goto_page(newpage);
   log_event("book", {"type":"nextpage","new":page});
 }
+
+$("#open_close_accordion a").click(function(){
+  if ($(".book-wrapper").hasClass("closed")){
+    $(".book-wrapper").removeClass("closed");
+  } else {
+    $(".book-wrapper").addClass("closed");
+  }
+});
+
 </script>
+</%block>
 
 <%include file="navigation.html" args="active_page='book'" />
 
 <section class="main-content">
   <div class="book-wrapper">
-    <ul id="booknav" class="treeview-booknav">
-      <%include file="book_toc.html" />
-    </ul>
+
+    <section class="book-sidebar">
+      <header id="open_close_accordion">
+        <h2>Table of Contents</h2>
+        <a href="#">close</a>
+      </header>
+
+      <ul id="booknav" class="treeview-booknav">
+        <%include file="book_toc.html" />
+      </ul>
+    </section>
 
     <section class="book">
-
       <section class="page">
         <nav>
           <ul>

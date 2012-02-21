@@ -1,43 +1,47 @@
 div.book-wrapper {
   @extend .table-wrapper;
 
-  ul#booknav {
+  section.book-sidebar {
     @extend .sidebar;
     @include box-sizing(border-box);
+    @extend .tran;
 
-    a {
-      color: #000;
+    ul#booknav {
 
-      &:hover {
-        color: #666;
-      }
-    }
-
-    li {
-      background: none;
-      padding-left: 30px;
-
-      div.hitarea {
-        margin-left: -22px;
-        background-image: url('/static/images/treeview-default.gif');
-        position: relative;
-        top: 4px;
+      a {
+        color: #000;
 
         &:hover {
-          opacity: 0.6;
-          filter: alpha(opacity=60);
+          color: #666;
         }
       }
 
-      ul {
+      li {
         background: none;
-      }
-    }
+        padding-left: 30px;
 
-    > li {
-      border-bottom: 1px solid #d3d3d3;
-      @include box-shadow(0 1px 0 #eee);
-      padding: 7px 7px 7px 30px;
+        div.hitarea {
+          margin-left: -22px;
+          background-image: url('/static/images/treeview-default.gif');
+          position: relative;
+          top: 4px;
+
+          &:hover {
+            opacity: 0.6;
+            filter: alpha(opacity=60);
+          }
+        }
+
+        ul {
+          background: none;
+        }
+      }
+
+      > li {
+        border-bottom: 1px solid #d3d3d3;
+        @include box-shadow(0 1px 0 #eee);
+        padding: 7px 7px 7px 30px;
+      }
     }
   }
 
@@ -90,6 +94,38 @@ div.book-wrapper {
         border: 1px solid $border-color;
         max-width: 100%;
       }
+    }
+  }
+
+  &.closed {
+    section.book-sidebar {
+      width: flex-grid(.6);
+
+      header#open_close_accordion {
+        padding: 0;
+
+        a {
+          background-image: url('/static/images/slide-right-icon.png');
+        }
+
+        h2 {
+          visibility: hidden;
+          width: 10px;
+          padding: 0;
+        }
+      }
+
+      ul#booknav {
+        visibility: hidden;
+        width: 10px;
+        padding: 0;
+        overflow: hidden;
+        max-height: 100px;
+      }
+    }
+
+    section.course-content {
+      width: flex-grid(11.5) + flex-gutter();
     }
   }
 }
