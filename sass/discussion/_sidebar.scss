@@ -7,6 +7,12 @@ div.discussion-wrapper aside {
   padding: lh();
   width: flex-grid(3);
 
+  h1 {
+    @extend .bottom-border;
+    margin: (-(lh())) (-(lh())) 0;
+    padding: lh(.5) lh();
+  }
+
   h2 {
     color: #4D4D4D;
 
@@ -25,11 +31,11 @@ div.discussion-wrapper aside {
   }
 
   div.box {
-    @include box-shadow(0 1px 0 #eee);
-    border-bottom: 1px solid #d3d3d3;
+    @extend .bottom-border;
+    @extend .clearfix;
     display: block;
-    padding-bottom: 20px;
-    overflow: hidden;
+    margin: 0 (-(lh()));
+    padding: lh(.5) lh();
 
     &:last-child {
       @include box-shadow(none);
@@ -68,11 +74,8 @@ div.discussion-wrapper aside {
     }
   }
 
-  #displayTagFilterControl {
-    margin-top: 10px;
-  }
-
   div.search-box {
+    margin-top: lh(.5);
     input {
       @include box-sizing(border-box);
       display: inline;
@@ -113,6 +116,34 @@ div.discussion-wrapper aside {
       font-size: 10px;
       margin-left: -25px;
       padding: 2px 5px;
+    }
+  }
+
+  div#tagSelector {
+    h2 {
+      @include box-shadow(inset 0 1px 0 #eee);
+      border-top: 1px solid #d3d3d3;
+      margin: 0 (-(lh())) 0;
+      padding: lh(.5) lh();
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    ul {
+      margin: 0;
+    }
+
+    div.inputs {
+      margin-bottom: lh();
+    }
+
+    div#displayTagFilterControl {
+      p.choice {
+        @include inline-block();
+        margin-right: lh(.5);
+      }
     }
   }
 
