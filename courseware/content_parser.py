@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import os
 import re
 
 from datetime import timedelta
@@ -141,22 +142,49 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
             #to its children later.
             return
 
-def course_file(user):
-    # TODO: Cache. 
-    filename = UserProfile.objects.get(user=user).courseware
-
+def user_groups(user):
     # TODO: Rewrite in Django
-    groups = [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
+    return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
 
-    options = {'dev_content':settings.DEV_CONTENT, 
-               'groups' : groups}
-
-    tree = etree.XML(render_to_string(filename, options, namespace = 'course'))
+def course_xml_process(tree):
+    ''' Do basic pre-processing of an XML tree. Assign IDs to all
+    items without. Propagate due dates, grace periods, etc. to child
+    items. 
+    '''
     id_tag(tree)
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")
     propogate_downward_tag(tree, "graceperiod")
+
+def course_file(user):
+    ''' Given a user, return course.xml
+    '''
+    # TODO: Cache. 
+    filename = UserProfile.objects.get(user=user).courseware
+
+    groups = user_groups(user)
+
+    options = {'dev_content':settings.DEV_CONTENT, 
+               'groups' : groups}
+
+    tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
     return tree
+
+def section_file(user, section):
+    ''' Given a user and the name of a section, return that section
+    '''
+    filename = section+".xml"
+
+    if filename not in os.listdir(settings.DATA_DIR + '/sections/'):
+        print filename+" not in "+str(os.listdir(settings.DATA_DIR + '/sections/'))
+        return None
+
+    options = {'dev_content':settings.DEV_CONTENT, 
+               'groups' : user_groups(user)}
+
+    tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'sections')))
+    return tree
+
 
 def module_xml(coursefile, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes
