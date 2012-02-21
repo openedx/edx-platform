@@ -1,13 +1,11 @@
-
 div.discussion-wrapper aside {
   @extend .sidebar;
-  @include box-shadow(inset 1px 0 0 #f6f6f6);
-  @include border-radius(0 4px 4px 0);
   border-left: 1px solid #d3d3d3;
+  @include border-radius(0 4px 4px 0);
   border-right: 1px solid #f6f6f6;
+  @include box-shadow(inset 1px 0 0 #f6f6f6);
   padding: lh();
   width: flex-grid(3);
-
 
   h2 {
     color: #4D4D4D;
