@@ -2,6 +2,13 @@ div#wiki_panel {
   @extend .sidebar;
   overflow: auto;
 
+  h2 {
+    padding: lh(.5) lh();
+    font-size: 18px;
+    margin: 0 ;
+    @extend .bottom-border;
+  }
+
   input[type="button"] {
     @extend h3;
     @include transition();

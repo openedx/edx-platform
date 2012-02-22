@@ -10,24 +10,24 @@
 }
 
 div.leanModal_box {
+  background: #fff;
+  border: none;
   @include border-radius(3px);
   @include box-shadow(0 0 6px #000);
   @include box-sizing(border-box);
   display: none;
-  border: none;
-  background: #fff;
   padding: lh(2);
 
   a.modal_close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    display: block;
-    width: 14px;
-    height: 14px;
-    z-index: 2;
     color: #aaa;
+    display: block;
     font-style: normal;
+    height: 14px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    width: 14px;
+    z-index: 2;
 
     &:hover{
       text-decoration: none;
@@ -36,19 +36,24 @@ div.leanModal_box {
   }
 
   h1 {
+    border-bottom: 1px solid #eee;
     font-size: 24px;
+    margin-bottom: lh();
     margin-top: 0;
     padding-bottom: lh();
-    border-bottom: 1px solid #eee;
-    margin-bottom: lh();
     text-align: left;
   }
 
   &#enroll {
     max-width: 600px;
 
+    p.ie-warning {
+      display: none;
+    }
+
     ol {
       @extend .clearfix;
+      padding-top: lh();
 
       li {
 
@@ -63,16 +68,16 @@ div.leanModal_box {
 
         &:hover {
           div.tip {
-            display: block;
-            line-height: lh();
-            position: absolute;
             background: #333;
             color: #fff;
-            width: 500px;
+            display: block;
+            font-size: 16px;
+            line-height: lh();
             margin: 0 0 0 -10px;
             padding: 10px;
+            position: absolute;
             -webkit-font-smoothing: antialiased;
-            font-size: 16px;
+            width: 500px;
           }
         }
       }
@@ -84,16 +89,16 @@ div.leanModal_box {
 
     div#enroll_error, div#login_error, div#pwd_error {
       $error-color: #333;
-      -webkit-font-smoothing: antialiased;
       background-color: $error-color;
       border: darken($error-color, 20%);
       color: #fff;
-      text-shadow: 0 1px 0 darken($error-color, 10%);
       font-family: "Open sans";
       font-weight: bold;
       letter-spacing: 1px;
       margin: (-(lh())) (-(lh())) lh();
       padding: lh(.5);
+      text-shadow: 0 1px 0 darken($error-color, 10%);
+      -webkit-font-smoothing: antialiased;
 
       &:empty {
         padding: 0;
@@ -108,11 +113,11 @@ div.leanModal_box {
         margin-bottom: lh(.5);
 
         &.terms, &.remember {
-          float: none;
-          width: auto;
-          clear: both;
-          padding-top: lh();
           border-top: 1px solid #eee;
+          clear: both;
+          float: none;
+          padding-top: lh();
+          width: auto;
         }
 
         &.honor-code {
@@ -139,11 +144,11 @@ div.leanModal_box {
           margin: lh(.5) 0 lh() lh();
 
           li {
+            color: #666;
+            float: none;
+            font-size: 14px;
             list-style: disc outside none;
             margin-bottom: lh(.5);
-            color: #666;
-            font-size: 14px;
-            float: none;
           }
         }
       }

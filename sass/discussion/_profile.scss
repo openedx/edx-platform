@@ -1,0 +1,124 @@
+body.user-profile-page {
+  section.user-info {
+    // @extend .sidebar;
+    header {
+      @extend .clearfix;
+      border-bottom: 1px solid #d3d3d3;
+      @include box-shadow(0 1px 0 #eee);
+      padding: 0 lh();
+      margin: 0 (-(lh())) lh();
+
+      section {
+        float: left;
+        width: flex-grid(2, 3);
+        margin-right: flex-gutter(3);
+
+        h1 {
+          margin-top: 0;
+        }
+      }
+
+      p.karma {
+        float: left;
+        width: flex-grid(1, 3);
+        border: 1px solid #D3D3D3;
+        @include border-radius(3px);
+        @include box-shadow(inset 0 0 0 1px #fff, 0 1px 0 #fff);
+        background: #eee;
+        text-align: center;
+        padding: lh(.5) 0;
+
+
+        strong {
+          display: block;
+          font-style: 20px;
+        }
+      }
+    }
+  }
+
+  section.questions {
+    h1 {
+      @extend .top-header;
+    }
+  }
+
+  ul.sub-info {
+    border-top: 1px solid #ddd;
+    margin-top: lh();
+    list-style: none;
+
+    > li {
+      width: flex-grid(2.25, 9);
+      display: table-cell;
+      padding: (flex-gutter(9)/2);
+      border-right: 1px solid #ddd;
+      @include box-sizing(border-box);
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:last-child {
+        border-right: 0;
+        padding-right: 0;
+      }
+
+      h2 {
+        margin-top: 0;
+      }
+
+      span.tag-number {
+        display: none;
+      }
+    }
+
+    ul {
+      list-style: none;
+
+      &.user-stats-table {
+        list-style: none;
+      }
+
+      &.vote-buttons {
+        list-style: none;
+
+        li {
+          @include border-radius(4px);
+          background-color: lighten(#F6EFD4, 3%);
+          background-position: 10px center;
+          background-repeat: no-repeat;
+          height: 20px;
+          padding: 10px 10px 10px 40px;
+          display: inline-block;
+
+          &.up {
+            background-image: url(/static/images/askbot/vote-arrow-up.png);
+            margin-right: 6px;
+          }
+
+          &.down {
+            background-image: url(/static/images/askbot/vote-arrow-down.png);
+          }
+        }
+      }
+
+      &.badges {
+        @include border-radius(4px);
+        background-color: #e3e3e3;
+        @include inline-block();
+
+        a {
+          border: 0;
+          background: none;
+          text-transform: uppercase;
+          color: #292309;
+          font-size: 12px;
+          padding: 10px;
+          text-shadow: 0 1px 0 #fff;
+          display: block;
+        }
+      }
+    }
+  }
+}

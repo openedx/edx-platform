@@ -1,0 +1,73 @@
+// JM MOSFET AMPLIFIER
+div#graph-container {
+  @extend .clearfix;
+
+  canvas#graph {
+    background-color: rgb(60, 60, 100);
+    width: flex-grid(4.5, 9);
+    float: left;
+    margin-right: flex-gutter(9); 
+  }
+
+  div.graph-controls {
+    width: flex-grid(4.5, 9);
+    float: left;
+
+    select#musicTypeSelect {
+      display: block;
+      margin-bottom: lh(2);
+    }
+
+    div#graph-output {
+      display: block;
+      margin-bottom: lh(2);
+    }
+
+    div#graph-listen {
+      display: block;
+      margin-bottom: lh(2);
+    }
+
+    p {
+      margin-bottom: lh(1);
+    }
+
+    div#label {
+      display: inline-block;
+    }
+
+    input#playButton {
+      display: block;
+    }
+  }
+}
+
+div#schematic-container {
+  @extend .clearfix;
+
+  canvas {
+    background-color: rgb(60, 60, 100);
+    width: flex-grid(4.5, 9);
+    float: left;
+    margin-right: flex-gutter(9); 
+  }
+
+  div.schematic-sliders {
+    width: flex-grid(4.5, 9);
+    float: left;
+
+    div.slider-label#vs {
+      margin-top: lh(2.0);
+    }
+
+    div.slider-label {
+      margin-bottom: lh(0.5);
+    }
+
+    div.slider {
+      margin-bottom: lh(1);
+    }
+  }
+}
+//End JM MOSFET AMPLIFIER
+

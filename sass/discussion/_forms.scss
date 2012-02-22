@@ -13,17 +13,27 @@ form.answer-form {
   }
 
   div.form-item {
-    margin: 25px 0;
+    margin: 15px 0;
 
     label {
       display: block;
       margin-bottom: -5px;
     }
+
+    .title-desc {
+      @include box-sizing(border-box);
+      background: #333;
+      color: #fff;
+      font-size: 13px;
+      padding: 5px 10px;
+      width: flex-grid(6);
+      -webkit-font-smoothing: antialiased;
+    }
   }
 
   span.form-error, label.form-error {
     color: #990000;
-    display: inline;
+    display: inline-block;
     font-size: 90%;
     font-weight: bold;
     padding: 10px 0;
@@ -78,6 +88,7 @@ form.question-form {
   }
 
   input[type="text"] {
+    @include box-sizing(border-box);
     width: flex-grid(6);
   }
 

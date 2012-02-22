@@ -8,6 +8,27 @@
 ${ wiki_article.title }
 </%block>
 
+<%block name="wiki_head">
+<script>
+  $(function() {
+    //Store the initial contents of #id_contents (the wiki body field) so we can compare for unsaved changes
+    $("#id_contents").data('initial_contents', $("#id_contents").val());
+    
+    window.onbeforeunload = function askConfirm() { //Warn the user before they navigate away
+      if ( $("#id_contents").val() != $("#id_contents").data('initial_contents') ) {
+        return "You have made changes to the article that have not been saved yet.";
+      }
+    };
+    
+    $("#submit_edit").click(function() {
+      $("#id_contents").data('initial_contents', $("#id_contents").val());
+    });
+    
+  });
+</script>
+</%block>
+
+
 <%block name="wiki_body">
 <form method="POST" id="wiki_revision">
   <div style="display:none">

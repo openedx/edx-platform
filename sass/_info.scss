@@ -43,8 +43,10 @@ div.info-wrapper {
     border-left: 1px solid #d3d3d3;
 
     h1 {
-      padding: 0 lh();
+      padding: lh(.5) lh();
       font-size: 18px;
+      margin: 0 ;
+      @extend .bottom-border;
     }
 
     ol {

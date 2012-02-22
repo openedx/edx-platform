@@ -1,4 +1,6 @@
 <%inherit file="main.html" />
+
+<%block name="js_extra">
 <script>
 var page=${ page };
 
@@ -16,34 +18,51 @@ function goto_page(n) {
   if(n<10) {
     prefix="00";
   }
-  $("#bookpage").attr("src","${ settings.BOOK_URL }p"+prefix+n+".jpg");
+  $("#bookpage").attr("src","${ settings.BOOK_URL }p"+prefix+n+".png");
 };
 
 function prev_page() {
   var newpage=page-1;
-  if(newpage<1) newpage=1;
+  if(newpage<0) newpage=0;
   goto_page(newpage);
   log_event("book", {"type":"prevpage","new":page});
 }
 
 function next_page() {
   var newpage=page+1;
-  if(newpage>1764) newpage=1764;
+  if(newpage>1008) newpage=1008;
   goto_page(newpage);
   log_event("book", {"type":"nextpage","new":page});
 }
+
+$("#open_close_accordion a").click(function(){
+  if ($(".book-wrapper").hasClass("closed")){
+    $(".book-wrapper").removeClass("closed");
+  } else {
+    $(".book-wrapper").addClass("closed");
+  }
+});
+
 </script>
+</%block>
 
 <%include file="navigation.html" args="active_page='book'" />
 
 <section class="main-content">
   <div class="book-wrapper">
-    <ul id="booknav" class="treeview-booknav">
-      <%include file="book_toc.html" />
-    </ul>
+
+    <section class="book-sidebar">
+      <header id="open_close_accordion">
+        <h2>Table of Contents</h2>
+        <a href="#">close</a>
+      </header>
+
+      <ul id="booknav" class="treeview-booknav">
+        <%include file="book_toc.html" />
+      </ul>
+    </section>
 
     <section class="book">
-
       <section class="page">
         <nav>
           <ul>
@@ -56,7 +75,18 @@ function next_page() {
           </ul>
         </nav>
 
-        <img id="bookpage" src="${ settings.BOOK_URL }p${ "%03i"%(page) }.jpg">
+        <img id="bookpage" src="${ settings.BOOK_URL }p${ "%03i"%(page) }.png">
+
+        <nav class="bottom-nav">
+          <ul>
+            <li class="last">
+              <a href="javascript:prev_page()">Previous page</a>
+            </li>
+            <li class="next">
+              <a href="javascript:next_page()">Next page</a>
+            </li>
+          </ul>
+        </nav>
       </section>
     </section>
   </div>

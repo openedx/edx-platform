@@ -72,7 +72,7 @@ div.question-header {
         width: flex-grid(4,8);
 
         a {
-          color: darken(#F6EFD4, 50%);
+          // color: darken(#F6EFD4, 50%);
 
           &.question-delete {
             color: $mit-red;
@@ -80,7 +80,7 @@ div.question-header {
         }
 
         span.sep {
-          color: darken(#F6EFD4, 10%);
+          color: #ccc;
         }
       }
     }
@@ -100,11 +100,10 @@ div.question-header {
         display: inline-block;
         float: left;
         width: flex-grid(1.8,8);
+        border-left: 1px dotted #CCC;
 
         div.post-update-info {
           @include box-sizing(border-box);
-          @include border-radius(5px);
-          background:lighten(#F6EFD4, 5%);
           padding: 10px;
           margin-bottom: 10px;
 
@@ -127,29 +126,19 @@ div.question-header {
 
           div.change-date {
             font-size: 12px;
-            margin-bottom: 10px;
-          }
-
-          div.avatar {
-            display: inline-block;
-            float: left;
-            margin-right: 3px;
-
-            img.gravatar {
-              background: white;
-              border: 1px solid darken(#F6EFD4, 10%);
-              margin-right: 5px;
-              padding: 3px ;
-              vertical-align: bottom;
-            }
+            margin-bottom: 2px;
           }
 
           div.user-meta {
             display: inline-block;
-            width: 60%;
+
+            span.username {
+              font-size: 20px;
+              margin-right: 5px;
+            }
 
             span.user-badges {
-              display: block;
+              // display: block;
             }
           }
         }
@@ -158,16 +147,13 @@ div.question-header {
 
     div.comments-container {
       @include box-sizing(border-box);
-      // background: lighten(#efefef, 3%);
-      padding: 3%;
       display: inline-block;
-      // margin: 15px 0 0;
-      padding: 3%;
+      padding: 0 0 3% 0;
       width: 100%;
 
       div.comments-content {
         font-size: 13px;
-        background: lighten(#efefef, 4%);
+        background: #efefef;
 
         div.block {
           border-top: 1px solid #ddd;
@@ -177,9 +163,6 @@ div.question-header {
           &:first-child {
             border-top: 0;
           }
-          // &:last-child {
-          //   border-bottom: 1px solid #ddd;
-          // }
         }
 
         form.post-comments {
@@ -291,7 +274,7 @@ div.question-header {
       }
       .counter {
         color: #888;
-        display: block;
+        display: none;
         float: right;
         margin-top: 5px;
         text-align: right;
@@ -299,7 +282,7 @@ div.question-header {
 
       div.controls {
         // padding: 15px 0;
-        background: lighten(#eeeeee, 4%);
+        background: #efefef ;
         text-align: right;
         a {
           display: inline-block;
@@ -311,4 +294,18 @@ div.question-header {
   }
 }
 
+div.question-status {
+  background: $mit-red;
+  clear:both;
+  color: #fff;
+  display: block;
+  padding: 10px 0 10px 7.5%;
 
+  h3 {
+  font-weight: normal;
+  }
+
+  a {
+    color: #eee;
+  }
+}

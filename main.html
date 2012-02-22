@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <%block name="title"><title>MITx 6.002</title></%block>
+  <%block name="title"><title>MITx 6.002x</title></%block>
 
   <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
   <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all" />
@@ -27,11 +27,6 @@
   </script>
   <script type="text/javascript" src="${ settings.LIB_URL }mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
-    });
-  </script>
 <%block name="headextra"/>
 
 </head>
@@ -115,6 +110,14 @@ $(function() {
       });
     });
 </script>
+
+  <script type="text/javascript">
+    $(function(){
+      $("a[rel*=leanModal]").leanModal();
+    });
+  </script>
+
+<%block name="js_extra"/>
 
 </body>
 </html>

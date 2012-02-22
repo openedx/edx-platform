@@ -12,7 +12,7 @@
       </section>
 
     <section class="intro-video">
-      <a id="video-overlay-link" rel="leanModal" href="#video-overlay"><img src="/static/images/video-image.png" id="video-img" alt="" /><span> Watch intro video</span></a>
+      <a id="video-overlay-link" rel="leanModal" href="#video-overlay"><img src="/static/images/video-image.png" id="video-img" alt="Link to MITx introduction video" /><span> Watch intro video</span></a>
     </section>
 
     </section>
@@ -40,7 +40,7 @@
     </hgroup>
 
     <p>
-      <a href="http://6002x.mitx.mit.edu/" class="more-info">More information <span>&amp;</span> Enroll</a>
+      <a href="http://6002x.mitx.mit.edu/" class="more-info">More information <span>&amp;</span> Enroll <span class="arrow">&#8227;</span></a>
     </p>
 
     <p>Taught by Anant Agarwal, with Gerald Sussman and Piotr Mitros, 6.002x (Circuits and Electronics) is an on-line adaption of 6.002, MIT&rsquo;s first undergraduate analog design course. This prototype course will run, free of charge, for students worldwide from March 5, 2012 through June 8, 2012. Students will be given the opportunity to demonstrate their mastery of the material and earn a certificate from <em>MITx</em>.</p>
@@ -51,6 +51,8 @@
   <iframe id="player" type="text/html" width="560" height="390" src="http://www.youtube.com/embed/p2Q6BrNhdh8?enablejsapi=1" frameborder="0">
   </iframe>
 </div>
+
+<%block name="js_extra">
 <script>
 
 var player;
@@ -113,3 +115,4 @@ $(function() {
 });
 
 </script>
+</%block>
