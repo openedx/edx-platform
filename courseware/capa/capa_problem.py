@@ -53,13 +53,16 @@ html_special_response = {"textline":textline.render,
                          "schematic":schematic.render}
 
 class LoncapaProblem(object):
-    def __init__(self, filename, id=None, state=None):
+    def __init__(self, filename, id=None, state=None, seed=None):
         ## Initialize class variables from state
         self.seed = None
         self.student_answers = dict()
         self.correct_map = dict()
         self.done = False
         self.filename = filename
+
+        if seed != None:
+            self.seed = seed
 
         if id:
             self.problem_id = id
@@ -78,9 +81,13 @@ class LoncapaProblem(object):
             if 'done' in state:
                 self.done = state['done']
 
+#        print self.seed
+
         # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
         if not self.seed:
             self.seed=struct.unpack('i', os.urandom(4))[0]
+
+#        print filename, self.seed, seed
 
         ## Parse XML file
         #log.debug(u"LoncapaProblem() opening file {0}".format(filename))
