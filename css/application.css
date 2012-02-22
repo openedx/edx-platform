@@ -5096,6 +5096,11 @@ div.question-header div.question-container div.comments-container div.comments-c
 div.question-header div.question-container div.comments-container div.comments-content div.comment aside.comment-controls, div.answer-block div.question-container div.comments-container div.comments-content div.comment aside.comment-controls, div.paginator div.question-container div.comments-container div.comments-content div.comment aside.comment-controls, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls, div.paginator div.answer-container div.comments-container div.comments-content div.comment aside.comment-controls {
   background: none;
   border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  -ms-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
   display: inline-block;
   margin-top: -8px;
   padding: 0 2% 0 0;
@@ -5511,7 +5516,8 @@ form.question-form input[type="checkbox"] {
   font-weight: normal;
   padding-bottom: 10px;
   position: absolute;
-  text-align: center; }
+  text-align: center;
+  z-index: 1; }
 .vote-notification h3, .vote-notification div#wiki_panel input[type="button"], div#wiki_panel .vote-notification input[type="button"] {
   background: #993333;
   padding: 10px 10px 10px 10px;
