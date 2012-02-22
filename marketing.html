@@ -27,11 +27,6 @@
   <script src="/static/js/html5shiv.js"></script>
   <![endif]-->
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
-    });
-  </script>
 
 <%block name="headextra"/>
 
@@ -156,7 +151,20 @@ $(document).ready(function(){
   });
 
 });
+
+$(function(){
+    $("a[rel*=leanModal]").leanModal();
+
+    $("a.login").click(function(){
+      $("#login_form #li_email").focus();
+      });
+
+    $("a.enroll").click(function(){
+      $("#enroll_form #ca_email").focus();
+      });
+    });
 </script>
 
+<%block name="js_extra"/>
 </body>
 </html>

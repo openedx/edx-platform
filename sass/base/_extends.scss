@@ -53,6 +53,10 @@ h1.top-header {
   padding: lh();
   vertical-align: top;
   width: flex-grid(9) + flex-gutter();
+
+  @media print {
+    @include box-shadow(none);
+  }
 }
 
 .sidebar {
@@ -78,6 +82,10 @@ h1.top-header {
   .bottom-border {
     @include box-shadow(0 1px 0 #eee);
     border-bottom: 1px solid #d3d3d3;
+  }
+
+  @media print {
+    display: none;
   }
 
   h3 {
@@ -164,6 +172,10 @@ h1.top-header {
   font-size: 12px;
   margin: (-$body-line-height) (-$body-line-height) $body-line-height;
   text-shadow: 0 1px 0 #fff;
+
+  @media print {
+    display: none;
+  }
 
   a {
     color: darken(#F6EFD4, 80%);

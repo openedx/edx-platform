@@ -6,6 +6,10 @@ footer {
   margin-top: $body-line-height;
   padding: 0 $body-line-height;
 
+  @media print {
+    display: none;
+  }
+
   p {
     float: left;
 
