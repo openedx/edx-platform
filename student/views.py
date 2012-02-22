@@ -28,7 +28,7 @@ def csrf_token(context):
 @ensure_csrf_cookie
 def index(request):
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
-        return redirect('/courseware')
+        return redirect('/info')
     else:
         csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done. 
