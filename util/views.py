@@ -51,4 +51,7 @@ def send_feedback(request):
 
 def info(request):
     ''' Info page (link from main header) '''
+    if not request.user.is_authenticated():
+        return redirect('/')
+
     return render_to_response("info.html", {})
