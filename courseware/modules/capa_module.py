@@ -181,7 +181,7 @@ class Module(XModule):
         self.filename=content_parser.item(dom2.xpath('/problem/@filename'))
         filename=settings.DATA_DIR+"/problems/"+self.filename+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
-        if self.rerandomize == 'Never':
+        if self.rerandomize == 'never':
             seed = 1
         else:
             seed = None
