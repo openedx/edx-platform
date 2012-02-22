@@ -52,6 +52,46 @@ footer {
         }
 
       }
+
+      &.social {
+        float: right;
+        margin-right: 60px;
+        position: relative;
+        top: -5px;
+
+        li {
+          float: left;
+          margin-right: lh(.5);
+
+          &:after {
+            content: none;
+            display: none;
+          }
+
+          a {
+            display: block;
+            height: 29px;
+            width: 28px;
+            text-indent: -9999px;
+
+            &:hover {
+              opacity: .8;
+            }
+          }
+
+          &.twitter a {
+            background: url('/static/images/marketing/twitter.png') 0 0 no-repeat;
+          }
+
+          &.facebook a {
+            background: url('/static/images/marketing/facebook.png') 0 0 no-repeat;
+          }
+
+          &.linkedin a {
+            background: url('/static/images/marketing/linkedin.png') 0 0 no-repeat;
+          }
+        }
+      }
     }
   }
 }
