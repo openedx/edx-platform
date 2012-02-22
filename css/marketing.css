@@ -474,19 +474,21 @@ footer div.footer-wrapper ul.social {
 footer div.footer-wrapper ul.social li {
   float: left;
   margin-right: 12.944px; }
+footer div.footer-wrapper ul.social li:after {
+  content: none;
+  display: none; }
 footer div.footer-wrapper ul.social li a {
   display: block;
   height: 29px;
   width: 28px;
   text-indent: -9999px; }
-footer div.footer-wrapper ul.social li:after {
-  content: none;
-  display: none; }
+footer div.footer-wrapper ul.social li a:hover {
+  opacity: .8; }
 footer div.footer-wrapper ul.social li.twitter a {
   background: url("/static/images/marketing/twitter.png") 0 0 no-repeat; }
 footer div.footer-wrapper ul.social li.facebook a {
   background: url("/static/images/marketing/facebook.png") 0 0 no-repeat; }
-footer div.footer-wrapper ul.social li.linkedin {
+footer div.footer-wrapper ul.social li.linkedin a {
   background: url("/static/images/marketing/linkedin.png") 0 0 no-repeat; }
 
 section.index-content section {
