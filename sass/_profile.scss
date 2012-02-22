@@ -59,32 +59,37 @@ div.profile-wrapper {
       @extend .top-header;
     }
 
+    div#grade-detail-graph {
+      width: 100%;
+      min-height: 300px;
+    }
+
     > ol {
-      list-style: none;
       border-top: 1px solid #e3e3e3;
+      list-style: none;
       margin-top: lh();
 
       > li {
+        @extend .clearfix;
         border-bottom: 1px solid #e3e3e3;
+        display: table;
         padding: lh() 0;
         width: 100%;
-        display: table;
-        @extend .clearfix;
 
         h2 {
-          display: table-cell;
-          padding: 0;
-          margin: 0;
-          width: flex-grid(2, 9);
-          padding-right: flex-gutter(9);
           border-right: 1px dotted #ccc;
           @include box-sizing(border-box);
+          display: table-cell;
+          margin: 0;
+          padding: 0;
+          padding-right: flex-gutter(9);
+          width: flex-grid(2, 9);
         }
 
         ol.sections {
-          padding-left: flex-gutter(9);
           display: table-cell;
           list-style: none;
+          padding-left: flex-gutter(9);
           width: flex-grid(7, 9);
 
          > li {
@@ -114,6 +119,5 @@ div.profile-wrapper {
         }
       }
     }
-
   }
 }
