@@ -19,6 +19,11 @@ html {
       margin-top: 3px;
       overflow: hidden;
 
+      @media print {
+        border-bottom: 0;
+        @include border-radius(none);
+      }
+
       @media screen and (min-width: 1400px) {
         @include border-radius(4px);
         margin-top: lh(.5);

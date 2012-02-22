@@ -181,6 +181,7 @@ div.question-header {
           aside.comment-controls {
             background: none;
             border: none;
+            @include box-shadow(none);
             display: inline-block;
             margin-top: -8px;
             padding:0 2% 0 0;

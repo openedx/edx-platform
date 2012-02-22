@@ -5,7 +5,6 @@
 
   <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
   <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all" />
-  <link href="/static/css/print.css" rel="stylesheet" type="text/css" media="print"/>
 
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
@@ -28,11 +27,6 @@
   </script>
   <script type="text/javascript" src="${ settings.LIB_URL }mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
-    });
-  </script>
 <%block name="headextra"/>
 
 </head>
@@ -116,6 +110,12 @@ $(function() {
       });
     });
 </script>
+
+  <script type="text/javascript">
+    $(function(){
+      $("a[rel*=leanModal]").leanModal();
+    });
+  </script>
 
 <%block name="js_extra"/>
 

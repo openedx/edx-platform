@@ -3,6 +3,10 @@ div.header-wrapper {
   border-bottom: 1px solid #fff;
   @include box-shadow(inset 0 -4px 6px darken($mit-red, 5%));
 
+  @media print {
+    display: none;
+  }
+
   header {
     @extend .clearfix;
     @extend .wrapper;
