@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, body.user-profile-page section.user-info header:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, body.user-profile-page section.user-info header:after {
   content: ".";
   display: block;
   height: 0;
@@ -2567,23 +2567,25 @@ section.course-index div#accordion ul.ui-accordion-content li a p {
 section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
   color: #666; }
 
-section.course-content div.video-wrapper {
+section.course-content div.video-subtitles {
+  position: relative; }
+section.course-content div.video-subtitles div.video-wrapper {
   float: left;
   width: 65.761%;
   margin-right: 2.717%; }
-section.course-content div.video-wrapper div.video-player {
+section.course-content div.video-subtitles div.video-wrapper div.video-player {
   position: relative;
   padding-bottom: 56.25%;
   padding-top: 30px;
   height: 0;
   overflow: hidden; }
-section.course-content div.video-wrapper div.video-player object {
+section.course-content div.video-subtitles div.video-wrapper div.video-player object {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%; }
-section.course-content div.video-wrapper div.video-player iframe#html5_player {
+section.course-content div.video-subtitles div.video-wrapper div.video-player iframe#html5_player {
   border: none;
   display: none;
   position: absolute;
@@ -2591,11 +2593,11 @@ section.course-content div.video-wrapper div.video-player iframe#html5_player {
   left: 0;
   width: 100%;
   height: 100%; }
-section.course-content div.video-wrapper section.video-controls {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls {
   background: #333;
   border: 1px solid #000;
   color: #ccc; }
-section.course-content div.video-wrapper section.video-controls div#slider {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   -ms-border-radius: 0;
@@ -2610,7 +2612,7 @@ section.course-content div.video-wrapper section.video-controls div#slider {
   border: none;
   border-bottom: 1px solid #000;
   height: 14px; }
-section.course-content div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
   -ms-border-radius: 20px;
@@ -2629,15 +2631,15 @@ section.course-content div.video-wrapper section.video-controls div#slider a.ui-
   margin-left: -10px;
   top: -4px;
   width: 20px; }
-section.course-content div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus {
   outline: none; }
-section.course-content div.video-wrapper section.video-controls ul.vcr {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr {
   float: left;
   margin-right: 22.652px; }
-section.course-content div.video-wrapper section.video-controls ul.vcr li {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li {
   float: left;
   margin-bottom: 0; }
-section.course-content div.video-wrapper section.video-controls ul.vcr li a {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a {
   -webkit-box-shadow: 1px 0 0 #555555;
   -moz-box-shadow: 1px 0 0 #555555;
   -ms-box-shadow: 1px 0 0 #555555;
@@ -2650,25 +2652,34 @@ section.course-content div.video-wrapper section.video-controls ul.vcr li a {
   padding: 16.989px 22.652px;
   text-indent: -9999px;
   width: 14px; }
-section.course-content div.video-wrapper section.video-controls ul.vcr li a.play {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.play {
   background: url("/static/images/play-icon.png") center center no-repeat; }
-section.course-content div.video-wrapper section.video-controls ul.vcr li a.play:hover {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.play:hover {
   background-color: #444; }
-section.course-content div.video-wrapper section.video-controls ul.vcr li a.pause {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.pause {
   background: url("/static/images/pause-icon.png") center center no-repeat; }
-section.course-content div.video-wrapper section.video-controls ul.vcr li a.pause:hover {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.pause:hover {
   background-color: #444; }
-section.course-content div.video-wrapper section.video-controls div#vidtime {
-  float: left;
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li div#vidtime {
+  padding-left: 22.652px;
   font-weight: bold;
   line-height: 46px;
   -webkit-font-smoothing: antialiased; }
-section.course-content div.video-wrapper section.video-controls div.speeds {
-  float: right;
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
+  float: right; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds {
+  float: left;
   line-height: 46px;
-  margin-right: 22.652px;
-  -webkit-font-smoothing: antialiased; }
-section.course-content div.video-wrapper section.video-controls div.speeds div#video_speeds {
+  padding-right: 22.652px;
+  margin-right: 0;
+  -webkit-font-smoothing: antialiased;
+  -webkit-box-shadow: 1px 0 0 #555555;
+  -moz-box-shadow: 1px 0 0 #555555;
+  -ms-box-shadow: 1px 0 0 #555555;
+  -o-box-shadow: 1px 0 0 #555555;
+  box-shadow: 1px 0 0 #555555;
+  border-right: 1px solid #000; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#video_speeds {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
@@ -2677,7 +2688,7 @@ section.course-content div.video-wrapper section.video-controls div.speeds div#v
   *display: inline;
   *vertical-align: auto;
   font-weight: bold; }
-section.course-content div.video-wrapper section.video-controls div.speeds div#video_speeds span {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#video_speeds span {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
@@ -2687,28 +2698,48 @@ section.course-content div.video-wrapper section.video-controls div.speeds div#v
   *vertical-align: auto;
   cursor: pointer;
   margin-bottom: 0; }
-section.course-content div.video-wrapper section.video-controls div.speeds div#video_speeds span:hover {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#video_speeds span:hover {
   color: #993333; }
-section.course-content ol.subtitles {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
+  float: left;
+  display: block;
+  padding-right: 11.326px;
+  margin-left: 0;
+  color: #797979;
+  padding-left: 50px;
+  line-height: 46px;
+  font-weight: 800;
+  background: url("/static/images/cc.png") 16px center no-repeat;
+  -webkit-font-smoothing: antialiased; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:hover {
+  color: #fff;
+  text-decoration: none;
+  background-color: #444; }
+section.course-content div.video-subtitles ol.subtitles {
   float: left;
   width: 31.522%;
   height: 530px;
   overflow: hidden; }
-section.course-content ol.subtitles li {
+section.course-content div.video-subtitles ol.subtitles li {
   margin-bottom: 0px;
   cursor: pointer;
   border: 0;
   padding: 0;
   color: #666; }
-section.course-content ol.subtitles li.current {
+section.course-content div.video-subtitles ol.subtitles li.current {
   background-color: #f3f3f3;
   color: #333; }
-section.course-content ol.subtitles li:hover {
+section.course-content div.video-subtitles ol.subtitles li:hover {
   color: #993333; }
-section.course-content ol.subtitles li div {
+section.course-content div.video-subtitles ol.subtitles li div {
   margin-bottom: 8px; }
-section.course-content ol.subtitles li div:empty {
+section.course-content div.video-subtitles ol.subtitles li div:empty {
   margin-bottom: 0px; }
+section.course-content div.video-subtitles.closed div.video-wrapper {
+  width: 100%; }
+section.course-content div.video-subtitles.closed ol.subtitles {
+  width: 0px;
+  height: 0; }
 
 nav.sequence-nav {
   margin-bottom: 22.652px; }
@@ -2998,11 +3029,11 @@ div.info-wrapper section.handouts ol li a:hover {
 div.profile-wrapper {
   color: #000; }
 div.profile-wrapper section.user-info {
-  -webkit-border-radius: 0px 4px 0px 4px;
-  -moz-border-radius: 0px 4px 0px 4px;
-  -ms-border-radius: 0px 4px 0px 4px;
-  -o-border-radius: 0px 4px 0px 4px;
-  border-radius: 0px 4px 0px 4px;
+  -webkit-border-radius: 0px 4px 4px 0;
+  -moz-border-radius: 0px 4px 4px 0;
+  -ms-border-radius: 0px 4px 4px 0;
+  -o-border-radius: 0px 4px 4px 0;
+  border-radius: 0px 4px 4px 0;
   border-left: 1px solid #d3d3d3;
   border-right: 0; }
 div.profile-wrapper section.user-info h1 {
@@ -3060,31 +3091,34 @@ div.profile-wrapper section.user-info ul li div#description {
 div.profile-wrapper section.user-info div#change_password_pop {
   padding: 7px 22.652px;
   color: #4D4D4D; }
+div.profile-wrapper section.course-info div#grade-detail-graph {
+  width: 100%;
+  min-height: 300px; }
 div.profile-wrapper section.course-info > ol {
-  list-style: none;
   border-top: 1px solid #e3e3e3;
+  list-style: none;
   margin-top: 22.652px; }
 div.profile-wrapper section.course-info > ol > li {
   border-bottom: 1px solid #e3e3e3;
+  display: table;
   padding: 22.652px 0;
-  width: 100%;
-  display: table; }
+  width: 100%; }
 div.profile-wrapper section.course-info > ol > li h2 {
-  display: table-cell;
-  padding: 0;
-  margin: 0;
-  width: 20.109%;
-  padding-right: 2.717%;
   border-right: 1px dotted #ccc;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  display: table-cell;
+  margin: 0;
+  padding: 0;
+  padding-right: 2.717%;
+  width: 20.109%; }
 div.profile-wrapper section.course-info > ol > li ol.sections {
-  padding-left: 2.717%;
   display: table-cell;
   list-style: none;
+  padding-left: 2.717%;
   width: 77.174%; }
 div.profile-wrapper section.course-info > ol > li ol.sections > li {
   padding: 0 0 22.652px 0; }
@@ -5081,11 +5115,11 @@ div.question-header div.question-container div.comments-container, div.answer-bl
 div.question-header div.question-container div.comments-container div.comments-content, div.answer-block div.question-container div.comments-container div.comments-content, div.paginator div.question-container div.comments-container div.comments-content, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content, div.answer-block div.answer-container div.comments-container div.comments-content, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content, div.question-header div.paginator div.answer-container div.comments-container div.comments-content, div.paginator div.question-header div.answer-container div.comments-container div.comments-content, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content, div.paginator div.answer-container div.comments-container div.comments-content {
   font-size: 13px;
   background: #efefef; }
-div.question-header div.question-container div.comments-container div.comments-content div.block, div.answer-block div.question-container div.comments-container div.comments-content div.block, div.paginator div.question-container div.comments-container div.comments-content div.block, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.block, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.block, div.answer-block div.answer-container div.comments-container div.comments-content div.block, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.block, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.block, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.block, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.block, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.block, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.block, div.paginator div.answer-container div.comments-container div.comments-content div.block {
+div.question-header div.question-container div.comments-container div.comments-content .block, div.answer-block div.question-container div.comments-container div.comments-content .block, div.paginator div.question-container div.comments-container div.comments-content .block, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block, div.answer-block div.answer-container div.comments-container div.comments-content .block, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content .block, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content .block, div.question-header div.paginator div.answer-container div.comments-container div.comments-content .block, div.paginator div.question-header div.answer-container div.comments-container div.comments-content .block, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content .block, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content .block, div.paginator div.answer-container div.comments-container div.comments-content .block {
   border-top: 1px solid #ddd;
   padding: 15px;
   display: block; }
-div.question-header div.question-container div.comments-container div.comments-content div.block:first-child, div.answer-block div.question-container div.comments-container div.comments-content div.block:first-child, div.paginator div.question-container div.comments-container div.comments-content div.block:first-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.block:first-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.block:first-child, div.answer-block div.answer-container div.comments-container div.comments-content div.block:first-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.block:first-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.block:first-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.block:first-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.block:first-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.block:first-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.block:first-child, div.paginator div.answer-container div.comments-container div.comments-content div.block:first-child {
+div.question-header div.question-container div.comments-container div.comments-content .block:first-child, div.answer-block div.question-container div.comments-container div.comments-content .block:first-child, div.paginator div.question-container div.comments-container div.comments-content .block:first-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content .block:first-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content .block:first-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content .block:first-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.paginator div.answer-container div.comments-container div.comments-content .block:first-child {
   border-top: 0; }
 div.question-header div.question-container div.comments-container div.comments-content form.post-comments, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments, div.paginator div.question-container div.comments-container div.comments-content form.post-comments, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments {
   padding: 15px; }
@@ -5175,7 +5209,7 @@ div.question-header div.question-container div.comments-container .counter, div.
   margin-top: 5px;
   text-align: right; }
 div.question-header div.question-container div.comments-container div.controls, div.answer-block div.question-container div.comments-container div.controls, div.paginator div.question-container div.comments-container div.controls, div.question-header div.answer-block div.answer-container div.comments-container div.controls, div.answer-block div.question-header div.answer-container div.comments-container div.controls, div.answer-block div.answer-container div.comments-container div.controls, div.paginator div.answer-block div.answer-container div.comments-container div.controls, div.answer-block div.paginator div.answer-container div.comments-container div.controls, div.question-header div.paginator div.answer-container div.comments-container div.controls, div.paginator div.question-header div.answer-container div.comments-container div.controls, div.answer-block div.paginator div.answer-container div.comments-container div.controls, div.paginator div.answer-block div.answer-container div.comments-container div.controls, div.paginator div.answer-container div.comments-container div.controls {
-  background: #efefef;
+  border-top: 1px dashed #ddd;
   text-align: right; }
 div.question-header div.question-container div.comments-container div.controls a, div.answer-block div.question-container div.comments-container div.controls a, div.paginator div.question-container div.comments-container div.controls a, div.question-header div.answer-block div.answer-container div.comments-container div.controls a, div.answer-block div.question-header div.answer-container div.comments-container div.controls a, div.answer-block div.answer-container div.comments-container div.controls a, div.paginator div.answer-block div.answer-container div.comments-container div.controls a, div.answer-block div.paginator div.answer-container div.comments-container div.controls a, div.question-header div.paginator div.answer-container div.comments-container div.controls a, div.paginator div.question-header div.answer-container div.comments-container div.controls a, div.answer-block div.paginator div.answer-container div.comments-container div.controls a, div.paginator div.answer-block div.answer-container div.comments-container div.controls a, div.paginator div.answer-container div.comments-container div.controls a {
   display: inline-block;
@@ -5192,6 +5226,12 @@ div.question-status h3, div.question-status div#wiki_panel input[type="button"],
   font-weight: normal; }
 div.question-status a {
   color: #eee; }
+
+div.share-question {
+  padding: 10px 0 10px 7.5%; }
+div.share-question p {
+  padding: 0;
+  margin: 0; }
 
 div.answer-controls {
   -webkit-box-sizing: border-box;
@@ -5232,8 +5272,12 @@ div.answer-block div.answered-by-owner p, div.paginator div.answered-by-owner p 
   color: #656565; }
 div.answer-block div.answered-by-owner div.comments-container, div.paginator div.answered-by-owner div.comments-container {
   color: #555; }
+div.answer-block div.accepted-answer p, div.paginator div.accepted-answer p {
+  color: #000; }
 div.answer-block div.deleted p, div.paginator div.deleted p {
   color: #993333; }
+div.answer-block img.answer-img-accept, div.paginator img.answer-img-accept {
+  opacity: 0.7; }
 
 div.paginator {
   text-align: center;
