@@ -249,6 +249,10 @@ div.question-header {
             display: inline-block;
             width: 95%;
 
+            &#full-width {
+              width: 100%;
+            }
+
             div.comment-meta {
               text-align: right;
 
@@ -317,5 +321,6 @@ div.share-question {
   p {
     padding: 0;
     margin: 0;
+    font-weight: bold;
   }
 }
