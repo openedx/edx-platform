@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, body.user-profile-page section.user-info header:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-wrapper section.video-controls:after, section.course-content div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, body.user-profile-page section.user-info header:after {
   content: ".";
   display: block;
   height: 0;
@@ -196,6 +196,13 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   padding: 22.652px;
   vertical-align: top;
   width: 76.518%; }
+@media print {
+  .content, div.course-wrapper section.course-content, div.book-wrapper section.book, div.info-wrapper section.updates, div.profile-wrapper section.course-info, div.wiki-wrapper section.wiki-body {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -ms-box-shadow: none;
+    -o-box-shadow: none;
+    box-shadow: none; } }
 
 .sidebar, section.course-index, div.book-wrapper section.book-sidebar, div.info-wrapper section.handouts, div.profile-wrapper section.user-info, div#wiki_panel, div.discussion-wrapper aside {
   background: #e3e3e3;
@@ -233,6 +240,9 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   -o-box-shadow: 0 1px 0 #eeeeee;
   box-shadow: 0 1px 0 #eeeeee;
   border-bottom: 1px solid #d3d3d3; }
+@media print {
+  .sidebar, section.course-index, div.book-wrapper section.book-sidebar, div.info-wrapper section.handouts, div.profile-wrapper section.user-info, div#wiki_panel, div.discussion-wrapper aside {
+    display: none; } }
 .sidebar h3, section.course-index h3, div.book-wrapper section.book-sidebar h3, div.info-wrapper section.handouts h3, div.profile-wrapper section.user-info h3, div#wiki_panel h3, div.discussion-wrapper aside h3, .sidebar div#wiki_panel input[type="button"], div#wiki_panel .sidebar input[type="button"], section.course-index div#wiki_panel input[type="button"], div#wiki_panel section.course-index input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div#wiki_panel input[type="button"], div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div#wiki_panel input[type="button"], div.discussion-wrapper aside div#wiki_panel input[type="button"], div#wiki_panel div.discussion-wrapper aside input[type="button"] {
   border: none;
   border-bottom: 1px solid #d3d3d3;
@@ -332,6 +342,9 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   font-size: 12px;
   margin: -22.652px -22.652px 22.652px;
   text-shadow: 0 1px 0 #fff; }
+@media print {
+  .topbar, nav.sequence-nav, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header {
+    display: none; } }
 .topbar a, nav.sequence-nav a, div.book-wrapper section.book nav a, div.wiki-wrapper section.wiki-body header a {
   color: #292309; }
 .topbar a:hover, nav.sequence-nav a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover {
@@ -454,6 +467,14 @@ html body section.main-content {
   box-sizing: border-box;
   margin-top: 3px;
   overflow: hidden; }
+@media print {
+  html body section.main-content {
+    border-bottom: 0;
+    -webkit-border-radius: none;
+    -moz-border-radius: none;
+    -ms-border-radius: none;
+    -o-border-radius: none;
+    border-radius: none; } }
 @media screen and (min-width: 1400px) {
   html body section.main-content {
     -webkit-border-radius: 4px;
@@ -471,6 +492,9 @@ div.header-wrapper {
   -ms-box-shadow: inset 0 -4px 6px #862d2d;
   -o-box-shadow: inset 0 -4px 6px #862d2d;
   box-shadow: inset 0 -4px 6px #862d2d; }
+@media print {
+  div.header-wrapper {
+    display: none; } }
 div.header-wrapper header {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -608,6 +632,9 @@ footer {
   color: #777;
   margin-top: 22.652px;
   padding: 0 22.652px; }
+@media print {
+  footer {
+    display: none; } }
 footer p {
   float: left; }
 footer p a {
@@ -682,6 +709,8 @@ div.leanModal_box#enroll {
   max-width: 600px; }
 div.leanModal_box#enroll p.ie-warning {
   display: none; }
+div.leanModal_box#enroll ol {
+  padding-top: 22.652px; }
 div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
   width: auto;
   float: none; }
@@ -2381,6 +2410,11 @@ div.course-wrapper section.course-content .problem-set h2, div.course-wrapper se
     display: block;
     width: auto;
     border-right: 0; } }
+@media print {
+  div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+    display: block;
+    width: auto;
+    border-right: 0; } }
 div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
   display: table-cell;
   width: 77.174%;
@@ -2390,6 +2424,13 @@ div.course-wrapper section.course-content .problem-set section.problem, div.cour
     display: block;
     width: auto;
     padding: 0; } }
+@media print {
+  div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+    display: block;
+    width: auto;
+    padding: 0; }
+  div.course-wrapper section.course-content .problem-set section.problem canvas, div.course-wrapper section.course-content section.problems-wrapper section.problem canvas, div.course-wrapper section.course-content div#seq_content section.problem canvas, div.course-wrapper section.course-content ol.vert-mod > li section.problem canvas, div.course-wrapper section.course-content .problem-set section.problem img, div.course-wrapper section.course-content section.problems-wrapper section.problem img, div.course-wrapper section.course-content div#seq_content section.problem img, div.course-wrapper section.course-content ol.vert-mod > li section.problem img {
+    page-break-inside: avoid; } }
 div.course-wrapper section.course-content .problem-set section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.unanswered, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-bullet, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-bullet, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-bullet, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-bullet {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -2759,6 +2800,45 @@ nav.sequence-nav ul li.next {
   background-image: url("/static/images/sequence-nav/next-icon.png"); }
 nav.sequence-nav ul li.next:hover {
   background-color: none; }
+
+div#graph-container canvas#graph {
+  background-color: #3c3c64;
+  width: 48.641%;
+  float: left;
+  margin-right: 2.717%; }
+div#graph-container div.graph-controls {
+  width: 48.641%;
+  float: left; }
+div#graph-container div.graph-controls select#musicTypeSelect {
+  display: block;
+  margin-bottom: 45.304px; }
+div#graph-container div.graph-controls div#graph-output {
+  display: block;
+  margin-bottom: 45.304px; }
+div#graph-container div.graph-controls div#graph-listen {
+  display: block;
+  margin-bottom: 45.304px; }
+div#graph-container div.graph-controls p {
+  margin-bottom: 22.652px; }
+div#graph-container div.graph-controls div#label {
+  display: inline-block; }
+div#graph-container div.graph-controls input#playButton {
+  display: block; }
+
+div#schematic-container canvas {
+  background-color: #3c3c64;
+  width: 48.641%;
+  float: left;
+  margin-right: 2.717%; }
+div#schematic-container div.schematic-sliders {
+  width: 48.641%;
+  float: left; }
+div#schematic-container div.schematic-sliders div.slider-label#vs {
+  margin-top: 45.304px; }
+div#schematic-container div.schematic-sliders div.slider-label {
+  margin-bottom: 11.326px; }
+div#schematic-container div.schematic-sliders div.slider {
+  margin-bottom: 22.652px; }
 
 div.book-wrapper section.book-sidebar {
   -webkit-box-sizing: border-box;
@@ -4394,7 +4474,7 @@ pre.prettyprint {
   padding: 3px;
   border: 0px solid #888; }
 
-.light-button, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa, div.paginator span.next, div.paginator span.prev, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a {
+.light-button, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, div.paginator span.next, div.paginator span.prev, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a {
   -webkit-box-shadow: inset 0 1px 0 white;
   -moz-box-shadow: inset 0 1px 0 white;
   -ms-box-shadow: inset 0 1px 0 white;
@@ -4419,7 +4499,7 @@ pre.prettyprint {
   text-decoration: none;
   cursor: pointer;
   -webkit-font-smoothing: antialiased; }
-.light-button:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:hover, div.paginator span.next:hover, div.paginator span.prev:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, .light-button:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:focus, div.paginator span.next:focus, div.paginator span.prev:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus {
+.light-button:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, div.paginator span.next:hover, div.paginator span.prev:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, .light-button:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, div.paginator span.next:focus, div.paginator span.prev:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus {
   background-color: white;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #d5d5d5));
   background-image: -webkit-linear-gradient(top, white, #d5d5d5);
@@ -4698,7 +4778,7 @@ div.discussion-wrapper aside div.markdown ul li ol li {
 
 div.question-list-header {
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 0px;
   overflow: hidden;
   width: 100%; }
 div.question-list-header section.question-list-meta {
@@ -4757,9 +4837,9 @@ ul.question-list li.single-question, div#question-list li.single-question {
 ul.question-list li.single-question:hover, div#question-list li.single-question:hover {
   background: #F3F3F3; }
 ul.question-list li.single-question:hover ul.tags li, div#question-list li.single-question:hover ul.tags li {
-  background: #fff; }
+  background: #ddd; }
 ul.question-list li.single-question:hover ul.tags li:before, div#question-list li.single-question:hover ul.tags li:before {
-  border-color: transparent #fff transparent transparent; }
+  border-color: transparent #ddd transparent transparent; }
 ul.question-list li.single-question:first-child, div#question-list li.single-question:first-child {
   border-top: 0; }
 ul.question-list li.single-question div, div#question-list li.single-question div {
@@ -4825,9 +4905,17 @@ ul.question-list li.single-question div.question-meta ul li div, div#question-li
   height: 25px;
   font-size: 12px; }
 ul.question-list div.post-own-question, div#question-list div.post-own-question {
-  padding: 11px; }
+  padding: 11px;
+  margin-top: 10px;
+  color: #888;
+  text-align: center; }
 ul.question-list div.post-own-question a, div#question-list div.post-own-question a {
-  font-weight: bold; }
+  font-weight: bold;
+  padding: 20px;
+  display: block;
+  margin: 10px auto;
+  text-align: center;
+  width: 40.486%; }
 
 ul.tags {
   list-style: none;
@@ -4987,13 +5075,12 @@ div.question-header div.question-container div.comments-container, div.answer-bl
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box;
-  padding: 3%;
   display: inline-block;
-  padding: 3%;
+  padding: 0 0 3% 0;
   width: 100%; }
 div.question-header div.question-container div.comments-container div.comments-content, div.answer-block div.question-container div.comments-container div.comments-content, div.paginator div.question-container div.comments-container div.comments-content, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content, div.answer-block div.answer-container div.comments-container div.comments-content, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content, div.question-header div.paginator div.answer-container div.comments-container div.comments-content, div.paginator div.question-header div.answer-container div.comments-container div.comments-content, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content, div.paginator div.answer-container div.comments-container div.comments-content {
   font-size: 13px;
-  background: #f9f9f9; }
+  background: #efefef; }
 div.question-header div.question-container div.comments-container div.comments-content div.block, div.answer-block div.question-container div.comments-container div.comments-content div.block, div.paginator div.question-container div.comments-container div.comments-content div.block, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.block, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.block, div.answer-block div.answer-container div.comments-container div.comments-content div.block, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.block, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.block, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.block, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.block, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.block, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.block, div.paginator div.answer-container div.comments-container div.comments-content div.block {
   border-top: 1px solid #ddd;
   padding: 15px;
@@ -5083,7 +5170,7 @@ div.question-header div.question-container div.comments-container .counter, div.
   margin-top: 5px;
   text-align: right; }
 div.question-header div.question-container div.comments-container div.controls, div.answer-block div.question-container div.comments-container div.controls, div.paginator div.question-container div.comments-container div.controls, div.question-header div.answer-block div.answer-container div.comments-container div.controls, div.answer-block div.question-header div.answer-container div.comments-container div.controls, div.answer-block div.answer-container div.comments-container div.controls, div.paginator div.answer-block div.answer-container div.comments-container div.controls, div.answer-block div.paginator div.answer-container div.comments-container div.controls, div.question-header div.paginator div.answer-container div.comments-container div.controls, div.paginator div.question-header div.answer-container div.comments-container div.controls, div.answer-block div.paginator div.answer-container div.comments-container div.controls, div.paginator div.answer-block div.answer-container div.comments-container div.controls, div.paginator div.answer-container div.comments-container div.controls {
-  background: #f8f8f8;
+  background: #efefef;
   text-align: right; }
 div.question-header div.question-container div.comments-container div.controls a, div.answer-block div.question-container div.comments-container div.controls a, div.paginator div.question-container div.comments-container div.controls a, div.question-header div.answer-block div.answer-container div.comments-container div.controls a, div.answer-block div.question-header div.answer-container div.comments-container div.controls a, div.answer-block div.answer-container div.comments-container div.controls a, div.paginator div.answer-block div.answer-container div.comments-container div.controls a, div.answer-block div.paginator div.answer-container div.comments-container div.controls a, div.question-header div.paginator div.answer-container div.comments-container div.controls a, div.paginator div.question-header div.answer-container div.comments-container div.controls a, div.answer-block div.paginator div.answer-container div.comments-container div.controls a, div.paginator div.answer-block div.answer-container div.comments-container div.controls a, div.paginator div.answer-container div.comments-container div.controls a {
   display: inline-block;
