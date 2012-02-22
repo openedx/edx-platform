@@ -28,11 +28,6 @@
   </script>
   <script type="text/javascript" src="${ settings.LIB_URL }mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
-    });
-  </script>
 <%block name="headextra"/>
 
 </head>
@@ -116,6 +111,12 @@ $(function() {
       });
     });
 </script>
+
+  <script type="text/javascript">
+    $(function(){
+      $("a[rel*=leanModal]").leanModal();
+    });
+  </script>
 
 <%block name="js_extra"/>
 

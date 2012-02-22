@@ -53,6 +53,7 @@ div.leanModal_box {
 
     ol {
       @extend .clearfix;
+      padding-top: lh();
 
       li {
 
