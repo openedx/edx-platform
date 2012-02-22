@@ -138,7 +138,6 @@ div.question-header {
             }
 
             span.user-badges {
-              // display: block;
             }
           }
         }
@@ -155,7 +154,7 @@ div.question-header {
         font-size: 13px;
         background: #efefef;
 
-        div.block {
+        .block {
           border-top: 1px solid #ddd;
           padding: 15px;
           display: block;
@@ -283,7 +282,8 @@ div.question-header {
 
       div.controls {
         // padding: 15px 0;
-        background: #efefef ;
+        // background: #efefef ;
+        border-top: 1px dashed #ddd;
         text-align: right;
         a {
           display: inline-block;
@@ -308,5 +308,14 @@ div.question-status {
 
   a {
     color: #eee;
+  }
+}
+
+div.share-question {
+  padding: 10px 0 10px 7.5%;
+
+  p {
+    padding: 0;
+    margin: 0;
   }
 }
