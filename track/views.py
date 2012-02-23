@@ -1,3 +1,4 @@
+import time
 import json
 import logging
 import os
@@ -39,6 +40,7 @@ def user_track(request):
         "event" : request.GET['event'],
         "agent" : agent,
         "page" : request.GET['page'],
+        "time": time.time()
         }
     log_event(event)
     return HttpResponse('success')
@@ -62,5 +64,6 @@ def server_track(request, event_type, event, page=None):
         "event" : event,
         "agent" : agent,
         "page" : page,
+        "time": time.time()
         }
     log_event(event)
