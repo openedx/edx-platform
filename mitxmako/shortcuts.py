@@ -20,7 +20,7 @@ from django.conf import settings
 
 from mitxmako.middleware import requestcontext
 
-def render_to_string(template_name, dictionary, context_instance=None):
+def render_to_string(template_name, dictionary, context_instance=None, namespace='main'):
     context_instance = context_instance or Context(dictionary)
     # add dictionary to context_instance
     context_instance.update(dictionary or {})
@@ -31,12 +31,12 @@ def render_to_string(template_name, dictionary, context_instance=None):
     for d in context_instance:
         context_dictionary.update(d)
     # fetch and render template
-    template = middleware.lookup.get_template(template_name)
+    template = middleware.lookup[namespace].get_template(template_name)
     return template.render(**context_dictionary)
 
-def render_to_response(template_name, dictionary, context_instance=None, **kwargs):
+def render_to_response(template_name, dictionary, context_instance=None, namespace='main', **kwargs):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     lookup.get_template(args[0]).render with the passed arguments.
     """
-    return HttpResponse(render_to_string(template_name, dictionary, context_instance), **kwargs)
+    return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)

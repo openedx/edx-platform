@@ -27,6 +27,10 @@ class UserProfile(models.Model):
     meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
+class UserTestGroup(models.Model):
+    users = models.ManyToManyField(User, db_index=True)
+    name = models.CharField(blank=False, max_length=32, db_index=True)
+    description = models.TextField(blank=True)
 
 class Registration(models.Model):
     ''' Allows us to wait for e-mail before user is registered. A

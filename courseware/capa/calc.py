@@ -1,14 +1,17 @@
 import copy
+import logging
 import math
 import operator
+import re
 
 import numpy
+import scipy.constants
 
 from pyparsing import Word, alphas, nums, oneOf, Literal
 from pyparsing import ZeroOrMore, OneOrMore, StringStart
 from pyparsing import StringEnd, Optional, Forward
 from pyparsing import CaselessLiteral, Group, StringEnd
-from pyparsing import NoMatch, stringEnd
+from pyparsing import NoMatch, stringEnd, alphanums
 
 default_functions = {'sin' : numpy.sin, 
                      'cos' : numpy.cos, 
@@ -23,19 +26,75 @@ default_functions = {'sin' : numpy.sin,
                      'abs':numpy.abs
                      }
 default_variables = {'j':numpy.complex(0,1), 
-                     'e':numpy.complex(numpy.e)
+                     'e':numpy.e,
+                     'pi':numpy.pi, 
+                     'k':scipy.constants.k,
+                     'c':scipy.constants.c, 
+                     'T':298.15,
+                     'q':scipy.constants.e
                      }
 
+log = logging.getLogger("mitx.courseware.capa")
 
-def evaluator(variables, functions, string):
+class UndefinedVariable(Exception):
+    def raiseself(self):
+        ''' Helper so we can use inside of a lambda '''
+        raise self
+
+
+general_whitespace = re.compile('[^\w]+')
+def check_variables(string, variables):
+    '''  Confirm the only variables in string are defined.  
+
+    Pyparsing uses a left-to-right parser, which makes the more
+    elegant approach pretty hopeless. 
+
+    achar = reduce(lambda a,b:a|b ,map(Literal,alphas)) # Any alphabetic character
+    undefined_variable = achar + Word(alphanums)
+    undefined_variable.setParseAction(lambda x:UndefinedVariable("".join(x)).raiseself())
+    varnames = varnames | undefined_variable'''
+    possible_variables = re.split(general_whitespace, string) # List of all alnums in string
+    bad_variables = list()
+    for v in possible_variables:
+        if len(v) == 0:
+            continue
+        if v[0] <= '9' and '0' <= 'v': # Skip things that begin with numbers
+            continue
+        if v not in variables: 
+            bad_variables.append(v)
+    if len(bad_variables)>0:
+        raise UndefinedVariable(' '.join(bad_variables))
+
+def evaluator(variables, functions, string, cs=False):
     ''' Evaluate an expression. Variables are passed as a dictionary
     from string to value. Unary functions are passed as a dictionary
-    from string to function '''
+    from string to function. Variables must be floats.
+    cs: Case sensitive
+
+    TODO: Fix it so we can pass integers and complex numbers in variables dict
+    '''
+    # log.debug("variables: {0}".format(variables))
+    # log.debug("functions: {0}".format(functions))
+    # log.debug("string: {0}".format(string))
+
     all_variables = copy.copy(default_variables)
     all_variables.update(variables)
     all_functions = copy.copy(default_functions)
     all_functions.update(functions)
     
+    if not cs: 
+        string_cs = string.lower()
+        for v in all_variables.keys():
+            all_variables[v.lower()]=all_variables[v]
+        for f in all_functions.keys():
+            all_functions[f.lower()]=all_functions[f]
+        CasedLiteral = CaselessLiteral 
+    else:
+        string_cs = string
+        CasedLiteral = Literal
+
+    check_variables(string_cs, set(all_variables.keys()+all_functions.keys()))
+
     if string.strip() == "":
         return float('nan')
     ops = { "^" : operator.pow,
@@ -119,19 +178,22 @@ def evaluator(variables, functions, string):
     # Handle variables passed in. E.g. if we have {'R':0.5}, we make the substitution. 
     # Special case for no variables because of how we understand PyParsing is put together
     if len(all_variables)>0:
-        varnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), all_variables.keys()))
+        # We sort the list so that var names (like "e2") match before 
+        # mathematical constants (like "e"). This is kind of a hack.
+        all_variables_keys = sorted(all_variables.keys(), key=len, reverse=True)
+        varnames = sreduce(lambda x,y:x|y, map(lambda x: CasedLiteral(x), all_variables_keys))
         varnames.setParseAction(lambda x:map(lambda y:all_variables[y], x))
     else:
         varnames=NoMatch()
     # Same thing for functions. 
     if len(all_functions)>0:
-        funcnames = sreduce(lambda x,y:x|y, map(lambda x: CaselessLiteral(x), all_functions.keys()))
+        funcnames = sreduce(lambda x,y:x|y, map(lambda x: CasedLiteral(x), all_functions.keys()))
         function = funcnames+lpar.suppress()+expr+rpar.suppress()
         function.setParseAction(func_parse_action)
     else:
         function = NoMatch()
 
-    atom = number | varnames | lpar+expr+rpar | function
+    atom = number | function | varnames | lpar+expr+rpar
     factor << (atom + ZeroOrMore(exp+atom)).setParseAction(exp_parse_action) # 7^6
     paritem = factor + ZeroOrMore(Literal('||')+factor) # 5k || 4k
     paritem=paritem.setParseAction(parallel)
@@ -147,7 +209,9 @@ if __name__=='__main__':
     print "X",evaluator(variables, functions, "10000||sin(7+5)-6k")
     print "X",evaluator(variables, functions, "13")
     print evaluator({'R1': 2.0, 'R3':4.0}, {}, "13")
-    # 
+
+    print evaluator({'e1':1,'e2':1.0,'R3':7,'V0':5,'R5':15,'I1':1,'R4':6}, {},"e2")
+
     print evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5")
     print evaluator({},{}, "-1")
     print evaluator({},{}, "-(7+5)")

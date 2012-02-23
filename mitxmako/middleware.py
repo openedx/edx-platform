@@ -17,33 +17,31 @@ import tempfile
 from django.template import RequestContext
 
 requestcontext = None
-lookup = None
+lookup = {}
 
 class MakoMiddleware(object):
     def __init__(self):
         """Setup mako variables and lookup object"""
         from django.conf import settings
         # Set all mako variables based on django settings
-        global template_dirs, output_encoding, module_directory, encoding_errors
-        directories      = getattr(settings, 'MAKO_TEMPLATE_DIRS', settings.TEMPLATE_DIRS)
-
+        template_locations = settings.MAKO_TEMPLATES
         module_directory = getattr(settings, 'MAKO_MODULE_DIR', None)
+
         if module_directory is None:
             module_directory = tempfile.mkdtemp()
 
-        output_encoding  = getattr(settings, 'MAKO_OUTPUT_ENCODING', 'utf-8')
-        encoding_errors  = getattr(settings, 'MAKO_ENCODING_ERRORS', 'replace')
-        
-        global lookup
-        lookup = TemplateLookup(directories=directories, 
+        for location in template_locations:
+            lookup[location] = TemplateLookup(directories=template_locations[location], 
                                 module_directory=module_directory,
-                                output_encoding=output_encoding, 
-                                encoding_errors=encoding_errors,
+                                output_encoding='utf-8', 
+                                input_encoding='utf-8', 
+                                encoding_errors='replace',
                                 )
+
         import mitxmako
         mitxmako.lookup = lookup
 
     def process_request (self, request):
         global requestcontext
         requestcontext = RequestContext(request)
-#        print requestcontext
+

@@ -7,14 +7,15 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from x_module import XModule
 from lxml import etree
 
-class HtmlModule(XModule):
+class Module(XModule):
     id_attribute = 'filename'
 
     def get_state(self):
         return json.dumps({ })
 
-    def get_xml_tags():
-        return "html"
+    @classmethod
+    def get_xml_tags(c):
+        return ["html"]
         
     def get_html(self):
         if self.filename==None:
@@ -23,7 +24,7 @@ class HtmlModule(XModule):
             textlist=[i for i in textlist if type(i)==str]
             return "".join(textlist)
         try: 
-            filename=settings.DATA_DIR+"html/"+self.filename+".xml"
+            filename=settings.DATA_DIR+"html/"+self.filename
             return open(filename).read()
         except: # For backwards compatibility. TODO: Remove
             return render_to_string(self.filename, {'id': self.item_id})

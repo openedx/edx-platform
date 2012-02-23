@@ -11,8 +11,8 @@ from x_module import XModule
 
 log = logging.getLogger("mitx.courseware.modules")
 
-class VideoModule(XModule):
-    #id_attribute = 'youtube'
+class Module(XModule):
+    id_attribute = 'youtube'
     video_time = 0
 
     def handle_ajax(self, dispatch, get):
@@ -28,9 +28,10 @@ class VideoModule(XModule):
         log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({ 'position':self.position })
 
-    def get_xml_tags():
+    @classmethod
+    def get_xml_tags(c):
         '''Tags in the courseware file guaranteed to correspond to the module'''
-        return "video"
+        return ["video"]
         
     def video_list(self):
         l = self.youtube.split(',')
