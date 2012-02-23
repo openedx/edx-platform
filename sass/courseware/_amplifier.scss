@@ -71,3 +71,24 @@ div#schematic-container {
 }
 //End JM MOSFET AMPLIFIER
 
+// Labels
+div.graph-controls, div#graph-listen {
+
+  label {
+    @include border-radius(2px);
+    font-weight: bold;
+    padding: 3px;
+  }
+
+  label[for="vinCheckbox"], label[for="vinRadioButton"]{
+      color: desaturate(#00bfff, 50%);
+  }
+  label[for="voutCheckbox"], label[for="voutRadioButton"]{
+      color: darken(#ffcf48, 20%);
+  }
+  label[for="vrCheckbox"], label[for="vrRadioButton"]{
+      color: desaturate(#1df914, 40%);
+  }
+
+}
+
