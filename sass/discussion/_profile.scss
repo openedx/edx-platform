@@ -1,41 +1,4 @@
 body.user-profile-page {
-  section.user-info {
-    // @extend .sidebar;
-    header {
-      @extend .clearfix;
-      border-bottom: 1px solid #d3d3d3;
-      @include box-shadow(0 1px 0 #eee);
-      padding: 0 lh();
-      margin: 0 (-(lh())) lh();
-
-      section {
-        float: left;
-        width: flex-grid(2, 3);
-        margin-right: flex-gutter(3);
-
-        h1 {
-          margin-top: 0;
-        }
-      }
-
-      p.karma {
-        float: left;
-        width: flex-grid(1, 3);
-        border: 1px solid #D3D3D3;
-        @include border-radius(3px);
-        @include box-shadow(inset 0 0 0 1px #fff, 0 1px 0 #fff);
-        background: #eee;
-        text-align: center;
-        padding: lh(.5) 0;
-
-
-        strong {
-          display: block;
-          font-style: 20px;
-        }
-      }
-    }
-  }
 
   section.questions {
     h1 {
@@ -44,12 +7,11 @@ body.user-profile-page {
   }
 
   ul.sub-info {
-    border-top: 1px solid #ddd;
+    // border-top: 1px solid #ddd;
     margin-top: lh();
     list-style: none;
 
     > li {
-      width: flex-grid(2.25, 9);
       display: table-cell;
       padding: (flex-gutter(9)/2);
       border-right: 1px solid #ddd;
@@ -64,7 +26,21 @@ body.user-profile-page {
         padding-right: 0;
       }
 
+      &.votes-badges {
+        width: flex-grid(2,9);
+
+      }
+
+      &.answer-list {
+        width: flex-grid(4, 9);
+      }
+
+      &.tags-list {
+        width: flex-grid(3,9);
+      }
+
       h2 {
+        margin-bottom: 30px;
         margin-top: 0;
       }
 
@@ -78,45 +54,67 @@ body.user-profile-page {
 
       &.user-stats-table {
         list-style: none;
+
+        li {
+          padding: 10px 0 15px;
+          border-top: 1px solid #eee;
+        }
       }
 
       &.vote-buttons {
         list-style: none;
+        margin-bottom: 30px;
 
         li {
-          @include border-radius(4px);
           background-color: lighten(#F6EFD4, 3%);
           background-position: 10px center;
           background-repeat: no-repeat;
+          @include border-radius(4px);
+          display: inline-block;
           height: 20px;
           padding: 10px 10px 10px 40px;
-          display: inline-block;
 
           &.up {
+            background-color:#d1e3a8;
             background-image: url(/static/images/askbot/vote-arrow-up.png);
             margin-right: 6px;
+
+            span.vote-count {
+              color: #3f6c3e;
+            }
           }
 
           &.down {
             background-image: url(/static/images/askbot/vote-arrow-down.png);
+            background-color:#eac6ad;
+
+            span.vote-count {
+              color: $mit-red;
+            }
+
           }
         }
       }
 
       &.badges {
-        @include border-radius(4px);
-        background-color: #e3e3e3;
         @include inline-block();
 
         a {
+          background-color: #e3e3e3;
           border: 0;
-          background: none;
-          text-transform: uppercase;
+          @include border-radius(4px);
           color: #292309;
+          display: block;
           font-size: 12px;
           padding: 10px;
+          margin-bottom: 10px;
           text-shadow: 0 1px 0 #fff;
-          display: block;
+          text-transform: uppercase;
+          text-decoration: none;
+
+          &:hover {
+            background-color: #cdcdcd;
+          }
         }
       }
     }
