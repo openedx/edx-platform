@@ -34,6 +34,38 @@ etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
 
 template_imports={'urllib':urllib}
 
+def get_grade(request, problem, cache):
+    ## HACK: assumes max score is fixed per problem
+    id = problem.get('id')
+    correct = 0
+    
+    # If the ID is not in the cache, add the item
+    if id not in cache: 
+        module = StudentModule(module_type = 'problem',  # TODO: Move into StudentModule.__init__?
+                               module_id = id,
+                               student = request.user, 
+                               state = None, 
+                               grade = 0,
+                               max_grade = None,
+                               done = 'i')
+        cache[id] = module
+
+    # Grab the # correct from cache
+    if id in cache:
+        response = cache[id]
+        if response.grade!=None:
+            correct=response.grade
+        
+    # Grab max grade from cache, or if it doesn't exist, compute and save to DB
+    if id in cache and response.max_grade != None:
+        total = response.max_grade
+    else:
+        total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
+        response.max_grade = total
+        response.save()
+
+    return (correct, total)
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile(request):
     ''' User profile. Show username, location, etc, as well as grades .
@@ -42,46 +74,48 @@ def profile(request):
         return redirect('/')
     
     dom=content_parser.course_file(request.user)
-    hw=[]
     course = dom.xpath('//course/@name')[0]
-    chapters = dom.xpath('//course[@name=$course]/chapter', course=course)
+    xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
     responses=StudentModule.objects.filter(student=request.user)
     response_by_id = {}
     for response in responses:
         response_by_id[response.module_id] = response
-        
-        
+    
+    
     total_scores = {}
-
-    for c in chapters:
+    chapters=[]
+    for c in xmlChapters:
+        sections = []
         chname=c.get('name')
         for s in dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section', 
                            course=course, chname=chname):
             problems=dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section[@name=$section]//problem', 
                            course=course, chname=chname, section=s.get('name'))
-                           
+
             graded = True if s.get('graded') == "true" else False
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    id = p.get('id')
-                    correct = 0
-                    if id in response_by_id:
-                        response = response_by_id[id]
-                        if response.grade!=None:
-                            correct=response.grade
-                    
-                    total=courseware.modules.capa_module.LoncapaModule(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    (correct,total) = get_grade(request, p, response_by_id)
+                    # id = p.get('id')
+                    # correct = 0
+                    # if id in response_by_id:
+                    #     response = response_by_id[id]
+                    #     if response.grade!=None:
+                    #         correct=response.grade
+
+                    # total=courseware.modules.capa_module.Module(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
+                    # print correct, total
                     scores.append((int(correct),total, graded ))
-                    
-                    
+
+
                 section_total = (sum([score[0] for score in scores]), 
                                 sum([score[1] for score in scores]))
-                
+
                 graded_total = (sum([score[0] for score in scores if score[2]]), 
                                 sum([score[1] for score in scores if score[2]]))
-                
+
                 #Add the graded total to total_scores
                 format = s.get('format') if s.get('format') else ""
                 subtitle = s.get('subtitle') if s.get('subtitle') else format
@@ -89,10 +123,8 @@ def profile(request):
                     format_scores = total_scores[ format ] if format in total_scores else []
                     format_scores.append( graded_total )
                     total_scores[ format ] = format_scores
-                
-                score={'course':course,
-                       'section':s.get("name"),
-                       'chapter':c.get("name"),
+
+                score={'section':s.get("name"),
                        'scores':scores,
                        'section_total' : section_total,
                        'format' : format,
@@ -100,7 +132,12 @@ def profile(request):
                        'due' : s.get("due") or "",
                        'graded' : graded,
                        }
-                hw.append(score)
+                sections.append(score)
+
+        chapters.append({'course':course,
+                         'chapter' : c.get("name"),
+                         'sections' : sections,})
+                         
     
     def totalWithDrops(scores, drop_count):
         #Note that this key will sort the list descending
@@ -216,11 +253,12 @@ def profile(request):
              'location':user_info.location,
              'language':user_info.language,
              'email':request.user.email,
-             'homeworks':hw,
+             'chapters':chapters,
              'format_url_params' : format_url_params,
              'grade_summary' : grade_summary,
              'csrf':csrf(request)['csrf_token']
              }
+
     return render_to_response('profile.html', context)
 
 def format_url_params(params):
@@ -243,6 +281,40 @@ def render_accordion(request,course,chapter,section):
                      template_imports.items())
     return {'init_js':render_to_string('accordion_init.js',context), 
             'content':render_to_string('accordion.html',context)}
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def render_section(request, section):
+    ''' TODO: Consolidate with index 
+    '''
+    user = request.user
+    if not settings.COURSEWARE_ENABLED or not user.is_authenticated():
+        return redirect('/')
+
+#    try: 
+    dom = content_parser.section_file(user, section)
+    #except:
+     #   raise Http404
+
+    accordion=render_accordion(request, '', '', '')
+
+    module_ids = dom.xpath("//@id")
+    
+    module_object_preload = list(StudentModule.objects.filter(student=user, 
+                                                              module_id__in=module_ids))
+    
+    module=render_module(user, request, dom, module_object_preload)
+
+    if 'init_js' not in module:
+        module['init_js']=''
+
+    context={'init':accordion['init_js']+module['init_js'],
+             'accordion':accordion['content'],
+             'content':module['content'],
+             'csrf':csrf(request)['csrf_token']}
+
+    result = render_to_response('courseware.html', context)
+    return result
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course="6.002 Spring 2012", chapter="Using the System", section="Hints"): 

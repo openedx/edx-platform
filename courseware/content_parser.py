@@ -1,16 +1,17 @@
 import hashlib
 import json
 import logging
+import os
 import re
 
 from datetime import timedelta
 from lxml import etree
-from mako.template import Template
-from mako.lookup import TemplateLookup
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
     from student.models import UserProfile
+    from student.models import UserTestGroup
+    from mitxmako.shortcuts import render_to_response, render_to_string
 except: 
     settings = None 
 
@@ -49,7 +50,7 @@ def xpath(xml, query_string, **args):
         We should remove this with the move to lxml. 
         We should also use lxml argument passing. '''
     doc = etree.fromstring(xml)
-    print type(doc)
+    #print type(doc)
     def escape(x):
         # TODO: This should escape the string. For now, we just assume it's made of valid characters. 
         # Couldn't figure out how to escape for lxml in a few quick Googles
@@ -60,7 +61,7 @@ def xpath(xml, query_string, **args):
         return x
 
     args=dict( ((k, escape(args[k])) for k in args) )
-    print args
+    #print args
     results = doc.xpath(query_string.format(**args))
     return results
 
@@ -86,14 +87,20 @@ def item(l, default="", process=lambda x:x):
 
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
-    default_ids = {'video':'youtube',
+    old_ids = {'video':'youtube',
                    'problem':'filename',
                    'sequential':'id',
                    'html':'filename',
                    'vertical':'id', 
                    'tab':'id',
-                   'schematic':'id'}
-    
+                   'schematic':'id',
+                   'book' : 'id'}
+    import courseware.modules
+    default_ids = courseware.modules.get_default_ids()
+
+    #print default_ids, old_ids
+    #print default_ids == old_ids
+
     # Tag elements with unique IDs
     elements = course.xpath("|".join(['//'+c for c in default_ids]))
     for elem in elements:
@@ -135,22 +142,50 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
             #to its children later.
             return
 
-template_lookup = TemplateLookup(directories = [settings.DATA_DIR], 
-                                 module_directory = settings.MAKO_MODULE_DIR)
+def user_groups(user):
+    # TODO: Rewrite in Django
+    return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
 
-def course_file(user):
-    # TODO: Cache. 
-    filename = UserProfile.objects.get(user=user).courseware
-    data_template = template_lookup.get_template(filename)
-
-    options = {'dev_content':True}
-
-    tree = etree.XML(data_template.render(**options))
+def course_xml_process(tree):
+    ''' Do basic pre-processing of an XML tree. Assign IDs to all
+    items without. Propagate due dates, grace periods, etc. to child
+    items. 
+    '''
     id_tag(tree)
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")
     propogate_downward_tag(tree, "graceperiod")
     return tree
+
+def course_file(user):
+    ''' Given a user, return course.xml
+    '''
+    # TODO: Cache. 
+    filename = UserProfile.objects.get(user=user).courseware
+
+    groups = user_groups(user)
+
+    options = {'dev_content':settings.DEV_CONTENT, 
+               'groups' : groups}
+
+    tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
+    return tree
+
+def section_file(user, section):
+    ''' Given a user and the name of a section, return that section
+    '''
+    filename = section+".xml"
+
+    if filename not in os.listdir(settings.DATA_DIR + '/sections/'):
+        print filename+" not in "+str(os.listdir(settings.DATA_DIR + '/sections/'))
+        return None
+
+    options = {'dev_content':settings.DEV_CONTENT, 
+               'groups' : user_groups(user)}
+
+    tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'sections')))
+    return tree
+
 
 def module_xml(coursefile, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes

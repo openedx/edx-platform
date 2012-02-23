@@ -28,27 +28,18 @@ def csrf_token(context):
 @ensure_csrf_cookie
 def index(request):
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
-        return redirect('/courseware')
+        return redirect('/info')
     else:
         csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done. 
-        return render_to_response('index.html', {'error' : '',
-                                                 'csrf': csrf_token }) 
+        return render_to_response('index.html', {'csrf': csrf_token }) 
                                                  
-# def courseinfo(request):
-#     if request.user.is_authenticated():
-#         return redirect('/courseware')
-#     else:
-#         csrf_token = csrf(request)['csrf_token']
-#         # TODO: Clean up how 'error' is done. 
-#         return render_to_response('courseinfo.html', {'error' : '',
-#                                                  'csrf': csrf_token }) 
-
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):
     if 'email' not in request.POST or 'password' not in request.POST:
-        return render_to_response('login.html', {'error':error.replace('+',' ')})
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error': 'Invalid login'})) # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
@@ -136,9 +127,15 @@ def create_account(request, post_override=None):
     # TODO: Confirm e-mail is not from a generic domain (mailinator, etc.)? Not sure if 
     # this is a good idea
     # TODO: Check password is sane
-    for a in ['username', 'email', 'password', 'terms_of_service', 'honor_code']:
+    for a in ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']:
         if len(post_vars[a])<2:
-            js['value']="{field} is required.".format(field=a)
+            error_str = {'username' : 'Username of length 2 or greater', 
+                         'email' : 'Properly formatted e-mail',
+                         'name' : 'Your legal name ',
+                         'password': 'Valid password ',
+                         'terms_of_service': 'Accepting Terms of Service',
+                         'honor_code': 'Agreeing to the Honor Code'}
+            js['value']="{field} is required.".format(field=error_str[a])
             return HttpResponse(json.dumps(js))
 
     try:

@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import datetime
 
 # Create your views here.
 from django.http import HttpResponse
@@ -39,6 +40,7 @@ def user_track(request):
         "event" : request.GET['event'],
         "agent" : agent,
         "page" : request.GET['page'],
+        "time": datetime.datetime.utcnow().isoformat(),
         }
     log_event(event)
     return HttpResponse('success')
@@ -62,5 +64,6 @@ def server_track(request, event_type, event, page=None):
         "event" : event,
         "agent" : agent,
         "page" : page,
+        "time": datetime.datetime.utcnow().isoformat(),
         }
     log_event(event)

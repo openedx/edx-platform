@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 from mitx.courseware.content_parser import course_file
 import mitx.courseware.module_render
+import mitx.courseware.modules
 
 class Command(BaseCommand):
     help = "Does basic validity tests on course.xml."
@@ -24,7 +25,7 @@ class Command(BaseCommand):
                 check = False
         print "Confirming all modules render. Nothing should print during this step. "
         for module in course.xpath('//problem|//html|//video|//vertical|//sequential|/tab'):
-            module_class=mitx.courseware.module_render.modx_modules[module.tag]
+            module_class=mitx.courseware.modules.modx_modules[module.tag]
             # TODO: Abstract this out in render_module.py
             try: 
                 instance=module_class(etree.tostring(module), 
@@ -41,6 +42,7 @@ class Command(BaseCommand):
         if os.path.exists(sections_dir):
             print "Checking all section includes are valid XML"
             for f in os.listdir(sections_dir):
+                print f
                 etree.parse(sections_dir+'/'+f)
         else:
             print "Skipping check of include files -- no section includes dir ("+sections_dir+")"
