@@ -22,13 +22,38 @@ form.answer-form {
 
     .title-desc {
       @include box-sizing(border-box);
+      @include border-radius(4px);
       background: #333;
       color: #fff;
+      display: none;
       font-size: 13px;
-      padding: 5px 10px;
-      width: flex-grid(6);
+      padding: 7px 14px;
       -webkit-font-smoothing: antialiased;
     }
+
+    &:hover  {
+      .title-desc {
+        display: inline-block;
+        position: absolute;
+        margin-left: 10px;
+        z-index: 1;
+        width: 200px;
+
+        &:before {
+          border-color: transparent #333 transparent transparent;
+          border-style:solid;
+          border-width:12px 12px 12px 0;
+          content:"";
+          height:0;
+          left:-10px;
+          position:absolute;
+          top:1;
+          width:0;
+
+        }
+      }
+    }
+
   }
 
   span.form-error, label.form-error {
