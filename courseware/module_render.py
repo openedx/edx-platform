@@ -55,6 +55,8 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         raise Http404
 
     s=s[0]
+    oldgrade = s.grade
+    oldstate = s.state
 
     dispatch=dispatch.split('?')[0]
 
@@ -65,9 +67,9 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     # Create the module
     instance=courseware.modules.get_module_class(module)(xml, 
-                                                         s.module_id, 
+                                                         id, 
                                                          ajax_url=ajax_url, 
-                                                         state=s.state, 
+                                                         state=oldstate, 
                                                          track_function = make_track_function(request), 
                                                          render_function = None)
     # Let the module handle the AJAX
@@ -76,7 +78,8 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     s.state=instance.get_state()
     if instance.get_score(): 
         s.grade=instance.get_score()['score']
-    s.save()
+    if s.grade != oldgrade or s.state != oldstate:
+        s.save()
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
 
@@ -113,7 +116,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
                            module_type = module_type,
                            module_id=module_id, 
                            state=instance.get_state())
-        smod.save() # This may be optional (at least in the case of no instance in the dB)
+        smod.save()
         module_object_preload.append(smod)
     # Grab content
     content = instance.get_html()
