@@ -9,6 +9,7 @@ from lxml import etree
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
+    from django.core.cache import cache
     from student.models import UserProfile
     from student.models import UserTestGroup
     from mitxmako.shortcuts import render_to_response, render_to_string
@@ -144,7 +145,16 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
 
 def user_groups(user):
     # TODO: Rewrite in Django
-    return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
+    key = 'user_group_names_{user.id}'.format(user=user)
+    cache_expiration = 60 * 60 * 4 # four hours
+    group_names = cache.get(key)
+    if group_names is None:
+        group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
+        cache.set(key, group_names, cache_expiration)
+
+    return group_names
+
+    # return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
 
 def course_xml_process(tree):
     ''' Do basic pre-processing of an XML tree. Assign IDs to all
@@ -161,7 +171,7 @@ def course_file(user):
     ''' Given a user, return course.xml
     '''
     # TODO: Cache. 
-    filename = UserProfile.objects.get(user=user).courseware
+    filename = user.profile_cache.courseware # UserProfile.objects.get(user=user).courseware
 
     groups = user_groups(user)
 

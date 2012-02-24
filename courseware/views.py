@@ -247,7 +247,7 @@ def profile(request):
     ]
     
     
-    user_info=UserProfile.objects.get(user=request.user)
+    user_info = request.user.profile_cache # UserProfile.objects.get(user=request.user)
     context={'name':user_info.name,
              'username':request.user.username,
              'location':user_info.location,
