@@ -12,6 +12,8 @@ file and check it in at the same time as your model changes. To do that,
 from django.db import models
 from django.contrib.auth.models import User
 
+from cache_toolbox import cache_model, cache_relation
+
 class StudentModule(models.Model):
     # For a homework problem, contains a JSON
     # object consisting of state
@@ -50,3 +52,4 @@ class StudentModule(models.Model):
         return self.module_type+'/'+self.student.username+"/"+self.module_id+'/'+str(self.state)[:20]
 
 
+cache_model(StudentModule)
