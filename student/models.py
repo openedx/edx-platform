@@ -13,6 +13,8 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
+from cache_toolbox import cache_model, cache_relation
+
 class UserProfile(models.Model):
     class Meta:
         db_table = "auth_userprofile"
@@ -20,7 +22,7 @@ class UserProfile(models.Model):
     ## CRITICAL TODO/SECURITY
     # Sanitize all fields. 
     # This is not visible to other users, but could introduce holes later
-    user = models.ForeignKey(User, unique=True, db_index=True)
+    user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
     language = models.CharField(blank=True, max_length=255, db_index=True)
     location = models.CharField(blank=True, max_length=255, db_index=True)
@@ -54,3 +56,4 @@ class Registration(models.Model):
         self.user.save()
         #self.delete()
 
+cache_relation(User.profile)
