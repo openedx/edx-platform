@@ -21,7 +21,8 @@ def user_track(request):
         username = "anonymous"
 
     try: 
-        scookie = request.META['HTTP_COOKIE']
+        scookie = request.META['HTTP_COOKIE'] # Get cookies
+        scookie = ";".join([c.split('=')[1] for c in scookie.split(";") if "sessionid" in c]).strip() # Extract session ID
     except: 
         scookie = ""
 
