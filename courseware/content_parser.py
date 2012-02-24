@@ -170,15 +170,24 @@ def course_xml_process(tree):
 def course_file(user):
     ''' Given a user, return course.xml
     '''
-    # TODO: Cache. 
+    
+    # TODO: Cache.         
     filename = user.profile_cache.courseware # UserProfile.objects.get(user=user).courseware
-
     groups = user_groups(user)
-
     options = {'dev_content':settings.DEV_CONTENT, 
                'groups' : groups}
 
-    tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
+    
+    cache_key = filename + "_processed?dev_content:" + str(options['dev_content']) + "&groups:" + str(sorted(groups))
+    tree_string = cache.get(cache_key)
+    if not tree_string:
+        tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
+        tree_string = etree.tostring(tree)
+        
+        cache.set(cache_key, tree_string, 60)
+    else:
+        tree = etree.XML(tree_string)
+
     return tree
 
 def section_file(user, section):
