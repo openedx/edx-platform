@@ -86,7 +86,7 @@ def logout_user(request):
 def change_setting(request):
     if not request.user.is_authenticated():
         return redirect('/')
-    up=UserProfile.objects.get(user=request.user)
+    up = request.user.profile_cache # UserProfile.objects.get(user=request.user)
     if 'location' in request.POST:
 #        print "loc"
         up.location=request.POST['location']
@@ -171,7 +171,7 @@ def create_account(request, post_override=None):
     u.save()
     r.register(u)
 
-    up=UserProfile(user=u)
+    up = UserProfile(user=u)
     up.name=post_vars['name']
     up.language=post_vars['language']
     up.location=post_vars['location']

@@ -105,14 +105,22 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'util.middleware.ExceptionLoggingMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    # Uncommenting the following will prevent csrf token from being re-set if you
+    # delete it on the browser. I don't know why.
+    #'django.middleware.cache.FetchFromCacheMiddleware',
+
 )
 
 ROOT_URLCONF = 'mitx.urls'
@@ -143,7 +151,7 @@ INSTALLED_APPS = (
 #TRACK_DIR = None
 DEBUG_TRACK_LOG = False
 # Maximum length of a tracking string. We don't want e.g. a file upload in our log
-TRACK_MAX_EVENT = 1000 
+TRACK_MAX_EVENT = 10000 
 # Maximum length of log file before starting a new one. 
 MAXLOG = 500
 
@@ -283,7 +291,6 @@ site.addsitedir(os.path.join(os.path.dirname(askbot.__file__), 'deps'))
 TEMPLATE_LOADERS = TEMPLATE_LOADERS + ('askbot.skins.loaders.filesystem_load_template_source',)
 
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
-    'util.middleware.ExceptionLoggingMiddleware',
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
     'askbot.middleware.forum_mode.ForumModeMiddleware',
     'askbot.middleware.cancel.CancelActionMiddleware',
@@ -291,7 +298,7 @@ MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'askbot.middleware.view_log.ViewLogMiddleware',
     'askbot.middleware.spaceless.SpacelessMiddleware',
-   # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+    #'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
 )
 
 FILE_UPLOAD_TEMP_DIR = os.path.join(os.path.dirname(__file__), 'tmp').replace('\\','/')
