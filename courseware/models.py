@@ -13,6 +13,7 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
 from django.db import models
+from django.db.models.signals import post_save, post_delete
 from django.core.cache import cache
 from django.contrib.auth.models import User
 
@@ -58,27 +59,34 @@ class StudentModule(models.Model):
         return self.module_type+'/'+self.student.username+"/"+self.module_id+'/'+str(self.state)[:20]
 
     @classmethod
-    def get_from_cache(cls, student, module_ids):
-        k = cls.key_for(student, module_ids)
-        student_modules = k.get(k)
-        if student_modules is None:
-            student_modules = StudentModule.objects.filter(student=student, module_id__in=module_ids)
+    def get_from_cache(cls, student, module_id):
+        k = cls.key_for(student, module_id)
+        student_module = cache.get(k)
+        if student_module is None:
+            student_module = StudentModule.objects.filter(student=student,
+                                                          module_id=module_id)[0]
             # It's possible it really doesn't exist...
-            if student_modules is not None:
-                k.set(k, student_modules, CACHE_TIMEOUT)
+            if student_module is not None:
+                cache.set(k, student_module, CACHE_TIMEOUT)
 
-        return student_modules
-
-
-    @classmethod
-    def clear_cache_for(cls, student, module_ids):
-        k = cls.key_for(student_id, module_ids)
-        cache.delete(k)
+        return student_module
 
     @classmethod
-    def key_for(cls, student, module_ids):
-        module_ids_hash = md5(",".join(sorted(modules_ids))).hexdigest()
-        return "StudentModule-student_id:{0};module_ids_hash:{1}".format(student.id, module_ids_hash)
+    def key_for(cls, student, module_id):
+        return "StudentModule-student_id:{0};module_id:{1}".format(student.id, module_id)
 
+
+def clear_cache_by_student_and_module_id(sender, instance, *args, **kwargs):
+    k = sender.key_for(instance.student, instance.module_id)
+    cache.delete(k)
+
+def update_cache_by_student_and_module_id(sender, instance, *args, **kwargs):
+    k = sender.key_for(instance.student, instance.module_id)
+    cache.set(k, instance, CACHE_TIMEOUT)
+
+
+post_save.connect(update_cache_by_student_and_module_id, sender=StudentModule, weak=False)
+post_delete.connect(clear_cache_by_student_and_module_id, sender=StudentModule, weak=False)
 
 cache_model(StudentModule)
+
