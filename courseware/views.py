@@ -159,7 +159,7 @@ def profile(request):
     for i in range(12):
         if i < len(homework_scores):
             percentage = homework_scores[i][0] / float(homework_scores[i][1])
-            summary = "{0:.0%} ({1}/{2})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
+            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
         else:
             percentage = 0
             summary = "0% (?/?)"
@@ -168,7 +168,7 @@ def profile(request):
             points_possible = random.randrange(10, 50)
             points_earned = random.randrange(5, points_possible)
             percentage = points_earned / float(points_possible)
-            summary = "{0:.0%} ({1}/{2})".format( percentage, points_earned, points_possible )
+            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
         
         summary = "Homework {0} - {1}".format(i + 1, summary)
         label = "HW {0:02d}".format(i + 1)
@@ -182,7 +182,7 @@ def profile(request):
     for i in range(12):
         if i < len(lab_scores):
             percentage = lab_scores[i][0] / float(lab_scores[i][1])
-            summary = "{0:.0%} ({1}/{2})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
+            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
         else:
             percentage = 0
             summary = "0% (?/?)"
@@ -191,7 +191,7 @@ def profile(request):
             points_possible = random.randrange(10, 50)
             points_earned = random.randrange(5, points_possible)
             percentage = points_earned / float(points_possible)
-            summary = "{0:.0%} ({1}/{2})".format( percentage, points_earned, points_possible )
+            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
             
         summary = "Lab {0} - {1}".format(i + 1, summary)
         label = "Lab {0:02d}".format(i + 1)
