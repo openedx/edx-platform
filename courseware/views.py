@@ -107,6 +107,12 @@ def profile(request):
 
                     # total=courseware.modules.capa_module.Module(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     # print correct, total
+                    if settings.GENERATE_PROFILE_SCORES:
+                        if total > 1:
+                            correct = random.randrange( max(total-2, 1) , total + 1 )
+                        else:
+                            correct = total
+                    
                     scores.append((int(correct),total, graded ))
 
 
@@ -164,11 +170,11 @@ def profile(request):
             percentage = 0
             summary = "0% (?/?)"
         
-        if settings.GENERATE_PROFILE_SCORES:
-            points_possible = random.randrange(10, 50)
-            points_earned = random.randrange(5, points_possible)
-            percentage = points_earned / float(points_possible)
-            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
+            if settings.GENERATE_PROFILE_SCORES:
+                points_possible = random.randrange(10, 50)
+                points_earned = random.randrange(5, points_possible)
+                percentage = points_earned / float(points_possible)
+                summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
         
         summary = "Homework {0} - {1}".format(i + 1, summary)
         label = "HW {0:02d}".format(i + 1)
@@ -179,6 +185,7 @@ def profile(request):
     #Figure the lab scores
     lab_scores = total_scores['Lab'] if 'Lab' in total_scores else []
     lab_percentages = []
+    print "lab_scores" , lab_scores
     for i in range(12):
         if i < len(lab_scores):
             percentage = lab_scores[i][0] / float(lab_scores[i][1])
@@ -187,11 +194,11 @@ def profile(request):
             percentage = 0
             summary = "0% (?/?)"
         
-        if settings.GENERATE_PROFILE_SCORES:
-            points_possible = random.randrange(10, 50)
-            points_earned = random.randrange(5, points_possible)
-            percentage = points_earned / float(points_possible)
-            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
+            if settings.GENERATE_PROFILE_SCORES:
+                points_possible = random.randrange(10, 50)
+                points_earned = random.randrange(5, points_possible)
+                percentage = points_earned / float(points_possible)
+                summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
             
         summary = "Lab {0} - {1}".format(i + 1, summary)
         label = "Lab {0:02d}".format(i + 1)
