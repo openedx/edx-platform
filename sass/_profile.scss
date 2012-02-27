@@ -77,7 +77,7 @@ div.profile-wrapper {
         width: 100%;
 
         h2 {
-          border-right: 1px dotted #ccc;
+          border-right: 1px dashed #ddd;
           @include box-sizing(border-box);
           display: table-cell;
           margin: 0;

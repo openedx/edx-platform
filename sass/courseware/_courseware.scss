@@ -36,7 +36,7 @@ div.course-wrapper {
         margin-bottom: 15px;
         width: flex-grid(2, 9);
         padding-right: flex-gutter(9);
-        border-right: 1px dotted #ccc;
+        border-right: 1px dashed #ddd;
         @include box-sizing(border-box);
         display: table-cell;
         vertical-align: top;
