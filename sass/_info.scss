@@ -27,10 +27,16 @@ div.info-wrapper {
           margin: 0 flex-gutter() 0 0;
         }
 
-        p {
+        section.update-description {
           float: left;
           width: flex-grid(7, 9);
           margin-bottom: 0;
+
+          p {
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
         }
       }
     }
