@@ -3,7 +3,6 @@ form.answer-form {
   border-top: 1px solid #ddd;
   overflow: hidden;
   padding-left: flex-grid(1.1);
-  // padding-top: 20px;
 
   textarea {
     @include box-sizing(border-box);
@@ -105,12 +104,8 @@ input.after-editor {
 form.question-form {
   @extend .answer-form;
   border: none;
-  padding: 0;
-  margin-top: -15px;
+  padding: 15px 0 0 0;
 
-  h1 a {
-    float: right;
-  }
 
   input[type="text"] {
     @include box-sizing(border-box);
@@ -121,4 +116,3 @@ form.question-form {
     margin-top: 10px;
   }
 }
-

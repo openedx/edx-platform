@@ -5,6 +5,14 @@ div.question-list-header {
   width: flex-grid(9,9);
   @extend h1.top-header;
 
+  h1 {
+    margin: 0;
+
+    > a.light-button {
+    
+    }
+  }
+
   section.question-list-meta  {
     display: block;
     overflow: hidden;
@@ -121,7 +129,6 @@ ul.question-list, div#question-list {
       &.question-body {
         @include box-sizing(border-box);
         margin-right: flex-gutter();
-        padding-left: 10px;
         width: flex-grid(5.5,9);
 
         h2 {
