@@ -1,9 +1,10 @@
 // JM MOSFET AMPLIFIER
 div#graph-container {
   @extend .clearfix;
-
+  border-top: 1px solid #ddd;
+  padding-top: lh(1.0);
+   
   canvas#graph {
-    background-color: rgb(60, 60, 100);
     width: flex-grid(4.5, 9);
     float: left;
     margin-right: flex-gutter(9); 
@@ -46,7 +47,6 @@ div#schematic-container {
   @extend .clearfix;
 
   canvas {
-    background-color: rgb(60, 60, 100);
     width: flex-grid(4.5, 9);
     float: left;
     margin-right: flex-gutter(9); 
