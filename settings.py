@@ -160,6 +160,8 @@ MAKO_MODULE_DIR = None
 
 MAKO_TEMPLATES = {}
 
+LOGGING_ENV = "dev" # override this in different environments
+
 # Make sure we execute correctly regardless of where we're called from
 execfile(os.path.join(BASE_DIR, "settings.py"))
 
@@ -185,7 +187,8 @@ LOGGING = {
             'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
         },
         'syslog_format' : {
-            'format' : '[%(name)s] %(levelname)s [' + hostname + ' %(process)d] [%(filename)s:%(lineno)d] - %(message)s',
+            'format' : '[%(name)s][env:' + LOGGING_ENV + '] %(levelname)s [' + \
+                        hostname + ' %(process)d] [%(filename)s:%(lineno)d] - %(message)s',
         },
         'raw' : {
             'format' : '%(message)s',
