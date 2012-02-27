@@ -6,7 +6,7 @@ Last Updated: 2010-09-17
 Author: Richard Clark - http://richclarkdesign.com 
 Twitter: @rich_clark
 */
-html, body, div, span, object, iframe, h1, h2, h3, div#wiki_panel input[type="button"], h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
+html, body, div, span, object, iframe, h1, h2, h3, div#wiki_panel input[type="button"], h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
   margin: 0;
   padding: 0;
   border: 0;
@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, body.user-profile-page section.user-info header:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
   content: ".";
   display: block;
   height: 0;
@@ -2491,7 +2491,7 @@ div.course-wrapper section.course-content section.problems-wrapper {
     width: auto; } }
 div.course-wrapper section.course-content div#seq_content h1 {
   background: none;
-  margin-bottom: 0;
+  margin-bottom: 22.652px;
   padding-bottom: 0;
   border-bottom: none; }
 div.course-wrapper section.course-content ol.vert-mod > li {
@@ -2832,8 +2832,10 @@ nav.sequence-nav ul li.next {
 nav.sequence-nav ul li.next:hover {
   background-color: none; }
 
+div#graph-container {
+  border-top: 1px solid #ddd;
+  padding-top: 22.652px; }
 div#graph-container canvas#graph {
-  background-color: #3c3c64;
   width: 48.641%;
   float: left;
   margin-right: 2.717%; }
@@ -2857,7 +2859,6 @@ div#graph-container div.graph-controls input#playButton {
   display: block; }
 
 div#schematic-container canvas {
-  background-color: #3c3c64;
   width: 48.641%;
   float: left;
   margin-right: 2.717%; }
@@ -2870,6 +2871,21 @@ div#schematic-container div.schematic-sliders div.slider-label {
   margin-bottom: 11.326px; }
 div#schematic-container div.schematic-sliders div.slider {
   margin-bottom: 22.652px; }
+
+div.graph-controls label, div#graph-listen label {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px;
+  font-weight: bold;
+  padding: 3px; }
+div.graph-controls label[for="vinCheckbox"], div.graph-controls label[for="vinRadioButton"], div#graph-listen label[for="vinCheckbox"], div#graph-listen label[for="vinRadioButton"] {
+  color: #409fbf; }
+div.graph-controls label[for="voutCheckbox"], div.graph-controls label[for="voutRadioButton"], div#graph-listen label[for="voutCheckbox"], div#graph-listen label[for="voutRadioButton"] {
+  color: #e1a600; }
+div.graph-controls label[for="vrCheckbox"], div.graph-controls label[for="vrRadioButton"], div#graph-listen label[for="vrCheckbox"], div#graph-listen label[for="vrRadioButton"] {
+  color: #49c944; }
 
 div.book-wrapper section.book-sidebar {
   -webkit-box-sizing: border-box;
@@ -2959,9 +2975,11 @@ div.info-wrapper section.updates ol li h2 {
   float: left;
   width: 20.109%;
   margin: 0 2.024% 0 0; }
-div.info-wrapper section.updates ol li p {
+div.info-wrapper section.updates ol li section.update-description {
   float: left;
   width: 77.174%;
+  margin-bottom: 0; }
+div.info-wrapper section.updates ol li section.update-description p:last-child {
   margin-bottom: 0; }
 div.info-wrapper section.handouts {
   -webkit-border-radius: 0 4px 4px 0;
@@ -4790,23 +4808,86 @@ div.discussion-wrapper aside div.follow-buttons a.button, div.discussion-wrapper
   display: block;
   text-align: center;
   width: 100%; }
-div.discussion-wrapper aside div.question-stats ul {
+div.discussion-wrapper aside div.question-stats ul, div.discussion-wrapper aside div.user-info ul, div.discussion-wrapper aside div.user-stats ul {
   color: #777;
   list-style: none; }
-div.discussion-wrapper aside div.question-stats ul li {
+div.discussion-wrapper aside div.question-stats ul li, div.discussion-wrapper aside div.user-info ul li, div.discussion-wrapper aside div.user-stats ul li {
   padding: 7px 0 0; }
-div.discussion-wrapper aside div.question-stats ul li:last-child {
+div.discussion-wrapper aside div.question-stats ul li:last-child, div.discussion-wrapper aside div.user-info ul li:last-child, div.discussion-wrapper aside div.user-stats ul li:last-child {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   -ms-box-shadow: none;
   -o-box-shadow: none;
   box-shadow: none;
   border: 0; }
-div.discussion-wrapper aside div.question-stats ul li strong {
+div.discussion-wrapper aside div.question-stats ul li strong, div.discussion-wrapper aside div.user-info ul li strong, div.discussion-wrapper aside div.user-stats ul li strong {
   float: right;
   padding-right: 10px; }
+div.discussion-wrapper aside div.user-info, div.discussion-wrapper aside div.user-stats {
+  overflow: hidden; }
+div.discussion-wrapper aside div.user-info div, div.discussion-wrapper aside div.user-stats div {
+  float: left;
+  display: block; }
+div.discussion-wrapper aside div.user-info div.karma, div.discussion-wrapper aside div.user-stats div.karma {
+  background: #eee;
+  border: 1px solid #D3D3D3;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  -moz-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  -ms-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  -o-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
+  padding: 9.061px 0;
+  text-align: center;
+  width: 27.586%;
+  float: right; }
+div.discussion-wrapper aside div.user-info div.karma strong, div.discussion-wrapper aside div.user-stats div.karma strong {
+  display: block;
+  font-style: 20px; }
+div.discussion-wrapper aside div.user-info div.meta, div.discussion-wrapper aside div.user-stats div.meta {
+  width: 63.793%;
+  padding-right: 4.31%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box; }
+div.discussion-wrapper aside div.user-info div.meta h2, div.discussion-wrapper aside div.user-stats div.meta h2 {
+  border: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  -ms-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+  margin: 0 0 8px 0;
+  padding: 0; }
+div.discussion-wrapper aside div.user-info div.meta p, div.discussion-wrapper aside div.user-stats div.meta p {
+  color: #777;
+  font-size: 14px; }
+div.discussion-wrapper aside div.user-stats {
+  overflow: visible; }
+div.discussion-wrapper aside div.user-stats ul {
+  font-size: 14px; }
+div.discussion-wrapper aside div.user-stats ul h2 {
+  margin: 0 -22.652px 5px -22.652px;
+  padding: 11.326px 22.652px; }
+div.discussion-wrapper aside div.question-tips ul, div.discussion-wrapper aside div.markdown ul {
+  margin-left: 8%; }
+div.discussion-wrapper aside div.question-tips ol, div.discussion-wrapper aside div.markdown ol {
+  margin-left: 8%; }
 div.discussion-wrapper aside div.markdown ul li {
   margin: 20px 0; }
+div.discussion-wrapper aside div.markdown ul li:first-child {
+  margin: 0; }
 div.discussion-wrapper aside div.markdown ul li ol li {
   margin: 0; }
 
@@ -4906,6 +4987,14 @@ ul.question-list li.single-question div.question-meta, div#question-list li.sing
 ul.question-list li.single-question div.question-meta ul, div#question-list li.single-question div.question-meta ul {
   text-align: right; }
 ul.question-list li.single-question div.question-meta ul li, div#question-list li.single-question div.question-meta ul li {
+  border: 1px solid #ddd;
+  -webkit-box-shadow: 0 1px 0 white;
+  -moz-box-shadow: 0 1px 0 white;
+  -ms-box-shadow: 0 1px 0 white;
+  -o-box-shadow: 0 1px 0 white;
+  box-shadow: 0 1px 0 white;
+  display: inline-block;
+  height: 60px;
   background-color: white;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #f5f5f5));
   background-image: -webkit-linear-gradient(top, white, #f5f5f5);
@@ -4913,9 +5002,6 @@ ul.question-list li.single-question div.question-meta ul li, div#question-list l
   background-image: -ms-linear-gradient(top, white, #f5f5f5);
   background-image: -o-linear-gradient(top, white, #f5f5f5);
   background-image: linear-gradient(top, white, #f5f5f5);
-  border: 1px solid #ddd;
-  display: inline-block;
-  height: 60px;
   margin-right: 10px;
   width: 60px; }
 ul.question-list li.single-question div.question-meta ul li:hover span, ul.question-list li.single-question div.question-meta ul li:hover div, div#question-list li.single-question div.question-meta ul li:hover span, div#question-list li.single-question div.question-meta ul li:hover div {
@@ -5190,6 +5276,8 @@ div.question-header div.question-container div.comments-container div.comments-c
 div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body, div.paginator div.question-container div.comments-container div.comments-content div.comment div.comment-body, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body, div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body {
   display: inline-block;
   width: 95%; }
+div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.paginator div.question-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width, div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body#full-width {
+  width: 100%; }
 div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.paginator div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta, div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta {
   text-align: right; }
 div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.paginator div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author, div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.author {
@@ -5231,7 +5319,8 @@ div.share-question {
   padding: 10px 0 10px 7.5%; }
 div.share-question p {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+  font-weight: bold; }
 
 div.answer-controls {
   -webkit-box-sizing: border-box;
@@ -5345,12 +5434,33 @@ form.answer-form div.form-item .title-desc, form.question-form div.form-item .ti
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
   background: #333;
   color: #fff;
+  display: none;
   font-size: 13px;
-  padding: 5px 10px;
-  width: 48.988%;
+  padding: 7px 14px;
   -webkit-font-smoothing: antialiased; }
+form.answer-form div.form-item:hover .title-desc, form.question-form div.form-item:hover .title-desc {
+  display: inline-block;
+  position: absolute;
+  margin-left: 10px;
+  z-index: 1;
+  width: 200px; }
+form.answer-form div.form-item:hover .title-desc:before, form.question-form div.form-item:hover .title-desc:before {
+  border-color: transparent #333 transparent transparent;
+  border-style: solid;
+  border-width: 12px 12px 12px 0;
+  content: "";
+  height: 0;
+  left: -10px;
+  position: absolute;
+  top: 1;
+  width: 0; }
 form.answer-form span.form-error, form.question-form span.form-error, form.answer-form label.form-error, form.question-form label.form-error {
   color: #990000;
   display: inline-block;
@@ -5585,47 +5695,10 @@ form.question-form input[type="checkbox"] {
   text-decoration: underline;
   font-weight: bold; }
 
-body.user-profile-page section.user-info header {
-  border-bottom: 1px solid #d3d3d3;
-  -webkit-box-shadow: 0 1px 0 #eeeeee;
-  -moz-box-shadow: 0 1px 0 #eeeeee;
-  -ms-box-shadow: 0 1px 0 #eeeeee;
-  -o-box-shadow: 0 1px 0 #eeeeee;
-  box-shadow: 0 1px 0 #eeeeee;
-  padding: 0 22.652px;
-  margin: 0 -22.652px 22.652px; }
-body.user-profile-page section.user-info header section {
-  float: left;
-  width: 63.793%;
-  margin-right: 8.621%; }
-body.user-profile-page section.user-info header section h1 {
-  margin-top: 0; }
-body.user-profile-page section.user-info header p.karma {
-  float: left;
-  width: 27.586%;
-  border: 1px solid #D3D3D3;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
-  border-radius: 3px;
-  -webkit-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
-  -moz-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
-  -ms-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
-  -o-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
-  box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
-  background: #eee;
-  text-align: center;
-  padding: 11.326px 0; }
-body.user-profile-page section.user-info header p.karma strong {
-  display: block;
-  font-style: 20px; }
 body.user-profile-page ul.sub-info {
-  border-top: 1px solid #ddd;
   margin-top: 22.652px;
   list-style: none; }
 body.user-profile-page ul.sub-info > li {
-  width: 22.962%;
   display: table-cell;
   padding: 1.359%;
   border-right: 1px solid #ddd;
@@ -5639,7 +5712,14 @@ body.user-profile-page ul.sub-info > li:first-child {
 body.user-profile-page ul.sub-info > li:last-child {
   border-right: 0;
   padding-right: 0; }
+body.user-profile-page ul.sub-info > li.votes-badges {
+  width: 20.109%; }
+body.user-profile-page ul.sub-info > li.answer-list {
+  width: 42.935%; }
+body.user-profile-page ul.sub-info > li.tags-list {
+  width: 31.522%; }
 body.user-profile-page ul.sub-info > li h2 {
+  margin-bottom: 30px;
   margin-top: 0; }
 body.user-profile-page ul.sub-info > li span.tag-number {
   display: none; }
@@ -5647,32 +5727,36 @@ body.user-profile-page ul.sub-info ul {
   list-style: none; }
 body.user-profile-page ul.sub-info ul.user-stats-table {
   list-style: none; }
+body.user-profile-page ul.sub-info ul.user-stats-table li {
+  padding: 10px 0 15px;
+  border-top: 1px solid #eee; }
 body.user-profile-page ul.sub-info ul.vote-buttons {
-  list-style: none; }
+  list-style: none;
+  margin-bottom: 30px; }
 body.user-profile-page ul.sub-info ul.vote-buttons li {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
-  border-radius: 4px;
   background-color: #f9f4e1;
   background-position: 10px center;
   background-repeat: no-repeat;
-  height: 20px;
-  padding: 10px 10px 10px 40px;
-  display: inline-block; }
-body.user-profile-page ul.sub-info ul.vote-buttons li.up {
-  background-image: url(/static/images/askbot/vote-arrow-up.png);
-  margin-right: 6px; }
-body.user-profile-page ul.sub-info ul.vote-buttons li.down {
-  background-image: url(/static/images/askbot/vote-arrow-down.png); }
-body.user-profile-page ul.sub-info ul.badges {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
-  background-color: #e3e3e3;
+  display: inline-block;
+  height: 20px;
+  padding: 10px 10px 10px 40px; }
+body.user-profile-page ul.sub-info ul.vote-buttons li.up {
+  background-color: #d1e3a8;
+  background-image: url(/static/images/askbot/vote-arrow-up.png);
+  margin-right: 6px; }
+body.user-profile-page ul.sub-info ul.vote-buttons li.up span.vote-count {
+  color: #3f6c3e; }
+body.user-profile-page ul.sub-info ul.vote-buttons li.down {
+  background-image: url(/static/images/askbot/vote-arrow-down.png);
+  background-color: #eac6ad; }
+body.user-profile-page ul.sub-info ul.vote-buttons li.down span.vote-count {
+  color: #993333; }
+body.user-profile-page ul.sub-info ul.badges {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
@@ -5681,11 +5765,20 @@ body.user-profile-page ul.sub-info ul.badges {
   *display: inline;
   *vertical-align: auto; }
 body.user-profile-page ul.sub-info ul.badges a {
+  background-color: #e3e3e3;
   border: 0;
-  background: none;
-  text-transform: uppercase;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
   color: #292309;
+  display: block;
   font-size: 12px;
   padding: 10px;
+  margin-bottom: 10px;
   text-shadow: 0 1px 0 #fff;
-  display: block; }
+  text-transform: uppercase;
+  text-decoration: none; }
+body.user-profile-page ul.sub-info ul.badges a:hover {
+  background-color: #cdcdcd; }
