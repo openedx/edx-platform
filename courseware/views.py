@@ -185,7 +185,7 @@ def profile(request):
     #Figure the lab scores
     lab_scores = total_scores['Lab'] if 'Lab' in total_scores else []
     lab_percentages = []
-    print "lab_scores" , lab_scores
+    log.debug("lab_scores: {0}".format(lab_scores))
     for i in range(12):
         if i < len(lab_scores):
             percentage = lab_scores[i][0] / float(lab_scores[i][1])
