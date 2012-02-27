@@ -34,9 +34,13 @@ loadNewVideo(streams["1.0"], ${ position });
 
 function add_speed(key, stream) {
     var id = 'speed_' + stream;
-    $("#video_speeds").append(' <span id="'+id+'">'+key+'x</span>');
+
+    $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
+
     $("#"+id).click(function(){
       change_video_speed(key, stream);
+      $(this).siblings().removeClass("active");
+      $(this).addClass("active");
     });
 }
 

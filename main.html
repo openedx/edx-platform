@@ -9,11 +9,6 @@
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script>
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script>
-  <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script>
-  <script type="text/javascript" src="/static/js/video_player.js"></script>
-  <script type="text/javascript" src="/static/js/schematic.js"></script>
-  <script type="text/javascript" src="/static/js/cktsim.js"></script>
 
   <!--[if lt IE 9]>
   <script src="/static/js/html5shiv.js"></script>
@@ -84,6 +79,12 @@
       </dl>
     </div>
 
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script>
+  <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script>
+  <script type="text/javascript" src="/static/js/video_player.js"></script>
+  <script type="text/javascript" src="/static/js/schematic.js"></script>
+  <script type="text/javascript" src="/static/js/cktsim.js"></script>
+ 
 <script>
   // Feedback form
 $(function() {
@@ -109,13 +110,11 @@ $(function() {
         });
       });
     });
-</script>
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
+$(function(){
+    $("a[rel*=leanModal]").leanModal();
     });
-  </script>
+</script>
 
 <%block name="js_extra"/>
 

@@ -100,7 +100,7 @@ div.question-header {
         display: inline-block;
         float: left;
         width: flex-grid(1.8,8);
-        border-left: 1px dotted #CCC;
+        border-left: 1px dashed #ddd;
 
         div.post-update-info {
           @include box-sizing(border-box);

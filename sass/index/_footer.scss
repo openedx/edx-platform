@@ -59,6 +59,10 @@ footer {
         position: relative;
         top: -5px;
 
+        @media screen and (max-width: 780px) {
+          float: none;
+        }
+
         li {
           float: left;
           margin-right: lh(.5);
