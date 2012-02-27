@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
   content: ".";
   display: block;
   height: 0;
@@ -2595,6 +2595,7 @@ section.course-content div.video-subtitles div.video-wrapper div.video-player if
   height: 100%; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls {
   background: #333;
+  position: relative;
   border: 1px solid #000;
   color: #ccc; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider {
@@ -2668,18 +2669,28 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
   float: right; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds {
+  border-right: 1px solid #000;
+  border-left: 1px solid #000;
+  -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  -ms-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  -o-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   float: left;
   line-height: 46px;
-  padding-right: 22.652px;
   margin-right: 0;
-  -webkit-font-smoothing: antialiased;
-  -webkit-box-shadow: 1px 0 0 #555555;
-  -moz-box-shadow: 1px 0 0 #555555;
-  -ms-box-shadow: 1px 0 0 #555555;
-  -o-box-shadow: 1px 0 0 #555555;
-  box-shadow: 1px 0 0 #555555;
-  border-right: 1px solid #000; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#video_speeds {
+  -webkit-font-smoothing: antialiased; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3 a, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"] a, div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] a {
+  color: #fff;
+  display: block;
+  padding: 0 11.326px; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3 a:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"] a:hover, div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] a:hover {
+  text-decoration: none;
+  background-color: #444; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
+  background: #333;
+  border: 1px solid #000;
+  font-weight: bold;
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
@@ -2687,18 +2698,22 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   zoom: 1;
   *display: inline;
   *vertical-align: auto;
-  font-weight: bold; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#video_speeds span {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
+  padding: 0 22.652px;
+  position: absolute;
+  right: 79px;
+  -webkit-box-shadow: inset 0 1px 0 #555555;
+  -moz-box-shadow: inset 0 1px 0 #555555;
+  -ms-box-shadow: inset 0 1px 0 #555555;
+  -o-box-shadow: inset 0 1px 0 #555555;
+  box-shadow: inset 0 1px 0 #555555; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
   cursor: pointer;
-  margin-bottom: 0; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#video_speeds span:hover {
+  float: left;
+  margin-bottom: 0;
+  margin-right: 11.326px; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:last-child {
+  margin-right: 0; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:hover {
   color: #993333; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
   float: left;
