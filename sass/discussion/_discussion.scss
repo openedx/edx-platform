@@ -1,5 +1,5 @@
 // Base extends (Merge with main stylesheet later)
-.light-button {
+.light-button, a.light-button {
   @include box-shadow(inset 0 1px 0 #fff);
   @include linear-gradient(#fff, lighten(#888, 40%));
   @include border-radius(3px);
@@ -12,7 +12,7 @@
   -webkit-font-smoothing: antialiased;
 
   &:hover, &:focus {
-    @include linear-gradient(#fff, lighten(#888, 30%));
+    @include linear-gradient(#fff, lighten(#888, 37%));
     border: 1px solid #ccc;
     text-decoration: none;
   }
@@ -43,7 +43,7 @@ body.askbot {
         vertical-align: top;
         width: flex-grid(9) + flex-gutter();
 
-        .tabula-rasa {
+        a.tabula-rasa, .tabula-rasa{
           @extend .light-button;
           @include border-radius(5px);
           display: block;
@@ -58,6 +58,7 @@ body.askbot {
           &:first-child {
             margin-top: 70px;
           }
+
           &:last-child {
             margin-bottom: 70px;
           }

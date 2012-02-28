@@ -271,4 +271,22 @@ div.discussion-wrapper aside {
       margin: 0;
     }
   }
+
+  div.view-profile {
+    h2 {
+      border-top: 0;
+      @include box-shadow(none);
+    }
+    a {
+      width: 100%;
+      @include box-sizing(border-box);
+      text-align: center;
+      padding: 10px;
+      display: block;
+
+      span {
+        font-weight: bold;
+      }
+    }
+  }
 }
