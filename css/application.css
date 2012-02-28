@@ -129,7 +129,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
   content: ".";
   display: block;
   height: 0;
@@ -2694,17 +2694,27 @@ section.course-content div.video-subtitles {
           line-height: 46px;
           margin-right: 0;
           -webkit-font-smoothing: antialiased; }
-          section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3 a, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"] a, div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] a {
-            color: #fff;
-            display: block;
-            padding: 0 11.326px; }
-            section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3 a:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"] a:hover, div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] a:hover {
-              text-decoration: none;
-              background-color: #444; }
+          section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] {
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto; }
+            section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3 a, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"] a, div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] a {
+              color: #fff;
+              padding: 0 11.326px;
+              display: -moz-inline-box;
+              -moz-box-orient: vertical;
+              display: inline-block;
+              vertical-align: baseline;
+              zoom: 1;
+              *display: inline;
+              *vertical-align: auto; }
+              section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3 a:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"] a:hover, div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] a:hover {
+                text-decoration: none; }
           section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
-            background: #333;
-            border: 1px solid #000;
-            font-weight: bold;
             display: -moz-inline-box;
             -moz-box-orient: vertical;
             display: inline-block;
@@ -2712,23 +2722,16 @@ section.course-content div.video-subtitles {
             zoom: 1;
             *display: inline;
             *vertical-align: auto;
-            padding: 0 22.652px;
-            position: absolute;
-            right: 79px;
-            -webkit-box-shadow: inset 0 1px 0 #555555;
-            -moz-box-shadow: inset 0 1px 0 #555555;
-            -ms-box-shadow: inset 0 1px 0 #555555;
-            -o-box-shadow: inset 0 1px 0 #555555;
-            box-shadow: inset 0 1px 0 #555555; }
+            padding-right: 11.326px; }
             section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
               cursor: pointer;
-              float: left;
-              margin-bottom: 0;
-              margin-right: 11.326px; }
-              section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:last-child {
-                margin-right: 0; }
-              section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:hover {
-                color: #993333; }
+              display: -moz-inline-box;
+              -moz-box-orient: vertical;
+              display: inline-block;
+              vertical-align: baseline;
+              zoom: 1;
+              *display: inline;
+              *vertical-align: auto; }
         section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
           float: left;
           display: block;
@@ -4947,7 +4950,10 @@ div.discussion-wrapper aside {
     box-sizing: border-box;
     text-align: center;
     padding: 10px;
-    display: block; }
+    display: block;
+    margin-top: 10px; }
+    div.discussion-wrapper aside div.view-profile a:first-child {
+      margin-top: 0; }
     div.discussion-wrapper aside div.view-profile a span {
       font-weight: bold; }
 
@@ -4958,6 +4964,8 @@ div.question-list-header {
   width: 100%; }
   div.question-list-header h1 {
     margin: 0; }
+    div.question-list-header h1 > a.light-button, div.question-list-header h1 > body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content div.question-list-header h1 > a.tabula-rasa, div.question-list-header h1 > ul.question-list div.post-own-question a, ul.question-list div.post-own-question div.question-list-header h1 > a, div.question-list-header h1 > div#question-list div.post-own-question a, div#question-list div.post-own-question div.question-list-header h1 > a, div.question-list-header h1 > form.answer-form div.preview-toggle a, form.answer-form div.preview-toggle div.question-list-header h1 > a, div.question-list-header h1 > form.question-form div.preview-toggle a, form.question-form div.preview-toggle div.question-list-header h1 > a {
+      float: right; }
   div.question-list-header section.question-list-meta {
     display: block;
     overflow: hidden;
@@ -5178,15 +5186,30 @@ div.question-header div.vote-buttons, div.answer-block div.vote-buttons, div.pag
       -ms-border-radius: 4px;
       -o-border-radius: 4px;
       border-radius: 4px;
-      background-color: #f9f4e1; }
+      background-color: #faf7e9;
+      border: 1px solid #eddfaa;
+      -webkit-box-shadow: inset 0 1px 0px white;
+      -moz-box-shadow: inset 0 1px 0px white;
+      -ms-box-shadow: inset 0 1px 0px white;
+      -o-box-shadow: inset 0 1px 0px white;
+      box-shadow: inset 0 1px 0px white; }
     div.question-header div.vote-buttons ul li.question-img-upvote, div.answer-block div.vote-buttons ul li.question-img-upvote, div.paginator div.vote-buttons ul li.question-img-upvote, div.question-header div.vote-buttons ul li.answer-img-upvote, div.answer-block div.vote-buttons ul li.answer-img-upvote, div.paginator div.vote-buttons ul li.answer-img-upvote {
-      background-image: url(/static/images/askbot/vote-arrow-up.png); }
+      background-image: url(/static/images/askbot/vote-arrow-up.png);
+      -webkit-box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5);
+      -moz-box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5);
+      -ms-box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5);
+      -o-box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5);
+      box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5); }
       div.question-header div.vote-buttons ul li.question-img-upvote:hover, div.answer-block div.vote-buttons ul li.question-img-upvote:hover, div.paginator div.vote-buttons ul li.question-img-upvote:hover, div.question-header div.vote-buttons ul li.question-img-upvote.on, div.answer-block div.vote-buttons ul li.question-img-upvote.on, div.paginator div.vote-buttons ul li.question-img-upvote.on, div.question-header div.vote-buttons ul li.answer-img-upvote:hover, div.answer-block div.vote-buttons ul li.answer-img-upvote:hover, div.paginator div.vote-buttons ul li.answer-img-upvote:hover, div.question-header div.vote-buttons ul li.answer-img-upvote.on, div.answer-block div.vote-buttons ul li.answer-img-upvote.on, div.paginator div.vote-buttons ul li.answer-img-upvote.on {
-        background-color: #d1e3a8; }
+        background-color: #d1e3a8;
+        border-color: #a8ca5b;
+        background-image: url(/static/images/askbot/vote-arrow-up-activate.png); }
     div.question-header div.vote-buttons ul li.question-img-downvote, div.answer-block div.vote-buttons ul li.question-img-downvote, div.paginator div.vote-buttons ul li.question-img-downvote, div.question-header div.vote-buttons ul li.answer-img-downvote, div.answer-block div.vote-buttons ul li.answer-img-downvote, div.paginator div.vote-buttons ul li.answer-img-downvote {
       background-image: url(/static/images/askbot/vote-arrow-down.png); }
       div.question-header div.vote-buttons ul li.question-img-downvote:hover, div.answer-block div.vote-buttons ul li.question-img-downvote:hover, div.paginator div.vote-buttons ul li.question-img-downvote:hover, div.question-header div.vote-buttons ul li.question-img-downvote.on, div.answer-block div.vote-buttons ul li.question-img-downvote.on, div.paginator div.vote-buttons ul li.question-img-downvote.on, div.question-header div.vote-buttons ul li.answer-img-downvote:hover, div.answer-block div.vote-buttons ul li.answer-img-downvote:hover, div.paginator div.vote-buttons ul li.answer-img-downvote:hover, div.question-header div.vote-buttons ul li.answer-img-downvote.on, div.answer-block div.vote-buttons ul li.answer-img-downvote.on, div.paginator div.vote-buttons ul li.answer-img-downvote.on {
-        background-color: #eac6ad; }
+        background-color: #EAC6AD;
+        border-color: #d58e5c;
+        background-image: url(/static/images/askbot/vote-arrow-down-activate.png); }
 div.question-header div.question-container, div.answer-block div.question-container, div.paginator div.question-container, div.question-header div.answer-block div.answer-container, div.answer-block div.question-header div.answer-container, div.answer-block div.answer-container, div.paginator div.answer-block div.answer-container, div.answer-block div.paginator div.answer-container, div.question-header div.paginator div.answer-container, div.paginator div.question-header div.answer-container, div.answer-block div.paginator div.answer-container, div.paginator div.answer-block div.answer-container, div.paginator div.answer-container {
   display: inline-block;
   float: left;
@@ -5358,7 +5381,7 @@ div.question-header div.question-container, div.answer-block div.question-contai
       margin-top: 5px;
       text-align: right; }
     div.question-header div.question-container div.comments-container div.controls, div.answer-block div.question-container div.comments-container div.controls, div.paginator div.question-container div.comments-container div.controls, div.question-header div.answer-block div.answer-container div.comments-container div.controls, div.answer-block div.question-header div.answer-container div.comments-container div.controls, div.answer-block div.answer-container div.comments-container div.controls, div.paginator div.answer-block div.answer-container div.comments-container div.controls, div.answer-block div.paginator div.answer-container div.comments-container div.controls, div.question-header div.paginator div.answer-container div.comments-container div.controls, div.paginator div.question-header div.answer-container div.comments-container div.controls, div.answer-block div.paginator div.answer-container div.comments-container div.controls, div.paginator div.answer-block div.answer-container div.comments-container div.controls, div.paginator div.answer-container div.comments-container div.controls {
-      border-top: 1px dashed #ddd;
+      border-top: 1px solid #efefef;
       text-align: right; }
       div.question-header div.question-container div.comments-container div.controls a, div.answer-block div.question-container div.comments-container div.controls a, div.paginator div.question-container div.comments-container div.controls a, div.question-header div.answer-block div.answer-container div.comments-container div.controls a, div.answer-block div.question-header div.answer-container div.comments-container div.controls a, div.answer-block div.answer-container div.comments-container div.controls a, div.paginator div.answer-block div.answer-container div.comments-container div.controls a, div.answer-block div.paginator div.answer-container div.comments-container div.controls a, div.question-header div.paginator div.answer-container div.comments-container div.controls a, div.paginator div.question-header div.answer-container div.comments-container div.controls a, div.answer-block div.paginator div.answer-container div.comments-container div.controls a, div.paginator div.answer-block div.answer-container div.comments-container div.controls a, div.paginator div.answer-container div.comments-container div.controls a {
         display: inline-block;
@@ -5380,8 +5403,7 @@ div.share-question {
   padding: 10px 0 10px 7.5%; }
   div.share-question p {
     padding: 0;
-    margin: 0;
-    font-weight: bold; }
+    margin: 0; }
 
 div.answer-controls {
   -webkit-box-sizing: border-box;
@@ -5760,7 +5782,7 @@ body.user-profile-page ul.sub-info {
   body.user-profile-page ul.sub-info > li {
     display: table-cell;
     padding: 1.359%;
-    border-right: 1px solid #ddd;
+    border-right: 1px dashed #efefef;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
@@ -5806,12 +5828,12 @@ body.user-profile-page ul.sub-info {
         padding: 10px 10px 10px 40px; }
         body.user-profile-page ul.sub-info ul.vote-buttons li.up {
           background-color: #d1e3a8;
-          background-image: url(/static/images/askbot/vote-arrow-up.png);
+          background-image: url(/static/images/askbot/vote-arrow-up-activate.png);
           margin-right: 6px; }
           body.user-profile-page ul.sub-info ul.vote-buttons li.up span.vote-count {
             color: #3f6c3e; }
         body.user-profile-page ul.sub-info ul.vote-buttons li.down {
-          background-image: url(/static/images/askbot/vote-arrow-down.png);
+          background-image: url(/static/images/askbot/vote-arrow-down-activate.png);
           background-color: #eac6ad; }
           body.user-profile-page ul.sub-info ul.vote-buttons li.down span.vote-count {
             color: #993333; }
