@@ -283,6 +283,11 @@ div.discussion-wrapper aside {
       text-align: center;
       padding: 10px;
       display: block;
+      margin-top: 10px;
+
+      &:first-child {
+        margin-top: 0;
+      }
 
       span {
         font-weight: bold;
