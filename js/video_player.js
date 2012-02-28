@@ -87,6 +87,7 @@ function change_video_speed(speed, youtube_id) {
     new_position = ytplayer.getCurrentTime() * video_speed / speed;
     video_speed = speed;
     ytplayer.loadVideoById(youtube_id, new_position);    
+    log_event("speed", {"new_speed":speed, "clip":youtube_id});
 }
 
 function caption_at(index) {
@@ -298,6 +299,7 @@ function onytplayerStateChange(newState) {
 
 function onPlayerError(errorCode) {
     //    alert("An error occured: " + errorCode);
+    log_event("player_error", {"error":errorCode});
 }
 
 // Currently duplicated to check for if video control changed by clicking the video for HTML5
@@ -349,6 +351,7 @@ function loadNewVideo(id, startSeconds) {
     catch(e) {
 	window['console'].log(JSON.stringify(e));
     }
+    log_event("load_video", {"id":id,"start":startSeconds});
     //$("#slider").slider("option","value",startSeconds);
     //seekTo(startSeconds);
 }
@@ -363,18 +366,21 @@ function play() {
     if (ytplayer) {
 	ytplayer.playVideo();
     }
+    log_event("play_video", {"id":getCurrentTime(), "code":getEmbedCode()});
 }
 
 function pause() {
     if (ytplayer) {
 	ytplayer.pauseVideo();
     }
+    log_event("pause_video", {"id":getCurrentTime(), "code":getEmbedCode()});
 }
 
 function stop() {
     if (ytplayer) {
 	ytplayer.stopVideo();
     }
+    log_event("stop_video", {"id":getCurrentTime(), "code":getEmbedCode()});
 }
 
 function getPlayerState() {
@@ -426,11 +432,15 @@ function unMute() {
 }
 
 function getEmbedCode() {
-    alert(ytplayer.getVideoEmbedCode());
+    if(ytplayer) {
+	ytplayer.getVideoEmbedCode();
+    }
 }
 
 function getVideoUrl() {
-    alert(ytplayer.getVideoUrl());
+    if(ytplayer) {
+	ytplayer.getVideoUrl();
+    }
 }
 
 function setVolume(newVolume) {
