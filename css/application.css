@@ -618,7 +618,7 @@ div.header-wrapper {
             display: table-cell;
             width: 16.6666666667%;
             text-align: center; } }
-      div.header-wrapper header nav .active, div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion div.header-wrapper header nav h3.ui-accordion-header.ui-state-active, div.header-wrapper header nav section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel div.header-wrapper header nav input.ui-accordion-header.ui-state-active[type="button"], div.header-wrapper header nav div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion div.header-wrapper header nav input.ui-accordion-header.ui-state-active[type="button"], div.header-wrapper header nav.sequence-nav ol li.seq_video_active, div.header-wrapper header nav.sequence-nav ol li.seq_other_active, div.header-wrapper header nav.sequence-nav ol li.seq_vertical_active, div.header-wrapper header nav.sequence-nav ol li.seq_problem_active {
+      div.header-wrapper header nav .active, div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion div.header-wrapper header nav h3.ui-accordion-header.ui-state-active, div.header-wrapper header nav section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel div.header-wrapper header nav input.ui-accordion-header.ui-state-active[type="button"], div.header-wrapper header nav div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion div.header-wrapper header nav input.ui-accordion-header.ui-state-active[type="button"], div.header-wrapper header nav.sequence-nav ol li a.seq_video_active, div.header-wrapper header nav.sequence-nav ol li a.seq_other_active, div.header-wrapper header nav.sequence-nav ol li a.seq_vertical_active, div.header-wrapper header nav.sequence-nav ol li a.seq_problem_active {
         background: #F4F4F4;
         border: 1px solid #26080a;
         border-bottom: 0;
@@ -2567,7 +2567,7 @@ section.course-index div#accordion ul.ui-accordion-content {
   font-size: 12px;
   margin: 0;
   overflow: hidden; }
-  section.course-index div#accordion ul.ui-accordion-content li.active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_video_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_other_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_other_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_vertical_active, section.course-index div#accordion ul.ui-accordion-content nav.sequence-nav ol li.seq_problem_active, nav.sequence-nav ol section.course-index div#accordion ul.ui-accordion-content li.seq_problem_active {
+  section.course-index div#accordion ul.ui-accordion-content li.active {
     font-weight: bold; }
   section.course-index div#accordion ul.ui-accordion-content li a {
     text-decoration: none;
@@ -2778,58 +2778,120 @@ nav.sequence-nav {
   nav.sequence-nav ol {
     display: table-row;
     float: left;
-    width: 84.905%; }
-    nav.sequence-nav ol .inactive, nav.sequence-nav ol li.seq_video_inactive, nav.sequence-nav ol li.seq_other_inactive, nav.sequence-nav ol li.seq_vertical_inactive, nav.sequence-nav ol li.seq_problem_inactive {
-      background-repeat: no-repeat; }
-      nav.sequence-nav ol .inactive:hover, nav.sequence-nav ol li.seq_video_inactive:hover, nav.sequence-nav ol li.seq_other_inactive:hover, nav.sequence-nav ol li.seq_vertical_inactive:hover, nav.sequence-nav ol li.seq_problem_inactive:hover {
-        background-color: #f9f4e1; }
-    nav.sequence-nav ol .visited, nav.sequence-nav ol li.seq_video_visited, nav.sequence-nav ol li.seq_other_visited, nav.sequence-nav ol li.seq_vertical_visited, nav.sequence-nav ol li.seq_problem_visited {
-      background-color: #ddd7be;
-      background-repeat: no-repeat;
-      border-color: #ddd7be; }
-      nav.sequence-nav ol .visited:hover, nav.sequence-nav ol li.seq_video_visited:hover, nav.sequence-nav ol li.seq_other_visited:hover, nav.sequence-nav ol li.seq_vertical_visited:hover, nav.sequence-nav ol li.seq_problem_visited:hover {
-        background-color: #F6EFD4; }
-    nav.sequence-nav ol .active, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.courseware li.courseware nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.book li.book nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.info li.info nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.discussion li.discussion nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.wiki li.wiki nav.sequence-nav ol a, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav.profile li.profile nav.sequence-nav ol a, nav.sequence-nav ol section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.seq_video_active, nav.sequence-nav ol li.seq_other_active, nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
-      -webkit-box-shadow: 0 1px 0 white;
-      -moz-box-shadow: 0 1px 0 white;
-      -ms-box-shadow: 0 1px 0 white;
-      -o-box-shadow: 0 1px 0 white;
-      box-shadow: 0 1px 0 white;
-      background-color: #fff;
-      background-repeat: no-repeat; }
-      nav.sequence-nav ol .active:hover, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a:hover, div.header-wrapper header nav.courseware li.courseware nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.book li.book a:hover, div.header-wrapper header nav.book li.book nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.info li.info a:hover, div.header-wrapper header nav.info li.info nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a:hover, div.header-wrapper header nav.discussion li.discussion nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a:hover, div.header-wrapper header nav.wiki li.wiki nav.sequence-nav ol a:hover, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a:hover, div.header-wrapper header nav.profile li.profile nav.sequence-nav ol a:hover, nav.sequence-nav ol section.course-index div#accordion h3.ui-accordion-header.ui-state-active:hover, section.course-index div#accordion nav.sequence-nav ol h3.ui-accordion-header.ui-state-active:hover, nav.sequence-nav ol section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"]:hover, section.course-index div#accordion div#wiki_panel nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"]:hover, div#wiki_panel section.course-index div#accordion nav.sequence-nav ol input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li.seq_video_active:hover, nav.sequence-nav ol li.seq_other_active:hover, nav.sequence-nav ol li.seq_vertical_active:hover, nav.sequence-nav ol li.seq_problem_active:hover {
-        background-color: #fff; }
+    width: 84.905%;
+    position: relative; }
     nav.sequence-nav ol li {
-      -webkit-box-shadow: 1px 0 0 white;
-      -moz-box-shadow: 1px 0 0 white;
-      -ms-box-shadow: 1px 0 0 white;
-      -o-box-shadow: 1px 0 0 white;
-      box-shadow: 1px 0 0 white;
-      background-position: center center;
-      border: none;
-      border-right: 1px solid #eddfaa;
-      cursor: pointer;
-      display: table-cell;
-      padding: 14px 4px;
-      width: 28px; }
-      nav.sequence-nav ol li.seq_video_inactive {
-        background-image: url("/static/images/sequence-nav/video-icon-normal.png"); }
-      nav.sequence-nav ol li.seq_video_visited {
-        background-image: url("/static/images/sequence-nav/video-icon-visited.png"); }
-      nav.sequence-nav ol li.seq_video_active {
-        background-image: url("/static/images/sequence-nav/video-icon-current.png"); }
-      nav.sequence-nav ol li.seq_other_inactive {
-        background-image: url("/static/images/sequence-nav/document-icon-normal.png"); }
-      nav.sequence-nav ol li.seq_other_visited {
-        background-image: url("/static/images/sequence-nav/document-icon-visited.png"); }
-      nav.sequence-nav ol li.seq_other_active {
-        background-image: url("/static/images/sequence-nav/document-icon-current.png"); }
-      nav.sequence-nav ol li.seq_vertical_inactive, nav.sequence-nav ol li.seq_problem_inactive {
-        background-image: url("/static/images/sequence-nav/list-icon-normal.png"); }
-      nav.sequence-nav ol li.seq_vertical_visited, nav.sequence-nav ol li.seq_problem_visited {
-        background-image: url("/static/images/sequence-nav/list-icon-visited.png"); }
-      nav.sequence-nav ol li.seq_vertical_active, nav.sequence-nav ol li.seq_problem_active {
-        background-image: url("/static/images/sequence-nav/list-icon-current.png"); }
+      display: table-cell; }
+      nav.sequence-nav ol li .inactive, nav.sequence-nav ol li a.seq_video_inactive, nav.sequence-nav ol li a.seq_other_inactive, nav.sequence-nav ol li a.seq_vertical_inactive, nav.sequence-nav ol li a.seq_problem_inactive {
+        background-repeat: no-repeat; }
+        nav.sequence-nav ol li .inactive:hover, nav.sequence-nav ol li a.seq_video_inactive:hover, nav.sequence-nav ol li a.seq_other_inactive:hover, nav.sequence-nav ol li a.seq_vertical_inactive:hover, nav.sequence-nav ol li a.seq_problem_inactive:hover {
+          background-color: #f9f4e1; }
+      nav.sequence-nav ol li .visited, nav.sequence-nav ol li a.seq_video_visited, nav.sequence-nav ol li a.seq_other_visited, nav.sequence-nav ol li a.seq_vertical_visited, nav.sequence-nav ol li a.seq_problem_visited {
+        background-color: #ddd7be;
+        background-repeat: no-repeat;
+        border-color: #ddd7be; }
+        nav.sequence-nav ol li .visited:hover, nav.sequence-nav ol li a.seq_video_visited:hover, nav.sequence-nav ol li a.seq_other_visited:hover, nav.sequence-nav ol li a.seq_vertical_visited:hover, nav.sequence-nav ol li a.seq_problem_visited:hover {
+          background-color: #F6EFD4;
+          background-position: center center; }
+      nav.sequence-nav ol li .active, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.courseware nav.sequence-nav ol li.courseware a, nav.sequence-nav ol div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.book nav.sequence-nav ol li.book a, nav.sequence-nav ol div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.info nav.sequence-nav ol li.info a, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.discussion nav.sequence-nav ol li.discussion a, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.wiki nav.sequence-nav ol li.wiki a, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav.profile nav.sequence-nav ol li.profile a, nav.sequence-nav ol li section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion nav.sequence-nav ol li h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol li section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li a.seq_problem_active {
+        -webkit-box-shadow: 0 1px 0 white;
+        -moz-box-shadow: 0 1px 0 white;
+        -ms-box-shadow: 0 1px 0 white;
+        -o-box-shadow: 0 1px 0 white;
+        box-shadow: 0 1px 0 white;
+        background-color: #fff;
+        background-repeat: no-repeat; }
+        nav.sequence-nav ol li .active:hover, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a:hover, div.header-wrapper header nav.courseware nav.sequence-nav ol li.courseware a:hover, nav.sequence-nav ol div.header-wrapper header nav.book li.book a:hover, div.header-wrapper header nav.book nav.sequence-nav ol li.book a:hover, nav.sequence-nav ol div.header-wrapper header nav.info li.info a:hover, div.header-wrapper header nav.info nav.sequence-nav ol li.info a:hover, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a:hover, div.header-wrapper header nav.discussion nav.sequence-nav ol li.discussion a:hover, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a:hover, div.header-wrapper header nav.wiki nav.sequence-nav ol li.wiki a:hover, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a:hover, div.header-wrapper header nav.profile nav.sequence-nav ol li.profile a:hover, nav.sequence-nav ol li section.course-index div#accordion h3.ui-accordion-header.ui-state-active:hover, section.course-index div#accordion nav.sequence-nav ol li h3.ui-accordion-header.ui-state-active:hover, nav.sequence-nav ol li section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"]:hover, section.course-index div#accordion div#wiki_panel nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"]:hover, div#wiki_panel section.course-index div#accordion nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li a.seq_video_active:hover, nav.sequence-nav ol li a.seq_other_active:hover, nav.sequence-nav ol li a.seq_vertical_active:hover, nav.sequence-nav ol li a.seq_problem_active:hover {
+          background-color: #fff;
+          background-position: center; }
+      nav.sequence-nav ol li a {
+        -webkit-box-shadow: 1px 0 0 white;
+        -moz-box-shadow: 1px 0 0 white;
+        -ms-box-shadow: 1px 0 0 white;
+        -o-box-shadow: 1px 0 0 white;
+        box-shadow: 1px 0 0 white;
+        background-position: center center;
+        border: none;
+        border-right: 1px solid #eddfaa;
+        cursor: pointer;
+        padding: 14px 4px;
+        width: 28px;
+        height: 17px; }
+        nav.sequence-nav ol li a.seq_video_inactive {
+          background-image: url("/static/images/sequence-nav/video-icon-normal.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_video_visited {
+          background-image: url("/static/images/sequence-nav/video-icon-visited.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_video_active {
+          background-image: url("/static/images/sequence-nav/video-icon-current.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_other_inactive {
+          background-image: url("/static/images/sequence-nav/document-icon-normal.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_other_visited {
+          background-image: url("/static/images/sequence-nav/document-icon-visited.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_other_active {
+          background-image: url("/static/images/sequence-nav/document-icon-current.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_vertical_inactive, nav.sequence-nav ol li a.seq_problem_inactive {
+          background-image: url("/static/images/sequence-nav/list-icon-normal.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_vertical_visited, nav.sequence-nav ol li a.seq_problem_visited {
+          background-image: url("/static/images/sequence-nav/list-icon-visited.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li a.seq_problem_active {
+          background-image: url("/static/images/sequence-nav/list-icon-current.png");
+          background-position: center; }
+      nav.sequence-nav ol li p {
+        position: absolute;
+        display: none;
+        background: #B3A87E;
+        padding: 6px;
+        white-space: pre-wrap;
+        z-index: 99;
+        margin: 4px 0 0 -5px;
+        text-shadow: 0 -1px 0 #a0925e;
+        color: #fff; }
+        nav.sequence-nav ol li p:empty {
+          background: none; }
+          nav.sequence-nav ol li p:empty::after {
+            display: none; }
+        nav.sequence-nav ol li p::after {
+          background: #B3A87E;
+          content: " ";
+          display: block;
+          height: 10px;
+          position: absolute;
+          top: -5px;
+          left: 18px;
+          -webkit-transform: rotate(45deg);
+          -moz-transform: rotate(45deg);
+          -ms-transform: rotate(45deg);
+          -o-transform: rotate(45deg);
+          transform: rotate(45deg);
+          -webkit-transition-property: all;
+          -moz-transition-property: all;
+          -ms-transition-property: all;
+          -o-transition-property: all;
+          transition-property: all;
+          -webkit-transition-duration: 0.15s;
+          -moz-transition-duration: 0.15s;
+          -ms-transition-duration: 0.15s;
+          -o-transition-duration: 0.15s;
+          transition-duration: 0.15s;
+          -webkit-transition-timing-function: ease-out;
+          -moz-transition-timing-function: ease-out;
+          -ms-transition-timing-function: ease-out;
+          -o-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+          -webkit-transition-delay: 0;
+          -moz-transition-delay: 0;
+          -ms-transition-delay: 0;
+          -o-transition-delay: 0;
+          transition-delay: 0;
+          width: 10px; }
   nav.sequence-nav ul {
     float: right;
     margin-right: 1px;
@@ -3476,7 +3538,6 @@ div.wiki-wrapper {
         -ms-transition-delay: 0;
         -o-transition-delay: 0;
         transition-delay: 0;
-        background: #f2e7bf;
         border: 0;
         border-left: 1px solid #e4d080;
         color: #292309;
@@ -3486,9 +3547,16 @@ div.wiki-wrapper {
         text-transform: uppercase;
         letter-spacing: 1px;
         padding: 14px;
+        padding-left: 38px;
         margin: 0; }
+        div.wiki-wrapper section.wiki-body header ul li input[type="button"].view {
+          background: #f2e7bf url("/static/images/sequence-nav/view.png") no-repeat 12px 12px; }
+        div.wiki-wrapper section.wiki-body header ul li input[type="button"].history {
+          background: #f2e7bf url("/static/images/sequence-nav/history.png") no-repeat 12px 12px; }
+        div.wiki-wrapper section.wiki-body header ul li input[type="button"].edit {
+          background: #f2e7bf url("/static/images/sequence-nav/edit.png") no-repeat 12px 12px; }
         div.wiki-wrapper section.wiki-body header ul li input[type="button"]:hover {
-          background: none; }
+          background-color: #F6EFD4; }
   div.wiki-wrapper section.wiki-body h1.wiki-title {
     font-weight: bold;
     padding-bottom: 10px;
@@ -3496,6 +3564,14 @@ div.wiki-wrapper {
     border-bottom: 1px solid #ccc; }
   div.wiki-wrapper section.wiki-body p {
     line-height: 1.6em; }
+  div.wiki-wrapper section.wiki-body ul.article-list {
+    margin-left: 15px; }
+    div.wiki-wrapper section.wiki-body ul.article-list li {
+      margin: 10px 0;
+      list-style-image: url("/static/images/bullet-triangle.png"); }
+      div.wiki-wrapper section.wiki-body ul.article-list li h3, div.wiki-wrapper section.wiki-body ul.article-list li div#wiki_panel input[type="button"], div#wiki_panel div.wiki-wrapper section.wiki-body ul.article-list li input[type="button"] {
+        font-size: 18px;
+        font-weight: normal; }
   div.wiki-wrapper section.wiki-body #wiki_history_table tr.dark {
     background-color: #dddddd; }
 
@@ -3533,7 +3609,7 @@ section.help.main-content {
         clear: left;
         width: 30.579%; }
 
-.badge-context-toggle.active, div.header-wrapper header nav.courseware li.courseware a.badge-context-toggle, div.header-wrapper header nav.book li.book a.badge-context-toggle, div.header-wrapper header nav.info li.info a.badge-context-toggle, div.header-wrapper header nav.discussion li.discussion a.badge-context-toggle, div.header-wrapper header nav.wiki li.wiki a.badge-context-toggle, div.header-wrapper header nav.profile li.profile a.badge-context-toggle, section.course-index div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, section.course-index div#accordion div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li.badge-context-toggle.seq_video_active, nav.sequence-nav ol li.badge-context-toggle.seq_other_active, nav.sequence-nav ol li.badge-context-toggle.seq_vertical_active, nav.sequence-nav ol li.badge-context-toggle.seq_problem_active {
+.badge-context-toggle.active, div.header-wrapper header nav.courseware li.courseware a.badge-context-toggle, div.header-wrapper header nav.book li.book a.badge-context-toggle, div.header-wrapper header nav.info li.info a.badge-context-toggle, div.header-wrapper header nav.discussion li.discussion a.badge-context-toggle, div.header-wrapper header nav.wiki li.wiki a.badge-context-toggle, div.header-wrapper header nav.profile li.profile a.badge-context-toggle, section.course-index div#accordion h3.badge-context-toggle.ui-accordion-header.ui-state-active, section.course-index div#accordion div#wiki_panel input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion input.badge-context-toggle.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li a.badge-context-toggle.seq_video_active, nav.sequence-nav ol li a.badge-context-toggle.seq_other_active, nav.sequence-nav ol li a.badge-context-toggle.seq_vertical_active, nav.sequence-nav ol li a.badge-context-toggle.seq_problem_active {
   cursor: pointer;
   text-decoration: underline; }
 
@@ -5246,7 +5322,7 @@ div.question-header div.question-container, div.answer-block div.question-contai
     div.question-header div.question-container div.question-content div.post-update-container, div.answer-block div.question-container div.question-content div.post-update-container, div.paginator div.question-container div.question-content div.post-update-container, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container, div.answer-block div.answer-container div.question-content div.post-update-container, div.paginator div.answer-block div.answer-container div.question-content div.post-update-container, div.answer-block div.paginator div.answer-container div.question-content div.post-update-container, div.question-header div.paginator div.answer-container div.question-content div.post-update-container, div.paginator div.question-header div.answer-container div.question-content div.post-update-container, div.answer-block div.paginator div.answer-container div.question-content div.post-update-container, div.paginator div.answer-block div.answer-container div.question-content div.post-update-container, div.paginator div.answer-container div.question-content div.post-update-container, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container, div.paginator div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.answer-container div.paginator div.question-container div.answer-content div.post-update-container, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container, div.answer-block div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container, div.question-header div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.question-header div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.paginator div.question-header div.answer-container div.answer-content div.post-update-container, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container, div.question-header div.question-container div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-container div.question-header div.question-container div.answer-content div.post-update-container, div.answer-block div.question-container div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-container div.answer-block div.question-container div.answer-content div.post-update-container, div.paginator div.question-container div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-container div.question-container div.answer-content div.post-update-container, div.question-header div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.question-header div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container, div.question-header div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.question-header div.answer-container div.answer-content div.post-update-container, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container, div.paginator div.answer-container div.answer-content div.post-update-container {
       display: inline-block;
       float: left;
-      width: 20.123%;
+      width: 20%;
       border-left: 1px dashed #ddd; }
       div.question-header div.question-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info, div.paginator div.question-container div.question-content div.post-update-container div.post-update-info, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.question-content div.post-update-container div.post-update-info, div.question-header div.paginator div.answer-container div.question-content div.post-update-container div.post-update-info, div.paginator div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.question-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.question-content div.post-update-container div.post-update-info, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.paginator div.question-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.question-container div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-container div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.answer-block div.question-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info {
         -webkit-box-sizing: border-box;
