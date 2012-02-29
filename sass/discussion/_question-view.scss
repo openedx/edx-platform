@@ -19,14 +19,19 @@ div.question-header {
 
         &.post-vote {
           @include border-radius(4px);
-          background-color: lighten(#F6EFD4, 3%);
+          background-color: lighten(#F6EFD4, 5%);
+          border: 1px solid darken( #F6EFD4,10% );
+          @include box-shadow(inset 0 1px 0px #fff);
         }
 
         &.question-img-upvote, &.answer-img-upvote  {
           background-image: url(/static/images/askbot/vote-arrow-up.png);
+          @include box-shadow(inset 0 1px 0px rgba(255, 255, 255, 0.5));
 
           &:hover, &.on {
             background-color:#d1e3a8;
+            border-color: darken(#D1E3A8, 20%);
+          background-image: url(/static/images/askbot/vote-arrow-up-activate.png);
           }
         }
 
@@ -34,7 +39,9 @@ div.question-header {
           background-image: url(/static/images/askbot/vote-arrow-down.png);
 
           &:hover, &.on {
-            background-color:#eac6ad;
+            background-color:#EAC6AD;
+            border-color: darken(#EAC6AD, 20%);
+            background-image: url(/static/images/askbot/vote-arrow-down-activate.png);
           }
         }
       }
@@ -99,7 +106,7 @@ div.question-header {
       div.post-update-container {
         display: inline-block;
         float: left;
-        width: flex-grid(1.8,8);
+        width: 20%;
         border-left: 1px dashed #ddd;
 
         div.post-update-info {
@@ -319,6 +326,5 @@ div.share-question {
   p {
     padding: 0;
     margin: 0;
-    font-weight: bold;
   }
 }

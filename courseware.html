@@ -4,8 +4,12 @@
 <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
 <script type="text/javascript">
   $(function() {
-      ${init}
-    });
+    ${init}
+
+    $(".sequence-nav li a").hover(function(){
+      $(this).siblings().toggle();
+      });
+  });
 </script>
 </%block>
 

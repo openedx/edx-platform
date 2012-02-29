@@ -1,7 +1,7 @@
 <nav class="sequence-nav">
   <ol>
     % for t in range(1,1+len(items)):
-    <li class="seq_inactive" id="tt_${ t }">&nbsp;</li>
+    <li><a href="#" class="seq_inactive" id="tt_${ t }"></a></li>
     % endfor
   </ol>
 
@@ -11,8 +11,5 @@
   </ul>
 </nav>
 
-
-<!-- <td colspan=${ len(items) }> -->
-  <div id="seq_content"></div>
-<!-- </td> -->
+<div id="seq_content"></div>
 

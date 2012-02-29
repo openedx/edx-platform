@@ -7,6 +7,10 @@ div.discussion-wrapper aside {
   padding: lh();
   width: flex-grid(3);
 
+  &.main-sidebar {
+    min-width:200px;
+  }
+
   h1 {
     @extend .bottom-border;
     margin: (-(lh())) (-(lh())) 0;
@@ -26,8 +30,15 @@ div.discussion-wrapper aside {
     box-shadow: none;
   }
 
-  input[type="text"] {
-    width: 76%;
+  div.inputs {
+    input[type="submit"] {
+      width: 27%;
+      float: right;
+    }
+
+    input[type="text"] {
+      width: 62%;
+    }
   }
 
   div.box {
@@ -283,6 +294,11 @@ div.discussion-wrapper aside {
       text-align: center;
       padding: 10px;
       display: block;
+      margin-top: 10px;
+
+      &:first-child {
+        margin-top: 0;
+      }
 
       span {
         font-weight: bold;

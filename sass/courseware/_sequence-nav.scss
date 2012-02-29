@@ -6,102 +6,150 @@ nav.sequence-nav {
     display: table-row;
     float: left;
     width: flex-grid(7.5,9) + flex-gutter();
+    position: relative;
 
     a {
       @extend .block-link;
     }
 
-    .inactive {
-      background-repeat: no-repeat;
-
-      &:hover {
-        background-color: lighten(#F6EFD4, 3%);
-      }
-    }
-
-    .visited {
-      background-color: shade(#F6EFD4, 10%);
-      background-repeat: no-repeat;
-      border-color: shade(#F6EFD4, 10%);
-
-      &:hover {
-        background-color: #F6EFD4;
-      }
-    }
-
-    .active {
-      // @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%), inset 1px 0 0 darken(#F6EFD4, 20%));
-      @include box-shadow(0 1px 0 #fff);
-      background-color: #fff;
-      background-repeat: no-repeat;
-
-      &:hover {
-        background-color: #fff;
-      }
-    }
-
     li {
-      @include box-shadow(1px 0 0 #fff);
-      background-position: center center;
-      border: none;
-      border-right: 1px solid darken(#F6EFD4, 10%);
-      cursor: pointer;
       display: table-cell;
-      padding: 14px 4px;
-      width: 28px;
 
-      // @media screen and (max-width: 800px) {
-      //   padding: 12px 8px;
-      // }
+      .inactive {
+        background-repeat: no-repeat;
 
-      //video
-      &.seq_video_inactive {
-        @extend .inactive;
-        background-image: url('/static/images/sequence-nav/video-icon-normal.png');
+        &:hover {
+          background-color: lighten(#F6EFD4, 3%);
+        }
       }
 
-      &.seq_video_visited {
-        @extend .visited;
-        background-image: url('/static/images/sequence-nav/video-icon-visited.png');
+      .visited {
+        background-color: shade(#F6EFD4, 10%);
+        background-repeat: no-repeat;
+        border-color: shade(#F6EFD4, 10%);
+
+        &:hover {
+          background-color: #F6EFD4;
+          background-position: center center;
+        }
       }
 
-      &.seq_video_active {
-        @extend .active;
-        background-image: url('/static/images/sequence-nav/video-icon-current.png');
+      .active {
+        // @include box-shadow(inset -1px 0 0 darken(#F6EFD4, 20%), inset 1px 0 0 darken(#F6EFD4, 20%));
+        @include box-shadow(0 1px 0 #fff);
+        background-color: #fff;
+        background-repeat: no-repeat;
+
+        &:hover {
+          background-color: #fff;
+          background-position: center;
+        }
       }
 
-      //other
-      &.seq_other_inactive {
-        @extend .inactive;
-        background-image: url('/static/images/sequence-nav/document-icon-normal.png');
-      }
+      a {
+        @include box-shadow(1px 0 0 #fff);
+        background-position: center center;
+        border: none;
+        border-right: 1px solid darken(#F6EFD4, 10%);
+        cursor: pointer;
+        padding: 14px 4px;
+        width: 28px;
+        height: 17px;
 
-      &.seq_other_visited {
-        @extend .visited;
-        background-image: url('/static/images/sequence-nav/document-icon-visited.png');
-      }
+        // @media screen and (max-width: 800px) {
+          //   padding: 12px 8px;
+          // }
 
-      &.seq_other_active {
-        @extend .active;
-        background-image: url('/static/images/sequence-nav/document-icon-current.png');
-      }
+          //video
+          &.seq_video_inactive {
+            @extend .inactive;
+            background-image: url('/static/images/sequence-nav/video-icon-normal.png');
+            background-position: center;
+          }
 
-      //vertical & problems
-      &.seq_vertical_inactive, &.seq_problem_inactive {
-        @extend .inactive;
-        background-image: url('/static/images/sequence-nav/list-icon-normal.png');
-      }
+          &.seq_video_visited {
+            @extend .visited;
+            background-image: url('/static/images/sequence-nav/video-icon-visited.png');
+            background-position: center;
+          }
 
-      &.seq_vertical_visited, &.seq_problem_visited {
-        @extend .visited;
-        background-image: url('/static/images/sequence-nav/list-icon-visited.png');
-      }
+          &.seq_video_active {
+            @extend .active;
+            background-image: url('/static/images/sequence-nav/video-icon-current.png');
+            background-position: center;
+          }
 
-      &.seq_vertical_active, &.seq_problem_active {
-        @extend .active;
-        background-image: url('/static/images/sequence-nav/list-icon-current.png');
-      }
+          //other
+          &.seq_other_inactive {
+            @extend .inactive;
+            background-image: url('/static/images/sequence-nav/document-icon-normal.png');
+            background-position: center;
+          }
 
+          &.seq_other_visited {
+            @extend .visited;
+            background-image: url('/static/images/sequence-nav/document-icon-visited.png');
+            background-position: center;
+          }
+
+          &.seq_other_active {
+            @extend .active;
+            background-image: url('/static/images/sequence-nav/document-icon-current.png');
+            background-position: center;
+          }
+
+          //vertical & problems
+          &.seq_vertical_inactive, &.seq_problem_inactive {
+            @extend .inactive;
+            background-image: url('/static/images/sequence-nav/list-icon-normal.png');
+            background-position: center;
+          }
+
+          &.seq_vertical_visited, &.seq_problem_visited {
+            @extend .visited;
+            background-image: url('/static/images/sequence-nav/list-icon-visited.png');
+            background-position: center;
+          }
+
+          &.seq_vertical_active, &.seq_problem_active {
+            @extend .active;
+            background-image: url('/static/images/sequence-nav/list-icon-current.png');
+            background-position: center;
+          }
+        }
+
+      p {
+        position: absolute;
+        display: none;
+        background: #B3A87E;
+        padding: 6px;
+        white-space: pre-wrap;
+        z-index: 99;
+        margin: 4px 0 0 -5px;
+        text-shadow: 0 -1px 0 darken(#B3A87E, 10%);
+        color: #fff;
+
+        &:empty {
+          background: none;
+
+          &::after {
+            display: none;
+          }
+        }
+
+        &::after {
+          background: #B3A87E;
+          content: " ";
+          display: block;
+          height: 10px;
+          position: absolute;
+          top: -5px;
+          left: 18px;
+          @include transform(rotate(45deg));
+          @include transition();
+          width: 10px;
+        }
+      }
     }
   }
 

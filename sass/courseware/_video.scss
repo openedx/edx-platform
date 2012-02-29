@@ -143,42 +143,28 @@ section.course-content {
             -webkit-font-smoothing: antialiased;
 
             h3 {
+              @include inline-block();
+
               a {
                 color: #fff;
-                display: block;
                 padding: 0 lh(.5);
+                @include inline-block();
 
                 &:hover {
                   text-decoration: none;
-                  background-color: #444;
+                  // background-color: #444;
                 }
               }
             }
 
+            // fix for now
             ol#video_speeds {
-              @extend .clearfix;
-              background: #333;
-              border: 1px solid #000;
-              font-weight: bold;
               @include inline-block();
-              padding: 0 lh();
-              position: absolute;
-              right: 79px;
-              @include box-shadow(inset 0 1px 0 #555);
+              padding-right: lh(.5);
 
               li {
                 cursor: pointer;
-                float: left;
-                margin-bottom: 0;
-                margin-right: lh(.5);
-
-                &:last-child {
-                  margin-right: 0;
-                }
-
-                &:hover {
-                  color: $mit-red;
-                }
+                @include inline-block();
               }
             }
           }

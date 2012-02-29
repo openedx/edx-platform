@@ -42,7 +42,7 @@ div.question-list-header {
     div.question-sort {
       float: right;
       margin-left: flex-gutter();
-      margin-top: 10px;
+      margin-top: 6px;
 
       nav {
         @extend .action-link;
@@ -87,11 +87,13 @@ div.question-list-header {
 
     }
 
-    ul.tags li {
-      background: #fff;
+    ul.tags {
+      li {
+        background: #fff;
 
-      &:before {
-        border-color: transparent #fff transparent transparent;
+        &:before {
+          border-color: transparent #fff transparent transparent;
+        }
       }
     }
   }
@@ -138,9 +140,14 @@ ul.question-list, div#question-list {
           text-transform: none;
         }
 
+        p.excerpt {
+          color: #777;
+        }
+
         div.user-info {
           display: inline-block;
           vertical-align: top;
+          margin-bottom: 10px;
 
           span.relative-time {
             font-weight: normal;
@@ -158,7 +165,10 @@ ul.question-list, div#question-list {
       }
 
       &.question-meta {
+        float: right;
+        margin-top: 10px;
         width: flex-grid(3.5,9);
+
 
         ul {
           text-align: right;
@@ -171,6 +181,10 @@ ul.question-list, div#question-list {
             @include linear-gradient(#fff, #f5f5f5);
             margin-right: 10px;
             width: 60px;
+
+            &:last-child {
+              margin-right: 0px;
+            }
 
             &:hover {
               span, div {

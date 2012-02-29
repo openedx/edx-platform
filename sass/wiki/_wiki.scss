@@ -7,6 +7,8 @@ div.wiki-wrapper {
 
     header {
       @extend .topbar;
+      height:46px;
+      @include box-shadow(inset 0 1px 0 white);
 
       &:empty {
         display: none !important;
@@ -35,7 +37,6 @@ div.wiki-wrapper {
             @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
             @include border-radius(0);
             @include transition();
-            background: darken(#F6EFD4, 5%);
             border: 0;
             border-left: 1px solid darken(#f6efd4, 20%);
             color: darken(#F6EFD4, 80%);
@@ -44,11 +45,25 @@ div.wiki-wrapper {
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 14px;
+            padding: 14.9px;
+            padding-left: 38px;
             margin: 0;
 
+
+            &.view {
+              background: darken(#F6EFD4, 5%) url('/static/images/sequence-nav/view.png') no-repeat 12px 12px;
+            }
+
+            &.history {
+              background: darken(#F6EFD4, 5%) url('/static/images/sequence-nav/history.png') no-repeat 12px 12px;
+            }
+
+            &.edit {
+              background: darken(#F6EFD4, 5%) url('/static/images/sequence-nav/edit.png') no-repeat 12px 12px;
+            }
+
             &:hover {
-              background: none;
+              background-color: #F6EFD4;
             }
           }
         }
@@ -66,10 +81,19 @@ div.wiki-wrapper {
       line-height: 1.6em;
     }
 
-    #wiki_history_table {
-      tr.dark {
-        background-color: $light-gray;
+    ul.article-list {
+      margin-left: 15px;
+
+      li {
+        margin: 10px 0;
+      list-style-image: url('/static/images/bullet-triangle.png');
+
+        h3 {
+          font-size: 18px;
+          font-weight: normal;
+        }
       }
     }
+
   }
 }
