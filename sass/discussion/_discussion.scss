@@ -39,6 +39,7 @@ body.askbot {
       div.discussion-content {
         @include box-sizing(border-box);
         display: table-cell;
+        min-width: 650px;
         padding: lh();
         vertical-align: top;
         width: flex-grid(9) + flex-gutter();
