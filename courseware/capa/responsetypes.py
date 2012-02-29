@@ -127,7 +127,7 @@ class formularesponse(object):
                 value = random.uniform(*ranges[var])
                 instructor_variables[str(var)] = value
                 student_variables[str(var)] = value
-            instructor_result = evaluator(instructor_variables,dict(),self.correct_answer)
+            instructor_result = evaluator(instructor_variables,dict(),self.correct_answer, cs = self.case_sensitive)
             try: 
                 #print student_variables,dict(),student_answers[self.answer_id]
                 student_result = evaluator(student_variables,dict(),
