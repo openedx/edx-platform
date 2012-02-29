@@ -7,6 +7,8 @@ div.wiki-wrapper {
 
     header {
       @extend .topbar;
+      height:46px;
+      @include box-shadow(inset 0 1px 0 white);
 
       &:empty {
         display: none !important;
@@ -43,7 +45,7 @@ div.wiki-wrapper {
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 14px;
+            padding: 14.9px;
             padding-left: 38px;
             margin: 0;
 
@@ -93,10 +95,5 @@ div.wiki-wrapper {
       }
     }
 
-    #wiki_history_table {
-      tr.dark {
-        background-color: $light-gray;
-      }
-    }
   }
 }
