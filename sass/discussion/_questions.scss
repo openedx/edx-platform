@@ -42,7 +42,7 @@ div.question-list-header {
     div.question-sort {
       float: right;
       margin-left: flex-gutter();
-      margin-top: 10px;
+      margin-top: 6px;
 
       nav {
         @extend .action-link;
@@ -169,6 +169,7 @@ ul.question-list, div#question-list {
         margin-top: 10px;
         width: flex-grid(3.5,9);
 
+
         ul {
           text-align: right;
 
@@ -180,6 +181,10 @@ ul.question-list, div#question-list {
             @include linear-gradient(#fff, #f5f5f5);
             margin-right: 10px;
             width: 60px;
+
+            &:last-child {
+              margin-right: 0px;
+            }
 
             &:hover {
               span, div {
