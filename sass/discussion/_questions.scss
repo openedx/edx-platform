@@ -138,6 +138,10 @@ ul.question-list, div#question-list {
           text-transform: none;
         }
 
+        p.excerpt {
+          color: #777;
+        }
+
         div.user-info {
           display: inline-block;
           vertical-align: top;
@@ -158,6 +162,8 @@ ul.question-list, div#question-list {
       }
 
       &.question-meta {
+        float: right;
+        margin-top: 10px;
         width: flex-grid(3.5,9);
 
         ul {
