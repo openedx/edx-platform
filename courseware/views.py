@@ -274,7 +274,9 @@ def format_url_params(params):
 def render_accordion(request,course,chapter,section):
     ''' Draws navigation bar. Takes current position in accordion as
         parameter. Returns (initialization_javascript, content)'''
-
+    if not course:
+        course = "6.002 Spring 2012"
+    
     toc=content_parser.toc_from_xml(content_parser.course_file(request.user), chapter, section)
     active_chapter=1
     for i in range(len(toc)):
