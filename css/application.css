@@ -129,7 +129,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -353,7 +353,9 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
   font-size: 12px;
   margin: -22.652px -22.652px 22.652px;
-  text-shadow: 0 1px 0 #fff; }
+  text-shadow: 0 1px 0 #fff;
+  line-height: 46px;
+  height: 46px; }
   @media print {
     .topbar, nav.sequence-nav, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header {
       display: none; } }
@@ -371,7 +373,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
       -o-box-shadow: inset 1px 0 0 #faf7e9;
       box-shadow: inset 1px 0 0 #faf7e9;
       display: block;
-      padding: 16.989px;
       text-transform: uppercase; }
       .topbar a.block-link:hover, nav.sequence-nav a.block-link:hover, div.book-wrapper section.book nav a.block-link:hover, div.wiki-wrapper section.wiki-body header a.block-link:hover, .topbar nav.sequence-nav ol a:hover, nav.sequence-nav ol .topbar a:hover, nav.sequence-nav ol a:hover, div.book-wrapper section.book nav.sequence-nav ol a:hover, div.wiki-wrapper section.wiki-body header nav.sequence-nav ol a:hover, nav.sequence-nav ol div.wiki-wrapper section.wiki-body header a:hover, .topbar div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav .topbar a:hover, div.book-wrapper section.book nav.sequence-nav a:hover, div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a:hover, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a:hover, .topbar div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header .topbar a:hover, nav.sequence-nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header nav.sequence-nav a:hover, div.book-wrapper section.book nav div.wiki-wrapper section.wiki-body header a:hover, div.wiki-wrapper section.wiki-body header div.book-wrapper section.book nav a:hover, div.wiki-wrapper section.wiki-body header a:hover {
         background: none; }
@@ -397,6 +398,14 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
   transition-delay: 0; }
+
+p.ie-warning {
+  display: block !important;
+  line-height: 1.3em;
+  background: yellow;
+  padding: 22.652px;
+  text-align: left;
+  margin-bottom: 0; }
 
 :focus {
   outline-color: #ccc; }
@@ -719,8 +728,6 @@ div.leanModal_box {
     text-align: left; }
   div.leanModal_box#enroll {
     max-width: 600px; }
-    div.leanModal_box#enroll p.ie-warning {
-      display: none; }
     div.leanModal_box#enroll ol {
       padding-top: 22.652px; }
       div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
@@ -2787,9 +2794,13 @@ nav.sequence-nav {
         nav.sequence-nav ol li .inactive:hover, nav.sequence-nav ol li a.seq_video_inactive:hover, nav.sequence-nav ol li a.seq_other_inactive:hover, nav.sequence-nav ol li a.seq_vertical_inactive:hover, nav.sequence-nav ol li a.seq_problem_inactive:hover {
           background-color: #f9f4e1; }
       nav.sequence-nav ol li .visited, nav.sequence-nav ol li a.seq_video_visited, nav.sequence-nav ol li a.seq_other_visited, nav.sequence-nav ol li a.seq_vertical_visited, nav.sequence-nav ol li a.seq_problem_visited {
-        background-color: #ddd7be;
+        background-color: #DCCDA2;
         background-repeat: no-repeat;
-        border-color: #ddd7be; }
+        -webkit-box-shadow: inset 0 0 3px #ceb97d;
+        -moz-box-shadow: inset 0 0 3px #ceb97d;
+        -ms-box-shadow: inset 0 0 3px #ceb97d;
+        -o-box-shadow: inset 0 0 3px #ceb97d;
+        box-shadow: inset 0 0 3px #ceb97d; }
         nav.sequence-nav ol li .visited:hover, nav.sequence-nav ol li a.seq_video_visited:hover, nav.sequence-nav ol li a.seq_other_visited:hover, nav.sequence-nav ol li a.seq_vertical_visited:hover, nav.sequence-nav ol li a.seq_problem_visited:hover {
           background-color: #F6EFD4;
           background-position: center center; }
@@ -2814,7 +2825,7 @@ nav.sequence-nav {
         border: none;
         border-right: 1px solid #eddfaa;
         cursor: pointer;
-        padding: 14px 4px;
+        padding: 15px 4px 14px;
         width: 28px;
         height: 17px; }
         nav.sequence-nav ol li a.seq_video_inactive {
@@ -2847,19 +2858,20 @@ nav.sequence-nav {
       nav.sequence-nav ol li p {
         position: absolute;
         display: none;
-        background: #B3A87E;
+        background: #333;
         padding: 6px;
         white-space: pre-wrap;
         z-index: 99;
         margin: 4px 0 0 -5px;
-        text-shadow: 0 -1px 0 #a0925e;
-        color: #fff; }
+        text-shadow: 0 -1px 0 black;
+        color: #fff;
+        line-height: 22.652px; }
         nav.sequence-nav ol li p:empty {
           background: none; }
           nav.sequence-nav ol li p:empty::after {
             display: none; }
         nav.sequence-nav ol li p::after {
-          background: #B3A87E;
+          background: #333;
           content: " ";
           display: block;
           height: 10px;
@@ -2909,7 +2921,7 @@ nav.sequence-nav {
       border-left: 1px solid #e4d080;
       cursor: pointer;
       display: table-cell;
-      padding: 14px 4px;
+      padding: 0 4px;
       text-indent: -9999px;
       width: 82px; }
       nav.sequence-nav ul li.prev:hover, nav.sequence-nav ul li.next:hover {
@@ -3013,7 +3025,7 @@ div.book-wrapper section.book-sidebar {
     box-shadow: 0 1px 0 #eeeeee;
     padding: 7px 7px 7px 30px; }
 div.book-wrapper section.book nav a {
-  padding: 14px; }
+  padding: 0 22.652px; }
 div.book-wrapper section.book nav ul li.last {
   float: left;
   display: block; }
@@ -3215,6 +3227,8 @@ div.profile-wrapper {
       display: table;
       padding: 22.652px 0;
       width: 100%; }
+      div.profile-wrapper section.course-info > ol > li:last-child {
+        border-bottom: 0px; }
       div.profile-wrapper section.course-info > ol > li h2 {
         border-right: 1px dashed #ddd;
         -webkit-box-sizing: border-box;
@@ -3494,86 +3508,172 @@ form#wiki_revision {
 div.wiki-wrapper {
   display: table;
   width: 100%; }
-  div.wiki-wrapper section.wiki-body header:empty {
-    display: none !important; }
-  div.wiki-wrapper section.wiki-body header p {
-    float: left;
-    padding: 15px;
-    margin-bottom: 0;
-    color: #937b1f;
-    line-height: 1em; }
-  div.wiki-wrapper section.wiki-body header ul {
-    float: right;
-    list-style: none; }
-    div.wiki-wrapper section.wiki-body header ul li {
-      float: left; }
-      div.wiki-wrapper section.wiki-body header ul li input[type="button"] {
-        -webkit-box-shadow: inset 1px 0 0 #faf7e9;
-        -moz-box-shadow: inset 1px 0 0 #faf7e9;
-        -ms-box-shadow: inset 1px 0 0 #faf7e9;
-        -o-box-shadow: inset 1px 0 0 #faf7e9;
-        box-shadow: inset 1px 0 0 #faf7e9;
-        -webkit-border-radius: 0;
-        -moz-border-radius: 0;
-        -ms-border-radius: 0;
-        -o-border-radius: 0;
-        border-radius: 0;
-        -webkit-transition-property: all;
-        -moz-transition-property: all;
-        -ms-transition-property: all;
-        -o-transition-property: all;
-        transition-property: all;
-        -webkit-transition-duration: 0.15s;
-        -moz-transition-duration: 0.15s;
-        -ms-transition-duration: 0.15s;
-        -o-transition-duration: 0.15s;
-        transition-duration: 0.15s;
-        -webkit-transition-timing-function: ease-out;
-        -moz-transition-timing-function: ease-out;
-        -ms-transition-timing-function: ease-out;
-        -o-transition-timing-function: ease-out;
-        transition-timing-function: ease-out;
-        -webkit-transition-delay: 0;
-        -moz-transition-delay: 0;
-        -ms-transition-delay: 0;
-        -o-transition-delay: 0;
-        transition-delay: 0;
-        border: 0;
-        border-left: 1px solid #e4d080;
-        color: #292309;
-        text-shadow: none;
-        font-weight: normal;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 14px;
-        padding-left: 38px;
-        margin: 0; }
-        div.wiki-wrapper section.wiki-body header ul li input[type="button"].view {
-          background: #f2e7bf url("/static/images/sequence-nav/view.png") no-repeat 12px 12px; }
-        div.wiki-wrapper section.wiki-body header ul li input[type="button"].history {
-          background: #f2e7bf url("/static/images/sequence-nav/history.png") no-repeat 12px 12px; }
-        div.wiki-wrapper section.wiki-body header ul li input[type="button"].edit {
-          background: #f2e7bf url("/static/images/sequence-nav/edit.png") no-repeat 12px 12px; }
-        div.wiki-wrapper section.wiki-body header ul li input[type="button"]:hover {
-          background-color: #F6EFD4; }
-  div.wiki-wrapper section.wiki-body h1.wiki-title {
-    font-weight: bold;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ccc; }
-  div.wiki-wrapper section.wiki-body p {
-    line-height: 1.6em; }
-  div.wiki-wrapper section.wiki-body ul.article-list {
-    margin-left: 15px; }
-    div.wiki-wrapper section.wiki-body ul.article-list li {
-      margin: 10px 0;
-      list-style-image: url("/static/images/bullet-triangle.png"); }
-      div.wiki-wrapper section.wiki-body ul.article-list li h3, div.wiki-wrapper section.wiki-body ul.article-list li div#wiki_panel input[type="button"], div#wiki_panel div.wiki-wrapper section.wiki-body ul.article-list li input[type="button"] {
-        font-size: 18px;
-        font-weight: normal; }
-  div.wiki-wrapper section.wiki-body #wiki_history_table tr.dark {
-    background-color: #dddddd; }
+  div.wiki-wrapper section.wiki-body {
+    position: relative; }
+    div.wiki-wrapper section.wiki-body header {
+      height: 46px;
+      -webkit-box-shadow: inset 0 1px 0 white;
+      -moz-box-shadow: inset 0 1px 0 white;
+      -ms-box-shadow: inset 0 1px 0 white;
+      -o-box-shadow: inset 0 1px 0 white;
+      box-shadow: inset 0 1px 0 white; }
+      div.wiki-wrapper section.wiki-body header:empty {
+        display: none !important;
+        border-bottom: 0; }
+      div.wiki-wrapper section.wiki-body header p {
+        float: left;
+        margin-bottom: 0;
+        color: #937b1f;
+        line-height: 46px;
+        padding-left: 22.652px; }
+      div.wiki-wrapper section.wiki-body header ul {
+        float: right;
+        list-style: none; }
+        div.wiki-wrapper section.wiki-body header ul li {
+          float: left; }
+          div.wiki-wrapper section.wiki-body header ul li input[type="button"] {
+            background-color: #f2e7bf;
+            background-position: 12px center;
+            background-repeat: no-repeat;
+            border: 0;
+            border-left: 1px solid #e4d080;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+            -ms-border-radius: 0;
+            -o-border-radius: 0;
+            border-radius: 0;
+            -webkit-box-shadow: inset 1px 0 0 #faf7e9;
+            -moz-box-shadow: inset 1px 0 0 #faf7e9;
+            -ms-box-shadow: inset 1px 0 0 #faf7e9;
+            -o-box-shadow: inset 1px 0 0 #faf7e9;
+            box-shadow: inset 1px 0 0 #faf7e9;
+            color: #292309;
+            display: block;
+            font-weight: normal;
+            font-size: 12px;
+            letter-spacing: 1px;
+            line-height: 46px;
+            margin: 0;
+            padding: 0 22.652px 0 38px;
+            text-shadow: none;
+            text-transform: uppercase;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: ease-out;
+            -moz-transition-timing-function: ease-out;
+            -ms-transition-timing-function: ease-out;
+            -o-transition-timing-function: ease-out;
+            transition-timing-function: ease-out;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0; }
+            div.wiki-wrapper section.wiki-body header ul li input[type="button"].view {
+              background-image: url("/static/images/sequence-nav/view.png"); }
+            div.wiki-wrapper section.wiki-body header ul li input[type="button"].history {
+              background-image: url("/static/images/sequence-nav/history.png"); }
+            div.wiki-wrapper section.wiki-body header ul li input[type="button"].edit {
+              background-image: url("/static/images/sequence-nav/edit.png"); }
+            div.wiki-wrapper section.wiki-body header ul li input[type="button"]:hover {
+              background-color: transparent; }
+    div.wiki-wrapper section.wiki-body h2.wiki-title {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+      -o-box-sizing: border-box;
+      box-sizing: border-box;
+      display: inline-block;
+      float: left;
+      margin-bottom: 15px;
+      margin-top: 0;
+      padding-right: 2.717%;
+      vertical-align: top;
+      width: 25.815%; }
+      @media screen and (max-width:900px) {
+        div.wiki-wrapper section.wiki-body h2.wiki-title {
+          display: block;
+          width: auto;
+          border-right: 0; } }
+      @media print {
+        div.wiki-wrapper section.wiki-body h2.wiki-title {
+          display: block;
+          width: auto;
+          border-right: 0; } }
+    div.wiki-wrapper section.wiki-body p {
+      line-height: 1.6em; }
+    div.wiki-wrapper section.wiki-body section.results {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+      -o-box-sizing: border-box;
+      box-sizing: border-box;
+      display: inline-block;
+      border-left: 1px dashed #ddd;
+      float: left;
+      padding-left: 10px;
+      width: 71.467%; }
+      @media screen and (max-width:900px) {
+        div.wiki-wrapper section.wiki-body section.results {
+          border: 0;
+          display: block;
+          padding-left: 0;
+          width: 100%;
+          width: auto; } }
+      @media print {
+        div.wiki-wrapper section.wiki-body section.results {
+          display: block;
+          width: auto;
+          padding: 0; }
+          div.wiki-wrapper section.wiki-body section.results canvas, div.wiki-wrapper section.wiki-body section.results img {
+            page-break-inside: avoid; } }
+      div.wiki-wrapper section.wiki-body section.results ul.article-list {
+        margin-left: 15px;
+        width: 100%; }
+        @media screen and (max-width:900px) {
+          div.wiki-wrapper section.wiki-body section.results ul.article-list {
+            margin-left: 0px; } }
+        div.wiki-wrapper section.wiki-body section.results ul.article-list li {
+          list-style: none;
+          margin: 0;
+          padding: 10px 0;
+          border-bottom: 1px solid #eee; }
+          div.wiki-wrapper section.wiki-body section.results ul.article-list li:last-child {
+            border-bottom: 0; }
+          div.wiki-wrapper section.wiki-body section.results ul.article-list li h3, div.wiki-wrapper section.wiki-body section.results ul.article-list li div#wiki_panel input[type="button"], div#wiki_panel div.wiki-wrapper section.wiki-body section.results ul.article-list li input[type="button"] {
+            font-size: 18px;
+            font-weight: normal; }
+
+table.wiki-history thead {
+  background: #ddd; }
+  table.wiki-history thead tr {
+    height: 40px; }
+    table.wiki-history thead tr th {
+      padding-top: 10px;
+      padding-left: 15px; }
+      table.wiki-history thead tr th#revision {
+        width: 5%; }
+      table.wiki-history thead tr th#comment {
+        width: 15%; }
+      table.wiki-history thead tr th#diff {
+        width: 60%; }
+      table.wiki-history thead tr th#modified {
+        width: 20%; }
+table.wiki-history tbody tr td {
+  padding: 8px 15px; }
+table.wiki-history tr.dark {
+  background-color: #efefef; }
+
+div.history-controls {
+  margin-top: 20px; }
 
 section.help.main-content {
   padding: 22.652px; }
@@ -3869,73 +3969,6 @@ body.anon #searchbar {
   margin-left: 5px;
   font-weight: normal;
   cursor: help; }
-
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  textarea {
-    padding-left: 3px !important; } }
-.facebook-share.icon, .twitter-share.icon, .linkedin-share.icon, .identica-share.icon {
-  background: url(../images/socialsprite.png) no-repeat;
-  display: block;
-  text-indent: -100em;
-  height: 25px;
-  width: 25px;
-  margin-bottom: 3px; }
-
-.facebook-share.icon:hover, .twitter-share.icon:hover, .linkedin-share.icon:hover, .identica-share.icon:hover {
-  opacity: 0.8;
-  filter: alpha(opacity=80); }
-
-.facebook-share.icon {
-  background-position: -26px 0px; }
-
-.identica-share.icon {
-  background-position: -78px 0px; }
-
-.twitter-share.icon {
-  margin-top: 10px;
-  background-position: 0px 0px; }
-
-.linkedin-share.icon {
-  background-position: -52px 0px; }
-
-.openid-signin, .meta, .users-page, .user-profile-edit-page {
-  font-size: 13px;
-  line-height: 1.3;
-  color: #525252; }
-
-.openid-signin p, .meta p, .users-page p, .user-profile-edit-page p {
-  font-size: 13px;
-  color: #707070;
-  line-height: 1.3;
-  font-family: arial;
-  color: #525252;
-  margin-bottom: 12px; }
-
-.openid-signin h2, .meta h2, .users-page h2, .user-profile-edit-page h2 {
-  color: #525252;
-  padding-left: 0px;
-  font-size: 16px; }
-
-.openid-signin form, .meta form, .users-page form, .user-profile-edit-page form, .user-profile-page form {
-  margin-bottom: 15px; }
-
-.openid-signin input[type="text"], .meta input[type="text"], .users-page input[type="text"], .user-profile-edit-page input[type="text"], .user-profile-page input[type="text"], .openid-signin input[type="password"], .meta input[type="password"], .users-page input[type="password"], .user-profile-edit-page input[type="password"], .user-profile-page input[type="password"], .openid-signin select, .meta select, .users-page select, .user-profile-edit-page select, .user-profile-page select {
-  border: #cce6ec 3px solid;
-  height: 25px;
-  padding-left: 5px;
-  width: 395px;
-  font-size: 14px; }
-
-.openid-signin select, .meta select, .users-page select, .user-profile-edit-page select, .user-profile-page select {
-  width: 405px;
-  height: 30px; }
-
-.openid-signin textarea, .meta textarea, .users-page textarea, .user-profile-edit-page textarea, .user-profile-page textarea {
-  border: #cce6ec 3px solid;
-  padding-left: 5px;
-  padding-top: 5px;
-  width: 395px;
-  font-size: 14px; }
 
 .openid-signin .cancel, .meta .cancel, .users-page .cancel, .user-profile-edit-page .cancel, .user-profile-page .cancel {
   background: url(../images/small-button-cancel.png) repeat-x top !important;
@@ -4354,15 +4387,6 @@ label.retag-error {
 .hilite3 {
   background-color: #0ff; }
 
-.gold, .badge1 {
-  color: #ffcc00; }
-
-.silver, .badge2 {
-  color: #cccccc; }
-
-.bronze, .badge3 {
-  color: #cc9933; }
-
 .score {
   font-weight: 800;
   color: #333; }
@@ -4646,7 +4670,7 @@ pre.prettyprint {
   padding: 3px;
   border: 0px solid #888; }
 
-.light-button, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, div.paginator span.next, div.paginator span.prev, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a, a.light-button, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a {
+.light-button, div.history-controls input[type="submit"], body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, div.paginator span.next, div.paginator span.prev, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a, a.light-button, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a {
   -webkit-box-shadow: inset 0 1px 0 white;
   -moz-box-shadow: inset 0 1px 0 white;
   -ms-box-shadow: inset 0 1px 0 white;
@@ -4671,7 +4695,7 @@ pre.prettyprint {
   text-decoration: none;
   cursor: pointer;
   -webkit-font-smoothing: antialiased; }
-  .light-button:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, div.paginator span.next:hover, div.paginator span.prev:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, .light-button:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, div.paginator span.next:focus, div.paginator span.prev:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus, a.light-button:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, a.light-button:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus {
+  .light-button:hover, div.history-controls input[type="submit"]:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, div.paginator span.next:hover, div.paginator span.prev:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, .light-button:focus, div.history-controls input[type="submit"]:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, div.paginator span.next:focus, div.paginator span.prev:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus, a.light-button:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, a.light-button:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus {
     background-color: white;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #e6e6e6));
     background-image: -webkit-linear-gradient(top, white, #e6e6e6);
@@ -4695,6 +4719,7 @@ body.askbot section.main-content div.discussion-wrapper div.discussion-content {
   -o-box-sizing: border-box;
   box-sizing: border-box;
   display: table-cell;
+  min-width: 650px;
   padding: 22.652px;
   vertical-align: top;
   width: 76.518%; }
@@ -4769,6 +4794,8 @@ div.discussion-wrapper aside {
   box-shadow: inset 1px 0 0 #f6f6f6;
   padding: 22.652px;
   width: 23.482%; }
+  div.discussion-wrapper aside.main-sidebar {
+    min-width: 200px; }
   div.discussion-wrapper aside h1 {
     margin: -22.652px -22.652px 0;
     padding: 11.326px 22.652px; }
@@ -4779,8 +4806,11 @@ div.discussion-wrapper aside {
   div.discussion-wrapper aside h3, div.discussion-wrapper aside div#wiki_panel input[type="button"], div#wiki_panel div.discussion-wrapper aside input[type="button"] {
     border-bottom: 0;
     box-shadow: none; }
-  div.discussion-wrapper aside input[type="text"] {
-    width: 76%; }
+  div.discussion-wrapper aside div.inputs input[type="submit"] {
+    width: 27%;
+    float: right; }
+  div.discussion-wrapper aside div.inputs input[type="text"] {
+    width: 62%; }
   div.discussion-wrapper aside div.box {
     display: block;
     margin: 11.326px 0; }
@@ -5060,7 +5090,7 @@ div.question-list-header {
     div.question-list-header section.question-list-meta div.question-sort {
       float: right;
       margin-left: 2.024%;
-      margin-top: 10px; }
+      margin-top: 6px; }
       div.question-list-header section.question-list-meta div.question-sort nav {
         float: right; }
         div.question-list-header section.question-list-meta div.question-sort nav a.on span {
@@ -5118,9 +5148,12 @@ ul.question-list, div#question-list {
           font-weight: bold;
           margin: 0px 0 15px 0;
           text-transform: none; }
+        ul.question-list li.single-question div.question-body p.excerpt, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body p.excerpt, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body p.excerpt, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body p.excerpt, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body p.excerpt, div#question-list li.single-question div.question-body p.excerpt, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body p.excerpt, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body p.excerpt, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body p.excerpt, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body p.excerpt {
+          color: #777; }
         ul.question-list li.single-question div.question-body div.user-info, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body div.user-info, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info, div#question-list li.single-question div.question-body div.user-info, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body div.user-info, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body div.user-info, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body div.user-info {
           display: inline-block;
-          vertical-align: top; }
+          vertical-align: top;
+          margin-bottom: 10px; }
           ul.question-list li.single-question div.question-body div.user-info span.relative-time, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info span.relative-time, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info span.relative-time, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body div.user-info span.relative-time, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info span.relative-time, div#question-list li.single-question div.question-body div.user-info span.relative-time, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info span.relative-time, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body div.user-info span.relative-time, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body div.user-info span.relative-time, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body div.user-info span.relative-time {
             font-weight: normal; }
           ul.question-list li.single-question div.question-body div.user-info a, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info a, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info a, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body div.user-info a, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info a, div#question-list li.single-question div.question-body div.user-info a, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info a, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body div.user-info a, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body div.user-info a, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body div.user-info a {
@@ -5128,6 +5161,8 @@ ul.question-list, div#question-list {
         ul.question-list li.single-question div.question-body ul.tags, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body ul.tags, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body ul.tags, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body ul.tags, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body ul.tags, div#question-list li.single-question div.question-body ul.tags, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body ul.tags, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body ul.tags, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body ul.tags, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body ul.tags {
           display: inline-block; }
       ul.question-list li.single-question div.question-meta, div#question-list li.single-question div.question-meta {
+        float: right;
+        margin-top: 10px;
         width: 37.228%; }
         ul.question-list li.single-question div.question-meta ul, div#question-list li.single-question div.question-meta ul {
           text-align: right; }
@@ -5149,6 +5184,8 @@ ul.question-list, div#question-list {
             background-image: linear-gradient(top, white, #f5f5f5);
             margin-right: 10px;
             width: 60px; }
+            ul.question-list li.single-question div.question-meta ul li:last-child, div#question-list li.single-question div.question-meta ul li:last-child {
+              margin-right: 0px; }
             ul.question-list li.single-question div.question-meta ul li:hover span, ul.question-list li.single-question div.question-meta ul li:hover div, div#question-list li.single-question div.question-meta ul li:hover span, div#question-list li.single-question div.question-meta ul li:hover div {
               color: #555; }
             ul.question-list li.single-question div.question-meta ul li span, ul.question-list li.single-question div.question-meta ul li div, div#question-list li.single-question div.question-meta ul li span, div#question-list li.single-question div.question-meta ul li div {
@@ -5871,6 +5908,8 @@ body.user-profile-page ul.sub-info {
       padding-right: 0; }
     body.user-profile-page ul.sub-info > li.votes-badges {
       width: 20.109%; }
+      body.user-profile-page ul.sub-info > li.votes-badges p {
+        margin-top: 15px; }
     body.user-profile-page ul.sub-info > li.answer-list {
       width: 42.935%; }
     body.user-profile-page ul.sub-info > li.tags-list {
@@ -5939,3 +5978,51 @@ body.user-profile-page ul.sub-info {
         text-decoration: none; }
         body.user-profile-page ul.sub-info ul.badges a:hover {
           background-color: #cdcdcd; }
+
+div.badges-intro, div.badge-intro {
+  margin: 20px 0; }
+
+div.badge-intro .badge1, div.badge-intro .badge2, div.badge-intro .badge3 {
+  font-size: 20px; }
+
+ul.badge-list li.badge {
+  border-bottom: 1px solid #eee;
+  list-style: none;
+  padding: 10px 0; }
+  ul.badge-list li.badge:last-child {
+    border-bottom: 0; }
+  ul.badge-list li.badge div.check {
+    float: right;
+    min-width: 8.696%;
+    text-align: right; }
+    ul.badge-list li.badge div.check span {
+      font-size: 19px;
+      padding-right: 5px;
+      color: green; }
+  ul.badge-list li.badge div.badge-name {
+    float: left;
+    width: 31.522%; }
+    ul.badge-list li.badge div.badge-name span {
+      font-size: 20px; }
+  ul.badge-list li.badge p {
+    margin: 0;
+    float: left; }
+
+.gold, .badge1 {
+  color: #ffcc00; }
+
+.silver, .badge2 {
+  color: #cccccc; }
+
+.bronze, .badge3 {
+  color: #cc9933; }
+
+div.badge-desc > div {
+  margin-bottom: 20px; }
+  div.badge-desc > div span {
+    font-size: 18px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px; }
