@@ -85,3 +85,10 @@
   }
 }
 
+p.ie-warning {
+  display: block !important;
+  line-height: 1.3em;
+  background: yellow;
+  margin-bottom: lh();
+  padding: lh();
+}
