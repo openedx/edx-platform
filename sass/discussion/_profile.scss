@@ -29,6 +29,10 @@ body.user-profile-page {
       &.votes-badges {
         width: flex-grid(2,9);
 
+        p {
+          margin-top: 15px;
+        }
+
       }
 
       &.answer-list {
