@@ -9,14 +9,17 @@ from django.core.urlresolvers import reverse
 %>
 
 <%block name="wiki_page_title">
+<h2 class="wiki-title">
 %if wiki_search_query:
 Search results for ${wiki_search_query | h}
 %else:
 Displaying all articles
 %endif
+</h2>
 </%block>
 
 <%block name="wiki_body">
+<section class="results">
 <ul class="article-list">
 %for article in wiki_search_results:
 <% article_deleted = not article.current_revision.deleted == 0 %>
@@ -27,4 +30,5 @@ Displaying all articles
 No articles matching <b>${wiki_search_query if wiki_search_query is not UNDEFINED else ""} </b>!
 %endif
 </ul>
+</section>
 </%block>

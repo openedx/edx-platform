@@ -3,7 +3,10 @@ div.wiki-wrapper {
   width: 100%;
 
   section.wiki-body {
+    @extend .clearfix;
     @extend .content;
+    position: relative;
+
 
     header {
       @extend .topbar;
@@ -73,27 +76,70 @@ div.wiki-wrapper {
       }
     }
 
-    h1.wiki-title {
-      font-weight: bold;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #ccc;
-    }
+     h2.wiki-title {
+        margin-top: 0;
+        margin-bottom: 15px;
+        width: flex-grid(4, 9);
+        padding-right: flex-gutter(9);
+        border-right: 1px dashed #ddd;
+        @include box-sizing(border-box);
+        display: table-cell;
+        vertical-align: top;
+
+        @media screen and (max-width:1120px) {
+          display: block;
+          width: auto;
+          border-right: 0;
+        }
+
+        @media print {
+          display: block;
+          width: auto;
+          border-right: 0;
+        }
+      }
 
     p {
       line-height: 1.6em;
     }
 
-    ul.article-list {
-      margin-left: 15px;
+    section.results {
+      display: table-cell;
+      width: flex-grid(5, 9);
+      padding-left: flex-gutter(9);
 
-      li {
-        margin: 10px 0;
-      list-style-image: url('/static/images/bullet-triangle.png');
+      @media screen and (max-width:1120px) {
+        display: block;
+        width: auto;
+        padding: 0;
+      }
 
-        h3 {
-          font-size: 18px;
-          font-weight: normal;
+      @media print {
+        display: block;
+        width: auto;
+        padding: 0;
+
+        canvas, img {
+          page-break-inside: avoid;
+        }
+      }
+
+      ul.article-list {
+        margin-left: 15px;
+
+        li {
+          list-style: none;
+          margin: 0;
+          padding: 10px 0;
+          border-bottom: 1px solid #eee;
+
+          &:last-child {
+            border-bottom: 0;
+          }
+          h3 {
+            font-size: 18px;
+            font-weight: normal;
+          }
         }
       }
     }

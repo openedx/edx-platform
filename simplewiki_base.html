@@ -127,8 +127,8 @@
             <div style="display:none">
               <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
             </div>
-            <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 72%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
-            <input type="submit" id="wiki_search_input_submit" value=Go! style="width: 20%" />
+            <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 71%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
+            <input type="submit" id="wiki_search_input_submit" value="Go!" style="width: 20%" />
           </form>
         </li>
       </ul>
@@ -163,8 +163,7 @@
         </header>
         %endif
 
-      <h1 class="wiki-title"><%block name="wiki_page_title"/></h1>
-
+      <%block name="wiki_page_title"/>
       <%block name="wiki_body"/>
     </section>
   </div>
