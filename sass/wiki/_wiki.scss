@@ -24,7 +24,6 @@ div.wiki-wrapper {
         padding: lh(.75) lh();
         margin-bottom: 0;
         color: darken(#F6EFD4, 55%);
-        line-height: lh();
       }
 
       ul {
@@ -36,24 +35,23 @@ div.wiki-wrapper {
 
           input[type="button"] {
             @extend .block-link;
-            @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
-            @include border-radius(0);
-            @include transition();
+            background-color: darken(#F6EFD4, 5%);
+            background-position: 12px center;
+            background-repeat: no-repeat;
             border: 0;
             border-left: 1px solid darken(#f6efd4, 20%);
+            @include border-radius(0);
+            @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
             color: darken(#F6EFD4, 80%);
-            text-shadow: none;
             font-weight: normal;
-            // font-size: 12px;
-            // text-transform: uppercase;
+            font-size: 12px;
             letter-spacing: 1px;
-            // padding: 14.9px;
-            padding: lh(.60) lh();
-            padding-left: 38px;
+            line-height: 46px;
             margin: 0;
-            background-position: 12px center;
-            background-color: darken(#F6EFD4, 5%);
-            background-repeat: no-repeat;
+            padding: 0 lh() 0 38px;
+            text-shadow: none;
+            text-transform: uppercase;
+            @include transition();
 
             &.view {
               background-image: url('/static/images/sequence-nav/view.png');
