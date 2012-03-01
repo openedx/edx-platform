@@ -79,16 +79,16 @@ div.wiki-wrapper {
     }
 
      h2.wiki-title {
-        margin-top: 0;
-        margin-bottom: 15px;
-        width: flex-grid(4, 9);
-        padding-right: flex-gutter(9);
-        border-right: 1px dashed #ddd;
         @include box-sizing(border-box);
-        display: table-cell;
+        display: inline-block;
+        float: left;
+        margin-bottom: 15px;
+        margin-top: 0;
+        padding-right: flex-gutter(9);
         vertical-align: top;
+        width: flex-grid(2.5, 9);
 
-        @media screen and (max-width:1120px) {
+        @media screen and (max-width:900px) {
           display: block;
           width: auto;
           border-right: 0;
@@ -106,14 +106,19 @@ div.wiki-wrapper {
     }
 
     section.results {
-      display: table-cell;
-      width: flex-grid(5, 9);
-      padding-left: flex-gutter(9);
+      @include box-sizing(border-box);
+      display: inline-block;
+      border-left: 1px dashed #ddd;
+      float: left;
+      padding-left: 10px;
+      width: flex-grid(6.5, 9);
 
-      @media screen and (max-width:1120px) {
+      @media screen and (max-width:900px) {
+        border: 0;
         display: block;
+        padding-left: 0;
+        width: 100%;
         width: auto;
-        padding: 0;
       }
 
       @media print {
@@ -128,6 +133,11 @@ div.wiki-wrapper {
 
       ul.article-list {
         margin-left: 15px;
+        width: 100%;
+
+        @media screen and (max-width:900px) {
+          margin-left: 0px;
+        }
 
         li {
           list-style: none;
