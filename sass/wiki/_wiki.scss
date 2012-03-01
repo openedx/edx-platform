@@ -24,9 +24,10 @@ div.wiki-wrapper {
 
       p {
         float: left;
-        padding: lh(.75) lh();
         margin-bottom: 0;
         color: darken(#F6EFD4, 55%);
+        line-height: 46px;
+        padding-left: lh();
       }
 
       ul {
@@ -46,6 +47,7 @@ div.wiki-wrapper {
             @include border-radius(0);
             @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
             color: darken(#F6EFD4, 80%);
+            display: block;
             font-weight: normal;
             font-size: 12px;
             letter-spacing: 1px;
