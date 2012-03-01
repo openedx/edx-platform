@@ -128,6 +128,7 @@ nav.sequence-nav {
         margin: 4px 0 0 -5px;
         text-shadow: 0 -1px 0 #000;
         color: #fff;
+        line-height: lh();
 
         &:empty {
           background: none;
