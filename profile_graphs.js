@@ -61,7 +61,7 @@ $(function () {
         color: colors[${sectionIndex}].toString(),
       });
       ticks = ticks.concat( [ [${tickIndex}, "${section['totallabel']}"] ] );
-      detail_tooltips["${section['category']} Average"] = [ "${section['totalscore']['summary']}" ];
+      detail_tooltips["${section['category']} Total"] = [ "${section['totalscore']['summary']}" ];
       <% tickIndex += 1 + sectionSpacer %>
           
     %else: ##This is for sections like midterm or final, which have no smaller components

@@ -54,7 +54,7 @@ div.book-wrapper {
 
       a {
         @extend .block-link;
-        padding: 14px;
+        padding: 0 lh();
       }
 
       ul {

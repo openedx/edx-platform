@@ -76,6 +76,10 @@ div.profile-wrapper {
         padding: lh() 0;
         width: 100%;
 
+        &:last-child {
+          border-bottom: 0px;
+        }
+
         h2 {
           border-right: 1px dashed #ddd;
           @include box-sizing(border-box);

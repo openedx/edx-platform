@@ -9,7 +9,9 @@
 %>
 
 <%block name="wiki_page_title">
+<h1>
 ${ wiki_article.title }
+</h1>
 </%block>
 
 <%block name="wiki_body">
@@ -17,7 +19,7 @@ ${ wiki_article.title }
 <div style="display:none">
     <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
 </div>
-<table id="wiki_history_table">
+<table id="wiki_history_table" class="wiki-history">
     <thead>
         <tr>
             <th id="revision">Revision</th>
@@ -27,34 +29,34 @@ ${ wiki_article.title }
         </tr>
     </thead>
     <tbody>
-		<% loopCount = 0 %>
-        %for revision in wiki_history:
-			%if revision.deleted < 2 or show_delete_revision:
-				<% loopCount += 1 %>
-	            <tr style="border-top: 1px" class="${'dark ' if (loopCount % 2) == 0 else ''}${'deleted ' if (revision.deleted==2) else ''}" >
-	                <td width="15px">
-	                    <input  type="radio" name="revision" id="${revision.id}" value="${revision.id}"${"checked" if wiki_article.current_revision.id == revision.id else ""}/>
-	                    <label for="${revision.id}">
-	                        ${ revision }
-	                        %if revision.previous_revision:
-	                            %if not revision.counter == revision.previous_revision.counter + 1:
-	                                <br/>(based on ${revision.previous_revision})
-	                            %endif
-	                        %endif
-	                    </label>
-	                </td>
-	                <td>
-					${ revision.revision_text if revision.revision_text else "<i>None</i>" }</td>
-	                <td class="diff">
-					%for x in revision.get_diff():
-					${x|h}<br/>
-					%endfor </td>
-	                <td>${revision.get_user()}
-	                    <br/>
-						${revision.revision_date.strftime("%b %d, %Y, %I:%M %p")}
-	                </td>
-	            </tr>
-			%endif
+      <% loopCount = 0 %>
+      %for revision in wiki_history:
+      %if revision.deleted < 2 or show_delete_revision:
+      <% loopCount += 1 %>
+      <tr style="border-top: 1px" class="${'dark ' if (loopCount % 2) == 0 else ''}${'deleted ' if (revision.deleted==2) else ''}" >
+        <td width="15px">
+          <input  type="radio" name="revision" id="${revision.id}" value="${revision.id}"${"checked" if wiki_article.current_revision.id == revision.id else ""}/>
+          <label for="${revision.id}">
+            ${ revision }
+            %if revision.previous_revision:
+            %if not revision.counter == revision.previous_revision.counter + 1:
+            <br/>(based on ${revision.previous_revision})
+            %endif
+            %endif
+          </label>
+        </td>
+        <td>
+          ${ revision.revision_text if revision.revision_text else "<i>None</i>" }</td>
+        <td class="diff">
+          %for x in revision.get_diff():
+          ${x|h}<br/>
+          %endfor </td>
+        <td>${revision.get_user()}
+          <br/>
+          ${revision.revision_date.strftime("%b %d, %Y, %I:%M %p")}
+        </td>
+      </tr>
+      %endif
         %endfor
     </tbody>
     %if wiki_prev_page or wiki_next_page:
@@ -72,17 +74,18 @@ ${ wiki_article.title }
         </tfoot>
     %endif
 </table>
-<input type="submit" name="view" value="View revision"/>
-<input type="submit" name="change" value="Change to revision"
-%if not wiki_write:
-	disabled="true"
-%endif
-/>
-%if show_delete_revision:
-<input type="submit" name="delete" value="Admin Delete revision"/>
-<input type="submit" name="restore" value="Admin Restore revision"/>
-<input type="submit" name="delete_all" value="Admin Delete all revisions">
-<input type="submit" name="lock_article" value="${'Lock Article' if not wiki_article.locked else 'Unlock Article'}">
-%endif
+<div class="history-controls"><input type="submit" name="view" value="View revision"/>
+  <input type="submit" name="change" value="Change to revision"
+  %if not wiki_write:
+    disabled="true"
+  %endif
+  />
+  %if show_delete_revision:
+  <input type="submit" name="delete" value="Delete revision"/>
+  <input type="submit" name="restore" value="Restore revision"/>
+  <input type="submit" name="delete_all" value="Delete all revisions">
+  <input type="submit" name="lock_article" value="${'Lock Article' if not wiki_article.locked else 'Unlock Article'}">
+  %endif
+</div>
 </form>
 </%block>

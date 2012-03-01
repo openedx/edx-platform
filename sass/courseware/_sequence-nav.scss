@@ -24,9 +24,9 @@ nav.sequence-nav {
       }
 
       .visited {
-        background-color: shade(#F6EFD4, 10%);
+        background-color: #DCCDA2;
         background-repeat: no-repeat;
-        border-color: shade(#F6EFD4, 10%);
+        @include box-shadow(inset 0 0 3px darken(#dccda2, 10%));
 
         &:hover {
           background-color: #F6EFD4;
@@ -52,7 +52,7 @@ nav.sequence-nav {
         border: none;
         border-right: 1px solid darken(#F6EFD4, 10%);
         cursor: pointer;
-        padding: 14px 4px;
+        padding: 15px 4px 14px;
         width: 28px;
         height: 17px;
 
@@ -121,13 +121,14 @@ nav.sequence-nav {
       p {
         position: absolute;
         display: none;
-        background: #B3A87E;
+        background: #333;
         padding: 6px;
         white-space: pre-wrap;
         z-index: 99;
         margin: 4px 0 0 -5px;
-        text-shadow: 0 -1px 0 darken(#B3A87E, 10%);
+        text-shadow: 0 -1px 0 #000;
         color: #fff;
+        line-height: lh();
 
         &:empty {
           background: none;
@@ -138,7 +139,7 @@ nav.sequence-nav {
         }
 
         &::after {
-          background: #B3A87E;
+          background: #333;
           content: " ";
           display: block;
           height: 10px;
@@ -172,7 +173,7 @@ nav.sequence-nav {
         border-left: 1px solid darken(#f6efd4, 20%);
         cursor: pointer;
         display: table-cell;
-        padding: 14px 4px;
+        padding: 0 4px;
         text-indent: -9999px;
         width: 82px;
 

@@ -172,6 +172,8 @@ h1.top-header {
   font-size: 12px;
   margin: (-$body-line-height) (-$body-line-height) $body-line-height;
   text-shadow: 0 1px 0 #fff;
+  line-height: 46px;
+  height:46px;
 
   @media print {
     display: none;
@@ -190,7 +192,6 @@ h1.top-header {
       border-left: 1px solid darken(#f6efd4, 20%);
       @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
       display: block;
-      padding: lh(.75);
       text-transform: uppercase;
 
       &:hover {
@@ -202,4 +203,13 @@ h1.top-header {
 
 .tran {
   @include transition( all, .2s, $ease-in-out-quad);
+}
+
+p.ie-warning {
+  display: block !important;
+  line-height: 1.3em;
+  background: yellow;
+  padding: lh();
+  text-align: left;
+  margin-bottom: 0;
 }
