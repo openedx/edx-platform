@@ -172,6 +172,7 @@ h1.top-header {
   font-size: 12px;
   margin: (-$body-line-height) (-$body-line-height) $body-line-height;
   text-shadow: 0 1px 0 #fff;
+  height:46px;
 
   @media print {
     display: none;
