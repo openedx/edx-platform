@@ -165,6 +165,10 @@ section.course-content {
               li {
                 cursor: pointer;
                 @include inline-block();
+
+                &.active {
+                  font-weight: bold;
+                }
               }
             }
           }
