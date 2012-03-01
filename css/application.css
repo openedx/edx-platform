@@ -387,6 +387,14 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   -o-transition-delay: 0;
   transition-delay: 0; }
 
+p.ie-warning {
+  display: block !important;
+  line-height: 1.3em;
+  background: yellow;
+  padding: 22.652px;
+  text-align: left;
+  margin-bottom: 0; }
+
 :focus {
   outline-color: #ccc; }
 
@@ -708,8 +716,6 @@ div.leanModal_box h1 {
   text-align: left; }
 div.leanModal_box#enroll {
   max-width: 600px; }
-div.leanModal_box#enroll p.ie-warning {
-  display: none; }
 div.leanModal_box#enroll ol {
   padding-top: 22.652px; }
 div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
@@ -2774,9 +2780,13 @@ nav.sequence-nav ol li .inactive, nav.sequence-nav ol li a.seq_video_inactive, n
 nav.sequence-nav ol li .inactive:hover, nav.sequence-nav ol li a.seq_video_inactive:hover, nav.sequence-nav ol li a.seq_other_inactive:hover, nav.sequence-nav ol li a.seq_vertical_inactive:hover, nav.sequence-nav ol li a.seq_problem_inactive:hover {
   background-color: #f9f4e1; }
 nav.sequence-nav ol li .visited, nav.sequence-nav ol li a.seq_video_visited, nav.sequence-nav ol li a.seq_other_visited, nav.sequence-nav ol li a.seq_vertical_visited, nav.sequence-nav ol li a.seq_problem_visited {
-  background-color: #ddd7be;
+  background-color: #DCCDA2;
   background-repeat: no-repeat;
-  border-color: #ddd7be; }
+  -webkit-box-shadow: inset 0 0 3px #ceb97d;
+  -moz-box-shadow: inset 0 0 3px #ceb97d;
+  -ms-box-shadow: inset 0 0 3px #ceb97d;
+  -o-box-shadow: inset 0 0 3px #ceb97d;
+  box-shadow: inset 0 0 3px #ceb97d; }
 nav.sequence-nav ol li .visited:hover, nav.sequence-nav ol li a.seq_video_visited:hover, nav.sequence-nav ol li a.seq_other_visited:hover, nav.sequence-nav ol li a.seq_vertical_visited:hover, nav.sequence-nav ol li a.seq_problem_visited:hover {
   background-color: #F6EFD4;
   background-position: center center; }
@@ -2801,7 +2811,7 @@ nav.sequence-nav ol li a {
   border: none;
   border-right: 1px solid #eddfaa;
   cursor: pointer;
-  padding: 14px 4px;
+  padding: 15px 4px 14px;
   width: 28px;
   height: 17px; }
 nav.sequence-nav ol li a.seq_video_inactive {
@@ -3478,9 +3488,10 @@ div.wiki-wrapper section.wiki-body header:empty {
   border-bottom: 0; }
 div.wiki-wrapper section.wiki-body header p {
   float: left;
-  padding: 16.989px 22.652px;
   margin-bottom: 0;
-  color: #937b1f; }
+  color: #937b1f;
+  line-height: 46px;
+  padding-left: 22.652px; }
 div.wiki-wrapper section.wiki-body header ul {
   float: right;
   list-style: none; }
@@ -3503,6 +3514,7 @@ div.wiki-wrapper section.wiki-body header ul li input[type="button"] {
   -o-box-shadow: inset 1px 0 0 #faf7e9;
   box-shadow: inset 1px 0 0 #faf7e9;
   color: #292309;
+  display: block;
   font-weight: normal;
   font-size: 12px;
   letter-spacing: 1px;

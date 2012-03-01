@@ -211,6 +211,13 @@ input, select {
   font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
   font-style: italic; }
 
+p.ie-warning {
+  display: block !important;
+  line-height: 1.3em;
+  background: yellow;
+  margin-bottom: 25.888px;
+  padding: 25.888px; }
+
 body {
   background-color: #fff;
   color: #444;
@@ -786,8 +793,6 @@ div.leanModal_box h1 {
   text-align: left; }
 div.leanModal_box#enroll {
   max-width: 600px; }
-div.leanModal_box#enroll p.ie-warning {
-  display: none; }
 div.leanModal_box#enroll ol {
   padding-top: 25.888px; }
 div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
