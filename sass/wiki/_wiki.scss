@@ -12,6 +12,7 @@ div.wiki-wrapper {
 
       &:empty {
         display: none !important;
+        border-bottom: 0;
       }
 
       a {
