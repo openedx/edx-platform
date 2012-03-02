@@ -174,6 +174,7 @@ execfile(os.path.join(BASE_DIR, "settings.py"))
 pid = os.getpid()
 hostname = platform.node().split(".")[0]
 SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
+LOGGING_FILENAME = 'trackinglog-' + str(pid)
 
 handlers = ['console']
 if not DEBUG:
@@ -213,6 +214,11 @@ LOGGING = {
             'address' : SYSLOG_ADDRESS,
             'formatter' : 'syslog_format',
         },
+        'filelogger' : {
+            'level' : 'INFO',
+            'class' : 'logging.FileHandler',
+            'filename' : LOGGING_FILENAME,
+        },
         'mail_admins' : {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
@@ -225,7 +231,7 @@ LOGGING = {
             'level' : 'INFO'
         },
         'tracking' : {
-            'handlers' : [] if DEBUG else ['syslogger'], # handlers,
+            'handlers' : [] if DEBUG else ['filelogger'], # handlers,
             'level' : 'DEBUG',
             'propagate' : False,
         },
@@ -241,8 +247,6 @@ LOGGING = {
         },
     }
 }
-
-
 
 if PERFSTATS :
     MIDDLEWARE_CLASSES = ( 'perfstats.middleware.ProfileMiddleware',) + MIDDLEWARE_CLASSES
