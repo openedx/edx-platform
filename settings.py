@@ -105,14 +105,22 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'util.middleware.ExceptionLoggingMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    # Uncommenting the following will prevent csrf token from being re-set if you
+    # delete it on the browser. I don't know why.
+    #'django.middleware.cache.FetchFromCacheMiddleware',
+
 )
 
 ROOT_URLCONF = 'mitx.urls'
@@ -152,6 +160,8 @@ MAKO_MODULE_DIR = None
 
 MAKO_TEMPLATES = {}
 
+LOGGING_ENV = "dev" # override this in different environments
+
 # Make sure we execute correctly regardless of where we're called from
 execfile(os.path.join(BASE_DIR, "settings.py"))
 
@@ -177,7 +187,8 @@ LOGGING = {
             'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
         },
         'syslog_format' : {
-            'format' : '[%(name)s] %(levelname)s [' + hostname + ' %(process)d] [%(filename)s:%(lineno)d] - %(message)s',
+            'format' : '[%(name)s][env:' + LOGGING_ENV + '] %(levelname)s [' + \
+                        hostname + ' %(process)d] [%(filename)s:%(lineno)d] - %(message)s',
         },
         'raw' : {
             'format' : '%(message)s',
@@ -283,7 +294,6 @@ site.addsitedir(os.path.join(os.path.dirname(askbot.__file__), 'deps'))
 TEMPLATE_LOADERS = TEMPLATE_LOADERS + ('askbot.skins.loaders.filesystem_load_template_source',)
 
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
-    'util.middleware.ExceptionLoggingMiddleware',
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
     'askbot.middleware.forum_mode.ForumModeMiddleware',
     'askbot.middleware.cancel.CancelActionMiddleware',
@@ -291,7 +301,7 @@ MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'askbot.middleware.view_log.ViewLogMiddleware',
     'askbot.middleware.spaceless.SpacelessMiddleware',
-   # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+    #'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
 )
 
 FILE_UPLOAD_TEMP_DIR = os.path.join(os.path.dirname(__file__), 'tmp').replace('\\','/')
@@ -520,21 +530,21 @@ LIVESETTINGS_OPTIONS = {
             'MIN_REP' : {
                 'MIN_REP_TO_ACCEPT_OWN_ANSWER' : 1,
                 'MIN_REP_TO_ANSWER_OWN_QUESTION' : 1,
-                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 100,
+                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 250,
                 'MIN_REP_TO_CLOSE_OWN_QUESTIONS' : 1,
                 'MIN_REP_TO_DELETE_OTHERS_COMMENTS' : 2000,
                 'MIN_REP_TO_DELETE_OTHERS_POSTS' : 5000,
                 'MIN_REP_TO_EDIT_OTHERS_POSTS' : 2000,
-                'MIN_REP_TO_EDIT_WIKI' : 1,
+                'MIN_REP_TO_EDIT_WIKI' : 50,
                 'MIN_REP_TO_FLAG_OFFENSIVE' : 1,
                 'MIN_REP_TO_HAVE_STRONG_URL' : 250,
                 'MIN_REP_TO_LEAVE_COMMENTS' : 1,
                 'MIN_REP_TO_LOCK_POSTS' : 4000,
                 'MIN_REP_TO_REOPEN_OWN_QUESTIONS' : 1,
-                'MIN_REP_TO_RETAG_OTHERS_QUESTIONS' : 1,
+                'MIN_REP_TO_RETAG_OTHERS_QUESTIONS' : 100,
                 'MIN_REP_TO_UPLOAD_FILES' : 1,
                 'MIN_REP_TO_VIEW_OFFENSIVE_FLAGS' : 2000,
-                'MIN_REP_TO_VOTE_DOWN' : 1,
+                'MIN_REP_TO_VOTE_DOWN' : 15,
                 'MIN_REP_TO_VOTE_UP' : 1,
             },
             'QA_SITE_SETTINGS' : {
