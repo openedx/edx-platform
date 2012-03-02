@@ -107,6 +107,12 @@ def profile(request):
 
                     # total=courseware.modules.capa_module.Module(etree.tostring(p), "id").max_score() # TODO: Add state. Not useful now, but maybe someday problems will have randomized max scores? 
                     # print correct, total
+                    if settings.GENERATE_PROFILE_SCORES:
+                        if total > 1:
+                            correct = random.randrange( max(total-2, 1) , total + 1 )
+                        else:
+                            correct = total
+                    
                     scores.append((int(correct),total, graded ))
 
 
@@ -159,16 +165,16 @@ def profile(request):
     for i in range(12):
         if i < len(homework_scores):
             percentage = homework_scores[i][0] / float(homework_scores[i][1])
-            summary = "{0:.0%} ({1}/{2})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
+            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
         else:
             percentage = 0
             summary = "0% (?/?)"
         
-        if settings.GENERATE_PROFILE_SCORES:
-            points_possible = random.randrange(10, 50)
-            points_earned = random.randrange(5, points_possible)
-            percentage = points_earned / float(points_possible)
-            summary = "{0:.0%} ({1}/{2})".format( percentage, points_earned, points_possible )
+            if settings.GENERATE_PROFILE_SCORES:
+                points_possible = random.randrange(10, 50)
+                points_earned = random.randrange(5, points_possible)
+                percentage = points_earned / float(points_possible)
+                summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
         
         summary = "Homework {0} - {1}".format(i + 1, summary)
         label = "HW {0:02d}".format(i + 1)
@@ -179,19 +185,20 @@ def profile(request):
     #Figure the lab scores
     lab_scores = total_scores['Lab'] if 'Lab' in total_scores else []
     lab_percentages = []
+    log.debug("lab_scores: {0}".format(lab_scores))
     for i in range(12):
         if i < len(lab_scores):
             percentage = lab_scores[i][0] / float(lab_scores[i][1])
-            summary = "{0:.0%} ({1}/{2})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
+            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
         else:
             percentage = 0
             summary = "0% (?/?)"
         
-        if settings.GENERATE_PROFILE_SCORES:
-            points_possible = random.randrange(10, 50)
-            points_earned = random.randrange(5, points_possible)
-            percentage = points_earned / float(points_possible)
-            summary = "{0:.0%} ({1}/{2})".format( percentage, points_earned, points_possible )
+            if settings.GENERATE_PROFILE_SCORES:
+                points_possible = random.randrange(10, 50)
+                points_earned = random.randrange(5, points_possible)
+                percentage = points_earned / float(points_possible)
+                summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
             
         summary = "Lab {0} - {1}".format(i + 1, summary)
         label = "Lab {0:02d}".format(i + 1)
@@ -247,7 +254,7 @@ def profile(request):
     ]
     
     
-    user_info=UserProfile.objects.get(user=request.user)
+    user_info = request.user.profile_cache # UserProfile.objects.get(user=request.user)
     context={'name':user_info.name,
              'username':request.user.username,
              'location':user_info.location,
@@ -267,7 +274,9 @@ def format_url_params(params):
 def render_accordion(request,course,chapter,section):
     ''' Draws navigation bar. Takes current position in accordion as
         parameter. Returns (initialization_javascript, content)'''
-
+    if not course:
+        course = "6.002 Spring 2012"
+    
     toc=content_parser.toc_from_xml(content_parser.course_file(request.user), chapter, section)
     active_chapter=1
     for i in range(len(toc)):
