@@ -650,7 +650,7 @@ ot = MAKO_TEMPLATES
 MAKO_TEMPLATES['course'] = [DATA_DIR]
 MAKO_TEMPLATES['sections'] = [DATA_DIR+'/sections']
 MAKO_TEMPLATES['custom_tags'] = [DATA_DIR+'/custom_tags']
-MAKO_TEMPLATES['main'] = [BASE_DIR+'/templates/']
+MAKO_TEMPLATES['main'] = [BASE_DIR+'/templates/', DATA_DIR+'/info']
 
 
 MAKO_TEMPLATES.update(ot)
