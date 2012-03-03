@@ -146,11 +146,11 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
 def user_groups(user):
     # TODO: Rewrite in Django
     key = 'user_group_names_{user.id}'.format(user=user)
-    cache_expiration = 60 * 60 * 4 # four hours
-    group_names = cache.get(key)
+    cache_expiration = 60 * 60 # one hour
+    group_names = cache.get(fasthash(key))
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
-        cache.set(key, group_names, cache_expiration)
+        cache.set(fasthash(key), group_names, cache_expiration)
 
     return group_names
 
@@ -176,12 +176,12 @@ def course_file(user):
 
     
     cache_key = filename + "_processed?dev_content:" + str(options['dev_content']) + "&groups:" + str(sorted(groups))
-    tree_string = cache.get(cache_key)
+    tree_string = cache.get(fasthash(cache_key))
     if not tree_string:
         tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
         tree_string = etree.tostring(tree)
         
-        cache.set(cache_key, tree_string, 60)
+        cache.set(fasthash(cache_key), tree_string, 60)
     else:
         tree = etree.XML(tree_string)
 
