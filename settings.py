@@ -174,7 +174,7 @@ execfile(os.path.join(BASE_DIR, "settings.py"))
 pid = os.getpid()
 hostname = platform.node().split(".")[0]
 SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
-TRACKING_LOG_FILE = LOG_DIR + "/tracking.log"
+TRACKING_LOG_FILE = LOG_DIR + "/tracking_{0}.log".format(pid)
 
 handlers = ['console']
 if not DEBUG:
