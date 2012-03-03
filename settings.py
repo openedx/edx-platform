@@ -174,6 +174,7 @@ execfile(os.path.join(BASE_DIR, "settings.py"))
 pid = os.getpid()
 hostname = platform.node().split(".")[0]
 SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
+TRACKING_LOG_FILE = LOG_DIR + "/tracking.log"
 
 handlers = ['console']
 if not DEBUG:
@@ -213,6 +214,12 @@ LOGGING = {
             'address' : SYSLOG_ADDRESS,
             'formatter' : 'syslog_format',
         },
+        'tracking' : {
+            'level' : 'DEBUG',
+            'class' : 'logging.handlers.WatchedFileHandler',
+            'filename' : TRACKING_LOG_FILE,
+            'formatter' : 'raw',
+        },
         'mail_admins' : {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
@@ -225,7 +232,7 @@ LOGGING = {
             'level' : 'INFO'
         },
         'tracking' : {
-            'handlers' : [] if DEBUG else ['syslogger'], # handlers,
+            'handlers' : ['tracking'],
             'level' : 'DEBUG',
             'propagate' : False,
         },
