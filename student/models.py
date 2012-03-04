@@ -13,7 +13,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
-from cache_toolbox import cache_model, cache_relation
+#from cache_toolbox import cache_model, cache_relation
 
 class UserProfile(models.Model):
     class Meta:
