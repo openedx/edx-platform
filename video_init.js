@@ -5,7 +5,7 @@ var atts = { id: "myytplayer" };
 // If the user doesn't have flash, use the HTML5 Video instead. YouTube's
 // iFrame API which supports HTML5 is still developmental so it is not default
 if (swfobject.hasFlashPlayerVersion("10.1")){
-  swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer?wmode=transparent",
+  swfobject.embedSWF(document.location.protocol +  "//www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer?wmode=transparent",
         "ytapiplayer", "640", "385", "8", null, null, params, atts);
 } else {
 
@@ -14,7 +14,7 @@ if (swfobject.hasFlashPlayerVersion("10.1")){
   $("#html5_player").show();
 
   var tag = document.createElement('script');
-  tag.src = "http://www.youtube.com/player_api";
+  tag.src = document.location.protocol +  "//www.youtube.com/player_api";
   var firstScriptTag = document.getElementsByTagName('script')[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   // Make sure the callback is called once API ready, YT seems to be buggy
