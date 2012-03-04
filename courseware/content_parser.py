@@ -169,7 +169,11 @@ def course_xml_process(tree):
 
 def course_file(user):
     ''' Given a user, return course.xml'''
-    filename = user.profile_cache.courseware # UserProfile.objects.get(user=user).courseware
+    #import logging
+    #log = logging.getLogger("tracking")
+    #log.info(  "DEBUG: cf:"+str(user) )
+
+    filename = UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
     groups = user_groups(user)
     options = {'dev_content':settings.DEV_CONTENT, 
                'groups' : groups}

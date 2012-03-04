@@ -92,6 +92,10 @@ def cache_relation(descriptor, timeout=None):
         except AttributeError:
             pass
 
+#        import logging
+#        log = logging.getLogger("tracking")
+#        log.info( "DEBUG: "+str(str(rel.model)+"/"+str(self.pk) ))
+
         instance = get_instance(rel.model, self.pk, timeout)
 
         setattr(self, '_%s_cache' % related_name, instance)

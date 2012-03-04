@@ -254,7 +254,7 @@ def profile(request):
     ]
     
     
-    user_info = request.user.profile_cache # UserProfile.objects.get(user=request.user)
+    user_info = UserProfile.objects.get(user=request.user) # request.user.profile_cache # 
     context={'name':user_info.name,
              'username':request.user.username,
              'location':user_info.location,
@@ -344,6 +344,10 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     # Without this, URLs break
     if course!="6.002 Spring 2012":
         return redirect('/')
+
+    #import logging
+    #log = logging.getLogger("mitx")
+    #log.info(  "DEBUG: "+str(user) )
 
     dom = content_parser.course_file(user)
     dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 

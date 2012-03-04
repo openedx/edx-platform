@@ -56,4 +56,4 @@ class Registration(models.Model):
         self.user.save()
         #self.delete()
 
-cache_relation(User.profile)
+#cache_relation(User.profile)
