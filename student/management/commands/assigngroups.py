@@ -65,6 +65,8 @@ Will log what happened to file.txt.
 
         group_objects = {}
 
+        f = open(args[1],"a+")
+
         ## Create groups
         for group in dict(groups):
             utg = UserTestGroup()
@@ -76,11 +78,22 @@ Will log what happened to file.txt.
 
         ## Assign groups
         users = list(User.objects.all())
+        count = 0
         for user in users:
+            if count % 1000 == 0:
+                print count
+            count = count + 1
             v = random.uniform(0,1)
             group = group_from_value(groups,v)
             group_objects[group].users.add(user)
+            f.write("Assigned user {name} ({id}) to {group}\n".format(name=user.username, 
+                                                                      id=user.id, 
+                                                                      group=group))
 
         ## Save groups
         for group in group_objects:
             group_objects[group].save()
+        f.close()
+
+# python manage.py assigngroups summary_test:0.3,skip_summary_test:0.7 log.txt "Do previews of future materials help?"
+# python manage.py assigngroups skip_capacitor:0.3,capacitor:0.7 log.txt "Do we show capacitor in linearity tutorial?"
