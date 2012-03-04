@@ -47,6 +47,9 @@ def make_track_function(request):
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
+    if not request.user.is_authenticated():
+        return redirect('/')
+
     # Grab the student information for the module from the database
     s = StudentModule.objects.filter(student=request.user, 
                                      module_id=id)
