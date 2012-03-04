@@ -48,9 +48,9 @@ def make_track_function(request):
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
     # Grab the student information for the module from the database
-    #s = StudentModule.objects.filter(student=request.user, 
-    #                                 module_id=id)
-    s = StudentModule.get_with_caching(request.user, id)
+    s = StudentModule.objects.filter(student=request.user, 
+                                     module_id=id)
+    #s = StudentModule.get_with_caching(request.user, id)
     if s is None:
         log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
         raise Http404
