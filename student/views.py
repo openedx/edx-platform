@@ -86,7 +86,7 @@ def logout_user(request):
 def change_setting(request):
     if not request.user.is_authenticated():
         return redirect('/')
-    up = request.user.profile_cache # UserProfile.objects.get(user=request.user)
+    up = UserProfile.objects.get(user=request.user) #request.user.profile_cache
     if 'location' in request.POST:
 #        print "loc"
         up.location=request.POST['location']
