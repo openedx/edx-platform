@@ -9,15 +9,18 @@ $(function () {
       display: 'none',
       top: y + 5,
       left: x + 5,
-      border: '1px solid #fdd',
-      padding: '2px',
-      'background-color': '#fee',
+      border: '1px solid #000',
+      padding: '4px 6px',
+      color: '#fff',
+      'background-color': '#333',
       opacity: 0.90
     }).appendTo("body").fadeIn(200);
   }
       
   /* -------------------------------- Grade detail bars -------------------------------- */
-  var colors = [$.color.parse("#E8B800"), $.color.parse("#A0CEFA"), $.color.parse("#BD3738"), $.color.parse("#429A2E")];
+  var colors = [ $.color.parse("#b72121"), $.color.parse("#600101"), $.color.parse("#666666"), $.color.parse("#333333")];
+  // var colors = [ $.color.parse("#2e80ce"), $.color.parse("#14518b"), $.color.parse("#599535"), $.color.parse("#3d731c")];
+  // var colors = [ $.color.parse("#3f80be"), $.color.parse("#128251"), $.color.parse("#e1b900"), $.color.parse("#d10404")];
   //var colors = [$.color.parse("#1B2045"), $.color.parse("#557a00"), $.color.parse("#F5600"), $.color.parse("#FEBA2C")];
   //var colors = [$.color.parse("#E7C856"), $.color.parse("#CD462E"), $.color.parse("#B01732"), $.color.parse("#41192A")];
   //var colors = [$.color.parse("#434F5E"), $.color.parse("#BEF731"), $.color.parse("#FB5455"), $.color.parse("#44C4B7")];
@@ -58,7 +61,7 @@ $(function () {
         color: colors[${sectionIndex}].toString(),
       });
       ticks = ticks.concat( [ [${tickIndex}, "${section['totallabel']}"] ] );
-      detail_tooltips["${section['category']} Average"] = [ "${section['totalscore']['summary']}" ];
+      detail_tooltips["${section['category']} Total"] = [ "${section['totalscore']['summary']}" ];
       <% tickIndex += 1 + sectionSpacer %>
           
     %else: ##This is for sections like midterm or final, which have no smaller components
@@ -76,7 +79,7 @@ $(function () {
   %endfor
       
   //Alwasy be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
-  series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "red"} );
+  series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
       
       
   /* ----------------------------- Grade overviewew bar -------------------------*/
@@ -113,12 +116,12 @@ $(function () {
   var options = {
     series: {stack: true,
               lines: {show: false, steps: false },
-              bars: {show: true, barWidth: 0.6, align: 'center', lineWidth: 1},},
+              bars: {show: true, barWidth: 0.8, align: 'center', lineWidth: 0, fill: .8 },},
     xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 90},
     yaxis: {ticks: [[1, "100%"], [0.87, "A 87%"], [0.7, "B 70%"], [0.6, "C 60%"], [0, "0%"]], min: 0.0, max: 1.0, labelWidth: 50},
     grid: { hoverable: true, clickable: true, borderWidth: 1,
-      markings: [ {yaxis: {from: 0.87, to: 1 }, color: "#EBFFD5"}, {yaxis: {from: 0.7, to: 0.87 }, color: "#E6FFFF"}, 
-                  {yaxis: {from: 0.6, to: 0.7 }, color: "#FFF2E3"}, ] },
+      markings: [ {yaxis: {from: 0.87, to: 1 }, color: "#ddd"}, {yaxis: {from: 0.7, to: 0.87 }, color: "#e9e9e9"}, 
+                  {yaxis: {from: 0.6, to: 0.7 }, color: "#f3f3f3"}, ] },
     legend: {show: false},
   };
   

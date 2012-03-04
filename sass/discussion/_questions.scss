@@ -1,9 +1,17 @@
 div.question-list-header {
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 0px;
   overflow: hidden;
   width: flex-grid(9,9);
   @extend h1.top-header;
+
+  h1 {
+    margin: 0;
+
+    > a.light-button {
+      float: right;
+    }
+  }
 
   section.question-list-meta  {
     display: block;
@@ -34,7 +42,7 @@ div.question-list-header {
     div.question-sort {
       float: right;
       margin-left: flex-gutter();
-      margin-top: 10px;
+      margin-top: 6px;
 
       nav {
         @extend .action-link;
@@ -79,11 +87,13 @@ div.question-list-header {
 
     }
 
-    ul.tags li {
-      background: #fff;
+    ul.tags {
+      li {
+        background: #fff;
 
-      &:before {
-        border-color: transparent #fff transparent transparent;
+        &:before {
+          border-color: transparent #fff transparent transparent;
+        }
       }
     }
   }
@@ -103,10 +113,10 @@ ul.question-list, div#question-list {
       background: #F3F3F3;
 
       ul.tags li {
-        background: #fff;
+        background: #ddd;
 
         &:before {
-          border-color: transparent #fff transparent transparent;
+          border-color: transparent #ddd transparent transparent;
         }
       }
     }
@@ -121,7 +131,6 @@ ul.question-list, div#question-list {
       &.question-body {
         @include box-sizing(border-box);
         margin-right: flex-gutter();
-        padding-left: 10px;
         width: flex-grid(5.5,9);
 
         h2 {
@@ -131,9 +140,14 @@ ul.question-list, div#question-list {
           text-transform: none;
         }
 
+        p.excerpt {
+          color: #777;
+        }
+
         div.user-info {
           display: inline-block;
           vertical-align: top;
+          margin-bottom: 10px;
 
           span.relative-time {
             font-weight: normal;
@@ -151,18 +165,26 @@ ul.question-list, div#question-list {
       }
 
       &.question-meta {
+        float: right;
+        margin-top: 10px;
         width: flex-grid(3.5,9);
+
 
         ul {
           text-align: right;
 
           li {
-            @include linear-gradient(#fff, #f5f5f5);
             border: 1px solid #ddd;
+            @include box-shadow(0 1px 0 #fff);
             display: inline-block;
             height:60px;
+            @include linear-gradient(#fff, #f5f5f5);
             margin-right: 10px;
             width: 60px;
+
+            &:last-child {
+              margin-right: 0px;
+            }
 
             &:hover {
               span, div {
@@ -207,9 +229,18 @@ ul.question-list, div#question-list {
 
   div.post-own-question {
     padding: 11px;
+    margin-top: 10px;
+    color: #888;
+    text-align: center;
 
     a {
       font-weight: bold;
+      @extend .light-button;
+      padding: 20px;
+      display: block;
+      margin: 10px auto;
+          text-align: center;
+          width: flex-grid(5);
     }
   }
 }

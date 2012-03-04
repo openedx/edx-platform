@@ -5,16 +5,10 @@
 
   <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
   <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all" />
-  <link href="/static/css/print.css" rel="stylesheet" type="text/css" media="print"/>
 
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script>
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script>
-  <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script>
-  <script type="text/javascript" src="/static/js/video_player.js"></script>
-  <script type="text/javascript" src="/static/js/schematic.js"></script>
-  <script type="text/javascript" src="/static/js/cktsim.js"></script>
 
   <!--[if lt IE 9]>
   <script src="/static/js/html5shiv.js"></script>
@@ -26,18 +20,16 @@
       displayMath: [["\\[","\\]"]]}
     });
   </script>
-  <script type="text/javascript" src="${ settings.LIB_URL }mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
-    });
-  </script>
 <%block name="headextra"/>
 
 </head>
 
 <body class="<%block name="bodyclass"/>">
+  <!--[if lte IE 8]>
+  <p class="ie-warning">You are using a browser that is not supported by <em>MITx</em>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p>
+  <![endif]-->
 
   ${self.body()}
   <%block name="bodyextra"/>
@@ -90,6 +82,13 @@
       </dl>
     </div>
 
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script>
+  <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script>
+  <script type="text/javascript" src="/static/js/video_player.js"></script>
+  <script type="text/javascript" src="/static/js/schematic.js"></script>
+  <script type="text/javascript" src="/static/js/cktsim.js"></script>
+ 
+
 <script>
   // Feedback form
 $(function() {
@@ -115,7 +114,12 @@ $(function() {
         });
       });
     });
+
+$(function(){
+    $("a[rel*=leanModal]").leanModal();
+    });
 </script>
 
+<%block name="js_extra"/>
 </body>
 </html>

@@ -1,37 +1,27 @@
 <%inherit file="main.html" />
 
+<%block name="js_extra">
 <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
 <script type="text/javascript">
   $(function() {
-      ${init}
+    ${init}
 
-      // Show and hide sidebar
-      var acc_hidden=false;
-      $('#hide_acc').click(function() {
-        if(acc_hidden) {
-          $('#accordion').show();
-          $('#acc_td').attr("width","320");
-          $('#hide_acc').html("&lt;<br>&lt;<br>&lt;");
-          acc_hidden=false;
-        } else {
-          $('#accordion').hide();
-          $('#acc_td').attr("width","0");
-          $('#hide_acc').html("&gt;<br>&gt;<br>&gt;");
-          acc_hidden=true;
-        }
+    $(".sequence-nav li a").hover(function(){
+      $(this).siblings().toggle();
       });
-    });
+  });
 </script>
+</%block>
 
 <%include file="navigation.html" args="active_page='courseware'" />
 
 <section class="main-content">
   <div class="course-wrapper">
     <section class="course-index">
-      <div id="open_close_accordion">
+      <header id="open_close_accordion">
         <h2>Courseware Index</h2>
         <a href="#">close</a>
-      </div>
+      </header>
 
       <div id="accordion">
         ${accordion}

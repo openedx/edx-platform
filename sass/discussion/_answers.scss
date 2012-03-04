@@ -74,10 +74,20 @@ div.answer-block {
     }
   }
 
+  div.accepted-answer {
+    p {
+      color:#000;
+    }
+  }
+
   div.deleted {
     p {
       color: $mit-red;
     }
+  }
+
+  img.answer-img-accept {
+    opacity: 0.7;
   }
 }
 
@@ -141,3 +151,4 @@ div.answer-actions {
   }
 
 }
+

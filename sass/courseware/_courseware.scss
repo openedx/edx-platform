@@ -5,10 +5,6 @@ div.course-wrapper {
     list-style: none;
   }
 
-  .tran {
-    @include transition( all, .2s, $ease-in-out-quad);
-  }
-
   section.course-content {
     @extend .content;
 
@@ -40,12 +36,18 @@ div.course-wrapper {
         margin-bottom: 15px;
         width: flex-grid(2, 9);
         padding-right: flex-gutter(9);
-        border-right: 1px dotted #ccc;
+        border-right: 1px dashed #ddd;
         @include box-sizing(border-box);
         display: table-cell;
         vertical-align: top;
 
         @media screen and (max-width:1120px) {
+          display: block;
+          width: auto;
+          border-right: 0;
+        }
+
+        @media print {
           display: block;
           width: auto;
           border-right: 0;
@@ -61,6 +63,16 @@ div.course-wrapper {
           display: block;
           width: auto;
           padding: 0;
+        }
+
+        @media print {
+          display: block;
+          width: auto;
+          padding: 0;
+
+          canvas, img {
+            page-break-inside: avoid;
+          }
         }
 
         span {
@@ -133,7 +145,7 @@ div.course-wrapper {
     div#seq_content {
       h1 {
         background: none;
-        margin-bottom: 0;
+        margin-bottom: lh();
         padding-bottom: 0;
         border-bottom: none;
       }
@@ -160,7 +172,7 @@ div.course-wrapper {
     section.course-index {
       width: flex-grid(.6);
 
-      div#open_close_accordion {
+      header#open_close_accordion {
         padding: 0;
 
         a {

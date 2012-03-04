@@ -2,27 +2,29 @@
 
 var ${ id }contents=["",
  %for t in items:
- ${t[1]['content']} , 
+ ${t['content']} , 
  %endfor
  ""
        ];
 
 var ${ id }types=["",
  %for t in items:
- "${t[1]['type']}" , 
+ "${t['type']}" , 
  %endfor
  ""
        ];
 
 var ${ id }init_functions=["",
  %for t in items:
-	       function(){ ${t[1]['init_js']} }, 
+	       function(){ ${t['init_js']} }, 
  %endfor
 	       ""];
 
+var ${ id }titles=${titles};
+
 var ${ id }destroy_functions=["",
  %for t in items:
-	       function(){ ${t[1]['destroy_js']} }, 
+	       function(){ ${t['destroy_js']} }, 
  %endfor
 	       ""];
 
@@ -52,6 +54,7 @@ function ${ id }goto(i) {
 function ${ id }setup_click(i) {
         $('#tt_'+i).click(function(eo) { ${ id }goto(i);});
 	$('#tt_'+i).addClass("seq_"+${ id }types[i]+"_inactive");
+	$('#tt_'+i).parent().append("<p>" + ${ id }titles[i-1] + "</p>");
 
 }
 

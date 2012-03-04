@@ -1,48 +1,74 @@
 % if name is not UNDEFINED and name != None: 
-<h1> ${name} </h1>
+  <h1> ${name} </h1>
 % endif
-<div class="video-wrapper">
-  <div class="video-player">
-    <div id="ytapiplayer">
+
+<div class="video-subtitles">
+
+  <div class="video-wrapper">
+    <div class="video-player">
+      <div id="ytapiplayer">
+      </div>
+
+      <iframe id="html5_player" type="text/html" frameborder="0">
+      </iframe>
     </div>
 
-    <iframe id="html5_player" type="text/html" frameborder="0">
-    </iframe>
+    <section class="video-controls">
+      <div id="slider"></div>
+
+      <section>
+        <ul class="vcr">
+          <li><a id="video_control" class="pause">Pause</a></li>
+
+          <li>
+            <div id="vidtime">0:00/0:00</div>
+          </li>
+        </ul>
+
+
+        <div class="secondary-controls">
+        <div class="speeds">
+          <h3><a href="#">Speed</a></h3>
+          <ol id="video_speeds"></ol>
+        </div>
+
+        <a href="#" class="hide-subtitles">on</a>
+        </div>
+      </section>
+    </section>
   </div>
 
-  <section class="video-controls">
-    <div id="slider"></div>
-
-    <section>
-      <ul class="vcr">
-        <li><a id="video_control" class="pause">Pause</a></li>
-      </ul>
-
-      <div id="vidtime">0:00/0:00</div>
-
-      <div class="speeds">
-        Speed: <div id="video_speeds"></div>
-      </div>
-    </section>
-  </section>
+  <ol class="subtitles">
+    <!-- <li id="stt_n5"><div id="std_n7" onclick="title_seek(-7);"></div></li> -->
+    <li id="stt_n4"><div id="std_n6" onclick="title_seek(-6);"></div></li>
+    <li id="stt_n4"><div id="std_n5" onclick="title_seek(-5);"></div></li>
+    <li id="stt_n4"><div id="std_n4" onclick="title_seek(-4);"></div></li>
+    <li id="stt_n3"><div id="std_n3" onclick="title_seek(-3);"></div></li>
+    <li id="stt_n2"><div id="std_n2" onclick="title_seek(-2);"></div></li>
+    <li id="stt_n1"><div id="std_n1" onclick="title_seek(-1);"></div></li>
+    <li id="stt_0 "class="current"><div id="std_0" onclick="title_seek(0);"></div></li>
+    <li id="stt_p1"><div id="std_p1" onclick="title_seek( 1);"></div></li>
+    <li id="stt_p2"><div id="std_p2" onclick="title_seek( 2);"></div></li>
+    <li id="stt_p3"><div id="std_p3" onclick="title_seek( 3);"></div></li>
+    <li id="stt_p4"><div id="std_p4" onclick="title_seek( 4);"></div></li>
+    <li id="stt_p5"><div id="std_p5" onclick="title_seek( 5);"></div></li>
+    <li id="stt_p6"><div id="std_p7" onclick="title_seek( 6);"></div></li>
+    <li id="stt_p6"><div id="std_p7" onclick="title_seek( 7);"></div></li>
+    <!-- <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li> -->
+  </ol>
 
 </div>
 
-<ol class="subtitles">
-  <!-- <li id="stt_n5"><div id="std_n7" onclick="title_seek(-7);"></div></li> -->
-  <li id="stt_n4"><div id="std_n6" onclick="title_seek(-6);"></div></li>
-  <li id="stt_n4"><div id="std_n5" onclick="title_seek(-5);"></div></li>
-  <li id="stt_n4"><div id="std_n4" onclick="title_seek(-4);"></div></li>
-  <li id="stt_n3"><div id="std_n3" onclick="title_seek(-3);"></div></li>
-  <li id="stt_n2"><div id="std_n2" onclick="title_seek(-2);"></div></li>
-  <li id="stt_n1"><div id="std_n1" onclick="title_seek(-1);"></div></li>
-  <li id="stt_0 "class="current"><div id="std_0" onclick="title_seek(0);"></div></li>
-  <li id="stt_p1"><div id="std_p1" onclick="title_seek( 1);"></div></li>
-  <li id="stt_p2"><div id="std_p2" onclick="title_seek( 2);"></div></li>
-  <li id="stt_p3"><div id="std_p3" onclick="title_seek( 3);"></div></li>
-  <li id="stt_p4"><div id="std_p4" onclick="title_seek( 4);"></div></li>
-  <li id="stt_p5"><div id="std_p5" onclick="title_seek( 5);"></div></li>
-  <li id="stt_p6"><div id="std_p7" onclick="title_seek( 6);"></div></li>
-  <li id="stt_p6"><div id="std_p7" onclick="title_seek( 7);"></div></li>
-  <!-- <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li> -->
-</ol>
+<%block name="js_extra">
+<script type="text/javascript" charset="utf-8">
+  $(function() {
+      $('.hide-subtitles').click(function() {
+        $('div.video-subtitles').toggleClass('closed');
+
+        var link_text = $('.hide-subtitles').text();
+        $(this).text((link_text == 'on') ? 'off' : 'on');
+        return false;
+       });
+  });
+</script>
+</%block>

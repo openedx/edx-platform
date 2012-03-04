@@ -23,15 +23,8 @@
   <!--script type="text/javascript" src="/static/js/video_player.js"></script-->
   <!-- <script type="text/javascript" src="/static/js/schematic.js"></script> -->
 
-  <!--[if lt IE 9]>
   <script src="/static/js/html5shiv.js"></script>
-  <![endif]-->
 
-  <script type="text/javascript">
-    $(function(){
-      $("a[rel*=leanModal]").leanModal();
-    });
-  </script>
 
 <%block name="headextra"/>
 
@@ -103,7 +96,20 @@ function postJSON(url, data, callback) {
         <li><a href="/t/honor.html">Honor Code</a></li>
         <li><a href="/t/mitx_help.html">Help</a></li>
       </ul>
+
+      <ul class="social">
+        <li class="linkedin">
+          <a href="http://www.linkedin.com/groups/Friends-Alumni-MITx-4316538">Linked In</a>
+        </li>
+        <li class="twitter">
+          <a href="https://twitter.com/#!/MyMITx">Twitter</a>
+        </li>
+        <li class="facebook">
+          <a href="http://www.facebook.com/pages/MITx/378592442151504">Facebook</a>
+        </li>
+      </ul>
     </div>
+
   </footer>
 
 % if settings.COURSEWARE_ENABLED:
@@ -128,7 +134,7 @@ $(document).ready(function(){
       submit_data,
       function(json) {
         if(json.success) {
-          location.href="/courseware";
+          location.href="/info";
         } else if($('#login_error').length == 0) {
         $('#login_form').prepend('<div id="login_error">Email or password is incorrect.</div>');
         } else {
@@ -156,7 +162,20 @@ $(document).ready(function(){
   });
 
 });
+
+$(function(){
+    $("a[rel*=leanModal]").leanModal();
+
+    $("a.login").click(function(){
+      $("#login_form #li_email").focus();
+      });
+
+    $("a.enroll").click(function(){
+      $("#enroll_form #ca_email").focus();
+      });
+    });
 </script>
 
+<%block name="js_extra"/>
 </body>
 </html>

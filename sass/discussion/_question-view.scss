@@ -19,14 +19,19 @@ div.question-header {
 
         &.post-vote {
           @include border-radius(4px);
-          background-color: lighten(#F6EFD4, 3%);
+          background-color: lighten(#F6EFD4, 5%);
+          border: 1px solid darken( #F6EFD4,10% );
+          @include box-shadow(inset 0 1px 0px #fff);
         }
 
         &.question-img-upvote, &.answer-img-upvote  {
           background-image: url(/static/images/askbot/vote-arrow-up.png);
+          @include box-shadow(inset 0 1px 0px rgba(255, 255, 255, 0.5));
 
           &:hover, &.on {
             background-color:#d1e3a8;
+            border-color: darken(#D1E3A8, 20%);
+          background-image: url(/static/images/askbot/vote-arrow-up-activate.png);
           }
         }
 
@@ -34,7 +39,9 @@ div.question-header {
           background-image: url(/static/images/askbot/vote-arrow-down.png);
 
           &:hover, &.on {
-            background-color:#eac6ad;
+            background-color:#EAC6AD;
+            border-color: darken(#EAC6AD, 20%);
+            background-image: url(/static/images/askbot/vote-arrow-down-activate.png);
           }
         }
       }
@@ -99,8 +106,8 @@ div.question-header {
       div.post-update-container {
         display: inline-block;
         float: left;
-        width: flex-grid(1.8,8);
-        border-left: 1px dotted #CCC;
+        width: 20%;
+        border-left: 1px dashed #ddd;
 
         div.post-update-info {
           @include box-sizing(border-box);
@@ -138,7 +145,6 @@ div.question-header {
             }
 
             span.user-badges {
-              // display: block;
             }
           }
         }
@@ -147,16 +153,15 @@ div.question-header {
 
     div.comments-container {
       @include box-sizing(border-box);
-      padding: 3%;
       display: inline-block;
-      padding: 3%;
+      padding: 0 0 3% 0;
       width: 100%;
 
       div.comments-content {
         font-size: 13px;
-        background: lighten(#efefef, 4%);
+        background: #efefef;
 
-        div.block {
+        .block {
           border-top: 1px solid #ddd;
           padding: 15px;
           display: block;
@@ -182,6 +187,7 @@ div.question-header {
           aside.comment-controls {
             background: none;
             border: none;
+            @include box-shadow(none);
             display: inline-block;
             margin-top: -8px;
             padding:0 2% 0 0;
@@ -250,6 +256,10 @@ div.question-header {
             display: inline-block;
             width: 95%;
 
+            &#full-width {
+              width: 100%;
+            }
+
             div.comment-meta {
               text-align: right;
 
@@ -282,8 +292,7 @@ div.question-header {
       }
 
       div.controls {
-        // padding: 15px 0;
-        background: lighten(#eeeeee, 4%);
+        border-top: 1px solid #efefef;
         text-align: right;
         a {
           display: inline-block;
@@ -308,5 +317,14 @@ div.question-status {
 
   a {
     color: #eee;
+  }
+}
+
+div.share-question {
+  padding: 10px 0 10px 7.5%;
+
+  p {
+    padding: 0;
+    margin: 0;
   }
 }

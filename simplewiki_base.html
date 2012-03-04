@@ -71,12 +71,14 @@
 </%block>
 
 <%block name="bodyextra">
+
 <%include file="navigation.html" args="active_page='wiki'" />
 
 <section class="main-content">
   <div class="wiki-wrapper">
     <%block name="wiki_panel">
     <div id="wiki_panel">
+    <h2>Course Wiki</h2>
       <%
           if (wiki_article is not UNDEFINED):
           	baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
@@ -120,14 +122,14 @@
         </li>
 
         <li class="search">
-    	        <form method="POST" action='${reverse("wiki_search_articles", args=[])}'>
-                <label class="wiki_box_title">Search</label>
-    	            <div style="display:none">
-                	    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-                	</div>
-    	            <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 72%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
-    	            <input type="submit" id="wiki_search_input_submit" value=Go! style="width: 20%" />
-    	        </form>
+          <form method="POST" action='${reverse("wiki_search_articles", args=[])}'>
+            <label class="wiki_box_title">Search</label>
+            <div style="display:none">
+              <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+            </div>
+            <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 71%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
+            <input type="submit" id="wiki_search_input_submit" value="Go!" style="width: 20%" />
+          </form>
         </li>
       </ul>
 
@@ -135,34 +137,33 @@
     </%block>
 
     <section class="wiki-body">
-      <header>
         %if wiki_article is not UNDEFINED:
+        <header>
           %if wiki_article.locked:
-            <p><strong>This article has been locked</strong></p>
+          <p><strong>This article has been locked</strong></p>
           %endif
-            <p>Last modified: ${wiki_article.modified_on.strftime("%b %d, %Y, %I:%M %p")}</p>
+          <p>Last modified: ${wiki_article.modified_on.strftime("%b %d, %Y, %I:%M %p")}</p>
           %endif
 
-        %if wiki_article is not UNDEFINED:
-        <ul>
+          %if wiki_article is not UNDEFINED:
+          <ul>
 
-          <li>
-            <input type="button" onclick="javascript:location.href='${reverse("wiki_view", args=[wiki_article.get_url()])}'" value="View" />
-          </li>
+            <li>
+              <input type="button" onclick="javascript:location.href='${reverse("wiki_view", args=[wiki_article.get_url()])}'" value="View" class="view" />
+            </li>
 
-          <li>
-            <input type="button" onclick="javascript:location.href='${reverse("wiki_edit", args=[wiki_article.get_url()])}'" value="Edit" ${'disabled="true"' if not wiki_write else ""}/>
-          </li>
+            <li>
+              <input type="button" onclick="javascript:location.href='${reverse("wiki_edit", args=[wiki_article.get_url()])}'" value="Edit" ${'disabled="true"' if not wiki_write else ""} class="edit"/>
+            </li>
 
-          <li>
-            <input type="button" onclick="javascript:location.href='${reverse("wiki_history", args=[wiki_article.get_url(),1])}'" value="History" class="button" />
-          </li>
-        </ul>
+            <li>
+              <input type="button" onclick="javascript:location.href='${reverse("wiki_history", args=[wiki_article.get_url(),1])}'" value="History" class="button history" />
+            </li>
+          </ul>
+        </header>
         %endif
-      </header>
 
-      <h1 class="wiki-title"><%block name="wiki_page_title"/></h1>
-
+      <%block name="wiki_page_title"/>
       <%block name="wiki_body"/>
     </section>
   </div>

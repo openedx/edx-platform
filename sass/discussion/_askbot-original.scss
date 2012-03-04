@@ -1165,13 +1165,13 @@ body.anon #searchbar {
   font-weight: normal;
   cursor: help; }
 
-.question-options {
-  margin-top: 1px;
-  color: #666;
-  line-height: 13px;
-  margin-bottom: 5px;
-  label {
-    vertical-align: text-bottom; } }
+// .question-options {
+//   margin-top: 1px;
+//   color: #666;
+//   line-height: 13px;
+//   margin-bottom: 5px;
+//   label {
+//     vertical-align: text-bottom; } }
 
 // .edit-content-html {
 //   border-top: 1px dotted #d8d2a9;
@@ -1652,73 +1652,73 @@ body.anon #searchbar {
 //     padding: 5px;
 //     margin: 0px 0 10px 0; } }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  textarea {
-    padding-left: 3px !important; } }
+// @media screen and (-webkit-min-device-pixel-ratio:0) {
+//   textarea {
+//     padding-left: 3px !important; } }
 
-.facebook-share.icon, .twitter-share.icon, .linkedin-share.icon, .identica-share.icon {
-  background: url(../images/socialsprite.png) no-repeat;
-  display: block;
-  text-indent: -100em;
-  height: 25px;
-  width: 25px;
-  margin-bottom: 3px; }
+// .facebook-share.icon, .twitter-share.icon, .linkedin-share.icon, .identica-share.icon {
+//   background: url(../images/socialsprite.png) no-repeat;
+//   display: block;
+//   text-indent: -100em;
+//   height: 25px;
+//   width: 25px;
+//   margin-bottom: 3px; }
 
-.facebook-share.icon:hover, .twitter-share.icon:hover, .linkedin-share.icon:hover, .identica-share.icon:hover {
-  opacity: 0.8;
-  filter: alpha(opacity = 80); }
+// .facebook-share.icon:hover, .twitter-share.icon:hover, .linkedin-share.icon:hover, .identica-share.icon:hover {
+//   opacity: 0.8;
+//   filter: alpha(opacity = 80); }
 
-.facebook-share.icon {
-  background-position: -26px 0px; }
+// .facebook-share.icon {
+//   background-position: -26px 0px; }
 
-.identica-share.icon {
-  background-position: -78px 0px; }
+// .identica-share.icon {
+//   background-position: -78px 0px; }
 
-.twitter-share.icon {
-  margin-top: 10px;
-  background-position: 0px 0px; }
+// .twitter-share.icon {
+//   margin-top: 10px;
+//   background-position: 0px 0px; }
 
-.linkedin-share.icon {
-  background-position: -52px 0px; }
+// .linkedin-share.icon {
+//   background-position: -52px 0px; }
 
-.openid-signin, .meta, .users-page, .user-profile-edit-page {
-  font-size: 13px;
-  line-height: 1.3;
-  color: #525252; }
+// .openid-signin, .meta, .users-page, .user-profile-edit-page {
+//   font-size: 13px;
+//   line-height: 1.3;
+//   color: #525252; }
 
-.openid-signin p, .meta p, .users-page p, .user-profile-edit-page p {
-  font-size: 13px;
-  color: #707070;
-  line-height: 1.3;
-  font-family: arial;
-  color: #525252;
-  margin-bottom: 12px; }
+// .openid-signin p, .meta p, .users-page p, .user-profile-edit-page p {
+//   font-size: 13px;
+//   color: #707070;
+//   line-height: 1.3;
+//   font-family: arial;
+//   color: #525252;
+//   margin-bottom: 12px; }
 
-.openid-signin h2, .meta h2, .users-page h2, .user-profile-edit-page h2 {
-  color: #525252;
-  padding-left: 0px;
-  font-size: 16px; }
+// .openid-signin h2, .meta h2, .users-page h2, .user-profile-edit-page h2 {
+//   color: #525252;
+//   padding-left: 0px;
+//   font-size: 16px; }
 
-.openid-signin form, .meta form, .users-page form, .user-profile-edit-page form, .user-profile-page form {
-  margin-bottom: 15px; }
+// .openid-signin form, .meta form, .users-page form, .user-profile-edit-page form, .user-profile-page form {
+//   margin-bottom: 15px; }
 
-.openid-signin input[type="text"], .meta input[type="text"], .users-page input[type="text"], .user-profile-edit-page input[type="text"], .user-profile-page input[type="text"], .openid-signin input[type="password"], .meta input[type="password"], .users-page input[type="password"], .user-profile-edit-page input[type="password"], .user-profile-page input[type="password"], .openid-signin select, .meta select, .users-page select, .user-profile-edit-page select, .user-profile-page select {
-  border: #cce6ec 3px solid;
-  height: 25px;
-  padding-left: 5px;
-  width: 395px;
-  font-size: 14px; }
+// .openid-signin input[type="text"], .meta input[type="text"], .users-page input[type="text"], .user-profile-edit-page input[type="text"], .user-profile-page input[type="text"], .openid-signin input[type="password"], .meta input[type="password"], .users-page input[type="password"], .user-profile-edit-page input[type="password"], .user-profile-page input[type="password"], .openid-signin select, .meta select, .users-page select, .user-profile-edit-page select, .user-profile-page select {
+//   border: #cce6ec 3px solid;
+//   height: 25px;
+//   padding-left: 5px;
+//   width: 395px;
+//   font-size: 14px; }
 
-.openid-signin select, .meta select, .users-page select, .user-profile-edit-page select, .user-profile-page select {
-  width: 405px;
-  height: 30px; }
+// .openid-signin select, .meta select, .users-page select, .user-profile-edit-page select, .user-profile-page select {
+//   width: 405px;
+//   height: 30px; }
 
-.openid-signin textarea, .meta textarea, .users-page textarea, .user-profile-edit-page textarea, .user-profile-page textarea {
-  border: #cce6ec 3px solid;
-  padding-left: 5px;
-  padding-top: 5px;
-  width: 395px;
-  font-size: 14px; }
+// .openid-signin textarea, .meta textarea, .users-page textarea, .user-profile-edit-page textarea, .user-profile-page textarea {
+//   border: #cce6ec 3px solid;
+//   padding-left: 5px;
+//   padding-top: 5px;
+//   width: 395px;
+//   font-size: 14px; }
 
 // .openid-signin input.submit, .meta input.submit, .users-page input.submit, .user-profile-edit-page input.submit, .user-profile-page input.submit {
 //   background: url(../images/small-button-blue.png) repeat-x top;
@@ -2327,14 +2327,14 @@ label.retag-error {
 .hilite3 {
   background-color: #0ff; }
 
-.gold, .badge1 {
-  color: #ffcc00; }
+// .gold, .badge1 {
+//   color: #ffcc00; }
 
-.silver, .badge2 {
-  color: #cccccc; }
+// .silver, .badge2 {
+//   color: #cccccc; }
 
-.bronze, .badge3 {
-  color: #cc9933; }
+// .bronze, .badge3 {
+//   color: #cc9933; }
 
 .score {
   font-weight: 800;

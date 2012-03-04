@@ -27,10 +27,16 @@ div.info-wrapper {
           margin: 0 flex-gutter() 0 0;
         }
 
-        p {
+        section.update-description {
           float: left;
           width: flex-grid(7, 9);
           margin-bottom: 0;
+
+          p {
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
         }
       }
     }
@@ -43,8 +49,10 @@ div.info-wrapper {
     border-left: 1px solid #d3d3d3;
 
     h1 {
-      padding: 0 lh();
+      padding: lh(.5) lh();
       font-size: 18px;
+      margin: 0 ;
+      @extend .bottom-border;
     }
 
     ol {
