@@ -55,7 +55,7 @@ rate -- messages per second
             self.hard_log(" ".join(users))
             send_mass_mail( emails, fail_silently = False )
             time.sleep(1)
-            print i,
+            print datetime.datetime.utcnow().isoformat(), i
             i = i+len(users)
             # Emergency interruptor
             if os.path.exists("/tmp/stopemails.txt"):
