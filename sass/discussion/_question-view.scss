@@ -185,6 +185,11 @@ div.question-header {
 
         form.post-comments {
           padding: 15px;
+
+           button:last-child {
+            margin-left: 10px;
+            @extend .light-button;
+          }
         }
 
         div.comment {
