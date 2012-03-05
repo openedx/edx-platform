@@ -11,6 +11,8 @@ import mitxmako.middleware as middleware
 
 from django.core.mail import send_mass_mail
 
+import datetime
+
 middleware.MakoMiddleware()
 
 def chunks(l, n):
@@ -32,7 +34,7 @@ rate -- messages per second
     log_file = None
 
     def hard_log(self, text):
-        self.log_file.write(text+'\n')
+        self.log_file.write(datetime.datetime.utcnow().isoformat()+' -- '+text+'\n')
 
     def handle(self, *args, **options):
         global log_file
