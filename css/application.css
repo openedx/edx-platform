@@ -2509,6 +2509,9 @@ div.course-wrapper section.course-content ol.vert-mod > li:last-child {
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0; }
+div.course-wrapper section.course-content section.tutorials ul {
+  list-style: disc outside none;
+  margin-left: 22.652px; }
 div.course-wrapper.closed section.course-index {
   width: 3.077%; }
 div.course-wrapper.closed section.course-index header#open_close_accordion {
@@ -2725,6 +2728,8 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   zoom: 1;
   *display: inline;
   *vertical-align: auto; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li.active {
+  font-weight: bold; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
   float: left;
   display: block;
@@ -2985,6 +2990,8 @@ div.book-wrapper section.book-sidebar {
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box; }
+div.book-wrapper section.book-sidebar ul#booknav {
+  font-size: 12px; }
 div.book-wrapper section.book-sidebar ul#booknav a {
   color: #000; }
 div.book-wrapper section.book-sidebar ul#booknav a:hover {

@@ -141,12 +141,17 @@ function format_time(t)
     hours = Math.floor(minutes / 60);
     seconds = seconds % 60;
     minutes = minutes % 60;
-    return hours+":"+((minutes < 10)?"0":"")+minutes+":"+((seconds < 10)?"0":"")+(seconds%60);
+
+    if (hours) {
+      return hours+":"+((minutes < 10)?"0":"")+minutes+":"+((seconds < 10)?"0":"")+(seconds%60);
+    } else {
+      return minutes+":"+((seconds < 10)?"0":"")+(seconds%60);
+    }
 }
 
 function update_captions(t) {
     var i=caption_index(t);
-    $("#vidtime").html(format_time(ytplayer.getCurrentTime())+'/'+format_time(ytplayer.getDuration()));
+    $("#vidtime").html(format_time(ytplayer.getCurrentTime())+' / '+format_time(ytplayer.getDuration()));
     var j;
     for(j=1; j<9; j++) {
 	$("#std_n"+j).html(caption_at(i-j));
