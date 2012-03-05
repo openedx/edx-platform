@@ -101,7 +101,19 @@ div.question-header {
         margin-right: flex-gutter(8);
         width: flex-grid(6.2,8);
 
+      blockquote {
+        margin-left: 2.5%;
+        padding-left: 1.5%;
+        border-left: 1px dashed #ddd;
+        color: $mit-red;;
       }
+
+      ul, ol, pre {
+        margin-left: 6%;
+        margin-bottom: 20px;
+      }
+    }
+
 
       div.post-update-container {
         display: inline-block;
