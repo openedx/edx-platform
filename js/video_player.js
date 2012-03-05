@@ -198,7 +198,7 @@ function onYouTubePlayerAPIReady() {
     }
   });
   updateytplayerInfoInterval = setInterval(updateHTML5ytplayerInfo, 200);
-  ajax_videoInterval = setInterval(ajax_video, 5000);
+  //ajax_videoInterval = setInterval(ajax_video, 5000);
 }
 
 // Need this function to call the API ready callback when we switch to a tab with AJAX that has a video
@@ -209,9 +209,26 @@ function loadHTML5Video() {
     }
 }
 
+function isiOSDevice(){
+  var iphone = "iphone";
+  var ipod = "ipod";
+  var ipad = "ipad";
+  var uagent = navigator.userAgent.toLowerCase();
+
+  //alert(uagent);
+  if (uagent.search(ipad) > -1 || uagent.search(iphone) > -1
+      || uagent.search(ipod) > -1) {
+    return true;
+  }
+  return false;
+}
+
 function onPlayerReady(event) {
-  // alert("ready");
-  event.target.playVideo();
+  //do not want to autoplay on iOS devices since its not enabled
+  //and leads to confusing behavior for the user
+  if (!isiOSDevice()) {
+    event.target.playVideo();
+  }
 }
 
 function onPlayerStateChange(event) {
