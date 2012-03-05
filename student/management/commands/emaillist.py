@@ -12,10 +12,7 @@ middleware.MakoMiddleware()
 
 class Command(BaseCommand):
     help = \
-'''Sends an e-mail to all users. Takes a single 
-parameter -- name of e-mail template -- located
-in templates/email. Adds a .txt for the message
-body, and an _subject.txt for the subject. '''
+''' Extract an e-mail list of all active students. '''
     def handle(self, *args, **options):
         #text = open(args[0]).read()
         #subject = open(args[1]).read()
