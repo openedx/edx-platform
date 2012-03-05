@@ -48,8 +48,11 @@ rate -- messages per second
         
         self.log_file = open(logfilename, "a+", buffering = 0)
 
+        i=0
         for users in chunks(users, rate):
             emails = [ (subject, message, settings.DEFAULT_FROM_EMAIL, [u]) for u in users ]
             self.hard_log(" ".join(users))
             send_mass_mail( emails, fail_silently = False )
             time.sleep(1)
+            print i,
+            i = i+len(users)
