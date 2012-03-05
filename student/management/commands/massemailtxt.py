@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 import mitxmako.middleware as middleware
 
 from django.core.mail import send_mass_mail
+import sys
 
 import datetime
 
@@ -56,3 +57,8 @@ rate -- messages per second
             time.sleep(1)
             print i,
             i = i+len(users)
+            # Emergency interruptor
+            if os.path.exists("/tmp/stopemails.txt"):
+                self.log_file.close()
+                sys.exit(-1)
+        self.log_file.close()
