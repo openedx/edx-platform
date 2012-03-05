@@ -35,7 +35,13 @@ loadNewVideo(streams["1.0"], ${ position });
 function add_speed(key, stream) {
   var id = 'speed_' + stream;
 
-  $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
+  //TODO: this should be smarter and know which video is first selected when we have 
+  // video speed as an option/parameter per user that is saved
+  if (key == 1.0) {
+    $("#video_speeds").append(' <li class=active id="'+id+'">'+key+'x</li>');
+  } else {
+    $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
+  }
 
   $("#"+id).click(function(){
     change_video_speed(key, stream);
