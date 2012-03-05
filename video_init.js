@@ -33,15 +33,15 @@ ajax_video=good;
 loadNewVideo(streams["1.0"], ${ position });
 
 function add_speed(key, stream) {
-    var id = 'speed_' + stream;
+  var id = 'speed_' + stream;
 
-    $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
+  $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
 
-    $("#"+id).click(function(){
-      change_video_speed(key, stream);
-      $(this).siblings().removeClass("active");
-      $(this).addClass("active");
-    });
+  $("#"+id).click(function(){
+    change_video_speed(key, stream);
+    $(this).siblings().removeClass("active");
+    $(this).addClass("active");
+  });
 }
 
 var l=[]
