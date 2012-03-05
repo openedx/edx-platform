@@ -3260,15 +3260,11 @@ div.profile-wrapper {
               display: inline-block;
               padding-right: 1em; }
 
-section.wiki-body div#wiki_article html, section.wiki-body div#wiki_article address,
-section.wiki-body div#wiki_article blockquote,
-section.wiki-body div#wiki_article body, section.wiki-body div#wiki_article dd, section.wiki-body div#wiki_article div,
-section.wiki-body div#wiki_article dl, section.wiki-body div#wiki_article dt, section.wiki-body div#wiki_article fieldset, section.wiki-body div#wiki_article form,
-section.wiki-body div#wiki_article frame, section.wiki-body div#wiki_article frameset,
-section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div#wiki_panel input[type="button"], div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4,
-section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article noframes,
-section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article p, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article center,
-section.wiki-body div#wiki_article dir, section.wiki-body div#wiki_article hr, section.wiki-body div#wiki_article menu, section.wiki-body div#wiki_article pre {
+section.wiki-body h1 {
+  font-weight: bold;
+  font-size: 2em;
+  margin-bottom: 25px; }
+section.wiki-body div#wiki_article html, section.wiki-body div#wiki_article address, section.wiki-body div#wiki_article blockquote, section.wiki-body div#wiki_article body, section.wiki-body div#wiki_article dd, section.wiki-body div#wiki_article div, section.wiki-body div#wiki_article dl, section.wiki-body div#wiki_article dt, section.wiki-body div#wiki_article fieldset, section.wiki-body div#wiki_article form, section.wiki-body div#wiki_article frame, section.wiki-body div#wiki_article frameset, section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div#wiki_panel input[type="button"], div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4, section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article noframes, section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article p, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article center, section.wiki-body div#wiki_article dir, section.wiki-body div#wiki_article hr, section.wiki-body div#wiki_article menu, section.wiki-body div#wiki_article pre {
   display: block;
   unicode-bidi: embed; }
 section.wiki-body div#wiki_article li {
@@ -3299,49 +3295,40 @@ section.wiki-body div#wiki_article th {
 section.wiki-body div#wiki_article caption {
   text-align: center; }
 section.wiki-body div#wiki_article h1 {
-  font-size: 2.4em;
+  font-size: 1.6em;
   margin: .67em 0;
   letter-spacing: 0px; }
 section.wiki-body div#wiki_article h2 {
   text-transform: none;
-  font-size: 2em;
+  font-size: 1.4em;
   margin: .75em 0;
   letter-spacing: 0px; }
 section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div#wiki_panel input[type="button"], div#wiki_panel section.wiki-body div#wiki_article input[type="button"] {
-  font-size: 1.75em;
+  font-size: 1.2em;
   margin: .83em 0; }
 section.wiki-body div#wiki_article h4 {
-  font-size: 1.25em; }
-section.wiki-body div#wiki_article h4, section.wiki-body div#wiki_article p,
-section.wiki-body div#wiki_article blockquote, section.wiki-body div#wiki_article ul,
-section.wiki-body div#wiki_article fieldset, section.wiki-body div#wiki_article form,
-section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article dl, section.wiki-body div#wiki_article dir,
-section.wiki-body div#wiki_article menu {
+  font-size: 1.1em; }
+section.wiki-body div#wiki_article h4, section.wiki-body div#wiki_article p, section.wiki-body div#wiki_article blockquote, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article fieldset, section.wiki-body div#wiki_article form, section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article dl, section.wiki-body div#wiki_article dir, section.wiki-body div#wiki_article menu {
   margin: 1.12em 0; }
 section.wiki-body div#wiki_article h5 {
-  font-size: 1.25em;
+  font-size: 1em;
   margin: 1.5em 0; }
 section.wiki-body div#wiki_article h6 {
-  font-size: 1em;
+  font-size: 0.5em;
   margin: 1.67em 0; }
-section.wiki-body div#wiki_article h1, section.wiki-body div#wiki_article h2, section.wiki-body div#wiki_article h3, section.wiki-body div#wiki_article div#wiki_panel input[type="button"], div#wiki_panel section.wiki-body div#wiki_article input[type="button"], section.wiki-body div#wiki_article h4,
-section.wiki-body div#wiki_article h5, section.wiki-body div#wiki_article h6, section.wiki-body div#wiki_article b,
-section.wiki-body div#wiki_article strong {
+section.wiki-body div#wiki_article b, section.wiki-body div#wiki_article strong {
   font-weight: bolder; }
 section.wiki-body div#wiki_article blockquote {
   padding: 10px 20px;
   background: #e3e3e3;
   border-left: 4px solid; }
-section.wiki-body div#wiki_article i, section.wiki-body div#wiki_article cite, section.wiki-body div#wiki_article em,
-section.wiki-body div#wiki_article var, section.wiki-body div#wiki_article address {
+section.wiki-body div#wiki_article i, section.wiki-body div#wiki_article cite, section.wiki-body div#wiki_article em, section.wiki-body div#wiki_article var, section.wiki-body div#wiki_article address {
   font-style: italic; }
-section.wiki-body div#wiki_article pre, section.wiki-body div#wiki_article tt, section.wiki-body div#wiki_article code,
-section.wiki-body div#wiki_article kbd, section.wiki-body div#wiki_article samp {
+section.wiki-body div#wiki_article pre, section.wiki-body div#wiki_article tt, section.wiki-body div#wiki_article code, section.wiki-body div#wiki_article kbd, section.wiki-body div#wiki_article samp {
   font-family: monospace; }
 section.wiki-body div#wiki_article pre {
   white-space: pre; }
-section.wiki-body div#wiki_article button, section.wiki-body div#wiki_article textarea,
-section.wiki-body div#wiki_article input, section.wiki-body div#wiki_article select {
+section.wiki-body div#wiki_article button, section.wiki-body div#wiki_article textarea, section.wiki-body div#wiki_article input, section.wiki-body div#wiki_article select {
   display: inline-block; }
 section.wiki-body div#wiki_article big {
   font-size: 1.17em; }
@@ -3353,8 +3340,7 @@ section.wiki-body div#wiki_article sup {
   vertical-align: super; }
 section.wiki-body div#wiki_article table {
   border-spacing: 2px; }
-section.wiki-body div#wiki_article thead, section.wiki-body div#wiki_article tbody,
-section.wiki-body div#wiki_article tfoot {
+section.wiki-body div#wiki_article thead, section.wiki-body div#wiki_article tbody, section.wiki-body div#wiki_article tfoot {
   vertical-align: middle; }
 section.wiki-body div#wiki_article td, section.wiki-body div#wiki_article th, section.wiki-body div#wiki_article tr {
   vertical-align: inherit; }
@@ -3364,13 +3350,11 @@ section.wiki-body div#wiki_article hr {
   height: 1px;
   background: #999;
   border: none; }
-section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article dir,
-section.wiki-body div#wiki_article menu, section.wiki-body div#wiki_article dd {
+section.wiki-body div#wiki_article ol, section.wiki-body div#wiki_article ul, section.wiki-body div#wiki_article dir, section.wiki-body div#wiki_article menu, section.wiki-body div#wiki_article dd {
   margin-left: 40px; }
 section.wiki-body div#wiki_article ol {
   list-style-type: decimal; }
-section.wiki-body div#wiki_article ol ul, section.wiki-body div#wiki_article ul ol,
-section.wiki-body div#wiki_article ul ul, section.wiki-body div#wiki_article ol ol {
+section.wiki-body div#wiki_article ol ul, section.wiki-body div#wiki_article ul ol, section.wiki-body div#wiki_article ul ul, section.wiki-body div#wiki_article ol ol {
   margin-top: 0;
   margin-bottom: 0; }
 section.wiki-body div#wiki_article u, section.wiki-body div#wiki_article ins {
@@ -5148,8 +5132,7 @@ ul.question-list, div#question-list {
           font-weight: bold;
           letter-spacing: 0;
           margin: 0px 0 15px 0;
-          text-transform: none;
-          letter-spacing: 0; }
+          text-transform: none; }
         ul.question-list li.single-question div.question-body p.excerpt, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body p.excerpt, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body p.excerpt, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body p.excerpt, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body p.excerpt, div#question-list li.single-question div.question-body p.excerpt, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body p.excerpt, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body p.excerpt, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body p.excerpt, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body p.excerpt {
           color: #777; }
         ul.question-list li.single-question div.question-body div.user-info, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body div.user-info, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body div.user-info, div#question-list li.single-question div.question-body div.user-info, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body div.user-info, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body div.user-info, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body div.user-info, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body div.user-info {
