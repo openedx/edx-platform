@@ -39,7 +39,7 @@ def view(request, wiki_url):
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
             'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
-            'wiki_title' : article.title + " - MITX 6.002 Wiki"
+            'wiki_title' : article.title + " - MITX 6.002x Wiki"
 			}
     d.update(csrf(request))
     return render_to_response('simplewiki_view.html', d)
