@@ -166,6 +166,13 @@ div.course-wrapper {
         }
       }
     }
+
+    section.tutorials {
+      ul {
+        list-style: disc outside none;
+        margin-left: lh();
+      }
+    }
   }
 
   &.closed {
