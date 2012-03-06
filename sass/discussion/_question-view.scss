@@ -181,7 +181,13 @@ div.question-header {
           &:first-child {
             border-top: 0;
           }
+
+          &.official {
+            // border-left: 4px solid $mit-red;
+            padding-top: 10px;
+          }
         }
+
 
         form.post-comments {
           padding: 15px;
