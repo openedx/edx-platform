@@ -232,7 +232,7 @@ def history(request, wiki_url, page=1):
     except ValueError:
         p = 1
    
-    history = Revision.objects.filter(article__exact = article).order_by('-counter')
+    history = Revision.objects.filter(article__exact = article).order_by('-counter').select_related('previous_revision__counter', 'revision_user', 'wiki_article')
     
     if request.method == 'POST':
         if request.POST.__contains__('revision'): #They selected a version, but they can be either deleting or changing the version
@@ -297,6 +297,37 @@ def history(request, wiki_url, page=1):
     d.update(csrf(request))
 
     return render_to_response('simplewiki_history.html', d)
+    
+    
+def revision_feed(request, page=1):
+    if not request.user.is_superuser:
+        return redirect('/')
+    
+    page_size = 10
+    
+    try:
+        p = int(page)
+    except ValueError:
+        p = 1
+   
+    history = Revision.objects.order_by('-revision_date').select_related('revision_user', 'article', 'previous_revision')
+    
+    page_count = (history.count()+(page_size-1)) / page_size
+    if p > page_count:
+        p = 1
+    beginItem = (p-1) * page_size
+    
+    next_page = p + 1 if page_count > p else None
+    prev_page = p - 1 if p > 1 else None
+    
+    d = {'wiki_page': p,
+	        'wiki_next_page': next_page,
+	        'wiki_prev_page': prev_page,
+	        'wiki_history': history[beginItem:beginItem+page_size],
+            'show_delete_revision' : request.user.is_superuser,}
+    d.update(csrf(request))
+
+    return render_to_response('simplewiki_revision_feed.html', d)
 
 def search_articles(request):
     if not request.user.is_authenticated():
@@ -333,9 +364,8 @@ def search_articles(request):
             results = results._search(Q(current_revision__contents__icontains = queryword) | \
                                       Q(title__icontains = queryword))
         
-    results.select_related('current_revision__deleted')
-        
-    print [(article.title.lower(), article.get_url()) for article in results]
+    results = results.select_related('current_revision__deleted')
+    
     results = sorted(results, key=lambda article: (article.current_revision.deleted, article.get_url().lower()) )
 
     if len(results) == 1 and querystring:
