@@ -173,6 +173,15 @@ div.course-wrapper {
         margin-left: lh();
       }
     }
+
+    div.staff_info {
+      white-space: pre-wrap;
+      border-top: 1px solid #ccc;
+      padding-top: lh();
+      margin-top: lh();
+      line-height: lh();
+      font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
+    }
   }
 
   &.closed {
