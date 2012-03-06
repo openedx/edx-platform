@@ -631,7 +631,7 @@ LIVESETTINGS_OPTIONS = {
             'VOTE_RULES' : {
                 'MAX_VOTES_PER_USER_PER_DAY' : 30,
                 'MAX_FLAGS_PER_USER_PER_DAY' : 5,
-                'MIN_DAYS_FOR_STAFF_TO_ACCEPT_ANSWER' : 7,
+                'MIN_DAYS_FOR_STAFF_TO_ACCEPT_ANSWER' : 0,
                 'MIN_DAYS_TO_ANSWER_OWN_QUESTION' : 0,
                 'MIN_FLAGS_TO_DELETE_POST' : 5,
                 'MIN_FLAGS_TO_HIDE_POST' : 3,
