@@ -18,100 +18,103 @@ $(function () {
   }
       
   /* -------------------------------- Grade detail bars -------------------------------- */
-  var colors = [ $.color.parse("#b72121"), $.color.parse("#600101"), $.color.parse("#666666"), $.color.parse("#333333")];
-  // var colors = [ $.color.parse("#2e80ce"), $.color.parse("#14518b"), $.color.parse("#599535"), $.color.parse("#3d731c")];
-  // var colors = [ $.color.parse("#3f80be"), $.color.parse("#128251"), $.color.parse("#e1b900"), $.color.parse("#d10404")];
-  //var colors = [$.color.parse("#1B2045"), $.color.parse("#557a00"), $.color.parse("#F5600"), $.color.parse("#FEBA2C")];
-  //var colors = [$.color.parse("#E7C856"), $.color.parse("#CD462E"), $.color.parse("#B01732"), $.color.parse("#41192A")];
-  //var colors = [$.color.parse("#434F5E"), $.color.parse("#BEF731"), $.color.parse("#FB5455"), $.color.parse("#44C4B7")];
-  //var colors = [$.color.parse("#147A7D"), $.color.parse("#C0C900"), $.color.parse("#C9005B"), $.color.parse("#FCF9A5")];
-      
-      
-      
-  var series = [];
-  var ticks = []; //These are the indices and x-axis labels for the data
-  var bottomTicks = []; //Labels on the bottom
-  var detail_tooltips = {}; //This an dictionary mapping from 'section' -> array of detail_tooltips
-  var droppedScores = []; //These are the datapoints to indicate assignments which aren't factored into the total score
-  detail_tooltips['Dropped Scores'] = [];
+  
   <%
+  colors = ["#b72121", "#600101", "#666666", "#333333"]
+  
   tickIndex = 1
   sectionSpacer = 0.5
   sectionIndex = 0
-  %>
-  %for section in grade_summary:
-    %if 'subscores' in section: ##This is for sections like labs or homeworks, with several smaller components and a total
-      series.push({label: "${section['category']}",
-        data: ${ json.dumps( [[i + tickIndex, score['percentage']] for i,score in enumerate(section['subscores'])] ) },
-        color: colors[${sectionIndex}].toString(),
-      });
-      ticks = ticks.concat( ${ json.dumps( [[i + tickIndex, score['label'] ] for i,score in enumerate(section['subscores'])] ) } );
-      bottomTicks.push( [ ${tickIndex + len(section['subscores'])/2}, "${section['category']}" ] );
-      detail_tooltips["${section['category']}"] = ${ json.dumps([score['summary'] for score in section['subscores']]  ) };
-          
-      droppedScores = droppedScores.concat(${ json.dumps( [[tickIndex + index, 0.05] for index in section['dropped_indices']]) });
-      <% dropExplanation = "The lowest {0} {1} scores are dropped".format( len(section['dropped_indices']), section['category'] ) %>
-      detail_tooltips['Dropped Scores'] = detail_tooltips['Dropped Scores'].concat( ${json.dumps( [dropExplanation] * len(section['dropped_indices']) )} );
-          
-      <% tickIndex += len(section['subscores']) + sectionSpacer %>
-          
-      ##Now put on the aggregate score
-      series.push({label: "${section['category']} Total",
-        data: [[${tickIndex}, ${section['totalscore']['score']}]],
-        color: colors[${sectionIndex}].toString(),
-      });
-      ticks = ticks.concat( [ [${tickIndex}, "${section['totallabel']}"] ] );
-      detail_tooltips["${section['category']} Total"] = [ "${section['totalscore']['summary']}" ];
-      <% tickIndex += 1 + sectionSpacer %>
-          
-    %else: ##This is for sections like midterm or final, which have no smaller components
-      series.push({label: "${section['category']}",
-        data: [[${tickIndex}, ${section['totalscore']['score']}]],
-        color: colors[${sectionIndex}].toString(),
-      });
-      ticks = ticks.concat( [ [${tickIndex}," ${section['totallabel']}"] ] );
-      
-      detail_tooltips["${section['category']}"] = [ "${section['totalscore']['summary']}" ];
 
-      <% tickIndex += 1 + sectionSpacer %>
-    %endif
-    <%sectionIndex += 1 %>
-  %endfor
-      
-  //Alwasy be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
-  series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
-      
-      
-  /* ----------------------------- Grade overviewew bar -------------------------*/
-  <%
+  series = []
+  ticks = [] #These are the indices and x-axis labels for the data
+  bottomTicks = [] #Labels on the bottom
+  detail_tooltips = {} #This an dictionary mapping from 'section' -> array of detail_tooltips
+  droppedScores = [] #These are the datapoints to indicate assignments which aren't factored into the total score
+  dropped_score_tooltips = []
+
+  for section in grade_summary:
+    if 'subscores' in section: ##This is for sections like labs or homeworks, with several smaller components and a total
+        series.append({
+            'label' : section['category'],
+            'data' : [[i + tickIndex, score['percentage']] for i,score in enumerate(section['subscores'])],
+            'color' : colors[sectionIndex]
+        })
+        
+        ticks += [[i + tickIndex, score['label'] ] for i,score in enumerate(section['subscores'])]
+        bottomTicks.append( [tickIndex + len(section['subscores'])/2, section['category']] )
+        detail_tooltips[ section['category'] ] = [score['summary'] for score in section['subscores']]
+        
+        droppedScores += [[tickIndex + index, 0.05] for index in section['dropped_indices']]
+        
+        dropExplanation = "The lowest {0} {1} scores are dropped".format( len(section['dropped_indices']), section['category'] )
+        dropped_score_tooltips += [dropExplanation] * len(section['dropped_indices'])
+        
+        
+        tickIndex += len(section['subscores']) + sectionSpacer
+        
+        
+        category_total_label = section['category'] + " Total"
+        series.append({
+            'label' : category_total_label,
+            'data' : [ [tickIndex, section['totalscore']['score']] ],
+            'color' : colors[sectionIndex]
+        })
+        
+        ticks.append( [tickIndex, section['totallabel']] )
+        detail_tooltips[category_total_label] = [section['totalscore']['summary']]
+    else:
+        series.append({
+            'label' : section['category'],
+            'data' : [ [tickIndex, section['totalscore']['score']] ],
+            'color' : colors[sectionIndex]
+        })
+        
+        ticks.append( [tickIndex, section['totallabel']] )
+        detail_tooltips[section['category']] = [section['totalscore']['summary']]
+        
+    tickIndex += 1 + sectionSpacer
+    sectionIndex += 1
+
+
+  detail_tooltips['Dropped Scores'] = dropped_score_tooltips    
+    
+  ## ----------------------------- Grade overviewew bar ------------------------- ##
   totalWeight = 0.0
   sectionIndex = 0
   totalScore = 0.0
   overviewBarX = tickIndex
-  %>
-  %for section in grade_summary:
-    <%
-    weighted_score = section['totalscore']['score'] * section['weight']
-    summary_text = "{0} - {1:.1%} of a possible {2:.0%}".format(section['category'], weighted_score, section['weight'])
-    %>
-    %if section['totalscore']['score'] > 0:
-      series.push({label: "${section['category']} - Weighted",
-        data: [[${overviewBarX}, ${weighted_score}]],
-        color: colors[${sectionIndex}].toString(),
-      }); 
-    %endif
      
-    detail_tooltips["${section['category']} - Weighted"] = [ "${summary_text}" ];
-    <%
-    sectionIndex += 1
-    totalWeight += section['weight']
-    totalScore += section['totalscore']['score'] * section['weight']
-    %>
-  %endfor
-  ticks = ticks.concat( [ [${overviewBarX}, "Total"] ] );
+  for section in grade_summary:
+      weighted_score = section['totalscore']['score'] * section['weight']
+      summary_text = "{0} - {1:.1%} of a possible {2:.0%}".format(section['category'], weighted_score, section['weight'])
+         
+      weighted_category_label = section['category'] + " - Weighted"
+         
+      if section['totalscore']['score'] > 0:
+          series.append({
+              'label' : weighted_category_label,
+              'data' : [ [overviewBarX, weighted_score] ],
+              'color' : colors[sectionIndex]
+          })
+            
+      detail_tooltips[weighted_category_label] = [ summary_text ]
+      sectionIndex += 1
+      totalWeight += section['weight']
+      totalScore += section['totalscore']['score'] * section['weight']
+        
+  ticks += [ [overviewBarX, "Total"] ]
+  tickIndex += 1 + sectionSpacer
+  %>
   
-  <% tickIndex += 1 + sectionSpacer %>
+  var series = ${ json.dumps(series) };
+  var ticks = ${ json.dumps(ticks) };
+  var bottomTicks = ${ json.dumps(bottomTicks) };
+  var detail_tooltips = ${ json.dumps(detail_tooltips) };
+  var droppedScores = ${ json.dumps(droppedScores) };
   
+  //Alwasy be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
+  series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
   
   var options = {
     series: {stack: true,
@@ -131,28 +134,7 @@ $(function () {
     
     var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
     $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
-    
-    // //Rotate the x-axis labels
-    // var rotateValue = "rotate(-60deg)";
-    // var rotateOrigin = "bottom left";
-    // $("#grade-detail-graph .x1Axis .tickLabel").css( {
-    //   '-webkit-transform': rotateValue,
-    //   '-moz-transform': rotateValue,
-    //   '-ms-transform': rotateValue,
-    //   '-o-transform': rotateValue,
-    //   'transform': rotateValue,
-    //   
-    //   '-webkit-transform-origin': rotateOrigin,
-    //   '-moz-transform-origin': rotateOrigin,
-    //   '-ms-transform-origin': rotateOrigin,
-    //   '-o-transform-origin': rotateOrigin,
-    //   
-    //   'text-align' : 'left',
-    // });
   }
-  
-
-  
       
   var previousPoint = null;
   $("#grade-detail-graph").bind("plothover", function (event, pos, item) {
