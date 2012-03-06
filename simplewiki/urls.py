@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^history(/[a-zA-Z\d/_-]*)/([0-9]*)/?$', 'simplewiki.views.history', name='wiki_history'),
     url(r'^search_related(/[a-zA-Z\d/_-]*)/?$', 'simplewiki.views.search_add_related', name='search_related'),
     url(r'^random/?$', 'simplewiki.views.random_article', name='wiki_random'),
+    url(r'^revision_feed/([0-9]*)/?$', 'simplewiki.views.revision_feed', name='wiki_revision_feed'),
     url(r'^search/?$', 'simplewiki.views.search_articles', name='wiki_search_articles'),    
     url(r'^list/?$', 'simplewiki.views.search_articles', name='wiki_list_articles'), #Just an alias for the search, but you usually don't submit a search term
 #    url(r'^/?([a-zA-Z\d/_-]*)/_related/add/$', 'simplewiki.views.add_related', name='add_related'),

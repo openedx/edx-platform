@@ -3,6 +3,7 @@ import os
 
 from django import forms
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import signals
@@ -55,10 +56,16 @@ class Article(models.Model):
             raise ShouldHaveExactlyOneRootSlug()
 
     def get_url(self):
-        """Return the Wiki URL for an article"""
+        """Return the Wiki URL for an article"""    
         url = self.slug + "/"
-        if (self.parent):
-            url = self.parent.get_url() + url
+        if self.parent_id:
+            parent_url = cache.get("wiki_url-" + str(self.parent_id))
+            if parent_url is None:
+                parent_url = self.parent.get_url()
+            
+            url = parent_url + url
+        
+        cache.set("wiki_url-" + str(self.id), url, 60*60)
             
         return url
 
