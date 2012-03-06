@@ -127,7 +127,7 @@ def profile(request):
                 subtitle = s.get('subtitle') if s.get('subtitle') else format
                 if format and graded_total[1] > 0:
                     format_scores = total_scores[ format ] if format in total_scores else []
-                    format_scores.append( graded_total )
+                    format_scores.append( graded_total + (s.get("name"),) )
                     total_scores[ format ] = format_scores
 
                 score={'section':s.get("name"),
@@ -165,18 +165,17 @@ def profile(request):
     for i in range(12):
         if i < len(homework_scores):
             percentage = homework_scores[i][0] / float(homework_scores[i][1])
-            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, homework_scores[i][0], homework_scores[i][1] )
+            summary = "Homework {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, homework_scores[i][2] , percentage, homework_scores[i][0], homework_scores[i][1] )
         else:
             percentage = 0
-            summary = "0% (?/?)"
+            summary = "Unreleased Homework {0} - 0% (?/?)".format(i + 1)
         
             if settings.GENERATE_PROFILE_SCORES:
                 points_possible = random.randrange(10, 50)
                 points_earned = random.randrange(5, points_possible)
                 percentage = points_earned / float(points_possible)
-                summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
+                summary = "Random Homework - {0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
         
-        summary = "Homework {0} - {1}".format(i + 1, summary)
         label = "HW {0:02d}".format(i + 1)
         
         homework_percentages.append( {'percentage': percentage, 'summary': summary, 'label' : label} )
@@ -189,18 +188,17 @@ def profile(request):
     for i in range(12):
         if i < len(lab_scores):
             percentage = lab_scores[i][0] / float(lab_scores[i][1])
-            summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, lab_scores[i][0], lab_scores[i][1] )
+            summary = "Lab {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, lab_scores[i][2] , percentage, lab_scores[i][0], lab_scores[i][1] )
         else:
             percentage = 0
-            summary = "0% (?/?)"
+            summary = "Unreleased Lab {0} - 0% (?/?)".format(i + 1)
         
             if settings.GENERATE_PROFILE_SCORES:
                 points_possible = random.randrange(10, 50)
                 points_earned = random.randrange(5, points_possible)
                 percentage = points_earned / float(points_possible)
-                summary = "{0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
+                summary = "Random Lab - {0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
             
-        summary = "Lab {0} - {1}".format(i + 1, summary)
         label = "Lab {0:02d}".format(i + 1)
                 
         lab_percentages.append( {'percentage': percentage, 'summary': summary, 'label' : label} )
