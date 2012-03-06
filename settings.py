@@ -174,7 +174,7 @@ execfile(os.path.join(BASE_DIR, "settings.py"))
 pid = os.getpid()
 hostname = platform.node().split(".")[0]
 SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
-LOGGING_FILENAME = 'trackinglog-' + str(pid)
+TRACKING_LOG_FILE = LOG_DIR + "/tracking_{0}.log".format(pid)
 
 handlers = ['console']
 if not DEBUG:
@@ -214,10 +214,11 @@ LOGGING = {
             'address' : SYSLOG_ADDRESS,
             'formatter' : 'syslog_format',
         },
-        'filelogger' : {
-            'level' : 'INFO',
-            'class' : 'logging.FileHandler',
-            'filename' : LOGGING_FILENAME,
+        'tracking' : {
+            'level' : 'DEBUG',
+            'class' : 'logging.handlers.WatchedFileHandler',
+            'filename' : TRACKING_LOG_FILE,
+            'formatter' : 'raw',
         },
         'mail_admins' : {
             'level': 'ERROR',
@@ -231,7 +232,7 @@ LOGGING = {
             'level' : 'INFO'
         },
         'tracking' : {
-            'handlers' : [] if DEBUG else ['filelogger'], # handlers,
+            'handlers' : ['tracking'],
             'level' : 'DEBUG',
             'propagate' : False,
         },
@@ -247,6 +248,8 @@ LOGGING = {
         },
     }
 }
+
+
 
 if PERFSTATS :
     MIDDLEWARE_CLASSES = ( 'perfstats.middleware.ProfileMiddleware',) + MIDDLEWARE_CLASSES
@@ -443,7 +446,7 @@ LIVESETTINGS_OPTIONS = {
                 'MIN_ANSWER_BODY_LENGTH' : 1,
                 'WIKI_ON' : True,
                 'ALLOW_ASK_ANONYMOUSLY' : True,
-                'ALLOW_POSTING_BEFORE_LOGGING_IN' : True,
+                'ALLOW_POSTING_BEFORE_LOGGING_IN' : False,
                 'ALLOW_SWAPPING_QUESTION_WITH_ANSWER' : False,
                 'MAX_TAG_LENGTH' : 20,
                 'MIN_TITLE_LENGTH' : 1,
@@ -628,7 +631,7 @@ LIVESETTINGS_OPTIONS = {
             'VOTE_RULES' : {
                 'MAX_VOTES_PER_USER_PER_DAY' : 30,
                 'MAX_FLAGS_PER_USER_PER_DAY' : 5,
-                'MIN_DAYS_FOR_STAFF_TO_ACCEPT_ANSWER' : 7,
+                'MIN_DAYS_FOR_STAFF_TO_ACCEPT_ANSWER' : 0,
                 'MIN_DAYS_TO_ANSWER_OWN_QUESTION' : 0,
                 'MIN_FLAGS_TO_DELETE_POST' : 5,
                 'MIN_FLAGS_TO_HIDE_POST' : 3,
@@ -647,7 +650,7 @@ ot = MAKO_TEMPLATES
 MAKO_TEMPLATES['course'] = [DATA_DIR]
 MAKO_TEMPLATES['sections'] = [DATA_DIR+'/sections']
 MAKO_TEMPLATES['custom_tags'] = [DATA_DIR+'/custom_tags']
-MAKO_TEMPLATES['main'] = [BASE_DIR+'/templates/']
+MAKO_TEMPLATES['main'] = [BASE_DIR+'/templates/', DATA_DIR+'/info']
 
 
 MAKO_TEMPLATES.update(ot)

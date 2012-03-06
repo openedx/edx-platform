@@ -58,6 +58,11 @@ def get_instance(model, instance_or_pk, timeout=None, using=None):
             cache.delete(key)
 
     # Use the default manager so we are never filtered by a .get_query_set()
+
+#    import logging
+#    log = logging.getLogger("tracking")
+#    log.info( str(pk) )
+
     instance = model._default_manager.using(using).get(pk=pk)
 
     data = {}
