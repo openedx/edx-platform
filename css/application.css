@@ -2523,6 +2523,16 @@ div.course-wrapper section.course-content ol.vert-mod > li {
     border-bottom: none;
     margin-bottom: 0;
     padding-bottom: 0; }
+div.course-wrapper section.course-content section.tutorials ul {
+  list-style: disc outside none;
+  margin-left: 22.652px; }
+div.course-wrapper section.course-content div.staff_info {
+  white-space: pre-wrap;
+  border-top: 1px solid #ccc;
+  padding-top: 22.652px;
+  margin-top: 22.652px;
+  line-height: 22.652px;
+  font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace; }
 div.course-wrapper.closed section.course-index {
   width: 3.077%; }
   div.course-wrapper.closed section.course-index header#open_close_accordion {
@@ -2739,6 +2749,8 @@ section.course-content div.video-subtitles {
               zoom: 1;
               *display: inline;
               *vertical-align: auto; }
+              section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li.active {
+                font-weight: bold; }
         section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
           float: left;
           display: block;
@@ -2999,31 +3011,33 @@ div.book-wrapper section.book-sidebar {
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box; }
-  div.book-wrapper section.book-sidebar ul#booknav a {
-    color: #000; }
-    div.book-wrapper section.book-sidebar ul#booknav a:hover {
-      color: #666; }
-  div.book-wrapper section.book-sidebar ul#booknav li {
-    background: none;
-    padding-left: 30px; }
-    div.book-wrapper section.book-sidebar ul#booknav li div.hitarea {
-      margin-left: -22px;
-      background-image: url("/static/images/treeview-default.gif");
-      position: relative;
-      top: 4px; }
-      div.book-wrapper section.book-sidebar ul#booknav li div.hitarea:hover {
-        opacity: 0.6;
-        filter: alpha(opacity=60); }
-    div.book-wrapper section.book-sidebar ul#booknav li ul {
-      background: none; }
-  div.book-wrapper section.book-sidebar ul#booknav > li {
-    border-bottom: 1px solid #d3d3d3;
-    -webkit-box-shadow: 0 1px 0 #eeeeee;
-    -moz-box-shadow: 0 1px 0 #eeeeee;
-    -ms-box-shadow: 0 1px 0 #eeeeee;
-    -o-box-shadow: 0 1px 0 #eeeeee;
-    box-shadow: 0 1px 0 #eeeeee;
-    padding: 7px 7px 7px 30px; }
+  div.book-wrapper section.book-sidebar ul#booknav {
+    font-size: 12px; }
+    div.book-wrapper section.book-sidebar ul#booknav a {
+      color: #000; }
+      div.book-wrapper section.book-sidebar ul#booknav a:hover {
+        color: #666; }
+    div.book-wrapper section.book-sidebar ul#booknav li {
+      background: none;
+      padding-left: 30px; }
+      div.book-wrapper section.book-sidebar ul#booknav li div.hitarea {
+        margin-left: -22px;
+        background-image: url("/static/images/treeview-default.gif");
+        position: relative;
+        top: 4px; }
+        div.book-wrapper section.book-sidebar ul#booknav li div.hitarea:hover {
+          opacity: 0.6;
+          filter: alpha(opacity=60); }
+      div.book-wrapper section.book-sidebar ul#booknav li ul {
+        background: none; }
+    div.book-wrapper section.book-sidebar ul#booknav > li {
+      border-bottom: 1px solid #d3d3d3;
+      -webkit-box-shadow: 0 1px 0 #eeeeee;
+      -moz-box-shadow: 0 1px 0 #eeeeee;
+      -ms-box-shadow: 0 1px 0 #eeeeee;
+      -o-box-shadow: 0 1px 0 #eeeeee;
+      box-shadow: 0 1px 0 #eeeeee;
+      padding: 7px 7px 7px 30px; }
 div.book-wrapper section.book nav a {
   padding: 0 22.652px; }
 div.book-wrapper section.book nav ul li.last {
@@ -5397,6 +5411,8 @@ div.question-header div.question-container, div.answer-block div.question-contai
         display: block; }
         div.question-header div.question-container div.comments-container div.comments-content .block:first-child, div.answer-block div.question-container div.comments-container div.comments-content .block:first-child, div.paginator div.question-container div.comments-container div.comments-content .block:first-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content .block:first-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content .block:first-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content .block:first-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content .block:first-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content .block:first-child, div.paginator div.answer-container div.comments-container div.comments-content .block:first-child {
           border-top: 0; }
+        div.question-header div.question-container div.comments-container div.comments-content .block.official, div.answer-block div.question-container div.comments-container div.comments-content .block.official, div.paginator div.question-container div.comments-container div.comments-content .block.official, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content .block.official, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content .block.official, div.answer-block div.answer-container div.comments-container div.comments-content .block.official, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content .block.official, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content .block.official, div.question-header div.paginator div.answer-container div.comments-container div.comments-content .block.official, div.paginator div.question-header div.answer-container div.comments-container div.comments-content .block.official, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content .block.official, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content .block.official, div.paginator div.answer-container div.comments-container div.comments-content .block.official {
+          padding-top: 10px; }
       div.question-header div.question-container div.comments-container div.comments-content form.post-comments, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments, div.paginator div.question-container div.comments-container div.comments-content form.post-comments, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments {
         padding: 15px; }
         div.question-header div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child {
@@ -5545,6 +5561,20 @@ div.answer-block, div.paginator {
   float: left;
   padding-top: 20px;
   width: 100%; }
+  div.answer-block div.official-stamp, div.paginator div.official-stamp, div.answer-block span.official-comment, div.paginator div.answer-block span.official-comment, div.answer-block div.paginator span.official-comment, div.answer-block div.paginator span.official-comment, div.paginator div.answer-block span.official-comment, div.paginator span.official-comment {
+    background: #993333;
+    color: #fff;
+    font-size: 12px;
+    margin-top: 10px;
+    padding: 2px 5px;
+    text-align: center;
+    margin-left: -1px; }
+  div.answer-block span.official-comment, div.paginator span.official-comment {
+    display: block;
+    margin: 0 0 10px -5%;
+    padding-left: 5%;
+    text-align: left;
+    width: 120px; }
   div.answer-block img.answer-img-accept, div.paginator img.answer-img-accept {
     margin: 10px 0px 10px 16px; }
   div.answer-block div.answered-by-owner p, div.paginator div.answered-by-owner p {
