@@ -4,8 +4,18 @@ div.badges-intro {
 
 div.badge-intro {
   @extend .badges-intro;
+
   .badge1, .badge2, .badge3 {
     font-size: 20px;
+  }
+
+
+}
+
+div#award-list{
+  li.username {
+    font-size: 20px;
+    margin-bottom: 8px;
   }
 }
 
