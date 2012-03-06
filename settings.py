@@ -446,7 +446,7 @@ LIVESETTINGS_OPTIONS = {
                 'MIN_ANSWER_BODY_LENGTH' : 1,
                 'WIKI_ON' : True,
                 'ALLOW_ASK_ANONYMOUSLY' : True,
-                'ALLOW_POSTING_BEFORE_LOGGING_IN' : True,
+                'ALLOW_POSTING_BEFORE_LOGGING_IN' : False,
                 'ALLOW_SWAPPING_QUESTION_WITH_ANSWER' : False,
                 'MAX_TAG_LENGTH' : 20,
                 'MIN_TITLE_LENGTH' : 1,
