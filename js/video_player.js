@@ -89,6 +89,10 @@ function change_video_speed(speed, youtube_id) {
     ytplayer.loadVideoById(youtube_id, new_position);
     syncPlayButton();
     log_event("speed", {"new_speed":speed, "clip":youtube_id});
+    console.log("setting");
+    console.log(speed);
+
+    $.cookie("video_speed", speed, {'expires':3650, 'path':'/'});
 }
 
 function caption_at(index) {
@@ -383,9 +387,9 @@ function loadNewVideo(cap_id, id, startSeconds) {
 function syncPlayButton(){
   var state = getPlayerState();
   if (state == 1 || state == 3) {
-    $("#video_control").removeClass().addClass("pause");
+    $("#video_control").removeClass("play").addClass("pause");
   } else if (state == 2 || state == -1 || state == 0){
-    $("#video_control").removeClass().addClass("play");
+    $("#video_control").removeClass("pause").addClass("play");
   }
 }
 
