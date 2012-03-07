@@ -29,13 +29,9 @@ function good() {
 }
 
 ajax_video=good;
+
 // load the same video speed your last video was at in a sequence
 // if the last speed played on video doesn't exist on another video just use 1.0 as default
-if (video_speed == 1 || !streams[video_speed]) {
-  loadNewVideo(streams["1.0"], streams["1.0"], ${ position });
-} else {
-  loadNewVideo(streams["1.0"], streams[video_speed], ${ position });
-}
 
 function add_speed(key, stream) {
   var id = 'speed_' + stream;
@@ -67,9 +63,24 @@ function sort_by_value(a,b) {
 
 l.sort(sort_by_value);
 
-for(var i=0; i<l.length; i++) {
-    add_speed(l[i], streams[l[i]])
-}
+$(document).ready(function() {
+    video_speed = $.cookie("video_speed");
+    console.log("ready");
+    console.log(video_speed);
+
+    if (( !video_speed ) || ( !streams[video_speed] )) {
+	video_speed = "1.0";
+    }
+    console.log(video_speed);
+    loadNewVideo(streams["1.0"], streams[video_speed], ${ position });
+
+    for(var i=0; i<l.length; i++) {
+	add_speed(l[i], streams[l[i]])
+    }
+
+});
+
+
 
 function toggleVideo(){
   if ($("#video_control").hasClass("play")){
