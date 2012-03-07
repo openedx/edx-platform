@@ -183,11 +183,20 @@ div.question-header {
           }
 
           &.official {
-            // border-left: 4px solid $mit-red;
             padding-top: 10px;
+
+            span.official-comment {
+              background: $mit-red;
+              color: #fff;
+              display: block;
+              font-size: 12px;
+              margin: 0 0 10px -5%;
+              padding:2px 5px 2px 5%;
+              text-align: left;
+              width:100px;
+            }
           }
         }
-
 
         form.post-comments {
           padding: 15px;
