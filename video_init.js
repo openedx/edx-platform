@@ -30,14 +30,13 @@ function good() {
 
 ajax_video=good;
 
-loadNewVideo(streams["1.0"], ${ position });
+// load the same video speed your last video was at in a sequence
+// if the last speed played on video doesn't exist on another video just use 1.0 as default
 
 function add_speed(key, stream) {
   var id = 'speed_' + stream;
 
-  //TODO: this should be smarter and know which video is first selected when we have 
-  // video speed as an option/parameter per user that is saved
-  if (key == 1.0) {
+  if (key == video_speed) {
     $("#video_speeds").append(' <li class=active id="'+id+'">'+key+'x</li>');
   } else {
     $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
@@ -64,9 +63,24 @@ function sort_by_value(a,b) {
 
 l.sort(sort_by_value);
 
-for(var i=0; i<l.length; i++) {
-    add_speed(l[i], streams[l[i]])
-}
+$(document).ready(function() {
+    video_speed = $.cookie("video_speed");
+    console.log("ready");
+    console.log(video_speed);
+
+    if (( !video_speed ) || ( !streams[video_speed] )) {
+	video_speed = "1.0";
+    }
+    console.log(video_speed);
+    loadNewVideo(streams["1.0"], streams[video_speed], ${ position });
+
+    for(var i=0; i<l.length; i++) {
+	add_speed(l[i], streams[l[i]])
+    }
+
+});
+
+
 
 function toggleVideo(){
   if ($("#video_control").hasClass("play")){
