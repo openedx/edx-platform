@@ -29,8 +29,8 @@ $(function() {
 
            loc=false;
 
-           $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
-                                   '<input type="button" id="change_loc_button" value="Change" />');
+           $("#location_sub").html('<form>'+'<input id="id_loc_text" type="text" name="loc_text" />'+
+             '<input type="submit" id="change_loc_button" value="Change" />'+'</form>');
            $("#change_loc_button").click(function() {
              $("#change_location").show();
 
@@ -50,8 +50,8 @@ $(function() {
 
          if(lang) {
            lang=false;
-           $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
-                                   '<input type="button" id="change_lang_button" value="Change" />');
+           $("#language_sub").html('<form>'+'<input id="id_lang_text" type="text" name="lang_text" />'+
+             '<input type="submit" id="change_lang_button" value="Change" />'+'</form>');
            $("#change_lang_button").click(function() {
              $("#change_language").show();
               postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
