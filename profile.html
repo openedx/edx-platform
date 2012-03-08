@@ -29,8 +29,9 @@ $(function() {
 
            loc=false;
 
-           $("#location_sub").html('<input id="id_loc_text" type="text" name="loc_text" />'+
-                                   '<input type="button" id="change_loc_button" value="Change" />');
+           $("#location_sub").html('<form>'+'<input id="id_loc_text" type="text" name="loc_text" />'+
+             '<input type="submit" id="change_loc_button" value="Save" />'+'</form>');
+
            $("#change_loc_button").click(function() {
              $("#change_location").show();
 
@@ -50,8 +51,8 @@ $(function() {
 
          if(lang) {
            lang=false;
-           $("#language_sub").html('<input id="id_lang_text" type="text" name="lang_text" />'+
-                                   '<input type="button" id="change_lang_button" value="Change" />');
+           $("#language_sub").html('<form>'+'<input id="id_lang_text" type="text" name="lang_text" />'+
+             '<input type="submit" id="change_lang_button" value="Save" />'+'</form>');
            $("#change_lang_button").click(function() {
              $("#change_language").show();
               postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
@@ -140,14 +141,12 @@ $(function() {
         <li>Forum name: <strong>${username}</strong></li>
         <li>E-mail: <strong>${email}</strong></li>
         <li>
-          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Change</a>
+          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Edit</a>
         </li>
         <li>
-          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Change</a>
+          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Edit</a>
         </li>
       </ul>
-
-      <!-- <div><a class="modal" href="#change_password_pop">Reset password</a></div> -->
 
       <div id="change_password_pop">
         <h2>Password change</h2>
