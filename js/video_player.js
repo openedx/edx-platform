@@ -77,8 +77,8 @@ function submit_circuit(circuit_id) {
 // Video player
 
 var load_id = 0;
-
-var video_speed = 1.0;
+var caption_id;
+var video_speed = "1.0";
 
 var updateytPlayerInterval;
 var ajax_videoInterval;
@@ -86,8 +86,13 @@ var ajax_videoInterval;
 function change_video_speed(speed, youtube_id) {
     new_position = ytplayer.getCurrentTime() * video_speed / speed;
     video_speed = speed;
-    ytplayer.loadVideoById(youtube_id, new_position);    
+    ytplayer.loadVideoById(youtube_id, new_position);
+    syncPlayButton();
     log_event("speed", {"new_speed":speed, "clip":youtube_id});
+    console.log("setting");
+    console.log(speed);
+
+    $.cookie("video_speed", speed, {'expires':3650, 'path':'/'});
 }
 
 function caption_at(index) {
@@ -190,7 +195,7 @@ function onYouTubePlayerReady(playerId) {
     ytplayer.addEventListener("onError", "onPlayerError");
     if((typeof load_id != "undefined") && (load_id != 0)) {
 	var id=load_id;
-	loadNewVideo(id, 0);
+	loadNewVideo(caption_id, id, 0);
     }
 }
 
@@ -357,11 +362,12 @@ function updateytplayerInfo() {
 }
 
 // functions for the api calls
-function loadNewVideo(id, startSeconds) {
+function loadNewVideo(cap_id, id, startSeconds) {
     captions={"start":[0],"end":[0],"text":["Attempting to load captions..."]};
-    $.getJSON("/static/subs/"+id+".srt.sjson", function(data) {
+    $.getJSON("/static/subs/"+cap_id+".srt.sjson", function(data) {
         captions=data;
     });
+    caption_id = cap_id;
     load_id = id;
     //if ((typeof ytplayer != "undefined") && (ytplayer.type=="application/x-shockwave-flash")) {
     // Try it every time. If we fail, we want the error message for now. 
@@ -376,6 +382,15 @@ function loadNewVideo(id, startSeconds) {
     log_event("load_video", {"id":id,"start":startSeconds});
     //$("#slider").slider("option","value",startSeconds);
     //seekTo(startSeconds);
+}
+
+function syncPlayButton(){
+  var state = getPlayerState();
+  if (state == 1 || state == 3) {
+    $("#video_control").removeClass("play").addClass("pause");
+  } else if (state == 2 || state == -1 || state == 0){
+    $("#video_control").removeClass("pause").addClass("play");
+  }
 }
 
 function cueNewVideo(id, startSeconds) {
