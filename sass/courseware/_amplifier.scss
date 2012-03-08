@@ -16,21 +16,21 @@ div#graph-container {
 
     select#musicTypeSelect {
       display: block;
-      margin-bottom: lh(2);
+      margin-bottom: lh();
     }
 
     div#graph-output {
       display: block;
-      margin-bottom: lh(2);
+      margin-bottom: lh();
     }
 
     div#graph-listen {
       display: block;
-      margin-bottom: lh(2);
+      margin-bottom: lh();
     }
 
     p {
-      margin-bottom: lh(1);
+      margin-bottom: lh(.5);
     }
 
     div#label {
