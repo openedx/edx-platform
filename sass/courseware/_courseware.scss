@@ -182,6 +182,25 @@ div.course-wrapper {
       line-height: lh();
       font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
     }
+
+    div.ui-slider {
+      border: 1px solid #aaa;
+      background: #ddd;
+      @include box-shadow(inset 0 1px 0 #eee);
+      @include border-radius(0);
+
+      a.ui-slider-handle {
+        @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
+        background: $mit-red url(/static/images/slider-bars.png) center center no-repeat;
+        border: 1px solid darken($mit-red, 20%);
+        cursor: pointer;
+
+        &:hover, &:focus {
+          background-color: lighten($mit-red, 10%);
+          outline: none;
+        }
+      }
+    }
   }
 
   &.closed {
