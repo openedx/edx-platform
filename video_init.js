@@ -65,17 +65,26 @@ l.sort(sort_by_value);
 
 $(document).ready(function() {
     video_speed = $.cookie("video_speed");
-    console.log("ready");
-    console.log(video_speed);
 
-    if (( !video_speed ) || ( !streams[video_speed] )) {
-	video_speed = "1.0";
+    //ugly hack to account for different formats in vid speed in the XML (.75 vs 0.75, 1.5 vs 1.50);
+    if (( !video_speed ) || ( !streams[video_speed] && !streams[video_speed + "0"]) && !streams[video_speed.slice(0,-1)] && !streams[video_speed.slice(1)] && !streams["0" + video_speed]) {
+      video_speed = "1.0";
     }
-    console.log(video_speed);
+
+    if (streams[video_speed + "0"]){
+      video_speed = video_speed + "0";
+    } else if (streams[video_speed.slice(0, -1)]){
+      video_speed = video_speed.slice(0, -1);
+    } else if (streams[video_speed.slice(1)]) {
+      video_speed = video_speed.slice(1);
+    } else if (streams["0" + video_speed]) {
+      video_speed = "0" + video_speed;
+    }
+
     loadNewVideo(streams["1.0"], streams[video_speed], ${ position });
 
     for(var i=0; i<l.length; i++) {
-	add_speed(l[i], streams[l[i]])
+      add_speed(l[i], streams[l[i]])
     }
 
 });
