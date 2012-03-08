@@ -89,8 +89,6 @@ function change_video_speed(speed, youtube_id) {
     ytplayer.loadVideoById(youtube_id, new_position);
     syncPlayButton();
     log_event("speed", {"new_speed":speed, "clip":youtube_id});
-    console.log("setting");
-    console.log(speed);
 
     $.cookie("video_speed", speed, {'expires':3650, 'path':'/'});
 }
