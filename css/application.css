@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -652,17 +652,45 @@ footer p a:link, footer p a:visited {
   color: #444; }
 footer p a:hover, footer p a:focus {
   color: #000; }
-footer ul {
+footer nav {
   float: right; }
-footer ul li {
+footer nav ul {
+  float: left; }
+footer nav ul li {
   display: inline-block;
   margin-right: 20px; }
-footer ul li a {
+footer nav ul li a {
   color: #444; }
-footer ul li a:link, footer ul li a:visited {
+footer nav ul li a:link, footer nav ul li a:visited {
   color: #444; }
-footer ul li a:hover, footer ul li a:focus {
+footer nav ul li a:hover, footer nav ul li a:focus {
   color: #000; }
+footer nav ul.social {
+  margin-right: 40px;
+  position: relative;
+  top: -5px; }
+@media screen and (max-width: 780px) {
+  footer nav ul.social {
+    float: none; } }
+footer nav ul.social li {
+  float: left;
+  margin-right: 11.326px; }
+footer nav ul.social li:after {
+  content: none;
+  display: none; }
+footer nav ul.social li a {
+  display: block;
+  height: 29px;
+  width: 28px;
+  text-indent: -9999px; }
+footer nav ul.social li a:hover {
+  opacity: .8; }
+footer nav ul.social li.twitter a {
+  background: url("/static/images/twitter.png") 0 0 no-repeat; }
+footer nav ul.social li.facebook a {
+  background: url("/static/images/facebook.png") 0 0 no-repeat; }
+footer nav ul.social li.linkedin a {
+  background: url("/static/images/linkedin.png") 0 0 no-repeat; }
 
 #lean_overlay {
   position: fixed;
@@ -2512,13 +2540,6 @@ div.course-wrapper section.course-content ol.vert-mod > li:last-child {
 div.course-wrapper section.course-content section.tutorials ul {
   list-style: disc outside none;
   margin-left: 22.652px; }
-div.course-wrapper section.course-content div.staff_info {
-  white-space: pre-wrap;
-  border-top: 1px solid #ccc;
-  padding-top: 22.652px;
-  margin-top: 22.652px;
-  line-height: 22.652px;
-  font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace; }
 div.course-wrapper.closed section.course-index {
   width: 3.077%; }
 div.course-wrapper.closed section.course-index header#open_close_accordion {
@@ -2783,7 +2804,7 @@ nav.sequence-nav {
 nav.sequence-nav ol {
   display: table-row;
   float: left;
-  width: 84.905%;
+  width: 90.611%;
   position: relative; }
 nav.sequence-nav ol li {
   display: table-cell; }
@@ -2905,9 +2926,11 @@ nav.sequence-nav ol li p::after {
 nav.sequence-nav ul {
   float: right;
   margin-right: 1px;
-  width: 14.402%;
+  width: 8.696%;
   display: table-row; }
-nav.sequence-nav ul li.prev, nav.sequence-nav ul li.next {
+nav.sequence-nav ul li {
+  display: table-cell; }
+nav.sequence-nav ul li.prev a, nav.sequence-nav ul li.next a {
   -webkit-box-shadow: inset 1px 0 0 #faf7e9;
   -moz-box-shadow: inset 1px 0 0 #faf7e9;
   -ms-box-shadow: inset 1px 0 0 #faf7e9;
@@ -2918,22 +2941,73 @@ nav.sequence-nav ul li.prev, nav.sequence-nav ul li.next {
   background-repeat: no-repeat;
   border-left: 1px solid #e4d080;
   cursor: pointer;
-  display: table-cell;
   padding: 0 4px;
   text-indent: -9999px;
-  width: 82px; }
-nav.sequence-nav ul li.prev:hover, nav.sequence-nav ul li.next:hover {
+  width: 38px;
+  display: block; }
+nav.sequence-nav ul li.prev a:hover, nav.sequence-nav ul li.next a:hover {
   text-decoration: none;
   color: #7e691a;
   text-decoration: none;
   background-color: none; }
-nav.sequence-nav ul li.prev {
+nav.sequence-nav ul li.prev a.disabled, nav.sequence-nav ul li.next a.disabled {
+  cursor: normal;
+  opacity: .4; }
+nav.sequence-nav ul li.prev a {
   background-image: url("/static/images/sequence-nav/previous-icon.png"); }
-nav.sequence-nav ul li.prev:hover {
+nav.sequence-nav ul li.prev a:hover {
   background-color: none; }
-nav.sequence-nav ul li.next {
+nav.sequence-nav ul li.next a {
   background-image: url("/static/images/sequence-nav/next-icon.png"); }
-nav.sequence-nav ul li.next:hover {
+nav.sequence-nav ul li.next a:hover {
+  background-color: none; }
+
+section.course-content nav.sequence-bottom {
+  margin-bottom: -22.652px; }
+section.course-content nav.sequence-bottom ul {
+  border: 1px solid #e4d080;
+  border-bottom: 0;
+  -webkit-border-radius: 3px 3px 0 0;
+  -moz-border-radius: 3px 3px 0 0;
+  -ms-border-radius: 3px 3px 0 0;
+  -o-border-radius: 3px 3px 0 0;
+  border-radius: 3px 3px 0 0;
+  margin: 22.652px auto 0;
+  overflow: hidden;
+  width: 106px;
+  background-color: #f2e7bf;
+  -webkit-box-shadow: inset 0 0 0 1px #faf7e9;
+  -moz-box-shadow: inset 0 0 0 1px #faf7e9;
+  -ms-box-shadow: inset 0 0 0 1px #faf7e9;
+  -o-box-shadow: inset 0 0 0 1px #faf7e9;
+  box-shadow: inset 0 0 0 1px #faf7e9; }
+section.course-content nav.sequence-bottom ul li {
+  float: left; }
+section.course-content nav.sequence-bottom ul li.prev, section.course-content nav.sequence-bottom ul li.next {
+  margin-bottom: 0; }
+section.course-content nav.sequence-bottom ul li.prev a, section.course-content nav.sequence-bottom ul li.next a {
+  background-position: center center;
+  background-repeat: no-repeat;
+  padding: 16.989px 4px;
+  text-indent: -9999px;
+  width: 45px;
+  display: block; }
+section.course-content nav.sequence-bottom ul li.prev a:hover, section.course-content nav.sequence-bottom ul li.next a:hover {
+  text-decoration: none;
+  color: #7e691a;
+  text-decoration: none;
+  opacity: .5;
+  background-color: #eddfaa; }
+section.course-content nav.sequence-bottom ul li.prev a.disabled, section.course-content nav.sequence-bottom ul li.next a.disabled {
+  opacity: .4;
+  background-color: #fffffe; }
+section.course-content nav.sequence-bottom ul li.prev a {
+  background-image: url("/static/images/sequence-nav/previous-icon.png"); }
+section.course-content nav.sequence-bottom ul li.prev a:hover {
+  background-color: none; }
+section.course-content nav.sequence-bottom ul li.next a {
+  background-image: url("/static/images/sequence-nav/next-icon.png"); }
+section.course-content nav.sequence-bottom ul li.next a:hover {
   background-color: none; }
 
 div#graph-container {
