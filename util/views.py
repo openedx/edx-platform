@@ -31,14 +31,23 @@ def send_feedback(request):
     ''' Feeback mechanism in footer of every page. '''
     try: 
         username = request.user.username
+        email = request.user.email
     except: 
         username = "anonymous"
+        email = "anonymous"
+    
+    try: 
+        browser = request.META['HTTP_USER_AGENT']
+    except: 
+        browser = "Unknown"
     
     feedback = render_to_string("feedback_email.txt", 
                                 {"subject":request.POST['subject'], 
                                  "url": request.POST['url'], 
                                  "time": datetime.datetime.now().isoformat(),
                                  "feedback": request.POST['message'], 
+                                 "email":email,
+                                 "browser":browser,
                                  "user":username})
 
     send_mail("MITx Feedback / " +request.POST['subject'], 
