@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import re
+import sys
 
 from datetime import timedelta
 from lxml import etree
@@ -21,6 +22,9 @@ course XML file and the rest of the system.
 
 TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
+
+class ContentException(Exception):
+    pass
 
 log = logging.getLogger("mitx.courseware")
 
@@ -207,21 +211,34 @@ def section_file(user, section):
     return tree
 
 
-def module_xml(coursefile, module, id_tag, module_id):
+def module_xml(user, module, id_tag, module_id):
     ''' Get XML for a module based on module and module_id. Assumes
-        module occurs once in courseware XML file.. '''
-    doc = coursefile
-
+        module occurs once in courseware XML file or hidden section. '''
     # Sanitize input
     if not module.isalnum():
         raise Exception("Module is not alphanumeric")
     if not module_id.isalnum():
         raise Exception("Module ID is not alphanumeric")
-    xpath_search='//*/{module}[(@{id_tag} = "{id}") or (@id = "{id}")]'.format(module=module, 
-                                                           id_tag=id_tag,
-                                                           id=module_id)
+    # Generate search
+    xpath_search='//{module}[(@{id_tag} = "{id}") or (@id = "{id}")]'.format(module=module, 
+                                                                             id_tag=id_tag,
+                                                                             id=module_id)
     #result_set=doc.xpathEval(xpath_search)
+    doc = course_file(user)
+    section_list = (s[:-4] for s in os.listdir(settings.DATA_DIR+'/sections') if s[-4:]=='.xml')
+
     result_set=doc.xpath(xpath_search)
+    if len(result_set)<1:
+        for section in section_list:
+            try: 
+                s = section_file(user, section)
+            except etree.XMLSyntaxError: 
+                ex= sys.exc_info()
+                raise ContentException("Malformed XML in " + section+ "("+str(ex[1].msg)+")")
+            result_set = s.xpath(xpath_search)
+            if len(result_set) != 0: 
+                break
+
     if len(result_set)>1:
         print "WARNING: Potentially malformed course file", module, module_id
     if len(result_set)==0:
