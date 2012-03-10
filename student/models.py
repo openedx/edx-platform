@@ -57,3 +57,31 @@ class Registration(models.Model):
         #self.delete()
 
 #cache_relation(User.profile)
+
+#### Helper methods for use from python manage.py shell. 
+
+def get_user(email):
+    u = User.objects.get(email = email)
+    up = UserProfile.objects.get(user = u)
+    return u,up
+
+def user_info(email):
+    u,up = get_user(email)
+    print "User id", u.id
+    print "Username", u.username
+    print "E-mail", u.email
+    print "Name", up.name
+    print "Location", up.location
+    print "Language", up.language
+    return u,up
+
+def change_email(old_email, new_email):
+    u = User.objects.get(email = old_email)
+    u.email = new_email
+    u.save()
+
+def change_name(email, new_name):
+    u,up = get_user(email)
+    up.name = new_name
+    up.save()
+
