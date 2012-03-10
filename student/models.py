@@ -85,3 +85,9 @@ def change_name(email, new_name):
     up.name = new_name
     up.save()
 
+def user_count():
+    return User.objects.all().count()
+
+def active_user_count():
+    return User.objects.filter(is_active = True).count()
+
