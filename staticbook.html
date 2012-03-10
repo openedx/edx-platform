@@ -5,6 +5,12 @@
 var page=${ page };
 
 $(document).ready(function(){
+   if(!page) {
+     cookie_page = $.cookie("book_page");
+     if(cookie_page) {
+       goto_page(cookie_page);
+     }
+   }
    $("#booknav").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
 });
 
@@ -19,6 +25,7 @@ function goto_page(n) {
     prefix="00";
   }
   $("#bookpage").attr("src","${ settings.BOOK_URL }p"+prefix+n+".png");
+  $.cookie("book_page", n, {'expires':3650, 'path':'/'});
 };
 
 function prev_page() {
