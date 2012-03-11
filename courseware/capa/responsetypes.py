@@ -137,10 +137,10 @@ class formularesponse(object):
                                            student_answers[self.answer_id], 
                                            cs = self.case_sensitive)
             except UndefinedVariable as uv:
-                raise StudentInputError('Undefined: '+uv.message)
+                raise StudentInputError(uv.message+" not permitted in answer")
             except:
                 #traceback.print_exc()
-                raise StudentInputError("Syntax Error")
+                raise StudentInputError("Error in formula")
             if math.isnan(student_result) or math.isinf(student_result):
                 return {self.answer_id:"incorrect"}
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
