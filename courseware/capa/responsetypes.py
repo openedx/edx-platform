@@ -47,7 +47,10 @@ class numericalresponse(object):
     def grade(self, student_answers):
         ''' Display HTML for a numeric response '''
         student_answer = student_answers[self.answer_id]
-        correct = compare_with_tolerance (evaluator(dict(),dict(),student_answer), self.correct_answer, self.tolerance)
+        try:
+            correct = compare_with_tolerance (evaluator(dict(),dict(),student_answer), self.correct_answer, self.tolerance)
+        except:
+            raise StudentInputError('Invalid input -- please use a number only')
 
         if correct:
             return {self.answer_id:'correct'}
