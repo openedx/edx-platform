@@ -153,7 +153,7 @@ def user_groups(user):
     cache_expiration = 60 * 60 # one hour
     
     # Kill caching on dev machines -- we switch groups a lot
-    if "dev" not in setting.DEFAULT_GROUPS:
+    if "dev" not in settings.DEFAULT_GROUPS:
         group_names = cache.get(fasthash(key))
     else: 
         group_names = None
