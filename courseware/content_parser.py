@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+import urllib
 
 from datetime import timedelta
 from lxml import etree
@@ -30,6 +31,9 @@ log = logging.getLogger("mitx.courseware")
 
 
 timedelta_regex = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+
+def format_url_params(params):
+    return [ urllib.quote(string.replace(' ','_')) for string in params ]
 
 def parse_timedelta(time_str):
     parts = timedelta_regex.match(time_str)
