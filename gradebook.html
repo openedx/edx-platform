@@ -1,0 +1,15 @@
+<table>
+% for s in students:
+<h1><a href=/profile/${s['id']}>${s['username']}</a></h1>
+% for c in s['grade_info']['grade_summary']:
+<h2>${c['category']} </h2>
+<p>
+% if 'subscores' in c:
+  % for ss in c['subscores']:
+    <br>${ss['summary']}
+  % endfor
+% endif
+</p>
+% endfor
+% endfor
+</table>
