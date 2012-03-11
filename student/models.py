@@ -29,6 +29,8 @@ class UserProfile(models.Model):
     meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
+## TODO: Should be renamed to generic UserGroup, and possibly
+# Given an optional field for type of group
 class UserTestGroup(models.Model):
     users = models.ManyToManyField(User, db_index=True)
     name = models.CharField(blank=False, max_length=32, db_index=True)
@@ -57,3 +59,52 @@ class Registration(models.Model):
         #self.delete()
 
 #cache_relation(User.profile)
+
+#### Helper methods for use from python manage.py shell. 
+
+def get_user(email):
+    u = User.objects.get(email = email)
+    up = UserProfile.objects.get(user = u)
+    return u,up
+
+def user_info(email):
+    u,up = get_user(email)
+    print "User id", u.id
+    print "Username", u.username
+    print "E-mail", u.email
+    print "Name", up.name
+    print "Location", up.location
+    print "Language", up.language
+    return u,up
+
+def change_email(old_email, new_email):
+    u = User.objects.get(email = old_email)
+    u.email = new_email
+    u.save()
+
+def change_name(email, new_name):
+    u,up = get_user(email)
+    up.name = new_name
+    up.save()
+
+def user_count():
+    return User.objects.all().count()
+
+def active_user_count():
+    return User.objects.filter(is_active = True).count()
+
+def create_group(name, description):
+    utg = UserTestGroup()
+    utg.name = name
+    utg.description = description
+    utg.save()
+
+def add_user_to_group(group, user):
+    utg = UserTestGroup.objects.get(name = group)
+    utg.users.add(User.objects.get(username = user))
+    utg.save()
+
+def remove_user_from_group(group, user):
+    utg = UserTestGroup.objects.get(name = group)
+    utg.users.add(User.objects.get(username = user))
+    utg.save()

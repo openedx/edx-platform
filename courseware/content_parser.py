@@ -151,7 +151,13 @@ def user_groups(user):
     # TODO: Rewrite in Django
     key = 'user_group_names_{user.id}'.format(user=user)
     cache_expiration = 60 * 60 # one hour
-    group_names = cache.get(fasthash(key))
+    
+    # Kill caching on dev machines -- we switch groups a lot
+    if "dev" not in setting.DEFAULT_GROUPS:
+        group_names = cache.get(fasthash(key))
+    else: 
+        group_names = None
+ 
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
         cache.set(fasthash(key), group_names, cache_expiration)
