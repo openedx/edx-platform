@@ -37,6 +37,20 @@ etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
 template_imports={'urllib':urllib}
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def gradebook(request):
+    if 'course_admin' not in content_parser.user_groups(request.user):
+        raise Http404
+    student_objects = User.objects.all()[:100]
+    student_info = [{'username' :s.username,
+                     'id' : s.id,
+                     'email': s.email,
+                     'grade_info' : grades.grade_sheet(s), 
+                     'realname' : UserProfile.objects.get(user = s).name
+                     } for s in student_objects]
+
+    return render_to_response('gradebook.html',{'students':student_info})
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile(request, student_id = None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
@@ -51,8 +65,17 @@ def profile(request, student_id = None):
             raise Http404
         student = User.objects.get( id = int(student_id))
 
-    context = grades.gradesheet(student)
-    context.update({'csrf':csrf(request)['csrf_token']})
+    user_info = UserProfile.objects.get(user=student) # request.user.profile_cache # 
+
+    context={'name':user_info.name,
+             'username':student.username,
+             'location':user_info.location,
+             'language':user_info.language,
+             'email':student.email,
+             'format_url_params' : content_parser.format_url_params,
+             'csrf':csrf(request)['csrf_token']
+             }
+    context.update(grades.grade_sheet(student))
 
     return render_to_response('profile.html', context)
 

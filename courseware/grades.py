@@ -1,9 +1,11 @@
 import logging
 import urllib
+from lxml import etree
 
 import courseware.content_parser as content_parser
 from models import StudentModule
 from django.conf import settings
+import courseware.modules
 
 from student.models import UserProfile
 
@@ -41,7 +43,7 @@ def get_grade(user, problem, cache):
 
     return (correct, total)
 
-def gradesheet(student):
+def grade_sheet(student):
     dom=content_parser.course_file(student)
     course = dom.xpath('//course/@name')[0]
     xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=course)
@@ -220,16 +222,7 @@ def gradesheet(student):
         }
     ]
     
-    
-    user_info = UserProfile.objects.get(user=student) # request.user.profile_cache # 
-    context={'name':user_info.name,
-             'username':student.username,
-             'location':user_info.location,
-             'language':user_info.language,
-             'email':student.email,
-             'chapters':chapters,
-             'format_url_params' : content_parser.format_url_params,
-             'grade_summary' : grade_summary,
-             }
+    return {'grade_summary' : grade_summary,
+            'chapters':chapters}
 
-    return context
+    
