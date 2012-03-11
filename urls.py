@@ -8,6 +8,7 @@ import django.contrib.auth.views
 # admin.autodiscover()
 
 urlpatterns = ('',
+    url(r'^gradebook$', 'courseware.views.gradebook'),
     url(r'^event$', 'track.views.user_track'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),
     url(r'^logout$', 'student.views.logout_user'),
