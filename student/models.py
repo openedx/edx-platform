@@ -29,6 +29,8 @@ class UserProfile(models.Model):
     meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
+## TODO: Should be renamed to generic UserGroup, and possibly
+# Given an optional field for type of group
 class UserTestGroup(models.Model):
     users = models.ManyToManyField(User, db_index=True)
     name = models.CharField(blank=False, max_length=32, db_index=True)
@@ -91,3 +93,13 @@ def user_count():
 def active_user_count():
     return User.objects.filter(is_active = True).count()
 
+def create_group(name, description):
+    utg = UserTestGroup()
+    utg.name = name
+    utg.description = description
+    utg.save()
+
+def add_user_to_group(group, user):
+    utg = UserTestGroup.objects.get(name = group)
+    utg.users.add(User.objects.get(username = user))
+    utg.save()
