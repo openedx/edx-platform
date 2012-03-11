@@ -6,6 +6,7 @@ import tempfile
 import djcelery
 
 # from settings2.askbotsettings import LIVESETTINGS_OPTIONS
+DEFAULT_GROUPS = []
 
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False

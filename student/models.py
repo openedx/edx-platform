@@ -103,3 +103,8 @@ def add_user_to_group(group, user):
     utg = UserTestGroup.objects.get(name = group)
     utg.users.add(User.objects.get(username = user))
     utg.save()
+
+def remove_user_from_group(group, user):
+    utg = UserTestGroup.objects.get(name = group)
+    utg.users.add(User.objects.get(username = user))
+    utg.save()
