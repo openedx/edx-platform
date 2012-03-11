@@ -76,7 +76,7 @@ def profile(request, student_id = None):
     if student_id == None:
         student = request.user
     else: 
-        if 'course_admin' not in user_groups(request.user):
+        if 'course_admin' not in content.user_groups(request.user):
             raise Http404
         student = User.objects.get( id = int(student_id))
 
