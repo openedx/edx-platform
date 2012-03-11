@@ -34,7 +34,7 @@ etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
 
 template_imports={'urllib':urllib}
 
-def get_grade(request, problem, cache):
+def get_grade(user, problem, cache):
     ## HACK: assumes max score is fixed per problem
     id = problem.get('id')
     correct = 0
@@ -43,7 +43,7 @@ def get_grade(request, problem, cache):
     if id not in cache: 
         module = StudentModule(module_type = 'problem',  # TODO: Move into StudentModule.__init__?
                                module_id = id,
-                               student = request.user, 
+                               student = user, 
                                state = None, 
                                grade = 0,
                                max_grade = None,
@@ -67,17 +67,25 @@ def get_grade(request, problem, cache):
     return (correct, total)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request):
+def profile(request, student_id = None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
     if not request.user.is_authenticated():
         return redirect('/')
-    
-    dom=content_parser.course_file(request.user)
+
+    if student_id == None:
+        student = request.user
+    else: 
+        print content_parser.user_groups(request.user)
+        if 'course_admin' not in content_parser.user_groups(request.user):
+            raise Http404
+        student = User.objects.get( id = int(student_id))
+
+    dom=content_parser.course_file(student)
     course = dom.xpath('//course/@name')[0]
     xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
-    responses=StudentModule.objects.filter(student=request.user)
+    responses=StudentModule.objects.filter(student=student)
     response_by_id = {}
     for response in responses:
         response_by_id[response.module_id] = response
@@ -97,7 +105,7 @@ def profile(request):
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    (correct,total) = get_grade(request, p, response_by_id)
+                    (correct,total) = get_grade(student, p, response_by_id)
                     # id = p.get('id')
                     # correct = 0
                     # if id in response_by_id:
@@ -252,12 +260,12 @@ def profile(request):
     ]
     
     
-    user_info = UserProfile.objects.get(user=request.user) # request.user.profile_cache # 
+    user_info = UserProfile.objects.get(user=student) # request.user.profile_cache # 
     context={'name':user_info.name,
-             'username':request.user.username,
+             'username':student.username,
              'location':user_info.location,
              'language':user_info.language,
-             'email':request.user.email,
+             'email':student.email,
              'chapters':chapters,
              'format_url_params' : format_url_params,
              'grade_summary' : grade_summary,
