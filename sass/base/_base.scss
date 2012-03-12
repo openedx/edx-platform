@@ -61,8 +61,13 @@ a {
     text-decoration:none;
   }
 
+  p &, li > &, .inline {
+    border-bottom: 1px solid #bbb;
+    font-style: italic;
+  }
+
   &:hover, &:focus {
-    text-decoration:underline;
+    color: #000;
   }
 }
 
