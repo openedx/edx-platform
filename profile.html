@@ -1,4 +1,5 @@
 <%inherit file="main.html" />
+<%namespace name="profile_graphs" file="profile_graphs.js"/>
 
 <%!
     from django.core.urlresolvers import reverse
@@ -9,7 +10,7 @@
 <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
 <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
 <script>
-<%include file="profile_graphs.js"/>
+${profile_graphs.body(grade_summary, "grade-detail-graph")}
 </script>
 
 <script>
@@ -93,7 +94,7 @@ $(function() {
       <div id="grade-detail-graph"></div>
             
       <ol class="chapters">
-        %for chapter in chapters:
+        %for chapter in courseware_summary:
         %if not chapter['chapter'] == "hidden":
         <li>
           <h2><a href="${reverse('courseware_chapter', args=format_url_params([chapter['course'], chapter['chapter']])) }">
