@@ -95,6 +95,7 @@ section.course-content {
 
             a {
               @include box-shadow(1px 0 0 #555);
+              border-bottom: none;
               border-right: 1px solid #000;
               display: block;
               cursor: pointer;

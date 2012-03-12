@@ -61,7 +61,7 @@ a {
     text-decoration:none;
   }
 
-  p &, li > &, .inline {
+  p &, li > &, span > &, .inline {
     border-bottom: 1px solid #bbb;
     font-style: italic;
   }

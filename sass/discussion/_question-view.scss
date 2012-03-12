@@ -64,7 +64,6 @@ div.question-header {
       overflow: hidden;
       padding: 5px 0 10px;
 
-
       div.tag-list {
         display: inline-block;
         float:left;
@@ -80,6 +79,7 @@ div.question-header {
 
         a {
           // color: darken(#F6EFD4, 50%);
+          border-bottom: none;
 
           &.question-delete {
             color: $mit-red;
@@ -121,6 +121,11 @@ div.question-header {
         width: 20%;
         border-left: 1px dashed #ddd;
 
+        a {
+          border-bottom: none;
+          font-style: normal;
+        }
+
         div.post-update-info {
           @include box-sizing(border-box);
           padding: 10px;
@@ -137,10 +142,6 @@ div.question-header {
             a {
               color: black;
             }
-          }
-
-          a {
-            color:$mit-red ;
           }
 
           div.change-date {
@@ -326,6 +327,7 @@ div.question-header {
       div.controls {
         border-top: 1px solid #efefef;
         text-align: right;
+
         a {
           display: inline-block;
           font-size: 12px;
