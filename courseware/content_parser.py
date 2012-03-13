@@ -194,7 +194,11 @@ def course_file(user):
 
     
     cache_key = filename + "_processed?dev_content:" + str(options['dev_content']) + "&groups:" + str(sorted(groups))
-    tree_string = cache.get(fasthash(cache_key))
+    if "dev" not in settings.DEFAULT_GROUPS:
+        tree_string = cache.get(fasthash(cache_key))
+    else: 
+        tree_string = None
+
     if not tree_string:
         tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
         tree_string = etree.tostring(tree)
