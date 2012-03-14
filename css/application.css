@@ -117,24 +117,24 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates ol li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
   clear: both;
   visibility: hidden; }
 
-.wrapper, html body section.main-content, div.header-wrapper header, footer {
+.wrapper, html body section.main-content, html body section.outside-app, div.header-wrapper header, footer {
   margin: 0 auto;
   max-width: 1400px;
   min-width: 810px;
   text-align: left;
   width: 100%; }
-.wrapper div.table-wrapper, html body section.main-content div.table-wrapper, div.header-wrapper header div.table-wrapper, footer div.table-wrapper, .wrapper div.course-wrapper, html body section.main-content div.course-wrapper, div.header-wrapper header div.course-wrapper, footer div.course-wrapper, .wrapper div.book-wrapper, html body section.main-content div.book-wrapper, div.header-wrapper header div.book-wrapper, footer div.book-wrapper, .wrapper div.info-wrapper, html body section.main-content div.info-wrapper, div.header-wrapper header div.info-wrapper, footer div.info-wrapper, .wrapper div.profile-wrapper, html body section.main-content div.profile-wrapper, div.header-wrapper header div.profile-wrapper, footer div.profile-wrapper, .wrapper body.askbot section.main-content div.discussion-wrapper, body.askbot section.main-content .wrapper div.discussion-wrapper, html body.askbot section.main-content div.discussion-wrapper, div.header-wrapper header body.askbot section.main-content div.discussion-wrapper, body.askbot section.main-content div.header-wrapper header div.discussion-wrapper, footer body.askbot section.main-content div.discussion-wrapper, body.askbot section.main-content footer div.discussion-wrapper {
+.wrapper div.table-wrapper, html body section.main-content div.table-wrapper, html body section.outside-app div.table-wrapper, div.header-wrapper header div.table-wrapper, footer div.table-wrapper, .wrapper div.course-wrapper, html body section.main-content div.course-wrapper, html body section.outside-app div.course-wrapper, div.header-wrapper header div.course-wrapper, footer div.course-wrapper, .wrapper div.book-wrapper, html body section.main-content div.book-wrapper, html body section.outside-app div.book-wrapper, div.header-wrapper header div.book-wrapper, footer div.book-wrapper, .wrapper div.info-wrapper, html body section.main-content div.info-wrapper, html body section.outside-app div.info-wrapper, div.header-wrapper header div.info-wrapper, footer div.info-wrapper, .wrapper div.profile-wrapper, html body section.main-content div.profile-wrapper, html body section.outside-app div.profile-wrapper, div.header-wrapper header div.profile-wrapper, footer div.profile-wrapper, .wrapper div.gradebook-wrapper, html body section.main-content div.gradebook-wrapper, html body section.outside-app div.gradebook-wrapper, div.header-wrapper header div.gradebook-wrapper, footer div.gradebook-wrapper, .wrapper body.askbot section.main-content div.discussion-wrapper, body.askbot section.main-content .wrapper div.discussion-wrapper, html body.askbot section.main-content div.discussion-wrapper, html body.askbot section.outside-app section.main-content div.discussion-wrapper, html body.askbot section.main-content section.outside-app div.discussion-wrapper, div.header-wrapper header body.askbot section.main-content div.discussion-wrapper, body.askbot section.main-content div.header-wrapper header div.discussion-wrapper, footer body.askbot section.main-content div.discussion-wrapper, body.askbot section.main-content footer div.discussion-wrapper, .wrapper html body.askbot section.outside-app div.discussion-wrapper, html body.askbot section.outside-app .wrapper div.discussion-wrapper, html body.askbot section.main-content section.outside-app div.discussion-wrapper, html body.askbot section.outside-app section.main-content div.discussion-wrapper, html body.askbot section.outside-app div.discussion-wrapper, div.header-wrapper header html body.askbot section.outside-app div.discussion-wrapper, html body.askbot section.outside-app div.header-wrapper header div.discussion-wrapper, footer html body.askbot section.outside-app div.discussion-wrapper, html body.askbot section.outside-app footer div.discussion-wrapper {
   display: table;
   width: 100%; }
 
-h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info > h1, div.question-list-header {
+h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info > h1, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
   background: #f3f3f3;
   border-bottom: 1px solid #e3e3e3;
   margin: -22.652px -22.652px 22.652px;
@@ -181,7 +181,7 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   background-image: linear-gradient(top, #a2a2a2, #7b7b7b);
   border: 1px solid #555555; }
 
-.content, div.course-wrapper section.course-content, div.book-wrapper section.book, div.info-wrapper section.updates, div.profile-wrapper section.course-info, div.wiki-wrapper section.wiki-body {
+.content, div.course-wrapper section.course-content, div.book-wrapper section.book, div.info-wrapper section.updates, div.profile-wrapper section.course-info, div.gradebook-wrapper section.gradebook-content, div.wiki-wrapper section.wiki-body {
   -webkit-box-shadow: inset 0 0 2px 3px #f3f3f3;
   -moz-box-shadow: inset 0 0 2px 3px #f3f3f3;
   -ms-box-shadow: inset 0 0 2px 3px #f3f3f3;
@@ -197,7 +197,7 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   vertical-align: top;
   width: 76.518%; }
 @media print {
-  .content, div.course-wrapper section.course-content, div.book-wrapper section.book, div.info-wrapper section.updates, div.profile-wrapper section.course-info, div.wiki-wrapper section.wiki-body {
+  .content, div.course-wrapper section.course-content, div.book-wrapper section.book, div.info-wrapper section.updates, div.profile-wrapper section.course-info, div.gradebook-wrapper section.gradebook-content, div.wiki-wrapper section.wiki-body {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     -ms-box-shadow: none;
@@ -332,7 +332,7 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   text-decoration: none; }
 
 .topbar, nav.sequence-nav, div.book-wrapper section.book nav, div.wiki-wrapper section.wiki-body header {
-  background: #F6EFD4;
+  background: #f6efd4;
   border-bottom: 1px solid #eddfaa;
   -webkit-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
   -moz-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
@@ -460,7 +460,7 @@ html body {
   text-align: center;
   margin: 0;
   background: #f4f4f4; }
-html body section.main-content {
+html body section.main-content, html body section.outside-app {
   background: #fff;
   border: 1px solid #bbb;
   border-bottom: 1px solid #bbb;
@@ -477,7 +477,7 @@ html body section.main-content {
   margin-top: 3px;
   overflow: hidden; }
 @media print {
-  html body section.main-content {
+  html body section.main-content, html body section.outside-app {
     border-bottom: 0;
     -webkit-border-radius: none;
     -moz-border-radius: none;
@@ -485,13 +485,18 @@ html body section.main-content {
     -o-border-radius: none;
     border-radius: none; } }
 @media screen and (min-width: 1400px) {
-  html body section.main-content {
+  html body section.main-content, html body section.outside-app {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     -ms-border-radius: 4px;
     -o-border-radius: 4px;
     border-radius: 4px;
     margin-top: 11.326px; } }
+html body section.outside-app {
+  max-width: 600px;
+  padding: 22.652px; }
+html body section.outside-app input[type="email"], html body section.outside-app input[type="number"], html body section.outside-app input[type="password"], html body section.outside-app input[type="search"], html body section.outside-app input[type="tel"], html body section.outside-app input[type="text"], html body section.outside-app input[type="url"], html body section.outside-app input[type="color"], html body section.outside-app input[type="date"], html body section.outside-app input[type="datetime"], html body section.outside-app input[type="datetime-local"], html body section.outside-app input[type="month"], html body section.outside-app input[type="time"], html body section.outside-app input[type="week"] {
+  display: block; }
 
 div.header-wrapper {
   background: #993333;
@@ -2853,7 +2858,7 @@ nav.sequence-nav ol li .visited, nav.sequence-nav ol li a.seq_video_visited, nav
   -o-box-shadow: inset 0 0 3px #ceb97d;
   box-shadow: inset 0 0 3px #ceb97d; }
 nav.sequence-nav ol li .visited:hover, nav.sequence-nav ol li a.seq_video_visited:hover, nav.sequence-nav ol li a.seq_other_visited:hover, nav.sequence-nav ol li a.seq_vertical_visited:hover, nav.sequence-nav ol li a.seq_problem_visited:hover {
-  background-color: #F6EFD4;
+  background-color: #f6efd4;
   background-position: center center; }
 nav.sequence-nav ol li .active, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.courseware nav.sequence-nav ol li.courseware a, nav.sequence-nav ol div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.book nav.sequence-nav ol li.book a, nav.sequence-nav ol div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.info nav.sequence-nav ol li.info a, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.discussion nav.sequence-nav ol li.discussion a, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.wiki nav.sequence-nav ol li.wiki a, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav.profile nav.sequence-nav ol li.profile a, nav.sequence-nav ol li section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion nav.sequence-nav ol li h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol li section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li a.seq_problem_active {
   -webkit-box-shadow: 0 1px 0 white;
@@ -3177,21 +3182,26 @@ div.book-wrapper.closed section.course-content {
 
 div.info-wrapper section.updates > p {
   margin-bottom: 22.652px; }
-div.info-wrapper section.updates ol {
+div.info-wrapper section.updates > ol {
   list-style: none; }
-div.info-wrapper section.updates ol li {
+div.info-wrapper section.updates > ol > li {
   padding-bottom: 11.326px;
   margin-bottom: 11.326px;
   border-bottom: 1px solid #e3e3e3; }
-div.info-wrapper section.updates ol li h2 {
+div.info-wrapper section.updates > ol > li:first-child {
+  padding: 11.326px;
+  margin-left: -11.326px;
+  background: #f6efd4;
+  border-bottom: 1px solid #eddfaa; }
+div.info-wrapper section.updates > ol > li h2 {
   float: left;
   width: 20.109%;
   margin: 0 2.024% 0 0; }
-div.info-wrapper section.updates ol li section.update-description {
+div.info-wrapper section.updates > ol > li section.update-description {
   float: left;
   width: 77.174%;
   margin-bottom: 0; }
-div.info-wrapper section.updates ol li section.update-description p:last-child {
+div.info-wrapper section.updates > ol > li section.update-description p:last-child {
   margin-bottom: 0; }
 div.info-wrapper section.handouts {
   -webkit-border-radius: 0 4px 4px 0;
@@ -3783,35 +3793,35 @@ table.wiki-history tr.dark {
 div.history-controls {
   margin-top: 20px; }
 
-section.help.main-content {
+section.help.main-content, html body section.help.outside-app {
   padding: 22.652px; }
-section.help.main-content h1 {
+section.help.main-content h1, html body section.help.outside-app h1 {
   margin-top: 0;
   margin-bottom: 22.652px;
   padding-bottom: 22.652px;
   border-bottom: 1px solid #ddd; }
-section.help.main-content p {
+section.help.main-content p, html body section.help.outside-app p {
   max-width: 700px; }
-section.help.main-content h2 {
+section.help.main-content h2, html body section.help.outside-app h2 {
   margin-top: 0; }
-section.help.main-content section.self-help {
+section.help.main-content section.self-help, html body section.help.outside-app section.self-help {
   margin-bottom: 22.652px;
   margin-right: 2.024%;
   float: left;
   width: 48.988%; }
-section.help.main-content section.self-help ul {
+section.help.main-content section.self-help ul, html body section.help.outside-app section.self-help ul {
   margin-left: 4.132%; }
-section.help.main-content section.self-help ul li {
+section.help.main-content section.self-help ul li, html body section.help.outside-app section.self-help ul li {
   margin-bottom: 11.326px; }
-section.help.main-content section.help-email {
+section.help.main-content section.help-email, html body section.help.outside-app section.help-email {
   float: left;
   width: 48.988%; }
-section.help.main-content section.help-email dl {
+section.help.main-content section.help-email dl, html body section.help.outside-app section.help-email dl {
   margin-bottom: 22.652px;
   display: block; }
-section.help.main-content section.help-email dl dd {
+section.help.main-content section.help-email dl dd, html body section.help.outside-app section.help-email dl dd {
   margin-bottom: 22.652px; }
-section.help.main-content section.help-email dl dt {
+section.help.main-content section.help-email dl dt, html body section.help.outside-app section.help-email dl dt {
   font-weight: bold;
   float: left;
   clear: left;
@@ -4778,7 +4788,7 @@ pre.prettyprint {
   padding: 3px;
   border: 0px solid #888; }
 
-.light-button, div.history-controls input[type="submit"], body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, div.question-header div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator span.next, div.paginator span.prev, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a, a.light-button, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a {
+.light-button, div.history-controls input[type="submit"], body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content .tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, div.question-header div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator span.next, div.paginator span.prev, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a, a.light-button, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a {
   -webkit-box-shadow: inset 0 1px 0 white;
   -moz-box-shadow: inset 0 1px 0 white;
   -ms-box-shadow: inset 0 1px 0 white;
@@ -4803,7 +4813,7 @@ pre.prettyprint {
   text-decoration: none;
   cursor: pointer;
   -webkit-font-smoothing: antialiased; }
-.light-button:hover, div.history-controls input[type="submit"]:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, div.question-header div.question-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator div.question-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator span.next:hover, div.paginator span.prev:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, .light-button:focus, div.history-controls input[type="submit"]:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, div.question-header div.question-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator div.question-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator span.next:focus, div.paginator span.prev:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus, a.light-button:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, a.light-button:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus {
+.light-button:hover, div.history-controls input[type="submit"]:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:hover, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content .tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, div.question-header div.question-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator div.question-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:hover:last-child, div.paginator span.next:hover, div.paginator span.prev:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, .light-button:focus, div.history-controls input[type="submit"]:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:focus, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content .tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, div.question-header div.question-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator div.question-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:focus:last-child, div.paginator span.next:focus, div.paginator span.prev:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus, a.light-button:hover, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa:hover, ul.question-list div.post-own-question a:hover, div#question-list div.post-own-question a:hover, form.answer-form div.preview-toggle a:hover, form.question-form div.preview-toggle a:hover, a.light-button:focus, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa:focus, ul.question-list div.post-own-question a:focus, div#question-list div.post-own-question a:focus, form.answer-form div.preview-toggle a:focus, form.question-form div.preview-toggle a:focus {
   background-color: white;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #e6e6e6));
   background-image: -webkit-linear-gradient(top, white, #e6e6e6);
@@ -4820,7 +4830,7 @@ pre.prettyprint {
   text-decoration: none;
   color: #4d1919; }
 
-body.askbot section.main-content div.discussion-wrapper div.discussion-content {
+body.askbot section.main-content div.discussion-wrapper div.discussion-content, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -4831,7 +4841,7 @@ body.askbot section.main-content div.discussion-wrapper div.discussion-content {
   padding: 22.652px;
   vertical-align: top;
   width: 76.518%; }
-body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa {
+body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content .tabula-rasa {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   -ms-border-radius: 5px;
@@ -4845,9 +4855,9 @@ body.askbot section.main-content div.discussion-wrapper div.discussion-content a
   text-decoration: none;
   color: #888;
   font-weight: bold; }
-body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:first-child, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:first-child {
+body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:first-child, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa:first-child, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:first-child, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content .tabula-rasa:first-child {
   margin-top: 70px; }
-body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:last-child, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:last-child {
+body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa:last-child, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa:last-child, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa:last-child, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content .tabula-rasa:last-child {
   margin-bottom: 70px; }
 
 .acInput {
@@ -5178,7 +5188,7 @@ div.question-list-header {
   width: 100%; }
 div.question-list-header h1 {
   margin: 0; }
-div.question-list-header h1 > a.light-button, div.question-list-header h1 > body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content div.question-list-header h1 > a.tabula-rasa, div.question-list-header h1 > ul.question-list div.post-own-question a, ul.question-list div.post-own-question div.question-list-header h1 > a, div.question-list-header h1 > div#question-list div.post-own-question a, div#question-list div.post-own-question div.question-list-header h1 > a, div.question-list-header h1 > form.answer-form div.preview-toggle a, form.answer-form div.preview-toggle div.question-list-header h1 > a, div.question-list-header h1 > form.question-form div.preview-toggle a, form.question-form div.preview-toggle div.question-list-header h1 > a {
+div.question-list-header h1 > a.light-button, div.question-list-header h1 > body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content div.question-list-header h1 > a.tabula-rasa, div.question-list-header h1 > html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content div.question-list-header h1 > a.tabula-rasa, div.question-list-header h1 > ul.question-list div.post-own-question a, ul.question-list div.post-own-question div.question-list-header h1 > a, div.question-list-header h1 > div#question-list div.post-own-question a, div#question-list div.post-own-question div.question-list-header h1 > a, div.question-list-header h1 > form.answer-form div.preview-toggle a, form.answer-form div.preview-toggle div.question-list-header h1 > a, div.question-list-header h1 > form.question-form div.preview-toggle a, form.question-form div.preview-toggle div.question-list-header h1 > a {
   float: right; }
 div.question-list-header section.question-list-meta {
   display: block;
@@ -5297,6 +5307,19 @@ ul.question-list li.single-question div.question-meta ul li:last-child, div#ques
   margin-right: 0px; }
 ul.question-list li.single-question div.question-meta ul li:hover span, ul.question-list li.single-question div.question-meta ul li:hover div, div#question-list li.single-question div.question-meta ul li:hover span, div#question-list li.single-question div.question-meta ul li:hover div {
   color: #555; }
+ul.question-list li.single-question div.question-meta ul li.answers.accepted, div#question-list li.single-question div.question-meta ul li.answers.accepted {
+  background-color: white;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #e9f3e7));
+  background-image: -webkit-linear-gradient(top, white, #e9f3e7);
+  background-image: -moz-linear-gradient(top, white, #e9f3e7);
+  background-image: -ms-linear-gradient(top, white, #e9f3e7);
+  background-image: -o-linear-gradient(top, white, #e9f3e7);
+  background-image: linear-gradient(top, white, #e9f3e7);
+  border-color: #c4dfbe; }
+ul.question-list li.single-question div.question-meta ul li.answers.accepted span, ul.question-list li.single-question div.question-meta ul li.answers.accepted div, div#question-list li.single-question div.question-meta ul li.answers.accepted span, div#question-list li.single-question div.question-meta ul li.answers.accepted div {
+  color: #5c9d4d; }
+ul.question-list li.single-question div.question-meta ul li.answers.no-answers span, ul.question-list li.single-question div.question-meta ul li.answers.no-answers div, div#question-list li.single-question div.question-meta ul li.answers.no-answers span, div#question-list li.single-question div.question-meta ul li.answers.no-answers div {
+  color: #cc6666; }
 ul.question-list li.single-question div.question-meta ul li span, ul.question-list li.single-question div.question-meta ul li div, div#question-list li.single-question div.question-meta ul li span, div#question-list li.single-question div.question-meta ul li div {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -5455,7 +5478,9 @@ div.question-header div.question-container div.meta-bar div.question-actions, di
   text-align: right;
   width: 48.466%; }
 div.question-header div.question-container div.meta-bar div.question-actions a.question-delete, div.answer-block div.question-container div.meta-bar div.question-actions a.question-delete, div.paginator div.question-container div.meta-bar div.question-actions a.question-delete, div.question-header div.answer-block div.answer-container div.meta-bar div.question-actions a.question-delete, div.answer-block div.question-header div.answer-container div.meta-bar div.question-actions a.question-delete, div.answer-block div.answer-container div.meta-bar div.question-actions a.question-delete, div.paginator div.answer-block div.answer-container div.meta-bar div.question-actions a.question-delete, div.answer-block div.paginator div.answer-container div.meta-bar div.question-actions a.question-delete, div.question-header div.paginator div.answer-container div.meta-bar div.question-actions a.question-delete, div.paginator div.question-header div.answer-container div.meta-bar div.question-actions a.question-delete, div.answer-block div.paginator div.answer-container div.meta-bar div.question-actions a.question-delete, div.paginator div.answer-block div.answer-container div.meta-bar div.question-actions a.question-delete, div.paginator div.answer-container div.meta-bar div.question-actions a.question-delete, div.question-header div.question-container div.answer-block div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-header div.question-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.question-container div.answer-block div.meta-bar div.answer-actions a.question-delete, div.answer-block div.paginator div.question-container div.meta-bar div.answer-actions a.question-delete, div.question-header div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-header div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions a.question-delete, div.question-header div.paginator div.answer-container div.answer-block div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-header div.paginator div.answer-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.question-header div.answer-container div.answer-block div.meta-bar div.answer-actions a.question-delete, div.answer-block div.paginator div.question-header div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-container div.answer-block div.meta-bar div.answer-actions a.question-delete, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions a.question-delete, div.question-header div.question-container div.paginator div.meta-bar div.answer-actions a.question-delete, div.paginator div.question-header div.question-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-container div.paginator div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-block div.question-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.question-container div.meta-bar div.answer-actions a.question-delete, div.question-header div.answer-block div.answer-container div.paginator div.meta-bar div.answer-actions a.question-delete, div.paginator div.question-header div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.question-header div.answer-container div.paginator div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-block div.question-header div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.answer-container div.paginator div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions a.question-delete, div.question-header div.paginator div.answer-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.question-header div.answer-container div.meta-bar div.answer-actions a.question-delete, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions a.question-delete, div.paginator div.answer-container div.meta-bar div.answer-actions a.question-delete {
-  color: #993333; }
+  color: #993333;
+  text-decoration: none;
+  cursor: pointer; }
 div.question-header div.question-container div.meta-bar div.question-actions span.sep, div.answer-block div.question-container div.meta-bar div.question-actions span.sep, div.paginator div.question-container div.meta-bar div.question-actions span.sep, div.question-header div.answer-block div.answer-container div.meta-bar div.question-actions span.sep, div.answer-block div.question-header div.answer-container div.meta-bar div.question-actions span.sep, div.answer-block div.answer-container div.meta-bar div.question-actions span.sep, div.paginator div.answer-block div.answer-container div.meta-bar div.question-actions span.sep, div.answer-block div.paginator div.answer-container div.meta-bar div.question-actions span.sep, div.question-header div.paginator div.answer-container div.meta-bar div.question-actions span.sep, div.paginator div.question-header div.answer-container div.meta-bar div.question-actions span.sep, div.answer-block div.paginator div.answer-container div.meta-bar div.question-actions span.sep, div.paginator div.answer-block div.answer-container div.meta-bar div.question-actions span.sep, div.paginator div.answer-container div.meta-bar div.question-actions span.sep, div.question-header div.question-container div.answer-block div.meta-bar div.answer-actions span.sep, div.answer-block div.question-header div.question-container div.meta-bar div.answer-actions span.sep, div.answer-block div.question-container div.meta-bar div.answer-actions span.sep, div.paginator div.question-container div.answer-block div.meta-bar div.answer-actions span.sep, div.answer-block div.paginator div.question-container div.meta-bar div.answer-actions span.sep, div.question-header div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.question-header div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions span.sep, div.question-header div.paginator div.answer-container div.answer-block div.meta-bar div.answer-actions span.sep, div.answer-block div.question-header div.paginator div.answer-container div.meta-bar div.answer-actions span.sep, div.paginator div.question-header div.answer-container div.answer-block div.meta-bar div.answer-actions span.sep, div.answer-block div.paginator div.question-header div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions span.sep, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.paginator div.answer-container div.answer-block div.meta-bar div.answer-actions span.sep, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions span.sep, div.question-header div.question-container div.paginator div.meta-bar div.answer-actions span.sep, div.paginator div.question-header div.question-container div.meta-bar div.answer-actions span.sep, div.answer-block div.question-container div.paginator div.meta-bar div.answer-actions span.sep, div.paginator div.answer-block div.question-container div.meta-bar div.answer-actions span.sep, div.paginator div.question-container div.meta-bar div.answer-actions span.sep, div.question-header div.answer-block div.answer-container div.paginator div.meta-bar div.answer-actions span.sep, div.paginator div.question-header div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.question-header div.answer-container div.paginator div.meta-bar div.answer-actions span.sep, div.paginator div.answer-block div.question-header div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.answer-container div.paginator div.meta-bar div.answer-actions span.sep, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions span.sep, div.question-header div.paginator div.answer-container div.meta-bar div.answer-actions span.sep, div.paginator div.question-header div.answer-container div.meta-bar div.answer-actions span.sep, div.answer-block div.paginator div.answer-container div.meta-bar div.answer-actions span.sep, div.paginator div.answer-block div.answer-container div.meta-bar div.answer-actions span.sep, div.paginator div.answer-container div.meta-bar div.answer-actions span.sep {
   color: #ccc; }
 div.question-header div.question-container div.question-content, div.answer-block div.question-container div.question-content, div.paginator div.question-container div.question-content, div.question-header div.answer-block div.answer-container div.question-content, div.answer-block div.question-header div.answer-container div.question-content, div.answer-block div.answer-container div.question-content, div.paginator div.answer-block div.answer-container div.question-content, div.answer-block div.paginator div.answer-container div.question-content, div.question-header div.paginator div.answer-container div.question-content, div.paginator div.question-header div.answer-container div.question-content, div.answer-block div.paginator div.answer-container div.question-content, div.paginator div.answer-block div.answer-container div.question-content, div.paginator div.answer-container div.question-content, div.question-header div.question-container div.answer-block div.answer-container div.answer-content, div.answer-block div.answer-container div.question-header div.question-container div.answer-content, div.answer-block div.question-container div.answer-container div.answer-content, div.answer-block div.answer-container div.question-container div.answer-content, div.paginator div.question-container div.answer-block div.answer-container div.answer-content, div.answer-block div.answer-container div.paginator div.question-container div.answer-content, div.question-header div.answer-block div.answer-container div.answer-content, div.answer-block div.question-header div.answer-container div.answer-content, div.answer-block div.answer-container div.answer-content, div.paginator div.answer-block div.answer-container div.answer-content, div.answer-block div.paginator div.answer-container div.answer-content, div.question-header div.paginator div.answer-block div.answer-container div.answer-content, div.answer-block div.question-header div.paginator div.answer-container div.answer-content, div.paginator div.question-header div.answer-block div.answer-container div.answer-content, div.answer-block div.paginator div.question-header div.answer-container div.answer-content, div.answer-block div.paginator div.answer-container div.answer-content, div.paginator div.answer-block div.answer-container div.answer-content, div.paginator div.answer-block div.answer-container div.answer-content, div.answer-block div.paginator div.answer-container div.answer-content, div.question-header div.question-container div.paginator div.answer-container div.answer-content, div.paginator div.answer-container div.question-header div.question-container div.answer-content, div.answer-block div.question-container div.paginator div.answer-container div.answer-content, div.paginator div.answer-container div.answer-block div.question-container div.answer-content, div.paginator div.question-container div.answer-container div.answer-content, div.paginator div.answer-container div.question-container div.answer-content, div.question-header div.answer-block div.paginator div.answer-container div.answer-content, div.paginator div.question-header div.answer-block div.answer-container div.answer-content, div.answer-block div.question-header div.paginator div.answer-container div.answer-content, div.paginator div.answer-block div.question-header div.answer-container div.answer-content, div.answer-block div.paginator div.answer-container div.answer-content, div.paginator div.answer-block div.answer-container div.answer-content, div.paginator div.answer-block div.answer-container div.answer-content, div.answer-block div.paginator div.answer-container div.answer-content, div.question-header div.paginator div.answer-container div.answer-content, div.paginator div.question-header div.answer-container div.answer-content, div.answer-block div.paginator div.answer-container div.answer-content, div.paginator div.answer-block div.answer-container div.answer-content, div.paginator div.answer-container div.answer-content {
@@ -5845,8 +5870,7 @@ form.question-form input[type="text"] {
   width: 48.988%; }
 form.question-form input[type="checkbox"] {
   margin-top: 10px; }
-
-div#question-list {
+form.question-form div#question-list {
   background-color: rgba(255, 255, 255, 0.95);
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -5861,12 +5885,12 @@ div#question-list {
   position: absolute;
   width: 35%;
   z-index: 9999; }
-div#question-list h2 {
+form.question-form div#question-list h2 {
   text-transform: none;
   padding: 8px 0;
   border-bottom: 1px solid #eee;
   margin: 0; }
-div#question-list h2 span {
+form.question-form div#question-list h2 span {
   background: #eee;
   color: #555;
   padding: 2px 5px;
