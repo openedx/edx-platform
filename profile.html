@@ -77,6 +77,19 @@ $(function() {
          log_event("profile", {"type":"password_send"});
       });
     });
+
+    $("#update_email").click(function() {
+      $("#change_email_link").click();
+    });
+
+    $("#apply_name").click(function() {
+      $("#apply_name_change_link").click();      
+    });
+
+    $("#unenroll_button").click(function(){
+      $("#unenroll_course_link").click();
+    });
+
 });
 </script>
 </%block>
@@ -136,10 +149,18 @@ $(function() {
     <section class="user-info">
 
       <h1>${name}</h1>
-
+      %if True:
+        <a href="#" id="apply_name">Apply to change</a>
+      %else:
+	(Name change pending)
+      %endif
       <ul>
-        <li>Forum name: <strong>${username}</strong></li>
-        <li>E-mail: <strong>${email}</strong></li>
+        <li>
+	  Forum name: <strong>${username}</strong> 
+	</li>
+        <li>
+	  E-mail: <strong>${email}</strong> <a href="#" id="update_email">Update</a>
+	</li>
         <li>
           Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Edit</a>
         </li>
@@ -155,13 +176,51 @@ $(function() {
         <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
         <input type="submit" id="pwd_reset_button" value="Reset Password" />
       </div>
-
+      
+      <div id="unenroll">
+	<input type="submit" id="unenroll_button" value="Unenroll" />
+      </div>
     </section>
   </div>
 </section>
 
-      <div id="password_reset_complete" class="leanModal_box">
-      <a href="#password_reset_complete" rel="leanModal" id="password_reset_complete_link"></a>
-        <h1>Password Reset Email Sent</h1>
-        An email has been sent to ${email}. Follow the link in the email to change your password.
-      </div>
+<div id="password_reset_complete" class="leanModal_box">
+  <a href="#password_reset_complete" rel="leanModal" id="password_reset_complete_link"></a>
+  <h1>Password Reset Email Sent</h1>
+  An email has been sent to ${email}. Follow the link in the email to change your password.
+</div>
+
+<div id="apply_name_change" class="leanModal_box">
+  <a href="#apply_name_change_link" rel="leanModal" id="apply_name_change_link"></a>
+  <h1>Apply to change your name</h1>
+  Enter your desired full name, as it will appear on the MITx Certificate: 
+  <p><input id="new_name" value="" />
+  <p>Reason for name change: 
+  <p><input id="name_rationale" value="" />
+  <p>A member of the course staff will review your request, and if approved, update your information. 
+  <p><input id="submit">
+</div>
+
+<div id="change_email" class="leanModal_box">
+  <a href="#change_email_link" rel="leanModal" id="change_email_link"></a>
+  <h1>Change e-mail</h1> 
+  <p> Please enter your new email address: 
+  <p><input id="new_name" value="" />
+  <p> Please confirm your password: 
+  <p><input id="new_name" value="" type="password" />
+  <p> We will send a confirmation to both ${email} and your new e-mail
+  as part of the process. Since we use e-mail as an authentication
+  mechanism, we keep a log e-mail changes.
+  <p><input id="submit">
+</div>
+
+<div id="unenroll_course" class="leanModal_box">
+  <a href="#unenroll_course_link" rel="leanModal" id="unenroll_course_link"></a>
+<h1> Unenroll </h1>
+<p> At the end of the semester, all students who do not complete the
+course will be automatically dropped. If you would still prefer to
+deactivate your account, you can: 
+<p> Deactivate account, but inform me about future courses.
+<p> Deactivate account/do not inform me about future courses. 
+</p>
+</div>
