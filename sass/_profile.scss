@@ -8,11 +8,14 @@ div.profile-wrapper {
     border-left: 1px solid #d3d3d3;
     border-right: 0;
 
-    h1 {
+    header {
       padding: lh(.5) lh();
-      font-size: 18px;
       margin: 0 ;
       @extend .bottom-border;
+
+      h1 {
+        font-size: 18px;
+      }
     }
 
     ul {
@@ -57,7 +60,7 @@ div.profile-wrapper {
           font-size: 12px;
         }
 
-        a#change_language, a#change_location {
+        a#change_language, a#change_location, a.edit-email {
           position: absolute;
           top: 9px;
           right: lh(.5);
@@ -69,12 +72,39 @@ div.profile-wrapper {
             color: #555;
           }
         }
+
       }
     }
 
     div#change_password_pop {
-      padding: 7px lh();
+      border-bottom: 1px solid #d3d3d3;
+      @include box-shadow(0 1px 0 #eee);
       color: #4D4D4D;
+      padding: 7px lh();
+
+      h2 {
+        margin-top: 0;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: $body-font-size;
+      }
+    }
+
+    div#unenroll {
+      border-bottom: 1px solid #d3d3d3;
+      @include box-shadow(0 1px 0 #eee);
+
+      a {
+        color: lighten($text-color, 10%);
+        display: block;
+        display: block;
+        padding: 7px lh();
+        @include transition();
+
+        &:hover {
+          background: #efefef;
+        }
+      }
     }
   }
 
