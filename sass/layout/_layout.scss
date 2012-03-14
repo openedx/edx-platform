@@ -29,5 +29,15 @@ html {
         margin-top: lh(.5);
       }
     }
+
+    section.outside-app {
+      @extend .main-content;
+      max-width: 600px;
+      padding: lh();
+
+      #{$all-text-inputs} {
+        display: block;
+      }
+    }
   }
 }

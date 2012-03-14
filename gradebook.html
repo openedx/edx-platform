@@ -1,38 +1,27 @@
+<<<<<<< local
+<%inherit file="main.html" />
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
-<html>
-  <head>
-    <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
-    <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>    
-    <script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
-    <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
-    <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
-
+<%block name="headextra">
+  <script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
+  <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
+  <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
     
-    % for s in students:
-    <script>
+  % for s in students:
+  <script>
     ${profile_graphs.body(s['grade_info']['grade_summary'], "grade-detail-graph-" + str(s['id']))}
-    </script>
-    %endfor
-  </head>
-  <body>
-    % for s in students:
-    <h1><a href=/profile/${s['id']}>${s['username']}</a></h1>
+  </script>
+  %endfor
+</%block>
 
-    <div id="grade-detail-graph-${s['id']}" style="width:1000;height:300;"></div>
-
-    <!---
-    % for c in s['grade_info']['grade_summary']:
-    <h2>${c['category']} </h2>
-    <p>
-    % if 'subscores' in c:
-      % for ss in c['subscores']:
-        <br>${ss['summary']}
+<%include file="navigation.html" args="active_page=''" />
+<section class="main-content">
+  <div class="gradebook-wrapper">
+    <section class="gradebook-content">
+      % for s in students:
+      <h2><a href=/profile/${s['id']}>${s['username']}</a></h2>
+      <div id="grade-detail-graph-${s['id']}" style="width:1000px;height:300px;"></div>
       % endfor
-    % endif
-    </p>
-    % endfor
-    -->
-    % endfor
-  </body>
-</html>
+    </section>
+  </div>
+</section>

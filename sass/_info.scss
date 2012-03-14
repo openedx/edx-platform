@@ -12,14 +12,21 @@ div.info-wrapper {
       margin-bottom: lh();
     }
 
-    ol {
+    > ol {
       list-style: none;
 
-      li {
+      > li {
         padding-bottom: lh(.5);
         margin-bottom: lh(.5);
         @extend .clearfix;
         border-bottom: 1px solid #e3e3e3;
+
+        &:first-child {
+          padding: lh(.5);
+          margin-left: (-(lh(.5)));
+          background: $cream;
+          border-bottom: 1px solid darken($cream, 10%);
+        }
 
         h2 {
           float: left;
