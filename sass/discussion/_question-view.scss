@@ -19,8 +19,8 @@ div.question-header {
 
         &.post-vote {
           @include border-radius(4px);
-          background-color: lighten(#F6EFD4, 5%);
-          border: 1px solid darken( #F6EFD4,10% );
+          background-color: lighten($cream, 5%);
+          border: 1px solid darken( $cream, 10% );
           @include box-shadow(inset 0 1px 0px #fff);
         }
 
@@ -64,7 +64,6 @@ div.question-header {
       overflow: hidden;
       padding: 5px 0 10px;
 
-
       div.tag-list {
         display: inline-block;
         float:left;
@@ -79,8 +78,6 @@ div.question-header {
         width: flex-grid(4,8);
 
         a {
-          // color: darken(#F6EFD4, 50%);
-
           &.question-delete {
             color: $mit-red;
             text-decoration: none;
@@ -123,6 +120,11 @@ div.question-header {
         width: 20%;
         border-left: 1px dashed #ddd;
 
+        a {
+          border-bottom: none;
+          font-style: normal;
+        }
+
         div.post-update-info {
           @include box-sizing(border-box);
           padding: 10px;
@@ -134,15 +136,11 @@ div.question-header {
 
           &.revision {
             text-align: center;
-            background:lighten(#F6EFD4, 7%);
+            background:lighten($cream, 7%);
 
             a {
               color: black;
             }
-          }
-
-          a {
-            color:$mit-red ;
           }
 
           div.change-date {
@@ -328,6 +326,7 @@ div.question-header {
       div.controls {
         border-top: 1px solid #efefef;
         text-align: right;
+
         a {
           display: inline-block;
           font-size: 12px;

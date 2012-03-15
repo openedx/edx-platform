@@ -1,0 +1,11 @@
+div.gradebook-wrapper {
+  @extend .table-wrapper;
+
+  section.gradebook-content {
+    @extend .content;
+
+    h1 {
+      @extend .top-header;
+    }
+  }
+}

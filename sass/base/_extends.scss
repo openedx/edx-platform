@@ -74,9 +74,14 @@ h1.top-header {
 
   h1, h2 {
    font-size: 18px;
-   font-weight: 800;
+   font-weight: bold;
    letter-spacing: 0;
    text-transform: none;
+  }
+
+  a {
+    font-style: normal;
+    border: none;
   }
 
   .bottom-border {
@@ -166,8 +171,8 @@ h1.top-header {
 
 .topbar {
   @extend .clearfix;
-  background: #F6EFD4;
-  border-bottom: 1px solid darken(#F6EFD4, 10%);
+  background: $cream;
+  border-bottom: 1px solid darken($cream, 10%);
   @include box-shadow(inset 0 1px 0 #fff, inset 1px 0 0 #fff);
   font-size: 12px;
   margin: (-$body-line-height) (-$body-line-height) $body-line-height;
@@ -180,17 +185,18 @@ h1.top-header {
   }
 
   a {
-    color: darken(#F6EFD4, 80%);
+    border-bottom: 0;
+    color: darken($cream, 80%);
 
     &:hover {
-      color: darken(#F6EFD4, 60%);
+      color: darken($cream, 60%);
       text-decoration: none;
     }
 
     &.block-link {
-      background: darken(#F6EFD4, 5%);
-      border-left: 1px solid darken(#f6efd4, 20%);
-      @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
+      background: darken($cream, 5%);
+      border-left: 1px solid darken($cream, 20%);
+      @include box-shadow(inset 1px 0 0 lighten($cream, 5%));
       display: block;
       text-transform: uppercase;
 

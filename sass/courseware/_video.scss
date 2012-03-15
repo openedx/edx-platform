@@ -95,6 +95,7 @@ section.course-content {
 
             a {
               @include box-shadow(1px 0 0 #555);
+              border-bottom: none;
               border-right: 1px solid #000;
               display: block;
               cursor: pointer;
@@ -141,20 +142,13 @@ section.course-content {
             line-height: 46px; //height of play pause buttons
             margin-right: 0;
             -webkit-font-smoothing: antialiased;
+            opacity: .7;
+            @include transition();
 
             h3 {
               @include inline-block();
-
-              a {
-                color: #fff;
-                padding: 0 lh(.5);
-                @include inline-block();
-
-                &:hover {
-                  text-decoration: none;
-                  // background-color: #444;
-                }
-              }
+              padding: 0 lh(.5);
+              font-weight: normal;
             }
 
             // fix for now
@@ -164,12 +158,22 @@ section.course-content {
 
               li {
                 cursor: pointer;
+                color: #fff;
                 @include inline-block();
 
                 &.active {
                   font-weight: bold;
                 }
+
+                &:hover {
+                  color: #aaa;
+                }
               }
+            }
+
+            &:hover {
+              opacity: 1;
+              background-color: #444;
             }
           }
 
@@ -184,6 +188,7 @@ section.course-content {
             font-weight: 800;
             background: url('/static/images/cc.png') 16px center no-repeat;
             -webkit-font-smoothing: antialiased;
+            @include transition();
 
             &:hover {
               color: #fff;

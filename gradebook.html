@@ -1,15 +1,22 @@
-<table>
-% for s in students:
-<h1><a href=/profile/${s['id']}>${s['username']}</a></h1>
-% for c in s['grade_info']['grade_summary']:
-<h2>${c['category']} </h2>
-<p>
-% if 'subscores' in c:
+<%inherit file="main.html" />
+<%include file="navigation.html" args="active_page=''" />
+<section class="main-content">
+<div class="gradebook-wrapper">
+  <section class="gradebook-content">
+  <h1>Gradebook</h1>
+  % for s in students:
+  <h2><a href=/profile/${s['id']}>${s['username']}</a></h2>
+  % for c in s['grade_info']['grade_summary']:
+  <h3>${c['category']} </h3>
+  <p>
+  % if 'subscores' in c:
   % for ss in c['subscores']:
-    <br>${ss['summary']}
+  <br>${ss['summary']}
   % endfor
-% endif
-</p>
-% endfor
-% endfor
-</table>
+  % endif
+  </p>
+  % endfor
+  % endfor
+  </section>
+</div>
+</section>
