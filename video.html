@@ -28,11 +28,11 @@
 
         <div class="secondary-controls">
         <div class="speeds">
-          <h3><a href="#">Speed</a></h3>
+          <h3>Speed</h3>
           <ol id="video_speeds"></ol>
         </div>
 
-        <a href="#" class="hide-subtitles">on</a>
+        <a href="#" class="hide-subtitles">turn off</a>
         </div>
       </section>
     </section>
@@ -66,7 +66,7 @@
         $('div.video-subtitles').toggleClass('closed');
 
         var link_text = $('.hide-subtitles').text();
-        $(this).text((link_text == 'on') ? 'off' : 'on');
+        $(this).text((link_text == 'turn off') ? 'turn on' : 'turn off');
         return false;
        });
   });
