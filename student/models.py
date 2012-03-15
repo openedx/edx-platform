@@ -59,13 +59,13 @@ class Registration(models.Model):
         #self.delete()
 
 class PendingNameChange(models.Model):
-    user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
-    new_name = models.CharField(blank=True, max_length=255, db_index=True)
-    rationale = models.CharField(blank=True, max_length=1024, db_index=True)
+    user = models.OneToOneField(User, unique=True, db_index=True)
+    new_name = models.CharField(blank=True, max_length=255)
+    rationale = models.CharField(blank=True, max_length=1024)
 
 class PendingEmailChange(models.Model):
-    user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
-    new_email = models.CharField(blank=True, max_length=255, db_index=True)
+    user = models.OneToOneField(User, unique=True, db_index=True)
+    new_email = models.CharField(blank=True, max_length=255)
     
 
 #cache_relation(User.profile)
