@@ -264,7 +264,20 @@ def change_email_request(request):
     ## Maske sure it checks for existing e-mail conflicts
     if not request.user.is_authenticated:
         raise Http404
-    pass
+    
+    if not request.user.check_password(request.POST['password']):
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error':'Invalid password'})) 
+    
+    new_email = request.POST['new_email']
+    if len(User.objects.filter(email = new_email)) != 0:
+        ## CRITICAL TODO: Handle case for e-mails
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error':'An account with this e-mail already exists.'}))         
+
+    
+
+    request.POST['new_email']
 
 @ensure_csrf_cookie
 def change_email_confirm(request):

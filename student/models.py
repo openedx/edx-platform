@@ -65,7 +65,7 @@ class PendingNameChange(models.Model):
 
 class PendingEmailChange(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
-    new_email = models.CharField(blank=True, max_length=255)
+    new_email = models.CharField(blank=True, max_length=255, db_index=True)
     
 
 #cache_relation(User.profile)
