@@ -163,6 +163,13 @@ MAKO_TEMPLATES = {}
 
 LOGGING_ENV = "dev" # override this in different environments
 
+# Default dev cache (i.e. no caching)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 # Make sure we execute correctly regardless of where we're called from
 execfile(os.path.join(BASE_DIR, "settings.py"))
 
