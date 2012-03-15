@@ -11,10 +11,11 @@ from lxml import etree
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
-    from django.core.cache import cache
+
     from student.models import UserProfile
     from student.models import UserTestGroup
     from mitxmako.shortcuts import render_to_response, render_to_string
+    from util.cache import cache
 except: 
     settings = None 
 
