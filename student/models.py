@@ -58,6 +58,16 @@ class Registration(models.Model):
         self.user.save()
         #self.delete()
 
+class PendingNameChange(models.Model):
+    user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
+    new_name = models.CharField(blank=True, max_length=255, db_index=True)
+    rationale = models.CharField(blank=True, max_length=1024, db_index=True)
+
+class PendingEmailChange(models.Model):
+    user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
+    new_email = models.CharField(blank=True, max_length=255, db_index=True)
+    
+
 #cache_relation(User.profile)
 
 #### Helper methods for use from python manage.py shell. 
