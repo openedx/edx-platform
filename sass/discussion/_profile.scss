@@ -70,7 +70,7 @@ body.user-profile-page {
         margin-bottom: 30px;
 
         li {
-          background-color: lighten(#F6EFD4, 3%);
+          background-color: lighten($cream, 3%);
           background-position: 10px center;
           background-repeat: no-repeat;
           @include border-radius(4px);

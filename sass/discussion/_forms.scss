@@ -128,9 +128,8 @@ form.question-form {
   input[type="checkbox"] {
     margin-top: 10px;
   }
-}
 
-div#question-list {
+  div#question-list {
   background-color: rgba(255,255,255,0.95);
   @include box-sizing(border-box);
   margin-top: -15px;
@@ -157,3 +156,6 @@ div#question-list {
     }
   }
 }
+}
+
+
