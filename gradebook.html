@@ -5,7 +5,6 @@
   <script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
   <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
   <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
-    
   % for s in students:
   <script>
     ${profile_graphs.body(s['grade_info']['grade_summary'], "grade-detail-graph-" + str(s['id']))}
@@ -15,12 +14,17 @@
 
 <%include file="navigation.html" args="active_page=''" />
 <section class="main-content">
-  <div class="gradebook-wrapper">
-    <section class="gradebook-content">
+<div class="gradebook-wrapper">
+  <section class="gradebook-content">
+    <h1>Gradebook</h1>
+    <ol>
       % for s in students:
-      <h2><a href=/profile/${s['id']}>${s['username']}</a></h2>
-      <div id="grade-detail-graph-${s['id']}" style="width:1000px;height:300px;"></div>
+      <li>
+        <h2><a href=/profile/${s['id']}>${s['username']}</a></h2>
+        <div id="grade-detail-graph-${s['id']}" style="width:1000px;height:300px;"></div>
+      </li>
       % endfor
-    </section>
-  </div>
+    </ol>
+  </section>
+</div>
 </section>
