@@ -79,6 +79,11 @@ h1.top-header {
    text-transform: none;
   }
 
+  a {
+    font-style: normal;
+    border: none;
+  }
+
   .bottom-border {
     @include box-shadow(0 1px 0 #eee);
     border-bottom: 1px solid #d3d3d3;
@@ -180,6 +185,7 @@ h1.top-header {
   }
 
   a {
+    border-bottom: 0;
     color: darken($cream, 80%);
 
     &:hover {

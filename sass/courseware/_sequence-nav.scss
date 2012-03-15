@@ -237,6 +237,7 @@ section.course-content {
 
     ul {
       @extend .clearfix;
+      background-color: darken(#F6EFD4, 5%);
       border: 1px solid darken(#f6efd4, 20%);
       border-bottom: 0;
       @include border-radius(3px 3px 0 0);
@@ -254,6 +255,8 @@ section.course-content {
           a {
             background-position: center center;
             background-repeat: no-repeat;
+            border-bottom: none;
+            display: block;
             padding: lh(.75) 4px;
             text-indent: -9999px;
             width: 45px;
@@ -261,16 +264,16 @@ section.course-content {
             @include transition(all, .4s, $ease-in-out-quad);
 
             &:hover {
-              text-decoration: none;
-              color: darken($cream, 60%);
-              text-decoration: none;
-              opacity: .5;
               background-color: darken($cream, 10%);
+              color: darken(#F6EFD4, 60%);
+              color: darken($cream, 60%);
+              opacity: .5;
+              text-decoration: none;
             }
 
             &.disabled {
-              opacity: .4;
               background-color: lighten($cream, 10%);
+              opacity: .4;
             }
           }
         }
