@@ -252,3 +252,68 @@ def password_reset(request):
     else:
         return HttpResponse(json.dumps({'success':False,
                                         'error': 'Invalid e-mail'}))
+
+@ensure_csrf_cookie
+def reactivation_email(request):
+    ''' Send an e-mail to reactivate a deactivated account, or to
+    resend an activation e-mail '''
+    pass
+
+@ensure_csrf_cookie
+def change_email_request(request):
+    if not request.user.is_authenticated:
+        raise Http404
+    pass
+
+@ensure_csrf_cookie
+def change_email_confirm(request):
+    pass
+
+@ensure_csrf_cookie
+def change_name_request(request):
+    if not request.user.is_authenticated:
+        raise Http404
+    
+    pnc = PendingNameChange()
+    pnc.user = request.User
+    pnc.new_name = request.POST['new_name']
+    pnc.rationale = request.POST['rationale']
+    pnc.save()
+    return HttpResponse(json.dumps({'success':True})) 
+    
+
+@ensure_csrf_cookie
+def change_name_list(request):
+    if not request.user.is_staff:
+        raise Http404
+
+    changes = list(PendingNameChange.objects.all())
+    json = [{'new_name': c.new_name, 
+             'rationale':c.rationale, 
+             'old_name':UserProfile.Objects.get(username=c.user).name, 
+             'email':c.user.email,
+             'id':c.id} for c in changes]
+    return render_to_response('name_changes.html', json) 
+
+@ensure_csrf_cookie
+def change_name_reject(request):
+    ''' Course staff clicks 'reject' on a given name change '''
+    if not request.user.is_staff:
+        raise Http404
+
+    pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
+    pnc.delete()
+    return HttpResponse(json.dumps({'success':True})) 
+
+@ensure_csrf_cookie
+def change_name_accept(request):
+    ''' Course staff clicks 'accept' on a given name change '''
+    pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
+
+    u = pnc.user
+    up = UserProfile.objects.get(user=u)
+    up.name = pnc.name
+    up.save()
+    pnc.delete()
+    return HttpResponse(json.dumps({'success':True})) 
+
