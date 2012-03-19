@@ -1,1 +1,1 @@
-../../data/js/schematic.js
+../../../data/js/schematic.js

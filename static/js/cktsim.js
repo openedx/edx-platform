@@ -1,1 +1,1 @@
-../../data/js/cktsim.js
+../../../data/js/cktsim.js
