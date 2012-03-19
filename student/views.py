@@ -8,6 +8,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
+from django.core.mail import send_mail
 from django.core.validators import validate_email, validate_slug
 from django.db import connection
 from django.http import HttpResponse, Http404
@@ -20,6 +21,8 @@ from django_future.csrf import ensure_csrf_cookie
 log = logging.getLogger("mitx.user")
 
 def csrf_token(context):
+    ''' A csrf token that can be included in a form. 
+    '''
     csrf_token = context.get('csrf_token', '')
     if csrf_token == 'NOTPROVIDED':
         return ''
@@ -27,6 +30,8 @@ def csrf_token(context):
 
 @ensure_csrf_cookie
 def index(request):
+    ''' Redirects to main page -- info page if user authenticated, or marketing if not
+    '''
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect('/info')
     else:
@@ -37,6 +42,7 @@ def index(request):
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):
+    ''' AJAX request to log in the user. '''
     if 'email' not in request.POST or 'password' not in request.POST:
         return HttpResponse(json.dumps({'success':False, 
                                         'error': 'Invalid login'})) # TODO: User error message
@@ -78,6 +84,7 @@ def login_user(request, error=""):
 
 @ensure_csrf_cookie
 def logout_user(request):
+    ''' HTTP request to log in the user. Redirects to marketing page'''
     logout(request)
 #    print len(connection.queries), connection.queries
     return redirect('/')
@@ -110,8 +117,6 @@ def create_account(request, post_override=None):
         if a not in post_vars:
             js['value']="Error (401 {field}). E-mail us.".format(field=a)
             return HttpResponse(json.dumps(js))
-
-
 
     if post_vars['honor_code']!=u'true':
         js['value']="To enroll, you must follow the honor code.".format(field=a)
@@ -181,16 +186,16 @@ def create_account(request, post_override=None):
        'key':r.activation_key,
        'site':settings.SITE_NAME}
 
-    subject = render_to_string('activation_email_subject.txt',d)
+    subject = render_to_string('emails/activation_email_subject.txt',d)
         # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
-    message = render_to_string('activation_email.txt',d)
+    message = render_to_string('emails/activation_email.txt',d)
 
     try:
         if not settings.GENERATE_RANDOM_USER_CREDENTIALS:
             res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
-        js['value']=str(sys.exc_info())
+        js['value']='Could not send activation e-mail.'
         return HttpResponse(json.dumps(js))
         
     js={'success':True,
@@ -225,6 +230,8 @@ if settings.GENERATE_RANDOM_USER_CREDENTIALS:
 
 @ensure_csrf_cookie
 def activate_account(request, key):
+    ''' When link in activation e-mail is clicked
+    '''
     r=Registration.objects.filter(activation_key=key)
     if len(r)==1:
         if not r[0].user.is_active:
@@ -257,15 +264,44 @@ def password_reset(request):
 def reactivation_email(request):
     ''' Send an e-mail to reactivate a deactivated account, or to
     resend an activation e-mail '''
-    pass
+    email = request.POST['email']
+    try: 
+        user = User.objects.get(email = 'email')
+    except: # TODO: Type of exception
+        return HttpResponse(json.dumps({'success':False,
+                                        'error': 'No inactive user with this e-mail exists'}))
+    
+    if user.is_active:
+        return HttpResponse(json.dumps({'success':False,
+                                        'error': 'User is already active'}))
+    
+    reg = Registration.objects.get(user = user)
+    reg.register(user)
+
+    d={'name':UserProfile.get(user = user).name,
+       'key':r.activation_key,
+       'site':settings.SITE_NAME}
+    
+    subject = render_to_string('reactivation_email_subject.txt',d)
+    subject = ''.join(subject.splitlines())
+    message = render_to_string('reactivation_email.txt',d)
+
+    res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    
+    return HttpResponse(json.dumps({'success':True}))
+
 
 @ensure_csrf_cookie
 def change_email_request(request):
-    ## Maske sure it checks for existing e-mail conflicts
+    ''' AJAX call from the profile page. User wants a new e-mail. 
+    '''
+    ## Make sure it checks for existing e-mail conflicts
     if not request.user.is_authenticated:
         raise Http404
     
-    if not request.user.check_password(request.POST['password']):
+    user = request.user
+
+    if not user.check_password(request.POST['password']):
         return HttpResponse(json.dumps({'success':False, 
                                         'error':'Invalid password'})) 
     
@@ -273,15 +309,64 @@ def change_email_request(request):
     if len(User.objects.filter(email = new_email)) != 0:
         ## CRITICAL TODO: Handle case for e-mails
         return HttpResponse(json.dumps({'success':False, 
-                                        'error':'An account with this e-mail already exists.'}))         
+                                        'error':'An account with this e-mail already exists.'}))
 
-    
+    pec_list = PendingEmailChange.objects.filter(user = request.user)
+    if len(pec_list) == 0: 
+        pec = PendingEmailChange()
+        pec.user = user
+    else :
+        pec = pec_list[0]
 
-    request.POST['new_email']
+    pec.new_email = request.POST['new_email']
+    pec.activation_key = uuid.uuid4().hex
+    pec.save()
+
+    if pec.new_email == user.email: 
+        pec.delete()
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error':'Old email is the same as the new email.'}))        
+
+    d = {'site':settings.SITE_NAME, 
+         'key':pec.activation_key, 
+         'old_email' : user.email, 
+         'new_email' : pec.email}
+
+    subject = render_to_string('emails/email_change_subject.txt',d)
+    message = render_to_string('emails/email_change.txt',d)
+
+    res=send_email(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.email])
+
+    return HttpResponse(json.dumps({'success':True}))
 
 @ensure_csrf_cookie
-def change_email_confirm(request):
-    pass
+def confirm_email_change(request, key):
+    ''' User requested a new e-mail. This is called when the activation 
+    link is clicked. We confirm with the old e-mail, and update
+    '''
+    try:
+        pec=PendingEmailChange.objects.get(activation_key=key)
+    except:
+        return render_to_response("email_invalid_key.html")
+    
+    subject = render_to_string('emails/confirm_email_change_subject.txt',d)
+    subject = ''.join(subject.splitlines())
+    message = render_to_string('emails/confirm_email_change.txt',d)
+    
+    user = pec.user
+    user.email_user(subject, message, DEFAULT_FROM_EMAIL)
+    up = UserProfile.objects.get( user = user )
+    meta = up.get_meta()
+    if 'old_emails' not in meta:
+        meta['old_emails'] = []
+    meta['old_emails'].append(user.email)
+    up.set_meta(meta)
+    up.save()
+    user.email = pec.new_email
+    user.save()
+    pec.delete()
+
+    return render_to_response("email_change_successful.html")
 
 @ensure_csrf_cookie
 def change_name_request(request):
@@ -294,7 +379,6 @@ def change_name_request(request):
     pnc.rationale = request.POST['rationale']
     pnc.save()
     return HttpResponse(json.dumps({'success':True})) 
-    
 
 @ensure_csrf_cookie
 def change_name_list(request):
