@@ -15,4 +15,8 @@ if [ -z "${BUILD_NUMBER}" ]; then
 fi
 
 ID=mitx-${GIT_BRANCH}-${BUILD_NUMBER}-${GIT_COMMIT}
-tar --exclude=.git --exclude=build -czf build/${ID}.tgz ${REPO}
+REPO_ROOT=$(dirname $0)/..
+BUILD_DIR=${REPO_ROOT}/build
+
+mkdir -p ${BUILD_DIR}
+tar -v --exclude=.git --exclude=build --transform="s#^#mitx/#" -czf ${BUILD_DIR}/${ID}.tgz ${REPO_ROOT}
