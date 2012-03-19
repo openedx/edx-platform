@@ -1,5 +1,5 @@
 We received a request to change the e-mail associated with MITx
-account ${username} from ${oldemail} to ${newemail}. If this is
+account ${username} from ${old_email} to ${new_email}. If this is
 correct, please confirm your new e-mail address by visiting:
 
 http://${ site }/confirmemail/${ key }

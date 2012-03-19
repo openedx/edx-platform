@@ -79,8 +79,18 @@ $(function() {
     });
 
 
-    $("#unenroll_button").click(function(){
-      $("#unenroll_course_link").click();
+    $("#submit_email_change").click(function(){
+      alert("Test 1");
+      var new_email = $('#new_email_field').val();
+      var new_password = $('#new_email_password').val();
+
+      postJSON('/email_change/',{"new_email":new_email},
+               function(data){});
+      alert("Test 2");
+       log_event("profile", {"type":"email_change_request", 
+                               "old_email":"${email}",
+                               "new_email":new_email});
+      alert("Test 3");
     });
 
 });
@@ -220,16 +230,16 @@ $(function() {
       <ul>
         <li>
           <label> Please enter your new email address: </label>
-          <input id="new_name" type="email" value="" />
+          <input id="new_email_field" type="email" value="" />
         </li>
 
         <li>
           <label> Please confirm your password: </label>
-          <input id="new_name" value="" type="password" />
+          <input id="new_email_password" value="" type="password" />
         </li>
         <li>
           <p> We will send a confirmation to both ${email} and your new e-mail as part of the process.</p>
-          <input type="submit" id="submit" />
+          <input type="submit" id="submit_email_change" />
         </li>
       </ul>
       </fieldset>
