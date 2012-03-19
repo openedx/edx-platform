@@ -22,6 +22,9 @@ GENERATE_PROFILE_SCORES = False # If this is true, random scores will be generat
 
 # Our parent dir (mitx_all) is the BASE_DIR
 BASE_DIR = os.path.abspath(os.path.join(__file__, "..", ".."))
+PROJECT_DIR = os.path.abspath(os.path.join(__file__, ".."))
+sys.path.append(BASE_DIR + "/mitx/djangoapps")
+sys.path.append(BASE_DIR + "/mitx/lib")
 
 COURSEWARE_ENABLED = True
 ASKBOT_ENABLED = True
@@ -266,15 +269,15 @@ if 'TEXTBOOK_DIR' not in locals():
 
 if 'TEMPLATE_DIRS' not in locals():
     TEMPLATE_DIRS = (
-        BASE_DIR+'/templates/',
+        PROJECT_DIR+'/templates/',
         DATA_DIR+'/templates',
         TEXTBOOK_DIR,
     )
 
 if 'STATICFILES_DIRS' not in locals():
     STATICFILES_DIRS = (
-        BASE_DIR+'/3rdParty/static',
-        BASE_DIR+'/static', 
+        PROJECT_DIR+'/3rdParty/static',
+        PROJECT_DIR+'/static', 
     )
 
 
@@ -651,7 +654,7 @@ ot = MAKO_TEMPLATES
 MAKO_TEMPLATES['course'] = [DATA_DIR]
 MAKO_TEMPLATES['sections'] = [DATA_DIR+'/sections']
 MAKO_TEMPLATES['custom_tags'] = [DATA_DIR+'/custom_tags']
-MAKO_TEMPLATES['main'] = [BASE_DIR+'/templates/', DATA_DIR+'/info']
+MAKO_TEMPLATES['main'] = [PROJECT_DIR+'/templates/', DATA_DIR+'/info']
 
 
 MAKO_TEMPLATES.update(ot)
