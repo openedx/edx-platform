@@ -1,0 +1,13 @@
+body {
+  margin: 0;
+  padding: 0; }
+
+.wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, section.index-content, footer {
+  margin: 0;
+  overflow: hidden; }
+
+div#enroll p.ie-warning {
+  display: block !important;
+  line-height: 1.3em; }
+div#enroll form {
+  display: none; }
