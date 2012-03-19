@@ -1,0 +1,25 @@
+MITx's prototype offering, 6.002x, is now open. To log in, visit
+
+ https://6002x.mitx.mit.edu
+
+where you will find a login button at the top right-hand corner of the
+window.
+
+Please make sure you're using the latest version of Google Chrome or
+Firefox. If you've forgotten your password, the log-in form has a
+place to reset it.
+
+Once you log in, we recommend that you start the course by reviewing
+the "System Usage Sequence" in the Overview section, and the "6.002x
+At-a-Glance (Calendar)" handout under the Course Info tab. After you
+familiarize yourself with the various features of the MITx platform,
+you can jump right into the coursework by working on "Administrivia
+and Circuit Elements", the first Lecture Sequence in Week 1.
+
+Thanks for joining us for the ride!
+
+The 6.002x team
+
+(Please note that this e-mail address does not receive e-mails --
+if you need assistance, please use the help section of the web
+site)

@@ -1,0 +1,24 @@
+##This file is based on the template from the SimpleWiki source which carries the GPL license
+
+<%inherit file="simplewiki_base.html"/>
+
+<%block name="title"><title>Wiki – Create Article – MITx 6.002x</title></%block>
+
+<%block name="wiki_page_title">
+<h1>Create article</h1>
+</%block>
+
+<%block name="wiki_body">
+<form method="POST" id="wiki_revision">
+  <div style="display:none">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+  </div>
+
+  ${ wiki_form }
+
+  <input type="submit" value="Create article" /></td>
+</form>
+
+<%include file="simplewiki_instructions.html"/>
+
+</%block>

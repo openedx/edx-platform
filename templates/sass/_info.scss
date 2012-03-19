@@ -1,0 +1,109 @@
+div.info-wrapper {
+  @extend .table-wrapper;
+
+  section.updates {
+    @extend .content;
+
+    > h1 {
+      @extend .top-header;
+    }
+
+    > p {
+      margin-bottom: lh();
+    }
+
+    > ol {
+      list-style: none;
+
+      > li {
+        padding-bottom: lh(.5);
+        margin-bottom: lh(.5);
+        @extend .clearfix;
+        border-bottom: 1px solid #e3e3e3;
+
+        &:first-child {
+          padding: lh(.5);
+          margin-left: (-(lh(.5)));
+          background: $cream;
+          border-bottom: 1px solid darken($cream, 10%);
+        }
+
+        h2 {
+          float: left;
+          width: flex-grid(2, 9);
+          margin: 0 flex-gutter() 0 0;
+        }
+
+        section.update-description {
+          float: left;
+          width: flex-grid(7, 9);
+          margin-bottom: 0;
+
+          p {
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  section.handouts {
+    @extend .sidebar;
+    @include border-radius(0 4px 4px 0);
+    border-right: 0;
+    border-left: 1px solid #d3d3d3;
+
+    h1 {
+      padding: lh(.5) lh();
+      font-size: 18px;
+      margin: 0 ;
+      @extend .bottom-border;
+    }
+
+    ol {
+      list-style: none;
+
+      li {
+        @include box-shadow(0 1px 0 #eee);
+        border-bottom: 1px solid #d3d3d3;
+        @extend .clearfix;
+
+        p {
+          padding: 7px lh();
+          margin: 0;
+          text-transform: none;
+          letter-spacing: 0;
+          font-size: $body-font-size;
+
+          &:hover {
+            background: #efefef;
+          }
+
+          a {
+            display: inline;
+            padding: 0;
+
+            &:hover {
+              text-decoration: underline;
+              background: none;
+            }
+          }
+        }
+
+        a {
+          @include transition();
+          color: lighten($text-color, 10%);
+          display: block;
+          padding: 7px lh();
+          text-decoration: none;
+
+          &:hover {
+            background: #efefef;
+          }
+        }
+      }
+    }
+  }
+}
