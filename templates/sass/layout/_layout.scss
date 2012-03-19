@@ -1,0 +1,43 @@
+html {
+  margin-top: 0;
+
+  body {
+    color: $dark-gray;
+    font: $body-font-size $body-font-family;
+    text-align: center;
+    margin: 0;
+    background: #f4f4f4; //#f3f1e5
+
+    section.main-content {
+      @extend .clearfix;
+      @extend .wrapper;
+      background: #fff;
+      border: 1px solid #bbb;
+      border-bottom: 1px solid #bbb;
+      @include box-shadow(0 0 4px #dfdfdf);
+      @include box-sizing(border-box);
+      margin-top: 3px;
+      overflow: hidden;
+
+      @media print {
+        border-bottom: 0;
+        @include border-radius(none);
+      }
+
+      @media screen and (min-width: 1400px) {
+        @include border-radius(4px);
+        margin-top: lh(.5);
+      }
+    }
+
+    section.outside-app {
+      @extend .main-content;
+      max-width: 600px;
+      padding: lh();
+
+      #{$all-text-inputs} {
+        display: block;
+      }
+    }
+  }
+}

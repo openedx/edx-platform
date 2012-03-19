@@ -1,0 +1,54 @@
+section.help.main-content {
+  padding: lh();
+
+  h1 {
+    margin-top: 0;
+    margin-bottom: lh();
+    padding-bottom: lh();
+    border-bottom: 1px solid #ddd;
+  }
+
+  p {
+    max-width: 700px;
+  }
+
+  h2 {
+    margin-top: 0;
+  }
+
+  section.self-help {
+    margin-bottom: lh();
+    margin-right: flex-gutter();
+    float: left;
+    width: flex-grid(6);
+
+    ul {
+      margin-left: flex-gutter(6);
+
+      li {
+        margin-bottom: lh(.5);
+      }
+    }
+  }
+
+  section.help-email {
+    float: left;
+    width: flex-grid(6);
+
+    dl {
+      margin-bottom: lh();
+      display: block;
+
+      dd {
+        margin-bottom: lh();
+      }
+
+      dt {
+        font-weight: bold;
+        float: left;
+        clear: left;
+        width: flex-grid(2, 6);
+      }
+    }
+  }
+}
