@@ -1,0 +1,14 @@
+<%inherit file="main.html" />
+<%include file="navigation.html" args="active_page=''" />
+<section class="main-content">
+<div class="gradebook-wrapper">
+  <section class="gradebook-content">
+  <h1>Pending name changes</h1>
+  <table>
+  % for s in students:
+  <tr><td><a href=/profile/${s.uid}/>${s.oldname}</td><td>${s.newname}</td><td onclick="update({$s.uid});">[Change]</td></tr>
+  % endfor
+  </table>
+  </section>
+</div>
+</section>

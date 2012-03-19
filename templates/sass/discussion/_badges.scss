@@ -1,0 +1,79 @@
+div.badges-intro {
+  margin: 20px 0;
+}
+
+div.badge-intro {
+  @extend .badges-intro;
+
+  .badge1, .badge2, .badge3 {
+    font-size: 20px;
+  }
+
+
+}
+
+div#award-list{
+  li.username {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+}
+
+ul.badge-list {
+  li.badge {
+    border-bottom: 1px solid #eee;
+    @extend .clearfix;
+    list-style: none;
+    padding: 10px 0;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    div.check {
+      float:right;
+      min-width:flex-grid(1,9);
+      text-align:right;
+
+      span {
+      font-size:19px;
+      padding-right:5px;
+      color:green;
+      }
+    }
+     div.badge-name {
+       float:left;
+       width:flex-grid(3,9);
+
+       span {
+        font-size: 20px;
+       }
+     }
+
+     p {
+       margin: 0;
+       float:left;
+     }
+  }
+}
+
+.gold, .badge1 {
+  color: #ffcc00;
+}
+
+.silver, .badge2 {
+  color: #cccccc;
+}
+
+.bronze, .badge3 {
+  color: #cc9933;
+}
+div.badge-desc {
+  > div {
+    margin-bottom: 20px;
+     span {
+      font-size: 18px;
+      @include border-radius(10px);
+     }
+  }
+}

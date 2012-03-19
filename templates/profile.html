@@ -1,0 +1,267 @@
+<%inherit file="main.html" />
+
+<%!
+    from django.core.urlresolvers import reverse
+%>
+
+<%block name="headextra">
+<script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
+<script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
+<script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
+<script>
+<%include file="profile_graphs.js"/>
+</script>
+
+<script>
+var loc=true; // Activate on clicks? Not if already clicked.
+var lang=true;
+$(function() {
+      $("#change_location").click(function() {
+         $(this).hide();
+
+         log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
+
+         if(loc) {
+           $("#description").html('<div>'+
+                                  "Preferred format is city, state, country (so for us, "+
+                                  "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
+                                  "as much or as little detail as you want. </div>");
+
+           loc=false;
+
+           $("#location_sub").html('<form>'+'<input id="id_loc_text" type="text" name="loc_text" />'+
+             '<input type="submit" id="change_loc_button" value="Save" />'+'</form>');
+
+           $("#change_loc_button").click(function() {
+             $("#change_location").show();
+
+              postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
+                $("#location_sub").text(json.location);
+                loc=true;
+                $("#description").html("");
+               log_event("profile", {"type":"location_change", "new":json.location});
+              });
+           });
+         }
+      });
+
+      $("#change_language").click(function() {
+         $(this).hide();
+         log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
+
+         if(lang) {
+           lang=false;
+           $("#language_sub").html('<form>'+'<input id="id_lang_text" type="text" name="lang_text" />'+
+             '<input type="submit" id="change_lang_button" value="Save" />'+'</form>');
+           $("#change_lang_button").click(function() {
+             $("#change_language").show();
+              postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
+                $("#language_sub").text(json.language);
+                lang=true;
+                $("#description").html("");
+               log_event("profile", {"type":"language_change", "new":json.language});
+              });
+           });
+         }
+      });
+
+      $('#change_password').click(function(){
+        $('.modal').trigger('click');
+        log_event("profile", {"type":"password_show"});
+      });
+
+    $('#pwd_reset_button').click(function() {
+      $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
+                    "email"  : $('#id_email').val()}, function(data){
+         $("#password_reset_complete_link").click();
+         log_event("profile", {"type":"password_send"});
+      });
+    });
+
+
+    $("#submit_email_change").click(function(){
+      alert("Test 1");
+      var new_email = $('#new_email_field').val();
+      var new_password = $('#new_email_password').val();
+
+      postJSON('/email_change/',{"new_email":new_email},
+               function(data){});
+      alert("Test 2");
+       log_event("profile", {"type":"email_change_request", 
+                               "old_email":"${email}",
+                               "new_email":new_email});
+      alert("Test 3");
+    });
+
+});
+</script>
+</%block>
+
+
+<%include file="navigation.html" args="active_page='profile'" />
+
+<section class="main-content">
+  <div class="profile-wrapper">
+
+    <section class="course-info">
+      <h1>Course Progress</h1>
+
+      <div id="grade-detail-graph"></div>
+
+      <ol class="chapters">
+        %for chapter in chapters:
+        %if not chapter['chapter'] == "hidden":
+        <li>
+          <h2><a href="${reverse('courseware_chapter', args=format_url_params([chapter['course'], chapter['chapter']])) }">
+          ${ chapter['chapter'] }</a></h2>
+
+          <ol class="sections">
+            %for section in chapter['sections']:
+            <li>
+              <%
+              earned = section['section_total'][0]
+              total = section['section_total'][1]
+              percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 else ""
+              %>
+              
+              <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">
+                ${ section['section'] }</a> ${"({0:g}/{1:g}) {2}".format( earned, total, percentageString )}</h3>
+              ${section['subtitle']}
+              %if 'due' in section and section['due']!="":
+                due ${section['due']}
+              %endif
+              
+              %if len(section['scores']) > 0:
+                <ol class="scores">
+                  ${ "Problem Scores: " if section['graded'] else "Practice Scores: "}
+                  %for score in section['scores']:
+                    <li class="score">${"{0:g}/{1:g}".format(score[0],score[1])}</li>
+                  %endfor
+                </ol>
+              %endif
+              
+            </li> <!--End section-->
+            %endfor
+          </ol> <!--End sections-->
+        </li> <!--End chapter-->
+        %endif
+        %endfor
+      </ol> <!--End chapters-->
+    </section>
+
+    <section class="user-info">
+
+      <header>
+        <h1>${name}</h1>
+        %if True:
+          <a href="#apply_name_change" rel="leanModal">Apply to change</a>
+        %else:
+          (Name change pending)
+        %endif
+      </header>
+
+      <ul>
+        <li>
+          Forum name: <strong>${username}</strong> 
+        </li>
+
+        <li>
+          E-mail: <strong>${email}</strong> <a href="#change_email" rel="leanModal" class="edit-email">Edit</a>
+        </li>
+        <li>
+          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Edit</a>
+        </li>
+        <li>
+          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Edit</a>
+        </li>
+      </ul>
+
+      <div id="change_password_pop">
+        <h2>Password change</h2>
+        <p>We'll e-mail a password reset link to ${email}.</p>
+
+        <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
+        <input type="submit" id="pwd_reset_button" value="Reset Password" />
+      </div>
+
+      <div id="unenroll">
+        <a href="#unenroll_course" rel="leanModal">Unenroll from 6.002x</a>
+      </div>
+    </section>
+  </div>
+</section>
+
+<div id="password_reset_complete" class="leanModal_box">
+  <a href="#password_reset_complete" rel="leanModal" id="password_reset_complete_link"></a>
+  <h1>Password Reset Email Sent</h1>
+  <p>
+    An email has been sent to ${email}. Follow the link in the email to change your password.
+  </p>
+</div>
+
+<div id="apply_name_change" class="leanModal_box">
+  <h1>Apply to change your name</h1>
+  <form>
+    <fieldset>
+      <p>A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your requested to be processed.</p> 
+
+      <ul>
+        <li>
+          <label>Enter your desired full name, as it will appear on the MITx Certificate: </label>
+          <input id="new_name" value="" type="text" />
+        </li>
+        <li>
+          <label>Reason for name change:</label>
+          <textarea id="name_rationale" value=""></textarea>
+        </li>
+        <li>
+          <input type="submit" id="submit">
+        </li>
+      </ul>
+    </fieldset>
+  </form>
+</div>
+
+<div id="change_email" class="leanModal_box">
+  <h1>Change e-mail</h1> 
+  <form>
+
+    <fieldset>
+      <ul>
+        <li>
+          <label> Please enter your new email address: </label>
+          <input id="new_email_field" type="email" value="" />
+        </li>
+
+        <li>
+          <label> Please confirm your password: </label>
+          <input id="new_email_password" value="" type="password" />
+        </li>
+        <li>
+          <p> We will send a confirmation to both ${email} and your new e-mail as part of the process.</p>
+          <input type="submit" id="submit_email_change" />
+        </li>
+      </ul>
+      </fieldset>
+    </form>
+</div>
+
+<div id="unenroll_course" class="leanModal_box">
+  <h1> Unenroll </h1>
+  <p> At the end of the semester, all students who do not complete the course will be automatically dropped. If you would still prefer to deactivate your account, you can: </p>
+  <form>
+    <fieldset>
+      <ul>
+        <li>
+          <label><input type="radio" name="updates" checked /> Deactivate account/do not inform me about future courses. </label>
+        </li>
+        <li>
+          <label><input type="radio" name="updates" /> Deactivate account, but inform me about future courses.</label>
+        </li>
+        <li>
+          <input type="submit" id="" value="Unenroll" />
+        </li>
+      </ul>
+    </fieldset>
+  </form>
+</div>
