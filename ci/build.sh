@@ -9,6 +9,8 @@ if [ -z "${GIT_BRANCH}" ]; then
     GIT_BRANCH=${GIT_BRANCH##refs/heads/}
     GIT_BRANCH=${GIT_BRANCH:-HEAD}
 fi
+GIT_BRANCH=${GIT_BRANCH##origin/}
+GIT_BRANCH=${GIT_BRANCH//\//_}
 
 if [ -z "${BUILD_NUMBER}" ]; then
     BUILD_NUMBER=dev
