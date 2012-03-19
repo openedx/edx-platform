@@ -1,0 +1,8 @@
+*.pyc
+*~
+*.scssc
+*.swp
+*.orig
+*.DS_Store
+#*
+.#*
