@@ -1,0 +1,15 @@
+<%inherit file="main.html" />
+<%block name="title"><title>Course Info - MITx 6.002x</title></%block>
+
+<%include file="navigation.html" args="active_page='info'" />
+
+<section class="main-content">
+  <div class="info-wrapper">
+    <section class="updates">
+      <%include file="updates.html" />
+    </section>
+    <section class="handouts">
+      <%include file="handouts.html" />
+    </section>
+  </div>
+</section>

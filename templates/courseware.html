@@ -1,0 +1,36 @@
+<%inherit file="main.html" />
+<%block name="title"><title>Courseware – MITx 6.002x</title></%block>
+
+<%block name="js_extra">
+<!-- TODO: http://docs.jquery.com/Plugins/Validation -->
+<script type="text/javascript">
+  $(function() {
+    ${init}
+
+    $(".sequence-nav li a").hover(function(){
+      $(this).siblings().toggleClass("shown");
+      });
+  });
+</script>
+</%block>
+
+<%include file="navigation.html" args="active_page='courseware'" />
+
+<section class="main-content">
+  <div class="course-wrapper">
+    <section class="course-index">
+      <header id="open_close_accordion">
+        <h2>Courseware Index</h2>
+        <a href="#">close</a>
+      </header>
+
+      <div id="accordion">
+        ${accordion}
+      </div>
+    </section>
+
+    <section class="course-content">
+      ${content}
+    </section>
+  </div>
+</section>

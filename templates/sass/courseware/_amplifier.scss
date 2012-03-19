@@ -1,0 +1,94 @@
+// JM MOSFET AMPLIFIER
+div#graph-container {
+  @extend .clearfix;
+  border-top: 1px solid #ddd;
+  padding-top: lh(1.0);
+   
+  canvas#graph {
+    width: flex-grid(4.5, 9);
+    float: left;
+    margin-right: flex-gutter(9); 
+  }
+
+  div.graph-controls {
+    width: flex-grid(4.5, 9);
+    float: left;
+
+    select#musicTypeSelect {
+      display: block;
+      margin-bottom: lh();
+    }
+
+    div#graph-output {
+      display: block;
+      margin-bottom: lh();
+    }
+
+    div#graph-listen {
+      display: block;
+      margin-bottom: lh();
+    }
+
+    p {
+      margin-bottom: lh(.5);
+    }
+
+    div#label {
+      display: inline-block;
+    }
+
+    input#playButton {
+      display: block;
+    }
+  }
+}
+
+div#schematic-container {
+  @extend .clearfix;
+
+  canvas {
+    width: flex-grid(4.5, 9);
+    float: left;
+    margin-right: flex-gutter(9); 
+  }
+
+  div.schematic-sliders {
+    width: flex-grid(4.5, 9);
+    float: left;
+
+    div.slider-label#vs {
+      margin-top: lh(2.0);
+    }
+
+    div.slider-label {
+      margin-bottom: lh(0.5);
+    }
+
+    div.slider {
+      margin-bottom: lh(1);
+    }
+  }
+}
+//End JM MOSFET AMPLIFIER
+
+// Labels
+div.graph-controls, div#graph-listen {
+
+  label {
+    @include border-radius(2px);
+    font-weight: bold;
+    padding: 3px;
+  }
+
+  label[for="vinCheckbox"], label[for="vinRadioButton"]{
+      color: desaturate(#00bfff, 50%);
+  }
+  label[for="voutCheckbox"], label[for="voutRadioButton"]{
+      color: darken(#ffcf48, 20%);
+  }
+  label[for="vrCheckbox"], label[for="vrRadioButton"]{
+      color: desaturate(#1df914, 40%);
+  }
+
+}
+

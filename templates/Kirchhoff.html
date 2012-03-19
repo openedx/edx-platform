@@ -1,0 +1,147 @@
+<h1>Kirchhoff's circuit laws</h1>
+ <div>From Wikipedia, the free encyclopedia. See <a href="http://en.wikipedia.org/wiki/Kirchhoff's_circuit_laws">original page</a> for copyright and attribution</div>
+<h2>Kirchhoff's current law (KCL)</h2>
+<div>
+<div style="width:198px;"><a href="http://en.wikipedia.org/wiki/File:KCL.png"><img alt="" src="/static/Kirchhoff_files/KCL.png" width="196" height="195"></a>
+<div>The current entering any junction is equal to the current leaving that junction. <i>i</i><sub>1</sub> + <i>i</i><sub>4</sub> = <i>i</i><sub>2</sub> + <i>i</i><sub>3</sub></div>
+</div>
+</div>
+<p>This law is also called <b>Kirchhoff's first law</b>, <b>Kirchhoff's point rule</b>, <b>Kirchhoff's junction rule</b> (or nodal rule), and <b>Kirchhoff's first rule</b>.</p>
+<p>The principle of conservation of <a href="http://en.wikipedia.org/wiki/Electric_charge" title="Electric charge">electric charge</a> implies that:</p>
+<dl>
+<dd>At any node (junction) in an <a href="http://en.wikipedia.org/wiki/Electrical_circuit" title="Electrical circuit">electrical circuit</a>, the sum of <a href="http://en.wikipedia.org/wiki/Current_(electricity)" title="Current (electricity)">currents</a> flowing into that node is equal to the sum of currents flowing out of that node.
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>or</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dd>The algebraic sum of currents in a network of conductors meeting at a point is zero.</dd>
+</dl>
+<p>Recalling that current is a signed (positive or negative) quantity reflecting direction towards or away from a node, this principle can be stated as:</p>
+<dl>
+<dd><img alt="\sum_{k=1}^n {I}_k = 0" src="/static/Kirchhoff_files/17bbbd9b6e69b94dab881bacae540191.png"></dd>
+</dl>
+<p><i>n</i> is the total number of branches with currents flowing towards or away from the node.</p>
+<p>This formula is valid for <a href="http://en.wikipedia.org/wiki/Complex_number" title="Complex number">complex</a> currents:</p>
+<dl>
+<dd><img alt="\sum_{k=1}^n \tilde{I}_k = 0" src="/static/Kirchhoff_files/912713fc906c190d03a73f02b2f738ab.png"></dd>
+</dl>
+<p>The law is based on the conservation of charge whereby the charge (measured in coulombs) is the product of the current (in amperes) and the time (in seconds).</p>
+<h3>Changing charge density</h3>
+<p>KCL is only valid if the <a href="http://en.wikipedia.org/wiki/Charge_density" title="Charge density">charge density</a> remains constant at the point to which it is applied. Consider the current entering a single plate of a capacitor. If one imagines a closed surface around that single plate, current enters through the surface, but does not exit, thus violating KCL. Certainly, the currents through a closed surface around the entire capacitor will meet KCL since the current entering one plate is balanced by the current exiting the other plate, and that is usually all that is important in circuit analysis, but there is a problem when considering just one plate. Another common example is the current in an <a href="http://en.wikipedia.org/wiki/Antenna_(radio)" title="Antenna (radio)">antenna</a> where current enters the antenna from the transmitter feeder but no current exits from the other end.(Johnson and Graham, pp.36-37)</p>
+<p><a href="http://en.wikipedia.org/wiki/James_Clerk_Maxwell" title="James Clerk Maxwell">Maxwell</a> introduced the concept of <a href="http://en.wikipedia.org/wiki/Displacement_current" title="Displacement current">displacement currents</a> to describe these situations. The current flowing into a capacitor plate is equal to the rate of accumulation of charge and hence is also equal to the rate of change of <a href="http://en.wikipedia.org/wiki/Electric_flux" title="Electric flux">electric flux</a> due to that charge (electric flux is measured in the same units, <a href="http://en.wikipedia.org/wiki/Coulomb" title="Coulomb">Coulombs</a>, as electric charge in the <a href="http://en.wikipedia.org/wiki/SI_system" title="SI system">SI system</a> of units). This rate of change of flux, <img alt="\psi \ " src="/static/Kirchhoff_files/ec93733267512bc18567c04e5a728e24.png">, is what Maxwell called displacement current <span dir="ltr"><i>I</i><sub>D</sub></span>;</p>
+<dl>
+<dd><img alt="I_\mathrm D = \frac {d \psi}{d t}" src="/static/Kirchhoff_files/c449f0cd2e060f03076e28ae5f8f0a75.png"></dd>
+</dl>
+<p>When the displacement currents are included, Kirchhoff's current law once again holds. Displacement currents are not real currents in that they do not consist of moving charges, they should be viewed more as a correction factor to make KCL true. In the case of the capacitor plate, the real current entering the plate is exactly cancelled by a displacement current leaving the plate and heading for the opposite plate.</p>
+<p>This can also be expressed in terms of vector field quantities by taking the <a href="http://en.wikipedia.org/wiki/Divergence" title="Divergence">divergence</a> of <a href="http://en.wikipedia.org/wiki/Amp%C3%A8re%27s_law" title="Ampere&#39;s law">Ampere's law</a> with Maxwell's correction and combining with <a href="http://en.wikipedia.org/wiki/Gauss%27s_law" title="Gauss&#39;s law">Gauss's law</a>, yielding:</p>
+<dl>
+<dd><img alt="\nabla \cdot \mathbf{J} = -\nabla \cdot \frac{\partial \mathbf{D}}{\partial t} = -\frac{\partial \rho}{\partial t}" src="/static/Kirchhoff_files/229253cd444bad52ccf237f182f18267.png"></dd>
+</dl>
+<p>This is simply the charge conservation equation (in integral form, it says that the current flowing out of a closed surface is equal to the rate of loss of charge within the enclosed volume (<a href="http://en.wikipedia.org/wiki/Divergence_theorem" title="Divergence theorem">Divergence theorem</a>)). Kirchhoff's current law is equivalent to the statement that the divergence of the current is zero, true for time-invariant p, or always true if the displacement current is included with <b>J</b>.</p>
+<h3>Uses</h3>
+<p>A <a href="http://en.wikipedia.org/wiki/Matrix_(mathematics)" title="Matrix (mathematics)">matrix</a> version of Kirchhoff's current law is the basis of most <a href="http://en.wikipedia.org/wiki/Electronic_circuit_simulation" title="Electronic circuit simulation">circuit simulation software</a>, such as <a href="http://en.wikipedia.org/wiki/SPICE" title="SPICE">SPICE</a>.</p>
+<h2><span>[<a href="http://en.wikipedia.org/w/index.php?title=Kirchhoff%27s_circuit_laws&action=edit&section=4" title="Edit section: Kirchhoff&#39;s voltage law (KVL)">edit</a>]</span> <span id="Kirchhoff.27s_voltage_law_.28KVL.29">Kirchhoff's voltage law (KVL)</span></h2>
+<div>
+<div style="width:202px;"><a href="http://en.wikipedia.org/wiki/File:Kirchhoff_voltage_law.svg"><img alt="" src="/static/Kirchhoff_files/200px-Kirchhoff_voltage_law.svg.png" width="200" height="175"></a>
+<div>
+<div><a href="http://en.wikipedia.org/wiki/File:Kirchhoff_voltage_law.svg" title="Enlarge"><img src="/static/Kirchhoff_files/magnify-clip.png" width="15" height="11" alt=""></a></div>
+The sum of all the voltages around the loop is equal to zero. v<sub>1</sub> + v<sub>2</sub> + v<sub>3</sub> - v<sub>4</sub> = 0</div>
+</div>
+</div>
+<p>This law is also called <b>Kirchhoff's second law</b>, <b>Kirchhoff's loop (or mesh) rule</b>, and <b>Kirchhoff's second rule</b>.</p>
+<p>The principle of conservation of energy implies that</p>
+<dl>
+<dd>The directed sum of the electrical <a href="http://en.wikipedia.org/wiki/Potential_difference" title="Potential difference">potential differences</a> (voltage) around any closed circuit is zero.
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>or</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dd>More simply, the sum of the <a href="http://en.wikipedia.org/wiki/Electromotive_force" title="Electromotive force">emfs</a> in any closed loop is equivalent to the sum of the potential drops in that loop.
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>
+<dl>
+<dd>or</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dd>The algebraic sum of the products of the resistances of the conductors and the currents in them in a closed loop is equal to the total <a href="http://en.wikipedia.org/wiki/Electromotive_force" title="Electromotive force">emf</a> available in that loop.</dd>
+</dl>
+<p>Similarly to KCL, it can be stated as:</p>
+<dl>
+<dd><img alt="\sum_{k=1}^n V_k = 0" src="/static/Kirchhoff_files/08d7bd7060be987d4da37b7fc263a740.png"></dd>
+</dl>
+<p>Here, <i>n</i> is the total number of voltages measured. The voltages may also be complex:</p>
+<dl>
+<dd><img alt="\sum_{k=1}^n \tilde{V}_k = 0" src="/static/Kirchhoff_files/98720898396d325be0abb463b68caf90.png"></dd>
+</dl>
+<p>This law is based on the conservation of "energy given/taken by potential field" (not including energy taken by dissipation). Given a voltage potential, a charge which has completed a closed loop doesn't gain or lose energy as it has gone back to initial potential level.</p>
+<p>This law holds true even when resistance (which causes <b>dissipation</b> of energy) is present in a circuit. The validity of this law in this case can be understood if one realizes that a charge in fact doesn't go back to its starting point, due to dissipation of energy. A charge will just terminate at the negative terminal, instead of positive terminal. This means all the energy given by the potential difference has been fully consumed by resistance which in turn loses the energy as heat dissipation.</p>
+<p>To summarize, Kirchhoff's voltage law has nothing to do with gain or loss of energy by electronic components (resistors, capacitors, etc.). It is a law referring to the potential field generated by voltage sources. In this potential field, regardless of what electronic components are present, the gain or loss in "energy given by the potential field" must be zero when a charge completes a closed loop.</p>
+<h3>Electric field and electric potential</h3>
+<p>Kirchhoff's voltage law could be viewed as a consequence of the principle of <a href="http://en.wikipedia.org/wiki/Conservation_of_energy" title="Conservation of energy">conservation of energy</a>. Otherwise, it would be possible to build a <a href="http://en.wikipedia.org/wiki/Perpetual_motion_machine" title="Perpetual motion machine">perpetual motion machine</a> that passed a current in a circle around the circuit.</p>
+<p>Considering that electric potential is defined as a <a href="http://en.wikipedia.org/wiki/Line_integral" title="Line integral">line integral</a> over an <a href="http://en.wikipedia.org/wiki/Electric_field" title="Electric field">electric field</a>, Kirchhoff's voltage law can be expressed equivalently as</p>
+<dl>
+<dd><img alt="\oint_C \mathbf{E} \cdot d\mathbf{l} = 0," src="/static/Kirchhoff_files/07172609b59c136393705e4067de95d0.png"></dd>
+</dl>
+<p>which states that the <a href="http://en.wikipedia.org/wiki/Line_integral" title="Line integral">line integral</a> of the <a href="http://en.wikipedia.org/wiki/Electric_field" title="Electric field">electric field</a> around closed loop C is zero.</p>
+<p>In order to return to the more special form, this integral can be "cut in pieces" in order to get the voltage at specific components.</p>
+<h3>Limitations</h3>
+<p>This is a simplification of <a href="http://en.wikipedia.org/wiki/Faraday%27s_law_of_induction" title="Faraday&#39;s law of induction">Faraday's law of induction</a> for the special case where there is no fluctuating <a href="http://en.wikipedia.org/wiki/Magnetic_field" title="Magnetic field">magnetic field</a> linking the closed loop. Therefore, it practically suffices for explaining circuits containing only resistors and capacitors.</p>
+<p>In the presence of a changing magnetic field the electric field is not <a href="http://en.wikipedia.org/wiki/Conservative_vector_field" title="Conservative vector field">conservative</a> and it cannot therefore define a pure scalar <a href="http://en.wikipedia.org/wiki/Potential" title="Potential">potential</a>-the <a href="http://en.wikipedia.org/wiki/Line_integral" title="Line integral">line integral</a> of the electric field around the circuit is not zero. This is because energy is being transferred from the magnetic field to the current (or vice versa). In order to "fix" Kirchhoff's voltage law for circuits containing inductors, an effective potential drop, or <a href="http://en.wikipedia.org/wiki/Electromotive_force" title="Electromotive force">electromotive force</a> (emf), is associated with each <a href="http://en.wikipedia.org/wiki/Inductance" title="Inductance">inductance</a> of the circuit, exactly equal to the amount by which the line integral of the electric field is not zero by <a href="http://en.wikipedia.org/wiki/Faraday%27s_law_of_induction" title="Faraday&#39;s law of induction">Faraday's law of induction</a>.</p>
