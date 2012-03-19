@@ -1,0 +1,172 @@
+##This file is based on the template from the SimpleWiki source which carries the GPL license
+
+<%inherit file="main.html"/>
+
+<%block name="headextra">
+  <!-- <link rel="stylesheet" media="screen,print" href="/static/simplewiki/css/base.css" /> -->
+  <!-- <link rel="stylesheet" media="print" href="/static/simplewiki/css/base_print.css" /> -->
+  <!-- <link rel="stylesheet" href="/static/simplewiki/css/autosuggest_inquisitor.css" /> -->
+  <!-- <link rel="stylesheet" href="/static/css/local.css" type="text/css" media="all" /> -->
+  <script type="text/javascript" src="/static/simplewiki/js/bsn.AutoSuggest_c_2.0.js"></script>
+
+  <%!
+      from django.core.urlresolvers import reverse
+  %>
+
+  <script type="text/javascript">
+    function set_related_article_id(s) {
+      document.getElementById('wiki_related_input_id').value = s.id;
+      document.getElementById('wiki_related_input_submit').disabled=false;
+    }
+    %if wiki_article is not UNDEFINED:
+    var x = window.onload;
+    window.onload = function(){
+        var options = {
+        script: "${reverse("search_related", args=[wiki_article.get_url()] )}/?self=${wiki_article.pk}&",
+        json: true,
+        varname: "query",
+        maxresults: 35,
+        callback: set_related_article_id,
+        noresults: "Nothing found!"
+      };
+      var as = new AutoSuggest('wiki_related_input', options);
+      if (typeof x == 'function')
+        x();
+    }
+    %endif
+  </script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [ ['$','$'], ["\\(","\\)"]],
+                displayMath: [ ['$$','$$'], ["\\[","\\]"]]}
+    });
+  </script> <script type="text/javascript" src="${ settings.LIB_URL }mathjax/MathJax.js?config=TeX-AMS_HTML-full"></script> 
+  <script>
+  $(function(){
+  $.ajaxSetup ({
+      // Disable caching of AJAX responses
+      cache: false
+  });
+
+  $(".div_wiki_circuit").each(function(d,e) {
+     id = $(this).attr("id");
+     name = id.substring(17);
+     //alert(name);
+     $("#"+id).load("/edit_circuit/"+name, function(){update_schematics();});
+     f=this;
+  });
+
+  $("#wiki_create_form").hide();
+
+  $("#create-article").click(function() {
+      $("#wiki_create_form").slideToggle();
+      $(this).parent().toggleClass("active");
+  });
+
+  });
+  </script>
+  
+  <%block name="wiki_head"/>
+  
+</%block>
+
+<%block name="bodyextra">
+
+<%include file="navigation.html" args="active_page='wiki'" />
+
+<section class="main-content">
+  <div class="wiki-wrapper">
+    <%block name="wiki_panel">
+    <div id="wiki_panel">
+    <h2>Course Wiki</h2>
+      <%
+          if (wiki_article is not UNDEFINED):
+          	baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
+          else:
+          	baseURL = reverse("wiki_view", args=["/"])
+      %>
+      <ul class="action">
+        <li>
+          <input type="button" onclick="javascript:location.href='${reverse("wiki_list_articles", args=[])}'" value="All articles" class="button" />
+        </li>
+        
+        <li class="create-article">
+          <h3>
+            <a href="#" id="create-article"/>Create Article</a>
+          </h3>
+
+          <div id="wiki_create_form">
+            <%
+              theaction = "this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '')"
+              baseURL = reverse("wiki_create", args=["/"])
+            %>
+
+            <form method="GET" onsubmit="this.action='${baseURL + "' + " + theaction};">
+
+              <div>
+                <label for="id_wiki_article_name">Title of article</label>
+                <input type="text" name="wiki_article_name" id="id_wiki_article_name" /><br/>
+                <!-- <label for="id_wiki_article_is_child">Create as a child of current article</label> -->
+                <!-- <input type="checkbox" name="wiki_article_is_child" id="id_wiki_artcile_is_child" disabled="true" ${ 'checked="checked"' if wiki_article is not UNDEFINED else ""}> -->
+              </div>
+
+              <ul>
+
+                <li>
+                  <input type="submit" class="button" value="Create" style="display: inline-block; margin-right: 2px; font-weight: bold;" />
+                </li>
+
+              </ul>
+            </form>
+          </div>
+        </li>
+
+        <li class="search">
+          <form method="POST" action='${reverse("wiki_search_articles", args=[])}'>
+            <label class="wiki_box_title">Search</label>
+            <div style="display:none">
+              <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+            </div>
+            <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 71%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
+            <input type="submit" id="wiki_search_input_submit" value="Go!" style="width: 20%" />
+          </form>
+        </li>
+      </ul>
+
+    </div>
+    </%block>
+
+    <section class="wiki-body">
+        %if wiki_article is not UNDEFINED:
+        <header>
+          %if wiki_article.locked:
+          <p><strong>This article has been locked</strong></p>
+          %endif
+          <p>Last modified: ${wiki_article.modified_on.strftime("%b %d, %Y, %I:%M %p")}</p>
+          %endif
+
+          %if wiki_article is not UNDEFINED:
+          <ul>
+
+            <li>
+              <input type="button" onclick="javascript:location.href='${reverse("wiki_view", args=[wiki_article.get_url()])}'" value="View" class="view" />
+            </li>
+
+            <li>
+              <input type="button" onclick="javascript:location.href='${reverse("wiki_edit", args=[wiki_article.get_url()])}'" value="Edit" ${'disabled="true"' if not wiki_write else ""} class="edit"/>
+            </li>
+
+            <li>
+              <input type="button" onclick="javascript:location.href='${reverse("wiki_history", args=[wiki_article.get_url(),1])}'" value="History" class="button history" />
+            </li>
+          </ul>
+        </header>
+        %endif
+
+      <%block name="wiki_page_title"/>
+      <%block name="wiki_body"/>
+    </section>
+  </div>
+</section>
+
+</%block>

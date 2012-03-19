@@ -1,0 +1,168 @@
+<%inherit file="main.html" />
+<%namespace name="profile_graphs" file="profile_graphs.js"/>
+
+<%!
+    from django.core.urlresolvers import reverse
+%>
+
+<%block name="headextra">
+<script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
+<script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
+<script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
+<script>
+${profile_graphs.body(grade_summary, "grade-detail-graph")}
+</script>
+
+<script>
+var loc=true; // Activate on clicks? Not if already clicked.
+var lang=true;
+$(function() {
+      $("#change_location").click(function() {
+         $(this).hide();
+
+         log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
+
+         if(loc) {
+           $("#description").html('<div>'+
+                                  "Preferred format is city, state, country (so for us, "+
+                                  "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
+                                  "as much or as little detail as you want. </div>");
+
+           loc=false;
+
+           $("#location_sub").html('<form>'+'<input id="id_loc_text" type="text" name="loc_text" />'+
+             '<input type="submit" id="change_loc_button" value="Save" />'+'</form>');
+
+           $("#change_loc_button").click(function() {
+             $("#change_location").show();
+
+              postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
+                $("#location_sub").text(json.location);
+                loc=true;
+                $("#description").html("");
+               log_event("profile", {"type":"location_change", "new":json.location});
+              });
+           });
+         }
+      });
+
+      $("#change_language").click(function() {
+         $(this).hide();
+         log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
+
+         if(lang) {
+           lang=false;
+           $("#language_sub").html('<form>'+'<input id="id_lang_text" type="text" name="lang_text" />'+
+             '<input type="submit" id="change_lang_button" value="Save" />'+'</form>');
+           $("#change_lang_button").click(function() {
+             $("#change_language").show();
+              postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
+                $("#language_sub").text(json.language);
+                lang=true;
+                $("#description").html("");
+               log_event("profile", {"type":"language_change", "new":json.language});
+              });
+           });
+         }
+      });
+
+      $('#change_password').click(function(){
+        $('.modal').trigger('click');
+        log_event("profile", {"type":"password_show"});
+      });
+
+    $('#pwd_reset_button').click(function() {
+      $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
+                    "email"  : $('#id_email').val()}, function(data){
+         $("#password_reset_complete_link").click();
+         log_event("profile", {"type":"password_send"});
+      });
+    });
+});
+</script>
+</%block>
+
+
+<%include file="navigation.html" args="active_page='profile'" />
+
+<section class="main-content">
+  <div class="profile-wrapper">
+
+    <section class="course-info">
+      <h1>Course Progress</h1>
+
+      <div id="grade-detail-graph"></div>
+            
+      <ol class="chapters">
+        %for chapter in courseware_summary:
+        %if not chapter['chapter'] == "hidden":
+        <li>
+          <h2><a href="${reverse('courseware_chapter', args=format_url_params([chapter['course'], chapter['chapter']])) }">
+          ${ chapter['chapter'] }</a></h2>
+        
+          <ol class="sections">
+            %for section in chapter['sections']:
+            <li>
+              <%
+              earned = section['section_total'][0]
+              total = section['section_total'][1]
+              percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 else ""
+              %>
+              
+              <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">
+                ${ section['section'] }</a> ${"({0:g}/{1:g}) {2}".format( earned, total, percentageString )}</h3>
+              ${section['subtitle']}
+              %if 'due' in section and section['due']!="":
+                due ${section['due']}
+              %endif
+              
+              %if len(section['scores']) > 0:
+                <ol class="scores">
+                  ${ "Problem Scores: " if section['graded'] else "Practice Scores: "}
+                  %for score in section['scores']:
+                    <li class="score">${"{0:g}/{1:g}".format(score[0],score[1])}</li>
+                  %endfor
+                </ol>
+              %endif
+              
+            </li> <!--End section-->
+            %endfor
+          </ol> <!--End sections-->
+        </li> <!--End chapter-->
+        %endif
+        %endfor
+      </ol> <!--End chapters-->
+    </section>
+
+    <section class="user-info">
+
+      <h1>${name}</h1>
+
+      <ul>
+        <li>Forum name: <strong>${username}</strong></li>
+        <li>E-mail: <strong>${email}</strong></li>
+        <li>
+          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Edit</a>
+        </li>
+        <li>
+          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Edit</a>
+        </li>
+      </ul>
+
+      <div id="change_password_pop">
+        <h2>Password change</h2>
+        <p>We'll e-mail a password reset link to ${email}.</p>
+
+        <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
+        <input type="submit" id="pwd_reset_button" value="Reset Password" />
+      </div>
+
+    </section>
+  </div>
+</section>
+
+      <div id="password_reset_complete" class="leanModal_box">
+      <a href="#password_reset_complete" rel="leanModal" id="password_reset_complete_link"></a>
+        <h1>Password Reset Email Sent</h1>
+        An email has been sent to ${email}. Follow the link in the email to change your password.
+      </div>

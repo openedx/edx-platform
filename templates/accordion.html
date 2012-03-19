@@ -1,0 +1,33 @@
+<%!
+    from django.core.urlresolvers import reverse
+%>
+
+<%def name="make_chapter(chapter)">
+  <h3><a href="#">${chapter['name']}</a></h3>
+
+    <ul>
+      % for section in chapter['sections']:
+      <li
+          % if 'active' in section and section['active']:
+            class="active"
+          % endif
+        >
+
+          <a href="${reverse('courseware_section', args=format_url_params([course_name, chapter['name'], section['name']]))}">
+            <p>${section['name']}</p>
+
+            <p class="subtitle">
+              ${section['format']}
+
+              % if 'due' in section and section['due']!="":
+                due ${section['due']}
+              % endif
+            </p>
+          </a>
+        % endfor
+      </ul>
+    </%def>
+
+% for chapter in toc:
+    ${make_chapter(chapter)}
+% endfor

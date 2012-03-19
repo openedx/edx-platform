@@ -1,0 +1,22 @@
+<nav class="sequence-nav">
+  <ol>
+    % for t in range(1,1+len(items)):
+    <li><a href="#" class="seq_inactive" id="tt_${ t }"></a></li>
+    % endfor
+  </ol>
+
+  <ul>
+    <li class="${ id }prev prev"><a href="#">Previous</a></li>
+    <li class="${ id }next next"><a href="#">Next</a></li>
+  </ul>
+</nav>
+
+<div id="seq_content"></div>
+
+<nav class="sequence-bottom">
+<ul>
+  <li class="${ id }prev prev"><a href="#">Previous</a></li>
+  <li class="${ id }next next"><a href="#">Next</a></li>
+</ul>
+</nav>
+
