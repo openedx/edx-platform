@@ -8,7 +8,7 @@ We are also using Bourbon with sass. They are a generic set of mixins, and funct
 To use bourbon you need to install it with:
 $ gem install bourbon
 
-Then to generate Sass files cd to templates directory and watch the sass files for developement: 
+Then to generate Sass files cd to templates directory and watch the sass files for development: 
 $ sass --watch sass:../static/css/ -r ./sass/bourbon/lib/bourbon.rb
 
 To generate a compressed css file for production:
