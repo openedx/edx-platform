@@ -1,0 +1,17 @@
+<h1> ${ homework['name']} Test </h1>
+
+<ol>
+% for problem in homework['problems']:
+  <li>
+    <h2>${ problem['name'] }</h2>
+
+    ${ problem['html'] }
+
+    <section>
+      <input type="hidden" name="problem_id" value="${ problem['name'] }">
+      <input type="submit" value="Check">
+    </section>
+  </li>
+% endfor
+</ol>
+

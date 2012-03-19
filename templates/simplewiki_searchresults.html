@@ -1,0 +1,34 @@
+##This file is based on the template from the SimpleWiki source which carries the GPL license
+
+<%inherit file="simplewiki_base.html"/>
+
+<%block name="title"><title>Search Results - MITx 6.002x Wiki</title></%block>
+
+<%!
+from django.core.urlresolvers import reverse
+%>
+
+<%block name="wiki_page_title">
+<h2 class="wiki-title">
+%if wiki_search_query:
+Search results for ${wiki_search_query | h}
+%else:
+Displaying all articles
+%endif
+</h2>
+</%block>
+
+<%block name="wiki_body">
+<section class="results">
+<ul class="article-list">
+%for article in wiki_search_results:
+<% article_deleted = not article.current_revision.deleted == 0 %>
+<li><h3><a href="${reverse("wiki_view", args=[article.get_url()])}">${article.title} ${'(Deleted)' if article_deleted else ''}</a></h3></li>
+%endfor
+
+%if not wiki_search_results: 
+No articles matching <b>${wiki_search_query if wiki_search_query is not UNDEFINED else ""} </b>!
+%endif
+</ul>
+</section>
+</%block>
