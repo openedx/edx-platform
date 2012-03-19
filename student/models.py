@@ -12,6 +12,7 @@ import uuid
 
 from django.db import models
 from django.contrib.auth.models import User
+import json
 
 #from cache_toolbox import cache_model, cache_relation
 
@@ -28,6 +29,15 @@ class UserProfile(models.Model):
     location = models.CharField(blank=True, max_length=255, db_index=True)
     meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
+
+    def get_meta():
+        try: 
+            js = json.reads(self.meta)
+        except:
+            js = dict()
+        return json
+    def set_meta(js):
+        self.meta = json.dumps(js)
 
 ## TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
@@ -66,7 +76,7 @@ class PendingNameChange(models.Model):
 class PendingEmailChange(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
-    
+    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
 #cache_relation(User.profile)
 
