@@ -1,5 +1,8 @@
 #! /bin/bash
 
+set -x
+set -e
+
 #sass sass:static/css -r templates/sass/bourbon/lib/bourbon.rb --style :compressed
 
 if [ -z "${GIT_COMMIT}" ]; then
