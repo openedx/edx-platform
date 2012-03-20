@@ -119,8 +119,6 @@ input, select {
 .wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, footer, section.index-content {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   margin: 0 auto;
   max-width: 1400px;
@@ -200,8 +198,6 @@ input, select {
   font-style: normal;
   -webkit-box-shadow: inset 0 1px 0 #b83d3d;
   -moz-box-shadow: inset 0 1px 0 #b83d3d;
-  -ms-box-shadow: inset 0 1px 0 #b83d3d;
-  -o-box-shadow: inset 0 1px 0 #b83d3d;
   box-shadow: inset 0 1px 0 #b83d3d;
   -webkit-font-smoothing: antialiased; }
 .button:hover, header.announcement div section.course section a:hover, section.index-content section.course a:hover, section.index-content section.staff a:hover, section.index-content section.about-course section.cta a.enroll:hover {
@@ -239,8 +235,6 @@ body a:hover, body a:focus {
 body input[type="email"], body input[type="number"], body input[type="password"], body input[type="search"], body input[type="tel"], body input[type="text"], body input[type="url"], body input[type="color"], body input[type="date"], body input[type="datetime"], body input[type="datetime-local"], body input[type="month"], body input[type="time"], body input[type="week"], body textarea {
   -webkit-box-shadow: 0 -1px 0 white;
   -moz-box-shadow: 0 -1px 0 white;
-  -ms-box-shadow: 0 -1px 0 white;
-  -o-box-shadow: 0 -1px 0 white;
   box-shadow: 0 -1px 0 white;
   background-color: #eeeeee;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, white));
@@ -385,8 +379,6 @@ header.announcement div section.course section a {
   border-color: #260d0d;
   -webkit-box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
   -moz-box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
-  -ms-box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
-  -o-box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
   box-shadow: inset 0 1px 0 #732626, 0 1px 0 #ac3939;
   display: block;
   padding: 12.944px 25.888px;
@@ -519,8 +511,6 @@ section.index-content section ul {
 section.index-content section.about {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   border-right: 1px solid #e5e5e5;
   margin-right: 2.513%;
@@ -684,8 +674,6 @@ section.index-content section.course h2 {
 section.index-content section.about-course {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   border-right: 1px solid #e5e5e5;
   margin-right: 2.513%;
@@ -761,13 +749,9 @@ div.leanModal_box {
   border-radius: 3px;
   -webkit-box-shadow: 0 0 6px black;
   -moz-box-shadow: 0 0 6px black;
-  -ms-box-shadow: 0 0 6px black;
-  -o-box-shadow: 0 0 6px black;
   box-shadow: 0 0 6px black;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: none;
   padding: 51.776px; }
@@ -847,8 +831,6 @@ div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li i
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box; }
 div.leanModal_box form ol li input[type="checkbox"] {
   margin-right: 10px; }
@@ -870,8 +852,6 @@ div.leanModal_box form input[type="button"], div.leanModal_box form input[type="
   border-radius: 3px;
   -webkit-box-shadow: inset 0 1px 0 0 #bc5c5c;
   -moz-box-shadow: inset 0 1px 0 0 #bc5c5c;
-  -ms-box-shadow: inset 0 1px 0 0 #bc5c5c;
-  -o-box-shadow: inset 0 1px 0 0 #bc5c5c;
   box-shadow: inset 0 1px 0 0 #bc5c5c;
   color: white;
   display: inline;
@@ -892,8 +872,6 @@ div.leanModal_box form input[type="button"], div.leanModal_box form input[type="
 div.leanModal_box form input[type="button"]:hover, div.leanModal_box form input[type="submit"]:hover {
   -webkit-box-shadow: inset 0 1px 0 0 #a44141;
   -moz-box-shadow: inset 0 1px 0 0 #a44141;
-  -ms-box-shadow: inset 0 1px 0 0 #a44141;
-  -o-box-shadow: inset 0 1px 0 0 #a44141;
   box-shadow: inset 0 1px 0 0 #a44141;
   cursor: pointer;
   background-color: #823030;
@@ -907,8 +885,6 @@ div.leanModal_box form input[type="button"]:active, div.leanModal_box form input
   border: 1px solid #691b1b;
   -webkit-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
   -moz-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
-  -ms-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
-  -o-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
   box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee; }
 
 div#login {
@@ -943,40 +919,3 @@ div#feedback_div form ol li {
   width: 100%; }
 div#feedback_div form ol li textarea#feedback_message {
   height: 100px; }
-
-div#calculator_div {
-  max-width: 500px; }
-div#calculator_div form {
-  padding-bottom: 25.888px;
-  margin-bottom: 25.888px;
-  border-bottom: 1px solid #ddd; }
-div#calculator_div form input#calculator_input {
-  width: 400px; }
-div#calculator_div form input#calculator_button {
-  background: 0;
-  color: #993333;
-  border: 0;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
-  box-shadow: none;
-  padding: 0;
-  text-shadow: none; }
-div#calculator_div form input#calculator_button:hover {
-  color: #333; }
-div#calculator_div form input#calculator_output {
-  border: 0;
-  background: none;
-  padding: 9.061px;
-  font-size: 24px;
-  width: 378px;
-  font-weight: bold;
-  margin-top: 4px; }
-div#calculator_div dl dt {
-  float: left;
-  clear: both;
-  padding-right: 12.944px;
-  font-weight: bold; }
-div#calculator_div dl dd {
-  float: left; }
