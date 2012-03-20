@@ -26,4 +26,4 @@ REPO_ROOT=$(dirname $0)/..
 BUILD_DIR=${REPO_ROOT}/build
 
 mkdir -p ${BUILD_DIR}
-tar -v --exclude=.git --exclude=build --transform="s#^#mitx/#" -czf ${BUILD_DIR}/${ID}.tgz ${REPO_ROOT}
+tar --exclude=.git --exclude=build --transform="s#^#mitx/#" -czf ${BUILD_DIR}/${ID}.tgz ${REPO_ROOT}
