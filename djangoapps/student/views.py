@@ -2,6 +2,7 @@ import json
 import logging
 import random
 import string
+import uuid
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -15,7 +16,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 
-from models import Registration, UserProfile
+from models import Registration, UserProfile, PendingNameChange, PendingEmailChange
 from django_future.csrf import ensure_csrf_cookie
 
 log = logging.getLogger("mitx.user")
@@ -330,12 +331,13 @@ def change_email_request(request):
     d = {'site':settings.SITE_NAME, 
          'key':pec.activation_key, 
          'old_email' : user.email, 
-         'new_email' : pec.email}
+         'new_email' : pec.new_email}
 
     subject = render_to_string('emails/email_change_subject.txt',d)
+    subject = ''.join(subject.splitlines())
     message = render_to_string('emails/email_change.txt',d)
 
-    res=send_email(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.email])
+    res=send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
 
     return HttpResponse(json.dumps({'success':True}))
 
@@ -349,14 +351,17 @@ def confirm_email_change(request, key):
     except:
         return render_to_response("email_invalid_key.html")
     
-    subject = render_to_string('emails/confirm_email_change_subject.txt',d)
+    user = pec.user
+    d = {'site':settings.SITE_NAME, 
+         'old_email' : user.email, 
+         'new_email' : pec.new_email}    
+
+    subject = render_to_string('emails/email_change_subject.txt',d)
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/confirm_email_change.txt',d)
-    
-    user = pec.user
-    user.email_user(subject, message, DEFAULT_FROM_EMAIL)
     up = UserProfile.objects.get( user = user )
     meta = up.get_meta()
+    print meta
     if 'old_emails' not in meta:
         meta['old_emails'] = []
     meta['old_emails'].append(user.email)
@@ -365,8 +370,9 @@ def confirm_email_change(request, key):
     user.email = pec.new_email
     user.save()
     pec.delete()
+    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
-    return render_to_response("email_change_successful.html")
+    return render_to_response("email_change_successful.html", d)
 
 @ensure_csrf_cookie
 def change_name_request(request):

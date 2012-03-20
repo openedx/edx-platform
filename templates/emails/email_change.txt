@@ -1,8 +1,8 @@
-We received a request to change the e-mail associated with MITx
-account ${username} from ${old_email} to ${new_email}. If this is
-correct, please confirm your new e-mail address by visiting:
+We received a request to change the e-mail associated with your MITx
+account from ${old_email} to ${new_email}. If this is correct, please
+confirm your new e-mail address by visiting:
 
-http://${ site }/confirmemail/${ key }
+http://${ site }/email_confirm/${ key }
 
 If you didn't request this, you don't need to do anything; you won't
 receive any more email from us. Please do not reply to this e-mail; if
