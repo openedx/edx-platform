@@ -23,7 +23,10 @@
     font-weight: normal;
     @include border-radius(4px 4px 0 0);
   }
+
   a {
     color: #fb7321;
     text-decoration: underline;
-    font-weight: bold; } }
+    font-weight: bold; 
+  }
+}

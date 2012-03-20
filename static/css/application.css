@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -149,8 +149,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   border-radius: 3px;
   -webkit-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
   -moz-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
-  -ms-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
-  -o-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
   box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
   color: #fff;
   cursor: pointer;
@@ -169,8 +167,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
 .button:hover, input[type="submit"]:hover, input[type="button"]:hover, button:hover, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.paginator div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:hover, .button:focus, input[type="submit"]:focus, input[type="button"]:focus, button:focus, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.paginator div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus, div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit:focus {
   -webkit-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
   -moz-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
-  -ms-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
-  -o-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
   box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
   background-color: #a2a2a2;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #a2a2a2), color-stop(100%, #7b7b7b));
@@ -184,13 +180,9 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
 .content, div.course-wrapper section.course-content, div.book-wrapper section.book, div.info-wrapper section.updates, div.profile-wrapper section.course-info, div.gradebook-wrapper section.gradebook-content, div.wiki-wrapper section.wiki-body {
   -webkit-box-shadow: inset 0 0 2px 3px #f3f3f3;
   -moz-box-shadow: inset 0 0 2px 3px #f3f3f3;
-  -ms-box-shadow: inset 0 0 2px 3px #f3f3f3;
-  -o-box-shadow: inset 0 0 2px 3px #f3f3f3;
   box-shadow: inset 0 0 2px 3px #f3f3f3;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: table-cell;
   padding: 22.652px;
@@ -200,8 +192,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   .content, div.course-wrapper section.course-content, div.book-wrapper section.book, div.info-wrapper section.updates, div.profile-wrapper section.course-info, div.gradebook-wrapper section.gradebook-content, div.wiki-wrapper section.wiki-body {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
-    -ms-box-shadow: none;
-    -o-box-shadow: none;
     box-shadow: none; } }
 
 .sidebar, section.course-index, div.book-wrapper section.book-sidebar, div.info-wrapper section.handouts, div.profile-wrapper section.user-info, div#wiki_panel, div.discussion-wrapper aside {
@@ -214,13 +204,9 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   border-right: 1px solid #d3d3d3;
   -webkit-box-shadow: inset 0 0 0 1px #f6f6f6;
   -moz-box-shadow: inset 0 0 0 1px #f6f6f6;
-  -ms-box-shadow: inset 0 0 0 1px #f6f6f6;
-  -o-box-shadow: inset 0 0 0 1px #f6f6f6;
   box-shadow: inset 0 0 0 1px #f6f6f6;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: table-cell;
   font-family: "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
@@ -239,8 +225,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
 .sidebar .bottom-border, section.course-index .bottom-border, div.book-wrapper section.book-sidebar .bottom-border, div.info-wrapper section.handouts .bottom-border, div.profile-wrapper section.user-info .bottom-border, div#wiki_panel .bottom-border, div.discussion-wrapper aside .bottom-border, .sidebar h3, section.course-index .sidebar h3, .sidebar section.course-index h3, div.book-wrapper section.book-sidebar .sidebar h3, .sidebar div.book-wrapper section.book-sidebar h3, div.info-wrapper section.handouts .sidebar h3, .sidebar div.info-wrapper section.handouts h3, div.profile-wrapper section.user-info .sidebar h3, .sidebar div.profile-wrapper section.user-info h3, div#wiki_panel .sidebar h3, .sidebar div#wiki_panel h3, div.discussion-wrapper aside .sidebar h3, .sidebar div.discussion-wrapper aside h3, .sidebar section.course-index h3, section.course-index .sidebar h3, section.course-index h3, div.book-wrapper section.book-sidebar section.course-index h3, section.course-index div.book-wrapper section.book-sidebar h3, div.info-wrapper section.handouts section.course-index h3, section.course-index div.info-wrapper section.handouts h3, div.profile-wrapper section.user-info section.course-index h3, section.course-index div.profile-wrapper section.user-info h3, div#wiki_panel section.course-index h3, section.course-index div#wiki_panel h3, div.discussion-wrapper aside section.course-index h3, section.course-index div.discussion-wrapper aside h3, .sidebar div.book-wrapper section.book-sidebar h3, div.book-wrapper section.book-sidebar .sidebar h3, section.course-index div.book-wrapper section.book-sidebar h3, div.book-wrapper section.book-sidebar section.course-index h3, div.book-wrapper section.book-sidebar h3, div.info-wrapper section.handouts div.book-wrapper section.book-sidebar h3, div.book-wrapper section.book-sidebar div.info-wrapper section.handouts h3, div.profile-wrapper section.user-info div.book-wrapper section.book-sidebar h3, div.book-wrapper section.book-sidebar div.profile-wrapper section.user-info h3, div#wiki_panel div.book-wrapper section.book-sidebar h3, div.book-wrapper section.book-sidebar div#wiki_panel h3, div.discussion-wrapper aside div.book-wrapper section.book-sidebar h3, div.book-wrapper section.book-sidebar div.discussion-wrapper aside h3, .sidebar div.info-wrapper section.handouts h3, div.info-wrapper section.handouts .sidebar h3, section.course-index div.info-wrapper section.handouts h3, div.info-wrapper section.handouts section.course-index h3, div.book-wrapper section.book-sidebar div.info-wrapper section.handouts h3, div.info-wrapper section.handouts div.book-wrapper section.book-sidebar h3, div.info-wrapper section.handouts h3, div.profile-wrapper section.user-info div.info-wrapper section.handouts h3, div.info-wrapper section.handouts div.profile-wrapper section.user-info h3, div#wiki_panel div.info-wrapper section.handouts h3, div.info-wrapper section.handouts div#wiki_panel h3, div.discussion-wrapper aside div.info-wrapper section.handouts h3, div.info-wrapper section.handouts div.discussion-wrapper aside h3, .sidebar div.profile-wrapper section.user-info h3, div.profile-wrapper section.user-info .sidebar h3, section.course-index div.profile-wrapper section.user-info h3, div.profile-wrapper section.user-info section.course-index h3, div.book-wrapper section.book-sidebar div.profile-wrapper section.user-info h3, div.profile-wrapper section.user-info div.book-wrapper section.book-sidebar h3, div.info-wrapper section.handouts div.profile-wrapper section.user-info h3, div.profile-wrapper section.user-info div.info-wrapper section.handouts h3, div.profile-wrapper section.user-info h3, div#wiki_panel div.profile-wrapper section.user-info h3, div.profile-wrapper section.user-info div#wiki_panel h3, div.discussion-wrapper aside div.profile-wrapper section.user-info h3, div.profile-wrapper section.user-info div.discussion-wrapper aside h3, .sidebar div#wiki_panel h3, div#wiki_panel .sidebar h3, section.course-index div#wiki_panel h3, div#wiki_panel section.course-index h3, div.book-wrapper section.book-sidebar div#wiki_panel h3, div#wiki_panel div.book-wrapper section.book-sidebar h3, div.info-wrapper section.handouts div#wiki_panel h3, div#wiki_panel div.info-wrapper section.handouts h3, div.profile-wrapper section.user-info div#wiki_panel h3, div#wiki_panel div.profile-wrapper section.user-info h3, div#wiki_panel h3, div.discussion-wrapper aside div#wiki_panel h3, div#wiki_panel div.discussion-wrapper aside h3, .sidebar div.discussion-wrapper aside h3, div.discussion-wrapper aside .sidebar h3, section.course-index div.discussion-wrapper aside h3, div.discussion-wrapper aside section.course-index h3, div.book-wrapper section.book-sidebar div.discussion-wrapper aside h3, div.discussion-wrapper aside div.book-wrapper section.book-sidebar h3, div.info-wrapper section.handouts div.discussion-wrapper aside h3, div.discussion-wrapper aside div.info-wrapper section.handouts h3, div.profile-wrapper section.user-info div.discussion-wrapper aside h3, div.discussion-wrapper aside div.profile-wrapper section.user-info h3, div#wiki_panel div.discussion-wrapper aside h3, div.discussion-wrapper aside div#wiki_panel h3, div.discussion-wrapper aside h3, .sidebar div#wiki_panel input[type="button"], section.course-index .sidebar div#wiki_panel input[type="button"], .sidebar div#wiki_panel section.course-index input[type="button"], div.book-wrapper section.book-sidebar .sidebar div#wiki_panel input[type="button"], .sidebar div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts .sidebar div#wiki_panel input[type="button"], .sidebar div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info .sidebar div#wiki_panel input[type="button"], .sidebar div#wiki_panel div.profile-wrapper section.user-info input[type="button"], .sidebar div#wiki_panel input[type="button"], div.discussion-wrapper aside .sidebar div#wiki_panel input[type="button"], .sidebar div#wiki_panel div.discussion-wrapper aside input[type="button"], div#wiki_panel .sidebar input[type="button"], section.course-index div#wiki_panel .sidebar input[type="button"], div#wiki_panel .sidebar section.course-index input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel .sidebar input[type="button"], div#wiki_panel .sidebar div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div#wiki_panel .sidebar input[type="button"], div#wiki_panel .sidebar div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div#wiki_panel .sidebar input[type="button"], div#wiki_panel .sidebar div.profile-wrapper section.user-info input[type="button"], div#wiki_panel .sidebar input[type="button"], div.discussion-wrapper aside div#wiki_panel .sidebar input[type="button"], div#wiki_panel .sidebar div.discussion-wrapper aside input[type="button"], .sidebar section.course-index div#wiki_panel input[type="button"], section.course-index div#wiki_panel .sidebar input[type="button"], section.course-index div#wiki_panel input[type="button"], div.book-wrapper section.book-sidebar section.course-index div#wiki_panel input[type="button"], section.course-index div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts section.course-index div#wiki_panel input[type="button"], section.course-index div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info section.course-index div#wiki_panel input[type="button"], section.course-index div#wiki_panel div.profile-wrapper section.user-info input[type="button"], section.course-index div#wiki_panel input[type="button"], div.discussion-wrapper aside section.course-index div#wiki_panel input[type="button"], section.course-index div#wiki_panel div.discussion-wrapper aside input[type="button"], .sidebar div#wiki_panel section.course-index input[type="button"], div#wiki_panel section.course-index .sidebar input[type="button"], div#wiki_panel section.course-index input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel section.course-index input[type="button"], div#wiki_panel section.course-index div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div#wiki_panel section.course-index input[type="button"], div#wiki_panel section.course-index div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div#wiki_panel section.course-index input[type="button"], div#wiki_panel section.course-index div.profile-wrapper section.user-info input[type="button"], div#wiki_panel section.course-index input[type="button"], div.discussion-wrapper aside div#wiki_panel section.course-index input[type="button"], div#wiki_panel section.course-index div.discussion-wrapper aside input[type="button"], .sidebar div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel .sidebar input[type="button"], section.course-index div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel section.course-index input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div.info-wrapper section.handouts div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div.discussion-wrapper aside div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel div.discussion-wrapper aside input[type="button"], .sidebar div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar .sidebar input[type="button"], section.course-index div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar section.course-index input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.discussion-wrapper aside div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar div.discussion-wrapper aside input[type="button"], .sidebar div.info-wrapper section.handouts div#wiki_panel input[type="button"], div.info-wrapper section.handouts div#wiki_panel .sidebar input[type="button"], section.course-index div.info-wrapper section.handouts div#wiki_panel input[type="button"], div.info-wrapper section.handouts div#wiki_panel section.course-index input[type="button"], div.book-wrapper section.book-sidebar div.info-wrapper section.handouts div#wiki_panel input[type="button"], div.info-wrapper section.handouts div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div#wiki_panel input[type="button"], div.profile-wrapper section.user-info div.info-wrapper section.handouts div#wiki_panel input[type="button"], div.info-wrapper section.handouts div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div.info-wrapper section.handouts div#wiki_panel input[type="button"], div.discussion-wrapper aside div.info-wrapper section.handouts div#wiki_panel input[type="button"], div.info-wrapper section.handouts div#wiki_panel div.discussion-wrapper aside input[type="button"], .sidebar div#wiki_panel div.info-wrapper section.handouts input[type="button"], div#wiki_panel div.info-wrapper section.handouts .sidebar input[type="button"], section.course-index div#wiki_panel div.info-wrapper section.handouts input[type="button"], div#wiki_panel div.info-wrapper section.handouts section.course-index input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel div.info-wrapper section.handouts input[type="button"], div#wiki_panel div.info-wrapper section.handouts div.book-wrapper section.book-sidebar input[type="button"], div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div#wiki_panel div.info-wrapper section.handouts input[type="button"], div#wiki_panel div.info-wrapper section.handouts div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.discussion-wrapper aside div#wiki_panel div.info-wrapper section.handouts input[type="button"], div#wiki_panel div.info-wrapper section.handouts div.discussion-wrapper aside input[type="button"], .sidebar div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div.profile-wrapper section.user-info div#wiki_panel .sidebar input[type="button"], section.course-index div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div.profile-wrapper section.user-info div#wiki_panel section.course-index input[type="button"], div.book-wrapper section.book-sidebar div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div.profile-wrapper section.user-info div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div.profile-wrapper section.user-info div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div.discussion-wrapper aside div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div.profile-wrapper section.user-info div#wiki_panel div.discussion-wrapper aside input[type="button"], .sidebar div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.profile-wrapper section.user-info .sidebar input[type="button"], section.course-index div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.profile-wrapper section.user-info section.course-index input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.profile-wrapper section.user-info div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.profile-wrapper section.user-info div.info-wrapper section.handouts input[type="button"], div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div.discussion-wrapper aside div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.profile-wrapper section.user-info div.discussion-wrapper aside input[type="button"], .sidebar div#wiki_panel input[type="button"], div#wiki_panel .sidebar input[type="button"], section.course-index div#wiki_panel input[type="button"], div#wiki_panel section.course-index input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"], div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div#wiki_panel input[type="button"], div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div#wiki_panel input[type="button"], div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div#wiki_panel input[type="button"], div.discussion-wrapper aside div#wiki_panel input[type="button"], div#wiki_panel div.discussion-wrapper aside input[type="button"], .sidebar div.discussion-wrapper aside div#wiki_panel input[type="button"], div.discussion-wrapper aside div#wiki_panel .sidebar input[type="button"], section.course-index div.discussion-wrapper aside div#wiki_panel input[type="button"], div.discussion-wrapper aside div#wiki_panel section.course-index input[type="button"], div.book-wrapper section.book-sidebar div.discussion-wrapper aside div#wiki_panel input[type="button"], div.discussion-wrapper aside div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div.discussion-wrapper aside div#wiki_panel input[type="button"], div.discussion-wrapper aside div#wiki_panel div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div.discussion-wrapper aside div#wiki_panel input[type="button"], div.discussion-wrapper aside div#wiki_panel div.profile-wrapper section.user-info input[type="button"], div.discussion-wrapper aside div#wiki_panel input[type="button"], div.discussion-wrapper aside div#wiki_panel input[type="button"], .sidebar div#wiki_panel div.discussion-wrapper aside input[type="button"], div#wiki_panel div.discussion-wrapper aside .sidebar input[type="button"], section.course-index div#wiki_panel div.discussion-wrapper aside input[type="button"], div#wiki_panel div.discussion-wrapper aside section.course-index input[type="button"], div.book-wrapper section.book-sidebar div#wiki_panel div.discussion-wrapper aside input[type="button"], div#wiki_panel div.discussion-wrapper aside div.book-wrapper section.book-sidebar input[type="button"], div.info-wrapper section.handouts div#wiki_panel div.discussion-wrapper aside input[type="button"], div#wiki_panel div.discussion-wrapper aside div.info-wrapper section.handouts input[type="button"], div.profile-wrapper section.user-info div#wiki_panel div.discussion-wrapper aside input[type="button"], div#wiki_panel div.discussion-wrapper aside div.profile-wrapper section.user-info input[type="button"], div#wiki_panel div.discussion-wrapper aside input[type="button"], div#wiki_panel div.discussion-wrapper aside input[type="button"], .sidebar div.info-wrapper section.handouts h1, div.info-wrapper section.handouts .sidebar h1, section.course-index div.info-wrapper section.handouts h1, div.info-wrapper section.handouts section.course-index h1, div.book-wrapper section.book-sidebar div.info-wrapper section.handouts h1, div.info-wrapper section.handouts div.book-wrapper section.book-sidebar h1, div.info-wrapper section.handouts h1, div.profile-wrapper section.user-info div.info-wrapper section.handouts h1, div.info-wrapper section.handouts div.profile-wrapper section.user-info h1, div#wiki_panel div.info-wrapper section.handouts h1, div.info-wrapper section.handouts div#wiki_panel h1, div.discussion-wrapper aside div.info-wrapper section.handouts h1, div.info-wrapper section.handouts div.discussion-wrapper aside h1, .sidebar div.profile-wrapper section.user-info h1, div.profile-wrapper section.user-info .sidebar h1, section.course-index div.profile-wrapper section.user-info h1, div.profile-wrapper section.user-info section.course-index h1, div.book-wrapper section.book-sidebar div.profile-wrapper section.user-info h1, div.profile-wrapper section.user-info div.book-wrapper section.book-sidebar h1, div.info-wrapper section.handouts div.profile-wrapper section.user-info h1, div.profile-wrapper section.user-info div.info-wrapper section.handouts h1, div.profile-wrapper section.user-info h1, div#wiki_panel div.profile-wrapper section.user-info h1, div.profile-wrapper section.user-info div#wiki_panel h1, div.discussion-wrapper aside div.profile-wrapper section.user-info h1, div.profile-wrapper section.user-info div.discussion-wrapper aside h1, .sidebar div#wiki_panel h2, div#wiki_panel .sidebar h2, section.course-index div#wiki_panel h2, div#wiki_panel section.course-index h2, div.book-wrapper section.book-sidebar div#wiki_panel h2, div#wiki_panel div.book-wrapper section.book-sidebar h2, div.info-wrapper section.handouts div#wiki_panel h2, div#wiki_panel div.info-wrapper section.handouts h2, div.profile-wrapper section.user-info div#wiki_panel h2, div#wiki_panel div.profile-wrapper section.user-info h2, div#wiki_panel h2, div.discussion-wrapper aside div#wiki_panel h2, div#wiki_panel div.discussion-wrapper aside h2, .sidebar div.discussion-wrapper aside h1, div.discussion-wrapper aside .sidebar h1, section.course-index div.discussion-wrapper aside h1, div.discussion-wrapper aside section.course-index h1, div.book-wrapper section.book-sidebar div.discussion-wrapper aside h1, div.discussion-wrapper aside div.book-wrapper section.book-sidebar h1, div.info-wrapper section.handouts div.discussion-wrapper aside h1, div.discussion-wrapper aside div.info-wrapper section.handouts h1, div.profile-wrapper section.user-info div.discussion-wrapper aside h1, div.discussion-wrapper aside div.profile-wrapper section.user-info h1, div#wiki_panel div.discussion-wrapper aside h1, div.discussion-wrapper aside div#wiki_panel h1, div.discussion-wrapper aside h1 {
   -webkit-box-shadow: 0 1px 0 #eeeeee;
   -moz-box-shadow: 0 1px 0 #eeeeee;
-  -ms-box-shadow: 0 1px 0 #eeeeee;
-  -o-box-shadow: 0 1px 0 #eeeeee;
   box-shadow: 0 1px 0 #eeeeee;
   border-bottom: 1px solid #d3d3d3; }
 @media print {
@@ -284,8 +268,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   background: #efefef;
   -webkit-box-shadow: 0 1px 0 white;
   -moz-box-shadow: 0 1px 0 white;
-  -ms-box-shadow: 0 1px 0 white;
-  -o-box-shadow: 0 1px 0 white;
   box-shadow: 0 1px 0 white; }
 .sidebar h3 span.ui-icon, section.course-index h3 span.ui-icon, div.book-wrapper section.book-sidebar h3 span.ui-icon, div.info-wrapper section.handouts h3 span.ui-icon, div.profile-wrapper section.user-info h3 span.ui-icon, div#wiki_panel h3 span.ui-icon, div.discussion-wrapper aside h3 span.ui-icon, .sidebar div#wiki_panel input[type="button"] span.ui-icon, div#wiki_panel .sidebar input[type="button"] span.ui-icon, section.course-index div#wiki_panel input[type="button"] span.ui-icon, div#wiki_panel section.course-index input[type="button"] span.ui-icon, div.book-wrapper section.book-sidebar div#wiki_panel input[type="button"] span.ui-icon, div#wiki_panel div.book-wrapper section.book-sidebar input[type="button"] span.ui-icon, div.info-wrapper section.handouts div#wiki_panel input[type="button"] span.ui-icon, div#wiki_panel div.info-wrapper section.handouts input[type="button"] span.ui-icon, div.profile-wrapper section.user-info div#wiki_panel input[type="button"] span.ui-icon, div#wiki_panel div.profile-wrapper section.user-info input[type="button"] span.ui-icon, div#wiki_panel input[type="button"] span.ui-icon, div.discussion-wrapper aside div#wiki_panel input[type="button"] span.ui-icon, div#wiki_panel div.discussion-wrapper aside input[type="button"] span.ui-icon {
   background-image: url(images/ui-icons_454545_256x240.png); }
@@ -295,8 +277,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   border-bottom: 1px solid #bbb;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none;
   color: #000;
   font-weight: bold; }
@@ -306,8 +286,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   border-bottom: 1px solid #d3d3d3;
   -webkit-box-shadow: 0 1px 0 #eeeeee;
   -moz-box-shadow: 0 1px 0 #eeeeee;
-  -ms-box-shadow: 0 1px 0 #eeeeee;
-  -o-box-shadow: 0 1px 0 #eeeeee;
   box-shadow: 0 1px 0 #eeeeee;
   padding: 11.326px 22.652px;
   position: relative; }
@@ -339,8 +317,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   border-bottom: 1px solid #eddfaa;
   -webkit-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
   -moz-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
-  -ms-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
-  -o-box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
   box-shadow: inset 0 1px 0 white, inset 1px 0 0 white;
   font-size: 12px;
   margin: -22.652px -22.652px 22.652px;
@@ -361,8 +337,6 @@ h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper se
   border-left: 1px solid #e4d080;
   -webkit-box-shadow: inset 1px 0 0 #faf7e9;
   -moz-box-shadow: inset 1px 0 0 #faf7e9;
-  -ms-box-shadow: inset 1px 0 0 #faf7e9;
-  -o-box-shadow: inset 1px 0 0 #faf7e9;
   box-shadow: inset 1px 0 0 #faf7e9;
   display: block;
   text-transform: uppercase; }
@@ -429,8 +403,6 @@ img {
 input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"], textarea {
   -webkit-box-shadow: 0 -1px 0 white;
   -moz-box-shadow: 0 -1px 0 white;
-  -ms-box-shadow: 0 -1px 0 white;
-  -o-box-shadow: 0 -1px 0 white;
   box-shadow: 0 -1px 0 white;
   background-color: #eeeeee;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, white));
@@ -473,13 +445,9 @@ html body section.main-content, html body section.outside-app {
   border-bottom: 1px solid #bbb;
   -webkit-box-shadow: 0 0 4px #dfdfdf;
   -moz-box-shadow: 0 0 4px #dfdfdf;
-  -ms-box-shadow: 0 0 4px #dfdfdf;
-  -o-box-shadow: 0 0 4px #dfdfdf;
   box-shadow: 0 0 4px #dfdfdf;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   margin-top: 3px;
   overflow: hidden; }
@@ -510,8 +478,6 @@ div.header-wrapper {
   border-bottom: 1px solid #fff;
   -webkit-box-shadow: inset 0 -4px 6px #862d2d;
   -moz-box-shadow: inset 0 -4px 6px #862d2d;
-  -ms-box-shadow: inset 0 -4px 6px #862d2d;
-  -o-box-shadow: inset 0 -4px 6px #862d2d;
   box-shadow: inset 0 -4px 6px #862d2d; }
 @media print {
   div.header-wrapper {
@@ -519,8 +485,6 @@ div.header-wrapper {
 div.header-wrapper header {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   padding: 0 22.652px; }
 div.header-wrapper header hgroup {
@@ -591,8 +555,6 @@ div.header-wrapper header nav {
   border-radius: 3px 3px 0 0;
   -webkit-box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
   -moz-box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
-  -ms-box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
-  -o-box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
   box-shadow: inset 0 0 0 1px #3b0c10, inset 0 2px 0 #65141c;
   display: block;
   float: left;
@@ -639,8 +601,6 @@ div.header-wrapper header nav .active, div.header-wrapper header nav.courseware 
   border-radius: 3px 3px 0 0;
   -webkit-box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
   -moz-box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
-  -ms-box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
-  -o-box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
   box-shadow: 0 2px 0 #f4f4f4, inset 0 1px 0 white;
   color: #333;
   text-shadow: 0 1px 0 #fff; }
@@ -648,8 +608,6 @@ div.header-wrapper header nav .active, div.header-wrapper header nav.courseware 
 footer {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   color: #777;
   margin-top: 22.652px;
@@ -706,6 +664,110 @@ footer nav ul.social li.facebook a {
 footer nav ul.social li.linkedin a {
   background: url("/static/images/linkedin.png") 0 0 no-repeat; }
 
+li.calc-main {
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  width: 100%; }
+li.calc-main a.calc {
+  text-indent: -9999px;
+  overflow: hidden;
+  display: block;
+  background: url("/static/images/calc-icon.png") rgba(17, 17, 17, 0.9) no-repeat center;
+  border-bottom: 0;
+  color: #fff;
+  float: right;
+  margin-right: 10px;
+  -webkit-border-radius: 3px 3px 0 0;
+  -moz-border-radius: 3px 3px 0 0;
+  -ms-border-radius: 3px 3px 0 0;
+  -o-border-radius: 3px 3px 0 0;
+  border-radius: 3px 3px 0 0;
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  padding: 8px 12px;
+  width: 16px;
+  height: 20px; }
+li.calc-main a.calc:hover {
+  opacity: .8; }
+li.calc-main a.calc.closed {
+  background-image: url("/static/images/close-calc-icon.png"); }
+li.calc-main div#calculator_wrapper {
+  background: rgba(17, 17, 17, 0.9);
+  clear: both; }
+li.calc-main div#calculator_wrapper form {
+  padding: 22.652px; }
+li.calc-main div#calculator_wrapper form input#calculator_input {
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 16px;
+  padding: 10px;
+  width: 61.741%;
+  margin: 0;
+  float: left; }
+li.calc-main div#calculator_wrapper form input#calculator_input:focus {
+  outline: none;
+  border: none; }
+li.calc-main div#calculator_wrapper form input#calculator_button {
+  background: #111;
+  border: 1px solid #000;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  padding: 0;
+  text-shadow: none;
+  width: 4.251%;
+  float: left;
+  margin: 0 1.012%; }
+li.calc-main div#calculator_wrapper form input#calculator_button:hover {
+  color: #333; }
+li.calc-main div#calculator_wrapper form input#calculator_output {
+  background: #222;
+  border: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #fff;
+  float: left;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 1px 0 0;
+  padding: 10px;
+  width: 31.984%; }
+li.calc-main div#calculator_wrapper dl {
+  display: none; }
+li.calc-main div#calculator_wrapper dl dt {
+  clear: both;
+  float: left;
+  font-weight: bold;
+  padding-right: 11.326px; }
+li.calc-main div#calculator_wrapper dl dd {
+  float: left; }
+
 #lean_overlay {
   position: fixed;
   z-index: 100;
@@ -726,13 +788,9 @@ div.leanModal_box {
   border-radius: 3px;
   -webkit-box-shadow: 0 0 6px black;
   -moz-box-shadow: 0 0 6px black;
-  -ms-box-shadow: 0 0 6px black;
-  -o-box-shadow: 0 0 6px black;
   box-shadow: 0 0 6px black;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: none;
   padding: 45.304px; }
@@ -812,8 +870,6 @@ div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li i
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box; }
 div.leanModal_box form ol li input[type="checkbox"] {
   margin-right: 10px; }
@@ -835,8 +891,6 @@ div.leanModal_box form input[type="button"], div.leanModal_box form input[type="
   border-radius: 3px;
   -webkit-box-shadow: inset 0 1px 0 0 #bc5c5c;
   -moz-box-shadow: inset 0 1px 0 0 #bc5c5c;
-  -ms-box-shadow: inset 0 1px 0 0 #bc5c5c;
-  -o-box-shadow: inset 0 1px 0 0 #bc5c5c;
   box-shadow: inset 0 1px 0 0 #bc5c5c;
   color: white;
   display: inline;
@@ -857,8 +911,6 @@ div.leanModal_box form input[type="button"], div.leanModal_box form input[type="
 div.leanModal_box form input[type="button"]:hover, div.leanModal_box form input[type="submit"]:hover {
   -webkit-box-shadow: inset 0 1px 0 0 #a44141;
   -moz-box-shadow: inset 0 1px 0 0 #a44141;
-  -ms-box-shadow: inset 0 1px 0 0 #a44141;
-  -o-box-shadow: inset 0 1px 0 0 #a44141;
   box-shadow: inset 0 1px 0 0 #a44141;
   cursor: pointer;
   background-color: #823030;
@@ -872,8 +924,6 @@ div.leanModal_box form input[type="button"]:active, div.leanModal_box form input
   border: 1px solid #691b1b;
   -webkit-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
   -moz-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
-  -ms-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
-  -o-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
   box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee; }
 
 div#login {
@@ -908,43 +958,6 @@ div#feedback_div form ol li {
   width: 100%; }
 div#feedback_div form ol li textarea#feedback_message {
   height: 100px; }
-
-div#calculator_div {
-  max-width: 500px; }
-div#calculator_div form {
-  padding-bottom: 22.652px;
-  margin-bottom: 22.652px;
-  border-bottom: 1px solid #ddd; }
-div#calculator_div form input#calculator_input {
-  width: 400px; }
-div#calculator_div form input#calculator_button {
-  background: 0;
-  color: #993333;
-  border: 0;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
-  box-shadow: none;
-  padding: 0;
-  text-shadow: none; }
-div#calculator_div form input#calculator_button:hover {
-  color: #333; }
-div#calculator_div form input#calculator_output {
-  border: 0;
-  background: none;
-  padding: 7.928px;
-  font-size: 24px;
-  width: 378px;
-  font-weight: bold;
-  margin-top: 4px; }
-div#calculator_div dl dt {
-  float: left;
-  clear: both;
-  padding-right: 11.326px;
-  font-weight: bold; }
-div#calculator_div dl dd {
-  float: left; }
 
 /*
  * jQuery UI CSS Framework 1.8.16
@@ -2449,8 +2462,6 @@ div.course-wrapper section.course-content .problem-set h2, div.course-wrapper se
   border-right: 1px dashed #ddd;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: table-cell;
   vertical-align: top; }
@@ -2566,8 +2577,6 @@ div.course-wrapper section.course-content div.ui-slider {
   background: #ddd;
   -webkit-box-shadow: inset 0 1px 0 #eeeeee;
   -moz-box-shadow: inset 0 1px 0 #eeeeee;
-  -ms-box-shadow: inset 0 1px 0 #eeeeee;
-  -o-box-shadow: inset 0 1px 0 #eeeeee;
   box-shadow: inset 0 1px 0 #eeeeee;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -2577,8 +2586,6 @@ div.course-wrapper section.course-content div.ui-slider {
 div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle {
   -webkit-box-shadow: inset 0 1px 0 #bf4040;
   -moz-box-shadow: inset 0 1px 0 #bf4040;
-  -ms-box-shadow: inset 0 1px 0 #bf4040;
-  -o-box-shadow: inset 0 1px 0 #bf4040;
   box-shadow: inset 0 1px 0 #bf4040;
   background: #993333 url(/static/images/slider-bars.png) center center no-repeat;
   border: 1px solid #4d1919;
@@ -2609,8 +2616,6 @@ section.course-index div#accordion h3, section.course-index div#accordion div#wi
 section.course-index div#accordion h3:last-child, section.course-index div#accordion div#wiki_panel input[type="button"]:last-child, div#wiki_panel section.course-index div#accordion input[type="button"]:last-child {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none; }
 section.course-index div#accordion h3.ui-accordion-header, section.course-index div#accordion div#wiki_panel input.ui-accordion-header[type="button"], div#wiki_panel section.course-index div#accordion input.ui-accordion-header[type="button"] {
   color: #000; }
@@ -2628,8 +2633,6 @@ section.course-index div#accordion ul.ui-accordion-content {
   border-radius: 0;
   -webkit-box-shadow: inset -1px 0 0 #e6e6e6;
   -moz-box-shadow: inset -1px 0 0 #e6e6e6;
-  -ms-box-shadow: inset -1px 0 0 #e6e6e6;
-  -o-box-shadow: inset -1px 0 0 #e6e6e6;
   box-shadow: inset -1px 0 0 #e6e6e6;
   background: #dadada;
   border: none;
@@ -2693,8 +2696,6 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   border-radius: 0;
   -webkit-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
   -moz-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
-  -ms-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
-  -o-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
   box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
   background: #c2c2c2;
   border: none;
@@ -2708,8 +2709,6 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   border-radius: 20px;
   -webkit-box-shadow: inset 0 1px 0 #bf4040;
   -moz-box-shadow: inset 0 1px 0 #bf4040;
-  -ms-box-shadow: inset 0 1px 0 #bf4040;
-  -o-box-shadow: inset 0 1px 0 #bf4040;
   box-shadow: inset 0 1px 0 #bf4040;
   background: #993333 url(/static/images/slider-handle.png) center center no-repeat;
   border: 1px solid #4d1919;
@@ -2730,8 +2729,6 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a {
   -webkit-box-shadow: 1px 0 0 #555555;
   -moz-box-shadow: 1px 0 0 #555555;
-  -ms-box-shadow: 1px 0 0 #555555;
-  -o-box-shadow: 1px 0 0 #555555;
   box-shadow: 1px 0 0 #555555;
   border-bottom: none;
   border-right: 1px solid #000;
@@ -2761,8 +2758,6 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   border-left: 1px solid #000;
   -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
-  -ms-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
-  -o-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   float: left;
   line-height: 46px;
@@ -2904,8 +2899,6 @@ nav.sequence-nav ol li .visited, nav.sequence-nav ol li a.seq_video_visited, nav
   background-repeat: no-repeat;
   -webkit-box-shadow: inset 0 0 3px #ceb97d;
   -moz-box-shadow: inset 0 0 3px #ceb97d;
-  -ms-box-shadow: inset 0 0 3px #ceb97d;
-  -o-box-shadow: inset 0 0 3px #ceb97d;
   box-shadow: inset 0 0 3px #ceb97d; }
 nav.sequence-nav ol li .visited:hover, nav.sequence-nav ol li a.seq_video_visited:hover, nav.sequence-nav ol li a.seq_other_visited:hover, nav.sequence-nav ol li a.seq_vertical_visited:hover, nav.sequence-nav ol li a.seq_problem_visited:hover {
   background-color: #f6efd4;
@@ -2913,8 +2906,6 @@ nav.sequence-nav ol li .visited:hover, nav.sequence-nav ol li a.seq_video_visite
 nav.sequence-nav ol li .active, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.courseware nav.sequence-nav ol li.courseware a, nav.sequence-nav ol div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.book nav.sequence-nav ol li.book a, nav.sequence-nav ol div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.info nav.sequence-nav ol li.info a, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.discussion nav.sequence-nav ol li.discussion a, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.wiki nav.sequence-nav ol li.wiki a, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav.profile nav.sequence-nav ol li.profile a, nav.sequence-nav ol li section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion nav.sequence-nav ol li h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol li section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li a.seq_problem_active {
   -webkit-box-shadow: 0 1px 0 white;
   -moz-box-shadow: 0 1px 0 white;
-  -ms-box-shadow: 0 1px 0 white;
-  -o-box-shadow: 0 1px 0 white;
   box-shadow: 0 1px 0 white;
   background-color: #fff;
   background-repeat: no-repeat; }
@@ -2924,8 +2915,6 @@ nav.sequence-nav ol li .active:hover, nav.sequence-nav ol div.header-wrapper hea
 nav.sequence-nav ol li a {
   -webkit-box-shadow: 1px 0 0 white;
   -moz-box-shadow: 1px 0 0 white;
-  -ms-box-shadow: 1px 0 0 white;
-  -o-box-shadow: 1px 0 0 white;
   box-shadow: 1px 0 0 white;
   background-position: center center;
   border: none;
@@ -3043,8 +3032,6 @@ nav.sequence-nav ul li {
 nav.sequence-nav ul li.prev a, nav.sequence-nav ul li.next a {
   -webkit-box-shadow: inset 1px 0 0 #faf7e9;
   -moz-box-shadow: inset 1px 0 0 #faf7e9;
-  -ms-box-shadow: inset 1px 0 0 #faf7e9;
-  -o-box-shadow: inset 1px 0 0 #faf7e9;
   box-shadow: inset 1px 0 0 #faf7e9;
   background-color: #f2e7bf;
   background-position: center center;
@@ -3095,8 +3082,6 @@ section.course-content nav.sequence-bottom ul {
   background-color: #f2e7bf;
   -webkit-box-shadow: inset 0 0 0 1px #faf7e9;
   -moz-box-shadow: inset 0 0 0 1px #faf7e9;
-  -ms-box-shadow: inset 0 0 0 1px #faf7e9;
-  -o-box-shadow: inset 0 0 0 1px #faf7e9;
   box-shadow: inset 0 0 0 1px #faf7e9; }
 section.course-content nav.sequence-bottom ul li {
   float: left; }
@@ -3207,8 +3192,6 @@ div.graph-controls label[for="vrCheckbox"], div.graph-controls label[for="vrRadi
 div.book-wrapper section.book-sidebar {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box; }
 div.book-wrapper section.book-sidebar ul#booknav {
   font-size: 12px; }
@@ -3233,8 +3216,6 @@ div.book-wrapper section.book-sidebar ul#booknav > li {
   border-bottom: 1px solid #d3d3d3;
   -webkit-box-shadow: 0 1px 0 #eeeeee;
   -moz-box-shadow: 0 1px 0 #eeeeee;
-  -ms-box-shadow: 0 1px 0 #eeeeee;
-  -o-box-shadow: 0 1px 0 #eeeeee;
   box-shadow: 0 1px 0 #eeeeee;
   padding: 7px 7px 7px 30px; }
 div.book-wrapper section.book nav a {
@@ -3245,8 +3226,6 @@ div.book-wrapper section.book nav ul li.last {
 div.book-wrapper section.book nav ul li.last a {
   -webkit-box-shadow: inset -1px 0 0 #faf7e9;
   -moz-box-shadow: inset -1px 0 0 #faf7e9;
-  -ms-box-shadow: inset -1px 0 0 #faf7e9;
-  -o-box-shadow: inset -1px 0 0 #faf7e9;
   box-shadow: inset -1px 0 0 #faf7e9;
   border-right: 1px solid #e4d080;
   border-left: 0; }
@@ -3319,8 +3298,6 @@ div.info-wrapper section.handouts ol {
 div.info-wrapper section.handouts ol li {
   -webkit-box-shadow: 0 1px 0 #eeeeee;
   -moz-box-shadow: 0 1px 0 #eeeeee;
-  -ms-box-shadow: 0 1px 0 #eeeeee;
-  -o-box-shadow: 0 1px 0 #eeeeee;
   box-shadow: 0 1px 0 #eeeeee;
   border-bottom: 1px solid #d3d3d3; }
 div.info-wrapper section.handouts ol li p {
@@ -3407,8 +3384,6 @@ div.profile-wrapper section.user-info ul li {
   text-decoration: none;
   -webkit-box-shadow: 0 1px 0 #eeeeee;
   -moz-box-shadow: 0 1px 0 #eeeeee;
-  -ms-box-shadow: 0 1px 0 #eeeeee;
-  -o-box-shadow: 0 1px 0 #eeeeee;
   box-shadow: 0 1px 0 #eeeeee;
   padding: 7px 22.652px;
   border-bottom: 1px solid #d3d3d3;
@@ -3429,8 +3404,6 @@ div.profile-wrapper section.user-info ul li div#location_sub input[type="text"],
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box; }
 div.profile-wrapper section.user-info ul li div#location_sub:empty, div.profile-wrapper section.user-info ul li div#language_sub:empty {
   padding: 0; }
@@ -3466,8 +3439,6 @@ div.profile-wrapper section.course-info > ol > li h2 {
   border-right: 1px dashed #ddd;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: table-cell;
   margin: 0;
@@ -3634,15 +3605,11 @@ div#wiki_panel input[type="button"] {
 div#wiki_panel input[type="button"]:hover {
   -webkit-box-shadow: 0 1px 0 white;
   -moz-box-shadow: 0 1px 0 white;
-  -ms-box-shadow: 0 1px 0 white;
-  -o-box-shadow: 0 1px 0 white;
   box-shadow: 0 1px 0 white;
   background: #efefef; }
 div#wiki_panel ul li.search {
   -webkit-box-shadow: 0 1px 0 #eeeeee;
   -moz-box-shadow: 0 1px 0 #eeeeee;
-  -ms-box-shadow: 0 1px 0 #eeeeee;
-  -o-box-shadow: 0 1px 0 #eeeeee;
   box-shadow: 0 1px 0 #eeeeee;
   border-bottom: 1px solid #d3d3d3;
   padding: 7px 22.652px; }
@@ -3660,8 +3627,6 @@ div#wiki_panel div#wiki_create_form input[type="text"] {
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box; }
 div#wiki_panel div#wiki_create_form ul {
   list-style: none; }
@@ -3681,8 +3646,6 @@ form#wiki_revision label {
 form#wiki_revision textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   margin-bottom: 20px;
   min-height: 450px;
@@ -3693,8 +3656,6 @@ form#wiki_revision input[type="text"] {
 form#wiki_revision #submit_delete {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none;
   background: none;
   border: none;
@@ -3731,8 +3692,6 @@ div.wiki-wrapper section.wiki-body header {
   height: 46px;
   -webkit-box-shadow: inset 0 1px 0 white;
   -moz-box-shadow: inset 0 1px 0 white;
-  -ms-box-shadow: inset 0 1px 0 white;
-  -o-box-shadow: inset 0 1px 0 white;
   box-shadow: inset 0 1px 0 white; }
 div.wiki-wrapper section.wiki-body header:empty {
   display: none !important;
@@ -3761,8 +3720,6 @@ div.wiki-wrapper section.wiki-body header ul li input[type="button"] {
   border-radius: 0;
   -webkit-box-shadow: inset 1px 0 0 #faf7e9;
   -moz-box-shadow: inset 1px 0 0 #faf7e9;
-  -ms-box-shadow: inset 1px 0 0 #faf7e9;
-  -o-box-shadow: inset 1px 0 0 #faf7e9;
   box-shadow: inset 1px 0 0 #faf7e9;
   color: #292309;
   display: block;
@@ -3805,8 +3762,6 @@ div.wiki-wrapper section.wiki-body header ul li input[type="button"]:hover {
 div.wiki-wrapper section.wiki-body h2.wiki-title {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: inline-block;
   float: left;
@@ -3830,8 +3785,6 @@ div.wiki-wrapper section.wiki-body p {
 div.wiki-wrapper section.wiki-body section.results {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: inline-block;
   border-left: 1px dashed #ddd;
@@ -4890,8 +4843,6 @@ pre.prettyprint {
 .light-button, div.history-controls input[type="submit"], body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa, body.askbot section.main-content div.discussion-wrapper div.discussion-content .tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content .tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, div.question-header div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.question-container div.comments-container div.comments-content form.post-comments button:last-child, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.question-header div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.question-header div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator div.answer-container div.comments-container div.comments-content form.post-comments button:last-child, div.paginator span.next, div.paginator span.prev, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a, a.light-button, body.askbot section.main-content div.discussion-wrapper div.discussion-content a.tabula-rasa, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content a.tabula-rasa, ul.question-list div.post-own-question a, div#question-list div.post-own-question a, form.answer-form div.preview-toggle a, form.question-form div.preview-toggle a {
   -webkit-box-shadow: inset 0 1px 0 white;
   -moz-box-shadow: inset 0 1px 0 white;
-  -ms-box-shadow: inset 0 1px 0 white;
-  -o-box-shadow: inset 0 1px 0 white;
   box-shadow: inset 0 1px 0 white;
   background-color: white;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #eeeeee));
@@ -4932,8 +4883,6 @@ pre.prettyprint {
 body.askbot section.main-content div.discussion-wrapper div.discussion-content, html body.askbot section.outside-app div.discussion-wrapper div.discussion-content {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: table-cell;
   min-width: 650px;
@@ -4969,8 +4918,6 @@ body.askbot section.main-content div.discussion-wrapper div.discussion-content a
   padding: 0px;
   -webkit-box-shadow: 0 2px 2px #bbbbbb;
   -moz-box-shadow: 0 2px 2px #bbbbbb;
-  -ms-box-shadow: 0 2px 2px #bbbbbb;
-  -o-box-shadow: 0 2px 2px #bbbbbb;
   box-shadow: 0 2px 2px #bbbbbb; }
 .acResults ul {
   list-style-position: outside;
@@ -5006,8 +4953,6 @@ div.discussion-wrapper aside {
   border-right: 1px solid #f6f6f6;
   -webkit-box-shadow: inset 1px 0 0 #f6f6f6;
   -moz-box-shadow: inset 1px 0 0 #f6f6f6;
-  -ms-box-shadow: inset 1px 0 0 #f6f6f6;
-  -o-box-shadow: inset 1px 0 0 #f6f6f6;
   box-shadow: inset 1px 0 0 #f6f6f6;
   padding: 22.652px;
   width: 23.482%; }
@@ -5034,8 +4979,6 @@ div.discussion-wrapper aside div.box {
 div.discussion-wrapper aside div.box:last-child {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none;
   border: 0; }
 div.discussion-wrapper aside div.box h2 {
@@ -5046,8 +4989,6 @@ div.discussion-wrapper aside div.box h2 {
 div.discussion-wrapper aside div.box h2:not(.first) {
   -webkit-box-shadow: inset 0 1px 0 #eeeeee;
   -moz-box-shadow: inset 0 1px 0 #eeeeee;
-  -ms-box-shadow: inset 0 1px 0 #eeeeee;
-  -o-box-shadow: inset 0 1px 0 #eeeeee;
   box-shadow: inset 0 1px 0 #eeeeee;
   border-top: 1px solid #d3d3d3;
   margin: 0 -22.652px 0;
@@ -5071,8 +5012,6 @@ div.discussion-wrapper aside div.box.contributors a:before {
   border-radius: 3px;
   -webkit-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
   -moz-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
-  -ms-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
-  -o-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
   box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
   top: 1px;
   left: 1px;
@@ -5094,15 +5033,11 @@ div.discussion-wrapper aside div.search-box {
 div.discussion-wrapper aside div.search-box input {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: inline; }
 div.discussion-wrapper aside div.search-box input[type='submit'] {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none;
   opacity: 0.5;
   background: url(/static/images/askbot/search-icon.png) no-repeat center;
@@ -5122,8 +5057,6 @@ div.discussion-wrapper aside div.search-box input#keywords {
 div.discussion-wrapper aside div.search-box input#clear {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none;
   -webkit-border-radius: 15px;
   -moz-border-radius: 15px;
@@ -5140,8 +5073,6 @@ div.discussion-wrapper aside div.search-box input#clear {
 div.discussion-wrapper aside div#tagSelector h2 {
   -webkit-box-shadow: inset 0 1px 0 #eeeeee;
   -moz-box-shadow: inset 0 1px 0 #eeeeee;
-  -ms-box-shadow: inset 0 1px 0 #eeeeee;
-  -o-box-shadow: inset 0 1px 0 #eeeeee;
   box-shadow: inset 0 1px 0 #eeeeee;
   border-top: 1px solid #d3d3d3;
   margin: 0 -22.652px 0;
@@ -5169,8 +5100,6 @@ div.discussion-wrapper aside div.follow-buttons {
 div.discussion-wrapper aside div.follow-buttons a.button, div.discussion-wrapper aside div.follow-buttons div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.paginator div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.paginator div.question-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.paginator div.answer-block div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.answer-block div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.question-header div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.paginator div.question-header div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit, div.discussion-wrapper aside div.follow-buttons div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta a.edit, div.paginator div.answer-container div.comments-container div.comments-content div.comment div.comment-body div.comment-meta div.discussion-wrapper aside div.follow-buttons a.edit {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: block;
   text-align: center;
@@ -5183,8 +5112,6 @@ div.discussion-wrapper aside div.question-stats ul li, div.discussion-wrapper as
 div.discussion-wrapper aside div.question-stats ul li:last-child, div.discussion-wrapper aside div.user-info ul li:last-child, div.discussion-wrapper aside div.user-stats ul li:last-child {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none;
   border: 0; }
 div.discussion-wrapper aside div.question-stats ul li strong, div.discussion-wrapper aside div.user-info ul li strong, div.discussion-wrapper aside div.user-stats ul li strong {
@@ -5205,13 +5132,9 @@ div.discussion-wrapper aside div.user-info div.karma, div.discussion-wrapper asi
   border-radius: 3px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
   -moz-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
-  -ms-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
-  -o-box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
   box-shadow: inset 0 0 0 1px white, 0 1px 0 white;
   padding: 9.061px 0;
   text-align: center;
@@ -5225,15 +5148,11 @@ div.discussion-wrapper aside div.user-info div.meta, div.discussion-wrapper asid
   padding-right: 4.31%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box; }
 div.discussion-wrapper aside div.user-info div.meta h2, div.discussion-wrapper aside div.user-stats div.meta h2 {
   border: 0;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none;
   margin: 0 0 8px 0;
   padding: 0; }
@@ -5261,15 +5180,11 @@ div.discussion-wrapper aside div.view-profile h2 {
   border-top: 0;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none; }
 div.discussion-wrapper aside div.view-profile a {
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   text-align: center;
   padding: 10px;
@@ -5355,8 +5270,6 @@ ul.question-list li.single-question div, div#question-list li.single-question di
 ul.question-list li.single-question div.question-body, ul.question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content ul.question-list li.single-question div.answer-body, ul.question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body, div.paginator div.answer-container div.answer-content ul.question-list li.single-question div.answer-body, div#question-list li.single-question div.question-body, div#question-list li.single-question div.answer-block div.answer-container div.answer-content div.answer-body, div.answer-block div.answer-container div.answer-content div#question-list li.single-question div.answer-body, div#question-list li.single-question div.paginator div.answer-container div.answer-content div.answer-body, div.paginator div.answer-container div.answer-content div#question-list li.single-question div.answer-body {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   margin-right: 2.024%;
   width: 60.054%; }
@@ -5388,8 +5301,6 @@ ul.question-list li.single-question div.question-meta ul li, div#question-list l
   border: 1px solid #ddd;
   -webkit-box-shadow: 0 1px 0 white;
   -moz-box-shadow: 0 1px 0 white;
-  -ms-box-shadow: 0 1px 0 white;
-  -o-box-shadow: 0 1px 0 white;
   box-shadow: 0 1px 0 white;
   display: inline-block;
   height: 60px;
@@ -5422,8 +5333,6 @@ ul.question-list li.single-question div.question-meta ul li.answers.no-answers s
 ul.question-list li.single-question div.question-meta ul li span, ul.question-list li.single-question div.question-meta ul li div, div#question-list li.single-question div.question-meta ul li span, div#question-list li.single-question div.question-meta ul li div {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   color: #888;
   display: block;
@@ -5464,8 +5373,6 @@ ul.tags li {
   border-radius: 4px;
   -webkit-box-shadow: 0px 1px 0px #cccccc;
   -moz-box-shadow: 0px 1px 0px #cccccc;
-  -ms-box-shadow: 0px 1px 0px #cccccc;
-  -o-box-shadow: 0px 1px 0px #cccccc;
   box-shadow: 0px 1px 0px #cccccc;
   color: #555;
   display: inline-block;
@@ -5536,15 +5443,11 @@ div.question-header div.vote-buttons ul li.post-vote, div.answer-block div.vote-
   border: 1px solid #eddfaa;
   -webkit-box-shadow: inset 0 1px 0px white;
   -moz-box-shadow: inset 0 1px 0px white;
-  -ms-box-shadow: inset 0 1px 0px white;
-  -o-box-shadow: inset 0 1px 0px white;
   box-shadow: inset 0 1px 0px white; }
 div.question-header div.vote-buttons ul li.question-img-upvote, div.answer-block div.vote-buttons ul li.question-img-upvote, div.paginator div.vote-buttons ul li.question-img-upvote, div.question-header div.vote-buttons ul li.answer-img-upvote, div.answer-block div.vote-buttons ul li.answer-img-upvote, div.paginator div.vote-buttons ul li.answer-img-upvote {
   background-image: url(/static/images/askbot/vote-arrow-up.png);
   -webkit-box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5);
   -moz-box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5);
-  -ms-box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5);
-  -o-box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5);
   box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.5); }
 div.question-header div.vote-buttons ul li.question-img-upvote:hover, div.answer-block div.vote-buttons ul li.question-img-upvote:hover, div.paginator div.vote-buttons ul li.question-img-upvote:hover, div.question-header div.vote-buttons ul li.question-img-upvote.on, div.answer-block div.vote-buttons ul li.question-img-upvote.on, div.paginator div.vote-buttons ul li.question-img-upvote.on, div.question-header div.vote-buttons ul li.answer-img-upvote:hover, div.answer-block div.vote-buttons ul li.answer-img-upvote:hover, div.paginator div.vote-buttons ul li.answer-img-upvote:hover, div.question-header div.vote-buttons ul li.answer-img-upvote.on, div.answer-block div.vote-buttons ul li.answer-img-upvote.on, div.paginator div.vote-buttons ul li.answer-img-upvote.on {
   background-color: #d1e3a8;
@@ -5610,8 +5513,6 @@ div.question-header div.question-container div.question-content div.post-update-
 div.question-header div.question-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.question-container div.question-content div.post-update-container div.post-update-info, div.paginator div.question-container div.question-content div.post-update-container div.post-update-info, div.question-header div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.question-content div.post-update-container div.post-update-info, div.question-header div.paginator div.answer-container div.question-content div.post-update-container div.post-update-info, div.paginator div.question-header div.answer-container div.question-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.question-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.question-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.question-content div.post-update-container div.post-update-info, div.question-header div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-container div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.paginator div.question-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.question-container div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.question-header div.question-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-container div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.answer-block div.question-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-container div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.question-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-header div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.question-header div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.question-header div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.question-header div.answer-container div.answer-content div.post-update-container div.post-update-info, div.answer-block div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-block div.answer-container div.answer-content div.post-update-container div.post-update-info, div.paginator div.answer-container div.answer-content div.post-update-container div.post-update-info {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   padding: 10px;
   margin-bottom: 10px; }
@@ -5633,8 +5534,6 @@ div.question-header div.question-container div.question-content div.post-update-
 div.question-header div.question-container div.comments-container, div.answer-block div.question-container div.comments-container, div.paginator div.question-container div.comments-container, div.question-header div.answer-block div.answer-container div.comments-container, div.answer-block div.question-header div.answer-container div.comments-container, div.answer-block div.answer-container div.comments-container, div.paginator div.answer-block div.answer-container div.comments-container, div.answer-block div.paginator div.answer-container div.comments-container, div.question-header div.paginator div.answer-container div.comments-container, div.paginator div.question-header div.answer-container div.comments-container, div.answer-block div.paginator div.answer-container div.comments-container, div.paginator div.answer-block div.answer-container div.comments-container, div.paginator div.answer-container div.comments-container {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: inline-block;
   padding: 0 0 3% 0;
@@ -5672,8 +5571,6 @@ div.question-header div.question-container div.comments-container div.comments-c
   border: none;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  -ms-box-shadow: none;
-  -o-box-shadow: none;
   box-shadow: none;
   display: inline-block;
   margin-top: -8px;
@@ -5778,8 +5675,6 @@ div.share-question p {
 div.answer-controls {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   display: inline-block;
   margin: 0 0 15px;
@@ -5870,8 +5765,6 @@ div.answer-actions a {
 form.answer-form, form.question-form {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   border-top: 1px solid #ddd;
   overflow: hidden;
@@ -5879,8 +5772,6 @@ form.answer-form, form.question-form {
 form.answer-form textarea, form.question-form textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   margin-top: 15px;
   resize: vertical;
@@ -5893,8 +5784,6 @@ form.answer-form div.form-item label, form.question-form div.form-item label {
 form.answer-form div.form-item .title-desc, form.question-form div.form-item .title-desc {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -5967,8 +5856,6 @@ form.question-form {
 form.question-form input[type="text"] {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   width: 48.988%; }
 form.question-form input[type="checkbox"] {
@@ -5977,8 +5864,6 @@ form.question-form div#question-list {
   background-color: rgba(255, 255, 255, 0.95);
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box;
   margin-top: -15px;
   max-width: 505px;
@@ -6156,8 +6041,6 @@ form.question-form div#question-list h2 span {
   border-radius: 4px;
   -webkit-box-shadow: 0px 2px 9px #aaaaaa;
   -moz-box-shadow: 0px 2px 9px #aaaaaa;
-  -ms-box-shadow: 0px 2px 9px #aaaaaa;
-  -o-box-shadow: 0px 2px 9px #aaaaaa;
   box-shadow: 0px 2px 9px #aaaaaa;
   color: white;
   cursor: pointer;
@@ -6176,8 +6059,6 @@ form.question-form div#question-list h2 span {
   border-bottom: #5b0000 1px solid;
   -webkit-box-shadow: 0 1px 0 #bf4040;
   -moz-box-shadow: 0 1px 0 #bf4040;
-  -ms-box-shadow: 0 1px 0 #bf4040;
-  -o-box-shadow: 0 1px 0 #bf4040;
   box-shadow: 0 1px 0 #bf4040;
   color: #fff;
   font-weight: normal;
@@ -6202,8 +6083,6 @@ body.user-profile-page ul.sub-info > li {
   border-right: 1px dashed #efefef;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
   box-sizing: border-box; }
 body.user-profile-page ul.sub-info > li:first-child {
   padding-left: 0; }

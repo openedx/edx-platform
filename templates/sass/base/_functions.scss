@@ -20,3 +20,9 @@
 @function lh($amount: 1) {
   @return $body-line-height * $amount;
 }
+
+@mixin hide-text(){
+  text-indent: -9999px;
+  overflow: hidden;
+  display: block;
+}
