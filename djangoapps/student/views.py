@@ -308,7 +308,7 @@ def change_email_request(request):
     
     new_email = request.POST['new_email']
     if len(User.objects.filter(email = new_email)) != 0:
-        ## CRITICAL TODO: Handle case for e-mails
+        ## CRITICAL TODO: Handle case sensitivity for e-mails
         return HttpResponse(json.dumps({'success':False, 
                                         'error':'An account with this e-mail already exists.'}))
 
@@ -349,12 +349,16 @@ def confirm_email_change(request, key):
     try:
         pec=PendingEmailChange.objects.get(activation_key=key)
     except:
-        return render_to_response("email_invalid_key.html")
+        return render_to_response("invalid_email_key.html", {})
     
     user = pec.user
     d = {'site':settings.SITE_NAME, 
          'old_email' : user.email, 
          'new_email' : pec.new_email}    
+
+    if len(User.objects.filter(email = pec.new_email)) != 0:
+        return render_to_response("email_exists.html", d)
+
 
     subject = render_to_string('emails/email_change_subject.txt',d)
     subject = ''.join(subject.splitlines())
@@ -383,6 +387,10 @@ def change_name_request(request):
     pnc.user = request.User
     pnc.new_name = request.POST['new_name']
     pnc.rationale = request.POST['rationale']
+    if len(pnc.new_name)<2:
+        return HttpResponse(json.dumps({'success':False,'error':'Name required'})) 
+    if len(pnc.rationale)<2:
+        return HttpResponse(json.dumps({'success':False,'error':'Rationale required'})) 
     pnc.save()
     return HttpResponse(json.dumps({'success':True})) 
 

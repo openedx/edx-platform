@@ -98,6 +98,25 @@ $(function() {
        return false;
     });
 
+    $("#change_name_form").submit(function(){
+      var new_name = $('#new_name_field').val();
+      var rationale = $('#name_rationale_field').val();
+
+      postJSON('/change_email',{"new_name":new_name, 
+                                "rationale":rationale},
+               function(data){
+          if(data.success){
+            $("#change_email").html("Request submitted. We'll send you an e-mail if we approve the change or need further information.");
+          } else {
+            $("#change_email_error").html(data.error);
+          }
+       });
+       log_event("profile", {"type":"name_change_request", 
+                               "new_name":new_name,
+                               "rationale":rationale});
+       return false;
+    });
+
 });
 </script>
 </%block>
@@ -214,11 +233,11 @@ $(function() {
       <ul>
         <li>
           <label>Enter your desired full name, as it will appear on the MITx Certificate: </label>
-          <input id="new_name" value="" type="text" />
+          <input id="new_name_field" value="" type="text" />
         </li>
         <li>
           <label>Reason for name change:</label>
-          <textarea id="name_rationale" value=""></textarea>
+          <textarea id="name_rationale_field" value=""></textarea>
         </li>
         <li>
           <input type="submit" id="submit">
