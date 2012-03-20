@@ -30,13 +30,14 @@ class UserProfile(models.Model):
     meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
-    def get_meta():
+    def get_meta(self):
         try: 
             js = json.reads(self.meta)
         except:
             js = dict()
-        return json
-    def set_meta(js):
+        return js
+
+    def set_meta(self,js):
         self.meta = json.dumps(js)
 
 ## TODO: Should be renamed to generic UserGroup, and possibly

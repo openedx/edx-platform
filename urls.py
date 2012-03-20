@@ -9,8 +9,8 @@ import django.contrib.auth.views
 
 urlpatterns = ('',
     url(r'^$', 'student.views.index'), # Main marketing page, or redirect to courseware
-    url(r'^email_change$', 'student.views.change_email_request'),
-    url(r'^email_confirm$', 'student.views.change_email_confirm'),
+    url(r'^change_email$', 'student.views.change_email_request'),
+    url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^gradebook$', 'courseware.views.gradebook'),
     url(r'^event$', 'track.views.user_track'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),

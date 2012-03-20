@@ -79,18 +79,23 @@ $(function() {
     });
 
 
-    $("#submit_email_change").click(function(){
-      alert("Test 1");
+    $("#change_email_form").submit(function(){
       var new_email = $('#new_email_field').val();
       var new_password = $('#new_email_password').val();
 
-      postJSON('/email_change/',{"new_email":new_email},
-               function(data){});
-      alert("Test 2");
+      postJSON('/change_email',{"new_email":new_email, 
+                                "password":new_password},
+               function(data){
+          if(data.success){
+            $("#change_email").html("Request submitted. You'll receive a confirmation in your in-box.");
+          } else {
+            $("#change_email_error").html(data.error);
+          }
+       });
        log_event("profile", {"type":"email_change_request", 
                                "old_email":"${email}",
                                "new_email":new_email});
-      alert("Test 3");
+       return false;
     });
 
 });
@@ -201,7 +206,8 @@ $(function() {
 
 <div id="apply_name_change" class="leanModal_box">
   <h1>Apply to change your name</h1>
-  <form>
+  <form id="change_name_form">
+    <div id="change_name_error"> </div>
     <fieldset>
       <p>A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your requested to be processed.</p> 
 
@@ -224,8 +230,8 @@ $(function() {
 
 <div id="change_email" class="leanModal_box">
   <h1>Change e-mail</h1> 
-  <form>
-
+  <form id="change_email_form">
+    <div id="change_email_error"> </div>
     <fieldset>
       <ul>
         <li>
@@ -249,7 +255,8 @@ $(function() {
 <div id="unenroll_course" class="leanModal_box">
   <h1> Unenroll </h1>
   <p> At the end of the semester, all students who do not complete the course will be automatically dropped. If you would still prefer to deactivate your account, you can: </p>
-  <form>
+  <form id="unenroll_form">
+    <div id="unenroll_error"> </div>
     <fieldset>
       <ul>
         <li>
