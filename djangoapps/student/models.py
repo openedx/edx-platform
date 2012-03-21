@@ -122,18 +122,30 @@ def create_group(name, description):
     utg.description = description
     utg.save()
 
-def add_user_to_group(group, user):
+def add_user_to_group(user, group):
     utg = UserTestGroup.objects.get(name = group)
     utg.users.add(User.objects.get(username = user))
     utg.save()
 
-def remove_user_from_group(group, user):
+def remove_user_from_group(user, group):
     utg = UserTestGroup.objects.get(name = group)
     utg.users.remove(User.objects.get(username = user))
     utg.save()
 
-def add_user_to_default_group(group, description, user):
-    utg = UserTestGroup.objects.get(name = group)
+default_groups = {'email_future_courses' : 'Receive e-mails about future MITx courses',
+                  'email_helpers' : 'Receive e-mails about how to help with MITx',
+                  'mitx_unenroll' : 'Fully unenrolled -- no further communications',
+                  '6002x_unenroll' : 'Took and dropped 6002x'}
+
+def add_user_to_default_group(user, group):
+    ''' Untested '''
+    try:
+        utg = UserTestGroup.objects.get(name = group)
+    except: 
+        utg = UserTestGroup()
+        utg.name = group
+        utg.description = default_groups[group]
+        utg.save()
     utg.users.add(User.objects.get(username = user))
     utg.save()
 
