@@ -1,6 +1,12 @@
 section.course-content {
   div.video-subtitles {
+    padding: 6px lh();
+    margin: 0 (-(lh()));
+    border-top: 1px solid #e1e1e1;
+    border-bottom: 1px solid #e1e1e1;
+    background: #f3f3f3;
     position: relative;
+    @extend .clearfix;
 
     div.video-wrapper {
       float: left;
@@ -203,19 +209,21 @@ section.course-content {
     ol.subtitles {
       float: left;
       width: flex-grid(3, 9);
+      padding-top: 10px;
       height: 530px;
       overflow: hidden;
 
       li {
-        margin-bottom: 0px;
-        cursor: pointer;
         border: 0;
-        padding: 0;
         color: #666;
+        cursor: pointer;
+        margin-bottom: 0px;
+        padding: 0;
+        @include transition(all, .5s, ease-in);
 
         &.current {
-          background-color: #f3f3f3;
           color: #333;
+          font-weight: 700;
         }
 
         &:hover {
