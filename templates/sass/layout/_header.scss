@@ -52,7 +52,7 @@ div.header-wrapper {
 
         a {
           color: #fff;
-          text-decoration: none;
+          border: none;
 
           &:hover {
             color: rgba(#fff, .7);
@@ -104,7 +104,8 @@ div.header-wrapper {
             display: block;
             font-weight: bold;
             padding: 10px lh() 8px;
-            text-decoration: none;
+            border: none;
+            font-style: normal;
 
             @media screen and (max-width: 1020px) {
               padding: 10px lh(.7) 8px;

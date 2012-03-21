@@ -11,10 +11,11 @@ from lxml import etree
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
-    from django.core.cache import cache
+
     from student.models import UserProfile
     from student.models import UserTestGroup
     from mitxmako.shortcuts import render_to_response, render_to_string
+    from util.cache import cache
 except: 
     settings = None 
 
@@ -157,10 +158,7 @@ def user_groups(user):
     cache_expiration = 60 * 60 # one hour
     
     # Kill caching on dev machines -- we switch groups a lot
-    if "dev" not in settings.DEFAULT_GROUPS:
-        group_names = cache.get(fasthash(key))
-    else: 
-        group_names = None
+    group_names = cache.get(fasthash(key))
  
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
