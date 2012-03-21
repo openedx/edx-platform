@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -2771,6 +2771,11 @@ section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
   color: #666; }
 
 section.course-content div.video-subtitles {
+  padding: 6px 22.652px;
+  margin: 0 -22.652px;
+  border-top: 1px solid #e1e1e1;
+  border-bottom: 1px solid #e1e1e1;
+  background: #f3f3f3;
   position: relative; }
 section.course-content div.video-subtitles div.video-wrapper {
   float: left;
@@ -2971,17 +2976,38 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles ol.subtitles {
   float: left;
   width: 31.522%;
+  padding-top: 10px;
   height: 530px;
   overflow: hidden; }
 section.course-content div.video-subtitles ol.subtitles li {
-  margin-bottom: 0px;
-  cursor: pointer;
   border: 0;
+  color: #666;
+  cursor: pointer;
+  margin-bottom: 0px;
   padding: 0;
-  color: #666; }
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.5s;
+  -moz-transition-duration: 0.5s;
+  -ms-transition-duration: 0.5s;
+  -o-transition-duration: 0.5s;
+  transition-duration: 0.5s;
+  -webkit-transition-timing-function: ease-in;
+  -moz-transition-timing-function: ease-in;
+  -ms-transition-timing-function: ease-in;
+  -o-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
 section.course-content div.video-subtitles ol.subtitles li.current {
-  background-color: #f3f3f3;
-  color: #333; }
+  color: #333;
+  font-weight: 700; }
 section.course-content div.video-subtitles ol.subtitles li:hover {
   color: #993333; }
 section.course-content div.video-subtitles ol.subtitles li div {
