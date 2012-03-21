@@ -102,13 +102,13 @@ $(function() {
       var new_name = $('#new_name_field').val();
       var rationale = $('#name_rationale_field').val();
 
-      postJSON('/change_email',{"new_name":new_name, 
+      postJSON('/change_name',{"new_name":new_name, 
                                 "rationale":rationale},
                function(data){
           if(data.success){
-            $("#change_email").html("Request submitted. We'll send you an e-mail if we approve the change or need further information.");
+            $("#apply_name_change").html("Request submitted. We'll send you an e-mail if we approve the change or need further information.");
           } else {
-            $("#change_email_error").html(data.error);
+            $("#apply_name_change_error").html(data.error);
           }
        });
        log_event("profile", {"type":"name_change_request", 
@@ -190,7 +190,7 @@ $(function() {
         </li>
 
         <li>
-          E-mail: <strong>${email}</strong> <a href="#change_email" rel="leanModal" class="edit-email">Edit</a>
+          E-mail: <strong>${email}</strong> <a href="#change_email" rel="leanModal" class="edit-email">Change</a>
         </li>
         <li>
           Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Edit</a>
@@ -249,6 +249,7 @@ $(function() {
 
 <div id="change_email" class="leanModal_box">
   <h1>Change e-mail</h1> 
+  <div id="apply_name_change_error"></div>
   <form id="change_email_form">
     <div id="change_email_error"> </div>
     <fieldset>
