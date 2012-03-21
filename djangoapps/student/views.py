@@ -92,6 +92,8 @@ def logout_user(request):
 
 @ensure_csrf_cookie
 def change_setting(request):
+    ''' JSON call to change a profile setting: Right now, location and language
+    '''
     if not request.user.is_authenticated():
         return redirect('/')
     up = UserProfile.objects.get(user=request.user) #request.user.profile_cache
@@ -109,6 +111,7 @@ def change_setting(request):
 
 @ensure_csrf_cookie
 def create_account(request, post_override=None):
+    ''' JSON call to enroll in the course. '''
     js={'success':False}
     
     post_vars = post_override if post_override else request.POST
@@ -380,6 +383,7 @@ def confirm_email_change(request, key):
 
 @ensure_csrf_cookie
 def change_name_request(request):
+    ''' Log a request for a new name. '''
     if not request.user.is_authenticated:
         raise Http404
     
@@ -399,6 +403,7 @@ def change_name_request(request):
 
 @ensure_csrf_cookie
 def pending_name_changes(request):
+    ''' Web page which allows staff to approve or reject name changes. '''
     print request.user.is_staff, request.user
     if not request.user.is_staff:
         print "AAAA"
@@ -415,7 +420,7 @@ def pending_name_changes(request):
 
 @ensure_csrf_cookie
 def reject_name_change(request):
-    ''' Course staff clicks 'reject' on a given name change '''
+    ''' JSON: Name change process. Course staff clicks 'reject' on a given name change '''
     if not request.user.is_staff:
         raise Http404
 
@@ -429,7 +434,7 @@ def reject_name_change(request):
 
 @ensure_csrf_cookie
 def accept_name_change(request):
-    ''' Course staff clicks 'accept' on a given name change '''
+    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change '''
     if not request.user.is_staff:
         raise Http404
 

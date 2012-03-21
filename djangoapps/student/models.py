@@ -109,6 +109,8 @@ def change_name(email, new_name):
     up.save()
 
 def user_count():
+    print "All users", User.objects.all().count()
+    print "Active users", User.objects.filter(is_active = True).count()
     return User.objects.all().count()
 
 def active_user_count():
@@ -129,3 +131,9 @@ def remove_user_from_group(group, user):
     utg = UserTestGroup.objects.get(name = group)
     utg.users.remove(User.objects.get(username = user))
     utg.save()
+
+def add_user_to_default_group(group, description, user):
+    utg = UserTestGroup.objects.get(name = group)
+    utg.users.add(User.objects.get(username = user))
+    utg.save()
+
