@@ -2,12 +2,12 @@
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
 then create a function that returns the calculated value based on the value of
-MITX_FEATURES[...]. That classes that extend this one can change the feature
+MITX_FEATURES[...]. Modules that extend this one can change the feature
 configuration in an environment specific config file and re-calculate those
 values.
 
 We should make a method that calls all these config methods so that you just 
-make one call at the end of your site-specific dev file and it reset all the
+make one call at the end of your site-specific dev file to reset all the
 dependent variables (like INSTALLED_APPS) for you.
 
 TODO:
@@ -39,20 +39,20 @@ MITX_FEATURES = {
     'SAMPLE' : False
 }
 
+# Used for A/B testing
+DEFAULT_GROUPS = []
+
+# If this is true, random scores will be generated for the purpose of debugging the profile graphs
+GENERATE_PROFILE_SCORES = False
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname() # /mitxweb
 ENV_ROOT = PROJECT_ROOT.dirname() # virtualenv dir /mitxweb is in
-#ASKBOT_ROOT = ENV_ROOT / "3rdparty" / "askbot-devel"
 ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
-#COURSES_ROOT = ENV_ROOT / "courses"
 COURSES_ROOT = ENV_ROOT / "data"
 
-# FIXME: code shouldn't expect trailing "/"
 # FIXME: To support multiple courses, we should walk the courses dir at startup
-#DATA_DIR = COURSES_ROOT / "6002x" / ""
 DATA_DIR = COURSES_ROOT
-
-#print DATA_DIR, COURSES_ROOT, ASKBOT_ROOT, ENV_ROOT, PROJECT_ROOT
 
 sys.path.append(ENV_ROOT)
 sys.path.append(ASKBOT_ROOT)
@@ -65,10 +65,11 @@ sys.path.append(PROJECT_ROOT / 'lib')
 MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['course'] = [DATA_DIR]
-MAKO_TEMPLATES['sections'] = [DATA_DIR+'/sections']
-MAKO_TEMPLATES['custom_tags'] = [DATA_DIR+'/custom_tags']
-MAKO_TEMPLATES['main'] = [ENV_ROOT+'/templates/']
+MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
+MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
+MAKO_TEMPLATES['main'] = [ENV_ROOT / 'templates/']
 
+# FIXME: We're not checking this out in this location yet
 TEXTBOOK_DIR = ENV_ROOT / "books" / "circuits_agarwal_lang"
 
 # FIXME ???????? -- 
@@ -87,9 +88,7 @@ STATIC_GRAB = False
 DEV_CONTENT = True
 
 # FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 1000 
-
-GENERATE_PROFILE_SCORES = False
+TRACK_MAX_EVENT = 5000 
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
@@ -101,7 +100,6 @@ SITE_ID = 1
 SITE_NAME = "localhost:8000"
 CSRF_COOKIE_DOMAIN = '127.0.0.1'
 HTTPS = 'on'
-#ROOT_URLCONF = 'mitxweb.urls'
 ROOT_URLCONF = 'mitx.urls'
 
 # Email
@@ -119,7 +117,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles" # FIXME: Should this and uploads be moved out of the repo?
 
 # FIXME: We should iterate through the courses we have, adding the static 
-#        contents for each of them.
+#        contents for each of them. (Right now we just use symlinks.)
 STATICFILES_DIRS = (
     # FIXME: Need to add entries for book, data/images, etc.
 #    PROJECT_ROOT / "static",
@@ -130,8 +128,6 @@ STATICFILES_DIRS = (
 #    ("subs", DATA_DIR / "subs"),
 #    ("book", TEXTBOOK_DIR)
 )
-
-print STATICFILES_DIRS
 
 # Templates
 TEMPLATE_DIRS = (
