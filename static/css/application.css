@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -702,22 +702,6 @@ li.calc-main div#calculator_wrapper {
   clear: both; }
 li.calc-main div#calculator_wrapper form {
   padding: 22.652px; }
-li.calc-main div#calculator_wrapper form input#calculator_input {
-  border: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  font-size: 16px;
-  padding: 10px;
-  width: 61.741%;
-  margin: 0;
-  float: left; }
-li.calc-main div#calculator_wrapper form input#calculator_input:focus {
-  outline: none;
-  border: none; }
 li.calc-main div#calculator_wrapper form input#calculator_button {
   background: #111;
   border: 1px solid #000;
@@ -758,14 +742,81 @@ li.calc-main div#calculator_wrapper form input#calculator_output {
   margin: 1px 0 0;
   padding: 10px;
   width: 31.984%; }
-li.calc-main div#calculator_wrapper dl {
-  display: none; }
-li.calc-main div#calculator_wrapper dl dt {
+li.calc-main div#calculator_wrapper form div.input-wrapper {
+  position: relative;
+  width: 61.741%;
+  margin: 0;
+  float: left; }
+li.calc-main div#calculator_wrapper form div.input-wrapper input#calculator_input {
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 16px;
+  padding: 10px;
+  width: 100%; }
+li.calc-main div#calculator_wrapper form div.input-wrapper input#calculator_input:focus {
+  outline: none;
+  border: none; }
+li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper {
+  position: absolute;
+  right: 8px;
+  top: 15px; }
+li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper a {
+  text-indent: -9999px;
+  overflow: hidden;
+  display: block;
+  width: 17px;
+  height: 17px;
+  background: url("/static/images/info-icon.png") center center no-repeat; }
+li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
+  background: #fff;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 0 3px #999999;
+  -moz-box-shadow: 0 0 3px #999999;
+  box-shadow: 0 0 3px #999999;
+  color: #333;
+  opacity: 0;
+  padding: 10px;
+  position: absolute;
+  right: -40px;
+  top: -110px;
+  width: 500px;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
+li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl.shown {
+  opacity: 1; }
+li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl dt {
   clear: both;
   float: left;
   font-weight: bold;
   padding-right: 11.326px; }
-li.calc-main div#calculator_wrapper dl dd {
+li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl dd {
   float: left; }
 
 #lean_overlay {
