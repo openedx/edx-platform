@@ -383,8 +383,11 @@ def change_name_request(request):
     if not request.user.is_authenticated:
         raise Http404
     
-    pnc = PendingNameChange()
-    pnc.user = request.User
+    try: 
+        pnc = PendingNameChange.objects.get(user = request.user)
+    except:
+        pnc = PendingNameChange()
+    pnc.user = request.user
     pnc.new_name = request.POST['new_name']
     pnc.rationale = request.POST['rationale']
     if len(pnc.new_name)<2:
@@ -395,37 +398,59 @@ def change_name_request(request):
     return HttpResponse(json.dumps({'success':True})) 
 
 @ensure_csrf_cookie
-def change_name_list(request):
+def pending_name_changes(request):
+    print request.user.is_staff, request.user
     if not request.user.is_staff:
+        print "AAAA"
         raise Http404
 
     changes = list(PendingNameChange.objects.all())
-    json = [{'new_name': c.new_name, 
-             'rationale':c.rationale, 
-             'old_name':UserProfile.Objects.get(username=c.user).name, 
-             'email':c.user.email,
-             'id':c.id} for c in changes]
-    return render_to_response('name_changes.html', json) 
+    js = {'students' : [{'new_name': c.new_name, 
+                         'rationale':c.rationale, 
+                         'old_name':UserProfile.objects.get(user=c.user).name, 
+                         'email':c.user.email,
+                         'uid':c.user.id,
+                         'cid':c.id} for c in changes]}
+    return render_to_response('name_changes.html', js) 
 
 @ensure_csrf_cookie
-def change_name_reject(request):
+def reject_name_change(request):
     ''' Course staff clicks 'reject' on a given name change '''
     if not request.user.is_staff:
         raise Http404
 
-    pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
+    try: 
+        pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
+    except: 
+        return HttpResponse(json.dumps({'success':False, 'error':'Invalid ID'})) 
+
     pnc.delete()
     return HttpResponse(json.dumps({'success':True})) 
 
 @ensure_csrf_cookie
-def change_name_accept(request):
+def accept_name_change(request):
     ''' Course staff clicks 'accept' on a given name change '''
-    pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
+    if not request.user.is_staff:
+        raise Http404
+
+    try: 
+        pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
+    except: 
+        return HttpResponse(json.dumps({'success':False, 'error':'Invalid ID'})) 
 
     u = pnc.user
     up = UserProfile.objects.get(user=u)
-    up.name = pnc.name
+
+    # Save old name
+    meta = up.get_meta()
+    print meta
+    if 'old_names' not in meta:
+        meta['old_names'] = []
+    meta['old_names'].append(up.name)
+    up.set_meta(meta)
+
+    up.name = pnc.new_name
     up.save()
     pnc.delete()
-    return HttpResponse(json.dumps({'success':True})) 
 
+    return HttpResponse(json.dumps({'success':True})) 
