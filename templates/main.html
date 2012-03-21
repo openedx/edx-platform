@@ -61,7 +61,7 @@
               <input type="text" id="calculator_input" />
 
               <div class="help-wrapper">
-                <a href="#">Help</a>
+                <a href="#">Hints</a>
                 <dl class="help">
                   <dt>Suffixes:</dt>
                   <dd> %kMGTcmunp</dd>
@@ -134,7 +134,7 @@ $(function() {
     $("#calculator_wrapper").hide();
 
     $(".calc").click(function(){
-      $("#calculator_wrapper").slideToggle();
+      $("#calculator_wrapper").slideToggle("fast");
       $("#calculator_wrapper #calculator_input").focus();
       $(this).toggleClass("closed");
       });

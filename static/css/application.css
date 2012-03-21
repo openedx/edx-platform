@@ -810,7 +810,8 @@ li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
   -o-transition-delay: 0;
   transition-delay: 0; }
 li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl.shown {
-  opacity: 1; }
+  opacity: 1;
+  top: -115px; }
 li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl dt {
   clear: both;
   float: left;
