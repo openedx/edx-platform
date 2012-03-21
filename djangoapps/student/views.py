@@ -2,6 +2,7 @@ import json
 import logging
 import random
 import string
+import sys
 import uuid
 
 from django.conf import settings
@@ -16,8 +17,9 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 
-from models import Registration, UserProfile, PendingNameChange, PendingEmailChange
 from django_future.csrf import ensure_csrf_cookie
+
+from models import Registration, UserProfile, PendingNameChange, PendingEmailChange
 
 log = logging.getLogger("mitx.user")
 
@@ -87,7 +89,6 @@ def login_user(request, error=""):
 def logout_user(request):
     ''' HTTP request to log in the user. Redirects to marketing page'''
     logout(request)
-#    print len(connection.queries), connection.queries
     return redirect('/')
 
 @ensure_csrf_cookie
@@ -98,10 +99,8 @@ def change_setting(request):
         return redirect('/')
     up = UserProfile.objects.get(user=request.user) #request.user.profile_cache
     if 'location' in request.POST:
-#        print "loc"
         up.location=request.POST['location']
     if 'language' in request.POST:
-#        print "lang"
         up.language=request.POST['language']
     up.save()
 
@@ -199,13 +198,13 @@ def create_account(request, post_override=None):
         if not settings.GENERATE_RANDOM_USER_CREDENTIALS:
             res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
+        log.exception(sys.exc_info())
         js['value']='Could not send activation e-mail.'
         return HttpResponse(json.dumps(js))
         
     js={'success':True,
         'value':render_to_string('registration/reg_complete.html', {'email':post_vars['email'], 
                                                                     'csrf':csrf(request)['csrf_token']})}
-#    print len(connection.queries), connection.queries
     return HttpResponse(json.dumps(js), mimetype="application/json")
     
 def create_random_account(create_account_function):
@@ -222,8 +221,6 @@ def create_random_account(create_account_function):
                             'name' : id_generator(size=5, chars=string.ascii_lowercase) + " " + id_generator(size=7, chars=string.ascii_lowercase),
                             'honor_code' : u'true',
                             'terms_of_service' : u'true',}
-        
-#        print "Creating random account: " , post_override
         
         return create_account_function(request, post_override = post_override)
         
@@ -267,11 +264,11 @@ def password_reset(request):
 @ensure_csrf_cookie
 def reactivation_email(request):
     ''' Send an e-mail to reactivate a deactivated account, or to
-    resend an activation e-mail '''
+    resend an activation e-mail. Untested. '''
     email = request.POST['email']
     try: 
         user = User.objects.get(email = 'email')
-    except: # TODO: Type of exception
+    except User.DoesNotExist:
         return HttpResponse(json.dumps({'success':False,
                                         'error': 'No inactive user with this e-mail exists'}))
     
@@ -351,7 +348,7 @@ def confirm_email_change(request, key):
     '''
     try:
         pec=PendingEmailChange.objects.get(activation_key=key)
-    except:
+    except PendingEmailChange.DoesNotExist:
         return render_to_response("invalid_email_key.html", {})
     
     user = pec.user
@@ -368,7 +365,6 @@ def confirm_email_change(request, key):
     message = render_to_string('emails/confirm_email_change.txt',d)
     up = UserProfile.objects.get( user = user )
     meta = up.get_meta()
-    print meta
     if 'old_emails' not in meta:
         meta['old_emails'] = []
     meta['old_emails'].append(user.email)
@@ -389,7 +385,7 @@ def change_name_request(request):
     
     try: 
         pnc = PendingNameChange.objects.get(user = request.user)
-    except:
+    except PendingNameChange.DoesNotExist:
         pnc = PendingNameChange()
     pnc.user = request.user
     pnc.new_name = request.POST['new_name']
@@ -404,9 +400,7 @@ def change_name_request(request):
 @ensure_csrf_cookie
 def pending_name_changes(request):
     ''' Web page which allows staff to approve or reject name changes. '''
-    print request.user.is_staff, request.user
     if not request.user.is_staff:
-        print "AAAA"
         raise Http404
 
     changes = list(PendingNameChange.objects.all())
@@ -426,7 +420,7 @@ def reject_name_change(request):
 
     try: 
         pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
-    except: 
+    except PendingNameChange.DoesNotExist: 
         return HttpResponse(json.dumps({'success':False, 'error':'Invalid ID'})) 
 
     pnc.delete()
@@ -440,7 +434,7 @@ def accept_name_change(request):
 
     try: 
         pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
-    except: 
+    except PendingNameChange.DoesNotExist: 
         return HttpResponse(json.dumps({'success':False, 'error':'Invalid ID'})) 
 
     u = pnc.user
@@ -448,7 +442,6 @@ def accept_name_change(request):
 
     # Save old name
     meta = up.get_meta()
-    print meta
     if 'old_names' not in meta:
         meta['old_names'] = []
     meta['old_names'].append(up.name)

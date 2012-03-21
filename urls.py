@@ -23,7 +23,7 @@ urlpatterns = ('',
     url(r'^logout$', 'student.views.logout_user'),
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account'),
-    url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
+#    url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
     url(r'^password_reset/$', 'student.views.password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
