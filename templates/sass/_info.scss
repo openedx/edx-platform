@@ -59,11 +59,21 @@ div.info-wrapper {
     border-right: 0;
     border-left: 1px solid #d3d3d3;
 
-    h1 {
-      padding: lh(.5) lh();
-      font-size: 18px;
-      margin: 0 ;
+    header {
       @extend .bottom-border;
+      padding: lh(.5) lh(.75);
+
+      h1 {
+        font-size: 18px;
+        margin: 0 ;
+      }
+
+      p {
+         margin-bottom: 0;
+         margin-top: 4px;
+         font-size: 12px;
+         color: #666;
+      }
     }
 
     ol {
@@ -73,25 +83,42 @@ div.info-wrapper {
         @include box-shadow(0 1px 0 #eee);
         border-bottom: 1px solid #d3d3d3;
         @extend .clearfix;
+        padding: 7px lh(.75);
+
+        &:hover {
+          background-color: #e9e9e9;
+        }
+
+        h3 {
+          border-bottom: 0;
+          text-transform: uppercase;
+          font-weight: bold;
+          color: #999;
+          @include box-shadow(none);
+          font-size: 12px;
+        }
 
         p {
-          padding: 7px lh();
           margin: 0;
           text-transform: none;
           letter-spacing: 0;
           font-size: $body-font-size;
 
-          &:hover {
-            background: #efefef;
-          }
-
           a {
-            display: inline;
-            padding: 0;
+            padding-right: 8px;
 
-            &:hover {
-              text-decoration: underline;
-              background: none;
+            &:before {
+              content: "•";
+              @include inline-block();
+              padding-right: 8px;
+              color: #ccc;
+            }
+
+            &:first-child {
+              &:before {
+                content: "";
+                padding-right: 0;
+              }
             }
           }
         }
@@ -99,12 +126,11 @@ div.info-wrapper {
         a {
           @include transition();
           color: lighten($text-color, 10%);
-          display: block;
-          padding: 7px lh();
           text-decoration: none;
+          @include inline-block();
 
           &:hover {
-            background: #efefef;
+            color: $mit-red;
           }
         }
       }
