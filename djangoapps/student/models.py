@@ -31,10 +31,12 @@ class UserProfile(models.Model):
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
     def get_meta(self):
-        try: 
-            js = json.reads(self.meta)
-        except:
+        js_str = self.meta
+        if not js: 
             js = dict()
+        else:
+            js = json.reads(self.meta)
+
         return js
 
     def set_meta(self,js):
@@ -138,10 +140,9 @@ default_groups = {'email_future_courses' : 'Receive e-mails about future MITx co
                   '6002x_unenroll' : 'Took and dropped 6002x'}
 
 def add_user_to_default_group(user, group):
-    ''' Untested '''
     try:
         utg = UserTestGroup.objects.get(name = group)
-    except: 
+    except UserTestGroup.DoesNotExist: 
         utg = UserTestGroup()
         utg.name = group
         utg.description = default_groups[group]
