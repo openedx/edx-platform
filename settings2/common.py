@@ -77,7 +77,7 @@ TEXTBOOK_DIR = ENV_ROOT / "book_images"
 # FIXME ???????? -- 
 # We should have separate S3 staged URLs in case we need to make changes to 
 # these assets and test them.
-LIB_URL = '/static/lib/'
+LIB_URL = '/static/js/'
 # LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/' # For AWS deploys
 
 # Dev machines shouldn't need the book
