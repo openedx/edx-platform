@@ -67,10 +67,12 @@ MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['course'] = [DATA_DIR]
 MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
 MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
-MAKO_TEMPLATES['main'] = [ENV_ROOT / 'templates/']
+MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates', DATA_DIR / 'info']
 
 # FIXME: We're not checking this out in this location yet
-TEXTBOOK_DIR = ENV_ROOT / "books" / "circuits_agarwal_lang"
+# TEXTBOOK_DIR = ENV_ROOT / "books" / "circuits_agarwal_lang" # What it should eventually be
+TEXTBOOK_DIR = ENV_ROOT / "book_images"
+
 
 # FIXME ???????? -- 
 # We should have separate S3 staged URLs in case we need to make changes to 
@@ -88,7 +90,8 @@ STATIC_GRAB = False
 DEV_CONTENT = True
 
 # FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 5000 
+TRACK_MAX_EVENT = 10000 
+DEBUG_TRACK_LOG = False
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
@@ -119,22 +122,26 @@ STATIC_ROOT = ENV_ROOT / "staticfiles" # FIXME: Should this and uploads be moved
 # FIXME: We should iterate through the courses we have, adding the static 
 #        contents for each of them. (Right now we just use symlinks.)
 STATICFILES_DIRS = (
-    # FIXME: Need to add entries for book, data/images, etc.
-#    PROJECT_ROOT / "static",
-    ENV_ROOT / "static",
+# FIXME: Need to add entries for book, data/images, etc.
+    PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
+
+# Something like this will probably need to be enabled when we're really doing
+# multiple courses.
 #    ("circuits", DATA_DIR / "images"),
 #    ("handouts", DATA_DIR / "handouts"),
 #    ("subs", DATA_DIR / "subs"),
 #    ("book", TEXTBOOK_DIR)
 )
 
-# Templates
+# This is where Django Template lookup is defined. 
 TEMPLATE_DIRS = (
-    ENV_ROOT / "templates",
-#    PROJECT_ROOT / "templates",
-#    DATA_DIR / "problems",
+    PROJECT_ROOT / "templates",
+    DATA_DIR / "templates",
 )
+
+#'/Users/dave/Projects/mitx/mitx_all//data//templates', '/Users/dave/Projects/mitx/mitx_all//textbook/')
+#path(u'/Users/dave/Projects/mitx/mitx_all/data/problems'))
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
@@ -149,7 +156,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
 MEDIA_URL = "/discussion/upfiles/"
-FILE_UPLOAD_TEMP_DIR = os.path.join(os.path.dirname(__file__), 'tmp').replace('\\','/')
+FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
@@ -166,12 +173,26 @@ USE_L10N = True
 # logger.
 pid = os.getpid() # So we can log which process is creating the log
 hostname = platform.node().split(".")[0]
+
+LOG_DIR = "/tmp"
 SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
+TRACKING_LOG_FILE = LOG_DIR + "/tracking_{0}.log".format(pid)
 
 handlers = ['console']
+
 # FIXME: re-enable syslogger later
 # if not DEBUG:
 #     handlers.append('syslogger')
+
+LOGGING_ENV = "dev" # override this in different environments
+
+# def register_loggers(syslog_addr, tracking_log_dir, logging_env):
+#     pid = os.getpid() # So we can log which process is creating the log
+#     hostname = platform.node().split(".")[0]
+#     SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
+#     TRACKING_LOG_FILE = LOG_DIR + "/tracking_{0}.log".format(pid)
+# 
+#     handlers = ['console']
 
 LOGGING = {
     'version': 1,
@@ -181,7 +202,8 @@ LOGGING = {
             'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
         },
         'syslog_format' : {
-            'format' : '[%(name)s] %(levelname)s [' + hostname + ' %(process)d] [%(filename)s:%(lineno)d] - %(message)s',
+            'format' : '[%(name)s][env:' + LOGGING_ENV + '] %(levelname)s [' + \
+                        hostname + ' %(process)d] [%(filename)s:%(lineno)d] - %(message)s',
         },
         'raw' : {
             'format' : '%(message)s',
@@ -189,7 +211,7 @@ LOGGING = {
     },
     'handlers' : {
         'console' : {
-            'level' : 'DEBUG',
+            'level' : 'DEBUG' if DEBUG else 'INFO',
             'class' : 'logging.StreamHandler',
             'formatter' : 'standard',
             'stream' : sys.stdout,
@@ -206,6 +228,12 @@ LOGGING = {
             'address' : SYSLOG_ADDRESS,
             'formatter' : 'syslog_format',
         },
+        'tracking' : {
+            'level' : 'DEBUG',
+            'class' : 'logging.handlers.WatchedFileHandler',
+            'filename' : TRACKING_LOG_FILE,
+            'formatter' : 'raw',
+        },
         'mail_admins' : {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
@@ -218,7 +246,7 @@ LOGGING = {
             'level' : 'INFO'
         },
         'tracking' : {
-            'handlers' : [] if DEBUG else ['syslogger'], # handlers,
+            'handlers' : ['tracking'],
             'level' : 'DEBUG',
             'propagate' : False,
         },
@@ -284,14 +312,16 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'util.middleware.ExceptionLoggingMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
     'askbot.middleware.forum_mode.ForumModeMiddleware',
     'askbot.middleware.cancel.CancelActionMiddleware',
@@ -299,10 +329,11 @@ MIDDLEWARE_CLASSES = (
     'askbot.middleware.view_log.ViewLogMiddleware',
     'askbot.middleware.spaceless.SpacelessMiddleware',
     # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ################################### APPS #######################################
-def installed_apps():
+def installed_apps(extras=()):
     """If you want to get a different set of INSTALLED_APPS out of this, you'll
     have to set ASKBOT_ENABLED and COURSEWARE_ENABLED to True/False and call 
     this method. We can't just take these as params because other pieces of the
@@ -339,6 +370,7 @@ def installed_apps():
     
     return tuple(STANDARD_APPS + 
                  (COURSEWARE_APPS if COURSEWARE_ENABLED else []) +
-                 (ASKBOT_APPS if ASKBOT_ENABLED else []))
+                 (ASKBOT_APPS if ASKBOT_ENABLED else []) + 
+                 list(extras))
 
 INSTALLED_APPS = installed_apps()
