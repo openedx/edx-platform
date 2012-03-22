@@ -22,6 +22,12 @@ CACHES = {
        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
        'LOCATION': '127.0.0.1:11211',
    }
+   'general': {
+       'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+       'LOCATION': '127.0.0.1:11211',
+       'KEY_PREFIX' : 'general',
+       'VERSION' : 3,
+   }
 }
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'

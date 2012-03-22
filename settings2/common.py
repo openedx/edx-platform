@@ -133,12 +133,11 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles" # FIXME: Should this and uploads be moved out of the repo?
+STATIC_ROOT = ENV_ROOT / "staticfiles" # We don't run collectstatic -- this is to appease askbot checks
 
 # FIXME: We should iterate through the courses we have, adding the static 
 #        contents for each of them. (Right now we just use symlinks.)
 STATICFILES_DIRS = (
-# FIXME: Need to add entries for book, data/images, etc.
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
@@ -148,16 +147,6 @@ STATICFILES_DIRS = (
 #    ("handouts", DATA_DIR / "handouts"),
 #    ("subs", DATA_DIR / "subs"),
 #    ("book", TEXTBOOK_DIR)
-)
-
-# Storage
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-MEDIA_ROOT = ENV_ROOT / "uploads"
-MEDIA_URL = "/discussion/upfiles/"
-FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
-FILE_UPLOAD_HANDLERS = (
-    'django.core.files.uploadhandler.MemoryFileUploadHandler',
-    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
 # Locale/Internationalization
@@ -323,7 +312,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 ################################### APPS #######################################
-def installed_apps(extras=()):
+def installed_apps():
     """If you want to get a different set of INSTALLED_APPS out of this, you'll
     have to set ASKBOT_ENABLED and COURSEWARE_ENABLED to True/False and call 
     this method. We can't just take these as params because other pieces of the
@@ -360,7 +349,6 @@ def installed_apps(extras=()):
     
     return tuple(STANDARD_APPS + 
                  (COURSEWARE_APPS if COURSEWARE_ENABLED else []) +
-                 (ASKBOT_APPS if ASKBOT_ENABLED else []) + 
-                 list(extras))
+                 (ASKBOT_APPS if ASKBOT_ENABLED else []))
 
 INSTALLED_APPS = installed_apps()
