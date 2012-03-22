@@ -26,8 +26,8 @@ DATABASES = {
 # MITX_FEATURES['SAMPLE'] = True  # Switch to this system so we get around the shadowing
 
 # Add the debug toolbar...
-#INSTALLED_APPS += ('debug_toolbar',) 
-#MIDDLEWARE_CLASSES = ('debug_toolbar.middleware.DebugToolbarMiddleware',) + MIDDLEWARE_CLASSES
+INSTALLED_APPS += ('debug_toolbar',) 
+MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
