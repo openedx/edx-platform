@@ -1,11 +1,10 @@
 """
 This config file tries to mimic the production environment more closely than the
 normal dev.py. It assumes you're running a local instance of MySQL 5.1 and that
-you're running memcached.
+you're running memcached. You'll want to use this to test caching and database
+migrations.
 """
-from common import *
-
-CSRF_COOKIE_DOMAIN = 'localhost'
+from dev import *
 
 DATABASES = {
     'default': {
@@ -18,9 +17,6 @@ DATABASES = {
     }
 }
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
-
 CACHES = {
    'default': {
        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
@@ -28,8 +24,4 @@ CACHES = {
    }
 }
 
-
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-
-DEBUG = True
-TEMPLATE_DEBUG = True
