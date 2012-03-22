@@ -174,7 +174,9 @@ CACHES = {
 }
 
 # Make sure we execute correctly regardless of where we're called from
-execfile(os.path.join(BASE_DIR, "settings.py"))
+override_settings = os.path.join(BASE_DIR, "settings.py")
+if os.path.isfile(override_settings):
+    execfile(override_settings)
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
