@@ -37,6 +37,20 @@ fpm -s dir -t deb \
     --exclude=ci \
     --exclude=.git \
     --prefix=/opt/wwc/mitx \
+    --depends=python-mysqldb \
+    --depends=python-django \
+    --depends=python-pip \
+    --depends=python-flup \
+    --depends=python-numpy \
+    --depends=python-scipy \
+    --depends=python-matplotlib \
+    --depends=python-libxml2 \
+    --depends=python2.7-dev \
+    --depends=libxml2-dev \
+    --depends=libxslt-dev \
+    --depends=python-markdown \
+    --depends=python-pygments \
+    --depends=mysql-client \
     --name ${NAME} \
     --version 0.1 \
     --iteration ${BUILD_NUMBER}-${GIT_COMMIT} \
