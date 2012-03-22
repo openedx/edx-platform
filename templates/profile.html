@@ -129,7 +129,10 @@ $(function() {
   <div class="profile-wrapper">
 
     <section class="course-info">
-      <h1>Course Progress</h1>
+      <header>
+        <h1>Course Progress</h1>
+        <a href="#unenroll" rel="leanModal" class="unenroll">Unenroll from 6.002x</a>
+      </header>
 
       <div id="grade-detail-graph"></div>
 
@@ -172,20 +175,25 @@ $(function() {
         %endif
         %endfor
       </ol> <!--End chapters-->
+
     </section>
 
     <section class="user-info">
 
       <header>
-        <h1>${name}</h1>
-        %if True:
-          <a href="#apply_name_change" rel="leanModal">Edit</a>
-        %else:
-          (Name change pending)
-        %endif
+        <h1>Student Profile</h1>
       </header>
 
       <ul>
+        <li>
+          Name: <strong>${name}</strong>
+          %if True:
+          <a href="#apply_name_change" rel="leanModal" class="name-edit">Edit</a>
+          %else:
+          (Name change pending)
+          %endif
+        </li>
+
         <li>
           Forum name: <strong>${username}</strong> 
         </li>
@@ -199,19 +207,21 @@ $(function() {
         <li>
           Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Edit</a>
         </li>
+        <li>
+          Password reset
+          <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
+          <input type="submit" id="pwd_reset_button" value="Reset" />
+          <p>We'll e-mail a password reset link to ${email}.</p>
+        </li>
+        <li>
+          Email preferences
+          <a href="#" class="email-edit">Edit</a>
+        </li>
+        <li class="deactivate">
+          <a href="#deactivate-account" rel="leanModal" class="deactivate">Deactivate MITx account</a>
+        </li>
       </ul>
 
-      <div id="change_password_pop">
-        <h2>Password change</h2>
-        <p>We'll e-mail a password reset link to ${email}.</p>
-
-        <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
-        <input type="submit" id="pwd_reset_button" value="Reset Password" />
-      </div>
-
-      <!--div id="unenroll">
-        <a href="#unenroll_course" rel="leanModal">Unenroll from 6.002x</a>
-      </div-->
     </section>
   </div>
 </section>
@@ -272,21 +282,33 @@ $(function() {
     </form>
 </div>
 
-<div id="unenroll_course" class="leanModal_box">
-  <h1> Unenroll </h1>
-  <p> At the end of the semester, all students who do not complete the course will be automatically dropped. If you would still prefer to deactivate your account, you can: </p>
+<div id="deactivate-account" class="leanModal_box">
+  <h1>Deactivate MITx Account</h1>
+  <p>Once you deactivate you&rsquo;re MIT<em>x</em> account you will no longer recieve updates and new class announcements from MIT<em>x</em>.</p>
+  <p>If you&rsquo;d like to still get updates and new class announcements you can just <a href="#unenroll" rel="leanModal">unenroll</a> and keep your account active.</p>
+
   <form id="unenroll_form">
     <div id="unenroll_error"> </div>
     <fieldset>
       <ul>
         <li>
-          <label><input type="radio" name="updates" checked /> Deactivate account/do not inform me about future courses. </label>
+          <input type="submit" id="" value="Yes, I don't want an MITx account or hear about any new classes or updates to MITx" />
         </li>
+      </ul>
+    </fieldset>
+  </form>
+</div>
+
+<div id="unenroll" class="leanModal_box">
+  <h1>Unenroll from 6.002x</h1>
+  <p>Please note: you will still receive updates and new class announcements from MIT<em>x</em>. If you don&rsquo;t wish to receive any more updates or announcements <a href="#deactivate-account" rel="leanModal">deactivate your account</a>.</p>
+
+  <form id="unenroll_form">
+    <div id="unenroll_error"> </div>
+    <fieldset>
+      <ul>
         <li>
-          <label><input type="radio" name="updates" /> Deactivate account, but inform me about future courses.</label>
-        </li>
-        <li>
-          <input type="submit" id="" value="Unenroll" />
+          <input type="submit" id="" value="Yes, I want to unenroll from 6.002x but still hear about any new classes or updates to MITx" />
         </li>
       </ul>
     </fieldset>

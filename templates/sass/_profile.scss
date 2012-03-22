@@ -75,7 +75,11 @@ div.profile-wrapper {
           font-size: 12px;
         }
 
-        a#change_language, a#change_location, a.edit-email {
+        a#change_language,
+        a#change_location,
+        a.edit-email,
+        a.name-edit,
+       a.email-edit {
           position: absolute;
           top: 9px;
           right: lh(.5);
@@ -88,6 +92,47 @@ div.profile-wrapper {
           }
         }
 
+        p {
+          font-size: 12px;
+          margin-bottom: 0;
+          margin-top: 4px;
+          color: #999;
+        }
+
+        a.deactivate {
+          color: #aaa;
+          font-style: italic;
+        }
+
+        input {
+          background: none;
+          border: none;
+          @include box-shadow(none);
+          color: #999;
+          font-size: 12px;
+          font-weight: normal;
+          margin: 0;
+          padding: 0;
+          position: absolute;
+          right: lh(.5);
+          text-transform: uppercase;
+          top: 9px;
+
+          &:hover {
+            color: #555;
+          }
+        }
+
+        &.deactivate {
+          // border-top: 1px solid #d3d3d3;
+          // position: absolute;
+          // bottom: 0;
+          // @include box-shadow(inset 0 1px 0 #eee);
+          // width: 100%;
+          border-bottom: none;
+          @include box-shadow(none);
+          margin-top: 10px;
+        }
       }
     }
 
@@ -104,30 +149,26 @@ div.profile-wrapper {
         font-size: $body-font-size;
       }
     }
-
-    div#unenroll {
-      border-bottom: 1px solid #d3d3d3;
-      @include box-shadow(0 1px 0 #eee);
-
-      a {
-        color: lighten($text-color, 10%);
-        display: block;
-        display: block;
-        padding: 7px lh();
-        @include transition();
-
-        &:hover {
-          background: #efefef;
-        }
-      }
-    }
   }
 
   section.course-info {
     @extend .content;
 
-    > h1 {
-      @extend .top-header;
+    header {
+      @extend h1.top-header;
+      @extend .clearfix;
+
+      h1 {
+        margin: 0;
+        float: left;
+      }
+
+      a.unenroll {
+        float: right;
+        color: #aaa;
+        font-style: italic;
+        margin-top: 8px;
+      }
     }
 
     div#grade-detail-graph {
@@ -167,29 +208,29 @@ div.profile-wrapper {
           padding-left: flex-gutter(9);
           width: flex-grid(7, 9);
 
-         > li {
-           padding:0 0 lh() 0;
+          > li {
+            padding:0 0 lh() 0;
 
-           &:first-child {
-             padding-top: 0;
-           }
-
-           &:last-child {
-             border-bottom: 0;
-           }
-
-          h3 {
-            color: #666;
-          }
-
-          ol {
-            list-style: none;
-
-            li {
-              display: inline-block;
-              padding-right: 1em;
+            &:first-child {
+              padding-top: 0;
             }
-          }
+
+            &:last-child {
+              border-bottom: 0;
+            }
+
+            h3 {
+              color: #666;
+            }
+
+            ol {
+              list-style: none;
+
+              li {
+                display: inline-block;
+                padding-right: 1em;
+              }
+            }
           }
         }
       }

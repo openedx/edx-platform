@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -134,7 +134,7 @@ input, select {
   display: table;
   width: 100%; }
 
-h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info > h1, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
+h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info header, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
   background: #f3f3f3;
   border-bottom: 1px solid #e3e3e3;
   margin: -22.652px -22.652px 22.652px;
@@ -954,20 +954,22 @@ div#pwd_reset p {
 div#pwd_reset input[type="email"] {
   margin-bottom: 22.652px; }
 
-div#apply_name_change, div#change_email, div#unenroll_course {
+div#apply_name_change, div#change_email, div#unenroll, div#deactivate-account {
   max-width: 700px; }
-div#apply_name_change ul, div#change_email ul, div#unenroll_course ul {
+div#apply_name_change ul, div#change_email ul, div#unenroll ul, div#deactivate-account ul {
   list-style: none; }
-div#apply_name_change ul li, div#change_email ul li, div#unenroll_course ul li {
+div#apply_name_change ul li, div#change_email ul li, div#unenroll ul li, div#deactivate-account ul li {
   margin-bottom: 11.326px; }
-div#apply_name_change ul li textarea, div#apply_name_change ul li input[type="email"], div#apply_name_change ul li input[type="number"], div#apply_name_change ul li input[type="password"], div#apply_name_change ul li input[type="search"], div#apply_name_change ul li input[type="tel"], div#apply_name_change ul li input[type="text"], div#apply_name_change ul li input[type="url"], div#apply_name_change ul li input[type="color"], div#apply_name_change ul li input[type="date"], div#apply_name_change ul li input[type="datetime"], div#apply_name_change ul li input[type="datetime-local"], div#apply_name_change ul li input[type="month"], div#apply_name_change ul li input[type="time"], div#apply_name_change ul li input[type="week"], div#change_email ul li textarea, div#change_email ul li input[type="email"], div#change_email ul li input[type="number"], div#change_email ul li input[type="password"], div#change_email ul li input[type="search"], div#change_email ul li input[type="tel"], div#change_email ul li input[type="text"], div#change_email ul li input[type="url"], div#change_email ul li input[type="color"], div#change_email ul li input[type="date"], div#change_email ul li input[type="datetime"], div#change_email ul li input[type="datetime-local"], div#change_email ul li input[type="month"], div#change_email ul li input[type="time"], div#change_email ul li input[type="week"], div#unenroll_course ul li textarea, div#unenroll_course ul li input[type="email"], div#unenroll_course ul li input[type="number"], div#unenroll_course ul li input[type="password"], div#unenroll_course ul li input[type="search"], div#unenroll_course ul li input[type="tel"], div#unenroll_course ul li input[type="text"], div#unenroll_course ul li input[type="url"], div#unenroll_course ul li input[type="color"], div#unenroll_course ul li input[type="date"], div#unenroll_course ul li input[type="datetime"], div#unenroll_course ul li input[type="datetime-local"], div#unenroll_course ul li input[type="month"], div#unenroll_course ul li input[type="time"], div#unenroll_course ul li input[type="week"] {
+div#apply_name_change ul li textarea, div#apply_name_change ul li input[type="email"], div#apply_name_change ul li input[type="number"], div#apply_name_change ul li input[type="password"], div#apply_name_change ul li input[type="search"], div#apply_name_change ul li input[type="tel"], div#apply_name_change ul li input[type="text"], div#apply_name_change ul li input[type="url"], div#apply_name_change ul li input[type="color"], div#apply_name_change ul li input[type="date"], div#apply_name_change ul li input[type="datetime"], div#apply_name_change ul li input[type="datetime-local"], div#apply_name_change ul li input[type="month"], div#apply_name_change ul li input[type="time"], div#apply_name_change ul li input[type="week"], div#change_email ul li textarea, div#change_email ul li input[type="email"], div#change_email ul li input[type="number"], div#change_email ul li input[type="password"], div#change_email ul li input[type="search"], div#change_email ul li input[type="tel"], div#change_email ul li input[type="text"], div#change_email ul li input[type="url"], div#change_email ul li input[type="color"], div#change_email ul li input[type="date"], div#change_email ul li input[type="datetime"], div#change_email ul li input[type="datetime-local"], div#change_email ul li input[type="month"], div#change_email ul li input[type="time"], div#change_email ul li input[type="week"], div#unenroll ul li textarea, div#unenroll ul li input[type="email"], div#unenroll ul li input[type="number"], div#unenroll ul li input[type="password"], div#unenroll ul li input[type="search"], div#unenroll ul li input[type="tel"], div#unenroll ul li input[type="text"], div#unenroll ul li input[type="url"], div#unenroll ul li input[type="color"], div#unenroll ul li input[type="date"], div#unenroll ul li input[type="datetime"], div#unenroll ul li input[type="datetime-local"], div#unenroll ul li input[type="month"], div#unenroll ul li input[type="time"], div#unenroll ul li input[type="week"], div#deactivate-account ul li textarea, div#deactivate-account ul li input[type="email"], div#deactivate-account ul li input[type="number"], div#deactivate-account ul li input[type="password"], div#deactivate-account ul li input[type="search"], div#deactivate-account ul li input[type="tel"], div#deactivate-account ul li input[type="text"], div#deactivate-account ul li input[type="url"], div#deactivate-account ul li input[type="color"], div#deactivate-account ul li input[type="date"], div#deactivate-account ul li input[type="datetime"], div#deactivate-account ul li input[type="datetime-local"], div#deactivate-account ul li input[type="month"], div#deactivate-account ul li input[type="time"], div#deactivate-account ul li input[type="week"] {
   display: block;
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
-div#apply_name_change ul li textarea, div#change_email ul li textarea, div#unenroll_course ul li textarea {
+div#apply_name_change ul li textarea, div#change_email ul li textarea, div#unenroll ul li textarea, div#deactivate-account ul li textarea {
   height: 60px; }
+div#apply_name_change ul li input[type="submit"], div#change_email ul li input[type="submit"], div#unenroll ul li input[type="submit"], div#deactivate-account ul li input[type="submit"] {
+  white-space: normal; }
 
 div#feedback_div form ol li {
   float: none;
@@ -3437,15 +3439,46 @@ div.profile-wrapper section.user-info ul li div#location_sub:empty, div.profile-
   padding: 0; }
 div.profile-wrapper section.user-info ul li div#description {
   font-size: 12px; }
-div.profile-wrapper section.user-info ul li a#change_language, div.profile-wrapper section.user-info ul li a#change_location, div.profile-wrapper section.user-info ul li a.edit-email {
+div.profile-wrapper section.user-info ul li a#change_language, div.profile-wrapper section.user-info ul li a#change_location, div.profile-wrapper section.user-info ul li a.edit-email, div.profile-wrapper section.user-info ul li a.name-edit, div.profile-wrapper section.user-info ul li a.email-edit {
   position: absolute;
   top: 9px;
   right: 11.326px;
   text-transform: uppercase;
   font-size: 12px;
   color: #999; }
-div.profile-wrapper section.user-info ul li a#change_language:hover, div.profile-wrapper section.user-info ul li a#change_location:hover, div.profile-wrapper section.user-info ul li a.edit-email:hover {
+div.profile-wrapper section.user-info ul li a#change_language:hover, div.profile-wrapper section.user-info ul li a#change_location:hover, div.profile-wrapper section.user-info ul li a.edit-email:hover, div.profile-wrapper section.user-info ul li a.name-edit:hover, div.profile-wrapper section.user-info ul li a.email-edit:hover {
   color: #555; }
+div.profile-wrapper section.user-info ul li p {
+  font-size: 12px;
+  margin-bottom: 0;
+  margin-top: 4px;
+  color: #999; }
+div.profile-wrapper section.user-info ul li a.deactivate {
+  color: #aaa;
+  font-style: italic; }
+div.profile-wrapper section.user-info ul li input {
+  background: none;
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  color: #999;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 11.326px;
+  text-transform: uppercase;
+  top: 9px; }
+div.profile-wrapper section.user-info ul li input:hover {
+  color: #555; }
+div.profile-wrapper section.user-info ul li.deactivate {
+  border-bottom: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  margin-top: 10px; }
 div.profile-wrapper section.user-info div#change_password_pop {
   border-bottom: 1px solid #d3d3d3;
   -webkit-box-shadow: 0 1px 0 #eeeeee;
@@ -3458,38 +3491,14 @@ div.profile-wrapper section.user-info div#change_password_pop h2 {
   font-weight: bold;
   text-transform: uppercase;
   font-size: 14px; }
-div.profile-wrapper section.user-info div#unenroll {
-  border-bottom: 1px solid #d3d3d3;
-  -webkit-box-shadow: 0 1px 0 #eeeeee;
-  -moz-box-shadow: 0 1px 0 #eeeeee;
-  box-shadow: 0 1px 0 #eeeeee; }
-div.profile-wrapper section.user-info div#unenroll a {
-  color: #4d4d4d;
-  display: block;
-  display: block;
-  padding: 7px 22.652px;
-  -webkit-transition-property: all;
-  -moz-transition-property: all;
-  -ms-transition-property: all;
-  -o-transition-property: all;
-  transition-property: all;
-  -webkit-transition-duration: 0.15s;
-  -moz-transition-duration: 0.15s;
-  -ms-transition-duration: 0.15s;
-  -o-transition-duration: 0.15s;
-  transition-duration: 0.15s;
-  -webkit-transition-timing-function: ease-out;
-  -moz-transition-timing-function: ease-out;
-  -ms-transition-timing-function: ease-out;
-  -o-transition-timing-function: ease-out;
-  transition-timing-function: ease-out;
-  -webkit-transition-delay: 0;
-  -moz-transition-delay: 0;
-  -ms-transition-delay: 0;
-  -o-transition-delay: 0;
-  transition-delay: 0; }
-div.profile-wrapper section.user-info div#unenroll a:hover {
-  background: #efefef; }
+div.profile-wrapper section.course-info header h1 {
+  margin: 0;
+  float: left; }
+div.profile-wrapper section.course-info header a.unenroll {
+  float: right;
+  color: #aaa;
+  font-style: italic;
+  margin-top: 8px; }
 div.profile-wrapper section.course-info div#grade-detail-graph {
   width: 100%;
   min-height: 300px; }
