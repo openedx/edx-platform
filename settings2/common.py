@@ -61,7 +61,8 @@ sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
 
 ################################## MITXWEB #####################################
-# This is where we stick our compiled template files
+# This is where we stick our compiled template files. Most of the app uses Mako
+# templates
 MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['course'] = [DATA_DIR]
@@ -69,12 +70,28 @@ MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
 MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates', DATA_DIR / 'info']
 
+# This is where Django Template lookup is defined. There are a few of these 
+# still left lying around.
+TEMPLATE_DIRS = (
+    PROJECT_ROOT / "templates",
+    DATA_DIR / "templates",
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.request',
+    'askbot.context.application_settings',
+    #'django.core.context_processors.i18n',
+    'askbot.user_messages.context_processors.user_messages',#must be before auth
+    'django.core.context_processors.auth', #this is required for admin
+    'django.core.context_processors.csrf', #necessary for csrf protection
+)
+
+
 # FIXME: We're not checking this out in this location yet
 # TEXTBOOK_DIR = ENV_ROOT / "books" / "circuits_agarwal_lang" # What it should eventually be
 TEXTBOOK_DIR = ENV_ROOT / "book_images"
 
-
-# FIXME ???????? -- 
+# FIXME: 
 # We should have separate S3 staged URLs in case we need to make changes to 
 # these assets and test them.
 LIB_URL = '/static/js/'
@@ -84,7 +101,6 @@ LIB_URL = '/static/js/'
 # BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/' # For AWS deploys
 
-# FIXME ??????? What are these exactly?
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
 DEV_CONTENT = True
@@ -134,24 +150,6 @@ STATICFILES_DIRS = (
 #    ("book", TEXTBOOK_DIR)
 )
 
-# This is where Django Template lookup is defined. 
-TEMPLATE_DIRS = (
-    PROJECT_ROOT / "templates",
-    DATA_DIR / "templates",
-)
-
-#'/Users/dave/Projects/mitx/mitx_all//data//templates', '/Users/dave/Projects/mitx/mitx_all//textbook/')
-#path(u'/Users/dave/Projects/mitx/mitx_all/data/problems'))
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'askbot.context.application_settings',
-    #'django.core.context_processors.i18n',
-    'askbot.user_messages.context_processors.user_messages',#must be before auth
-    'django.core.context_processors.auth', #this is required for admin
-    'django.core.context_processors.csrf', #necessary for csrf protection
-)
-
 # Storage
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
@@ -185,14 +183,6 @@ handlers = ['console']
 #     handlers.append('syslogger')
 
 LOGGING_ENV = "dev" # override this in different environments
-
-# def register_loggers(syslog_addr, tracking_log_dir, logging_env):
-#     pid = os.getpid() # So we can log which process is creating the log
-#     hostname = platform.node().split(".")[0]
-#     SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
-#     TRACKING_LOG_FILE = LOG_DIR + "/tracking_{0}.log".format(pid)
-# 
-#     handlers = ['console']
 
 LOGGING = {
     'version': 1,
