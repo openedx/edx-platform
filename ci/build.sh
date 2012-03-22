@@ -21,9 +21,24 @@ if [ -z "${BUILD_NUMBER}" ]; then
     BUILD_NUMBER=dev
 fi
 
-ID=mitx-${GIT_BRANCH}-${BUILD_NUMBER}-${GIT_COMMIT}
-REPO_ROOT=$(dirname $0)/..
+REPO_ROOT=$(dirname $(pwd)/$(dirname $0))
 BUILD_DIR=${REPO_ROOT}/build
 
+if [ "${GIT_BRANCH}" == "master" ]; then
+    NAME=mitx
+else
+    NAME=mitx-${GIT_BRANCH}
+fi
+
 mkdir -p ${BUILD_DIR}
-tar --exclude=.git --exclude=build --transform="s#^#mitx/#" -czf ${BUILD_DIR}/${ID}.tgz ${REPO_ROOT}
+cd ${BUILD_DIR}
+fpm -s dir -t deb \
+    --exclude=build \
+    --exclude=ci \
+    --exclude=.git \
+    --prefix=/opt/wwc/mitx \
+    --name ${NAME} \
+    --version 0.1 \
+    --iteration ${BUILD_NUMBER}-${GIT_COMMIT} \
+    -a all \
+    ${REPO_ROOT}
