@@ -1,6 +1,11 @@
 """
 This config file runs the simplest dev environment using sqlite, and db-based
-sessions.
+sessions. Assumes structure:
+
+/envroot/
+        /db   # This is where it'll write the database file
+        /mitx # The location of this repo
+
 """
 from common import *
 
@@ -24,7 +29,7 @@ TEMPLATE_DEBUG = True
 # 
 # ASKBOT_ENABLED = True
 # MITX_FEATURES['SAMPLE'] = True  # Switch to this system so we get around the shadowing
-#
+
 INSTALLED_APPS = installed_apps(extras=['debug_toolbar'])
 MIDDLEWARE_CLASSES = ('debug_toolbar.middleware.DebugToolbarMiddleware',) + MIDDLEWARE_CLASSES
 
@@ -39,4 +44,3 @@ DEBUG_TOOLBAR_PANELS = (
    'debug_toolbar.panels.logger.LoggingPanel',
 #   'debug_toolbar.panels.profiling.ProfilingDebugPanel', # Lots of overhead
 )
-
