@@ -68,13 +68,15 @@ MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['course'] = [DATA_DIR]
 MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
 MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
-MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates', DATA_DIR / 'info']
+MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates', 
+                          DATA_DIR / 'info',
+                          DATA_DIR / 'problems']
 
 # This is where Django Template lookup is defined. There are a few of these 
 # still left lying around.
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
-    DATA_DIR / "templates",
+    DATA_DIR / "problems",
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
