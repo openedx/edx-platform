@@ -207,7 +207,8 @@ div#pwd_reset {
 
 div#apply_name_change,
 div#change_email,
-div#unenroll_course {
+div#unenroll,
+div#deactivate-account {
   max-width: 700px;
 
   ul {
@@ -224,6 +225,10 @@ div#unenroll_course {
 
       textarea {
         height: 60px;
+      }
+
+      input[type="submit"] {
+        white-space: normal;
       }
     }
   }
