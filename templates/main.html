@@ -137,12 +137,17 @@ $(function() {
       $("#calculator_wrapper").slideToggle("fast");
       $("#calculator_wrapper #calculator_input").focus();
       $(this).toggleClass("closed");
+      return false;
       });
 
     $("div.help-wrapper a").hover(function(){
       $(".help").toggleClass("shown");
+
       });
 
+    $("div.help-wrapper a").click(function(){
+      return false;
+      });
     $("form#calculator").submit(function(e){
       e.preventDefault();
       $.getJSON("/calculate", {"equation":$("#calculator_input").attr("value")},
