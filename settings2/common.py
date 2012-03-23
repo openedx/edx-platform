@@ -10,7 +10,11 @@ We should make a method that calls all these config methods so that you just
 make one call at the end of your site-specific dev file to reset all the
 dependent variables (like INSTALLED_APPS) for you.
 
-TODO:
+IMMEDIATE TODO:
+1. Fix logging()
+2. 
+
+Longer TODO:
 1. Right now our treatment of static content in general and in particular 
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
@@ -314,43 +318,37 @@ MIDDLEWARE_CLASSES = (
 )
 
 ################################### APPS #######################################
-def installed_apps():
-    """If you want to get a different set of INSTALLED_APPS out of this, you'll
-    have to set ASKBOT_ENABLED and COURSEWARE_ENABLED to True/False and call 
-    this method. We can't just take these as params because other pieces of the
-    code check fo the value of these constants.
-    """
-    # We always install these
-    STANDARD_APPS = ['django.contrib.auth',
-                     'django.contrib.contenttypes',
-                     'django.contrib.humanize',
-                     'django.contrib.sessions',
-                     'django.contrib.sites',
-                     'django.contrib.messages',
-                     'django.contrib.staticfiles',
-                     'track',
-                     'util']
-    COURSEWARE_APPS = ['circuit',
-                       'courseware',
-                       'student',
-                       'static_template_view',
-                       'staticbook',
-                       'simplewiki',
-                       'perfstats']
-    ASKBOT_APPS = ['django.contrib.sitemaps',
-                   'django.contrib.admin',
-                   'south',
-                   'askbot.deps.livesettings',
-                   'askbot',
-                   'keyedcache',
-                   'robots',
-                   'django_countries',
-                   'djcelery',
-                   'djkombu',
-                   'followit']
-    
-    return tuple(STANDARD_APPS + 
-                 (COURSEWARE_APPS if COURSEWARE_ENABLED else []) +
-                 (ASKBOT_APPS if ASKBOT_ENABLED else []))
+INSTALLED_APPS = (
+    # Standard ones that are always installed...
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.humanize',
+    'django.contrib.messages',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.staticfiles',
+    'south',
 
-INSTALLED_APPS = installed_apps()
+    # Our courseware
+    'circuit',
+    'courseware',
+    'perfstats',
+    'student',
+    'static_template_view',
+    'staticbook',
+    'simplewiki',
+    'track',
+    'util',
+
+    # For Askbot 
+    'django.contrib.sitemaps',
+    'django.contrib.admin',
+    'django_countries',
+    'djcelery',
+    'djkombu',
+    'askbot',
+    'askbot.deps.livesettings',
+    'followit',
+    'keyedcache',
+    'robots',
+)
