@@ -10,7 +10,7 @@ task :package do
     commit = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()
     branch = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp()
     branch = branch.gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
-    build_number = (ENV["BRANCH_NUMBER"] || "dev").chomp()
+    build_number = (ENV["BUILD_NUMBER"] || "dev").chomp()
 
     if branch == "master"
         package_name = "mitx"
