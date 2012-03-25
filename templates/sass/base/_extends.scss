@@ -74,9 +74,14 @@ h1.top-header {
 
   h1, h2 {
    font-size: 18px;
-   font-weight: 800;
+   font-weight: bold;
    letter-spacing: 0;
    text-transform: none;
+  }
+
+  a {
+    font-style: normal;
+    border: none;
   }
 
   .bottom-border {
@@ -180,6 +185,7 @@ h1.top-header {
   }
 
   a {
+    border-bottom: 0;
     color: darken($cream, 80%);
 
     &:hover {

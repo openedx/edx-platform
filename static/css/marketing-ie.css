@@ -6,8 +6,5 @@ body {
   margin: 0;
   overflow: hidden; }
 
-div#enroll p.ie-warning {
-  display: block !important;
-  line-height: 1.3em; }
 div#enroll form {
   display: none; }

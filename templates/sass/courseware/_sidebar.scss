@@ -34,16 +34,37 @@ section.course-index {
     ul.ui-accordion-content {
       @include border-radius(0);
       @include box-shadow( inset -1px 0 0 #e6e6e6);
-      background: #d6d6d6;
+      background: #dadada;
       border: none;
       border-bottom: 1px solid #c3c3c3;
       font-size: 12px;
       margin: 0;
-      overflow: hidden;
+      // overflow: visible;
 
       li {
+        position: relative;
+
         &.active {
           font-weight: bold;
+
+          p.subtitle {
+            font-weight: normal;
+          }
+
+          // &:after {
+          //   content: " ";
+          //   width: 16px;
+          //   height: 16px;
+          //   position: absolute;
+          //   right: -35px;
+          //   top: 7px;
+          //   display: block;
+          //   background-color: #dadada;
+          //   border-top: 1px solid #c3c3c3;
+          //   border-right: 1px solid #c3c3c3;
+          //   z-index: 99;
+          //   @include transform(rotate(45deg));
+          // }
         }
 
         a {

@@ -1,0 +1,50 @@
+require 'rake/clean'
+require 'tempfile'
+
+REPO_ROOT = File.dirname(__FILE__)
+BUILD_DIR = File.join(REPO_ROOT, "build")
+CLOBBER.include('build')
+CLEAN.include("#{BUILD_DIR}/*.deb")
+
+task :package do
+    commit = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()
+    branch = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp()
+    branch = branch.gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
+    build_number = (ENV["BUILD_NUMBER"] || "dev").chomp()
+
+    if branch == "master"
+        package_name = "mitx"
+    else
+        package_name = "mitx-#{branch}"
+    end
+
+    FileUtils.mkdir_p(BUILD_DIR)
+    
+    Dir.chdir(BUILD_DIR) do
+        args = ["fakeroot", "fpm", "-s", "dir", "-t", "deb",
+            "--exclude=build",
+            "--exclude=rakefile",
+            "--exclude=.git",
+            "--prefix=/opt/wwc/mitx-#{commit}",
+            "--depends=python-mysqldb",
+            "--depends=python-django",
+            "--depends=python-pip",
+            "--depends=python-flup",
+            "--depends=python-numpy",
+            "--depends=python-scipy",
+            "--depends=python-matplotlib",
+            "--depends=python-libxml2",
+            "--depends=python2.7-dev",
+            "--depends=libxml2-dev",
+            "--depends=libxslt-dev",
+            "--depends=python-markdown",
+            "--depends=python-pygments",
+            "--depends=mysql-client",
+            "--name=#{package_name}-#{commit}",
+            "--version=0.1",
+            "--iteration=#{build_number}",
+            "-a", "all",
+            "#{REPO_ROOT}"]
+        system(*args) || raise("fpm failed to build the .deb")
+    end
+end

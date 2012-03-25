@@ -3,7 +3,6 @@ import os
 
 from django import forms
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import signals
@@ -11,6 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from markdown import markdown
 
 from settings import *
+from util.cache import cache
+
 
 class ShouldHaveExactlyOneRootSlug(Exception):
     pass
