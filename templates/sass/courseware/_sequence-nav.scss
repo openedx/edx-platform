@@ -54,6 +54,7 @@ nav.sequence-nav {
         padding: 15px 4px 14px;
         width: 28px;
         height: 17px;
+        @include transition(all, .4s, $ease-in-out-quad);
 
         // @media screen and (max-width: 800px) {
           //   padding: 12px 8px;
@@ -118,16 +119,24 @@ nav.sequence-nav {
         }
 
       p {
-        position: absolute;
-        display: none;
+        // display: none;
+        // visibility: hidden;
         background: #333;
-        padding: 6px;
-        white-space: pre-wrap;
-        z-index: 99;
-        margin: 4px 0 0 -5px;
-        text-shadow: 0 -1px 0 #000;
         color: #fff;
         line-height: lh();
+        margin: 0px 0 0 -5px;
+        opacity: 0;
+        padding: 6px;
+        position: absolute;
+        text-shadow: 0 -1px 0 #000;
+        @include transition(all, .6s, $ease-in-out-quart);
+        white-space: pre-wrap;
+        z-index: 99;
+
+        &.shown {
+          opacity: 1;
+          margin-top: 4px;
+        }
 
         &:empty {
           background: none;
@@ -146,7 +155,6 @@ nav.sequence-nav {
           top: -5px;
           left: 18px;
           @include transform(rotate(45deg));
-          @include transition();
           width: 10px;
         }
       }
@@ -215,15 +223,24 @@ nav.sequence-nav {
 
 
 section.course-content {
+  position: relative;
+
+  div#seq_content {
+    margin-bottom: 60px;
+  }
+
   nav.sequence-bottom {
-    margin-bottom: -(lh());
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    margin-right: -53px;
 
     ul {
       @extend .clearfix;
+      background-color: darken(#F6EFD4, 5%);
       border: 1px solid darken(#f6efd4, 20%);
       border-bottom: 0;
       @include border-radius(3px 3px 0 0);
-      margin: lh() auto 0;
       overflow: hidden;
       width: 106px;
       background-color: darken($cream, 5%);
@@ -238,22 +255,25 @@ section.course-content {
           a {
             background-position: center center;
             background-repeat: no-repeat;
+            border-bottom: none;
+            display: block;
             padding: lh(.75) 4px;
             text-indent: -9999px;
             width: 45px;
             display: block;
+            @include transition(all, .4s, $ease-in-out-quad);
 
             &:hover {
-              text-decoration: none;
-              color: darken($cream, 60%);
-              text-decoration: none;
-              opacity: .5;
               background-color: darken($cream, 10%);
+              color: darken(#F6EFD4, 60%);
+              color: darken($cream, 60%);
+              opacity: .5;
+              text-decoration: none;
             }
 
             &.disabled {
-              opacity: .4;
               background-color: lighten($cream, 10%);
+              opacity: .4;
             }
           }
         }

@@ -7,31 +7,5 @@ div.gradebook-wrapper {
     h1 {
       @extend .top-header;
     }
-    > ol {
-      list-style: none;
-      margin-top: lh();
-
-      > li {
-        @extend .clearfix;
-        border-bottom: 1px solid #e3e3e3;
-        display: table;
-        padding: lh() 0;
-        width: 100%;
-
-        &:last-child {
-          border-bottom: 0px;
-        }
-
-        h2 {
-          border-right: 1px dashed #ddd;
-          @include box-sizing(border-box);
-          display: table-cell;
-          margin: 0;
-          padding: 0;
-          width: flex-grid(2, 9);
-          vertical-align: top;
-        }
-      }
-    }
   }
 }

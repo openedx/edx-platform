@@ -166,8 +166,17 @@ MAKO_TEMPLATES = {}
 
 LOGGING_ENV = "dev" # override this in different environments
 
+# Default dev cache (i.e. no caching)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 # Make sure we execute correctly regardless of where we're called from
-execfile(os.path.join(BASE_DIR, "settings.py"))
+override_settings = os.path.join(BASE_DIR, "settings.py")
+if os.path.isfile(override_settings):
+    execfile(override_settings)
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -448,7 +457,7 @@ LIVESETTINGS_OPTIONS = {
                 'MIN_TITLE_LENGTH' : 1,
                 'MIN_QUESTION_BODY_LENGTH' : 1,
                 'MIN_ANSWER_BODY_LENGTH' : 1,
-                'WIKI_ON' : True,
+                'WIKI_ON' : False,
                 'ALLOW_ASK_ANONYMOUSLY' : True,
                 'ALLOW_POSTING_BEFORE_LOGGING_IN' : False,
                 'ALLOW_SWAPPING_QUESTION_WITH_ANSWER' : False,
@@ -541,16 +550,16 @@ LIVESETTINGS_OPTIONS = {
             'MIN_REP' : {
                 'MIN_REP_TO_ACCEPT_OWN_ANSWER' : 1,
                 'MIN_REP_TO_ANSWER_OWN_QUESTION' : 1,
-                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 250,
+                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 1200,
                 'MIN_REP_TO_CLOSE_OWN_QUESTIONS' : 1,
-                'MIN_REP_TO_DELETE_OTHERS_COMMENTS' : 2000,
-                'MIN_REP_TO_DELETE_OTHERS_POSTS' : 5000,
-                'MIN_REP_TO_EDIT_OTHERS_POSTS' : 2000,
-                'MIN_REP_TO_EDIT_WIKI' : 50,
+                'MIN_REP_TO_DELETE_OTHERS_COMMENTS' : 5000,
+                'MIN_REP_TO_DELETE_OTHERS_POSTS' : 10000,
+                'MIN_REP_TO_EDIT_OTHERS_POSTS' : 5000,
+                'MIN_REP_TO_EDIT_WIKI' : 200,
                 'MIN_REP_TO_FLAG_OFFENSIVE' : 1,
                 'MIN_REP_TO_HAVE_STRONG_URL' : 250,
                 'MIN_REP_TO_LEAVE_COMMENTS' : 1,
-                'MIN_REP_TO_LOCK_POSTS' : 4000,
+                'MIN_REP_TO_LOCK_POSTS' : 10000,
                 'MIN_REP_TO_REOPEN_OWN_QUESTIONS' : 1,
                 'MIN_REP_TO_RETAG_OTHERS_QUESTIONS' : 100,
                 'MIN_REP_TO_UPLOAD_FILES' : 1,

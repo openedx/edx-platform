@@ -1,0 +1,138 @@
+li.calc-main {
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  width: 100%;
+
+  a.calc {
+    @include hide-text;
+    background: url("/static/images/calc-icon.png") rgba(#111, .9) no-repeat center;
+    border-bottom: 0;
+    color: #fff;
+    float: right;
+    margin-right: 10px;
+    @include border-radius(3px 3px 0 0);
+    @include inline-block;
+    padding: 8px 12px;
+    width: 16px;
+    height: 20px;
+
+    &:hover {
+      opacity: .8;
+    }
+
+    &.closed {
+      background-image: url("/static/images/close-calc-icon.png");
+    }
+  }
+
+  div#calculator_wrapper {
+    background: rgba(#111, .9);
+    clear: both;
+
+    form {
+      padding: lh();
+      @extend .clearfix;
+
+
+      input#calculator_button {
+        background: #111;
+        border: 1px solid #000;
+        @include border-radius(0);
+        @include box-shadow(none);
+        @include box-sizing(border-box);
+        color: #fff;
+        font-size: 30px;
+        font-weight: bold;
+        padding: 0;
+        text-shadow: none;
+        width: flex-grid(.5) + flex-gutter();
+        float: left;
+        margin: 0 (flex-gutter() / 2);
+
+        &:hover {
+          color: #333;
+        }
+      }
+
+      input#calculator_output {
+        background: #222;
+        border: 0;
+        @include box-shadow(none);
+        @include box-sizing(border-box);
+        color: #fff;
+        float: left;
+        font-size: 16px;
+        font-weight: bold;
+        margin: 1px 0 0;
+        padding: 10px;
+        width: flex-grid(4);
+      }
+
+      div.input-wrapper {
+        position: relative;
+        @extend .clearfix;
+        width: flex-grid(7.5);
+        margin: 0;
+        float: left;
+
+      input#calculator_input {
+        border: none;
+        @include box-shadow(none);
+        @include box-sizing(border-box);
+        font-size: 16px;
+        padding: 10px;
+        width: 100%;
+
+        &:focus {
+          outline: none;
+          border: none;
+        }
+      }
+
+        div.help-wrapper {
+          position: absolute;
+          right: 8px;
+          top: 15px;
+
+          a {
+            @include hide-text;
+            width: 17px;
+            height: 17px;
+            background: url("/static/images/info-icon.png") center center no-repeat;
+          }
+
+          dl {
+            background: #fff;
+            @include border-radius(3px);
+            @include box-shadow(0 0 3px #999);
+            color: #333;
+            opacity: 0;
+            padding: 10px;
+            position: absolute;
+            right: -40px;
+            top: -110px;
+            width: 500px;
+            @include transition();
+
+            &.shown {
+              opacity: 1;
+              top: -115px;
+            }
+
+            dt {
+              clear: both;
+              float: left;
+              font-weight: bold;
+              padding-right: lh(.5);
+            }
+
+            dd {
+              float: left;
+            }
+          }
+        }
+      }
+    }
+  }
+}
