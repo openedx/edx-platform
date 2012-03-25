@@ -22,15 +22,14 @@ Longer TODO:
 3. We need to handle configuration for multiple courses. This could be as 
    multiple sites, but we do need a way to map their data assets.
 """
-import os
-import platform
 import sys
 import tempfile
 
 import djcelery
 from path import path
 
-from askbotsettings import LIVESETTINGS_OPTIONS
+from askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
+import logsettings
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
@@ -126,6 +125,7 @@ SITE_NAME = "localhost:8000"
 CSRF_COOKIE_DOMAIN = '127.0.0.1'
 HTTPS = 'on'
 ROOT_URLCONF = 'mitx.urls'
+IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -160,93 +160,6 @@ TIME_ZONE = 'America/New_York' # http://en.wikipedia.org/wiki/List_of_tz_zones_b
 LANGUAGE_CODE = 'en' # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
-
-################################### LOGGING ####################################
-# Might want to rewrite this to use logger code and push more things to the root
-# logger.
-pid = os.getpid() # So we can log which process is creating the log
-hostname = platform.node().split(".")[0]
-
-LOG_DIR = "/tmp"
-SYSLOG_ADDRESS = ('syslog.m.i4x.org', 514)
-TRACKING_LOG_FILE = LOG_DIR + "/tracking_{0}.log".format(pid)
-
-handlers = ['console']
-
-# FIXME: re-enable syslogger later
-# if not DEBUG:
-#     handlers.append('syslogger')
-
-LOGGING_ENV = "dev" # override this in different environments
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters' : {
-        'standard' : {
-            'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
-        },
-        'syslog_format' : {
-            'format' : '[%(name)s][env:' + LOGGING_ENV + '] %(levelname)s [' + \
-                        hostname + ' %(process)d] [%(filename)s:%(lineno)d] - %(message)s',
-        },
-        'raw' : {
-            'format' : '%(message)s',
-        }
-    },
-    'handlers' : {
-        'console' : {
-            'level' : 'DEBUG' if DEBUG else 'INFO',
-            'class' : 'logging.StreamHandler',
-            'formatter' : 'standard',
-            'stream' : sys.stdout,
-        },
-        'console_err' : {
-            'level' : 'ERROR',
-            'class' : 'logging.StreamHandler',
-            'formatter' : 'standard',
-            'stream' : sys.stderr,
-        },
-        'syslogger' : {
-            'level' : 'INFO',
-            'class' : 'logging.handlers.SysLogHandler',
-            'address' : SYSLOG_ADDRESS,
-            'formatter' : 'syslog_format',
-        },
-        'tracking' : {
-            'level' : 'DEBUG',
-            'class' : 'logging.handlers.WatchedFileHandler',
-            'filename' : TRACKING_LOG_FILE,
-            'formatter' : 'raw',
-        },
-        'mail_admins' : {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-        },
-    },
-    'loggers' : {
-        'django' : {
-            'handlers' : handlers + ['mail_admins'],
-            'propagate' : True,
-            'level' : 'INFO'
-        },
-        'tracking' : {
-            'handlers' : ['tracking'],
-            'level' : 'DEBUG',
-            'propagate' : False,
-        },
-        'root' : {
-            'handlers' : handlers,
-            'level' : 'DEBUG',
-            'propagate' : False
-        },
-        'mitx' : {
-            'handlers' : handlers,
-            'level' : 'DEBUG',
-            'propagate' : False
-        },
-    }
-}
 
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it 

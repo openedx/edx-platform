@@ -12,6 +12,11 @@ from common import *
 DEBUG = True
 TEMPLATE_DEBUG = True
 
+LOGGING = logsettings.get_logger_config(ENV_ROOT / "log", 
+                                        logging_env="dev",
+                                        tracking_filename="tracking.log",
+                                        debug=True)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
