@@ -27,6 +27,7 @@ task :package do
             "--exclude=.git",
             "--exclude=**/*.pyc",
             "--prefix=/opt/wwc/mitx-#{commit}",
+            "-C", "#{REPO_ROOT}",
             "--depends=python-mysqldb",
             "--depends=python-django",
             "--depends=python-pip",
@@ -45,7 +46,7 @@ task :package do
             "--version=0.1",
             "--iteration=#{build_number}",
             "-a", "all",
-            "#{REPO_ROOT}"]
+            "."]
         system(*args) || raise("fpm failed to build the .deb")
     end
 end
