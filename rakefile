@@ -25,6 +25,7 @@ task :package do
             "--exclude=build",
             "--exclude=rakefile",
             "--exclude=.git",
+            "--exclude=**/*.pyc",
             "--prefix=/opt/wwc/mitx-#{commit}",
             "--depends=python-mysqldb",
             "--depends=python-django",
