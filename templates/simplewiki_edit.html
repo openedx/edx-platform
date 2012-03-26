@@ -9,22 +9,54 @@
 </%block>
 
 <%block name="wiki_head">
+
+
+<script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/codemirror.js"></script>
+<link rel="stylesheet" href="${ settings.LIB_URL }CodeMirror/codemirror.css" />
+
+<script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/xml.js"></script>
+<script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/mitx_markdown.js"></script>
+
+
+<style type="text/css">
+  .CodeMirror-scroll {
+    height: 600px;
+    width: 100%;
+  }
+  .CodeMirror {
+    border: 1px solid black;
+    text-align: left;
+  }
+</style>
+
+
 <script>
-  $(function() {
-    //Store the initial contents of #id_contents (the wiki body field) so we can compare for unsaved changes
-    $("#id_contents").data('initial_contents', $("#id_contents").val());
+	$(function(){
+    $(document).ready(function() {
+      
+      var editor = CodeMirror.fromTextArea(document.getElementById("id_contents"), {
+        mode: 'mitx_markdown',
+        matchBrackets: true,
+        theme: "default"
+      });
+      
+      //Store the inital contents so we can compare for unsaved changes
+      var initial_contents = editor.getValue();
+      
+      window.onbeforeunload = function askConfirm() { //Warn the user before they navigate away
+        if ( editor.getValue() != initial_contents ) {
+          return "You have made changes to the article that have not been saved yet.";
+        }
+      };
     
-    window.onbeforeunload = function askConfirm() { //Warn the user before they navigate away
-      if ( $("#id_contents").val() != $("#id_contents").data('initial_contents') ) {
-        return "You have made changes to the article that have not been saved yet.";
-      }
-    };
-    
-    $("#submit_edit").click(function() {
-      $("#id_contents").data('initial_contents', $("#id_contents").val());
+      $("#submit_edit").click(function() {
+        initial_contents = editor.getValue();
+      });
+      
     });
-    
   });
+  
+  
 </script>
 </%block>
 

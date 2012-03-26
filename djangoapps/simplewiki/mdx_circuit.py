@@ -30,15 +30,14 @@ class CircuitExtension(markdown.Extension):
         md.inlinePatterns.add(name, pattern, "<reference")
     
     def extendMarkdown(self, md, md_globals):
-        self.add_inline(md, 'circuit', CircuitLink, r'^circuit:(?P<name>[a-zA-Z0-9]*)$')
+        self.add_inline(md, 'circuit', CircuitLink, r'^circuit-schematic:(?P<data>.*)$')
 
 class CircuitLink(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
-        name = m.group('name')
-        if not name.isalnum():
-            return etree.fromstring("<div>Circuit name must be alphanumeric</div>")
-
-        return etree.fromstring(render_to_string('show_circuit.html', {'name':name}))
+        data = m.group('data')
+        
+        ##TODO: We need to html escape the data
+        return etree.fromstring("<input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls'/>")
         
     
 def makeExtension(configs=None) :
