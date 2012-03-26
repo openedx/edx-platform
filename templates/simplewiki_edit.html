@@ -38,7 +38,8 @@
       var editor = CodeMirror.fromTextArea(document.getElementById("id_contents"), {
         mode: 'mitx_markdown',
         matchBrackets: true,
-        theme: "default"
+        theme: "default",
+        lineWrapping: true,
       });
       
       //Store the inital contents so we can compare for unsaved changes

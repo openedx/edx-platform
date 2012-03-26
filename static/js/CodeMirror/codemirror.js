@@ -693,31 +693,6 @@ var CodeMirror = (function() {
         if (nlines > 1) doc.remove(from.line + 1, nlines - 1, callbacks);
         doc.insert(from.line + 1, added);
       }
-      if (options.lineWrapping) {
-        var perLine = scroller.clientWidth / charWidth() - 3;
-        doc.iter(from.line, from.line + newText.length, function(line) {
-          if (line.hidden) return;
-          var guess = Math.ceil(line.text.length / perLine) || 1;
-          if (guess != line.height) updateLineHeight(line, guess);
-        });
-      } else {
-        doc.iter(from.line, i + newText.length, function(line) {
-          var l = line.text;
-          if (l.length > maxLineLength) {
-            maxLine = l; maxLineLength = l.length; maxWidth = null;
-            recomputeMaxLength = false;
-          }
-        });
-        if (recomputeMaxLength) {
-          maxLineLength = 0; maxLine = ""; maxWidth = null;
-          doc.iter(0, doc.size, function(line) {
-            var l = line.text;
-            if (l.length > maxLineLength) {
-              maxLineLength = l.length; maxLine = l;
-            }
-          });
-        }
-      }
 
       // Add these lines to the work array, so that they will be
       // highlighted. Adjust work lines if lines were added/removed.
@@ -739,6 +714,36 @@ var CodeMirror = (function() {
         for (var cur = textChanged; cur.next; cur = cur.next) {}
         cur.next = changeObj;
       } else textChanged = changeObj;
+
+      
+      if (options.lineWrapping) {
+        var perLine = scroller.clientWidth / charWidth() - 3;
+        doc.iter(from.line, from.line + newText.length, function(line) {
+          if (line.hidden) return;
+          var guess = Math.ceil(line.text.length / perLine) || 1;
+          if (line.isWidgetBlock) 
+            guess = line.styles[1].size(line.text).height / textHeight();
+          if (guess != line.height) updateLineHeight(line, guess);
+        });
+      } else {
+        //TODO: update height here for widget blocks
+        doc.iter(from.line, i + newText.length, function(line) {
+          var l = line.text;
+          if (l.length > maxLineLength) {
+            maxLine = l; maxLineLength = l.length; maxWidth = null;
+            recomputeMaxLength = false;
+          }
+        });
+        if (recomputeMaxLength) {
+          maxLineLength = 0; maxLine = ""; maxWidth = null;
+          doc.iter(0, doc.size, function(line) {
+            var l = line.text;
+            if (l.length > maxLineLength) {
+              maxLineLength = l.length; maxLine = l;
+            }
+          });
+        }
+      }
 
       // Update the selection
       function updateLine(n) {return n <= Math.min(to.line, to.line + lendiff) ? n : n + lendiff;}
@@ -938,7 +943,7 @@ var CodeMirror = (function() {
       intact.sort(function(a, b) {return a.domStart - b.domStart;});
 
       var th = textHeight(), gutterDisplay = gutter.style.display;
-      //lineDiv.style.display = "none";
+      lineDiv.style.display = "none";
       patchDisplay(from, to, intact);
       lineDiv.style.display = gutter.style.display = "";
 
@@ -964,8 +969,9 @@ var CodeMirror = (function() {
         maxWidth = scroller.clientWidth;
         var curNode = lineDiv.firstChild, heightChanged = false;
         doc.iter(showingFrom, showingTo, function(line) {
-          if (!line.hidden) {
+          if (!line.hidden && !line.isWidgetBlock) { //TODO: We should handle widget blocks better here
             var height = Math.round(curNode.offsetHeight / th) || 1;
+            if (line.isWidgetBlock) height = line.styles[1].size(line.text).height  / textHeight();
             if (line.height != height) {
               updateLineHeight(line, height);
               gutterDirty = heightChanged = true;
@@ -1055,7 +1061,6 @@ var CodeMirror = (function() {
           var insertChild = scratch.firstChild;
           lineDiv.insertBefore(insertChild, curNode);
           line.nodeAdded(insertChild);
-          line.setHeight( insertChild.clientHeight / text_height );
         } else {
           curNode = curNode.nextSibling;
         }
@@ -1354,7 +1359,7 @@ var CodeMirror = (function() {
         wrapper.className = wrapper.className.replace(" CodeMirror-wrap", "");
         maxWidth = null; maxLine = "";
         doc.iter(0, doc.size, function(line) {
-          if (line.height != 1 && !line.hidden) updateLineHeight(line, 1);
+          if (line.height != 1 && !line.hidden && !line.isWidgetBlock) updateLineHeight(line, 1);
           if (line.text.length > maxLine.length) maxLine = line.text;
         });
       }
@@ -2403,17 +2408,6 @@ var CodeMirror = (function() {
       if (this.isWidgetBlock) this.styles[1].callback(node, this);
       //this.setHeight(node.clientHeight);
     },
-    setHeight: function(newHeight) {
-      if (this.isWidgetBlock) newHeight = 300 / 14.0;
-      this.growHeight(newHeight - this.height);
-    },
-    //This is a bottom-up height change. InsertHeight is a top-down height change
-    growHeight: function(deltaHeight) {
-      if (this.parent && deltaHeight != 0) {
-        this.parent.growHeight(deltaHeight);
-      }
-      this.height = this.height + deltaHeight;
-    },
     // Fetch the parser token for a given character. Useful for hacks
     // that want to inspect the mode state (say, for completion).
     getTokenAt: function(mode, state, ch) {
@@ -2562,13 +2556,6 @@ var CodeMirror = (function() {
     collapse: function(lines) {
       lines.splice.apply(lines, [lines.length, 0].concat(this.lines));
     },
-    //This is a bottom-up height change. InsertHeight is a top-down height change
-    growHeight: function(deltaHeight) {
-      if (this.parent && deltaHeight != 0) {
-        this.parent.growHeight(deltaHeight)
-      }
-      this.height = this.height + deltaHeight;
-    },
     insertHeight: function(at, lines, height) {
       this.height += height;
       this.lines.splice.apply(this.lines, [at, 0].concat(lines));
@@ -2642,13 +2629,6 @@ var CodeMirror = (function() {
         }
         at -= sz;
       }
-    },
-    //This is a bottom-up height change. InsertHeight is a top-down height change
-    growHeight: function(deltaHeight) {
-      if (this.parent && deltaHeight != 0) {
-        this.parent.growHeight(deltaHeight)
-      }
-      this.height = this.height + deltaHeight;
     },
     maybeSpill: function() {
       if (this.children.length <= 10) return;

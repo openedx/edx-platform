@@ -70,6 +70,9 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
       
       return html;
     },
+    size: function(text) {
+      return {width: 400, height:302};
+    },
     callback: function(node, line) {
       update_schematics();
       var schmInput = node.firstChild;
