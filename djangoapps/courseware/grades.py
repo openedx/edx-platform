@@ -4,12 +4,15 @@ import logging
 import random
 import urllib
 
+from collections import namedtuple
 from django.conf import settings
 from lxml import etree
 from models import StudentModule
 from student.models import UserProfile
 
 log = logging.getLogger("mitx.courseware")
+
+Score = namedtuple("Score", "earned possible graded section")
 
 def get_grade(user, problem, cache):
     ## HACK: assumes max score is fixed per problem
@@ -65,11 +68,14 @@ def grade_sheet(student):
         response_by_id[response.module_id] = response
     
     
+    
     totaled_scores = {}
     chapters=[]
     for c in xmlChapters:
         sections = []
         chname=c.get('name')
+        
+        
         for s in dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section', 
                            course=course, chname=chname):
             problems=dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section[@name=$section]//problem', 
@@ -95,21 +101,25 @@ def grade_sheet(student):
                         else:
                             correct = total
                     
-                    scores.append((int(correct),total, graded ))
+                    scores.append( Score(int(correct),total, graded, s.get("name")) )
 
+                
+                section_total = Score(sum([score.earned for score in scores]), 
+                                        sum([score.possible for score in scores]),
+                                        False,
+                                        p.get("id"))
 
-                section_total = (sum([score[0] for score in scores]), 
-                                sum([score[1] for score in scores]))
-
-                graded_total = (sum([score[0] for score in scores if score[2]]), 
-                                sum([score[1] for score in scores if score[2]]))
+                graded_total = Score(sum([score.earned for score in scores if score.graded]), 
+                                sum([score.possible for score in scores if score.graded]),
+                                True,
+                                p.get("id"))
 
                 #Add the graded total to totaled_scores
                 format = s.get('format') if s.get('format') else ""
                 subtitle = s.get('subtitle') if s.get('subtitle') else format
                 if format and graded_total[1] > 0:
-                    format_scores = totaled_scores[ format ] if format in totaled_scores else []
-                    format_scores.append( graded_total + (s.get("name"),) )
+                    format_scores = totaled_scores.get(format, [])
+                    format_scores.append( graded_total )
                     totaled_scores[ format ] = format_scores
 
                 score={'section':s.get("name"),
@@ -159,8 +169,8 @@ def grade_summary_6002x(totaled_scores):
     homework_percentages = []
     for i in range(12):
         if i < len(homework_scores):
-            percentage = homework_scores[i][0] / float(homework_scores[i][1])
-            summary = "Homework {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, homework_scores[i][2] , percentage, homework_scores[i][0], homework_scores[i][1] )
+            percentage = homework_scores[1].earned / float(homework_scores[i].possible)
+            summary = "Homework {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, homework_scores[i].section , percentage, homework_scores[i].earned, homework_scores[i].possible )
         else:
             percentage = 0
             summary = "Unreleased Homework {0} - 0% (?/?)".format(i + 1)
@@ -179,11 +189,10 @@ def grade_summary_6002x(totaled_scores):
     #Figure the lab scores
     lab_scores = totaled_scores['Lab'] if 'Lab' in totaled_scores else []
     lab_percentages = []
-    log.debug("lab_scores: {0}".format(lab_scores))
     for i in range(12):
         if i < len(lab_scores):
-            percentage = lab_scores[i][0] / float(lab_scores[i][1])
-            summary = "Lab {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, lab_scores[i][2] , percentage, lab_scores[i][0], lab_scores[i][1] )
+            percentage = lab_scores[i].earned / float(lab_scores[i].possible)
+            summary = "Lab {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, lab_scores[i].section , percentage, lab_scores[i].earned, lab_scores[i].possible )
         else:
             percentage = 0
             summary = "Unreleased Lab {0} - 0% (?/?)".format(i + 1)
@@ -201,18 +210,18 @@ def grade_summary_6002x(totaled_scores):
     
     
     #TODO: Pull this data about the midterm and final from the databse. It should be exactly similar to above, but we aren't sure how exams will be done yet.
-    midterm_score = ('?', '?')
+    midterm_score = Score('?', '?', True, "?")
     midterm_percentage = 0
     
-    final_score = ('?', '?')
+    final_score = Score('?', '?', True, "?")
     final_percentage = 0
     
     if settings.GENERATE_PROFILE_SCORES:
-        midterm_score = (random.randrange(50, 150), 150)
-        midterm_percentage = midterm_score[0] / float(midterm_score[1])
+        midterm_score = Score(random.randrange(50, 150), 150, True, "?")
+        midterm_percentage = midterm_score.earned / float(midterm_score.possible)
         
-        final_score = (random.randrange(100, 300), 300)
-        final_percentage = final_score[0] / float(final_score[1])
+        final_score = Score(random.randrange(100, 300), 300, True, "?")
+        final_percentage = final_score.earned / float(final_score.possible)
         
     
     grade_summary = [
@@ -237,14 +246,14 @@ def grade_summary_6002x(totaled_scores):
         {
             'category': 'Midterm',
             'totalscore' : midterm_percentage,
-            'totalscore_summary' : "Midterm - {0:.0%} ({1}/{2})".format(midterm_percentage, midterm_score[0], midterm_score[1]),
+            'totalscore_summary' : "Midterm - {0:.0%} ({1}/{2})".format(midterm_percentage, midterm_score.earned, midterm_score.possible),
             'totallabel' : 'Midterm',
             'weight' : 0.30,
         },
         {
             'category': 'Final',
             'totalscore' : final_percentage,
-            'totalscore_summary' : "Final - {0:.0%} ({1}/{2})".format(final_percentage, final_score[0], final_score[1]),
+            'totalscore_summary' : "Final - {0:.0%} ({1}/{2})".format(final_percentage, final_score.earned, final_score.possible),
             'totallabel' : 'Final',
             'weight' : 0.40,
         }
