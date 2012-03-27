@@ -2,7 +2,7 @@ $(function(){
   $(document).ready(function() {
 	  $("a[rel*=leanModal]").leanModal();
     
-    $("body").append('<div id="circuit_editor" class="leanModal_box" style="z-index: 11000; left: 50%; margin-left: -250px; position: absolute; top: 100px; opacity: 1; "><div align="center"> <input class="schematic" height="300" width="400" id="schematic_editor" name="schematic" type="hidden" value=""/> <button type="button" id="circuit_save_btn">save</button></div></div>');
+    $("body").append('<div id="circuit_editor" class="leanModal_box" style="z-index: 11000; left: 50%; margin-left: -250px; position: absolute; top: 100px; opacity: 1; "><div align="center"> <input class="schematic" height="150" width="150" id="schematic_editor" name="schematic" type="hidden" value=""/> <button type="button" id="circuit_save_btn">save</button></div></div>');
     
     //This is the editor that pops up as a modal
     var editorCircuit = $("#schematic_editor").get(0);
@@ -65,13 +65,13 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
       //TODO: We need real html escaping here
       circuit_value = CodeMirror.htmlEscape(circuit_value);// circuit_value.replace("\"", "'");
       
-      var html = "<a href='#circuit_editor' rel='leanModal' class='schematic_open' style='width:400px; '><input type='hidden' parts='' value='" +
-        circuit_value + "' analyses='' class='schematic ctrls'/></a>";
+      var html = "<a href='#circuit_editor' rel='leanModal' class='schematic_open' style='display:inline-block;'>" + 
+                  "<input type='hidden' parts='' value='" + circuit_value + "' width='150' height='150' analyses='' class='schematic ctrls'/></a>";
       
       return html;
     },
     size: function(text) {
-      return {width: 400, height:302};
+      return {width: 150, height:154};
     },
     callback: function(node, line) {
       update_schematics();

@@ -616,6 +616,24 @@ var CodeMirror = (function() {
     // Afterwards, set the selection to selFrom, selTo.
     function updateLines(from, to, newText, selFrom, selTo) {
       if (suppressEdits) return;
+
+      if (from.ch > 0 && newText[0] != '' && getLine(from.line).isWidgetBlock) {
+        newText.unshift('');
+        var widgetLine = getLine(from.line);
+        function moveSel(sel) {
+          if (sel.line == from.line && sel.ch > 0){
+            return {line: sel.line + 1, ch: sel.ch - widgetLine.text.length};
+          } else if (sel.line > from.line) {
+            return {line: sel.line + 1, ch: sel.ch};
+          }
+        }
+        selFrom = moveSel(selFrom, widgetLine);
+        selTo = moveSel(selTo, widgetLine);
+      }
+      if (to.ch == 0 && newText[newText.length - 1] != '' && getLine(to.line).isWidgetBlock) {
+        newText.push('');
+      }
+      
       if (history) {
         var old = [];
         doc.iter(from.line, to.line + 1, function(line) { old.push(line.text); });
@@ -726,7 +744,6 @@ var CodeMirror = (function() {
           if (guess != line.height) updateLineHeight(line, guess);
         });
       } else {
-        //TODO: update height here for widget blocks
         doc.iter(from.line, from.line + newText.length, function(line) {
           var l = line.text;
           if (l.length > maxLineLength) {
@@ -779,23 +796,11 @@ var CodeMirror = (function() {
       return end;
     }
     function replaceSelection(code, collapse) {
-      var reposition = false;
-      if (code.length > 0) {
-        var fromLine = getLine(sel.from.line), toLine = getLine(sel.to.line);
-        if (fromLine.isWidgetBlock && sel.from.ch == fromLine.text.length) {
-          code = "\n" + code;
-        } else if (toLine.isWidgetBlock && sel.to.ch == 0) {
-          code = code + "\n";
-          reposition = true;
-        }
-      }
-      
       replaceRange1(splitLines(code), sel.from, sel.to, function(end) {
         if (collapse == "end") return {from: end, to: end};
         else if (collapse == "start") return {from: sel.from, to: sel.from};
         else return {from: sel.from, to: end};
       });
-      if (reposition) moveH(-1, "char");
     }
     function replaceRange1(code, from, to, computeSel) {
       var endch = code.length == 1 ? code[0].length + from.ch : code[code.length-1].length;
@@ -1266,9 +1271,19 @@ var CodeMirror = (function() {
       setCursor(pos.line, pos.ch, true);
     }
     function deleteH(dir, unit) {
-      if (!posEq(sel.from, sel.to)) replaceRange("", sel.from, sel.to);
-      else if (dir < 0) replaceRange("", findPosH(dir, unit), sel.to);
-      else replaceRange("", sel.from, findPosH(dir, unit));
+      var from = sel.from;
+      var to = sel.to;
+      if (posEq(sel.from, sel.to)) {
+        if (dir < 0) {
+          from = findPosH(dir, unit);
+          if (getLine(from.line).isWidgetBlock) from.ch = 0;
+        }
+        else {
+          to = findPosH(dir, unit);
+          if (getLine(to.line).isWidgetBlock) to.ch = getLine(to.line).text.length;
+        }
+      }
+      replaceRange("", from, to);
       userSelChange = true;
     }
     var goalColumn = null;
@@ -1554,6 +1569,10 @@ var CodeMirror = (function() {
     var tempId = Math.floor(Math.random() * 0xffffff).toString(16);
     function measureLine(line, ch) {
       if (ch == 0) return {top: 0, left: 0};
+      if (line.isWidgetBlock) {
+        var size = line.styles[1].size(line.text);
+        return {top: -1, left: size.width};
+      } 
       var extra = "";
       // Include extra text at the end to make sure the measured line is wrapped in the right way.
       if (options.lineWrapping) {
