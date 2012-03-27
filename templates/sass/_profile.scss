@@ -79,7 +79,7 @@ div.profile-wrapper {
         a#change_location,
         a.edit-email,
         a.name-edit,
-       a.email-edit {
+        a.email-edit {
           position: absolute;
           top: 9px;
           right: lh(.5);
@@ -122,17 +122,6 @@ div.profile-wrapper {
             color: #555;
           }
         }
-
-        &.deactivate {
-          // border-top: 1px solid #d3d3d3;
-          // position: absolute;
-          // bottom: 0;
-          // @include box-shadow(inset 0 1px 0 #eee);
-          // width: 100%;
-          border-bottom: none;
-          @include box-shadow(none);
-          margin-top: 10px;
-        }
       }
     }
 
@@ -161,13 +150,6 @@ div.profile-wrapper {
       h1 {
         margin: 0;
         float: left;
-      }
-
-      a.unenroll {
-        float: right;
-        color: #aaa;
-        font-style: italic;
-        margin-top: 8px;
       }
     }
 
