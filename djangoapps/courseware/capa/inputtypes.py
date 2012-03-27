@@ -8,7 +8,8 @@ class textline(object):
     def render(element, value, state):
         eid=element.get('id')
         count = int(eid.split('_')[-2])-1 # HACK
-        context = {'id':eid, 'value':value, 'state':state, 'count':count}
+        size = element.get('size')
+        context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size}
         html=render_to_string("textinput.html", context)
         return etree.XML(html)
 
