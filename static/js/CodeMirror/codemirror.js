@@ -697,8 +697,8 @@ var CodeMirror = (function() {
       // Add these lines to the work array, so that they will be
       // highlighted. Adjust work lines if lines were added/removed.
       var newWork = [], lendiff = newText.length - nlines - 1;
-      for (var i = 0, l = work.length; i < l; ++i) {
-        var task = work[i];
+      for (var j = 0, l = work.length; j < l; ++j) {
+        var task = work[j];
         if (task < from.line) newWork.push(task);
         else if (task > to.line) newWork.push(task + lendiff);
       }
@@ -727,11 +727,15 @@ var CodeMirror = (function() {
         });
       } else {
         //TODO: update height here for widget blocks
-        doc.iter(from.line, i + newText.length, function(line) {
+        doc.iter(from.line, from.line + newText.length, function(line) {
           var l = line.text;
           if (l.length > maxLineLength) {
             maxLine = l; maxLineLength = l.length; maxWidth = null;
             recomputeMaxLength = false;
+          }
+          if (line.isWidgetBlock) {
+            var guess = line.styles[1].size(line.text).height / textHeight();
+            if (guess != line.height) updateLineHeight(line, guess);
           }
         });
         if (recomputeMaxLength) {
