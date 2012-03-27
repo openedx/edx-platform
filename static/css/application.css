@@ -3473,12 +3473,6 @@ div.profile-wrapper section.user-info ul li input {
   top: 9px; }
 div.profile-wrapper section.user-info ul li input:hover {
   color: #555; }
-div.profile-wrapper section.user-info ul li.deactivate {
-  border-bottom: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  margin-top: 10px; }
 div.profile-wrapper section.user-info div#change_password_pop {
   border-bottom: 1px solid #d3d3d3;
   -webkit-box-shadow: 0 1px 0 #eeeeee;
@@ -3494,11 +3488,6 @@ div.profile-wrapper section.user-info div#change_password_pop h2 {
 div.profile-wrapper section.course-info header h1 {
   margin: 0;
   float: left; }
-div.profile-wrapper section.course-info header a.unenroll {
-  float: right;
-  color: #aaa;
-  font-style: italic;
-  margin-top: 8px; }
 div.profile-wrapper section.course-info div#grade-detail-graph {
   width: 100%;
   min-height: 300px; }
