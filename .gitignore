@@ -10,3 +10,4 @@ db.newaskbot
 db.oldaskbot
 flushdb.sh
 build
+\#*\#

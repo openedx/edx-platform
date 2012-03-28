@@ -1,5 +1,6 @@
 import json
 import math
+import numbers
 import numpy
 import random
 import scipy
@@ -158,9 +159,7 @@ class formularesponse(object):
         ''' 
         d=dict([(k, numpy.complex(d[k])) for k in d if type(k)==str and \
                     k.isalnum() and \
-                    (type(d[k]) == float or \
-                         type(d[k]) == int or \
-                         type(d[k]) == complex) ])
+                    isinstance(d[k], numbers.Number)])
         return d
 
     def get_answers(self):
