@@ -17,7 +17,7 @@ html {
       @include box-shadow(0 0 4px #dfdfdf);
       @include box-sizing(border-box);
       margin-top: 3px;
-      overflow: hidden;
+      // overflow: hidden;
 
       @media print {
         border-bottom: 0;
