@@ -498,17 +498,17 @@ var CodeMirror = (function() {
         if (!bound) return false;
       }
       var prevShift = shiftSelecting;
-      try {
+      // try { //TODO: Reenable this try/catch
         if (options.readOnly) suppressEdits = true;
         if (dropShift) shiftSelecting = null;
         bound(instance);
-      } catch(e) {
-        if (e != Pass) throw e;
-        return false;
-      } finally {
-        shiftSelecting = prevShift;
-        suppressEdits = false;
-      }
+      // } catch(e) {
+      //   if (e != Pass) throw e;
+      //   return false;
+      // } finally {
+      //   shiftSelecting = prevShift;
+      //   suppressEdits = false;
+      // }
       return true;
     }
     function handleKeyBinding(e) {
@@ -617,7 +617,7 @@ var CodeMirror = (function() {
     function updateLines(from, to, newText, selFrom, selTo) {
       if (suppressEdits) return;
 
-      if (from.ch > 0 && newText[0] != '' && getLine(from.line).isWidgetBlock) {
+      if (from.ch > 0 && (newText[0] != '' || newText.length == 1) && getLine(from.line).widgetFunction) {
         newText.unshift('');
         var widgetLine = getLine(from.line);
         function moveSel(sel) {
@@ -630,7 +630,7 @@ var CodeMirror = (function() {
         selFrom = moveSel(selFrom, widgetLine);
         selTo = moveSel(selTo, widgetLine);
       }
-      if (to.ch == 0 && newText[newText.length - 1] != '' && getLine(to.line).isWidgetBlock) {
+      if (to.ch == 0 && (newText[newText.length - 1] != '' || newText.length == 1) && getLine(to.line).widgetFunction) {
         newText.push('');
       }
       
@@ -739,8 +739,8 @@ var CodeMirror = (function() {
         doc.iter(from.line, from.line + newText.length, function(line) {
           if (line.hidden) return;
           var guess = Math.ceil(line.text.length / perLine) || 1;
-          if (line.isWidgetBlock) 
-            guess = line.styles[1].size(line.text).height / textHeight();
+          if (line.widgetFunction) 
+            guess = line.widgetFunction.size(line.text).height / textHeight();
           if (guess != line.height) updateLineHeight(line, guess);
         });
       } else {
@@ -750,8 +750,8 @@ var CodeMirror = (function() {
             maxLine = l; maxLineLength = l.length; maxWidth = null;
             recomputeMaxLength = false;
           }
-          if (line.isWidgetBlock) {
-            var guess = line.styles[1].size(line.text).height / textHeight();
+          if (line.widgetFunction) {
+            var guess = line.widgetFunction.size(line.text).height / textHeight();
             if (guess != line.height) updateLineHeight(line, guess);
           }
         });
@@ -978,9 +978,9 @@ var CodeMirror = (function() {
         maxWidth = scroller.clientWidth;
         var curNode = lineDiv.firstChild, heightChanged = false;
         doc.iter(showingFrom, showingTo, function(line) {
-          if (!line.hidden && !line.isWidgetBlock) { //TODO: We should handle widget blocks better here
+          if (!line.hidden && !line.widgetFunction) { //TODO: We should handle widget blocks better here
             var height = Math.round(curNode.offsetHeight / th) || 1;
-            if (line.isWidgetBlock) height = line.styles[1].size(line.text).height  / textHeight();
+            if (line.widgetFunction) height = line.widgetFunction.size(line.text).height  / textHeight();
             if (line.height != height) {
               updateLineHeight(line, height);
               gutterDirty = heightChanged = true;
@@ -1058,7 +1058,7 @@ var CodeMirror = (function() {
           if (line.hidden) var html = scratch.innerHTML = "<pre></pre>";
           else {
             var html = line.getHTML(makeTab);
-            if (!line.isWidgetBlock) {
+            if (!line.widgetFunction) {
               html = '<pre' + (line.className ? ' class="' + line.className + '"' : '') + '>' + html + '</pre>';
             }
             // Kludge to make sure the styled element lies behind the selection (by z-index)
@@ -1228,7 +1228,8 @@ var CodeMirror = (function() {
     function clipPos(pos) {
       if (pos.line < 0) return {line: 0, ch: 0};
       if (pos.line >= doc.size) return {line: doc.size-1, ch: getLine(doc.size-1).text.length};
-      var ch = pos.ch, linelen = getLine(pos.line).text.length;
+      var ch = pos.ch, line = getLine(pos.line), linelen =line.text.length;
+      if (line.widgetFunction && ch != 0) return {line: pos.line, ch: linelen};
       if (ch == null || ch > linelen) return {line: pos.line, ch: linelen};
       else if (ch < 0) return {line: pos.line, ch: 0};
       else return pos;
@@ -1247,7 +1248,7 @@ var CodeMirror = (function() {
         if (ch == (dir < 0 ? 0 : lineObj.text.length)) {
           if (!boundToLine && findNextLine()) ch = dir < 0 ? lineObj.text.length : 0;
           else return false;
-        } else if (lineObj.isWidgetBlock) { //Select the entire line
+        } else if (lineObj.widgetFunction) { //Select the entire line
           ch = dir < 0 ? 0 : lineObj.text.length;
         } else ch += dir;
         return true;
@@ -1276,11 +1277,11 @@ var CodeMirror = (function() {
       if (posEq(sel.from, sel.to)) {
         if (dir < 0) {
           from = findPosH(dir, unit);
-          if (getLine(from.line).isWidgetBlock) from.ch = 0;
+          if (getLine(from.line).widgetFunction) from.ch = 0;
         }
         else {
           to = findPosH(dir, unit);
-          if (getLine(to.line).isWidgetBlock) to.ch = getLine(to.line).text.length;
+          if (getLine(to.line).widgetFunction) to.ch = getLine(to.line).text.length;
         }
       }
       replaceRange("", from, to);
@@ -1378,7 +1379,7 @@ var CodeMirror = (function() {
         wrapper.className = wrapper.className.replace(" CodeMirror-wrap", "");
         maxWidth = null; maxLine = "";
         doc.iter(0, doc.size, function(line) {
-          if (line.height != 1 && !line.hidden && !line.isWidgetBlock) updateLineHeight(line, 1);
+          if (line.height != 1 && !line.hidden && !line.widgetFunction) updateLineHeight(line, 1);
           if (line.text.length > maxLine.length) maxLine = line.text;
         });
       }
@@ -1569,8 +1570,8 @@ var CodeMirror = (function() {
     var tempId = Math.floor(Math.random() * 0xffffff).toString(16);
     function measureLine(line, ch) {
       if (ch == 0) return {top: 0, left: 0};
-      if (line.isWidgetBlock) {
-        var size = line.styles[1].size(line.text);
+      if (line.widgetFunction) {
+        var size = line.widgetFunction.size(line.text);
         return {top: -1, left: size.width};
       } 
       var extra = "";
@@ -2288,7 +2289,7 @@ var CodeMirror = (function() {
     this.height = 1;
     this.marked = this.gutterMarker = this.className = this.bgClassName = this.handlers = null;
     this.stateAfter = this.parent = this.hidden = null;
-    this.isWidgetBlock = false;
+    this.widgetFunction = null;
   }
   Line.inheritMarks = function(text, orig) {
     var ln = new Line(text), mk = orig && orig.marked;
@@ -2421,14 +2422,19 @@ var CodeMirror = (function() {
       }
       if (st.length != pos) {st.length = pos; changed = true;}
       if (pos && st[pos-2] != prevWord) changed = true;
-      this.isWidgetBlock = (st.length == 2 && st[1] && typeof st[1] == 'object');
+      if (st.length == 2 && typeof st[1] == 'object') {
+        this.widgetFunction = st[1];
+        st[1] = null;
+      } else {
+        this.widgetFunction = null;
+      }
       // Short lines with simple highlights return null, and are
       // counted as changed by the driver because they are likely to
       // highlight the same way in various contexts.
       return changed || (st.length < 5 && this.text.length < 10 ? null : false);
     },
     nodeAdded: function(node) {
-      if (this.isWidgetBlock) this.styles[1].callback(node, this);
+      if (this.widgetFunction) this.widgetFunction.callback(node, this);
       //this.setHeight(node.clientHeight);
     },
     // Fetch the parser token for a given character. Useful for hacks
@@ -2480,7 +2486,7 @@ var CodeMirror = (function() {
       }
       var st = this.styles, allText = this.text, marked = this.marked;
       var len = allText.length;
-      if (this.isWidgetBlock) return st[1].creator(allText);
+      if (this.widgetFunction) return this.widgetFunction.creator(allText);
       if (endAt != null) len = Math.min(endAt, len);
       function styleToClass(style) {
         if (!style) return null;

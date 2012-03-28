@@ -35,7 +35,7 @@ $(function(){
       editingCircuit.schematic.load_schematic(saving_circuit, "");
       
       if (editingCircuit.codeMirrorLine) {
-        editingCircuit.codeMirrorLine.text = "circuit-schematic:" + saving_circuit;
+        editingCircuit.codeMirrorLine.replace(0, null, "circuit-schematic:" + saving_circuit);
       }
       
       $(".modal_close").first().click();
