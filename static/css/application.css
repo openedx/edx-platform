@@ -3125,16 +3125,13 @@ nav.sequence-nav ul li.next a {
 nav.sequence-nav ul li.next a:hover {
   background-color: none; }
 
-section.course-content {
-  position: relative; }
 section.course-content div#seq_content {
   margin-bottom: 60px; }
 section.course-content nav.sequence-bottom {
-  position: absolute;
-  bottom: 0;
-  right: 50%;
-  margin-right: -53px; }
+  position: relative;
+  bottom: -22.652px; }
 section.course-content nav.sequence-bottom ul {
+  background-color: #f2e7bf;
   background-color: #f2e7bf;
   border: 1px solid #e4d080;
   border-bottom: 0;
@@ -3143,12 +3140,12 @@ section.course-content nav.sequence-bottom ul {
   -ms-border-radius: 3px 3px 0 0;
   -o-border-radius: 3px 3px 0 0;
   border-radius: 3px 3px 0 0;
-  overflow: hidden;
-  width: 106px;
-  background-color: #f2e7bf;
   -webkit-box-shadow: inset 0 0 0 1px #faf7e9;
   -moz-box-shadow: inset 0 0 0 1px #faf7e9;
-  box-shadow: inset 0 0 0 1px #faf7e9; }
+  box-shadow: inset 0 0 0 1px #faf7e9;
+  margin: 0 auto;
+  overflow: hidden;
+  width: 106px; }
 section.course-content nav.sequence-bottom ul li {
   float: left; }
 section.course-content nav.sequence-bottom ul li.prev, section.course-content nav.sequence-bottom ul li.next {
