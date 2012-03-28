@@ -664,7 +664,7 @@ footer nav ul.social li.linkedin a {
   background: url("/static/images/linkedin.png") 0 0 no-repeat; }
 
 li.calc-main {
-  bottom: 0;
+  bottom: -36px;
   left: 0;
   position: fixed;
   width: 100%; }
@@ -691,13 +691,17 @@ li.calc-main a.calc {
   *vertical-align: auto;
   padding: 8px 12px;
   width: 16px;
-  height: 20px; }
+  height: 20px;
+  position: relative;
+  top: -36px; }
 li.calc-main a.calc:hover {
   opacity: .8; }
 li.calc-main a.calc.closed {
   background-image: url("/static/images/close-calc-icon.png"); }
 li.calc-main div#calculator_wrapper {
   background: rgba(17, 17, 17, 0.9);
+  position: relative;
+  top: -36px;
   clear: both; }
 li.calc-main div#calculator_wrapper form {
   padding: 22.652px; }
