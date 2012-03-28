@@ -3,7 +3,11 @@ from ${old_email} to ${new_email}. If you did not make this request,
 please contact the course staff immediately. Contact information is
 listed at:
 
+% if is_secure:
   https://${ site }/t/mitx_help.html
+% else:
+  http://${ site }/t/mitx_help.html
+% endif
 
 We keep a log of old e-mails, so if this request was unintentional, we
 can investigate.
