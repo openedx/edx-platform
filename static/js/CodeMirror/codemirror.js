@@ -498,17 +498,17 @@ var CodeMirror = (function() {
         if (!bound) return false;
       }
       var prevShift = shiftSelecting;
-      // try { //TODO: Reenable this try/catch
+      try {
         if (options.readOnly) suppressEdits = true;
         if (dropShift) shiftSelecting = null;
         bound(instance);
-      // } catch(e) {
-      //   if (e != Pass) throw e;
-      //   return false;
-      // } finally {
-      //   shiftSelecting = prevShift;
-      //   suppressEdits = false;
-      // }
+      } catch(e) {
+        if (e != Pass) throw e;
+        return false;
+      } finally {
+        shiftSelecting = prevShift;
+        suppressEdits = false;
+      }
       return true;
     }
     function handleKeyBinding(e) {
