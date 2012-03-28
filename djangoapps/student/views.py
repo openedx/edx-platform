@@ -11,7 +11,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
-from django.core.validators import validate_email, validate_slug
+from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import connection
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
@@ -148,13 +148,13 @@ def create_account(request, post_override=None):
 
     try:
         validate_email(post_vars['email'])
-    except:
+    except ValidationError:
         js['value']="Valid e-mail is required.".format(field=a)
         return HttpResponse(json.dumps(js))
 
     try:
         validate_slug(post_vars['username'])
-    except:
+    except ValidationError:
         js['value']="Username should only consist of A-Z and 0-9.".format(field=a)
         return HttpResponse(json.dumps(js))
         
@@ -307,6 +307,12 @@ def change_email_request(request):
                                         'error':'Invalid password'})) 
     
     new_email = request.POST['new_email']
+    try:
+        validate_email(new_email)
+    except ValidationError:
+        return HttpResponse(json.dumps({'success':False, 
+                                        'error':'Valid e-mail address required.'}))
+
     if len(User.objects.filter(email = new_email)) != 0:
         ## CRITICAL TODO: Handle case sensitivity for e-mails
         return HttpResponse(json.dumps({'success':False, 
