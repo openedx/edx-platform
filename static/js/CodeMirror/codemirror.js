@@ -980,7 +980,7 @@ var CodeMirror = (function() {
         maxWidth = scroller.clientWidth;
         var curNode = lineDiv.firstChild, heightChanged = false;
         doc.iter(showingFrom, showingTo, function(line) {
-          if (!line.hidden && !line.widgetFunction) { //TODO: We should handle widget blocks better here
+          if (!line.hidden && !line.widgetFunction) {
             var height = Math.round(curNode.offsetHeight / th) || 1;
             if (line.widgetFunction) height = line.widgetFunction.size(line.text).height  / textHeight();
             if (line.height != height) {
