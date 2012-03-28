@@ -32,12 +32,12 @@ class UserProfile(models.Model):
 
     def get_meta(self):
         js_str = self.meta
-        if not js: 
-            js = dict()
+        if not js_str: 
+            js_str = dict()
         else:
-            js = json.reads(self.meta)
+            js_str = json.loads(self.meta)
 
-        return js
+        return js_str
 
     def set_meta(self,js):
         self.meta = json.dumps(js)

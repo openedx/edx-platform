@@ -109,7 +109,7 @@ $(function() {
           if(data.success){
           $("#apply_name_change").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail if we approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
           } else {
-            $("#apply_name_change_error").html(data.error);
+            $("#change_name_error").html(data.error);
           }
        });
        log_event("profile", {"type":"name_change_request", 

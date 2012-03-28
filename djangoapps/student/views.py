@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import random
@@ -16,6 +17,7 @@ from django.db import connection
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
+from mako import exceptions
 
 from django_future.csrf import ensure_csrf_cookie
 
@@ -373,7 +375,7 @@ def confirm_email_change(request, key):
     meta = up.get_meta()
     if 'old_emails' not in meta:
         meta['old_emails'] = []
-    meta['old_emails'].append(user.email)
+    meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
     up.set_meta(meta)
     up.save()
     user.email = pec.new_email
@@ -450,7 +452,7 @@ def accept_name_change(request):
     meta = up.get_meta()
     if 'old_names' not in meta:
         meta['old_names'] = []
-    meta['old_names'].append(up.name)
+    meta['old_names'].append([up.name, pnc.rationale, datetime.datetime.now().isoformat()])
     up.set_meta(meta)
 
     up.name = pnc.new_name
