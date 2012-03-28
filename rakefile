@@ -10,14 +10,14 @@ DEPLOY_DIR = "/opt/wwc"
 PACKAGE_NAME = "mitx"
 LINK_PATH = File.join(DEPLOY_DIR, PACKAGE_NAME)
 VERSION = "0.1"
-COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()
+COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
 BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
 BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
 
 if BRANCH == "master"
-    DEPLOY_NAME = "#{PACKAGE_NAME}-#{COMMIT}"
+    DEPLOY_NAME = "#{PACKAGE_NAME}-#{BUILD_NUMBER}-#{COMMIT}"
 else
-    DEPLOY_NAME = "#{PACKAGE_NAME}-#{BRANCH}-#{COMMIT}"
+    DEPLOY_NAME = "#{PACKAGE_NAME}-#{BRANCH}-#{BUILD_NUMBER}-#{COMMIT}"
 end
 INSTALL_DIR_PATH = File.join(DEPLOY_DIR, DEPLOY_NAME)
 PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
@@ -67,7 +67,6 @@ task :package do
             "--depends=mysql-client",
             "--name=#{DEPLOY_NAME}",
             "--version=#{VERSION}",
-            "--iteration=#{BUILD_NUMBER}",
             "-a", "all",
             "."]
         system(*args) || raise("fpm failed to build the .deb")
