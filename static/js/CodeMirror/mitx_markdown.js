@@ -77,6 +77,8 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
       update_schematics();
       var schmInput = node.firstChild;
       schmInput.codeMirrorLine = line;
+      schmInput.schematic.always_draw_grid = true;
+      schmInput.schematic.redraw_background();
       $(node).leanModal();
     }
   };
