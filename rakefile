@@ -10,24 +10,25 @@ DEPLOY_DIR = "/opt/wwc"
 PACKAGE_NAME = "mitx"
 LINK_PATH = File.join(DEPLOY_DIR, PACKAGE_NAME)
 VERSION = "0.1"
+COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()
+BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
+BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
+
+if BRANCH == "master"
+    DEPLOY_NAME = "#{PACKAGE_NAME}-#{COMMIT}"
+else
+    DEPLOY_NAME = "#{PACKAGE_NAME}-#{BRANCH}-#{COMMIT}"
+end
+INSTALL_DIR_PATH = File.join(DEPLOY_DIR, DEPLOY_NAME)
+PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
+
 
 # Set up the clean and clobber tasks
 CLOBBER.include('build')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
+
 task :package do
-    commit = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()
-    branch = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp()
-    branch = branch.gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
-    build_number = (ENV["BUILD_NUMBER"] || "dev").chomp()
-
-    if branch == "master"
-        deploy_name = "#{PACKAGE_NAME}-#{commit}"
-    else
-        deploy_name = "#{PACKAGE_NAME}-#{branch}-#{commit}"
-    end
-    INSTALL_DIR_PATH = File.join(DEPLOY_DIR, deploy_name)
-
     FileUtils.mkdir_p(BUILD_DIR)
     
     Dir.chdir(BUILD_DIR) do
@@ -47,10 +48,6 @@ task :package do
         FileUtils.chmod(0755, postinstall.path)
 
         args = ["fakeroot", "fpm", "-s", "dir", "-t", "deb",
-            "--exclude=build",
-            "--exclude=rakefile",
-            "--exclude=.git",
-            "--exclude=**/*.pyc",
             "--after-install=#{postinstall.path}",
             "--prefix=#{INSTALL_DIR_PATH}",
             "-C", "#{REPO_ROOT}",
@@ -68,11 +65,15 @@ task :package do
             "--depends=python-markdown",
             "--depends=python-pygments",
             "--depends=mysql-client",
-            "--name=#{deploy_name}",
+            "--name=#{DEPLOY_NAME}",
             "--version=#{VERSION}",
-            "--iteration=#{build_number}",
+            "--iteration=#{BUILD_NUMBER}",
             "-a", "all",
             "."]
         system(*args) || raise("fpm failed to build the .deb")
     end
+end
+
+task :publish => :package do
+    sh("scp #{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}-#{BUILD_NUMBER}_all.deb #{PACKAGE_REPO}")
 end
