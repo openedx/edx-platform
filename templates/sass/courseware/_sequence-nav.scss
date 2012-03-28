@@ -1,19 +1,28 @@
 nav.sequence-nav {
   @extend .topbar;
   margin-bottom: $body-line-height;
+  position: relative;
+  @include box-sizing(border-box);
 
   ol {
-    display: table-row;
-    float: left;
-    width: flex-grid(8,9) + flex-gutter();
-    position: relative;
+    display: table;
+    width: 100%;
+    @include box-sizing(border-box);
+    padding-right: flex-grid(1, 9);
+    border-bottom: 1px solid darken($cream, 20%);
 
     a {
       @extend .block-link;
     }
 
     li {
+      min-width: 20px;
       display: table-cell;
+      border-left: 1px solid darken($cream, 20%);
+      // @include box-shadow(1px 0 0 lighten($cream, 10%));
+      &:first-child {
+        border-left: none;
+      }
 
       .inactive {
         background-repeat: no-repeat;
@@ -46,15 +55,14 @@ nav.sequence-nav {
       }
 
       a {
-        @include box-shadow(1px 0 0 #fff);
         background-position: center center;
         border: none;
-        border-right: 1px solid darken($cream, 10%);
         cursor: pointer;
-        padding: 15px 4px 14px;
-        width: 28px;
+        display: block;
         height: 17px;
+        padding: 15px 0 14px;
         @include transition(all, .4s, $ease-in-out-quad);
+        width: 100%;
 
         // @media screen and (max-width: 800px) {
           //   padding: 12px 8px;
@@ -162,27 +170,28 @@ nav.sequence-nav {
   }
 
   ul {
-    float: right;
     margin-right: 1px;
     width: flex-grid(1, 9);
-    display: table-row;
+    position: absolute;
+    top: 0;
+    right: 0;
 
     li {
-      display: table-cell;
+      width: 50%;
+      float: left;
 
       &.prev, &.next {
 
         a {
-          @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
           background-color: darken($cream, 5%);
           background-position: center center;
           background-repeat: no-repeat;
           border-left: 1px solid darken(#f6efd4, 20%);
+          @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
+          @include box-sizing(border-box);
           cursor: pointer;
-          padding: 0 4px;
-          text-indent: -9999px;
-          width: 38px;
           display: block;
+          text-indent: -9999px;
 
           &:hover {
             text-decoration: none;
