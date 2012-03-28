@@ -753,6 +753,8 @@ var CodeMirror = (function() {
           if (line.widgetFunction) {
             var guess = line.widgetFunction.size(line.text).height / textHeight();
             if (guess != line.height) updateLineHeight(line, guess);
+          } else if (line.height != 1) {
+            updateLineHeight(line, 1);
           }
         });
         if (recomputeMaxLength) {
