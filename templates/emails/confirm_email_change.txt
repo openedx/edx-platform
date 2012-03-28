@@ -3,7 +3,7 @@ from ${old_email} to ${new_email}. If you did not make this request,
 please contact the course staff immediately. Contact information is
 listed at:
 
-  https://${sitename}/t/mitx_help.html
+  https://${ site }/t/mitx_help.html
 
 We keep a log of old e-mails, so if this request was unintentional, we
 can investigate.
