@@ -40,7 +40,7 @@ task :package do
         set -x
         
         service gunicorn stop
-        rm #{LINK_PATH}
+        rm -f #{LINK_PATH}
         ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
         service gunicorn start
         POSTINSTALL
