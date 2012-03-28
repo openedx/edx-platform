@@ -3,7 +3,11 @@ offering of 6.002 using this email address. If it was you, and you'd
 like to activate and use your account, copy and paste this address
 into your web browser's address bar:
 
-https://${ site }/activate/${ key }
+% if is_secure:
+  https://${ site }/activate/${ key }
+% else:
+  http://${ site }/activate/${ key }
+% endif
 
 If you didn't request this, you don't need to do anything; you won't
 receive any more email from us. Please do not reply to this e-mail; if

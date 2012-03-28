@@ -188,8 +188,7 @@ def create_account(request, post_override=None):
     up.save()
 
     d={'name':post_vars['name'],
-       'key':r.activation_key,
-       'site':settings.SITE_NAME}
+       'key':r.activation_key}
 
     subject = render_to_string('emails/activation_email_subject.txt',d)
         # Email subject *must not* contain newlines
@@ -282,8 +281,7 @@ def reactivation_email(request):
     reg.register(user)
 
     d={'name':UserProfile.get(user = user).name,
-       'key':r.activation_key,
-       'site':settings.SITE_NAME}
+       'key':r.activation_key}
     
     subject = render_to_string('reactivation_email_subject.txt',d)
     subject = ''.join(subject.splitlines())
@@ -336,8 +334,7 @@ def change_email_request(request):
         return HttpResponse(json.dumps({'success':False, 
                                         'error':'Old email is the same as the new email.'}))        
 
-    d = {'site':settings.SITE_NAME, 
-         'key':pec.activation_key, 
+    d = {'key':pec.activation_key, 
          'old_email' : user.email, 
          'new_email' : pec.new_email}
 
@@ -360,9 +357,8 @@ def confirm_email_change(request, key):
         return render_to_response("invalid_email_key.html", {})
     
     user = pec.user
-    d = {'site':settings.SITE_NAME, 
-         'old_email' : user.email, 
-         'new_email' : pec.new_email}    
+    d = {'old_email' : user.email, 
+         'new_email' : pec.new_email}
 
     if len(User.objects.filter(email = pec.new_email)) != 0:
         return render_to_response("email_exists.html", d)

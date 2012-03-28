@@ -18,18 +18,21 @@ from django.http import HttpResponse
 import mitxmako.middleware as middleware
 from django.conf import settings
 
-from mitxmako.middleware import requestcontext
+import mitxmako.middleware
 
-def render_to_string(template_name, dictionary, context_instance=None, namespace='main'):
-    context_instance = context_instance or Context(dictionary)
+def render_to_string(template_name, dictionary, context=None, namespace='main'):
+    context_instance = Context(dictionary)
     # add dictionary to context_instance
     context_instance.update(dictionary or {})
     # collapse context_instance to a single dictionary for mako
     context_dictionary = {}
     context_instance['settings'] = settings
-    context_instance['request_context'] = requestcontext
+    for d in mitxmako.middleware.requestcontext:
+        context_dictionary.update(d)
     for d in context_instance:
         context_dictionary.update(d)
+    if context: 
+        context_dictionary.update(context)
     # fetch and render template
     template = middleware.lookup[namespace].get_template(template_name)
     return template.render(**context_dictionary)
