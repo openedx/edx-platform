@@ -240,7 +240,7 @@ LOGGING = {
     },
     'loggers' : {
         'django' : {
-            'handlers' : handlers + ['mail_admins'],
+            'handlers' : handlers, # + ['mail_admins'],
             'propagate' : True,
             'level' : 'INFO'
         },
