@@ -1,8 +1,13 @@
+var schematic_height = 153;
+var schematic_width = 400;
+
 $(function(){
   $(document).ready(function() {
 	  $("a[rel*=leanModal]").leanModal();
     
-    $("body").append('<div id="circuit_editor" class="leanModal_box" style="z-index: 11000; left: 50%; margin-left: -250px; position: absolute; top: 100px; opacity: 1; "><div align="center"> <input class="schematic" height="150" width="150" id="schematic_editor" name="schematic" type="hidden" value=""/> <button type="button" id="circuit_save_btn">save</button></div></div>');
+    $("body").append('<div id="circuit_editor" class="leanModal_box" style="z-index: 11000; left: 50%; margin-left: -250px; position: absolute; top: 100px; opacity: 1; "><div align="center">'+
+      '<input class="schematic" height="' + schematic_height + '" width="' + schematic_width + '" id="schematic_editor" name="schematic" type="hidden" value=""/>' + 
+      '<button type="button" id="circuit_save_btn">save</button></div></div>');
     
     //This is the editor that pops up as a modal
     var editorCircuit = $("#schematic_editor").get(0);
@@ -43,6 +48,7 @@ $(function(){
   });
 });
 
+
 CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
 
   var htmlMode = CodeMirror.getMode(cmCfg, { name: 'xml', htmlMode: true });
@@ -66,30 +72,34 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
            .replace(/"/g, "&quot;")
            .replace(/'/g, "&#039;");
    }
-  
-  var circuit_formatter = {
-    creator: function(text) {
-      var circuit_value = text.match(circuitRE)[1]
+   
+   var circuit_formatter = {
+     creator: function(text) {
+       var circuit_value = text.match(circuitRE)[1]
       
-      circuit_value = escapeHtml(circuit_value);
+       circuit_value = escapeHtml(circuit_value);
       
-      var html = "<a href='#circuit_editor' rel='leanModal' class='schematic_open' style='display:inline-block;'>" + 
-                  "<input type='hidden' parts='' value='" + circuit_value + "' width='150' height='148' analyses='' class='schematic ctrls'/></a>";
-      
-      return html;
-    },
-    size: function(text) {
-      return {width: 150, height:152};
-    },
-    callback: function(node, line) {
-      update_schematics();
-      var schmInput = node.firstChild;
-      schmInput.codeMirrorLine = line;
-      schmInput.schematic.always_draw_grid = true;
-      schmInput.schematic.redraw_background();
-      $(node).leanModal();
-    }
-  };
+       var html = "<div style='display:block;line-height:0;' class='schematic_container'><a href='#circuit_editor' rel='leanModal' class='schematic_open' style='display:inline-block;'>" + 
+                   "<input type='hidden' parts='' value='" + circuit_value + "' width='" + schematic_width + "' height='" + schematic_height + "' analyses='' class='schematic ctrls'/></a></div>";
+                   
+       return html;
+     },
+     size: function(text) {
+       return {width: schematic_width, height:schematic_height};
+     },
+     callback: function(node, line) {
+       update_schematics();
+       var schmInput = node.firstChild.firstChild;
+       schmInput.codeMirrorLine = line;
+       if (schmInput.schematic) { //This is undefined if there was an error making the schematic
+         schmInput.schematic.canvas.style.display = "block"; //Otherwise, it gets line height and is a weird size
+         schmInput.schematic.always_draw_grid = true;
+         schmInput.schematic.redraw_background();
+       }
+       $(node.firstChild).leanModal();
+     }
+   };
+   
 
   var hrRE = /^[*-=_]/
   ,   ulRE = /^[*-+]\s+/
