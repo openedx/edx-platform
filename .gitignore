@@ -9,3 +9,5 @@ courseware/static/js/mathjax/*
 db.newaskbot
 db.oldaskbot
 flushdb.sh
+build
+\#*\#

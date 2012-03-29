@@ -1,5 +1,6 @@
 import json
 import math
+import numbers
 import numpy
 import random
 import scipy
@@ -37,7 +38,7 @@ class numericalresponse(object):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
-        self.correct_answer = float(self.correct_answer)
+        self.correct_answer = complex(self.correct_answer)
         self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                                    id=xml.get('id'))[0]
         self.tolerance = contextualize_text(self.tolerance_xml, context)
@@ -49,7 +50,10 @@ class numericalresponse(object):
         student_answer = student_answers[self.answer_id]
         try:
             correct = compare_with_tolerance (evaluator(dict(),dict(),student_answer), self.correct_answer, self.tolerance)
-        except:
+        # We should catch this explicitly. 
+        # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
+        # But we'd need to confirm
+        except: 
             raise StudentInputError('Invalid input -- please use a number only')
 
         if correct:
@@ -141,7 +145,7 @@ class formularesponse(object):
             except:
                 #traceback.print_exc()
                 raise StudentInputError("Error in formula")
-            if math.isnan(student_result) or math.isinf(student_result):
+            if numpy.isnan(student_result) or numpy.isinf(student_result):
                 return {self.answer_id:"incorrect"}
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
                 return {self.answer_id:"incorrect"}
@@ -153,9 +157,9 @@ class formularesponse(object):
         keys and all non-numeric values stripped out. All values also
         converted to float. Used so we can safely use Python contexts.
         ''' 
-        d=dict([(k, float(d[k])) for k in d if type(k)==str and \
+        d=dict([(k, numpy.complex(d[k])) for k in d if type(k)==str and \
                     k.isalnum() and \
-                    (type(d[k]) == float or type(d[k]) == int) ])
+                    isinstance(d[k], numbers.Number)])
         return d
 
     def get_answers(self):

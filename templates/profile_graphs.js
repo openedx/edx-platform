@@ -1,3 +1,4 @@
+<%page args="grade_summary, graph_div_id, **kwargs"/>
 <%!
   import json
 %>
@@ -57,21 +58,21 @@ $(function () {
         category_total_label = section['category'] + " Total"
         series.append({
             'label' : category_total_label,
-            'data' : [ [tickIndex, section['totalscore']['score']] ],
+            'data' : [ [tickIndex, section['totalscore']] ],
             'color' : colors[sectionIndex]
         })
         
         ticks.append( [tickIndex, section['totallabel']] )
-        detail_tooltips[category_total_label] = [section['totalscore']['summary']]
+        detail_tooltips[category_total_label] = [section['totalscore_summary']]
     else:
         series.append({
             'label' : section['category'],
-            'data' : [ [tickIndex, section['totalscore']['score']] ],
+            'data' : [ [tickIndex, section['totalscore']] ],
             'color' : colors[sectionIndex]
         })
         
         ticks.append( [tickIndex, section['totallabel']] )
-        detail_tooltips[section['category']] = [section['totalscore']['summary']]
+        detail_tooltips[section['category']] = [section['totalscore_summary']]
         
     tickIndex += 1 + sectionSpacer
     sectionIndex += 1
@@ -86,12 +87,12 @@ $(function () {
   overviewBarX = tickIndex
      
   for section in grade_summary:
-      weighted_score = section['totalscore']['score'] * section['weight']
+      weighted_score = section['totalscore'] * section['weight']
       summary_text = "{0} - {1:.1%} of a possible {2:.0%}".format(section['category'], weighted_score, section['weight'])
-         
+      
       weighted_category_label = section['category'] + " - Weighted"
          
-      if section['totalscore']['score'] > 0:
+      if section['totalscore'] > 0:
           series.append({
               'label' : weighted_category_label,
               'data' : [ [overviewBarX, weighted_score] ],
@@ -101,7 +102,7 @@ $(function () {
       detail_tooltips[weighted_category_label] = [ summary_text ]
       sectionIndex += 1
       totalWeight += section['weight']
-      totalScore += section['totalscore']['score'] * section['weight']
+      totalScore += section['totalscore'] * section['weight']
         
   ticks += [ [overviewBarX, "Total"] ]
   tickIndex += 1 + sectionSpacer
@@ -128,7 +129,7 @@ $(function () {
     legend: {show: false},
   };
   
-  var $grade_detail_graph = $("#grade-detail-graph");
+  var $grade_detail_graph = $("#${graph_div_id}");
   if ($grade_detail_graph.length > 0) {
     var plot = $.plot($grade_detail_graph, series, options);
     
@@ -137,7 +138,7 @@ $(function () {
   }
       
   var previousPoint = null;
-  $("#grade-detail-graph").bind("plothover", function (event, pos, item) {
+  $grade_detail_graph.bind("plothover", function (event, pos, item) {
     $("#x").text(pos.x.toFixed(2));
     $("#y").text(pos.y.toFixed(2));
     if (item) {
