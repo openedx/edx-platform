@@ -5,6 +5,7 @@ import operator
 import re
 
 import numpy
+import numbers
 import scipy.constants
 
 from pyparsing import Word, alphas, nums, oneOf, Literal
@@ -121,7 +122,7 @@ def evaluator(variables, functions, string, cs=False):
     def number_parse_action(x): # [ '7' ] ->  [ 7 ]
         return [super_float("".join(x))]
     def exp_parse_action(x): # [ 2 ^ 3 ^ 2 ] -> 512
-        x = [e for e in x if type(e) in [float, numpy.float64, numpy.complex]] # Ignore ^
+        x = [e for e in x if isinstance(e, numbers.Number)] # Ignore ^
         x.reverse()
         x=reduce(lambda a,b:b**a, x)
         return x
@@ -130,7 +131,7 @@ def evaluator(variables, functions, string, cs=False):
             return x[0]
         if 0 in x:
             return float('nan')
-        x = [1./e for e in x if type(e) == float] # Ignore ^
+        x = [1./e for e in x if isinstance(e, numbers.Number)] # Ignore ||
         return 1./sum(x)
     def sum_parse_action(x): # [ 1 + 2 - 3 ] -> 0
         total = 0.0
@@ -217,4 +218,7 @@ if __name__=='__main__':
     print evaluator({},{}, "-(7+5)")
     print evaluator({},{}, "-0.33")
     print evaluator({},{}, "-.33")
+    print evaluator({},{}, "5+1*j")
+    print evaluator({},{}, "j||1")
+    print evaluator({},{}, "e^(j*pi)")
     print evaluator({},{}, "5+7 QWSEKO")
