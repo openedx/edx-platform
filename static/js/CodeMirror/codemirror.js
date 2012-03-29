@@ -1613,7 +1613,7 @@ var CodeMirror = (function() {
       var lineNo = lineAtHeight(doc, heightPos);
       if (lineNo >= doc.size) return {line: doc.size - 1, ch: getLine(doc.size - 1).text.length};
       var lineObj = getLine(lineNo), text = lineObj.text;
-      var tw = options.lineWrapping, innerOff = tw ? heightPos - heightAtLine(doc, lineNo) : 0;
+      var tw = options.lineWrapping, innerOff = tw ? Math.floor(heightPos - heightAtLine(doc, lineNo)) : 0;
       if (x <= 0 && innerOff == 0) return {line: lineNo, ch: 0};
       function getX(len) {
         var sp = measureLine(lineObj, len);
@@ -2437,7 +2437,6 @@ var CodeMirror = (function() {
     },
     nodeAdded: function(node) {
       if (this.widgetFunction) this.widgetFunction.callback(node, this);
-      //this.setHeight(node.clientHeight);
     },
     // Fetch the parser token for a given character. Useful for hacks
     // that want to inspect the mode state (say, for completion).
