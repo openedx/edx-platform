@@ -1,25 +1,25 @@
 nav.sequence-nav {
   @extend .topbar;
+  @include box-sizing(border-box);
   margin-bottom: $body-line-height;
   position: relative;
-  @include box-sizing(border-box);
 
   ol {
-    display: table;
-    width: 100%;
-    @include box-sizing(border-box);
-    padding-right: flex-grid(1, 9);
     border-bottom: 1px solid darken($cream, 20%);
+    @include box-sizing(border-box);
+    display: table;
+    padding-right: flex-grid(1, 9);
+    width: 100%;
 
     a {
       @extend .block-link;
     }
 
     li {
-      min-width: 20px;
-      display: table-cell;
       border-left: 1px solid darken($cream, 20%);
-      // @include box-shadow(1px 0 0 lighten($cream, 10%));
+      display: table-cell;
+      min-width: 20px;
+
       &:first-child {
         border-left: none;
       }
@@ -44,9 +44,9 @@ nav.sequence-nav {
       }
 
       .active {
-        @include box-shadow(0 1px 0 #fff);
         background-color: #fff;
         background-repeat: no-repeat;
+        @include box-shadow(0 1px 0 #fff);
 
         &:hover {
           background-color: #fff;
@@ -142,8 +142,8 @@ nav.sequence-nav {
         z-index: 99;
 
         &.shown {
-          opacity: 1;
           margin-top: 4px;
+          opacity: 1;
         }
 
         &:empty {
@@ -159,9 +159,9 @@ nav.sequence-nav {
           content: " ";
           display: block;
           height: 10px;
+          left: 18px;
           position: absolute;
           top: -5px;
-          left: 18px;
           @include transform(rotate(45deg));
           width: 10px;
         }
@@ -171,14 +171,14 @@ nav.sequence-nav {
 
   ul {
     margin-right: 1px;
-    width: flex-grid(1, 9);
     position: absolute;
-    top: 0;
     right: 0;
+    top: 0;
+    width: flex-grid(1, 9);
 
     li {
-      width: 50%;
       float: left;
+      width: 50%;
 
       &.prev, &.next {
 
@@ -194,10 +194,10 @@ nav.sequence-nav {
           text-indent: -9999px;
 
           &:hover {
-            text-decoration: none;
+            background-color: none;
             color: darken($cream, 60%);
             text-decoration: none;
-            background-color: none;
+            text-decoration: none;
           }
 
           &.disabled {
@@ -238,8 +238,8 @@ section.course-content {
   }
 
   nav.sequence-bottom {
-    position: relative;
     bottom: (-(lh()));
+    position: relative;
 
     ul {
       @extend .clearfix;
@@ -264,11 +264,11 @@ section.course-content {
             background-repeat: no-repeat;
             border-bottom: none;
             display: block;
+            display: block;
             padding: lh(.75) 4px;
             text-indent: -9999px;
-            width: 45px;
-            display: block;
             @include transition(all, .4s, $ease-in-out-quad);
+            width: 45px;
 
             &:hover {
               background-color: darken($cream, 10%);
