@@ -59,7 +59,7 @@ class CircuitLink(markdown.inlinepatterns.Pattern):
         data = m.group('data')
         data = escape(data)
         ##TODO: We need to html escape the data
-        return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='150' height='150'/></div>")
+        return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='500' height='300'/></div>")
         
     
 def makeExtension(configs=None) :
