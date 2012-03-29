@@ -38,7 +38,6 @@ class numericalresponse(object):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
-        self.correct_answer = complex(self.correct_answer)
         self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                                    id=xml.get('id'))[0]
         self.tolerance = contextualize_text(self.tolerance_xml, context)
