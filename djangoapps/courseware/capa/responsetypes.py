@@ -53,7 +53,7 @@ class numericalresponse(object):
         # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
         # But we'd need to confirm
         except: 
-            raise #StudentInputError('Invalid input -- please use a number only')
+            raise StudentInputError('Invalid input -- please use a number only')
 
         if correct:
             return {self.answer_id:'correct'}
