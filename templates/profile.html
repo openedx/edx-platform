@@ -107,7 +107,7 @@ $(function() {
                                 "rationale":rationale},
                function(data){
           if(data.success){
-          $("#apply_name_change").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail if we approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
+          $("#apply_name_change").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail when approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
           } else {
             $("#change_name_error").html(data.error);
           }
@@ -231,7 +231,7 @@ $(function() {
   <form id="change_name_form">
     <div id="change_name_error"> </div>
     <fieldset>
-      <p>To uphold credibility of any MITx certificates, we want to approve of any name changes. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your requested to be processed.</p> 
+      <p>To uphold the credibility of MITx certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p> 
       <ul>
         <li>
           <label>Enter your desired full name, as it will appear on the MITx Certificate: </label>
