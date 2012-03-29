@@ -2937,23 +2937,23 @@ section.course-content div.video-subtitles.closed ol.subtitles {
   height: 0; }
 
 nav.sequence-nav {
-  margin-bottom: 22.652px;
-  position: relative;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box; }
-nav.sequence-nav ol {
-  display: table;
-  width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  margin-bottom: 22.652px;
+  position: relative; }
+nav.sequence-nav ol {
+  border-bottom: 1px solid #e4d080;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table;
   padding-right: 8.696%;
-  border-bottom: 1px solid #e4d080; }
+  width: 100%; }
 nav.sequence-nav ol li {
-  min-width: 20px;
+  border-left: 1px solid #e4d080;
   display: table-cell;
-  border-left: 1px solid #e4d080; }
+  min-width: 20px; }
 nav.sequence-nav ol li:first-child {
   border-left: none; }
 nav.sequence-nav ol li .inactive, nav.sequence-nav ol li a.seq_video_inactive, nav.sequence-nav ol li a.seq_other_inactive, nav.sequence-nav ol li a.seq_vertical_inactive, nav.sequence-nav ol li a.seq_problem_inactive {
@@ -2970,11 +2970,11 @@ nav.sequence-nav ol li .visited:hover, nav.sequence-nav ol li a.seq_video_visite
   background-color: #f6efd4;
   background-position: center center; }
 nav.sequence-nav ol li .active, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a, div.header-wrapper header nav.courseware nav.sequence-nav ol li.courseware a, nav.sequence-nav ol div.header-wrapper header nav.book li.book a, div.header-wrapper header nav.book nav.sequence-nav ol li.book a, nav.sequence-nav ol div.header-wrapper header nav.info li.info a, div.header-wrapper header nav.info nav.sequence-nav ol li.info a, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a, div.header-wrapper header nav.discussion nav.sequence-nav ol li.discussion a, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a, div.header-wrapper header nav.wiki nav.sequence-nav ol li.wiki a, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a, div.header-wrapper header nav.profile nav.sequence-nav ol li.profile a, nav.sequence-nav ol li section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion nav.sequence-nav ol li h3.ui-accordion-header.ui-state-active, nav.sequence-nav ol li section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"], section.course-index div#accordion div#wiki_panel nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"], div#wiki_panel section.course-index div#accordion nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"], nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li a.seq_problem_active {
+  background-color: #fff;
+  background-repeat: no-repeat;
   -webkit-box-shadow: 0 1px 0 white;
   -moz-box-shadow: 0 1px 0 white;
-  box-shadow: 0 1px 0 white;
-  background-color: #fff;
-  background-repeat: no-repeat; }
+  box-shadow: 0 1px 0 white; }
 nav.sequence-nav ol li .active:hover, nav.sequence-nav ol div.header-wrapper header nav.courseware li.courseware a:hover, div.header-wrapper header nav.courseware nav.sequence-nav ol li.courseware a:hover, nav.sequence-nav ol div.header-wrapper header nav.book li.book a:hover, div.header-wrapper header nav.book nav.sequence-nav ol li.book a:hover, nav.sequence-nav ol div.header-wrapper header nav.info li.info a:hover, div.header-wrapper header nav.info nav.sequence-nav ol li.info a:hover, nav.sequence-nav ol div.header-wrapper header nav.discussion li.discussion a:hover, div.header-wrapper header nav.discussion nav.sequence-nav ol li.discussion a:hover, nav.sequence-nav ol div.header-wrapper header nav.wiki li.wiki a:hover, div.header-wrapper header nav.wiki nav.sequence-nav ol li.wiki a:hover, nav.sequence-nav ol div.header-wrapper header nav.profile li.profile a:hover, div.header-wrapper header nav.profile nav.sequence-nav ol li.profile a:hover, nav.sequence-nav ol li section.course-index div#accordion h3.ui-accordion-header.ui-state-active:hover, section.course-index div#accordion nav.sequence-nav ol li h3.ui-accordion-header.ui-state-active:hover, nav.sequence-nav ol li section.course-index div#accordion div#wiki_panel input.ui-accordion-header.ui-state-active[type="button"]:hover, section.course-index div#accordion div#wiki_panel nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li div#wiki_panel section.course-index div#accordion input.ui-accordion-header.ui-state-active[type="button"]:hover, div#wiki_panel section.course-index div#accordion nav.sequence-nav ol li input.ui-accordion-header.ui-state-active[type="button"]:hover, nav.sequence-nav ol li a.seq_video_active:hover, nav.sequence-nav ol li a.seq_other_active:hover, nav.sequence-nav ol li a.seq_vertical_active:hover, nav.sequence-nav ol li a.seq_problem_active:hover {
   background-color: #fff;
   background-position: center; }
@@ -3065,8 +3065,8 @@ nav.sequence-nav ol li p {
   white-space: pre-wrap;
   z-index: 99; }
 nav.sequence-nav ol li p.shown {
-  opacity: 1;
-  margin-top: 4px; }
+  margin-top: 4px;
+  opacity: 1; }
 nav.sequence-nav ol li p:empty {
   background: none; }
 nav.sequence-nav ol li p:empty::after {
@@ -3076,9 +3076,9 @@ nav.sequence-nav ol li p::after {
   content: " ";
   display: block;
   height: 10px;
+  left: 18px;
   position: absolute;
   top: -5px;
-  left: 18px;
   -webkit-transform: rotate(45deg);
   -moz-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
@@ -3087,13 +3087,13 @@ nav.sequence-nav ol li p::after {
   width: 10px; }
 nav.sequence-nav ul {
   margin-right: 1px;
-  width: 8.696%;
   position: absolute;
+  right: 0;
   top: 0;
-  right: 0; }
+  width: 8.696%; }
 nav.sequence-nav ul li {
-  width: 50%;
-  float: left; }
+  float: left;
+  width: 50%; }
 nav.sequence-nav ul li.prev a, nav.sequence-nav ul li.next a {
   background-color: #f2e7bf;
   background-position: center center;
@@ -3109,10 +3109,10 @@ nav.sequence-nav ul li.prev a, nav.sequence-nav ul li.next a {
   display: block;
   text-indent: -9999px; }
 nav.sequence-nav ul li.prev a:hover, nav.sequence-nav ul li.next a:hover {
-  text-decoration: none;
+  background-color: none;
   color: #7e691a;
   text-decoration: none;
-  background-color: none; }
+  text-decoration: none; }
 nav.sequence-nav ul li.prev a.disabled, nav.sequence-nav ul li.next a.disabled {
   cursor: normal;
   opacity: .4; }
@@ -3128,8 +3128,8 @@ nav.sequence-nav ul li.next a:hover {
 section.course-content div#seq_content {
   margin-bottom: 60px; }
 section.course-content nav.sequence-bottom {
-  position: relative;
-  bottom: -22.652px; }
+  bottom: -22.652px;
+  position: relative; }
 section.course-content nav.sequence-bottom ul {
   background-color: #f2e7bf;
   background-color: #f2e7bf;
@@ -3155,10 +3155,9 @@ section.course-content nav.sequence-bottom ul li.prev a, section.course-content 
   background-repeat: no-repeat;
   border-bottom: none;
   display: block;
+  display: block;
   padding: 16.989px 4px;
   text-indent: -9999px;
-  width: 45px;
-  display: block;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
@@ -3178,7 +3177,8 @@ section.course-content nav.sequence-bottom ul li.prev a, section.course-content 
   -moz-transition-delay: 0;
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
-  transition-delay: 0; }
+  transition-delay: 0;
+  width: 45px; }
 section.course-content nav.sequence-bottom ul li.prev a:hover, section.course-content nav.sequence-bottom ul li.next a:hover {
   background-color: #eddfaa;
   color: #7e691a;
