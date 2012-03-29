@@ -58,20 +58,28 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
   ,   strong   = 'strong'
   ,   emstrong = 'emstrong';
   
+  function escapeHtml(unsafe) {
+      return unsafe
+           .replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#039;");
+   }
+  
   var circuit_formatter = {
     creator: function(text) {
       var circuit_value = text.match(circuitRE)[1]
       
-      //TODO: We need real html escaping here
-      circuit_value = CodeMirror.htmlEscape(circuit_value);// circuit_value.replace("\"", "'");
+      circuit_value = escapeHtml(circuit_value);
       
       var html = "<a href='#circuit_editor' rel='leanModal' class='schematic_open' style='display:inline-block;'>" + 
-                  "<input type='hidden' parts='' value='" + circuit_value + "' width='150' height='150' analyses='' class='schematic ctrls'/></a>";
+                  "<input type='hidden' parts='' value='" + circuit_value + "' width='150' height='148' analyses='' class='schematic ctrls'/></a>";
       
       return html;
     },
     size: function(text) {
-      return {width: 150, height:154};
+      return {width: 150, height:152};
     },
     callback: function(node, line) {
       update_schematics();

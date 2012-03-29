@@ -10,6 +10,7 @@ import re
 
 import simplewiki.settings as settings
 
+from django.utils.html import escape
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 
@@ -56,8 +57,9 @@ class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
 class CircuitLink(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         data = m.group('data')
+        data = escape(data)
         ##TODO: We need to html escape the data
-        return etree.fromstring("<input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='150' height='150'/>")
+        return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='150' height='150'/></div>")
         
     
 def makeExtension(configs=None) :
