@@ -2,21 +2,29 @@
 
 <%inherit file="simplewiki_base.html"/>
 
-<%block name="title"><title>${"Edit " + wiki_title + " - " if wiki_title is not UNDEFINED else ""}MITx 6.002x Wiki</title></%block>
+<%block name="title">
+<title>
+%if create_article:
+Wiki – Create Article – MITx 6.002x
+%else:
+${"Edit " + wiki_title + " - " if wiki_title is not UNDEFINED else ""}MITx 6.002x Wiki
+%endif
+</title></%block>
 
 <%block name="wiki_page_title">
+%if create_article:
+<h1>Create article</h1>
+%else:
 <h1>${ wiki_article.title }</h1>
+%endif
 </%block>
 
 <%block name="wiki_head">
-
-
 <script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/codemirror.js"></script>
 <link rel="stylesheet" href="${ settings.LIB_URL }CodeMirror/codemirror.css" />
 
 <script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/xml.js"></script>
 <script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/mitx_markdown.js"></script>
-
 
 <style type="text/css">
   .CodeMirror-scroll {
@@ -68,8 +76,12 @@
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
   </div>
   ${wiki_form}
+  %if create_article:
+  <input type="submit" id="submit_edit" value="Create article" /></td>
+  %else:
   <input type="submit" id="submit_edit" name="edit" value="Save Changes" />
   <input type="submit" id="submit_delete" name="delete" value="Delete article" />
+  %endif
 </form>
 
 <%include file="simplewiki_instructions.html"/>
