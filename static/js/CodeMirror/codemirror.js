@@ -1295,9 +1295,9 @@ var CodeMirror = (function() {
       if (goalColumn != null) pos.x = goalColumn;
       if (unit == "page") dist = Math.min(scroller.clientHeight, window.innerHeight || document.documentElement.clientHeight);
       else if (unit == "line") {
-        if (dir > 0) {
-          dist = Math.ceil(getLine(pos.line).height);
-        } else dist = 1;
+        var line = getLine(pos.line);
+        if (dir > 0 && line.widgetFunction) dist = Math.ceil(getLine(pos.line).height);
+        else dist = 1;
         dist *= textHeight();
       }
       var target = coordsChar(loc.x, loc.y + dist * dir + 2);
