@@ -617,6 +617,7 @@ var CodeMirror = (function() {
     function updateLines(from, to, newText, selFrom, selTo) {
       if (suppressEdits) return;
 
+      //This block ensures that widget lines don't have any text inserted on the same line.
       if (from.ch > 0 && (newText[0] != '' || newText.length == 1) && getLine(from.line).widgetFunction) {
         newText.unshift('');
         var widgetLine = getLine(from.line);
@@ -980,7 +981,7 @@ var CodeMirror = (function() {
         maxWidth = scroller.clientWidth;
         var curNode = lineDiv.firstChild, heightChanged = false;
         doc.iter(showingFrom, showingTo, function(line) {
-          if (!line.hidden && !line.widgetFunction) {
+          if (!line.hidden) {
             var height = Math.round(curNode.offsetHeight / th) || 1;
             if (line.widgetFunction) height = line.widgetFunction.size(line.text).height  / textHeight();
             if (line.height != height) {
@@ -1053,7 +1054,6 @@ var CodeMirror = (function() {
       // This pass fills in the lines that actually changed.
       var nextIntact = intact.shift(), curNode = lineDiv.firstChild, j = from;
       var scratch = document.createElement("div");
-      var text_height = textHeight(); //Remove this once heights are in pixels instead of lines
       doc.iter(from, to, function(line) {
         if (nextIntact && nextIntact.to == j) nextIntact = intact.shift();
         if (!nextIntact || nextIntact.from > j) {
@@ -2143,7 +2143,7 @@ var CodeMirror = (function() {
     };
     return instance;
   };
-  
+
   // Utility functions for working with state. Exported because modes
   // sometimes need to do this.
   function copyState(mode, state) {
@@ -2493,6 +2493,7 @@ var CodeMirror = (function() {
         if (!style) return null;
         return "cm-" + style.replace(/ +/g, " cm-");
       }
+
       if (!allText && endAt == null)
         span(" ");
       else if (!marked || !marked.length)
