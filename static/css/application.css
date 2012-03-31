@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /* 
 html5doctor.com Reset Stylesheet
 v1.6.1
@@ -400,7 +399,7 @@ img {
   max-width: 100%;
   height: auto; }
 
-input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"], textarea {
+input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"], textarea, form#wiki_revision .CodeMirror {
   -webkit-box-shadow: 0 -1px 0 white;
   -moz-box-shadow: 0 -1px 0 white;
   box-shadow: 0 -1px 0 white;
@@ -414,7 +413,7 @@ input[type="email"], input[type="number"], input[type="password"], input[type="s
   border: 1px solid #999;
   font: 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
   padding: 4px; }
-input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="color"]:focus, input[type="date"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, textarea:focus {
+input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="color"]:focus, input[type="date"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, textarea:focus, form#wiki_revision .CodeMirror:focus {
   border-color: #993333; }
 
 a {
@@ -918,7 +917,7 @@ div.leanModal_box form ol li.honor-code {
 div.leanModal_box form ol li label {
   display: block;
   font-weight: bold; }
-div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li input[type="number"], div.leanModal_box form ol li input[type="password"], div.leanModal_box form ol li input[type="search"], div.leanModal_box form ol li input[type="tel"], div.leanModal_box form ol li input[type="text"], div.leanModal_box form ol li input[type="url"], div.leanModal_box form ol li input[type="color"], div.leanModal_box form ol li input[type="date"], div.leanModal_box form ol li input[type="datetime"], div.leanModal_box form ol li input[type="datetime-local"], div.leanModal_box form ol li input[type="month"], div.leanModal_box form ol li input[type="time"], div.leanModal_box form ol li input[type="week"], div.leanModal_box form ol li textarea {
+div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li input[type="number"], div.leanModal_box form ol li input[type="password"], div.leanModal_box form ol li input[type="search"], div.leanModal_box form ol li input[type="tel"], div.leanModal_box form ol li input[type="text"], div.leanModal_box form ol li input[type="url"], div.leanModal_box form ol li input[type="color"], div.leanModal_box form ol li input[type="date"], div.leanModal_box form ol li input[type="datetime"], div.leanModal_box form ol li input[type="datetime-local"], div.leanModal_box form ol li input[type="month"], div.leanModal_box form ol li input[type="time"], div.leanModal_box form ol li input[type="week"], div.leanModal_box form ol li textarea, div.leanModal_box form#wiki_revision ol li .CodeMirror {
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1008,7 +1007,7 @@ div#pwd_reset input[type="email"] {
 div#feedback_div form ol li {
   float: none;
   width: 100%; }
-div#feedback_div form ol li textarea#feedback_message {
+div#feedback_div form ol li textarea#feedback_message, div#feedback_div form#wiki_revision ol li #feedback_message.CodeMirror {
   height: 100px; }
 
 /*
@@ -1111,7 +1110,7 @@ div#feedback_div form ol li textarea#feedback_message {
 .ui-widget .ui-widget {
   font-size: 1em; }
 
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget form#wiki_revision .CodeMirror, form#wiki_revision .ui-widget .CodeMirror, .ui-widget button {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 1em; }
 
@@ -3584,7 +3583,7 @@ section.wiki-body div#wiki_article pre, section.wiki-body div#wiki_article tt, s
   font-family: monospace; }
 section.wiki-body div#wiki_article pre {
   white-space: pre; }
-section.wiki-body div#wiki_article button, section.wiki-body div#wiki_article textarea, section.wiki-body div#wiki_article input, section.wiki-body div#wiki_article select {
+section.wiki-body div#wiki_article button, section.wiki-body div#wiki_article textarea, section.wiki-body div#wiki_article form#wiki_revision .CodeMirror, form#wiki_revision section.wiki-body div#wiki_article .CodeMirror, section.wiki-body div#wiki_article input, section.wiki-body div#wiki_article select {
   display: inline-block; }
 section.wiki-body div#wiki_article big {
   font-size: 1.17em; }
@@ -3695,7 +3694,16 @@ form#wiki_revision {
 form#wiki_revision label {
   display: block;
   margin-bottom: 7px; }
-form#wiki_revision textarea {
+form#wiki_revision .CodeMirror-scroll {
+  min-height: 550px;
+  width: 100%; }
+form#wiki_revision .CodeMirror {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid black;
+  text-align: left; }
+form#wiki_revision textarea, form#wiki_revision .CodeMirror {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -5821,7 +5829,7 @@ form.answer-form, form.question-form {
   border-top: 1px solid #ddd;
   overflow: hidden;
   padding-left: 7.328%; }
-form.answer-form textarea, form.question-form textarea {
+form.answer-form textarea, form.question-form textarea, form.answer-form form#wiki_revision .CodeMirror, form#wiki_revision form.answer-form .CodeMirror, form.question-form form#wiki_revision .CodeMirror, form#wiki_revision form.question-form .CodeMirror {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
