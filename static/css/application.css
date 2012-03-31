@@ -3701,8 +3701,8 @@ form#wiki_revision .CodeMirror {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  border: 1px solid black;
-  text-align: left; }
+  font-family: monospace;
+  margin-bottom: 20px; }
 form#wiki_revision textarea, form#wiki_revision .CodeMirror {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;

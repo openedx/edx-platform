@@ -15,8 +15,8 @@ form#wiki_revision {
   .CodeMirror {
     @extend textarea;
     @include box-sizing(border-box);
-    border: 1px solid black;
-    text-align: left;
+    font-family: monospace;
+    margin-bottom: 20px;
   }
   
   textarea {
