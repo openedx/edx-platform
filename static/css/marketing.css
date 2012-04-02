@@ -754,7 +754,8 @@ div.leanModal_box {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   display: none;
-  padding: 51.776px; }
+  padding: 51.776px;
+  text-align: left; }
 div.leanModal_box a.modal_close {
   color: #aaa;
   display: block;
@@ -913,6 +914,23 @@ div#pwd_reset p {
   margin-bottom: 25.888px; }
 div#pwd_reset input[type="email"] {
   margin-bottom: 25.888px; }
+
+div#apply_name_change, div#change_email, div#unenroll, div#deactivate-account {
+  max-width: 700px; }
+div#apply_name_change ul, div#change_email ul, div#unenroll ul, div#deactivate-account ul {
+  list-style: none; }
+div#apply_name_change ul li, div#change_email ul li, div#unenroll ul li, div#deactivate-account ul li {
+  margin-bottom: 12.944px; }
+div#apply_name_change ul li textarea, div#apply_name_change ul li input[type="email"], div#apply_name_change ul li input[type="number"], div#apply_name_change ul li input[type="password"], div#apply_name_change ul li input[type="search"], div#apply_name_change ul li input[type="tel"], div#apply_name_change ul li input[type="text"], div#apply_name_change ul li input[type="url"], div#apply_name_change ul li input[type="color"], div#apply_name_change ul li input[type="date"], div#apply_name_change ul li input[type="datetime"], div#apply_name_change ul li input[type="datetime-local"], div#apply_name_change ul li input[type="month"], div#apply_name_change ul li input[type="time"], div#apply_name_change ul li input[type="week"], div#change_email ul li textarea, div#change_email ul li input[type="email"], div#change_email ul li input[type="number"], div#change_email ul li input[type="password"], div#change_email ul li input[type="search"], div#change_email ul li input[type="tel"], div#change_email ul li input[type="text"], div#change_email ul li input[type="url"], div#change_email ul li input[type="color"], div#change_email ul li input[type="date"], div#change_email ul li input[type="datetime"], div#change_email ul li input[type="datetime-local"], div#change_email ul li input[type="month"], div#change_email ul li input[type="time"], div#change_email ul li input[type="week"], div#unenroll ul li textarea, div#unenroll ul li input[type="email"], div#unenroll ul li input[type="number"], div#unenroll ul li input[type="password"], div#unenroll ul li input[type="search"], div#unenroll ul li input[type="tel"], div#unenroll ul li input[type="text"], div#unenroll ul li input[type="url"], div#unenroll ul li input[type="color"], div#unenroll ul li input[type="date"], div#unenroll ul li input[type="datetime"], div#unenroll ul li input[type="datetime-local"], div#unenroll ul li input[type="month"], div#unenroll ul li input[type="time"], div#unenroll ul li input[type="week"], div#deactivate-account ul li textarea, div#deactivate-account ul li input[type="email"], div#deactivate-account ul li input[type="number"], div#deactivate-account ul li input[type="password"], div#deactivate-account ul li input[type="search"], div#deactivate-account ul li input[type="tel"], div#deactivate-account ul li input[type="text"], div#deactivate-account ul li input[type="url"], div#deactivate-account ul li input[type="color"], div#deactivate-account ul li input[type="date"], div#deactivate-account ul li input[type="datetime"], div#deactivate-account ul li input[type="datetime-local"], div#deactivate-account ul li input[type="month"], div#deactivate-account ul li input[type="time"], div#deactivate-account ul li input[type="week"] {
+  display: block;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+div#apply_name_change ul li textarea, div#change_email ul li textarea, div#unenroll ul li textarea, div#deactivate-account ul li textarea {
+  height: 60px; }
+div#apply_name_change ul li input[type="submit"], div#change_email ul li input[type="submit"], div#unenroll ul li input[type="submit"], div#deactivate-account ul li input[type="submit"] {
+  white-space: normal; }
 
 div#feedback_div form ol li {
   float: none;

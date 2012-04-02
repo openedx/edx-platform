@@ -1,5 +1,5 @@
 li.calc-main {
-  bottom: 0;
+  bottom: -36px;
   left: 0;
   position: fixed;
   width: 100%;
@@ -16,6 +16,8 @@ li.calc-main {
     padding: 8px 12px;
     width: 16px;
     height: 20px;
+    position: relative;
+    top: -36px;
 
     &:hover {
       opacity: .8;
@@ -28,27 +30,14 @@ li.calc-main {
 
   div#calculator_wrapper {
     background: rgba(#111, .9);
+    position: relative;
+    top: -36px;
     clear: both;
 
     form {
       padding: lh();
       @extend .clearfix;
 
-      input#calculator_input {
-        border: none;
-        @include box-shadow(none);
-        @include box-sizing(border-box);
-        font-size: 16px;
-        padding: 10px;
-        width: flex-grid(7.5);
-        margin: 0;
-        float: left;
-
-        &:focus {
-          outline: none;
-          border: none;
-        }
-      }
 
       input#calculator_button {
         background: #111;
@@ -83,20 +72,70 @@ li.calc-main {
         padding: 10px;
         width: flex-grid(4);
       }
-    }
 
-    dl {
-      display: none;
-
-      dt {
-        clear: both;
+      div.input-wrapper {
+        position: relative;
+        @extend .clearfix;
+        width: flex-grid(7.5);
+        margin: 0;
         float: left;
-        font-weight: bold;
-        padding-right: lh(.5);
+
+      input#calculator_input {
+        border: none;
+        @include box-shadow(none);
+        @include box-sizing(border-box);
+        font-size: 16px;
+        padding: 10px;
+        width: 100%;
+
+        &:focus {
+          outline: none;
+          border: none;
+        }
       }
 
-      dd {
-        float: left;
+        div.help-wrapper {
+          position: absolute;
+          right: 8px;
+          top: 15px;
+
+          a {
+            @include hide-text;
+            width: 17px;
+            height: 17px;
+            background: url("/static/images/info-icon.png") center center no-repeat;
+          }
+
+          dl {
+            background: #fff;
+            @include border-radius(3px);
+            @include box-shadow(0 0 3px #999);
+            color: #333;
+            opacity: 0;
+            padding: 10px;
+            position: absolute;
+            right: -40px;
+            top: -110px;
+            width: 500px;
+            @include transition();
+
+            &.shown {
+              opacity: 1;
+              top: -115px;
+            }
+
+            dt {
+              clear: both;
+              float: left;
+              font-weight: bold;
+              padding-right: lh(.5);
+            }
+
+            dd {
+              float: left;
+            }
+          }
+        }
       }
     }
   }

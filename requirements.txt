@@ -1,0 +1,14 @@
+django<1.4
+pip
+flup
+scipy
+matplotlib
+markdown
+pygments
+django-mako
+django-ses
+lxml
+boto
+mako
+python-memcached
+django-celery
