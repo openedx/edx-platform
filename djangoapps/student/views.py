@@ -17,7 +17,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from models import Registration, UserProfile
 from django_future.csrf import ensure_csrf_cookie
 
-log = logging.getLogger("mitx.user")
+log = logging.getLogger("mitx.student")
 
 def csrf_token(context):
     csrf_token = context.get('csrf_token', '')
