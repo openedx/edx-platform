@@ -32,7 +32,7 @@
           <ol id="video_speeds"></ol>
         </div>
 
-        <a href="#" class="hide-subtitles">turn off</a>
+        <a href="#" class="hide-subtitles">Captions</a>
         </div>
       </section>
     </section>
@@ -54,7 +54,7 @@
     <li id="stt_p5"><div id="std_p5" onclick="title_seek( 5);"></div></li>
     <li id="stt_p6"><div id="std_p7" onclick="title_seek( 6);"></div></li>
     <li id="stt_p6"><div id="std_p7" onclick="title_seek( 7);"></div></li>
-    <!-- <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li> -->
+    <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li>
   </ol>
 
 </div>
@@ -65,10 +65,15 @@
       $('.hide-subtitles').click(function() {
         $('div.video-subtitles').toggleClass('closed');
 
-        var link_text = $('.hide-subtitles').text();
-        $(this).text((link_text == 'turn off') ? 'turn on' : 'turn off');
+        $(this).toggleClass("off");
+        // var link_text = $('.hide-subtitles').text();
+        // $(this).text((link_text == 'turn off') ? 'turn on' : 'turn off');
         return false;
        });
+
+      $("div.speeds").click(function(){
+        $("div.speeds ol#video_speeds").slideToggle();
+        });
   });
 </script>
 </%block>
