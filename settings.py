@@ -166,6 +166,15 @@ MAKO_TEMPLATES = {}
 
 LOGGING_ENV = "dev" # override this in different environments
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '../mitx.db',
+    }
+}
+
+SECRET_KEY = 'unsecure'
+
 # Default dev cache (i.e. no caching)
 CACHES = {
     'default': {
@@ -174,7 +183,9 @@ CACHES = {
 }
 
 # Make sure we execute correctly regardless of where we're called from
-execfile(os.path.join(BASE_DIR, "settings.py"))
+override_settings = os.path.join(BASE_DIR, "settings.py")
+if os.path.isfile(override_settings):
+    execfile(override_settings)
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -238,7 +249,7 @@ LOGGING = {
     },
     'loggers' : {
         'django' : {
-            'handlers' : handlers + ['mail_admins'],
+            'handlers' : handlers, # + ['mail_admins'],
             'propagate' : True,
             'level' : 'INFO'
         },

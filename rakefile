@@ -1,0 +1,78 @@
+require 'rake/clean'
+require 'tempfile'
+
+# Build Constants
+REPO_ROOT = File.dirname(__FILE__)
+BUILD_DIR = File.join(REPO_ROOT, "build")
+
+# Packaging constants
+DEPLOY_DIR = "/opt/wwc"
+PACKAGE_NAME = "mitx"
+LINK_PATH = File.join(DEPLOY_DIR, PACKAGE_NAME)
+VERSION = "0.1"
+COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
+BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
+BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
+
+if BRANCH == "master"
+    DEPLOY_NAME = "#{PACKAGE_NAME}-#{BUILD_NUMBER}-#{COMMIT}"
+else
+    DEPLOY_NAME = "#{PACKAGE_NAME}-#{BRANCH}-#{BUILD_NUMBER}-#{COMMIT}"
+end
+INSTALL_DIR_PATH = File.join(DEPLOY_DIR, DEPLOY_NAME)
+PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
+
+
+# Set up the clean and clobber tasks
+CLOBBER.include('build')
+CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
+
+
+task :package do
+    FileUtils.mkdir_p(BUILD_DIR)
+    
+    Dir.chdir(BUILD_DIR) do
+
+        postinstall = Tempfile.new('postinstall')
+        postinstall.write <<-POSTINSTALL.gsub(/^\s*/, '')
+        #! /bin/sh
+        set -e
+        set -x
+        
+        service gunicorn stop
+        rm -f #{LINK_PATH}
+        ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
+        service gunicorn start
+        POSTINSTALL
+        postinstall.close()
+        FileUtils.chmod(0755, postinstall.path)
+
+        args = ["fakeroot", "fpm", "-s", "dir", "-t", "deb",
+            "--after-install=#{postinstall.path}",
+            "--prefix=#{INSTALL_DIR_PATH}",
+            "-C", "#{REPO_ROOT}",
+            "--depends=python-mysqldb",
+            "--depends=python-django",
+            "--depends=python-pip",
+            "--depends=python-flup",
+            "--depends=python-numpy",
+            "--depends=python-scipy",
+            "--depends=python-matplotlib",
+            "--depends=python-libxml2",
+            "--depends=python2.7-dev",
+            "--depends=libxml2-dev",
+            "--depends=libxslt-dev",
+            "--depends=python-markdown",
+            "--depends=python-pygments",
+            "--depends=mysql-client",
+            "--name=#{DEPLOY_NAME}",
+            "--version=#{VERSION}",
+            "-a", "all",
+            "."]
+        system(*args) || raise("fpm failed to build the .deb")
+    end
+end
+
+task :publish => :package do
+    sh("scp #{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}-1_all.deb #{PACKAGE_REPO}")
+end

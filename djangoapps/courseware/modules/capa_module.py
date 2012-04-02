@@ -26,6 +26,12 @@ import courseware.content_parser as content_parser
 
 log = logging.getLogger("mitx.courseware")
 
+class ComplexEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, complex):
+            return "{real:.7g}{imag:+.7g}*j".format(real = obj.real,imag = obj.imag)
+        return json.JSONEncoder.default(self, obj)
+
 class Module(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
     meant to be refactored out, but it seems to be serving a useful
@@ -240,7 +246,8 @@ class Module(XModule):
         if not self.answer_available():
             raise Http404
         else: 
-            return json.dumps(self.lcp.get_question_answers())
+            return json.dumps(self.lcp.get_question_answers(), 
+                              cls=ComplexEncoder)
 
 
     # Figure out if we should move these to capa_problem?

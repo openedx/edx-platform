@@ -1,5 +1,9 @@
 <section class="text-input">
-  <input type="text" name="input_${id}" id="input_${id}" value="${value}" />
+  <input type="text" name="input_${id}" id="input_${id}" value="${value}" 
+	 % if size:
+	 size="${size}"
+	 % endif 
+	 />
 
   <span id="answer_${id}"></span>
 

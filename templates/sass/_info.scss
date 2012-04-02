@@ -21,12 +21,12 @@ div.info-wrapper {
         @extend .clearfix;
         border-bottom: 1px solid #e3e3e3;
 
-        // &:first-child {
-        //   padding: lh(.5);
-        //   margin-left: (-(lh(.5)));
-        //   background: $cream;
-        //   border-bottom: 1px solid darken($cream, 10%);
-        // }
+        &:first-child {
+          padding: lh(.5);
+          margin: 0 (-(lh(.5))) lh();
+          background: $cream;
+          border-bottom: 1px solid darken($cream, 10%);
+        }
 
         h2 {
           float: left;
