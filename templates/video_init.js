@@ -37,7 +37,7 @@ function add_speed(key, stream) {
   var id = 'speed_' + stream;
 
   if (key == video_speed) {
-    $("#video_speeds").append(' <li class=active id="'+id+'">'+key+'x</li>');
+    $("#video_speeds").append(' <li class="active" id="'+id+'">'+key+'x</li>');
   } else {
     $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
   }

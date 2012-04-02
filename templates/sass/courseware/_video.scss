@@ -6,7 +6,7 @@ section.course-content {
     border-bottom: 1px solid #e1e1e1;
     background: #f3f3f3;
     position: relative;
-    @extend .clearfix;
+    @include clearfix();
 
     div.video-wrapper {
       float: left;
@@ -106,7 +106,7 @@ section.course-content {
               display: block;
               cursor: pointer;
               height: 14px;
-              padding: lh(.75) lh();
+              padding: lh(.75);
               text-indent: -9999px;
               width: 14px;
 
@@ -129,7 +129,7 @@ section.course-content {
             }
 
             div#vidtime {
-              padding-left: lh();
+              padding-left: lh(.75);
               font-weight: bold;
               line-height: 46px; //height of play pause buttons
               -webkit-font-smoothing: antialiased;
@@ -186,20 +186,52 @@ section.course-content {
           a.hide-subtitles {
             float: left;
             display: block;
-            padding-right: lh(.5);
+            padding: 0 lh(.5);
             margin-left: 0;
             color: #797979;
-            padding-left: 50px;
             line-height: 46px; //height of play pause buttons
+            width: 30px;
+            text-indent: -9999px;
             font-weight: 800;
-            background: url('/static/images/cc.png') 16px center no-repeat;
+            background: url('/static/images/cc.png') center no-repeat;
             -webkit-font-smoothing: antialiased;
             @include transition();
+            opacity: 1;
+            position: relative;
+
+            &:after {
+              text-indent: 0;
+              position: absolute;
+              top: 0;
+              right: -40px;
+              content: "turn off";
+              display: block;
+              width: 70px;
+              opacity: 0;
+              visibility: hidden;
+              @include transition();
+            }
 
             &:hover {
               color: #fff;
               text-decoration: none;
               background-color: #444;
+              padding-right: 80px;
+              background-position: 11px center;
+
+              &:after {
+                right: 0;
+                opacity: 1;
+                visibility: visible;
+              }
+            }
+
+            &.off {
+              opacity: .7;
+
+              &:after {
+                content: "turn on";
+              }
             }
           }
         }
@@ -210,7 +242,7 @@ section.course-content {
       float: left;
       width: flex-grid(3, 9);
       padding-top: 10px;
-      height: 530px;
+      max-height: 460px;
       overflow: hidden;
 
       li {
@@ -252,5 +284,11 @@ section.course-content {
         height: 0;
       }
     }
+  }
+}
+
+div.course-wrapper.closed section.course-content div.video-subtitles {
+  ol.subtitles {
+    max-height: 577px;
   }
 }
