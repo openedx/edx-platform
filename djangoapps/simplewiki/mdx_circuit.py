@@ -59,15 +59,6 @@ class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
                 return line
         
         return [ convertLine(line) for line in lines ]
-        
-        new_lines = []
-        for line in lines:
-            m = self.preRegex.match(line)
-            if m:
-                new_lines.append()
-            else:
-                new_lines.append(line)
-        return new_lines
 
 
 class CircuitLink(markdown.inlinepatterns.Pattern):
