@@ -1,6 +1,5 @@
 django<1.4
 pip
-flup
 scipy
 matplotlib
 markdown
@@ -12,3 +11,4 @@ boto
 mako
 python-memcached
 django-celery
+path.py
