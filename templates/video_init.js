@@ -20,9 +20,38 @@ if (swfobject.hasFlashPlayerVersion("10.1")){
   // Make sure the callback is called once API ready, YT seems to be buggy
   loadHTML5Video();
 }
+
 var captions=0;
-$("#slider").slider({slide:function(event,ui){seek_slide('slide',event.originalEvent,ui.value);},
-                     stop:function(event,ui){seek_slide('stop',event.originalEvent,ui.value);}});
+
+/* Cache a reference to our slider element */
+var slider = $('#slider')
+
+.slider({range: "min", slide:function(event,ui){seek_slide('slide',event.originalEvent,ui.value); handle.qtip('option', 'content.text', '' + ui.value);}, stop:function(event,ui){seek_slide('stop',event.originalEvent,ui.value);}}),
+
+/* Grab and cache the newly created slider handle */
+handle = $('.ui-slider-handle', slider);
+
+/* 
+	 * Selector needs changing here to match your elements.
+	 * 
+	 * Notice the second argument to the $() constructor, which tells
+	 * jQuery to use that as the top-level element to seareh down from.
+	 */
+	handle.qtip({
+		content: '' + slider.slider('option', 'value'), // Use the current value of the slider
+		position: {
+			my: 'bottom center',
+			at: 'top center',
+			container: handle // Stick it inside the handle element so it keeps the position synched up
+		},
+		hide: {
+			delay: 700 // Give it a longer delay so it doesn't hide frequently as we move the handle
+		},
+		style: {
+			classes: 'ui-tooltip-slider',
+			widget: true // Make it Themeroller compatible
+		}
+	});
 
 function good() {
     window['console'].log(ytplayer.getCurrentTime());
@@ -91,8 +120,6 @@ $(document).ready(function() {
     }
 
 });
-
-
 
 function toggleVideo(){
   if ($("#video_control").hasClass("play")){
