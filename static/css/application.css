@@ -2830,26 +2830,84 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   background: #c2c2c2;
   border: none;
   border-bottom: 1px solid #000;
-  height: 14px; }
+  height: 7px;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
-  border-radius: 20px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+  border-radius: 15px;
   -webkit-box-shadow: inset 0 1px 0 #bf4040;
   -moz-box-shadow: inset 0 1px 0 #bf4040;
   box-shadow: inset 0 1px 0 #bf4040;
   background: #993333 url(/static/images/slider-handle.png) center center no-repeat;
   border: 1px solid #4d1919;
   cursor: pointer;
+  height: 15px;
+  margin-left: -7px;
+  top: -4px;
+  width: 15px;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  -webkit-background-size: 50%;
+  -moz-background-size: 50%;
+  -ms-background-size: 50%;
+  -o-background-size: 50%;
+  background-size: 50%; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:hover {
+  background-color: #bf4040;
+  outline: none; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:hover {
+  height: 14px;
+  margin-top: -7px; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:hover a.ui-slider-handle {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
   height: 20px;
   margin-left: -10px;
   top: -4px;
   width: 20px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:hover {
-  background-color: #bf4040;
-  outline: none; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr {
   float: left;
   margin-right: 22.652px; }
@@ -2884,16 +2942,15 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
   float: right; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds {
-  border-right: 1px solid #000;
   border-left: 1px solid #000;
+  border-right: 1px solid #000;
   -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   float: left;
   line-height: 46px;
   margin-right: 0;
-  -webkit-font-smoothing: antialiased;
-  opacity: .7;
+  position: relative;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
@@ -2913,7 +2970,9 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -moz-transition-delay: 0;
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
-  transition-delay: 0; }
+  transition-delay: 0;
+  width: 110px;
+  -webkit-font-smoothing: antialiased; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -2922,9 +2981,13 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   zoom: 1;
   *display: inline;
   *vertical-align: auto;
-  padding: 0 11.326px;
-  font-weight: normal; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
+  padding: 0 5.663px 0 11.326px;
+  font-weight: normal;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #999; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds p.active {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
@@ -2932,21 +2995,47 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   zoom: 1;
   *display: inline;
   *vertical-align: auto;
-  padding-right: 11.326px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
-  cursor: pointer;
-  color: #fff;
+  padding: 0 11.326px 0 0;
+  margin-bottom: 0;
+  font-weight: bold; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
+  background-color: #444;
+  border: 1px solid #000;
+  border-top: 0;
+  -webkit-box-shadow: inset 1px 0 0 #555555;
+  -moz-box-shadow: inset 1px 0 0 #555555;
+  box-shadow: inset 1px 0 0 #555555;
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
   vertical-align: baseline;
   zoom: 1;
   *display: inline;
-  *vertical-align: auto; }
+  *vertical-align: auto;
+  left: -1px;
+  position: absolute;
+  top: 48px;
+  width: 100%;
+  z-index: 10; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
+  border-bottom: 1px solid #000;
+  -webkit-box-shadow: 0 1px 0 #555555;
+  -moz-box-shadow: 0 1px 0 #555555;
+  box-shadow: 0 1px 0 #555555;
+  color: #fff;
+  cursor: pointer;
+  padding: 0 11.326px; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li.active {
   font-weight: bold; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:last-child {
+  border-bottom: 0;
+  margin-top: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:hover {
-  color: #aaa; }
+  color: #aaa;
+  background-color: #666; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds:hover {
   opacity: 1;
   background-color: #444; }
