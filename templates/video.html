@@ -3,6 +3,7 @@
 % endif
 
 <div class="video-subtitles">
+<div class="tc-wrapper">
 
   <div class="video-wrapper">
     <div class="video-player">
@@ -33,6 +34,8 @@
           <ol id="video_speeds"></ol>
         </div>
 
+        <a href="#" class="add-fullscreen">Full screen</a>
+
         <a href="#" class="hide-subtitles">Captions</a>
         </div>
       </section>
@@ -57,18 +60,31 @@
     <li id="stt_p6"><div id="std_p7" onclick="title_seek( 7);"></div></li>
     <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li>
   </ol>
+</div>
 
 </div>
 
 <%block name="js_extra">
 <script type="text/javascript" charset="utf-8">
   $(function() {
+      $('.add-fullscreen').click(function(){
+          $('div.video-subtitles').toggleClass('fullscreen');
+          return false;
+        });
+
       $('.hide-subtitles').click(function() {
         $('div.video-subtitles').toggleClass('closed');
 
         $(this).toggleClass("off");
         return false;
        });
-  });
+
+      $("ol#video_speeds").hide();
+
+      $("div.speeds").click(function() {
+        $("ol#video_speeds").slideToggle(150);
+        });
+
+      });
 </script>
 </%block>
