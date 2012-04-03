@@ -10,10 +10,6 @@ We should make a method that calls all these config methods so that you just
 make one call at the end of your site-specific dev file to reset all the
 dependent variables (like INSTALLED_APPS) for you.
 
-IMMEDIATE TODO:
-1. Fix logging()
-2. 
-
 Longer TODO:
 1. Right now our treatment of static content in general and in particular 
    course-specific static content is haphazard.
