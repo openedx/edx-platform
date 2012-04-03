@@ -104,7 +104,7 @@ div.profile-wrapper {
           font-style: italic;
         }
 
-        input {
+        input#pwd_reset_button {
           background: none;
           border: none;
           @include box-shadow(none);
