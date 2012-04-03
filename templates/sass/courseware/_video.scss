@@ -5,8 +5,12 @@ section.course-content {
     border-top: 1px solid #e1e1e1;
     border-bottom: 1px solid #e1e1e1;
     background: #f3f3f3;
-    position: relative;
     @include clearfix();
+
+    // div.tc-wrapper {
+    //   display: table-cell;
+    //   width: 100%;
+    // }
 
     div.video-wrapper {
       float: left;
@@ -356,6 +360,34 @@ section.course-content {
       ol.subtitles {
         width: 0px;
         height: 0;
+      }
+    }
+
+    &.fullscreen {
+      background: rgba(#000, .95);
+      border: 0;
+      padding: 0;
+      height: 100%;
+      left: 22px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 999;
+
+      div.tc-wrapper {
+        padding: 20px;
+        vertical-align: middle;
+        display: table-cell;
+      }
+
+      ol.subtitles {
+        li {
+          color: #aaa;
+
+          &.current {
+            color: #fff;
+          }
+        }
       }
     }
   }
