@@ -56,7 +56,7 @@
       
       %for student in students:
       <tr>
-        <td><a href="/discussion/users/${student['id']}/${student['username']}/">${student['username']}</a></td>
+        <td><a href="/profile/${student['id']}/">${student['username']}</a></td>
         %for section in student['grade_info']['grade_summary']:
           %if 'subscores' in section:
             %for subsection in section['subscores']:
