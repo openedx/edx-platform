@@ -1,9 +1,13 @@
 section.course-content {
+  div.video {
+    padding: 6px lh();
+    margin: 0 (-(lh()));
+    border-top: 1px solid #e1e1e1;
+    border-bottom: 1px solid #e1e1e1;
+    background: #f3f3f3;
+    display: block;
+  }
   div.video-subtitles {
-    // padding: 6px lh();
-    // border-top: 1px solid #e1e1e1;
-    // border-bottom: 1px solid #e1e1e1;
-    // background: #f3f3f3;
     display: table;
     @include clearfix();
 
@@ -261,6 +265,24 @@ section.course-content {
             }
           }
 
+          a.add-fullscreen {
+            float: left;
+            display: block;
+            padding: 0 lh(.5);
+            margin-left: 0;
+            line-height: 46px; //height of play pause buttons
+            color: #797979;
+            @include transition();
+            border-right: 1px solid #000;
+            @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+
+            &:hover {
+              color: #fff;
+              text-decoration: none;
+              background-color: #444;
+            }
+          }
+
           a.hide-subtitles {
             float: left;
             display: block;
@@ -368,15 +390,19 @@ section.course-content {
       border: 0;
       padding: 0;
       height: 100%;
-      left: 22px;
       position: fixed;
+      left: 0;
       top: 0;
+      bottom: 0;
       width: 100%;
+      max-height: 100%;
       z-index: 999;
 
       div.tc-wrapper {
         padding: 20px;
         vertical-align: middle;
+        min-height: 100%;
+        overflow: hidden;
       }
 
       ol.subtitles {
