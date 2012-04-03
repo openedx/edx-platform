@@ -2945,6 +2945,42 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -webkit-box-shadow: inset 0 1px 0 #999999;
   -moz-box-shadow: inset 0 1px 0 #999999;
   box-shadow: inset 0 1px 0 #999999; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider .ui-tooltip.qtip .ui-tooltip-content {
+  background: #993333;
+  border: 1px solid #4d1919;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 1px 0 #bf4040;
+  -moz-box-shadow: inset 0 1px 0 #bf4040;
+  box-shadow: inset 0 1px 0 #bf4040;
+  color: #fff;
+  font: bold 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  margin-bottom: 6px;
+  padding: 4px;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0 -1px 0 #732626;
+  overflow: visible; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider .ui-tooltip.qtip .ui-tooltip-content::after {
+  content: " ";
+  width: 7px;
+  height: 7px;
+  display: block;
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  margin-left: -3px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  background: #993333;
+  border-right: 1px solid #4d1919;
+  border-bottom: 1px solid #4d1919; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
   -webkit-border-radius: 15px;
   -moz-border-radius: 15px;
