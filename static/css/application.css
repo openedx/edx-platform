@@ -2864,17 +2864,16 @@ section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
   color: #666; }
 
 section.course-content div.video-subtitles {
-  padding: 6px 22.652px;
-  margin: 0 -22.652px;
-  border-top: 1px solid #e1e1e1;
-  border-bottom: 1px solid #e1e1e1;
-  background: #f3f3f3;
+  display: table;
   zoom: 1; }
 section.course-content div.video-subtitles:before, section.course-content div.video-subtitles:after {
   content: "";
   display: table; }
 section.course-content div.video-subtitles:after {
   clear: both; }
+section.course-content div.video-subtitles div.tc-wrapper {
+  display: table-cell;
+  width: 100%; }
 section.course-content div.video-subtitles div.video-wrapper {
   float: left;
   width: 65.761%;
@@ -3305,8 +3304,7 @@ section.course-content div.video-subtitles.fullscreen {
   z-index: 999; }
 section.course-content div.video-subtitles.fullscreen div.tc-wrapper {
   padding: 20px;
-  vertical-align: middle;
-  display: table-cell; }
+  vertical-align: middle; }
 section.course-content div.video-subtitles.fullscreen ol.subtitles li {
   color: #aaa; }
 section.course-content div.video-subtitles.fullscreen ol.subtitles li.current {
