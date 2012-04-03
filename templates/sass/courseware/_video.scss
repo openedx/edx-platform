@@ -62,6 +62,7 @@ section.course-content {
         background: #333;
         position: relative;
         border: 1px solid #000;
+        border-top: 0;
         color: #ccc;
 
         div#slider {
@@ -70,9 +71,15 @@ section.course-content {
           @include box-shadow(inset 0 1px 0 #eee, 0 1px 0 #555);
           background: #c2c2c2;
           border: none;
+          border-top: 1px solid #000;
           border-bottom: 1px solid #000;
           height: 7px;
           @include transition();
+
+          div.ui-widget-header {
+            background: #777;
+            @include box-shadow(inset 0 1px 0 #999);
+          }
 
           a.ui-slider-handle {
             @include border-radius(15px);
@@ -125,6 +132,7 @@ section.course-content {
               padding: lh(.75);
               text-indent: -9999px;
               width: 14px;
+              @include transition();
 
               &.play {
                 background: url('/static/images/play-icon.png') center center no-repeat;
@@ -166,6 +174,7 @@ section.course-content {
             position: relative;
             @include transition();
             width: 110px;
+            cursor: pointer;
             -webkit-font-smoothing: antialiased;
 
             h3 {

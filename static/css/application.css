@@ -2556,6 +2556,93 @@ button.ui-button::-moz-focus-inner {
   margin: -1px;
   height: 100%; }
 
+.ui-tooltip, .qtip {
+  position: absolute;
+  left: -28000px;
+  top: -28000px;
+  display: none;
+  max-width: 280px;
+  min-width: 50px;
+  font-size: 10.5px;
+  line-height: 12px; }
+
+.ui-tooltip-fluid {
+  display: block;
+  visibility: hidden;
+  position: static!important;
+  float: left!important; }
+
+.ui-tooltip-content {
+  position: relative;
+  padding: 5px 9px;
+  overflow: hidden;
+  border: 1px solid #000001;
+  text-align: left;
+  word-wrap: break-word;
+  overflow: hidden; }
+
+.ui-tooltip-titlebar {
+  position: relative;
+  min-height: 14px;
+  padding: 5px 35px 5px 10px;
+  overflow: hidden;
+  border: 1px solid #000001;
+  border-width: 1px 1px 0;
+  font-weight: bold; }
+
+.ui-tooltip-titlebar + .ui-tooltip-content {
+  border-top-width: 0!important; }
+
+/*Default close button class */
+.ui-tooltip-titlebar .ui-state-default {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  margin-top: -9px;
+  cursor: pointer;
+  outline: medium none;
+  border-width: 1px;
+  border-style: solid; }
+
+* html .ui-tooltip-titlebar .ui-state-default {
+  top: 16px; }
+
+.ui-tooltip-titlebar .ui-icon, .ui-tooltip-icon .ui-icon {
+  display: block;
+  text-indent: -1000em; }
+
+.ui-tooltip-icon, .ui-tooltip-icon .ui-icon {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px; }
+
+.ui-tooltip-icon .ui-icon {
+  width: 18px;
+  height: 14px;
+  text-align: center;
+  text-indent: 0;
+  font: normal bold 10px/13px Tahoma, sans-serif;
+  color: inherit;
+  background: transparent none no-repeat -100em -100em; }
+
+/*Default tooltip style */
+.ui-tooltip-default .ui-tooltip-titlebar, .ui-tooltip-default .ui-tooltip-content {
+  border-color: #F1D031;
+  background-color: #FFFFA3;
+  color: #555; }
+
+.ui-tooltip-default .ui-tooltip-titlebar {
+  background-color: #FFEF93; }
+
+.ui-tooltip-default .ui-tooltip-icon {
+  border-color: #CCC;
+  background: #F1F1F1;
+  color: #777; }
+
+.ui-tooltip-default .ui-tooltip-titlebar .ui-state-hover {
+  border-color: #AAA;
+  color: #111; }
+
 div.course-wrapper ul, div.course-wrapper ol {
   list-style: none; }
 div.course-wrapper section.course-content p {
@@ -2817,6 +2904,7 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   background: #333;
   position: relative;
   border: 1px solid #000;
+  border-top: 0;
   color: #ccc; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider {
   -webkit-border-radius: 0;
@@ -2829,6 +2917,7 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
   background: #c2c2c2;
   border: none;
+  border-top: 1px solid #000;
   border-bottom: 1px solid #000;
   height: 7px;
   -webkit-transition-property: all;
@@ -2851,6 +2940,11 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
   transition-delay: 0; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider div.ui-widget-header {
+  background: #777;
+  -webkit-box-shadow: inset 0 1px 0 #999999;
+  -moz-box-shadow: inset 0 1px 0 #999999;
+  box-shadow: inset 0 1px 0 #999999; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
   -webkit-border-radius: 15px;
   -moz-border-radius: 15px;
@@ -2925,7 +3019,27 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   height: 14px;
   padding: 16.989px;
   text-indent: -9999px;
-  width: 14px; }
+  width: 14px;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.play {
   background: url("/static/images/play-icon.png") center center no-repeat; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.play:hover {
@@ -2972,6 +3086,7 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -o-transition-delay: 0;
   transition-delay: 0;
   width: 110px;
+  cursor: pointer;
   -webkit-font-smoothing: antialiased; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] {
   display: -moz-inline-box;
