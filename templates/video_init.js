@@ -38,6 +38,7 @@ function add_speed(key, stream) {
 
   if (key == video_speed) {
     $("#video_speeds").append(' <li class="active" id="'+id+'">'+key+'x</li>');
+    $("p.active").text(key + 'x');
   } else {
     $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
   }
@@ -46,6 +47,8 @@ function add_speed(key, stream) {
     change_video_speed(key, stream);
     $(this).siblings().removeClass("active");
     $(this).addClass("active");
+    var active = $(this).text();
+    $("p.active").text(active);
   });
 }
 

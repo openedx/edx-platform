@@ -71,22 +71,38 @@ section.course-content {
           background: #c2c2c2;
           border: none;
           border-bottom: 1px solid #000;
-          height: 14px;
+          height: 7px;
+          @include transition();
 
           a.ui-slider-handle {
-            @include border-radius(20px);
+            @include border-radius(15px);
             @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
             background: $mit-red url(/static/images/slider-handle.png) center center no-repeat;
             border: 1px solid darken($mit-red, 20%);
             cursor: pointer;
-            height: 20px;
-            margin-left: -10px;
+            height: 15px;
+            margin-left: -7px;
             top: -4px;
-            width: 20px;
+            width: 15px;
+            @include transition();
+            @include background-size(50%);
 
             &:focus, &:hover {
               background-color: lighten($mit-red, 10%);
               outline: none;
+            }
+          }
+
+          &:hover {
+            height: 14px;
+            margin-top: -7px;
+
+            a.ui-slider-handle {
+              @include border-radius(20px);
+              height: 20px;
+              margin-left: -10px;
+              top: -4px;
+              width: 20px;
             }
           }
         }
@@ -141,38 +157,67 @@ section.course-content {
           float: right;
 
           div.speeds {
-            border-right: 1px solid #000;
             border-left: 1px solid #000;
+            border-right: 1px solid #000;
             @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
             float: left;
             line-height: 46px; //height of play pause buttons
             margin-right: 0;
-            -webkit-font-smoothing: antialiased;
-            opacity: .7;
+            position: relative;
             @include transition();
+            width: 110px;
+            -webkit-font-smoothing: antialiased;
 
             h3 {
               @include inline-block();
-              padding: 0 lh(.5);
+              padding: 0 lh(.25) 0 lh(.5);
               font-weight: normal;
+              text-transform: uppercase;
+              font-size: 12px;
+              letter-spacing: 1px;
+              color: #999;
+            }
+
+            p.active {
+              @include inline-block();
+              padding: 0 lh(.5) 0 0;
+              margin-bottom: 0;
+              font-weight: bold;
             }
 
             // fix for now
             ol#video_speeds {
+              background-color: #444;
+              border: 1px solid #000;
+              border-top: 0;
+              @include box-shadow(inset 1px 0 0 #555);
               @include inline-block();
-              padding-right: lh(.5);
+              left: -1px;
+              position: absolute;
+              top: 48px;
+              width: 100%;
+              z-index: 10;
 
               li {
-                cursor: pointer;
+                border-bottom: 1px solid #000;
+                @include box-shadow( 0 1px 0 #555);
                 color: #fff;
-                @include inline-block();
+                cursor: pointer;
+                padding: 0 lh(.5);
 
                 &.active {
                   font-weight: bold;
                 }
 
+                &:last-child {
+                  border-bottom: 0;
+                  margin-top: 0;
+                  @include box-shadow(none);
+                }
+
                 &:hover {
                   color: #aaa;
+                  background-color: #666;
                 }
               }
             }
