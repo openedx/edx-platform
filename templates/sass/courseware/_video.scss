@@ -81,6 +81,36 @@ section.course-content {
             @include box-shadow(inset 0 1px 0 #999);
           }
 
+          .ui-tooltip.qtip .ui-tooltip-content {
+            background: $mit-red;
+            border: 1px solid darken($mit-red, 20%);
+            @include border-radius(2px);
+            @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
+            color: #fff;
+            font: bold 12px $body-font-family;
+            margin-bottom: 6px;
+            padding: 4px;
+            text-align: center;
+            -webkit-font-smoothing: antialiased;
+            text-shadow: 0 -1px 0 darken($mit-red, 10%);
+            overflow: visible;
+
+            &::after {
+              content: " ";
+              width: 7px;
+              height: 7px;
+              display: block;
+              position: absolute;
+              bottom: -5px;
+              left: 50%;
+              margin-left: -3px;
+              @include transform(rotate(45deg));
+              background: $mit-red;
+              border-right: 1px solid darken($mit-red, 20%);
+              border-bottom: 1px solid darken($mit-red, 20%);
+            }
+          }
+
           a.ui-slider-handle {
             @include border-radius(15px);
             @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
