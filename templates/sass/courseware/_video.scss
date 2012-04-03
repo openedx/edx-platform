@@ -1,16 +1,16 @@
 section.course-content {
   div.video-subtitles {
-    padding: 6px lh();
-    margin: 0 (-(lh()));
-    border-top: 1px solid #e1e1e1;
-    border-bottom: 1px solid #e1e1e1;
-    background: #f3f3f3;
+    // padding: 6px lh();
+    // border-top: 1px solid #e1e1e1;
+    // border-bottom: 1px solid #e1e1e1;
+    // background: #f3f3f3;
+    display: table;
     @include clearfix();
 
-    // div.tc-wrapper {
-    //   display: table-cell;
-    //   width: 100%;
-    // }
+    div.tc-wrapper {
+      display: table-cell;
+      width: 100%;
+    }
 
     div.video-wrapper {
       float: left;
@@ -377,7 +377,6 @@ section.course-content {
       div.tc-wrapper {
         padding: 20px;
         vertical-align: middle;
-        display: table-cell;
       }
 
       ol.subtitles {
