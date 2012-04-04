@@ -26,7 +26,16 @@ var captions=0;
 /* Cache a reference to our slider element */
 var slider = $('#slider')
 
-.slider({range: "min", slide:function(event,ui){seek_slide('slide',event.originalEvent,ui.value); handle.qtip('option', 'content.text', '' + ui.value);}, stop:function(event,ui){seek_slide('stop',event.originalEvent,ui.value);}}),
+.slider({
+  range: "min", 
+  slide: function(event,ui) {
+    var time = format_time(ui.value)
+
+    seek_slide('slide',event.originalEvent,ui.value);
+    handle.qtip('option', 'content.text', '' + time);
+  }, 
+  stop:function(event,ui){seek_slide('stop',event.originalEvent,ui.value);}
+}),
 
 /* Grab and cache the newly created slider handle */
 handle = $('.ui-slider-handle', slider);
