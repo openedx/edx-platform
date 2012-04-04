@@ -29,10 +29,10 @@ var slider = $('#slider')
 .slider({
   range: "min", 
   slide: function(event,ui) {
-    var time = format_time(ui.value)
+    var slider_time = format_time(ui.value)
 
     seek_slide('slide',event.originalEvent,ui.value);
-    handle.qtip('option', 'content.text', '' + time);
+    handle.qtip('option', 'content.text', '' + slider_time);
   }, 
   stop:function(event,ui){seek_slide('stop',event.originalEvent,ui.value);}
 }),
