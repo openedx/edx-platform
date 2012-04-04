@@ -74,7 +74,7 @@ section.course-content {
           border-top: 1px solid #000;
           border-bottom: 1px solid #000;
           height: 7px;
-          @include transition();
+          @include transition(height 2.0s ease-in-out);
 
           div.ui-widget-header {
             background: #777;
@@ -121,7 +121,7 @@ section.course-content {
             margin-left: -7px;
             top: -4px;
             width: 15px;
-            @include transition();
+            @include transition(height 2.0s ease-in-out, width 2.0s ease-in-out);
             @include background-size(50%);
 
             &:focus, &:hover {
