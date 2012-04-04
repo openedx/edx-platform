@@ -352,7 +352,7 @@ function updateytplayerInfo() {
     }
     if (player_state == 1){
       update_captions(getCurrentTime());
-      handle = $('.ui-slider-handle', slider);
+      handle = $('.ui-slider-handle',  $('#slider'));
       handle.qtip('option', 'content.text', '' +  format_time(getCurrentTime()));
     }
        // updateHTML("videoduration", getDuration());
@@ -422,7 +422,7 @@ function stop() {
 
 function getPlayerState() {
     if (ytplayer) {
-	return ytplayer.getPlayerState();
+      return ytplayer.getPlayerState();
     }
 }
 
