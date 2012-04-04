@@ -2556,6 +2556,93 @@ button.ui-button::-moz-focus-inner {
   margin: -1px;
   height: 100%; }
 
+.ui-tooltip, .qtip {
+  position: absolute;
+  left: -28000px;
+  top: -28000px;
+  display: none;
+  max-width: 280px;
+  min-width: 50px;
+  font-size: 10.5px;
+  line-height: 12px; }
+
+.ui-tooltip-fluid {
+  display: block;
+  visibility: hidden;
+  position: static!important;
+  float: left!important; }
+
+.ui-tooltip-content {
+  position: relative;
+  padding: 5px 9px;
+  overflow: hidden;
+  border: 1px solid #000001;
+  text-align: left;
+  word-wrap: break-word;
+  overflow: hidden; }
+
+.ui-tooltip-titlebar {
+  position: relative;
+  min-height: 14px;
+  padding: 5px 35px 5px 10px;
+  overflow: hidden;
+  border: 1px solid #000001;
+  border-width: 1px 1px 0;
+  font-weight: bold; }
+
+.ui-tooltip-titlebar + .ui-tooltip-content {
+  border-top-width: 0!important; }
+
+/*Default close button class */
+.ui-tooltip-titlebar .ui-state-default {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  margin-top: -9px;
+  cursor: pointer;
+  outline: medium none;
+  border-width: 1px;
+  border-style: solid; }
+
+* html .ui-tooltip-titlebar .ui-state-default {
+  top: 16px; }
+
+.ui-tooltip-titlebar .ui-icon, .ui-tooltip-icon .ui-icon {
+  display: block;
+  text-indent: -1000em; }
+
+.ui-tooltip-icon, .ui-tooltip-icon .ui-icon {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px; }
+
+.ui-tooltip-icon .ui-icon {
+  width: 18px;
+  height: 14px;
+  text-align: center;
+  text-indent: 0;
+  font: normal bold 10px/13px Tahoma, sans-serif;
+  color: inherit;
+  background: transparent none no-repeat -100em -100em; }
+
+/*Default tooltip style */
+.ui-tooltip-default .ui-tooltip-titlebar, .ui-tooltip-default .ui-tooltip-content {
+  border-color: #F1D031;
+  background-color: #FFFFA3;
+  color: #555; }
+
+.ui-tooltip-default .ui-tooltip-titlebar {
+  background-color: #FFEF93; }
+
+.ui-tooltip-default .ui-tooltip-icon {
+  border-color: #CCC;
+  background: #F1F1F1;
+  color: #777; }
+
+.ui-tooltip-default .ui-tooltip-titlebar .ui-state-hover {
+  border-color: #AAA;
+  color: #111; }
+
 div.course-wrapper ul, div.course-wrapper ol {
   list-style: none; }
 div.course-wrapper section.course-content p {
@@ -2679,12 +2766,18 @@ div.course-wrapper section.course-content section.tutorials ul {
   list-style: disc outside none;
   margin-left: 22.652px; }
 div.course-wrapper section.course-content div.staff_info {
+  zoom: 1;
   white-space: pre-wrap;
   border-top: 1px solid #ccc;
   padding-top: 22.652px;
   margin-top: 22.652px;
   line-height: 22.652px;
   font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace; }
+div.course-wrapper section.course-content div.staff_info:before, div.course-wrapper section.course-content div.staff_info:after {
+  content: "";
+  display: table; }
+div.course-wrapper section.course-content div.staff_info:after {
+  clear: both; }
 div.course-wrapper section.course-content div.ui-slider {
   border: 1px solid #aaa;
   background: #ddd;
@@ -2771,7 +2864,18 @@ section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
   color: #666; }
 
 section.course-content div.video-subtitles {
-  position: relative; }
+  padding: 6px 22.652px;
+  margin: 0 -22.652px;
+  border-top: 1px solid #e1e1e1;
+  border-bottom: 1px solid #e1e1e1;
+  background: #f3f3f3;
+  position: relative;
+  zoom: 1; }
+section.course-content div.video-subtitles:before, section.course-content div.video-subtitles:after {
+  content: "";
+  display: table; }
+section.course-content div.video-subtitles:after {
+  clear: both; }
 section.course-content div.video-subtitles div.video-wrapper {
   float: left;
   width: 65.761%;
@@ -2800,6 +2904,7 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   background: #333;
   position: relative;
   border: 1px solid #000;
+  border-top: 0;
   color: #ccc; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider {
   -webkit-border-radius: 0;
@@ -2812,71 +2917,9 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
   background: #c2c2c2;
   border: none;
+  border-top: 1px solid #000;
   border-bottom: 1px solid #000;
-  height: 14px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
-  border-radius: 20px;
-  -webkit-box-shadow: inset 0 1px 0 #bf4040;
-  -moz-box-shadow: inset 0 1px 0 #bf4040;
-  box-shadow: inset 0 1px 0 #bf4040;
-  background: #993333 url(/static/images/slider-handle.png) center center no-repeat;
-  border: 1px solid #4d1919;
-  cursor: pointer;
-  height: 20px;
-  margin-left: -10px;
-  top: -4px;
-  width: 20px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:hover {
-  background-color: #bf4040;
-  outline: none; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr {
-  float: left;
-  margin-right: 22.652px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li {
-  float: left;
-  margin-bottom: 0; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a {
-  -webkit-box-shadow: 1px 0 0 #555555;
-  -moz-box-shadow: 1px 0 0 #555555;
-  box-shadow: 1px 0 0 #555555;
-  border-bottom: none;
-  border-right: 1px solid #000;
-  display: block;
-  cursor: pointer;
-  height: 14px;
-  padding: 16.989px 22.652px;
-  text-indent: -9999px;
-  width: 14px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.play {
-  background: url("/static/images/play-icon.png") center center no-repeat; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.play:hover {
-  background-color: #444; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.pause {
-  background: url("/static/images/pause-icon.png") center center no-repeat; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.pause:hover {
-  background-color: #444; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li div#vidtime {
-  padding-left: 22.652px;
-  font-weight: bold;
-  line-height: 46px;
-  -webkit-font-smoothing: antialiased; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
-  float: right; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds {
-  border-right: 1px solid #000;
-  border-left: 1px solid #000;
-  -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
-  -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
-  box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
-  float: left;
-  line-height: 46px;
-  margin-right: 0;
-  -webkit-font-smoothing: antialiased;
-  opacity: .7;
+  height: 7px;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
@@ -2897,6 +2940,190 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
   transition-delay: 0; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider div.ui-widget-header {
+  background: #777;
+  -webkit-box-shadow: inset 0 1px 0 #999999;
+  -moz-box-shadow: inset 0 1px 0 #999999;
+  box-shadow: inset 0 1px 0 #999999; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider .ui-tooltip.qtip .ui-tooltip-content {
+  background: #993333;
+  border: 1px solid #4d1919;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 1px 0 #bf4040;
+  -moz-box-shadow: inset 0 1px 0 #bf4040;
+  box-shadow: inset 0 1px 0 #bf4040;
+  color: #fff;
+  font: bold 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  margin-bottom: 6px;
+  padding: 4px;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0 -1px 0 #732626;
+  overflow: visible; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider .ui-tooltip.qtip .ui-tooltip-content::after {
+  content: " ";
+  width: 7px;
+  height: 7px;
+  display: block;
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  margin-left: -3px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  background: #993333;
+  border-right: 1px solid #4d1919;
+  border-bottom: 1px solid #4d1919; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle {
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+  border-radius: 15px;
+  -webkit-box-shadow: inset 0 1px 0 #bf4040;
+  -moz-box-shadow: inset 0 1px 0 #bf4040;
+  box-shadow: inset 0 1px 0 #bf4040;
+  background: #993333 url(/static/images/slider-handle.png) center center no-repeat;
+  border: 1px solid #4d1919;
+  cursor: pointer;
+  height: 15px;
+  margin-left: -7px;
+  top: -4px;
+  width: 15px;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  -webkit-background-size: 50%;
+  -moz-background-size: 50%;
+  -ms-background-size: 50%;
+  -o-background-size: 50%;
+  background-size: 50%; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:hover {
+  background-color: #bf4040;
+  outline: none; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:hover {
+  height: 14px;
+  margin-top: -7px; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:hover a.ui-slider-handle {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
+  height: 20px;
+  margin-left: -10px;
+  top: -4px;
+  width: 20px; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr {
+  float: left;
+  margin-right: 22.652px; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li {
+  float: left;
+  margin-bottom: 0; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a {
+  -webkit-box-shadow: 1px 0 0 #555555;
+  -moz-box-shadow: 1px 0 0 #555555;
+  box-shadow: 1px 0 0 #555555;
+  border-bottom: none;
+  border-right: 1px solid #000;
+  display: block;
+  cursor: pointer;
+  height: 14px;
+  padding: 16.989px;
+  text-indent: -9999px;
+  width: 14px;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.play {
+  background: url("/static/images/play-icon.png") center center no-repeat; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.play:hover {
+  background-color: #444; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.pause {
+  background: url("/static/images/pause-icon.png") center center no-repeat; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li a.pause:hover {
+  background-color: #444; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li div#vidtime {
+  padding-left: 16.989px;
+  font-weight: bold;
+  line-height: 46px;
+  -webkit-font-smoothing: antialiased; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
+  float: right; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds {
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+  -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  float: left;
+  line-height: 46px;
+  margin-right: 0;
+  position: relative;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  width: 110px;
+  cursor: pointer;
+  -webkit-font-smoothing: antialiased; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -2905,9 +3132,13 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   zoom: 1;
   *display: inline;
   *vertical-align: auto;
-  padding: 0 11.326px;
-  font-weight: normal; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
+  padding: 0 5.663px 0 11.326px;
+  font-weight: normal;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #999; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds p.active {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
@@ -2915,35 +3146,94 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   zoom: 1;
   *display: inline;
   *vertical-align: auto;
-  padding-right: 11.326px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
-  cursor: pointer;
-  color: #fff;
+  padding: 0 11.326px 0 0;
+  margin-bottom: 0;
+  font-weight: bold; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
+  background-color: #444;
+  border: 1px solid #000;
+  border-top: 0;
+  -webkit-box-shadow: inset 1px 0 0 #555555;
+  -moz-box-shadow: inset 1px 0 0 #555555;
+  box-shadow: inset 1px 0 0 #555555;
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
   vertical-align: baseline;
   zoom: 1;
   *display: inline;
-  *vertical-align: auto; }
+  *vertical-align: auto;
+  left: -1px;
+  position: absolute;
+  top: 48px;
+  width: 100%;
+  z-index: 10; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
+  border-bottom: 1px solid #000;
+  -webkit-box-shadow: 0 1px 0 #555555;
+  -moz-box-shadow: 0 1px 0 #555555;
+  box-shadow: 0 1px 0 #555555;
+  color: #fff;
+  cursor: pointer;
+  padding: 0 11.326px; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li.active {
   font-weight: bold; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:last-child {
+  border-bottom: 0;
+  margin-top: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:hover {
-  color: #aaa; }
+  color: #aaa;
+  background-color: #666; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds:hover {
   opacity: 1;
   background-color: #444; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
   float: left;
   display: block;
-  padding-right: 11.326px;
+  padding: 0 11.326px;
   margin-left: 0;
   color: #797979;
-  padding-left: 50px;
   line-height: 46px;
+  width: 30px;
+  text-indent: -9999px;
   font-weight: 800;
-  background: url("/static/images/cc.png") 16px center no-repeat;
+  background: url("/static/images/cc.png") center no-repeat;
   -webkit-font-smoothing: antialiased;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  opacity: 1;
+  position: relative; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:after {
+  text-indent: 0;
+  position: absolute;
+  top: 0;
+  right: -40px;
+  content: "turn off";
+  display: block;
+  width: 70px;
+  opacity: 0;
+  visibility: hidden;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
@@ -2967,21 +3257,52 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:hover {
   color: #fff;
   text-decoration: none;
-  background-color: #444; }
+  background-color: #444;
+  padding-right: 80px;
+  background-position: 11px center; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:hover:after {
+  right: 0;
+  opacity: 1;
+  visibility: visible; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles.off {
+  opacity: .7; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles.off:after {
+  content: "turn on"; }
 section.course-content div.video-subtitles ol.subtitles {
   float: left;
   width: 31.522%;
-  height: 530px;
+  padding-top: 10px;
+  max-height: 460px;
   overflow: hidden; }
 section.course-content div.video-subtitles ol.subtitles li {
-  margin-bottom: 0px;
-  cursor: pointer;
   border: 0;
+  color: #666;
+  cursor: pointer;
+  margin-bottom: 0px;
   padding: 0;
-  color: #666; }
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.5s;
+  -moz-transition-duration: 0.5s;
+  -ms-transition-duration: 0.5s;
+  -o-transition-duration: 0.5s;
+  transition-duration: 0.5s;
+  -webkit-transition-timing-function: ease-in;
+  -moz-transition-timing-function: ease-in;
+  -ms-transition-timing-function: ease-in;
+  -o-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
 section.course-content div.video-subtitles ol.subtitles li.current {
-  background-color: #f3f3f3;
-  color: #333; }
+  color: #333;
+  font-weight: 700; }
 section.course-content div.video-subtitles ol.subtitles li:hover {
   color: #993333; }
 section.course-content div.video-subtitles ol.subtitles li div {
@@ -2993,6 +3314,9 @@ section.course-content div.video-subtitles.closed div.video-wrapper {
 section.course-content div.video-subtitles.closed ol.subtitles {
   width: 0px;
   height: 0; }
+
+div.course-wrapper.closed section.course-content div.video-subtitles ol.subtitles {
+  max-height: 577px; }
 
 nav.sequence-nav {
   -webkit-box-sizing: border-box;
