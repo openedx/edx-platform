@@ -27,7 +27,7 @@ var captions=0;
 var slider = $('#slider')
 
 .slider({
-  range: "min", 
+  range: "min",
   slide: function(event,ui) {
     var slider_time = format_time(ui.value)
 
