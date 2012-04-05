@@ -7,10 +7,10 @@
     <input type="hidden" name="problem_id" value="${ problem['name'] }">
 
     % if check_button:
-    <input id="check_${ id }" type="button" value="Check ${ attempts }" >
+    <input id="check_${ id }" type="button" value="${ check_button }" >
     % endif
     % if reset_button:
-    <input id="reset_${ id }" type="button" value="Reset ${ attempts }" >
+    <input id="reset_${ id }" type="button" value="Reset" >
     % endif
     % if save_button:
     <input id="save_${ id }" type="button" value="Save" >
@@ -20,6 +20,11 @@
     % endif
     % if explain :
     <a href="/courseware/6.002_Spring_2012/${ explain }" class="new-page">Explanation</a>
+    % endif
+    % if attempts_allowed :
+    <section class="submission_feedback">
+    You have used ${ attempts_used } of ${ attempts_allowed } submissions
+    </section>
     % endif
   </section>
 </section>
