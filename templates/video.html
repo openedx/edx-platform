@@ -69,10 +69,28 @@
 <%block name="js_extra">
 <script type="text/javascript" charset="utf-8">
   $(function() {
-      $('.add-fullscreen').click(function(){
+      $('.add-fullscreen').click(function() {
+          //var window_height = $(window).height();
+          //var video_height = (window_height - 97) + 'px';
+          //$('div.video-wrapper, div.tc-wrapper').css('max-height', window_height);
+          //$('object#myytplayer').css('height', video_height);
+
           $('div.video-subtitles').toggleClass('fullscreen');
+
+          if ($('div.video-subtitles').hasClass('fullscreen')) {
+            $('div.video-subtitles').append('<a href="#" class="exit">Exit</a>');
+            } else {
+            $('a.exit').remove();
+            }
+
+          $('.exit').click(function() {
+            $('div.video-subtitles').removeClass('fullscreen');
+            $(this).remove();
+            return false;
+            });
           return false;
         });
+
 
       $('.hide-subtitles').click(function() {
         $('div.video-subtitles').toggleClass('closed');

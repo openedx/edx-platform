@@ -136,18 +136,6 @@ section.course-content {
             }
           }
 
-          &:hover {
-            height: 14px;
-            margin-top: -7px;
-
-            a.ui-slider-handle {
-              @include border-radius(20px);
-              height: 20px;
-              margin-left: -10px;
-              top: -4px;
-              width: 20px;
-            }
-          }
         }
 
         ul.vcr {
@@ -336,6 +324,25 @@ section.course-content {
           }
         }
       }
+
+      &:hover section.video-controls {
+        ul, div {
+          opacity: 1;
+        }
+
+        div#slider {
+          height: 14px;
+          margin-top: -7px;
+
+          a.ui-slider-handle {
+            @include border-radius(20px);
+            height: 20px;
+            margin-left: -10px;
+            top: -4px;
+            width: 20px;
+          }
+        }
+      }
     }
 
     ol.subtitles {
@@ -388,21 +395,47 @@ section.course-content {
     &.fullscreen {
       background: rgba(#000, .95);
       border: 0;
-      padding: 0;
-      height: 100%;
-      position: fixed;
-      left: 0;
-      top: 0;
       bottom: 0;
-      width: 100%;
+      height: 100%;
+      left: 0;
       max-height: 100%;
+      padding: 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
       z-index: 999;
+
+      a.exit {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-style: 12px;
+
+        &::after {
+          content: "✖";
+          @include inline-block();
+          padding-left: 6px;
+        }
+
+        &:hover {
+          color: $mit-red;
+        }
+      }
 
       div.tc-wrapper {
         padding: 20px;
         vertical-align: middle;
-        min-height: 100%;
-        overflow: hidden;
+        max-height: 100%;
+        overflow-y: scroll;
+
+
+        object#myytplayer {
+          max-height: 100%;
+          overflow: hidden;
+        }
       }
 
       ol.subtitles {
