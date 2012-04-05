@@ -3056,19 +3056,6 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:hover {
   background-color: #bf4040;
   outline: none; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:hover {
-  height: 14px;
-  margin-top: -7px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:hover a.ui-slider-handle {
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
-  border-radius: 20px;
-  height: 20px;
-  margin-left: -10px;
-  top: -4px;
-  width: 20px; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr {
   float: left;
   margin-right: 22.652px; }
@@ -3314,6 +3301,21 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   opacity: .7; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles.off:after {
   content: "turn on"; }
+section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls ul, section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls div {
+  opacity: 1; }
+section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls div#slider {
+  height: 14px;
+  margin-top: -7px; }
+section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls div#slider a.ui-slider-handle {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
+  height: 20px;
+  margin-left: -10px;
+  top: -4px;
+  width: 20px; }
 section.course-content div.video-subtitles ol.subtitles {
   float: left;
   width: 31.522%;
@@ -3363,19 +3365,42 @@ section.course-content div.video-subtitles.closed ol.subtitles {
 section.course-content div.video-subtitles.fullscreen {
   background: rgba(0, 0, 0, 0.95);
   border: 0;
-  padding: 0;
-  height: 100%;
-  position: fixed;
-  left: 0;
-  top: 0;
   bottom: 0;
-  width: 100%;
+  height: 100%;
+  left: 0;
   max-height: 100%;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
   z-index: 999; }
+section.course-content div.video-subtitles.fullscreen a.exit {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-style: 12px; }
+section.course-content div.video-subtitles.fullscreen a.exit::after {
+  content: "✖";
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  padding-left: 6px; }
+section.course-content div.video-subtitles.fullscreen a.exit:hover {
+  color: #993333; }
 section.course-content div.video-subtitles.fullscreen div.tc-wrapper {
   padding: 20px;
   vertical-align: middle;
-  min-height: 100%;
+  max-height: 100%;
+  overflow-y: scroll; }
+section.course-content div.video-subtitles.fullscreen div.tc-wrapper object#myytplayer {
+  max-height: 100%;
   overflow: hidden; }
 section.course-content div.video-subtitles.fullscreen ol.subtitles li {
   color: #aaa; }
