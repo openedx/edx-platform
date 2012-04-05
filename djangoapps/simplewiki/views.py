@@ -154,10 +154,11 @@ def create(request, wiki_url):
         
     d = {'wiki_form': f,
         'wiki_write': True,
+        'create_article' : True,
         }
     d.update(csrf(request))
 
-    return render_to_response('simplewiki_create.html', d)
+    return render_to_response('simplewiki_edit.html', d)
 
 def edit(request, wiki_url):
     if not request.user.is_authenticated():
@@ -207,6 +208,7 @@ def edit(request, wiki_url):
         	'wiki_article': article,
             'wiki_title' : article.title,
         	'wiki_attachments_write': article.can_attach(request.user),
+            'create_article' : False,
         	}
     d.update(csrf(request))
 

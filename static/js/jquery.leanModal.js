@@ -10,9 +10,12 @@
                 closeButton:'.modal_close'
             }
             
-            var overlay = $("<div id='lean_overlay'></div>");
+            var overlay = $("#lean_overlay");
+            if (overlay.length == 0) {
+              overlay = $("<div id='lean_overlay'></div>");
+              $("body").append(overlay);
+            }
             
-            $("body").append(overlay);
                  
             options =  $.extend(defaults, options);
  
