@@ -12,6 +12,7 @@ import uuid
 
 from django.db import models
 from django.contrib.auth.models import User
+import json
 
 #from cache_toolbox import cache_model, cache_relation
 
@@ -28,6 +29,18 @@ class UserProfile(models.Model):
     location = models.CharField(blank=True, max_length=255, db_index=True)
     meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
+
+    def get_meta(self):
+        js_str = self.meta
+        if not js_str: 
+            js_str = dict()
+        else:
+            js_str = json.loads(self.meta)
+
+        return js_str
+
+    def set_meta(self,js):
+        self.meta = json.dumps(js)
 
 ## TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
@@ -57,6 +70,16 @@ class Registration(models.Model):
         self.user.is_active = True
         self.user.save()
         #self.delete()
+
+class PendingNameChange(models.Model):
+    user = models.OneToOneField(User, unique=True, db_index=True)
+    new_name = models.CharField(blank=True, max_length=255)
+    rationale = models.CharField(blank=True, max_length=1024)
+
+class PendingEmailChange(models.Model):
+    user = models.OneToOneField(User, unique=True, db_index=True)
+    new_email = models.CharField(blank=True, max_length=255, db_index=True)
+    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
 #cache_relation(User.profile)
 
@@ -88,6 +111,8 @@ def change_name(email, new_name):
     up.save()
 
 def user_count():
+    print "All users", User.objects.all().count()
+    print "Active users", User.objects.filter(is_active = True).count()
     return User.objects.all().count()
 
 def active_user_count():
@@ -99,12 +124,29 @@ def create_group(name, description):
     utg.description = description
     utg.save()
 
-def add_user_to_group(group, user):
+def add_user_to_group(user, group):
     utg = UserTestGroup.objects.get(name = group)
     utg.users.add(User.objects.get(username = user))
     utg.save()
 
-def remove_user_from_group(group, user):
+def remove_user_from_group(user, group):
     utg = UserTestGroup.objects.get(name = group)
     utg.users.remove(User.objects.get(username = user))
     utg.save()
+
+default_groups = {'email_future_courses' : 'Receive e-mails about future MITx courses',
+                  'email_helpers' : 'Receive e-mails about how to help with MITx',
+                  'mitx_unenroll' : 'Fully unenrolled -- no further communications',
+                  '6002x_unenroll' : 'Took and dropped 6002x'}
+
+def add_user_to_default_group(user, group):
+    try:
+        utg = UserTestGroup.objects.get(name = group)
+    except UserTestGroup.DoesNotExist: 
+        utg = UserTestGroup()
+        utg.name = group
+        utg.description = default_groups[group]
+        utg.save()
+    utg.users.add(User.objects.get(username = user))
+    utg.save()
+

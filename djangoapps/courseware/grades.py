@@ -1,15 +1,18 @@
-import logging
-import urllib
-from lxml import etree
-
 import courseware.content_parser as content_parser
-from models import StudentModule
-from django.conf import settings
 import courseware.modules
+import logging
+import random
+import urllib
 
+from collections import namedtuple
+from django.conf import settings
+from lxml import etree
+from models import StudentModule
 from student.models import UserProfile
 
 log = logging.getLogger("mitx.courseware")
+
+Score = namedtuple("Score", "earned possible graded section")
 
 def get_grade(user, problem, cache):
     ## HACK: assumes max score is fixed per problem
@@ -17,7 +20,7 @@ def get_grade(user, problem, cache):
     correct = 0
     
     # If the ID is not in the cache, add the item
-    if id not in cache: 
+    if id not in cache:
         module = StudentModule(module_type = 'problem',  # TODO: Move into StudentModule.__init__?
                                module_id = id,
                                student = user, 
@@ -44,6 +47,17 @@ def get_grade(user, problem, cache):
     return (correct, total)
 
 def grade_sheet(student):
+    """
+    This pulls a summary of all problems in the course. It returns a dictionary with two datastructures:
+    
+    - courseware_summary is a summary of all sections with problems in the course. It is organized as an array of chapters,
+    each containing an array of sections, each containing an array of scores. This contains information for graded and ungraded
+    problems, and is good for displaying a course summary with due dates, etc.
+    
+    - grade_summary is a summary of how the final grade breaks down. It is an array of "sections". Each section can either be
+    a conglomerate of scores (like labs or homeworks) which has subscores and a totalscore, or a section can be all from one assignment
+    (such as a midterm or final) and only has a totalscore. Each section has a weight that shows how it contributes to the total grade.
+    """
     dom=content_parser.course_file(student)
     course = dom.xpath('//course/@name')[0]
     xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=course)
@@ -54,11 +68,14 @@ def grade_sheet(student):
         response_by_id[response.module_id] = response
     
     
-    total_scores = {}
+    
+    totaled_scores = {}
     chapters=[]
     for c in xmlChapters:
         sections = []
         chname=c.get('name')
+        
+        
         for s in dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section', 
                            course=course, chname=chname):
             problems=dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section[@name=$section]//problem', 
@@ -84,22 +101,26 @@ def grade_sheet(student):
                         else:
                             correct = total
                     
-                    scores.append((int(correct),total, graded ))
+                    scores.append( Score(int(correct),total, graded, s.get("name")) )
 
+                
+                section_total = Score(sum([score.earned for score in scores]), 
+                                        sum([score.possible for score in scores]),
+                                        False,
+                                        p.get("id"))
 
-                section_total = (sum([score[0] for score in scores]), 
-                                sum([score[1] for score in scores]))
+                graded_total = Score(sum([score.earned for score in scores if score.graded]), 
+                                sum([score.possible for score in scores if score.graded]),
+                                True,
+                                p.get("id"))
 
-                graded_total = (sum([score[0] for score in scores if score[2]]), 
-                                sum([score[1] for score in scores if score[2]]))
-
-                #Add the graded total to total_scores
+                #Add the graded total to totaled_scores
                 format = s.get('format') if s.get('format') else ""
                 subtitle = s.get('subtitle') if s.get('subtitle') else format
                 if format and graded_total[1] > 0:
-                    format_scores = total_scores[ format ] if format in total_scores else []
-                    format_scores.append( graded_total + (s.get("name"),) )
-                    total_scores[ format ] = format_scores
+                    format_scores = totaled_scores.get(format, [])
+                    format_scores.append( graded_total )
+                    totaled_scores[ format ] = format_scores
 
                 score={'section':s.get("name"),
                        'scores':scores,
@@ -114,7 +135,20 @@ def grade_sheet(student):
         chapters.append({'course':course,
                          'chapter' : c.get("name"),
                          'sections' : sections,})
-                         
+    
+    
+    grade_summary = grade_summary_6002x(totaled_scores)
+    
+    return {'courseware_summary' : chapters,
+            'grade_summary' : grade_summary}
+
+
+def grade_summary_6002x(totaled_scores):
+    """
+    This function takes the a dictionary of (graded) section scores, and applies the course grading rules to create
+    the grade_summary. For 6.002x this means homeworks and labs all have equal weight, with the lowest 2 of each
+    being dropped. There is one midterm and one final.
+    """
     
     def totalWithDrops(scores, drop_count):
         #Note that this key will sort the list descending
@@ -131,12 +165,12 @@ def grade_sheet(student):
         return aggregate_score, dropped_indices
         
     #Figure the homework scores
-    homework_scores = total_scores['Homework'] if 'Homework' in total_scores else []
+    homework_scores = totaled_scores['Homework'] if 'Homework' in totaled_scores else []
     homework_percentages = []
     for i in range(12):
         if i < len(homework_scores):
-            percentage = homework_scores[i][0] / float(homework_scores[i][1])
-            summary = "Homework {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, homework_scores[i][2] , percentage, homework_scores[i][0], homework_scores[i][1] )
+            percentage = homework_scores[i].earned / float(homework_scores[i].possible)
+            summary = "Homework {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, homework_scores[i].section , percentage, homework_scores[i].earned, homework_scores[i].possible )
         else:
             percentage = 0
             summary = "Unreleased Homework {0} - 0% (?/?)".format(i + 1)
@@ -153,13 +187,12 @@ def grade_sheet(student):
     homework_total, homework_dropped_indices = totalWithDrops(homework_percentages, 2)
     
     #Figure the lab scores
-    lab_scores = total_scores['Lab'] if 'Lab' in total_scores else []
+    lab_scores = totaled_scores['Lab'] if 'Lab' in totaled_scores else []
     lab_percentages = []
-    log.debug("lab_scores: {0}".format(lab_scores))
     for i in range(12):
         if i < len(lab_scores):
-            percentage = lab_scores[i][0] / float(lab_scores[i][1])
-            summary = "Lab {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, lab_scores[i][2] , percentage, lab_scores[i][0], lab_scores[i][1] )
+            percentage = lab_scores[i].earned / float(lab_scores[i].possible)
+            summary = "Lab {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, lab_scores[i].section , percentage, lab_scores[i].earned, lab_scores[i].possible )
         else:
             percentage = 0
             summary = "Unreleased Lab {0} - 0% (?/?)".format(i + 1)
@@ -177,18 +210,18 @@ def grade_sheet(student):
     
     
     #TODO: Pull this data about the midterm and final from the databse. It should be exactly similar to above, but we aren't sure how exams will be done yet.
-    midterm_score = ('?', '?')
+    midterm_score = Score('?', '?', True, "?")
     midterm_percentage = 0
     
-    final_score = ('?', '?')
+    final_score = Score('?', '?', True, "?")
     final_percentage = 0
     
     if settings.GENERATE_PROFILE_SCORES:
-        midterm_score = (random.randrange(50, 150), 150)
-        midterm_percentage = midterm_score[0] / float(midterm_score[1])
+        midterm_score = Score(random.randrange(50, 150), 150, True, "?")
+        midterm_percentage = midterm_score.earned / float(midterm_score.possible)
         
-        final_score = (random.randrange(100, 300), 300)
-        final_percentage = final_score[0] / float(final_score[1])
+        final_score = Score(random.randrange(100, 300), 300, True, "?")
+        final_percentage = final_score.earned / float(final_score.possible)
         
     
     grade_summary = [
@@ -196,7 +229,8 @@ def grade_sheet(student):
             'category': 'Homework',
             'subscores' : homework_percentages,
             'dropped_indices' : homework_dropped_indices,
-            'totalscore' : {'score' : homework_total, 'summary' : "Homework Average - {0:.0%}".format(homework_total)},
+            'totalscore' : homework_total,
+            'totalscore_summary' : "Homework Average - {0:.0%}".format(homework_total),
             'totallabel' : 'HW Avg',
             'weight' : 0.15,
         },
@@ -204,25 +238,25 @@ def grade_sheet(student):
             'category': 'Labs',
             'subscores' : lab_percentages,
             'dropped_indices' : lab_dropped_indices,
-            'totalscore' : {'score' : lab_total, 'summary' : "Lab Average - {0:.0%}".format(lab_total)},
+            'totalscore' : lab_total,
+            'totalscore_summary' : "Lab Average - {0:.0%}".format(lab_total),
             'totallabel' : 'Lab Avg',
             'weight' : 0.15,
         },
         {
             'category': 'Midterm',
-            'totalscore' : {'score' : midterm_percentage, 'summary' : "Midterm - {0:.0%} ({1}/{2})".format(midterm_percentage, midterm_score[0], midterm_score[1])},
+            'totalscore' : midterm_percentage,
+            'totalscore_summary' : "Midterm - {0:.0%} ({1}/{2})".format(midterm_percentage, midterm_score.earned, midterm_score.possible),
             'totallabel' : 'Midterm',
             'weight' : 0.30,
         },
         {
             'category': 'Final',
-            'totalscore' : {'score' : final_percentage, 'summary' : "Final - {0:.0%} ({1}/{2})".format(final_percentage, final_score[0], final_score[1])},
+            'totalscore' : final_percentage,
+            'totalscore_summary' : "Final - {0:.0%} ({1}/{2})".format(final_percentage, final_score.earned, final_score.possible),
             'totallabel' : 'Final',
             'weight' : 0.40,
         }
     ]
     
-    return {'grade_summary' : grade_summary,
-            'chapters':chapters}
-
-    
+    return grade_summary

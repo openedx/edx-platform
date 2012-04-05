@@ -166,6 +166,15 @@ MAKO_TEMPLATES = {}
 
 LOGGING_ENV = "dev" # override this in different environments
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '../mitx.db',
+    }
+}
+
+SECRET_KEY = 'unsecure'
+
 # Default dev cache (i.e. no caching)
 CACHES = {
     'default': {
@@ -240,7 +249,7 @@ LOGGING = {
     },
     'loggers' : {
         'django' : {
-            'handlers' : handlers + ['mail_admins'],
+            'handlers' : handlers, # + ['mail_admins'],
             'propagate' : True,
             'level' : 'INFO'
         },

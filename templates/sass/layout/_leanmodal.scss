@@ -17,6 +17,7 @@ div.leanModal_box {
   @include box-sizing(border-box);
   display: none;
   padding: lh(2);
+  text-align: left;
 
   a.modal_close {
     color: #aaa;
@@ -201,6 +202,35 @@ div#pwd_reset {
 
   input[type="email"] {
     margin-bottom: lh();
+  }
+}
+
+div#apply_name_change,
+div#change_email,
+div#unenroll,
+div#deactivate-account {
+  max-width: 700px;
+
+  ul {
+    list-style: none;
+
+    li {
+      margin-bottom: lh(.5);
+
+      textarea, #{$all-text-inputs} {
+        display: block;
+        width: 100%;
+        @include box-sizing(border-box);
+      }
+
+      textarea {
+        height: 60px;
+      }
+
+      input[type="submit"] {
+        white-space: normal;
+      }
+    }
   }
 }
 

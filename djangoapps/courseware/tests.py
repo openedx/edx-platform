@@ -20,7 +20,7 @@ class ModelsTest(unittest.TestCase):
         variables={'R1':2.0, 'R3':4.0}
         functions={'sin':numpy.sin, 'cos':numpy.cos}
 
-        self.assertEqual(calc.evaluator(variables, functions, "10000||sin(7+5)-6k"), 4000.0)
+        self.assertTrue(abs(calc.evaluator(variables, functions, "10000||sin(7+5)+0.5356"))<0.01)
         self.assertEqual(calc.evaluator({'R1': 2.0, 'R3':4.0}, {}, "13"), 13)
         self.assertEqual(calc.evaluator(variables, functions, "13"), 13)
         self.assertEqual(calc.evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5"), 5)
@@ -30,6 +30,8 @@ class ModelsTest(unittest.TestCase):
         self.assertEqual(calc.evaluator(variables, functions, "R1*R3"), 8.0)
         self.assertTrue(abs(calc.evaluator(variables, functions, "sin(e)-0.41"))<0.01)
         self.assertTrue(abs(calc.evaluator(variables, functions, "k*T/q-0.025"))<0.001)
+        self.assertTrue(abs(calc.evaluator(variables, functions, "e^(j*pi)")+1)<0.00001)
+        self.assertTrue(abs(calc.evaluator(variables, functions, "j||1")-0.5-0.5j)<0.00001)
         exception_happened = False
         try: 
             calc.evaluator({},{}, "5+7 QWSEKO")

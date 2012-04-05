@@ -1,6 +1,10 @@
 MITx's prototype offering, 6.002x, is now open. To log in, visit
 
+% if is_secure:
  https://6002x.mitx.mit.edu
+% else:
+ http://6002x.mitx.mit.edu
+% endif
 
 where you will find a login button at the top right-hand corner of the
 window.

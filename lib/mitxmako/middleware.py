@@ -7,7 +7,7 @@
 #       http://www.apache.org/licenses/LICENSE-2.0
 #
 #   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
+#   distribuetd under the License is distributed on an "AS IS" BASIS,
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
@@ -15,6 +15,7 @@
 from mako.lookup import TemplateLookup
 import tempfile
 from django.template import RequestContext
+from django.conf import settings
 
 requestcontext = None
 lookup = {}
@@ -44,4 +45,5 @@ class MakoMiddleware(object):
     def process_request (self, request):
         global requestcontext
         requestcontext = RequestContext(request)
-
+        requestcontext['is_secure'] = request.is_secure()
+        requestcontext['site'] = settings.SITE_NAME
