@@ -150,7 +150,7 @@ $(function() {
               <%
               earned = section['section_total'].earned
               total = section['section_total'].possible
-              percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 else ""
+              percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
               
               <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">

@@ -13,6 +13,8 @@ from student.models import UserProfile
 log = logging.getLogger("mitx.courseware")
 
 Score = namedtuple("Score", "earned possible graded section")
+SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
+
 
 def get_grade(user, problem, cache):
     ## HACK: assumes max score is fixed per problem
@@ -107,12 +109,12 @@ def grade_sheet(student):
                 section_total = Score(sum([score.earned for score in scores]), 
                                         sum([score.possible for score in scores]),
                                         False,
-                                        p.get("id"))
+                                        s.get("name"))
 
                 graded_total = Score(sum([score.earned for score in scores if score.graded]), 
                                 sum([score.possible for score in scores if score.graded]),
                                 True,
-                                p.get("id"))
+                                s.get("name"))
 
                 #Add the graded total to totaled_scores
                 format = s.get('format') if s.get('format') else ""
@@ -152,13 +154,13 @@ def grade_summary_6002x(totaled_scores):
     
     def totalWithDrops(scores, drop_count):
         #Note that this key will sort the list descending
-        sorted_scores = sorted( enumerate(scores), key=lambda x: -x[1]['percentage'] )
+        sorted_scores = sorted( enumerate(scores), key=lambda x: -x[1].percentage )
         # A list of the indices of the dropped scores
         dropped_indices = [score[0] for score in sorted_scores[-drop_count:]] 
         aggregate_score = 0
         for index, score in enumerate(scores):
             if index not in dropped_indices:
-                aggregate_score += score['percentage']
+                aggregate_score += score.percentage
         
         aggregate_score /= len(scores) - drop_count
         
@@ -183,7 +185,7 @@ def grade_summary_6002x(totaled_scores):
         
         label = "HW {0:02d}".format(i + 1)
         
-        homework_percentages.append( {'percentage': percentage, 'summary': summary, 'label' : label} )
+        homework_percentages.append(SectionPercentage(percentage, label, summary) )
     homework_total, homework_dropped_indices = totalWithDrops(homework_percentages, 2)
     
     #Figure the lab scores
@@ -205,7 +207,7 @@ def grade_summary_6002x(totaled_scores):
             
         label = "Lab {0:02d}".format(i + 1)
                 
-        lab_percentages.append( {'percentage': percentage, 'summary': summary, 'label' : label} )
+        lab_percentages.append(SectionPercentage(percentage, label, summary) )
     lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
     
     

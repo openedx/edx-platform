@@ -22,7 +22,7 @@ $(function () {
   
   <%
   colors = ["#b72121", "#600101", "#666666", "#333333"]
-  
+  #'
   tickIndex = 1
   sectionSpacer = 0.5
   sectionIndex = 0
@@ -38,13 +38,13 @@ $(function () {
     if 'subscores' in section: ##This is for sections like labs or homeworks, with several smaller components and a total
         series.append({
             'label' : section['category'],
-            'data' : [[i + tickIndex, score['percentage']] for i,score in enumerate(section['subscores'])],
+            'data' : [[i + tickIndex, score.percentage] for i,score in enumerate(section['subscores'])],
             'color' : colors[sectionIndex]
         })
         
-        ticks += [[i + tickIndex, score['label'] ] for i,score in enumerate(section['subscores'])]
+        ticks += [[i + tickIndex, score.label ] for i,score in enumerate(section['subscores'])]
         bottomTicks.append( [tickIndex + len(section['subscores'])/2, section['category']] )
-        detail_tooltips[ section['category'] ] = [score['summary'] for score in section['subscores']]
+        detail_tooltips[ section['category'] ] = [score.summary for score in section['subscores']]
         
         droppedScores += [[tickIndex + index, 0.05] for index in section['dropped_indices']]
         
