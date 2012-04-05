@@ -2863,6 +2863,30 @@ section.course-index div#accordion ul.ui-accordion-content li a p {
 section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
   color: #666; }
 
+section.course-content .dullify, section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
+  opacity: .4;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
+section.course-content .dullify:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls:hover {
+  opacity: 1; }
 section.course-content div.video {
   padding: 6px 22.652px;
   margin: 0 -22.652px;
@@ -2911,6 +2935,8 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   border: 1px solid #000;
   border-top: 0;
   color: #ccc; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls:hover ul, section.course-content div.video-subtitles div.video-wrapper section.video-controls:hover div {
+  opacity: 1; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;

@@ -1,4 +1,13 @@
 section.course-content {
+  .dullify {
+    opacity: .4;
+    @include transition();
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
   div.video {
     padding: 6px lh();
     margin: 0 (-(lh()));
@@ -7,6 +16,7 @@ section.course-content {
     background: #f3f3f3;
     display: block;
   }
+
   div.video-subtitles {
     display: table;
     @include clearfix();
@@ -47,24 +57,6 @@ section.course-content {
         }
       }
 
-      // ul {
-      //   float: left;
-
-      //   li {
-      //     margin-top: 5px;
-      //     display: inline-block;
-      //     cursor: pointer;
-      //     border: 0;
-      //     padding: 0;
-
-      //     div {
-      //       &:empty {
-      //         display: none;
-      //       }
-      //     }
-      //   }
-      // }
-
       section.video-controls {
         @extend .clearfix;
         background: #333;
@@ -72,6 +64,12 @@ section.course-content {
         border: 1px solid #000;
         border-top: 0;
         color: #ccc;
+
+        &:hover {
+          ul, div {
+            opacity: 1;
+          }
+        }
 
         div#slider {
           @extend .clearfix;
@@ -155,6 +153,7 @@ section.course-content {
         ul.vcr {
           float: left;
           margin-right: lh();
+          @extend .dullify;
 
           li {
             float: left;
@@ -201,6 +200,7 @@ section.course-content {
 
         div.secondary-controls {
           float: right;
+          @extend .dullify;
 
           div.speeds {
             border-left: 1px solid #000;
