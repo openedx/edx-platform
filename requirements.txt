@@ -1,4 +1,4 @@
-django
+django<1.4
 pip
 flup
 scipy

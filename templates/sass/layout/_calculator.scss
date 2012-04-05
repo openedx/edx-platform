@@ -1,5 +1,5 @@
 li.calc-main {
-  bottom: 0;
+  bottom: -36px;
   left: 0;
   position: fixed;
   width: 100%;
@@ -16,6 +16,8 @@ li.calc-main {
     padding: 8px 12px;
     width: 16px;
     height: 20px;
+    position: relative;
+    top: -36px;
 
     &:hover {
       opacity: .8;
@@ -28,6 +30,8 @@ li.calc-main {
 
   div#calculator_wrapper {
     background: rgba(#111, .9);
+    position: relative;
+    top: -36px;
     clear: both;
 
     form {

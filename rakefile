@@ -1,31 +1,56 @@
 require 'rake/clean'
 require 'tempfile'
 
+# Build Constants
 REPO_ROOT = File.dirname(__FILE__)
 BUILD_DIR = File.join(REPO_ROOT, "build")
+
+# Packaging constants
+DEPLOY_DIR = "/opt/wwc"
+PACKAGE_NAME = "mitx"
+LINK_PATH = File.join(DEPLOY_DIR, PACKAGE_NAME)
+VERSION = "0.1"
+COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
+BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
+BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
+
+if BRANCH == "master"
+    DEPLOY_NAME = "#{PACKAGE_NAME}-#{BUILD_NUMBER}-#{COMMIT}"
+else
+    DEPLOY_NAME = "#{PACKAGE_NAME}-#{BRANCH}-#{BUILD_NUMBER}-#{COMMIT}"
+end
+INSTALL_DIR_PATH = File.join(DEPLOY_DIR, DEPLOY_NAME)
+PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
+
+
+# Set up the clean and clobber tasks
 CLOBBER.include('build')
-CLEAN.include("#{BUILD_DIR}/*.deb")
+CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
+
 
 task :package do
-    commit = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()
-    branch = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp()
-    branch = branch.gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
-    build_number = (ENV["BUILD_NUMBER"] || "dev").chomp()
-
-    if branch == "master"
-        package_name = "mitx"
-    else
-        package_name = "mitx-#{branch}"
-    end
-
     FileUtils.mkdir_p(BUILD_DIR)
     
     Dir.chdir(BUILD_DIR) do
+
+        postinstall = Tempfile.new('postinstall')
+        postinstall.write <<-POSTINSTALL.gsub(/^\s*/, '')
+        #! /bin/sh
+        set -e
+        set -x
+        
+        service gunicorn stop
+        rm -f #{LINK_PATH}
+        ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
+        service gunicorn start
+        POSTINSTALL
+        postinstall.close()
+        FileUtils.chmod(0755, postinstall.path)
+
         args = ["fakeroot", "fpm", "-s", "dir", "-t", "deb",
-            "--exclude=build",
-            "--exclude=rakefile",
-            "--exclude=.git",
-            "--prefix=/opt/wwc/mitx-#{commit}",
+            "--after-install=#{postinstall.path}",
+            "--prefix=#{INSTALL_DIR_PATH}",
+            "-C", "#{REPO_ROOT}",
             "--depends=python-mysqldb",
             "--depends=python-django",
             "--depends=python-pip",
@@ -40,11 +65,15 @@ task :package do
             "--depends=python-markdown",
             "--depends=python-pygments",
             "--depends=mysql-client",
-            "--name=#{package_name}-#{commit}",
-            "--version=0.1",
-            "--iteration=#{build_number}",
+            "--provides=#{PACKAGE_NAME}",
+            "--name=#{DEPLOY_NAME}",
+            "--version=#{VERSION}",
             "-a", "all",
-            "#{REPO_ROOT}"]
+            "."]
         system(*args) || raise("fpm failed to build the .deb")
     end
+end
+
+task :publish => :package do
+    sh("scp #{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}-1_all.deb #{PACKAGE_REPO}")
 end

@@ -46,6 +46,36 @@ h1.top-header {
   }
 }
 
+.light-button, a.light-button {
+  @include box-shadow(inset 0 1px 0 #fff);
+  @include linear-gradient(#fff, lighten(#888, 40%));
+  @include border-radius(3px);
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  color: #666;
+  font: normal $body-font-size $body-font-family;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-font-smoothing: antialiased;
+
+  &:hover, &:focus {
+    @include linear-gradient(#fff, lighten(#888, 37%));
+    border: 1px solid #ccc;
+    text-decoration: none;
+  }
+}
+
+.action-link {
+  a {
+    color: $mit-red;
+
+    &:hover {
+      text-decoration: none;
+      color: darken($mit-red, 20%);
+    }
+  }
+}
+
 .content {
   @include box-shadow(inset 0 0 2px 3px #f3f3f3);
   @include box-sizing(border-box);

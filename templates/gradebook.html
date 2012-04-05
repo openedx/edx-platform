@@ -1,22 +1,76 @@
 <%inherit file="main.html" />
+
+<%block name="headextra">
+  <script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
+  <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
+  <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
+  
+  <style type="text/css">
+  .grade_a {color:green;}
+  .grade_b {color:Chocolate;}
+  .grade_c {color:DimGray;}
+  .grade_none {color:LightGray;}
+  </style>
+  
+</%block>
+
 <%include file="navigation.html" args="active_page=''" />
 <section class="main-content">
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
-  <h1>Gradebook</h1>
-  % for s in students:
-  <h2><a href=/profile/${s['id']}>${s['username']}</a></h2>
-  % for c in s['grade_info']['grade_summary']:
-  <h3>${c['category']} </h3>
-  <p>
-  % if 'subscores' in c:
-  % for ss in c['subscores']:
-  <br>${ss['summary']}
-  % endfor
-  % endif
-  </p>
-  % endfor
-  % endfor
+    <h1>Gradebook</h1>
+    
+    %if len(students) > 0:
+    <table>
+      <%
+      templateSummary = students[0]['grade_info']['grade_summary']
+      %>
+      
+      
+      <tr> <!-- Header Row -->
+        <th>Student</th>
+        %for section in templateSummary:
+          %if 'subscores' in section:
+            %for subsection in section['subscores']:
+              <th>${subsection['label']}</th>
+            %endfor
+            <th>${section['totallabel']}</th>
+          %else:
+            <th>${section['category']}</th>
+          %endif
+        %endfor
+      </tr>
+      
+      <%def name="percent_data(percentage)">
+        <%
+          data_class = "grade_none"
+          if percentage > .87:
+            data_class = "grade_a"
+          elif percentage > .70:
+            data_class = "grade_b"
+          elif percentage > .6:
+            data_class = "grade_c"
+        %>
+        <td class="${data_class}">${ "{0:.0%}".format( percentage ) }</td>
+      </%def>
+      
+      %for student in students:
+      <tr>
+        <td><a href="/profile/${student['id']}/">${student['username']}</a></td>
+        %for section in student['grade_info']['grade_summary']:
+          %if 'subscores' in section:
+            %for subsection in section['subscores']:
+              ${percent_data( subsection['percentage'] )}
+            %endfor
+            ${percent_data( section['totalscore'] )}
+          %else:
+            ${percent_data( section['totalscore'] )}
+          %endif
+        %endfor
+      </tr>
+      %endfor
+    </table>
+    %endif
   </section>
 </div>
 </section>

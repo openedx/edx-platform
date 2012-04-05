@@ -288,6 +288,7 @@ div.discussion-wrapper aside {
       border-top: 0;
       @include box-shadow(none);
     }
+
     a {
       width: 100%;
       @include box-sizing(border-box);
@@ -295,6 +296,7 @@ div.discussion-wrapper aside {
       padding: 10px;
       display: block;
       margin-top: 10px;
+      @extend .light-button;
 
       &:first-child {
         margin-top: 0;
