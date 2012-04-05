@@ -30,6 +30,16 @@ html {
       }
     }
 
+    div.qtip {
+     div.ui-tooltip-content {
+       border: none;
+       background: rgba(#000, .8);
+       color: #fff;
+       font: 12px $body-font-size;
+       margin-top: 5px;
+      }
+    }
+
     section.outside-app {
       @extend .main-content;
       max-width: 600px;

@@ -506,6 +506,12 @@ html body section.main-content, html body section.outside-app {
     -o-border-radius: 4px;
     border-radius: 4px;
     margin-top: 11.326px; } }
+html body div.qtip div.ui-tooltip-content {
+  border: none;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font: 12px 14px;
+  margin-top: 5px; }
 html body section.outside-app {
   max-width: 600px;
   padding: 22.652px; }
