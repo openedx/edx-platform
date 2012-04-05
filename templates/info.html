@@ -1,4 +1,22 @@
 <%inherit file="main.html" />
+
+<%block name="js_extra">
+<script>
+
+$(document).ready(function(){
+   //if(!page) {
+   //  cookie_page = $.cookie("book_page");
+   //  if(cookie_page) {
+   //    goto_page(cookie_page);
+   //  }
+   //}
+
+   $(".handouts ol").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
+});
+
+</script>
+</%block>
+
 <%block name="title"><title>Course Info - MITx 6.002x</title></%block>
 
 <%include file="navigation.html" args="active_page='info'" />
