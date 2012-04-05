@@ -35,9 +35,9 @@
           <ol id="video_speeds"></ol>
         </div>
 
-        <a href="#" class="add-fullscreen">Full screen</a>
+        <a href="#" class="add-fullscreen" title="Full screen">Full screen</a>
 
-        <a href="#" class="hide-subtitles">Captions</a>
+        <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
         </div>
       </section>
     </section>
@@ -69,6 +69,8 @@
 <%block name="js_extra">
 <script type="text/javascript" charset="utf-8">
   $(function() {
+      $('.add-fullscreen, .hide-subtitles').qtip();
+
       $('.add-fullscreen').click(function() {
           //var window_height = $(window).height();
           //var video_height = (window_height - 97) + 'px';
@@ -95,7 +97,11 @@
       $('.hide-subtitles').click(function() {
         $('div.video-subtitles').toggleClass('closed');
 
-        $(this).toggleClass("off");
+        var link_title = $(this).attr('title');
+        console.log(link_title);
+
+        ///$(this).attr('title', 'Turn on captions' ? 'Turn off captions' : 'Turn on captions');
+
         return false;
        });
 

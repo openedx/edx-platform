@@ -2643,6 +2643,14 @@ button.ui-button::-moz-focus-inner {
   border-color: #AAA;
   color: #111; }
 
+html {
+  height: 100%;
+  max-height: 100%; }
+
+body.courseware {
+  height: 100%;
+  max-height: 100%; }
+
 div.course-wrapper ul, div.course-wrapper ol {
   list-style: none; }
 div.course-wrapper section.course-content p {
@@ -3189,12 +3197,18 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds:hover {
   opacity: 1; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.add-fullscreen {
-  float: left;
-  display: block;
-  padding: 0 11.326px;
-  margin-left: 0;
-  line-height: 46px;
+  background: url(/static/images/fullscreen.png) center no-repeat;
+  border-right: 1px solid #000;
+  -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   color: #797979;
+  display: block;
+  float: left;
+  line-height: 46px;
+  margin-left: 0;
+  padding: 0 11.326px;
+  text-indent: -9999px;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
@@ -3215,10 +3229,7 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
   transition-delay: 0;
-  border-right: 1px solid #000;
-  -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
-  -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
-  box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555; }
+  width: 30px; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.add-fullscreen:hover {
   color: #fff;
   text-decoration: none;
@@ -3257,50 +3268,13 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   transition-delay: 0;
   opacity: 1;
   position: relative; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:after {
-  text-indent: 0;
-  position: absolute;
-  top: 0;
-  right: -40px;
-  content: "turn off";
-  display: block;
-  width: 70px;
-  opacity: 0;
-  visibility: hidden;
-  -webkit-transition-property: all;
-  -moz-transition-property: all;
-  -ms-transition-property: all;
-  -o-transition-property: all;
-  transition-property: all;
-  -webkit-transition-duration: 0.15s;
-  -moz-transition-duration: 0.15s;
-  -ms-transition-duration: 0.15s;
-  -o-transition-duration: 0.15s;
-  transition-duration: 0.15s;
-  -webkit-transition-timing-function: ease-out;
-  -moz-transition-timing-function: ease-out;
-  -ms-transition-timing-function: ease-out;
-  -o-transition-timing-function: ease-out;
-  transition-timing-function: ease-out;
-  -webkit-transition-delay: 0;
-  -moz-transition-delay: 0;
-  -ms-transition-delay: 0;
-  -o-transition-delay: 0;
-  transition-delay: 0; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:hover {
   color: #fff;
   text-decoration: none;
   background-color: #444;
-  padding-right: 80px;
   background-position: 11px center; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:hover:after {
-  right: 0;
-  opacity: 1;
-  visibility: visible; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles.off {
   opacity: .7; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles.off:after {
-  content: "turn on"; }
 section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls ul, section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls div {
   opacity: 1; }
 section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls div#slider {
@@ -3374,6 +3348,13 @@ section.course-content div.video-subtitles.fullscreen {
   top: 0;
   width: 100%;
   z-index: 999; }
+section.course-content div.video-subtitles.fullscreen.closed div.video-wrapper {
+  width: 82.88%;
+  margin: 0 auto;
+  float: none; }
+section.course-content div.video-subtitles.fullscreen.closed ol.subtitles {
+  width: 0px;
+  height: 0; }
 section.course-content div.video-subtitles.fullscreen a.exit {
   position: absolute;
   top: 20px;
