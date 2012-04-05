@@ -254,15 +254,18 @@ section.course-content {
           }
 
           a.add-fullscreen {
-            float: left;
-            display: block;
-            padding: 0 lh(.5);
-            margin-left: 0;
-            line-height: 46px; //height of play pause buttons
-            color: #797979;
-            @include transition();
+            background: url(/static/images/fullscreen.png) center no-repeat;
             border-right: 1px solid #000;
             @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+            color: #797979;
+            display: block;
+            float: left;
+            line-height: 46px; //height of play pause buttons
+            margin-left: 0;
+            padding: 0 lh(.5);
+            text-indent: -9999px;
+            @include transition();
+            width: 30px;
 
             &:hover {
               color: #fff;
@@ -287,39 +290,15 @@ section.course-content {
             opacity: 1;
             position: relative;
 
-            &:after {
-              text-indent: 0;
-              position: absolute;
-              top: 0;
-              right: -40px;
-              content: "turn off";
-              display: block;
-              width: 70px;
-              opacity: 0;
-              visibility: hidden;
-              @include transition();
-            }
-
             &:hover {
               color: #fff;
               text-decoration: none;
               background-color: #444;
-              padding-right: 80px;
               background-position: 11px center;
-
-              &:after {
-                right: 0;
-                opacity: 1;
-                visibility: visible;
-              }
             }
 
             &.off {
               opacity: .7;
-
-              &:after {
-                content: "turn on";
-              }
             }
           }
         }
@@ -404,6 +383,21 @@ section.course-content {
       top: 0;
       width: 100%;
       z-index: 999;
+
+      &.closed {
+        @extend .trans;
+
+        div.video-wrapper {
+          width: flex-grid(7.5,9);
+          margin: 0 auto;
+          float: none;
+        }
+
+        ol.subtitles {
+          width: 0px;
+          height: 0;
+        }
+      }
 
       a.exit {
         position: absolute;
