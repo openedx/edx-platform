@@ -16,7 +16,113 @@ Score = namedtuple("Score", "earned possible graded section")
 SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
 
 
-def get_grade(user, problem, cache):
+class CourseGrader:
+    def grade(self, grade_sheet):
+        raise NotImplementedError
+        
+class FormatWithDropsGrader(CourseGrader):
+    """
+    Grades all sections specified in course_format with an equal weight. A specified
+    number of lowest scores can be dropped from the calculation. The minimum number of
+    sections in this format must be specified (even if those sections haven't been
+    written yet).    
+    
+    section_detail_formatter is a format string with the parameters (index, name, percent, earned, possible).
+    ex: "Homework {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})"
+    
+    section_missing_detail_formatter is a format string with the parameters (index) for
+    when the minimum number of sections weren't found in the course.
+    ex: "Unreleased Homework {index} - 0% (?/?)"
+    
+    section_label_formatter is a format string for a short label with the parameters (index). 
+    These look best when fixed-length.
+    ex: "HW {index:02d}"
+    
+    total_detail_formatter is a format string for displaying the average score with the 
+    parameters (percent).
+    ex: "Homework Average = {percent:.0%}"
+    
+    total_label_formatter is a string (with no parameters).
+    ex: "HW Avg"
+    
+    """
+    def __init__(self, course_format, min_number, drop_count, category, section_detail_formatter, section_missing_detail_formatter,
+                        section_label_formatter, total_detail_formatter, total_label_formatter):
+        
+        self.course_format = course_format
+        self.min_number = min_number
+        self.drop_count = drop_count
+        self.category = category
+        self.section_detail_formatter = section_detail_formatter
+        self.section_missing_detail_formatter = section_missing_detail_formatter
+        self.section_label_formatter = section_label_formatter
+        self.total_detail_formatter = total_detail_formatter
+        self.total_label_formatter = total_label_formatter
+    
+    
+    def grade(self, grade_sheet):
+        def totalWithDrops(breakdown, drop_count):
+            #create an array of tuples with (index, mark), sorted by mark['percentage'] descending
+            sorted_breakdown = sorted( enumerate(breakdown), key=lambda x: -x[1]['percentage'] )
+            # A list of the indices of the dropped scores
+            dropped_indices = [x[0] for x in sorted_breakdown[-drop_count:]] 
+            aggregate_score = 0
+            for index, mark in enumerate(breakdown):
+                if index not in dropped_indices:
+                    aggregate_score += mark['percentage']
+        
+            aggregate_score /= len(scores) - drop_count
+        
+            return aggregate_score, dropped_indices
+        
+        #Figure the homework scores
+        scores = grade_sheet.get(self.course_format, [])
+        breakdown = []
+        for i in range(12):
+            if i < len(scores):
+                percentage = scores[i].earned / float(scores[i].possible)
+                summary = self.section_detail_formatter.format(index: i+1, 
+                                                                name: scores[i].section,
+                                                                percentage: percentage, 
+                                                                earned: scores[i].earned, 
+                                                                possible: scores[i].possible )
+            else:
+                percentage = 0
+                summary = self.section_missing_detail_formatter.format(index: i+1)
+        
+                if settings.GENERATE_PROFILE_SCORES:
+                    points_possible = random.randrange(10, 50)
+                    points_earned = random.randrange(5, points_possible)
+                    percentage = points_earned / float(points_possible)
+                    summary = self.section_detail_formatter.format(index: i+1, 
+                                                                    name: "Randomly Generated",
+                                                                    percentage: percentage, 
+                                                                    earned: points_earned, 
+                                                                    possible: points_possible )
+        
+            label = self.section_label_formatter.format(index: i+1)
+            
+            
+            breakdown.append( {'percent': percentage, 'label': label, 'detail': summary, category: self.category} )
+            
+        total_percent, dropped_indices = totalWithDrops(breakdown, self.drop_count)
+        
+        for dropped_index in dropped_indicies:
+            breakdown[dropped_index]['mark'] = {'detail': "The lowest {0} scores are dropped.".format(self.drop_count) }
+        
+        
+        total_detail = self.total_detail_formatter.format(percent: total_percent)
+        breakdown.append( {'percent': total_percent, 'label': self.total_label_formatter, 'detail': total_detail, category: self.category, prominent: True} )
+        
+        
+        return {'percent' : total_percent,
+                'section_breakdown' : breakdown,
+                #No grade_breakdown here
+                }
+        
+
+
+def get_score(user, problem, cache):
     ## HACK: assumes max score is fixed per problem
     id = problem.get('id')
     correct = 0
@@ -87,7 +193,7 @@ def grade_sheet(student):
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    (correct,total) = get_grade(student, p, response_by_id)
+                    (correct,total) = get_score(student, p, response_by_id)
                     # id = p.get('id')
                     # correct = 0
                     # if id in response_by_id:
@@ -124,7 +230,7 @@ def grade_sheet(student):
                     format_scores.append( graded_total )
                     totaled_scores[ format ] = format_scores
 
-                score={'section':s.get("name"),
+                section_score={'section':s.get("name"),
                        'scores':scores,
                        'section_total' : section_total,
                        'format' : format,
@@ -132,7 +238,7 @@ def grade_sheet(student):
                        'due' : s.get("due") or "",
                        'graded' : graded,
                        }
-                sections.append(score)
+                sections.append(section_score)
 
         chapters.append({'course':course,
                          'chapter' : c.get("name"),
