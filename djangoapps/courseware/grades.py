@@ -119,7 +119,36 @@ class FormatWithDropsGrader(CourseGrader):
                 'section_breakdown' : breakdown,
                 #No grade_breakdown here
                 }
+                
+class WeightedSubsectionsGrader(CourseGrader):
+    """
+    This grader takes a list of tuples containing (grader, section_name, weight) and computes
+    a final grade by totalling the contribution of each sub grader and weighting it
+    accordingly. For example, the sections may be 
+    [ (homeworkGrader, "Homework", 0.15), (labGrader, "Labs", 0.15), (midtermGrader, "Midterm", 0.30), (finalGrader, "Final", 0.40) ]
+    """
+    def __init__(self, sections):
+        self.sections = sections
         
+    def grade(self, grade_sheet):
+        total_percent = 0.0
+        section_breakdown = []
+        grade_breakdown = []
+        
+        for subgrader, section_name, weight in self.sections:
+            subgrade_result = subgrader.grade(grade_sheet)
+            
+            weightedPercent = subgrade_result['percent'] * weight
+            section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(section_name, weightedPercent, weight)
+            section_category = "{0} - Weighted".format(section_name)
+            
+            total_percent += weightedPercent
+            section_breakdown += subgrade_result['section_breakdown']
+            grade_breakdown.append( {'percent' : weightedPercent, 'detail' : section_detail, 'category' : section_category} )
+            
+        return {'percent' : total_percent,
+                'section_breakdown' : section_breakdown,
+                'grade_breakdown' : grade_breakdown}
 
 
 def get_score(user, problem, cache):
@@ -245,8 +274,13 @@ def grade_sheet(student):
                          'sections' : sections,})
     
     
-    grader = FormatWithDropsGrader("Homework", 12, 2, "Homework", "Homework {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
+    hwGrader = FormatWithDropsGrader("Homework", 12, 2, "Homework", "Homework {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
                         "Unreleased Homework {index} - 0% (?/?)", "HW {index:02d}", "Homework Average = {percent:.0%}", "HW Avg")
+                        
+    labGrader = FormatWithDropsGrader("Lab", 12, 2, "Labs", "Lab {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
+                        "Unreleased Lab {index} - 0% (?/?)", "Lab {index:02d}", "Lab Average = {percent:.0%}", "Lab Avg")
+    
+    grader = WeightedSubsectionsGrader( [(hwGrader, "Homework", 0.15), (labGrader, "Labs", 0.15)] )
     
     
     grade_summary = grader.grade(totaled_scores)
