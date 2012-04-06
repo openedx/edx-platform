@@ -20,10 +20,10 @@
       displayMath: [["\\[","\\]"]]}
     });
   </script>
+  <%block name="headextra"/>
+
+  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates -->
   <script type="text/javascript" src="${ settings.LIB_URL }mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script>
-
-<%block name="headextra"/>
-
 </head>
 
 <body class="<%block name="bodyclass"/>">
