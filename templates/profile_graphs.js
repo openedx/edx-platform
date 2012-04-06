@@ -22,6 +22,7 @@ $(function () {
   
   <%
   colors = ["#b72121", "#600101", "#666666", "#333333"]
+  categories = {}
   #'
   tickIndex = 1
   sectionSpacer = 0.5
@@ -34,78 +35,31 @@ $(function () {
   droppedScores = [] #These are the datapoints to indicate assignments which aren't factored into the total score
   dropped_score_tooltips = []
 
-  for section in grade_summary:
-    if 'subscores' in section: ##This is for sections like labs or homeworks, with several smaller components and a total
-        series.append({
-            'label' : section['category'],
-            'data' : [[i + tickIndex, score.percentage] for i,score in enumerate(section['subscores'])],
-            'color' : colors[sectionIndex]
-        })
-        
-        ticks += [[i + tickIndex, score.label ] for i,score in enumerate(section['subscores'])]
-        bottomTicks.append( [tickIndex + len(section['subscores'])/2, section['category']] )
-        detail_tooltips[ section['category'] ] = [score.summary for score in section['subscores']]
-        
-        droppedScores += [[tickIndex + index, 0.05] for index in section['dropped_indices']]
-        
-        dropExplanation = "The lowest {0} {1} scores are dropped".format( len(section['dropped_indices']), section['category'] )
-        dropped_score_tooltips += [dropExplanation] * len(section['dropped_indices'])
-        
-        
-        tickIndex += len(section['subscores']) + sectionSpacer
-        
-        
-        category_total_label = section['category'] + " Total"
-        series.append({
-            'label' : category_total_label,
-            'data' : [ [tickIndex, section['totalscore']] ],
-            'color' : colors[sectionIndex]
-        })
-        
-        ticks.append( [tickIndex, section['totallabel']] )
-        detail_tooltips[category_total_label] = [section['totalscore_summary']]
-    else:
-        series.append({
-            'label' : section['category'],
-            'data' : [ [tickIndex, section['totalscore']] ],
-            'color' : colors[sectionIndex]
-        })
-        
-        ticks.append( [tickIndex, section['totallabel']] )
-        detail_tooltips[section['category']] = [section['totalscore_summary']]
-        
-    tickIndex += 1 + sectionSpacer
-    sectionIndex += 1
-
-
-  detail_tooltips['Dropped Scores'] = dropped_score_tooltips    
-    
-  ## ----------------------------- Grade overviewew bar ------------------------- ##
-  totalWeight = 0.0
-  sectionIndex = 0
-  totalScore = 0.0
-  overviewBarX = tickIndex
-     
-  for section in grade_summary:
-      weighted_score = section['totalscore'] * section['weight']
-      summary_text = "{0} - {1:.1%} of a possible {2:.0%}".format(section['category'], weighted_score, section['weight'])
-      
-      weighted_category_label = section['category'] + " - Weighted"
-         
-      if section['totalscore'] > 0:
-          series.append({
-              'label' : weighted_category_label,
-              'data' : [ [overviewBarX, weighted_score] ],
-              'color' : colors[sectionIndex]
-          })
+  for section in grade_summary['section_breakdown']:
+      if section.get('prominent', False):
+          tickIndex += sectionSpacer
             
-      detail_tooltips[weighted_category_label] = [ summary_text ]
-      sectionIndex += 1
-      totalWeight += section['weight']
-      totalScore += section['totalscore'] * section['weight']
+      if section['category'] not in categories:
+          colorIndex = len(categories) % len(colors)
+          categories[ section['category'] ] = {'label' : section['category'], 
+                                              'data' : [], 
+                                              'color' : colors[colorIndex]}
         
-  ticks += [ [overviewBarX, "Total"] ]
-  tickIndex += 1 + sectionSpacer
+      categoryData = categories[ section['category'] ]
+    
+      categoryData['data'].append( [tickIndex, section['percent']] )
+      ticks.append( [tickIndex, section['label'] ] )
+    
+    
+      if section['category'] in detail_tooltips:
+          detail_tooltips[ section['category'] ].append( section['detail'] )
+      else:
+          detail_tooltips[ section['category'] ] = [ section['detail'], ]
+        
+      tickIndex += 1
+    
+      if section.get('prominent', False):
+          tickIndex += sectionSpacer
   %>
   
   var series = ${ json.dumps(series) };
