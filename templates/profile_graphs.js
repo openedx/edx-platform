@@ -19,20 +19,19 @@ $(function () {
   }
       
   /* -------------------------------- Grade detail bars -------------------------------- */
-  
+    
   <%
   colors = ["#b72121", "#600101", "#666666", "#333333"]
   categories = {}
-  #'
+
   tickIndex = 1
   sectionSpacer = 0.5
   sectionIndex = 0
 
-  series = []
   ticks = [] #These are the indices and x-axis labels for the data
   bottomTicks = [] #Labels on the bottom
   detail_tooltips = {} #This an dictionary mapping from 'section' -> array of detail_tooltips
-  droppedScores = [] #These are the datapoints to indicate assignments which aren't factored into the total score
+  droppedScores = [] #These are the datapoints to indicate assignments which are not factored into the total score
   dropped_score_tooltips = []
 
   for section in grade_summary['section_breakdown']:
@@ -44,7 +43,7 @@ $(function () {
           categories[ section['category'] ] = {'label' : section['category'], 
                                               'data' : [], 
                                               'color' : colors[colorIndex]}
-        
+      
       categoryData = categories[ section['category'] ]
     
       categoryData['data'].append( [tickIndex, section['percent']] )
@@ -60,9 +59,10 @@ $(function () {
     
       if section.get('prominent', False):
           tickIndex += sectionSpacer
+  
   %>
   
-  var series = ${ json.dumps(series) };
+  var series = ${ json.dumps( categories.values() ) };
   var ticks = ${ json.dumps(ticks) };
   var bottomTicks = ${ json.dumps(bottomTicks) };
   var detail_tooltips = ${ json.dumps(detail_tooltips) };
@@ -86,9 +86,7 @@ $(function () {
   var $grade_detail_graph = $("#${graph_div_id}");
   if ($grade_detail_graph.length > 0) {
     var plot = $.plot($grade_detail_graph, series, options);
-    
-    var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
-    $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
+    //We need to put back the plotting of the percent here
   }
       
   var previousPoint = null;
