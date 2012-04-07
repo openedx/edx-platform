@@ -140,11 +140,10 @@ class WeightedSubsectionsGrader(CourseGrader):
             
             weightedPercent = subgrade_result['percent'] * weight
             section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(section_name, weightedPercent, weight)
-            section_category = "{0} - Weighted".format(section_name)
             
             total_percent += weightedPercent
             section_breakdown += subgrade_result['section_breakdown']
-            grade_breakdown.append( {'percent' : weightedPercent, 'detail' : section_detail, 'category' : section_category} )
+            grade_breakdown.append( {'percent' : weightedPercent, 'detail' : section_detail, 'category' : section_name} )
             
         return {'percent' : total_percent,
                 'section_breakdown' : section_breakdown,
