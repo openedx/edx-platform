@@ -19,13 +19,56 @@ SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
 class CourseGrader:
     def grade(self, grade_sheet):
         raise NotImplementedError
+
+class SingleSectionGrader(CourseGrader):
+    """
+    This grades a single section with the format section_format and the name section_name.
+    """
+    def __init__(self, section_format, section_name, label = None, category = None):
+        self.section_format = section_format
+        self.section_name = section_name
+        self.label = label or section_name
+        self.category = category or section_name
+    
+    def grade(self, grade_sheet):
+        foundScore = None
+        if self.section_format in grade_sheet:
+            for score in grade_sheet[self.section_format]:
+                if score.section == self.section_name:
+                    foundScore = score
+                    break
+        
+        if foundScore:
+            percent = foundScore.earned / float(foundScore.possible)
+            detail = "{name} - {percent:.0%} ({earned:g}/{possible:g})".format( name = self.section_name, 
+                                                                        percent = percent,
+                                                                        earned = foundScore.earned,
+                                                                        possible = foundScore.possible)
+            
+        else:
+            percent = 0.0
+            detail = "{name} - 0% (?/?)".format(name = self.section_name)
+            
+        
+        breakdown = [{'percent': percent, 'label': self.label, 'detail': detail, 'category': self.category, 'prominent': True}]
+            
+        return {'percent' : percent,
+                'section_breakdown' : breakdown,
+                #No grade_breakdown here
+                }
+        
+        
+    
      
-class FormatWithDropsGrader(CourseGrader):
+class AssignmentFormatGrader(CourseGrader):
     """
     Grades all sections specified in course_format with an equal weight. A specified
     number of lowest scores can be dropped from the calculation. The minimum number of
     sections in this format must be specified (even if those sections haven't been
-    written yet).    
+    written yet).
+    
+    category should be presentable to the user, but may not appear. When the grade breakdown is 
+    displayed, scores from the same category will be similar (for example, by color).
     
     section_detail_formatter is a format string with the parameters (index, name, percent, earned, possible).
     ex: "Homework {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})"
@@ -273,13 +316,18 @@ def grade_sheet(student):
                          'sections' : sections,})
     
     
-    hwGrader = FormatWithDropsGrader("Homework", 12, 2, "Homework", "Homework {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
+    hwGrader = AssignmentFormatGrader("Homework", 12, 2, "Homework", "Homework {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
                         "Unreleased Homework {index} - 0% (?/?)", "HW {index:02d}", "Homework Average = {percent:.0%}", "HW Avg")
                         
-    labGrader = FormatWithDropsGrader("Lab", 12, 2, "Labs", "Lab {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
+    labGrader = AssignmentFormatGrader("Lab", 12, 2, "Labs", "Lab {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
                         "Unreleased Lab {index} - 0% (?/?)", "Lab {index:02d}", "Lab Average = {percent:.0%}", "Lab Avg")
+                        
+    midtermGrader = SingleSectionGrader("Examination", "Midterm Exam", "Midterm")
     
-    grader = WeightedSubsectionsGrader( [(hwGrader, "Homework", 0.15), (labGrader, "Labs", 0.15)] )
+    finalGrader = SingleSectionGrader("Examination", "Final Exam", "Final")
+    
+    grader = WeightedSubsectionsGrader( [(hwGrader, hwGrader.category, 0.15), (labGrader, labGrader.category, 0.15), 
+        (midtermGrader, midtermGrader.category, 0.30), (finalGrader, finalGrader.category, 0.40)] )
     
     
     grade_summary = grader.grade(totaled_scores)
