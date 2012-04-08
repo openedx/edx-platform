@@ -19,156 +19,15 @@ SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
 class CourseGrader:
     def grade(self, grade_sheet):
         raise NotImplementedError
-
-class SingleSectionGrader(CourseGrader):
-    """
-    This grades a single section with the format section_format and the name section_name.
-    """
-    def __init__(self, section_format, section_name, label = None, category = None):
-        self.section_format = section_format
-        self.section_name = section_name
-        self.label = label or section_name
-        self.category = category or section_name
     
-    def grade(self, grade_sheet):
-        foundScore = None
-        if self.section_format in grade_sheet:
-            for score in grade_sheet[self.section_format]:
-                if score.section == self.section_name:
-                    foundScore = score
-                    break
-        
-        if foundScore:
-            percent = foundScore.earned / float(foundScore.possible)
-            detail = "{name} - {percent:.0%} ({earned:g}/{possible:g})".format( name = self.section_name, 
-                                                                        percent = percent,
-                                                                        earned = foundScore.earned,
-                                                                        possible = foundScore.possible)
-            
-        else:
-            percent = 0.0
-            detail = "{name} - 0% (?/?)".format(name = self.section_name)
-            
-        
-        breakdown = [{'percent': percent, 'label': self.label, 'detail': detail, 'category': self.category, 'prominent': True}]
-            
-        return {'percent' : percent,
-                'section_breakdown' : breakdown,
-                #No grade_breakdown here
-                }
-        
-        
-    
-     
-class AssignmentFormatGrader(CourseGrader):
-    """
-    Grades all sections specified in course_format with an equal weight. A specified
-    number of lowest scores can be dropped from the calculation. The minimum number of
-    sections in this format must be specified (even if those sections haven't been
-    written yet).
-    
-    category should be presentable to the user, but may not appear. When the grade breakdown is 
-    displayed, scores from the same category will be similar (for example, by color).
-    
-    section_detail_formatter is a format string with the parameters (index, name, percent, earned, possible).
-    ex: "Homework {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})"
-    
-    section_missing_detail_formatter is a format string with the parameters (index) for
-    when the minimum number of sections weren't found in the course.
-    ex: "Unreleased Homework {index} - 0% (?/?)"
-    
-    section_label_formatter is a format string for a short label with the parameters (index). 
-    These look best when fixed-length.
-    ex: "HW {index:02d}"
-    
-    total_detail_formatter is a format string for displaying the average score with the 
-    parameters (percent).
-    ex: "Homework Average = {percent:.0%}"
-    
-    total_label_formatter is a string (with no parameters).
-    ex: "HW Avg"
-    
-    """
-    def __init__(self, course_format, min_number, drop_count, category, section_detail_formatter, section_missing_detail_formatter,
-                        section_label_formatter, total_detail_formatter, total_label_formatter):
-        
-        self.course_format = course_format
-        self.min_number = min_number
-        self.drop_count = drop_count
-        self.category = category
-        self.section_detail_formatter = section_detail_formatter
-        self.section_missing_detail_formatter = section_missing_detail_formatter
-        self.section_label_formatter = section_label_formatter
-        self.total_detail_formatter = total_detail_formatter
-        self.total_label_formatter = total_label_formatter
-    
-    
-    def grade(self, grade_sheet):
-        def totalWithDrops(breakdown, drop_count):
-            #create an array of tuples with (index, mark), sorted by mark['percent'] descending
-            sorted_breakdown = sorted( enumerate(breakdown), key=lambda x: -x[1]['percent'] )
-            # A list of the indices of the dropped scores
-            dropped_indices = [x[0] for x in sorted_breakdown[-drop_count:]] 
-            aggregate_score = 0
-            for index, mark in enumerate(breakdown):
-                if index not in dropped_indices:
-                    aggregate_score += mark['percent']
-        
-            aggregate_score /= len(scores) - drop_count
-        
-            return aggregate_score, dropped_indices
-        
-        #Figure the homework scores
-        scores = grade_sheet.get(self.course_format, [])
-        breakdown = []
-        for i in range(12):
-            if i < len(scores):
-                percentage = scores[i].earned / float(scores[i].possible)
-                summary = self.section_detail_formatter.format(index = i+1, 
-                                                                name = scores[i].section,
-                                                                percent = percentage, 
-                                                                earned = scores[i].earned, 
-                                                                possible = scores[i].possible )
-            else:
-                percentage = 0
-                summary = self.section_missing_detail_formatter.format(index = i+1)
-        
-                if settings.GENERATE_PROFILE_SCORES:
-                    points_possible = random.randrange(10, 50)
-                    points_earned = random.randrange(5, points_possible)
-                    percentage = points_earned / float(points_possible)
-                    summary = self.section_detail_formatter.format(index = i+1, 
-                                                                    name = "Randomly Generated",
-                                                                    percent = percentage, 
-                                                                    earned = points_earned, 
-                                                                    possible = points_possible )
-        
-            label = self.section_label_formatter.format(index = i+1)
-            
-            
-            breakdown.append( {'percent': percentage, 'label': label, 'detail': summary, 'category': self.category} )
-            
-        total_percent, dropped_indices = totalWithDrops(breakdown, self.drop_count)
-        
-        for dropped_index in dropped_indices:
-            breakdown[dropped_index]['mark'] = {'detail': "The lowest {0} scores are dropped.".format(self.drop_count) }
-        
-        
-        total_detail = self.total_detail_formatter.format(percent = total_percent)
-        breakdown.append( {'percent': total_percent, 'label': self.total_label_formatter, 'detail': total_detail, 'category': self.category, 'prominent': True} )
-        
-        
-        return {'percent' : total_percent,
-                'section_breakdown' : breakdown,
-                #No grade_breakdown here
-                }
-                
 class WeightedSubsectionsGrader(CourseGrader):
     """
-    This grader takes a list of tuples containing (grader, section_name, weight) and computes
+    This grader takes a list of tuples containing (grader, category_name, weight) and computes
     a final grade by totalling the contribution of each sub grader and weighting it
     accordingly. For example, the sections may be 
     [ (homeworkGrader, "Homework", 0.15), (labGrader, "Labs", 0.15), (midtermGrader, "Midterm", 0.30), (finalGrader, "Final", 0.40) ]
+    All items in section_breakdown for each subgrader will be combined. A grade_breakdown will be
+    composed using the score from each grader.
     """
     def __init__(self, sections):
         self.sections = sections
@@ -192,6 +51,133 @@ class WeightedSubsectionsGrader(CourseGrader):
                 'section_breakdown' : section_breakdown,
                 'grade_breakdown' : grade_breakdown}
 
+
+class SingleSectionGrader(CourseGrader):
+    """
+    This grades a single section with the format section_format and the name section_name.
+    
+    If the section_name is not appropriate for the short short_label or category, they each may
+    be specified individually.
+    """
+    def __init__(self, section_format, section_name, short_label = None, category = None):
+        self.section_format = section_format
+        self.section_name = section_name
+        self.short_label = short_label or section_name
+        self.category = category or section_name
+    
+    def grade(self, grade_sheet):
+        foundScore = None
+        if self.section_format in grade_sheet:
+            for score in grade_sheet[self.section_format]:
+                if score.section == self.section_name:
+                    foundScore = score
+                    break
+        
+        if foundScore:
+            percent = foundScore.earned / float(foundScore.possible)
+            detail = "{name} - {percent:.0%} ({earned:g}/{possible:g})".format( name = self.section_name, 
+                                                                        percent = percent,
+                                                                        earned = foundScore.earned,
+                                                                        possible = foundScore.possible)
+            
+        else:
+            percent = 0.0
+            detail = "{name} - 0% (?/?)".format(name = self.section_name)
+            
+        
+        breakdown = [{'percent': percent, 'label': self.short_label, 'detail': detail, 'category': self.category, 'prominent': True}]
+            
+        return {'percent' : percent,
+                'section_breakdown' : breakdown,
+                #No grade_breakdown here
+                }
+     
+class AssignmentFormatGrader(CourseGrader):
+    """
+    Grades all sections specified in course_format with an equal weight. A specified
+    number of lowest scores can be dropped from the calculation. The minimum number of
+    sections in this format must be specified (even if those sections haven't been
+    written yet).
+    
+    category should be presentable to the user, but may not appear. When the grade breakdown is 
+    displayed, scores from the same category will be similar (for example, by color).
+    
+    section_type is a string that is the type of a singular section. For example, for Labs it
+    would be "Lab". This defaults to be the same as category.
+    
+    short_label is similar to section_type, but shorter. For example, for Homework it would be
+    "HW".
+    
+    """
+    def __init__(self, course_format, min_number, drop_count, category = None, section_type = None, short_label = None):
+        self.course_format = course_format
+        self.min_number = min_number
+        self.drop_count = drop_count
+        self.category = category or course_format
+        self.section_type = section_type or course_format
+        self.short_label = short_label or section_type
+    
+    def grade(self, grade_sheet):
+        def totalWithDrops(breakdown, drop_count):
+            #create an array of tuples with (index, mark), sorted by mark['percent'] descending
+            sorted_breakdown = sorted( enumerate(breakdown), key=lambda x: -x[1]['percent'] )
+            # A list of the indices of the dropped scores
+            dropped_indices = [x[0] for x in sorted_breakdown[-drop_count:]] 
+            aggregate_score = 0
+            for index, mark in enumerate(breakdown):
+                if index not in dropped_indices:
+                    aggregate_score += mark['percent']
+        
+            aggregate_score /= len(scores) - drop_count
+        
+            return aggregate_score, dropped_indices
+        
+        #Figure the homework scores
+        scores = grade_sheet.get(self.course_format, [])
+        breakdown = []
+        for i in range(12):
+            if i < len(scores):
+                percentage = scores[i].earned / float(scores[i].possible)
+                summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})".format(index = i+1, 
+                                                                section_type = self.section_type,
+                                                                name = scores[i].section,
+                                                                percent = percentage, 
+                                                                earned = scores[i].earned, 
+                                                                possible = scores[i].possible )
+            else:
+                percentage = 0
+                summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index = i+1, section_type = self.section_type)
+        
+                if settings.GENERATE_PROFILE_SCORES:
+                    points_possible = random.randrange(10, 50)
+                    points_earned = random.randrange(5, points_possible)
+                    percentage = points_earned / float(points_possible)
+                    summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})".format(index = i+1, 
+                                                                    section_type = self.section_type,
+                                                                    name = "Randomly Generated",
+                                                                    percent = percentage, 
+                                                                    earned = points_earned, 
+                                                                    possible = points_possible )
+        
+            short_label = "{short_label} {index:02d}".format(index = i+1, short_label = self.short_label)
+            
+            breakdown.append( {'percent': percentage, 'label': short_label, 'detail': summary, 'category': self.category} )
+            
+        total_percent, dropped_indices = totalWithDrops(breakdown, self.drop_count)
+        
+        for dropped_index in dropped_indices:
+            breakdown[dropped_index]['mark'] = {'detail': "The lowest {drop_count} {section_type} scores are dropped.".format(drop_count = self.drop_count, section_type=self.section_type) }
+        
+        
+        total_detail = "{section_type} Average = {percent:.0%}".format(percent = total_percent, section_type = self.section_type)
+        total_label = "{short_label} Avg".format(short_label = self.short_label)
+        breakdown.append( {'percent': total_percent, 'label': total_label, 'detail': total_detail, 'category': self.category, 'prominent': True} )
+        
+        
+        return {'percent' : total_percent,
+                'section_breakdown' : breakdown,
+                #No grade_breakdown here
+                }
 
 def get_score(user, problem, cache):
     ## HACK: assumes max score is fixed per problem
@@ -316,14 +302,9 @@ def grade_sheet(student):
                          'sections' : sections,})
     
     
-    hwGrader = AssignmentFormatGrader("Homework", 12, 2, "Homework", "Homework {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
-                        "Unreleased Homework {index} - 0% (?/?)", "HW {index:02d}", "Homework Average = {percent:.0%}", "HW Avg")
-                        
-    labGrader = AssignmentFormatGrader("Lab", 12, 2, "Labs", "Lab {index} - {name} - {percent:.0%} ({earned:g}/{possible:g})",
-                        "Unreleased Lab {index} - 0% (?/?)", "Lab {index:02d}", "Lab Average = {percent:.0%}", "Lab Avg")
-                        
+    hwGrader = AssignmentFormatGrader("Homework", 12, 2, "Homework", "Homework", "HW")
+    labGrader = AssignmentFormatGrader("Lab", 12, 2, "Labs", "Lab", "Lab")
     midtermGrader = SingleSectionGrader("Examination", "Midterm Exam", "Midterm")
-    
     finalGrader = SingleSectionGrader("Examination", "Final Exam", "Final")
     
     grader = WeightedSubsectionsGrader( [(hwGrader, hwGrader.category, 0.15), (labGrader, labGrader.category, 0.15), 
@@ -334,122 +315,3 @@ def grade_sheet(student):
     
     return {'courseware_summary' : chapters,
             'grade_summary' : grade_summary}
-
-
-def grade_summary_6002x(totaled_scores):
-    """
-    This function takes the a dictionary of (graded) section scores, and applies the course grading rules to create
-    the grade_summary. For 6.002x this means homeworks and labs all have equal weight, with the lowest 2 of each
-    being dropped. There is one midterm and one final.
-    """
-    
-    def totalWithDrops(scores, drop_count):
-        #Note that this key will sort the list descending
-        sorted_scores = sorted( enumerate(scores), key=lambda x: -x[1].percentage )
-        # A list of the indices of the dropped scores
-        dropped_indices = [score[0] for score in sorted_scores[-drop_count:]] 
-        aggregate_score = 0
-        for index, score in enumerate(scores):
-            if index not in dropped_indices:
-                aggregate_score += score.percentage
-        
-        aggregate_score /= len(scores) - drop_count
-        
-        return aggregate_score, dropped_indices
-        
-    #Figure the homework scores
-    homework_scores = totaled_scores['Homework'] if 'Homework' in totaled_scores else []
-    homework_percentages = []
-    for i in range(12):
-        if i < len(homework_scores):
-            percentage = homework_scores[i].earned / float(homework_scores[i].possible)
-            summary = "Homework {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, homework_scores[i].section , percentage, homework_scores[i].earned, homework_scores[i].possible )
-        else:
-            percentage = 0
-            summary = "Unreleased Homework {0} - 0% (?/?)".format(i + 1)
-        
-            if settings.GENERATE_PROFILE_SCORES:
-                points_possible = random.randrange(10, 50)
-                points_earned = random.randrange(5, points_possible)
-                percentage = points_earned / float(points_possible)
-                summary = "Random Homework - {0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
-        
-        label = "HW {0:02d}".format(i + 1)
-        
-        homework_percentages.append(SectionPercentage(percentage, label, summary) )
-    homework_total, homework_dropped_indices = totalWithDrops(homework_percentages, 2)
-    
-    #Figure the lab scores
-    lab_scores = totaled_scores['Lab'] if 'Lab' in totaled_scores else []
-    lab_percentages = []
-    for i in range(12):
-        if i < len(lab_scores):
-            percentage = lab_scores[i].earned / float(lab_scores[i].possible)
-            summary = "Lab {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, lab_scores[i].section , percentage, lab_scores[i].earned, lab_scores[i].possible )
-        else:
-            percentage = 0
-            summary = "Unreleased Lab {0} - 0% (?/?)".format(i + 1)
-        
-            if settings.GENERATE_PROFILE_SCORES:
-                points_possible = random.randrange(10, 50)
-                points_earned = random.randrange(5, points_possible)
-                percentage = points_earned / float(points_possible)
-                summary = "Random Lab - {0:.0%} ({1:g}/{2:g})".format( percentage, points_earned, points_possible )
-            
-        label = "Lab {0:02d}".format(i + 1)
-                
-        lab_percentages.append(SectionPercentage(percentage, label, summary) )
-    lab_total, lab_dropped_indices = totalWithDrops(lab_percentages, 2)
-    
-    
-    #TODO: Pull this data about the midterm and final from the databse. It should be exactly similar to above, but we aren't sure how exams will be done yet.
-    midterm_score = Score('?', '?', True, "?")
-    midterm_percentage = 0
-    
-    final_score = Score('?', '?', True, "?")
-    final_percentage = 0
-    
-    if settings.GENERATE_PROFILE_SCORES:
-        midterm_score = Score(random.randrange(50, 150), 150, True, "?")
-        midterm_percentage = midterm_score.earned / float(midterm_score.possible)
-        
-        final_score = Score(random.randrange(100, 300), 300, True, "?")
-        final_percentage = final_score.earned / float(final_score.possible)
-        
-    
-    grade_summary = [
-        {
-            'category': 'Homework',
-            'subscores' : homework_percentages,
-            'dropped_indices' : homework_dropped_indices,
-            'totalscore' : homework_total,
-            'totalscore_summary' : "Homework Average - {0:.0%}".format(homework_total),
-            'totallabel' : 'HW Avg',
-            'weight' : 0.15,
-        },
-        {
-            'category': 'Labs',
-            'subscores' : lab_percentages,
-            'dropped_indices' : lab_dropped_indices,
-            'totalscore' : lab_total,
-            'totalscore_summary' : "Lab Average - {0:.0%}".format(lab_total),
-            'totallabel' : 'Lab Avg',
-            'weight' : 0.15,
-        },
-        {
-            'category': 'Midterm',
-            'totalscore' : midterm_percentage,
-            'totalscore_summary' : "Midterm - {0:.0%} ({1}/{2})".format(midterm_percentage, midterm_score.earned, midterm_score.possible),
-            'totallabel' : 'Midterm',
-            'weight' : 0.30,
-        },
-        {
-            'category': 'Final',
-            'totalscore' : final_percentage,
-            'totalscore_summary' : "Final - {0:.0%} ({1}/{2})".format(final_percentage, final_score.earned, final_score.possible),
-            'totallabel' : 'Final',
-            'weight' : 0.40,
-        }
-    ]
-    
-    return grade_summary

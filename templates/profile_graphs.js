@@ -25,7 +25,7 @@ $(function () {
   categories = {}
 
   tickIndex = 1
-  sectionSpacer = 0.5
+  sectionSpacer = 0.25
   sectionIndex = 0
 
   ticks = [] #These are the indices and x-axis labels for the data
