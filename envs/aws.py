@@ -26,46 +26,21 @@ with open(BASE_DIR / "env.json") as env_file:
 SITE_NAME = ENV_TOKENS['SITE_NAME'] # "extstage.mitx.mit.edu"
 CSRF_COOKIE_DOMAIN = ENV_TOKENS['CSRF_COOKIE_DOMAIN'] # '.mitx.mit.edu'
 
-BOOK_URL = ENV_TOKENS['BOOK_URL'] # 'https://mitxstatic.s3.amazonaws.com/book_images/'
-LIB_URL = ENV_TOKENS['LIB_URL'] # 'https://mitxstatic.s3.amazonaws.com/js/'
-MEDIA_URL = ENV_TOKENS['MEDIA_URL'] # 'http://s3.amazonaws.com/mitx_askbot_stage/'
+BOOK_URL = ENV_TOKENS['BOOK_URL']
+LIB_URL = ENV_TOKENS['LIB_URL']
+MEDIA_URL = ENV_TOKENS['MEDIA_URL']
+LOG_DIR = ENV_TOKENS['LOG_DIR']
 
-LOG_DIR = ENV_TOKENS['LOG_DIR'] # "/mnt/logs/"
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-    }
-}
-
-CACHES = {
-   'default': {
-       'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-       'LOCATION': '127.0.0.1:11211',
-   },
-   'general': {
-       'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-       'LOCATION': '127.0.0.1:11211',
-       'KEY_PREFIX' : 'general',
-       'VERSION' : 5,
-   }
-}
+CACHES = ENV_TOKENS['CACHES']
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
 with open(BASE_DIR / "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
+SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
+
 AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'wwc',
-        'USER': 'root',
-        'PASSWORD': authtokens["PASSWORD"],
-        'HOST': 'staging.ciqreuddjk02.us-east-1.rds.amazonaws.com',
-        'PORT': '3306',
-    }
-}
+DATABASES = AUTH_TOKENS['DATABASES']
