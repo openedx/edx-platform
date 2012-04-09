@@ -12,3 +12,5 @@ mako
 python-memcached
 django-celery
 path.py
+django_debug_toolbar
+
