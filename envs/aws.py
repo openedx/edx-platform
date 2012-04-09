@@ -20,7 +20,7 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 ########################### NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
-with open(BASE_DIR / "env.json") as env_file:
+with open(ENV_ROOT / "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
 SITE_NAME = ENV_TOKENS['SITE_NAME'] # "extstage.mitx.mit.edu"
@@ -35,7 +35,7 @@ CACHES = ENV_TOKENS['CACHES']
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
-with open(BASE_DIR / "auth.json") as auth_file:
+with open(ENV_ROOT / "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
 SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
