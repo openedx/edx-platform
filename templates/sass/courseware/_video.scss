@@ -194,43 +194,57 @@ section.course-content {
             border-left: 1px solid #000;
             border-right: 1px solid #000;
             @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
-            float: left;
-            line-height: 0;
-            padding-right: lh(.25);
-            margin-right: 0;
-            @include transition();
             cursor: pointer;
+            float: left;
+            line-height: 46px; //height of play pause buttons
+            margin-right: 0;
+            padding-left: 15px;
+            background: url('/static/images/closed-arrow.png') 10px center no-repeat;
+            position: relative;
+            @include transition();
             -webkit-font-smoothing: antialiased;
+            width: 110px;
+
+            &.open {
+              background: url('/static/images/open-arrow.png') 10px center no-repeat;
+            }
 
             h3 {
-              float: left;
-              padding: 0 lh(.25) 0 lh(.5);
-              font-weight: normal;
-              text-transform: uppercase;
-              font-size: 12px;
-              letter-spacing: 1px;
               color: #999;
-              line-height: 46px; //height of play pause buttons
+              font-size: 12px;
+              font-weight: normal;
+              @include inline-block();
+              letter-spacing: 1px;
+              padding: 0 lh(.25) 0 lh(.5);
+              text-transform: uppercase;
             }
 
             p.active {
-              @include inline-block();
-              padding: 0 lh(.5) 0 0;
-              margin-bottom: 0;
               font-weight: bold;
-              display: none;
+              @include inline-block();
+              margin-bottom: 0;
+              padding: 0 lh(.5) 0 0;
             }
 
             // fix for now
             ol#video_speeds {
+              background-color: #444;
+              border: 1px solid #000;
+              border-top: 0;
+              @include box-shadow(inset 1px 0 0 #555);
               @include inline-block();
+              left: -1px;
+              position: absolute;
+              top: 48px;
+              width: 100%;
+              z-index: 10;
 
               li {
-                float: left;
+                border-bottom: 1px solid #000;
+                @include box-shadow( 0 1px 0 #555);
                 color: #fff;
                 cursor: pointer;
-                padding: 0 lh(.25);
-                line-height: 46px; //height of play pause buttons
+                padding: 0 lh(.5);
 
                 &.active {
                   font-weight: bold;
@@ -243,13 +257,15 @@ section.course-content {
                 }
 
                 &:hover {
-                  background-color: #444;
+                  color: #aaa;
+                  background-color: #666;
                 }
               }
             }
 
             &:hover {
               opacity: 1;
+              background-color: #444;
             }
           }
 
