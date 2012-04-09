@@ -9,6 +9,8 @@ import traceback
 from calc import evaluator, UndefinedVariable
 from django.conf import settings
 from util import contextualize_text
+from lxml import etree
+from lxml.etree import Element
 
 import calc
 import eia
@@ -34,6 +36,32 @@ def compare_with_tolerance(v1, v2, tol):
         tolerance = evaluator(dict(),dict(),tol)
     return abs(v1-v2) <= tolerance
 
+#Every response type needs methods "grade" and "get_answers"     
+
+class multiplechoiceresponse(object):
+    def __init__(self, xml, context):
+        self.xml = xml
+        self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+                                    id=xml.get('id'))
+        self.correct_choices = [choice.get('name') for choice in self.correct_choices]
+        self.context = context
+
+        self.answer_id = xml.xpath('//*[@id=$id]//choicegroup/@id',
+                                   id=xml.get('id'))
+        assert len(self.answer_id) == 1, "should have exactly one choice group per multiplechoicceresponse"
+        self.answer_id=self.answer_id[0]
+
+    def grade(self, student_answers):
+        answers={}
+
+        if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
+            return {self.answer_id:'correct'}
+        else:
+            return {self.answer_id:'incorrect'}
+
+    def get_answers(self):
+        return {self.answer_id:self.correct_choices}
+    
 class numericalresponse(object):
     def __init__(self, xml, context):
         self.xml = xml

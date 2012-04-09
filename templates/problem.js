@@ -5,11 +5,23 @@ function ${ id }_load() {
   update_schematics();
 
   $('#check_${ id }').click(function() {
-  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
+    $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
-      submit_data[value.id]=value.value;
+	    if (value.type==="radio" || value.type==="checkbox"){
+		if (value.checked) {
+		    console.log("adding a radio or checkbox value");
+		    if (typeof submit_data[value.name] == 'undefined')
+			submit_data[value.name]=[]
+		    submit_data[value.name]+=value.value;
+		}
+	    }
+	    else{
+ 		console.log("adding a standard value");
+		submit_data[value.id]=value.value;
+	    }
     });
+    console.log(submit_data)
     postJSON('/modx/problem/${ id }/problem_check',
     submit_data,
     function(json) {
