@@ -23,8 +23,8 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 with open(ENV_ROOT / "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
-SITE_NAME = ENV_TOKENS['SITE_NAME'] # "extstage.mitx.mit.edu"
-CSRF_COOKIE_DOMAIN = ENV_TOKENS['CSRF_COOKIE_DOMAIN'] # '.mitx.mit.edu'
+SITE_NAME = ENV_TOKENS['SITE_NAME']
+CSRF_COOKIE_DOMAIN = ENV_TOKENS['CSRF_COOKIE_DOMAIN']
 
 BOOK_URL = ENV_TOKENS['BOOK_URL']
 MEDIA_URL = ENV_TOKENS['MEDIA_URL']
