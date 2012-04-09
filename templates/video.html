@@ -119,6 +119,9 @@ at: 'bottom center', // at the bottom right
       $("div.speeds a").hover(function() {
         $(this).toggleClass("open");
         $("ol#video_speeds").slideToggle(150);
+        });
+
+      $("div.speeds a").click(function() {
         return false;
         });
 
