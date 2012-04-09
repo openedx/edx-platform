@@ -35,7 +35,7 @@ CACHES = ENV_TOKENS['CACHES']
 LOGGING = logsettings.get_logger_config(LOG_DIR, 
                                         logging_env=ENV_TOKENS['LOGGING_ENV'],
                                         tracking_filename="tracking.log",
-                                        syslog_addr=ENV_TOKENS['SYSLOG_SERVER'],
+                                        syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                                         debug=False)
 
 ############################## SECURE AUTH ITEMS ###############################
