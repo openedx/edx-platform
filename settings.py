@@ -13,7 +13,7 @@ STATIC_GRAB = False
 DEV_CONTENT = True
 
 LIB_URL = '/static/js/'
-LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/'
+# LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/' # No longer using S3 for this
 BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'
 
