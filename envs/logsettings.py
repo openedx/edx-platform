@@ -29,7 +29,7 @@ def get_logger_config(log_dir,
                      " %(process)d] [%(filename)s:%(lineno)d] - %(message)s").format(
                         logging_env=logging_env, hostname=hostname)
 
-    handlers = ['console'] if debug else ['syslog']
+    handlers = ['console'] if debug else ['console', 'syslogger']
 
     return {
         'version': 1,
