@@ -1,5 +1,5 @@
-var schematic_height = 300;
-var schematic_width = 500;
+var schematic_height = 480;
+var schematic_width = 640;
 
 $(function(){
   $(document).ready(function() {
