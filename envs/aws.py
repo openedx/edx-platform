@@ -32,6 +32,11 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
+LOGGING = logsettings.get_logger_config(LOG_DIR, 
+                                        logging_env=ENV_TOKENS['LOGGING_ENV'],
+                                        tracking_filename="tracking.log",
+                                        debug=False)
+
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
 with open(ENV_ROOT / "auth.json") as auth_file:
