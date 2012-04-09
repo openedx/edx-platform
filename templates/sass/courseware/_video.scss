@@ -191,81 +191,87 @@ section.course-content {
           @extend .dullify;
 
           div.speeds {
-            border-left: 1px solid #000;
-            border-right: 1px solid #000;
-            @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
-            cursor: pointer;
             float: left;
-            line-height: 46px; //height of play pause buttons
-            margin-right: 0;
-            padding-left: 15px;
-            background: url('/static/images/closed-arrow.png') 10px center no-repeat;
-            position: relative;
-            @include transition();
-            -webkit-font-smoothing: antialiased;
-            width: 110px;
 
-            &.open {
-              background: url('/static/images/open-arrow.png') 10px center no-repeat;
-            }
+            a {
+              background: url('/static/images/closed-arrow.png') 10px center no-repeat;
+              border-left: 1px solid #000;
+              border-right: 1px solid #000;
+              display: block;
+              @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+              @include clearfix();
+              cursor: pointer;
+              line-height: 46px; //height of play pause buttons
+              margin-right: 0;
+              padding-left: 15px;
+              position: relative;
+              @include transition();
+              -webkit-font-smoothing: antialiased;
+              width: 110px;
+              color: #fff;
 
-            h3 {
-              color: #999;
-              font-size: 12px;
-              font-weight: normal;
-              @include inline-block();
-              letter-spacing: 1px;
-              padding: 0 lh(.25) 0 lh(.5);
-              text-transform: uppercase;
-            }
+              &.open {
+                background: url('/static/images/open-arrow.png') 10px center no-repeat;
+              }
 
-            p.active {
-              font-weight: bold;
-              @include inline-block();
-              margin-bottom: 0;
-              padding: 0 lh(.5) 0 0;
-            }
+              h3 {
+                color: #999;
+                font-size: 12px;
+                font-weight: normal;
+                float: left;
+                letter-spacing: 1px;
+                padding: 0 lh(.25) 0 lh(.5);
+                text-transform: uppercase;
+              }
 
-            // fix for now
-            ol#video_speeds {
-              background-color: #444;
-              border: 1px solid #000;
-              border-top: 0;
-              @include box-shadow(inset 1px 0 0 #555);
-              @include inline-block();
-              left: -1px;
-              position: absolute;
-              top: 48px;
-              width: 100%;
-              z-index: 10;
+              p.active {
+                font-weight: bold;
+                float: left;
+                margin-bottom: 0;
+                padding: 0 lh(.5) 0 0;
+              }
 
-              li {
-                border-bottom: 1px solid #000;
-                @include box-shadow( 0 1px 0 #555);
-                color: #fff;
-                cursor: pointer;
-                padding: 0 lh(.5);
+              // fix for now
+              ol#video_speeds {
+                background-color: #444;
+                border: 1px solid #000;
+                border-top: 0;
+                @include box-shadow(inset 1px 0 0 #555);
+                @include inline-block();
+                left: -1px;
+                position: absolute;
+                top: 46px;
+                width: 100%;
+                z-index: 10;
 
-                &.active {
-                  font-weight: bold;
-                }
+                li {
+                  border-bottom: 1px solid #000;
+                  @include box-shadow( 0 1px 0 #555);
+                  color: #fff;
+                  cursor: pointer;
+                  padding: 0 lh(.5);
 
-                &:last-child {
-                  border-bottom: 0;
-                  margin-top: 0;
-                  @include box-shadow(none);
-                }
+                  &.active {
+                    font-weight: bold;
+                  }
 
-                &:hover {
-                  color: #aaa;
-                  background-color: #666;
+                  &:last-child {
+                    border-bottom: 0;
+                    margin-top: 0;
+                    @include box-shadow(none);
+                  }
+
+                  &:hover {
+                    color: #aaa;
+                    background-color: #666;
+                  }
                 }
               }
-            }
 
-            &:hover {
-              opacity: 1;
-              background-color: #444;
+              &:hover {
+                opacity: 1;
+                background-color: #444;
+              }
             }
           }
 

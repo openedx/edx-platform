@@ -30,9 +30,11 @@
 
         <div class="secondary-controls">
         <div class="speeds">
-          <h3>Speed</h3>
-          <p class="active"></p>
-          <ol id="video_speeds"></ol>
+          <a href="#">
+            <h3>Speed</h3>
+            <p class="active"></p>
+            <ol id="video_speeds"></ol>
+          </a>
         </div>
 
         <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
@@ -114,10 +116,12 @@ at: 'bottom center', // at the bottom right
 
       $("ol#video_speeds").hide();
 
-      $("div.speeds").click(function() {
+      $("div.speeds a").hover(function() {
         $(this).toggleClass("open");
         $("ol#video_speeds").slideToggle(150);
+        return false;
         });
+
   });
 </script>
 </%block>
