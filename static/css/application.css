@@ -3124,17 +3124,20 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
   float: right; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds {
+  float: left; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a {
+  background: url("/static/images/closed-arrow.png") 10px center no-repeat;
   border-left: 1px solid #000;
   border-right: 1px solid #000;
+  display: block;
   -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  zoom: 1;
   cursor: pointer;
-  float: left;
   line-height: 46px;
   margin-right: 0;
   padding-left: 15px;
-  background: url("/static/images/closed-arrow.png") 10px center no-repeat;
   position: relative;
   -webkit-transition-property: all;
   -moz-transition-property: all;
@@ -3157,35 +3160,29 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -o-transition-delay: 0;
   transition-delay: 0;
   -webkit-font-smoothing: antialiased;
-  width: 110px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds.open {
+  width: 110px;
+  color: #fff; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a:before, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a:after {
+  content: "";
+  display: table; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a:after {
+  clear: both; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a.open {
   background: url("/static/images/open-arrow.png") 10px center no-repeat; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a input[type="button"] {
   color: #999;
   font-size: 12px;
   font-weight: normal;
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
+  float: left;
   letter-spacing: 1px;
   padding: 0 5.663px 0 11.326px;
   text-transform: uppercase; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds p.active {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a p.active {
   font-weight: bold;
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
+  float: left;
   margin-bottom: 0;
   padding: 0 11.326px 0 0; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds {
   background-color: #444;
   border: 1px solid #000;
   border-top: 0;
@@ -3201,10 +3198,10 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   *vertical-align: auto;
   left: -1px;
   position: absolute;
-  top: 48px;
+  top: 46px;
   width: 100%;
   z-index: 10; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li {
   border-bottom: 1px solid #000;
   -webkit-box-shadow: 0 1px 0 #555555;
   -moz-box-shadow: 0 1px 0 #555555;
@@ -3212,18 +3209,18 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   color: #fff;
   cursor: pointer;
   padding: 0 11.326px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li.active {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li.active {
   font-weight: bold; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:last-child {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li:last-child {
   border-bottom: 0;
   margin-top: 0;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:hover {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li:hover {
   color: #aaa;
   background-color: #666; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds:hover {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a:hover {
   opacity: 1;
   background-color: #444; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.add-fullscreen {
