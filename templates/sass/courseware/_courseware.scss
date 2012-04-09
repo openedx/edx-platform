@@ -175,6 +175,7 @@ div.course-wrapper {
     }
 
     div.staff_info {
+      @include clearfix();
       white-space: pre-wrap;
       border-top: 1px solid #ccc;
       padding-top: lh();

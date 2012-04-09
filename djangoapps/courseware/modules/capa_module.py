@@ -73,7 +73,9 @@ class Module(XModule):
         content={'name':self.name, 
                  'html':html}
         
-        check_button = True
+        # We using strings as truthy values, because the terminology of the check button
+        # is context-specific.
+        check_button = "Grade" if self.max_attempts else "Check"
         reset_button = True
         save_button = True
 
@@ -95,10 +97,6 @@ class Module(XModule):
         # User hasn't submitted an answer yet -- we don't want resets
         if not self.lcp.done:
             reset_button = False
-
-        attempts_str = ""
-        if self.max_attempts != None: 
-            attempts_str = " ({a}/{m})".format(a=self.attempts, m=self.max_attempts)
 
         # We don't need a "save" button if infinite number of attempts and non-randomized
         if self.max_attempts == None and self.rerandomize != "always":
@@ -122,7 +120,8 @@ class Module(XModule):
                                'save_button' : save_button,
                                'answer_available' : self.answer_available(),
                                'ajax_url' : self.ajax_url,
-                               'attempts': attempts_str, 
+                               'attempts_used': self.attempts, 
+                               'attempts_allowed': self.max_attempts, 
                                'explain': explain
                                })
         if encapsulate:
