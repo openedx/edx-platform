@@ -3097,9 +3097,9 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   float: left;
-  line-height: 46px;
+  line-height: 0;
+  padding-right: 5.663px;
   margin-right: 0;
-  position: relative;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
@@ -3120,23 +3120,17 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
   transition-delay: 0;
-  width: 110px;
   cursor: pointer;
   -webkit-font-smoothing: antialiased; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
+  float: left;
   padding: 0 5.663px 0 11.326px;
   font-weight: normal;
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: 1px;
-  color: #999; }
+  color: #999;
+  line-height: 46px; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds p.active {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -3147,34 +3141,22 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   *vertical-align: auto;
   padding: 0 11.326px 0 0;
   margin-bottom: 0;
-  font-weight: bold; }
+  font-weight: bold;
+  display: none; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
-  background-color: #444;
-  border: 1px solid #000;
-  border-top: 0;
-  -webkit-box-shadow: inset 1px 0 0 #555555;
-  -moz-box-shadow: inset 1px 0 0 #555555;
-  box-shadow: inset 1px 0 0 #555555;
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
   vertical-align: baseline;
   zoom: 1;
   *display: inline;
-  *vertical-align: auto;
-  left: -1px;
-  position: absolute;
-  top: 48px;
-  width: 100%;
-  z-index: 10; }
+  *vertical-align: auto; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
-  border-bottom: 1px solid #000;
-  -webkit-box-shadow: 0 1px 0 #555555;
-  -moz-box-shadow: 0 1px 0 #555555;
-  box-shadow: 0 1px 0 #555555;
+  float: left;
   color: #fff;
   cursor: pointer;
-  padding: 0 11.326px; }
+  padding: 0 5.663px;
+  line-height: 46px; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li.active {
   font-weight: bold; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:last-child {
@@ -3184,11 +3166,9 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -moz-box-shadow: none;
   box-shadow: none; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:hover {
-  color: #aaa;
-  background-color: #666; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds:hover {
-  opacity: 1;
   background-color: #444; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds:hover {
+  opacity: 1; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
   float: left;
   display: block;
