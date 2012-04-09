@@ -65,6 +65,7 @@ task :package do
             "--depends=python-markdown",
             "--depends=python-pygments",
             "--depends=mysql-client",
+            "--provides=#{PACKAGE_NAME}",
             "--name=#{DEPLOY_NAME}",
             "--version=#{VERSION}",
             "-a", "all",

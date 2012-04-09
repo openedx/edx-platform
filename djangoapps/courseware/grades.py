@@ -169,7 +169,7 @@ def grade_summary_6002x(totaled_scores):
     homework_percentages = []
     for i in range(12):
         if i < len(homework_scores):
-            percentage = homework_scores[1].earned / float(homework_scores[i].possible)
+            percentage = homework_scores[i].earned / float(homework_scores[i].possible)
             summary = "Homework {0} - {1} - {2:.0%} ({3:g}/{4:g})".format( i + 1, homework_scores[i].section , percentage, homework_scores[i].earned, homework_scores[i].possible )
         else:
             percentage = 0
