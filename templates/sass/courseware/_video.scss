@@ -9,16 +9,16 @@ section.course-content {
   }
 
   div.video {
+  }
+
+  div.video-subtitles {
+    @include clearfix();
     padding: 6px lh();
     margin: 0 (-(lh()));
     border-top: 1px solid #e1e1e1;
     border-bottom: 1px solid #e1e1e1;
     background: #f3f3f3;
     display: block;
-  }
-
-  div.video-subtitles {
-    @include clearfix();
 
     div.video-wrapper {
       float: left;
@@ -395,6 +395,7 @@ section.course-content {
     &.fullscreen {
       background: rgba(#000, .95);
       border: 0;
+      margin: 0;
       bottom: 0;
       height: 100%;
       left: 0;
@@ -427,7 +428,11 @@ section.course-content {
       }
 
       div.tc-wrapper {
-        object#myytplayer {
+        div.video-wrapper {
+          width: 100%;
+        }
+
+        object#myytplayer, iframe {
           height: 100%;
           position: fixed;
           top: 0;
