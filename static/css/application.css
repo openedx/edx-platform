@@ -2901,15 +2901,14 @@ section.course-content .dullify, section.course-content div.video-subtitles div.
   transition-delay: 0; }
 section.course-content .dullify:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls:hover {
   opacity: 1; }
-section.course-content div.video {
+section.course-content div.video-subtitles {
+  zoom: 1;
   padding: 6px 22.652px;
   margin: 0 -22.652px;
   border-top: 1px solid #e1e1e1;
   border-bottom: 1px solid #e1e1e1;
   background: #f3f3f3;
   display: block; }
-section.course-content div.video-subtitles {
-  zoom: 1; }
 section.course-content div.video-subtitles:before, section.course-content div.video-subtitles:after {
   content: "";
   display: table; }
@@ -3378,6 +3377,7 @@ section.course-content div.video-subtitles.closed ol.subtitles {
 section.course-content div.video-subtitles.fullscreen {
   background: rgba(0, 0, 0, 0.95);
   border: 0;
+  margin: 0;
   bottom: 0;
   height: 100%;
   left: 0;
@@ -3408,7 +3408,9 @@ section.course-content div.video-subtitles.fullscreen a.exit::after {
   padding-left: 6px; }
 section.course-content div.video-subtitles.fullscreen a.exit:hover {
   color: #993333; }
-section.course-content div.video-subtitles.fullscreen div.tc-wrapper object#myytplayer {
+section.course-content div.video-subtitles.fullscreen div.tc-wrapper div.video-wrapper {
+  width: 100%; }
+section.course-content div.video-subtitles.fullscreen div.tc-wrapper object#myytplayer, section.course-content div.video-subtitles.fullscreen div.tc-wrapper iframe {
   height: 100%;
   position: fixed;
   top: 0;
