@@ -72,10 +72,10 @@
 <script type="text/javascript" charset="utf-8">
   $(function() {
       $('.add-fullscreen, .hide-subtitles').qtip({
-        position: {
-my: 'top center',  // Position my top left...
-at: 'bottom center', // at the bottom right 
-        }
+          position: {
+            my: 'top right',
+            at: 'top right'
+          }
         });
 
       $('.add-fullscreen').click(function() {
@@ -114,11 +114,13 @@ at: 'bottom center', // at the bottom right
         return false;
        });
 
-      $("ol#video_speeds").hide();
+      var dropUpHeight = $('ol#video_speeds').height();
+      console.log(dropUpHeight);
+
+      // $('ol#video_speeds').css('top', -(dropUpHeight));
 
       $("div.speeds a").hover(function() {
         $(this).toggleClass("open");
-        $("ol#video_speeds").slideToggle(150);
         });
 
       $("div.speeds a").click(function() {

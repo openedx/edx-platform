@@ -88,6 +88,7 @@ function add_speed(key, stream) {
     var active = $(this).text();
     $("p.active").text(active);
   });
+
 }
 
 var l=[]
@@ -128,6 +129,9 @@ $(document).ready(function() {
       add_speed(l[i], streams[l[i]])
     }
 
+    var dropUpHeight = $('ol#video_speeds').height();
+    console.log(dropUpHeight);
+    $('ol#video_speeds').css('top', -(dropUpHeight));
 });
 
 function toggleVideo(){
