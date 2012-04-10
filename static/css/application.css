@@ -511,7 +511,8 @@ html body div.qtip div.ui-tooltip-content {
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   font: 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
-  margin-top: -30px; }
+  margin-top: -30px;
+  margin-right: 3px; }
 html body section.outside-app {
   max-width: 600px;
   padding: 22.652px; }
@@ -3165,7 +3166,8 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a.open {
   background: url("/static/images/open-arrow.png") 10px center no-repeat; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a.open ol#video_speeds {
-  opacity: 1; }
+  opacity: 1;
+  display: block; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a input[type="button"] {
   color: #999;
   font-size: 12px;
@@ -3187,6 +3189,7 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -moz-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444;
   box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444;
   left: -1px;
+  display: none;
   position: absolute;
   top: 0;
   width: 100%;
@@ -3386,7 +3389,12 @@ section.course-content div.video-subtitles.fullscreen {
   position: fixed;
   top: 0;
   width: 100%;
-  z-index: 999; }
+  z-index: 999;
+  overflow: hidden; }
+section.course-content div.video-subtitles.fullscreen.closed ol.subtitles {
+  width: auto;
+  height: auto;
+  right: -31.984%; }
 section.course-content div.video-subtitles.fullscreen a.exit {
   position: absolute;
   top: 20px;
@@ -3432,7 +3440,27 @@ section.course-content div.video-subtitles.fullscreen ol.subtitles {
   background: rgba(0, 0, 0, 0.8);
   padding: 22.652px;
   max-width: 23.482%;
-  max-height: 100%; }
+  max-height: 100%;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
 section.course-content div.video-subtitles.fullscreen ol.subtitles li {
   color: #aaa; }
 section.course-content div.video-subtitles.fullscreen ol.subtitles li.current {

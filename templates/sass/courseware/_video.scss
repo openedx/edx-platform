@@ -209,6 +209,7 @@ section.course-content {
 
                 ol#video_speeds {
                   opacity: 1;
+                  display: block;
                 }
               }
 
@@ -236,6 +237,7 @@ section.course-content {
                 border-bottom: 0;
                 @include box-shadow(inset 1px 0 0 #555, 0 2px 0 #444);
                 left: -1px;
+                display: none;
                 position: absolute;
                 top:0;
                 width: 100%;
@@ -405,6 +407,15 @@ section.course-content {
       top: 0;
       width: 100%;
       z-index: 999;
+      overflow: hidden;
+
+      &.closed {
+        ol.subtitles {
+          width: auto;
+          height: auto;
+          right: -(flex-grid(4));
+        }
+      }
 
       a.exit {
         position: absolute;
@@ -460,6 +471,7 @@ section.course-content {
         padding: lh();
         max-width: flex-grid(3);
         max-height: 100%;
+        @include transition();
 
         li {
           color: #aaa;
