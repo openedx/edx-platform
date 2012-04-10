@@ -12,7 +12,7 @@ from student.models import UserProfile
 
 log = logging.getLogger("mitx.courseware")
 
-Score = namedtuple("Score", "earned possible graded section")
+Score = namedtuple("Score", "earned possible weight graded section")
 
 def get_grade(user, problem, cache):
     ## HACK: assumes max score is fixed per problem
@@ -83,6 +83,7 @@ def grade_sheet(student):
 
             graded = True if s.get('graded') == "true" else False
             scores=[]
+            weighted=False
             if len(problems)>0:
                 for p in problems:
                     (correct,total) = get_grade(student, p, response_by_id)
@@ -100,20 +101,33 @@ def grade_sheet(student):
                             correct = random.randrange( max(total-2, 1) , total + 1 )
                         else:
                             correct = total
-                    
-                    scores.append( Score(int(correct),total, graded, s.get("name")) )
-
-                
-                section_total = Score(sum([score.earned for score in scores]), 
-                                        sum([score.possible for score in scores]),
-                                        False,
-                                        p.get("id"))
-
-                graded_total = Score(sum([score.earned for score in scores if score.graded]), 
-                                sum([score.possible for score in scores if score.graded]),
-                                True,
-                                p.get("id"))
-
+                    if p.get("weight"):
+                        weighted=True
+                    scores.append( Score(int(correct),total, p.get("weight", 1), graded, p.get("name")) )
+                if weighted:
+                    total_correct_graded = sum([(score.earned*1.0/score.possible)*int(score.weight) for score in scores if score.graded])
+                    total_possible_graded = sum([int(score.weight) for score in scores if score.graded])
+                    total_correct = sum([(score.earned*1.0/score.possible)*int(score.weight) for score in scores])
+                    total_possible = sum([int(score.weight) for score in scores])
+                    section_weight = s.get("weight", 1)
+                else:
+                    total_correct_graded=sum([score.earned for score in scores if score.graded])
+                    total_possible_graded=sum([score.possible for score in scores if score.graded])
+                    total_correct = sum([score.earned for score in scores])
+                    total_possible = sum([score.possible for score in scores])
+                    section_weight = None
+                #regardless of whether or not it is graded
+                section_total = Score(total_correct, 
+                                      total_possible,
+                                      section_weight,
+                                      False,
+                                      p.get("id"))
+                #selecting only graded things
+                graded_total = Score(total_correct_graded, 
+                                     total_possible_graded, 
+                                     section_weight, 
+                                     True, 
+                                     p.get("id"))
                 #Add the graded total to totaled_scores
                 format = s.get('format') if s.get('format') else ""
                 subtitle = s.get('subtitle') if s.get('subtitle') else format
@@ -136,11 +150,10 @@ def grade_sheet(student):
                          'chapter' : c.get("name"),
                          'sections' : sections,})
     
-    
     grade_summary = grade_summary_6002x(totaled_scores)
-    
-    return {'courseware_summary' : chapters,
-            'grade_summary' : grade_summary}
+    return {'courseware_summary' : chapters, #all assessments as they appear in the course definition
+            'grade_summary' : grade_summary, #graded assessments only
+            }
 
 
 def grade_summary_6002x(totaled_scores):
@@ -210,10 +223,11 @@ def grade_summary_6002x(totaled_scores):
     
     
     #TODO: Pull this data about the midterm and final from the databse. It should be exactly similar to above, but we aren't sure how exams will be done yet.
-    midterm_score = Score('?', '?', True, "?")
-    midterm_percentage = 0
+    #This is a hack, but I have no intention of having this function be useful for anything but 6.002x anyway, so I don't want to make it pretty.
+    midterm_score = totaled_scores['Midterm'][0] if 'Midterm' in totaled_scores else Score('?', '?', '?', True, "?")
+    midterm_percentage = midterm_score.earned * 1.0 / midterm_score.possible if 'Midterm' in totaled_scores else 0
     
-    final_score = Score('?', '?', True, "?")
+    final_score = Score('?', '?', '?', True, "?")
     final_percentage = 0
     
     if settings.GENERATE_PROFILE_SCORES:
