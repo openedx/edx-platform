@@ -67,20 +67,20 @@
 </div>
 
 <%block name="js_extra">
+<script src="/static/js/jquery.ui.touch-punch.min.js"></script>
 <script type="text/javascript" charset="utf-8">
   $(function() {
-      $('.add-fullscreen, .hide-subtitles').qtip({
+      // tooltips for full browser and closed caption
+      $('.add-fullscreen, .hide-subtitles ').qtip({
           position: {
             my: 'top right',
-            at: 'top right'
-          }
+            at: 'top center',
+            target: 'mouse'
+            }
         });
 
+      //full browser
       $('.add-fullscreen').click(function() {
-          //var window_height = $(window).height();
-          //var video_height = (window_height - 97) + 'px';
-          //$('div.video-wrapper, div.tc-wrapper').css('max-height', window_height);
-          //$('object#myytplayer').css('height', video_height);
 
           $('div.video-subtitles').toggleClass('fullscreen');
 
@@ -103,6 +103,7 @@
         });
 
 
+      //hide subtitles
       $('.hide-subtitles').click(function() {
         $('div.video-subtitles').toggleClass('closed');
 
@@ -111,11 +112,6 @@
 
         return false;
        });
-
-      var dropUpHeight = $('ol#video_speeds').height();
-      console.log(dropUpHeight);
-
-      // $('ol#video_speeds').css('top', -(dropUpHeight));
 
       $("div.speeds a").hover(function() {
         $(this).toggleClass("open");
