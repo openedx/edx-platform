@@ -510,8 +510,8 @@ html body div.qtip div.ui-tooltip-content {
   border: none;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
-  font: 12px 14px;
-  margin-top: 5px; }
+  font: 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  margin-top: -30px; }
 html body section.outside-app {
   max-width: 600px;
   padding: 22.652px; }
@@ -2909,16 +2909,12 @@ section.course-content div.video {
   background: #f3f3f3;
   display: block; }
 section.course-content div.video-subtitles {
-  display: table;
   zoom: 1; }
 section.course-content div.video-subtitles:before, section.course-content div.video-subtitles:after {
   content: "";
   display: table; }
 section.course-content div.video-subtitles:after {
   clear: both; }
-section.course-content div.video-subtitles div.tc-wrapper {
-  display: table-cell;
-  width: 100%; }
 section.course-content div.video-subtitles div.video-wrapper {
   float: left;
   width: 65.761%;
@@ -3169,6 +3165,8 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   clear: both; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a.open {
   background: url("/static/images/open-arrow.png") 10px center no-repeat; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a.open ol#video_speeds {
+  opacity: 1; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a input[type="button"] {
   color: #999;
   font-size: 12px;
@@ -3185,22 +3183,36 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds {
   background-color: #444;
   border: 1px solid #000;
-  border-top: 0;
-  -webkit-box-shadow: inset 1px 0 0 #555555;
-  -moz-box-shadow: inset 1px 0 0 #555555;
-  box-shadow: inset 1px 0 0 #555555;
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
+  border-bottom: 0;
+  -webkit-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444;
+  -moz-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444;
+  box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444;
   left: -1px;
   position: absolute;
-  top: 46px;
+  top: 0;
   width: 100%;
-  z-index: 10; }
+  z-index: 10;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  opacity: 0; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li {
   border-bottom: 1px solid #000;
   -webkit-box-shadow: 0 1px 0 #555555;
@@ -3375,21 +3387,15 @@ section.course-content div.video-subtitles.fullscreen {
   top: 0;
   width: 100%;
   z-index: 999; }
-section.course-content div.video-subtitles.fullscreen.closed div.video-wrapper {
-  width: 82.88%;
-  margin: 0 auto;
-  float: none; }
-section.course-content div.video-subtitles.fullscreen.closed ol.subtitles {
-  width: 0px;
-  height: 0; }
 section.course-content div.video-subtitles.fullscreen a.exit {
   position: absolute;
   top: 20px;
-  right: 20px;
+  left: 20px;
   color: #aaa;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-style: 12px; }
+  font-style: 12px;
+  display: none; }
 section.course-content div.video-subtitles.fullscreen a.exit::after {
   content: "✖";
   display: -moz-inline-box;
@@ -3402,14 +3408,29 @@ section.course-content div.video-subtitles.fullscreen a.exit::after {
   padding-left: 6px; }
 section.course-content div.video-subtitles.fullscreen a.exit:hover {
   color: #993333; }
-section.course-content div.video-subtitles.fullscreen div.tc-wrapper {
-  padding: 20px;
-  vertical-align: middle;
-  max-height: 100%;
-  overflow-y: scroll; }
 section.course-content div.video-subtitles.fullscreen div.tc-wrapper object#myytplayer {
-  max-height: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
   overflow: hidden; }
+section.course-content div.video-subtitles.fullscreen div.tc-wrapper section.video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999; }
+section.course-content div.video-subtitles.fullscreen ol.subtitles {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 22.652px;
+  max-width: 23.482%;
+  max-height: 100%; }
 section.course-content div.video-subtitles.fullscreen ol.subtitles li {
   color: #aaa; }
 section.course-content div.video-subtitles.fullscreen ol.subtitles li.current {

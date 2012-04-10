@@ -18,13 +18,7 @@ section.course-content {
   }
 
   div.video-subtitles {
-    display: table;
     @include clearfix();
-
-    div.tc-wrapper {
-      display: table-cell;
-      width: 100%;
-    }
 
     div.video-wrapper {
       float: left;
@@ -212,6 +206,10 @@ section.course-content {
 
               &.open {
                 background: url('/static/images/open-arrow.png') 10px center no-repeat;
+
+                ol#video_speeds {
+                  opacity: 1;
+                }
               }
 
               h3 {
@@ -235,14 +233,15 @@ section.course-content {
               ol#video_speeds {
                 background-color: #444;
                 border: 1px solid #000;
-                border-top: 0;
-                @include box-shadow(inset 1px 0 0 #555);
-                @include inline-block();
+                border-bottom: 0;
+                @include box-shadow(inset 1px 0 0 #555, 0 2px 0 #444);
                 left: -1px;
                 position: absolute;
-                top: 46px;
+                top:0;
                 width: 100%;
                 z-index: 10;
+                @include transition();
+                opacity: 0;
 
                 li {
                   border-bottom: 1px solid #000;
@@ -406,29 +405,15 @@ section.course-content {
       width: 100%;
       z-index: 999;
 
-      &.closed {
-        @extend .trans;
-
-        div.video-wrapper {
-          width: flex-grid(7.5,9);
-          margin: 0 auto;
-          float: none;
-        }
-
-        ol.subtitles {
-          width: 0px;
-          height: 0;
-        }
-      }
-
       a.exit {
         position: absolute;
         top: 20px;
-        right: 20px;
+        left: 20px;
         color: #aaa;
         text-transform: uppercase;
         letter-spacing: 1px;
         font-style: 12px;
+        display: none;
 
         &::after {
           content: "✖";
@@ -442,19 +427,35 @@ section.course-content {
       }
 
       div.tc-wrapper {
-        padding: 20px;
-        vertical-align: middle;
-        max-height: 100%;
-        overflow-y: scroll;
-
-
         object#myytplayer {
-          max-height: 100%;
+          height: 100%;
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
           overflow: hidden;
+        }
+
+        section.video-controls {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          z-index: 9999;
         }
       }
 
       ol.subtitles {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        background: rgba(#000, .8);
+        padding: lh();
+        max-width: flex-grid(3);
+        max-height: 100%;
+
         li {
           color: #aaa;
 
