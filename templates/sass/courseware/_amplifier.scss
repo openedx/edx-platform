@@ -79,7 +79,7 @@ div.graph-controls, div#graph-listen {
     font-weight: bold;
     padding: 3px;
   }
-
+  //MOSFET AMPLIFIER
   label[for="vinCheckbox"], label[for="vinRadioButton"]{
       color: desaturate(#00bfff, 50%);
   }
@@ -89,6 +89,13 @@ div.graph-controls, div#graph-listen {
   label[for="vrCheckbox"], label[for="vrRadioButton"]{
       color: desaturate(#1df914, 40%);
   }
-
+  //RC Filters
+  label[for="vcCheckbox"], label[for="vcRadioButton"]{
+      color: darken(#ffcf48, 20%);
+  }
+  //RLC Series
+  label[for="vlCheckbox"], label[for="vlRadioButton"]{
+      color: desaturate(#d33682, 40%);
+  }
 }
 
