@@ -41,6 +41,12 @@ def object_cache(cache, user, module_type, module_id):
     return None
 
 def make_track_function(request):
+    ''' We want the capa problem (and other modules) to be able to
+    track/log what happens inside them without adding dependencies on
+    Django or the rest of the codebase. We do this by passing a
+    tracking function to them. This generates a closure for each request 
+    that gives a clean interface on both sides. 
+    '''
     def f(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
@@ -88,7 +94,9 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     return HttpResponse(ajax_return)
 
 def grade_histogram(module_id):
-    print module_id
+    ''' Print out a histogram of grades on a given problem. 
+        Part of staff member debug info. 
+    '''
     from django.db import connection, transaction
     cursor = connection.cursor()
 
