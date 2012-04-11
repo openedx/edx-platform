@@ -228,7 +228,7 @@ def grade_summary_6002x(totaled_scores):
     midterm_percentage = midterm_score.earned * 1.0 / midterm_score.possible if 'Midterm' in totaled_scores else 0
     
     final_score = totaled_scores['Final'][0] if 'Final' in totaled_scores else Score('?', '?', '?', True, "?")
-    final_percentage = midterm_score.earned * 1.0 / midterm_score.possible if 'Final' in totaled_scores else 0
+    final_percentage = final_score.earned * 1.0 / final_score.possible if 'Final' in totaled_scores else 0
     
     if settings.GENERATE_PROFILE_SCORES:
         midterm_score = Score(random.randrange(50, 150), 150, True, "?")
