@@ -3189,10 +3189,9 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds {
   background-color: #444;
   border: 1px solid #000;
-  border-bottom: 0;
-  -webkit-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444, inset 0 -1px 0 black;
-  -moz-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444, inset 0 -1px 0 black;
-  box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444, inset 0 -1px 0 black;
+  -webkit-box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+  -moz-box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+  box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
   left: -1px;
   display: none;
   position: absolute;

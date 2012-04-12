@@ -131,7 +131,7 @@ $(document).ready(function() {
 
     var dropUpHeight = $('ol#video_speeds').height();
     console.log(dropUpHeight);
-    $('ol#video_speeds').css('top', -(dropUpHeight));
+    $('ol#video_speeds').css('top', -(dropUpHeight + 2));
 });
 
 function toggleVideo(){
