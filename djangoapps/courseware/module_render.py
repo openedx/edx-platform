@@ -41,6 +41,12 @@ def object_cache(cache, user, module_type, module_id):
     return None
 
 def make_track_function(request):
+    ''' We want the capa problem (and other modules) to be able to
+    track/log what happens inside them without adding dependencies on
+    Django or the rest of the codebase. We do this by passing a
+    tracking function to them. This generates a closure for each request 
+    that gives a clean interface on both sides. 
+    '''
     def f(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
@@ -87,6 +93,20 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
 
+def grade_histogram(module_id):
+    ''' Print out a histogram of grades on a given problem. 
+        Part of staff member debug info. 
+    '''
+    from django.db import connection, transaction
+    cursor = connection.cursor()
+
+    cursor.execute("select courseware_studentmodule.grade,COUNT(courseware_studentmodule.student_id) from courseware_studentmodule where courseware_studentmodule.module_id=%s group by courseware_studentmodule.grade", [module_id])
+
+    grades = list(cursor.fetchall())
+    print grades
+    grades.sort(key=lambda x:x[0]) # Probably not necessary
+    return grades
+
 def render_x_module(user, request, xml_module, module_object_preload):
     ''' Generic module for extensions. This renders to HTML. '''
     # Check if problem has an instance in DB
@@ -125,7 +145,8 @@ def render_x_module(user, request, xml_module, module_object_preload):
     # Grab content
     content = instance.get_html()
     if user.is_staff:
-        content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module)})
+        content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
+                                                                     'histogram':grade_histogram(module_id)})
     content = {'content':content, 
                "destroy_js":instance.get_destroy_js(),
                'init_js':instance.get_init_js(), 
