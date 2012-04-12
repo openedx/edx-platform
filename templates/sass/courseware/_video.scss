@@ -1,3 +1,9 @@
+@-moz-document url-prefix() {
+  a.add-fullscreen {
+    display: none !important;
+  }
+}
+
 section.course-content {
   .dullify {
     opacity: .4;
@@ -289,6 +295,7 @@ section.course-content {
             text-indent: -9999px;
             @include transition();
             width: 30px;
+
 
             &:hover {
               color: #fff;
