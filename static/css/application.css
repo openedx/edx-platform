@@ -2878,6 +2878,10 @@ section.course-index div#accordion ul.ui-accordion-content li a p {
 section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
   color: #666; }
 
+@-moz-document url-prefix() {
+  a.add-fullscreen {
+    display: none  !important; } }
+
 section.course-content .dullify, section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
   opacity: .4;
   -webkit-transition-property: all;
