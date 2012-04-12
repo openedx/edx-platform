@@ -95,6 +95,7 @@ section.course-content {
             color: #fff;
             font: bold 12px $body-font-family;
             margin-bottom: 6px;
+            margin-right: 0;
             padding: 4px;
             text-align: center;
             -webkit-font-smoothing: antialiased;
@@ -153,8 +154,9 @@ section.course-content {
               border-right: 1px solid #000;
               display: block;
               cursor: pointer;
-              height: 14px;
-              padding: lh(.75);
+              // height: 14px;
+              line-height: 46px;
+              padding: 0 lh(.75);
               text-indent: -9999px;
               width: 14px;
               @include transition();
@@ -241,7 +243,7 @@ section.course-content {
                 background-color: #444;
                 border: 1px solid #000;
                 border-bottom: 0;
-                @include box-shadow(inset 1px 0 0 #555, 0 2px 0 #444);
+                @include box-shadow(inset 1px 0 0 #555, 0 2px 0 #444, inset 0 -1px 0 #000);
                 left: -1px;
                 display: none;
                 position: absolute;

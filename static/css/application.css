@@ -2880,7 +2880,7 @@ section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
 
 @-moz-document url-prefix() {
   a.add-fullscreen {
-    display: none  !important; } }
+    display: none !important; } }
 
 section.course-content .dullify, section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
   opacity: .4;
@@ -3004,6 +3004,7 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   color: #fff;
   font: bold 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
   margin-bottom: 6px;
+  margin-right: 0;
   padding: 4px;
   text-align: center;
   -webkit-font-smoothing: antialiased;
@@ -3084,8 +3085,8 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   border-right: 1px solid #000;
   display: block;
   cursor: pointer;
-  height: 14px;
-  padding: 16.989px;
+  line-height: 46px;
+  padding: 0 16.989px;
   text-indent: -9999px;
   width: 14px;
   -webkit-transition-property: all;
@@ -3189,9 +3190,9 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   background-color: #444;
   border: 1px solid #000;
   border-bottom: 0;
-  -webkit-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444;
-  -moz-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444;
-  box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444;
+  -webkit-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444, inset 0 -1px 0 black;
+  -moz-box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444, inset 0 -1px 0 black;
+  box-shadow: inset 1px 0 0 #555555, 0 2px 0 #444444, inset 0 -1px 0 black;
   left: -1px;
   display: none;
   position: absolute;
