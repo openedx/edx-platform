@@ -550,8 +550,8 @@ LIVESETTINGS_OPTIONS = {
             },
             'MARKUP' : {
                 'MARKUP_CODE_FRIENDLY' : False,
-                'ENABLE_MATHJAX' : False,  # FIXME: Test with this enabled
-                'MATHJAX_BASE_URL' : u'',
+                'ENABLE_MATHJAX' : True,  # FIXME: Test with this enabled
+                'MATHJAX_BASE_URL' : u'/static/js/mathjax-MathJax-c9db6ac/',
                 'ENABLE_AUTO_LINKING' : False,
                 'AUTO_LINK_PATTERNS' : u'',
                 'AUTO_LINK_URLS' : u'',
