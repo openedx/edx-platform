@@ -183,9 +183,33 @@ div.course-wrapper {
     }
 
     section.tutorials {
+      h2 {
+        padding-bottom: lh(.25);
+        margin-bottom: lh();
+        border-bottom: 1px solid #e3e3e3;
+      }
       ul {
-        list-style: disc outside none;
-        margin-left: lh();
+        margin: 0;
+        @include clearfix();
+
+        li {
+          width: flex-grid(3, 9);
+          float: left;
+          margin-right: flex-gutter(9);
+          margin-bottom: lh();
+
+          &:nth-child(3n) {
+            margin-right: 0;
+          }
+
+          &:nth-child(3n+1) {
+            clear: both;
+          }
+
+          a {
+            font-weight: bold;
+          }
+        }
       }
     }
 
