@@ -12,7 +12,7 @@ DEFAULT_GROUPS = []
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-LIB_URL = '/static/lib/'
+LIB_URL = '/static/js/'
 LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/'
 BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'

@@ -12,7 +12,7 @@ from student.models import UserProfile
 
 log = logging.getLogger("mitx.courseware")
 
-Score = namedtuple("Score", "earned possible graded section")
+Score = namedtuple("Score", "earned possible weight graded section")
 SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
 
 
@@ -265,20 +265,9 @@ def grade_sheet(student):
                             correct = random.randrange( max(total-2, 1) , total + 1 )
                         else:
                             correct = total
-                    
-                    scores.append( Score(int(correct),total, graded, s.get("name")) )
+                    scores.append( Score(int(correct),total, float(p.get("weight", 1)), graded, p.get("name")) )
 
-                
-                section_total = Score(sum([score.earned for score in scores]), 
-                                        sum([score.possible for score in scores]),
-                                        False,
-                                        s.get("name"))
-
-                graded_total = Score(sum([score.earned for score in scores if score.graded]), 
-                                sum([score.possible for score in scores if score.graded]),
-                                True,
-                                s.get("name"))
-
+                section_total, graded_total = aggregate_scores(scores, s)
                 #Add the graded total to totaled_scores
                 format = s.get('format') if s.get('format') else ""
                 subtitle = s.get('subtitle') if s.get('subtitle') else format
@@ -301,7 +290,7 @@ def grade_sheet(student):
                          'chapter' : c.get("name"),
                          'sections' : sections,})
     
-    
+    #TODO: This grader declaration should live in the data repository. It is only here now to get it working
     hwGrader = AssignmentFormatGrader("Homework", 12, 2, "Homework", "Homework", "HW")
     labGrader = AssignmentFormatGrader("Lab", 12, 2, "Labs", "Lab", "Lab")
     midtermGrader = SingleSectionGrader("Examination", "Midterm Exam", "Midterm")
@@ -310,8 +299,34 @@ def grade_sheet(student):
     grader = WeightedSubsectionsGrader( [(hwGrader, hwGrader.category, 0.15), (labGrader, labGrader.category, 0.15), 
         (midtermGrader, midtermGrader.category, 0.30), (finalGrader, finalGrader.category, 0.40)] )
     
-    
     grade_summary = grader.grade(totaled_scores)
     
     return {'courseware_summary' : chapters,
             'grade_summary' : grade_summary}
+
+def aggregate_scores(scores, section):
+    #TODO: What does a possible score of zero mean? We need to think what extra credit is
+    scores = filter( lambda score: score.possible > 0, scores )
+    
+    total_correct_graded = sum((score.earned*1.0/score.possible)*score.weight for score in scores if score.graded)
+    total_possible_graded = sum(score.weight for score in scores if score.graded)
+    
+    total_correct = sum((score.earned*1.0/score.possible)*score.weight for score in scores)
+    total_possible = sum(score.weight for score in scores)
+    
+    section_weight = section.get("weight", 1)
+    
+    #regardless of whether or not it is graded
+    all_total = Score(total_correct, 
+                          total_possible,
+                          section_weight,
+                          False,
+                          section.get("name"))
+    #selecting only graded things
+    graded_total = Score(total_correct_graded, 
+                         total_possible_graded, 
+                         section_weight, 
+                         True, 
+                         section.get("name"))
+
+    return all_total, graded_total
