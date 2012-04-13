@@ -71,7 +71,9 @@ class Module(XModule):
     def get_problem_html(self, encapsulate=True):
         html = self.lcp.get_html()
         content={'name':self.name, 
-                 'html':html}
+                 'html':html, 
+                 'weight': self.weight,
+                 }
         
         # We using strings as truthy values, because the terminology of the check button
         # is context-specific.
@@ -136,7 +138,7 @@ class Module(XModule):
         self.max_attempts = None
         
         dom2 = etree.fromstring(xml)
-
+        
         self.explanation=content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
         self.explain_available=content_parser.item(dom2.xpath('/problem/@explain_available'))
 
@@ -186,6 +188,7 @@ class Module(XModule):
         self.filename=content_parser.item(dom2.xpath('/problem/@filename'))
         filename=settings.DATA_DIR+"/problems/"+self.filename+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
+        self.weight=content_parser.item(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
             seed = 1
         else:
