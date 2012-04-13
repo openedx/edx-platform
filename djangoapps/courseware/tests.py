@@ -4,6 +4,7 @@ import numpy
 
 import courseware.modules
 import courseware.capa.calc as calc
+from grades import Score, aggregate_scores
 
 class ModelsTest(unittest.TestCase):
     def setUp(self):
@@ -53,3 +54,35 @@ class ModelsTest(unittest.TestCase):
             exception_happened = True
         self.assertTrue(exception_happened)
 
+class GraderTest(unittest.TestCase):
+
+    def test_weighted_grading(self):
+        scores = []
+
+        all, graded = aggregate_scores(scores)
+        self.assertTrue(all.earned == 0)
+        self.assertTrue(graded.earned == 0)
+        self.assertTrue(all.possible == 0)
+        self.assertTrue(graded.possible == 0)
+
+        scores.append(Score(0,5,1,False, 'foo'))
+        all, graded = aggregate_scores(scores)
+        self.assertTrue(all.earned == 0)
+        self.assertTrue(graded.earned == 0)
+        print all
+        self.assertTrue(all.possible == 1)
+        self.assertTrue(graded.possible == 0)
+
+        scores.append(Score(3,5,1,True, 'foo'))
+        all, graded = aggregate_scores(scores)
+        self.assertTrue(all.earned == 3.0/5)
+        self.assertTrue(graded.earned == 3.0/5)
+        self.assertTrue(all.possible == 2)
+        self.assertTrue(graded.possible == 1)
+
+        scores.append(Score(2,5,2,True, 'foo'))
+        all, graded = aggregate_scores(scores)
+        self.assertTrue(all.earned == 7.0/5)
+        self.assertTrue(graded.earned == 7.0/5)
+        self.assertTrue(all.possible == 4)
+        self.assertTrue(graded.possible == 3)
