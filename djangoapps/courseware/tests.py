@@ -58,6 +58,7 @@ class GraderTest(unittest.TestCase):
 
     def test_weighted_grading(self):
         scores = []
+        Score.__sub__=lambda me, other: (me.earned - other.earned) + (me.possible - other.possible)
 
         all, graded = aggregate_scores(scores)
         self.assertEqual(all, Score(earned=0, possible=0, weight=1, graded=False, section="summary"))
@@ -70,15 +71,25 @@ class GraderTest(unittest.TestCase):
 
         scores.append(Score(earned=3, possible=5, weight=1, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertEqual(all, Score(earned=3.0/5, possible=2, weight=1, graded=False, section="summary"))
-        self.assertEqual(graded, Score(earned=3.0/5, possible=0, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=3.0/5, possible=2, weight=1, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=3.0/5, possible=1, weight=1, graded=True, section="summary"))
 
         scores.append(Score(earned=2, possible=5, weight=2, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertEqual(all, Score(earned=7.0/5, possible=4, weight=1, graded=False, section="summary"))
-        self.assertEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=7.0/5, possible=4, weight=1, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
 
         scores.append(Score(earned=2, possible=5, weight=0, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertEqual(all, Score(earned=7.0/5, possible=4, weight=1, graded=False, section="summary"))
-        self.assertEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=7.0/5, possible=4, weight=1, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+
+        scores.append(Score(earned=2, possible=5, weight=3, graded=False, section="summary"))
+        all, graded = aggregate_scores(scores)
+        self.assertAlmostEqual(all, Score(earned=13.0/5, possible=7, weight=1, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+
+        scores.append(Score(earned=2, possible=5, weight=.5, graded=True, section="summary"))
+        all, graded = aggregate_scores(scores)
+        self.assertAlmostEqual(all, Score(earned=14.0/5, possible=7.5, weight=1, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=8.0/5, possible=3.5, weight=1, graded=True, section="summary"))
