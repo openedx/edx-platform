@@ -83,7 +83,6 @@ def grade_sheet(student):
 
             graded = True if s.get('graded') == "true" else False
             scores=[]
-            weighted=False
             if len(problems)>0:
                 for p in problems:
                     (correct,total) = get_grade(student, p, response_by_id)
@@ -101,33 +100,9 @@ def grade_sheet(student):
                             correct = random.randrange( max(total-2, 1) , total + 1 )
                         else:
                             correct = total
-                    if p.get("weight"):
-                        weighted=True
-                    scores.append( Score(int(correct),total, p.get("weight", 1), graded, p.get("name")) )
-                if weighted:
-                    total_correct_graded = sum([(score.earned*1.0/score.possible)*int(score.weight) for score in scores if score.graded])
-                    total_possible_graded = sum([int(score.weight) for score in scores if score.graded])
-                    total_correct = sum([(score.earned*1.0/score.possible)*int(score.weight) for score in scores])
-                    total_possible = sum([int(score.weight) for score in scores])
-                    section_weight = s.get("weight", 1)
-                else:
-                    total_correct_graded=sum([score.earned for score in scores if score.graded])
-                    total_possible_graded=sum([score.possible for score in scores if score.graded])
-                    total_correct = sum([score.earned for score in scores])
-                    total_possible = sum([score.possible for score in scores])
-                    section_weight = None
-                #regardless of whether or not it is graded
-                section_total = Score(total_correct, 
-                                      total_possible,
-                                      section_weight,
-                                      False,
-                                      p.get("id"))
-                #selecting only graded things
-                graded_total = Score(total_correct_graded, 
-                                     total_possible_graded, 
-                                     section_weight, 
-                                     True, 
-                                     p.get("id"))
+                    scores.append( Score(int(correct),total, float(p.get("weight", 1)), graded, p.get("name")) )
+
+                section_total, graded_total = aggregate_scores(scores)
                 #Add the graded total to totaled_scores
                 format = s.get('format') if s.get('format') else ""
                 subtitle = s.get('subtitle') if s.get('subtitle') else format
@@ -155,6 +130,25 @@ def grade_sheet(student):
             'grade_summary' : grade_summary, #graded assessments only
             }
 
+def aggregate_scores(scores): 
+    total_correct_graded = sum((score.earned*1.0/score.possible)*score.weight for score in scores if score.graded)
+    total_possible_graded = sum(score.weight for score in scores if score.graded)
+    total_correct = sum((score.earned*1.0/score.possible)*score.weight for score in scores)
+    total_possible = sum(score.weight for score in scores)
+    #regardless of whether or not it is graded
+    all_total = Score(total_correct, 
+                          total_possible,
+                          1,
+                          False,
+                          "summary")
+    #selecting only graded things
+    graded_total = Score(total_correct_graded, 
+                         total_possible_graded, 
+                         1, 
+                         True, 
+                         "summary")
+
+    return all_total, graded_total
 
 def grade_summary_6002x(totaled_scores):
     """
