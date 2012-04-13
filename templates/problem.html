@@ -1,4 +1,8 @@
-<h2>${ problem['name'] }</h2>
+<h2 class="problem-header">${ problem['name'] }
+% if problem['weight']:
+: ${ problem['weight'] } points
+% endif
+</h2>
 
 <section class="problem">
   ${ problem['html'] }
