@@ -16,7 +16,7 @@ Score = namedtuple("Score", "earned possible graded section")
 SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
 
 
-class CourseGrader:
+class CourseGrader(object):
     def grade(self, grade_sheet):
         raise NotImplementedError
     
