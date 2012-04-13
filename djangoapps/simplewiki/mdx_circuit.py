@@ -3,14 +3,24 @@
 Image Circuit Extension for Python-Markdown
 ======================================
 
-circuit:name becomes the circuit. 
+
+Any single line beginning with circuit-schematic: and followed by data (which should be json data, but this
+is not enforced at this level) will be displayed as a circuit schematic. This is simply an input element with
+the value set to the data. It is left to javascript on the page to render that input as a circuit schematic.
+
+ex:
+circuit-schematic:[["r",[128,48,0],{"r":"1","_json_":0},["2","1"]],["view",0,0,2,null,null,null,null,null,null,null],["dc",{"0":0,"1":1,"I(_3)":-1}]]
+
+(This is a schematic with a single one-ohm resistor. Note that this data is not meant to be user-editable.)
+
 '''
+import markdown
+import re
 
 import simplewiki.settings as settings
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from django.utils.html import escape
 
-import markdown
 try:
     # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
     # but import the 2.0.3 version if it fails
@@ -22,23 +32,40 @@ class CircuitExtension(markdown.Extension):
     def __init__(self, configs):
         for key, value in configs :
             self.setConfig(key, value)
-    
-    def add_inline(self, md, name, klass, re):
-        pattern = klass(re)
-        pattern.md = md
-        pattern.ext = self
-        md.inlinePatterns.add(name, pattern, "<reference")
+            
     
     def extendMarkdown(self, md, md_globals):
-        self.add_inline(md, 'circuit', CircuitLink, r'^circuit:(?P<name>[a-zA-Z0-9]*)$')
+        ## Because Markdown treats contigous lines as one block of text, it is hard to match
+        ## a regex that must occupy the whole line (like the circuit regex). This is why we have
+        ## a preprocessor that inspects the lines and replaces the matched lines with text that is
+        ## easier to match
+        md.preprocessors.add('circuit',  CircuitPreprocessor(md), "_begin")
+        
+        pattern = CircuitLink(r'processed-schematic:(?P<data>.*?)processed-schematic-end')
+        pattern.md = md
+        pattern.ext = self
+        md.inlinePatterns.add('circuit', pattern, "<reference")
+
+
+class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
+    preRegex = re.compile(r'^circuit-schematic:(?P<data>.*)$')
+    
+    def run(self, lines):
+        def convertLine(line):
+            m = self.preRegex.match(line)
+            if m:
+                return 'processed-schematic:{0}processed-schematic-end'.format( m.group('data') )
+            else:
+                return line
+        
+        return [ convertLine(line) for line in lines ]
+
 
 class CircuitLink(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
-        name = m.group('name')
-        if not name.isalnum():
-            return etree.fromstring("<div>Circuit name must be alphanumeric</div>")
-
-        return etree.fromstring(render_to_string('show_circuit.html', {'name':name}))
+        data = m.group('data')
+        data = escape(data)
+        return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='500' height='300'/></div>")
         
     
 def makeExtension(configs=None) :

@@ -71,9 +71,13 @@ class Module(XModule):
     def get_problem_html(self, encapsulate=True):
         html = self.lcp.get_html()
         content={'name':self.name, 
-                 'html':html}
+                 'html':html, 
+                 'weight': self.weight,
+                 }
         
-        check_button = True
+        # We using strings as truthy values, because the terminology of the check button
+        # is context-specific.
+        check_button = "Grade" if self.max_attempts else "Check"
         reset_button = True
         save_button = True
 
@@ -95,10 +99,6 @@ class Module(XModule):
         # User hasn't submitted an answer yet -- we don't want resets
         if not self.lcp.done:
             reset_button = False
-
-        attempts_str = ""
-        if self.max_attempts != None: 
-            attempts_str = " ({a}/{m})".format(a=self.attempts, m=self.max_attempts)
 
         # We don't need a "save" button if infinite number of attempts and non-randomized
         if self.max_attempts == None and self.rerandomize != "always":
@@ -122,7 +122,8 @@ class Module(XModule):
                                'save_button' : save_button,
                                'answer_available' : self.answer_available(),
                                'ajax_url' : self.ajax_url,
-                               'attempts': attempts_str, 
+                               'attempts_used': self.attempts, 
+                               'attempts_allowed': self.max_attempts, 
                                'explain': explain
                                })
         if encapsulate:
@@ -137,7 +138,7 @@ class Module(XModule):
         self.max_attempts = None
         
         dom2 = etree.fromstring(xml)
-
+        
         self.explanation=content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
         self.explain_available=content_parser.item(dom2.xpath('/problem/@explain_available'))
 
@@ -187,6 +188,7 @@ class Module(XModule):
         self.filename=content_parser.item(dom2.xpath('/problem/@filename'))
         filename=settings.DATA_DIR+"/problems/"+self.filename+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
+        self.weight=content_parser.item(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
             seed = 1
         else:
