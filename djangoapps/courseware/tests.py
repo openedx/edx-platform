@@ -4,7 +4,7 @@ import numpy
 
 import courseware.modules
 import courseware.capa.calc as calc
-from grades import Score, aggregate_scores
+from grades import Score, aggregate_scores, WeightedSubsectionsGrader, SingleSectionGrader, AssignmentFormatGrader
 
 class ModelsTest(unittest.TestCase):
     def setUp(self):
@@ -54,7 +54,7 @@ class ModelsTest(unittest.TestCase):
             exception_happened = True
         self.assertTrue(exception_happened)
 
-class GraderTest(unittest.TestCase):
+class GradesheetTest(unittest.TestCase):
 
     def test_weighted_grading(self):
         scores = []
@@ -93,3 +93,97 @@ class GraderTest(unittest.TestCase):
         all, graded = aggregate_scores(scores)
         self.assertAlmostEqual(all, Score(earned=14.0/5, possible=7.5, weight=1, graded=False, section="summary"))
         self.assertAlmostEqual(graded, Score(earned=8.0/5, possible=3.5, weight=1, graded=True, section="summary"))
+        
+class GraderTest(unittest.TestCase):
+
+    empty_gradesheet = {
+    }
+    
+    incomplete_gradesheet = {
+        'Homework': [],
+        'Lab': [],
+        'Midterm' : [],
+    }
+        
+    test_gradesheet = {
+        'Homework': [Score(earned=2, possible=20.0, weight=1, graded=True, section='hw1'),
+              Score(earned=16, possible=16.0, weight=1, graded=True, section='hw2')],
+              #The dropped scores should be from the assignments that don't exist yet
+              
+        'Lab': [Score(earned=1, possible=2.0, weight=1, graded=True, section='lab1'), #Dropped
+             Score(earned=1, possible=1.0, weight=1, graded=True, section='lab2'),
+             Score(earned=1, possible=1.0, weight=1, graded=True, section='lab3'),
+             Score(earned=5, possible=25.0, weight=1, graded=True, section='lab4'), #Dropped
+             Score(earned=3, possible=4.0, weight=1, graded=True, section='lab5'), #Dropped
+             Score(earned=6, possible=7.0, weight=1, graded=True, section='lab6'),
+             Score(earned=5, possible=6.0, weight=1, graded=True, section='lab7')],
+        
+        'Midterm' : [Score(earned=50.5, possible=100, weight=1, graded=True, section="Midterm Exam"),],
+    }
+    
+    def test_SingleSectionGrader(self):
+        midtermGrader = SingleSectionGrader("Midterm", "Midterm Exam")
+        lab4Grader = SingleSectionGrader("Lab", "lab4")
+        badLabGrader = SingleSectionGrader("Lab", "lab42")
+        
+        for graded in [midtermGrader.grade(self.empty_gradesheet), 
+                        midtermGrader.grade(self.incomplete_gradesheet), 
+                        badLabGrader.grade(self.test_gradesheet)]:
+            self.assertEqual( len(graded['section_breakdown']), 1 )
+            self.assertEqual( graded['percent'], 0.0 )
+        
+        graded = midtermGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.505 )
+        self.assertEqual( len(graded['section_breakdown']), 1 )
+        
+        graded = lab4Grader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.2 )
+        self.assertEqual( len(graded['section_breakdown']), 1 )
+        
+        
+    
+    
+    def test_assignmentFormatGrader(self):
+        homeworkGrader = AssignmentFormatGrader("Homework", 12, 2)
+        noDropGrader = AssignmentFormatGrader("Homework", 12, 0)
+        #Even though the minimum number is 3, this should grade correctly when 7 assignments are found
+        overflowGrader = AssignmentFormatGrader("Lab", 3, 2)
+        labGrader = AssignmentFormatGrader("Lab", 7, 3)
+        
+        
+        #Test the grading of an empty gradesheet
+        for graded in [ homeworkGrader.grade(self.empty_gradesheet), 
+                        noDropGrader.grade(self.empty_gradesheet),
+                        homeworkGrader.grade(self.incomplete_gradesheet),
+                        noDropGrader.grade(self.incomplete_gradesheet) ]:
+            self.assertAlmostEqual( graded['percent'], 0.0 )
+            #Make sure the breakdown includes 12 sections, plus one summary
+            self.assertEqual( len(graded['section_breakdown']), 12 + 1 )
+        
+        
+        graded = homeworkGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.11 ) # 100% + 10% / 10 assignments
+        self.assertEqual( len(graded['section_breakdown']), 12 + 1 )
+        
+        graded = noDropGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.0916666666666666 ) # 100% + 10% / 12 assignments
+        self.assertEqual( len(graded['section_breakdown']), 12 + 1 )
+        
+        graded = overflowGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.8880952380952382 ) # 100% + 10% / 5 assignments
+        self.assertEqual( len(graded['section_breakdown']), 7 + 1 )
+        
+        graded = labGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.9226190476190477 )
+        self.assertEqual( len(graded['section_breakdown']), 7 + 1 )
+        
+        
+
+        
+        
+        
+        
+        
+        
+        
+
