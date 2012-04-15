@@ -140,6 +140,56 @@ class GraderTest(unittest.TestCase):
         self.assertAlmostEqual( graded['percent'], 0.2 )
         self.assertEqual( len(graded['section_breakdown']), 1 )
         
+    def test_WeightedSubsectionsGrader(self):
+        #First, a few sub graders
+        homeworkGrader = AssignmentFormatGrader("Homework", 12, 2)
+        labGrader = AssignmentFormatGrader("Lab", 7, 3)
+        midtermGrader = SingleSectionGrader("Midterm", "Midterm Exam")
+        
+        weightedGrader = WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.25), (labGrader, labGrader.category, 0.25), 
+        (midtermGrader, midtermGrader.category, 0.5)] )
+        
+        overOneWeightsGrader = WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.5), (labGrader, labGrader.category, 0.5), 
+        (midtermGrader, midtermGrader.category, 0.5)] )
+        
+        #The midterm should have all weight on this one
+        zeroWeightsGrader = WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.0), (labGrader, labGrader.category, 0.0), 
+        (midtermGrader, midtermGrader.category, 0.5)] )
+        
+        #This should always have a final percent of zero
+        allZeroWeightsGrader = WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.0), (labGrader, labGrader.category, 0.0), 
+        (midtermGrader, midtermGrader.category, 0.0)] )
+        
+        
+        graded = weightedGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.5106547619047619 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        graded = overOneWeightsGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.7688095238095238 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        graded = zeroWeightsGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.2525 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        
+        graded = allZeroWeightsGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.0 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        for graded in [ weightedGrader.grade(self.empty_gradesheet), 
+                        weightedGrader.grade(self.incomplete_gradesheet),
+                        zeroWeightsGrader.grade(self.empty_gradesheet),
+                        allZeroWeightsGrader.grade(self.empty_gradesheet)]:
+            self.assertAlmostEqual( graded['percent'], 0.0 )
+            #section_breakdown should have all subsections from before
+            self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+            self.assertEqual( len(graded['grade_breakdown']), 3 )
         
     
     
