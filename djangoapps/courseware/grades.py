@@ -117,7 +117,7 @@ class SingleSectionGrader(CourseGrader):
                     break
         
         if foundScore:
-            percent = foundScore.earned / float(foundScore.possible)
+            percent = foundScore.earned / float(foundScore.possible) 
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format( name = self.section_name, 
                                                                         percent = percent,
                                                                         earned = float(foundScore.earned),
@@ -126,6 +126,17 @@ class SingleSectionGrader(CourseGrader):
         else:
             percent = 0.0
             detail = "{name} - 0% (?/?)".format(name = self.section_name)
+            
+            if settings.GENERATE_PROFILE_SCORES:
+                points_possible = random.randrange(50, 100)
+                points_earned = random.randrange(40, points_possible)
+                percent = points_earned / float(points_possible)
+                detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format( name = self.section_name, 
+                                                                        percent = percent,
+                                                                        earned = float(points_earned),
+                                                                        possible = float(points_possible))
+
+            
             
         
         breakdown = [{'percent': percent, 'label': self.short_label, 'detail': detail, 'category': self.category, 'prominent': True}]
@@ -206,8 +217,8 @@ class AssignmentFormatGrader(CourseGrader):
                                                                     section_type = self.section_type,
                                                                     name = "Randomly Generated",
                                                                     percent = percentage, 
-                                                                    earned = points_earned, 
-                                                                    possible = points_possible )
+                                                                    earned = float(points_earned), 
+                                                                    possible = float(points_possible) )
         
             short_label = "{short_label} {index:02d}".format(index = i+1, short_label = self.short_label)
             
