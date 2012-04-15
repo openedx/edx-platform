@@ -17,6 +17,45 @@ SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
 
 
 class CourseGrader(object):
+    """
+    A course grader takes the totaled scores for each graded section (that a student has 
+    started) in the course. From these scores, the grader calculates an overall percentage 
+    grade. The grader should also generate information about how that score was calculated,
+    to be displayed in graphs or charts.
+    
+    A grader has one required method, grade(), which is passed a grade_sheet. The grade_sheet
+    contains scores for all graded section that the student has started. If a student has
+    a score of 0 for that section, it may be missing from the grade_sheet. The grade_sheet
+    is keyed by section format. Each value is a list of Score namedtuples for each section
+    that has the matching section format.
+    
+    The grader outputs a dictionary with the following keys:
+    - percent: Contaisn a float value, which is the final percentage score for the student.
+    - section_breakdown: This is a list of dictionaries which provide details on sections
+    that were graded. These are used for display in a graph or chart. The format for a 
+    section_breakdown dictionary is explained below.
+    - grade_breakdown: This is a list of dictionaries which provide details on the contributions
+    of the final percentage grade. This is a higher level breakdown, for when the grade is constructed
+    of a few very large sections (such as Homeworks, Labs, a Midterm, and a Final). The format for
+    a grade_breakdown is explained below. This section is optional.
+    
+    A dictionary in the section_breakdown list has the following keys:
+    percent: A float percentage for the section.
+    label: A short string identifying the section. Preferably fixed-length. E.g. "HW  3".
+    detail: A string explanation of the score. E.g. "Homework 1 - Ohms Law - 83% (5/6)"
+    category: A string identifying the category. Items with the same category are grouped together
+    in the display (for example, by color).
+    prominent: A boolean value indicating that this section should be displayed as more prominent
+    than other items.
+    
+    A dictionary in the grade_breakdown list has the following keys:
+    percent: A float percentage in the breakdown. All percents should add up to the final percentage.
+    detail: A string explanation of this breakdown. E.g. "Homework - 10% of a possible 15%"
+    category: A string identifying the category. Items with the same category are grouped together
+    in the display (for example, by color).
+    
+    
+    """
     def grade(self, grade_sheet):
         raise NotImplementedError
     
