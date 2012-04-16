@@ -9,7 +9,7 @@ $(function () {
       position: 'absolute',
       display: 'none',
       top: y + 5,
-      left: x + 5,
+      left: x + 15,
       border: '1px solid #000',
       padding: '4px 6px',
       color: '#fff',
