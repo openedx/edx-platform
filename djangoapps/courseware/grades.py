@@ -59,6 +59,36 @@ class CourseGrader(object):
     def grade(self, grade_sheet):
         raise NotImplementedError
     
+    
+    @classmethod
+    def graderFromConf(cls, conf):
+        if isinstance(conf, CourseGrader):
+            return conf
+        
+        subgraders = []
+        for subgraderconf in conf:
+            subgraderconf = subgraderconf.copy()
+            weight = subgraderconf.pop("weight", 0)
+            try:
+                if 'min_count' in subgraderconf:
+                    #This is an AssignmentFormatGrader
+                    subgrader = AssignmentFormatGrader(**subgraderconf)
+                    subgraders.append( (subgrader, subgrader.category, weight) ) 
+                elif 'section_name' in subgraderconf:
+                    #This is an SingleSectionGrader
+                    subgrader = SingleSectionGrader(**subgraderconf)
+                    subgraders.append( (subgrader, subgrader.category, weight) )
+                else:
+                    raise ValueError("Configuration has no appropriate grader class.")
+                    
+            except TypeError as error:
+                 log.error("Unable to parse grader configuration:\n" + subgraderconf + "\nError was:\n" + error)
+            except ValueError as error:
+                 log.error("Unable to parse grader configuration:\n" + subgraderconf + "\nError was:\n" + error)
+        
+        return WeightedSubsectionsGrader( subgraders )
+        
+    
 class WeightedSubsectionsGrader(CourseGrader):
     """
     This grader takes a list of tuples containing (grader, category_name, weight) and computes
@@ -153,9 +183,9 @@ class AssignmentFormatGrader(CourseGrader):
     sections in this format must be specified (even if those sections haven't been
     written yet).
     
-    min_number defines how many assignments are expected throughout the course. Placeholder
-    scores (of 0) will be inserted if the number of matching sections in the course is < min_number.
-    If there number of matching sections in the course is > min_number, min_number will be ignored.
+    min_count defines how many assignments are expected throughout the course. Placeholder
+    scores (of 0) will be inserted if the number of matching sections in the course is < min_count.
+    If there number of matching sections in the course is > min_count, min_count will be ignored.
     
     category should be presentable to the user, but may not appear. When the grade breakdown is 
     displayed, scores from the same category will be similar (for example, by color).
@@ -167,9 +197,9 @@ class AssignmentFormatGrader(CourseGrader):
     "HW".
     
     """
-    def __init__(self, course_format, min_number, drop_count, category = None, section_type = None, short_label = None):
+    def __init__(self, course_format, min_count, drop_count, category = None, section_type = None, short_label = None):
         self.course_format = course_format
-        self.min_number = min_number
+        self.min_count = min_count
         self.drop_count = drop_count
         self.category = category or self.course_format
         self.section_type = section_type or self.course_format
@@ -196,7 +226,7 @@ class AssignmentFormatGrader(CourseGrader):
         #Figure the homework scores
         scores = grade_sheet.get(self.course_format, [])
         breakdown = []
-        for i in range( max(self.min_number, len(scores)) ):
+        for i in range( max(self.min_count, len(scores)) ):
             if i < len(scores):
                 percentage = scores[i].earned / float(scores[i].possible)
                 summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index = i+1, 
