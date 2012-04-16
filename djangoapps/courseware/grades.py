@@ -100,7 +100,7 @@ def grade_sheet(student):
                             correct = random.randrange( max(total-2, 1) , total + 1 )
                         else:
                             correct = total
-                    scores.append( Score(int(correct),total, float(p.get("weight", 1)), graded, p.get("name")) )
+                    scores.append( Score(int(correct),total, float(p.get("weight", total)), graded, p.get("name")) )
 
                 section_total, graded_total = aggregate_scores(scores)
                 #Add the graded total to totaled_scores
