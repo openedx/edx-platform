@@ -61,38 +61,38 @@ class GradesheetTest(unittest.TestCase):
         Score.__sub__=lambda me, other: (me.earned - other.earned) + (me.possible - other.possible)
 
         all, graded = aggregate_scores(scores)
-        self.assertEqual(all, Score(earned=0, possible=0, weight=1, graded=False, section="summary"))
-        self.assertEqual(graded, Score(earned=0, possible=0, weight=1, graded=True, section="summary"))
+        self.assertEqual(all, Score(earned=0, possible=0, graded=False, section="summary"))
+        self.assertEqual(graded, Score(earned=0, possible=0, graded=True, section="summary"))
 
-        scores.append(Score(earned=0, possible=5, weight=1, graded=False, section="summary"))
+        scores.append(Score(earned=0, possible=5, graded=False, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertEqual(all, Score(earned=0, possible=1, weight=1, graded=False, section="summary"))
-        self.assertEqual(graded, Score(earned=0, possible=0, weight=1, graded=True, section="summary"))
+        self.assertEqual(all, Score(earned=0, possible=1, graded=False, section="summary"))
+        self.assertEqual(graded, Score(earned=0, possible=0, graded=True, section="summary"))
 
-        scores.append(Score(earned=3, possible=5, weight=1, graded=True, section="summary"))
+        scores.append(Score(earned=3, possible=5, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=3.0/5, possible=2, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=3.0/5, possible=1, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=3.0/5, possible=2, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=3.0/5, possible=1, graded=True, section="summary"))
 
         scores.append(Score(earned=2, possible=5, weight=2, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=7.0/5, possible=4, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=7.0/5, possible=4, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, graded=True, section="summary"))
 
         scores.append(Score(earned=2, possible=5, weight=0, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=7.0/5, possible=4, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=7.0/5, possible=4, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, graded=True, section="summary"))
 
         scores.append(Score(earned=2, possible=5, weight=3, graded=False, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=13.0/5, possible=7, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=13.0/5, possible=7, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, graded=True, section="summary"))
 
         scores.append(Score(earned=2, possible=5, weight=.5, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=14.0/5, possible=7.5, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=8.0/5, possible=3.5, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=14.0/5, possible=7.5, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=8.0/5, possible=3.5, graded=True, section="summary"))
         
 class GraderTest(unittest.TestCase):
 
@@ -106,19 +106,19 @@ class GraderTest(unittest.TestCase):
     }
         
     test_gradesheet = {
-        'Homework': [Score(earned=2, possible=20.0, weight=1, graded=True, section='hw1'),
-              Score(earned=16, possible=16.0, weight=1, graded=True, section='hw2')],
+        'Homework': [Score(earned=2, possible=20.0, graded=True, section='hw1'),
+              Score(earned=16, possible=16.0, graded=True, section='hw2')],
               #The dropped scores should be from the assignments that don't exist yet
               
-        'Lab': [Score(earned=1, possible=2.0, weight=1, graded=True, section='lab1'), #Dropped
-             Score(earned=1, possible=1.0, weight=1, graded=True, section='lab2'),
-             Score(earned=1, possible=1.0, weight=1, graded=True, section='lab3'),
-             Score(earned=5, possible=25.0, weight=1, graded=True, section='lab4'), #Dropped
-             Score(earned=3, possible=4.0, weight=1, graded=True, section='lab5'), #Dropped
-             Score(earned=6, possible=7.0, weight=1, graded=True, section='lab6'),
-             Score(earned=5, possible=6.0, weight=1, graded=True, section='lab7')],
+        'Lab': [Score(earned=1, possible=2.0, graded=True, section='lab1'), #Dropped
+             Score(earned=1, possible=1.0, graded=True, section='lab2'),
+             Score(earned=1, possible=1.0, graded=True, section='lab3'),
+             Score(earned=5, possible=25.0, graded=True, section='lab4'), #Dropped
+             Score(earned=3, possible=4.0, graded=True, section='lab5'), #Dropped
+             Score(earned=6, possible=7.0, graded=True, section='lab6'),
+             Score(earned=5, possible=6.0, graded=True, section='lab7')],
         
-        'Midterm' : [Score(earned=50.5, possible=100, weight=1, graded=True, section="Midterm Exam"),],
+        'Midterm' : [Score(earned=50.5, possible=100, graded=True, section="Midterm Exam"),],
     }
     
     def test_SingleSectionGrader(self):

@@ -12,7 +12,7 @@ from student.models import UserProfile
 
 log = logging.getLogger("mitx.courseware")
 
-Score = namedtuple("Score", "earned possible weight graded section")
+Score = namedtuple("Score", "earned possible graded section")
 SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
 
 
@@ -273,7 +273,7 @@ class AssignmentFormatGrader(CourseGrader):
 def get_score(user, problem, cache):
     ## HACK: assumes max score is fixed per problem
     id = problem.get('id')
-    correct = 0
+    correct = 0.0
     
     # If the ID is not in the cache, add the item
     if id not in cache:
@@ -290,15 +290,22 @@ def get_score(user, problem, cache):
     if id in cache:
         response = cache[id]
         if response.grade!=None:
-            correct=response.grade
+            correct=float(response.grade)
         
     # Grab max grade from cache, or if it doesn't exist, compute and save to DB
     if id in cache and response.max_grade != None:
         total = response.max_grade
     else:
-        total=courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score()
+        total=float(courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score())
         response.max_grade = total
         response.save()
+        
+    #Now we re-weight the problem, if specified
+    weight = problem.get("weight", None)
+    if weight:
+        weight = float(weight) 
+        correct = correct * weight / total
+        total = weight        
 
     return (correct, total)
 
@@ -348,12 +355,12 @@ def grade_sheet(student):
                             correct = random.randrange( max(total-2, 1) , total + 1 )
                         else:
                             correct = total
-                    scores.append( Score(int(correct),total, float(p.get("weight", total)), graded, p.get("name")) )
+                    scores.append( Score(correct,total, graded, p.get("name")) )
 
-                section_total, graded_total = aggregate_scores(scores, s.get("name"), s.get("weight", 1))
+                section_total, graded_total = aggregate_scores(scores, s.get("name"))
                 #Add the graded total to totaled_scores
-                format = s.get('format') if s.get('format') else ""
-                subtitle = s.get('subtitle') if s.get('subtitle') else format
+                format = s.get('format', "")
+                subtitle = s.get('subtitle', format)
                 if format and graded_total[1] > 0:
                     format_scores = totaled_scores.get(format, [])
                     format_scores.append( graded_total )
@@ -387,26 +394,21 @@ def grade_sheet(student):
     return {'courseware_summary' : chapters,
             'grade_summary' : grade_summary}
 
-def aggregate_scores(scores, section_name = "summary", section_weight = 1):
-    #TODO: What does a possible score of zero mean? We need to think what extra credit is
-    scores = filter( lambda score: score.possible > 0, scores )
+def aggregate_scores(scores, section_name = "summary"):    
+    total_correct_graded = sum(score.earned for score in scores if score.graded)
+    total_possible_graded = sum(score.possible for score in scores if score.graded)
     
-    total_correct_graded = sum((score.earned*1.0/score.possible)*score.weight for score in scores if score.graded)
-    total_possible_graded = sum(score.weight for score in scores if score.graded)
-    
-    total_correct = sum((score.earned*1.0/score.possible)*score.weight for score in scores)
-    total_possible = sum(score.weight for score in scores)
+    total_correct = sum(score.earned for score in scores)
+    total_possible = sum(score.possible for score in scores)
         
     #regardless of whether or not it is graded
     all_total = Score(total_correct, 
                           total_possible,
-                          section_weight,
                           False,
                           section_name)
     #selecting only graded things
     graded_total = Score(total_correct_graded, 
                          total_possible_graded, 
-                         section_weight, 
                          True, 
                          section_name)
 

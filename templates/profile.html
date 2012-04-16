@@ -154,7 +154,7 @@ $(function() {
               %>
               
               <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">
-                ${ section['section'] }</a> ${"({0:g}/{1:g}) {2}".format( earned, total, percentageString )}</h3>
+                ${ section['section'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
               ${section['subtitle']}
               %if 'due' in section and section['due']!="":
                 due ${section['due']}
@@ -164,7 +164,7 @@ $(function() {
                 <ol class="scores">
                   ${ "Problem Scores: " if section['graded'] else "Practice Scores: "}
                   %for score in section['scores']:
-                    <li class="score">${"{0:g}/{1:g}".format(score.earned,score.possible)}</li>
+                    <li class="score">${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
                   %endfor
                 </ol>
               %endif
