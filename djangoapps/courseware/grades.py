@@ -331,7 +331,6 @@ def grade_sheet(student):
         response_by_id[response.module_id] = response
     
     
-    
     totaled_scores = {}
     chapters=[]
     for c in xmlChapters:
