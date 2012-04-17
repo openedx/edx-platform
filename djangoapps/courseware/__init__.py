@@ -15,7 +15,6 @@ from courseware.course_settings import GRADER  # This won't work.
 
 """
 
-
 import courseware
 import imp
 import logging
@@ -27,8 +26,6 @@ from django.utils.functional import SimpleLazyObject
 from courseware import global_course_settings
 
 _log = logging.getLogger("mitx.courseware")
-
-
 
 class Settings(object):
     def __init__(self):
@@ -52,6 +49,5 @@ class Settings(object):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
                 setattr(self, setting, setting_value)
-
 
 course_settings = Settings()

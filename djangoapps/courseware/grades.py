@@ -16,7 +16,6 @@ log = logging.getLogger("mitx.courseware")
 Score = namedtuple("Score", "earned possible graded section")
 SectionPercentage = namedtuple("SectionPercentage", "percentage label summary")
 
-
 class CourseGrader(object):
     """
     A course grader takes the totaled scores for each graded section (that a student has 
@@ -271,45 +270,6 @@ class AssignmentFormatGrader(CourseGrader):
                 #No grade_breakdown here
                 }
 
-def get_score(user, problem, cache):
-    ## HACK: assumes max score is fixed per problem
-    id = problem.get('id')
-    correct = 0.0
-    
-    # If the ID is not in the cache, add the item
-    if id not in cache:
-        module = StudentModule(module_type = 'problem',  # TODO: Move into StudentModule.__init__?
-                               module_id = id,
-                               student = user, 
-                               state = None, 
-                               grade = 0,
-                               max_grade = None,
-                               done = 'i')
-        cache[id] = module
-
-    # Grab the # correct from cache
-    if id in cache:
-        response = cache[id]
-        if response.grade!=None:
-            correct=float(response.grade)
-        
-    # Grab max grade from cache, or if it doesn't exist, compute and save to DB
-    if id in cache and response.max_grade != None:
-        total = response.max_grade
-    else:
-        total=float(courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score())
-        response.max_grade = total
-        response.save()
-        
-    #Now we re-weight the problem, if specified
-    weight = problem.get("weight", None)
-    if weight:
-        weight = float(weight) 
-        correct = correct * weight / total
-        total = weight        
-
-    return (correct, total)
-
 def grade_sheet(student):
     """
     This pulls a summary of all problems in the course. It returns a dictionary with two datastructures:
@@ -405,3 +365,43 @@ def aggregate_scores(scores, section_name = "summary"):
                          section_name)
 
     return all_total, graded_total
+    
+
+def get_score(user, problem, cache):
+    ## HACK: assumes max score is fixed per problem
+    id = problem.get('id')
+    correct = 0.0
+    
+    # If the ID is not in the cache, add the item
+    if id not in cache:
+        module = StudentModule(module_type = 'problem',  # TODO: Move into StudentModule.__init__?
+                               module_id = id,
+                               student = user, 
+                               state = None, 
+                               grade = 0,
+                               max_grade = None,
+                               done = 'i')
+        cache[id] = module
+
+    # Grab the # correct from cache
+    if id in cache:
+        response = cache[id]
+        if response.grade!=None:
+            correct=float(response.grade)
+        
+    # Grab max grade from cache, or if it doesn't exist, compute and save to DB
+    if id in cache and response.max_grade != None:
+        total = response.max_grade
+    else:
+        total=float(courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score())
+        response.max_grade = total
+        response.save()
+        
+    #Now we re-weight the problem, if specified
+    weight = problem.get("weight", None)
+    if weight:
+        weight = float(weight) 
+        correct = correct * weight / total
+        total = weight        
+
+    return (correct, total)
