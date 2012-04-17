@@ -5,6 +5,7 @@ import random
 import urllib
 
 from collections import namedtuple
+from courseware import course_settings
 from django.conf import settings
 from lxml import etree
 from models import StudentModule
@@ -317,9 +318,7 @@ def grade_sheet(student):
     each containing an array of sections, each containing an array of scores. This contains information for graded and ungraded
     problems, and is good for displaying a course summary with due dates, etc.
     
-    - grade_summary is a summary of how the final grade breaks down. It is an array of "sections". Each section can either be
-    a conglomerate of scores (like labs or homeworks) which has subscores and a totalscore, or a section can be all from one assignment
-    (such as a midterm or final) and only has a totalscore. Each section has a weight that shows how it contributes to the total grade.
+    - grade_summary is the output from the course grader. More information on the format is in the docstring for CourseGrader.
     """
     dom=content_parser.course_file(student)
     course = dom.xpath('//course/@name')[0]
@@ -379,15 +378,9 @@ def grade_sheet(student):
                          'chapter' : c.get("name"),
                          'sections' : sections,})
     
-    #TODO: This grader declaration should live in the data repository. It is only here now to get it working
-    hwGrader = AssignmentFormatGrader("Homework", 12, 2, short_label = "HW")
-    labGrader = AssignmentFormatGrader("Lab", 12, 2, category = "Labs")
-    midtermGrader = SingleSectionGrader("Midterm", "Midterm Exam", short_label = "Midterm")
-    finalGrader = SingleSectionGrader("Examination", "Final Exam", short_label = "Final")
-    
-    grader = WeightedSubsectionsGrader( [(hwGrader, hwGrader.category, 0.15), (labGrader, labGrader.category, 0.15), 
-        (midtermGrader, midtermGrader.category, 0.30), (finalGrader, finalGrader.category, 0.40)] )
-    
+        
+    grader = CourseGrader.graderFromConf(course_settings.GRADER)
+    #TODO: We should cache this grader object
     grade_summary = grader.grade(totaled_scores)
     
     return {'courseware_summary' : chapters,
