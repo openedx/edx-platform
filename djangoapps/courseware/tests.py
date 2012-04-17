@@ -4,7 +4,9 @@ import numpy
 
 import courseware.modules
 import courseware.capa.calc as calc
-from grades import Score, aggregate_scores, CourseGrader, WeightedSubsectionsGrader, SingleSectionGrader, AssignmentFormatGrader
+import courseware.graders as graders
+from courseware.graders import Score, CourseGrader, WeightedSubsectionsGrader, SingleSectionGrader, AssignmentFormatGrader
+from courseware.grades import aggregate_scores
 
 class ModelsTest(unittest.TestCase):
     def setUp(self):
@@ -107,9 +109,9 @@ class GraderTest(unittest.TestCase):
     }
     
     def test_SingleSectionGrader(self):
-        midtermGrader = SingleSectionGrader("Midterm", "Midterm Exam")
-        lab4Grader = SingleSectionGrader("Lab", "lab4")
-        badLabGrader = SingleSectionGrader("Lab", "lab42")
+        midtermGrader = graders.SingleSectionGrader("Midterm", "Midterm Exam")
+        lab4Grader = graders.SingleSectionGrader("Lab", "lab4")
+        badLabGrader = graders.SingleSectionGrader("Lab", "lab42")
         
         for graded in [midtermGrader.grade(self.empty_gradesheet), 
                         midtermGrader.grade(self.incomplete_gradesheet), 
@@ -125,12 +127,12 @@ class GraderTest(unittest.TestCase):
         self.assertAlmostEqual( graded['percent'], 0.2 )
         self.assertEqual( len(graded['section_breakdown']), 1 )
         
-    def test_assignmentFormatGrader(self):
-        homeworkGrader = AssignmentFormatGrader("Homework", 12, 2)
-        noDropGrader = AssignmentFormatGrader("Homework", 12, 0)
+    def test_AssignmentFormatGrader(self):
+        homeworkGrader = graders.AssignmentFormatGrader("Homework", 12, 2)
+        noDropGrader = graders.AssignmentFormatGrader("Homework", 12, 0)
         #Even though the minimum number is 3, this should grade correctly when 7 assignments are found
-        overflowGrader = AssignmentFormatGrader("Lab", 3, 2)
-        labGrader = AssignmentFormatGrader("Lab", 7, 3)
+        overflowGrader = graders.AssignmentFormatGrader("Lab", 3, 2)
+        labGrader = graders.AssignmentFormatGrader("Lab", 7, 3)
         
         
         #Test the grading of an empty gradesheet
@@ -162,25 +164,25 @@ class GraderTest(unittest.TestCase):
         
     def test_WeightedSubsectionsGrader(self):
         #First, a few sub graders
-        homeworkGrader = AssignmentFormatGrader("Homework", 12, 2)
-        labGrader = AssignmentFormatGrader("Lab", 7, 3)
-        midtermGrader = SingleSectionGrader("Midterm", "Midterm Exam")
+        homeworkGrader = graders.AssignmentFormatGrader("Homework", 12, 2)
+        labGrader = graders.AssignmentFormatGrader("Lab", 7, 3)
+        midtermGrader = graders.SingleSectionGrader("Midterm", "Midterm Exam")
         
-        weightedGrader = WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.25), (labGrader, labGrader.category, 0.25), 
+        weightedGrader = graders.WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.25), (labGrader, labGrader.category, 0.25), 
         (midtermGrader, midtermGrader.category, 0.5)] )
         
-        overOneWeightsGrader = WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.5), (labGrader, labGrader.category, 0.5), 
+        overOneWeightsGrader = graders.WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.5), (labGrader, labGrader.category, 0.5), 
         (midtermGrader, midtermGrader.category, 0.5)] )
         
         #The midterm should have all weight on this one
-        zeroWeightsGrader = WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.0), (labGrader, labGrader.category, 0.0), 
+        zeroWeightsGrader = graders.WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.0), (labGrader, labGrader.category, 0.0), 
         (midtermGrader, midtermGrader.category, 0.5)] )
         
         #This should always have a final percent of zero
-        allZeroWeightsGrader = WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.0), (labGrader, labGrader.category, 0.0), 
+        allZeroWeightsGrader = graders.WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.0), (labGrader, labGrader.category, 0.0), 
         (midtermGrader, midtermGrader.category, 0.0)] )
         
-        emptyGrader = WeightedSubsectionsGrader( [] )
+        emptyGrader = graders.WeightedSubsectionsGrader( [] )
         
         graded = weightedGrader.grade(self.test_gradesheet)
         self.assertAlmostEqual( graded['percent'], 0.5106547619047619 )
@@ -221,33 +223,33 @@ class GraderTest(unittest.TestCase):
 
     def test_graderFromConf(self):
         
-        #Confs always produce a WeightedSubsectionsGrader, so we test this by repeating the test
-        #in test_WeightedSubsectionsGrader, but generate the graders with confs.
+        #Confs always produce a graders.WeightedSubsectionsGrader, so we test this by repeating the test
+        #in test_graders.WeightedSubsectionsGrader, but generate the graders with confs.
         
-        weightedGrader = CourseGrader.graderFromConf([
+        weightedGrader = graders.grader_from_conf([
             {
-                'course_format' : "Homework",
+                'type' : "Homework",
                 'min_count' : 12,
                 'drop_count' : 2,
                 'short_label' : "HW",
                 'weight' : 0.25,
             },
             {
-                'course_format' : "Lab",
+                'type' : "Lab",
                 'min_count' : 7,
                 'drop_count' : 3,
                 'category' : "Labs",
                 'weight' : 0.25
             },
             {
-                'section_format' : "Midterm",
-                'section_name' : "Midterm Exam",
+                'type' : "Midterm",
+                'name' : "Midterm Exam",
                 'short_label' : "Midterm",
                 'weight' : 0.5,
             },
         ])
         
-        emptyGrader = CourseGrader.graderFromConf([])
+        emptyGrader = graders.grader_from_conf([])
         
         graded = weightedGrader.grade(self.test_gradesheet)
         self.assertAlmostEqual( graded['percent'], 0.5106547619047619 )
@@ -260,8 +262,8 @@ class GraderTest(unittest.TestCase):
         self.assertEqual( len(graded['grade_breakdown']), 0 )
         
         #Test that graders can also be used instead of lists of dictionaries
-        homeworkGrader = AssignmentFormatGrader("Homework", 12, 2)
-        homeworkGrader2 = CourseGrader.graderFromConf(homeworkGrader)
+        homeworkGrader = graders.AssignmentFormatGrader("Homework", 12, 2)
+        homeworkGrader2 = graders.grader_from_conf(homeworkGrader)
         
         graded = homeworkGrader2.grade(self.test_gradesheet)
         self.assertAlmostEqual( graded['percent'], 0.11 )
