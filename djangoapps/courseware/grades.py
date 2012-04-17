@@ -131,6 +131,8 @@ def grade_sheet(student):
             }
 
 def aggregate_scores(scores): 
+    scores = filter( lambda score: score.possible > 0, scores )
+    
     total_correct_graded = sum((score.earned*1.0/score.possible)*score.weight for score in scores if score.graded)
     total_possible_graded = sum(score.weight for score in scores if score.graded)
     total_correct = sum((score.earned*1.0/score.possible)*score.weight for score in scores)
@@ -225,10 +227,10 @@ def grade_summary_6002x(totaled_scores):
     final_percentage = final_score.earned * 1.0 / final_score.possible if 'Final' in totaled_scores else 0
     
     if settings.GENERATE_PROFILE_SCORES:
-        midterm_score = Score(random.randrange(50, 150), 150, True, "?")
+        midterm_score = Score(random.randrange(50, 150), 150, 150, True, "?")
         midterm_percentage = midterm_score.earned / float(midterm_score.possible)
         
-        final_score = Score(random.randrange(100, 300), 300, True, "?")
+        final_score = Score(random.randrange(100, 300), 300, 300, True, "?")
         final_percentage = final_score.earned / float(final_score.possible)
         
     
