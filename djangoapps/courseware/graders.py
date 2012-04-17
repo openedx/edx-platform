@@ -1,3 +1,4 @@
+import abc
 import logging
 
 from django.conf import settings
@@ -86,6 +87,10 @@ class CourseGrader(object):
     
     
     """
+    
+    __metaclass__ = abc.ABCMeta
+    
+    @abc.abstractmethod
     def grade(self, grade_sheet):
         raise NotImplementedError        
     
