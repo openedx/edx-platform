@@ -144,12 +144,17 @@ def render_x_module(user, request, xml_module, module_object_preload):
         module_object_preload.append(smod)
     # Grab content
     content = instance.get_html()
+    init_js = instance.get_init_js()
+    destory_js = instance.get_destroy_js()
     if user.is_staff:
         content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
-                                                                     'histogram':grade_histogram(module_id)})
+                                                                     'module_id' : module_id})
+        init_js = init_js+render_to_string("staff_problem_histogram.js", {'histogram' : grade_histogram(module_id),
+                                                                          'module_id' : module_id})
+        
     content = {'content':content, 
-               "destroy_js":instance.get_destroy_js(),
-               'init_js':instance.get_init_js(), 
+               "destroy_js":destory_js,
+               'init_js':init_js, 
                'type':module_type}
 
     return content
