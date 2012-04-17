@@ -15,15 +15,15 @@ from courseware.course_settings import GRADER  # This won't work.
 
 """
 
-import courseware
 import imp
 import logging
 import sys
 import types
 
 from django.conf import settings
-from django.utils.functional import SimpleLazyObject
+
 from courseware import global_course_settings
+from courseware import graders
 
 _log = logging.getLogger("mitx.courseware")
 
@@ -49,5 +49,8 @@ class Settings(object):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
                 setattr(self, setting, setting_value)
+                
+        # Here is where we should parse any configurations, so that we can fail early
+        self.GRADER = graders.grader_from_conf(self.GRADER)
 
 course_settings = Settings()
