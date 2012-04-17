@@ -33,13 +33,16 @@ class Settings(object):
         for setting in dir(global_course_settings):
             if setting == setting.upper():
                 setattr(self, setting, getattr(global_course_settings, setting))
-                
+        
+        
+        data_dir = settings.DATA_DIR
+        
         fp = None
         try:
-            fp, pathname, description = imp.find_module("course_settings", [settings.DATA_DIR])
+            fp, pathname, description = imp.find_module("course_settings", [data_dir])
             mod = imp.load_module("course_settings", fp, pathname, description)
         except Exception as e:
-            _log.error("Unable to import course settings file from " + settings.DATA_DIR + ". Error: " + str(e))
+            _log.exception("Unable to import course settings file from " + data_dir + ". Error: " + str(e))
             mod = types.ModuleType('course_settings')
         finally:
             if fp:
