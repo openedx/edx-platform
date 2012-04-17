@@ -11,6 +11,6 @@ from django.core import cache
 # to returning the default cache. This will happen with dev machines.
 try:
     cache = cache.get_cache('general')
-except ValueError:
+except Exception:
     cache = cache.cache
 
