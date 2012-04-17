@@ -199,22 +199,22 @@ section.course-content {
             border-right: 1px solid #000;
             @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
             float: left;
-            line-height: 46px; //height of play pause buttons
+            line-height: 0;
+            padding-right: lh(.25);
             margin-right: 0;
-            position: relative;
             @include transition();
-            width: 110px;
             cursor: pointer;
             -webkit-font-smoothing: antialiased;
 
             h3 {
-              @include inline-block();
+              float: left;
               padding: 0 lh(.25) 0 lh(.5);
               font-weight: normal;
               text-transform: uppercase;
               font-size: 12px;
               letter-spacing: 1px;
               color: #999;
+              line-height: 46px; //height of play pause buttons
             }
 
             p.active {
@@ -222,27 +222,19 @@ section.course-content {
               padding: 0 lh(.5) 0 0;
               margin-bottom: 0;
               font-weight: bold;
+              display: none;
             }
 
             // fix for now
             ol#video_speeds {
-              background-color: #444;
-              border: 1px solid #000;
-              border-top: 0;
-              @include box-shadow(inset 1px 0 0 #555);
               @include inline-block();
-              left: -1px;
-              position: absolute;
-              top: 48px;
-              width: 100%;
-              z-index: 10;
 
               li {
-                border-bottom: 1px solid #000;
-                @include box-shadow( 0 1px 0 #555);
+                float: left;
                 color: #fff;
                 cursor: pointer;
-                padding: 0 lh(.5);
+                padding: 0 lh(.25);
+                line-height: 46px; //height of play pause buttons
 
                 &.active {
                   font-weight: bold;
@@ -255,15 +247,13 @@ section.course-content {
                 }
 
                 &:hover {
-                  color: #aaa;
-                  background-color: #666;
+                  background-color: #444;
                 }
               }
             }
 
             &:hover {
               opacity: 1;
-              background-color: #444;
             }
           }
 

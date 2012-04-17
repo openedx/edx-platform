@@ -13,7 +13,7 @@ STATIC_GRAB = False
 DEV_CONTENT = True
 
 LIB_URL = '/static/js/'
-LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/'
+# LIB_URL = 'https://mitxstatic.s3.amazonaws.com/js/' # No longer using S3 for this
 BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'
 
@@ -550,8 +550,8 @@ LIVESETTINGS_OPTIONS = {
             },
             'MARKUP' : {
                 'MARKUP_CODE_FRIENDLY' : False,
-                'ENABLE_MATHJAX' : False,  # FIXME: Test with this enabled
-                'MATHJAX_BASE_URL' : u'',
+                'ENABLE_MATHJAX' : True,  # FIXME: Test with this enabled
+                'MATHJAX_BASE_URL' : u'/static/js/mathjax-MathJax-c9db6ac/',
                 'ENABLE_AUTO_LINKING' : False,
                 'AUTO_LINK_PATTERNS' : u'',
                 'AUTO_LINK_URLS' : u'',

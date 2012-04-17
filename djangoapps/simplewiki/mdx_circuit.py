@@ -65,7 +65,7 @@ class CircuitLink(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         data = m.group('data')
         data = escape(data)
-        return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='500' height='300'/></div>")
+        return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='640' height='480'/></div>")
         
     
 def makeExtension(configs=None) :
