@@ -313,6 +313,10 @@ def grade_sheet(student):
                             correct = random.randrange( max(total-2, 1) , total + 1 )
                         else:
                             correct = total
+                    
+                    if not total > 0:
+                        #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
+                        graded = False 
                     scores.append( Score(correct,total, graded, p.get("name")) )
 
                 section_total, graded_total = aggregate_scores(scores, s.get("name"))
