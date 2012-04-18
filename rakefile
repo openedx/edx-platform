@@ -11,7 +11,7 @@ PACKAGE_NAME = "mitx"
 LINK_PATH = "/opt/wwc/mitx"
 VERSION = "0.1"
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
-BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_')
+BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_').downcase()
 BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
 
 if BRANCH == "master"
