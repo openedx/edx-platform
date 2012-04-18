@@ -6,7 +6,7 @@ REPO_ROOT = File.dirname(__FILE__)
 BUILD_DIR = File.join(REPO_ROOT, "build")
 
 # Packaging constants
-DEPLOY_DIR = "/opt/packages"
+DEPLOY_DIR = "/opt/wwc"
 PACKAGE_NAME = "mitx"
 LINK_PATH = "/opt/wwc/mitx"
 VERSION = "0.1"
