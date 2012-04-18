@@ -38,10 +38,13 @@ task :package do
         #! /bin/sh
         set -e
         set -x
+
+        sudo chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
         
         service gunicorn stop
         rm -f #{LINK_PATH}
         ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
+        sudo chown makeitso:makeitso #{LINK_PATH}
         service gunicorn start
         POSTINSTALL
         postinstall.close()
