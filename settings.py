@@ -377,6 +377,8 @@ ALLOW_UNICODE_SLUGS = False
 ASKBOT_USE_STACKEXCHANGE_URLS = False #mimic url scheme of stackexchange
 ASKBOT_CSS_DEVEL = True
 
+ASKBOT_CLOSED_FORUM_MODE = True
+
 LIVESETTINGS_OPTIONS = {
     1: {
         'DB' : False,
