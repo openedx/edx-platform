@@ -88,10 +88,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 
-# FIXME: We're not checking this out in this location yet
-# TEXTBOOK_DIR = ENV_ROOT / "books" / "circuits_agarwal_lang" # What it should eventually be
-TEXTBOOK_DIR = ENV_ROOT / "book_images"
-
 # FIXME: 
 # We should have separate S3 staged URLs in case we need to make changes to 
 # these assets and test them.
@@ -142,12 +138,8 @@ STATICFILES_DIRS = (
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
-# Something like this will probably need to be enabled when we're really doing
-# multiple courses.
-#    ("circuits", DATA_DIR / "images"),
-#    ("handouts", DATA_DIR / "handouts"),
-#    ("subs", DATA_DIR / "subs"),
-#    ("book", TEXTBOOK_DIR)
+# This is how you would use the textbook images locally
+#    ("book", ENV_ROOT / "book_images")
 )
 
 # Locale/Internationalization
@@ -209,8 +201,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+
+    # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
