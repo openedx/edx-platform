@@ -75,8 +75,10 @@ if settings.ASKBOT_ENABLED:
                     url(r'^followit/', include('followit.urls')), \
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
+
+urlpatterns = patterns(*urlpatterns)
+
 if settings.DEBUG:
-    urlpatterns = patterns(*urlpatterns) + staticfiles_urlpatterns()
-else:
-    urlpatterns = patterns(*urlpatterns)
+    urlpatterns += staticfiles_urlpatterns()
+
 
