@@ -250,7 +250,7 @@ PIPELINE_COMPILERS = [
     'pipeline.compilers.sass.SASSCompiler'
 ]
 
-PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/css/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 PIPELINE_CSS_COMPRESSOR = None
 
