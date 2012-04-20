@@ -1,17 +1,18 @@
+<%namespace name='static' file='static_content.html'/>
 <!DOCTYPE html>
 <html>
 <head>
   <%block name="title"><title>MITx 6.002x</title></%block>
 
-  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
-  <link rel="stylesheet" href="/static/css/application.css?v2" type="text/css" media="all" />
+  <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
+  <%static:css group='application'/>
 
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
-  <script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script>
+  <script type="text/javascript" src="${static.url('js/jquery-1.6.2.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery-ui-1.8.16.custom.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script>
 
   <!--[if lt IE 9]>
-  <script src="/static/js/html5shiv.js"></script>
+  <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
   <script type="text/x-mathjax-config">
@@ -23,7 +24,7 @@
   <%block name="headextra"/>
 
   <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates -->
-  <script type="text/javascript" src="${ settings.LIB_URL }mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script>
+  <script type="text/javascript" src="${static.url('js/mathjax-MathJax-c9db6ac/MathJax.js')}?config=TeX-AMS_HTML-full"></script>
 </head>
 
 <body class="<%block name="bodyclass"/>">
@@ -105,13 +106,13 @@
     </div>
 
 
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script>
-  <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script>
-  <script type="text/javascript" src="/static/js/jquery.qtip.min.js"></script>
-  <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
-  <script type="text/javascript" src="/static/js/video_player.js"></script>
-  <script type="text/javascript" src="/static/js/schematic.js"></script>
-  <script type="text/javascript" src="/static/js/cktsim.js"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.leanModal.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.qtip.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.cookie.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/video_player.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/cktsim.js')}"></script>
  
 
 <script>

@@ -1,0 +1,188 @@
+div.info-wrapper {
+  @extend .table-wrapper;
+
+  section.updates {
+    @extend .content;
+
+    > h1 {
+      @extend .top-header;
+    }
+
+    > p {
+      margin-bottom: lh();
+    }
+
+    > ol {
+      list-style: none;
+
+      > li {
+        padding-bottom: lh(.5);
+        margin-bottom: lh(.5);
+        @extend .clearfix;
+        border-bottom: 1px solid #e3e3e3;
+
+        &:first-child {
+          padding: lh(.5);
+          margin: 0 (-(lh(.5))) lh();
+          background: $cream;
+          border-bottom: 1px solid darken($cream, 10%);
+        }
+
+        h2 {
+          float: left;
+          width: flex-grid(2, 9);
+          margin: 0 flex-gutter() 0 0;
+        }
+
+        section.update-description {
+          float: left;
+          width: flex-grid(7, 9);
+          margin-bottom: 0;
+
+          li {
+            margin-bottom: lh(.5);
+          }
+
+          p {
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  section.handouts {
+    @extend .sidebar;
+    @include border-radius(0 4px 4px 0);
+    border-right: 0;
+    border-left: 1px solid #d3d3d3;
+
+    header {
+      @extend .bottom-border;
+      padding: lh(.5) lh(.75);
+
+      h1 {
+        font-size: 18px;
+        margin: 0 ;
+      }
+
+      p {
+         margin-bottom: 0;
+         margin-top: 4px;
+         font-size: 12px;
+         color: #666;
+      }
+    }
+
+    ol {
+      list-style: none;
+      background: none;
+
+      li {
+        @include box-shadow(0 1px 0 #eee);
+        border-bottom: 1px solid #d3d3d3;
+        @include box-sizing(border-box);
+        @extend .clearfix;
+        padding: 7px lh(.75);
+        background: none;
+        position: relative;
+
+        &.expandable,
+        &.collapsable {
+          h4 {
+            padding-left: 18px;
+            font-style: $body-font-size;
+            font-weight: normal;
+          }
+        }
+
+        ul {
+          background: none;
+          margin: 7px (-(lh(.75))) 0;
+
+          li {
+            padding-left: 18px + lh(.75);
+            @include box-shadow(inset 0 1px 0 #eee);
+            border-top: 1px solid #d3d3d3;
+            border-bottom: 0;
+          }
+        }
+
+        &:hover {
+          background-color: #e9e9e9;
+        }
+
+        div.hitarea {
+          background-image: url('../images/treeview-default.gif');
+          width: 100%;
+          height: 100%;
+          max-height: 20px;
+          display: block;
+          position: absolute;
+          left: lh(.75);
+          margin-left: 0;
+
+          &:hover {
+            opacity: 0.6;
+            filter: alpha(opacity=60);
+          }
+
+          &.expandable-hitarea {
+            background-position: -80px 1px;
+          }
+
+          &.collapsable-hitarea {
+            background-position: -64px -21px;
+          }
+        }
+
+        h3 {
+          border-bottom: 0;
+          text-transform: uppercase;
+          font-weight: bold;
+          color: #999;
+          @include box-shadow(none);
+          font-size: 12px;
+        }
+
+        p {
+          margin: 0;
+          text-transform: none;
+          letter-spacing: 0;
+          font-size: $body-font-size;
+
+          a {
+            padding-right: 8px;
+
+            &:before {
+              content: "•";
+              @include inline-block();
+              padding-right: 8px;
+              color: #ccc;
+            }
+
+            &:first-child {
+              &:before {
+                content: "";
+                padding-right: 0;
+              }
+            }
+          }
+        }
+
+        a {
+          @include transition();
+          color: lighten($text-color, 10%);
+          text-decoration: none;
+          @include inline-block();
+
+          &:hover {
+            color: $mit-red;
+          }
+        }
+      }
+    }
+  }
+}

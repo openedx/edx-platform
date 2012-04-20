@@ -137,6 +137,9 @@ STATIC_ROOT = ENV_ROOT / "staticfiles" # We don't run collectstatic -- this is t
 STATICFILES_DIRS = (
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
+    ("circuits", DATA_DIR / "images"),
+    ("handouts", DATA_DIR / "handouts"),
+    ("subs", DATA_DIR / "subs"),
 
 # This is how you would use the textbook images locally
 #    ("book", ENV_ROOT / "book_images")
@@ -183,8 +186,8 @@ WIKI_REQUIRE_LOGIN_VIEW = True
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -220,6 +223,37 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
+############################### Pipeline #######################################
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+PIPELINE_CSS = {
+    'application': {
+        'source_filenames': ['css/application.scss'],
+        'output_filename': 'css/application.css',
+    },
+    'marketing': {
+        'source_filenames': ['css/marketing.scss'],
+        'output_filename': 'css/marketing.css',
+    },
+    'marketing-ie': {
+        'source_filenames': ['css/marketing-ie.scss'],
+        'output_filename': 'css/marketing-ie.css',
+    },
+    'print': {
+        'source_filenames': ['css/print.scss'],
+        'output_filename': 'css/print.css',
+    }
+}
+
+PIPELINE_COMPILERS = [
+    'pipeline.compilers.sass.SASSCompiler'
+]
+
+PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+
+PIPELINE_CSS_COMPRESSOR = None
+
 ################################### APPS #######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
@@ -229,8 +263,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.staticfiles',
     'south',
+
+    # For asset pipelining
+    'pipeline',
+    'staticfiles',
 
     # Our courseware
     'circuit',

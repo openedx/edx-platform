@@ -10,6 +10,7 @@ sessions. Assumes structure:
 from common import *
 
 DEBUG = True
+PIPELINE = True
 TEMPLATE_DEBUG = True
 
 LOGGING = logsettings.get_logger_config(ENV_ROOT / "log", 
