@@ -1,10 +1,11 @@
 <%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
 <%block name="headextra">
-  <script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
-  <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
-  <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
+  <script type="text/javascript" src="${static.url('js/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/flot/jquery.flot.stack.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/flot/jquery.flot.symbol.js')}"></script>
   % for s in students:
   <script>
     ${profile_graphs.body(s['grade_info']['grade_summary'], "grade-detail-graph-" + str(s['id']))}

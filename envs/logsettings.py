@@ -82,5 +82,10 @@ def get_logger_config(log_dir,
                 'level' : 'DEBUG',
                 'propagate' : False
             },
+            'keyedcache' : {
+                'handlers' : handlers,
+                'level' : 'DEBUG',
+                'propagate' : False
+            },
         }
     }
