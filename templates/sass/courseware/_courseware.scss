@@ -184,10 +184,9 @@ div.course-wrapper {
 
     section.tutorials {
       h2 {
-        padding-bottom: lh(.25);
         margin-bottom: lh();
-        border-bottom: 1px solid #e3e3e3;
       }
+
       ul {
         margin: 0;
         @include clearfix();
