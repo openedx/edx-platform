@@ -79,7 +79,6 @@ def evaluator(variables, functions, string, cs=False):
     # log.debug("string: {0}".format(string))
 
     def lower_dict(d):
-        print d
         return dict([(k.lower(), d[k]) for k in d])
 
     all_variables = copy.copy(default_variables)
