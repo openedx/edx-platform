@@ -134,7 +134,7 @@ input, select {
   display: table;
   width: 100%; }
 
-h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info header, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
+h1.top-header, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info header, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
   background: #f3f3f3;
   border-bottom: 1px solid #e3e3e3;
   margin: -22.652px -22.652px 22.652px;
@@ -2659,6 +2659,8 @@ body.courseware {
 
 div.course-wrapper ul, div.course-wrapper ol {
   list-style: none; }
+div.course-wrapper section.course-content h1 {
+  margin: 0 0 22.652px; }
 div.course-wrapper section.course-content p {
   margin-bottom: 22.652px; }
 div.course-wrapper section.course-content p:empty {
