@@ -19,7 +19,7 @@ div.course-wrapper {
     @extend .content;
 
     h1 {
-      @extend .top-header;
+      margin: 0 0 lh();
     }
 
     p {
