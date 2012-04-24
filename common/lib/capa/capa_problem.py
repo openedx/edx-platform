@@ -174,10 +174,9 @@ class LoncapaProblem(object):
         return self.correct_map
 
     def get_question_answers(self):
-        '''
-        Make a dict of (id,correct_answer) entries, for all the problems. 
-        Called by "show answers" button JSON request (see capa_module)
-        '''
+        """Returns a dict of answer_ids to answer values. If we can't generate
+        an answer (because it's a customresponse type), that answer_id is 
+        not included."""
         context=self.extract_context(self.tree)
         answer_map = dict()
         problems_simple = self.extract_problems(self.tree)	# purified (flat) XML tree of just response queries
