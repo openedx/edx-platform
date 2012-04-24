@@ -78,17 +78,24 @@ def evaluator(variables, functions, string, cs=False):
     # log.debug("functions: {0}".format(functions))
     # log.debug("string: {0}".format(string))
 
+    def lower_dict(d):
+        print d
+        return dict([(k.lower(), d[k]) for k in d])
+
     all_variables = copy.copy(default_variables)
-    all_variables.update(variables)
     all_functions = copy.copy(default_functions)
+
+    if not cs: 
+        all_variables = lower_dict(all_variables)
+        all_functions = lower_dict(all_functions)
+
+    all_variables.update(variables)    
     all_functions.update(functions)
     
     if not cs: 
         string_cs = string.lower()
-        for v in all_variables.keys():
-            all_variables[v.lower()]=all_variables[v]
-        for f in all_functions.keys():
-            all_functions[f.lower()]=all_functions[f]
+        all_functions = lower_dict(all_functions)
+        all_variables = lower_dict(all_variables)
         CasedLiteral = CaselessLiteral 
     else:
         string_cs = string
