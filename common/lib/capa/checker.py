@@ -38,11 +38,10 @@ def main():
 
         if args.command == 'test':
             test_problem(problem)
-
-        log_captured_output(problem_stdout, 
-                            "captured stdout from {0}".format(problem_file.name))
-        log_captured_output(problem_stderr,
-                            "captured stderr from {0}".format(problem_file.name))
+            log_captured_output(problem_stdout, 
+                                "captured stdout from {0}".format(problem_file.name))
+            log_captured_output(problem_stderr,
+                                "captured stderr from {0}".format(problem_file.name))
 
         # Print captured problem prints
         problem_file.close()
