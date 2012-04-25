@@ -4,6 +4,7 @@ Commandline tool for doing operations on Problems
 """
 import argparse
 import logging
+import os.path
 import sys
 
 from cStringIO import StringIO
@@ -18,9 +19,12 @@ def main():
     parser.add_argument("command", choices=['test']) # Watch? Render? Open?
     parser.add_argument("files", nargs="+", type=argparse.FileType('r'))
     parser.add_argument("--seed", required=False, type=int)
+    parser.add_argument("--log-level", required=False, default="INFO",
+                        choices=['info', 'debug', 'warn', 'error',
+                                 'INFO', 'DEBUG', 'WARN', 'ERROR'])
 
     args = parser.parse_args()
-    log.setLevel(logging.INFO)
+    log.setLevel(args.log_level.upper())
 
     old_stdout = sys.stdout
     old_stderr = sys.stderr
