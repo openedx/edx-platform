@@ -2777,6 +2777,9 @@ div.course-wrapper section.course-content ol.vert-mod > li:last-child {
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0; }
+div.course-wrapper section.course-content ol.vert-mod > li ul {
+  list-style: disc outside none;
+  padding-left: 1em; }
 div.course-wrapper section.course-content section.tutorials ul {
   list-style: disc outside none;
   margin-left: 22.652px; }
