@@ -2,6 +2,8 @@
 """
 Commandline tool for doing operations on Problems
 """
+from __future__ import unicode_literals
+
 import argparse
 import logging
 import os.path
@@ -26,12 +28,8 @@ def main():
     args = parser.parse_args()
     log.setLevel(args.log_level.upper())
 
-    old_stdout = sys.stdout
-    old_stderr = sys.stderr
     for problem_file in args.files:
         log.info("Opening {0}".format(problem_file.name))
-        sys.stdout = problem_stdout = StringIO()
-        sys.stderr = problem_stderr = StringIO()
 
         try:
             problem = LoncapaProblem(problem_file.name, "fakeid", seed=args.seed)
@@ -41,28 +39,31 @@ def main():
             continue
 
         if args.command == 'test':
-            test_problem(problem)
-            log_captured_output(problem_stdout, 
-                                "captured stdout from {0}".format(problem_file.name))
-            log_captured_output(problem_stderr,
-                                "captured stderr from {0}".format(problem_file.name))
+            command_test(problem)
 
-        # Print captured problem prints
         problem_file.close()
-
-    sys.stdout = old_stdout
-    sys.stderr = old_stderr
 
     # In case we want to do anything else here.
 
-def log_captured_output(output_stream, stream_name):
-    output_stream.seek(0)
-    output_text = output_stream.read()
-    if output_text:
-        log.info("##### Begin {0} #####\n".format(stream_name) + output_text)
-        log.info("##### End {0} #####".format(stream_name))
+def command_test(problem):
+    # We're going to trap stdout/stderr from the problems (yes, some print)    
+    old_stdout, old_stderr = sys.stdout, sys.stderr
+    try:
+        sys.stdout = StringIO()
+        sys.stderr = StringIO()
 
-def test_problem(problem):
+        check_that_suggested_answers_work(problem)
+
+        log_captured_output(sys.stdout, 
+                            "captured stdout from {0}".format(problem))
+        log_captured_output(sys.stderr,
+                            "captured stderr from {0}".format(problem))
+    except Exception as e:
+        log.exception(e)
+    finally:
+        sys.stdout, sys.stderr = old_stdout, old_stderr
+
+def check_that_suggested_answers_work(problem):
     """Split this up so that we're only used for formula/numeric answers.
 
     Examples of where this fails:
@@ -99,6 +100,12 @@ def test_problem(problem):
         except Exception as ex:
             log.exception(ex)
 
+def log_captured_output(output_stream, stream_name):
+    output_stream.seek(0)
+    output_text = output_stream.read()
+    if output_text:
+        log.info("##### Begin {0} #####\n".format(stream_name) + output_text)
+        log.info("##### End {0} #####".format(stream_name))
 
 
 if __name__ == '__main__':
