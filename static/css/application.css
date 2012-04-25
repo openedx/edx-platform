@@ -3792,28 +3792,33 @@ section.course-content nav.sequence-bottom ul li.next a:hover {
 
 section.tool-wrapper {
   background: #073642;
-  border-top: 1px solid #00171c;
-  border-bottom: 1px solid #00171c;
+  border-top: 1px solid #000203;
+  border-bottom: 1px solid #000203;
   -webkit-box-shadow: inset 0 0 0 4px #084150;
   -moz-box-shadow: inset 0 0 0 4px #084150;
   box-shadow: inset 0 0 0 4px #084150;
-  margin: 22.652px -22.652px;
-  padding: 22.652px;
+  margin: 22.652px -22.652px 0;
   color: #839496; }
 section.tool-wrapper div#graph-container {
   width: 48.641%;
-  margin-right: 2.717%;
-  float: left; }
+  margin-left: 2.717%;
+  padding: 22.652px;
+  display: table-cell;
+  vertical-align: top; }
 section.tool-wrapper div#graph-container canvas {
   width: 100%; }
 section.tool-wrapper div#controlls-container {
-  width: 48.641%;
-  float: left;
-  padding-bottom: 22.652px; }
+  display: table-cell;
+  vertical-align: top;
+  padding: 22.652px;
+  background: #062e39;
+  border-right: 1px solid #001317;
+  -webkit-box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+  -moz-box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+  box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d; }
 section.tool-wrapper div#controlls-container div.graph-controls {
-  padding: 45.304px 0 33.978px;
-  border-bottom: 1px solid #05232b;
-  margin-bottom: 22.652px; }
+  padding: 22.652px 0 22.652px;
+  border-bottom: 1px solid #05232b; }
 section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
   float: left;
   width: 47.207%; }
@@ -3823,10 +3828,13 @@ section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapp
   padding-top: 11.326px; }
 section.tool-wrapper div#controlls-container div.graph-controls select#musicTypeSelect {
   display: block;
-  margin-bottom: 22.652px; }
+  margin-bottom: 11.326px;
+  font: 16px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  width: 100%; }
 section.tool-wrapper div#controlls-container div.graph-controls div#graph-output, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen {
   display: block;
-  margin-bottom: 11.326px; }
+  margin-bottom: 11.326px;
+  text-align: right; }
 section.tool-wrapper div#controlls-container div.graph-controls div#graph-output p, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen p {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -3854,6 +3862,8 @@ section.tool-wrapper div#controlls-container div.graph-controls div#graph-output
   *display: inline;
   *vertical-align: auto;
   margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul li input, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul li input {
+  margin-right: 5px; }
 section.tool-wrapper div#controlls-container div.graph-controls input#playButton {
   display: block;
   border: 1px solid #13649d;
@@ -3897,6 +3907,56 @@ section.tool-wrapper div#controlls-container div.graph-controls input#playButton
   -webkit-box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee;
   -moz-box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee;
   box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton:active {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"] {
+  border: 1px solid #030d15;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 0 0 #215f8a;
+  -moz-box-shadow: inset 0 1px 0 0 #215f8a;
+  box-shadow: inset 0 1px 0 0 #215f8a;
+  color: white;
+  display: inline;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #0f3550;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0f3550), color-stop(100%, #041623));
+  background-image: -webkit-linear-gradient(top, #0f3550, #041623);
+  background-image: -moz-linear-gradient(top, #0f3550, #041623);
+  background-image: -ms-linear-gradient(top, #0f3550, #041623);
+  background-image: -o-linear-gradient(top, #0f3550, #041623);
+  background-image: linear-gradient(top, #0f3550, #041623);
+  padding: 6px 18px 7px;
+  text-shadow: 0 1px 0 #000203;
+  -webkit-background-clip: padding-box;
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:hover {
+  -webkit-box-shadow: inset 0 1px 0 0 #174362;
+  -moz-box-shadow: inset 0 1px 0 0 #174362;
+  box-shadow: inset 0 1px 0 0 #174362;
+  cursor: pointer;
+  background-color: #0c2739;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0c2739), color-stop(100%, #030d15));
+  background-image: -webkit-linear-gradient(top, #0c2739, #030d15);
+  background-image: -moz-linear-gradient(top, #0c2739, #030d15);
+  background-image: -ms-linear-gradient(top, #0c2739, #030d15);
+  background-image: -o-linear-gradient(top, #0c2739, #030d15);
+  background-image: linear-gradient(top, #0c2739, #030d15); }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:active {
+  border: 1px solid #030d15;
+  -webkit-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
+  -moz-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
+  box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:active {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
 section.tool-wrapper div#controlls-container label {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
@@ -3919,13 +3979,15 @@ section.tool-wrapper div#controlls-container label[for="vlCheckbox"], section.to
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label#vs {
   margin-top: 45.304px; }
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label {
-  margin-bottom: 11.326px; }
+  margin-bottom: 11.326px;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased; }
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider {
   margin-bottom: 22.652px; }
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider.ui-slider-horizontal {
   height: 0.4em;
-  background: #002b36;
-  border: 1px solid #00171c;
+  background: #00232c;
+  border: 1px solid #000b0d;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }

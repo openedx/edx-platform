@@ -1,18 +1,19 @@
 // JM MOSFET AMPLIFIER
 section.tool-wrapper {
   background: #073642;
-  border-top: 1px solid darken(#002b36, 5%);
-  border-bottom: 1px solid darken(#002b36, 5%);
+  border-top: 1px solid darken(#002b36, 10%);
+  border-bottom: 1px solid darken(#002b36, 10%);
   @include box-shadow(inset 0 0 0 4px darken(#094959, 2%));
-  margin: lh() (-(lh()));
-  padding: lh();
+  margin: lh() (-(lh())) 0;
   color: #839496;
   @extend .clearfix;
 
   div#graph-container {
     width: flex-grid(4.5, 9);
-    margin-right: flex-gutter(9);
-    float: left;
+    margin-left: flex-gutter(9);
+    padding: lh();
+    display: table-cell;
+    vertical-align: top;
 
     canvas {
       width: 100%;
@@ -21,14 +22,16 @@ section.tool-wrapper {
 
   div#controlls-container {
     @extend .clearfix;
-    width: flex-grid(4.5, 9);
-    float: left;
-    padding-bottom: lh();
+    display: table-cell;
+    vertical-align: top;
+    padding: lh();
+    background: darken(#073642, 2%);
+    border-right: 1px solid darken(#002b36, 6%);
+    @include box-shadow(1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%));
 
     div.graph-controls {
-      padding: lh(2) 0 lh(1.5);
+      padding: lh() 0 lh();
       border-bottom: 1px solid darken(#073642, 5%);
-      margin-bottom: lh();
       @extend .clearfix;
 
       div.music-wrapper, div.inputs-wrapper {
@@ -46,12 +49,15 @@ section.tool-wrapper {
 
       select#musicTypeSelect {
         display: block;
-        margin-bottom: lh();
+        margin-bottom: lh(.5);
+        font: 16px $body-font-family;
+        width: 100%;
       }
 
       div#graph-output, div#graph-listen {
         display: block;
         margin-bottom: lh(.5);
+        text-align: right;
 
         p {
           @include inline-block();
@@ -65,6 +71,10 @@ section.tool-wrapper {
           li {
             @include inline-block();
             margin-bottom: 0;
+
+            input {
+              margin-right: 5px;
+            }
           }
         }
       }
@@ -73,6 +83,19 @@ section.tool-wrapper {
         display: block;
         @include button(simple, #268bd2);
         font: bold 14px $body-font-family;
+
+        &:active {
+          @include box-shadow(none);
+        }
+
+        &[value="Stop"] {
+          @include button(simple, darken(#268bd2, 30%));
+          font: bold 14px $body-font-family;
+
+          &:active {
+            @include box-shadow(none);
+          }
+        }
       }
     }
 
@@ -114,6 +137,8 @@ section.tool-wrapper {
 
       div.slider-label {
         margin-bottom: lh(0.5);
+        font-weight: bold;
+        -webkit-font-smoothing: antialiased;
       }
 
       div.slider {
@@ -121,8 +146,8 @@ section.tool-wrapper {
 
         &.ui-slider-horizontal {
           height: 0.4em;
-          background: #002b36;
-          border: 1px solid darken(#002b36, 5%);
+          background: darken(#002b36, 2%);
+          border: 1px solid darken(#002b36, 8%);
           @include box-shadow(none);
         }
 
