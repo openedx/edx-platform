@@ -2,6 +2,7 @@ html {
   height: 100%;
   max-height: 100%;
 }
+
 body.courseware {
   height: 100%;
   max-height: 100%;
@@ -172,6 +173,11 @@ div.course-wrapper {
           border-bottom: none;
           margin-bottom: 0;
           padding-bottom: 0;
+        }
+
+        ul {
+          list-style: disc outside none;
+          padding-left: 1em;
         }
       }
     }
