@@ -69,18 +69,29 @@ def test_problem(problem):
       string "a or d".
       - L1-e00.xml
     """
-    answers = problem.get_question_answers()
-    log.debug(answers)
-    if answers:
+    # These are actual answers we get from the responsetypes
+    real_answers = problem.get_question_answers()
+
+    # all_answers is real_answers + blanks for other answer_ids for which the
+    # responsetypes can't provide us pre-canned answers (customresopnse)
+    all_answer_ids = problem.get_answer_ids()
+    all_answers = dict((answer_id, real_answers.get(answer_id, ""))
+                       for answer_id in all_answer_ids)
+
+    log.debug(real_answers)
+    if real_answers:
         try:
-            results = problem.grade_answers(answers)
-            log.debug(results)
-            assert(all(result == 'correct' for result in results.values()))
+            real_results = dict((answer_id, result) for answer_id, result 
+                                in problem.grade_answers(all_answers).items()
+                                if answer_id in real_answers)
+            log.debug(real_results)
+            assert(all(result == 'correct'
+                       for answer_id, result in real_results.items()))
         except AssertionError:
             log.error("The following generated answers were not accepted:")
-            for question_id, result in sorted(results.items()):
+            for question_id, result in sorted(real_results.items()):
                 if result != 'correct':
-                    log.error("  {0} = {1}".format(question_id, answers[question_id]))
+                    log.error("  {0} = {1}".format(question_id, real_answers[question_id]))
         except Exception as ex:
             log.exception(ex)
 
