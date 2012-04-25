@@ -27,6 +27,9 @@ PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
 CLOBBER.include('build')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
+task :test do
+    sh("django-admin.py test --settings=envs.dev --pythonpath=. $(ls djangoapps)")
+end
 
 task :package do
     FileUtils.mkdir_p(BUILD_DIR)
