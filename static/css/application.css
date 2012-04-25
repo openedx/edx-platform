@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -2848,6 +2848,26 @@ div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle {
 div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle:hover, div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle:focus {
   background-color: #bf4040;
   outline: none; }
+div.course-wrapper section.course-content div.ui-tabs {
+  border: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 0; }
+div.course-wrapper section.course-content div.ui-tabs .ui-tabs-nav {
+  background: none;
+  border: 0;
+  margin-bottom: 11.326px; }
+div.course-wrapper section.course-content div.ui-tabs .ui-tabs-panel {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  padding: 0; }
 div.course-wrapper.closed section.course-index {
   width: 3.077%; }
 div.course-wrapper.closed section.course-index header#open_close_accordion {
@@ -3770,64 +3790,150 @@ section.course-content nav.sequence-bottom ul li.next a {
 section.course-content nav.sequence-bottom ul li.next a:hover {
   background-color: none; }
 
-div#graph-container {
-  border-top: 1px solid #ddd;
-  padding-top: 22.652px; }
-div#graph-container canvas#graph {
+section.tool-wrapper {
+  background: #073642;
+  border-top: 1px solid #00171c;
+  border-bottom: 1px solid #00171c;
+  -webkit-box-shadow: inset 0 0 0 4px #084150;
+  -moz-box-shadow: inset 0 0 0 4px #084150;
+  box-shadow: inset 0 0 0 4px #084150;
+  margin: 22.652px -22.652px;
+  padding: 22.652px;
+  color: #839496; }
+section.tool-wrapper div#graph-container {
+  width: 48.641%;
+  margin-right: 2.717%;
+  float: left; }
+section.tool-wrapper div#graph-container canvas {
+  width: 100%; }
+section.tool-wrapper div#controlls-container {
   width: 48.641%;
   float: left;
-  margin-right: 2.717%; }
-div#graph-container div.graph-controls {
-  width: 48.641%;
-  float: left; }
-div#graph-container div.graph-controls select#musicTypeSelect {
-  display: block;
+  padding-bottom: 22.652px; }
+section.tool-wrapper div#controlls-container div.graph-controls {
+  padding: 45.304px 0 33.978px;
+  border-bottom: 1px solid #05232b;
   margin-bottom: 22.652px; }
-div#graph-container div.graph-controls div#graph-output {
-  display: block;
-  margin-bottom: 22.652px; }
-div#graph-container div.graph-controls div#graph-listen {
-  display: block;
-  margin-bottom: 22.652px; }
-div#graph-container div.graph-controls p {
-  margin-bottom: 11.326px; }
-div#graph-container div.graph-controls div#label {
-  display: inline-block; }
-div#graph-container div.graph-controls input#playButton {
-  display: block; }
-
-div#schematic-container canvas {
-  width: 48.641%;
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
   float: left;
-  margin-right: 2.717%; }
-div#schematic-container div.schematic-sliders {
-  width: 48.641%;
-  float: left; }
-div#schematic-container div.schematic-sliders div.slider-label#vs {
-  margin-top: 45.304px; }
-div#schematic-container div.schematic-sliders div.slider-label {
-  margin-bottom: 11.326px; }
-div#schematic-container div.schematic-sliders div.slider {
+  width: 47.207%; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper {
+  margin-right: 5.587%; }
+section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
+  padding-top: 11.326px; }
+section.tool-wrapper div#controlls-container div.graph-controls select#musicTypeSelect {
+  display: block;
   margin-bottom: 22.652px; }
-
-div.graph-controls label, div#graph-listen label {
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen {
+  display: block;
+  margin-bottom: 11.326px; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output p, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen p {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul li, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul li {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton {
+  display: block;
+  border: 1px solid #13649d;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 0 0 #69acdb;
+  -moz-box-shadow: inset 0 1px 0 0 #69acdb;
+  box-shadow: inset 0 1px 0 0 #69acdb;
+  color: white;
+  display: inline;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #268bd2;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #268bd2), color-stop(100%, #156dab));
+  background-image: -webkit-linear-gradient(top, #268bd2, #156dab);
+  background-image: -moz-linear-gradient(top, #268bd2, #156dab);
+  background-image: -ms-linear-gradient(top, #268bd2, #156dab);
+  background-image: -o-linear-gradient(top, #268bd2, #156dab);
+  background-image: linear-gradient(top, #268bd2, #156dab);
+  padding: 6px 18px 7px;
+  text-shadow: 0 1px 0 #0c5a90;
+  -webkit-background-clip: padding-box;
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton:hover {
+  -webkit-box-shadow: inset 0 1px 0 0 #3f96d2;
+  -moz-box-shadow: inset 0 1px 0 0 #3f96d2;
+  box-shadow: inset 0 1px 0 0 #3f96d2;
+  cursor: pointer;
+  background-color: #277cb8;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #277cb8), color-stop(100%, #14649d));
+  background-image: -webkit-linear-gradient(top, #277cb8, #14649d);
+  background-image: -moz-linear-gradient(top, #277cb8, #14649d);
+  background-image: -ms-linear-gradient(top, #277cb8, #14649d);
+  background-image: -o-linear-gradient(top, #277cb8, #14649d);
+  background-image: linear-gradient(top, #277cb8, #14649d); }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton:active {
+  border: 1px solid #13649d;
+  -webkit-box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee;
+  -moz-box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee;
+  box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee; }
+section.tool-wrapper div#controlls-container label {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   -ms-border-radius: 2px;
   -o-border-radius: 2px;
   border-radius: 2px;
   font-weight: bold;
-  padding: 3px; }
-div.graph-controls label[for="vinCheckbox"], div.graph-controls label[for="vinRadioButton"], div#graph-listen label[for="vinCheckbox"], div#graph-listen label[for="vinRadioButton"] {
+  padding: 3px;
+  color: #fff; }
+section.tool-wrapper div#controlls-container label[for="vinCheckbox"], section.tool-wrapper div#controlls-container label[for="vinRadioButton"] {
   color: #409fbf; }
-div.graph-controls label[for="voutCheckbox"], div.graph-controls label[for="voutRadioButton"], div#graph-listen label[for="voutCheckbox"], div#graph-listen label[for="voutRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="voutCheckbox"], section.tool-wrapper div#controlls-container label[for="voutRadioButton"] {
   color: #e1a600; }
-div.graph-controls label[for="vrCheckbox"], div.graph-controls label[for="vrRadioButton"], div#graph-listen label[for="vrCheckbox"], div#graph-listen label[for="vrRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vrCheckbox"], section.tool-wrapper div#controlls-container label[for="vrRadioButton"] {
   color: #49c944; }
-div.graph-controls label[for="vcCheckbox"], div.graph-controls label[for="vcRadioButton"], div#graph-listen label[for="vcCheckbox"], div#graph-listen label[for="vcRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vcCheckbox"], section.tool-wrapper div#controlls-container label[for="vcRadioButton"] {
   color: #e1a600; }
-div.graph-controls label[for="vlCheckbox"], div.graph-controls label[for="vlRadioButton"], div#graph-listen label[for="vlCheckbox"], div#graph-listen label[for="vlRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vlCheckbox"], section.tool-wrapper div#controlls-container label[for="vlRadioButton"] {
   color: #a26784; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label#vs {
+  margin-top: 45.304px; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label {
+  margin-bottom: 11.326px; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider {
+  margin-bottom: 22.652px; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider.ui-slider-horizontal {
+  height: 0.4em;
+  background: #002b36;
+  border: 1px solid #00171c;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle {
+  background-color: #dc322f;
+  margin-top: -0.3em; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:hover, section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:active {
+  background-color: #e04845; }
 
 div.book-wrapper section.book-sidebar {
   -webkit-box-sizing: border-box;
