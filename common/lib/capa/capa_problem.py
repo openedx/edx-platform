@@ -12,6 +12,7 @@ import logging
 import math
 import numpy
 import os
+import os.path
 import random
 import re
 import scipy
@@ -124,6 +125,9 @@ class LoncapaProblem(object):
         for response in self.tree.xpath('//'+"|//".join(response_types)):
             responder = response_types[response.tag](response, self.context, self.system)
             responder.preprocess_response()
+
+    def __unicode__(self):
+        return u"LoncapaProblem ({0})".format(os.path.basename(self.filename))
 
     def get_state(self):
         ''' Stored per-user session data neeeded to: 
