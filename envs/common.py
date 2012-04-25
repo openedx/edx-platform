@@ -81,6 +81,7 @@ TEMPLATE_DIRS = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'askbot.context.application_settings',
+    'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'askbot.user_messages.context_processors.user_messages',#must be before auth
     'django.core.context_processors.auth', #this is required for admin
@@ -147,6 +148,9 @@ TIME_ZONE = 'America/New_York' # http://en.wikipedia.org/wiki/List_of_tz_zones_b
 LANGUAGE_CODE = 'en' # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
+
+# Messages
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it 
