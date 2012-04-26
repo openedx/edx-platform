@@ -3968,7 +3968,8 @@ section.tool-wrapper div#controlls-container label {
   border-radius: 2px;
   font-weight: bold;
   padding: 3px;
-  color: #fff; }
+  color: #fff;
+  -webkit-font-smoothing: antialiased; }
 section.tool-wrapper div#controlls-container label[for="vinCheckbox"], section.tool-wrapper div#controlls-container label[for="vinRadioButton"] {
   color: #409fbf; }
 section.tool-wrapper div#controlls-container label[for="voutCheckbox"], section.tool-wrapper div#controlls-container label[for="voutRadioButton"] {
