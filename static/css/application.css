@@ -3626,6 +3626,7 @@ nav.sequence-nav ol li p::after {
   width: 10px; }
 nav.sequence-nav ul {
   margin-right: 1px;
+  list-style: none;
   position: absolute;
   right: 0;
   top: 0;
