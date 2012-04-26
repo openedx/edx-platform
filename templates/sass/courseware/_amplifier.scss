@@ -35,17 +35,16 @@ section.tool-wrapper {
       @include box-shadow(0 1px 0 lighten(#073642, 2%));
       @extend .clearfix;
 
-      div.music-wrapper, div.inputs-wrapper {
-        float: left;
-        width: flex-grid(2.25, 4.5);
-      }
-
       div.music-wrapper {
         margin-right: flex-gutter(4.5);
+        width: flex-grid(1.5, 4.5);
+        float: left;
       }
 
       div.inputs-wrapper {
         padding-top: lh(.5);
+        width: flex-grid(3, 4.5);
+        float: left;
       }
 
       select#musicTypeSelect {
