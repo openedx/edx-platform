@@ -5,6 +5,52 @@ import copy
 from collections import defaultdict
 from argparse import ArgumentParser, FileType
 
+def generate_user(user_number):
+  return {
+    "pk": user_number,
+    "model": "auth.user",
+    "fields": {
+      "status": "w",
+      "last_name": "Last",
+      "gold": 0,
+      "is_staff": False,
+      "user_permissions": [],
+      "interesting_tags": "",
+      "email_key": None,
+      "date_joined": "2012-04-26 11:36:39",
+      "first_name": "",
+      "email_isvalid": False,
+      "avatar_type": "n",
+      "website": "",
+      "is_superuser": False,
+      "date_of_birth": None,
+      "last_login": "2012-04-26 11:36:48",
+      "location": "",
+      "new_response_count": 0,
+      "email": "user{num}@example.com".format(num=user_number),
+      "username": "user{num}".format(num=user_number),
+      "is_active": True,
+      "consecutive_days_visit_count": 0,
+      "email_tag_filter_strategy": 1,
+      "groups": [],
+      "password": "sha1$90e6f$562a1d783a0c47ce06ebf96b8c58123a0671bbf0",
+      "silver": 0,
+      "bronze": 0,
+      "questions_per_page": 10,
+      "about": "",
+      "show_country": True,
+      "country": "",
+      "display_tag_filter_strategy": 0,
+      "seen_response_count": 0,
+      "real_name": "",
+      "ignored_tags": "",
+      "reputation": 1,
+      "gravatar": "366d981a10116969c568a18ee090f44c",
+      "last_seen": "2012-04-26 11:36:39"
+    }
+  }
+
+
 
 def parse_args(args=sys.argv[1:]):
     parser = ArgumentParser()
@@ -37,7 +83,11 @@ def main(args=sys.argv[1:]):
             out_pk += 1
             out_data.append(data)
 
+    for student_id in xrange(args.count):
+        out_data.append(generate_user(student_id))
+
     json.dump(out_data, args.output, indent=2)
+
 
 if __name__ == "__main__":
     sys.exit(main())
