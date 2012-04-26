@@ -3822,13 +3822,14 @@ section.tool-wrapper div#controlls-container div.graph-controls {
   -webkit-box-shadow: 0 1px 0 #083e4b;
   -moz-box-shadow: 0 1px 0 #083e4b;
   box-shadow: 0 1px 0 #083e4b; }
-section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
-  float: left;
-  width: 47.207%; }
 section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper {
-  margin-right: 5.587%; }
+  margin-right: 5.587%;
+  width: 29.609%;
+  float: left; }
 section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
-  padding-top: 11.326px; }
+  padding-top: 11.326px;
+  width: 64.804%;
+  float: left; }
 section.tool-wrapper div#controlls-container div.graph-controls select#musicTypeSelect {
   display: block;
   margin-bottom: 11.326px;
