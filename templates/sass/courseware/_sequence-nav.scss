@@ -3,9 +3,11 @@ nav.sequence-nav {
   @include box-sizing(border-box);
   margin-bottom: $body-line-height;
   position: relative;
+  top: -1px;
 
   ol {
     border-bottom: 1px solid darken($cream, 20%);
+    border-top: 1px solid darken($cream, 20%);
     @include box-sizing(border-box);
     display: table;
     padding-right: flex-grid(1, 9);
