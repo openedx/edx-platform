@@ -53,6 +53,7 @@ def command_test(problem):
         sys.stderr = StringIO()
 
         check_that_suggested_answers_work(problem)
+        check_that_blanks_fail(problem)
 
         log_captured_output(sys.stdout, 
                             "captured stdout from {0}".format(problem))
@@ -62,6 +63,21 @@ def command_test(problem):
         log.exception(e)
     finally:
         sys.stdout, sys.stderr = old_stdout, old_stderr
+
+def check_that_blanks_fail(problem):
+    """Leaving it blank should never work. Neither should a space."""
+    blank_answers = dict((answer_id, u"") 
+                         for answer_id in problem.get_question_answers())
+    grading_results = problem.grade_answers(blank_answers)
+    try:
+        assert(all(result == 'incorrect' for result in grading_results.values()))
+    except AssertionError:
+        log.error("Blank accepted as correct answer in {0} for {1}"
+                  .format(problem,
+                          [answer_id for answer_id, result
+                           in sorted(grading_results.items())
+                           if result != 'incorrect']))
+
 
 def check_that_suggested_answers_work(problem):
     """Split this up so that we're only used for formula/numeric answers.
@@ -78,12 +94,12 @@ def check_that_suggested_answers_work(problem):
     real_answers = problem.get_question_answers()
 
     # all_answers is real_answers + blanks for other answer_ids for which the
-    # responsetypes can't provide us pre-canned answers (customresopnse)
+    # responsetypes can't provide us pre-canned answers (customresponse)
     all_answer_ids = problem.get_answer_ids()
     all_answers = dict((answer_id, real_answers.get(answer_id, ""))
                        for answer_id in all_answer_ids)
 
-    log.debug(real_answers)
+    log.debug("Real answers: {0}".format(real_answers))
     if real_answers:
         try:
             real_results = dict((answer_id, result) for answer_id, result 
@@ -93,11 +109,13 @@ def check_that_suggested_answers_work(problem):
             assert(all(result == 'correct'
                        for answer_id, result in real_results.items()))
         except AssertionError:
-            log.error("The following generated answers were not accepted:")
+            log.error("The following generated answers were not accepted for {0}:"
+                      .format(problem))
             for question_id, result in sorted(real_results.items()):
                 if result != 'correct':
                     log.error("  {0} = {1}".format(question_id, real_answers[question_id]))
         except Exception as ex:
+            log.error("Uncaught error in {0}".format(problem))
             log.exception(ex)
 
 def log_captured_output(output_stream, stream_name):
