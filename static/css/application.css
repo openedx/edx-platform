@@ -3866,47 +3866,47 @@ section.tool-wrapper div#controlls-container div.graph-controls div#graph-output
   margin-right: 5px; }
 section.tool-wrapper div#controlls-container div.graph-controls input#playButton {
   display: block;
-  border: 1px solid #13649d;
+  border: 1px solid #b01613;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: inset 0 1px 0 0 #69acdb;
-  -moz-box-shadow: inset 0 1px 0 0 #69acdb;
-  box-shadow: inset 0 1px 0 0 #69acdb;
+  -webkit-box-shadow: inset 0 1px 0 0 #e07977;
+  -moz-box-shadow: inset 0 1px 0 0 #e07977;
+  box-shadow: inset 0 1px 0 0 #e07977;
   color: white;
   display: inline;
   font-size: 11px;
   font-weight: bold;
-  background-color: #268bd2;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #268bd2), color-stop(100%, #156dab));
-  background-image: -webkit-linear-gradient(top, #268bd2, #156dab);
-  background-image: -moz-linear-gradient(top, #268bd2, #156dab);
-  background-image: -ms-linear-gradient(top, #268bd2, #156dab);
-  background-image: -o-linear-gradient(top, #268bd2, #156dab);
-  background-image: linear-gradient(top, #268bd2, #156dab);
+  background-color: #dc322f;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #dc322f), color-stop(100%, #be1815));
+  background-image: -webkit-linear-gradient(top, #dc322f, #be1815);
+  background-image: -moz-linear-gradient(top, #dc322f, #be1815);
+  background-image: -ms-linear-gradient(top, #dc322f, #be1815);
+  background-image: -o-linear-gradient(top, #dc322f, #be1815);
+  background-image: linear-gradient(top, #dc322f, #be1815);
   padding: 6px 18px 7px;
-  text-shadow: 0 1px 0 #0c5a90;
+  text-shadow: 0 1px 0 #a30f0c;
   -webkit-background-clip: padding-box;
   font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
 section.tool-wrapper div#controlls-container div.graph-controls input#playButton:hover {
-  -webkit-box-shadow: inset 0 1px 0 0 #3f96d2;
-  -moz-box-shadow: inset 0 1px 0 0 #3f96d2;
-  box-shadow: inset 0 1px 0 0 #3f96d2;
+  -webkit-box-shadow: inset 0 1px 0 0 #d84f4c;
+  -moz-box-shadow: inset 0 1px 0 0 #d84f4c;
+  box-shadow: inset 0 1px 0 0 #d84f4c;
   cursor: pointer;
-  background-color: #277cb8;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #277cb8), color-stop(100%, #14649d));
-  background-image: -webkit-linear-gradient(top, #277cb8, #14649d);
-  background-image: -moz-linear-gradient(top, #277cb8, #14649d);
-  background-image: -ms-linear-gradient(top, #277cb8, #14649d);
-  background-image: -o-linear-gradient(top, #277cb8, #14649d);
-  background-image: linear-gradient(top, #277cb8, #14649d); }
+  background-color: #ca2a28;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ca2a28), color-stop(100%, #af1714));
+  background-image: -webkit-linear-gradient(top, #ca2a28, #af1714);
+  background-image: -moz-linear-gradient(top, #ca2a28, #af1714);
+  background-image: -ms-linear-gradient(top, #ca2a28, #af1714);
+  background-image: -o-linear-gradient(top, #ca2a28, #af1714);
+  background-image: linear-gradient(top, #ca2a28, #af1714); }
 section.tool-wrapper div#controlls-container div.graph-controls input#playButton:active {
-  border: 1px solid #13649d;
-  -webkit-box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee;
-  -moz-box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee;
-  box-shadow: inset 0 0 8px 4px #135b8e, inset 0 0 8px 4px #135b8e, 0 1px 1px 0 #eeeeee; }
+  border: 1px solid #b01613;
+  -webkit-box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee;
+  -moz-box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee;
+  box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee; }
 section.tool-wrapper div#controlls-container div.graph-controls input#playButton:active {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;

@@ -81,7 +81,7 @@ section.tool-wrapper {
 
       input#playButton {
         display: block;
-        @include button(simple, #268bd2);
+        @include button(simple, #dc322f);
         font: bold 14px $body-font-family;
 
         &:active {
