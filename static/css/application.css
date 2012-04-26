@@ -3948,7 +3948,12 @@ section.tool-wrapper div#controlls-container div.graph-controls input#playButton
   padding: 6px 18px 7px;
   text-shadow: 0 1px 0 #a30f0c;
   -webkit-background-clip: padding-box;
-  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  color: #47221a;
+  text-shadow: 0 1px 0 #e04845;
+  -webkit-box-shadow: inset 0 1px 0 #e35d5b;
+  -moz-box-shadow: inset 0 1px 0 #e35d5b;
+  box-shadow: inset 0 1px 0 #e35d5b; }
 section.tool-wrapper div#controlls-container div.graph-controls input#playButton:hover {
   -webkit-box-shadow: inset 0 1px 0 0 #d84f4c;
   -moz-box-shadow: inset 0 1px 0 0 #d84f4c;

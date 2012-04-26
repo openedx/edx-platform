@@ -138,6 +138,9 @@ section.tool-wrapper {
         display: block;
         @include button(simple, #dc322f);
         font: bold 14px $body-font-family;
+        color: #47221a;
+        text-shadow: 0 1px 0 lighten(#dc322f, 5%);
+        @include box-shadow(inset 0 1px 0 lighten(#dc322f, 10%));
 
         &:active {
           @include box-shadow(none);
