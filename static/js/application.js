@@ -39,6 +39,50 @@
 
   })();
 
+  window.Courseware = (function() {
+
+    function Courseware() {}
+
+    Courseware.bind = function() {
+      return this.Navigation.bind();
+    };
+
+    Courseware.Navigation = (function() {
+
+      function Navigation() {}
+
+      Navigation.bind = function() {
+        var navigation;
+        if ($('#accordion').length) {
+          navigation = new Navigation;
+          $('#accordion').bind('accordionchange', navigation.log).accordion({
+            active: $('#accordion ul:has(li.active)').index('#accordion ul'),
+            header: 'h3',
+            autoHeight: false
+          });
+          return $('#open_close_accordion a').click(navigation.toggle);
+        }
+      };
+
+      Navigation.prototype.log = function(event, ui) {
+        return log_event('accordion', {
+          newheader: ui.newHeader.text(),
+          oldheader: ui.oldHeader.text()
+        });
+      };
+
+      Navigation.prototype.toggle = function() {
+        return $('.course-wrapper').toggleClass('closed');
+      };
+
+      return Navigation;
+
+    })();
+
+    return Courseware;
+
+  }).call(this);
+
   window.FeedbackForm = (function() {
 
     function FeedbackForm() {}
@@ -67,8 +111,9 @@
         'X-CSRFToken': $.cookie('csrftoken')
       }
     });
-    FeedbackForm.bind();
     Calculator.bind();
+    Courseware.bind();
+    FeedbackForm.bind();
     return $("a[rel*=leanModal]").leanModal();
   });
 
