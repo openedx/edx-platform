@@ -17,6 +17,7 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
+    overflow: hidden;
 
     h1 {
       margin: 0 0 lh();
@@ -168,6 +169,23 @@ div.course-wrapper {
         border-bottom: 1px solid #ddd;
         margin-bottom: 15px;
         padding: 0 0 15px;
+
+        header {
+          @extend h1.top-header;
+          margin-bottom: 0;
+
+          h1 {
+            margin: 0;
+          }
+
+          h2 {
+            float: right;
+            margin-right: 0;
+            margin-top: 8px;
+            text-align: right;
+            padding-right: 0;
+          }
+        }
 
         &:last-child {
           border-bottom: none;

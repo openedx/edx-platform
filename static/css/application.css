@@ -134,7 +134,7 @@ input, select {
   display: table;
   width: 100%; }
 
-h1.top-header, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info header, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
+h1.top-header, div.course-wrapper section.course-content ol.vert-mod > li header, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info header, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
   background: #f3f3f3;
   border-bottom: 1px solid #e3e3e3;
   margin: -22.652px -22.652px 22.652px;
@@ -2659,6 +2659,8 @@ body.courseware {
 
 div.course-wrapper ul, div.course-wrapper ol {
   list-style: none; }
+div.course-wrapper section.course-content {
+  overflow: hidden; }
 div.course-wrapper section.course-content h1 {
   margin: 0 0 22.652px; }
 div.course-wrapper section.course-content p {
@@ -2774,6 +2776,16 @@ div.course-wrapper section.course-content ol.vert-mod > li {
   border-bottom: 1px solid #ddd;
   margin-bottom: 15px;
   padding: 0 0 15px; }
+div.course-wrapper section.course-content ol.vert-mod > li header {
+  margin-bottom: 0; }
+div.course-wrapper section.course-content ol.vert-mod > li header h1 {
+  margin: 0; }
+div.course-wrapper section.course-content ol.vert-mod > li header h2 {
+  float: right;
+  margin-right: 0;
+  margin-top: 8px;
+  text-align: right;
+  padding-right: 0; }
 div.course-wrapper section.course-content ol.vert-mod > li:last-child {
   border-bottom: none;
   margin-bottom: 0;
@@ -3499,9 +3511,11 @@ nav.sequence-nav {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   margin-bottom: 22.652px;
-  position: relative; }
+  position: relative;
+  top: -1px; }
 nav.sequence-nav ol {
   border-bottom: 1px solid #e4d080;
+  border-top: 1px solid #e4d080;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
