@@ -7,27 +7,81 @@ section.tool-wrapper {
   margin: lh() (-(lh())) 0;
   color: #839496;
   @extend .clearfix;
+  display: table;
 
   div#graph-container {
-    width: flex-grid(4.5, 9);
-    margin-left: flex-gutter(9);
-    padding: lh();
+    background: none;
+    @include box-sizing(border-box);
     display: table-cell;
+    padding: lh();
     vertical-align: top;
+    width: flex-grid(4.5, 9) + flex-gutter(9);
+
+.ui-widget-content {
+  background: none;
+  border: none;
+  @include border-radius(0);
+}
 
     canvas {
       width: 100%;
+    }
+
+    ul.ui-tabs-nav {
+      background: darken(#073642, 2%);
+      margin: (-(lh())) (-(lh())) 0;
+      padding: 0;
+      position: relative;
+      width: 110%;
+      @include border-radius(0);
+      border-bottom: 1px solid darken(#073642, 8%);
+
+      li {
+        margin-bottom: 0;
+        background: none;
+        color: #fff;
+        border: none;
+        @include border-radius(0);
+
+        &.ui-tabs-selected {
+          border-right: 1px solid darken(#073642, 8%);
+          border-left: 1px solid darken(#073642, 8%);
+          background-color: #073642;
+
+          &:first-child {
+            border-left: none;
+          }
+
+          a {
+            color: #eee8d5;
+          }
+        }
+
+        a {
+          border: none;
+          font: bold 12px $body-font-family;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #839496;
+
+          &:hover {
+            color: #eee8d5;
+          }
+        }
+      }
     }
   }
 
   div#controlls-container {
     @extend .clearfix;
-    display: table-cell;
-    vertical-align: top;
-    padding: lh();
     background: darken(#073642, 2%);
     border-right: 1px solid darken(#002b36, 6%);
     @include box-shadow(1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%));
+    @include box-sizing(border-box);
+    display: table-cell;
+    padding: lh();
+    vertical-align: top;
+    width: flex-grid(4.5, 9);
 
     div.graph-controls {
       padding: lh() 0 lh();
