@@ -17,11 +17,11 @@ section.tool-wrapper {
     vertical-align: top;
     width: flex-grid(4.5, 9) + flex-gutter(9);
 
-.ui-widget-content {
-  background: none;
-  border: none;
-  @include border-radius(0);
-}
+    .ui-widget-content {
+      background: none;
+      border: none;
+      @include border-radius(0);
+    }
 
     canvas {
       width: 100%;
@@ -84,7 +84,8 @@ section.tool-wrapper {
     width: flex-grid(4.5, 9);
 
     div.graph-controls {
-      padding: lh() 0 lh();
+      padding: 0 0 lh();
+      margin-bottom: lh();
       border-bottom: 1px solid darken(#073642, 5%);
       @include box-shadow(0 1px 0 lighten(#073642, 2%));
       @extend .clearfix;
@@ -185,10 +186,6 @@ section.tool-wrapper {
     }
 
     div.schematic-sliders {
-
-      div.slider-label#vs {
-        margin-top: lh(2.0);
-      }
 
       div.slider-label {
         margin-bottom: lh(0.5);

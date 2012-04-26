@@ -3871,7 +3871,8 @@ section.tool-wrapper div#controlls-container {
   vertical-align: top;
   width: 48.641%; }
 section.tool-wrapper div#controlls-container div.graph-controls {
-  padding: 22.652px 0 22.652px;
+  padding: 0 0 22.652px;
+  margin-bottom: 22.652px;
   border-bottom: 1px solid #05232b;
   -webkit-box-shadow: 0 1px 0 #083e4b;
   -moz-box-shadow: 0 1px 0 #083e4b;
@@ -4035,8 +4036,6 @@ section.tool-wrapper div#controlls-container label[for="vcCheckbox"], section.to
   color: #e1a600; }
 section.tool-wrapper div#controlls-container label[for="vlCheckbox"], section.tool-wrapper div#controlls-container label[for="vlRadioButton"] {
   color: #a26784; }
-section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label#vs {
-  margin-top: 45.304px; }
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label {
   margin-bottom: 11.326px;
   font-weight: bold;
