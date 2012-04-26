@@ -3679,7 +3679,7 @@ nav.sequence-nav ol li p::after {
   width: 10px; }
 nav.sequence-nav ul {
   margin-right: 1px;
-  list-style: none  !important;
+  list-style: none !important;
   position: absolute;
   right: 0;
   top: 0;
