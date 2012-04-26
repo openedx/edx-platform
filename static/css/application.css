@@ -3818,7 +3818,10 @@ section.tool-wrapper div#controlls-container {
   box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d; }
 section.tool-wrapper div#controlls-container div.graph-controls {
   padding: 22.652px 0 22.652px;
-  border-bottom: 1px solid #05232b; }
+  border-bottom: 1px solid #05232b;
+  -webkit-box-shadow: 0 1px 0 #083e4b;
+  -moz-box-shadow: 0 1px 0 #083e4b;
+  box-shadow: 0 1px 0 #083e4b; }
 section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
   float: left;
   width: 47.207%; }
@@ -3981,6 +3984,7 @@ section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-la
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label {
   margin-bottom: 11.326px;
   font-weight: bold;
+  text-shadow: 0 -1px 0 #021014;
   -webkit-font-smoothing: antialiased; }
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider {
   margin-bottom: 22.652px; }

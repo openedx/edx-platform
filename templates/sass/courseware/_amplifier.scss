@@ -32,6 +32,7 @@ section.tool-wrapper {
     div.graph-controls {
       padding: lh() 0 lh();
       border-bottom: 1px solid darken(#073642, 5%);
+      @include box-shadow(0 1px 0 lighten(#073642, 2%));
       @extend .clearfix;
 
       div.music-wrapper, div.inputs-wrapper {
@@ -138,6 +139,7 @@ section.tool-wrapper {
       div.slider-label {
         margin-bottom: lh(0.5);
         font-weight: bold;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
         -webkit-font-smoothing: antialiased;
       }
 
