@@ -3751,11 +3751,15 @@ nav.sequence-nav ul li.next a {
 nav.sequence-nav ul li.next a:hover {
   background-color: none; }
 
+section.course-content {
+  position: relative; }
 section.course-content div#seq_content {
   margin-bottom: 60px; }
 section.course-content nav.sequence-bottom {
-  bottom: -22.652px;
-  position: relative; }
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-left: -50px; }
 section.course-content nav.sequence-bottom ul {
   background-color: #f2e7bf;
   background-color: #f2e7bf;
@@ -3768,10 +3772,7 @@ section.course-content nav.sequence-bottom ul {
   border-radius: 3px 3px 0 0;
   -webkit-box-shadow: inset 0 0 0 1px #faf7e9;
   -moz-box-shadow: inset 0 0 0 1px #faf7e9;
-  box-shadow: inset 0 0 0 1px #faf7e9;
-  margin: 0 auto;
-  overflow: hidden;
-  width: 106px; }
+  box-shadow: inset 0 0 0 1px #faf7e9; }
 section.course-content nav.sequence-bottom ul li {
   float: left; }
 section.course-content nav.sequence-bottom ul li.prev, section.course-content nav.sequence-bottom ul li.next {
