@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -2879,6 +2879,26 @@ div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle {
 div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle:hover, div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle:focus {
   background-color: #bf4040;
   outline: none; }
+div.course-wrapper section.course-content div.ui-tabs {
+  border: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 0; }
+div.course-wrapper section.course-content div.ui-tabs .ui-tabs-nav {
+  background: none;
+  border: 0;
+  margin-bottom: 11.326px; }
+div.course-wrapper section.course-content div.ui-tabs .ui-tabs-panel {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  padding: 0; }
 div.course-wrapper.closed section.course-index {
   width: 3.077%; }
 div.course-wrapper.closed section.course-index header#open_close_accordion {
@@ -3803,64 +3823,276 @@ section.course-content nav.sequence-bottom ul li.next a {
 section.course-content nav.sequence-bottom ul li.next a:hover {
   background-color: none; }
 
-div#graph-container {
-  border-top: 1px solid #ddd;
-  padding-top: 22.652px; }
-div#graph-container canvas#graph {
-  width: 48.641%;
-  float: left;
-  margin-right: 2.717%; }
-div#graph-container div.graph-controls {
-  width: 48.641%;
+section.tool-wrapper {
+  background: #073642;
+  border-top: 1px solid #000203;
+  border-bottom: 1px solid #000203;
+  -webkit-box-shadow: inset 0 0 0 4px #084150;
+  -moz-box-shadow: inset 0 0 0 4px #084150;
+  box-shadow: inset 0 0 0 4px #084150;
+  margin: 22.652px -22.652px 0;
+  color: #839496;
+  display: table; }
+section.tool-wrapper div#graph-container {
+  background: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table-cell;
+  padding: 22.652px;
+  vertical-align: top;
+  width: 51.359%; }
+section.tool-wrapper div#graph-container .ui-widget-content {
+  background: none;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0; }
+section.tool-wrapper div#graph-container canvas {
+  width: 100%; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav {
+  background: #062e39;
+  margin: -22.652px -22.652px 0;
+  padding: 0;
+  position: relative;
+  width: 110%;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  border-bottom: 1px solid #03181d; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li {
+  margin-bottom: 0;
+  background: none;
+  color: #fff;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected {
+  border-right: 1px solid #03181d;
+  border-left: 1px solid #03181d;
+  background-color: #073642; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected:first-child {
+  border-left: none; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected a {
+  color: #eee8d5; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li a {
+  border: none;
+  font: bold 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #839496; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li a:hover {
+  color: #eee8d5; }
+section.tool-wrapper div#controlls-container {
+  background: #062e39;
+  border-right: 1px solid #001317;
+  -webkit-box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+  -moz-box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+  box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table-cell;
+  padding: 22.652px;
+  vertical-align: top;
+  width: 48.641%; }
+section.tool-wrapper div#controlls-container div.graph-controls {
+  padding: 0 0 22.652px;
+  margin-bottom: 22.652px;
+  border-bottom: 1px solid #05232b;
+  -webkit-box-shadow: 0 1px 0 #083e4b;
+  -moz-box-shadow: 0 1px 0 #083e4b;
+  box-shadow: 0 1px 0 #083e4b; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper {
+  margin-right: 5.587%;
+  width: 29.609%;
   float: left; }
-div#graph-container div.graph-controls select#musicTypeSelect {
-  display: block;
-  margin-bottom: 22.652px; }
-div#graph-container div.graph-controls div#graph-output {
-  display: block;
-  margin-bottom: 22.652px; }
-div#graph-container div.graph-controls div#graph-listen {
-  display: block;
-  margin-bottom: 22.652px; }
-div#graph-container div.graph-controls p {
-  margin-bottom: 11.326px; }
-div#graph-container div.graph-controls div#label {
-  display: inline-block; }
-div#graph-container div.graph-controls input#playButton {
-  display: block; }
-
-div#schematic-container canvas {
-  width: 48.641%;
-  float: left;
-  margin-right: 2.717%; }
-div#schematic-container div.schematic-sliders {
-  width: 48.641%;
+section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
+  padding-top: 11.326px;
+  width: 64.804%;
   float: left; }
-div#schematic-container div.schematic-sliders div.slider-label#vs {
-  margin-top: 45.304px; }
-div#schematic-container div.schematic-sliders div.slider-label {
-  margin-bottom: 11.326px; }
-div#schematic-container div.schematic-sliders div.slider {
-  margin-bottom: 22.652px; }
-
-div.graph-controls label, div#graph-listen label {
+section.tool-wrapper div#controlls-container div.graph-controls select#musicTypeSelect {
+  display: block;
+  margin-bottom: 11.326px;
+  font: 16px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  width: 100%; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen {
+  display: block;
+  margin-bottom: 11.326px;
+  text-align: right; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output p, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen p {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul li, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul li {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul li input, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul li input {
+  margin-right: 5px; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton {
+  display: block;
+  border: 1px solid #b01613;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 0 0 #e07977;
+  -moz-box-shadow: inset 0 1px 0 0 #e07977;
+  box-shadow: inset 0 1px 0 0 #e07977;
+  color: white;
+  display: inline;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #dc322f;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #dc322f), color-stop(100%, #be1815));
+  background-image: -webkit-linear-gradient(top, #dc322f, #be1815);
+  background-image: -moz-linear-gradient(top, #dc322f, #be1815);
+  background-image: -ms-linear-gradient(top, #dc322f, #be1815);
+  background-image: -o-linear-gradient(top, #dc322f, #be1815);
+  background-image: linear-gradient(top, #dc322f, #be1815);
+  padding: 6px 18px 7px;
+  text-shadow: 0 1px 0 #a30f0c;
+  -webkit-background-clip: padding-box;
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  color: #47221a;
+  text-shadow: 0 1px 0 #e04845;
+  -webkit-box-shadow: inset 0 1px 0 #e35d5b;
+  -moz-box-shadow: inset 0 1px 0 #e35d5b;
+  box-shadow: inset 0 1px 0 #e35d5b; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton:hover {
+  -webkit-box-shadow: inset 0 1px 0 0 #d84f4c;
+  -moz-box-shadow: inset 0 1px 0 0 #d84f4c;
+  box-shadow: inset 0 1px 0 0 #d84f4c;
+  cursor: pointer;
+  background-color: #ca2a28;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ca2a28), color-stop(100%, #af1714));
+  background-image: -webkit-linear-gradient(top, #ca2a28, #af1714);
+  background-image: -moz-linear-gradient(top, #ca2a28, #af1714);
+  background-image: -ms-linear-gradient(top, #ca2a28, #af1714);
+  background-image: -o-linear-gradient(top, #ca2a28, #af1714);
+  background-image: linear-gradient(top, #ca2a28, #af1714); }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton:active {
+  border: 1px solid #b01613;
+  -webkit-box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee;
+  -moz-box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee;
+  box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton:active {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"] {
+  border: 1px solid #030d15;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 0 0 #215f8a;
+  -moz-box-shadow: inset 0 1px 0 0 #215f8a;
+  box-shadow: inset 0 1px 0 0 #215f8a;
+  color: white;
+  display: inline;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #0f3550;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0f3550), color-stop(100%, #041623));
+  background-image: -webkit-linear-gradient(top, #0f3550, #041623);
+  background-image: -moz-linear-gradient(top, #0f3550, #041623);
+  background-image: -ms-linear-gradient(top, #0f3550, #041623);
+  background-image: -o-linear-gradient(top, #0f3550, #041623);
+  background-image: linear-gradient(top, #0f3550, #041623);
+  padding: 6px 18px 7px;
+  text-shadow: 0 1px 0 #000203;
+  -webkit-background-clip: padding-box;
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:hover {
+  -webkit-box-shadow: inset 0 1px 0 0 #174362;
+  -moz-box-shadow: inset 0 1px 0 0 #174362;
+  box-shadow: inset 0 1px 0 0 #174362;
+  cursor: pointer;
+  background-color: #0c2739;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0c2739), color-stop(100%, #030d15));
+  background-image: -webkit-linear-gradient(top, #0c2739, #030d15);
+  background-image: -moz-linear-gradient(top, #0c2739, #030d15);
+  background-image: -ms-linear-gradient(top, #0c2739, #030d15);
+  background-image: -o-linear-gradient(top, #0c2739, #030d15);
+  background-image: linear-gradient(top, #0c2739, #030d15); }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:active {
+  border: 1px solid #030d15;
+  -webkit-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
+  -moz-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
+  box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee; }
+section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:active {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+section.tool-wrapper div#controlls-container label {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   -ms-border-radius: 2px;
   -o-border-radius: 2px;
   border-radius: 2px;
   font-weight: bold;
-  padding: 3px; }
-div.graph-controls label[for="vinCheckbox"], div.graph-controls label[for="vinRadioButton"], div#graph-listen label[for="vinCheckbox"], div#graph-listen label[for="vinRadioButton"] {
+  padding: 3px;
+  color: #fff;
+  -webkit-font-smoothing: antialiased; }
+section.tool-wrapper div#controlls-container label[for="vinCheckbox"], section.tool-wrapper div#controlls-container label[for="vinRadioButton"] {
   color: #409fbf; }
-div.graph-controls label[for="voutCheckbox"], div.graph-controls label[for="voutRadioButton"], div#graph-listen label[for="voutCheckbox"], div#graph-listen label[for="voutRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="voutCheckbox"], section.tool-wrapper div#controlls-container label[for="voutRadioButton"] {
   color: #e1a600; }
-div.graph-controls label[for="vrCheckbox"], div.graph-controls label[for="vrRadioButton"], div#graph-listen label[for="vrCheckbox"], div#graph-listen label[for="vrRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vrCheckbox"], section.tool-wrapper div#controlls-container label[for="vrRadioButton"] {
   color: #49c944; }
-div.graph-controls label[for="vcCheckbox"], div.graph-controls label[for="vcRadioButton"], div#graph-listen label[for="vcCheckbox"], div#graph-listen label[for="vcRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vcCheckbox"], section.tool-wrapper div#controlls-container label[for="vcRadioButton"] {
   color: #e1a600; }
-div.graph-controls label[for="vlCheckbox"], div.graph-controls label[for="vlRadioButton"], div#graph-listen label[for="vlCheckbox"], div#graph-listen label[for="vlRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vlCheckbox"], section.tool-wrapper div#controlls-container label[for="vlRadioButton"] {
   color: #a26784; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label {
+  margin-bottom: 11.326px;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 #021014;
+  -webkit-font-smoothing: antialiased; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider {
+  margin-bottom: 22.652px; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider.ui-slider-horizontal {
+  height: 0.4em;
+  background: #00232c;
+  border: 1px solid #000b0d;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle {
+  background-color: #dc322f;
+  margin-top: -0.3em; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:hover, section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:active {
+  background-color: #e04845; }
 
 div.book-wrapper section.book-sidebar {
   -webkit-box-sizing: border-box;
