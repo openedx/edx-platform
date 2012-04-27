@@ -127,15 +127,11 @@ $(function() {
         $("#feedback_div").html("Feedback submitted. Thank you");
         });
       });
-    });
 
 // Calculator
-$(function() {
-
-    $("#calculator_wrapper").hide();
 
     $(".calc").click(function(){
-      $("#calculator_wrapper").slideToggle("fast");
+      $("li.calc-main").toggleClass('open');
       $("#calculator_wrapper #calculator_input").focus();
       $(this).toggleClass("closed");
       return false;
@@ -156,10 +152,9 @@ $(function() {
         $("#calculator_output").attr("value",data.result);
         });
       });
-    });
 
-$(function(){
     $("a[rel*=leanModal]").leanModal();
+
     });
 </script>
 
