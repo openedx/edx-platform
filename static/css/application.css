@@ -734,7 +734,7 @@ li.calc-main {
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
   transition-delay: 0;
-  z-index: 9999;
+  z-index: 99;
   -webkit-appearance: none; }
 li.calc-main.open {
   bottom: -36px; }

@@ -4,7 +4,7 @@ li.calc-main {
   position: fixed;
   width: 100%;
   @include transition(bottom);
-  z-index: 9999;
+  z-index: 99;
   -webkit-appearance: none;
 
   &.open {
