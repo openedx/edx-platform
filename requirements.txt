@@ -15,3 +15,4 @@ path.py
 django_debug_toolbar
 django-masquerade
 pyfilesystem
+django-jasmine
