@@ -3107,7 +3107,9 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   outline: none; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr {
   float: left;
-  margin-right: 22.652px; }
+  margin-right: 22.652px;
+  list-style: none;
+  padding: 0; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li {
   float: left;
   margin-bottom: 0; }
@@ -3659,7 +3661,7 @@ nav.sequence-nav ol li p::after {
   width: 10px; }
 nav.sequence-nav ul {
   margin-right: 1px;
-  list-style: none  !important;
+  list-style: none !important;
   position: absolute;
   right: 0;
   top: 0;
