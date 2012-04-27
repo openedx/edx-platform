@@ -77,6 +77,10 @@ if settings.ASKBOT_ENABLED:
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
 
+if settings.DEBUG:
+    ## Jasmine
+    urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
