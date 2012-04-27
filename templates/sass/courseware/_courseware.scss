@@ -1,4 +1,4 @@
-html { 
+html {
   height: 100%;
   max-height: 100%;
 }
@@ -256,6 +256,24 @@ div.course-wrapper {
           background-color: lighten($mit-red, 10%);
           outline: none;
         }
+      }
+    }
+
+    div.ui-tabs {
+      border: 0;
+      @include border-radius(0);
+      margin: 0;
+      padding: 0;
+
+      .ui-tabs-nav {
+        background: none;
+        border: 0;
+        margin-bottom: lh(.5);
+      }
+
+      .ui-tabs-panel {
+        @include border-radius(0);
+        padding: 0;
       }
     }
   }
