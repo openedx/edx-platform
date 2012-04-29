@@ -51,7 +51,13 @@ function ${ id }_load() {
   $('#show_${ id }').click(function() {
     postJSON('/modx/problem/${ id }/problem_show', {}, function(data) {
       for (var key in data) {
-      $("#answer_"+key).text(data[key]);
+	  if ($.isArray(data[key])){
+	      for (var ans_index in data[key]){
+		  var choice_id = 'input_'+key+'_'+data[key][ans_index];
+		  $("label[for="+choice_id+"]").attr("correct_answer", "true");   
+	      }
+	  }
+	  $("#answer_"+key).text(data[key]);
     }
   });
 
