@@ -1,5 +1,4 @@
 import hashlib
-import json
 import logging
 import os
 import re
@@ -14,7 +13,7 @@ try: # This lets us do __name__ == ='__main__'
 
     from student.models import UserProfile
     from student.models import UserTestGroup
-    from mitxmako.shortcuts import render_to_response, render_to_string
+    from mitxmako.shortcuts import render_to_string
     from util.cache import cache
 except: 
     settings = None 
@@ -97,19 +96,8 @@ def item(l, default="", process=lambda x:x):
 
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
-    old_ids = {'video':'youtube',
-                   'problem':'filename',
-                   'sequential':'id',
-                   'html':'filename',
-                   'vertical':'id', 
-                   'tab':'id',
-                   'schematic':'id',
-                   'book' : 'id'}
     import courseware.modules
     default_ids = courseware.modules.get_default_ids()
-
-    #print default_ids, old_ids
-    #print default_ids == old_ids
 
     # Tag elements with unique IDs
     elements = course.xpath("|".join(['//'+c for c in default_ids]))

@@ -1,10 +1,5 @@
-# Create your views here.
-import os
-
-from django.conf import settings
-from django.http import Http404
-from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_response, render_to_string
+from django.contrib.auth.decorators import login_required
+from mitxmako.shortcuts import render_to_response
 
 def index(request, page=0): 
     if not request.user.is_authenticated():

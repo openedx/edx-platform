@@ -1,30 +1,11 @@
-import StringIO
-import json
 import logging
-import os
-import sys
-import sys
-import urllib
-import uuid
 
 from lxml import etree
 
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.context_processors import csrf
-from django.db import connection
-from django.http import Http404
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.template import Context
-from django.template import Context, loader
-from mitxmako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_string
 
 from models import StudentModule
-from student.models import UserProfile
 import track.views
-
-import courseware.content_parser as content_parser
 
 import courseware.modules
 
