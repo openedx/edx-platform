@@ -245,6 +245,8 @@ class Module(XModule):
             return True
         if self.show_answer == 'closed' and not self.closed():
             return False
+        if self.show_answer == 'always':
+            return True
         print "aa", self.show_answer
         raise Http404
 
