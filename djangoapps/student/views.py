@@ -10,14 +10,13 @@ from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.validators import validate_email, validate_slug, ValidationError
-from django.db import connection
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
-from mako import exceptions
 
 from django_future.csrf import ensure_csrf_cookie
 
