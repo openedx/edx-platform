@@ -316,21 +316,19 @@ class Module(XModule):
 
         self.attempts = self.attempts + 1
         self.lcp.done=True
-
+        
         success = 'correct'
         for i in correct_map:
             if correct_map[i]!='correct':
                 success = 'incorrect'
-
-        js=json.dumps({'correct_map' : correct_map,
-                       'success' : success})
 
         event_info['correct_map']=correct_map
         event_info['success']=success
 
         self.tracker('save_problem_check', event_info)
 
-        return js
+        return json.dumps({'success': success,
+                           'contents': self.get_problem_html(encapsulate=False)})
 
     def save_problem(self, get):
         event_info = dict()

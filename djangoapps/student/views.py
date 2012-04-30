@@ -92,12 +92,11 @@ def logout_user(request):
     logout(request)
     return redirect('/')
 
+@login_required
 @ensure_csrf_cookie
 def change_setting(request):
     ''' JSON call to change a profile setting: Right now, location and language
     '''
-    if not request.user.is_authenticated():
-        return redirect('/')
     up = UserProfile.objects.get(user=request.user) #request.user.profile_cache
     if 'location' in request.POST:
         up.location=request.POST['location']

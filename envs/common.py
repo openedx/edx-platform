@@ -180,8 +180,8 @@ CELERY_ALWAYS_EAGER = True
 djcelery.setup_loader()
 
 ################################# SIMPLEWIKI ###################################
-WIKI_REQUIRE_LOGIN_EDIT = True
-WIKI_REQUIRE_LOGIN_VIEW = True
+SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
+SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
