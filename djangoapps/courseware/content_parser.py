@@ -141,6 +141,9 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
             return
 
 def user_groups(user):
+    if not user.is_authenticated():
+        return []
+
     # TODO: Rewrite in Django
     key = 'user_group_names_{user.id}'.format(user=user)
     cache_expiration = 60 * 60 # one hour
@@ -171,12 +174,13 @@ def course_xml_process(tree):
 
 def course_file(user):
     ''' Given a user, return course.xml'''
-    #import logging
-    #log = logging.getLogger("tracking")
-    #log.info(  "DEBUG: cf:"+str(user) )
 
-    filename = UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
-    groups = user_groups(user)
+    if user.is_authenticated():
+        filename = UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
+        groups = user_groups(user)
+    else:
+        filename = 'guest_course.xml'
+        groups = []
     options = {'dev_content':settings.DEV_CONTENT, 
                'groups' : groups}
 
