@@ -1,22 +1,28 @@
-<nav aria-label="Section Navigation" class="sequence-nav">
-  <ol>
-    % for t in range(1,1+len(items)):
-    <li><a href="#" class="seq_inactive" id="tt_${ t }"></a></li>
-    % endfor
-  </ol>
+<div id="sequence_${id}" class="sequence">
+  <nav aria-label="Section Navigation" class="sequence-nav">
+    <ol id="sequence-list">
+    </ol>
 
-  <ul>
-    <li class="${ id }prev prev"><a href="#">Previous</a></li>
-    <li class="${ id }next next"><a href="#">Next</a></li>
-  </ul>
-</nav>
+    <ul class="sequence-nav-buttons">
+      <li class="prev"><a href="#">Previous</a></li>
+      <li class="next"><a href="#">Next</a></li>
+    </ul>
+  </nav>
 
-<div id="seq_content"></div>
+  <div id="seq_content"></div>
 
-<nav class="sequence-bottom">
-<ul aria-label="Section Navigation">
-  <li class="${ id }prev prev"><a href="#">Previous</a></li>
-  <li class="${ id }next next"><a href="#">Next</a></li>
-</ul>
-</nav>
+  <nav class="sequence-bottom">
+    <ul aria-label="Section Navigation" class="sequence-nav-buttons">
+      <li class="prev"><a href="#">Previous</a></li>
+      <li class="next"><a href="#">Next</a></li>
+    </ul>
+  </nav>
+</div>
 
+<%block name="js_extra">
+<script type="text/javascript">
+  $(function(){
+      new Sequence('${id}', ${items}, '${tag}', ${position});
+  });
+</script>
+</%block>
