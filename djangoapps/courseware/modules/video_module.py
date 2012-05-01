@@ -30,31 +30,18 @@ class Module(XModule):
     def get_xml_tags(c):
         '''Tags in the courseware file guaranteed to correspond to the module'''
         return ["video"]
-        
+
     def video_list(self):
         l = self.youtube.split(',')
         l = [i.split(":") for i in l]
         return json.dumps(dict(l))
-    
+
     def get_html(self):
         return render_to_string('video.html',{'streams':self.video_list(),
                                               'id':self.item_id,
-                                              'position':self.position, 
-                                              'name':self.name, 
+                                              'position':self.position,
+                                              'name':self.name,
                                               'annotations':self.annotations})
-
-    def get_init_js(self):
-        '''JavaScript code to be run when problem is shown. Be aware
-        that this may happen several times on the same page
-        (e.g. student switching tabs). Common functions should be put
-        in the main course .js files for now. ''' 
-        log.debug(u"INIT POSITION {0}".format(self.position))
-        return render_to_string('video_init.js',{'streams':self.video_list(),
-                                                 'id':self.item_id,
-                                                 'position':self.position})+self.annotations_init
-
-    def get_destroy_js(self):
-        return "videoDestroy(\"{0}\");".format(self.item_id)+self.annotations_destroy
 
     def __init__(self, system, xml, item_id, state=None):
         XModule.__init__(self, system, xml, item_id, state)
@@ -69,5 +56,3 @@ class Module(XModule):
 
         self.annotations=[(e.get("name"),self.render_function(e)) \
                       for e in xmltree]
-        self.annotations_init="".join([e[1]['init_js'] for e in self.annotations if 'init_js' in e[1]])
-        self.annotations_destroy="".join([e[1]['destroy_js'] for e in self.annotations if 'destroy_js' in e[1]])
