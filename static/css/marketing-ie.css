@@ -1,10 +1,13 @@
+/* line 1, sass/marketing-ie.scss */
 body {
   margin: 0;
   padding: 0; }
 
+/* line 6, sass/marketing-ie.scss */
 .wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, section.index-content, footer {
   margin: 0;
   overflow: hidden; }
 
+/* line 12, sass/marketing-ie.scss */
 div#enroll form {
   display: none; }

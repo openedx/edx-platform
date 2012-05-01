@@ -20,6 +20,7 @@ section.index-content {
     p {
       line-height: lh();
       margin-bottom: lh();
+
     }
 
     ul {
@@ -235,6 +236,19 @@ section.index-content {
 
         @media screen and (min-width: 500px) and (max-width: 781px) {
           padding-top: lh(8);
+        }
+      }
+
+      div.announcement {
+        p.announcement-button {
+          a {
+            margin-top: 0;
+          }
+        }
+
+        img {
+          max-width: 100%;
+          margin-bottom: lh();
         }
       }
     }
