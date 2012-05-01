@@ -13,6 +13,8 @@ class window.Courseware
           autoHeight: false
         $('#open_close_accordion a').click navigation.toggle
 
+        $('#accordion').show()
+
     log: (event, ui) ->
       log_event 'accordion',
         newheader: ui.newHeader.text()

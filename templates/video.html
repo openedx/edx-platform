@@ -2,123 +2,49 @@
   <h1> ${name} </h1>
 % endif
 
-<div class="video-subtitles">
-<div class="tc-wrapper">
+<div id="video_${id}" class="video">
+  <div class="tc-wrapper">
+    <article class="video-wrapper">
+      <section class="video-player">
+        <div id="${id}"></div>
+      </section>
 
-  <div class="video-wrapper">
-    <div class="video-player">
-      <div id="ytapiplayer">
-      </div>
+      <section class="video-controls">
+        <div class="slider"></div>
+        <div>
+          <ul class="vcr">
+            <li><a class="video_control play">Play</a></li>
+            <li>
+              <div class="vidtime">0:00 / 0:00</div>
+            </li>
+          </ul>
 
-      <iframe id="html5_player" type="text/html" frameborder="0">
-      </iframe>
-    </div>
+          <div class="secondary-controls">
+            <div class="speeds">
+              <a href="#">
+                <h3>Speed</h3>
+                <p class="active"></p>
+              </a>
+              <ol class="video_speeds"></ol>
+            </div>
 
-    <section class="video-controls">
-      <div id="slider"></div>
-
-      <section>
-        <ul class="vcr">
-          <li><a id="video_control" class="pause">Pause</a></li>
-
-          <li>
-            <div id="vidtime">0:00 / 0:00</div>
-          </li>
-        </ul>
-
-
-        <div class="secondary-controls">
-        <div class="speeds">
-          <a href="#">
-            <h3>Speed</h3>
-            <p class="active"></p>
-            <ol id="video_speeds"></ol>
-          </a>
-        </div>
-
-        <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
-
-        <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
+            <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
+            <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
+          </div>
         </div>
       </section>
-    </section>
+    </article>
+
+    <ol class="subtitles">
+      <li>Attempting to load captions...</li>
+    </ol>
   </div>
-
-  <ol class="subtitles">
-    <!-- <li id="stt_n5"><div id="std_n7" onclick="title_seek(-7);"></div></li> -->
-    <li id="stt_n4"><div id="std_n6" onclick="title_seek(-6);"></div></li>
-    <li id="stt_n4"><div id="std_n5" onclick="title_seek(-5);"></div></li>
-    <li id="stt_n4"><div id="std_n4" onclick="title_seek(-4);"></div></li>
-    <li id="stt_n3"><div id="std_n3" onclick="title_seek(-3);"></div></li>
-    <li id="stt_n2"><div id="std_n2" onclick="title_seek(-2);"></div></li>
-    <li id="stt_n1"><div id="std_n1" onclick="title_seek(-1);"></div></li>
-    <li id="stt_0 "class="current"><div id="std_0" onclick="title_seek(0);"></div></li>
-    <li id="stt_p1"><div id="std_p1" onclick="title_seek( 1);"></div></li>
-    <li id="stt_p2"><div id="std_p2" onclick="title_seek( 2);"></div></li>
-    <li id="stt_p3"><div id="std_p3" onclick="title_seek( 3);"></div></li>
-    <li id="stt_p4"><div id="std_p4" onclick="title_seek( 4);"></div></li>
-    <li id="stt_p5"><div id="std_p5" onclick="title_seek( 5);"></div></li>
-    <li id="stt_p6"><div id="std_p7" onclick="title_seek( 6);"></div></li>
-    <li id="stt_p6"><div id="std_p7" onclick="title_seek( 7);"></div></li>
-    <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li>
-  </ol>
-</div>
-
 </div>
 
 <%block name="js_extra">
-<script src="/static/js/jquery.ui.touch-punch.min.js"></script>
-<script type="text/javascript" charset="utf-8">
-  $(function() {
-      // tooltips for full browser and closed caption
-      $('.add-fullscreen, .hide-subtitles ').qtip({
-          position: {
-            my: 'top right',
-            at: 'top center'
-            }
-        });
-
-      //full browser
-      $('.add-fullscreen').click(function() {
-
-          $('div.video-subtitles').toggleClass('fullscreen');
-
-          if ($('div.video-subtitles').hasClass('fullscreen')) {
-            $('div.video-subtitles').append('<a href="#" class="exit">Exit</a>');
-            } else {
-            $('a.exit').remove();
-            }
-
-          $('.exit').click(function() {
-            $('div.video-subtitles').removeClass('fullscreen');
-            $(this).remove();
-            return false;
-            });
-
-          var link_title = $(this).attr('title');
-          $(this).attr('title', (link_title == 'Exit fill browser') ? 'Fill browser' : 'Exit fill browser');
-
-          return false;
-        });
-
-
-      //hide subtitles
-      $('.hide-subtitles').click(function() {
-        $('div.video-subtitles').toggleClass('closed');
-
-        var link_title = $(this).attr('title');
-        $(this).attr('title', (link_title == 'Turn on captions') ? 'Turn off captions' : 'Turn on captions');
-
-        return false;
-       });
-
-      $("div.speeds a").hover(function() {
-        $(this).toggleClass("open");
-        });
-
-      $("div.speeds a").click(function() {
-        return false;
-        });
+<script type="text/javascript">
+  $(function(){
+    new Video('${id}', ${streams});
   });
 </script>
 </%block>
