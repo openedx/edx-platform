@@ -15,18 +15,18 @@ from mako.template import Template
 
 from util import contextualize_text
 import inputtypes
-from responsetypes import numericalresponse, formularesponse, customresponse, schematicresponse, multiplechoiceresponse,  StudentInputError
+from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError
 
 import calc
 import eia
 
 log = logging.getLogger("mitx.courseware")
 
-response_types = {'numericalresponse':numericalresponse, 
-                  'formularesponse':formularesponse,
-                  'customresponse':customresponse,
-                  'schematicresponse':schematicresponse,
-                  'multiplechoiceresponse':multiplechoiceresponse}
+response_types = {'numericalresponse':NumericalResponse, 
+                  'formularesponse':FormulaResponse,
+                  'customresponse':CustomResponse,
+                  'schematicresponse':SchematicResponse,
+                  'multiplechoiceresponse':MultipleChoiceResponse}
 entry_types = ['textline', 'schematic', 'choicegroup']
 response_properties = ["responseparam", "answer"]
 # How to convert from original XML to HTML
