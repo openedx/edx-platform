@@ -38,7 +38,7 @@ def compare_with_tolerance(v1, v2, tol):
 
 #Every response type needs methods "grade" and "get_answers"     
 
-class multiplechoiceresponse(object):
+class MultipleChoiceResponse(object):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
@@ -62,7 +62,7 @@ class multiplechoiceresponse(object):
     def get_answers(self):
         return {self.answer_id:self.correct_choices}
     
-class numericalresponse(object):
+class NumericalResponse(object):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -91,7 +91,7 @@ class numericalresponse(object):
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
-class customresponse(object):
+class CustomResponse(object):
     def __init__(self, xml, context):
         self.xml = xml
         ## CRITICAL TODO: Should cover all entrytypes
@@ -122,7 +122,7 @@ class customresponse(object):
 class StudentInputError(Exception):
     pass
 
-class formularesponse(object):
+class FormulaResponse(object):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -192,7 +192,7 @@ class formularesponse(object):
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
-class schematicresponse(object):
+class SchematicResponse(object):
     def __init__(self, xml, context):
         self.xml = xml
         self.answer_ids = xml.xpath('//*[@id=$id]//schematic/@id',
