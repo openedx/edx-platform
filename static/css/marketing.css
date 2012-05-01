@@ -5,7 +5,6 @@ Last Updated: 2010-09-17
 Author: Richard Clark - http://richclarkdesign.com 
 Twitter: @rich_clark
 */
-/* line 20, sass/base/_reset.scss */
 html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 abbr, address, cite, code,
@@ -26,30 +25,24 @@ time, mark, audio, video {
   vertical-align: baseline;
   background: transparent; }
 
-/* line 30, sass/base/_reset.scss */
 body {
   line-height: 1; }
 
-/* line 35, sass/base/_reset.scss */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block; }
 
-/* line 39, sass/base/_reset.scss */
 nav ul {
   list-style: none; }
 
-/* line 43, sass/base/_reset.scss */
 blockquote, q {
   quotes: none; }
 
-/* line 48, sass/base/_reset.scss */
 blockquote:before, blockquote:after,
 q:before, q:after {
   content: '';
   content: none; }
 
-/* line 53, sass/base/_reset.scss */
 a {
   margin: 0;
   padding: 0;
@@ -58,36 +51,30 @@ a {
   background: transparent; }
 
 /* change colours to suit your needs */
-/* line 62, sass/base/_reset.scss */
 ins {
   background-color: #ff9;
   color: #000;
   text-decoration: none; }
 
 /* change colours to suit your needs */
-/* line 69, sass/base/_reset.scss */
 mark {
   background-color: #ff9;
   color: #000;
   font-style: italic;
   font-weight: bold; }
 
-/* line 76, sass/base/_reset.scss */
 del {
   text-decoration: line-through; }
 
-/* line 80, sass/base/_reset.scss */
 abbr[title], dfn[title] {
   border-bottom: 1px dotted;
   cursor: help; }
 
-/* line 85, sass/base/_reset.scss */
 table {
   border-collapse: collapse;
   border-spacing: 0; }
 
 /* change border colour to suit your needs */
-/* line 91, sass/base/_reset.scss */
 hr {
   display: block;
   height: 1px;
@@ -96,7 +83,6 @@ hr {
   margin: 1em 0;
   padding: 0; }
 
-/* line 100, sass/base/_reset.scss */
 input, select {
   vertical-align: middle; }
 
@@ -143,7 +129,6 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-/* line 1, sass/index/_extends.scss */
 .wrapper, .subpage, section.copyright, section.tos, section.privacy-policy, section.honor-code, header.announcement div, footer, section.index-content {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -153,40 +138,30 @@ input, select {
   padding: 25.888px;
   width: 100%; }
 
-/* line 14, sass/index/_extends.scss */
 .subpage > div, section.copyright > div, section.tos > div, section.privacy-policy > div, section.honor-code > div {
   padding-left: 34.171%; }
   @media screen and (max-width: 940px) {
-    /* line 14, sass/index/_extends.scss */
     .subpage > div, section.copyright > div, section.tos > div, section.privacy-policy > div, section.honor-code > div {
       padding-left: 0; } }
-  /* line 21, sass/index/_extends.scss */
   .subpage > div p, section.copyright > div p, section.tos > div p, section.privacy-policy > div p, section.honor-code > div p {
     margin-bottom: 25.888px;
     line-height: 25.888px; }
-  /* line 26, sass/index/_extends.scss */
   .subpage > div h1, section.copyright > div h1, section.tos > div h1, section.privacy-policy > div h1, section.honor-code > div h1 {
     margin-bottom: 12.944px; }
-  /* line 30, sass/index/_extends.scss */
   .subpage > div h2, section.copyright > div h2, section.tos > div h2, section.privacy-policy > div h2, section.honor-code > div h2 {
     font: 18px "Open Sans", Helvetica, Arial, sans-serif;
     color: #000;
     margin-bottom: 12.944px; }
-  /* line 36, sass/index/_extends.scss */
   .subpage > div ul, section.copyright > div ul, section.tos > div ul, section.privacy-policy > div ul, section.honor-code > div ul {
     list-style: disc outside none; }
-    /* line 39, sass/index/_extends.scss */
     .subpage > div ul li, section.copyright > div ul li, section.tos > div ul li, section.privacy-policy > div ul li, section.honor-code > div ul li {
       list-style: disc outside none;
       line-height: 25.888px; }
-  /* line 45, sass/index/_extends.scss */
   .subpage > div dl, section.copyright > div dl, section.tos > div dl, section.privacy-policy > div dl, section.honor-code > div dl {
     margin-bottom: 25.888px; }
-    /* line 48, sass/index/_extends.scss */
     .subpage > div dl dd, section.copyright > div dl dd, section.tos > div dl dd, section.privacy-policy > div dl dd, section.honor-code > div dl dd {
       margin-bottom: 12.944px; }
 
-/* line 55, sass/index/_extends.scss */
 .clearfix:after, .subpage:after, section.copyright:after, section.tos:after, section.privacy-policy:after, section.honor-code:after, header.announcement div section:after, footer:after, section.index-content:after, section.index-content section:after, section.index-content section.about section:after, div.leanModal_box#enroll ol:after {
   content: ".";
   display: block;
@@ -194,7 +169,6 @@ input, select {
   clear: both;
   visibility: hidden; }
 
-/* line 63, sass/index/_extends.scss */
 .button, header.announcement div section.course section a, section.index-content section.course a, section.index-content section.staff a, section.index-content section.about-course section.cta a.enroll {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -239,16 +213,13 @@ input, select {
   -moz-box-shadow: inset 0 1px 0 #b83d3d;
   box-shadow: inset 0 1px 0 #b83d3d;
   -webkit-font-smoothing: antialiased; }
-  /* line 77, sass/index/_extends.scss */
   .button:hover, header.announcement div section.course section a:hover, section.index-content section.course a:hover, section.index-content section.staff a:hover, section.index-content section.about-course section.cta a.enroll:hover {
     background-color: #732626;
     border-color: #4d1919; }
-  /* line 82, sass/index/_extends.scss */
   .button span, header.announcement div section.course section a span, section.index-content section.course a span, section.index-content section.staff a span, section.index-content section.about-course section.cta a.enroll span {
     font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
     font-style: italic; }
 
-/* line 88, sass/index/_extends.scss */
 p.ie-warning {
   display: block !important;
   line-height: 1.3em;
@@ -256,32 +227,24 @@ p.ie-warning {
   margin-bottom: 25.888px;
   padding: 25.888px; }
 
-/* line 1, sass/index/_base.scss */
 body {
   background-color: #fff;
   color: #444;
   font: 16px Georgia, serif; }
-  /* line 6, sass/index/_base.scss */
   body :focus {
     outline-color: #ccc; }
-  /* line 10, sass/index/_base.scss */
   body h1 {
     font: 800 24px "Open Sans", Helvetica, Arial, sans-serif; }
-  /* line 14, sass/index/_base.scss */
   body li {
     margin-bottom: 25.888px; }
-  /* line 18, sass/index/_base.scss */
   body em {
     font-style: italic; }
-  /* line 22, sass/index/_base.scss */
   body a {
     color: #993333;
     font-style: italic;
     text-decoration: none; }
-    /* line 27, sass/index/_base.scss */
     body a:hover, body a:focus {
       color: #732626; }
-  /* line 32, sass/index/_base.scss */
   body input[type="email"], body input[type="number"], body input[type="password"], body input[type="search"], body input[type="tel"], body input[type="text"], body input[type="url"], body input[type="color"], body input[type="date"], body input[type="datetime"], body input[type="datetime-local"], body input[type="month"], body input[type="time"], body input[type="week"], body textarea {
     -webkit-box-shadow: 0 -1px 0 white;
     -moz-box-shadow: 0 -1px 0 white;
@@ -297,11 +260,9 @@ body {
     font: 16px Georgia, serif;
     padding: 4px;
     width: 100%; }
-    /* line 40, sass/index/_base.scss */
     body input[type="email"]:focus, body input[type="number"]:focus, body input[type="password"]:focus, body input[type="search"]:focus, body input[type="tel"]:focus, body input[type="text"]:focus, body input[type="url"]:focus, body input[type="color"]:focus, body input[type="date"]:focus, body input[type="datetime"]:focus, body input[type="datetime-local"]:focus, body input[type="month"]:focus, body input[type="time"]:focus, body input[type="week"]:focus, body textarea:focus {
       border-color: #993333; }
 
-/* line 1, sass/index/_header.scss */
 header.announcement {
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -312,48 +273,35 @@ header.announcement {
   border-bottom: 1px solid #000;
   color: #fff;
   -webkit-font-smoothing: antialiased; }
-  /* line 8, sass/index/_header.scss */
   header.announcement.home {
     background: #e3e3e3 url("/static/images/marketing/shot-5-medium.jpg"); }
     @media screen and (min-width: 1200px) {
-      /* line 8, sass/index/_header.scss */
       header.announcement.home {
         background: #e3e3e3 url("/static/images/marketing/shot-5-large.jpg"); } }
-    /* line 15, sass/index/_header.scss */
     header.announcement.home div {
       padding: 258.88px 25.888px 77.664px; }
       @media screen and (max-width:780px) {
-        /* line 15, sass/index/_header.scss */
         header.announcement.home div {
           padding: 64.72px 25.888px 51.776px; } }
-      /* line 24, sass/index/_header.scss */
       header.announcement.home div nav h1 {
         margin-right: 0; }
-      /* line 28, sass/index/_header.scss */
       header.announcement.home div nav a.login {
         display: none; }
-  /* line 35, sass/index/_header.scss */
   header.announcement.course {
     background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg"); }
     @media screen and (min-width: 1200px) {
-      /* line 35, sass/index/_header.scss */
       header.announcement.course {
         background: #e3e3e3 url("/static/images/marketing/course-bg-large.jpg"); } }
     @media screen and (max-width: 1199px) and (min-width: 700px) {
-      /* line 35, sass/index/_header.scss */
       header.announcement.course {
         background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg"); } }
-    /* line 46, sass/index/_header.scss */
     header.announcement.course div {
       padding: 103.552px 25.888px 51.776px; }
       @media screen and (max-width:780px) {
-        /* line 46, sass/index/_header.scss */
         header.announcement.course div {
           padding: 64.72px 25.888px 51.776px; } }
-  /* line 56, sass/index/_header.scss */
   header.announcement div {
     position: relative; }
-    /* line 60, sass/index/_header.scss */
     header.announcement div nav {
       position: absolute;
       top: 0;
@@ -366,7 +314,6 @@ header.announcement {
       background: #333;
       background: rgba(0, 0, 0, 0.7);
       padding: 12.944px 25.888px; }
-      /* line 69, sass/index/_header.scss */
       header.announcement div nav h1 {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
@@ -376,25 +323,20 @@ header.announcement {
         *display: inline;
         *vertical-align: auto;
         margin-right: 12.944px; }
-        /* line 74, sass/index/_header.scss */
         header.announcement div nav h1 a {
           font: italic 800 18px "Open Sans", Helvetica, Arial, sans-serif;
           color: #fff;
           text-decoration: none; }
-          /* line 79, sass/index/_header.scss */
           header.announcement div nav h1 a:hover, header.announcement div nav h1 a:focus {
             color: #999; }
-      /* line 85, sass/index/_header.scss */
       header.announcement div nav a.login {
         text-decoration: none;
         color: #fff;
         font-size: 12px;
         font-style: normal;
         font-family: "Open Sans", Helvetica, Arial, sans-serif; }
-        /* line 92, sass/index/_header.scss */
         header.announcement div nav a.login:hover, header.announcement div nav a.login:focus {
           color: #999; }
-    /* line 98, sass/index/_header.scss */
     header.announcement div section {
       background: #993333;
       display: -moz-inline-box;
@@ -407,10 +349,8 @@ header.announcement {
       margin-left: 34.171%;
       padding: 25.888px 38.832px; }
       @media screen and (max-width: 780px) {
-        /* line 98, sass/index/_header.scss */
         header.announcement div section {
           margin-left: 0; } }
-      /* line 109, sass/index/_header.scss */
       header.announcement div section h1 {
         font-family: "Open Sans";
         font-size: 30px;
@@ -424,7 +364,6 @@ header.announcement {
         *vertical-align: auto;
         line-height: 1.2em;
         margin: 0 25.888px 0 0; }
-      /* line 118, sass/index/_header.scss */
       header.announcement div section h2 {
         font-family: "Open Sans";
         font-size: 24px;
@@ -437,7 +376,6 @@ header.announcement {
         *display: inline;
         *vertical-align: auto;
         line-height: 1.2em; }
-      /* line 127, sass/index/_header.scss */
       header.announcement div section.course section {
         float: left;
         margin-left: 0;
@@ -445,12 +383,10 @@ header.announcement {
         padding: 0;
         width: 48.092%; }
         @media screen and (max-width: 780px) {
-          /* line 127, sass/index/_header.scss */
           header.announcement div section.course section {
             float: none;
             width: 100%;
             margin-right: 0; } }
-        /* line 140, sass/index/_header.scss */
         header.announcement div section.course section a {
           background-color: #4d1919;
           border-color: #260d0d;
@@ -460,35 +396,28 @@ header.announcement {
           display: block;
           padding: 12.944px 25.888px;
           text-align: center; }
-          /* line 149, sass/index/_header.scss */
           header.announcement div section.course section a:hover {
             background-color: #732626;
             border-color: #4d1919; }
-      /* line 156, sass/index/_header.scss */
       header.announcement div section.course p {
         width: 48.092%;
         line-height: 25.888px;
         float: left; }
         @media screen and (max-width: 780px) {
-          /* line 156, sass/index/_header.scss */
           header.announcement div section.course p {
             float: none;
             width: 100%; } }
 
-/* line 1, sass/index/_footer.scss */
 footer {
   padding-top: 0; }
-  /* line 6, sass/index/_footer.scss */
   footer div.footer-wrapper {
     border-top: 1px solid #e5e5e5;
     padding: 25.888px 0;
     background: url("/static/images/marketing/mit-logo.png") right center no-repeat; }
     @media screen and (max-width: 780px) {
-      /* line 6, sass/index/_footer.scss */
       footer div.footer-wrapper {
         background-position: left bottom;
         padding-bottom: 77.664px; } }
-    /* line 16, sass/index/_footer.scss */
     footer div.footer-wrapper a {
       color: #888;
       text-decoration: none;
@@ -512,10 +441,8 @@ footer {
       -ms-transition-delay: 0;
       -o-transition-delay: 0;
       transition-delay: 0; }
-      /* line 21, sass/index/_footer.scss */
       footer div.footer-wrapper a:hover, footer div.footer-wrapper a:focus {
         color: #666; }
-    /* line 26, sass/index/_footer.scss */
     footer div.footer-wrapper p {
       display: -moz-inline-box;
       -moz-box-orient: vertical;
@@ -525,7 +452,6 @@ footer {
       *display: inline;
       *vertical-align: auto;
       margin-right: 25.888px; }
-    /* line 31, sass/index/_footer.scss */
     footer div.footer-wrapper ul {
       display: -moz-inline-box;
       -moz-box-orient: vertical;
@@ -535,10 +461,8 @@ footer {
       *display: inline;
       *vertical-align: auto; }
       @media screen and (max-width: 780px) {
-        /* line 31, sass/index/_footer.scss */
         footer div.footer-wrapper ul {
           margin-top: 25.888px; } }
-      /* line 38, sass/index/_footer.scss */
       footer div.footer-wrapper ul li {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
@@ -548,72 +472,55 @@ footer {
         *display: inline;
         *vertical-align: auto;
         margin-bottom: 0; }
-        /* line 42, sass/index/_footer.scss */
         footer div.footer-wrapper ul li:after {
           content: ' |';
           display: inline;
           color: #ccc; }
-        /* line 49, sass/index/_footer.scss */
         footer div.footer-wrapper ul li:last-child:after {
           content: none; }
-      /* line 56, sass/index/_footer.scss */
       footer div.footer-wrapper ul.social {
         float: right;
         margin-right: 60px;
         position: relative;
         top: -5px; }
         @media screen and (max-width: 780px) {
-          /* line 56, sass/index/_footer.scss */
           footer div.footer-wrapper ul.social {
             float: none; } }
-        /* line 66, sass/index/_footer.scss */
         footer div.footer-wrapper ul.social li {
           float: left;
           margin-right: 12.944px; }
-          /* line 70, sass/index/_footer.scss */
           footer div.footer-wrapper ul.social li:after {
             content: none;
             display: none; }
-          /* line 75, sass/index/_footer.scss */
           footer div.footer-wrapper ul.social li a {
             display: block;
             height: 29px;
             width: 28px;
             text-indent: -9999px; }
-            /* line 81, sass/index/_footer.scss */
             footer div.footer-wrapper ul.social li a:hover {
               opacity: .8; }
-          /* line 86, sass/index/_footer.scss */
           footer div.footer-wrapper ul.social li.twitter a {
             background: url("/static/images/marketing/twitter.png") 0 0 no-repeat; }
-          /* line 90, sass/index/_footer.scss */
           footer div.footer-wrapper ul.social li.facebook a {
             background: url("/static/images/marketing/facebook.png") 0 0 no-repeat; }
-          /* line 94, sass/index/_footer.scss */
           footer div.footer-wrapper ul.social li.linkedin a {
             background: url("/static/images/marketing/linkedin.png") 0 0 no-repeat; }
 
-/* line 5, sass/index/_index.scss */
 section.index-content section {
   float: left; }
   @media screen and (max-width: 780px) {
-    /* line 5, sass/index/_index.scss */
     section.index-content section {
       float: none;
       width: auto;
       margin-right: 0; } }
-  /* line 15, sass/index/_index.scss */
   section.index-content section h1 {
     font-size: 800 24px "Open Sans";
     margin-bottom: 25.888px; }
-  /* line 20, sass/index/_index.scss */
   section.index-content section p {
     line-height: 25.888px;
     margin-bottom: 25.888px; }
-  /* line 26, sass/index/_index.scss */
   section.index-content section ul {
     margin: 0; }
-  /* line 30, sass/index/_index.scss */
   section.index-content section.about {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -623,71 +530,54 @@ section.index-content section {
     padding-right: 1.256%;
     width: 65.829%; }
     @media screen and (max-width: 780px) {
-      /* line 30, sass/index/_index.scss */
       section.index-content section.about {
         width: 100%;
         border-right: 0;
         margin-right: 0;
         padding-right: 0; } }
-    /* line 44, sass/index/_index.scss */
     section.index-content section.about section {
       margin-bottom: 25.888px; }
-      /* line 48, sass/index/_index.scss */
       section.index-content section.about section p {
         width: 48.092%;
         float: left; }
         @media screen and (max-width: 780px) {
-          /* line 48, sass/index/_index.scss */
           section.index-content section.about section p {
             float: none;
             width: auto; } }
-        /* line 57, sass/index/_index.scss */
         section.index-content section.about section p:nth-child(odd) {
           margin-right: 3.817%; }
           @media screen and (max-width: 780px) {
-            /* line 57, sass/index/_index.scss */
             section.index-content section.about section p:nth-child(odd) {
               margin-right: 0; } }
-      /* line 67, sass/index/_index.scss */
       section.index-content section.about section.intro section {
         margin-bottom: 0; }
-        /* line 70, sass/index/_index.scss */
         section.index-content section.about section.intro section.intro-text {
           margin-right: 3.817%;
           width: 48.092%; }
           @media screen and (max-width: 780px) {
-            /* line 70, sass/index/_index.scss */
             section.index-content section.about section.intro section.intro-text {
               margin-right: 0;
               width: auto; } }
-          /* line 79, sass/index/_index.scss */
           section.index-content section.about section.intro section.intro-text p {
             margin-right: 0;
             width: auto;
             float: none; }
-        /* line 86, sass/index/_index.scss */
         section.index-content section.about section.intro section.intro-video {
           width: 48.092%; }
           @media screen and (max-width: 780px) {
-            /* line 86, sass/index/_index.scss */
             section.index-content section.about section.intro section.intro-video {
               width: auto; } }
-          /* line 93, sass/index/_index.scss */
           section.index-content section.about section.intro section.intro-video a {
             display: block;
             width: 100%; }
-            /* line 97, sass/index/_index.scss */
             section.index-content section.about section.intro section.intro-video a img {
               width: 100%; }
-            /* line 101, sass/index/_index.scss */
             section.index-content section.about section.intro section.intro-video a span {
               display: none; }
-      /* line 109, sass/index/_index.scss */
       section.index-content section.about section.features {
         border-top: 1px solid #E5E5E5;
         padding-top: 25.888px;
         margin-bottom: 0; }
-        /* line 114, sass/index/_index.scss */
         section.index-content section.about section.features h2 {
           text-transform: uppercase;
           letter-spacing: 1px;
@@ -695,18 +585,14 @@ section.index-content section {
           margin-bottom: 25.888px;
           font-weight: normal;
           font-size: 14px; }
-          /* line 122, sass/index/_index.scss */
           section.index-content section.about section.features h2 span {
             text-transform: none; }
-        /* line 128, sass/index/_index.scss */
         section.index-content section.about section.features p {
           width: auto;
           clear: both; }
-          /* line 132, sass/index/_index.scss */
           section.index-content section.about section.features p strong {
             font-family: "Open sans";
             font-weight: 800; }
-          /* line 137, sass/index/_index.scss */
           section.index-content section.about section.features p a {
             color: #993333;
             text-decoration: none;
@@ -730,38 +616,29 @@ section.index-content section {
             -ms-transition-delay: 0;
             -o-transition-delay: 0;
             transition-delay: 0; }
-            /* line 142, sass/index/_index.scss */
             section.index-content section.about section.features p a:hover, section.index-content section.about section.features p a:focus {
               color: #602020; }
-        /* line 148, sass/index/_index.scss */
         section.index-content section.about section.features ul {
           margin-bottom: 0; }
-          /* line 151, sass/index/_index.scss */
           section.index-content section.about section.features ul li {
             line-height: 25.888px;
             width: 48.092%;
             float: left;
             margin-bottom: 12.944px; }
             @media screen and (max-width: 780px) {
-              /* line 151, sass/index/_index.scss */
               section.index-content section.about section.features ul li {
                 width: auto;
                 float: none; } }
-            /* line 162, sass/index/_index.scss */
             section.index-content section.about section.features ul li:nth-child(odd) {
               margin-right: 3.817%; }
               @media screen and (max-width: 780px) {
-                /* line 162, sass/index/_index.scss */
                 section.index-content section.about section.features ul li:nth-child(odd) {
                   margin-right: 0; } }
-  /* line 175, sass/index/_index.scss */
   section.index-content section.course, section.index-content section.staff {
     width: 31.658%; }
     @media screen and (max-width: 780px) {
-      /* line 175, sass/index/_index.scss */
       section.index-content section.course, section.index-content section.staff {
         width: auto; } }
-    /* line 182, sass/index/_index.scss */
     section.index-content section.course h1, section.index-content section.staff h1 {
       color: #888;
       font: normal 16px Georgia, serif;
@@ -769,13 +646,10 @@ section.index-content section {
       letter-spacing: 1px;
       margin-bottom: 25.888px;
       text-transform: uppercase; }
-    /* line 191, sass/index/_index.scss */
     section.index-content section.course h2, section.index-content section.staff h2 {
       font: 800 24px "Open Sans", Helvetica, Arial, sans-serif; }
-    /* line 195, sass/index/_index.scss */
     section.index-content section.course h3, section.index-content section.staff h3 {
       font: 400 18px "Open Sans", Helvetica, Arial, sans-serif; }
-    /* line 202, sass/index/_index.scss */
     section.index-content section.course a span.arrow, section.index-content section.staff a span.arrow {
       color: rgba(255, 255, 255, 0.6);
       font-style: normal;
@@ -787,14 +661,11 @@ section.index-content section {
       *display: inline;
       *vertical-align: auto;
       padding-left: 10px; }
-    /* line 210, sass/index/_index.scss */
     section.index-content section.course ul, section.index-content section.staff ul {
       list-style: none; }
-      /* line 214, sass/index/_index.scss */
       section.index-content section.course ul li img, section.index-content section.staff ul li img {
         float: left;
         margin-right: 12.944px; }
-  /* line 223, sass/index/_index.scss */
   section.index-content section.course h2 {
     padding-top: 129.44px;
     background: url("/static/images/marketing/circuits-bg.jpg") 0 0 no-repeat;
@@ -804,26 +675,20 @@ section.index-content section {
     -o-background-size: contain;
     background-size: contain; }
     @media screen and (max-width: 998px) and (min-width: 781px) {
-      /* line 223, sass/index/_index.scss */
       section.index-content section.course h2 {
         background: url("/static/images/marketing/circuits-medium-bg.jpg") 0 0 no-repeat; } }
     @media screen and (max-width: 780px) {
-      /* line 223, sass/index/_index.scss */
       section.index-content section.course h2 {
         padding-top: 129.44px;
         background: url("/static/images/marketing/circuits-bg.jpg") 0 0 no-repeat; } }
     @media screen and (min-width: 500px) and (max-width: 781px) {
-      /* line 223, sass/index/_index.scss */
       section.index-content section.course h2 {
         padding-top: 207.104px; } }
-  /* line 244, sass/index/_index.scss */
   section.index-content section.course div.announcement p.announcement-button a {
     margin-top: 0; }
-  /* line 249, sass/index/_index.scss */
   section.index-content section.course div.announcement img {
     max-width: 100%;
     margin-bottom: 25.888px; }
-  /* line 259, sass/index/_index.scss */
   section.index-content section.about-course {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -833,52 +698,41 @@ section.index-content section {
     padding-right: 1.256%;
     width: 65.829%; }
     @media screen and (max-width: 780px) {
-      /* line 259, sass/index/_index.scss */
       section.index-content section.about-course {
         width: auto;
         border-right: 0;
         margin-right: 0;
         padding-right: 0; } }
-    /* line 273, sass/index/_index.scss */
     section.index-content section.about-course section {
       width: 48.092%; }
       @media screen and (max-width: 780px) {
-        /* line 273, sass/index/_index.scss */
         section.index-content section.about-course section {
           width: auto; } }
-      /* line 280, sass/index/_index.scss */
       section.index-content section.about-course section.about-info {
         margin-right: 3.817%; }
         @media screen and (max-width: 780px) {
-          /* line 280, sass/index/_index.scss */
           section.index-content section.about-course section.about-info {
             margin-right: 0; } }
-      /* line 288, sass/index/_index.scss */
       section.index-content section.about-course section.requirements {
         clear: both;
         width: 100%;
         border-top: 1px solid #E5E5E5;
         padding-top: 25.888px;
         margin-bottom: 0; }
-        /* line 295, sass/index/_index.scss */
         section.index-content section.about-course section.requirements p {
           float: left;
           width: 48.092%;
           margin-right: 3.817%; }
           @media screen and (max-width: 780px) {
-            /* line 295, sass/index/_index.scss */
             section.index-content section.about-course section.requirements p {
               margin-right: 0;
               float: none;
               width: auto; } }
-          /* line 306, sass/index/_index.scss */
           section.index-content section.about-course section.requirements p:nth-child(odd) {
             margin-right: 0; }
-      /* line 312, sass/index/_index.scss */
       section.index-content section.about-course section.cta {
         width: 100%;
         text-align: center; }
-        /* line 316, sass/index/_index.scss */
         section.index-content section.about-course section.cta a.enroll {
           padding: 12.944px 51.776px;
           display: -moz-inline-box;
@@ -890,11 +744,9 @@ section.index-content section {
           *vertical-align: auto;
           text-align: center;
           font: 800 18px "Open Sans", Helvetica, Arial, sans-serif; }
-  /* line 328, sass/index/_index.scss */
   section.index-content section.staff h1 {
     margin-top: 25.888px; }
 
-/* line 1, sass/layout/_leanmodal.scss */
 #lean_overlay {
   position: fixed;
   z-index: 100;
@@ -905,7 +757,6 @@ section.index-content section {
   background: #000;
   display: none; }
 
-/* line 12, sass/layout/_leanmodal.scss */
 div.leanModal_box {
   background: #fff;
   border: none;
@@ -923,7 +774,6 @@ div.leanModal_box {
   display: none;
   padding: 51.776px;
   text-align: left; }
-  /* line 22, sass/layout/_leanmodal.scss */
   div.leanModal_box a.modal_close {
     color: #aaa;
     display: block;
@@ -934,11 +784,9 @@ div.leanModal_box {
     top: 12px;
     width: 14px;
     z-index: 2; }
-    /* line 33, sass/layout/_leanmodal.scss */
     div.leanModal_box a.modal_close:hover {
       text-decoration: none;
       color: #993333; }
-  /* line 39, sass/layout/_leanmodal.scss */
   div.leanModal_box h1 {
     border-bottom: 1px solid #eee;
     font-size: 24px;
@@ -946,20 +794,15 @@ div.leanModal_box {
     margin-top: 0;
     padding-bottom: 25.888px;
     text-align: left; }
-  /* line 48, sass/layout/_leanmodal.scss */
   div.leanModal_box#enroll {
     max-width: 600px; }
-    /* line 51, sass/layout/_leanmodal.scss */
     div.leanModal_box#enroll ol {
       padding-top: 25.888px; }
-      /* line 57, sass/layout/_leanmodal.scss */
       div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
         width: auto;
         float: none; }
-      /* line 62, sass/layout/_leanmodal.scss */
       div.leanModal_box#enroll ol li div.tip {
         display: none; }
-      /* line 67, sass/layout/_leanmodal.scss */
       div.leanModal_box#enroll ol li:hover div.tip {
         background: #333;
         color: #fff;
@@ -971,10 +814,8 @@ div.leanModal_box {
         position: absolute;
         -webkit-font-smoothing: antialiased;
         width: 500px; }
-  /* line 84, sass/layout/_leanmodal.scss */
   div.leanModal_box form {
     text-align: left; }
-    /* line 87, sass/layout/_leanmodal.scss */
     div.leanModal_box form div#enroll_error, div.leanModal_box form div#login_error, div.leanModal_box form div#pwd_error {
       background-color: #333333;
       border: black;
@@ -986,52 +827,41 @@ div.leanModal_box {
       padding: 12.944px;
       text-shadow: 0 1px 0 #1a1a1a;
       -webkit-font-smoothing: antialiased; }
-      /* line 100, sass/layout/_leanmodal.scss */
       div.leanModal_box form div#enroll_error:empty, div.leanModal_box form div#login_error:empty, div.leanModal_box form div#pwd_error:empty {
         padding: 0; }
-    /* line 105, sass/layout/_leanmodal.scss */
     div.leanModal_box form ol {
       list-style: none;
       margin-bottom: 25.888px; }
-      /* line 109, sass/layout/_leanmodal.scss */
       div.leanModal_box form ol li {
         margin-bottom: 12.944px; }
-        /* line 112, sass/layout/_leanmodal.scss */
         div.leanModal_box form ol li.terms, div.leanModal_box form ol li.remember {
           border-top: 1px solid #eee;
           clear: both;
           float: none;
           padding-top: 25.888px;
           width: auto; }
-        /* line 120, sass/layout/_leanmodal.scss */
         div.leanModal_box form ol li.honor-code {
           width: auto;
           float: none; }
-        /* line 125, sass/layout/_leanmodal.scss */
         div.leanModal_box form ol li label {
           display: block;
           font-weight: bold; }
-        /* line 130, sass/layout/_leanmodal.scss */
         div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li input[type="number"], div.leanModal_box form ol li input[type="password"], div.leanModal_box form ol li input[type="search"], div.leanModal_box form ol li input[type="tel"], div.leanModal_box form ol li input[type="text"], div.leanModal_box form ol li input[type="url"], div.leanModal_box form ol li input[type="color"], div.leanModal_box form ol li input[type="date"], div.leanModal_box form ol li input[type="datetime"], div.leanModal_box form ol li input[type="datetime-local"], div.leanModal_box form ol li input[type="month"], div.leanModal_box form ol li input[type="time"], div.leanModal_box form ol li input[type="week"], div.leanModal_box form ol li textarea {
           width: 100%;
           -webkit-box-sizing: border-box;
           -moz-box-sizing: border-box;
           box-sizing: border-box; }
-        /* line 135, sass/layout/_leanmodal.scss */
         div.leanModal_box form ol li input[type="checkbox"] {
           margin-right: 10px; }
-        /* line 139, sass/layout/_leanmodal.scss */
         div.leanModal_box form ol li ul {
           list-style: disc outside none;
           margin: 12.944px 0 25.888px 25.888px; }
-          /* line 143, sass/layout/_leanmodal.scss */
           div.leanModal_box form ol li ul li {
             color: #666;
             float: none;
             font-size: 14px;
             list-style: disc outside none;
             margin-bottom: 12.944px; }
-    /* line 154, sass/layout/_leanmodal.scss */
     div.leanModal_box form input[type="button"], div.leanModal_box form input[type="submit"] {
       border: 1px solid #691b1b;
       -webkit-border-radius: 3px;
@@ -1058,7 +888,6 @@ div.leanModal_box {
       -webkit-background-clip: padding-box;
       font-size: 18px;
       padding: 12.944px; }
-      /* line 73, sass/bourbon/addons/_button.scss */
       div.leanModal_box form input[type="button"]:hover, div.leanModal_box form input[type="submit"]:hover {
         -webkit-box-shadow: inset 0 1px 0 0 #a44141;
         -moz-box-shadow: inset 0 1px 0 0 #a44141;
@@ -1071,68 +900,54 @@ div.leanModal_box {
         background-image: -ms-linear-gradient(top, #823030, #691c1c);
         background-image: -o-linear-gradient(top, #823030, #691c1c);
         background-image: linear-gradient(top, #823030, #691c1c); }
-      /* line 89, sass/bourbon/addons/_button.scss */
       div.leanModal_box form input[type="button"]:active, div.leanModal_box form input[type="submit"]:active {
         border: 1px solid #691b1b;
         -webkit-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
         -moz-box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee;
         box-shadow: inset 0 0 8px 4px #5c1919, inset 0 0 8px 4px #5c1919, 0 1px 1px 0 #eeeeee; }
 
-/* line 162, sass/layout/_leanmodal.scss */
 div#login {
   min-width: 400px; }
-  /* line 165, sass/layout/_leanmodal.scss */
   div#login header {
     border-bottom: 1px solid #ddd;
     margin-bottom: 25.888px;
     padding-bottom: 25.888px; }
-    /* line 170, sass/layout/_leanmodal.scss */
     div#login header h1 {
       border-bottom: 0;
       padding-bottom: 0;
       margin-bottom: 6.472px; }
-  /* line 178, sass/layout/_leanmodal.scss */
   div#login ol li {
     width: auto;
     float: none; }
 
-/* line 185, sass/layout/_leanmodal.scss */
 div.lost-password {
   text-align: left;
   margin-top: 25.888px; }
-  /* line 189, sass/layout/_leanmodal.scss */
   div.lost-password a {
     color: #999; }
-    /* line 192, sass/layout/_leanmodal.scss */
     div.lost-password a:hover {
       color: #444; }
 
-/* line 199, sass/layout/_leanmodal.scss */
 div#pwd_reset p {
   margin-bottom: 25.888px; }
-/* line 203, sass/layout/_leanmodal.scss */
 div#pwd_reset input[type="email"] {
   margin-bottom: 25.888px; }
 
-/* line 211, sass/layout/_leanmodal.scss */
 div#apply_name_change,
 div#change_email,
 div#unenroll,
 div#deactivate-account {
   max-width: 700px; }
-  /* line 214, sass/layout/_leanmodal.scss */
   div#apply_name_change ul,
   div#change_email ul,
   div#unenroll ul,
   div#deactivate-account ul {
     list-style: none; }
-    /* line 217, sass/layout/_leanmodal.scss */
     div#apply_name_change ul li,
     div#change_email ul li,
     div#unenroll ul li,
     div#deactivate-account ul li {
       margin-bottom: 12.944px; }
-      /* line 220, sass/layout/_leanmodal.scss */
       div#apply_name_change ul li textarea, div#apply_name_change ul li input[type="email"], div#apply_name_change ul li input[type="number"], div#apply_name_change ul li input[type="password"], div#apply_name_change ul li input[type="search"], div#apply_name_change ul li input[type="tel"], div#apply_name_change ul li input[type="text"], div#apply_name_change ul li input[type="url"], div#apply_name_change ul li input[type="color"], div#apply_name_change ul li input[type="date"], div#apply_name_change ul li input[type="datetime"], div#apply_name_change ul li input[type="datetime-local"], div#apply_name_change ul li input[type="month"], div#apply_name_change ul li input[type="time"], div#apply_name_change ul li input[type="week"],
       div#change_email ul li textarea,
       div#change_email ul li input[type="email"],
@@ -1184,23 +999,19 @@ div#deactivate-account {
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box; }
-      /* line 226, sass/layout/_leanmodal.scss */
       div#apply_name_change ul li textarea,
       div#change_email ul li textarea,
       div#unenroll ul li textarea,
       div#deactivate-account ul li textarea {
         height: 60px; }
-      /* line 230, sass/layout/_leanmodal.scss */
       div#apply_name_change ul li input[type="submit"],
       div#change_email ul li input[type="submit"],
       div#unenroll ul li input[type="submit"],
       div#deactivate-account ul li input[type="submit"] {
         white-space: normal; }
 
-/* line 240, sass/layout/_leanmodal.scss */
 div#feedback_div form ol li {
   float: none;
   width: 100%; }
-  /* line 244, sass/layout/_leanmodal.scss */
   div#feedback_div form ol li textarea#feedback_message {
     height: 100px; }
