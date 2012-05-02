@@ -9,6 +9,10 @@ li.calc-main {
 
   &.open {
     bottom: -36px;
+
+    div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
+      display: block;
+    }
   }
 
   a.calc {
@@ -128,6 +132,7 @@ li.calc-main {
             right: -40px;
             top: -110px;
             width: 500px;
+             display: none;
             @include transition();
 
             &.shown {
