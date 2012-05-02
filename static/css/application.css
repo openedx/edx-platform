@@ -738,6 +738,8 @@ li.calc-main {
   -webkit-appearance: none; }
 li.calc-main.open {
   bottom: -36px; }
+li.calc-main.open div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
+  display: block; }
 li.calc-main a.calc {
   text-indent: -9999px;
   overflow: hidden;
@@ -869,6 +871,7 @@ li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
   right: -40px;
   top: -110px;
   width: 500px;
+  display: none;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
