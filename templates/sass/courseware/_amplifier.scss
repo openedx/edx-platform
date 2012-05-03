@@ -84,35 +84,52 @@ section.tool-wrapper {
     width: flex-grid(4.5, 9);
 
     div.graph-controls {
-      padding: 0 0 lh();
-      margin-bottom: lh();
-      border-bottom: 1px solid darken(#073642, 5%);
-      @include box-shadow(0 1px 0 lighten(#073642, 2%));
-      @extend .clearfix;
 
       div.music-wrapper {
-        margin-right: flex-gutter(4.5);
-        width: flex-grid(1.5, 4.5);
-        float: left;
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
+
+        input#playButton {
+          display: block;
+          @include button(simple, lighten( #586e75, 5% ));
+          font: bold 14px $body-font-family;
+          float: left;
+
+          &:active {
+            @include box-shadow(none);
+          }
+
+          &[value="Stop"] {
+            @include button(simple, darken(#268bd2, 30%));
+            font: bold 14px $body-font-family;
+
+            &:active {
+              @include box-shadow(none);
+            }
+          }
+        }
       }
 
       div.inputs-wrapper {
-        padding-top: lh(.5);
-        width: flex-grid(3, 4.5);
-        float: left;
-      }
+        @include clearfix;
+        margin-bottom: lh();
 
-      select#musicTypeSelect {
-        display: block;
-        margin-bottom: lh(.5);
-        font: 16px $body-font-family;
-        width: 100%;
+        select#musicTypeSelect {
+          display: block;
+          font: 16px $body-font-family;
+          float: right;
+          margin-bottom: 0;
+        }
       }
 
       div#graph-output, div#graph-listen {
         display: block;
-        margin-bottom: lh(.5);
         text-align: right;
+        float: left;
+        margin-bottom: 0;
 
         p {
           @include inline-block();
@@ -134,26 +151,9 @@ section.tool-wrapper {
         }
       }
 
-      input#playButton {
-        display: block;
-        @include button(simple, #dc322f);
-        font: bold 14px $body-font-family;
-        color: #47221a;
-        text-shadow: 0 1px 0 lighten(#dc322f, 5%);
-        @include box-shadow(inset 0 1px 0 lighten(#dc322f, 10%));
-
-        &:active {
-          @include box-shadow(none);
-        }
-
-        &[value="Stop"] {
-          @include button(simple, darken(#268bd2, 30%));
-          font: bold 14px $body-font-family;
-
-          &:active {
-            @include box-shadow(none);
-          }
-        }
+      div#graph-listen {
+        margin-top: 8px;
+        margin-right: 20px;
       }
     }
 
@@ -190,6 +190,14 @@ section.tool-wrapper {
 
     div.schematic-sliders {
 
+      div.top-sliders {
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
+      }
+
       div.slider-label {
         margin-bottom: lh(0.5);
         font-weight: bold;
@@ -208,11 +216,13 @@ section.tool-wrapper {
         }
 
         .ui-slider-handle {
-          background-color: #dc322f;
+          background: lighten( #586e75, 5% ) url('/static/images/amplifier-slider-handle.png') center no-repeat;
+          border: 1px solid darken(#002b36, 8%);
+          @include box-shadow(inset 0 1px 0 lighten( #586e75, 20% ));
           margin-top: -.3em;
 
           &:hover, &:active {
-            background-color: lighten(#dc322f, 5%);
+          background-color: lighten( #586e75, 10% );
           }
         }
       }
