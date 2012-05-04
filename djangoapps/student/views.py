@@ -181,8 +181,7 @@ def create_account(request, post_override=None):
             js['value']="An account with this e-mail already exists."
             return HttpResponse(json.dumps(js))
         
-        js['value'] = "Unable to create your account"
-        return HttpResponse(json.dumps(js))
+        raise
 
     r.register(u)
 
