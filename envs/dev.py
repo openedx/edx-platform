@@ -73,7 +73,8 @@ DEBUG_TOOLBAR_PANELS = (
 ############################ FILE UPLOADS (ASKBOT) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
-MEDIA_URL = "/discussion/upfiles/"
+MEDIA_URL = "/static/uploads/"
+STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
