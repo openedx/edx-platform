@@ -49,6 +49,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courseware/$', 'courseware.views.index', name="courseware"),
         url(r'^info$', 'util.views.info'),
         url(r'^wiki/', include('simplewiki.urls')),
+        url(r'^masquerade/', include('masquerade.urls')),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index', name="courseware_chapter"),
         url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index', name="courseware_course"),
