@@ -16,14 +16,28 @@
       });
       describe('bind', function() {
         describe('when the #accordion exists', function() {
-          it('activate the accordion with correct active section', function() {
-            spyOn($.fn, 'accordion');
-            $('#accordion').append('<ul><li></li></ul><ul><li class="active"></li></ul>');
-            Courseware.Navigation.bind();
-            return expect($('#accordion').accordion).toHaveBeenCalledWith({
-              active: 1,
-              header: 'h3',
-              autoHeight: false
+          describe('when there is an active section', function() {
+            return it('activate the accordion with correct active section', function() {
+              spyOn($.fn, 'accordion');
+              $('#accordion').append('<ul><li></li></ul><ul><li class="active"></li></ul>');
+              Courseware.Navigation.bind();
+              return expect($('#accordion').accordion).toHaveBeenCalledWith({
+                active: 1,
+                header: 'h3',
+                autoHeight: false
+              });
+            });
+          });
+          describe('when there is no active section', function() {
+            return it('activate the accordian with section 1 as active', function() {
+              spyOn($.fn, 'accordion');
+              $('#accordion').append('<ul><li></li></ul><ul><li></li></ul>');
+              Courseware.Navigation.bind();
+              return expect($('#accordion').accordion).toHaveBeenCalledWith({
+                active: 1,
+                header: 'h3',
+                autoHeight: false
+              });
             });
           });
           it('binds the accordionchange event', function() {
