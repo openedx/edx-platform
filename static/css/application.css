@@ -2811,7 +2811,7 @@ div.course-wrapper section.course-content ol.vert-mod > li {
   margin-bottom: 15px;
   padding: 0 0 15px; }
 div.course-wrapper section.course-content ol.vert-mod > li header {
-  margin-bottom: 0; }
+  margin-bottom: -16px; }
 div.course-wrapper section.course-content ol.vert-mod > li header h1 {
   margin: 0; }
 div.course-wrapper section.course-content ol.vert-mod > li header h2 {
@@ -3761,6 +3761,7 @@ section.course-content nav.sequence-bottom {
   text-align: center; }
 section.course-content nav.sequence-bottom ul {
   background-color: #f2e7bf;
+  padding: 0  !important;
   background-color: #f2e7bf;
   border: 1px solid #e4d080;
   -webkit-border-radius: 3px;
