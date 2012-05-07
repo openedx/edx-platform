@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings as dj_settings
+from django.conf import settings as settings
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
 
 from models import Revision, Article, CreateArticleForm, RevisionFormWithTitle, RevisionForm
-import settings
+import wiki_settings
 
 def view(request, wiki_url):
     (article, path, err) = fetch_from_url(request, wiki_url)
@@ -149,7 +149,7 @@ def edit(request, wiki_url):
     if perm_err:
         return perm_err
 
-    if settings.WIKI_ALLOW_TITLE_EDIT:
+    if wiki_settings.WIKI_ALLOW_TITLE_EDIT:
         EditForm = RevisionFormWithTitle
     else:
         EditForm = RevisionForm
@@ -171,7 +171,7 @@ def edit(request, wiki_url):
             if not request.user.is_anonymous():
                 new_revision.revision_user = request.user
             new_revision.save()
-            if settings.WIKI_ALLOW_TITLE_EDIT:
+            if wiki_settings.WIKI_ALLOW_TITLE_EDIT:
                 new_revision.article.title = f.cleaned_data['title']
                 new_revision.article.save()
             return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
@@ -501,7 +501,7 @@ def check_permissions(request, article, check_read=False, check_write=False, che
 # LOGIN PROTECTION #
 ####################
 
-if settings.WIKI_REQUIRE_LOGIN_VIEW:
+if wiki_settings.WIKI_REQUIRE_LOGIN_VIEW:
     view               = login_required(view)
     history            = login_required(history)
     search_articles    = login_required(search_articles)
@@ -512,11 +512,11 @@ if settings.WIKI_REQUIRE_LOGIN_VIEW:
     not_found          = login_required(not_found)
     view_revision      = login_required(view_revision)
     
-if settings.WIKI_REQUIRE_LOGIN_EDIT:
+if wiki_settings.WIKI_REQUIRE_LOGIN_EDIT:
     create          = login_required(create)
     edit            = login_required(edit)
     add_related     = login_required(add_related)
     remove_related  = login_required(remove_related)
 
-if settings.WIKI_CONTEXT_PREPROCESSORS:
-    dj_settings.TEMPLATE_CONTEXT_PROCESSORS += settings.WIKI_CONTEXT_PREPROCESSORS
+if wiki_settings.WIKI_CONTEXT_PREPROCESSORS:
+    settings.TEMPLATE_CONTEXT_PROCESSORS += wiki_settings.WIKI_CONTEXT_PREPROCESSORS
