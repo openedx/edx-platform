@@ -177,10 +177,10 @@ def course_file(user):
 
     if user.is_authenticated():
         filename = UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
-        groups = user_groups(user)
     else:
         filename = 'guest_course.xml'
-        groups = []
+
+    groups = user_groups(user)
     options = {'dev_content':settings.DEV_CONTENT, 
                'groups' : groups}
 
