@@ -193,9 +193,17 @@ div.course-wrapper {
           padding-bottom: 0;
         }
 
+
         ul {
           list-style: disc outside none;
           padding-left: 1em;
+        }
+
+        nav.sequence-bottom {
+          ul {
+          list-style: none;
+          padding: 0;
+          }
         }
       }
     }
