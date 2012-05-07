@@ -28,7 +28,6 @@ sys.path.append(BASE_DIR + "/mitx/lib")
 
 COURSEWARE_ENABLED = True
 ASKBOT_ENABLED = True
-CSRF_COOKIE_DOMAIN = '127.0.0.1'
 
 # Defaults to be overridden
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
