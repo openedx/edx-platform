@@ -2827,6 +2827,9 @@ div.course-wrapper section.course-content ol.vert-mod > li:last-child {
 div.course-wrapper section.course-content ol.vert-mod > li ul {
   list-style: disc outside none;
   padding-left: 1em; }
+div.course-wrapper section.course-content ol.vert-mod > li nav.sequence-bottom ul {
+  list-style: none;
+  padding: 0; }
 div.course-wrapper section.course-content section.tutorials h2 {
   margin-bottom: 22.652px; }
 div.course-wrapper section.course-content section.tutorials ul {
@@ -3761,7 +3764,6 @@ section.course-content nav.sequence-bottom {
   text-align: center; }
 section.course-content nav.sequence-bottom ul {
   background-color: #f2e7bf;
-  padding: 0  !important;
   background-color: #f2e7bf;
   border: 1px solid #e4d080;
   -webkit-border-radius: 3px;
