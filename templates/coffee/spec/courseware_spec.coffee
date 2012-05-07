@@ -12,14 +12,25 @@ describe 'Courseware', ->
 
     describe 'bind', ->
       describe 'when the #accordion exists', ->
-        it 'activate the accordion with correct active section', ->
-          spyOn $.fn, 'accordion'
-          $('#accordion').append('<ul><li></li></ul><ul><li class="active"></li></ul>')
-          Courseware.Navigation.bind()
-          expect($('#accordion').accordion).toHaveBeenCalledWith
-            active: 1
-            header: 'h3'
-            autoHeight: false
+        describe 'when there is an active section', ->
+          it 'activate the accordion with correct active section', ->
+            spyOn $.fn, 'accordion'
+            $('#accordion').append('<ul><li></li></ul><ul><li class="active"></li></ul>')
+            Courseware.Navigation.bind()
+            expect($('#accordion').accordion).toHaveBeenCalledWith
+              active: 1
+              header: 'h3'
+              autoHeight: false
+
+        describe 'when there is no active section', ->
+          it 'activate the accordian with section 1 as active', ->
+            spyOn $.fn, 'accordion'
+            $('#accordion').append('<ul><li></li></ul><ul><li></li></ul>')
+            Courseware.Navigation.bind()
+            expect($('#accordion').accordion).toHaveBeenCalledWith
+              active: 1
+              header: 'h3'
+              autoHeight: false
 
         it 'binds the accordionchange event', ->
           Courseware.Navigation.bind()

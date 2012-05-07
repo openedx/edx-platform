@@ -52,11 +52,12 @@
       function Navigation() {}
 
       Navigation.bind = function() {
-        var navigation;
+        var active, navigation;
         if ($('#accordion').length) {
           navigation = new Navigation;
+          active = $('#accordion ul:has(li.active)').index('#accordion ul');
           $('#accordion').bind('accordionchange', navigation.log).accordion({
-            active: $('#accordion ul:has(li.active)').index('#accordion ul'),
+            active: active >= 0 ? active : 1,
             header: 'h3',
             autoHeight: false
           });
