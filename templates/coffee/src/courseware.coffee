@@ -6,8 +6,9 @@ class window.Courseware
     @bind: ->
       if $('#accordion').length
         navigation = new Navigation
+        active = $('#accordion ul:has(li.active)').index('#accordion ul')
         $('#accordion').bind('accordionchange', navigation.log).accordion
-          active: $('#accordion ul:has(li.active)').index('#accordion ul')
+          active: if active >= 0 then active else 1
           header: 'h3'
           autoHeight: false
         $('#open_close_accordion a').click navigation.toggle
