@@ -92,7 +92,6 @@ class Module(XModule):
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions. 
         if self.lcp.done and self.rerandomize == "always":
-            #print "!"
             check_button = False
             save_button = False
         
@@ -247,7 +246,6 @@ class Module(XModule):
             return False
         if self.show_answer == 'always':
             return True
-        print "aa", self.show_answer
         raise Http404
 
     def get_answer(self, get):
@@ -276,15 +274,12 @@ class Module(XModule):
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
 
-#        print "XXX", answers, get
-
         event_info['answers']=answers
 
         # Too late. Cannot submit
         if self.closed():
             event_info['failure']='closed'
             self.tracker('save_problem_check_fail', event_info)
-            print "cp"
             raise Http404
             
         # Problem submitted. Student should reset before checking
@@ -292,7 +287,6 @@ class Module(XModule):
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure']='unreset'
             self.tracker('save_problem_check_fail', event_info)
-            print "cpdr"
             raise Http404
 
         try:
@@ -303,10 +297,6 @@ class Module(XModule):
         except StudentInputError as inst: 
             self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
             traceback.print_exc()
-#            print {'error':sys.exc_info(),
-#                   'answers':answers, 
-#                   'seed':self.lcp.seed, 
-#                   'filename':self.lcp.filename}
             return json.dumps({'success':inst.message})
         except: 
             self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
