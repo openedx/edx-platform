@@ -42,7 +42,8 @@ class Module(XModule):
         return render_to_string('video.html',{'streams':self.video_list(),
                                               'id':self.item_id,
                                               'position':self.position, 
-                                              'name':self.name})
+                                              'name':self.name, 
+                                              'annotations':self.annotations})
 
     def get_init_js(self):
         '''JavaScript code to be run when problem is shown. Be aware
@@ -52,19 +53,23 @@ class Module(XModule):
         log.debug(u"INIT POSITION {0}".format(self.position))
         return render_to_string('video_init.js',{'streams':self.video_list(),
                                                  'id':self.item_id,
-                                                 'position':self.position})
+                                                 'position':self.position})+self.annotations_init
 
     def get_destroy_js(self):
-        return "videoDestroy(\"{0}\");".format(self.item_id)
+        return "videoDestroy(\"{0}\");".format(self.item_id)+self.annotations_destroy
 
     def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
         XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
-        self.youtube = etree.XML(xml).get('youtube')
-        self.name = etree.XML(xml).get('name')
+        xmltree=etree.fromstring(xml)
+        self.youtube = xmltree.get('youtube')
+        self.name = xmltree.get('name')
         self.position = 0
         if state != None:
             state = json.loads(state)
             if 'position' in state:
                 self.position = int(float(state['position']))
-            #log.debug("POSITION IN STATE")
-        #log.debug(u"LOAD POSITION {0}".format(self.position))
+
+        self.annotations=[(e.get("name"),self.render_function(e)) \
+                      for e in xmltree]
+        self.annotations_init="".join([e[1]['init_js'] for e in self.annotations if 'init_js' in e[1]])
+        self.annotations_destroy="".join([e[1]['destroy_js'] for e in self.annotations if 'destroy_js' in e[1]])
