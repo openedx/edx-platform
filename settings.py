@@ -147,6 +147,7 @@ INSTALLED_APPS = (
     'perfstats',
     'util',
     'masquerade',
+    'django_jasmine',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -347,6 +348,7 @@ PROJECT_ROOT = os.path.dirname(__file__)
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
+    'django.core.context_processors.static',
     'askbot.context.application_settings',
     #'django.core.context_processors.i18n',
     'askbot.user_messages.context_processors.user_messages',#must be before auth
@@ -683,3 +685,5 @@ if MAKO_MODULE_DIR == None:
 
 djcelery.setup_loader()
 
+# Jasmine Settings
+JASMINE_TEST_DIRECTORY = PROJECT_DIR+'/templates/coffee'
