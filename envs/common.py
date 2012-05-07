@@ -114,7 +114,6 @@ TEMPLATE_DEBUG = False
 # Site info
 SITE_ID = 1
 SITE_NAME = "localhost:8000"
-CSRF_COOKIE_DOMAIN = '127.0.0.1'
 HTTPS = 'on'
 ROOT_URLCONF = 'mitx.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
