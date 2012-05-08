@@ -4,11 +4,12 @@
   <%block name="title"><title>MITx 6.002x</title></%block>
 
   <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
-  <link rel="stylesheet" href="/static/css/application.css?v2" type="text/css" media="all" />
+  <link rel="stylesheet" href="/static/css/application.css?v3" type="text/css" media="all" />
 
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script>
+  <script type="text/javascript" src="/static/js/application.js"></script>
 
   <!--[if lt IE 9]>
   <script src="/static/js/html5shiv.js"></script>
@@ -92,20 +93,18 @@
       </nav>
   </footer>
 
-    <div id="feedback_div" class="leanModal_box">
-      <h1>Feedback for MITx</h1>
-      <p>Found a bug? Got an idea for improving our system? Let us know.</p>
+  <div id="feedback_div" class="leanModal_box">
+    <h1>Feedback for MITx</h1>
+    <p>Found a bug? Got an idea for improving our system? Let us know.</p>
 
-      <form>
-        <ol>
-          <li><label>Subject:</label> <input type="text" id="feedback_subject"></li>
-          <li><label>Feedback: </label><textarea id="feedback_message"></textarea></li>
-          <li><input id="feedback_button" type="button" value="Submit"></li>
-        </ol>
-      </form>
-
-    </div>
-
+    <form>
+      <ol>
+        <li><label>Subject:</label> <input type="text" id="feedback_subject"></li>
+        <li><label>Feedback: </label><textarea id="feedback_message"></textarea></li>
+        <li><input id="feedback_button" type="button" value="Submit"></li>
+      </ol>
+    </form>
+  </div>
 
   <script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script>
   <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script>
@@ -114,57 +113,7 @@
   <script type="text/javascript" src="/static/js/video_player.js"></script>
   <script type="text/javascript" src="/static/js/schematic.js"></script>
   <script type="text/javascript" src="/static/js/cktsim.js"></script>
- 
 
-<script>
-  // Feedback form
-$(function() {
-    $("#feedback_button").click(function(){
-      postJSON("/send_feedback", {"subject":$("#feedback_subject").attr("value"),
-        "url":document.URL,
-        "message":$("#feedback_message").attr("value")},
-        function(data){
-        $("#feedback_subject").attr("value","");
-        $("#feedback_message").attr("value","");
-        $("#feedback_div").html("Feedback submitted. Thank you");
-        });
-      });
-    });
-
-// Calculator
-$(function() {
-
-    $("#calculator_wrapper").hide();
-
-    $(".calc").click(function(){
-      $("#calculator_wrapper").slideToggle("fast");
-      $("#calculator_wrapper #calculator_input").focus();
-      $(this).toggleClass("closed");
-      return false;
-      });
-
-    $("div.help-wrapper a").hover(function(){
-      $(".help").toggleClass("shown");
-
-      });
-
-    $("div.help-wrapper a").click(function(){
-      return false;
-      });
-    $("form#calculator").submit(function(e){
-      e.preventDefault();
-      $.getJSON("/calculate", {"equation":$("#calculator_input").attr("value")},
-        function(data){
-        $("#calculator_output").attr("value",data.result);
-        });
-      });
-    });
-
-$(function(){
-    $("a[rel*=leanModal]").leanModal();
-    });
-</script>
-
-<%block name="js_extra"/>
+  <%block name="js_extra"/>
 </body>
 </html>

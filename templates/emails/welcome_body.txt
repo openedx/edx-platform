@@ -1,4 +1,4 @@
-MITx's prototype offering, 6.002x, is now open. To log in, visit
+MITx's prototype offering, 6.002x, is open. To log in, visit
 
 % if is_secure:
  https://6002x.mitx.mit.edu
@@ -16,7 +16,7 @@ place to reset it.
 Once you log in, we recommend that you start the course by reviewing
 the "System Usage Sequence" in the Overview section, and the "6.002x
 At-a-Glance (Calendar)" handout under the Course Info tab. After you
-familiarize yourself with the various features of the MITx platform,
+familiarize yourself with the features of the MITx platform,
 you can jump right into the coursework by working on "Administrivia
 and Circuit Elements", the first Lecture Sequence in Week 1.
 

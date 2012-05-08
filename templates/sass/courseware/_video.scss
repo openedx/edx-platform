@@ -143,6 +143,8 @@ section.course-content {
           float: left;
           margin-right: lh();
           @extend .dullify;
+          list-style: none;
+          padding: 0;
 
           li {
             float: left;

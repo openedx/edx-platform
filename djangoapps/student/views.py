@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.validators import validate_email, validate_slug, ValidationError
+from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
@@ -160,15 +161,6 @@ def create_account(request, post_override=None):
         
     
 
-    # Confirm username and e-mail are unique. TODO: This should be in a transaction
-    if len(User.objects.filter(username=post_vars['username']))>0:
-        js['value']="An account with this username already exists."
-        return HttpResponse(json.dumps(js))
-
-    if len(User.objects.filter(email=post_vars['email']))>0:
-        js['value']="An account with this e-mail already exists."
-        return HttpResponse(json.dumps(js))
-
     u=User(username=post_vars['username'],
            email=post_vars['email'],
            is_active=False)
@@ -176,7 +168,20 @@ def create_account(request, post_override=None):
     r=Registration()
     # TODO: Rearrange so that if part of the process fails, the whole process fails. 
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
-    u.save()
+    try:
+        u.save()
+    except IntegrityError:
+        # Figure out the cause of the integrity error
+        if len(User.objects.filter(username=post_vars['username']))>0:
+            js['value']="An account with this username already exists."
+            return HttpResponse(json.dumps(js))
+
+        if len(User.objects.filter(email=post_vars['email']))>0:
+            js['value']="An account with this e-mail already exists."
+            return HttpResponse(json.dumps(js))
+        
+        raise
+
     r.register(u)
 
     up = UserProfile(user=u)

@@ -1,8 +1,19 @@
 li.calc-main {
-  bottom: -36px;
+  bottom: -126px;
   left: 0;
   position: fixed;
   width: 100%;
+  @include transition(bottom);
+  z-index: 99;
+  -webkit-appearance: none;
+
+  &.open {
+    bottom: -36px;
+
+    div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
+      display: block;
+    }
+  }
 
   a.calc {
     @include hide-text;
@@ -33,11 +44,12 @@ li.calc-main {
     position: relative;
     top: -36px;
     clear: both;
+    max-height: 90px;
 
     form {
       padding: lh();
       @extend .clearfix;
-
+      @include box-sizing(border-box);
 
       input#calculator_button {
         background: #111;
@@ -46,13 +58,14 @@ li.calc-main {
         @include box-shadow(none);
         @include box-sizing(border-box);
         color: #fff;
+        float: left;
         font-size: 30px;
         font-weight: bold;
+        margin: 0 (flex-gutter() / 2);
         padding: 0;
         text-shadow: none;
+        -webkit-appearance: none;
         width: flex-grid(.5) + flex-gutter();
-        float: left;
-        margin: 0 (flex-gutter() / 2);
 
         &:hover {
           color: #333;
@@ -70,15 +83,16 @@ li.calc-main {
         font-weight: bold;
         margin: 1px 0 0;
         padding: 10px;
+        -webkit-appearance: none;
         width: flex-grid(4);
       }
 
       div.input-wrapper {
-        position: relative;
         @extend .clearfix;
-        width: flex-grid(7.5);
-        margin: 0;
         float: left;
+        margin: 0;
+        position: relative;
+        width: flex-grid(7.5);
 
       input#calculator_input {
         border: none;
@@ -86,6 +100,7 @@ li.calc-main {
         @include box-sizing(border-box);
         font-size: 16px;
         padding: 10px;
+        -webkit-appearance: none;
         width: 100%;
 
         &:focus {
@@ -117,6 +132,7 @@ li.calc-main {
             right: -40px;
             top: -110px;
             width: 500px;
+             display: none;
             @include transition();
 
             &.shown {
