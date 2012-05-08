@@ -97,7 +97,6 @@ class LoncapaProblem(object):
             responder = response_types[response.tag](response, self.context)
             responder.preprocess_response()
 
-
     def get_state(self):
         ''' Stored per-user session data neeeded to: 
             1) Recreate the problem
@@ -185,7 +184,7 @@ class LoncapaProblem(object):
         tree=Element(problemtree.tag)
         for item in problemtree:
             subitems = self.extract_html(item)
-            if len(subitems): 
+            if subitems is not None:
                 for subitem in subitems:
                     tree.append(subitem)
         for (key,value) in problemtree.items():
