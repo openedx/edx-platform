@@ -2,7 +2,12 @@
 <%block name="bodyclass">courseware</%block>
 <%block name="title"><title>Courseware – MITx 6.002x</title></%block>
 
+<%block name="headextra">
+<script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
+</%block>
+
 <%block name="js_extra">
+##Is there a reason this isn't in header_extra? Is it important that the javascript is at the bottom of the generated document?
 <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
 <script type="text/javascript">
   $(function() {

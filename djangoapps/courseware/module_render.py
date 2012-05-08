@@ -106,8 +106,9 @@ def grade_histogram(module_id):
     cursor.execute("select courseware_studentmodule.grade,COUNT(courseware_studentmodule.student_id) from courseware_studentmodule where courseware_studentmodule.module_id=%s group by courseware_studentmodule.grade", [module_id])
 
     grades = list(cursor.fetchall())
-    print grades
     grades.sort(key=lambda x:x[0]) # Probably not necessary
+    if (len(grades) == 1 and grades[0][0] == None):
+        return []
     return grades
 
 def render_x_module(user, request, xml_module, module_object_preload):
@@ -147,12 +148,21 @@ def render_x_module(user, request, xml_module, module_object_preload):
         module_object_preload.append(smod)
     # Grab content
     content = instance.get_html()
+    init_js = instance.get_init_js()
+    destory_js = instance.get_destroy_js()
     if user.is_staff:
+        histogram = grade_histogram(module_id)
+        render_histogram = len(histogram) > 0
         content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
-                                                                     'histogram':grade_histogram(module_id)})
+                                                                     'module_id' : module_id,
+                                                                     'render_histogram' : render_histogram})
+        if render_histogram:
+            init_js = init_js+render_to_string("staff_problem_histogram.js", {'histogram' : histogram,
+                                                                              'module_id' : module_id})
+        
     content = {'content':content, 
-               "destroy_js":instance.get_destroy_js(),
-               'init_js':instance.get_init_js(), 
+               "destroy_js":destory_js,
+               'init_js':init_js, 
                'type':module_type}
 
     return content

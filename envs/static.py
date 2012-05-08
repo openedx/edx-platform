@@ -9,13 +9,12 @@ sessions. Assumes structure:
 """
 from common import *
 
-DEBUG = True
-TEMPLATE_DEBUG = True
+STATIC_GRAB = True
 
 LOGGING = logsettings.get_logger_config(ENV_ROOT / "log", 
                                         logging_env="dev",
                                         tracking_filename="tracking.log",
-                                        debug=True)
+                                        debug=False)
 
 DATABASES = {
     'default': {
@@ -48,33 +47,10 @@ CACHES = {
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-################################ DEBUG TOOLBAR #################################
-INSTALLED_APPS += ('debug_toolbar',) 
-MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
-INTERNAL_IPS = ('127.0.0.1',)
-
-DEBUG_TOOLBAR_PANELS = (
-   'debug_toolbar.panels.version.VersionDebugPanel',
-   'debug_toolbar.panels.timer.TimerDebugPanel',
-   'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-   'debug_toolbar.panels.headers.HeaderDebugPanel',
-   'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-   'debug_toolbar.panels.sql.SQLDebugPanel',
-   'debug_toolbar.panels.signals.SignalDebugPanel',
-   'debug_toolbar.panels.logger.LoggingPanel',
-
-#  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
-#  Django=1.3.1/1.4 where requests to views get duplicated (your method gets 
-#  hit twice). So you can uncomment when you need to diagnose performance 
-#  problems, but you shouldn't leave it on.
-#  'debug_toolbar.panels.profiling.ProfilingDebugPanel',
-)
-
 ############################ FILE UPLOADS (ASKBOT) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
-MEDIA_URL = "/static/uploads/"
-STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
+MEDIA_URL = "/discussion/upfiles/"
 FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
