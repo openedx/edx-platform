@@ -55,3 +55,4 @@ class XModule(object):
         self.tracker = system.track_function
         self.filestore = system.filestore
         self.render_function = system.render_function
+        self.system = system

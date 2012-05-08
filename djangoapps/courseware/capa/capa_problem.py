@@ -53,13 +53,12 @@ html_special_response = {"textline":textline.render,
                          "schematic":schematic.render}
 
 class LoncapaProblem(object):
-    def __init__(self, filename, id=None, state=None, seed=None):
+    def __init__(self, fileobject, id=None, state=None, seed=None):
         ## Initialize class variables from state
         self.seed = None
         self.student_answers = dict()
         self.correct_map = dict()
         self.done = False
-        self.filename = filename
 
         if seed != None:
             self.seed = seed
@@ -69,7 +68,6 @@ class LoncapaProblem(object):
         else:
             print "NO ID"
             raise Exception("This should never happen (183)")
-            #self.problem_id = filename
 
         if state:
             if 'seed' in state:
@@ -81,17 +79,12 @@ class LoncapaProblem(object):
             if 'done' in state:
                 self.done = state['done']
 
-#        print self.seed
-
         # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
         if not self.seed:
             self.seed=struct.unpack('i', os.urandom(4))[0]
 
-#        print filename, self.seed, seed
-
         ## Parse XML file
-        #log.debug(u"LoncapaProblem() opening file {0}".format(filename))
-        file_text = open(filename).read()
+        file_text = fileobject.read()
         # Convert startouttext and endouttext to proper <text></text>
         # TODO: Do with XML operations
         file_text = re.sub("startouttext\s*/","text",file_text)

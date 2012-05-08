@@ -40,6 +40,7 @@ class I4xSystem(object):
         self.track_function = args['track_function']
         self.filestore = OSFS(settings.DATA_DIR)
         self.render_function = args['render_function']
+        self.exception404 = Http404
 
 def object_cache(cache, user, module_type, module_id):
     # We don't look up on user -- all queries include user

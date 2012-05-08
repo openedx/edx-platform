@@ -92,7 +92,6 @@ class Module(XModule):
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions. 
         if self.lcp.done and self.rerandomize == "always":
-            #print "!"
             check_button = False
             save_button = False
         
@@ -193,7 +192,7 @@ class Module(XModule):
             seed = 1
         else:
             seed = None
-        self.lcp=LoncapaProblem(filename, self.item_id, state, seed = seed)
+        self.lcp=LoncapaProblem(open(filename), self.item_id, state, seed = seed)
 
     def handle_ajax(self, dispatch, get):
         if dispatch=='problem_get':
@@ -242,7 +241,7 @@ class Module(XModule):
         if self.show_answer == 'closed' and not self.closed():
             return False
         print "aa", self.show_answer
-        raise Http404
+        raise Http404 #TODO: Not 404
 
     def get_answer(self, get):
         if not self.answer_available():
@@ -270,15 +269,12 @@ class Module(XModule):
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
 
-#        print "XXX", answers, get
-
         event_info['answers']=answers
 
         # Too late. Cannot submit
         if self.closed():
             event_info['failure']='closed'
             self.tracker('save_problem_check_fail', event_info)
-            print "cp"
             raise Http404
             
         # Problem submitted. Student should reset before checking
@@ -286,7 +282,6 @@ class Module(XModule):
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure']='unreset'
             self.tracker('save_problem_check_fail', event_info)
-            print "cpdr"
             raise Http404
 
         try:
@@ -295,15 +290,11 @@ class Module(XModule):
             filename = self.lcp.filename
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst: 
-            self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
+            self.lcp = LoncapaProblem(open(filename), id=lcp_id, state=old_state)
             traceback.print_exc()
-#            print {'error':sys.exc_info(),
-#                   'answers':answers, 
-#                   'seed':self.lcp.seed, 
-#                   'filename':self.lcp.filename}
             return json.dumps({'success':inst.message})
         except: 
-            self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
+            self.lcp = LoncapaProblem(open(filename), id=lcp_id, state=old_state)
             traceback.print_exc()
             return json.dumps({'success':'Unknown Error'})
             
@@ -383,7 +374,7 @@ class Module(XModule):
             self.lcp.seed=None
 
         filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
-        self.lcp=LoncapaProblem(filename, self.item_id, self.lcp.get_state())
+        self.lcp=LoncapaProblem(open(filename), self.item_id, self.lcp.get_state())
 
         event_info['new_state']=self.lcp.get_state()
         self.tracker('reset_problem', event_info)

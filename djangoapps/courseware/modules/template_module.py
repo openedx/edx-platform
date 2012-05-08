@@ -14,6 +14,7 @@ class Module(XModule):
 
     @classmethod
     def get_xml_tags(c):
+        ## TODO: Abstract out from filesystem
         tags = os.listdir(settings.DATA_DIR+'/custom_tags')
         return tags
 

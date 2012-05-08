@@ -1,7 +1,5 @@
 import json
 
-## TODO: Abstract out from Django
-from django.conf import settings
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 from x_module import XModule
