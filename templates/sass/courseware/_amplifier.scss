@@ -95,8 +95,8 @@ section.tool-wrapper {
         input#playButton {
           display: block;
           @include button(simple, lighten( #586e75, 5% ));
-          font: bold 14px $body-font-family;
-          float: left;
+          font: bold 16px $body-font-family;
+          float: right;
 
           &:active {
             @include box-shadow(none);
@@ -116,37 +116,31 @@ section.tool-wrapper {
       div.inputs-wrapper {
         @include clearfix;
         margin-bottom: lh();
-
-        select#musicTypeSelect {
-          display: block;
-          font: 16px $body-font-family;
-          float: right;
-          margin-bottom: 0;
-        }
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
       }
 
-      div#graph-output, div#graph-listen {
-        display: block;
-        text-align: right;
-        float: left;
+      p {
+        @include inline-block();
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+        font-weight: bold;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+      }
+
+      ul {
+        @include inline-block();
         margin-bottom: 0;
 
-        p {
-          @include inline-block();
-          margin: 0;
-        }
-
-        ul {
+        li {
           @include inline-block();
           margin-bottom: 0;
 
-          li {
-            @include inline-block();
-            margin-bottom: 0;
-
-            input {
-              margin-right: 5px;
-            }
+          input {
+            margin-right: 5px;
           }
         }
       }
@@ -154,14 +148,18 @@ section.tool-wrapper {
       div#graph-listen {
         margin-top: 8px;
         margin-right: 20px;
+        display: block;
+        text-align: right;
+        float: left;
+        margin-bottom: 0;
       }
     }
 
     label {
       @include border-radius(2px);
       font-weight: bold;
-      padding: 3px;
       color: #fff;
+      padding: 3px;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -196,6 +194,21 @@ section.tool-wrapper {
         border-bottom: 1px solid darken(#073642, 10%);
         @include box-shadow(0 1px 0 lighten(#073642, 2%));
         @extend .clearfix;
+
+      select#musicTypeSelect {
+        @include inline-block();
+        font: 16px $body-font-family;
+        margin-bottom: 0;
+      }
+
+      p {
+        @include inline-block();
+        -webkit-font-smoothing: antialiased;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+        margin: 0 lh(.5) lh() 0;
+        font-weight: bold;
+      }
+
       }
 
       div.slider-label {
@@ -222,7 +235,7 @@ section.tool-wrapper {
           margin-top: -.3em;
 
           &:hover, &:active {
-          background-color: lighten( #586e75, 10% );
+            background-color: lighten( #586e75, 10% );
           }
         }
       }
