@@ -28,7 +28,6 @@ sys.path.append(BASE_DIR + "/mitx/lib")
 
 COURSEWARE_ENABLED = True
 ASKBOT_ENABLED = True
-CSRF_COOKIE_DOMAIN = '127.0.0.1'
 
 # Defaults to be overridden
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -116,6 +115,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'masquerade.middleware.MasqueradeMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
@@ -146,6 +146,8 @@ INSTALLED_APPS = (
     'circuit',
     'perfstats',
     'util',
+    'masquerade',
+    'django_jasmine',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -346,6 +348,7 @@ PROJECT_ROOT = os.path.dirname(__file__)
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
+    'django.core.context_processors.static',
     'askbot.context.application_settings',
     #'django.core.context_processors.i18n',
     'askbot.user_messages.context_processors.user_messages',#must be before auth
@@ -682,3 +685,5 @@ if MAKO_MODULE_DIR == None:
 
 djcelery.setup_loader()
 
+# Jasmine Settings
+JASMINE_TEST_DIRECTORY = PROJECT_DIR+'/templates/coffee'
