@@ -107,9 +107,8 @@ class Module(XModule):
         self.rendered = True
         
 
-
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
+    def __init__(self, system, xml, item_id, state=None):
+        XModule.__init__(self, system, xml, item_id, state)
         self.xmltree=etree.fromstring(xml)
 
         self.position = 1
