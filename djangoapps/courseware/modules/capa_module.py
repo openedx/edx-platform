@@ -270,8 +270,6 @@ class Module(XModule):
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
 
-#        print "XXX", answers, get
-
         event_info['answers']=answers
 
         # Too late. Cannot submit

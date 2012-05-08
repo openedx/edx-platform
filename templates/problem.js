@@ -8,12 +8,17 @@ function ${ id }_load() {
     $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
-	    if (value.type==="radio" || value.type==="checkbox"){
+	    if (value.type==="checkbox"){
 		if (value.checked) {
 		    if (typeof submit_data[value.name] == 'undefined'){
-			submit_data[value.name]=[]
+			submit_data[value.name]=[];
 		    }
-		    submit_data[value.name]+=value.value;
+		    submit_data[value.name].push(value.value);
+		}
+	    }
+	    if (value.type==="radio"){
+		if (value.checked) {
+		    submit_data[value.name]= value.value;
 		}
 	    }
 	    else{
@@ -21,18 +26,18 @@ function ${ id }_load() {
 	    }
     });
     postJSON('/modx/problem/${ id }/problem_check',
-    submit_data,
-    function(json) {
-      switch(json.success) {
-      case 'incorrect': // Worked, but answer not 
-      case 'correct':
-	  ${ id }_load();
-      //alert("!!"+json.success);  
-          break;
-      default:
-        alert(json.success);  
-      }
-    });
+	     submit_data,
+	     function(json) {
+		 switch(json.success) {
+		 case 'incorrect': // Worked, but answer not 
+		 case 'correct':
+		     ${ id }_load();
+		     //alert("!!"+json.success);  
+		     break;
+		 default:
+		     alert(json.success);  
+		 }
+	     });
     log_event('problem_check', submit_data);
   });
 

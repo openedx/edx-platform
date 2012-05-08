@@ -83,7 +83,10 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                                          track_function = make_track_function(request), 
                                                          render_function = None)
     # Let the module handle the AJAX
-    ajax_return=instance.handle_ajax(dispatch, request.POST)
+    post_data=""
+    if request.raw_post_data:
+        post_data = json.loads(request.raw_post_data)
+    ajax_return=instance.handle_ajax(dispatch, post_data)
     # Save the state back to the database
     s.state=instance.get_state()
     if instance.get_score(): 

@@ -15,7 +15,7 @@ from mako.template import Template
 
 from util import contextualize_text
 import inputtypes
-from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError
+from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse
 
 import calc
 import eia
@@ -26,7 +26,8 @@ response_types = {'numericalresponse':NumericalResponse,
                   'formularesponse':FormulaResponse,
                   'customresponse':CustomResponse,
                   'schematicresponse':SchematicResponse,
-                  'multiplechoiceresponse':MultipleChoiceResponse}
+                  'multiplechoiceresponse':MultipleChoiceResponse,
+                  'truefalseresponse':TrueFalseResponse}
 entry_types = ['textline', 'schematic', 'choicegroup']
 response_properties = ["responseparam", "answer"]
 # How to convert from original XML to HTML
@@ -92,6 +93,10 @@ class LoncapaProblem(object):
 
         self.preprocess_problem(self.tree, correct_map=self.correct_map, answer_map = self.student_answers)
         self.context = self.extract_context(self.tree, seed=self.seed)
+        for response in self.tree.xpath('//'+"|//".join(response_types)):
+            responder = response_types[response.tag](response, self.context)
+            responder.preprocess_response()
+
 
     def get_state(self):
         ''' Stored per-user session data neeeded to: 
@@ -129,7 +134,6 @@ class LoncapaProblem(object):
             grader = response_types[response.tag](response, self.context)
             results = grader.grade(answers)
             self.correct_map.update(results)
-
         return self.correct_map
 
     def get_question_answers(self):
@@ -181,7 +185,7 @@ class LoncapaProblem(object):
         tree=Element(problemtree.tag)
         for item in problemtree:
             subitems = self.extract_html(item)
-            if subitems: 
+            if len(subitems): 
                 for subitem in subitems:
                     tree.append(subitem)
         for (key,value) in problemtree.items():
