@@ -114,7 +114,6 @@ TEMPLATE_DEBUG = False
 # Site info
 SITE_ID = 1
 SITE_NAME = "localhost:8000"
-CSRF_COOKIE_DOMAIN = '127.0.0.1'
 HTTPS = 'on'
 ROOT_URLCONF = 'mitx.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
@@ -135,13 +134,13 @@ STATIC_ROOT = ENV_ROOT / "staticfiles" # We don't run collectstatic -- this is t
 
 # FIXME: We should iterate through the courses we have, adding the static 
 #        contents for each of them. (Right now we just use symlinks.)
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
 # This is how you would use the textbook images locally
 #    ("book", ENV_ROOT / "book_images")
-)
+]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York' # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

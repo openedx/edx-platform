@@ -4,11 +4,15 @@ li.calc-main {
   position: fixed;
   width: 100%;
   @include transition(bottom);
-  z-index: 9999;
+  z-index: 99;
   -webkit-appearance: none;
 
   &.open {
     bottom: -36px;
+
+    div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
+      display: block;
+    }
   }
 
   a.calc {
@@ -128,6 +132,7 @@ li.calc-main {
             right: -40px;
             top: -110px;
             width: 500px;
+             display: none;
             @include transition();
 
             &.shown {
