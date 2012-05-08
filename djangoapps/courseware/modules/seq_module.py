@@ -2,9 +2,6 @@ import json
 
 from lxml import etree
 
-## TODO: Abstract out from Django
-from django.http import Http404
-from django.conf import settings
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 from x_module import XModule
@@ -38,12 +35,10 @@ class Module(XModule):
         return self.destroy_js
 
     def handle_ajax(self, dispatch, get):
-        print "GET", get
-        print "DISPATCH", dispatch
         if dispatch=='goto_position':
             self.position = int(get['position'])
             return json.dumps({'success':True})
-        raise Http404()
+        raise self.system.exception404
 
     def render(self):
         if self.rendered:
