@@ -7,7 +7,12 @@ from mitxmako.shortcuts import render_to_string
 
 def choicegroup(element, value, state):
     eid=element.get('id')
-    type="radio" #because right now, we are only doing multiple choice
+    if element.get('type') == "MultipleChoice":
+        type="radio"
+    elif element.get('type') == "TrueFalse":
+        type="checkbox"
+    else:
+        type="radio"
     choices={}
     for choice in element:
         assert choice.tag =="choice", "only <choice> tags should be immediate children of a <choicegroup>"

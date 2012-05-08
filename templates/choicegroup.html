@@ -2,7 +2,7 @@
   
   % for choice_id, choice_description in choices.items():
   <label for="input_${id}_${choice_id}">  <input type="${type}" name="input_${id}" id="input_${id}_${choice_id}" value="${choice_id}"
-  % if value == choice_id:
+  % if choice_id in value:
 	checked="true"
   % endif
   /> ${choice_description} </label>

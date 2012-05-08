@@ -5,6 +5,7 @@ import numpy
 import random
 import scipy
 import traceback
+import copy
 
 from calc import evaluator, UndefinedVariable
 from django.conf import settings
@@ -36,9 +37,17 @@ def compare_with_tolerance(v1, v2, tol):
         tolerance = evaluator(dict(),dict(),tol)
     return abs(v1-v2) <= tolerance
 
+class GenericResponse(object):
+    def grade(self, student_answers):
+        pass
+    def get_answers(self):
+        pass
+    def preprocess_response(self):
+        pass
+
 #Every response type needs methods "grade" and "get_answers"     
 
-class MultipleChoiceResponse(object):
+class MultipleChoiceResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
@@ -52,8 +61,6 @@ class MultipleChoiceResponse(object):
         self.answer_id=self.answer_id[0]
 
     def grade(self, student_answers):
-        answers={}
-
         if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
             return {self.answer_id:'correct'}
         else:
@@ -61,8 +68,32 @@ class MultipleChoiceResponse(object):
 
     def get_answers(self):
         return {self.answer_id:self.correct_choices}
-    
-class NumericalResponse(object):
+
+    def preprocess_response(self):
+        for response in self.xml.xpath("choicegroup"):
+            response.set("type", "MultipleChoice")
+
+class TrueFalseResponse(MultipleChoiceResponse):
+    def preprocess_response(self):
+        for response in self.xml.xpath("choicegroup"):
+            response.set("type", "TrueFalse")
+
+    def grade(self, student_answers):
+        correct = copy.deepcopy(self.correct_choices)
+        if self.answer_id in student_answers and student_answers[self.answer_id]:
+            for answer in student_answers[self.answer_id]:
+                if answer in correct:
+                    correct.remove(answer)
+                else:
+                    return {self.answer_id:'incorrect'}
+            if len(correct) != 0:
+                return {self.answer_id:'incorrect'}
+            else:
+                return{self.answer_id:'correct'}
+        else:
+            return {self.answer_id:'incorrect'}
+
+class NumericalResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -91,7 +122,7 @@ class NumericalResponse(object):
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
-class CustomResponse(object):
+class CustomResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         ## CRITICAL TODO: Should cover all entrytypes
@@ -122,7 +153,7 @@ class CustomResponse(object):
 class StudentInputError(Exception):
     pass
 
-class FormulaResponse(object):
+class FormulaResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -192,7 +223,7 @@ class FormulaResponse(object):
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
-class SchematicResponse(object):
+class SchematicResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.answer_ids = xml.xpath('//*[@id=$id]//schematic/@id',
