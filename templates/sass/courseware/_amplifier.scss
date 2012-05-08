@@ -95,7 +95,8 @@ section.tool-wrapper {
         input#playButton {
           display: block;
           @include button(simple, lighten( #586e75, 5% ));
-          font: bold 16px $body-font-family;
+          font: bold 14px $body-font-family;
+          border-color: darken(#002b36, 6%);
           float: right;
 
           &:active {
