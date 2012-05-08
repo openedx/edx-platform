@@ -117,7 +117,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -3911,112 +3911,63 @@ section.tool-wrapper div#controlls-container {
   padding: 22.652px;
   vertical-align: top;
   width: 48.641%; }
-section.tool-wrapper div#controlls-container div.graph-controls {
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper {
   padding: 0 0 22.652px;
   margin-bottom: 22.652px;
-  border-bottom: 1px solid #05232b;
+  border-bottom: 1px solid #021014;
   -webkit-box-shadow: 0 1px 0 #083e4b;
   -moz-box-shadow: 0 1px 0 #083e4b;
   box-shadow: 0 1px 0 #083e4b; }
-section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper {
-  margin-right: 5.587%;
-  width: 29.609%;
-  float: left; }
-section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
-  padding-top: 11.326px;
-  width: 64.804%;
-  float: left; }
-section.tool-wrapper div#controlls-container div.graph-controls select#musicTypeSelect {
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton {
   display: block;
-  margin-bottom: 11.326px;
-  font: 16px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
-  width: 100%; }
-section.tool-wrapper div#controlls-container div.graph-controls div#graph-output, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen {
-  display: block;
-  margin-bottom: 11.326px;
-  text-align: right; }
-section.tool-wrapper div#controlls-container div.graph-controls div#graph-output p, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen p {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
-  margin: 0; }
-section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
-  margin-bottom: 0; }
-section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul li, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul li {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
-  margin-bottom: 0; }
-section.tool-wrapper div#controlls-container div.graph-controls div#graph-output ul li input, section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen ul li input {
-  margin-right: 5px; }
-section.tool-wrapper div#controlls-container div.graph-controls input#playButton {
-  display: block;
-  border: 1px solid #b01613;
+  border: 1px solid #3d5962;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: inset 0 1px 0 0 #e07977;
-  -moz-box-shadow: inset 0 1px 0 0 #e07977;
-  box-shadow: inset 0 1px 0 0 #e07977;
+  -webkit-box-shadow: inset 0 1px 0 0 #939da0;
+  -moz-box-shadow: inset 0 1px 0 0 #939da0;
+  box-shadow: inset 0 1px 0 0 #939da0;
   color: white;
   display: inline;
   font-size: 11px;
   font-weight: bold;
-  background-color: #dc322f;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #dc322f), color-stop(100%, #be1815));
-  background-image: -webkit-linear-gradient(top, #dc322f, #be1815);
-  background-image: -moz-linear-gradient(top, #dc322f, #be1815);
-  background-image: -ms-linear-gradient(top, #dc322f, #be1815);
-  background-image: -o-linear-gradient(top, #dc322f, #be1815);
-  background-image: linear-gradient(top, #dc322f, #be1815);
+  background-color: #637c84;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #637c84), color-stop(100%, #43626b));
+  background-image: -webkit-linear-gradient(top, #637c84, #43626b);
+  background-image: -moz-linear-gradient(top, #637c84, #43626b);
+  background-image: -ms-linear-gradient(top, #637c84, #43626b);
+  background-image: -o-linear-gradient(top, #637c84, #43626b);
+  background-image: linear-gradient(top, #637c84, #43626b);
   padding: 6px 18px 7px;
-  text-shadow: 0 1px 0 #a30f0c;
+  text-shadow: 0 1px 0 #31505a;
   -webkit-background-clip: padding-box;
   font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
-  color: #47221a;
-  text-shadow: 0 1px 0 #e04845;
-  -webkit-box-shadow: inset 0 1px 0 #e35d5b;
-  -moz-box-shadow: inset 0 1px 0 #e35d5b;
-  box-shadow: inset 0 1px 0 #e35d5b; }
-section.tool-wrapper div#controlls-container div.graph-controls input#playButton:hover {
-  -webkit-box-shadow: inset 0 1px 0 0 #d84f4c;
-  -moz-box-shadow: inset 0 1px 0 0 #d84f4c;
-  box-shadow: inset 0 1px 0 0 #d84f4c;
+  border-color: #001317;
+  float: right; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:hover {
+  -webkit-box-shadow: inset 0 1px 0 0 #778589;
+  -moz-box-shadow: inset 0 1px 0 0 #778589;
+  box-shadow: inset 0 1px 0 0 #778589;
   cursor: pointer;
-  background-color: #ca2a28;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ca2a28), color-stop(100%, #af1714));
-  background-image: -webkit-linear-gradient(top, #ca2a28, #af1714);
-  background-image: -moz-linear-gradient(top, #ca2a28, #af1714);
-  background-image: -ms-linear-gradient(top, #ca2a28, #af1714);
-  background-image: -o-linear-gradient(top, #ca2a28, #af1714);
-  background-image: linear-gradient(top, #ca2a28, #af1714); }
-section.tool-wrapper div#controlls-container div.graph-controls input#playButton:active {
-  border: 1px solid #b01613;
-  -webkit-box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee;
-  -moz-box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee;
-  box-shadow: inset 0 0 8px 4px #a11614, inset 0 0 8px 4px #a11614, 0 1px 1px 0 #eeeeee; }
-section.tool-wrapper div#controlls-container div.graph-controls input#playButton:active {
+  background-color: #5c6c71;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #5c6c71), color-stop(100%, #3e5961));
+  background-image: -webkit-linear-gradient(top, #5c6c71, #3e5961);
+  background-image: -moz-linear-gradient(top, #5c6c71, #3e5961);
+  background-image: -ms-linear-gradient(top, #5c6c71, #3e5961);
+  background-image: -o-linear-gradient(top, #5c6c71, #3e5961);
+  background-image: linear-gradient(top, #5c6c71, #3e5961); }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:active {
+  border: 1px solid #3d5962;
+  -webkit-box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee;
+  -moz-box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee;
+  box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:active {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"] {
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"] {
   border: 1px solid #030d15;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -4041,7 +3992,7 @@ section.tool-wrapper div#controlls-container div.graph-controls input#playButton
   text-shadow: 0 1px 0 #000203;
   -webkit-background-clip: padding-box;
   font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
-section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:hover {
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:hover {
   -webkit-box-shadow: inset 0 1px 0 0 #174362;
   -moz-box-shadow: inset 0 1px 0 0 #174362;
   box-shadow: inset 0 1px 0 0 #174362;
@@ -4053,15 +4004,68 @@ section.tool-wrapper div#controlls-container div.graph-controls input#playButton
   background-image: -ms-linear-gradient(top, #0c2739, #030d15);
   background-image: -o-linear-gradient(top, #0c2739, #030d15);
   background-image: linear-gradient(top, #0c2739, #030d15); }
-section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:active {
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:active {
   border: 1px solid #030d15;
   -webkit-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
   -moz-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
   box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee; }
-section.tool-wrapper div#controlls-container div.graph-controls input#playButton[value="Stop"]:active {
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:active {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
+section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
+  zoom: 1;
+  margin-bottom: 22.652px;
+  padding: 0 0 22.652px;
+  margin-bottom: 22.652px;
+  border-bottom: 1px solid #021014;
+  -webkit-box-shadow: 0 1px 0 #083e4b;
+  -moz-box-shadow: 0 1px 0 #083e4b;
+  box-shadow: 0 1px 0 #083e4b; }
+section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:before, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after {
+  content: "";
+  display: table; }
+section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after {
+  clear: both; }
+section.tool-wrapper div#controlls-container div.graph-controls p {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 #021014; }
+section.tool-wrapper div#controlls-container div.graph-controls ul {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls ul li {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls ul li input {
+  margin-right: 5px; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen {
+  margin-top: 8px;
+  margin-right: 20px;
+  display: block;
+  text-align: right;
+  float: left;
+  margin-bottom: 0; }
 section.tool-wrapper div#controlls-container label {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
@@ -4069,8 +4073,8 @@ section.tool-wrapper div#controlls-container label {
   -o-border-radius: 2px;
   border-radius: 2px;
   font-weight: bold;
-  padding: 3px;
   color: #fff;
+  padding: 3px;
   -webkit-font-smoothing: antialiased; }
 section.tool-wrapper div#controlls-container label[for="vinCheckbox"], section.tool-wrapper div#controlls-container label[for="vinRadioButton"] {
   color: #409fbf; }
@@ -4082,6 +4086,35 @@ section.tool-wrapper div#controlls-container label[for="vcCheckbox"], section.to
   color: #e1a600; }
 section.tool-wrapper div#controlls-container label[for="vlCheckbox"], section.tool-wrapper div#controlls-container label[for="vlRadioButton"] {
   color: #a26784; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders {
+  padding: 0 0 22.652px;
+  margin-bottom: 22.652px;
+  border-bottom: 1px solid #021014;
+  -webkit-box-shadow: 0 1px 0 #083e4b;
+  -moz-box-shadow: 0 1px 0 #083e4b;
+  box-shadow: 0 1px 0 #083e4b; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders select#musicTypeSelect {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  font: 16px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders p {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0 -1px 0 #021014;
+  margin: 0 11.326px 22.652px 0;
+  font-weight: bold; }
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label {
   margin-bottom: 11.326px;
   font-weight: bold;
@@ -4097,10 +4130,14 @@ section.tool-wrapper div#controlls-container div.schematic-sliders div.slider.ui
   -moz-box-shadow: none;
   box-shadow: none; }
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle {
-  background-color: #dc322f;
+  background: #637c84 url("/static/images/amplifier-slider-handle.png") center no-repeat;
+  border: 1px solid #000b0d;
+  -webkit-box-shadow: inset 0 1px 0 #8ba1a8;
+  -moz-box-shadow: inset 0 1px 0 #8ba1a8;
+  box-shadow: inset 0 1px 0 #8ba1a8;
   margin-top: -0.3em; }
 section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:hover, section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:active {
-  background-color: #e04845; }
+  background-color: #6e8992; }
 
 div.book-wrapper section.book-sidebar {
   -webkit-box-sizing: border-box;

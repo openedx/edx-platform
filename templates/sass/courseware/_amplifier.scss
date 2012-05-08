@@ -84,84 +84,83 @@ section.tool-wrapper {
     width: flex-grid(4.5, 9);
 
     div.graph-controls {
-      padding: 0 0 lh();
-      margin-bottom: lh();
-      border-bottom: 1px solid darken(#073642, 5%);
-      @include box-shadow(0 1px 0 lighten(#073642, 2%));
-      @extend .clearfix;
 
       div.music-wrapper {
-        margin-right: flex-gutter(4.5);
-        width: flex-grid(1.5, 4.5);
-        float: left;
-      }
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
 
-      div.inputs-wrapper {
-        padding-top: lh(.5);
-        width: flex-grid(3, 4.5);
-        float: left;
-      }
+        input#playButton {
+          display: block;
+          @include button(simple, lighten( #586e75, 5% ));
+          font: bold 14px $body-font-family;
+          border-color: darken(#002b36, 6%);
+          float: right;
 
-      select#musicTypeSelect {
-        display: block;
-        margin-bottom: lh(.5);
-        font: 16px $body-font-family;
-        width: 100%;
-      }
+          &:active {
+            @include box-shadow(none);
+          }
 
-      div#graph-output, div#graph-listen {
-        display: block;
-        margin-bottom: lh(.5);
-        text-align: right;
+          &[value="Stop"] {
+            @include button(simple, darken(#268bd2, 30%));
+            font: bold 14px $body-font-family;
 
-        p {
-          @include inline-block();
-          margin: 0;
-        }
-
-        ul {
-          @include inline-block();
-          margin-bottom: 0;
-
-          li {
-            @include inline-block();
-            margin-bottom: 0;
-
-            input {
-              margin-right: 5px;
+            &:active {
+              @include box-shadow(none);
             }
           }
         }
       }
 
-      input#playButton {
-        display: block;
-        @include button(simple, #dc322f);
-        font: bold 14px $body-font-family;
-        color: #47221a;
-        text-shadow: 0 1px 0 lighten(#dc322f, 5%);
-        @include box-shadow(inset 0 1px 0 lighten(#dc322f, 10%));
+      div.inputs-wrapper {
+        @include clearfix;
+        margin-bottom: lh();
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
+      }
 
-        &:active {
-          @include box-shadow(none);
-        }
+      p {
+        @include inline-block();
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+        font-weight: bold;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+      }
 
-        &[value="Stop"] {
-          @include button(simple, darken(#268bd2, 30%));
-          font: bold 14px $body-font-family;
+      ul {
+        @include inline-block();
+        margin-bottom: 0;
 
-          &:active {
-            @include box-shadow(none);
+        li {
+          @include inline-block();
+          margin-bottom: 0;
+
+          input {
+            margin-right: 5px;
           }
         }
+      }
+
+      div#graph-listen {
+        margin-top: 8px;
+        margin-right: 20px;
+        display: block;
+        text-align: right;
+        float: left;
+        margin-bottom: 0;
       }
     }
 
     label {
       @include border-radius(2px);
       font-weight: bold;
-      padding: 3px;
       color: #fff;
+      padding: 3px;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -190,6 +189,29 @@ section.tool-wrapper {
 
     div.schematic-sliders {
 
+      div.top-sliders {
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
+
+      select#musicTypeSelect {
+        @include inline-block();
+        font: 16px $body-font-family;
+        margin-bottom: 0;
+      }
+
+      p {
+        @include inline-block();
+        -webkit-font-smoothing: antialiased;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+        margin: 0 lh(.5) lh() 0;
+        font-weight: bold;
+      }
+
+      }
+
       div.slider-label {
         margin-bottom: lh(0.5);
         font-weight: bold;
@@ -208,11 +230,13 @@ section.tool-wrapper {
         }
 
         .ui-slider-handle {
-          background-color: #dc322f;
+          background: lighten( #586e75, 5% ) url('/static/images/amplifier-slider-handle.png') center no-repeat;
+          border: 1px solid darken(#002b36, 8%);
+          @include box-shadow(inset 0 1px 0 lighten( #586e75, 20% ));
           margin-top: -.3em;
 
           &:hover, &:active {
-            background-color: lighten(#dc322f, 5%);
+            background-color: lighten( #586e75, 10% );
           }
         }
       }
