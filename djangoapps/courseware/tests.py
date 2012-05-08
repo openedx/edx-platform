@@ -1,9 +1,11 @@
 import unittest
+import os
 
 import numpy
 
 import courseware.modules
 import courseware.capa.calc as calc
+import courseware.capa.capa_problem as lcp
 from grades import Score, aggregate_scores
 
 class ModelsTest(unittest.TestCase):
@@ -58,6 +60,29 @@ class ModelsTest(unittest.TestCase):
         except:
             exception_happened = True
         self.assertTrue(exception_happened)
+
+class MultiChoiceTest(unittest.TestCase):
+    def test_MC_grade(self):
+        multichoice_file = os.getcwd()+"/djangoapps/courseware/test_files/multichoice.xml"
+        test_lcp = lcp.LoncapaProblem(multichoice_file, '1')
+        correct_answers = {'1_2_1':'foil3'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        false_answers = {'1_2_1':'foil2'}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        
+    def test_TF_grade(self):
+        truefalse_file =  os.getcwd()+"/djangoapps/courseware/test_files/truefalse.xml"
+        test_lcp = lcp.LoncapaProblem(truefalse_file, '1')
+        correct_answers = {'1_2_1':['foil2', 'foil1']}
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        false_answers = {'1_2_1':['foil1']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['foil1', 'foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['foil1', 'foil2', 'foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
 
 class GraderTest(unittest.TestCase):
 
