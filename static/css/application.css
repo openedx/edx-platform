@@ -3940,7 +3940,8 @@ section.tool-wrapper div#controlls-container div.graph-controls div.music-wrappe
   padding: 6px 18px 7px;
   text-shadow: 0 1px 0 #31505a;
   -webkit-background-clip: padding-box;
-  font: bold 16px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  border-color: #001317;
   float: right; }
 section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:hover {
   -webkit-box-shadow: inset 0 1px 0 0 #778589;
