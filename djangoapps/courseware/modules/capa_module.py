@@ -16,9 +16,7 @@ import traceback
 from lxml import etree
 
 ## TODO: Abstract out from Django
-from django.conf import settings
-from mitxmako.shortcuts import render_to_response, render_to_string
-from django.http import Http404
+from mitxmako.shortcuts import render_to_string
 
 from x_module import XModule
 from courseware.capa.capa_problem import LoncapaProblem, StudentInputError
@@ -184,15 +182,14 @@ class Module(XModule):
         if state!=None and 'attempts' in state:
             self.attempts=state['attempts']
 
-        self.filename=content_parser.item(dom2.xpath('/problem/@filename'))
-        filename=settings.DATA_DIR+"/problems/"+self.filename+".xml"
+        self.filename="problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
         self.weight=content_parser.item(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
             seed = 1
         else:
             seed = None
-        self.lcp=LoncapaProblem(open(filename), self.item_id, state, seed = seed)
+        self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, state, seed = seed)
 
     def handle_ajax(self, dispatch, get):
         if dispatch=='problem_get':
@@ -241,15 +238,14 @@ class Module(XModule):
         if self.show_answer == 'closed' and not self.closed():
             return False
         print "aa", self.show_answer
-        raise Http404 #TODO: Not 404
+        raise self.system.exception404 #TODO: Not 404
 
     def get_answer(self, get):
         if not self.answer_available():
-            raise Http404
+            raise self.system.exception404
         else: 
             return json.dumps(self.lcp.get_question_answers(), 
                               cls=ComplexEncoder)
-
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
@@ -275,27 +271,27 @@ class Module(XModule):
         if self.closed():
             event_info['failure']='closed'
             self.tracker('save_problem_check_fail', event_info)
-            raise Http404
+            raise self.system.exception404
             
         # Problem submitted. Student should reset before checking
         # again.
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure']='unreset'
             self.tracker('save_problem_check_fail', event_info)
-            raise Http404
+            raise self.system.exception404
 
         try:
             old_state = self.lcp.get_state()
             lcp_id = self.lcp.problem_id
-            filename = self.lcp.filename
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst: 
-            self.lcp = LoncapaProblem(open(filename), id=lcp_id, state=old_state)
+            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state)
             traceback.print_exc()
             return json.dumps({'success':inst.message})
         except: 
-            self.lcp = LoncapaProblem(open(filename), id=lcp_id, state=old_state)
+            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state)
             traceback.print_exc()
+            raise
             return json.dumps({'success':'Unknown Error'})
             
 
@@ -373,8 +369,8 @@ class Module(XModule):
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None
 
-        filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
-        self.lcp=LoncapaProblem(open(filename), self.item_id, self.lcp.get_state())
+        filename="problems/"+self.filename+".xml"
+        self.lcp=LoncapaProblem(self.filestore.open(filename), self.item_id, self.lcp.get_state())
 
         event_info['new_state']=self.lcp.get_state()
         self.tracker('reset_problem', event_info)
