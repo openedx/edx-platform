@@ -40,20 +40,20 @@ class window.Sequence
       @position = new_position
       @toggleArrows()
 
-  goto: (e) =>
-    e.preventDefault()
-    new_position = $(e.srcElement).data('element')
+  goto: (event) =>
+    event.preventDefault()
+    new_position = $(event.target).data('element')
     log_event("seq_goto", old: @position, new: new_position, id: @id)
     @render new_position
 
-  next: (e) =>
-    e.preventDefault()
+  next: (event) =>
+    event.preventDefault()
     new_position = @position + 1
     log_event("seq_next", old: @position, new: new_position, id: @id)
     @render new_position
 
-  previous: (e) =>
-    e.preventDefault()
+  previous: (event) =>
+    event.preventDefault()
     new_position = @position - 1
     log_event("seq_prev", old: @position, new: new_position, id: @id)
     @render new_position

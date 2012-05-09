@@ -1,10 +1,9 @@
-class window.Calculator
-  @bind: ->
-    calculator = new Calculator
-    $('.calc').click calculator.toggle
-    $('form#calculator').submit(calculator.calculate).submit (e) ->
+class Calculator
+  constructor: ->
+    $('.calc').click @toggle
+    $('form#calculator').submit(@calculate).submit (e) ->
       e.preventDefault()
-    $('div.help-wrapper a').hover(calculator.helpToggle).click (e) ->
+    $('div.help-wrapper a').hover(@helpToggle).click (e) ->
       e.preventDefault()
 
   toggle: ->
