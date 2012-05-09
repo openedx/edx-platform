@@ -20,3 +20,6 @@ $ ->
     schematic_value $("#schematic_#{circuit_id}").attr("value")
     $.post "/save_circuit/#{circuit_id}", schematic: schematic_value, (data) ->
       alert('Saved') if data.results == 'success'
+
+  window.postJSON = (url, data, callback) ->
+    $.post url, data, callback
