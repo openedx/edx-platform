@@ -3,9 +3,7 @@ import logging
 
 from lxml import etree
 
-## TODO: Abstract out from Django
-from django.http import Http404
-from mitxmako.shortcuts import render_to_string
+from mitxmako.shortcuts import render_to_response, render_to_string
 
 from x_module import XModule
 
@@ -58,8 +56,8 @@ class Module(XModule):
     def get_destroy_js(self):
         return "videoDestroy(\"{0}\");".format(self.item_id)+self.annotations_destroy
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
+    def __init__(self, system, xml, item_id, state=None):
+        XModule.__init__(self, system, xml, item_id, state)
         xmltree=etree.fromstring(xml)
         self.youtube = xmltree.get('youtube')
         self.name = xmltree.get('name')
