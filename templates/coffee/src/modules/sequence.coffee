@@ -6,6 +6,7 @@ class window.Sequence
 
   bind: ->
     $('#sequence-list a').click @goto
+    $('#seq_content').change @toggleArrows
 
   buildNavigation: ->
     $.each @elements, (index, item) ->
@@ -14,7 +15,7 @@ class window.Sequence
       list_item = $('<li>').append(link.append(title))
       $('#sequence-list').append list_item
 
-  toggleArrows: ->
+  toggleArrows: =>
     $('.sequence-nav-buttons a').unbind('click')
 
     if @position == 1
@@ -38,7 +39,7 @@ class window.Sequence
 
       MathJax.Hub.Queue(["Typeset",MathJax.Hub])
       @position = new_position
-      @toggleArrows()
+      $('#seq_content').change()
 
   goto: (event) =>
     event.preventDefault()

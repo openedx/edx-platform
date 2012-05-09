@@ -63,12 +63,14 @@ class VideoPlayer
         $(@).trigger('ended')
 
   onPlay: =>
+    Logger.log 'play_video', id: @currentTime, code: @player.getVideoEmbedCode()
     window.player.pauseVideo() if window.player && window.player != @player
     window.player = @player
     unless @player.interval
       @player.interval = setInterval(@update, 200)
 
   onPause: =>
+    Logger.log 'pause_video', id: @currentTime, code: @player.getVideoEmbedCode()
     window.player = null if window.player == @player
     clearInterval(@player.interval)
     @player.interval = null

@@ -4,12 +4,17 @@ class window.Courseware
     new Calculator
     new FeedbackForm
     Logger.bind()
-    @renderModules()
+    @bind()
+    @render()
 
   @start: ->
     new Courseware
 
-  renderModules: ->
+  bind: ->
+    if $('#seq_content').length
+      $('#seq_content').change @render
+
+  render: ->
     $('.course-content .video').each ->
       id = $(this).attr('id').replace(/video_/, '')
       new Video id, $(this).data('streams')
