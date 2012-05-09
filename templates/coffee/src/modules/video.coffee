@@ -1,13 +1,16 @@
 class Video
   constructor: (@id, videos) ->
+    window.player = null
     @element = $("#video_#{@id}")
     @parseVideos videos
-    @fetchMetadata()
-    @parseSpeed()
     $("#video_#{@id}").data('video', this)
-    window.onYouTubePlayerAPIReady = =>
-      $('.course-content .video').each ->
-        $(this).data('video').embed()
+
+    if YT.Player
+      @embed()
+    else
+      window.onYouTubePlayerAPIReady = =>
+        $('.course-content .video').each ->
+          $(this).data('video').embed()
 
   youtubeId: (speed)->
     @videos[speed || @speed]
@@ -18,6 +21,8 @@ class Video
       video = video.split(/:/)
       speed = parseFloat(video[0]).toFixed(2).replace /\.00$/, '.0'
       @videos[speed] = video[1]
+    @fetchMetadata()
+    @parseSpeed()
 
   parseSpeed: ->
     @setSpeed($.cookie('video_speed'))
