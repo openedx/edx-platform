@@ -15,7 +15,6 @@ class VideoCaption
     @$('.subtitles').mouseenter(@onMouseEnter).mouseleave(@onMouseLeave)
       .mousemove(@onMovement).bind('mousewheel', @onMovement)
       .bind('DOMMouseScroll', @onMovement)
-    @$('.subtitles li[data-index]').click @seekPlayer
 
   captionURL: ->
     "/static/subs/#{@youtubeId}.srt.sjson"
@@ -39,6 +38,7 @@ class VideoCaption
         'data-start': @start[index]
 
     @$('.subtitles').html(container.html())
+    @$('.subtitles li[data-index]').click @seekPlayer
 
     # prepend and append an empty <li> for cosmatic reason
     @$('.subtitles').prepend($('<li class="spacing">').height(@topSpacingHeight()))
