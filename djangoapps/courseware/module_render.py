@@ -35,11 +35,11 @@ import courseware.modules
 log = logging.getLogger("mitx.courseware")
 
 class I4xSystem(object):
-    def __init__(self, **args):
-        self.ajax_url = args['ajax_url']
-        self.track_function = args['track_function']
+    def __init__(self, ajax_url, track_function, render_function, filestore=None):
+        self.ajax_url = ajax_url
+        self.track_function = track_function
         self.filestore = OSFS(settings.DATA_DIR)
-        self.render_function = args['render_function']
+        self.render_function = render_function
         self.exception404 = Http404
 
 def object_cache(cache, user, module_type, module_id):
