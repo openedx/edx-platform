@@ -3,6 +3,7 @@ class window.Courseware
     new CoursewareNavigation
     new Calculator
     new FeedbackForm
+    Logger.bind()
     @renderModules()
 
   @start: ->
