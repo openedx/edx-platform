@@ -1,5 +1,5 @@
-class window.FeedbackForm
-  @bind: ->
+class FeedbackForm
+  constructor: ->
     $('#feedback_button').click ->
       data =
         subject: $('#feedback_subject').val()

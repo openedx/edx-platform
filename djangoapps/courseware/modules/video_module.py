@@ -32,9 +32,7 @@ class Module(XModule):
         return ["video"]
 
     def video_list(self):
-        l = self.youtube.split(',')
-        l = [i.split(":") for i in l]
-        return json.dumps(dict(l))
+        return self.youtube
 
     def get_html(self):
         return render_to_string('video.html',{'streams':self.video_list(),

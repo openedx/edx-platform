@@ -2,7 +2,7 @@
   <h1> ${name} </h1>
 % endif
 
-<div id="video_${id}" class="video">
+<div id="video_${id}" class="video" data-streams="${streams}">
   <div class="tc-wrapper">
     <article class="video-wrapper">
       <section class="video-player">
@@ -40,14 +40,6 @@
     </ol>
   </div>
 </div>
-
-<%block name="js_extra">
-<script type="text/javascript">
-  $(function(){
-    new Video('${id}', ${streams});
-  });
-</script>
-</%block>
 
 <ol class="video-mod">
 % for t in annotations:

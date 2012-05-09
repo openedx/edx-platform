@@ -1,4 +1,4 @@
-class window.Video
+class Video
   constructor: (@id, videos) ->
     @element = $("#video_#{@id}")
     @parseVideos videos
@@ -14,9 +14,10 @@ class window.Video
 
   parseVideos: (videos) ->
     @videos = {}
-    $.each videos, (speed, url) =>
-      speed = parseFloat(speed).toFixed(2).replace /\.00$/, '.0'
-      @videos[speed] = url
+    $.each videos.split(/,/), (index, video) =>
+      video = video.split(/:/)
+      speed = parseFloat(video[0]).toFixed(2).replace /\.00$/, '.0'
+      @videos[speed] = video[1]
 
   parseSpeed: ->
     @setSpeed($.cookie('video_speed'))
