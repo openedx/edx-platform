@@ -1,6 +1,6 @@
 class VideoSpeedControl
   constructor: (@player, @speeds) ->
-    @build()
+    @render()
     @bind()
 
   $: (selector) ->
@@ -18,7 +18,17 @@ class VideoSpeedControl
         event.preventDefault()
         $(this).removeClass('open')
 
-  build: ->
+  render: ->
+    @$('.secondary-controls').prepend """
+      <div class="speeds">
+        <a href="#">
+          <h3>Speed</h3>
+          <p class="active"></p>
+        </a>
+        <ol class="video_speeds"></ol>
+      </div>
+      """
+
     $.each @speeds, (index, speed) =>
       link = $('<a>').attr(href: "#").html("#{speed}x")
       @$('.video_speeds').prepend($('<li>').attr('data-speed', speed).html(link))

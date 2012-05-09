@@ -2,7 +2,7 @@ class VideoPlayer
   constructor: (@video) ->
     @currentTime = 0
     @element = $("#video_#{@video.id}")
-    @buildPlayer()
+    @render()
     @bind()
 
   $: (selector) ->
@@ -10,11 +10,13 @@ class VideoPlayer
 
   bind: ->
     $(@).bind('seek', @onSeek)
-    $(@).bind('updatePlayTime', @onUpdatePlayTime)
-    $(@).bind('speedChange', @onSpeedChange)
+      .bind('updatePlayTime', @onUpdatePlayTime)
+      .bind('speedChange', @onSpeedChange)
+      .bind('play', @onPlay)
+      .bind('pause', @onPause)
+      .bind('ended', @onPause)
     $(document).keyup @bindExitFullScreen
 
-    @$('.video_control').click @togglePlayback
     @$('.add-fullscreen').click @toggleFullScreen
     @addToolTip unless onTouchBasedDevice()
 
@@ -22,7 +24,8 @@ class VideoPlayer
     if @element.hasClass('fullscreen') && event.keyCode == 27
       @toggleFullScreen(event)
 
-  buildPlayer: ->
+  render: ->
+    new VideoControl(this)
     new VideoCaption(this, @video.youtubeId('1.0'))
     new VideoSpeedControl(this, @video.speeds)
     new VideoProgressSlider(this)
@@ -53,26 +56,20 @@ class VideoPlayer
   onStateChange: (event) =>
     switch event.data
       when YT.PlayerState.PLAYING
-        if window.player && window.player != @player
-          window.player.pauseVideo()
-        window.player = @player
-        @onPlay()
+        $(@).trigger('play')
       when YT.PlayerState.PAUSED
-        if window.player == @player
-          window.player = null
-        @onPause()
+        $(@).trigger('pause')
       when YT.PlayerState.ENDED
-        if window.player == @player
-          window.player = null
-        @onPause()
+        $(@).trigger('ended')
 
-  onPlay: ->
-    @$('.video_control').removeClass('play').addClass('pause').html('Pause')
+  onPlay: =>
+    window.player.pauseVideo() if window.player && window.player != @player
+    window.player = @player
     unless @player.interval
       @player.interval = setInterval(@update, 200)
 
-  onPause: ->
-    @$('.video_control').removeClass('pause').addClass('play').html('Play')
+  onPause: =>
+    window.player = null if window.player == @player
     clearInterval(@player.interval)
     @player.interval = null
 
@@ -108,13 +105,6 @@ class VideoPlayer
     if @progress != progress
       @$(".vidtime").html(progress)
       @progress = progress
-
-  togglePlayback: (event) =>
-    event.preventDefault()
-    if $(event.target).hasClass('play')
-      @play()
-    else
-      @pause()
 
   toggleFullScreen: (event) =>
     event.preventDefault()

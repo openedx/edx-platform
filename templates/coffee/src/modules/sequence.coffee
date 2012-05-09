@@ -66,5 +66,3 @@ class window.Sequence
 
   mark_active: (position) ->
     @link_for(position).attr class: "seq_#{@elements[position - 1].type}_active"
-
-

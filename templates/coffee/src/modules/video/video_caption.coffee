@@ -1,7 +1,7 @@
 class VideoCaption
   constructor: (@player, @youtubeId) ->
     @index = []
-    @fetchCaption()
+    @render()
     @bind()
 
   $: (selector) ->
@@ -12,6 +12,37 @@ class VideoCaption
     $(@player).bind('resize', @onWindowResize)
     $(@player).bind('updatePlayTime', @onUpdatePlayTime)
     @$('.hide-subtitles').click @toggle
+    @$('.subtitles').mouseenter(@onMouseEnter).mouseleave(@onMouseLeave)
+      .mousemove(@onMovement).bind('mousewheel', @onMovement)
+      .bind('DOMMouseScroll', @onMovement)
+    @$('.subtitles li[data-index]').click @seekPlayer
+
+  captionURL: ->
+    "/static/subs/#{@youtubeId}.srt.sjson"
+
+  render: ->
+    @$('.video-wrapper').after """
+      <ol class="subtitles"><li>Attempting to load captions...</li></ol>
+      """
+    @$('.video-controls .secondary-controls').append """
+      <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
+      """
+    @$('.subtitles').css maxHeight: @$('.video-wrapper').height() - 5
+    @fetchCaption()
+
+  renderCaption: ->
+    container = $('<ol>')
+
+    $.each @captions, (index, text) =>
+      container.append $('<li>').html(text).attr
+        'data-index': index
+        'data-start': @start[index]
+
+    @$('.subtitles').html(container.html())
+
+    # prepend and append an empty <li> for cosmatic reason
+    @$('.subtitles').prepend($('<li class="spacing">').height(@topSpacingHeight()))
+      .append($('<li class="spacing">').height(@bottomSpacingHeight()))
 
   fetchCaption: ->
     $.getJSON @captionURL(), (captions) =>
@@ -21,29 +52,7 @@ class VideoCaption
         for time in [captions.start[index]..captions.end[index]]
           @index[time] ||= []
           @index[time].push(index)
-      @render()
-
-  captionURL: ->
-    "/static/subs/#{@youtubeId}.srt.sjson"
-
-  render: ->
-    container = $('<ol class="subtitles">')
-    container.css maxHeight: @$('.video-wrapper').height() - 5
-
-    $.each @captions, (index, text) =>
-      container.append $('<li>').html(text).attr
-        'data-index': index
-        'data-start': @start[index]
-
-    @$('.subtitles').replaceWith(container)
-    @$('.subtitles').mouseenter(@onMouseEnter).mouseleave(@onMouseLeave)
-      .mousemove(@onMovement).bind('mousewheel', @onMovement)
-      .bind('DOMMouseScroll', @onMovement)
-    @$('.subtitles li[data-index]').click @seekPlayer
-
-    # prepend and append an empty <li> for cosmatic reason
-    @$('.subtitles').prepend($('<li class="spacing">').height(@topSpacingHeight()))
-      .append($('<li class="spacing">').height(@bottomSpacingHeight()))
+      @renderCaption()
 
   onUpdatePlayTime: (event, time) =>
     # This 250ms offset is required to match the video speed
