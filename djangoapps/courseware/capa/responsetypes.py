@@ -6,6 +6,7 @@ import random
 import scipy
 import traceback
 import copy
+import abc
 
 from calc import evaluator, UndefinedVariable
 from django.conf import settings
@@ -38,10 +39,17 @@ def compare_with_tolerance(v1, v2, tol):
     return abs(v1-v2) <= tolerance
 
 class GenericResponse(object):
+    __metaclass__=abc.ABCMeta
+
+    @abc.abstractmethod
     def grade(self, student_answers):
         pass
+
+    @abc.abstractmethod
     def get_answers(self):
         pass
+
+    #not an abstract method because plenty of responses will not want to preprocess anything, and we should not require that they override this method.
     def preprocess_response(self):
         pass
 
@@ -57,7 +65,8 @@ class MultipleChoiceResponse(GenericResponse):
 
         self.answer_id = xml.xpath('//*[@id=$id]//choicegroup/@id',
                                    id=xml.get('id'))
-        assert len(self.answer_id) == 1, "should have exactly one choice group per multiplechoicceresponse"
+        if not len(self.answer_id) == 1:
+            raise Exception("should have exactly one choice group per multiplechoicceresponse")
         self.answer_id=self.answer_id[0]
 
     def grade(self, student_answers):
@@ -79,19 +88,14 @@ class TrueFalseResponse(MultipleChoiceResponse):
             response.set("type", "TrueFalse")
 
     def grade(self, student_answers):
-        correct = copy.deepcopy(self.correct_choices)
-        if self.answer_id in student_answers and student_answers[self.answer_id]:
-            for answer in student_answers[self.answer_id]:
-                if answer in correct:
-                    correct.remove(answer)
-                else:
-                    return {self.answer_id:'incorrect'}
-            if len(correct) != 0:
-                return {self.answer_id:'incorrect'}
-            else:
-                return{self.answer_id:'correct'}
-        else:
-            return {self.answer_id:'incorrect'}
+        correct = set(self.correct_choices)
+        answers = set(student_answers.get(self.answer_id, []))
+        
+        if correct == answers:
+            return { self.answer_id : 'correct'}
+        
+        return {self.answer_id : 'incorrect'}
+
 
 class NumericalResponse(GenericResponse):
     def __init__(self, xml, context):
