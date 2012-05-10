@@ -2,7 +2,11 @@ import logging
 
 from lxml import etree
 
+from django.http import Http404
+from django import settings
 from mitxmako.shortcuts import render_to_string
+from fs.osfs import OSFS
+
 
 from models import StudentModule
 import track.views
@@ -10,6 +14,14 @@ import track.views
 import courseware.modules
 
 log = logging.getLogger("mitx.courseware")
+
+class I4xSystem(object):
+    def __init__(self, ajax_url, track_function, render_function, filestore=None):
+        self.ajax_url = ajax_url
+        self.track_function = track_function
+        self.filestore = OSFS(settings.DATA_DIR)
+        self.render_function = render_function
+        self.exception404 = Http404
 
 def object_cache(cache, user, module_type, module_id):
     # We don't look up on user -- all queries include user
@@ -32,12 +44,11 @@ def make_track_function(request):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
 
-
 def grade_histogram(module_id):
     ''' Print out a histogram of grades on a given problem. 
         Part of staff member debug info. 
     '''
-    from django.db import connection, transaction
+    from django.db import connection
     cursor = connection.cursor()
 
     cursor.execute("select courseware_studentmodule.grade,COUNT(courseware_studentmodule.student_id) from courseware_studentmodule where courseware_studentmodule.module_id=%s group by courseware_studentmodule.grade", [module_id])
@@ -68,12 +79,15 @@ def render_x_module(user, request, xml_module, module_object_preload):
 
     # Create a new instance
     ajax_url = '/modx/'+module_type+'/'+module_id+'/'
-    instance=module_class(etree.tostring(xml_module), 
+    system = I4xSystem(track_function = make_track_function(request), 
+                       render_function = lambda x: render_module(user, request, x, module_object_preload), 
+                       ajax_url = ajax_url,
+                       filestore = None
+                       )
+    instance=module_class(system, 
+                          etree.tostring(xml_module), 
                           module_id, 
-                          ajax_url=ajax_url,
-                          state=state, 
-                          track_function = make_track_function(request), 
-                          render_function = lambda x: render_module(user, request, x, module_object_preload))
+                          state=state)
     
     # If instance wasn't already in the database, and this
     # isn't a guest user, create it
