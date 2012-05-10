@@ -1,4 +1,15 @@
 div.question-header {
+
+  div.official-stamp {
+    background: $mit-red;
+    color: #fff;
+    font-size: 12px;
+    margin-top: 10px;
+    padding: 2px 5px;
+    text-align: center;
+    margin-left: -1px;
+  }
+
   div.vote-buttons {
     display: inline-block;
     float: left;

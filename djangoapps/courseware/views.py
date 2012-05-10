@@ -187,20 +187,20 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
     ''' Generic view for extensions. '''
-    # Grab the student information for the module from the database
-    if request.user.is_authenticated():
-        s = StudentModule.objects.filter(student=request.user, 
-                                         module_id=id)
-        #s = StudentModule.get_with_caching(request.user, id)
-        if len(s) == 0 or s is None:
-            log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
-            raise Http404
-        s = s[0]
+    if not request.user.is_authenticated():
+        return redirect('/')
 
-        oldgrade = s.grade
-        oldstate = s.state
-    else:
-        oldstate = "{}"
+    # Grab the student information for the module from the database
+    s = StudentModule.objects.filter(student=request.user, 
+                                     module_id=id)
+    #s = StudentModule.get_with_caching(request.user, id)
+    if len(s) == 0 or s is None:
+        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
+        raise Http404
+    s = s[0]
+
+    oldgrade = s.grade
+    oldstate = s.state
 
     dispatch=dispatch.split('?')[0]
 
@@ -210,22 +210,22 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     xml = content_parser.module_xml(request.user, module, 'id', id)
 
     # Create the module
-    instance=courseware.modules.get_module_class(module)(xml, 
+    system = I4xSystem(track_function = make_track_function(request), 
+                       render_function = None, 
+                       ajax_url = ajax_url,
+                       filestore = None
+                       )
+    instance=courseware.modules.get_module_class(module)(system, 
+                                                         xml, 
                                                          id, 
-                                                         ajax_url=ajax_url, 
-                                                         state=oldstate, 
-                                                         track_function = make_track_function(request), 
-                                                         render_function = None)
+                                                         state=oldstate)
     # Let the module handle the AJAX
     ajax_return=instance.handle_ajax(dispatch, request.POST)
-    
     # Save the state back to the database
-    if request.user.is_authenticated():
-        s.state=instance.get_state()
-        if instance.get_score(): 
-            s.grade=instance.get_score()['score']
-        if s.grade != oldgrade or s.state != oldstate:
-            s.save()
-
+    s.state=instance.get_state()
+    if instance.get_score(): 
+        s.grade=instance.get_score()['score']
+    if s.grade != oldgrade or s.state != oldstate:
+        s.save()
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
