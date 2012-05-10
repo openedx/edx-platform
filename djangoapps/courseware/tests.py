@@ -63,7 +63,7 @@ class ModelsTest(unittest.TestCase):
 
 class MultiChoiceTest(unittest.TestCase):
     def test_MC_grade(self):
-        multichoice_file = os.getcwd()+"/djangoapps/courseware/test_files/multichoice.xml"
+        multichoice_file = os.path.dirname(__file__)+"/test_files/multichoice.xml"
         test_lcp = lcp.LoncapaProblem(multichoice_file, '1')
         correct_answers = {'1_2_1':'foil3'}
         self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
