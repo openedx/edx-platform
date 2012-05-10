@@ -1,31 +1,24 @@
-import json
 import logging
-import os
-import random
-import sys
-import StringIO
 import urllib
-import uuid
 
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
-from django.http import HttpResponse, Http404
+from django.contrib.auth.decorators import login_required
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
-from django.template import Context, loader
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
-from django.db import connection
 from django.views.decorators.cache import cache_control
 
 from lxml import etree
 
-from module_render import render_module, modx_dispatch
+from module_render import render_module, make_track_function
 from models import StudentModule
 from student.models import UserProfile
 
 import courseware.content_parser as content_parser
-import courseware.modules.capa_module
+import courseware.modules
 
 import courseware.grades as grades
 
@@ -50,12 +43,11 @@ def gradebook(request):
 
     return render_to_response('gradebook.html',{'students':student_info})
 
+@login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile(request, student_id = None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
-    if not request.user.is_authenticated():
-        return redirect('/')
 
     if student_id == None:
         student = request.user
@@ -103,7 +95,7 @@ def render_section(request, section):
     ''' TODO: Consolidate with index 
     '''
     user = request.user
-    if not settings.COURSEWARE_ENABLED or not user.is_authenticated():
+    if not settings.COURSEWARE_ENABLED:
         return redirect('/')
 
 #    try: 
@@ -115,8 +107,11 @@ def render_section(request, section):
 
     module_ids = dom.xpath("//@id")
     
-    module_object_preload = list(StudentModule.objects.filter(student=user, 
-                                                              module_id__in=module_ids))
+    if user.is_authenticated():
+        module_object_preload = list(StudentModule.objects.filter(student=user, 
+                                                                  module_id__in=module_ids))
+    else:
+        module_object_preload = []
     
     module=render_module(user, request, dom, module_object_preload)
 
@@ -137,7 +132,7 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     ''' Displays courseware accordion, and any associated content. 
     ''' 
     user = request.user
-    if not settings.COURSEWARE_ENABLED or not user.is_authenticated():
+    if not settings.COURSEWARE_ENABLED:
         return redirect('/')
 
     # Fixes URLs -- we don't get funny encoding characters from spaces
@@ -169,8 +164,11 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     module_ids = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]//@id", 
                            course=course, chapter=chapter, section=section)
 
-    module_object_preload = list(StudentModule.objects.filter(student=user, 
-                                                              module_id__in=module_ids))
+    if user.is_authenticated():
+        module_object_preload = list(StudentModule.objects.filter(student=user, 
+                                                                  module_id__in=module_ids))
+    else:
+        module_object_preload = []
     
 
     module=render_module(user, request, module, module_object_preload)
@@ -185,3 +183,49 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     result = render_to_response('courseware.html', context)
     return result
+
+
+def modx_dispatch(request, module=None, dispatch=None, id=None):
+    ''' Generic view for extensions. '''
+    if not request.user.is_authenticated():
+        return redirect('/')
+
+    # Grab the student information for the module from the database
+    s = StudentModule.objects.filter(student=request.user, 
+                                     module_id=id)
+    #s = StudentModule.get_with_caching(request.user, id)
+    if len(s) == 0 or s is None:
+        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
+        raise Http404
+    s = s[0]
+
+    oldgrade = s.grade
+    oldstate = s.state
+
+    dispatch=dispatch.split('?')[0]
+
+    ajax_url = '/modx/'+module+'/'+id+'/'
+
+    # Grab the XML corresponding to the request from course.xml
+    xml = content_parser.module_xml(request.user, module, 'id', id)
+
+    # Create the module
+    system = I4xSystem(track_function = make_track_function(request), 
+                       render_function = None, 
+                       ajax_url = ajax_url,
+                       filestore = None
+                       )
+    instance=courseware.modules.get_module_class(module)(system, 
+                                                         xml, 
+                                                         id, 
+                                                         state=oldstate)
+    # Let the module handle the AJAX
+    ajax_return=instance.handle_ajax(dispatch, request.POST)
+    # Save the state back to the database
+    s.state=instance.get_state()
+    if instance.get_score(): 
+        s.grade=instance.get_score()['score']
+    if s.grade != oldgrade or s.state != oldstate:
+        s.save()
+    # Return whatever the module wanted to return to the client/caller
+    return HttpResponse(ajax_return)
