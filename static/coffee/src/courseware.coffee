@@ -1,6 +1,6 @@
-class window.Courseware
+class @Courseware
   constructor: ->
-    new CoursewareNavigation
+    new Navigation
     new Calculator
     new FeedbackForm
     Logger.bind()

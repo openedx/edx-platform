@@ -1,4 +1,4 @@
-class Video
+class @Video
   constructor: (@id, videos) ->
     window.player = null
     @element = $("#video_#{@id}")

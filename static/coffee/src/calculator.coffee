@@ -1,4 +1,4 @@
-class Calculator
+class @Calculator
   constructor: ->
     $('.calc').click @toggle
     $('form#calculator').submit(@calculate).submit (e) ->

@@ -1,4 +1,4 @@
-class Courseware::Navigation
+class @Navigation
   constructor: ->
     if $('#accordion').length
       active = $('#accordion ul:has(li.active)').index('#accordion ul')

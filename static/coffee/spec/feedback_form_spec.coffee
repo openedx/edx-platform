@@ -2,9 +2,9 @@ describe 'FeedbackForm', ->
   beforeEach ->
     loadFixtures 'feedback_form.html'
 
-  describe 'bind', ->
+  describe 'constructor', ->
     beforeEach ->
-      FeedbackForm.bind()
+      new FeedbackForm
       spyOn($, 'post').andCallFake (url, data, callback, format) ->
         callback()
 

@@ -1,77 +1,46 @@
 describe 'Courseware', ->
+  describe 'start', ->
+    it 'create the navigation', ->
+      spyOn(window, 'Navigation')
+      Courseware.start()
+      expect(window.Navigation).toHaveBeenCalled()
+
+    it 'create the calculator', ->
+      spyOn(window, 'Calculator')
+      Courseware.start()
+      expect(window.Calculator).toHaveBeenCalled()
+
+    it 'creates the FeedbackForm', ->
+      spyOn(window, 'FeedbackForm')
+      Courseware.start()
+      expect(window.FeedbackForm).toHaveBeenCalled()
+
+    it 'binds the Logger', ->
+      spyOn(Logger, 'bind')
+      Courseware.start()
+      expect(Logger.bind).toHaveBeenCalled()
+
   describe 'bind', ->
-    it 'bind the navigation', ->
-      spyOn Courseware.Navigation, 'bind'
-      Courseware.bind()
-      expect(Courseware.Navigation.bind).toHaveBeenCalled()
-
-  describe 'Navigation', ->
     beforeEach ->
-      loadFixtures 'accordion.html'
-      @navigation = new Courseware.Navigation
+      @courseware = new Courseware
+      setFixtures """<div id="seq_content"></div>"""
 
-    describe 'bind', ->
-      describe 'when the #accordion exists', ->
-        describe 'when there is an active section', ->
-          it 'activate the accordion with correct active section', ->
-            spyOn $.fn, 'accordion'
-            $('#accordion').append('<ul><li></li></ul><ul><li class="active"></li></ul>')
-            Courseware.Navigation.bind()
-            expect($('#accordion').accordion).toHaveBeenCalledWith
-              active: 1
-              header: 'h3'
-              autoHeight: false
+    it 'binds the sequential content change event', ->
+      @courseware.bind()
+      expect($('#seq_content')).toHandleWith 'change', @courseware.render
 
-        describe 'when there is no active section', ->
-          it 'activate the accordian with section 1 as active', ->
-            spyOn $.fn, 'accordion'
-            $('#accordion').append('<ul><li></li></ul><ul><li></li></ul>')
-            Courseware.Navigation.bind()
-            expect($('#accordion').accordion).toHaveBeenCalledWith
-              active: 1
-              header: 'h3'
-              autoHeight: false
+  describe 'render', ->
+    beforeEach ->
+      @courseware = new Courseware
+      setFixtures """
+        <div class="course-content">
+          <div id="video_1" class="video" data-streams="1.0:abc1234"></div>
+          <div id="video_2" class="video" data-streams="1.0:def5678"></div>
+        </div>
+        """
 
-        it 'binds the accordionchange event', ->
-          Courseware.Navigation.bind()
-          expect($('#accordion')).toHandleWith 'accordionchange', @navigation.log
-
-        it 'bind the navigation toggle', ->
-          Courseware.Navigation.bind()
-          expect($('#open_close_accordion a')).toHandleWith 'click', @navigation.toggle
-
-      describe 'when the #accordion does not exists', ->
-        beforeEach ->
-          $('#accordion').remove()
-
-        it 'does not activate the accordion', ->
-          spyOn $.fn, 'accordion'
-          Courseware.Navigation.bind()
-          expect($('#accordion').accordion).wasNotCalled()
-
-    describe 'toggle', ->
-      it 'toggle closed class on the wrapper', ->
-        $('.course-wrapper').removeClass('closed')
-
-        @navigation.toggle()
-        expect($('.course-wrapper')).toHaveClass('closed')
-
-        @navigation.toggle()
-        expect($('.course-wrapper')).not.toHaveClass('closed')
-
-    describe 'log', ->
-      beforeEach ->
-        window.log_event = ->
-        spyOn window, 'log_event'
-
-      it 'submit event log', ->
-        @navigation.log {}, {
-          newHeader:
-            text: -> "new"
-          oldHeader:
-            text: -> "old"
-        }
-
-        expect(window.log_event).toHaveBeenCalledWith 'accordion',
-          newheader: 'new'
-          oldheader: 'old'
+    it 'detect the video element and convert them', ->
+      spyOn(window, 'Video')
+      @courseware.render()
+      expect(window.Video).toHaveBeenCalledWith('1', '1.0:abc1234')
+      expect(window.Video).toHaveBeenCalledWith('2', '1.0:def5678')
