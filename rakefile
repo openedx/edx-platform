@@ -67,5 +67,6 @@ task :package do
 end
 
 task :publish => :package do
-    sh("scp #{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}*.deb #{PACKAGE_REPO}")
+    packages = Dir["#{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}*.deb"]
+    sh("scp #{packages.join(" ")} #{PACKAGE_REPO}")
 end
