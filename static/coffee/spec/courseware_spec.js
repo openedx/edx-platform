@@ -30,7 +30,7 @@
       });
       return it('binds the sequential content change event', function() {
         this.courseware.bind();
-        return expect($('#seq_content')).toHandleWith('change', this.courseware.render);
+        return expect($('#seq_content')).toHandleWith('contentChanged', this.courseware.render);
       });
     });
     return describe('render', function() {

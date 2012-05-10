@@ -1,17 +1,15 @@
 <%namespace name='static' file='static_content.html'/>
-<h2 class="problem-header">${ problem['name'] }
-% if problem['weight']:
-: ${ problem['weight'] } points
-% endif
-% if settings.QUICKEDIT:
-<span class="staff">
-<br/>
-<br/>
-<br/>
-<br/>
-<font size=-2><a href=${MITX_ROOT_URL}/quickedit/${id}>Quick
-Edit Problem</a></font></span>
-% endif
+<h2 class="problem-header">
+  ${ problem['name'] }
+  % if problem['weight']:
+    : ${ problem['weight'] } points
+  % endif
+
+  % if settings.QUICKEDIT:
+  <section class="staff">
+    <a href=${MITX_ROOT_URL}/quickedit/${id}>Quick Edit Problem</a>
+  </section>
+  % endif
 </h2>
 
 <section class="problem">
@@ -21,16 +19,16 @@ Edit Problem</a></font></span>
     <input type="hidden" name="problem_id" value="${ problem['name'] }">
 
     % if check_button:
-    <input id="check_${ id }" type="button" value="${ check_button }" >
+    <input class="check" type="button" value="${ check_button }">
     % endif
     % if reset_button:
-    <input id="reset_${ id }" type="button" value="Reset" >
+    <input class="reset" type="button" value="Reset">
     % endif
     % if save_button:
-    <input id="save_${ id }" type="button" value="Save" >
+    <input class="save" type="button" value="Save">
     % endif
     % if answer_available:
-    <input id="show_${ id }" type="button" value="Show Answer" >
+    <input class="show" type="button" value="Show Answer">
     % endif
     % if explain :
     <a href="/courseware/6.002_Spring_2012/${ explain }" class="new-page">Explanation</a>
@@ -42,3 +40,4 @@ Edit Problem</a></font></span>
     % endif
   </section>
 </section>
+

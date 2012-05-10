@@ -39,7 +39,7 @@ class window.Sequence
 
       MathJax.Hub.Queue(["Typeset",MathJax.Hub])
       @position = new_position
-      $('#seq_content').change()
+      $('#seq_content').trigger 'contentChanged'
 
   goto: (event) =>
     event.preventDefault()

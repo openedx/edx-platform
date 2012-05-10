@@ -54,6 +54,13 @@ div.course-wrapper {
         display: table-cell;
         vertical-align: top;
 
+        &.problem-header {
+          section.staff {
+            margin-top: 30px;
+            font-size: 80%;
+          }
+        }
+
         @media screen and (max-width:1120px) {
           display: block;
           width: auto;
