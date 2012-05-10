@@ -1,7 +1,5 @@
 import json
 
-## TODO: Abstract out from Django
-from django.conf import settings
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 from x_module import XModule
@@ -24,13 +22,13 @@ class Module(XModule):
             textlist=[i for i in textlist if type(i)==str]
             return "".join(textlist)
         try: 
-            filename=settings.DATA_DIR+"html/"+self.filename
-            return open(filename).read()
+            filename="html/"+self.filename
+            return self.filestore.open(filename).read()
         except: # For backwards compatibility. TODO: Remove
             return render_to_string(self.filename, {'id': self.item_id})
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
+    def __init__(self, system, xml, item_id, state=None):
+        XModule.__init__(self, system, xml, item_id, state)
         xmltree=etree.fromstring(xml)
         self.filename = None
         filename_l=xmltree.xpath("/html/@filename")

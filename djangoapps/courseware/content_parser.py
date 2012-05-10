@@ -177,6 +177,8 @@ def course_xml_process(tree):
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")
     propogate_downward_tag(tree, "graceperiod")
+    propogate_downward_tag(tree, "showanswer")
+    propogate_downward_tag(tree, "rerandomize")
     return tree
 
 def course_file(user):
