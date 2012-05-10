@@ -11,7 +11,7 @@ PACKAGE_NAME = "mitx"
 LINK_PATH = "/opt/wwc/mitx"
 VERSION = "0.1"
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
-BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_').downcase()
+BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '')
 BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
 
 if BRANCH == "master"
@@ -19,9 +19,10 @@ if BRANCH == "master"
 else
     DEPLOY_NAME = "#{PACKAGE_NAME}-#{BRANCH}-#{BUILD_NUMBER}-#{COMMIT}"
 end
-INSTALL_DIR_PATH = File.join(DEPLOY_DIR, DEPLOY_NAME)
 PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
 
+NORMALIZED_DEPLOY_NAME = DEPLOY_NAME.downcase().gsub(/[_\/]/, '-')
+INSTALL_DIR_PATH = File.join(DEPLOY_DIR, NORMALIZED_DEPLOY_NAME)
 
 # Set up the clean and clobber tasks
 CLOBBER.include('build')
@@ -58,7 +59,7 @@ task :package do
             "--prefix=#{INSTALL_DIR_PATH}",
             "-C", "#{REPO_ROOT}",
             "--provides=#{PACKAGE_NAME}",
-            "--name=#{DEPLOY_NAME}",
+            "--name=#{NORMALIZED_DEPLOY_NAME}",
             "--version=#{VERSION}",
             "-a", "all",
             "."]
@@ -67,5 +68,5 @@ task :package do
 end
 
 task :publish => :package do
-    sh("scp #{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}-1_all.deb #{PACKAGE_REPO}")
+    sh("scp #{BUILD_DIR}/#{NORMALIZED_DEPLOY_NAME}_#{VERSION}*.deb #{PACKAGE_REPO}")
 end

@@ -84,7 +84,7 @@ def render_accordion(request,course,chapter,section):
         parameter. Returns (initialization_javascript, content)'''
     if not course:
         course = "6.002 Spring 2012"
-    
+
     toc=content_parser.toc_from_xml(content_parser.course_file(request.user), chapter, section)
     active_chapter=1
     for i in range(len(toc)):
@@ -96,8 +96,7 @@ def render_accordion(request,course,chapter,section):
                   ['format_url_params',content_parser.format_url_params],
                   ['csrf',csrf(request)['csrf_token']]] + \
                      template_imports.items())
-    return {'init_js':render_to_string('accordion_init.js',context), 
-            'content':render_to_string('accordion.html',context)}
+    return render_to_string('accordion.html',context)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def render_section(request, section):
@@ -124,8 +123,8 @@ def render_section(request, section):
     if 'init_js' not in module:
         module['init_js']=''
 
-    context={'init':accordion['init_js']+module['init_js'],
-             'accordion':accordion['content'],
+    context={'init':module['init_js'],
+             'accordion':accordion,
              'content':module['content'],
              'csrf':csrf(request)['csrf_token']}
 
@@ -179,8 +178,8 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     if 'init_js' not in module:
         module['init_js']=''
 
-    context={'init':accordion['init_js']+module['init_js'],
-             'accordion':accordion['content'],
+    context={'init':module['init_js'],
+             'accordion':accordion,
              'content':module['content'],
              'csrf':csrf(request)['csrf_token']}
 

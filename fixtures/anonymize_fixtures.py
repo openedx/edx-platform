@@ -1,9 +1,12 @@
+#! /usr/bin/env python
+
 import sys
 import json
 import random
 import copy
 from collections import defaultdict
 from argparse import ArgumentParser, FileType
+from datetime import datetime
 
 def generate_user(user_number):
   return {
@@ -51,13 +54,13 @@ def generate_user(user_number):
   }
 
 
-
 def parse_args(args=sys.argv[1:]):
     parser = ArgumentParser()
     parser.add_argument('-d', '--data', type=FileType('r'), default=sys.stdin)
     parser.add_argument('-o', '--output', type=FileType('w'), default=sys.stdout)
     parser.add_argument('count', type=int)
     return parser.parse_args(args)
+
 
 def main(args=sys.argv[1:]):
     args = parse_args(args)
@@ -79,6 +82,8 @@ def main(args=sys.argv[1:]):
             sample = random.choice(answers)
             data = copy.deepcopy(sample)
             data["fields"]["student"] = student_id + 1
+            data["fields"]["created"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            data["fields"]["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             data["pk"] = out_pk
             out_pk += 1
             out_data.append(data)
