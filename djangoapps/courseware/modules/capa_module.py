@@ -369,8 +369,7 @@ class Module(XModule):
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None
 
-        filename="problems/"+self.filename+".xml"
-        self.lcp=LoncapaProblem(self.filestore.open(filename), self.item_id, self.lcp.get_state())
+        self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state())
 
         event_info['new_state']=self.lcp.get_state()
         self.tracker('reset_problem', event_info)
