@@ -12,9 +12,12 @@ class @Courseware
 
   bind: ->
     if $('#seq_content').length
-      $('#seq_content').change @render
+      $('#seq_content').bind 'contentChanged', @render
 
   render: ->
     $('.course-content .video').each ->
       id = $(this).attr('id').replace(/video_/, '')
       new Video id, $(this).data('streams')
+    $('.course-content .problems-wrapper').each ->
+      id = $(this).attr('id').replace(/problem_/, '')
+      new Problem id, $(this).data('url')

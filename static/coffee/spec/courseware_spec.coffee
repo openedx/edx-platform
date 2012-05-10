@@ -27,7 +27,7 @@ describe 'Courseware', ->
 
     it 'binds the sequential content change event', ->
       @courseware.bind()
-      expect($('#seq_content')).toHandleWith 'change', @courseware.render
+      expect($('#seq_content')).toHandleWith 'contentChanged', @courseware.render
 
   describe 'render', ->
     beforeEach ->

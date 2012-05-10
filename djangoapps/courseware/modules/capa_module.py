@@ -61,12 +61,6 @@ class Module(XModule):
                                'ajax_url':self.ajax_url,
                                })
 
-    def get_init_js(self):
-        return render_to_string('problem.js', 
-                              {'id':self.item_id, 
-                               'ajax_url':self.ajax_url,
-                               })
-
     def get_problem_html(self, encapsulate=True):
         html = self.lcp.get_html()
         content={'name':self.name, 
@@ -130,8 +124,8 @@ class Module(XModule):
 
         html=render_to_string('problem.html', context)
         if encapsulate:
-            html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
-            
+            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id)+html+"</div>"
+
         return html
 
     def __init__(self, system, xml, item_id, state=None):
