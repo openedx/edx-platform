@@ -4,9 +4,9 @@
     beforeEach(function() {
       return loadFixtures('feedback_form.html');
     });
-    return describe('bind', function() {
+    return describe('constructor', function() {
       beforeEach(function() {
-        FeedbackForm.bind();
+        new FeedbackForm;
         return spyOn($, 'post').andCallFake(function(url, data, callback, format) {
           return callback();
         });

@@ -1,4 +1,4 @@
-class FeedbackForm
+class @FeedbackForm
   constructor: ->
     $('#feedback_button').click ->
       data =
