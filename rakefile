@@ -71,5 +71,5 @@ task :package do
 end
 
 task :publish => :package do
-    sh("scp #{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}-1_all.deb #{PACKAGE_REPO}")
+    sh("scp #{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}*.deb #{PACKAGE_REPO}")
 end
