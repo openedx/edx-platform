@@ -42,7 +42,7 @@ function postJSON(url, data, callback) {
     $.ajax({type:'POST',
 	    url: url,
 		dataType: 'json',
-		data: JSON.stringify(data),
+		data: data,
 		success: callback,
 		headers : {'X-CSRFToken':getCookie('csrftoken')}
   });
@@ -52,7 +52,7 @@ function postJSONAsync(url, data, callback) {
     $.ajax({type:'POST',
 	    url: url,
 		dataType: 'json',
-		data: JSON.stringify(data),
+		data: data,
 		success: callback,
 		headers : {'X-CSRFToken':getCookie('csrftoken')},
 		async:true
