@@ -23,11 +23,15 @@ describe 'Courseware', ->
   describe 'bind', ->
     beforeEach ->
       @courseware = new Courseware
-      setFixtures """<div id="seq_content"></div>"""
+      setFixtures """
+        <div class="course-content">
+          <div class="sequence"></div>
+        </div>
+        """
 
-    it 'binds the sequential content change event', ->
+    it 'binds the content change event', ->
       @courseware.bind()
-      expect($('#seq_content')).toHandleWith 'contentChanged', @courseware.render
+      expect($('.course-content .sequence')).toHandleWith 'contentChanged', @courseware.render
 
   describe 'render', ->
     beforeEach ->

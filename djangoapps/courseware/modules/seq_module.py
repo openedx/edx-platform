@@ -52,13 +52,12 @@ class Module(XModule):
         child_classes = [set([i.tag for i in e.iter()]) for e in self.xmltree]
 
         titles = ["\n".join([i.get("name").strip() for i in e.iter() if i.get("name") != None]) \
-                           for e in self.xmltree]
+                       for e in self.xmltree]
 
-        self.contents = [j(self.render_function(e)) \
-                             for e in self.xmltree]
+        self.contents = [j(self.render_function(e)) for e in self.xmltree]
 
         for i in range(len(self.contents)):
-          self.contents[i]['title'] = titles[i]
+            self.contents[i]['title'] = titles[i]
 
         for (content, element_class) in zip(self.contents, child_classes):
             new_class = 'other'
@@ -83,7 +82,6 @@ class Module(XModule):
         if self.xmltree.tag in ['sequential', 'videosequence']:
             self.content=render_to_string('seq_module.html',params)
         if self.xmltree.tag == 'tab':
-            params['id'] = 'tab'
             self.content=render_to_string('tab_module.html',params)
         self.rendered = True
 
