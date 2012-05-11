@@ -1,9 +1,11 @@
 import unittest
+import os
 
 import numpy
 
 import courseware.modules
 import courseware.capa.calc as calc
+import courseware.capa.capa_problem as lcp
 import courseware.graders as graders
 from courseware.graders import Score, CourseGrader, WeightedSubsectionsGrader, SingleSectionGrader, AssignmentFormatGrader
 from courseware.grades import aggregate_scores
@@ -60,6 +62,37 @@ class ModelsTest(unittest.TestCase):
         except:
             exception_happened = True
         self.assertTrue(exception_happened)
+
+class MultiChoiceTest(unittest.TestCase):
+    def test_MC_grade(self):
+        multichoice_file = os.path.dirname(__file__)+"/test_files/multichoice.xml"
+        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1')
+        correct_answers = {'1_2_1':'choice_foil3'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        false_answers = {'1_2_1':'choice_foil2'}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+
+    def test_MC_bare_grades(self):
+        multichoice_file = os.path.dirname(__file__)+"/test_files/multi_bare.xml"
+        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1')
+        correct_answers = {'1_2_1':'choice_2'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        false_answers = {'1_2_1':'choice_1'}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        
+    def test_TF_grade(self):
+        truefalse_file =  os.getcwd()+"/djangoapps/courseware/test_files/truefalse.xml"
+        test_lcp = lcp.LoncapaProblem(open(truefalse_file), '1')
+        correct_answers = {'1_2_1':['choice_foil2', 'choice_foil1']}
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        false_answers = {'1_2_1':['choice_foil1']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['choice_foil1', 'choice_foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['choice_foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['choice_foil1', 'choice_foil2', 'choice_foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
 
 class GradesheetTest(unittest.TestCase):
 

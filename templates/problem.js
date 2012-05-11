@@ -6,7 +6,22 @@ function ${ id }_content_updated() {
     $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
-      submit_data[value.id]=value.value;
+	    if (value.type==="checkbox"){
+		if (value.checked) {
+		    if (typeof submit_data[value.name] == 'undefined'){
+			submit_data[value.name]=[];
+		    }
+		    submit_data[value.name].push(value.value);
+		}
+	    }
+	    if (value.type==="radio"){
+		if (value.checked) {
+		    submit_data[value.name]= value.value;
+		}
+	    }
+	    else{
+		submit_data[value.id]=value.value;
+	    }
     });
     postJSON('${ MITX_ROOT_URL }/modx/problem/${ id }/problem_check',
       submit_data,
@@ -40,9 +55,15 @@ function ${ id }_content_updated() {
   $('#show_${ id }').unbind('click').click(function() {
     postJSON('${ MITX_ROOT_URL }/modx/problem/${ id }/problem_show', {}, function(data) {
       for (var key in data) {
-        $("#answer_"+key).text(data[key]);
-      }
-    });
+	  if ($.isArray(data[key])){
+	      for (var ans_index in data[key]){
+		  var choice_id = 'input_'+key+'_'+data[key][ans_index];
+		  $("label[for="+choice_id+"]").attr("correct_answer", "true");   
+	      }
+	  }
+	  $("#answer_"+key).text(data[key]);
+    }
+  });
 
     log_event('problem_show', {'problem':'${ id }'});
   });

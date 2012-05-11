@@ -3,9 +3,15 @@ import logging
 from lxml import etree
 
 from django.http import Http404
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.template import Context
+from django.template import Context, loader
+
+from fs.osfs import OSFS
+
 from django.conf import settings
 from mitxmako.shortcuts import render_to_string
-from fs.osfs import OSFS
 
 
 from models import StudentModule
@@ -43,7 +49,6 @@ def make_track_function(request):
     def f(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
-
 def grade_histogram(module_id):
     ''' Print out a histogram of grades on a given problem. 
         Part of staff member debug info. 

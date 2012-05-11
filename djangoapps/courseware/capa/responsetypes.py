@@ -5,10 +5,14 @@ import numpy
 import random
 import scipy
 import traceback
+import copy
+import abc
 
 from calc import evaluator, UndefinedVariable
 from django.conf import settings
 from util import contextualize_text
+from lxml import etree
+from lxml.etree import Element
 
 import calc
 import eia
@@ -34,7 +38,80 @@ def compare_with_tolerance(v1, v2, tol):
         tolerance = evaluator(dict(),dict(),tol)
     return abs(v1-v2) <= tolerance
 
-class numericalresponse(object):
+class GenericResponse(object):
+    __metaclass__=abc.ABCMeta
+
+    @abc.abstractmethod
+    def grade(self, student_answers):
+        pass
+
+    @abc.abstractmethod
+    def get_answers(self):
+        pass
+
+    #not an abstract method because plenty of responses will not want to preprocess anything, and we should not require that they override this method.
+    def preprocess_response(self):
+        pass
+
+#Every response type needs methods "grade" and "get_answers"     
+
+class MultipleChoiceResponse(GenericResponse):
+    def __init__(self, xml, context):
+        self.xml = xml
+        self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+                                    id=xml.get('id'))
+        self.correct_choices = [choice.get('name') for choice in self.correct_choices]
+        self.context = context
+
+        self.answer_id = xml.xpath('//*[@id=$id]//choicegroup/@id',
+                                   id=xml.get('id'))
+        if not len(self.answer_id) == 1:
+            raise Exception("should have exactly one choice group per multiplechoicceresponse")
+        self.answer_id=self.answer_id[0]
+
+    def grade(self, student_answers):
+        if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
+            return {self.answer_id:'correct'}
+        else:
+            return {self.answer_id:'incorrect'}
+
+    def get_answers(self):
+        return {self.answer_id:self.correct_choices}
+
+    def preprocess_response(self):
+        i=0
+        for response in self.xml.xpath("choicegroup"):
+            response.set("type", "MultipleChoice")
+            for choice in list(response):
+                if choice.get("name") == None:
+                    choice.set("name", "choice_"+str(i))
+                    i+=1
+                else:
+                    choice.set("name", "choice_"+choice.get("name"))
+        
+class TrueFalseResponse(MultipleChoiceResponse):
+    def preprocess_response(self):
+        i=0
+        for response in self.xml.xpath("choicegroup"):
+            response.set("type", "TrueFalse")
+            for choice in list(response):
+                if choice.get("name") == None:
+                    choice.set("name", "choice_"+str(i))
+                    i+=1
+                else:
+                    choice.set("name", "choice_"+choice.get("name"))
+    
+    def grade(self, student_answers):
+        correct = set(self.correct_choices)
+        answers = set(student_answers.get(self.answer_id, []))
+        
+        if correct == answers:
+            return { self.answer_id : 'correct'}
+        
+        return {self.answer_id : 'incorrect'}
+
+
+class NumericalResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -63,7 +140,7 @@ class numericalresponse(object):
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
-class customresponse(object):
+class CustomResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         ## CRITICAL TODO: Should cover all entrytypes
@@ -94,7 +171,7 @@ class customresponse(object):
 class StudentInputError(Exception):
     pass
 
-class formularesponse(object):
+class FormulaResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -164,7 +241,7 @@ class formularesponse(object):
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
-class schematicresponse(object):
+class SchematicResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.answer_ids = xml.xpath('//*[@id=$id]//schematic/@id',

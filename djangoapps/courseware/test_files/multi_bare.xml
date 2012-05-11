@@ -1,0 +1,21 @@
+<problem>
+<multiplechoiceresponse>
+  <choicegroup>
+    <choice correct="false" >
+      <startouttext />This is foil One.<endouttext />
+    </choice>
+    <choice correct="false" >
+      <startouttext />This is foil Two.<endouttext />
+    </choice>
+    <choice correct="true" >
+      <startouttext />This is foil Three.<endouttext />
+    </choice>
+    <choice correct="false">
+      <startouttext />This is foil Four.<endouttext />
+    </choice>
+    <choice correct="false">
+      <startouttext />This is foil Five.<endouttext />
+    </choice>
+  </choicegroup>
+</multiplechoiceresponse>
+</problem>
