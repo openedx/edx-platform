@@ -3,7 +3,7 @@ import logging
 from lxml import etree
 
 from django.http import Http404
-from django import settings
+from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 from fs.osfs import OSFS
 
