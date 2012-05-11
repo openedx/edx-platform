@@ -14,19 +14,21 @@ from lxml.etree import Element
 from mako.template import Template
 
 from util import contextualize_text
-from inputtypes import textline, schematic
-from responsetypes import numericalresponse, formularesponse, customresponse, schematicresponse, StudentInputError
+import inputtypes
+from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse
 
 import calc
 import eia
 
 log = logging.getLogger("mitx.courseware")
 
-response_types = {'numericalresponse':numericalresponse, 
-                  'formularesponse':formularesponse,
-                  'customresponse':customresponse,
-                  'schematicresponse':schematicresponse}
-entry_types = ['textline', 'schematic']
+response_types = {'numericalresponse':NumericalResponse, 
+                  'formularesponse':FormulaResponse,
+                  'customresponse':CustomResponse,
+                  'schematicresponse':SchematicResponse,
+                  'multiplechoiceresponse':MultipleChoiceResponse,
+                  'truefalseresponse':TrueFalseResponse}
+entry_types = ['textline', 'schematic', 'choicegroup']
 response_properties = ["responseparam", "answer"]
 # How to convert from original XML to HTML
 # We should do this with xlst later
@@ -35,6 +37,7 @@ html_transforms = {'problem': {'tag':'div'},
                    "customresponse": {'tag':'span'}, 
                    "schematicresponse": {'tag':'span'}, 
                    "formularesponse": {'tag':'span'}, 
+                   "multiplechoiceresponse": {'tag':'span'}, 
                    "text": {'tag':'span'}}
 
 global_context={'random':random,
@@ -48,26 +51,18 @@ global_context={'random':random,
 html_problem_semantics = ["responseparam", "answer", "script"]
 # These should be removed from HTML output, but keeping subelements
 html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formularesponse", "text"]
-# These should be transformed
-html_special_response = {"textline":textline.render,
-                         "schematic":schematic.render}
 
 class LoncapaProblem(object):
-    def __init__(self, fileobject, id=None, state=None, seed=None):
+    def __init__(self, fileobject, id, state=None, seed=None):
         ## Initialize class variables from state
         self.seed = None
         self.student_answers = dict()
         self.correct_map = dict()
         self.done = False
+        self.problem_id = id
 
         if seed != None:
             self.seed = seed
-
-        if id:
-            self.problem_id = id
-        else:
-            print "NO ID"
-            raise Exception("This should never happen (183)")
 
         if state:
             if 'seed' in state:
@@ -93,6 +88,9 @@ class LoncapaProblem(object):
 
         self.preprocess_problem(self.tree, correct_map=self.correct_map, answer_map = self.student_answers)
         self.context = self.extract_context(self.tree, seed=self.seed)
+        for response in self.tree.xpath('//'+"|//".join(response_types)):
+            responder = response_types[response.tag](response, self.context)
+            responder.preprocess_response()
 
     def get_state(self):
         ''' Stored per-user session data neeeded to: 
@@ -130,7 +128,6 @@ class LoncapaProblem(object):
             grader = response_types[response.tag](response, self.context)
             results = grader.grade(answers)
             self.correct_map.update(results)
-
         return self.correct_map
 
     def get_question_answers(self):
@@ -168,7 +165,7 @@ class LoncapaProblem(object):
         if problemtree.tag in html_problem_semantics:
             return
 
-        if problemtree.tag in html_special_response:
+        if hasattr(inputtypes, problemtree.tag):
             status = "unsubmitted"
             if problemtree.get('id') in self.correct_map:
                 status = self.correct_map[problemtree.get('id')]
@@ -177,12 +174,12 @@ class LoncapaProblem(object):
             if self.student_answers and problemtree.get('id') in self.student_answers:
                 value = self.student_answers[problemtree.get('id')]
 
-            return html_special_response[problemtree.tag](problemtree, value, status) #TODO
+            return getattr(inputtypes, problemtree.tag)(problemtree, value, status) #TODO
 
         tree=Element(problemtree.tag)
         for item in problemtree:
             subitems = self.extract_html(item)
-            if subitems: 
+            if subitems is not None:
                 for subitem in subitems:
                     tree.append(subitem)
         for (key,value) in problemtree.items():
@@ -203,7 +200,6 @@ class LoncapaProblem(object):
         # TODO: Fix. This loses Element().tail
         #if problemtree.tag in html_skip:
         #    return tree
-
         return [tree]
 
     def preprocess_problem(self, tree, correct_map=dict(), answer_map=dict()): # private
