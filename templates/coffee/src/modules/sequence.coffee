@@ -11,9 +11,10 @@ class @Sequence
   bind: ->
     @element.bind 'contentChanged', @toggleArrows
     @$('#sequence-list a').click @goto
+    @$('.sequence-nav li a').hover @navHover
 
   buildNavigation: ->
-    $.each @elements, (index, item) ->
+    $.each @elements, (index, item) =>
       link = $('<a>').attr class: "seq_#{item.type}_inactive", 'data-element': index + 1
       title = $('<p>').html(item.title)
       list_item = $('<li>').append(link.append(title))
@@ -44,6 +45,9 @@ class @Sequence
       MathJax.Hub.Queue(["Typeset",MathJax.Hub])
       @position = new_position
       @element.trigger 'contentChanged'
+
+  navHover: (event) =>
+    $(event.target).siblings().toggleClass("shown")
 
   goto: (event) =>
     event.preventDefault()
