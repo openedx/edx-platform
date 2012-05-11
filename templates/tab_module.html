@@ -1,13 +1,11 @@
-<div id="tabs">
-<ul>
-  % for t in items:
-  <li> <a href="#tabs-${items.index(t)}">${t[0]}</a>
-  % endfor
-</ul>
-
-% for t in items:
-  <div id="tabs-${items.index(t)}">
-  </div>
-% endfor
-
+<div id="tab_${id}" class="tab">
+  <ul class="navigation"></ul>
 </div>
+
+<%block name="js_extra">
+<script type="text/javascript">
+  $(function(){
+      new Tab('${id}', ${items});
+  });
+</script>
+</%block>

@@ -11,8 +11,8 @@ class @Courseware
     new Courseware
 
   bind: ->
-    if $('#seq_content').length
-      $('#seq_content').bind 'contentChanged', @render
+    $('.course-content .sequence, .course-content .tab')
+      .bind 'contentChanged', @render
 
   render: ->
     $('.course-content .video').each ->

@@ -26,11 +26,11 @@
     describe('bind', function() {
       beforeEach(function() {
         this.courseware = new Courseware;
-        return setFixtures("<div id=\"seq_content\"></div>");
+        return setFixtures("<div class=\"course-content\">\n  <div class=\"sequence\"></div>\n</div>");
       });
-      return it('binds the sequential content change event', function() {
+      return it('binds the content change event', function() {
         this.courseware.bind();
-        return expect($('#seq_content')).toHandleWith('contentChanged', this.courseware.render);
+        return expect($('.course-content .sequence')).toHandleWith('contentChanged', this.courseware.render);
       });
     });
     return describe('render', function() {
