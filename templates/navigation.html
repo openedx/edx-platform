@@ -3,17 +3,21 @@
   <header>
     <hgroup>
       <h1><em>MITx</em></h1>
-      <h2><a href="/courseware">Circuits and Electronics</a></h2>
+      <h2><a href="${ MITX_ROOT_URL }/courseware/">${ settings.COURSE_TITLE }</a></h2>
     </hgroup>
 
     <nav class="${active_page}">
       <ul class="coursenav">
-        <li class="courseware"><a href="/courseware">Courseware</a></li>
-        <li class="info"><a href="/info">Course Info</a></li>
-        <li class="book"><a href="/book">Textbook</a></li>
-        <li class="discussion"><a href="/discussion/questions">Discussion</a></li>
-        <li class="wiki"><a href="/wiki/view">Wiki</a></li>
-        <li class="profile"><a href="/profile">Profile</a></li>
+        <li class="courseware"><a href="${ MITX_ROOT_URL }/courseware/">Courseware</a></li>
+        <li class="info"><a href="${ MITX_ROOT_URL }/info">Course Info</a></li>
+% if user.is_authenticated():
+        <li class="book"><a href="${ MITX_ROOT_URL }/book">Textbook</a></li>
+        <li class="discussion"><a href="${ MITX_ROOT_URL }/discussion/questions/">Discussion</a></li>
+% endif
+        <li class="wiki"><a href="${ MITX_ROOT_URL }/wiki/view/">Wiki</a></li>
+% if user.is_authenticated():
+        <li class="profile"><a href="${ MITX_ROOT_URL }/profile">Profile</a></li>
+% endif
       </ul>
     </nav>
   </header>

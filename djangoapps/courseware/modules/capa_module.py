@@ -93,6 +93,10 @@ class Module(XModule):
             check_button = False
             save_button = False
         
+        # Only show the reset button if pressing it will show different values
+        if self.rerandomize != 'always':
+            reset_button = False
+
         # User hasn't submitted an answer yet -- we don't want resets
         if not self.lcp.done:
             reset_button = False
@@ -237,7 +241,8 @@ class Module(XModule):
             return True
         if self.show_answer == 'closed' and not self.closed():
             return False
-        print "aa", self.show_answer
+        if self.show_answer == 'always':
+            return True
         raise self.system.exception404 #TODO: Not 404
 
     def get_answer(self, get):
@@ -297,21 +302,19 @@ class Module(XModule):
 
         self.attempts = self.attempts + 1
         self.lcp.done=True
-
+        
         success = 'correct'
         for i in correct_map:
             if correct_map[i]!='correct':
                 success = 'incorrect'
-
-        js=json.dumps({'correct_map' : correct_map,
-                       'success' : success})
 
         event_info['correct_map']=correct_map
         event_info['success']=success
 
         self.tracker('save_problem_check', event_info)
 
-        return js
+        return json.dumps({'success': success,
+                           'contents': self.get_problem_html(encapsulate=False)})
 
     def save_problem(self, get):
         event_info = dict()
@@ -368,9 +371,7 @@ class Module(XModule):
             self.lcp.context=dict()
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None
-
-        filename="problems/"+self.filename+".xml"
-        self.lcp=LoncapaProblem(self.filestore.open(filename), self.item_id, self.lcp.get_state())
+        self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state())
 
         event_info['new_state']=self.lcp.get_state()
         self.tracker('reset_problem', event_info)
