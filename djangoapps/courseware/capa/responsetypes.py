@@ -79,14 +79,28 @@ class MultipleChoiceResponse(GenericResponse):
         return {self.answer_id:self.correct_choices}
 
     def preprocess_response(self):
+        i=0
         for response in self.xml.xpath("choicegroup"):
             response.set("type", "MultipleChoice")
-
+            for choice in list(response):
+                if choice.get("name") == None:
+                    choice.set("name", "choice_"+str(i))
+                    i+=1
+                else:
+                    choice.set("name", "choice_"+choice.get("name"))
+        
 class TrueFalseResponse(MultipleChoiceResponse):
     def preprocess_response(self):
+        i=0
         for response in self.xml.xpath("choicegroup"):
             response.set("type", "TrueFalse")
-
+            for choice in list(response):
+                if choice.get("name") == None:
+                    choice.set("name", "choice_"+str(i))
+                    i+=1
+                else:
+                    choice.set("name", "choice_"+choice.get("name"))
+    
     def grade(self, student_answers):
         correct = set(self.correct_choices)
         answers = set(student_answers.get(self.answer_id, []))
