@@ -196,6 +196,9 @@ class Module(XModule):
         self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, state, seed = seed)
 
     def handle_ajax(self, dispatch, get):
+        '''
+        This is called by courseware.module_render, to handle an AJAX call.  "get" is request.POST 
+        '''
         if dispatch=='problem_get':
             response = self.get_problem(get)
         elif False: #self.close_date > 
@@ -246,10 +249,16 @@ class Module(XModule):
         raise self.system.exception404 #TODO: Not 404
 
     def get_answer(self, get):
+        '''
+        For the "show answer" button.
+
+        TODO: show answer events should be logged here, not just in the problem.js
+        '''
         if not self.answer_available():
             raise self.system.exception404
         else: 
-            return json.dumps(self.lcp.get_question_answers(), 
+            answers = self.lcp.get_question_answers()
+            return json.dumps(answers, 
                               cls=ComplexEncoder)
 
     # Figure out if we should move these to capa_problem?
@@ -265,6 +274,7 @@ class Module(XModule):
         event_info['state'] = self.lcp.get_state()
         event_info['filename'] = self.filename
 
+        # make a dict of all the student responses ("answers").
         answers=dict()
         # input_resistor_1 ==> resistor_1
         for key in get:
@@ -299,7 +309,6 @@ class Module(XModule):
             raise
             return json.dumps({'success':'Unknown Error'})
             
-
         self.attempts = self.attempts + 1
         self.lcp.done=True
         
@@ -371,6 +380,7 @@ class Module(XModule):
             self.lcp.context=dict()
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None
+
         self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state())
 
         event_info['new_state']=self.lcp.get_state()
