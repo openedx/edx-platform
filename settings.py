@@ -5,6 +5,14 @@ import tempfile
 
 import djcelery
 
+MITX_ROOT_URL = ''
+
+COURSE_NAME = "6.002_Spring_2012"
+COURSE_NUMBER = "6.002x"
+COURSE_TITLE = "Circuits and Electronics"
+
+ROOT_URLCONF = 'urls'
+
 # from settings2.askbotsettings import LIVESETTINGS_OPTIONS
 DEFAULT_GROUPS = []
 

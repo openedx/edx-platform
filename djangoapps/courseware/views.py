@@ -204,7 +204,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     dispatch=dispatch.split('?')[0]
 
-    ajax_url = '/modx/'+module+'/'+id+'/'
+    ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
 
     # Grab the XML corresponding to the request from course.xml
     xml = content_parser.module_xml(request.user, module, 'id', id)
