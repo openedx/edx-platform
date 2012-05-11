@@ -380,8 +380,8 @@ INSTALLED_APPS = INSTALLED_APPS + (
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 ASKBOT_URL = 'discussion/'
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/'
+LOGIN_URL = MITX_ROOT_URL + '/'
 
 # ASKBOT_UPLOADED_FILES_URL = '%s%s' % (ASKBOT_URL, 'upfiles/')
 ALLOW_UNICODE_SLUGS = False
@@ -511,10 +511,11 @@ LIVESETTINGS_OPTIONS = {
                 'CUSTOM_HEADER' : u'',
                 'CUSTOM_HTML_HEAD' : u'',
                 'CUSTOM_JS' : u'',
-                'SITE_FAVICON' : u'/images/favicon.gif',
-                'SITE_LOGO_URL' : u'/images/logo.gif',
+                'MITX_ROOT_URL' : MITX_ROOT_URL,	# for askbot header.html file
+                'SITE_FAVICON' : unicode(MITX_ROOT_URL) + u'/images/favicon.gif',
+                'SITE_LOGO_URL' :unicode(MITX_ROOT_URL) +  u'/images/logo.gif',
                 'SHOW_LOGO' : False,
-                'LOCAL_LOGIN_ICON' : u'/images/pw-login.gif',
+                'LOCAL_LOGIN_ICON' : unicode(MITX_ROOT_URL) + u'/images/pw-login.gif',
                 'ALWAYS_SHOW_ALL_UI_FUNCTIONS' : False,
                 'ASKBOT_DEFAULT_SKIN' : u'default',
                 'USE_CUSTOM_HTML_HEAD' : False,
@@ -547,12 +548,12 @@ LIVESETTINGS_OPTIONS = {
                 'SIGNIN_WORDPRESS_ENABLED' : True,
                 'SIGNIN_WORDPRESS_SITE_ENABLED' : False,
                 'SIGNIN_YAHOO_ENABLED' : True,
-                'WORDPRESS_SITE_ICON' : u'/images/logo.gif',
+                'WORDPRESS_SITE_ICON' : unicode(MITX_ROOT_URL) + u'/images/logo.gif',
                 'WORDPRESS_SITE_URL' : '',                   
             },
             'LICENSE_SETTINGS' : {
                 'LICENSE_ACRONYM' : u'cc-by-sa',
-                'LICENSE_LOGO_URL' : u'/images/cc-by-sa.png',
+                'LICENSE_LOGO_URL' : unicode(MITX_ROOT_URL) + u'/images/cc-by-sa.png',
                 'LICENSE_TITLE' : u'Creative Commons Attribution Share Alike 3.0',
                 'LICENSE_URL' : 'http://creativecommons.org/licenses/by-sa/3.0/legalcode',
                 'LICENSE_USE_LOGO' : True,

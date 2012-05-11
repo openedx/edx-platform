@@ -16,3 +16,4 @@ django_debug_toolbar
 django-masquerade
 fs
 django-jasmine
+beautifulsoup
