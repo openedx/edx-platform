@@ -13,7 +13,7 @@ from django.views.decorators.cache import cache_control
 
 from lxml import etree
 
-from module_render import render_module, make_track_function
+from module_render import render_module, make_track_function, I4xSystem
 from models import StudentModule
 from student.models import UserProfile
 
