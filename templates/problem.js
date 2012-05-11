@@ -8,7 +8,7 @@ function ${ id }_content_updated() {
     $.each($("[id^=input_${ id }_]"), function(index,value){
       submit_data[value.id]=value.value;
     });
-    postJSON('/modx/problem/${ id }/problem_check',
+    postJSON('${ MITX_ROOT_URL }/modx/problem/${ id }/problem_check',
       submit_data,
       function(json) {
         switch(json.success) {
@@ -30,7 +30,7 @@ function ${ id }_content_updated() {
       submit_data[value.id]=value.value;
     });
 
-    postJSON('/modx/problem/${ id }/problem_reset', {'id':'${ id }'}, function(html_as_json) {
+    postJSON('${ MITX_ROOT_URL }/modx/problem/${ id }/problem_reset', {'id':'${ id }'}, function(html_as_json) {
       $('#main_${ id }').html(html_as_json);
       ${ id }_content_updated();
     });
@@ -38,7 +38,7 @@ function ${ id }_content_updated() {
   });
 
   $('#show_${ id }').unbind('click').click(function() {
-    postJSON('/modx/problem/${ id }/problem_show', {}, function(data) {
+    postJSON('${ MITX_ROOT_URL }/modx/problem/${ id }/problem_show', {}, function(data) {
       for (var key in data) {
         $("#answer_"+key).text(data[key]);
       }
@@ -53,7 +53,7 @@ function ${ id }_content_updated() {
     $.each($("[id^=input_${ id }_]"), function(index,value) {
       submit_data[value.id]=value.value;
     });
-    postJSON('/modx/problem/${ id }/problem_save',
+    postJSON('${ MITX_ROOT_URL }/modx/problem/${ id }/problem_save',
       submit_data,
       function(data) {
         if(data.success) {

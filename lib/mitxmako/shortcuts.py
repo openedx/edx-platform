@@ -27,6 +27,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     # collapse context_instance to a single dictionary for mako
     context_dictionary = {}
     context_instance['settings'] = settings
+    context_instance['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
     for d in mitxmako.middleware.requestcontext:
         context_dictionary.update(d)
     for d in context_instance:

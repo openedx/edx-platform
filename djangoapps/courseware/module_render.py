@@ -78,7 +78,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
         state = smod.state
 
     # Create a new instance
-    ajax_url = '/modx/'+module_type+'/'+module_id+'/'
+    ajax_url = settings.MITX_ROOT_URL + '/modx/'+module_type+'/'+module_id+'/'
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = lambda x: render_module(user, request, x, module_object_preload), 
                        ajax_url = ajax_url,
@@ -102,6 +102,8 @@ def render_x_module(user, request, xml_module, module_object_preload):
     content = instance.get_html()
     init_js = instance.get_init_js()
     destory_js = instance.get_destroy_js()
+
+    # special extra information about each problem, only for users who are staff 
     if user.is_staff:
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
