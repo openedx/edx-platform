@@ -135,7 +135,11 @@ def get_score(user, problem, cache):
     if id in cache and response.max_grade != None:
         total = response.max_grade
     else:
-        total=float(courseware.modules.capa_module.Module(etree.tostring(problem), "id").max_score())
+        ## HACK 1: We shouldn't specifically reference capa_module
+        ## HACK 2: Backwards-compatibility: This should be written when a grade is saved, and removed from the system
+        from module_render import I4xSystem
+        system = I4xSystem(None, None, None)
+        total=float(courseware.modules.capa_module.Module(system, etree.tostring(problem), "id").max_score())
         response.max_grade = total
         response.save()
         

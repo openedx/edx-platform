@@ -51,8 +51,11 @@ class XModule(object):
         self.item_id = item_id
         self.state = state
 
-        self.ajax_url = system.ajax_url
-        self.tracker = system.track_function
-        self.filestore = system.filestore
-        self.render_function = system.render_function
+        if system: 
+            ## These are temporary; we really should go 
+            ## through self.system. 
+            self.ajax_url = system.ajax_url
+            self.tracker = system.track_function
+            self.filestore = system.filestore
+            self.render_function = system.render_function
         self.system = system
