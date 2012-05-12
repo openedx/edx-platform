@@ -25,7 +25,8 @@ class I4xSystem(object):
     def __init__(self, ajax_url, track_function, render_function, filestore=None):
         self.ajax_url = ajax_url
         self.track_function = track_function
-        self.filestore = OSFS(settings.DATA_DIR)
+        if not filestore: 
+            self.filestore = OSFS(settings.DATA_DIR)
         self.render_function = render_function
         self.exception404 = Http404
 
