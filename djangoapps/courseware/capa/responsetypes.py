@@ -149,8 +149,13 @@ class CustomResponse(GenericResponse):
         self.answer_ids = xml.xpath('//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
         self.context = context
-        answer = xml.xpath('//*[@id=$id]//answer',
-                           id=xml.get('id'))[0]
+        answer_list = xml.xpath('//*[@id=$id]//answer',
+                           id=xml.get('id'))
+        if len(answer_list):
+            answer=answer_list[0]
+        else: 
+            raise Exception("Invalid custom response -- no checker code")
+
         answer_src = answer.get('src')
         if answer_src != None:
             self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
