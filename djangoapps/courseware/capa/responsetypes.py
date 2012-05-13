@@ -1,29 +1,36 @@
+#
+# File:   courseware/capa/responsetypes.py
+#
+'''
+Problem response evaluation.  Handles checking of student responses, of a variety of types.
+
+Used by capa_problem.py
+'''
+
+# standard library imports
 import json
 import math
 import numbers
 import numpy
 import random
+import re
+import requests
 import scipy
 import traceback
 import copy
 import abc
 
+# specific library imports
 from calc import evaluator, UndefinedVariable
 from django.conf import settings
 from util import contextualize_text
 from lxml import etree
 from lxml.etree import Element
+from lxml.html.soupparser import fromstring as fromstring_bs	# uses Beautiful Soup!!! FIXME?
 
+# local imports
 import calc
 import eia
-
-# TODO: Should be the same object as in capa_problem
-global_context={'random':random,
-                'numpy':numpy,
-                'math':math,
-                'scipy':scipy, 
-                'calc':calc, 
-                'eia':eia}
 
 
 def compare_with_tolerance(v1, v2, tol):
@@ -56,6 +63,21 @@ class GenericResponse(object):
 #Every response type needs methods "grade" and "get_answers"     
 
 class MultipleChoiceResponse(GenericResponse):
+    '''
+    Example: 
+
+    <multiplechoiceresponse direction="vertical" randomize="yes">
+     <choicegroup type="MultipleChoice">
+        <choice location="random" name="1" correct="false"><span>`a+b`<br/></span></choice>
+        <choice location="random" name="2" correct="true"><span><math>a+b^2</math><br/></span></choice>
+        <choice location="random" name="3" correct="false"><math>a+b+c</math></choice>
+        <choice location="bottom" name="4" correct="false"><math>a+b+d</math></choice>
+     </choicegroup>
+    </multiplechoiceresponse>
+
+    TODO: handle direction and randomize
+
+    '''
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
@@ -115,11 +137,17 @@ class NumericalResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
-        self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
-                                   id=xml.get('id'))[0]
-        self.tolerance = contextualize_text(self.tolerance_xml, context)
-        self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
-                                   id=xml.get('id'))[0]
+        try:
+            self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+                                           id=xml.get('id'))[0]
+            self.tolerance = contextualize_text(self.tolerance_xml, context)
+        except Exception,err:
+            self.tolerance = 0
+        try:
+            self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
+                                       id=xml.get('id'))[0]
+        except Exception, err:
+            self.answer_id = None
 
     def grade(self, student_answers):
         ''' Display HTML for a numeric response '''
@@ -140,7 +168,50 @@ class NumericalResponse(GenericResponse):
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
+#-----------------------------------------------------------------------------
+
 class CustomResponse(GenericResponse):
+    '''
+    Custom response.  The python code to be run should be in <answer>...</answer>.  Example:
+
+    <customresponse>
+    <startouttext/>
+    <br/>
+    Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
+    In the space provided below write an algebraic expression for \(I(t)\).
+    <br/>
+    <textline size="5" correct_answer="IS*u(t-t0)" />
+    <endouttext/>
+    <answer type="loncapa/python">
+    correct=['correct']
+    try:
+        r = str(submission[0])
+    except ValueError:
+        correct[0] ='incorrect'
+        r = '0'
+    if not(r=="IS*u(t-t0)"):
+        correct[0] ='incorrect'
+    </answer>
+    </customresponse>
+    
+    Alternatively, the check function can be defined in <script>...</script>  Example:
+
+<script type="loncapa/python"><![CDATA[
+
+def sympy_check2():
+  messages[0] = '%s:%s' % (submission[0],fromjs[0].replace('<','&lt;'))
+  #messages[0] = str(answers)
+  correct[0] = 'correct'
+
+]]>
+</script>
+
+  <customresponse cfn="sympy_check2" type="cs" expect="2.27E-39" dojs="math" size="30" answer="2.27E-39">
+    <textline size="40" dojs="math" />
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
+  </customresponse>
+
+    '''
     def __init__(self, xml, context):
         self.xml = xml
         ## CRITICAL TODO: Should cover all entrytypes
@@ -163,6 +234,10 @@ class CustomResponse(GenericResponse):
             self.code = answer.text
 
     def grade(self, student_answers):
+        '''
+        student_answers is a dict with everything from request.POST, but with the first part
+        of each key removed (the string before the first "_").
+        '''
         submission = [student_answers[k] for k in sorted(self.answer_ids)]
         self.context.update({'submission':submission})
         exec self.code in global_context, self.context
@@ -173,19 +248,92 @@ class CustomResponse(GenericResponse):
         # be handled by capa_problem
         return {}
 
+#-----------------------------------------------------------------------------
+
+class ExternalResponse(GenericResponse):
+    '''
+    Grade the student's input using an external server.
+    
+    Typically used by coding problems.
+    '''
+    def __init__(self, xml, context):
+        self.xml = xml
+        self.answer_ids = xml.xpath('//*[@id=$id]//textbox/@id|//*[@id=$id]//textline/@id',
+                                    id=xml.get('id'))
+        self.context = context
+        answer = xml.xpath('//*[@id=$id]//answer',
+                           id=xml.get('id'))[0]
+
+        answer_src = answer.get('src')
+        if answer_src != None:
+            self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
+        else:
+            self.code = answer.text
+
+        self.tests = xml.get('answer')
+
+    def grade(self, student_answers):
+        submission = [student_answers[k] for k in sorted(self.answer_ids)]
+        self.context.update({'submission':submission})
+
+        xmlstr = etree.tostring(self.xml, pretty_print=True)
+
+        payload = {'xml': xmlstr, 
+				   ### Question: Is this correct/what we want? Shouldn't this be a json.dumps? 
+          	       'LONCAPA_student_response': ''.join(submission), 
+                   'LONCAPA_correct_answer': self.tests,
+                   'processor' : self.code,
+                   }
+
+        # call external server; TODO: get URL from settings.py
+        r = requests.post("http://eecs1.mit.edu:8889/pyloncapa",data=payload)
+
+        rxml = etree.fromstring(r.text)         # response is XML; prase it
+        ad = rxml.find('awarddetail').text
+        admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
+        	 'WRONG_FORMAT': 'incorrect',
+                 }
+        self.context['correct'] = ['correct']
+        if ad in admap:
+            self.context['correct'][0] = admap[ad]
+
+        # self.context['correct'] = ['correct','correct']
+        correct_map = dict(zip(sorted(self.answer_ids), self.context['correct']))
+        
+        # TODO: separate message for each answer_id?
+        correct_map['msg'] = rxml.find('message').text.replace('&nbsp;','&#160;')  # store message in correct_map
+
+        return  correct_map
+
+    def get_answers(self):
+        # Since this is explicitly specified in the problem, this will 
+        # be handled by capa_problem
+        return {}
+
 class StudentInputError(Exception):
     pass
+
+#-----------------------------------------------------------------------------
 
 class FormulaResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         self.samples = contextualize_text(xml.get('samples'), context)
-        self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
-                                   id=xml.get('id'))[0]
-        self.tolerance = contextualize_text(self.tolerance_xml, context)
-        self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
-                                   id=xml.get('id'))[0]
+        try:
+            self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+                                           id=xml.get('id'))[0]
+            self.tolerance = contextualize_text(self.tolerance_xml, context)
+        except Exception,err:
+            self.tolerance = 0
+
+        try:
+            self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
+                                       id=xml.get('id'))[0]
+        except Exception, err:
+            self.answer_id = None
+            raise Exception, "[courseware.capa.responsetypes.FormulaResponse] Error: missing answer_id!!"
+
         self.context = context
         ts = xml.get('type')
         if ts == None:
@@ -211,7 +359,7 @@ class FormulaResponse(GenericResponse):
         for i in range(numsamples):
             instructor_variables = self.strip_dict(dict(self.context))
             student_variables = dict()
-            for var in ranges:
+            for var in ranges:				# ranges give numerical ranges for testing
                 value = random.uniform(*ranges[var])
                 instructor_variables[str(var)] = value
                 student_variables[str(var)] = value
@@ -246,6 +394,8 @@ class FormulaResponse(GenericResponse):
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
+#-----------------------------------------------------------------------------
+
 class SchematicResponse(GenericResponse):
     def __init__(self, xml, context):
         self.xml = xml
@@ -270,3 +420,68 @@ class SchematicResponse(GenericResponse):
         # Since this is explicitly specified in the problem, this will 
         # be handled by capa_problem
         return {}
+
+#-----------------------------------------------------------------------------
+
+class ImageResponse(GenericResponse):
+    """
+    Handle student response for image input: the input is a click on an image,
+    which produces an [x,y] coordinate pair.  The click is correct if it falls
+    within a region specified.  This region is nominally a rectangle.
+
+    Lon-CAPA requires that each <imageresponse> has a <foilgroup> inside it.  That
+    doesn't make sense to me (Ike).  Instead, let's have it such that <imageresponse>
+    should contain one or more <imageinput> stanzas. Each <imageinput> should specify 
+    a rectangle, given as an attribute, defining the correct answer.
+
+    Example:
+
+    <imageresponse>
+      <imageinput src="image1.jpg" width="200" height="100" rectangle="(10,10)-(20,30)" />
+      <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
+    </imageresponse>
+
+    """
+    def __init__(self, xml, context):
+        self.xml = xml
+        self.context = context
+        self.ielements = xml.findall('imageinput')
+        self.answer_ids = [ie.get('id')  for ie in self.ielements]
+
+    def grade(self, student_answers):
+        correct_map = {}
+        expectedset = self.get_answers()
+
+        for aid in self.answer_ids:	# loop through IDs of <imageinput> fields in our stanza
+            given = student_answers[aid]	# this should be a string of the form '[x,y]'
+
+            # parse expected answer
+            # TODO: Compile regexp on file load
+            m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',expectedset[aid].strip().replace(' ',''))
+            if not m:
+                msg = 'Error in problem specification! cannot parse rectangle in %s' % (etree.tostring(self.ielements[aid],
+                                                                                                       pretty_print=True))
+                raise Exception,'[capamodule.capa.responsetypes.imageinput] '+msg
+            (llx,lly,urx,ury) = [int(x) for x in m.groups()]
+                
+            # parse given answer
+            m = re.match('\[([0-9]+),([0-9]+)]',given.strip().replace(' ',''))
+            if not m:
+                raise Exception,'[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (err,aid,given)
+            (gx,gy) = [int(x) for x in m.groups()]
+            
+            if settings.DEBUG:
+                print "[capamodule.capa.responsetypes.imageinput] llx,lly,urx,ury=",(llx,lly,urx,ury)
+                print "[capamodule.capa.responsetypes.imageinput] gx,gy=",(gx,gy)
+
+            # answer is correct if (x,y) is within the specified rectangle
+            if (llx <= gx <= urx) and (lly <= gy <= ury):
+                correct_map[aid] = 'correct'
+            else:
+                correct_map[aid] = 'incorrect'
+        if settings.DEBUG:
+            print "[capamodule.capa.responsetypes.imageinput] correct_map=",correct_map
+        return correct_map
+
+    def get_answers(self):
+        return dict([(ie.get('id'),ie.get('rectangle')) for ie in self.ielements])

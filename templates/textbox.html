@@ -1,0 +1,34 @@
+<section class="text-input">
+  <textarea rows="30" cols="80" name="input_${id}" id="input_${id}">${value|h}</textarea>
+
+  <span id="answer_${id}"></span>
+
+  % if state == 'unsubmitted':
+  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+  % elif state == 'correct': 
+  <span class="correct" id="status_${id}"></span>
+  % elif state == 'incorrect':
+  <span class="incorrect" id="status_${id}"></span>
+  % elif state == 'incomplete':
+  <span class="incorrect" id="status_${id}"></span>
+  % endif
+  <br/>
+  <span class="debug">(${state})</span>
+  <br/>
+  <span class="debug">${msg|n}</span>
+  <br/>
+
+<br/>
+<script>
+// Note: We need to make the area follow the CodeMirror for this to 
+// work. 
+$(function(){
+  var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), 
+                                   {'mode':"python"});
+});
+</script>
+<style type="text/css">
+  .CodeMirror {border-style: solid;
+              border-width: 1px;}
+</style>
+</section>
