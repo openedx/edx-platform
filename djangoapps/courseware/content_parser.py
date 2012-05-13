@@ -1,3 +1,12 @@
+'''
+courseware/content_parser.py
+
+This file interfaces between all courseware modules and the top-level course.xml file for a course.
+
+Does some caching (to be explained).
+
+'''
+
 import hashlib
 import logging
 import os
