@@ -47,7 +47,7 @@ section.course-index {
         &.active {
           font-weight: bold;
 
-          p.subtitle {
+          span.subtitle {
             font-weight: normal;
           }
 
@@ -80,8 +80,9 @@ section.course-index {
           p {
             margin-bottom: 0;
 
-            &.subtitle {
+            span.subtitle {
               color: #666;
+              display: block;
             }
           }
         }
