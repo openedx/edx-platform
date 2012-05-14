@@ -8,6 +8,7 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from common import *
+import os
 
 INSTALLED_APPS = [
     app
@@ -16,6 +17,14 @@ INSTALLED_APPS = [
     if not app.startswith('askbot')
 ]
 
+# Nose Test Runner
+INSTALLED_APPS += ['django_nose']
+NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html', '--cover-inclusive']
+for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
+    NOSE_ARGS += ['--cover-package', app]
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Local Directories
 COURSES_ROOT = PROJECT_ROOT / "test_data"
 DATA_DIR = COURSES_ROOT
 MAKO_TEMPLATES['course'] = [DATA_DIR]
