@@ -1,5 +1,6 @@
 import abc
 import logging
+import random
 
 from django.conf import settings
 
@@ -61,7 +62,7 @@ class CourseGrader(object):
     that has the matching section format.
     
     The grader outputs a dictionary with the following keys:
-    - percent: Contaisn a float value, which is the final percentage score for the student.
+    - percent: Contains a float value, which is the final percentage score for the student.
     - section_breakdown: This is a list of dictionaries which provide details on sections
     that were graded. These are used for display in a graph or chart. The format for a 
     section_breakdown dictionary is explained below.
