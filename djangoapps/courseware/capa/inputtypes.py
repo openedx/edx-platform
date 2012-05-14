@@ -74,7 +74,7 @@ class TextLine(GenericInput):
 #-----------------------------------------------------------------------------
 # TODO: Make a wrapper for <formulainput>
 # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-class jstextline(GenericInput):
+class jstextline(object):
     '''
     Plan: We will inspect element to figure out type
     '''
