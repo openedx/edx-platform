@@ -34,7 +34,7 @@ class I4xSystem(object):
     and user, or other environment-specific info.
     '''
     def __init__(self, ajax_url, track_function, render_function,
-                 render_template, filestore=None):
+                 render_template, request=None, filestore=None):
         '''
         Create a closure around the system environment.
 
@@ -49,6 +49,7 @@ class I4xSystem(object):
                           and 'type'.
         render_template - a function that takes (template_file, context), and returns
                           rendered html.
+        request - the request in progress
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
         '''
@@ -65,6 +66,7 @@ class I4xSystem(object):
         self.render_template = render_template
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
+        self.id = request.user.id if request is not None else 0
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
@@ -169,6 +171,7 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
                        render_function = render_x_module_wrapper, 
                        render_template = render_to_string,
                        ajax_url = ajax_url,
+                       request = request,
                        filestore = OSFS(data_root),
                        )
     # pass position specified in URL to module through I4xSystem
@@ -298,6 +301,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                        render_function = None, 
                        render_template = render_to_string,
                        ajax_url = ajax_url,
+                       request = request,
                        filestore = OSFS(data_root),
                        )
 
