@@ -30,7 +30,7 @@ from lxml import etree
 import requests
 from copy import deepcopy
 
-print "Warning: Dark code. Needs review before enabling in prod."
+print "[lib.sympy_check.formula] Warning: Dark code. Needs review before enabling in prod."
 
 os.environ['PYTHONIOENCODING'] = 'utf-8'
 

@@ -5,11 +5,34 @@ import tempfile
 
 import djcelery
 
+### Dark code. Should be enabled in local settings for devel. 
+
+ENABLE_MULTICOURSE = False	# set to False to disable multicourse display (see lib.util.views.mitxhome)
+
+###
+
+
 MITX_ROOT_URL = ''
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
 COURSE_TITLE = "Circuits and Electronics"
+
+COURSE_DEFAULT = '6.002_Spring_2012'
+
+COURSE_LIST =  {'6.002_Spring_2012': {'number' : '6.002x',
+                                      'title'  :  'Circuits and Electronics',
+                                      'datapath': '6002x/',
+                                       },
+                '8.02_Spring_2013': {'number' : '8.02x',
+                                     'title'  : 'Electricity &amp; Magnetism',
+                                     'datapath': '802x/',
+                                     },
+                '8.01_Spring_2013': {'number' : '8.01x',
+                                     'title'  : 'Mechanics',
+                                     'datapath': '801x/',
+                                     },
+               }
 
 ROOT_URLCONF = 'urls'
 

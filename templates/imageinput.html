@@ -1,0 +1,16 @@
+<span>
+  <input type="hidden" class="imageinput" src="${src}" name="input_${id}" id="input_${id}" value="${value}" />
+  <div id="imageinput_${id}" onclick="image_input_click('${id}',event);" style = "background-image:url('${src}');width:${width}px;height:${height}px;position: relative; left: 0; top: 0;">
+      <img src="/static/green-pointer.png" id="cross_${id}" style="position: absolute;top: ${gy}px;left: ${gx}px;" />
+  </div>
+
+  % if state == 'unsubmitted':
+  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+  % elif state == 'correct': 
+  <span class="correct" id="status_${id}"></span>
+  % elif state == 'incorrect':
+  <span class="incorrect" id="status_${id}"></span>
+  % elif state == 'incomplete':
+  <span class="incorrect" id="status_${id}"></span>
+  % endif
+</span>
