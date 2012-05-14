@@ -38,10 +38,20 @@ class @Problem
       @render(content)
 
   show: =>
-    Logger.log 'problem_show', problem: @id
-    $.postWithPrefix "/modx/problem/#{@id}/problem_show", (response) =>
-      $.each response, (key, value) =>
-        @$("#answer_#{key}").text(value)
+    if !@element.hasClass 'showed'
+      Logger.log 'problem_show', problem: @id
+      $.postWithPrefix "/modx/problem/#{@id}/problem_show", (response) =>
+        $.each response, (key, value) =>
+          if $.isArray(data[key])
+            $.each data[key], (index, answer_index) =>
+              @$("#label[for='input_#{key}_#{data[key][answer_index]}']").attr
+                correct_answer: 'true'
+          @$("#answer_#{key}").text(value)
+        @element.addClass 'showed'
+    else
+      @$('[id^=answer_]').text('')
+      @$('[correct_answer]').attr(correct_answer: null)
+
 
   save: =>
     Logger.log 'problem_save', @answers
@@ -50,8 +60,8 @@ class @Problem
         alert 'Saved'
 
   refreshAnswers: =>
-    @answers = {}
     @$('input.schematic').each (index, element) ->
       element.schematic.update_value()
-    $.each @$("[id^=input_#{@id}_]"), (index, input) =>
-      @answers[$(input).attr('id')] = $(input).val()
+    @$(".CodeMirror").each (index, element) ->
+      element.CodeMirror.save() if element.CodeMirror.save
+    @answers = @$("[id^=input_#{@id}_]").serialize()
