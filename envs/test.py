@@ -16,6 +16,15 @@ INSTALLED_APPS = [
     if not app.startswith('askbot')
 ]
 
+COURSES_ROOT = PROJECT_ROOT / "test_data"
+DATA_DIR = COURSES_ROOT
+MAKO_TEMPLATES['course'] = [DATA_DIR]
+MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
+MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
+MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates', 
+                          DATA_DIR / 'info',
+                          DATA_DIR / 'problems']
+
 LOGGING = logsettings.get_logger_config(PROJECT_ROOT / "log", 
                                         logging_env="dev",
                                         tracking_filename="tracking.log",
