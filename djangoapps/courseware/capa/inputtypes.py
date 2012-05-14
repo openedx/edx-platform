@@ -52,17 +52,34 @@ def choicegroup(element, value, state, msg=""):
     return etree.XML(html)
 
 def textline(element, value, state, msg=""):
-    eid=element.get('id')
-    count = int(eid.split('_')[-2])-1 # HACK
-    size = element.get('size')
-    context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size}
-    html=render_to_string("textinput.html", context)
-    return etree.XML(html)
+    return TextLine(element, value, state, msg).render()
+
+class GenericInput(object):
+    def __init__(element, value, state, msg=""):
+        ''' This will move into the parent object '''
+        self.element = element
+        self.value = value
+        self.state = state
+        self.msg = msg
+
+class TextLine(GenericInput):
+    def render(self):
+        eid=self.element.get('id')
+        count = int(eid.split('_')[-2])-1 # HACK
+        size = self.element.get('size')
+        context = {'id':eid, 'value':self.value, 'state':self.state, 'count':count, 'size': size}
+        html=render_to_string("textinput.html", context)
+        return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 # TODO: Make a wrapper for <formulainput>
 # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-def jstextline(element, value, state, msg=""):
+class jstextline(GenericInput):
+    '''
+    Plan: We will inspect element to figure out type
+    '''
+    js_types = {'formulainput' : 'math'}
+    def render(element, value, state, msg=""):
         '''
         textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
         '''
@@ -81,7 +98,8 @@ def jstextline(element, value, state, msg=""):
 
 #-----------------------------------------------------------------------------
 ## TODO: Make a wrapper for <codeinput>
-def textbox(element, value, state, msg=''):
+class textbox(GenericInput):
+    def render(element, value, state, msg=''):
         '''
         The textbox is used for code input.  The message is the return HTML string from
         evaluating the code, eg error messages, and output from the code tests.

@@ -72,11 +72,12 @@ html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formul
 
 # removed in MC
 ## These should be transformed
-#html_special_response = {"textline":textline.render,
-#                         "schematic":schematic.render,
-#                         "textbox":textbox.render,
-#                         "solution":solution.render,
-#                         }
+html_special_response = {"textline":inputtypes.textline.render,
+                         "schematic":inputtypes.schematic.render,
+                         "textbox":inputtypes.textbox.render,
+                         "formulainput":inputtypes.jstextline.render,
+#                         "solution":inputtypes.solution.render,
+                         }
 
 class LoncapaProblem(object):
     def __init__(self, fileobject, id, state=None, seed=None, system=None):
