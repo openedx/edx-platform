@@ -9,6 +9,13 @@ sessions. Assumes structure:
 """
 from common import *
 
+INSTALLED_APPS = [
+    app
+    for app
+    in INSTALLED_APPS
+    if not app.startswith('askbot')
+]
+
 LOGGING = logsettings.get_logger_config(PROJECT_ROOT / "log", 
                                         logging_env="dev",
                                         tracking_filename="tracking.log",
