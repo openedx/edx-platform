@@ -18,6 +18,8 @@ def grade_sheet(student):
     problems, and is good for displaying a course summary with due dates, etc.
     
     - grade_summary is the output from the course grader. More information on the format is in the docstring for CourseGrader.
+    
+    - grade is a letter grade, either 'A', 'B', 'C', or None
     """
     dom=content_parser.course_file(student)
     course = dom.xpath('//course/@name')[0]
@@ -85,8 +87,17 @@ def grade_sheet(student):
     grader = course_settings.GRADER
     grade_summary = grader.grade(totaled_scores)
     
+    letter_grade = None
+    for possible_grade in ['A', 'B', 'C']:
+        if grade_summary['percent'] >= course_settings.GRADE_CUTOFFS[possible_grade]:
+            letter_grade = possible_grade
+            break
+    
+    _log.debug("Final grade: " + str(letter_grade))
+    
     return {'courseware_summary' : chapters,
-            'grade_summary' : grade_summary}
+            'grade_summary' : grade_summary,
+            'grade' : letter_grade}
 
 def aggregate_scores(scores, section_name = "summary"):    
     total_correct_graded = sum(score.earned for score in scores if score.graded)

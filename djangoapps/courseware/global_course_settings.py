@@ -26,3 +26,5 @@ GRADER = [
         'weight' : 0.4,
     }
 ]
+
+GRADE_CUTOFFS = {'A' : 0.87, 'B' : 0.7, 'C' : 0.6}
