@@ -78,7 +78,7 @@ class MultipleChoiceResponse(GenericResponse):
     TODO: handle direction and randomize
 
     '''
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
                                     id=xml.get('id'))
@@ -134,7 +134,7 @@ class TrueFalseResponse(MultipleChoiceResponse):
 
 
 class NumericalResponse(GenericResponse):
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         try:
@@ -212,7 +212,7 @@ def sympy_check2():
   </customresponse>
 
     '''
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         ## CRITICAL TODO: Should cover all entrytypes
         ## NOTE: xpath will look at root of XML tree, not just 
@@ -256,7 +256,7 @@ class ExternalResponse(GenericResponse):
     
     Typically used by coding problems.
     '''
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.answer_ids = xml.xpath('//*[@id=$id]//textbox/@id|//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
@@ -316,7 +316,7 @@ class StudentInputError(Exception):
 #-----------------------------------------------------------------------------
 
 class FormulaResponse(GenericResponse):
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         self.samples = contextualize_text(xml.get('samples'), context)
@@ -397,7 +397,7 @@ class FormulaResponse(GenericResponse):
 #-----------------------------------------------------------------------------
 
 class SchematicResponse(GenericResponse):
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.answer_ids = xml.xpath('//*[@id=$id]//schematic/@id',
                                     id=xml.get('id'))
@@ -442,7 +442,7 @@ class ImageResponse(GenericResponse):
     </imageresponse>
 
     """
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.context = context
         self.ielements = xml.findall('imageinput')

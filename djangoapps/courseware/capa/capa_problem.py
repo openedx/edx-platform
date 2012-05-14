@@ -79,13 +79,14 @@ html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formul
 #                         }
 
 class LoncapaProblem(object):
-    def __init__(self, fileobject, id, state=None, seed=None):
+    def __init__(self, fileobject, id, state=None, seed=None, system=None):
         ## Initialize class variables from state
         self.seed = None
         self.student_answers = dict()
         self.correct_map = dict()
         self.done = False
         self.problem_id = id
+        self.system = system
 
         if seed != None:
             self.seed = seed
