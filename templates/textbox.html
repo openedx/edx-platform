@@ -1,11 +1,11 @@
-<section class="text-input">
+<section id="textbox_${id}" class="textbox">
   <textarea rows="30" cols="80" name="input_${id}" id="input_${id}">${value|h}</textarea>
 
   <span id="answer_${id}"></span>
 
   % if state == 'unsubmitted':
   <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif state == 'correct': 
+  % elif state == 'correct':
   <span class="correct" id="status_${id}"></span>
   % elif state == 'incorrect':
   <span class="incorrect" id="status_${id}"></span>
@@ -18,17 +18,21 @@
   <span class="debug">${msg|n}</span>
   <br/>
 
-<br/>
-<script>
-// Note: We need to make the area follow the CodeMirror for this to 
-// work. 
-$(function(){
-  var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), 
-                                   {'mode':"python"});
-});
-</script>
-<style type="text/css">
-  .CodeMirror {border-style: solid;
-              border-width: 1px;}
-</style>
+  <br/>
+
+  <script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/codemirror.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/python.js"></script>
+  <link rel="stylesheet" href="${ settings.LIB_URL }CodeMirror/codemirror.css" />
+  <script>
+    // Note: We need to make the area follow the CodeMirror for this to work.
+    $(function(){
+      var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), {
+        mode: "python"
+      });
+    });
+  </script>
+  <style type="text/css">
+    .CodeMirror {border-style: solid;
+      border-width: 1px;}
+  </style>
 </section>
