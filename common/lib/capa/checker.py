@@ -32,7 +32,7 @@ def main():
         log.info("Opening {0}".format(problem_file.name))
 
         try:
-            problem = LoncapaProblem(problem_file.name, "fakeid", seed=args.seed)
+            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed)
         except Exception as ex:
             log.error("Could not parse file {0}".format(problem_file.name))
             log.exception(ex)
