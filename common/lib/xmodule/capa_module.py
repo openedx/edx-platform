@@ -222,6 +222,8 @@ class Module(XModule):
         self.weight=only_one(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
             seed = 1
+        elif self.rerandomize == "per_student" and hasattr(system, 'id'):
+            seed = system.id
         else:
             seed = None
         try:
