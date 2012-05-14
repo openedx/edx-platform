@@ -127,7 +127,7 @@ class LoncapaProblem(object):
             responder.preprocess_response()
 
     def __unicode__(self):
-        return u"LoncapaProblem ({0})".format(os.path.basename(self.filename))
+        return u"LoncapaProblem ({0})".format(os.path.basename(self.fileobject.name))
 
     def get_state(self):
         ''' Stored per-user session data neeeded to: 
