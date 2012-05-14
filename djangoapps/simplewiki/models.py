@@ -9,7 +9,7 @@ from django.db.models import signals
 from django.utils.translation import ugettext_lazy as _
 from markdown import markdown
 
-from settings import *
+from wiki_settings import *
 from util.cache import cache
 
 
