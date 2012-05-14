@@ -68,10 +68,10 @@ class MultipleChoiceResponse(GenericResponse):
 
     <multiplechoiceresponse direction="vertical" randomize="yes">
      <choicegroup type="MultipleChoice">
-        <choice location="random" name="1" correct="false"><span>`a+b`<br/></span></choice>
-        <choice location="random" name="2" correct="true"><span><math>a+b^2</math><br/></span></choice>
-        <choice location="random" name="3" correct="false"><math>a+b+c</math></choice>
-        <choice location="bottom" name="4" correct="false"><math>a+b+d</math></choice>
+        <choice location="random" correct="false"><span>`a+b`<br/></span></choice>
+        <choice location="random" correct="true"><span><math>a+b^2</math><br/></span></choice>
+        <choice location="random" correct="false"><math>a+b+c</math></choice>
+        <choice location="bottom" correct="false"><math>a+b+d</math></choice>
      </choicegroup>
     </multiplechoiceresponse>
 
@@ -406,7 +406,7 @@ class SchematicResponse(GenericResponse):
                            id=xml.get('id'))[0]
         answer_src = answer.get('src')
         if answer_src != None:
-            self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
+            self.code = self.system.filestore.open('src/'+answer_src).read() # Untested; never used
         else:
             self.code = answer.text
 
