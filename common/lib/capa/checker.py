@@ -11,6 +11,7 @@ import sys
 
 from cStringIO import StringIO
 
+from calc import UndefinedVariable
 from capa_problem import LoncapaProblem
 
 logging.basicConfig(format="%(levelname)s %(message)s")
@@ -108,6 +109,9 @@ def check_that_suggested_answers_work(problem):
             log.debug(real_results)
             assert(all(result == 'correct'
                        for answer_id, result in real_results.items()))
+        except UndefinedVariable as uv_exc:
+            log.error("The variable \"{0}\" specified in the ".format(uv_exc) + 
+                      "solution isn't recognized (is it a units measure?).")
         except AssertionError:
             log.error("The following generated answers were not accepted for {0}:"
                       .format(problem))
