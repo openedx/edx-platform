@@ -32,7 +32,6 @@ from lxml.html.soupparser import fromstring as fromstring_bs	# uses Beautiful So
 import calc
 import eia
 
-
 def compare_with_tolerance(v1, v2, tol):
     ''' Compare v1 to v2 with maximum tolerance tol
     tol is relative if it ends in %; otherwise, it is absolute
@@ -238,6 +237,7 @@ def sympy_check2():
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
         '''
+        from capa_problem import global_context
         submission = [student_answers[k] for k in sorted(self.answer_ids)]
         self.context.update({'submission':submission})
         exec self.code in global_context, self.context
@@ -411,6 +411,7 @@ class SchematicResponse(GenericResponse):
             self.code = answer.text
 
     def grade(self, student_answers):
+        from capa_problem import global_context
         submission = [json.loads(student_answers[k]) for k in sorted(self.answer_ids)]
         self.context.update({'submission':submission})
         exec self.code in global_context, self.context
