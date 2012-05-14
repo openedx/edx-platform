@@ -1,0 +1,3 @@
+django-nose
+coverage
+nosexcover
