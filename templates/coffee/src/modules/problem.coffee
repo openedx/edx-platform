@@ -25,7 +25,7 @@ class @Problem
 
   check: =>
     Logger.log 'problem_check', @answers
-    $.post "/modx/problem/#{@id}/problem_check", @answers, (response) =>
+    $.postWithPrefix "/modx/problem/#{@id}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
           @render(response.contents)
@@ -34,18 +34,18 @@ class @Problem
 
   reset: =>
     Logger.log 'problem_reset', @answers
-    $.post "/modx/problem/#{@id}/problem_reset", id: @id, (content) =>
+    $.postWithPrefix "/modx/problem/#{@id}/problem_reset", id: @id, (content) =>
       @render(content)
 
   show: =>
     Logger.log 'problem_show', problem: @id
-    $.post "/modx/problem/#{@id}/problem_show", (response) =>
+    $.postWithPrefix "/modx/problem/#{@id}/problem_show", (response) =>
       $.each response, (key, value) =>
         @$("#answer_#{key}").text(value)
 
   save: =>
     Logger.log 'problem_save', @answers
-    $.post "/modx/problem/#{@id}/problem_save", @answers, (response) =>
+    $.postWithPrefix "/modx/problem/#{@id}/problem_save", @answers, (response) =>
       if response.success
         alert 'Saved'
 

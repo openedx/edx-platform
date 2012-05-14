@@ -45,7 +45,7 @@ class VideoCaption
       .append($('<li class="spacing">').height(@bottomSpacingHeight()))
 
   fetchCaption: ->
-    $.getJSON @captionURL(), (captions) =>
+    $.getWithPrefix @captionURL(), (captions) =>
       @captions = captions.text
       @start = captions.start
       for index in [0...captions.start.length]

@@ -60,7 +60,7 @@ describe 'Calculator', ->
       @calculator.calculate()
 
     it 'send data to /calculate', ->
-      expect($.getJSON).toHaveBeenCalledWith '/calculate',
+      expect($.getWithPrefix).toHaveBeenCalledWith '/calculate',
         equation: '1+2'
       , jasmine.any(Function)
 

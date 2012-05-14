@@ -36,7 +36,7 @@ class @Sequence
   render: (new_position) ->
     if @position != undefined
       @mark_visited @position
-      $.post "/modx/#{@tag}/#{@id}/goto_position", position: new_position
+      $.postWithPrefix "/modx/#{@tag}/#{@id}/goto_position", position: new_position
 
     if @position != new_position
       @mark_active new_position
