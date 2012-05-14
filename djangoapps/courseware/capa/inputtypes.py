@@ -62,7 +62,7 @@ def textline(element, value, state, msg=""):
 #-----------------------------------------------------------------------------
 # TODO: Make a wrapper for <formulainput>
 # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-def js_textline(element, value, state, msg=""):
+def jstextline(element, value, state, msg=""):
         '''
         textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
         '''
@@ -76,7 +76,7 @@ def js_textline(element, value, state, msg=""):
                    'dojs':dojs,
                    'msg':msg,
                    }
-        html=render_to_string("textinput.html", context)
+        html=render_to_string("jstext.html", context)
         return etree.XML(html)
 
 #-----------------------------------------------------------------------------

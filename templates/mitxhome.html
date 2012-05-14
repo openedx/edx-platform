@@ -1,0 +1,37 @@
+<%inherit file="main.html" />
+
+<%block name="js_extra">
+<script>
+
+$(document).ready(function(){
+   //if(!page) {
+   //  cookie_page = $.cookie("book_page");
+   //  if(cookie_page) {
+   //    goto_page(cookie_page);
+   //  }
+   //}
+
+   $(".handouts ol").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
+});
+
+</script>
+</%block>
+
+<%block name="title"><title>MITx Home</title></%block>
+
+<%include file="navigation.html" args="active_page='info'" />
+
+<section class="main-content">
+  <div class="info-wrapper">
+    <section class="updates">
+   <h2>Welcome to MITx</h2>
+   <hr width="100%">
+   <h3>Courses available:</h3>
+    <ul>
+      <li><a href=${ MITX_ROOT_URL }/courseware/6.002_Spring_2012/>6.002 (Spring 2012)</a></li>
+      <li><a href=${ MITX_ROOT_URL }/courseware/8.02_Spring_2013/>8.02 (Spring 2013)</a></li>
+      <li><a href=${ MITX_ROOT_URL }/courseware/8.01_Spring_2013/>8.01 (Spring 201x)</a></li>
+   </ul>
+  </section>
+</div>
+</section>

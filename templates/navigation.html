@@ -2,7 +2,13 @@
 <div class="header-wrapper">
   <header>
     <hgroup>
-      <h1><em>MITx</em></h1>
+      <h1><em>
+        % if settings.ENABLE_MULTICOURSE:
+            <a href="${ MITX_ROOT_URL }/mitxhome" style="color:black;">MITx</a>
+        % else:
+            MITx
+        % endif
+       </em></h1>
       <h2><a href="${ MITX_ROOT_URL }/courseware/">${ settings.COURSE_TITLE }</a></h2>
     </hgroup>
 

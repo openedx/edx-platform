@@ -3,7 +3,8 @@ function ${ id }_content_updated() {
   update_schematics();
 
   $('#check_${ id }').unbind('click').click(function() {
-    $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
+  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
+  $(".CodeMirror").each(function(index,element){ if (element.CodeMirror.save) element.CodeMirror.save(); });
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
 	    if (value.type==="checkbox"){
@@ -52,6 +53,8 @@ function ${ id }_content_updated() {
     log_event('problem_reset', submit_data);
   });
 
+  // show answer button
+  // TODO: the button should turn into "hide answer" afterwards
   $('#show_${ id }').unbind('click').click(function() {
     postJSON('${ MITX_ROOT_URL }/modx/problem/${ id }/problem_show', {}, function(data) {
       for (var key in data) {
