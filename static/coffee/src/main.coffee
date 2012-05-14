@@ -1,3 +1,9 @@
+jQuery.postWithPrefix = (url, data, callback, type) ->
+  $.post("#{Courseware.prefix}#{url}", data, callback, type)
+
+jQuery.getWithPrefix = (url, data, callback, type) ->
+  $.get("#{Courseware.prefix}#{url}", data, callback, type)
+
 $ ->
   $.ajaxSetup
     headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
@@ -18,8 +24,8 @@ $ ->
       element.schematic.update_value()
 
     schematic_value $("#schematic_#{circuit_id}").attr("value")
-    $.post "/save_circuit/#{circuit_id}", schematic: schematic_value, (data) ->
+    $.postWithPrefix "/save_circuit/#{circuit_id}", schematic: schematic_value, (data) ->
       alert('Saved') if data.results == 'success'
 
   window.postJSON = (url, data, callback) ->
-    $.post url, data, callback
+    $.postWithPrefix url, data, callback

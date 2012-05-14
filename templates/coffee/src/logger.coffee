@@ -1,6 +1,6 @@
 class @Logger
   @log: (event_type, data) ->
-    $.getJSON '/event',
+    $.getWithPrefix '/event',
       event_type: event_type
       event: JSON.stringify(data)
       page: window.location.href
@@ -8,7 +8,7 @@ class @Logger
   @bind: ->
     window.onunload = ->
       $.ajax
-        url: '/event'
+        url: "#{Courseware.prefix}/event"
         data:
           event_type: 'page_close'
           event: ''

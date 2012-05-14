@@ -16,7 +16,7 @@ describe 'FeedbackForm', ->
       $('#feedback_message').val 'This site is really good.'
       $('#feedback_button').click()
 
-      expect($.post).toHaveBeenCalledWith '/send_feedback', {
+      expect($.postWithPrefix).toHaveBeenCalledWith '/send_feedback', {
         subject: 'Awesome!'
         message: 'This site is really good.'
         url: window.location.href

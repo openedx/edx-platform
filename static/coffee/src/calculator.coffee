@@ -20,5 +20,5 @@ class @Calculator
     $('.help').toggleClass 'shown'
 
   calculate: ->
-    $.getJSON '/calculate', { equation: $('#calculator_input').val() }, (data) ->
+    $.getWithPrefix '/calculate', { equation: $('#calculator_input').val() }, (data) ->
       $('#calculator_output').val(data.result)
