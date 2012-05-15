@@ -186,7 +186,7 @@ class Module(XModule):
         if state!=None and 'attempts' in state:
             self.attempts=state['attempts']
 
-        self.filename="problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
+        self.filename=content_parser.item(dom2.xpath('/problem/@filename')) # "problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
         self.weight=content_parser.item(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':

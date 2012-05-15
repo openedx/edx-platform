@@ -72,12 +72,12 @@ html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formul
 
 # removed in MC
 ## These should be transformed
-html_special_response = {"textline":inputtypes.textline.render,
-                         "schematic":inputtypes.schematic.render,
-                         "textbox":inputtypes.textbox.render,
-                         "formulainput":inputtypes.jstextline.render,
+#html_special_response = {"textline":inputtypes.textline.render,
+#                         "schematic":inputtypes.schematic.render,
+#                         "textbox":inputtypes.textbox.render,
+#                         "formulainput":inputtypes.jstextline.render,
 #                         "solution":inputtypes.solution.render,
-                         }
+#                         }
 
 class LoncapaProblem(object):
     def __init__(self, fileobject, id, state=None, seed=None, system=None):
@@ -280,6 +280,7 @@ class LoncapaProblem(object):
         '''
         response_id = 1
         for response in tree.xpath('//'+"|//".join(response_types)):
+            print self.problem_id
             response_id_str=self.problem_id+"_"+str(response_id)
             response.attrib['id']=response_id_str
             if response_id not in correct_map:
