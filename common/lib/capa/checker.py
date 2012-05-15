@@ -19,7 +19,7 @@ log = logging.getLogger('capa.checker')
 
 def main():
     parser = argparse.ArgumentParser(description='Check Problem Files')
-    parser.add_argument("command", choices=['test']) # Watch? Render? Open?
+    parser.add_argument("command", choices=['test', 'show']) # Watch? Render? Open?
     parser.add_argument("files", nargs="+", type=argparse.FileType('r'))
     parser.add_argument("--seed", required=False, type=int)
     parser.add_argument("--log-level", required=False, default="INFO",
@@ -41,10 +41,17 @@ def main():
 
         if args.command == 'test':
             command_test(problem)
+        elif args.command == 'show':
+            command_show(problem)
 
         problem_file.close()
 
     # In case we want to do anything else here.
+
+def command_show(problem):
+    """Display the text for this problem"""
+    print problem.get_html()
+    
 
 def command_test(problem):
     # We're going to trap stdout/stderr from the problems (yes, some print)    
