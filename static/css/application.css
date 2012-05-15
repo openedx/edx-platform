@@ -2966,23 +2966,121 @@ section.course-index div#accordion ul.ui-accordion-content {
   font-size: 12px;
   margin: 0; }
 section.course-index div#accordion ul.ui-accordion-content li {
-  position: relative; }
-section.course-index div#accordion ul.ui-accordion-content li.active {
-  font-weight: bold; }
-section.course-index div#accordion ul.ui-accordion-content li.active span.subtitle {
-  font-weight: normal; }
+  background: transparent;
+  border: 1px solid transparent;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  margin-bottom: 11.326px;
+  position: relative;
+  padding: 5px 10px;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: linear;
+  -moz-transition-timing-function: linear;
+  -ms-transition-timing-function: linear;
+  -o-transition-timing-function: linear;
+  transition-timing-function: linear;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
 section.course-index div#accordion ul.ui-accordion-content li a {
   text-decoration: none;
-  margin-bottom: 11.326px;
   display: block;
   color: #000; }
-section.course-index div#accordion ul.ui-accordion-content li a:hover {
-  color: #666; }
 section.course-index div#accordion ul.ui-accordion-content li a p {
   margin-bottom: 0; }
 section.course-index div#accordion ul.ui-accordion-content li a p span.subtitle {
   color: #666;
   display: block; }
+section.course-index div#accordion ul.ui-accordion-content li:after {
+  background: transparent;
+  border-top: 1px solid #b4b4b4;
+  border-right: 1px solid #b4b4b4;
+  content: "";
+  display: block;
+  height: 13px;
+  opacity: 0;
+  position: absolute;
+  top: 14px;
+  right: 30px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -ms-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: linear;
+  -moz-transition-timing-function: linear;
+  -ms-transition-timing-function: linear;
+  -o-transition-timing-function: linear;
+  transition-timing-function: linear;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  width: 13px; }
+section.course-index div#accordion ul.ui-accordion-content li:hover {
+  background-image: -webkit-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  background-image: -moz-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  background-image: -ms-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  background-image: -o-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  background-image: linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  border-color: #c8c8c8; }
+section.course-index div#accordion ul.ui-accordion-content li:hover:after {
+  opacity: 1;
+  right: 15px; }
+section.course-index div#accordion ul.ui-accordion-content li:hover a {
+  color: #666; }
+section.course-index div#accordion ul.ui-accordion-content li:active {
+  background-image: -webkit-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  background-image: -moz-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  background-image: -ms-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  background-image: -o-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  background-image: linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+  border-color: #c8c8c8;
+  -webkit-box-shadow: inset 0 0 14px 0 rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0 0 14px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 14px 0 rgba(0, 0, 0, 0.1); }
+section.course-index div#accordion ul.ui-accordion-content li:active:after {
+  opacity: 1;
+  right: 15px; }
+section.course-index div#accordion ul.ui-accordion-content li.active {
+  background: #f0f0f0;
+  background-image: -webkit-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+  background-image: -moz-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+  background-image: -ms-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+  background-image: -o-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+  background-image: linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+  border-color: #c8c8c8;
+  font-weight: bold; }
+section.course-index div#accordion ul.ui-accordion-content li.active span.subtitle {
+  font-weight: normal; }
+section.course-index div#accordion ul.ui-accordion-content li.active:after {
+  opacity: 1;
+  right: 15px; }
 
 @-moz-document url-prefix() {
   a.add-fullscreen {
