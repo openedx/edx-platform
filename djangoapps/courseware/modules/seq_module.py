@@ -2,7 +2,7 @@ import json
 
 from lxml import etree
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_string
 
 from x_module import XModule
 
@@ -104,11 +104,11 @@ class Module(XModule):
 
     def __init__(self, system, xml, item_id, state=None):
         XModule.__init__(self, system, xml, item_id, state)
-        self.xmltree=etree.fromstring(xml)
+        self.xmltree = etree.fromstring(xml)
 
         self.position = 1
 
-        if state!=None:
+        if state != None:
             state = json.loads(state)
             if 'position' in state: self.position = int(state['position'])
 
