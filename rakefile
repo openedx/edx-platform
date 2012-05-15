@@ -79,6 +79,7 @@ task :package do
             "--exclude=rakefile",
             "--exclude=.git",
             "--exclude=**/*.pyc",
+            "--exclude=reports",
             "-C", "#{REPO_ROOT}",
             "--provides=#{PACKAGE_NAME}",
             "--name=#{NORMALIZED_DEPLOY_NAME}",
