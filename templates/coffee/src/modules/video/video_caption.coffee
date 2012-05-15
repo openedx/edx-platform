@@ -1,6 +1,5 @@
 class VideoCaption
   constructor: (@player, @youtubeId) ->
-    @index = []
     @render()
     @bind()
 
@@ -29,6 +28,12 @@ class VideoCaption
     @$('.subtitles').css maxHeight: @$('.video-wrapper').height() - 5
     @fetchCaption()
 
+  fetchCaption: ->
+    $.getWithPrefix @captionURL(), (captions) =>
+      @captions = captions.text
+      @start = captions.start
+      @renderCaption()
+
   renderCaption: ->
     container = $('<ol>')
 
@@ -44,28 +49,28 @@ class VideoCaption
     @$('.subtitles').prepend($('<li class="spacing">').height(@topSpacingHeight()))
       .append($('<li class="spacing">').height(@bottomSpacingHeight()))
 
-  fetchCaption: ->
-    $.getWithPrefix @captionURL(), (captions) =>
-      @captions = captions.text
-      @start = captions.start
-      for index in [0...captions.start.length]
-        for time in [captions.start[index]..captions.end[index]]
-          @index[time] ||= []
-          @index[time].push(index)
-      @renderCaption()
+  search: (time) ->
+    min = 0
+    max = @start.length - 1
+
+    while min < max
+      index = Math.ceil((max + min) / 2)
+      if time < @start[index]
+        max = index - 1
+      if time >= @start[index]
+        min = index
+
+    return min
 
   onUpdatePlayTime: (event, time) =>
     # This 250ms offset is required to match the video speed
     time = Math.round(Time.convert(time, @player.currentSpeed(), '1.0') * 1000 + 250)
-    newIndex = @index[time]
+    newIndex = @search time
 
     if newIndex != undefined && @currentIndex != newIndex
       if @currentIndex
-        for index in @currentIndex
-          @$(".subtitles li[data-index='#{index}']").removeClass('current')
-
-      for index in newIndex
-        @$(".subtitles li[data-index='#{newIndex}']").addClass('current')
+        @$(".subtitles li.current").removeClass('current')
+      @$(".subtitles li[data-index='#{newIndex}']").addClass('current')
 
       @currentIndex = newIndex
       @scrollCaption()
