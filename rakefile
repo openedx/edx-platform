@@ -9,7 +9,7 @@ BUILD_DIR = File.join(REPO_ROOT, "build")
 DEPLOY_DIR = "/opt/wwc"
 PACKAGE_NAME = "mitx"
 LINK_PATH = "/opt/wwc/mitx"
-VERSION = "0.1"
+PKG_VERSION = "0.1"
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
 BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '')
 BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
@@ -72,7 +72,7 @@ task :package do
             "-C", "#{REPO_ROOT}",
             "--provides=#{PACKAGE_NAME}",
             "--name=#{NORMALIZED_DEPLOY_NAME}",
-            "--version=#{VERSION}",
+            "--version=#{PKG_VERSION}",
             "-a", "all",
             "."]
         system(*args) || raise("fpm failed to build the .deb")
@@ -80,5 +80,5 @@ task :package do
 end
 
 task :publish => :package do
-    sh("scp #{BUILD_DIR}/#{NORMALIZED_DEPLOY_NAME}_#{VERSION}*.deb #{PACKAGE_REPO}")
+    sh("scp #{BUILD_DIR}/#{NORMALIZED_DEPLOY_NAME}_#{PKG_VERSION}*.deb #{PACKAGE_REPO}")
 end
