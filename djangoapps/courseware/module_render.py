@@ -1,3 +1,4 @@
+import json
 import logging
 
 from lxml import etree
@@ -137,6 +138,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
         render_histogram = len(histogram) > 0
         content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
                                                                      'module_id' : module_id,
+                                                                     'histogram': json.dumps(histogram),
                                                                      'render_histogram' : render_histogram})
 
     content = {'content':content,

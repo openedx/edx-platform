@@ -66,7 +66,7 @@
         return this.calculator.calculate();
       });
       it('send data to /calculate', function() {
-        return expect($.getJSON).toHaveBeenCalledWith('/calculate', {
+        return expect($.getWithPrefix).toHaveBeenCalledWith('/calculate', {
           equation: '1+2'
         }, jasmine.any(Function));
       });

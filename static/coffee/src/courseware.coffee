@@ -22,3 +22,7 @@ class @Courseware
     $('.course-content .problems-wrapper').each ->
       id = $(this).attr('id').replace(/problem_/, '')
       new Problem id, $(this).data('url')
+    $('.course-content .histogram').each ->
+      id = $(this).attr('id').replace(/histogram_/, '')
+      new Histogram id, $(this).data('histogram')
+
