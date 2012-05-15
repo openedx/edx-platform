@@ -63,109 +63,109 @@ nav.sequence-nav {
         display: block;
         height: 17px;
         padding: 15px 0 14px;
+        position: relative;
         @include transition(all, .4s, $ease-in-out-quad);
         width: 100%;
 
-        // @media screen and (max-width: 800px) {
-          //   padding: 12px 8px;
-          // }
-
-          //video
-          &.seq_video_inactive {
-            @extend .inactive;
-            background-image: url('/static/images/sequence-nav/video-icon-normal.png');
-            background-position: center;
-          }
-
-          &.seq_video_visited {
-            @extend .visited;
-            background-image: url('/static/images/sequence-nav/video-icon-visited.png');
-            background-position: center;
-          }
-
-          &.seq_video_active {
-            @extend .active;
-            background-image: url('/static/images/sequence-nav/video-icon-current.png');
-            background-position: center;
-          }
-
-          //other
-          &.seq_other_inactive {
-            @extend .inactive;
-            background-image: url('/static/images/sequence-nav/document-icon-normal.png');
-            background-position: center;
-          }
-
-          &.seq_other_visited {
-            @extend .visited;
-            background-image: url('/static/images/sequence-nav/document-icon-visited.png');
-            background-position: center;
-          }
-
-          &.seq_other_active {
-            @extend .active;
-            background-image: url('/static/images/sequence-nav/document-icon-current.png');
-            background-position: center;
-          }
-
-          //vertical & problems
-          &.seq_vertical_inactive, &.seq_problem_inactive {
-            @extend .inactive;
-            background-image: url('/static/images/sequence-nav/list-icon-normal.png');
-            background-position: center;
-          }
-
-          &.seq_vertical_visited, &.seq_problem_visited {
-            @extend .visited;
-            background-image: url('/static/images/sequence-nav/list-icon-visited.png');
-            background-position: center;
-          }
-
-          &.seq_vertical_active, &.seq_problem_active {
-            @extend .active;
-            background-image: url('/static/images/sequence-nav/list-icon-current.png');
-            background-position: center;
-          }
+        //video
+        &.seq_video_inactive {
+          @extend .inactive;
+          background-image: url('/static/images/sequence-nav/video-icon-normal.png');
+          background-position: center;
         }
 
-      p {
-        // display: none;
-        // visibility: hidden;
-        background: #333;
-        color: #fff;
-        line-height: lh();
-        margin: 0px 0 0 -5px;
-        opacity: 0;
-        padding: 6px;
-        position: absolute;
-        text-shadow: 0 -1px 0 #000;
-        @include transition(all, .6s, $ease-in-out-quart);
-        white-space: pre-wrap;
-        z-index: 99;
-
-        &.shown {
-          margin-top: 4px;
-          opacity: 1;
+        &.seq_video_visited {
+          @extend .visited;
+          background-image: url('/static/images/sequence-nav/video-icon-visited.png');
+          background-position: center;
         }
 
-        &:empty {
-          background: none;
+        &.seq_video_active {
+          @extend .active;
+          background-image: url('/static/images/sequence-nav/video-icon-current.png');
+          background-position: center;
+        }
+
+        //other
+        &.seq_other_inactive {
+          @extend .inactive;
+          background-image: url('/static/images/sequence-nav/document-icon-normal.png');
+          background-position: center;
+        }
+
+        &.seq_other_visited {
+          @extend .visited;
+          background-image: url('/static/images/sequence-nav/document-icon-visited.png');
+          background-position: center;
+        }
+
+        &.seq_other_active {
+          @extend .active;
+          background-image: url('/static/images/sequence-nav/document-icon-current.png');
+          background-position: center;
+        }
+
+        //vertical & problems
+        &.seq_vertical_inactive, &.seq_problem_inactive {
+          @extend .inactive;
+          background-image: url('/static/images/sequence-nav/list-icon-normal.png');
+          background-position: center;
+        }
+
+        &.seq_vertical_visited, &.seq_problem_visited {
+          @extend .visited;
+          background-image: url('/static/images/sequence-nav/list-icon-visited.png');
+          background-position: center;
+        }
+
+        &.seq_vertical_active, &.seq_problem_active {
+          @extend .active;
+          background-image: url('/static/images/sequence-nav/list-icon-current.png');
+          background-position: center;
+        }
+
+       p {
+          background: #333;
+          color: #fff;
+          display: none;
+          line-height: lh();
+          left: 0px;
+          opacity: 0;
+          padding: 6px;
+          position: absolute;
+          top: 48px;
+          text-shadow: 0 -1px 0 #000;
+          @include transition(all, .1s, $ease-in-out-quart);
+          white-space: pre;
+          z-index: 99;
+
+          &:empty {
+            background: none;
+
+            &::after {
+              display: none;
+            }
+          }
 
           &::after {
-            display: none;
+            background: #333;
+            content: " ";
+            display: block;
+            height: 10px;
+            left: 18px;
+            position: absolute;
+            top: -5px;
+            @include transform(rotate(45deg));
+            width: 10px;
           }
         }
 
-        &::after {
-          background: #333;
-          content: " ";
-          display: block;
-          height: 10px;
-          left: 18px;
-          position: absolute;
-          top: -5px;
-          @include transform(rotate(45deg));
-          width: 10px;
+        &:hover {
+          p {
+            display: block;
+            margin-top: 4px;
+            opacity: 1;
+          }
         }
       }
     }
