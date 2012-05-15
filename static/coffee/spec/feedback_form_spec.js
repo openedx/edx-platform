@@ -18,7 +18,7 @@
         $('#feedback_subject').val('Awesome!');
         $('#feedback_message').val('This site is really good.');
         $('#feedback_button').click();
-        return expect($.post).toHaveBeenCalledWith('/send_feedback', {
+        return expect($.postWithPrefix).toHaveBeenCalledWith('/send_feedback', {
           subject: 'Awesome!',
           message: 'This site is really good.',
           url: window.location.href
