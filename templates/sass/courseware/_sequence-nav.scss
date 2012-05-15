@@ -1,15 +1,13 @@
 nav.sequence-nav {
   @extend .topbar;
-  @include box-sizing(border-box);
+  border-bottom: 1px solid darken($cream, 20%);
   margin-bottom: $body-line-height;
   position: relative;
-  top: -1px;
 
   ol {
-    border-bottom: 1px solid darken($cream, 20%);
-    border-top: 1px solid darken($cream, 20%);
     @include box-sizing(border-box);
     display: table;
+    height: 100%;
     padding-right: flex-grid(1, 9);
     width: 100%;
 
@@ -172,8 +170,8 @@ nav.sequence-nav {
   }
 
   ul {
-    margin-right: 1px;
     list-style: none !important;
+    height: 100%;
     position: absolute;
     right: 0;
     top: 0;

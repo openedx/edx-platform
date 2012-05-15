@@ -3567,19 +3567,15 @@ div.course-wrapper.closed section.course-content div.video-subtitles ol.subtitle
   max-height: 577px; }
 
 nav.sequence-nav {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  margin-bottom: 22.652px;
-  position: relative;
-  top: -1px; }
-nav.sequence-nav ol {
   border-bottom: 1px solid #e4d080;
-  border-top: 1px solid #e4d080;
+  margin-bottom: 22.652px;
+  position: relative; }
+nav.sequence-nav ol {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   display: table;
+  height: 100%;
   padding-right: 8.696%;
   width: 100%; }
 nav.sequence-nav ol li {
@@ -3722,8 +3718,8 @@ nav.sequence-nav ol li a:hover p {
   margin-top: 4px;
   opacity: 1; }
 nav.sequence-nav ul {
-  margin-right: 1px;
   list-style: none !important;
+  height: 100%;
   position: absolute;
   right: 0;
   top: 0;
