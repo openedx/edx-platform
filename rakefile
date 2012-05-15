@@ -29,6 +29,8 @@ CLOBBER.include('build')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
 task :test do
+    sh("pip install -r pre-requirements.txt")
+    sh("pip install -r requirements.txt")
     sh("pip install -r test-requirements.txt")
     sh("django-admin.py test --settings=envs.test --pythonpath=. $(ls djangoapps)")
 end
