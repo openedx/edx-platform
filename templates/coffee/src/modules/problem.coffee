@@ -42,16 +42,18 @@ class @Problem
       Logger.log 'problem_show', problem: @id
       $.postWithPrefix "/modx/problem/#{@id}/problem_show", (response) =>
         $.each response, (key, value) =>
-          if $.isArray(data[key])
-            $.each data[key], (index, answer_index) =>
-              @$("#label[for='input_#{key}_#{data[key][answer_index]}']").attr
+          if $.isArray(value)
+            $.each value, (index, answer_index) =>
+              @$("#label[for='input_#{key}_#{value[answer_index]}']").attr
                 correct_answer: 'true'
           @$("#answer_#{key}").text(value)
+        @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
     else
       @$('[id^=answer_]').text('')
       @$('[correct_answer]').attr(correct_answer: null)
-
+      @element.removeClass 'showed'
+      @$('.show').val 'Show Answer'
 
   save: =>
     Logger.log 'problem_save', @answers
