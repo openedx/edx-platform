@@ -4,6 +4,7 @@ require 'tempfile'
 # Build Constants
 REPO_ROOT = File.dirname(__FILE__)
 BUILD_DIR = File.join(REPO_ROOT, "build")
+REPORT_DIR = File.join(REPO_ROOT, "reports")
 
 # Packaging constants
 DEPLOY_DIR = "/opt/wwc"
@@ -25,18 +26,27 @@ NORMALIZED_DEPLOY_NAME = DEPLOY_NAME.downcase().gsub(/[_\/]/, '-')
 INSTALL_DIR_PATH = File.join(DEPLOY_DIR, NORMALIZED_DEPLOY_NAME)
 
 # Set up the clean and clobber tasks
-CLOBBER.include('build')
+CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
-task :pylint do
+task :default => [:pep8, :pylint, :test]
+
+directory REPORT_DIR
+
+task :pep8 => REPORT_DIR do
+    sh("pep8 djangoapps | tee #{REPORT_DIR}/pep8.report")
+end
+
+task :pylint => REPORT_DIR do
     Dir.chdir("djangoapps") do
         Dir["*"].each do |app|
-            sh("pylint -f parseable #{app} | tee #{app}.pylint")
+            sh("pylint -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
         end
     end
 end
 
-task :test do
+task :test => REPORT_DIR do
+    ENV['NOSE_XUNIT_FILE'] = File.join(REPORT_DIR, "nosetests.xml")
     sh("django-admin.py test --settings=envs.test --pythonpath=. $(ls djangoapps)")
 end
 
