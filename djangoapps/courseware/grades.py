@@ -87,17 +87,23 @@ def grade_sheet(student):
     grader = course_settings.GRADER
     grade_summary = grader.grade(totaled_scores)
     
-    letter_grade = None
-    for possible_grade in ['A', 'B', 'C']:
-        if grade_summary['percent'] >= course_settings.GRADE_CUTOFFS[possible_grade]:
-            letter_grade = possible_grade
-            break
+    letter_grade = grade_for_percentage(grade_summary['percent'])
     
     _log.debug("Final grade: " + str(letter_grade))
     
     return {'courseware_summary' : chapters,
             'grade_summary' : grade_summary,
             'grade' : letter_grade}
+            
+
+def grade_for_percentage(percentage):
+    letter_grade = None
+    for possible_grade in ['A', 'B', 'C']:
+        if percentage >= course_settings.GRADE_CUTOFFS[possible_grade]:
+            letter_grade = possible_grade
+            break
+    
+    return letter_grade
 
 def aggregate_scores(scores, section_name = "summary"):    
     total_correct_graded = sum(score.earned for score in scores if score.graded)

@@ -45,10 +45,13 @@ def gradebook(request):
                      'id' : s.id,
                      'email': s.email,
                      'grade_info' : grades.grade_sheet(s), 
-                     'realname' : UserProfile.objects.get(user = s).name
+                     'realname' : UserProfile.objects.get(user = s).name,
                      } for s in student_objects]
 
-    return render_to_response('gradebook.html',{'students':student_info})
+    return render_to_response('gradebook.html',
+        {'students':student_info,
+        'grade_cutoffs' : course_settings.GRADE_CUTOFFS,}
+    )
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile(request, student_id = None):
@@ -73,7 +76,8 @@ def profile(request, student_id = None):
              'language':user_info.language,
              'email':student.email,
              'format_url_params' : content_parser.format_url_params,
-             'csrf':csrf(request)['csrf_token']
+             'csrf':csrf(request)['csrf_token'],
+             'grade_cutoffs' : course_settings.GRADE_CUTOFFS,
              }
     context.update(grades.grade_sheet(student))
 
