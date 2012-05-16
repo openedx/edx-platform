@@ -68,11 +68,11 @@ footer {
           }
 
           a {
+            border-bottom: 0;
             display: block;
             height: 29px;
-            width: 28px;
             text-indent: -9999px;
-            border-bottom: 0;
+            width: 28px;
 
             &:hover {
               opacity: .8;

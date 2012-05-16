@@ -2,10 +2,10 @@ section.help.main-content {
   padding: lh();
 
   h1 {
-    margin-top: 0;
-    margin-bottom: lh();
-    padding-bottom: lh();
     border-bottom: 1px solid #ddd;
+    margin-bottom: lh();
+    margin-top: 0;
+    padding-bottom: lh();
   }
 
   p {
@@ -17,9 +17,9 @@ section.help.main-content {
   }
 
   section.self-help {
+    float: left;
     margin-bottom: lh();
     margin-right: flex-gutter();
-    float: left;
     width: flex-grid(6);
 
     ul {
@@ -36,17 +36,17 @@ section.help.main-content {
     width: flex-grid(6);
 
     dl {
-      margin-bottom: lh();
       display: block;
+      margin-bottom: lh();
 
       dd {
         margin-bottom: lh();
       }
 
       dt {
-        font-weight: bold;
-        float: left;
         clear: left;
+        float: left;
+        font-weight: bold;
         width: flex-grid(2, 6);
       }
     }

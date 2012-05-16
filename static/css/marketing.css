@@ -735,14 +735,14 @@ section.index-content section.staff h1 {
   margin-top: 25.888px; }
 
 #lean_overlay {
-  position: fixed;
-  z-index: 100;
-  top: 0px;
-  left: 0px;
-  height: 100%;
-  width: 100%;
   background: #000;
-  display: none; }
+  display: none;
+  height: 100%;
+  left: 0px;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 100; }
 
 div.leanModal_box {
   background: #fff;
@@ -772,8 +772,8 @@ div.leanModal_box a.modal_close {
   width: 14px;
   z-index: 2; }
 div.leanModal_box a.modal_close:hover {
-  text-decoration: none;
-  color: #993333; }
+  color: #993333;
+  text-decoration: none; }
 div.leanModal_box h1 {
   border-bottom: 1px solid #eee;
   font-size: 24px;
@@ -786,8 +786,8 @@ div.leanModal_box#enroll {
 div.leanModal_box#enroll ol {
   padding-top: 25.888px; }
 div.leanModal_box#enroll ol li.terms, div.leanModal_box#enroll ol li.honor-code {
-  width: auto;
-  float: none; }
+  float: none;
+  width: auto; }
 div.leanModal_box#enroll ol li div.tip {
   display: none; }
 div.leanModal_box#enroll ol li:hover div.tip {
@@ -828,16 +828,16 @@ div.leanModal_box form ol li.terms, div.leanModal_box form ol li.remember {
   padding-top: 25.888px;
   width: auto; }
 div.leanModal_box form ol li.honor-code {
-  width: auto;
-  float: none; }
+  float: none;
+  width: auto; }
 div.leanModal_box form ol li label {
   display: block;
   font-weight: bold; }
 div.leanModal_box form ol li input[type="email"], div.leanModal_box form ol li input[type="number"], div.leanModal_box form ol li input[type="password"], div.leanModal_box form ol li input[type="search"], div.leanModal_box form ol li input[type="tel"], div.leanModal_box form ol li input[type="text"], div.leanModal_box form ol li input[type="url"], div.leanModal_box form ol li input[type="color"], div.leanModal_box form ol li input[type="date"], div.leanModal_box form ol li input[type="datetime"], div.leanModal_box form ol li input[type="datetime-local"], div.leanModal_box form ol li input[type="month"], div.leanModal_box form ol li input[type="time"], div.leanModal_box form ol li input[type="week"], div.leanModal_box form ol li textarea {
-  width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  width: 100%; }
 div.leanModal_box form ol li input[type="checkbox"] {
   margin-right: 10px; }
 div.leanModal_box form ol li ul {
@@ -904,12 +904,12 @@ div#login header h1 {
   padding-bottom: 0;
   margin-bottom: 6.472px; }
 div#login ol li {
-  width: auto;
-  float: none; }
+  float: none;
+  width: auto; }
 
 div.lost-password {
-  text-align: left;
-  margin-top: 25.888px; }
+  margin-top: 25.888px;
+  text-align: left; }
 div.lost-password a {
   color: #999; }
 div.lost-password a:hover {
@@ -927,11 +927,11 @@ div#apply_name_change ul, div#change_email ul, div#unenroll ul, div#deactivate-a
 div#apply_name_change ul li, div#change_email ul li, div#unenroll ul li, div#deactivate-account ul li {
   margin-bottom: 12.944px; }
 div#apply_name_change ul li textarea, div#apply_name_change ul li input[type="email"], div#apply_name_change ul li input[type="number"], div#apply_name_change ul li input[type="password"], div#apply_name_change ul li input[type="search"], div#apply_name_change ul li input[type="tel"], div#apply_name_change ul li input[type="text"], div#apply_name_change ul li input[type="url"], div#apply_name_change ul li input[type="color"], div#apply_name_change ul li input[type="date"], div#apply_name_change ul li input[type="datetime"], div#apply_name_change ul li input[type="datetime-local"], div#apply_name_change ul li input[type="month"], div#apply_name_change ul li input[type="time"], div#apply_name_change ul li input[type="week"], div#change_email ul li textarea, div#change_email ul li input[type="email"], div#change_email ul li input[type="number"], div#change_email ul li input[type="password"], div#change_email ul li input[type="search"], div#change_email ul li input[type="tel"], div#change_email ul li input[type="text"], div#change_email ul li input[type="url"], div#change_email ul li input[type="color"], div#change_email ul li input[type="date"], div#change_email ul li input[type="datetime"], div#change_email ul li input[type="datetime-local"], div#change_email ul li input[type="month"], div#change_email ul li input[type="time"], div#change_email ul li input[type="week"], div#unenroll ul li textarea, div#unenroll ul li input[type="email"], div#unenroll ul li input[type="number"], div#unenroll ul li input[type="password"], div#unenroll ul li input[type="search"], div#unenroll ul li input[type="tel"], div#unenroll ul li input[type="text"], div#unenroll ul li input[type="url"], div#unenroll ul li input[type="color"], div#unenroll ul li input[type="date"], div#unenroll ul li input[type="datetime"], div#unenroll ul li input[type="datetime-local"], div#unenroll ul li input[type="month"], div#unenroll ul li input[type="time"], div#unenroll ul li input[type="week"], div#deactivate-account ul li textarea, div#deactivate-account ul li input[type="email"], div#deactivate-account ul li input[type="number"], div#deactivate-account ul li input[type="password"], div#deactivate-account ul li input[type="search"], div#deactivate-account ul li input[type="tel"], div#deactivate-account ul li input[type="text"], div#deactivate-account ul li input[type="url"], div#deactivate-account ul li input[type="color"], div#deactivate-account ul li input[type="date"], div#deactivate-account ul li input[type="datetime"], div#deactivate-account ul li input[type="datetime-local"], div#deactivate-account ul li input[type="month"], div#deactivate-account ul li input[type="time"], div#deactivate-account ul li input[type="week"] {
-  display: block;
-  width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  display: block;
+  width: 100%; }
 div#apply_name_change ul li textarea, div#change_email ul li textarea, div#unenroll ul li textarea, div#deactivate-account ul li textarea {
   height: 60px; }
 div#apply_name_change ul li input[type="submit"], div#change_email ul li input[type="submit"], div#unenroll ul li input[type="submit"], div#deactivate-account ul li input[type="submit"] {

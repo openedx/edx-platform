@@ -1,12 +1,12 @@
 #lean_overlay {
-  position: fixed;
-  z-index:100;
-  top: 0px;
-  left: 0px;
-  height:100%;
-  width:100%;
   background: #000;
   display: none;
+  height:100%;
+  left: 0px;
+  position: fixed;
+  top: 0px;
+  width:100%;
+  z-index:100;
 }
 
 div.leanModal_box {
@@ -31,8 +31,8 @@ div.leanModal_box {
     z-index: 2;
 
     &:hover{
-      text-decoration: none;
       color: $mit-red;
+      text-decoration: none;
     }
   }
 
@@ -55,8 +55,8 @@ div.leanModal_box {
       li {
 
         &.terms, &.honor-code {
-          width: auto;
           float: none;
+          width: auto;
         }
 
         div.tip {
@@ -118,8 +118,8 @@ div.leanModal_box {
         }
 
         &.honor-code {
-          width: auto;
           float: none;
+          width: auto;
         }
 
         label {
@@ -128,8 +128,8 @@ div.leanModal_box {
         }
 
         #{$all-text-inputs}, textarea {
-          width: 100%;
           @include box-sizing(border-box);
+          width: 100%;
         }
 
         input[type="checkbox"] {
@@ -176,15 +176,15 @@ div#login {
 
   ol {
     li {
-      width: auto;
       float: none;
+      width: auto;
     }
   }
 }
 
 div.lost-password {
-  text-align: left;
   margin-top: lh();
+  text-align: left;
 
   a {
     color: #999;
@@ -218,9 +218,9 @@ div#deactivate-account {
       margin-bottom: lh(.5);
 
       textarea, #{$all-text-inputs} {
+        @include box-sizing(border-box);
         display: block;
         width: 100%;
-        @include box-sizing(border-box);
       }
 
       textarea {
