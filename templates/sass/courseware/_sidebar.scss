@@ -26,14 +26,16 @@ section.course-index {
         }
 
         &.ui-state-active {
+          @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
           @extend .active;
+          //@include box-shadow(0 1px 3px 0 rgba(0,0,0, 0.15));
         }
       }
     }
 
     ul.ui-accordion-content {
       @include border-radius(0);
-      @include box-shadow( inset -1px 0 0 #e6e6e6);
+      @include box-shadow(inset -1px 0 0 #e6e6e6);
       background: #dadada;
       border: none;
       border-bottom: 1px solid #c3c3c3;
@@ -47,18 +49,19 @@ section.course-index {
         margin-bottom: lh(.5);
         position: relative;
         padding: 5px 10px;
-        @include transition(all, 0.15s, linear);
 
         a {
           text-decoration: none;
           display: block;
-          color: #000;
+          color: #666;
 
           p {
+            font-weight: bold;
             margin-bottom: 0;
 
             span.subtitle {
               color: #666;
+              font-weight: normal;
               display: block;
             }
           }
@@ -76,7 +79,6 @@ section.course-index {
           top: 14px;
           right: 30px;
           @include transform(rotate(45deg));
-          @include transition(all, 0.2s, linear);
           width: 13px;
         }
 
@@ -87,17 +89,17 @@ section.course-index {
           &:after {
             opacity: 1;
             right: 15px;
+            @include transition(all, 0.2s, linear);
           }
 
-          a {
-            color: #666;
+          > a p {
+            color: #333;
           }
         }
 
         &:active {
-          @include background-image(linear-gradient(-90deg, rgba(245,245,245, 0.4), rgba(230,230,230, 0.4)));
-          border-color: rgb(200,200,200);
-          @include box-shadow(inset 0 0 14px 0 rgba(0,0,0, 0.1));
+          @include box-shadow(inset 0 1px 14px 0 rgba(0,0,0, 0.1));
+          top: 1px;
 
           &:after {
             opacity: 1;
@@ -110,6 +112,10 @@ section.course-index {
           @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(230,230,230)));
           border-color: rgb(200,200,200);
           font-weight: bold;
+
+          > a p {
+            color: $mit-red;
+          }
 
           span.subtitle {
             font-weight: normal;
