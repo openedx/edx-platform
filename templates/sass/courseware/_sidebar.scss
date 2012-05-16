@@ -28,7 +28,6 @@ section.course-index {
         &.ui-state-active {
           @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
           @extend .active;
-          //@include box-shadow(0 1px 3px 0 rgba(0,0,0, 0.15));
         }
       }
     }
@@ -41,6 +40,7 @@ section.course-index {
       border-bottom: 1px solid #c3c3c3;
       font-size: 12px;
       margin: 0;
+      padding: 1em 1.5em;
 
       li {
         background: transparent;
