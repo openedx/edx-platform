@@ -3,6 +3,7 @@ nav.sequence-nav {
   border-bottom: 1px solid darken($cream, 20%);
   margin-bottom: $body-line-height;
   position: relative;
+  @include border-top-right-radius(4px);
 
   ol {
     @include box-sizing(border-box);
@@ -221,6 +222,7 @@ nav.sequence-nav {
       &.next {
         a {
           background-image: url('/static/images/sequence-nav/next-icon.png');
+          @include border-top-right-radius(4px);
 
           &:hover {
             background-color: none;
