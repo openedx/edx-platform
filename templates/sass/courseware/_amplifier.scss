@@ -1,13 +1,13 @@
 // JM MOSFET AMPLIFIER
 section.tool-wrapper {
-  background: #073642;
-  border-top: 1px solid darken(#002b36, 10%);
-  border-bottom: 1px solid darken(#002b36, 10%);
-  @include box-shadow(inset 0 0 0 4px darken(#094959, 2%));
-  margin: lh() (-(lh())) 0;
-  color: #839496;
   @extend .clearfix;
+  background: #073642;
+  border-bottom: 1px solid darken(#002b36, 10%);
+  border-top: 1px solid darken(#002b36, 10%);
+  @include box-shadow(inset 0 0 0 4px darken(#094959, 2%));
+  color: #839496;
   display: table;
+  margin: lh() (-(lh())) 0;
 
   div#graph-container {
     background: none;
@@ -29,24 +29,24 @@ section.tool-wrapper {
 
     ul.ui-tabs-nav {
       background: darken(#073642, 2%);
+      border-bottom: 1px solid darken(#073642, 8%);
+      @include border-radius(0);
       margin: (-(lh())) (-(lh())) 0;
       padding: 0;
       position: relative;
       width: 110%;
-      @include border-radius(0);
-      border-bottom: 1px solid darken(#073642, 8%);
 
       li {
-        margin-bottom: 0;
         background: none;
-        color: #fff;
         border: none;
         @include border-radius(0);
+        color: #fff;
+        margin-bottom: 0;
 
         &.ui-tabs-selected {
-          border-right: 1px solid darken(#073642, 8%);
-          border-left: 1px solid darken(#073642, 8%);
           background-color: #073642;
+          border-left: 1px solid darken(#073642, 8%);
+          border-right: 1px solid darken(#073642, 8%);
 
           &:first-child {
             border-left: none;
@@ -59,10 +59,10 @@ section.tool-wrapper {
 
         a {
           border: none;
-          font: bold 12px $body-font-family;
-          text-transform: uppercase;
-          letter-spacing: 1px;
           color: #839496;
+          font: bold 12px $body-font-family;
+          letter-spacing: 1px;
+          text-transform: uppercase;
 
           &:hover {
             color: #eee8d5;
@@ -86,18 +86,18 @@ section.tool-wrapper {
     div.graph-controls {
 
       div.music-wrapper {
-        padding: 0 0 lh();
-        margin-bottom: lh();
+        @extend .clearfix;
         border-bottom: 1px solid darken(#073642, 10%);
         @include box-shadow(0 1px 0 lighten(#073642, 2%));
-        @extend .clearfix;
+        margin-bottom: lh();
+        padding: 0 0 lh();
 
         input#playButton {
-          display: block;
-          @include button(simple, lighten( #586e75, 5% ));
-          font: bold 14px $body-font-family;
           border-color: darken(#002b36, 6%);
+          @include button(simple, lighten( #586e75, 5% ));
+          display: block;
           float: right;
+          font: bold 14px $body-font-family;
 
           &:active {
             @include box-shadow(none);
@@ -115,21 +115,21 @@ section.tool-wrapper {
       }
 
       div.inputs-wrapper {
-        @include clearfix;
-        margin-bottom: lh();
-        padding: 0 0 lh();
-        margin-bottom: lh();
+        @extend .clearfix;
         border-bottom: 1px solid darken(#073642, 10%);
         @include box-shadow(0 1px 0 lighten(#073642, 2%));
-        @extend .clearfix;
+        @include clearfix;
+        margin-bottom: lh();
+        margin-bottom: lh();
+        padding: 0 0 lh();
       }
 
       p {
+        font-weight: bold;
         @include inline-block();
         margin: 0;
-        -webkit-font-smoothing: antialiased;
-        font-weight: bold;
         text-shadow: 0 -1px 0 darken(#073642, 10%);
+        -webkit-font-smoothing: antialiased;
       }
 
       ul {
@@ -147,19 +147,19 @@ section.tool-wrapper {
       }
 
       div#graph-listen {
-        margin-top: 8px;
-        margin-right: 20px;
         display: block;
-        text-align: right;
         float: left;
         margin-bottom: 0;
+        margin-right: 20px;
+        margin-top: 8px;
+        text-align: right;
       }
     }
 
     label {
       @include border-radius(2px);
-      font-weight: bold;
       color: #fff;
+      font-weight: bold;
       padding: 3px;
       -webkit-font-smoothing: antialiased;
     }
@@ -188,33 +188,31 @@ section.tool-wrapper {
     }
 
     div.schematic-sliders {
-
       div.top-sliders {
-        padding: 0 0 lh();
-        margin-bottom: lh();
+        @extend .clearfix;
         border-bottom: 1px solid darken(#073642, 10%);
         @include box-shadow(0 1px 0 lighten(#073642, 2%));
-        @extend .clearfix;
+        margin-bottom: lh();
+        padding: 0 0 lh();
 
-      select#musicTypeSelect {
-        @include inline-block();
-        font: 16px $body-font-family;
-        margin-bottom: 0;
-      }
+        select#musicTypeSelect {
+          font: 16px $body-font-family;
+          @include inline-block();
+          margin-bottom: 0;
+        }
 
-      p {
-        @include inline-block();
-        -webkit-font-smoothing: antialiased;
-        text-shadow: 0 -1px 0 darken(#073642, 10%);
-        margin: 0 lh(.5) lh() 0;
-        font-weight: bold;
-      }
-
+        p {
+          font-weight: bold;
+          @include inline-block();
+          margin: 0 lh(.5) lh() 0;
+          text-shadow: 0 -1px 0 darken(#073642, 10%);
+          -webkit-font-smoothing: antialiased;
+        }
       }
 
       div.slider-label {
-        margin-bottom: lh(0.5);
         font-weight: bold;
+        margin-bottom: lh(0.5);
         text-shadow: 0 -1px 0 darken(#073642, 10%);
         -webkit-font-smoothing: antialiased;
       }
@@ -223,10 +221,10 @@ section.tool-wrapper {
         margin-bottom: lh(1);
 
         &.ui-slider-horizontal {
-          height: 0.4em;
           background: darken(#002b36, 2%);
           border: 1px solid darken(#002b36, 8%);
           @include box-shadow(none);
+          height: 0.4em;
         }
 
         .ui-slider-handle {
@@ -243,5 +241,3 @@ section.tool-wrapper {
     }
   }
 }
-
-

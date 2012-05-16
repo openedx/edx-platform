@@ -14,56 +14,53 @@ section.course-content {
     }
   }
 
-  div.video {
-  }
-
   div.video-subtitles {
-    @include clearfix();
-    padding: 6px lh();
-    margin: 0 (-(lh()));
-    border-top: 1px solid #e1e1e1;
-    border-bottom: 1px solid #e1e1e1;
     background: #f3f3f3;
+    border-bottom: 1px solid #e1e1e1;
+    border-top: 1px solid #e1e1e1;
+    @include clearfix();
     display: block;
+    margin: 0 (-(lh()));
+    padding: 6px lh();
 
     div.video-wrapper {
       float: left;
-      width: flex-grid(6, 9);
       margin-right: flex-gutter(9);
+      width: flex-grid(6, 9);
 
       div.video-player {
-        position: relative;
-        padding-bottom: 56.25%;
-        padding-top: 30px;
         height: 0;
         overflow: hidden;
+        padding-bottom: 56.25%;
+        padding-top: 30px;
+        position: relative;
 
         object {
+          height: 100%;
+          left: 0;
           position: absolute;
           top: 0;
-          left: 0;
           width: 100%;
-          height: 100%;
         }
 
         iframe#html5_player {
           border: none;
           display: none;
+          height: 100%;
+          left: 0;
           position: absolute;
           top: 0;
-          left: 0;
           width: 100%;
-          height: 100%;
         }
       }
 
       section.video-controls {
         @extend .clearfix;
         background: #333;
-        position: relative;
         border: 1px solid #000;
         border-top: 0;
         color: #ccc;
+        position: relative;
 
         &:hover {
           ul, div {
@@ -73,12 +70,12 @@ section.course-content {
 
         div#slider {
           @extend .clearfix;
-          @include border-radius(0);
-          @include box-shadow(inset 0 1px 0 #eee, 0 1px 0 #555);
           background: #c2c2c2;
           border: none;
-          border-top: 1px solid #000;
           border-bottom: 1px solid #000;
+          @include border-radius(0);
+          border-top: 1px solid #000;
+          @include box-shadow(inset 0 1px 0 #eee, 0 1px 0 #555);
           height: 7px;
           @include transition(height 2.0s ease-in-out);
 
@@ -96,54 +93,53 @@ section.course-content {
             font: bold 12px $body-font-family;
             margin-bottom: 6px;
             margin-right: 0;
+            overflow: visible;
             padding: 4px;
             text-align: center;
-            -webkit-font-smoothing: antialiased;
             text-shadow: 0 -1px 0 darken($mit-red, 10%);
-            overflow: visible;
+            -webkit-font-smoothing: antialiased;
 
             &::after {
-              content: " ";
-              width: 7px;
-              height: 7px;
-              display: block;
-              position: absolute;
+              background: $mit-red;
+              border-bottom: 1px solid darken($mit-red, 20%);
+              border-right: 1px solid darken($mit-red, 20%);
               bottom: -5px;
+              content: " ";
+              display: block;
+              height: 7px;
               left: 50%;
               margin-left: -3px;
+              position: absolute;
               @include transform(rotate(45deg));
-              background: $mit-red;
-              border-right: 1px solid darken($mit-red, 20%);
-              border-bottom: 1px solid darken($mit-red, 20%);
+              width: 7px;
             }
           }
 
           a.ui-slider-handle {
+            background: $mit-red url(/static/images/slider-handle.png) center center no-repeat;
+            @include background-size(50%);
+            border: 1px solid darken($mit-red, 20%);
             @include border-radius(15px);
             @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
-            background: $mit-red url(/static/images/slider-handle.png) center center no-repeat;
-            border: 1px solid darken($mit-red, 20%);
             cursor: pointer;
             height: 15px;
             margin-left: -7px;
             top: -4px;
-            width: 15px;
             @include transition(height 2.0s ease-in-out, width 2.0s ease-in-out);
-            @include background-size(50%);
+            width: 15px;
 
             &:focus, &:hover {
               background-color: lighten($mit-red, 10%);
               outline: none;
             }
           }
-
         }
 
         ul.vcr {
-          float: left;
-          margin-right: lh();
           @extend .dullify;
+          float: left;
           list-style: none;
+          margin-right: lh();
           padding: 0;
 
           li {
@@ -151,17 +147,16 @@ section.course-content {
             margin-bottom: 0;
 
             a {
-              @include box-shadow(1px 0 0 #555);
               border-bottom: none;
               border-right: 1px solid #000;
-              display: block;
+              @include box-shadow(1px 0 0 #555);
               cursor: pointer;
-              // height: 14px;
+              display: block;
               line-height: 46px;
               padding: 0 lh(.75);
               text-indent: -9999px;
-              width: 14px;
               @include transition();
+              width: 14px;
 
               &.play {
                 background: url('/static/images/play-icon.png') center center no-repeat;
@@ -178,21 +173,20 @@ section.course-content {
                   background-color: #444;
                 }
               }
-
             }
 
             div#vidtime {
-              padding-left: lh(.75);
               font-weight: bold;
               line-height: 46px; //height of play pause buttons
+              padding-left: lh(.75);
               -webkit-font-smoothing: antialiased;
             }
           }
         }
 
         div.secondary-controls {
-          float: right;
           @extend .dullify;
+          float: right;
 
           div.speeds {
             float: left;
@@ -201,10 +195,11 @@ section.course-content {
               background: url('/static/images/closed-arrow.png') 10px center no-repeat;
               border-left: 1px solid #000;
               border-right: 1px solid #000;
-              display: block;
               @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
               @include clearfix();
+              color: #fff;
               cursor: pointer;
+              display: block;
               line-height: 46px; //height of play pause buttons
               margin-right: 0;
               padding-left: 15px;
@@ -212,30 +207,29 @@ section.course-content {
               @include transition();
               -webkit-font-smoothing: antialiased;
               width: 110px;
-              color: #fff;
 
               &.open {
                 background: url('/static/images/open-arrow.png') 10px center no-repeat;
 
                 ol#video_speeds {
-                  opacity: 1;
                   display: block;
+                  opacity: 1;
                 }
               }
 
               h3 {
                 color: #999;
+                float: left;
                 font-size: 12px;
                 font-weight: normal;
-                float: left;
                 letter-spacing: 1px;
                 padding: 0 lh(.25) 0 lh(.5);
                 text-transform: uppercase;
               }
 
               p.active {
-                font-weight: bold;
                 float: left;
+                font-weight: bold;
                 margin-bottom: 0;
                 padding: 0 lh(.5) 0 0;
               }
@@ -245,14 +239,14 @@ section.course-content {
                 background-color: #444;
                 border: 1px solid #000;
                 @include box-shadow(inset 1px 0 0 #555, 0 3px 0 #444);
-                left: -1px;
                 display: none;
+                left: -1px;
+                opacity: 0;
                 position: absolute;
                 top:0;
+                @include transition();
                 width: 100%;
                 z-index: 10;
-                @include transition();
-                opacity: 0;
 
                 li {
                   border-bottom: 1px solid #000;
@@ -267,20 +261,20 @@ section.course-content {
 
                   &:last-child {
                     border-bottom: 0;
-                    margin-top: 0;
                     @include box-shadow(none);
+                    margin-top: 0;
                   }
 
                   &:hover {
-                    color: #aaa;
                     background-color: #666;
+                    color: #aaa;
                   }
                 }
               }
 
               &:hover {
-                opacity: 1;
                 background-color: #444;
+                opacity: 1;
               }
             }
           }
@@ -299,34 +293,33 @@ section.course-content {
             @include transition();
             width: 30px;
 
-
             &:hover {
+              background-color: #444;
               color: #fff;
               text-decoration: none;
-              background-color: #444;
             }
           }
 
           a.hide-subtitles {
-            float: left;
-            display: block;
-            padding: 0 lh(.5);
-            margin-left: 0;
-            color: #797979;
-            line-height: 46px; //height of play pause buttons
-            width: 30px;
-            text-indent: -9999px;
-            font-weight: 800;
             background: url('/static/images/cc.png') center no-repeat;
-            -webkit-font-smoothing: antialiased;
-            @include transition();
+            color: #797979;
+            display: block;
+            float: left;
+            font-weight: 800;
+            line-height: 46px; //height of play pause buttons
+            margin-left: 0;
             opacity: 1;
+            padding: 0 lh(.5);
             position: relative;
+            text-indent: -9999px;
+            @include transition();
+            -webkit-font-smoothing: antialiased;
+            width: 30px;
 
             &:hover {
+              background-color: #444;
               color: #fff;
               text-decoration: none;
-              background-color: #444;
             }
 
             &.off {
@@ -358,10 +351,10 @@ section.course-content {
 
     ol.subtitles {
       float: left;
-      width: flex-grid(3, 9);
-      padding-top: 10px;
       max-height: 460px;
       overflow: hidden;
+      padding-top: 10px;
+      width: flex-grid(3, 9);
 
       li {
         border: 0;
@@ -398,43 +391,43 @@ section.course-content {
       }
 
       ol.subtitles {
-        width: 0px;
         height: 0;
+        width: 0px;
       }
     }
 
     &.fullscreen {
       background: rgba(#000, .95);
       border: 0;
-      margin: 0;
       bottom: 0;
       height: 100%;
       left: 0;
+      margin: 0;
       max-height: 100%;
+      overflow: hidden;
       padding: 0;
       position: fixed;
       top: 0;
       width: 100%;
       z-index: 999;
-      overflow: hidden;
 
       &.closed {
         ol.subtitles {
-          width: auto;
           height: auto;
           right: -(flex-grid(4));
+          width: auto;
         }
       }
 
       a.exit {
-        position: absolute;
-        top: 20px;
-        left: 20px;
         color: #aaa;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-style: 12px;
         display: none;
+        font-style: 12px;
+        left: 20px;
+        letter-spacing: 1px;
+        position: absolute;
+        text-transform: uppercase;
+        top: 20px;
 
         &::after {
           content: "✖";
@@ -453,33 +446,33 @@ section.course-content {
         }
 
         object#myytplayer, iframe {
-          height: 100%;
-          position: fixed;
-          top: 0;
           bottom: 0;
+          height: 100%;
           left: 0;
           overflow: hidden;
+          position: fixed;
+          top: 0;
         }
 
         section.video-controls {
-          position: absolute;
           bottom: 0;
           left: 0;
+          position: absolute;
           width: 100%;
           z-index: 9999;
         }
       }
 
       ol.subtitles {
-        position: fixed;
-        top: 0;
-        right: 0;
+        background: rgba(#000, .8);
         bottom: 0;
         height: 100%;
-        background: rgba(#000, .8);
-        padding: lh();
-        max-width: flex-grid(3);
         max-height: 100%;
+        max-width: flex-grid(3);
+        padding: lh();
+        position: fixed;
+        right: 0;
+        top: 0;
         @include transition();
 
         li {
