@@ -488,7 +488,8 @@ html body section.main-content, html body section.outside-app {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  margin-top: 3px; }
+  margin-top: 3px;
+  overflow: hidden; }
 @media print {
   html body section.main-content, html body section.outside-app {
     border-bottom: 0;
@@ -506,6 +507,7 @@ html body section.main-content, html body section.outside-app {
     border-radius: 4px;
     margin-top: 11.326px; } }
 html body div.qtip div.ui-tooltip-content {
+  background: #000;
   background: rgba(0, 0, 0, 0.8);
   border: none;
   color: #fff;
