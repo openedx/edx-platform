@@ -8,8 +8,8 @@ section.course-index {
       overflow: hidden;
       margin: 0;
 
-      &:last-child {
-        @include box-shadow(none);
+      &:first-child {
+        border: none;
       }
 
       &.ui-accordion-header {
@@ -20,14 +20,10 @@ section.course-index {
           color: lighten($text-color, 10%);
         }
 
-        &.ui-state-hover {
-          border: none;
-          border-bottom: 1px solid #d3d3d3;
-        }
-
         &.ui-state-active {
           @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
           @extend .active;
+          border-bottom: 1px solid #d3d3d3;
         }
       }
     }
