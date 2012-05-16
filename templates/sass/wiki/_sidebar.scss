@@ -3,20 +3,20 @@ div#wiki_panel {
   overflow: auto;
 
   h2 {
-    padding: lh(.5) lh();
+    @extend .bottom-border;
     font-size: 18px;
     margin: 0 ;
-    @extend .bottom-border;
+    padding: lh(.5) lh();
   }
 
   input[type="button"] {
     @extend h3;
-    @include transition();
     color: lighten($text-color, 10%);
     font-size: $body-font-size;
     margin: 0  !important;
     padding: 7px lh();
     text-align: left;
+    @include transition();
     width: 100%;
 
     &:hover {
@@ -28,8 +28,8 @@ div#wiki_panel {
   ul {
     li {
       &.search {
-        @include box-shadow(0 1px 0 #eee);
         border-bottom: 1px solid #d3d3d3;
+        @include box-shadow(0 1px 0 #eee);
         padding: 7px lh();
 
         label {
@@ -49,15 +49,15 @@ div#wiki_panel {
 
   div#wiki_create_form {
     @extend .clearfix;
-    padding: 15px;
     background: #d6d6d6;
     border-bottom: 1px solid #bbb;
+    padding: 15px;
 
     input[type="text"] {
-      margin-bottom: 6px;
-      display: block;
-      width: 100%;
       @include box-sizing(border-box);
+      display: block;
+      margin-bottom: 6px;
+      width: 100%;
     }
 
     ul {

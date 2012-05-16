@@ -2,11 +2,11 @@ html {
   margin-top: 0;
 
   body {
+    background: #f4f4f4; //#f3f1e5
     color: $dark-gray;
     font: $body-font-size $body-font-family;
-    text-align: center;
     margin: 0;
-    background: #f4f4f4; //#f3f1e5
+    text-align: center;
 
     section.main-content {
       @extend .clearfix;
@@ -17,7 +17,6 @@ html {
       @include box-shadow(0 0 4px #dfdfdf);
       @include box-sizing(border-box);
       margin-top: 3px;
-      // overflow: hidden;
 
       @media print {
         border-bottom: 0;
@@ -32,12 +31,12 @@ html {
 
     div.qtip {
      div.ui-tooltip-content {
-       border: none;
        background: rgba(#000, .8);
+       border: none;
        color: #fff;
        font: 12px $body-font-family;
-       margin-top: -30px;
        margin-right: -20px;
+       margin-top: -30px;
       }
     }
 

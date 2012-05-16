@@ -100,12 +100,12 @@ div.header-wrapper {
           float: left;
 
           a {
+            border: none;
             color: #fff;
             display: block;
+            font-style: normal;
             font-weight: bold;
             padding: 10px lh() 8px;
-            border: none;
-            font-style: normal;
 
             @media screen and (max-width: 1020px) {
               padding: 10px lh(.7) 8px;
@@ -125,10 +125,10 @@ div.header-wrapper {
 
         ul {
           li {
-            padding: auto;
             display: table-cell;
-            width: 16.6666666667%;
+            padding: auto;
             text-align: center;
+            width: 16.6666666667%;
           }
         }
       }
