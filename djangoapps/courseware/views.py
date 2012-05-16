@@ -227,7 +227,15 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
 
     # Grab the XML corresponding to the request from course.xml
-    xml = content_parser.module_xml(request.user, module, 'id', id)
+    try:
+        xml = content_parser.module_xml(request.user, module, 'id', id)
+    except:
+        record_exception(log, "Unable to load module during ajax call")
+        if 'text/html' in request.accepted_types:
+            return render_to_response("module-error.html", {})
+        else:
+            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
+        return response
 
     # Create the module
     system = I4xSystem(track_function = make_track_function(request), 
@@ -242,8 +250,11 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                                              id, 
                                                              state=oldstate)
     except:
-        record_exception(log, "Unable to load module during ajax call")
-        response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
+        record_exception(log, "Unable to load module instance during ajax call")
+        if 'text/html' in request.accepted_types:
+            return render_to_response("module-error.html", {})
+        else:
+            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
         return response
 
     # Let the module handle the AJAX

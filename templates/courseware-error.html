@@ -2,43 +2,11 @@
 <%block name="bodyclass">courseware</%block>
 <%block name="title"><title>Courseware – MITx 6.002x</title></%block>
 
-<%block name="headextra">
-<script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
-</%block>
-
-<%block name="js_extra">
-##Is there a reason this isn't in header_extra? Is it important that the javascript is at the bottom of the generated document?
-<!-- TODO: http://docs.jquery.com/Plugins/Validation -->
-<script type="text/javascript">
-  $(function() {
-    ${init}
-
-    $(".sequence-nav li a").hover(function(){
-      $(this).siblings().toggleClass("shown");
-      });
-  });
-</script>
-</%block>
-
 <%include file="navigation.html" args="active_page='courseware'" />
 
 <section class="main-content">
-  <div class="course-wrapper">
-    <section class="course-index">
-      <header id="open_close_accordion">
-        <h2>Courseware Index</h2>
-        <a href="#">close</a>
-      </header>
-
-      <div id="accordion">
-        <nav>
-          ${accordion}
-        </nav>
-      </div>
-    </section>
-
-    <section class="course-content">
-      ${content}
-    </section>
-  </div>
+  <section class="outside-app">
+    <h1>There has been an error on the <em>MITx</em> servers</h1>
+    <p>We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible. Please email us at <a href="mailto:technical@mitx.mit.edu">technical@mitx.mit.edu</a> to report any problems or downtime.</p>
+  </section>
 </section>
