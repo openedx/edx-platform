@@ -9,8 +9,8 @@ sessions. Assumes structure:
 """
 from common import *
 
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 LOGGING = logsettings.get_logger_config(ENV_ROOT / "log", 
                                         logging_env="dev",
