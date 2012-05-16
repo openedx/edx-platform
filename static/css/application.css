@@ -2981,7 +2981,7 @@ section.course-index div#accordion ul.ui-accordion-content li {
   border-radius: 4px;
   margin-bottom: 11.326px;
   position: relative;
-  padding: 5px 10px; }
+  padding: 5px 36px 5px 10px; }
 section.course-index div#accordion ul.ui-accordion-content li a {
   text-decoration: none;
   display: block;
@@ -2999,17 +2999,18 @@ section.course-index div#accordion ul.ui-accordion-content li:after {
   border-right: 1px solid #b4b4b4;
   content: "";
   display: block;
-  height: 13px;
+  height: 12px;
+  margin-top: -6px;
   opacity: 0;
   position: absolute;
-  top: 14px;
+  top: 50%;
   right: 30px;
   -webkit-transform: rotate(45deg);
   -moz-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   -o-transform: rotate(45deg);
   transform: rotate(45deg);
-  width: 13px; }
+  width: 12px; }
 section.course-index div#accordion ul.ui-accordion-content li:hover {
   background-image: -webkit-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
   background-image: -moz-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
