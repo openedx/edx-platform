@@ -2970,7 +2970,8 @@ section.course-index div#accordion ul.ui-accordion-content {
   border: none;
   border-bottom: 1px solid #c3c3c3;
   font-size: 12px;
-  margin: 0; }
+  margin: 0;
+  padding: 1em 1.5em; }
 section.course-index div#accordion ul.ui-accordion-content li {
   background: transparent;
   border: 1px solid transparent;
