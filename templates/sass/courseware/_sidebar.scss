@@ -48,7 +48,7 @@ section.course-index {
         @include border-radius(4px);
         margin-bottom: lh(.5);
         position: relative;
-        padding: 5px 10px;
+        padding: 5px 36px 5px 10px;
 
         a {
           text-decoration: none;
@@ -73,13 +73,14 @@ section.course-index {
           border-right: 1px solid rgb(180,180,180);
           content: "";
           display: block;
-          height: 13px;
+          height: 12px;
+          margin-top: -6px;
           opacity: 0;
           position: absolute;
-          top: 14px;
+          top: 50%;
           right: 30px;
           @include transform(rotate(45deg));
-          width: 13px;
+          width: 12px;
         }
 
         &:hover {
