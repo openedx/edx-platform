@@ -1,5 +1,6 @@
 import logging
 import urllib
+import json
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -16,6 +17,7 @@ from lxml import etree
 from module_render import render_module, make_track_function, I4xSystem
 from models import StudentModule
 from student.models import UserProfile
+from util.errors import record_exception
 
 import courseware.content_parser as content_parser
 import courseware.modules
@@ -98,12 +100,16 @@ def render_section(request, section):
     if not settings.COURSEWARE_ENABLED:
         return redirect('/')
 
-#    try: 
-    dom = content_parser.section_file(user, section)
-    #except:
-     #   raise Http404
+    try:
+        dom = content_parser.section_file(user, section)
+    except:
+        record_exception(log, "Unable to parse courseware xml")
+        return render_to_response('courseware-error.html', {})
 
-    accordion=render_accordion(request, '', '', '')
+    context = {
+        'csrf': csrf(request)['csrf_token'],
+        'accordion': render_accordion(request, '', '', '')
+    }
 
     module_ids = dom.xpath("//@id")
     
@@ -113,15 +119,20 @@ def render_section(request, section):
     else:
         module_object_preload = []
     
-    module=render_module(user, request, dom, module_object_preload)
+    try:
+        module = render_module(user, request, dom, module_object_preload)
+    except:
+        record_exception(log, "Unable to load module")
+        context.update({
+            'init': '',
+            'content': render_to_string("module-error.html", {}),
+        })
+        return render_to_response('courseware.html', context)
 
-    if 'init_js' not in module:
-        module['init_js']=''
-
-    context={'init':module['init_js'],
-             'accordion':accordion,
-             'content':module['content'],
-             'csrf':csrf(request)['csrf_token']}
+    context.update({
+        'init':module.get('init_js', ''),
+        'content':module['content'],
+    })
 
     result = render_to_response('courseware.html', context)
     return result
@@ -147,19 +158,19 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
     if course!="6.002 Spring 2012":
         return redirect('/')
 
-    #import logging
-    #log = logging.getLogger("mitx")
-    #log.info(  "DEBUG: "+str(user) )
+    try:
+        dom = content_parser.course_file(user)
+    except:
+        record_exception(log, "Unable to parse courseware xml")
+        return render_to_response('courseware-error.html', {})
 
-    dom = content_parser.course_file(user)
     dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
                            course=course, chapter=chapter, section=section)
+
     if len(dom_module) == 0:
         module = None
     else:
         module = dom_module[0]
-
-    accordion=render_accordion(request, course, chapter, section)
 
     module_ids = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]//@id", 
                            course=course, chapter=chapter, section=section)
@@ -169,17 +180,26 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
                                                                   module_id__in=module_ids))
     else:
         module_object_preload = []
-    
 
-    module=render_module(user, request, module, module_object_preload)
+    context = {
+        'csrf': csrf(request)['csrf_token'],
+        'accordion': render_accordion(request, course, chapter, section)
+    }
 
-    if 'init_js' not in module:
-        module['init_js']=''
+    try:
+        module = render_module(user, request, module, module_object_preload)
+    except:
+        record_exception(log, "Unable to load module")
+        context.update({
+            'init': '',
+            'content': render_to_string("module-error.html", {}),
+        })
+        return render_to_response('courseware.html', context)
 
-    context={'init':module['init_js'],
-             'accordion':accordion,
-             'content':module['content'],
-             'csrf':csrf(request)['csrf_token']}
+    context.update({
+        'init': module.get('init_js', ''),
+        'content': module['content'],
+    })
 
     result = render_to_response('courseware.html', context)
     return result
@@ -215,10 +235,17 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                        ajax_url = ajax_url,
                        filestore = None
                        )
-    instance=courseware.modules.get_module_class(module)(system, 
-                                                         xml, 
-                                                         id, 
-                                                         state=oldstate)
+
+    try:
+        instance=courseware.modules.get_module_class(module)(system, 
+                                                             xml, 
+                                                             id, 
+                                                             state=oldstate)
+    except:
+        record_exception(log, "Unable to load module during ajax call")
+        response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
+        return response
+
     # Let the module handle the AJAX
     ajax_return=instance.handle_ajax(dispatch, request.POST)
     # Save the state back to the database

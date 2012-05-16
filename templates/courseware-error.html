@@ -1,0 +1,44 @@
+<%inherit file="main.html" />
+<%block name="bodyclass">courseware</%block>
+<%block name="title"><title>Courseware – MITx 6.002x</title></%block>
+
+<%block name="headextra">
+<script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
+</%block>
+
+<%block name="js_extra">
+##Is there a reason this isn't in header_extra? Is it important that the javascript is at the bottom of the generated document?
+<!-- TODO: http://docs.jquery.com/Plugins/Validation -->
+<script type="text/javascript">
+  $(function() {
+    ${init}
+
+    $(".sequence-nav li a").hover(function(){
+      $(this).siblings().toggleClass("shown");
+      });
+  });
+</script>
+</%block>
+
+<%include file="navigation.html" args="active_page='courseware'" />
+
+<section class="main-content">
+  <div class="course-wrapper">
+    <section class="course-index">
+      <header id="open_close_accordion">
+        <h2>Courseware Index</h2>
+        <a href="#">close</a>
+      </header>
+
+      <div id="accordion">
+        <nav>
+          ${accordion}
+        </nav>
+      </div>
+    </section>
+
+    <section class="course-content">
+      ${content}
+    </section>
+  </div>
+</section>
