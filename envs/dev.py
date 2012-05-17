@@ -10,8 +10,8 @@ sessions. Assumes structure:
 from envs.common import *
 from envs.logsettings import get_logger_config
 
-DEBUG = False
-TEMPLATE_DEBUG = False
+DEBUG = True
+TEMPLATE_DEBUG = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log", 
                             logging_env="dev",
