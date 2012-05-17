@@ -8,6 +8,7 @@ import djcelery
 ### Dark code. Should be enabled in local settings for devel. 
 
 ENABLE_MULTICOURSE = False	# set to False to disable multicourse display (see lib.util.views.mitxhome)
+QUICKEDIT = False
 
 ###
 
@@ -20,19 +21,11 @@ COURSE_TITLE = "Circuits and Electronics"
 
 COURSE_DEFAULT = '6.002_Spring_2012'
 
-COURSE_LIST =  {'6.002_Spring_2012': {'number' : '6.002x',
-                                      'title'  :  'Circuits and Electronics',
-                                      'datapath': '6002x/',
-                                       },
-                '8.02_Spring_2013': {'number' : '8.02x',
-                                     'title'  : 'Electricity &amp; Magnetism',
-                                     'datapath': '802x/',
-                                     },
-                '8.01_Spring_2013': {'number' : '8.01x',
-                                     'title'  : 'Mechanics',
-                                     'datapath': '801x/',
-                                     },
-               }
+COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
+                                          'title'  :  'Circuits and Electronics',
+                                          'xmlpath': '6002x/',
+                                          }
+                    }
 
 ROOT_URLCONF = 'urls'
 
@@ -151,6 +144,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
+    #'ssl_auth.ssl_auth.NginxProxyHeaderMiddleware',		# ssl authentication behind nginx proxy
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     # Uncommenting the following will prevent csrf token from being re-set if you
@@ -180,6 +174,8 @@ INSTALLED_APPS = (
     'util',
     'masquerade',
     'django_jasmine',
+    #'ssl_auth', ## Broken. Disabled for now. 
+    'multicourse',		# multiple courses
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

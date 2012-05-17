@@ -26,6 +26,7 @@ section.course-index {
         }
 
         &.ui-state-active {
+          @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
           @extend .active;
         }
       }
@@ -33,57 +34,97 @@ section.course-index {
 
     ul.ui-accordion-content {
       @include border-radius(0);
-      @include box-shadow( inset -1px 0 0 #e6e6e6);
+      @include box-shadow(inset -1px 0 0 #e6e6e6);
       background: #dadada;
       border: none;
       border-bottom: 1px solid #c3c3c3;
       font-size: 12px;
       margin: 0;
-      // overflow: visible;
+      padding: 1em 1.5em;
 
       li {
+        background: transparent;
+        border: 1px solid transparent;
+        @include border-radius(4px);
+        margin-bottom: lh(.5);
         position: relative;
+        padding: 5px 36px 5px 10px;
+
+        a {
+          text-decoration: none;
+          display: block;
+          color: #666;
+
+          p {
+            font-weight: bold;
+            margin-bottom: 0;
+
+            span.subtitle {
+              color: #666;
+              font-weight: normal;
+              display: block;
+            }
+          }
+        }
+
+        &:after {
+          background: transparent;
+          border-top: 1px solid rgb(180,180,180);
+          border-right: 1px solid rgb(180,180,180);
+          content: "";
+          display: block;
+          height: 12px;
+          margin-top: -6px;
+          opacity: 0;
+          position: absolute;
+          top: 50%;
+          right: 30px;
+          @include transform(rotate(45deg));
+          width: 12px;
+        }
+
+        &:hover {
+          @include background-image(linear-gradient(-90deg, rgba(245,245,245, 0.4), rgba(230,230,230, 0.4)));
+          border-color: rgb(200,200,200);
+
+          &:after {
+            opacity: 1;
+            right: 15px;
+            @include transition(all, 0.2s, linear);
+          }
+
+          > a p {
+            color: #333;
+          }
+        }
+
+        &:active {
+          @include box-shadow(inset 0 1px 14px 0 rgba(0,0,0, 0.1));
+          top: 1px;
+
+          &:after {
+            opacity: 1;
+            right: 15px;
+          }
+        }
 
         &.active {
+          background: rgb(240,240,240);
+          @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(230,230,230)));
+          border-color: rgb(200,200,200);
           font-weight: bold;
+
+          > a p {
+            color: #333;
+          }
 
           span.subtitle {
             font-weight: normal;
           }
 
-          // &:after {
-          //   content: " ";
-          //   width: 16px;
-          //   height: 16px;
-          //   position: absolute;
-          //   right: -35px;
-          //   top: 7px;
-          //   display: block;
-          //   background-color: #dadada;
-          //   border-top: 1px solid #c3c3c3;
-          //   border-right: 1px solid #c3c3c3;
-          //   z-index: 99;
-          //   @include transform(rotate(45deg));
-          // }
-        }
-
-        a {
-          text-decoration: none;
-          margin-bottom: lh(.5);
-          display: block;
-          color: #000;
-
-          &:hover {
-            color: #666;
-          }
-
-          p {
-            margin-bottom: 0;
-
-            span.subtitle {
-              color: #666;
-              display: block;
-            }
+          &:after {
+            opacity: 1;
+            right: 15px;
           }
         }
       }

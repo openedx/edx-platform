@@ -63,6 +63,9 @@ class ModelsTest(unittest.TestCase):
             exception_happened = True
         self.assertTrue(exception_happened)
 
+#-----------------------------------------------------------------------------
+# tests of capa_problem inputtypes
+
 class MultiChoiceTest(unittest.TestCase):
     def test_MC_grade(self):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multichoice.xml"
@@ -93,6 +96,38 @@ class MultiChoiceTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
         false_answers = {'1_2_1':['choice_foil1', 'choice_foil2', 'choice_foil3']}
         self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        
+class ImageResponseTest(unittest.TestCase):
+    def test_ir_grade(self):
+        imageresponse_file = os.path.dirname(__file__)+"/test_files/imageresponse.xml"
+        test_lcp = lcp.LoncapaProblem(open(imageresponse_file), '1')
+        correct_answers = {'1_2_1':'(490,11)-(556,98)',
+                           '1_2_2':'(242,202)-(296,276)'}
+        test_answers = {'1_2_1':'[500,20]',
+                        '1_2_2':'[250,300]',
+                        }
+        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+        
+class OptionResponseTest(unittest.TestCase):
+    '''
+    Run this with
+
+    python manage.py test courseware.OptionResponseTest
+    '''
+    def test_or_grade(self):
+        optionresponse_file = os.path.dirname(__file__)+"/test_files/optionresponse.xml"
+        test_lcp = lcp.LoncapaProblem(open(optionresponse_file), '1')
+        correct_answers = {'1_2_1':'True',
+                           '1_2_2':'False'}
+        test_answers = {'1_2_1':'True',
+                        '1_2_2':'True',
+                        }
+        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+
+#-----------------------------------------------------------------------------
+# Grading tests
 
 class GradesheetTest(unittest.TestCase):
 
@@ -118,7 +153,7 @@ class GradesheetTest(unittest.TestCase):
         all, graded = aggregate_scores(scores)
         self.assertAlmostEqual(all, Score(earned=5, possible=15, graded=False, section="summary"))
         self.assertAlmostEqual(graded, Score(earned=5, possible=10, graded=True, section="summary"))
-        
+
 class GraderTest(unittest.TestCase):
 
     empty_gradesheet = {

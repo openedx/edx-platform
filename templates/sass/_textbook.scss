@@ -3,8 +3,8 @@ div.book-wrapper {
 
   section.book-sidebar {
     @extend .sidebar;
-    @include box-sizing(border-box);
     @extend .tran;
+    @include box-sizing(border-box);
 
     ul#booknav {
       font-size: 12px;
@@ -22,14 +22,14 @@ div.book-wrapper {
         padding-left: 30px;
 
         div.hitarea {
-          margin-left: -22px;
           background-image: url('/static/images/treeview-default.gif');
+          margin-left: -22px;
           position: relative;
           top: 4px;
 
           &:hover {
-            opacity: 0.6;
             filter: alpha(opacity=60);
+            opacity: 0.6;
           }
         }
 
@@ -63,13 +63,13 @@ div.book-wrapper {
 
         li {
           &.last {
-            float: left;
             display: block;
+            float: left;
 
             a {
-              @include box-shadow(inset -1px 0 0 lighten(#f6efd4, 5%));
-              border-right: 1px solid darken(#f6efd4, 20%);
               border-left: 0;
+              border-right: 1px solid darken(#f6efd4, 20%);
+              @include box-shadow(inset -1px 0 0 lighten(#f6efd4, 5%));
             }
           }
 
@@ -81,10 +81,10 @@ div.book-wrapper {
       }
 
       &.bottom-nav {
-        margin-top: lh();
-        margin-bottom: -(lh());
         border-bottom: 0;
         border-top: 1px solid #EDDFAA;
+        margin-bottom: -(lh());
+        margin-top: lh();
       }
     }
 
@@ -110,18 +110,18 @@ div.book-wrapper {
         }
 
         h2 {
+          padding: 0;
           visibility: hidden;
           width: 10px;
-          padding: 0;
         }
       }
 
       ul#booknav {
+        max-height: 100px;
+        overflow: hidden;
+        padding: 0;
         visibility: hidden;
         width: 10px;
-        padding: 0;
-        overflow: hidden;
-        max-height: 100px;
       }
     }
 

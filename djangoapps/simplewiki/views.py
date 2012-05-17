@@ -9,6 +9,8 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
 
+from multicourse import multicourse_settings
+
 from models import Revision, Article, CreateArticleForm, RevisionFormWithTitle, RevisionForm
 import wiki_settings
 
@@ -17,6 +19,11 @@ def view(request, wiki_url):
     if err:
         return err
     
+    if 'coursename' in request.session: coursename = request.session['coursename']
+    else: coursename = None
+
+    course_number = multicourse_settings.get_course_number(coursename)
+
     perm_err = check_permissions(request, article, check_read=True, check_deleted=True)
     if perm_err:
         return perm_err
@@ -25,7 +32,7 @@ def view(request, wiki_url):
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
             'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
-            'wiki_title' : article.title + " - MITX 6.002x Wiki"
+            'wiki_title' : article.title + " - MITX %s Wiki" % course_number
 			}
     d.update(csrf(request))
     return render_to_response('simplewiki_view.html', d)

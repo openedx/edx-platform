@@ -25,7 +25,7 @@ from mako.template import Template
 
 from util import contextualize_text
 import inputtypes
-from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse, ExternalResponse,ImageResponse
+from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse, ExternalResponse,ImageResponse,OptionResponse
 
 import calc
 import eia
@@ -40,8 +40,9 @@ response_types = {'numericalresponse':NumericalResponse,
                   'multiplechoiceresponse':MultipleChoiceResponse,
                   'truefalseresponse':TrueFalseResponse,
                   'imageresponse':ImageResponse,
+                  'optionresponse':OptionResponse,
                   }
-entry_types = ['textline', 'schematic', 'choicegroup','textbox','imageinput']
+entry_types = ['textline', 'schematic', 'choicegroup','textbox','imageinput','optioninput']
 solution_types = ['solution']	# extra things displayed after "show answers" is pressed
 response_properties = ["responseparam", "answer"]	# these get captured as student responses
 
@@ -186,6 +187,13 @@ class LoncapaProblem(object):
             if answer:
                 answer_map[entry.get('id')] = contextualize_text(answer, self.context)
 
+        # include solutions from <solution>...</solution> stanzas
+        # Tentative merge; we should figure out how we want to handle hints and solutions
+        for entry in self.tree.xpath("//"+"|//".join(solution_types)):
+            answer = etree.tostring(entry)
+            if answer:
+                answer_map[entry.get('id')] = answer
+
         return answer_map
 
     # ======= Private ========
@@ -241,7 +249,24 @@ class LoncapaProblem(object):
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
 
-            return getattr(inputtypes, problemtree.tag)(problemtree, value, status) #TODO
+            #### This code is a hack. It was merged to help bring two branches
+            #### in sync, but should be replaced. msg should be passed in a 
+            #### response_type
+            # prepare the response message, if it exists in correct_map
+            if 'msg' in self.correct_map:
+                msg = self.correct_map['msg']
+            elif ('msg_%s' % problemid) in self.correct_map:
+                msg = self.correct_map['msg_%s' % problemid]
+            else:
+                msg = ''
+
+            #if settings.DEBUG:
+            #    print "[courseware.capa.capa_problem.extract_html] msg = ",msg
+
+            # do the rendering
+            #render_function = html_special_response[problemtree.tag]
+            render_function = getattr(inputtypes, problemtree.tag)
+            return render_function(problemtree, value, status, msg) # render the special response (textline, schematic,...)
 
         tree=Element(problemtree.tag)
         for item in problemtree:
@@ -287,6 +312,7 @@ class LoncapaProblem(object):
             answer_id = 1
             for entry in tree.xpath("|".join(['//'+response.tag+'[@id=$id]//'+x for x in (entry_types + solution_types)]), 
                                     id=response_id_str):
+                # assign one answer_id for each entry_type or solution_type 
                 entry.attrib['response_id'] = str(response_id)
                 entry.attrib['answer_id'] = str(answer_id)
                 entry.attrib['id'] = "%s_%i_%i"%(self.problem_id, response_id, answer_id)

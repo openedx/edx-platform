@@ -6,10 +6,15 @@
 Module containing the problem elements which render into input objects
 
 - textline
-- textbox (change this to textarea?)
+- textbox     (change this to textarea?)
 - schemmatic
+- choicegroup (for multiplechoice: checkbox, radio, or select option)
+- imageinput  (for clickable image)
+- optioninput (for option list)
 
 These are matched by *.html files templates/*.html which are mako templates with the actual html.
+
+Each input type takes the xml tree as 'element', the previous answer as 'value', and the graded status as 'status'
 
 '''
 
@@ -18,6 +23,7 @@ These are matched by *.html files templates/*.html which are mako templates with
 # but it will turn into a dict containing both the answer and any associated message for the problem ID for the input element.
 
 import re
+import shlex # for splitting quoted strings
 
 from django.conf import settings
 
@@ -27,9 +33,42 @@ from lxml import etree
 from mitxmako.shortcuts import render_to_string
 
 #-----------------------------------------------------------------------------
-#takes the xml tree as 'element', the student's previous answer as 'value', and the graded status as 'state'
 
-def choicegroup(element, value, state, msg=""):
+def optioninput(element, value, status, msg=''):
+    '''
+    Select option input type.
+
+    Example:
+
+    <optioninput options="('Up','Down')" correct="Up"/><text>The location of the sky</text>
+    '''
+    eid=element.get('id')
+    options = element.get('options')
+    if not options:
+        raise Exception,"[courseware.capa.inputtypes.optioninput] Missing options specification in " + etree.tostring(element)
+    oset = shlex.shlex(options[1:-1])
+    oset.quotes = "'"
+    oset.whitespace = ","
+    oset = [x[1:-1] for x  in list(oset)]
+
+    # osetdict = dict([('option_%s_%s' % (eid,x),oset[x]) for x in range(len(oset)) ])	# make dict with IDs
+    osetdict = dict([(oset[x],oset[x]) for x in range(len(oset)) ])	# make dict with key,value same
+    if settings.DEBUG:
+        print '[courseware.capa.inputtypes.optioninput] osetdict=',osetdict
+    
+    context={'id':eid,
+             'value':value,
+             'state':status,
+             'msg':msg,
+             'options':osetdict,
+             }
+
+    html=render_to_string("optioninput.html", context)
+    return etree.XML(html)
+
+#-----------------------------------------------------------------------------
+
+def choicegroup(element, value, status, msg=''):
     '''
     Radio button inputs: multiple choice or true/false
 
@@ -47,7 +86,7 @@ def choicegroup(element, value, state, msg=""):
     for choice in element:
         assert choice.tag =="choice", "only <choice> tags should be immediate children of a <choicegroup>"
         choices[choice.get("name")] = etree.tostring(choice[0])	# TODO: what if choice[0] has math tags in it?
-    context={'id':eid, 'value':value, 'state':state, 'type':type, 'choices':choices}
+    context={'id':eid, 'value':value, 'state':status, 'type':type, 'choices':choices}
     html=render_to_string("choicegroup.html", context)
     return etree.XML(html)
 
@@ -60,9 +99,9 @@ def textline(element, value, state, msg=""):
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
-# TODO: Make a wrapper for <formulainput>
-# TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-def jstextline(element, value, state, msg=""):
+
+def js_textline(element, value, status, msg=''):
+		## TODO: Code should follow PEP8 (4 spaces per indentation level)
         '''
         textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
         '''
@@ -72,7 +111,7 @@ def jstextline(element, value, state, msg=""):
         dojs = element.get('dojs')	# dojs is used for client-side javascript display & return
         				# when dojs=='math', a <span id=display_eid>`{::}`</span>
                                         # and a hidden textarea with id=input_eid_fromjs will be output
-        context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size,
+        context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
                    'dojs':dojs,
                    'msg':msg,
                    }
@@ -81,7 +120,7 @@ def jstextline(element, value, state, msg=""):
 
 #-----------------------------------------------------------------------------
 ## TODO: Make a wrapper for <codeinput>
-def textbox(element, value, state, msg=''):
+def textbox(element, value, status, msg=''):
         '''
         The textbox is used for code input.  The message is the return HTML string from
         evaluating the code, eg error messages, and output from the code tests.
@@ -91,12 +130,12 @@ def textbox(element, value, state, msg=''):
         eid=element.get('id')
         count = int(eid.split('_')[-2])-1 # HACK
         size = element.get('size')
-        context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size, 'msg':msg}
+        context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg}
         html=render_to_string("textbox.html", context)
         return etree.XML(html)
 
 #-----------------------------------------------------------------------------
-def schematic(element, value, state):
+def schematic(element, value, status, msg=''):
     eid = element.get('id')
     height = element.get('height')
     width = element.get('width')
@@ -120,7 +159,7 @@ def schematic(element, value, state):
 
 #-----------------------------------------------------------------------------
 ### TODO: Move out of inputtypes
-def math(element, value, state, msg=''):
+def math(element, value, status, msg=''):
     '''
     This is not really an input type.  It is a convention from Lon-CAPA, used for
     displaying a math equation.
@@ -134,21 +173,27 @@ def math(element, value, state, msg=''):
 
     TODO: use shorter tags (but this will require converting problem XML files!)
     '''
-    mathstr = element.text[1:-1]
-    if '\\displaystyle' in mathstr:
-        isinline = False
-        mathstr = mathstr.replace('\\displaystyle','')
-    else:
-        isinline = True
+    mathstr = re.sub('\$(.*)\$','[mathjaxinline]\\1[/mathjaxinline]',element.text)
+    mtag = 'mathjax'
+    if not '\\displaystyle' in mathstr: mtag += 'inline'
+    else: mathstr = mathstr.replace('\\displaystyle','')
+    mathstr = mathstr.replace('mathjaxinline]','%s]'%mtag)
 
-    html=render_to_string("mathstring.html",{'mathstr':mathstr,'isinline':isinline,'tail':element.tail})
+    #if '\\displaystyle' in mathstr:
+    #    isinline = False
+    #    mathstr = mathstr.replace('\\displaystyle','')
+    #else:
+    #    isinline = True
+    # html=render_to_string("mathstring.html",{'mathstr':mathstr,'isinline':isinline,'tail':element.tail})
+
+    html = '<html><html>%s</html><html>%s</html></html>' % (mathstr,element.tail)
     xhtml = etree.XML(html)
     # xhtml.tail = element.tail	# don't forget to include the tail!
     return xhtml
 
 #-----------------------------------------------------------------------------
 
-def solution(element, value, state, msg=''):
+def solution(element, value, status, msg=''):
     '''
     This is not really an input type.  It is just a <span>...</span> which is given an ID,
     that is used for displaying an extended answer (a problem "solution") after "show answers"
@@ -159,7 +204,7 @@ def solution(element, value, state, msg=''):
     size = element.get('size')
     context = {'id':eid,
                'value':value,
-               'state':state,
+               'state':status,
                'size': size,
                'msg':msg,
                }

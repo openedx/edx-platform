@@ -16,28 +16,28 @@ div.info-wrapper {
       list-style: none;
 
       > li {
-        padding-bottom: lh(.5);
-        margin-bottom: lh(.5);
         @extend .clearfix;
         border-bottom: 1px solid #e3e3e3;
+        margin-bottom: lh(.5);
+        padding-bottom: lh(.5);
 
         &:first-child {
-          padding: lh(.5);
-          margin: 0 (-(lh(.5))) lh();
           background: $cream;
           border-bottom: 1px solid darken($cream, 10%);
+          margin: 0 (-(lh(.5))) lh();
+          padding: lh(.5);
         }
 
         h2 {
           float: left;
-          width: flex-grid(2, 9);
           margin: 0 flex-gutter() 0 0;
+          width: flex-grid(2, 9);
         }
 
         section.update-description {
           float: left;
-          width: flex-grid(7, 9);
           margin-bottom: 0;
+          width: flex-grid(7, 9);
 
           li {
             margin-bottom: lh(.5);
@@ -55,9 +55,9 @@ div.info-wrapper {
 
   section.handouts {
     @extend .sidebar;
+    border-left: 1px solid #d3d3d3;
     @include border-radius(0 4px 4px 0);
     border-right: 0;
-    border-left: 1px solid #d3d3d3;
 
     header {
       @extend .bottom-border;
@@ -69,32 +69,32 @@ div.info-wrapper {
       }
 
       p {
+         color: #666;
+         font-size: 12px;
          margin-bottom: 0;
          margin-top: 4px;
-         font-size: 12px;
-         color: #666;
       }
     }
 
     ol {
-      list-style: none;
       background: none;
+      list-style: none;
 
       li {
-        @include box-shadow(0 1px 0 #eee);
-        border-bottom: 1px solid #d3d3d3;
-        @include box-sizing(border-box);
         @extend .clearfix;
-        padding: 7px lh(.75);
         background: none;
+        border-bottom: 1px solid #d3d3d3;
+        @include box-shadow(0 1px 0 #eee);
+        @include box-sizing(border-box);
+        padding: 7px lh(.75);
         position: relative;
 
         &.expandable,
         &.collapsable {
           h4 {
-            padding-left: 18px;
             font-style: $body-font-size;
             font-weight: normal;
+            padding-left: 18px;
           }
         }
 
@@ -103,10 +103,10 @@ div.info-wrapper {
           margin: 7px (-(lh(.75))) 0;
 
           li {
-            padding-left: 18px + lh(.75);
-            @include box-shadow(inset 0 1px 0 #eee);
-            border-top: 1px solid #d3d3d3;
             border-bottom: 0;
+            border-top: 1px solid #d3d3d3;
+            @include box-shadow(inset 0 1px 0 #eee);
+            padding-left: 18px + lh(.75);
           }
         }
 
@@ -116,13 +116,13 @@ div.info-wrapper {
 
         div.hitarea {
           background-image: url('/static/images/treeview-default.gif');
-          width: 100%;
-          height: 100%;
-          max-height: 20px;
           display: block;
-          position: absolute;
+          height: 100%;
           left: lh(.75);
           margin-left: 0;
+          max-height: 20px;
+          position: absolute;
+          width: 100%;
 
           &:hover {
             opacity: 0.6;
@@ -140,27 +140,27 @@ div.info-wrapper {
 
         h3 {
           border-bottom: 0;
-          text-transform: uppercase;
-          font-weight: bold;
-          color: #999;
           @include box-shadow(none);
+          color: #999;
           font-size: 12px;
+          font-weight: bold;
+          text-transform: uppercase;
         }
 
         p {
+          font-size: $body-font-size;
+          letter-spacing: 0;
           margin: 0;
           text-transform: none;
-          letter-spacing: 0;
-          font-size: $body-font-size;
 
           a {
             padding-right: 8px;
 
             &:before {
+              color: #ccc;
               content: "•";
               @include inline-block();
               padding-right: 8px;
-              color: #ccc;
             }
 
             &:first-child {
@@ -173,10 +173,10 @@ div.info-wrapper {
         }
 
         a {
-          @include transition();
           color: lighten($text-color, 10%);
-          text-decoration: none;
           @include inline-block();
+          text-decoration: none;
+          @include transition();
 
           &:hover {
             color: $mit-red;
