@@ -10,6 +10,24 @@ import courseware.graders as graders
 from courseware.graders import Score, CourseGrader, WeightedSubsectionsGrader, SingleSectionGrader, AssignmentFormatGrader
 from courseware.grades import aggregate_scores
 
+class I4xSystem(object):
+    '''
+    This is an abstraction such that x_modules can function independent 
+    of the courseware (e.g. import into other types of courseware, LMS, 
+    or if we want to have a sandbox server for user-contributed content)
+    '''
+    def __init__(self):
+        self.ajax_url = '/'
+        self.track_function = lambda x: None
+        self.render_function = lambda x: {} # Probably incorrect
+        self.exception404 = Exception
+    def __repr__(self):
+        return repr(self.__dict__)
+    def __str__(self):
+        return str(self.__dict__)
+
+i4xs = I4xSystem
+
 class ModelsTest(unittest.TestCase):
     def setUp(self):
         pass
@@ -69,7 +87,7 @@ class ModelsTest(unittest.TestCase):
 class MultiChoiceTest(unittest.TestCase):
     def test_MC_grade(self):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multichoice.xml"
-        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1')
+        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'choice_foil3'}
         self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
         false_answers = {'1_2_1':'choice_foil2'}
@@ -77,7 +95,7 @@ class MultiChoiceTest(unittest.TestCase):
 
     def test_MC_bare_grades(self):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multi_bare.xml"
-        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1')
+        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'choice_2'}
         self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
         false_answers = {'1_2_1':'choice_1'}
@@ -85,7 +103,7 @@ class MultiChoiceTest(unittest.TestCase):
         
     def test_TF_grade(self):
         truefalse_file =  os.getcwd()+"/djangoapps/courseware/test_files/truefalse.xml"
-        test_lcp = lcp.LoncapaProblem(open(truefalse_file), '1')
+        test_lcp = lcp.LoncapaProblem(open(truefalse_file), '1', system=i4xs)
         correct_answers = {'1_2_1':['choice_foil2', 'choice_foil1']}
         self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
         false_answers = {'1_2_1':['choice_foil1']}
@@ -100,7 +118,7 @@ class MultiChoiceTest(unittest.TestCase):
 class ImageResponseTest(unittest.TestCase):
     def test_ir_grade(self):
         imageresponse_file = os.path.dirname(__file__)+"/test_files/imageresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(imageresponse_file), '1')
+        test_lcp = lcp.LoncapaProblem(open(imageresponse_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'(490,11)-(556,98)',
                            '1_2_2':'(242,202)-(296,276)'}
         test_answers = {'1_2_1':'[500,20]',
@@ -117,7 +135,7 @@ class OptionResponseTest(unittest.TestCase):
     '''
     def test_or_grade(self):
         optionresponse_file = os.path.dirname(__file__)+"/test_files/optionresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(optionresponse_file), '1')
+        test_lcp = lcp.LoncapaProblem(open(optionresponse_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'True',
                            '1_2_2':'False'}
         test_answers = {'1_2_1':'True',

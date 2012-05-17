@@ -1,8 +1,6 @@
 import json
 import os
 
-## TODO: Abstract out from Django
-from django.conf import settings
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 from x_module import XModule
@@ -14,8 +12,14 @@ class Module(XModule):
 
     @classmethod
     def get_xml_tags(c):
-        ## TODO: Abstract out from filesystem
-        tags = os.listdir(settings.DATA_DIR+'/custom_tags')
+        ## TODO: Abstract out from filesystem and Django
+        ## HACK: For now, this lets us import without abstracting out
+        try: 
+            from django.conf import settings
+            tags = os.listdir(settings.DATA_DIR+'/custom_tags')
+        except: 
+            print "Could not open tags directory."
+            tags = []
         return tags
 
     def get_html(self):
