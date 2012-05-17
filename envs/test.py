@@ -25,7 +25,8 @@ for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Local Directories
-COURSES_ROOT = PROJECT_ROOT / "test_data"
+TEST_ROOT = path("test_root")
+COURSES_ROOT = TEST_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 MAKO_TEMPLATES['course'] = [DATA_DIR]
 MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
@@ -34,7 +35,7 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           DATA_DIR / 'info',
                           DATA_DIR / 'problems']
 
-LOGGING = logsettings.get_logger_config(PROJECT_ROOT / "log", 
+LOGGING = logsettings.get_logger_config(TEST_ROOT / "log", 
                                         logging_env="dev",
                                         tracking_filename="tracking.log",
                                         debug=True)
