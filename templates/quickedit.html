@@ -1,0 +1,95 @@
+<html>
+<head>
+  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
+ <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
+
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
+<script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
+  <script type="text/javascript" src="/static/js/schematic.js"></script>
+<%include file="mathjax_include.html" />
+
+<script>
+function postJSON(url, data, callback) {
+  $.ajax({type:'POST',
+      url: url,
+      dataType: 'json',
+      data: data,
+      success: callback,
+      headers : {'X-CSRFToken':'none'} // getCookie('csrftoken')}
+      });
+}
+</script>
+
+</head>
+<body>
+
+  <!--[if lt IE 9]>
+  <script src="/static/js/html5shiv.js"></script>
+  <![endif]-->
+
+<style type="text/css">
+  .CodeMirror {border-style: solid;
+              border-width: 1px;}
+.CodeMirror-scroll {
+ height: 500;
+ width: 100%
+}
+</style>
+
+## -----------------------------------------------------------------------------
+## information and i4x PSL code
+
+<hr width="100%">
+<h2>QuickEdit</h2>
+<hr width="100%">
+<ul>
+<li>File = ${filename}</li>
+<li>ID = ${id}</li>
+</ul>
+
+<form method="post">
+  <textarea rows="40" cols="160" name="quickedit_${id}" id="quickedit_${id}">${pxmls|h}</textarea>
+<br/>
+<input type="submit" value="Change Problem" name="qesubmit" />
+<input type="submit" value="Revert to original" name="qesubmit" />
+</form>
+
+<span>${msg|n}</span>
+
+## -----------------------------------------------------------------------------
+## rendered problem display
+
+<script>
+//  height: auto;
+//  overflow-y: hidden;
+//  overflow-x: auto;
+ 
+$(function(){
+  var cm = CodeMirror.fromTextArea(document.getElementById("quickedit_${id}"), 
+			{ 'mode': {name: "xml", alignCDATA: true},
+                        lineNumbers: true
+                        });
+
+// $('.my-wymeditor').wymeditor();
+
+});
+</script>
+
+<hr width="100%">
+
+<script>
+${init_js} 
+</script>
+
+<style type="text/css">
+  .staff {display:none;}
+}
+</style>
+
+<form>
+ ${phtml}
+</form>
+
+</body>
+</html>

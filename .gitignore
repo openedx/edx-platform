@@ -4,6 +4,9 @@
 *.swp
 *.orig
 *.DS_Store
+:2e_*
+:2e#
+.AppleDouble
 database.sqlite
 courseware/static/js/mathjax/*
 db.newaskbot

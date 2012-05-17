@@ -69,6 +69,12 @@ if settings.COURSEWARE_ENABLED:
         url(r'^calculate$', 'util.views.calculate'),
     )
 
+if settings.ENABLE_MULTICOURSE:
+	urlpatterns += (url(r'^mitxhome$', 'util.views.mitxhome'),)
+
+if settings.QUICKEDIT:
+	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'courseware.views.quickedit'),)
+
 if settings.ASKBOT_ENABLED:
     urlpatterns += (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
                     url(r'^admin/', include(admin.site.urls)), \

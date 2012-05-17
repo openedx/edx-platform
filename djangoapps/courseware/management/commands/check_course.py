@@ -6,9 +6,9 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from courseware.content_parser import course_file
-import courseware.module_render
-import courseware.modules
+from mitx.courseware.content_parser import course_file
+import mitx.courseware.module_render
+import mitx.courseware.modules
 
 class Command(BaseCommand):
     help = "Does basic validity tests on course.xml."
@@ -25,15 +25,15 @@ class Command(BaseCommand):
                 check = False
         print "Confirming all modules render. Nothing should print during this step. "
         for module in course.xpath('//problem|//html|//video|//vertical|//sequential|/tab'):
-            module_class = courseware.modules.modx_modules[module.tag]
+            module_class=mitx.courseware.modules.modx_modules[module.tag]
             # TODO: Abstract this out in render_module.py
             try: 
-                module_class(etree.tostring(module), 
-                             module.get('id'), 
-                             ajax_url='',
-                             state=None, 
-                             track_function = lambda x,y,z:None, 
-                             render_function = lambda x: {'content':'','destroy_js':'','init_js':'','type':'video'})
+                instance=module_class(etree.tostring(module), 
+                                      module.get('id'), 
+                                      ajax_url='',
+                                      state=None, 
+                                      track_function = lambda x,y,z:None, 
+                                      render_function = lambda x: {'content':'','destroy_js':'','init_js':'','type':'video'})
             except:
                 print "==============> Error in ", etree.tostring(module)
                 check = False
