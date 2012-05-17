@@ -124,10 +124,8 @@ h1.top-header {
   }
 
   h3 {
-    @include box-shadow(inset 0 1px 0 0 #eee);
     background: none;
     border: none;
-    border-top: 1px solid #d3d3d3;
     color: #000;
     font-weight: normal;
     margin: 0;
@@ -140,11 +138,6 @@ h1.top-header {
       padding: 7px 7px 7px 30px;
       text-decoration: none;
       @include transition();
-
-      &:hover {
-        background: #efefef;
-        @include box-shadow(0 1px 0 #fff);
-      }
     }
 
     span.ui-icon {
@@ -153,9 +146,9 @@ h1.top-header {
 
     &.active {
       background: none;
-      //border: 0;
-      //border-bottom: 1px solid #bbb;
-      //@include box-shadow(none);
+      @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
+      border-bottom: 1px solid #d3d3d3;
+      @include box-shadow(inset 0 1px 0 0 #eee);
       color: #000;
       font-weight: bold;
 
