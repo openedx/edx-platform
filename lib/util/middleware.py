@@ -13,3 +13,4 @@ class ExceptionLoggingMiddleware(object):
         def process_exception(self, request, exception):
             log.exception(exception)
             return HttpResponseServerError("Server Error - Please try again later.")
+
