@@ -12,7 +12,7 @@
 <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
 <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
 <script>
-${profile_graphs.body(grade_summary, grade_cutoffs, "grade-detail-graph")}
+${profile_graphs.body(grade_sheet['grade_summary'], grade_cutoffs, "grade-detail-graph")}
 </script>
 
 <script>
@@ -100,6 +100,7 @@ $(function() {
                                "new_email":new_email});
        return false;
     });
+    
 
     $("#change_name_form").submit(function(){
       var new_name = $('#new_name_field').val();
@@ -119,7 +120,26 @@ $(function() {
                                "rationale":rationale});
        return false;
     });
-
+    
+    
+    $("#cert_request_form").submit(function(){
+      var values = {'cert_request_verify' : $("#cert_request_verify").is(':checked'),
+                    'cert_request_email': $("#cert_request_email").val() };
+      
+      postJSON('/certificate_request', values, function(data) {
+        if (data.success) {
+          $("#cert_request").html("<h1>Certificate Request Received</h1><p>A certificate will be sent to the specified email in a short time.</p>");
+        } else {
+          $("#cert_request_error").html(data.error);
+        }
+      });
+      //TODO: What do I log here?
+      // log_event("profile", {"type":"email_change_request", 
+      //                          "old_email":"${email}",
+      //                          "new_email":new_email});
+      return false;
+    });
+    
 });
 </script>
 </%block>
@@ -136,9 +156,18 @@ $(function() {
       </header>
 
       <div id="grade-detail-graph"></div>
+      
+      <div id="grade">
+        %if grade_sheet['grade']:
+          Final Grade <strong>${grade_sheet['grade']}</strong>
+          <a rel="leanModal" class="cert_request" href="#cert_request">Request Certificate</a>
+        %else:
+          No letter grade has been earned for this course
+        %endif
+      </div>
 
       <ol class="chapters">
-        %for chapter in courseware_summary:
+        %for chapter in grade_sheet['courseware_summary']:
         %if not chapter['chapter'] == "hidden":
         <li>
           <h2><a href="${reverse('courseware_chapter', args=format_url_params([chapter['course'], chapter['chapter']])) }">
@@ -308,3 +337,31 @@ $(function() {
     </fieldset>
   </form>
 </div>
+
+
+<div id="cert_request" class="leanModal_box">
+  <h1>Request a 6.002x Certificate</h1>
+  <p>You have earned the grade <strong>${grade_sheet['grade']}</strong> in this class.</p>
+  <p>Your name is <strong>${name}</strong></p>
+  <p>You can request a certificate be sent to your email, or send the certificate directly to another school or employer.</p>
+
+  <form id="cert_request_form">
+    <div id="cert_request_error"> </div>
+    <fieldset>
+      <ul>
+        <li>
+          <input type="checkbox" id="cert_request_verify"/>
+          <label> I certify that I have not violated the Honor Code for this course. The name shown above is correct. </label>
+        </li>
+        <li>
+          <label> Please enter your new email address: </label>
+          <input id="cert_request_email" type="email" value="" />
+        </li>
+        <li>
+          <input type="submit" id="" value="Send Certificate" />
+        </li>
+      </ul>
+    </fieldset>
+  </form>
+</div>
+
