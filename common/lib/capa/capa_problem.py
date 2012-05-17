@@ -179,8 +179,10 @@ class LoncapaProblem(object):
 
     def get_question_answers(self):
         """Returns a dict of answer_ids to answer values. If we can't generate
-        an answer (because it's a customresponse type), that answer_id is 
-        not included."""
+        an answer (this sometimes happens in customresponses), that answer_id is 
+        not included. Called by "show answers" button JSON request 
+        (see capa_module)
+        """
         context=self.extract_context(self.tree)
         answer_map = dict()
         problems_simple = self.extract_problems(self.tree)	# purified (flat) XML tree of just response queries
