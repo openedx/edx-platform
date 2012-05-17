@@ -142,7 +142,8 @@ class Module(XModule):
         
         dom2 = etree.fromstring(xml)
         
-        self.explanation=content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
+        self.explanation="problems/"+content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
+        # TODO: Should be converted to: self.explanation=content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
         self.explain_available=content_parser.item(dom2.xpath('/problem/@explain_available'))
 
         display_due_date_string=content_parser.item(dom2.xpath('/problem/@due'))
@@ -188,7 +189,8 @@ class Module(XModule):
         if state!=None and 'attempts' in state:
             self.attempts=state['attempts']
 
-        self.filename=content_parser.item(dom2.xpath('/problem/@filename')) # "problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
+        # TODO: Should be: self.filename=content_parser.item(dom2.xpath('/problem/@filename')) 
+        self.filename= "problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
         self.weight=content_parser.item(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
