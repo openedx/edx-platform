@@ -117,8 +117,17 @@ ROOT_URLCONF = 'urls'
 ### Dark code. Should be enabled in local settings for devel. 
 
 ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
+QUICKEDIT = False
 
 ###
+
+COURSE_DEFAULT = '6.002_Spring_2012'
+COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
+                                          'title'  :  'Circuits and Electronics',
+                                          'xmlpath': '6002x/',
+                                          }
+                    }
+
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
