@@ -152,7 +152,7 @@ def schematic(element, value, status, msg=''):
         'id':eid,
         'value':value,
         'initial_value':initial_value,
-        'state':state,
+        'state':status,
         'width':width,
         'height':height,
         'parts':parts,
