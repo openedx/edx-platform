@@ -7,14 +7,15 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
-from common import *
+from envs.common import *
+from envs.logsettings import get_logger_config
 
 STATIC_GRAB = True
 
-LOGGING = logsettings.get_logger_config(ENV_ROOT / "log", 
-                                        logging_env="dev",
-                                        tracking_filename="tracking.log",
-                                        debug=False)
+LOGGING = get_logger_config(ENV_ROOT / "log", 
+                            logging_env="dev",
+                            tracking_filename="tracking.log",
+                            debug=False)
 
 DATABASES = {
     'default': {
