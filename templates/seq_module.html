@@ -1,4 +1,4 @@
-<nav class="sequence-nav">
+<nav aria-label="Section Navigation" class="sequence-nav">
   <ol>
     % for t in range(1,1+len(items)):
     <li><a href="#" class="seq_inactive" id="tt_${ t }"></a></li>
@@ -14,7 +14,7 @@
 <div id="seq_content"></div>
 
 <nav class="sequence-bottom">
-<ul>
+<ul aria-label="Section Navigation">
   <li class="${ id }prev prev"><a href="#">Previous</a></li>
   <li class="${ id }next next"><a href="#">Next</a></li>
 </ul>

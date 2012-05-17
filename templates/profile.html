@@ -179,7 +179,7 @@ $(function() {
 
     </section>
 
-    <section class="user-info">
+    <section aria-label="Profile Navigation" class="user-info">
 
       <header>
         <h1>Student Profile</h1>
@@ -189,7 +189,7 @@ $(function() {
         <li>
           Name: <strong>${name}</strong>
           %if True:
-          <a href="#apply_name_change" rel="leanModal" class="name-edit">Edit</a>
+          <a href="#apply_name_change" rel="leanModal" class="name-edit" aria-label="Edit Name">Edit</a>
           %else:
           (Name change pending)
           %endif
@@ -200,18 +200,18 @@ $(function() {
         </li>
 
         <li>
-          E-mail: <strong>${email}</strong> <a href="#change_email" rel="leanModal" class="edit-email">Edit</a>
+          E-mail: <strong>${email}</strong> <a href="#change_email" rel="leanModal" class="edit-email" aria-label="Edit Email">Edit</a>
         </li>
         <li>
-          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location">Edit</a>
+          Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location" aria-label="Edit Location">Edit</a>
         </li>
         <li>
-          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language">Edit</a>
+          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language" aria-label="Edit Language">Edit</a>
         </li>
         <li>
           Password reset
           <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
-          <input type="submit" id="pwd_reset_button" value="Reset" />
+          <input type="submit" id="pwd_reset_button" value="Reset" aria-label="Reset Password" />
           <p>We'll e-mail a password reset link to ${email}.</p>
         </li>
       </ul>
