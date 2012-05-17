@@ -22,6 +22,11 @@ import courseware.modules
 log = logging.getLogger("mitx.courseware")
 
 class I4xSystem(object):
+    '''
+    This is an abstraction such that x_modules can function independent 
+    of the courseware (e.g. import into other types of courseware, LMS, 
+    or if we want to have a sandbox server for user-contributed content)
+    '''
     def __init__(self, ajax_url, track_function, render_function, filestore=None):
         self.ajax_url = ajax_url
         self.track_function = track_function
@@ -29,6 +34,10 @@ class I4xSystem(object):
             self.filestore = OSFS(settings.DATA_DIR)
         self.render_function = render_function
         self.exception404 = Http404
+    def __repr__(self):
+        return repr(self.__dict__)
+    def __str__(self):
+        return str(self.__dict__)
 
 def object_cache(cache, user, module_type, module_id):
     # We don't look up on user -- all queries include user
@@ -50,6 +59,7 @@ def make_track_function(request):
     def f(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
+
 def grade_histogram(module_id):
     ''' Print out a histogram of grades on a given problem. 
         Part of staff member debug info. 
@@ -83,6 +93,10 @@ def render_x_module(user, request, xml_module, module_object_preload):
     else:
         state = smod.state
 
+    # get coursename if stored
+    if 'coursename' in request.session: coursename = request.session['coursename']
+    else: coursename = None
+
     # Create a new instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module_type+'/'+module_id+'/'
     system = I4xSystem(track_function = make_track_function(request), 
@@ -104,6 +118,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
                            state=instance.get_state())
         smod.save()
         module_object_preload.append(smod)
+
     # Grab content
     content = instance.get_html()
     init_js = instance.get_init_js()

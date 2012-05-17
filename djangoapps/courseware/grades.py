@@ -67,7 +67,7 @@ course_settings = Settings()
 
 
 
-def grade_sheet(student):
+def grade_sheet(student,coursename=None):
     """
     This pulls a summary of all problems in the course. It returns a dictionary with two datastructures:
     
@@ -77,7 +77,7 @@ def grade_sheet(student):
     
     - grade_summary is the output from the course grader. More information on the format is in the docstring for CourseGrader.
     """
-    dom=content_parser.course_file(student)
+    dom=content_parser.course_file(student,coursename)
     course = dom.xpath('//course/@name')[0]
     xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
@@ -103,7 +103,7 @@ def grade_sheet(student):
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    (correct,total) = get_score(student, p, response_by_id)
+                    (correct,total) = get_score(student, p, response_by_id, coursename=coursename)
                     
                     if settings.GENERATE_PROFILE_SCORES:
                         if total > 1:
@@ -167,7 +167,7 @@ def aggregate_scores(scores, section_name = "summary"):
     return all_total, graded_total
     
 
-def get_score(user, problem, cache):
+def get_score(user, problem, cache, coursename=None):
     ## HACK: assumes max score is fixed per problem
     id = problem.get('id')
     correct = 0.0
@@ -196,7 +196,7 @@ def get_score(user, problem, cache):
         ## HACK 1: We shouldn't specifically reference capa_module
         ## HACK 2: Backwards-compatibility: This should be written when a grade is saved, and removed from the system
         from module_render import I4xSystem
-        system = I4xSystem(None, None, None)
+        system = I4xSystem(None, None, None, coursename=coursename)
         total=float(courseware.modules.capa_module.Module(system, etree.tostring(problem), "id").max_score())
         response.max_grade = total
         response.save()

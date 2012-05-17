@@ -21,6 +21,7 @@ from mitxmako.shortcuts import render_to_string
 from x_module import XModule
 from courseware.capa.capa_problem import LoncapaProblem, StudentInputError
 import courseware.content_parser as content_parser
+from multicourse import multicourse_settings
 
 log = logging.getLogger("mitx.courseware")
 
@@ -115,18 +116,19 @@ class Module(XModule):
         if len(explain) == 0:
             explain = False
 
-        html=render_to_string('problem.html', 
-                              {'problem' : content, 
-                               'id' : self.item_id, 
-                               'check_button' : check_button,
-                               'reset_button' : reset_button,
-                               'save_button' : save_button,
-                               'answer_available' : self.answer_available(),
-                               'ajax_url' : self.ajax_url,
-                               'attempts_used': self.attempts, 
-                               'attempts_allowed': self.max_attempts, 
-                               'explain': explain
-                               })
+        context = {'problem' : content, 
+                   'id' : self.item_id, 
+                   'check_button' : check_button,
+                   'reset_button' : reset_button,
+                   'save_button' : save_button,
+                   'answer_available' : self.answer_available(),
+                   'ajax_url' : self.ajax_url,
+                   'attempts_used': self.attempts, 
+                   'attempts_allowed': self.max_attempts, 
+                   'explain': explain,
+                   }
+
+        html=render_to_string('problem.html', context)
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
             
@@ -193,7 +195,12 @@ class Module(XModule):
             seed = 1
         else:
             seed = None
-        self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, state, seed = seed)
+        try:
+            fp = self.filestore.open(self.filename)
+        except Exception,err:
+            print '[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename)
+            raise Exception,err
+        self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -306,7 +313,7 @@ class Module(XModule):
         except: 
             self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state)
             traceback.print_exc()
-            raise
+            raise Exception,"error in capa_module"
             return json.dumps({'success':'Unknown Error'})
             
         self.attempts = self.attempts + 1
