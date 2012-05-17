@@ -6,10 +6,10 @@ header.announcement {
   -webkit-font-smoothing: antialiased;
 
   &.home {
-    background: #e3e3e3 url("/static/images/marketing/shot-5-medium.jpg");
+    background: #e3e3e3 url("../images/marketing/shot-5-medium.jpg");
 
     @media screen and (min-width: 1200px) {
-      background: #e3e3e3 url("/static/images/marketing/shot-5-large.jpg");
+      background: #e3e3e3 url("../images/marketing/shot-5-large.jpg");
     }
 
     div {
@@ -33,14 +33,14 @@ header.announcement {
   }
 
   &.course {
-    background: #e3e3e3 url("/static/images/marketing/course-bg-small.jpg");
+    background: #e3e3e3 url("../images/marketing/course-bg-small.jpg");
 
     @media screen and (min-width: 1200px) {
-      background: #e3e3e3 url("/static/images/marketing/course-bg-large.jpg");
+      background: #e3e3e3 url("../images/marketing/course-bg-large.jpg");
     }
 
     @media screen and (max-width: 1199px) and (min-width: 700px) {
-      background: #e3e3e3 url("/static/images/marketing/course-bg-medium.jpg");
+      background: #e3e3e3 url("../images/marketing/course-bg-medium.jpg");
     }
 
     div {

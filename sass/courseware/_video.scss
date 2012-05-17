@@ -192,7 +192,7 @@ section.course-content {
             float: left;
 
             a {
-              background: url('/static/images/closed-arrow.png') 10px center no-repeat;
+              background: url('../images/closed-arrow.png') 10px center no-repeat;
               border-left: 1px solid #000;
               border-right: 1px solid #000;
               @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
@@ -209,7 +209,7 @@ section.course-content {
               width: 110px;
 
               &.open {
-                background: url('/static/images/open-arrow.png') 10px center no-repeat;
+                background: url('../images/open-arrow.png') 10px center no-repeat;
 
                 ol#video_speeds {
                   display: block;
@@ -280,7 +280,7 @@ section.course-content {
           }
 
           a.add-fullscreen {
-            background: url(/static/images/fullscreen.png) center no-repeat;
+            background: url(../images/fullscreen.png) center no-repeat;
             border-right: 1px solid #000;
             @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
             color: #797979;
