@@ -24,8 +24,7 @@ import tempfile
 import djcelery
 from path import path
 
-from askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
-import logsettings
+from envs.askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True

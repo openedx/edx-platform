@@ -7,7 +7,8 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
-from common import *
+from envs.common import *
+from envs.logsettings import get_logger_config
 import os
 
 INSTALLED_APPS = [
@@ -35,10 +36,10 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           DATA_DIR / 'info',
                           DATA_DIR / 'problems']
 
-LOGGING = logsettings.get_logger_config(TEST_ROOT / "log", 
-                                        logging_env="dev",
-                                        tracking_filename="tracking.log",
-                                        debug=True)
+LOGGING = get_logger_config(TEST_ROOT / "log", 
+                            logging_env="dev",
+                            tracking_filename="tracking.log",
+                            debug=True)
 
 DATABASES = {
     'default': {
