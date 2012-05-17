@@ -34,7 +34,7 @@ task :default => [:pep8, :pylint, :test]
 directory REPORT_DIR
 
 task :pep8 => REPORT_DIR do
-    sh("pep8 djangoapps | tee #{REPORT_DIR}/pep8.report")
+    sh("pep8 --ignore=E501 djangoapps | tee #{REPORT_DIR}/pep8.report")
 end
 
 task :pylint => REPORT_DIR do
