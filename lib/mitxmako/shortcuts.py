@@ -34,6 +34,9 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
         context_dictionary.update(d)
     if context: 
         context_dictionary.update(context)
+    ## HACK
+    ## We should remove this, and possible set COURSE_TITLE in the middleware from the session. 
+    if 'COURSE_TITLE' not in context_dictionary: context_dictionary['COURSE_TITLE'] = ''
     # fetch and render template
     template = middleware.lookup[namespace].get_template(template_name)
     return template.render(**context_dictionary)

@@ -32,6 +32,8 @@ from lxml.html.soupparser import fromstring as fromstring_bs	# uses Beautiful So
 import calc
 import eia
 
+from util import contextualize_text
+
 def compare_with_tolerance(v1, v2, tol):
     ''' Compare v1 to v2 with maximum tolerance tol
     tol is relative if it ends in %; otherwise, it is absolute
@@ -61,6 +63,8 @@ class GenericResponse(object):
 
 #Every response type needs methods "grade" and "get_answers"     
 
+#-----------------------------------------------------------------------------
+
 class MultipleChoiceResponse(GenericResponse):
     '''
     Example: 
@@ -84,6 +88,7 @@ class MultipleChoiceResponse(GenericResponse):
         self.correct_choices = [choice.get('name') for choice in self.correct_choices]
         self.context = context
 
+        self.answer_field = xml.find('choicegroup')	# assumes only ONE choicegroup within this response
         self.answer_id = xml.xpath('//*[@id=$id]//choicegroup/@id',
                                    id=xml.get('id'))
         if not len(self.answer_id) == 1:
@@ -100,9 +105,14 @@ class MultipleChoiceResponse(GenericResponse):
         return {self.answer_id:self.correct_choices}
 
     def preprocess_response(self):
+        '''
+        Initialize name attributes in <choice> stanzas in the <choicegroup> in this response.
+        '''
         i=0
         for response in self.xml.xpath("choicegroup"):
-            response.set("type", "MultipleChoice")
+            rtype = response.get('type')
+            if rtype not in ["MultipleChoice"]:
+                response.set("type", "MultipleChoice")		# force choicegroup to be MultipleChoice if not valid
             for choice in list(response):
                 if choice.get("name") == None:
                     choice.set("name", "choice_"+str(i))
@@ -131,6 +141,42 @@ class TrueFalseResponse(MultipleChoiceResponse):
         
         return {self.answer_id : 'incorrect'}
 
+#-----------------------------------------------------------------------------
+
+class OptionResponse(GenericResponse):
+    '''
+    Example: 
+
+    <optionresponse direction="vertical" randomize="yes">
+        <optioninput options="('Up','Down')" correct="Up"><text>The location of the sky</text></optioninput>
+        <optioninput options="('Up','Down')" correct="Down"><text>The location of the earth</text></optioninput>
+    </optionresponse>
+
+    TODO: handle direction and randomize
+
+    '''
+    def __init__(self, xml, context):
+        self.xml = xml
+        self.answer_fields = xml.findall('optioninput')
+        if settings.DEBUG:
+            print '[courseware.capa.responsetypes.OR.init] answer_fields=%s' % (self.answer_fields)
+        self.context = context
+
+    def grade(self, student_answers):
+        cmap = {}
+        amap = self.get_answers()
+        for aid in amap:
+            if aid in student_answers and student_answers[aid]==amap[aid]:
+                cmap[aid] = 'correct'
+            else:
+                cmap[aid] = 'incorrect'
+        return cmap
+
+    def get_answers(self):
+        amap = dict([(af.get('id'),af.get('correct')) for af in self.answer_fields])
+        return amap
+
+#-----------------------------------------------------------------------------
 
 class NumericalResponse(GenericResponse):
     def __init__(self, xml, context):
@@ -219,43 +265,153 @@ def sympy_check2():
         self.answer_ids = xml.xpath('//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
         self.context = context
-        answer_list = xml.xpath('//*[@id=$id]//answer',
-                           id=xml.get('id'))
-        if len(answer_list):
-            answer=answer_list[0]
-        else: 
-            raise Exception("Invalid custom response -- no checker code")
 
-        answer_src = answer.get('src')
-        if answer_src != None:
-            self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
-        else:
-            self.code = answer.text
+        # if <customresponse> has an "expect" attribute then save that
+        self.expect = xml.get('expect')
+        self.myid = xml.get('id')
+
+        # the <answer>...</answer> stanza should be local to the current <customresponse>.  So try looking there first.
+        self.code = None
+        answer = None
+        try:
+            answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]
+        except IndexError,err:
+            # print "xml = ",etree.tostring(xml,pretty_print=True)
+
+            # if we have a "cfn" attribute then look for the function specified by cfn, in the problem context
+            # ie the comparison function is defined in the <script>...</script> stanza instead
+            cfn = xml.get('cfn')
+            if cfn:
+                if settings.DEBUG: print "[courseware.capa.responsetypes] cfn = ",cfn
+                if cfn in context:
+                    self.code = context[cfn]
+                else:
+                    print "can't find cfn in context = ",context
+
+        if not self.code:
+            if not answer:
+                # raise Exception,"[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid
+                print "[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid
+                self.code = ''
+            else:
+                answer_src = answer.get('src')
+                if answer_src != None:
+                    self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
+                else:
+                    self.code = answer.text
 
     def grade(self, student_answers):
         '''
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
         '''
-        from capa_problem import global_context
-        submission = [student_answers[k] for k in sorted(self.answer_ids)]
-        self.context.update({'submission':submission})
-        exec self.code in global_context, self.context
-        return  zip(sorted(self.answer_ids), self.context['correct'])
+
+        def getkey2(dict,key,default):
+            """utilify function: get dict[key] if key exists, or return default"""
+            if dict.has_key(key):
+                return dict[key]
+            return default
+
+        idset = sorted(self.answer_ids)				# ordered list of answer id's
+        submission = [student_answers[k] for k in idset]	# ordered list of answers
+        fromjs = [ getkey2(student_answers,k+'_fromjs',None) for k in idset ]	# ordered list of fromjs_XXX responses (if exists)
+
+        # if there is only one box, and it's empty, then don't evaluate
+        if len(idset)==1 and not submission[0]:
+            return {idset[0]:'no_answer_entered'}
+
+        gctxt = self.context['global_context']
+
+        correct = ['unknown'] * len(idset)
+        messages = [''] * len(idset)
+
+        # put these in the context of the check function evaluator
+        # note that this doesn't help the "cfn" version - only the exec version
+        self.context.update({'xml' : self.xml,		# our subtree
+                             'response_id' : self.myid,	# my ID
+                             'expect': self.expect,		# expected answer (if given as attribute)
+                             'submission':submission,		# ordered list of student answers from entry boxes in our subtree
+                             'idset':idset,			# ordered list of ID's of all entry boxes in our subtree
+                             'fromjs':fromjs,			# ordered list of all javascript inputs in our subtree
+                             'answers':student_answers,		# dict of student's responses, with keys being entry box IDs
+                             'correct':correct,			# the list to be filled in by the check function
+                             'messages':messages,		# the list of messages to be filled in by the check function
+                             'testdat':'hello world',
+                             })
+
+        # exec the check function
+        if type(self.code)==str:
+            try:
+                exec self.code in self.context['global_context'], self.context
+            except Exception,err:
+                print "oops in customresponse (code) error %s" % err
+                print "context = ",self.context
+                print traceback.format_exc()
+        else:					# self.code is not a string; assume its a function
+
+            # this is an interface to the Tutor2 check functions
+            fn = self.code
+            try:
+                answer_given = submission[0] if (len(idset)==1) else submission
+                if fn.func_code.co_argcount>=4:	# does it want four arguments (the answers dict, myname)?
+                    ret = fn(self.expect,answer_given,student_answers,self.answer_ids[0])
+                elif fn.func_code.co_argcount>=3:	# does it want a third argument (the answers dict)?
+                    ret = fn(self.expect,answer_given,student_answers)
+                else:
+                    ret = fn(self.expect,answer_given)
+            except Exception,err:
+                print "oops in customresponse (cfn) error %s" % err
+                # print "context = ",self.context
+                print traceback.format_exc()
+            if settings.DEBUG: print "[courseware.capa.responsetypes.customresponse.grade] ret = ",ret
+            if type(ret)==dict:
+                correct[0] = 'correct' if ret['ok'] else 'incorrect'
+                msg = ret['msg']
+
+                if 1:
+                    # try to clean up message html
+                    msg = '<html>'+msg+'</html>'
+                    msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
+                    msg = msg.replace('&#13;','')
+                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)	# python 2.7
+                    msg = re.sub('(?ms)<html>(.*)</html>','\\1',msg)
+
+                messages[0] = msg
+            else:
+                correct[0] = 'correct' if ret else 'incorrect'
+
+        # build map giving "correct"ness of the answer(s)
+        #correct_map = dict(zip(idset, self.context['correct']))
+        correct_map = {}
+        for k in range(len(idset)):
+            correct_map[idset[k]] = correct[k]
+            correct_map['msg_%s' % idset[k]] = messages[k]
+        return  correct_map
 
     def get_answers(self):
-        # Since this is explicitly specified in the problem, this will 
-        # be handled by capa_problem
+        '''
+        Give correct answer expected for this response.
+
+        capa_problem handles correct_answers from entry objects like textline, and that
+        is what should be used when this response has multiple entry objects.
+
+        but for simplicity, if an "expect" attribute was given by the content author
+        ie <customresponse expect="foo" ...> then return it now.
+        '''
+        if len(self.answer_ids)>1:
+            return {}
+        if self.expect:
+            return {self.answer_ids[0] : self.expect}
         return {}
 
 #-----------------------------------------------------------------------------
 
 class ExternalResponse(GenericResponse):
-    '''
+    """
     Grade the student's input using an external server.
     
     Typically used by coding problems.
-    '''
+    """
     def __init__(self, xml, context):
         self.xml = xml
         self.answer_ids = xml.xpath('//*[@id=$id]//textbox/@id|//*[@id=$id]//textline/@id',
@@ -471,10 +627,6 @@ class ImageResponse(GenericResponse):
                 raise Exception,'[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (err,aid,given)
             (gx,gy) = [int(x) for x in m.groups()]
             
-            if settings.DEBUG:
-                print "[capamodule.capa.responsetypes.imageinput] llx,lly,urx,ury=",(llx,lly,urx,ury)
-                print "[capamodule.capa.responsetypes.imageinput] gx,gy=",(gx,gy)
-
             # answer is correct if (x,y) is within the specified rectangle
             if (llx <= gx <= urx) and (lly <= gy <= ury):
                 correct_map[aid] = 'correct'
