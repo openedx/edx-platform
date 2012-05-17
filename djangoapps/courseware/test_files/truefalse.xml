@@ -1,0 +1,21 @@
+<problem>
+  <truefalseresponse max="10" randomize="yes">
+  <choicegroup>
+    <choice location="random" correct="true" name="foil1">
+      <startouttext />This is foil One.<endouttext />
+    </choice>
+    <choice location="random" correct="true" name="foil2">
+      <startouttext />This is foil Two.<endouttext />
+    </choice>
+    <choice location="random" correct="false" name="foil3">
+      <startouttext />This is foil Three.<endouttext />
+    </choice>
+    <choice location="random" correct="false" name="foil4">
+      <startouttext />This is foil Four.<endouttext />
+    </choice>
+    <choice location="random" correct="false" name="foil5">
+            <startouttext />This is foil Five.<endouttext />
+    </choice>
+  </choicegroup>
+</truefalseresponse>
+</problem>

@@ -1,0 +1,5 @@
+django-nose
+coverage
+nosexcover
+pylint
+pep8

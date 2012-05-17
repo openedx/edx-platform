@@ -1,3 +1,13 @@
+html {
+  height: 100%;
+  max-height: 100%;
+}
+
+body.courseware {
+  height: 100%;
+  max-height: 100%;
+}
+
 div.course-wrapper {
   @extend .table-wrapper;
 
@@ -7,9 +17,12 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
+    overflow: hidden;
+    @include border-top-right-radius(4px);
+    @include border-bottom-right-radius(4px);
 
     h1 {
-      @extend .top-header;
+      margin: 0 0 lh();
     }
 
     p {
@@ -159,18 +172,71 @@ div.course-wrapper {
         margin-bottom: 15px;
         padding: 0 0 15px;
 
+        header {
+          @extend h1.top-header;
+          margin-bottom: -16px;
+
+          h1 {
+            margin: 0;
+          }
+
+          h2 {
+            float: right;
+            margin-right: 0;
+            margin-top: 8px;
+            text-align: right;
+            padding-right: 0;
+          }
+        }
+
         &:last-child {
           border-bottom: none;
           margin-bottom: 0;
           padding-bottom: 0;
         }
+
+
+        ul {
+          list-style: disc outside none;
+          padding-left: 1em;
+        }
+
+        nav.sequence-bottom {
+          ul {
+          list-style: none;
+          padding: 0;
+          }
+        }
       }
     }
 
     section.tutorials {
+      h2 {
+        margin-bottom: lh();
+      }
+
       ul {
-        list-style: disc outside none;
-        margin-left: lh();
+        margin: 0;
+        @include clearfix();
+
+        li {
+          width: flex-grid(3, 9);
+          float: left;
+          margin-right: flex-gutter(9);
+          margin-bottom: lh();
+
+          &:nth-child(3n) {
+            margin-right: 0;
+          }
+
+          &:nth-child(3n+1) {
+            clear: both;
+          }
+
+          a {
+            font-weight: bold;
+          }
+        }
       }
     }
 
@@ -200,6 +266,24 @@ div.course-wrapper {
           background-color: lighten($mit-red, 10%);
           outline: none;
         }
+      }
+    }
+
+    div.ui-tabs {
+      border: 0;
+      @include border-radius(0);
+      margin: 0;
+      padding: 0;
+
+      .ui-tabs-nav {
+        background: none;
+        border: 0;
+        margin-bottom: lh(.5);
+      }
+
+      .ui-tabs-panel {
+        @include border-radius(0);
+        padding: 0;
       }
     }
   }

@@ -20,6 +20,7 @@ section.index-content {
     p {
       line-height: lh();
       margin-bottom: lh();
+
     }
 
     ul {
@@ -221,20 +222,33 @@ section.index-content {
     &.course {
       h2 {
         padding-top: lh(5);
-        background: url('../images/marketing/circuits-bg.jpg') 0 0 no-repeat;
+        background: url('/static/images/marketing/circuits-bg.jpg') 0 0 no-repeat;
         @include background-size(contain);
 
         @media screen and (max-width: 998px) and (min-width: 781px){
-          background: url('../images/marketing/circuits-medium-bg.jpg') 0 0 no-repeat;
+          background: url('/static/images/marketing/circuits-medium-bg.jpg') 0 0 no-repeat;
         }
 
         @media screen and (max-width: 780px) {
           padding-top: lh(5);
-          background: url('../images/marketing/circuits-bg.jpg') 0 0 no-repeat;
+          background: url('/static/images/marketing/circuits-bg.jpg') 0 0 no-repeat;
         }
 
         @media screen and (min-width: 500px) and (max-width: 781px) {
           padding-top: lh(8);
+        }
+      }
+
+      div.announcement {
+        p.announcement-button {
+          a {
+            margin-top: 0;
+          }
+        }
+
+        img {
+          max-width: 100%;
+          margin-bottom: lh();
         }
       }
     }

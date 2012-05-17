@@ -16,13 +16,12 @@ import traceback
 from lxml import etree
 
 ## TODO: Abstract out from Django
-from django.conf import settings
-from mitxmako.shortcuts import render_to_response, render_to_string
-from django.http import Http404
+from mitxmako.shortcuts import render_to_string
 
 from x_module import XModule
 from courseware.capa.capa_problem import LoncapaProblem, StudentInputError
 import courseware.content_parser as content_parser
+from multicourse import multicourse_settings
 
 log = logging.getLogger("mitx.courseware")
 
@@ -92,10 +91,13 @@ class Module(XModule):
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions. 
         if self.lcp.done and self.rerandomize == "always":
-            #print "!"
             check_button = False
             save_button = False
         
+        # Only show the reset button if pressing it will show different values
+        if self.rerandomize != 'always':
+            reset_button = False
+
         # User hasn't submitted an answer yet -- we don't want resets
         if not self.lcp.done:
             reset_button = False
@@ -114,25 +116,26 @@ class Module(XModule):
         if len(explain) == 0:
             explain = False
 
-        html=render_to_string('problem.html', 
-                              {'problem' : content, 
-                               'id' : self.item_id, 
-                               'check_button' : check_button,
-                               'reset_button' : reset_button,
-                               'save_button' : save_button,
-                               'answer_available' : self.answer_available(),
-                               'ajax_url' : self.ajax_url,
-                               'attempts_used': self.attempts, 
-                               'attempts_allowed': self.max_attempts, 
-                               'explain': explain
-                               })
+        context = {'problem' : content, 
+                   'id' : self.item_id, 
+                   'check_button' : check_button,
+                   'reset_button' : reset_button,
+                   'save_button' : save_button,
+                   'answer_available' : self.answer_available(),
+                   'ajax_url' : self.ajax_url,
+                   'attempts_used': self.attempts, 
+                   'attempts_allowed': self.max_attempts, 
+                   'explain': explain,
+                   }
+
+        html=render_to_string('problem.html', context)
         if encapsulate:
             html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
             
         return html
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None, meta = None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
+    def __init__(self, system, xml, item_id, state=None):
+        XModule.__init__(self, system, xml, item_id, state)
 
         self.attempts = 0
         self.max_attempts = None
@@ -185,17 +188,24 @@ class Module(XModule):
         if state!=None and 'attempts' in state:
             self.attempts=state['attempts']
 
-        self.filename=content_parser.item(dom2.xpath('/problem/@filename'))
-        filename=settings.DATA_DIR+"/problems/"+self.filename+".xml"
+        self.filename="problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
         self.weight=content_parser.item(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
             seed = 1
         else:
             seed = None
-        self.lcp=LoncapaProblem(filename, self.item_id, state, seed = seed)
+        try:
+            fp = self.filestore.open(self.filename)
+        except Exception,err:
+            print '[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename)
+            raise Exception,err
+        self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed)
 
     def handle_ajax(self, dispatch, get):
+        '''
+        This is called by courseware.module_render, to handle an AJAX call.  "get" is request.POST 
+        '''
         if dispatch=='problem_get':
             response = self.get_problem(get)
         elif False: #self.close_date > 
@@ -241,16 +251,22 @@ class Module(XModule):
             return True
         if self.show_answer == 'closed' and not self.closed():
             return False
-        print "aa", self.show_answer
-        raise Http404
+        if self.show_answer == 'always':
+            return True
+        raise self.system.exception404 #TODO: Not 404
 
     def get_answer(self, get):
-        if not self.answer_available():
-            raise Http404
-        else: 
-            return json.dumps(self.lcp.get_question_answers(), 
-                              cls=ComplexEncoder)
+        '''
+        For the "show answer" button.
 
+        TODO: show answer events should be logged here, not just in the problem.js
+        '''
+        if not self.answer_available():
+            raise self.system.exception404
+        else: 
+            answers = self.lcp.get_question_answers()
+            return json.dumps(answers, 
+                              cls=ComplexEncoder)
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
@@ -265,12 +281,11 @@ class Module(XModule):
         event_info['state'] = self.lcp.get_state()
         event_info['filename'] = self.filename
 
+        # make a dict of all the student responses ("answers").
         answers=dict()
         # input_resistor_1 ==> resistor_1
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
-
-#        print "XXX", answers, get
 
         event_info['answers']=answers
 
@@ -278,53 +293,44 @@ class Module(XModule):
         if self.closed():
             event_info['failure']='closed'
             self.tracker('save_problem_check_fail', event_info)
-            print "cp"
-            raise Http404
+            raise self.system.exception404
             
         # Problem submitted. Student should reset before checking
         # again.
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure']='unreset'
             self.tracker('save_problem_check_fail', event_info)
-            print "cpdr"
-            raise Http404
+            raise self.system.exception404
 
         try:
             old_state = self.lcp.get_state()
             lcp_id = self.lcp.problem_id
-            filename = self.lcp.filename
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst: 
-            self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
+            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state)
             traceback.print_exc()
-#            print {'error':sys.exc_info(),
-#                   'answers':answers, 
-#                   'seed':self.lcp.seed, 
-#                   'filename':self.lcp.filename}
             return json.dumps({'success':inst.message})
         except: 
-            self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
+            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state)
             traceback.print_exc()
+            raise Exception,"error in capa_module"
             return json.dumps({'success':'Unknown Error'})
             
-
         self.attempts = self.attempts + 1
         self.lcp.done=True
-
+        
         success = 'correct'
         for i in correct_map:
             if correct_map[i]!='correct':
                 success = 'incorrect'
-
-        js=json.dumps({'correct_map' : correct_map,
-                       'success' : success})
 
         event_info['correct_map']=correct_map
         event_info['success']=success
 
         self.tracker('save_problem_check', event_info)
 
-        return js
+        return json.dumps({'success': success,
+                           'contents': self.get_problem_html(encapsulate=False)})
 
     def save_problem(self, get):
         event_info = dict()
@@ -382,8 +388,7 @@ class Module(XModule):
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None
 
-        filename=settings.DATA_DIR+"problems/"+self.filename+".xml"
-        self.lcp=LoncapaProblem(filename, self.item_id, self.lcp.get_state())
+        self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state())
 
         event_info['new_state']=self.lcp.get_state()
         self.tracker('reset_problem', event_info)

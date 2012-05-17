@@ -1,5 +1,13 @@
+'''
+courseware/content_parser.py
+
+This file interfaces between all courseware modules and the top-level course.xml file for a course.
+
+Does some caching (to be explained).
+
+'''
+
 import hashlib
-import json
 import logging
 import os
 import re
@@ -14,9 +22,11 @@ try: # This lets us do __name__ == ='__main__'
 
     from student.models import UserProfile
     from student.models import UserTestGroup
-    from mitxmako.shortcuts import render_to_response, render_to_string
+    from mitxmako.shortcuts import render_to_string
     from util.cache import cache
+    from multicourse import multicourse_settings
 except: 
+    print "Could not import/content_parser"
     settings = None 
 
 ''' This file will eventually form an abstraction layer between the
@@ -97,19 +107,8 @@ def item(l, default="", process=lambda x:x):
 
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
-    old_ids = {'video':'youtube',
-                   'problem':'filename',
-                   'sequential':'id',
-                   'html':'filename',
-                   'vertical':'id', 
-                   'tab':'id',
-                   'schematic':'id',
-                   'book' : 'id'}
     import courseware.modules
     default_ids = courseware.modules.get_default_ids()
-
-    #print default_ids, old_ids
-    #print default_ids == old_ids
 
     # Tag elements with unique IDs
     elements = course.xpath("|".join(['//'+c for c in default_ids]))
@@ -153,6 +152,9 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
             return
 
 def user_groups(user):
+    if not user.is_authenticated():
+        return []
+
     # TODO: Rewrite in Django
     key = 'user_group_names_{user.id}'.format(user=user)
     cache_expiration = 60 * 60 # one hour
@@ -177,15 +179,23 @@ def course_xml_process(tree):
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")
     propogate_downward_tag(tree, "graceperiod")
+    propogate_downward_tag(tree, "showanswer")
+    propogate_downward_tag(tree, "rerandomize")
     return tree
 
-def course_file(user):
+def course_file(user,coursename=None):
     ''' Given a user, return course.xml'''
-    #import logging
-    #log = logging.getLogger("tracking")
-    #log.info(  "DEBUG: cf:"+str(user) )
 
-    filename = UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
+    if user.is_authenticated():
+        filename = UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
+    else:
+        filename = 'guest_course.xml'
+
+    # if a specific course is specified, then use multicourse to get the right path to the course XML directory
+    if coursename and settings.ENABLE_MULTICOURSE:
+        xp = multicourse_settings.get_course_xmlpath(coursename)
+        filename = xp + filename	# prefix the filename with the path
+
     groups = user_groups(user)
     options = {'dev_content':settings.DEV_CONTENT, 
                'groups' : groups}
@@ -207,13 +217,24 @@ def course_file(user):
 
     return tree
 
-def section_file(user, section):
-    ''' Given a user and the name of a section, return that section
+def section_file(user, section, coursename=None, dironly=False):
+    '''
+    Given a user and the name of a section, return that section.
+    This is done specific to each course.
+    If dironly=True then return the sections directory.
     '''
     filename = section+".xml"
 
-    if filename not in os.listdir(settings.DATA_DIR + '/sections/'):
-        print filename+" not in "+str(os.listdir(settings.DATA_DIR + '/sections/'))
+    # if a specific course is specified, then use multicourse to get the right path to the course XML directory
+    xp = ''
+    if coursename and settings.ENABLE_MULTICOURSE: xp = multicourse_settings.get_course_xmlpath(coursename)
+
+    dirname = settings.DATA_DIR + xp + '/sections/'
+
+    if dironly: return dirname
+
+    if filename not in os.listdir(dirname):
+        print filename+" not in "+str(os.listdir(dirname))
         return None
 
     options = {'dev_content':settings.DEV_CONTENT, 
@@ -223,7 +244,7 @@ def section_file(user, section):
     return tree
 
 
-def module_xml(user, module, id_tag, module_id):
+def module_xml(user, module, id_tag, module_id, coursename=None):
     ''' Get XML for a module based on module and module_id. Assumes
         module occurs once in courseware XML file or hidden section. '''
     # Sanitize input
@@ -236,14 +257,15 @@ def module_xml(user, module, id_tag, module_id):
                                                                              id_tag=id_tag,
                                                                              id=module_id)
     #result_set=doc.xpathEval(xpath_search)
-    doc = course_file(user)
-    section_list = (s[:-4] for s in os.listdir(settings.DATA_DIR+'/sections') if s[-4:]=='.xml')
+    doc = course_file(user,coursename)
+    sdirname = section_file(user,'',coursename,True)	# get directory where sections information is stored
+    section_list = (s[:-4] for s in os.listdir(sdirname) if s[-4:]=='.xml')
 
     result_set=doc.xpath(xpath_search)
     if len(result_set)<1:
         for section in section_list:
             try: 
-                s = section_file(user, section)
+                s = section_file(user, section, coursename)
             except etree.XMLSyntaxError: 
                 ex= sys.exc_info()
                 raise ContentException("Malformed XML in " + section+ "("+str(ex[1].msg)+")")

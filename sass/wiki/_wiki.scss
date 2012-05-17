@@ -7,15 +7,14 @@ div.wiki-wrapper {
     @extend .content;
     position: relative;
 
-
     header {
       @extend .topbar;
-      height:46px;
       @include box-shadow(inset 0 1px 0 white);
+      height:46px;
 
       &:empty {
-        display: none !important;
         border-bottom: 0;
+        display: none !important;
       }
 
       a {
@@ -23,10 +22,10 @@ div.wiki-wrapper {
       }
 
       p {
-        float: left;
-        margin-bottom: 0;
         color: darken($cream, 55%);
+        float: left;
         line-height: 46px;
+        margin-bottom: 0;
         padding-left: lh();
       }
 
@@ -48,8 +47,8 @@ div.wiki-wrapper {
             @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
             color: darken($cream, 80%);
             display: block;
-            font-weight: normal;
             font-size: 12px;
+            font-weight: normal;
             letter-spacing: 1px;
             line-height: 46px;
             margin: 0;
@@ -89,15 +88,15 @@ div.wiki-wrapper {
         width: flex-grid(2.5, 9);
 
         @media screen and (max-width:900px) {
+          border-right: 0;
           display: block;
           width: auto;
-          border-right: 0;
         }
 
         @media print {
+          border-right: 0;
           display: block;
           width: auto;
-          border-right: 0;
         }
       }
 
@@ -106,9 +105,9 @@ div.wiki-wrapper {
     }
 
     section.results {
+      border-left: 1px dashed #ddd;
       @include box-sizing(border-box);
       display: inline-block;
-      border-left: 1px dashed #ddd;
       float: left;
       padding-left: 10px;
       width: flex-grid(6.5, 9);
@@ -123,8 +122,8 @@ div.wiki-wrapper {
 
       @media print {
         display: block;
-        width: auto;
         padding: 0;
+        width: auto;
 
         canvas, img {
           page-break-inside: avoid;
@@ -140,14 +139,15 @@ div.wiki-wrapper {
         }
 
         li {
+          border-bottom: 1px solid #eee;
           list-style: none;
           margin: 0;
           padding: 10px 0;
-          border-bottom: 1px solid #eee;
 
           &:last-child {
             border-bottom: 0;
           }
+
           h3 {
             font-size: 18px;
             font-weight: normal;
@@ -155,6 +155,5 @@ div.wiki-wrapper {
         }
       }
     }
-
   }
 }

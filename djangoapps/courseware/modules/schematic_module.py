@@ -19,6 +19,6 @@ class Module(XModule):
     def get_html(self):
         return '<input type="hidden" class="schematic" name="{item_id}" height="480" width="640">'.format(item_id=self.item_id)
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, render_function = None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, render_function)
+    def __init__(self, system, xml, item_id, state=None):
+        XModule.__init__(self, system, xml, item_id, state)
 

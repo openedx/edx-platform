@@ -1,0 +1,63 @@
+  <problem>
+    <text>
+      <p>
+Why do bicycles benefit from having larger wheels when going up a bump as shown in the picture? <br/>
+Assume that for both bicycles:<br/>
+1.)	The tires have equal air pressure.<br/>
+2.)	The bicycles never leave the contact with the bump.<br/>
+3.)	The bicycles have the same mass. The bicycle tires (regardless of size) have the same mass.<br/>
+</p>
+    </text>
+    <optionresponse texlayout="horizontal" max="10" randomize="yes">
+      <ul>
+        <li>
+          <text>
+            <p>The bicycles with larger wheels have more time to go over the bump. This decreases the magnitude of the force needed to lift the bicycle.</p>
+          </text>
+          <optioninput name="Foil1" location="random" options="('True','False')" correct="True">
+</optioninput>
+        </li>
+        <li>
+          <text>
+            <p>The bicycles with larger wheels always have a smaller vertical displacement regardless of speed.</p>
+          </text>
+          <optioninput name="Foil2" location="random" options="('True','False')" correct="False">
+</optioninput>
+        </li>
+        <li>
+          <text>
+            <p>The bicycles with larger wheels experience a force backward with less magnitude for the same amount of time.</p>
+          </text>
+          <optioninput name="Foil3" location="random" options="('True','False')" correct="False">
+</optioninput>
+        </li>
+        <li>
+          <text>
+            <p>The bicycles with larger wheels experience a force backward with less magnitude for a greater amount of time.</p>
+          </text>
+          <optioninput name="Foil4" location="random" options="('True','False')" correct="True">
+</optioninput>
+        </li>
+        <li>
+          <text>
+            <p>The bicycles with larger wheels have more kinetic energy turned into gravitational potential energy.</p>
+          </text>
+          <optioninput name="Foil5" location="random" options="('True','False')" correct="False">
+</optioninput>
+        </li>
+        <li>
+          <text>
+            <p>The bicycles with larger wheels have more rotational kinetic energy, so the horizontal velocity of the biker changes less.</p>
+          </text>
+          <optioninput name="Foil6" location="random" options="('True','False')" correct="False">
+</optioninput>
+        </li>
+      </ul>
+      <hintgroup showoncorrect="no">
+        <text>
+          <br/>
+          <br/>
+        </text>
+      </hintgroup>
+    </optionresponse>
+  </problem>

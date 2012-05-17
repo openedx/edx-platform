@@ -4,14 +4,15 @@ require 'tempfile'
 # Build Constants
 REPO_ROOT = File.dirname(__FILE__)
 BUILD_DIR = File.join(REPO_ROOT, "build")
+REPORT_DIR = File.join(REPO_ROOT, "reports")
 
 # Packaging constants
 DEPLOY_DIR = "/opt/wwc"
 PACKAGE_NAME = "mitx"
 LINK_PATH = "/opt/wwc/mitx"
-VERSION = "0.1"
+PKG_VERSION = "0.1"
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
-BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '').gsub('/', '_').downcase()
+BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '')
 BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
 
 if BRANCH == "master"
@@ -19,14 +20,41 @@ if BRANCH == "master"
 else
     DEPLOY_NAME = "#{PACKAGE_NAME}-#{BRANCH}-#{BUILD_NUMBER}-#{COMMIT}"
 end
-INSTALL_DIR_PATH = File.join(DEPLOY_DIR, DEPLOY_NAME)
 PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
 
+NORMALIZED_DEPLOY_NAME = DEPLOY_NAME.downcase().gsub(/[_\/]/, '-')
+INSTALL_DIR_PATH = File.join(DEPLOY_DIR, NORMALIZED_DEPLOY_NAME)
 
 # Set up the clean and clobber tasks
-CLOBBER.include('build')
+CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
+def select_executable(*cmds)
+    cmds.find_all{ |cmd| system("which #{cmd} > /dev/null 2>&1") }[0] || fail("No executables found from #{cmds.join(', ')}")
+end
+
+
+task :default => [:pep8, :pylint, :test]
+
+directory REPORT_DIR
+
+task :pep8 => REPORT_DIR do
+    sh("pep8 --ignore=E501 djangoapps | tee #{REPORT_DIR}/pep8.report")
+end
+
+task :pylint => REPORT_DIR do
+    Dir.chdir("djangoapps") do
+        Dir["*"].each do |app|
+            sh("pylint -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
+        end
+    end
+end
+
+task :test => REPORT_DIR do
+    ENV['NOSE_XUNIT_FILE'] = File.join(REPORT_DIR, "nosetests.xml")
+    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
+    sh("#{django_admin} test --settings=envs.test --pythonpath=. $(ls djangoapps)")
+end
 
 task :package do
     FileUtils.mkdir_p(BUILD_DIR)
@@ -53,10 +81,15 @@ task :package do
         args = ["fakeroot", "fpm", "-s", "dir", "-t", "deb",
             "--after-install=#{postinstall.path}",
             "--prefix=#{INSTALL_DIR_PATH}",
+            "--exclude=build",
+            "--exclude=rakefile",
+            "--exclude=.git",
+            "--exclude=**/*.pyc",
+            "--exclude=reports",
             "-C", "#{REPO_ROOT}",
             "--provides=#{PACKAGE_NAME}",
-            "--name=#{DEPLOY_NAME}",
-            "--version=#{VERSION}",
+            "--name=#{NORMALIZED_DEPLOY_NAME}",
+            "--version=#{PKG_VERSION}",
             "-a", "all",
             "."]
         system(*args) || raise("fpm failed to build the .deb")
@@ -64,5 +97,5 @@ task :package do
 end
 
 task :publish => :package do
-    sh("scp #{BUILD_DIR}/#{DEPLOY_NAME}_#{VERSION}-1_all.deb #{PACKAGE_REPO}")
+    sh("scp #{BUILD_DIR}/#{NORMALIZED_DEPLOY_NAME}_#{PKG_VERSION}*.deb #{PACKAGE_REPO}")
 end

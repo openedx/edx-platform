@@ -3,7 +3,6 @@ import json
 import sys
 
 from django.conf import settings
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
@@ -60,7 +59,10 @@ def send_feedback(request):
 
 def info(request):
     ''' Info page (link from main header) '''
-    if not request.user.is_authenticated():
-        return redirect('/')
-
     return render_to_response("info.html", {})
+
+def mitxhome(request):
+    ''' Home page (link from main header). List of courses.  '''
+    if settings.ENABLE_MULTICOURSE:
+        return render_to_response("mitxhome.html", {})
+    return info(request)

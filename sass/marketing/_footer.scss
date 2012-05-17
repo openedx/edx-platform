@@ -6,7 +6,7 @@ footer {
   div.footer-wrapper {
     border-top: 1px solid #e5e5e5;
     padding: lh() 0;
-    background: url('../images/marketing/mit-logo.png') right center no-repeat;
+    background: url('/static/images/marketing/mit-logo.png') right center no-repeat;
 
     @media screen and (max-width: 780px) {
       background-position: left bottom;
@@ -84,15 +84,15 @@ footer {
           }
 
           &.twitter a {
-            background: url('../images/marketing/twitter.png') 0 0 no-repeat;
+            background: url('/static/images/marketing/twitter.png') 0 0 no-repeat;
           }
 
           &.facebook a {
-            background: url('../images/marketing/facebook.png') 0 0 no-repeat;
+            background: url('/static/images/marketing/facebook.png') 0 0 no-repeat;
           }
 
           &.linkedin a {
-            background: url('../images/marketing/linkedin.png') 0 0 no-repeat;
+            background: url('/static/images/marketing/linkedin.png') 0 0 no-repeat;
           }
         }
       }
