@@ -1,4 +1,4 @@
-class VideoProgressSlider
+class @VideoProgressSlider
   constructor: (@player) ->
     @buildSlider()
     @buildHandle()

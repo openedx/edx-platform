@@ -25,11 +25,11 @@ class @Histogram
     ],
       xaxis:
         min: -1
-        max: Math.max $.map(@xTicks, (data) -> data[0] + 1)
+        max: Math.max.apply Math, $.map(@xTicks, (data) -> data[0] + 1)
         ticks: @xTicks
         tickLength: 0
       yaxis:
         min: 0.0
-        max: Math.max $.map(@yTicks, (data) -> data[0] * 1.1)
+        max: Math.max.apply Math, $.map(@yTicks, (data) -> data[0] * 1.1)
         ticks: @yTicks
         labelWidth: 50

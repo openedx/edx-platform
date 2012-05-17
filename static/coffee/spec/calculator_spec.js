@@ -26,6 +26,7 @@
         return expect($('form#calculator')).toHandleWith('submit', this.calculator.calculate);
       });
       return it('prevent default behavior on form submit', function() {
+        jasmine.stubRequests();
         $('form#calculator').submit(function(e) {
           expect(e.isDefaultPrevented()).toBeTruthy();
           return e.preventDefault();
@@ -58,7 +59,7 @@
     return describe('calculate', function() {
       beforeEach(function() {
         $('#calculator_input').val('1+2');
-        spyOn($, 'getJSON').andCallFake(function(url, data, callback) {
+        spyOn($, 'getWithPrefix').andCallFake(function(url, data, callback) {
           return callback({
             result: 3
           });

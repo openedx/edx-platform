@@ -1,4 +1,4 @@
-class VideoSpeedControl
+class @VideoSpeedControl
   constructor: (@player, @speeds) ->
     @render()
     @bind()
@@ -13,8 +13,8 @@ class VideoSpeedControl
       @$('.speeds').click -> $(this).toggleClass('open')
     else
       @$('.speeds').mouseover -> $(this).addClass('open')
-      .mouseout -> $(this).removeClass('open')
-      .click (event) ->
+      @$('.speeds').mouseout -> $(this).removeClass('open')
+      @$('.speeds').click (event) ->
         event.preventDefault()
         $(this).removeClass('open')
 

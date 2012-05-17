@@ -1,4 +1,4 @@
-class VideoControl
+class @VideoControl
   constructor: (@player) ->
     @render()
     @bind()
@@ -36,7 +36,7 @@ class VideoControl
 
   togglePlayback: (event) =>
     event.preventDefault()
-    if $(event.target).hasClass('play')
-      $(@player).trigger('play')
-    else
+    if @player.isPlaying()
       $(@player).trigger('pause')
+    else
+      $(@player).trigger('play')
