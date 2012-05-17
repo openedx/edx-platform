@@ -15,4 +15,8 @@ path.py
 django_debug_toolbar
 django-pipeline
 django-staticfiles>=1.2.1
-
+django-masquerade
+fs
+django-jasmine
+beautifulsoup
+requests

@@ -49,6 +49,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courseware/$', 'courseware.views.index', name="courseware"),
         url(r'^info$', 'util.views.info'),
         url(r'^wiki/', include('simplewiki.urls')),
+        url(r'^masquerade/', include('masquerade.urls')),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index', name="courseware_chapter"),
         url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index', name="courseware_course"),
@@ -68,6 +69,12 @@ if settings.COURSEWARE_ENABLED:
         url(r'^calculate$', 'util.views.calculate'),
     )
 
+if settings.ENABLE_MULTICOURSE:
+	urlpatterns += (url(r'^mitxhome$', 'util.views.mitxhome'),)
+
+if settings.QUICKEDIT:
+	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'courseware.views.quickedit'),)
+
 if settings.ASKBOT_ENABLED:
     urlpatterns += (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
                     url(r'^admin/', include(admin.site.urls)), \
@@ -75,6 +82,10 @@ if settings.ASKBOT_ENABLED:
                     url(r'^followit/', include('followit.urls')), \
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
+
+if settings.DEBUG:
+    ## Jasmine
+    urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 urlpatterns = patterns(*urlpatterns)
 

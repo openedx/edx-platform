@@ -24,8 +24,7 @@ import tempfile
 import djcelery
 from path import path
 
-from askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
-import logsettings
+from envs.askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
@@ -81,6 +80,7 @@ TEMPLATE_DIRS = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'askbot.context.application_settings',
+    'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'askbot.user_messages.context_processors.user_messages',#must be before auth
     'django.core.context_processors.auth', #this is required for admin
@@ -113,7 +113,6 @@ TEMPLATE_DEBUG = False
 # Site info
 SITE_ID = 1
 SITE_NAME = "localhost:8000"
-CSRF_COOKIE_DOMAIN = '127.0.0.1'
 HTTPS = 'on'
 ROOT_URLCONF = 'mitx.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
@@ -134,7 +133,7 @@ STATIC_ROOT = ENV_ROOT / "staticfiles" # We don't run collectstatic -- this is t
 
 # FIXME: We should iterate through the courses we have, adding the static 
 #        contents for each of them. (Right now we just use symlinks.)
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
     ("circuits", DATA_DIR / "images"),
@@ -143,13 +142,16 @@ STATICFILES_DIRS = (
 
 # This is how you would use the textbook images locally
 #    ("book", ENV_ROOT / "book_images")
-)
+]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York' # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en' # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
+
+# Messages
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it 
@@ -179,8 +181,8 @@ CELERY_ALWAYS_EAGER = True
 djcelery.setup_loader()
 
 ################################# SIMPLEWIKI ###################################
-WIKI_REQUIRE_LOGIN_EDIT = True
-WIKI_REQUIRE_LOGIN_VIEW = True
+SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
+SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in

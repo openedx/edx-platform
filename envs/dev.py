@@ -7,16 +7,17 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
-from common import *
+from envs.common import *
+from envs.logsettings import get_logger_config
 
 DEBUG = True
 PIPELINE = True
 TEMPLATE_DEBUG = True
 
-LOGGING = logsettings.get_logger_config(ENV_ROOT / "log", 
-                                        logging_env="dev",
-                                        tracking_filename="tracking.log",
-                                        debug=True)
+LOGGING = get_logger_config(ENV_ROOT / "log", 
+                            logging_env="dev",
+                            tracking_filename="tracking.log",
+                            debug=True)
 
 DATABASES = {
     'default': {
@@ -74,7 +75,8 @@ DEBUG_TOOLBAR_PANELS = (
 ############################ FILE UPLOADS (ASKBOT) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
-MEDIA_URL = "/discussion/upfiles/"
+MEDIA_URL = "/static/uploads/"
+STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',

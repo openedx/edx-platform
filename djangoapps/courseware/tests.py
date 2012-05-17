@@ -1,10 +1,14 @@
 import unittest
+import os
 
 import numpy
 
 import courseware.modules
 import courseware.capa.calc as calc
-from grades import Score, aggregate_scores
+import courseware.capa.capa_problem as lcp
+import courseware.graders as graders
+from courseware.graders import Score, CourseGrader, WeightedSubsectionsGrader, SingleSectionGrader, AssignmentFormatGrader
+from courseware.grades import aggregate_scores
 
 class ModelsTest(unittest.TestCase):
     def setUp(self):
@@ -33,6 +37,11 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(abs(calc.evaluator(variables, functions, "k*T/q-0.025"))<0.001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "e^(j*pi)")+1)<0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "j||1")-0.5-0.5j)<0.00001)
+        variables['t'] = 1.0
+        self.assertTrue(abs(calc.evaluator(variables, functions, "t")-1.0)<0.00001)
+        self.assertTrue(abs(calc.evaluator(variables, functions, "T")-1.0)<0.00001)
+        self.assertTrue(abs(calc.evaluator(variables, functions, "t", cs=True)-1.0)<0.00001)
+        self.assertTrue(abs(calc.evaluator(variables, functions, "T", cs=True)-298)<0.2)
         exception_happened = False
         try: 
             calc.evaluator({},{}, "5+7 QWSEKO")
@@ -54,42 +63,284 @@ class ModelsTest(unittest.TestCase):
             exception_happened = True
         self.assertTrue(exception_happened)
 
-class GraderTest(unittest.TestCase):
+#-----------------------------------------------------------------------------
+# tests of capa_problem inputtypes
+
+class MultiChoiceTest(unittest.TestCase):
+    def test_MC_grade(self):
+        multichoice_file = os.path.dirname(__file__)+"/test_files/multichoice.xml"
+        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1')
+        correct_answers = {'1_2_1':'choice_foil3'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        false_answers = {'1_2_1':'choice_foil2'}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+
+    def test_MC_bare_grades(self):
+        multichoice_file = os.path.dirname(__file__)+"/test_files/multi_bare.xml"
+        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1')
+        correct_answers = {'1_2_1':'choice_2'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        false_answers = {'1_2_1':'choice_1'}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        
+    def test_TF_grade(self):
+        truefalse_file =  os.getcwd()+"/djangoapps/courseware/test_files/truefalse.xml"
+        test_lcp = lcp.LoncapaProblem(open(truefalse_file), '1')
+        correct_answers = {'1_2_1':['choice_foil2', 'choice_foil1']}
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        false_answers = {'1_2_1':['choice_foil1']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['choice_foil1', 'choice_foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['choice_foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        false_answers = {'1_2_1':['choice_foil1', 'choice_foil2', 'choice_foil3']}
+        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        
+class ImageResponseTest(unittest.TestCase):
+    def test_ir_grade(self):
+        imageresponse_file = os.path.dirname(__file__)+"/test_files/imageresponse.xml"
+        test_lcp = lcp.LoncapaProblem(open(imageresponse_file), '1')
+        correct_answers = {'1_2_1':'(490,11)-(556,98)',
+                           '1_2_2':'(242,202)-(296,276)'}
+        test_answers = {'1_2_1':'[500,20]',
+                        '1_2_2':'[250,300]',
+                        }
+        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+        
+class OptionResponseTest(unittest.TestCase):
+    '''
+    Run this with
+
+    python manage.py test courseware.OptionResponseTest
+    '''
+    def test_or_grade(self):
+        optionresponse_file = os.path.dirname(__file__)+"/test_files/optionresponse.xml"
+        test_lcp = lcp.LoncapaProblem(open(optionresponse_file), '1')
+        correct_answers = {'1_2_1':'True',
+                           '1_2_2':'False'}
+        test_answers = {'1_2_1':'True',
+                        '1_2_2':'True',
+                        }
+        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+
+#-----------------------------------------------------------------------------
+# Grading tests
+
+class GradesheetTest(unittest.TestCase):
 
     def test_weighted_grading(self):
         scores = []
         Score.__sub__=lambda me, other: (me.earned - other.earned) + (me.possible - other.possible)
 
         all, graded = aggregate_scores(scores)
-        self.assertEqual(all, Score(earned=0, possible=0, weight=1, graded=False, section="summary"))
-        self.assertEqual(graded, Score(earned=0, possible=0, weight=1, graded=True, section="summary"))
+        self.assertEqual(all, Score(earned=0, possible=0, graded=False, section="summary"))
+        self.assertEqual(graded, Score(earned=0, possible=0, graded=True, section="summary"))
 
-        scores.append(Score(earned=0, possible=5, weight=1, graded=False, section="summary"))
+        scores.append(Score(earned=0, possible=5, graded=False, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertEqual(all, Score(earned=0, possible=1, weight=1, graded=False, section="summary"))
-        self.assertEqual(graded, Score(earned=0, possible=0, weight=1, graded=True, section="summary"))
+        self.assertEqual(all, Score(earned=0, possible=5, graded=False, section="summary"))
+        self.assertEqual(graded, Score(earned=0, possible=0, graded=True, section="summary"))
 
-        scores.append(Score(earned=3, possible=5, weight=1, graded=True, section="summary"))
+        scores.append(Score(earned=3, possible=5, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=3.0/5, possible=2, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=3.0/5, possible=1, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=3, possible=10, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=3, possible=5, graded=True, section="summary"))
 
-        scores.append(Score(earned=2, possible=5, weight=2, graded=True, section="summary"))
+        scores.append(Score(earned=2, possible=5, graded=True, section="summary"))
         all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=7.0/5, possible=4, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+        self.assertAlmostEqual(all, Score(earned=5, possible=15, graded=False, section="summary"))
+        self.assertAlmostEqual(graded, Score(earned=5, possible=10, graded=True, section="summary"))
 
-        scores.append(Score(earned=2, possible=5, weight=0, graded=True, section="summary"))
-        all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=7.0/5, possible=4, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+class GraderTest(unittest.TestCase):
 
-        scores.append(Score(earned=2, possible=5, weight=3, graded=False, section="summary"))
-        all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=13.0/5, possible=7, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=7.0/5, possible=3, weight=1, graded=True, section="summary"))
+    empty_gradesheet = {
+    }
+    
+    incomplete_gradesheet = {
+        'Homework': [],
+        'Lab': [],
+        'Midterm' : [],
+    }
+        
+    test_gradesheet = {
+        'Homework': [Score(earned=2, possible=20.0, graded=True, section='hw1'),
+              Score(earned=16, possible=16.0, graded=True, section='hw2')],
+              #The dropped scores should be from the assignments that don't exist yet
+              
+        'Lab': [Score(earned=1, possible=2.0, graded=True, section='lab1'), #Dropped
+             Score(earned=1, possible=1.0, graded=True, section='lab2'),
+             Score(earned=1, possible=1.0, graded=True, section='lab3'),
+             Score(earned=5, possible=25.0, graded=True, section='lab4'), #Dropped
+             Score(earned=3, possible=4.0, graded=True, section='lab5'), #Dropped
+             Score(earned=6, possible=7.0, graded=True, section='lab6'),
+             Score(earned=5, possible=6.0, graded=True, section='lab7')],
+        
+        'Midterm' : [Score(earned=50.5, possible=100, graded=True, section="Midterm Exam"),],
+    }
+    
+    def test_SingleSectionGrader(self):
+        midtermGrader = graders.SingleSectionGrader("Midterm", "Midterm Exam")
+        lab4Grader = graders.SingleSectionGrader("Lab", "lab4")
+        badLabGrader = graders.SingleSectionGrader("Lab", "lab42")
+        
+        for graded in [midtermGrader.grade(self.empty_gradesheet), 
+                        midtermGrader.grade(self.incomplete_gradesheet), 
+                        badLabGrader.grade(self.test_gradesheet)]:
+            self.assertEqual( len(graded['section_breakdown']), 1 )
+            self.assertEqual( graded['percent'], 0.0 )
+        
+        graded = midtermGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.505 )
+        self.assertEqual( len(graded['section_breakdown']), 1 )
+        
+        graded = lab4Grader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.2 )
+        self.assertEqual( len(graded['section_breakdown']), 1 )
+        
+    def test_AssignmentFormatGrader(self):
+        homeworkGrader = graders.AssignmentFormatGrader("Homework", 12, 2)
+        noDropGrader = graders.AssignmentFormatGrader("Homework", 12, 0)
+        #Even though the minimum number is 3, this should grade correctly when 7 assignments are found
+        overflowGrader = graders.AssignmentFormatGrader("Lab", 3, 2)
+        labGrader = graders.AssignmentFormatGrader("Lab", 7, 3)
+        
+        
+        #Test the grading of an empty gradesheet
+        for graded in [ homeworkGrader.grade(self.empty_gradesheet), 
+                        noDropGrader.grade(self.empty_gradesheet),
+                        homeworkGrader.grade(self.incomplete_gradesheet),
+                        noDropGrader.grade(self.incomplete_gradesheet) ]:
+            self.assertAlmostEqual( graded['percent'], 0.0 )
+            #Make sure the breakdown includes 12 sections, plus one summary
+            self.assertEqual( len(graded['section_breakdown']), 12 + 1 )
+        
+        
+        graded = homeworkGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.11 ) # 100% + 10% / 10 assignments
+        self.assertEqual( len(graded['section_breakdown']), 12 + 1 )
+        
+        graded = noDropGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.0916666666666666 ) # 100% + 10% / 12 assignments
+        self.assertEqual( len(graded['section_breakdown']), 12 + 1 )
+        
+        graded = overflowGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.8880952380952382 ) # 100% + 10% / 5 assignments
+        self.assertEqual( len(graded['section_breakdown']), 7 + 1 )
+        
+        graded = labGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.9226190476190477 )
+        self.assertEqual( len(graded['section_breakdown']), 7 + 1 )
+        
+        
+    def test_WeightedSubsectionsGrader(self):
+        #First, a few sub graders
+        homeworkGrader = graders.AssignmentFormatGrader("Homework", 12, 2)
+        labGrader = graders.AssignmentFormatGrader("Lab", 7, 3)
+        midtermGrader = graders.SingleSectionGrader("Midterm", "Midterm Exam")
+        
+        weightedGrader = graders.WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.25), (labGrader, labGrader.category, 0.25), 
+        (midtermGrader, midtermGrader.category, 0.5)] )
+        
+        overOneWeightsGrader = graders.WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.5), (labGrader, labGrader.category, 0.5), 
+        (midtermGrader, midtermGrader.category, 0.5)] )
+        
+        #The midterm should have all weight on this one
+        zeroWeightsGrader = graders.WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.0), (labGrader, labGrader.category, 0.0), 
+        (midtermGrader, midtermGrader.category, 0.5)] )
+        
+        #This should always have a final percent of zero
+        allZeroWeightsGrader = graders.WeightedSubsectionsGrader( [(homeworkGrader, homeworkGrader.category, 0.0), (labGrader, labGrader.category, 0.0), 
+        (midtermGrader, midtermGrader.category, 0.0)] )
+        
+        emptyGrader = graders.WeightedSubsectionsGrader( [] )
+        
+        graded = weightedGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.5106547619047619 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        graded = overOneWeightsGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.7688095238095238 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        graded = zeroWeightsGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.2525 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        
+        graded = allZeroWeightsGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.0 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        for graded in [ weightedGrader.grade(self.empty_gradesheet), 
+                        weightedGrader.grade(self.incomplete_gradesheet),
+                        zeroWeightsGrader.grade(self.empty_gradesheet),
+                        allZeroWeightsGrader.grade(self.empty_gradesheet)]:
+            self.assertAlmostEqual( graded['percent'], 0.0 )
+            self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+            self.assertEqual( len(graded['grade_breakdown']), 3 )
+            
+            
+        graded = emptyGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.0 )
+        self.assertEqual( len(graded['section_breakdown']), 0 )
+        self.assertEqual( len(graded['grade_breakdown']), 0 )
+        
+    
 
-        scores.append(Score(earned=2, possible=5, weight=.5, graded=True, section="summary"))
-        all, graded = aggregate_scores(scores)
-        self.assertAlmostEqual(all, Score(earned=14.0/5, possible=7.5, weight=1, graded=False, section="summary"))
-        self.assertAlmostEqual(graded, Score(earned=8.0/5, possible=3.5, weight=1, graded=True, section="summary"))
+    def test_graderFromConf(self):
+        
+        #Confs always produce a graders.WeightedSubsectionsGrader, so we test this by repeating the test
+        #in test_graders.WeightedSubsectionsGrader, but generate the graders with confs.
+        
+        weightedGrader = graders.grader_from_conf([
+            {
+                'type' : "Homework",
+                'min_count' : 12,
+                'drop_count' : 2,
+                'short_label' : "HW",
+                'weight' : 0.25,
+            },
+            {
+                'type' : "Lab",
+                'min_count' : 7,
+                'drop_count' : 3,
+                'category' : "Labs",
+                'weight' : 0.25
+            },
+            {
+                'type' : "Midterm",
+                'name' : "Midterm Exam",
+                'short_label' : "Midterm",
+                'weight' : 0.5,
+            },
+        ])
+        
+        emptyGrader = graders.grader_from_conf([])
+        
+        graded = weightedGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.5106547619047619 )
+        self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
+        self.assertEqual( len(graded['grade_breakdown']), 3 )
+        
+        graded = emptyGrader.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.0 )
+        self.assertEqual( len(graded['section_breakdown']), 0 )
+        self.assertEqual( len(graded['grade_breakdown']), 0 )
+        
+        #Test that graders can also be used instead of lists of dictionaries
+        homeworkGrader = graders.AssignmentFormatGrader("Homework", 12, 2)
+        homeworkGrader2 = graders.grader_from_conf(homeworkGrader)
+        
+        graded = homeworkGrader2.grade(self.test_gradesheet)
+        self.assertAlmostEqual( graded['percent'], 0.11 )
+        self.assertEqual( len(graded['section_breakdown']), 12 + 1 )
+        
+        #TODO: How do we test failure cases? The parser only logs an error when it can't parse something. Maybe it should throw exceptions?
+

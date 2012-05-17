@@ -2,7 +2,7 @@
 
 var ${ id }contents=["",
  %for t in items:
- ${t['content']} , 
+ ${t['content']} ,
  %endfor
  ""
        ];
@@ -16,7 +16,7 @@ var ${ id }types=["",
 
 var ${ id }init_functions=["",
  %for t in items:
-	       function(){ ${t['init_js']} }, 
+	       function(){ ${t['init_js']} },
  %endfor
 	       ""];
 
@@ -24,12 +24,12 @@ var ${ id }titles=${titles};
 
 var ${ id }destroy_functions=["",
  %for t in items:
-	       function(){ ${t['destroy_js']} }, 
+	       function(){ ${t['destroy_js']} },
  %endfor
 	       ""];
 
 var ${ id }loc = -1;
-function disablePrev() { 
+function disablePrev() {
     var i=${ id }loc-1;
     log_event("seq_prev", {'old':${id}loc, 'new':i,'id':'${id}'});
     if (i < 1 ) {
@@ -39,7 +39,7 @@ function disablePrev() {
     };
   }
 
-  function disableNext() { 
+  function disableNext() {
     var i=${ id }loc+1;
     log_event("seq_next", {'old':${id}loc, 'new':i,'id':'${id}'});
 
@@ -53,7 +53,7 @@ function disablePrev() {
 function ${ id }goto(i) {
   log_event("seq_goto", {'old':${id}loc, 'new':i,'id':'${id}'});
 
-  postJSON('/modx/sequential/${ id }/goto_position',
+  postJSON('${ MITX_ROOT_URL }/modx/sequential/${ id }/goto_position',
   {'position' : i });
 
   if (${ id }loc!=-1)
@@ -77,11 +77,11 @@ function ${ id }goto(i) {
 function ${ id }setup_click(i) {
         $('#tt_'+i).click(function(eo) { ${ id }goto(i);});
 	$('#tt_'+i).addClass("seq_"+${ id }types[i]+"_inactive");
-	$('#tt_'+i).parent().append("<p>" + ${ id }titles[i-1] + "</p>");
+	$('#tt_'+i).append("<p>" + ${ id }titles[i-1] + "</p>");
 
 }
 
-function ${ id }next() { 
+function ${ id }next() {
     var i=${ id }loc+1;
     log_event("seq_next", {'old':${id}loc, 'new':i,'id':'${id}'});
     if(i > ${ len(items) } ) {
@@ -92,7 +92,7 @@ function ${ id }next() {
 }
 
 
-function ${ id }prev() { 
+function ${ id }prev() {
     var i=${ id }loc-1;
     log_event("seq_prev", {'old':${id}loc, 'new':i,'id':'${id}'});
     if (i < 1 ) {
@@ -105,7 +105,7 @@ function ${ id }prev() {
 
 
 $(function() {
-  var i; 
+  var i;
   for(i=1; i<${ len(items)+1 }; i++) {
     ${ id }setup_click(i);
   }

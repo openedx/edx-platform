@@ -3,7 +3,7 @@ from django.conf import settings
 from django.template.defaultfilters import stringfilter
 from django.utils.http import urlquote  as django_urlquote
 
-from simplewiki.settings import *
+from simplewiki.wiki_settings import *
 
 register = template.Library()
 

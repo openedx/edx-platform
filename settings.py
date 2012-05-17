@@ -5,6 +5,30 @@ import tempfile
 
 import djcelery
 
+### Dark code. Should be enabled in local settings for devel. 
+
+ENABLE_MULTICOURSE = False	# set to False to disable multicourse display (see lib.util.views.mitxhome)
+QUICKEDIT = False
+
+###
+
+
+MITX_ROOT_URL = ''
+
+COURSE_NAME = "6.002_Spring_2012"
+COURSE_NUMBER = "6.002x"
+COURSE_TITLE = "Circuits and Electronics"
+
+COURSE_DEFAULT = '6.002_Spring_2012'
+
+COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
+                                          'title'  :  'Circuits and Electronics',
+                                          'xmlpath': '6002x/',
+                                          }
+                    }
+
+ROOT_URLCONF = 'urls'
+
 # from settings2.askbotsettings import LIVESETTINGS_OPTIONS
 DEFAULT_GROUPS = []
 
@@ -28,7 +52,6 @@ sys.path.append(BASE_DIR + "/mitx/lib")
 
 COURSEWARE_ENABLED = True
 ASKBOT_ENABLED = True
-CSRF_COOKIE_DOMAIN = '127.0.0.1'
 
 # Defaults to be overridden
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -39,8 +62,8 @@ DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
 
 GENERATE_RANDOM_USER_CREDENTIALS = False
 
-WIKI_REQUIRE_LOGIN_EDIT = True
-WIKI_REQUIRE_LOGIN_VIEW = True
+SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
+SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 PERFSTATS = False
 
@@ -116,9 +139,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'masquerade.middleware.MasqueradeMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
+    #'ssl_auth.ssl_auth.NginxProxyHeaderMiddleware',		# ssl authentication behind nginx proxy
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     # Uncommenting the following will prevent csrf token from being re-set if you
@@ -146,6 +171,10 @@ INSTALLED_APPS = (
     'circuit',
     'perfstats',
     'util',
+    'masquerade',
+    'django_jasmine',
+    #'ssl_auth', ## Broken. Disabled for now. 
+    'multicourse',		# multiple courses
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -346,6 +375,7 @@ PROJECT_ROOT = os.path.dirname(__file__)
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
+    'django.core.context_processors.static',
     'askbot.context.application_settings',
     #'django.core.context_processors.i18n',
     'askbot.user_messages.context_processors.user_messages',#must be before auth
@@ -369,8 +399,8 @@ INSTALLED_APPS = INSTALLED_APPS + (
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 ASKBOT_URL = 'discussion/'
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/'
+LOGIN_URL = MITX_ROOT_URL + '/'
 
 # ASKBOT_UPLOADED_FILES_URL = '%s%s' % (ASKBOT_URL, 'upfiles/')
 ALLOW_UNICODE_SLUGS = False
@@ -500,10 +530,11 @@ LIVESETTINGS_OPTIONS = {
                 'CUSTOM_HEADER' : u'',
                 'CUSTOM_HTML_HEAD' : u'',
                 'CUSTOM_JS' : u'',
-                'SITE_FAVICON' : u'/images/favicon.gif',
-                'SITE_LOGO_URL' : u'/images/logo.gif',
+                'MITX_ROOT_URL' : MITX_ROOT_URL,	# for askbot header.html file
+                'SITE_FAVICON' : unicode(MITX_ROOT_URL) + u'/images/favicon.gif',
+                'SITE_LOGO_URL' :unicode(MITX_ROOT_URL) +  u'/images/logo.gif',
                 'SHOW_LOGO' : False,
-                'LOCAL_LOGIN_ICON' : u'/images/pw-login.gif',
+                'LOCAL_LOGIN_ICON' : unicode(MITX_ROOT_URL) + u'/images/pw-login.gif',
                 'ALWAYS_SHOW_ALL_UI_FUNCTIONS' : False,
                 'ASKBOT_DEFAULT_SKIN' : u'default',
                 'USE_CUSTOM_HTML_HEAD' : False,
@@ -536,12 +567,12 @@ LIVESETTINGS_OPTIONS = {
                 'SIGNIN_WORDPRESS_ENABLED' : True,
                 'SIGNIN_WORDPRESS_SITE_ENABLED' : False,
                 'SIGNIN_YAHOO_ENABLED' : True,
-                'WORDPRESS_SITE_ICON' : u'/images/logo.gif',
+                'WORDPRESS_SITE_ICON' : unicode(MITX_ROOT_URL) + u'/images/logo.gif',
                 'WORDPRESS_SITE_URL' : '',                   
             },
             'LICENSE_SETTINGS' : {
                 'LICENSE_ACRONYM' : u'cc-by-sa',
-                'LICENSE_LOGO_URL' : u'/images/cc-by-sa.png',
+                'LICENSE_LOGO_URL' : unicode(MITX_ROOT_URL) + u'/images/cc-by-sa.png',
                 'LICENSE_TITLE' : u'Creative Commons Attribution Share Alike 3.0',
                 'LICENSE_URL' : 'http://creativecommons.org/licenses/by-sa/3.0/legalcode',
                 'LICENSE_USE_LOGO' : True,
@@ -682,3 +713,5 @@ if MAKO_MODULE_DIR == None:
 
 djcelery.setup_loader()
 
+# Jasmine Settings
+JASMINE_TEST_DIRECTORY = PROJECT_DIR+'/templates/coffee'

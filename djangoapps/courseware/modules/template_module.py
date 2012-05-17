@@ -14,16 +14,16 @@ class Module(XModule):
 
     @classmethod
     def get_xml_tags(c):
+        ## TODO: Abstract out from filesystem
         tags = os.listdir(settings.DATA_DIR+'/custom_tags')
         return tags
 
     def get_html(self):
         return self.html
 
-    def __init__(self, xml, item_id, ajax_url=None, track_url=None, state=None, track_function=None, render_function = None):
-        XModule.__init__(self, xml, item_id, ajax_url, track_url, state, track_function, render_function)
+    def __init__(self, system, xml, item_id, state=None):
+        XModule.__init__(self, system, xml, item_id, state)
         xmltree = etree.fromstring(xml)
         filename = xmltree.tag
         params = dict(xmltree.items())
-#        print params
         self.html = render_to_string(filename, params, namespace = 'custom_tags')

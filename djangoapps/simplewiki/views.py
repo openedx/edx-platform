@@ -1,36 +1,29 @@
 # -*- coding: utf-8 -*-
-import types
-
-from django.conf import settings
+from django.conf import settings as settings
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
-from django.core.urlresolvers import get_callable
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotAllowed
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404 
-from django.shortcuts import redirect
-from django.template import Context
-from django.template import RequestContext, Context, loader
+from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
-from mitxmako.shortcuts import render_to_response, render_to_string
-from mako.lookup import TemplateLookup
-from mako.template import Template
-import mitxmako.middleware
+from mitxmako.shortcuts import render_to_response
 
-from models import * # TODO: Clean up
-from settings import *
+from multicourse import multicourse_settings
+
+from models import Revision, Article, CreateArticleForm, RevisionFormWithTitle, RevisionForm
+import wiki_settings
 
 def view(request, wiki_url):
-    if not request.user.is_authenticated():
-        return redirect('/')
-    
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
     
+    if 'coursename' in request.session: coursename = request.session['coursename']
+    else: coursename = None
+
+    course_number = multicourse_settings.get_course_number(coursename)
+
     perm_err = check_permissions(request, article, check_read=True, check_deleted=True)
     if perm_err:
         return perm_err
@@ -39,15 +32,12 @@ def view(request, wiki_url):
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
             'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
-            'wiki_title' : article.title + " - MITX 6.002x Wiki"
+            'wiki_title' : article.title + " - MITX %s Wiki" % course_number
 			}
     d.update(csrf(request))
     return render_to_response('simplewiki_view.html', d)
     
 def view_revision(request, revision_number, wiki_url, revision=None):
-    if not request.user.is_authenticated():
-        return redirect('/')
-    
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
@@ -76,8 +66,6 @@ def view_revision(request, revision_number, wiki_url, revision=None):
 
 
 def root_redirect(request):
-    if not request.user.is_authenticated():
-        return redirect('/')
     try:
         root = Article.get_root()
     except:
@@ -87,8 +75,6 @@ def root_redirect(request):
     return HttpResponseRedirect(reverse('wiki_view', args=(root.get_url())))
 
 def create(request, wiki_url):
-    if not request.user.is_authenticated():
-        return redirect('/')
     
     url_path = get_url_path(wiki_url)
 
@@ -161,9 +147,6 @@ def create(request, wiki_url):
     return render_to_response('simplewiki_edit.html', d)
 
 def edit(request, wiki_url):
-    if not request.user.is_authenticated():
-        return redirect('/')
-
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
@@ -173,7 +156,7 @@ def edit(request, wiki_url):
     if perm_err:
         return perm_err
 
-    if WIKI_ALLOW_TITLE_EDIT:
+    if wiki_settings.WIKI_ALLOW_TITLE_EDIT:
         EditForm = RevisionFormWithTitle
     else:
         EditForm = RevisionForm
@@ -195,7 +178,7 @@ def edit(request, wiki_url):
             if not request.user.is_anonymous():
                 new_revision.revision_user = request.user
             new_revision.save()
-            if WIKI_ALLOW_TITLE_EDIT:
+            if wiki_settings.WIKI_ALLOW_TITLE_EDIT:
                 new_revision.article.title = f.cleaned_data['title']
                 new_revision.article.save()
             return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
@@ -215,9 +198,6 @@ def edit(request, wiki_url):
     return render_to_response('simplewiki_edit.html', d)
 
 def history(request, wiki_url, page=1):
-    if not request.user.is_authenticated():
-        return redirect('/')
-
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
@@ -302,9 +282,6 @@ def history(request, wiki_url, page=1):
     
     
 def revision_feed(request, page=1):
-    if not request.user.is_superuser:
-        return redirect('/')
-    
     page_size = 10
     
     try:
@@ -332,8 +309,6 @@ def revision_feed(request, page=1):
     return render_to_response('simplewiki_revision_feed.html', d)
 
 def search_articles(request):
-    if not request.user.is_authenticated():
-        return redirect('/')
     # blampe: We should check for the presence of other popular django search
     # apps and use those if possible. Only fall back on this as a last resort.
     # Adding some context to results (eg where matches were) would also be nice.
@@ -380,9 +355,6 @@ def search_articles(request):
         
 
 def search_add_related(request, wiki_url):
-    if not request.user.is_authenticated():
-        return redirect('/')
-
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
@@ -435,9 +407,6 @@ def add_related(request, wiki_url):
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
 def remove_related(request, wiki_url, related_id):
-    if not request.user.is_authenticated():
-        return redirect('/')
-
     (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
@@ -457,8 +426,6 @@ def remove_related(request, wiki_url, related_id):
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
 def random_article(request):
-    if not request.user.is_authenticated():
-        return redirect('/')
     from random import randint
     num_arts = Article.objects.count()
     article = Article.objects.all()[randint(0, num_arts-1)]
@@ -470,8 +437,6 @@ def encode_err(request, url):
     return render_to_response('simplewiki_error.html', d)
     
 def not_found(request, wiki_url):
-    if not request.user.is_authenticated():
-        return redirect('/')
     """Generate a NOT FOUND message for some URL"""
     d = {'wiki_err_notfound': True,
          'wiki_url': wiki_url}
@@ -543,17 +508,22 @@ def check_permissions(request, article, check_read=False, check_write=False, che
 # LOGIN PROTECTION #
 ####################
 
-if WIKI_REQUIRE_LOGIN_VIEW:
-    view            = login_required(view)
-    history         = login_required(history)
-#    search_related  = login_required(search_related)
-#    wiki_encode_err = login_required(wiki_encode_err)
+if wiki_settings.WIKI_REQUIRE_LOGIN_VIEW:
+    view               = login_required(view)
+    history            = login_required(history)
+    search_articles    = login_required(search_articles)
+    root_redirect      = login_required(root_redirect)
+    revision_feed      = login_required(revision_feed)
+    random_article     = login_required(random_article)
+    search_add_related = login_required(search_add_related)
+    not_found          = login_required(not_found)
+    view_revision      = login_required(view_revision)
     
-if WIKI_REQUIRE_LOGIN_EDIT:
+if wiki_settings.WIKI_REQUIRE_LOGIN_EDIT:
     create          = login_required(create)
     edit            = login_required(edit)
     add_related     = login_required(add_related)
     remove_related  = login_required(remove_related)
 
-if WIKI_CONTEXT_PREPROCESSORS:
-    settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + WIKI_CONTEXT_PREPROCESSORS
+if wiki_settings.WIKI_CONTEXT_PREPROCESSORS:
+    settings.TEMPLATE_CONTEXT_PROCESSORS += wiki_settings.WIKI_CONTEXT_PREPROCESSORS

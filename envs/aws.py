@@ -8,7 +8,8 @@ Common traits:
 """
 import json
 
-from common import *
+from envs.logsettings import get_logger_config
+from envs.common import *
 
 ############################### ALWAYS THE SAME ################################
 DEBUG = False
@@ -24,7 +25,6 @@ with open(ENV_ROOT / "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
-CSRF_COOKIE_DOMAIN = ENV_TOKENS['CSRF_COOKIE_DOMAIN']
 
 BOOK_URL = ENV_TOKENS['BOOK_URL']
 MEDIA_URL = ENV_TOKENS['MEDIA_URL']
@@ -32,10 +32,10 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
-LOGGING = logsettings.get_logger_config(LOG_DIR, 
-                                        logging_env=ENV_TOKENS['LOGGING_ENV'],
-                                        syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
-                                        debug=False)
+LOGGING = get_logger_config(LOG_DIR, 
+                            logging_env=ENV_TOKENS['LOGGING_ENV'],
+                            syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
+                            debug=False)
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
