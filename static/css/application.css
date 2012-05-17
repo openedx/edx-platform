@@ -3062,7 +3062,7 @@ section.course-index div#accordion ul.ui-accordion-content li.active {
   border-color: #c8c8c8;
   font-weight: bold; }
 section.course-index div#accordion ul.ui-accordion-content li.active > a p {
-  color: #993333; }
+  color: #333; }
 section.course-index div#accordion ul.ui-accordion-content li.active span.subtitle {
   font-weight: normal; }
 section.course-index div#accordion ul.ui-accordion-content li.active:after {
