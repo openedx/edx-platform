@@ -5,11 +5,17 @@ section.course-index {
   div#accordion {
 
     h3 {
+      @include box-shadow(inset 0 1px 0 0 #eee);
+      border-top: 1px solid #d3d3d3;
       overflow: hidden;
       margin: 0;
 
-      &:last-child {
-        @include box-shadow(none);
+      &:first-child {
+        border: none;
+      }
+
+      &:hover {
+        @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
       }
 
       &.ui-accordion-header {
@@ -20,14 +26,10 @@ section.course-index {
           color: lighten($text-color, 10%);
         }
 
-        &.ui-state-hover {
-          border: none;
-          border-bottom: 1px solid #d3d3d3;
-        }
-
         &.ui-state-active {
           @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
           @extend .active;
+          border-bottom: 1px solid #d3d3d3;
         }
       }
     }
@@ -37,7 +39,6 @@ section.course-index {
       @include box-shadow(inset -1px 0 0 #e6e6e6);
       background: #dadada;
       border: none;
-      border-bottom: 1px solid #c3c3c3;
       font-size: 12px;
       margin: 0;
       padding: 1em 1.5em;
