@@ -79,6 +79,7 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
+    'django.core.context_processors.static',
     'askbot.context.application_settings',
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
@@ -104,6 +105,20 @@ DEV_CONTENT = True
 # FIXME: Should we be doing this truncation?
 TRACK_MAX_EVENT = 10000 
 DEBUG_TRACK_LOG = False
+
+MITX_ROOT_URL = ''
+
+COURSE_NAME = "6.002_Spring_2012"
+COURSE_NUMBER = "6.002x"
+COURSE_TITLE = "Circuits and Electronics"
+
+ROOT_URLCONF = 'urls'
+
+### Dark code. Should be enabled in local settings for devel. 
+
+ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
+
+###
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
@@ -159,14 +174,22 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60 # 10 years
 
 ################################### ASKBOT #####################################
+LIVESETTINGS_OPTIONS['MITX_ROOT_URL'] = MITX_ROOT_URL
+skin_settings = LIVESETTINGS_OPTIONS[1]['SETTINGS']['GENERAL_SKIN_SETTINGS']
+skin_settings['SITE_FAVICON'] = unicode(MITX_ROOT_URL) + skin_settings['SITE_FAVICON']
+skin_settings['SITE_LOGO_URL'] = unicode(MITX_ROOT_URL) +  skin_settings['SITE_LOGO_URL']
+skin_settings['LOCAL_LOGIN_ICON'] = unicode(MITX_ROOT_URL) + skin_settings['LOCAL_LOGIN_ICON']
+LIVESETTINGS_OPTIONS[1]['SETTINGS']['LOGIN_PROVIDERS']['WORDPRESS_SITE_ICON'] = unicode(MITX_ROOT_URL) + LIVESETTINGS_OPTIONS[1]['SETTINGS']['LOGIN_PROVIDERS']['WORDPRESS_SITE_ICON']
+LIVESETTINGS_OPTIONS[1]['SETTINGS']['LICENSE_SETTINGS']['LICENSE_LOGO_URL'] = unicode(MITX_ROOT_URL) + LIVESETTINGS_OPTIONS[1]['SETTINGS']['LICENSE_SETTINGS']['LICENSE_LOGO_URL']
+
 ASKBOT_EXTRA_SKINS_DIR = ASKBOT_ROOT / "askbot" / "skins"
 ASKBOT_ALLOWED_UPLOAD_FILE_TYPES = ('.jpg', '.jpeg', '.gif', '.bmp', '.png', '.tiff')
 ASKBOT_MAX_UPLOAD_FILE_SIZE = 1024 * 1024 # result in bytes
 
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 ASKBOT_URL = 'discussion/'
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/'
+LOGIN_URL = MITX_ROOT_URL + '/'
 
 ALLOW_UNICODE_SLUGS = False
 ASKBOT_USE_STACKEXCHANGE_URLS = False # mimic url scheme of stackexchange
@@ -180,6 +203,9 @@ djcelery.setup_loader()
 ################################# SIMPLEWIKI ###################################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
+
+################################# Jasmine ###################################
+JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/templates/coffee'
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
@@ -199,6 +225,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'util.middleware.ExceptionLoggingMiddleware',
+    'util.middleware.AcceptMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -244,6 +271,9 @@ INSTALLED_APPS = (
     'simplewiki',
     'track',
     'util',
+
+    # For testing
+    'django_jasmine',
 
     # For Askbot 
     'django.contrib.sitemaps',
