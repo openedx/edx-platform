@@ -1,8 +1,6 @@
 import os
 import os.path
 
-from django.conf import settings
-
 import capa_module
 import html_module
 import schematic_module

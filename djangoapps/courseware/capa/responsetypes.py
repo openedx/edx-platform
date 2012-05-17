@@ -71,17 +71,17 @@ class MultipleChoiceResponse(GenericResponse):
 
     <multiplechoiceresponse direction="vertical" randomize="yes">
      <choicegroup type="MultipleChoice">
-        <choice location="random" name="1" correct="false"><span>`a+b`<br/></span></choice>
-        <choice location="random" name="2" correct="true"><span><math>a+b^2</math><br/></span></choice>
-        <choice location="random" name="3" correct="false"><math>a+b+c</math></choice>
-        <choice location="bottom" name="4" correct="false"><math>a+b+d</math></choice>
+        <choice location="random" correct="false"><span>`a+b`<br/></span></choice>
+        <choice location="random" correct="true"><span><math>a+b^2</math><br/></span></choice>
+        <choice location="random" correct="false"><math>a+b+c</math></choice>
+        <choice location="bottom" correct="false"><math>a+b+d</math></choice>
      </choicegroup>
     </multiplechoiceresponse>
 
     TODO: handle direction and randomize
 
     '''
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
                                     id=xml.get('id'))
@@ -155,7 +155,7 @@ class OptionResponse(GenericResponse):
     TODO: handle direction and randomize
 
     '''
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.answer_fields = xml.findall('optioninput')
         if settings.DEBUG:
@@ -179,7 +179,7 @@ class OptionResponse(GenericResponse):
 #-----------------------------------------------------------------------------
 
 class NumericalResponse(GenericResponse):
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         try:
@@ -257,7 +257,7 @@ def sympy_check2():
   </customresponse>
 
     '''
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         ## CRITICAL TODO: Should cover all entrytypes
         ## NOTE: xpath will look at root of XML tree, not just 
@@ -412,7 +412,7 @@ class ExternalResponse(GenericResponse):
     
     Typically used by coding problems.
     """
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.answer_ids = xml.xpath('//*[@id=$id]//textbox/@id|//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
@@ -472,7 +472,7 @@ class StudentInputError(Exception):
 #-----------------------------------------------------------------------------
 
 class FormulaResponse(GenericResponse):
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         self.samples = contextualize_text(xml.get('samples'), context)
@@ -553,7 +553,7 @@ class FormulaResponse(GenericResponse):
 #-----------------------------------------------------------------------------
 
 class SchematicResponse(GenericResponse):
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.answer_ids = xml.xpath('//*[@id=$id]//schematic/@id',
                                     id=xml.get('id'))
@@ -562,7 +562,7 @@ class SchematicResponse(GenericResponse):
                            id=xml.get('id'))[0]
         answer_src = answer.get('src')
         if answer_src != None:
-            self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
+            self.code = self.system.filestore.open('src/'+answer_src).read() # Untested; never used
         else:
             self.code = answer.text
 
@@ -599,7 +599,7 @@ class ImageResponse(GenericResponse):
     </imageresponse>
 
     """
-    def __init__(self, xml, context):
+    def __init__(self, xml, context, system=None):
         self.xml = xml
         self.context = context
         self.ielements = xml.findall('imageinput')
