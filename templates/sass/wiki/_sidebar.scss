@@ -10,27 +10,35 @@ div#wiki_panel {
   }
 
   input[type="button"] {
-    @extend h3;
-    color: lighten($text-color, 10%);
-    font-size: $body-font-size;
-    margin: 0  !important;
+    background: transparent;
+    border: none;
+    @include box-shadow(none);
+    color: #666;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0px;
     padding: 7px lh();
     text-align: left;
     @include transition();
     width: 100%;
-
-    &:hover {
-      @include box-shadow(0 1px 0 #fff);
-      background: #efefef;
-    }
   }
 
   ul {
     li {
+      @include box-shadow(inset 0 1px 0 0 #eee);
+      border-top: 1px solid #d3d3d3;
+
+      &:hover {
+        background: #efefef;
+        @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
+      }
+
+      &:first-child {
+        border: none;
+      }
+
       &.search {
-        border-bottom: 1px solid #d3d3d3;
-        @include box-shadow(0 1px 0 #eee);
-        padding: 7px lh();
+        padding: 10px lh();
 
         label {
           display: none;
@@ -39,18 +47,21 @@ div#wiki_panel {
 
       &.create-article {
         h3 {
-          a {
-            padding: 7px lh();
-          }
         }
+      }
+
+      a {
+        color: #666;
+        font-size: 14px;
+        padding: 7px lh();
       }
     }
   }
 
   div#wiki_create_form {
     @extend .clearfix;
-    background: #d6d6d6;
-    border-bottom: 1px solid #bbb;
+    background: #dadada;
+    border-bottom: 1px solid #d3d3d3;
     padding: 15px;
 
     input[type="text"] {
