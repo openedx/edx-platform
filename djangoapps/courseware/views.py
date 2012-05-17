@@ -205,7 +205,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
 
     context = {
         'csrf': csrf(request)['csrf_token'],
-        'accordion': render_accordion(request, course, chapter, section)
+        'accordion': render_accordion(request, course, chapter, section),
         'COURSE_TITLE':multicourse_settings.get_course_title(course),
     }
 
