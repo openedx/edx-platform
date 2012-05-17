@@ -15,7 +15,6 @@ from mitxmako.shortcuts import render_to_string
 
 
 from models import StudentModule
-import track.views
 
 import courseware.modules
 
@@ -56,6 +55,8 @@ def make_track_function(request):
     tracking function to them. This generates a closure for each request 
     that gives a clean interface on both sides. 
     '''
+    import track.views
+
     def f(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f

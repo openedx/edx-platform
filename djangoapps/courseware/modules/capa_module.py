@@ -188,7 +188,7 @@ class Module(XModule):
         if state!=None and 'attempts' in state:
             self.attempts=state['attempts']
 
-        self.filename="problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
+        self.filename=content_parser.item(dom2.xpath('/problem/@filename')) # "problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
         self.name=content_parser.item(dom2.xpath('/problem/@name'))
         self.weight=content_parser.item(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
@@ -200,7 +200,7 @@ class Module(XModule):
         except Exception,err:
             print '[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename)
             raise Exception,err
-        self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed)
+        self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -307,11 +307,11 @@ class Module(XModule):
             lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst: 
-            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state)
+            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             return json.dumps({'success':inst.message})
         except: 
-            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state)
+            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             raise Exception,"error in capa_module"
             return json.dumps({'success':'Unknown Error'})
@@ -388,7 +388,7 @@ class Module(XModule):
             self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
             self.lcp.seed=None
 
-        self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state())
+        self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state(), system=self.system)
 
         event_info['new_state']=self.lcp.get_state()
         self.tracker('reset_problem', event_info)
