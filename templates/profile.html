@@ -341,10 +341,9 @@ $(function() {
 
 <div id="cert_request" class="leanModal_box">
   <h1>Request a 6.002x Certificate</h1>
-  <p>You have earned the grade <strong>${grade_sheet['grade']}</strong> in this class.</p>
-  <p>Your name is <strong>${name}</strong></p>
-  <p>You can request a certificate be sent to your email, or send the certificate directly to another school or employer.</p>
-
+  <p>You can request a certificate verifying your grade in this course. The certificate can be sent to your email, or directly to any other email address.</p>
+  <p>The certificate will indicate that <strong>${name}</strong> has earned a grade of <strong>${grade_sheet['grade']}</strong> in the Fall 2012 offering of <strong>6.002x Beta - Circuits and Electronics</strong>. Please ensure that this is correct.</p>
+  
   <form id="cert_request_form">
     <div id="cert_request_error"> </div>
     <fieldset>
@@ -354,8 +353,8 @@ $(function() {
           <label> I certify that I have not violated the Honor Code for this course. The name shown above is correct. </label>
         </li>
         <li>
-          <label> Please enter your new email address: </label>
-          <input id="cert_request_email" type="email" value="" />
+          <label> Please enter the email address to send the certificate to: </label>
+          <input id="cert_request_email" type="email" value="${email}" />
         </li>
         <li>
           <input type="submit" id="" value="Send Certificate" />

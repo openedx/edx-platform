@@ -144,6 +144,7 @@ INSTALLED_APPS = (
     'simplewiki',
     'track',
     'circuit',
+    'certificates',
     'perfstats',
     'util',
     # Uncomment the next line to enable the admin:
