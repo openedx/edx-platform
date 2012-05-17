@@ -84,9 +84,11 @@
       %>
       <ul class="action">
         <li>
-          <input type="button" onclick="javascript:location.href='${reverse("wiki_list_articles", args=[])}'" value="All articles" class="button" />
+          <h3>
+            <a href="${reverse("wiki_list_articles", args=[])}">All Articles</a>
+          </h3>
         </li>
-        
+
         <li class="create-article">
           <h3>
             <a href="#" id="create-article"/>Create Article</a>
