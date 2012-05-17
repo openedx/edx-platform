@@ -20,12 +20,18 @@ div.info-wrapper {
         border-bottom: 1px solid #e3e3e3;
         margin-bottom: lh(.5);
         padding-bottom: lh(.5);
+        list-style-type: disk;
 
         &:first-child {
           background: $cream;
           border-bottom: 1px solid darken($cream, 10%);
           margin: 0 (-(lh(.5))) lh();
           padding: lh(.5);
+        }
+
+        ol, ul {
+          margin: lh() 0 0 lh();
+          list-style-type: circle;
         }
 
         h2 {
