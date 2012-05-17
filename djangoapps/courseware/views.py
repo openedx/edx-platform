@@ -18,6 +18,7 @@ from module_render import render_module, make_track_function, I4xSystem
 from models import StudentModule
 from student.models import UserProfile
 from util.errors import record_exception
+from util.views import accepts
 from multicourse import multicourse_settings
 
 import courseware.content_parser as content_parser
@@ -258,7 +259,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
     except:
         record_exception(log, "Unable to load module during ajax call")
-        if 'text/html' in request.accepted_types:
+        if accepts(request, 'text/html'):
             return render_to_response("module-error.html", {})
         else:
             response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
@@ -278,7 +279,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                                              state=oldstate)
     except:
         record_exception(log, "Unable to load module instance during ajax call")
-        if 'text/html' in request.accepted_types:
+        if accepts(request, 'text/html'):
             return render_to_response("module-error.html", {})
         else:
             response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
