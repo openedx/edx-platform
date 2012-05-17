@@ -1,4 +1,4 @@
-class VideoPlayer
+class @VideoPlayer
   constructor: (@video) ->
     @currentTime = 0
     @element = $("#video_#{@video.id}")
@@ -18,17 +18,17 @@ class VideoPlayer
     $(document).keyup @bindExitFullScreen
 
     @$('.add-fullscreen').click @toggleFullScreen
-    @addToolTip unless onTouchBasedDevice()
+    @addToolTip() unless onTouchBasedDevice()
 
   bindExitFullScreen: (event) =>
     if @element.hasClass('fullscreen') && event.keyCode == 27
       @toggleFullScreen(event)
 
   render: ->
-    new VideoControl(this)
-    new VideoCaption(this, @video.youtubeId('1.0'))
-    new VideoSpeedControl(this, @video.speeds)
-    new VideoProgressSlider(this)
+    new VideoControl @
+    new VideoCaption @, @video.youtubeId('1.0')
+    new VideoSpeedControl @, @video.speeds
+    new VideoProgressSlider @
     @player = new YT.Player @video.id,
       playerVars:
         controls: 0
@@ -48,9 +48,9 @@ class VideoPlayer
         at: 'top center'
 
   onReady: =>
-    @setProgress(0, @duration())
     $(@).trigger('ready')
-    unless true || onTouchBasedDevice()
+    $(@).trigger('updatePlayTime', 0)
+    unless onTouchBasedDevice()
       $('.course-content .video:first').data('video').player.play()
 
   onStateChange: (event) =>
@@ -92,7 +92,6 @@ class VideoPlayer
       @player.loadVideoById(@video.youtubeId(), @currentTime)
     else
       @player.cueVideoById(@video.youtubeId(), @currentTime)
-      @setProgress(@currentTime, @duration())
     $(@).trigger('updatePlayTime', @currentTime)
 
   update: =>
@@ -100,13 +99,8 @@ class VideoPlayer
       $(@).trigger('updatePlayTime', @currentTime)
 
   onUpdatePlayTime: (event, time) =>
-    @setProgress(@currentTime) if time
-
-  setProgress: (time) =>
     progress = Time.format(time) + ' / ' + Time.format(@duration())
-    if @progress != progress
-      @$(".vidtime").html(progress)
-      @progress = progress
+    @$(".vidtime").html(progress)
 
   toggleFullScreen: (event) =>
     event.preventDefault()

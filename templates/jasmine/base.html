@@ -1,0 +1,68 @@
+<!doctype html>
+
+<html>
+<head>
+    <title>Jasmine Spec Runner</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}jasmine-latest/jasmine.css"
+        media="screen">
+
+    {# core files #}
+    <script  src="{{ STATIC_URL }}jasmine-latest/jasmine.js"></script>
+    <script  src="{{ STATIC_URL }}jasmine-latest/jasmine-html.js"></script>
+    <script  src="https://raw.github.com/sikachu/jasmine-jquery/master/lib/jasmine-jquery.js"></script>
+
+    {# source files #}
+    {% for url in suite.js_files %}
+    <script src="{{ url }}"></script>
+    {% endfor %}
+
+    {# static files #}
+    {% for url in suite.static_files %}
+    <script src="{{ STATIC_URL }}{{ url }}"></script>
+    {% endfor %}
+
+    {# spec files #}
+    {% for file in files %}
+    <script src="{% url jasmine_test file %}"></script>
+    {% endfor %}
+
+</head>
+<body>
+
+<h1>Jasmine Spec Runner</h1>
+
+<script>
+    {% block jasmine %}
+    (function() {
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
+
+        var trivialReporter = new jasmine.TrivialReporter();
+
+        jasmineEnv.addReporter(trivialReporter);
+
+        jasmineEnv.specFilter = function(spec) {
+            return trivialReporter.specFilter(spec);
+        };
+
+        // Additional configuration can be done in this block
+        {% block jasmine_extra %}{% endblock %}
+
+        var currentWindowOnload = window.onload;
+
+        window.onload = function() {
+            if (currentWindowOnload) {
+                currentWindowOnload();
+            }
+            execJasmine();
+        };
+
+        function execJasmine() {
+            jasmineEnv.execute();
+        }
+    })();
+    {% endblock %}
+</script>
+
+</body>
+</html>

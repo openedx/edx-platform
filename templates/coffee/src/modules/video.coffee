@@ -3,6 +3,8 @@ class @Video
     window.player = null
     @element = $("#video_#{@id}")
     @parseVideos videos
+    @fetchMetadata()
+    @parseSpeed()
     $("#video_#{@id}").data('video', this)
 
     if YT.Player
@@ -21,8 +23,6 @@ class @Video
       video = video.split(/:/)
       speed = parseFloat(video[0]).toFixed(2).replace /\.00$/, '.0'
       @videos[speed] = video[1]
-    @fetchMetadata()
-    @parseSpeed()
 
   parseSpeed: ->
     @setSpeed($.cookie('video_speed'))

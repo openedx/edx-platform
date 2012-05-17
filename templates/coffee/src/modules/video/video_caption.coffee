@@ -1,4 +1,4 @@
-class VideoCaption
+class @VideoCaption
   constructor: (@player, @youtubeId) ->
     @render()
     @bind()
@@ -85,7 +85,7 @@ class VideoCaption
     clearTimeout @frozen if @frozen
     @frozen = setTimeout @onMouseLeave, 10000
 
-  onMovement: (event) =>
+  onMovement: =>
     @onMouseEnter()
 
   onMouseLeave: =>
@@ -107,24 +107,23 @@ class VideoCaption
     @captionHeight() / 2 - element.height() / 2
 
   topSpacingHeight: ->
-    @calculateOffset(@$('.subtitles li:not(.spacing).first'))
+    @calculateOffset(@$('.subtitles li:not(.spacing):first'))
 
   bottomSpacingHeight: ->
-    @calculateOffset(@$('.subtitles li:not(.spacing).last'))
+    @calculateOffset(@$('.subtitles li:not(.spacing):last'))
 
   toggle: (event) =>
     event.preventDefault()
     if @player.element.hasClass('closed')
       @$('.hide-subtitles').attr('title', 'Turn off captions')
       @player.element.removeClass('closed')
+      @scrollCaption()
     else
       @$('.hide-subtitles').attr('title', 'Turn on captions')
       @player.element.addClass('closed')
-    @scrollCaption()
 
   captionHeight: ->
     if @player.element.hasClass('fullscreen')
       $(window).height() - @$('.video-controls').height()
     else
       @$('.video-wrapper').height()
-

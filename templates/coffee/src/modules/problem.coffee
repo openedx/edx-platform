@@ -8,7 +8,7 @@ class @Problem
     $(selector, @element)
 
   bind: =>
-    MathJax.Hub.Queue ["Typeset",MathJax.Hub]
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub]
     window.update_schematics()
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check
@@ -43,15 +43,16 @@ class @Problem
       $.postWithPrefix "/modx/problem/#{@id}/problem_show", (response) =>
         $.each response, (key, value) =>
           if $.isArray(value)
-            $.each value, (index, answer_index) =>
-              @$("#label[for='input_#{key}_#{value[answer_index]}']").attr
+            for choice in value
+              @$("label[for='input_#{key}_#{choice}']").attr
                 correct_answer: 'true'
-          @$("#answer_#{key}").text(value)
+          else
+            @$("#answer_#{key}").text(value)
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
     else
-      @$('[id^=answer_]').text('')
-      @$('[correct_answer]').attr(correct_answer: null)
+      @$('[id^=answer_]').text ''
+      @$('[correct_answer]').attr correct_answer: null
       @element.removeClass 'showed'
       @$('.show').val 'Show Answer'
 

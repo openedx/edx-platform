@@ -11,7 +11,6 @@ class @Sequence
   bind: ->
     @element.bind 'contentChanged', @toggleArrows
     @$('#sequence-list a').click @goto
-    @$('.sequence-nav li a').hover @navHover
 
   buildNavigation: ->
     $.each @elements, (index, item) =>
@@ -34,37 +33,34 @@ class @Sequence
       @$('.sequence-nav-buttons .next a').removeClass('disabled').click(@next)
 
   render: (new_position) ->
-    if @position != undefined
-      @mark_visited @position
-      $.postWithPrefix "/modx/#{@tag}/#{@id}/goto_position", position: new_position
-
     if @position != new_position
+      if @position != undefined
+        @mark_visited @position
+        $.postWithPrefix "/modx/#{@tag}/#{@id}/goto_position", position: new_position
+
       @mark_active new_position
       @$('#seq_content').html eval(@elements[new_position - 1].content)
 
-      MathJax.Hub.Queue(["Typeset",MathJax.Hub])
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub])
       @position = new_position
       @element.trigger 'contentChanged'
-
-  navHover: (event) =>
-    $(event.target).siblings().toggleClass("shown")
 
   goto: (event) =>
     event.preventDefault()
     new_position = $(event.target).data('element')
-    log_event("seq_goto", old: @position, new: new_position, id: @id)
+    Logger.log "seq_goto", old: @position, new: new_position, id: @id
     @render new_position
 
   next: (event) =>
     event.preventDefault()
     new_position = @position + 1
-    log_event("seq_next", old: @position, new: new_position, id: @id)
+    Logger.log "seq_next", old: @position, new: new_position, id: @id
     @render new_position
 
   previous: (event) =>
     event.preventDefault()
     new_position = @position - 1
-    log_event("seq_prev", old: @position, new: new_position, id: @id)
+    Logger.log "seq_prev", old: @position, new: new_position, id: @id
     @render new_position
 
   link_for: (position) ->

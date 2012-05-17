@@ -14,7 +14,6 @@ class @Logger
           event: ''
           page: window.location.href
         async: false
-      return true
 
 # Keeping this for conpatibility issue only.
 @log_event = Logger.log

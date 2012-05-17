@@ -7,7 +7,7 @@
     return describe('constructor', function() {
       beforeEach(function() {
         new FeedbackForm;
-        return spyOn($, 'post').andCallFake(function(url, data, callback, format) {
+        return spyOn($, 'postWithPrefix').andCallFake(function(url, data, callback, format) {
           return callback();
         });
       });
