@@ -85,5 +85,4 @@ FILE_UPLOAD_HANDLERS = (
 ########################### PIPELINE #################################
 
 PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
-PIPELINE_JS_COMPRESSOR = None
-PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
