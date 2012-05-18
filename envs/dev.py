@@ -82,3 +82,9 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
+
+########################### PIPELINE #################################
+
+PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
+PIPELINE_JS_COMPRESSOR = None
+PIPELINE_CSS_COMPRESSOR = None

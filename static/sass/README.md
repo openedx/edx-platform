@@ -24,15 +24,4 @@ If you already install all the dependencies using Bundler, you can just do:
 
     $ bundle exec guard
 
-This will generate the sass file for development which some debugging
-information.
-
-### Before Commit
-
-Since this compiled style you're going to push are going to be used on live
-production site, you're encouraged to compress all of the style to save some
-bandwidth. You can do that by run this command:
-
-    $ bundle exec guard -g production
-
-Guard will watch your directory and generated a compressed version of CSS.
+This will execute `django-admin collectstatic`, which will compile the sass files

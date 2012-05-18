@@ -153,7 +153,7 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles" # We don't run collectstatic -- this is to appease askbot checks
+STATIC_ROOT = ENV_ROOT / "staticfiles" 
 
 # FIXME: We should iterate through the courses we have, adding the static 
 #        contents for each of them. (Right now we just use symlinks.)
@@ -217,7 +217,7 @@ SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# Jasmine ###################################
-JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/templates/coffee'
+JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
@@ -266,36 +266,49 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 PIPELINE_CSS = {
     'application': {
-        'source_filenames': ['css/application.scss'],
+        'source_filenames': ['sass/application.scss'],
         'output_filename': 'css/application.css',
     },
     'marketing': {
-        'source_filenames': ['css/marketing.scss'],
+        'source_filenames': ['sass/marketing.scss'],
         'output_filename': 'css/marketing.css',
     },
     'marketing-ie': {
-        'source_filenames': ['css/marketing-ie.scss'],
+        'source_filenames': ['sass/marketing-ie.scss'],
         'output_filename': 'css/marketing-ie.css',
     },
     'print': {
-        'source_filenames': ['css/print.scss'],
+        'source_filenames': ['sass/print.scss'],
         'output_filename': 'css/print.css',
     }
 }
 
+PIPELINE_JS = {
+    'application': {
+        'source_filenames': [
+            'coffee/src/calculator.coffee',
+            'coffee/src/courseware.coffee',
+            'coffee/src/feedback_form.coffee',
+            'coffee/src/main.coffee'
+        ],
+        'output_filename': 'js/application.js'
+    }
+}
+
 PIPELINE_COMPILERS = [
-    'pipeline.compilers.sass.SASSCompiler'
+    'pipeline.compilers.sass.SASSCompiler',
+    'pipeline.compilers.coffee.CoffeeScriptCompiler',
 ]
 
-PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 PIPELINE_CSS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
-    "*.scss",
-    "*.rb",
+    "sass/*",
+    "coffee/*",
     "*.py",
-    "*.pyc",
+    "*.pyc"
 )
 
 ################################### APPS #######################################
