@@ -1,0 +1,98 @@
+ <script type="text/x-mathjax-config">
+//    MathJax.Hub.Config({
+//      tex2jax: {inlineMath: [["\\(","\\)"]],
+//      displayMath: [["\\[","\\]"]]}
+//    });
+
+//  (function () {
+    var QUEUE = MathJax.Hub.queue;  // shorthand for the queue
+    var math = null;
+    var jaxset = {};                // associative array of the element jaxs for the math output.
+    var mmlset = {};		// associative array of mathml from each jax
+
+      // constructs mathML of the specified jax element
+        function toMathML(jax,callback) {
+          var mml;
+          try {
+            mml = jax.root.toMathML("");
+          } catch(err) {
+            if (!err.restart) {throw err} // an actual error
+            return MathJax.Callback.After([toMathML,jax,callback],err.restart);
+          }
+          MathJax.Callback(callback)(mml);
+        }
+
+      // function to queue in MathJax to get put the MathML expression in in the right document element
+      function UpdateMathML(jax,id) {
+              	toMathML(jax,function (mml) {
+                    // document.getElementById(id+'_fromjs').value=math.originalText+ "\n\n=>\n\n"+ mml;
+                    delem = document.getElementById("input_" + id + "_fromjs");
+		    if (delem) { delem.value=mml; };
+		    mmlset[id] = mml;
+              	})
+      }
+
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [
+	["\\(","\\)"],
+      ['[mathjaxinline]','[/mathjaxinline]']
+    ],
+   displayMath: [
+	["\\[","\\]"],
+     ['[mathjax]','[/mathjax]']
+    ]
+  }
+});
+
+    //
+    //  Get the element jax when MathJax has produced it.
+    //
+//    QUEUE.Push(function () {
+//     {% for id in jsids %}
+//         math = MathJax.Hub.getAllJax("{{id}}_display")[0];
+//	 jaxset["{{id}}"] = math;
+//	 math.Text(document.getElementById("{{id}}").defaultValue);
+//     	 UpdateMathML(math,"{{id}}");
+//      {% endfor %}
+//  });
+
+   //
+    //  The onchange event handler that typesets the
+    //  math entered by the user
+    //
+    window.UpdateMath = function (Am,id) {
+      QUEUE.Push(["Text",jaxset[id],Am]);
+      QUEUE.Push(UpdateMathML(jaxset[id],id));
+    }
+
+//  })();
+
+function DoUpdateMath(inputId) {
+  var str = document.getElementById("input_"+inputId).value;
+
+  // make sure the input field is in the jaxset
+  if ($.inArray(inputId,jaxset) == -1){
+      //alert('missing '+inputId);
+    if (document.getElementById("display_" + inputId)){
+	  MathJax.Hub.queue.Push(function () {
+	      math = MathJax.Hub.getAllJax("display_" + inputId)[0];
+	      if (math){
+		  jaxset[inputId] = math;
+	      }
+	 });
+      };
+ }
+
+  UpdateMath(str,inputId)
+}
+
+  </script>
+  <%block name="headextra"/>
+
+  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates -->
+  <!-- TODO: move to settings -->
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full">
+</script>
+
