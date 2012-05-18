@@ -305,7 +305,7 @@ def quickedit(request, id=None):
     print "In deployed use, this will only edit on one server"
     print "We need a setting to disable for production where there is"
     print "a load balanacer"
-    if not request.user.is_staff():
+    if not request.user.is_staff:
         return redirect('/')
 
     # get coursename if stored
