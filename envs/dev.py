@@ -11,7 +11,6 @@ from envs.common import *
 from envs.logsettings import get_logger_config
 
 DEBUG = True
-PIPELINE = True
 TEMPLATE_DEBUG = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log", 

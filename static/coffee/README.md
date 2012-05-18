@@ -34,15 +34,10 @@ Conveniently, you can install Node via `apt-get`, then use npm:
 Compiling
 ---------
 
-We're using Guard to watch your folder and automatic compile those CoffeeScript
-files. First, install guard by using Bundler:
-
-    $ gem install bundler
-    $ bundle install
-
-Then you can run this command:
-
-    $ bundle exec guard
+The dev server will automatically compile coffeescript files that have changed.
+Simply start the server using:
+    
+    $ rake runserver
 
 Testing
 -------

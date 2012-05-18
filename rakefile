@@ -59,18 +59,11 @@ task :test => REPORT_DIR do
     sh("#{django_admin} test --settings=envs.test --pythonpath=. $(ls djangoapps)")
 end
 
-desc "Collect static files"
-task :collectstatic, :env do |t, args|
-    args.with_defaults(:env => 'dev')
-    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    sh("#{django_admin} collectstatic --settings=envs.#{args.env} --pythonpath=. --noinput --link")
-end
-
 desc "Start a local server with the specified environment (defaults to dev). Other useful environments are devplus (for dev testing with a real local database)"
-task :runserver, [:env] => [:collectstatic] do |t, args|
+task :runserver, [:env] => [] do |t, args|
     args.with_defaults(:env => 'dev')
     django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    sh("#{django_admin} runserver --settings=envs.#{args.env} --pythonpath=. --nostatic")
+    sh("#{django_admin} runserver --settings=envs.#{args.env} --pythonpath=.")
 end
 
 task :package do
