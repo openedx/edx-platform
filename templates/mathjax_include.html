@@ -1,8 +1,11 @@
+##
+## File:   templates/mathjax_include.html
+##
+## Advanced mathjax using 2.0-latest CDN for Dynamic Math
+##
+## This enables ASCIIMathJAX, and is used by js_textbox
+
  <script type="text/x-mathjax-config">
-//    MathJax.Hub.Config({
-//      tex2jax: {inlineMath: [["\\(","\\)"]],
-//      displayMath: [["\\[","\\]"]]}
-//    });
 
 //  (function () {
     var QUEUE = MathJax.Hub.queue;  // shorthand for the queue
@@ -46,18 +49,6 @@ MathJax.Hub.Config({
 });
 
     //
-    //  Get the element jax when MathJax has produced it.
-    //
-//    QUEUE.Push(function () {
-//     {% for id in jsids %}
-//         math = MathJax.Hub.getAllJax("{{id}}_display")[0];
-//	 jaxset["{{id}}"] = math;
-//	 math.Text(document.getElementById("{{id}}").defaultValue);
-//     	 UpdateMathML(math,"{{id}}");
-//      {% endfor %}
-//  });
-
-   //
     //  The onchange event handler that typesets the
     //  math entered by the user
     //
