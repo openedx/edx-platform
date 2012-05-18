@@ -101,6 +101,11 @@ def textline(element, value, state, msg=""):
 #-----------------------------------------------------------------------------
 
 def js_textline(element, value, status, msg=''):
+        '''
+        Plan: We will inspect element to figure out type
+        '''
+        # TODO: Make a wrapper for <formulainput>
+        # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
 		## TODO: Code should follow PEP8 (4 spaces per indentation level)
         '''
         textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
@@ -147,7 +152,7 @@ def schematic(element, value, status, msg=''):
         'id':eid,
         'value':value,
         'initial_value':initial_value,
-        'state':state,
+        'state':status,
         'width':width,
         'height':height,
         'parts':parts,
