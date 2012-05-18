@@ -19,9 +19,7 @@ This should ensure that you have all the dependencies required for compiling.
 Compiling
 ---------
 
-We're using Guard to watch your folder and automatic compile those SASS files.
-If you already install all the dependencies using Bundler, you can just do:
-
-    $ bundle exec guard
-
-This will execute `django-admin collectstatic`, which will compile the sass files
+The dev server will automatically compile sass files that have changed. Simply start
+the server using:
+    
+    $ rake runserver
