@@ -73,20 +73,22 @@ html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formul
 
 # removed in MC
 ## These should be transformed
-#html_special_response = {"textline":textline.render,
-#                         "schematic":schematic.render,
-#                         "textbox":textbox.render,
-#                         "solution":solution.render,
+#html_special_response = {"textline":inputtypes.textline.render,
+#                         "schematic":inputtypes.schematic.render,
+#                         "textbox":inputtypes.textbox.render,
+#                         "formulainput":inputtypes.jstextline.render,
+#                         "solution":inputtypes.solution.render,
 #                         }
 
 class LoncapaProblem(object):
-    def __init__(self, fileobject, id, state=None, seed=None):
+    def __init__(self, fileobject, id, state=None, seed=None, system=None):
         ## Initialize class variables from state
         self.seed = None
         self.student_answers = dict()
         self.correct_map = dict()
         self.done = False
         self.problem_id = id
+        self.system = system
 
         if seed != None:
             self.seed = seed
@@ -117,7 +119,7 @@ class LoncapaProblem(object):
         self.preprocess_problem(self.tree, correct_map=self.correct_map, answer_map = self.student_answers)
         self.context = self.extract_context(self.tree, seed=self.seed)
         for response in self.tree.xpath('//'+"|//".join(response_types)):
-            responder = response_types[response.tag](response, self.context)
+            responder = response_types[response.tag](response, self.context, self.system)
             responder.preprocess_response()
 
     def get_state(self):
@@ -163,7 +165,7 @@ class LoncapaProblem(object):
         self.correct_map = dict()
         problems_simple = self.extract_problems(self.tree)
         for response in problems_simple:
-            grader = response_types[response.tag](response, self.context)
+            grader = response_types[response.tag](response, self.context, self.system)
             results = grader.grade(answers)		# call the responsetype instance to do the actual grading
             self.correct_map.update(results)
         return self.correct_map
@@ -177,7 +179,7 @@ class LoncapaProblem(object):
         answer_map = dict()
         problems_simple = self.extract_problems(self.tree)	# purified (flat) XML tree of just response queries
         for response in problems_simple:
-            responder = response_types[response.tag](response, self.context)	# instance of numericalresponse, customresponse,...
+            responder = response_types[response.tag](response, self.context, self.system)	# instance of numericalresponse, customresponse,...
             results = responder.get_answers()
             answer_map.update(results)				# dict of (id,correct_answer) 
 
