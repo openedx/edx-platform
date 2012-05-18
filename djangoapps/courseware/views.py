@@ -2,6 +2,8 @@ import logging
 import urllib
 import json
 
+from fs.osfs import OSFS
+
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
@@ -38,9 +40,7 @@ def gradebook(request):
     if 'course_admin' not in content_parser.user_groups(request.user):
         raise Http404
 
-    # TODO: This should be abstracted out. We repeat this logic many times. 
-    if 'coursename' in request.session: coursename = request.session['coursename'] 
-    else: coursename = None
+    coursename = multicourse_settings.get_coursename_from_request(request)
 
     student_objects = User.objects.all()[:100]
     student_info = [{'username' :s.username,
@@ -68,8 +68,7 @@ def profile(request, student_id = None):
 
     user_info = UserProfile.objects.get(user=student) # request.user.profile_cache # 
 
-    if 'coursename' in request.session: coursename = request.session['coursename']
-    else: coursename = None
+    coursename = multicourse_settings.get_coursename_from_request(request)
 
     context={'name':user_info.name,
              'username':student.username,
@@ -110,8 +109,7 @@ def render_section(request, section):
     if not settings.COURSEWARE_ENABLED:
         return redirect('/')
 
-    if 'coursename' in request.session: coursename = request.session['coursename']
-    else: coursename = None
+    coursename = multicourse_settings.get_coursename_from_request(request)
 
     try:
         dom = content_parser.section_file(user, section, coursename)
@@ -251,8 +249,8 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
 
     # get coursename if stored
-    if 'coursename' in request.session: coursename = request.session['coursename']
-    else: coursename = None
+    coursename = multicourse_settings.get_coursename_from_request(request)
+    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
 
     # Grab the XML corresponding to the request from course.xml
     try:
@@ -269,7 +267,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = None, 
                        ajax_url = ajax_url,
-                       filestore = None
+                       filestore = OSFS(settings.DATA_DIR + xp),
                        )
 
     try:
@@ -311,8 +309,8 @@ def quickedit(request, id=None):
         return redirect('/')
 
     # get coursename if stored
-    if 'coursename' in request.session: coursename = request.session['coursename']
-    else: coursename = None
+    coursename = multicourse_settings.get_coursename_from_request(request)
+    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
 
     def get_lcp(coursename,id):
         # Grab the XML corresponding to the request from course.xml
@@ -325,9 +323,8 @@ def quickedit(request, id=None):
         system = I4xSystem(track_function = make_track_function(request), 
                            render_function = None, 
                            ajax_url = ajax_url,
-                           filestore = None,
-                           coursename = coursename,
-                           role = 'staff' if request.user.is_staff else 'student',		# TODO: generalize this
+                           filestore = OSFS(settings.DATA_DIR + xp),
+                           #role = 'staff' if request.user.is_staff else 'student',		# TODO: generalize this
                            )
         instance=courseware.modules.get_module_class(module)(system, 
                                                              xml, 
