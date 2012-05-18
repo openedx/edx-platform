@@ -1,38 +1,19 @@
-GIT
-  remote: git://github.com/sikachu/guard-sass.git
-  revision: 2a646996d7fdaa2fabf5f65ba700bd8b02f14c1b
-  specs:
-    guard-sass (0.6.0)
-      guard (>= 0.4.0)
-      sass (>= 3.1)
-
 GEM
   remote: http://rubygems.org/
   specs:
     bourbon (1.3.6)
       sass (>= 3.1)
-    coffee-script (2.2.0)
-      coffee-script-source
-      execjs
-    coffee-script-source (1.3.3)
-    execjs (1.3.2)
-      multi_json (~> 1.0)
     ffi (1.0.11)
     guard (1.0.3)
       ffi (>= 0.5.0)
       thor (>= 0.14.6)
-    guard-coffeescript (0.6.0)
-      coffee-script (>= 2.2.0)
-      guard (>= 0.8.3)
-    guard-process (1.0.3)
-      ffi (~> 1.0.9)
-      guard (>= 0.4.2)
-      spoon (~> 0.0.1)
+    guard-rake (0.0.5)
+      guard
+      rake
     libnotify (0.7.2)
-    multi_json (1.3.5)
+    rake (0.9.2.2)
     ruby_gntp (0.3.4)
     sass (3.1.15)
-    spoon (0.0.1)
     thor (0.15.2)
 
 PLATFORMS
@@ -41,9 +22,7 @@ PLATFORMS
 DEPENDENCIES
   bourbon (~> 1.3.6)
   guard (~> 1.0.3)
-  guard-coffeescript (~> 0.6.0)
-  guard-process (~> 1.0.3)
-  guard-sass!
+  guard-rake (= 0.0.5)
   libnotify (~> 0.7.2)
   ruby_gntp (~> 0.3.4)
   sass (= 3.1.15)
