@@ -42,6 +42,11 @@ else:						# default to 6.002_Spring_2012
 #-----------------------------------------------------------------------------
 # wrapper functions around course settings
 
+def get_coursename_from_request(request):
+    if 'coursename' in request.session: coursename = request.session['coursename']
+    else: coursename = None
+    return coursename
+
 def get_course_settings(coursename):
     if not coursename:
         if hasattr(settings,'COURSE_DEFAULT'):
