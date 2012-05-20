@@ -32,9 +32,60 @@ from lxml import etree
 
 from mitxmako.shortcuts import render_to_string
 
-def simpleinput(fn):
+class SimpleInput():# XModule
+    ''' Type for simple inputs
+    State is a dictionary with optional keys: 
+    * Value
+    * ID
+    * Status (answered, unanswered, unsubmitted)
+    * Feedback (dictionary containing keys for hints, errors, or other 
+      feedback from previous attempt)
+    '''
+
+    simple_types = {} ## Maps tags to functions
+    
+    @classmethod
+    def get_xml_tags(c):
+        return c.simple_types.keys()
+
+    @classmethod
+    def get_uses(c):
+        return ['capa_input']
+
+    def get_html(self):
+        return self.simple_types[self.tag](self.xml, self.value, self.status, self.msg)
+
+    def __init__(self, system, xml, item_id = None, track_url=None, state=None, use = 'capa_input'):
+        self.xml = xml
+        self.tag = xml.tag
+        if not state:
+            state = {}
+        if item_id:
+            self.id = item_id
+        if xml.get('id'):
+            self.id = xml.get('id')
+        if 'id' in state:
+            self.id = state['id']
+        self.system = system
+
+        self.value = ''
+        if 'value' in state:
+            self.value = state['value']
+
+        self.msg = ''
+        if 'feedback' in state and 'message' in state['feedback']:
+            self.msg = state['feedback']['message']
+
+        self.status = 'unanswered'
+        if 'status' in state:
+            self.status = state['status']
+
+def simpleinput(fn, names=None):
+    if names == None:
+        SimpleInput.simple_types[fn.__name__] = fn
+    else:
+        raise "Unimplemented/input types"
     def wrapped():
-        print "XXXXXXXXXXXXX", fn
         return fn
     return wrapped
 
@@ -74,7 +125,7 @@ def optioninput(element, value, status, msg=''):
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
-
+@simpleinput
 def choicegroup(element, value, status, msg=''):
     '''
     Radio button inputs: multiple choice or true/false
@@ -97,6 +148,7 @@ def choicegroup(element, value, status, msg=''):
     html=render_to_string("choicegroup.html", context)
     return etree.XML(html)
 
+@simpleinput
 def textline(element, value, state, msg=""):
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
@@ -107,6 +159,7 @@ def textline(element, value, state, msg=""):
 
 #-----------------------------------------------------------------------------
 
+@simpleinput
 def js_textline(element, value, status, msg=''):
         '''
         Plan: We will inspect element to figure out type
@@ -132,6 +185,7 @@ def js_textline(element, value, status, msg=''):
 
 #-----------------------------------------------------------------------------
 ## TODO: Make a wrapper for <codeinput>
+@simpleinput
 def textbox(element, value, status, msg=''):
         '''
         The textbox is used for code input.  The message is the return HTML string from
@@ -147,6 +201,7 @@ def textbox(element, value, status, msg=''):
         return etree.XML(html)
 
 #-----------------------------------------------------------------------------
+@simpleinput
 def schematic(element, value, status, msg=''):
     eid = element.get('id')
     height = element.get('height')
@@ -171,6 +226,7 @@ def schematic(element, value, status, msg=''):
 
 #-----------------------------------------------------------------------------
 ### TODO: Move out of inputtypes
+@simpleinput
 def math(element, value, status, msg=''):
     '''
     This is not really an input type.  It is a convention from Lon-CAPA, used for
@@ -205,6 +261,7 @@ def math(element, value, status, msg=''):
 
 #-----------------------------------------------------------------------------
 
+@simpleinput
 def solution(element, value, status, msg=''):
     '''
     This is not really an input type.  It is just a <span>...</span> which is given an ID,
@@ -225,6 +282,7 @@ def solution(element, value, status, msg=''):
 
 #-----------------------------------------------------------------------------
 
+@simpleinput
 def imageinput(element, value, status, msg=''):
     '''
     Clickable image as an input field.  Element should specify the image source, height, and width, eg
@@ -260,62 +318,3 @@ def imageinput(element, value, status, msg=''):
         print '[courseware.capa.inputtypes.imageinput] context=',context
     html=render_to_string("imageinput.html", context)
     return etree.XML(html)
-
-
-
-class SimpleInput():# XModule
-    ''' Type for simple inputs
-    State is a dictionary with optional keys: 
-    * Value
-    * ID
-    * Status (answered, unanswered, unsubmitted)
-    * Feedback (dictionary containing keys for hints, errors, or other 
-      feedback from previous attempt)
-    '''
-
-    # We should populate this with a decorator on the specific types
-    simple_types = {'choicegroup':choicegroup,
-                    'imageinput':imageinput,
-                    'js_textline':js_textline,
-                    'math':math,
-                    'optioninput':optioninput,
-                    'schematic':schematic,
-                    'solution':solution,
-                    'textbox':textbox,
-                    'textline':textline}
-
-    @classmethod
-    def get_xml_tags(c):
-        return c.simple_types.keys()
-
-    @classmethod
-    def get_uses(c):
-        return ['capa_input']
-
-    def get_html(self):
-        return self.simple_types[self.tag](self.xml, self.value, self.status, self.msg)
-
-    def __init__(self, system, xml, item_id = None, track_url=None, state=None, use = 'capa_input'):
-        self.xml = xml
-        self.tag = xml.tag
-        if not state:
-            state = {}
-        if item_id:
-            self.id = item_id
-        if xml.get('id'):
-            self.id = xml.get('id')
-        if 'id' in state:
-            self.id = state['id']
-        self.system = system
-
-        self.value = ''
-        if 'value' in state:
-            self.value = state['value']
-
-        self.msg = ''
-        if 'feedback' in state and 'message' in state['feedback']:
-            self.msg = state['feedback']['message']
-
-        self.status = 'unanswered'
-        if 'status' in state:
-            self.status = state['status']
