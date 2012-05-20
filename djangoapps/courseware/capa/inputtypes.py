@@ -32,6 +32,10 @@ from lxml import etree
 
 from mitxmako.shortcuts import render_to_string
 
+def get_input_xml_tags():
+    ''' Eventually, this will be for all registered input types '''
+    return SimpleInput.get_xml_tags()
+
 class SimpleInput():# XModule
     ''' Type for simple inputs -- plain HTML with a form element
     State is a dictionary with optional keys: 

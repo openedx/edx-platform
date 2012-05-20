@@ -240,7 +240,7 @@ class LoncapaProblem(object):
         # used to be
         # if problemtree.tag in html_special_response:
         
-        if problemtree.tag in inputtypes.SimpleInput.get_xml_tags():
+        if problemtree.tag in inputtypes.get_input_xml_tags():
             # status is currently the answer for the problem ID for the input element,
             # but it will turn into a dict containing both the answer and any associated message
             # for the problem ID for the input element.
@@ -267,6 +267,8 @@ class LoncapaProblem(object):
             #    print "[courseware.capa.capa_problem.extract_html] msg = ",msg
 
             # do the rendering
+            # This should be broken out into a helper function
+            # that handles all input objects
             render_object = inputtypes.SimpleInput(system = self.system, 
                                                    xml = problemtree,
                                                    state = {'value':value, 
