@@ -167,7 +167,7 @@ class LoncapaProblem(object):
         problems_simple = self.extract_problems(self.tree)
         for response in problems_simple:
             grader = response_types[response.tag](response, self.context, self.system)
-            results = grader.grade(answers)		# call the responsetype instance to do the actual grading
+            results = grader.get_score(answers)		# call the responsetype instance to do the actual grading
             self.correct_map.update(results)
         return self.correct_map
 
