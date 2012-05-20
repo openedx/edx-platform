@@ -2,6 +2,15 @@
 % if problem['weight']:
 : ${ problem['weight'] } points
 % endif
+% if settings.QUICKEDIT:
+<span class="staff">
+<br/>
+<br/>
+<br/>
+<br/>
+<font size=-2><a href=${MITX_ROOT_URL}/quickedit/${id}>Quick
+Edit Problem</a></font></span>
+% endif
 </h2>
 
 <section class="problem">
