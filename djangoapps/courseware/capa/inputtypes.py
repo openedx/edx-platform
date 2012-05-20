@@ -32,8 +32,15 @@ from lxml import etree
 
 from mitxmako.shortcuts import render_to_string
 
+def simpleinput(fn):
+    def wrapped():
+        print "XXXXXXXXXXXXX", fn
+        return fn
+    return wrapped
+
 #-----------------------------------------------------------------------------
 
+@simpleinput
 def optioninput(element, value, status, msg=''):
     '''
     Select option input type.
@@ -254,3 +261,61 @@ def imageinput(element, value, status, msg=''):
     html=render_to_string("imageinput.html", context)
     return etree.XML(html)
 
+
+
+class SimpleInput():# XModule
+    ''' Type for simple inputs
+    State is a dictionary with optional keys: 
+    * Value
+    * ID
+    * Status (answered, unanswered, unsubmitted)
+    * Feedback (dictionary containing keys for hints, errors, or other 
+      feedback from previous attempt)
+    '''
+
+    # We should populate this with a decorator on the specific types
+    simple_types = {'choicegroup':choicegroup,
+                    'imageinput':imageinput,
+                    'js_textline':js_textline,
+                    'math':math,
+                    'optioninput':optioninput,
+                    'schematic':schematic,
+                    'solution':solution,
+                    'textbox':textbox,
+                    'textline':textline}
+
+    @classmethod
+    def get_xml_tags(c):
+        return c.simple_types.keys()
+
+    @classmethod
+    def get_uses(c):
+        return ['capa_input']
+
+    def get_html(self):
+        return self.simple_types[self.tag](self.xml, self.value, self.status, self.msg)
+
+    def __init__(self, system, xml, item_id = None, track_url=None, state=None, use = 'capa_input'):
+        self.xml = xml
+        self.tag = xml.tag
+        if not state:
+            state = {}
+        if item_id:
+            self.id = item_id
+        if xml.get('id'):
+            self.id = xml.get('id')
+        if 'id' in state:
+            self.id = state['id']
+        self.system = system
+
+        self.value = ''
+        if 'value' in state:
+            self.value = state['value']
+
+        self.msg = ''
+        if 'feedback' in state and 'message' in state['feedback']:
+            self.msg = state['feedback']['message']
+
+        self.status = 'unanswered'
+        if 'status' in state:
+            self.status = state['status']
