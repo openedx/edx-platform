@@ -25,6 +25,7 @@ from mako.template import Template
 
 from util import contextualize_text
 import inputtypes
+
 from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse, ExternalResponse,ImageResponse,OptionResponse
 
 import calc
@@ -166,7 +167,7 @@ class LoncapaProblem(object):
         problems_simple = self.extract_problems(self.tree)
         for response in problems_simple:
             grader = response_types[response.tag](response, self.context, self.system)
-            results = grader.grade(answers)		# call the responsetype instance to do the actual grading
+            results = grader.get_score(answers)		# call the responsetype instance to do the actual grading
             self.correct_map.update(results)
         return self.correct_map
 
@@ -239,7 +240,7 @@ class LoncapaProblem(object):
         # used to be
         # if problemtree.tag in html_special_response:
         
-        if hasattr(inputtypes, problemtree.tag):
+        if problemtree.tag in inputtypes.get_input_xml_tags():
             # status is currently the answer for the problem ID for the input element,
             # but it will turn into a dict containing both the answer and any associated message
             # for the problem ID for the input element.
@@ -266,9 +267,17 @@ class LoncapaProblem(object):
             #    print "[courseware.capa.capa_problem.extract_html] msg = ",msg
 
             # do the rendering
-            #render_function = html_special_response[problemtree.tag]
-            render_function = getattr(inputtypes, problemtree.tag)
-            return render_function(problemtree, value, status, msg) # render the special response (textline, schematic,...)
+            # This should be broken out into a helper function
+            # that handles all input objects
+            render_object = inputtypes.SimpleInput(system = self.system, 
+                                                   xml = problemtree,
+                                                   state = {'value':value, 
+                                                            'status': status, 
+                                                            'id':problemtree.get('id'), 
+                                                            'feedback':{'message':msg}
+                                                            },
+                                                   use = 'capa_input')
+            return render_object.get_html() #function(problemtree, value, status, msg) # render the special response (textline, schematic,...)
 
         tree=Element(problemtree.tag)
         for item in problemtree:

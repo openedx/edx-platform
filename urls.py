@@ -70,7 +70,7 @@ if settings.COURSEWARE_ENABLED:
     )
 
 if settings.ENABLE_MULTICOURSE:
-	urlpatterns += (url(r'^mitxhome$', 'util.views.mitxhome'),)
+	urlpatterns += (url(r'^mitxhome$', 'multicourse.views.mitxhome'),)
 
 if settings.QUICKEDIT:
 	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'courseware.views.quickedit'),)

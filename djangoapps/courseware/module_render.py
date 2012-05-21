@@ -13,8 +13,8 @@ from fs.osfs import OSFS
 from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 
-
 from models import StudentModule
+from multicourse import multicourse_settings
 
 import courseware.modules
 
@@ -31,6 +31,8 @@ class I4xSystem(object):
         self.track_function = track_function
         if not filestore: 
             self.filestore = OSFS(settings.DATA_DIR)
+        else:
+            self.filestore = filestore
         self.render_function = render_function
         self.exception404 = Http404
     def __repr__(self):
@@ -95,15 +97,15 @@ def render_x_module(user, request, xml_module, module_object_preload):
         state = smod.state
 
     # get coursename if stored
-    if 'coursename' in request.session: coursename = request.session['coursename']
-    else: coursename = None
+    coursename = multicourse_settings.get_coursename_from_request(request)
+    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
 
     # Create a new instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module_type+'/'+module_id+'/'
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = lambda x: render_module(user, request, x, module_object_preload), 
                        ajax_url = ajax_url,
-                       filestore = None
+                       filestore = OSFS(settings.DATA_DIR + xp),
                        )
     instance=module_class(system, 
                           etree.tostring(xml_module), 
