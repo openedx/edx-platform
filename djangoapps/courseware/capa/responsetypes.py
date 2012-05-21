@@ -47,10 +47,10 @@ def compare_with_tolerance(v1, v2, tol):
     return abs(v1-v2) <= tolerance
 
 class GenericResponse(object):
-    __metaclass__=abc.ABCMeta
+    __metaclass__=abc.ABCMeta # abc = Abstract Base Class
 
     @abc.abstractmethod
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         pass
 
     @abc.abstractmethod
@@ -61,7 +61,7 @@ class GenericResponse(object):
     def preprocess_response(self):
         pass
 
-#Every response type needs methods "grade" and "get_answers"     
+#Every response type needs methods "get_score" and "get_answers"     
 
 #-----------------------------------------------------------------------------
 
@@ -95,7 +95,7 @@ class MultipleChoiceResponse(GenericResponse):
             raise Exception("should have exactly one choice group per multiplechoicceresponse")
         self.answer_id=self.answer_id[0]
 
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
             return {self.answer_id:'correct'}
         else:
@@ -132,7 +132,7 @@ class TrueFalseResponse(MultipleChoiceResponse):
                 else:
                     choice.set("name", "choice_"+choice.get("name"))
     
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         correct = set(self.correct_choices)
         answers = set(student_answers.get(self.answer_id, []))
         
@@ -162,7 +162,7 @@ class OptionResponse(GenericResponse):
             print '[courseware.capa.responsetypes.OR.init] answer_fields=%s' % (self.answer_fields)
         self.context = context
 
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         cmap = {}
         amap = self.get_answers()
         for aid in amap:
@@ -194,7 +194,7 @@ class NumericalResponse(GenericResponse):
         except Exception, err:
             self.answer_id = None
 
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         ''' Display HTML for a numeric response '''
         student_answer = student_answers[self.answer_id]
         try:
@@ -300,7 +300,7 @@ def sympy_check2():
                 else:
                     self.code = answer.text
 
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         '''
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
@@ -363,7 +363,7 @@ def sympy_check2():
                 print "oops in customresponse (cfn) error %s" % err
                 # print "context = ",self.context
                 print traceback.format_exc()
-            if settings.DEBUG: print "[courseware.capa.responsetypes.customresponse.grade] ret = ",ret
+            if settings.DEBUG: print "[courseware.capa.responsetypes.customresponse.get_score] ret = ",ret
             if type(ret)==dict:
                 correct[0] = 'correct' if ret['ok'] else 'incorrect'
                 msg = ret['msg']
@@ -428,7 +428,7 @@ class ExternalResponse(GenericResponse):
 
         self.tests = xml.get('answer')
 
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         submission = [student_answers[k] for k in sorted(self.answer_ids)]
         self.context.update({'submission':submission})
 
@@ -504,7 +504,7 @@ class FormulaResponse(GenericResponse):
             self.case_sensitive = False
 
 
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         variables=self.samples.split('@')[0].split(',')
         numsamples=int(self.samples.split('@')[1].split('#')[1])
         sranges=zip(*map(lambda x:map(float, x.split(",")), 
@@ -566,7 +566,7 @@ class SchematicResponse(GenericResponse):
         else:
             self.code = answer.text
 
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         from capa_problem import global_context
         submission = [json.loads(student_answers[k]) for k in sorted(self.answer_ids)]
         self.context.update({'submission':submission})
@@ -605,7 +605,7 @@ class ImageResponse(GenericResponse):
         self.ielements = xml.findall('imageinput')
         self.answer_ids = [ie.get('id')  for ie in self.ielements]
 
-    def grade(self, student_answers):
+    def get_score(self, student_answers):
         correct_map = {}
         expectedset = self.get_answers()
 
