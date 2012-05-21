@@ -64,6 +64,10 @@ class SimpleInput():# XModule
         self.tag = xml.tag
         if not state:
             state = {}
+        ## ID should only come from one place. 
+        ## If it comes from multiple, we use state first, XML second, and parameter
+        ## third. Since we don't make this guarantee, we can swap this around in 
+        ## the future if there's a more logical order. 
         if item_id:
             self.id = item_id
         if xml.get('id'):
@@ -132,7 +136,7 @@ def register_render_function(fn, names=None, cls=SimpleInput):
     if names == None:
         SimpleInput.xml_tags[fn.__name__] = fn
     else:
-        raise "Unimplemented/input types"
+        raise NotImplementedError
     def wrapped():
         return fn
     return wrapped
