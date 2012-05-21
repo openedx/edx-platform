@@ -20,7 +20,9 @@ class Module(XModule):
 
     @classmethod
     def get_xml_tags(c):
-        return ["sequential", 'tab']
+        obsolete_tags = ["sequential", 'tab']
+        modern_tags = ["problemset", "videosequence"]
+        return obsolete_tags + modern_tags
         
     def get_html(self):
         self.render()
