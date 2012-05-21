@@ -27,14 +27,14 @@ $(document).ready(function(){
     <section class="updates">
       <%include file="updates.html" />
     </section>
-    <section class="handouts">
+    <section aria-label="Handout Navigation" class="handouts">
       <%include file="handouts.html" />
     </section>
     % else:
     <section class="updates">
       <%include file="guest_updates.html" />
     </section>
-    <section class="handouts">
+    <section aria-label="Handout Navigation" class="handouts">
       <%include file="guest_handouts.html" />
     </section>
     % endif
