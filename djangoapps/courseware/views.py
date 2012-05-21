@@ -19,7 +19,6 @@ from lxml import etree
 from module_render import render_module, make_track_function, I4xSystem
 from models import StudentModule
 from student.models import UserProfile
-from util.errors import record_exception
 from util.views import accepts
 from multicourse import multicourse_settings
 
@@ -114,7 +113,7 @@ def render_section(request, section):
     try:
         dom = content_parser.section_file(user, section, coursename)
     except:
-        record_exception(log, "Unable to parse courseware xml")
+        log.exception("Unable to parse courseware xml")
         return render_to_response('courseware-error.html', {})
 
     context = {
@@ -133,7 +132,7 @@ def render_section(request, section):
     try:
         module = render_module(user, request, dom, module_object_preload)
     except:
-        record_exception(log, "Unable to load module")
+        log.exception("Unable to load module")
         context.update({
             'init': '',
             'content': render_to_string("module-error.html", {}),
@@ -182,7 +181,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     try:
         dom = content_parser.course_file(user,course)	# also pass course to it, for course-specific XML path
     except:
-        record_exception(log, "Unable to parse courseware xml")
+        log.exception("Unable to parse courseware xml")
         return render_to_response('courseware-error.html', {})
 
     dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
@@ -211,7 +210,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     try:
         module = render_module(user, request, module, module_object_preload)
     except:
-        record_exception(log, "Unable to load module")
+        log.exception("Unable to load module")
         context.update({
             'init': '',
             'content': render_to_string("module-error.html", {}),
@@ -250,13 +249,18 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     # get coursename if stored
     coursename = multicourse_settings.get_coursename_from_request(request)
-    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+
+    if coursename and settings.ENABLE_MULTICOURSE:
+        xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+        data_root = settings.DATA_DIR + xp
+    else:
+        data_root = settings.DATA_DIR
 
     # Grab the XML corresponding to the request from course.xml
     try:
         xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
     except:
-        record_exception(log, "Unable to load module during ajax call")
+        log.exception("Unable to load module during ajax call")
         if accepts(request, 'text/html'):
             return render_to_response("module-error.html", {})
         else:
@@ -267,7 +271,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = None, 
                        ajax_url = ajax_url,
-                       filestore = OSFS(settings.DATA_DIR + xp),
+                       filestore = OSFS(data_root),
                        )
 
     try:
@@ -276,7 +280,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                                              id, 
                                                              state=oldstate)
     except:
-        record_exception(log, "Unable to load module instance during ajax call")
+        log.exception("Unable to load module instance during ajax call")
         if accepts(request, 'text/html'):
             return render_to_response("module-error.html", {})
         else:

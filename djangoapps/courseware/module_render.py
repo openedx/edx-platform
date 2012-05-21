@@ -98,14 +98,20 @@ def render_x_module(user, request, xml_module, module_object_preload):
 
     # get coursename if stored
     coursename = multicourse_settings.get_coursename_from_request(request)
-    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+
+    if coursename and settings.ENABLE_MULTICOURSE:
+        xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+        data_root = settings.DATA_DIR + xp
+    else:
+        data_root = settings.DATA_DIR
 
     # Create a new instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module_type+'/'+module_id+'/'
+    
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = lambda x: render_module(user, request, x, module_object_preload), 
                        ajax_url = ajax_url,
-                       filestore = OSFS(settings.DATA_DIR + xp),
+                       filestore = OSFS(data_root),
                        )
     instance=module_class(system, 
                           etree.tostring(xml_module), 
