@@ -28,10 +28,10 @@ $(document).ready(function(){
    <hr width="100%">
    <h3>Courses available:</h3>
     <ul>
-      <li><a href=${ MITX_ROOT_URL }/courseware/6.002_Spring_2012/>6.002 (Spring 2012)</a></li>
-      <li><a href=${ MITX_ROOT_URL }/courseware/8.02_Spring_2013/>8.02 (Spring 2013)</a></li>
-      <li><a href=${ MITX_ROOT_URL }/courseware/8.01_Spring_2013/>8.01 (Spring 201x)</a></li>
-   </ul>
+      % for coursename, info in courseinfo.items():
+          <li><a href=${ MITX_ROOT_URL }/courseware/${coursename}/>${info['title']} (${coursename})</a></li>
+      % endfor
+  </ul>
   </section>
 </div>
 </section>
