@@ -249,7 +249,12 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
 
     # get coursename if stored
     coursename = multicourse_settings.get_coursename_from_request(request)
-    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+
+    if coursename and settings.ENABLE_MULTICOURSE:
+        xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+        data_root = settings.DATA_DIR + xp
+    else:
+        data_root = settings.DATA_DIR
 
     # Grab the XML corresponding to the request from course.xml
     try:
@@ -266,7 +271,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = None, 
                        ajax_url = ajax_url,
-                       filestore = OSFS(settings.DATA_DIR + xp),
+                       filestore = OSFS(data_root),
                        )
 
     try:
