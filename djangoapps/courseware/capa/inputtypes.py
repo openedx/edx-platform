@@ -32,8 +32,121 @@ from lxml import etree
 
 from mitxmako.shortcuts import render_to_string
 
+def get_input_xml_tags():
+    ''' Eventually, this will be for all registered input types '''
+    return SimpleInput.get_xml_tags()
+
+class SimpleInput():# XModule
+    ''' Type for simple inputs -- plain HTML with a form element
+    State is a dictionary with optional keys: 
+    * Value
+    * ID
+    * Status (answered, unanswered, unsubmitted)
+    * Feedback (dictionary containing keys for hints, errors, or other 
+      feedback from previous attempt)
+    '''
+
+    xml_tags = {} ## Maps tags to functions
+    
+    @classmethod
+    def get_xml_tags(c):
+        return c.xml_tags.keys()
+
+    @classmethod
+    def get_uses(c):
+        return ['capa_input', 'capa_transform']
+
+    def get_html(self):
+        return self.xml_tags[self.tag](self.xml, self.value, self.status, self.msg)
+
+    def __init__(self, system, xml, item_id = None, track_url=None, state=None, use = 'capa_input'):
+        self.xml = xml
+        self.tag = xml.tag
+        if not state:
+            state = {}
+        ## ID should only come from one place. 
+        ## If it comes from multiple, we use state first, XML second, and parameter
+        ## third. Since we don't make this guarantee, we can swap this around in 
+        ## the future if there's a more logical order. 
+        if item_id:
+            self.id = item_id
+        if xml.get('id'):
+            self.id = xml.get('id')
+        if 'id' in state:
+            self.id = state['id']
+        self.system = system
+
+        self.value = ''
+        if 'value' in state:
+            self.value = state['value']
+
+        self.msg = ''
+        if 'feedback' in state and 'message' in state['feedback']:
+            self.msg = state['feedback']['message']
+
+        self.status = 'unanswered'
+        if 'status' in state:
+            self.status = state['status']
+
+## TODO
+# class SimpleTransform():
+#     ''' Type for simple XML to HTML transforms. Examples:
+#     * Math tags, which go from LON-CAPA-style m-tags to MathJAX
+#     '''
+#     xml_tags = {} ## Maps tags to functions
+    
+#     @classmethod
+#     def get_xml_tags(c):
+#         return c.xml_tags.keys()
+
+#     @classmethod
+#     def get_uses(c):
+#         return ['capa_transform']
+
+#     def get_html(self):
+#         return self.xml_tags[self.tag](self.xml, self.value, self.status, self.msg)
+
+#     def __init__(self, system, xml, item_id = None, track_url=None, state=None, use = 'capa_input'):
+#         self.xml = xml
+#         self.tag = xml.tag
+#         if not state:
+#             state = {}
+#         if item_id:
+#             self.id = item_id
+#         if xml.get('id'):
+#             self.id = xml.get('id')
+#         if 'id' in state:
+#             self.id = state['id']
+#         self.system = system
+
+#         self.value = ''
+#         if 'value' in state:
+#             self.value = state['value']
+
+#         self.msg = ''
+#         if 'feedback' in state and 'message' in state['feedback']:
+#             self.msg = state['feedback']['message']
+
+#         self.status = 'unanswered'
+#         if 'status' in state:
+#             self.status = state['status']
+
+
+def register_render_function(fn, names=None, cls=SimpleInput):
+    if names == None:
+        SimpleInput.xml_tags[fn.__name__] = fn
+    else:
+        raise NotImplementedError
+    def wrapped():
+        return fn
+    return wrapped
+
+
+
+
 #-----------------------------------------------------------------------------
 
+@register_render_function
 def optioninput(element, value, status, msg=''):
     '''
     Select option input type.
@@ -67,7 +180,7 @@ def optioninput(element, value, status, msg=''):
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
-
+@register_render_function
 def choicegroup(element, value, status, msg=''):
     '''
     Radio button inputs: multiple choice or true/false
@@ -90,6 +203,7 @@ def choicegroup(element, value, status, msg=''):
     html=render_to_string("choicegroup.html", context)
     return etree.XML(html)
 
+@register_render_function
 def textline(element, value, state, msg=""):
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
@@ -100,6 +214,7 @@ def textline(element, value, state, msg=""):
 
 #-----------------------------------------------------------------------------
 
+@register_render_function
 def js_textline(element, value, status, msg=''):
         '''
         Plan: We will inspect element to figure out type
@@ -125,6 +240,7 @@ def js_textline(element, value, status, msg=''):
 
 #-----------------------------------------------------------------------------
 ## TODO: Make a wrapper for <codeinput>
+@register_render_function
 def textbox(element, value, status, msg=''):
         '''
         The textbox is used for code input.  The message is the return HTML string from
@@ -140,6 +256,7 @@ def textbox(element, value, status, msg=''):
         return etree.XML(html)
 
 #-----------------------------------------------------------------------------
+@register_render_function
 def schematic(element, value, status, msg=''):
     eid = element.get('id')
     height = element.get('height')
@@ -164,6 +281,7 @@ def schematic(element, value, status, msg=''):
 
 #-----------------------------------------------------------------------------
 ### TODO: Move out of inputtypes
+@register_render_function
 def math(element, value, status, msg=''):
     '''
     This is not really an input type.  It is a convention from Lon-CAPA, used for
@@ -198,6 +316,7 @@ def math(element, value, status, msg=''):
 
 #-----------------------------------------------------------------------------
 
+@register_render_function
 def solution(element, value, status, msg=''):
     '''
     This is not really an input type.  It is just a <span>...</span> which is given an ID,
@@ -218,6 +337,7 @@ def solution(element, value, status, msg=''):
 
 #-----------------------------------------------------------------------------
 
+@register_render_function
 def imageinput(element, value, status, msg=''):
     '''
     Clickable image as an input field.  Element should specify the image source, height, and width, eg
@@ -253,4 +373,3 @@ def imageinput(element, value, status, msg=''):
         print '[courseware.capa.inputtypes.imageinput] context=',context
     html=render_to_string("imageinput.html", context)
     return etree.XML(html)
-
