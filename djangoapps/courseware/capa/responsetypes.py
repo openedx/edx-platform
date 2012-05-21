@@ -66,10 +66,8 @@ class GenericResponse(object):
 #-----------------------------------------------------------------------------
 
 class MultipleChoiceResponse(GenericResponse):
-    '''
-    Example: 
-
-    <multiplechoiceresponse direction="vertical" randomize="yes">
+    # TODO: handle direction and randomize
+    snippets = [{'snippet': '''<multiplechoiceresponse direction="vertical" randomize="yes">
      <choicegroup type="MultipleChoice">
         <choice location="random" correct="false"><span>`a+b`<br/></span></choice>
         <choice location="random" correct="true"><span><math>a+b^2</math><br/></span></choice>
@@ -77,10 +75,7 @@ class MultipleChoiceResponse(GenericResponse):
         <choice location="bottom" correct="false"><math>a+b+d</math></choice>
      </choicegroup>
     </multiplechoiceresponse>
-
-    TODO: handle direction and randomize
-
-    '''
+    '''}]
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
@@ -218,8 +213,9 @@ class NumericalResponse(GenericResponse):
 class CustomResponse(GenericResponse):
     '''
     Custom response.  The python code to be run should be in <answer>...</answer>.  Example:
+    '''
 
-    <customresponse>
+    snippets = [{'snippet': '''<customresponse>
     <startouttext/>
     <br/>
     Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
@@ -237,9 +233,10 @@ class CustomResponse(GenericResponse):
     if not(r=="IS*u(t-t0)"):
         correct[0] ='incorrect'
     </answer>
-    </customresponse>
+    </customresponse>'''}]
     
-    Alternatively, the check function can be defined in <script>...</script>  Example:
+
+    '''Footnote: the check function can also be defined in <script>...</script>  Example:
 
 <script type="loncapa/python"><![CDATA[
 
