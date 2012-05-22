@@ -66,6 +66,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
         url(r'^calculate$', 'util.views.calculate'),
+        url(r'^heartbeat$', include('heartbeat.urls')),
     )
 
 if settings.ASKBOT_ENABLED:
