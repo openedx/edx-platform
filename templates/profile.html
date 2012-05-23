@@ -155,16 +155,17 @@ $(function() {
         <h1>Course Progress</h1>
       </header>
 
-      <div id="grade-detail-graph"></div>
-      
       <div id="grade">
         %if grade_sheet['grade']:
-          Final Grade <strong>${grade_sheet['grade']}</strong>
+          <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
+
           <a rel="leanModal" class="cert_request" href="#cert_request">Request Certificate</a>
         %else:
-          No letter grade has been earned for this course
+          <p> No letter grade has been earned for this course </p>
         %endif
       </div>
+
+      <div id="grade-detail-graph"></div>
 
       <ol class="chapters">
         %for chapter in grade_sheet['courseware_summary']:

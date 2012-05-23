@@ -153,6 +153,42 @@ div.profile-wrapper {
       }
     }
 
+    div#grade {
+      @include clearfix;
+      @extend .topbar;
+      padding-left: lh();
+      padding-right: lh();
+
+      p {
+        color: darken($cream, 80%);
+        float: left;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+
+        strong {
+          font-size: 18px;
+          position: relative;
+          top: 1px;
+        }
+      }
+
+      a {
+        background-color: darken($cream, 10%);
+        border: 1px solid darken($cream, 30%);
+        @include border-radius(3px);
+        display: block;
+        float: right;
+        font-weight: bold;
+        line-height: 1em;
+        margin-top: 9px;
+        @include box-shadow(inset 0 1px 0 lighten($cream, 5%));
+        padding: 8px;
+        text-shadow: 0 1px 0 lighten($cream, 5%);
+      }
+    }
+
     div#grade-detail-graph {
       width: 100%;
       min-height: 300px;
