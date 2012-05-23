@@ -13,4 +13,9 @@ db.newaskbot
 db.oldaskbot
 flushdb.sh
 build
+.coverage
+coverage.xml
+cover/
+log/
+reports/
 \#*\#
