@@ -89,6 +89,7 @@ task :package do
         FileUtils.chmod(0755, postinstall.path)
 
         args = ["fakeroot", "fpm", "-s", "dir", "-t", "deb",
+            "--verbose",
             "--after-install=#{postinstall.path}",
             "--prefix=#{INSTALL_DIR_PATH}",
             "--exclude=build",
