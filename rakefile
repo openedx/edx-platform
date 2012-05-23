@@ -28,6 +28,8 @@ INSTALL_DIR_PATH = File.join(DEPLOY_DIR, NORMALIZED_DEPLOY_NAME)
 CLOBBER.include('build')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
+task :default
+
 task :test do
     sh("django-admin.py test --settings=envs.test --pythonpath=. $(ls djangoapps)")
 end
