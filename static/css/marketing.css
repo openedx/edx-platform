@@ -937,3 +937,24 @@ div#feedback_div form ol li {
   width: 100%; }
 div#feedback_div form ol li textarea#feedback_message {
   height: 100px; }
+
+div#cert_request label {
+  font-weight: bold;
+  margin-bottom: 6px;
+  display: block; }
+div#cert_request div#cert_request_error {
+  display: block;
+  color: #993333;
+  font-weight: bold;
+  margin-bottom: 6px; }
+div#cert_request li.verify {
+  zoom: 1; }
+div#cert_request li.verify:before, div#cert_request li.verify:after {
+  content: "";
+  display: table; }
+div#cert_request li.verify:after {
+  clear: both; }
+div#cert_request li.verify input {
+  float: left; }
+div#cert_request li.verify label {
+  margin-left: 25px; }
