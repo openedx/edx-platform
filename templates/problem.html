@@ -1,3 +1,4 @@
+<%namespace name='static' file='static_content.html'/>
 <h2 class="problem-header">${ problem['name'] }
 % if problem['weight']:
 : ${ problem['weight'] } points
@@ -14,7 +15,7 @@ Edit Problem</a></font></span>
 </h2>
 
 <section class="problem">
-  ${ problem['html'] }
+  ${ static.replace_urls(problem['html']) }
 
   <section class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }">

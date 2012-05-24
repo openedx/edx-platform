@@ -1,0 +1,10 @@
+<%!
+from staticfiles.storage import staticfiles_storage
+from pipeline_mako import compressed_css, compressed_js
+from static_replace import replace_urls
+%>
+
+<%def name='url(file)'>${staticfiles_storage.url(file)}</%def>
+<%def name='css(group)'>${compressed_css(group)}</%def>
+<%def name='js(group)'>${compressed_js(group)}</%def>
+<%def name='replace_urls(text)'>${replace_urls(text)}</%def>

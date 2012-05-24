@@ -1,9 +1,10 @@
 <%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
 
 <%block name="headextra">
-  <script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
-  <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
-  <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
+  <script type="text/javascript" src="${static.url('js/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/flot/jquery.flot.stack.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/flot/jquery.flot.symbol.js')}"></script>
   
   <style type="text/css">
   .grade_a {color:green;}
