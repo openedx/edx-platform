@@ -60,7 +60,7 @@ task :test => REPORT_DIR do
 end
 
 desc "Start a local server with the specified environment (defaults to dev). Other useful environments are devplus (for dev testing with a real local database)"
-task :runserver, :env do |t, args|
+task :runserver, [:env] => [] do |t, args|
     args.with_defaults(:env => 'dev')
     django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
     sh("#{django_admin} runserver --settings=envs.#{args.env} --pythonpath=.")
@@ -78,11 +78,15 @@ task :package do
         set -x
 
         chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
-        
+        chmod +x #{INSTALL_DIR_PATH}/collect_static_resources
+
         service gunicorn stop
         rm -f #{LINK_PATH}
         ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
         chown makeitso:makeitso #{LINK_PATH}
+
+        /opt/wwc/mitx/collect_static_resources
+
         service gunicorn start
         POSTINSTALL
         postinstall.close()

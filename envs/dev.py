@@ -81,3 +81,8 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
+
+########################### PIPELINE #################################
+
+PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
+PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
