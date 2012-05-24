@@ -1,12 +1,9 @@
-try:
-    from staticfiles.storage import staticfiles_storage
-except ImportError:
-    from django.contrib.staticfiles.storage import staticfiles_storage # noqa
+from staticfiles.storage import staticfiles_storage
 
 from mitxmako.shortcuts import render_to_string
 
 from pipeline.conf import settings
-from pipeline.packager import Packager, PackageNotFound
+from pipeline.packager import Packager
 from pipeline.utils import guess_type
 
 def compressed_css(package_name):
@@ -15,10 +12,7 @@ def compressed_css(package_name):
         package = {package_name: package}
     packager = Packager(css_packages=package, js_packages={})
 
-    try:
-        package = packager.package_for('css', package_name)
-    except PackageNotFound:
-        return ''  # fail silently, do not return anything if an invalid group is specified
+    package = packager.package_for('css', package_name)
 
     if settings.PIPELINE:
         return render_css(package, package.output_filename)
@@ -46,10 +40,7 @@ def compressed_js(package_name):
         package = {package_name: package}
     packager = Packager(css_packages={}, js_packages=package)
 
-    try:
-        package = packager.package_for('js', package_name)
-    except PackageNotFound:
-        return ''  # fail silently, do not return anything if an invalid group is specified
+    package = packager.package_for('js', package_name)
 
     if settings.PIPELINE:
         return render_js(package, package.output_filename)
