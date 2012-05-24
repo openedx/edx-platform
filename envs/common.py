@@ -312,7 +312,9 @@ STATICFILES_IGNORE_PATTERNS = (
     "*.pyc"
 )
 
-PIPELINE_YUI_BINARY = '/usr/bin/yui-compressor'
+PIPELINE_YUI_BINARY = 'yui-compressor'
+PIPELINE_SASS_BINARY = 'sass'
+PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
 
 ################################### APPS #######################################
 INSTALLED_APPS = (
