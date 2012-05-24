@@ -78,6 +78,7 @@ task :package do
         set -x
 
         chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
+        chmod +x #{INSTALL_DIR_PATH}/collect_static_resources
 
         service gunicorn stop
         rm -f #{LINK_PATH}
