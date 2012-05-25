@@ -195,8 +195,8 @@ output "Installing MITx requirements"
 pip install -r mitx/pre-requirements.txt >> $LOG
 pip install -r mitx/requirements.txt >>$LOG 
 
-mkdir "$BASE/log"
-mkdir "$BASE/db"
+mkdir "$BASE/log" || true
+mkdir "$BASE/db" || true
 
 cat<<END
    
