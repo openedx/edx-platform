@@ -9,7 +9,7 @@ import urllib
 def fasthash(string):
     m = hashlib.new("md4")
     m.update(string)
-    return "id"+m.hexdigest()
+    return m.hexdigest()
 
 def safe_key(key, key_prefix, version):
     safe_key = urllib.quote_plus(smart_str(key))

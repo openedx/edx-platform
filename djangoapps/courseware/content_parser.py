@@ -118,7 +118,7 @@ def id_tag(course):
             new_id = default_ids[elem.tag] + new_id
             elem.set('id', new_id)
         else:
-            elem.set('id', fasthash(etree.tostring(elem)))
+            elem.set('id', "id"+fasthash(etree.tostring(elem)))
             
 def propogate_downward_tag(element, attribute_name, parent_attribute = None):
     ''' This call is to pass down an attribute to all children. If an element
