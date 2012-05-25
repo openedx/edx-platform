@@ -26,9 +26,7 @@ info() {
     MITx base dir : $BASE 
     Python dir : $PYTHON_DIR
     Ruby dir : $RUBY_DIR
-
     Ruby ver : $RUBY_VER
-    Ruby libraries : $GEM_PKGS
 
 EO
 
@@ -45,7 +43,6 @@ SCIPY_VER="0.10.1"
 LOG="/var/tmp/install.log"
 BREW_PKGS="readline sqlite gdbm pkg-config gfortran mercurial python yuicompressor "
 APT_PKGS="curl git mercurial python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor"
-GEM_PKGS="sass bourbon"
 
 ARGS=$(getopt "cvh" "$*")
 if [[ $? != 0 ]]; then
@@ -154,8 +151,10 @@ source $RUBY_DIR/scripts/rvm
 rvm install $RUBY_VER
 virtualenv "$PYTHON_DIR"
 source $PYTHON_DIR/bin/activate
-output "Installing ruby packages - $GEM_PKGS"
-gem install $GEM_PKGS
+output "Installing ruby packages"
+gem install --version '0.8.3' rake
+gem install --version '3.1.15' sass
+gem install --version '1.3.6' bourbon
 cd "$BASE"
 output "Cloning mitx, askbot and data repos"
 if [[ -d "$BASE/mitx" ]]; then
