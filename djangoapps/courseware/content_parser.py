@@ -7,7 +7,6 @@ Does some caching (to be explained).
 
 '''
 
-import hashlib
 import logging
 import os
 import re
@@ -16,6 +15,7 @@ import urllib
 
 from datetime import timedelta
 from lxml import etree
+from util.memcache import fasthash
 
 try: # This lets us do __name__ == ='__main__'
     from django.conf import settings
@@ -57,10 +57,6 @@ def parse_timedelta(time_str):
             time_params[name] = int(param)
     return timedelta(**time_params)
 
-def fasthash(string):
-    m = hashlib.new("md4")
-    m.update(string)
-    return "id"+m.hexdigest()
 
 def xpath(xml, query_string, **args):
     ''' Safe xpath query into an xml tree:
@@ -160,11 +156,11 @@ def user_groups(user):
     cache_expiration = 60 * 60 # one hour
     
     # Kill caching on dev machines -- we switch groups a lot
-    group_names = cache.get(fasthash(key))
+    group_names = cache.get(key)
  
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
-        cache.set(fasthash(key), group_names, cache_expiration)
+        cache.set(key, group_names, cache_expiration)
 
     return group_names
 
@@ -203,7 +199,7 @@ def course_file(user,coursename=None):
     
     cache_key = filename + "_processed?dev_content:" + str(options['dev_content']) + "&groups:" + str(sorted(groups))
     if "dev" not in settings.DEFAULT_GROUPS:
-        tree_string = cache.get(fasthash(cache_key))
+        tree_string = cache.get(cache_key)
     else: 
         tree_string = None
 
@@ -211,7 +207,7 @@ def course_file(user,coursename=None):
         tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
         tree_string = etree.tostring(tree)
         
-        cache.set(fasthash(cache_key), tree_string, 60)
+        cache.set(cache_key, tree_string, 60)
     else:
         tree = etree.XML(tree_string)
 
