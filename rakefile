@@ -88,7 +88,7 @@ task :package do
         /opt/wwc/mitx/collect_static_resources
 
         # Delete mako temp files
-        rm -rf /tmp/tmp*
+        rm -rf /tmp/tmp*mako
 
         service gunicorn start
         POSTINSTALL
