@@ -43,7 +43,9 @@ else:						# default to 6.002_Spring_2012
 # wrapper functions around course settings
 
 def get_coursename_from_request(request):
-    if 'coursename' in request.session: coursename = request.session['coursename']
+    if 'coursename' in request.session:
+        coursename = request.session['coursename']
+        settings.COURSE_TITLE = get_course_title(coursename) 	# overwrite settings.COURSE_TITLE based on this
     else: coursename = None
     return coursename
 
