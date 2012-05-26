@@ -1,4 +1,5 @@
 <%inherit file="marketing.html" />
+<%namespace name='static' file='static_content.html'/>
 
 <%block name="header_class">home</%block>
 
@@ -12,7 +13,7 @@
       </section>
 
     <section class="intro-video">
-      <a id="video-overlay-link" rel="leanModal" href="#video-overlay"><img src="/static/images/video-image.png" id="video-img" alt="Link to MITx introduction video" /><span> Watch intro video</span></a>
+      <a id="video-overlay-link" rel="leanModal" href="#video-overlay"><img src="${static.url('images/video-image.png')}" id="video-img" alt="Link to MITx introduction video" /><span> Watch intro video</span></a>
     </section>
 
     </section>

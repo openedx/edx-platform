@@ -29,7 +29,7 @@ def get_logger_config(log_dir,
                      " %(process)d] [%(filename)s:%(lineno)d] - %(message)s").format(
                         logging_env=logging_env, hostname=hostname)
 
-    handlers = ['console'] if debug else ['console', 'syslogger']
+    handlers = ['console'] if debug else ['console', 'syslogger', 'newrelic']
 
     return {
         'version': 1,
@@ -60,6 +60,11 @@ def get_logger_config(log_dir,
                 'filename' : tracking_file_loc,
                 'formatter' : 'raw',
             },
+            'newrelic' : {
+                'level': 'ERROR',
+                'class': 'newrelic_logging.NewRelicHandler',
+                'formatter': 'raw',
+            }
         },
         'loggers' : {
             'django' : {
@@ -78,6 +83,11 @@ def get_logger_config(log_dir,
                 'propagate' : False
             },
             'mitx' : {
+                'handlers' : handlers,
+                'level' : 'DEBUG',
+                'propagate' : False
+            },
+            'keyedcache' : {
                 'handlers' : handlers,
                 'level' : 'DEBUG',
                 'propagate' : False

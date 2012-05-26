@@ -1,3 +1,4 @@
+<%namespace name='static' file='static_content.html'/>
 <!DOCTYPE html>
 <html>
   <head>
@@ -8,23 +9,22 @@
     <meta name="keywords" content="<%block name="keywords">MITx, online learning, MIT, online laboratory, education, learners, undergraduate, certificate</%block>" />
 
     <!--link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" /-->
-    <link rel="stylesheet" href="/static/css/marketing.css" type="text/css" media="all" />
+    <%static:css group='marketing'/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <!--[if lt IE 8]>
-    <link rel="stylesheet" href="/static/css/marketing-ie.css" type="text/css" media="all" />
+    <%static:css group='marketing-ie'/>
     <![endif]-->
 
-    <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
-    <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="${static.url('js/jquery-1.6.2.min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/jquery-ui-1.8.16.custom.min.js')}"></script>
 
-    <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script>
-    <!--script type="text/javascript" src="${ settings.LIB_URL }swfobject/swfobject.js"></script-->
-    <!--script type="text/javascript" src="${ settings.LIB_URL }jquery.treeview.js"></script-->
-    <!--script type="text/javascript" src="/static/js/video_player.js"></script-->
-    <!-- <script type="text/javascript" src="/static/js/schematic.js"></script> -->
+    <script type="text/javascript" src="${static.url('js/jquery.leanModal.min.js')}"></script>
+    <!--script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script-->
+    <!--script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script-->
+    <!--script type="text/javascript" src="${static.url('js/video_player.js')}"></script-->
+    <!-- <script type="text/javascript" src="${static.url('js/schematic.js')}"></script> -->
 
-    <script src="/static/js/html5shiv.js"></script>
-
+    <script src="${static.url('js/html5shiv.js')}"></script>
 
     <%block name="headextra"/>
 
@@ -97,7 +97,7 @@ function postJSON(url, data, callback) {
       <li><a href="/t/mitx_help.html">Help</a></li>
     </ul>
 
-    <ul class="social">
+    <ul aria-label="Social Links" class="social">
       <li class="linkedin">
         <a href="http://www.linkedin.com/groups/Friends-Alumni-MITx-4316538">Linked In</a>
       </li>

@@ -61,12 +61,6 @@ def info(request):
     ''' Info page (link from main header) '''
     return render_to_response("info.html", {})
 
-def mitxhome(request):
-    ''' Home page (link from main header). List of courses.  '''
-    if settings.ENABLE_MULTICOURSE:
-        return render_to_response("mitxhome.html", {})
-    return info(request)
-
 # From http://djangosnippets.org/snippets/1042/
 def parse_accept_header(accept):
     """Parse the Accept header *accept*, returning a list with pairs of
