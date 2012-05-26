@@ -30,12 +30,14 @@ CACHES = {
    'default': {
        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
        'LOCATION': '127.0.0.1:11211',
+       'KEY_FUNCTION': 'util.memcache.safe_key',
    },
    'general': {
        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
        'LOCATION': '127.0.0.1:11211',
        'KEY_PREFIX' : 'general',
        'VERSION' : 5,
+       'KEY_FUNCTION': 'util.memcache.safe_key',
    }
 }
 

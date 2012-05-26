@@ -153,13 +153,16 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles" # We don't run collectstatic -- this is to appease askbot checks
+STATIC_ROOT = ENV_ROOT / "staticfiles" 
 
 # FIXME: We should iterate through the courses we have, adding the static 
 #        contents for each of them. (Right now we just use symlinks.)
 STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
+    ("circuits", DATA_DIR / "images"),
+    ("handouts", DATA_DIR / "handouts"),
+    ("subs", DATA_DIR / "subs"),
 
 # This is how you would use the textbook images locally
 #    ("book", ENV_ROOT / "book_images")
@@ -214,14 +217,14 @@ SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# Jasmine ###################################
-JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/templates/coffee'
+JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -257,6 +260,62 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
+############################### Pipeline #######################################
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+PIPELINE_CSS = {
+    'application': {
+        'source_filenames': ['sass/application.scss'],
+        'output_filename': 'css/application.css',
+    },
+    'marketing': {
+        'source_filenames': ['sass/marketing.scss'],
+        'output_filename': 'css/marketing.css',
+    },
+    'marketing-ie': {
+        'source_filenames': ['sass/marketing-ie.scss'],
+        'output_filename': 'css/marketing-ie.css',
+    },
+    'print': {
+        'source_filenames': ['sass/print.scss'],
+        'output_filename': 'css/print.css',
+    }
+}
+
+PIPELINE_JS = {
+    'application': {
+        'source_filenames': [
+            'coffee/src/calculator.coffee',
+            'coffee/src/courseware.coffee',
+            'coffee/src/feedback_form.coffee',
+            'coffee/src/main.coffee'
+        ],
+        'output_filename': 'js/application.js'
+    }
+}
+
+PIPELINE_COMPILERS = [
+    'pipeline.compilers.sass.SASSCompiler',
+    'pipeline.compilers.coffee.CoffeeScriptCompiler',
+]
+
+PIPELINE_SASS_ARGUMENTS = '-t compressed -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+
+PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
+
+STATICFILES_IGNORE_PATTERNS = (
+    "sass/*",
+    "coffee/*",
+    "*.py",
+    "*.pyc"
+)
+
+PIPELINE_YUI_BINARY = 'yui-compressor'
+PIPELINE_SASS_BINARY = 'sass'
+PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
+
 ################################### APPS #######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
@@ -266,8 +325,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.staticfiles',
     'south',
+
+    # For asset pipelining
+    'pipeline',
+    'staticfiles',
 
     # Our courseware
     'circuit',

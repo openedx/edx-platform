@@ -1,13 +1,10 @@
 ##This file is based on the template from the SimpleWiki source which carries the GPL license
 
 <%inherit file="main.html"/>
+<%namespace name='static' file='static_content.html'/>
 
 <%block name="headextra">
-  <!-- <link rel="stylesheet" media="screen,print" href="/static/simplewiki/css/base.css" /> -->
-  <!-- <link rel="stylesheet" media="print" href="/static/simplewiki/css/base_print.css" /> -->
-  <!-- <link rel="stylesheet" href="/static/simplewiki/css/autosuggest_inquisitor.css" /> -->
-  <!-- <link rel="stylesheet" href="/static/css/local.css" type="text/css" media="all" /> -->
-  <script type="text/javascript" src="/static/js/simplewiki/bsn.AutoSuggest_c_2.0.js"></script>
+<script type="text/javascript" src="${static.url('js/simplewiki/bsn.AutoSuggest_c_2.0.js')}"></script>
 
   <%!
       from django.core.urlresolvers import reverse
@@ -77,7 +74,7 @@
 <section class="main-content">
   <div class="wiki-wrapper">
     <%block name="wiki_panel">
-    <div id="wiki_panel">
+    <div aria-label="Wiki Navigation" id="wiki_panel">
     <h2>Course Wiki</h2>
       <%
           if (wiki_article is not UNDEFINED):

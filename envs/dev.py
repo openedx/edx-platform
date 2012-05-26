@@ -31,7 +31,8 @@ CACHES = {
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'mitx_loc_mem_cache'
+        'LOCATION': 'mitx_loc_mem_cache',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
     # The general cache is what you get if you use our util.cache. It's used for
@@ -43,6 +44,7 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
+        'KEY_FUNCTION': 'util.cache.memcache_safe_key',
     }
 }
 
@@ -81,3 +83,7 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
+
+########################### PIPELINE #################################
+
+PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)

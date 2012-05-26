@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls.static import static
 
 import django.contrib.auth.views
 
@@ -67,10 +67,11 @@ if settings.COURSEWARE_ENABLED:
         url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
         url(r'^calculate$', 'util.views.calculate'),
+        url(r'^heartbeat$', include('heartbeat.urls')),
     )
 
 if settings.ENABLE_MULTICOURSE:
-	urlpatterns += (url(r'^mitxhome$', 'util.views.mitxhome'),)
+	urlpatterns += (url(r'^mitxhome$', 'multicourse.views.mitxhome'),)
 
 if settings.QUICKEDIT:
 	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'courseware.views.quickedit'),)
@@ -90,6 +91,4 @@ if settings.DEBUG:
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
-    urlpatterns += staticfiles_urlpatterns()
-
-
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
