@@ -251,6 +251,7 @@ def textbox(element, value, status, msg=''):
         eid=element.get('id')
         count = int(eid.split('_')[-2])-1 # HACK
         size = element.get('size')
+        if not value: value = element.text	# if no student input yet, then use the default input given by the problem
         context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg}
         html=render_to_string("textbox.html", context)
         return etree.XML(html)
