@@ -29,7 +29,9 @@ $(document).ready(function(){
    <h3>Courses available:</h3>
     <ul>
       % for coursename, info in courseinfo.items():
+        % if info['active']:
           <li><a href=${ MITX_ROOT_URL }/courseware/${coursename}/>${info['title']} (${coursename})</a></li>
+	% endif
       % endfor
   </ul>
   </section>
