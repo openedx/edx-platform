@@ -53,6 +53,7 @@ function postJSON(url, data, callback) {
 <br/>
 <input type="submit" value="Change Problem" name="qesubmit" />
 <input type="submit" value="Revert to original" name="qesubmit" />
+<input type="hidden" name="csrfmiddlewaretoken" value="${csrf}"/>
 </form>
 
 <span>${msg|n}</span>
