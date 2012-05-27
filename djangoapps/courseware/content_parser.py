@@ -218,6 +218,7 @@ def section_file(user, section, coursename=None, dironly=False):
     Given a user and the name of a section, return that section.
     This is done specific to each course.
     If dironly=True then return the sections directory.
+    TODO: This is a bit weird; dironly should be scrapped. 
     '''
     filename = section+".xml"
 
