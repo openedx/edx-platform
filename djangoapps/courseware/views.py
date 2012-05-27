@@ -387,6 +387,7 @@ def quickedit(request, id=None):
                'pxmls' : pxmls,
                'phtml' : phtml,
                'init_js':instance.get_init_js(),
+               'csrf':csrf(request)['csrf_token'],
                }
 
     result = render_to_response('quickedit.html', context)
