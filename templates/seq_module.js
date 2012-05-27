@@ -53,7 +53,7 @@ function disablePrev() {
 function ${ id }goto(i) {
   log_event("seq_goto", {'old':${id}loc, 'new':i,'id':'${id}'});
 
-  postJSON('${ MITX_ROOT_URL }/modx/sequential/${ id }/goto_position',
+  postJSON('${ MITX_ROOT_URL }/modx/${tag}/${ id }/goto_position',
   {'position' : i });
 
   if (${ id }loc!=-1)

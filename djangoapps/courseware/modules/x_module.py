@@ -17,7 +17,7 @@ class XModule(object):
         ''' Tags in the courseware file guaranteed to correspond to the module '''
         return []
         
-    @classmethod(c):
+    @classmethod
     def get_usage_tags(c):
         ''' We should convert to a real module system
             For now, this tells us whether we use this as an xmodule, a CAPA response type
