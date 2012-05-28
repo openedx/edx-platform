@@ -213,7 +213,7 @@ class LoncapaProblem(object):
         context = {'global_context':global_context}	# save global context in here also
         context.update(global_context)			# initialize context to have stuff in global_context
         context['__builtins__'] = globals()['__builtins__']	# put globals there also
-        context['I4xSystem'] = self.system
+        context['the_lcp'] = self				# pass instance of LoncapaProblem in 
 
         #for script in tree.xpath('/problem/script'):
         for script in tree.findall('.//script'):
