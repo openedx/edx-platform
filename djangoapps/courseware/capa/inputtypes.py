@@ -197,8 +197,12 @@ def choicegroup(element, value, status, msg=''):
         type="radio"
     choices={}
     for choice in element:
-        assert choice.tag =="choice", "only <choice> tags should be immediate children of a <choicegroup>"
-        choices[choice.get("name")] = etree.tostring(choice[0])	# TODO: what if choice[0] has math tags in it?
+        if not choice.tag=='choice':
+            raise Exception,"[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag
+        ctext = ""
+        ctext += ''.join([etree.tostring(x) for x in choice])	# TODO: what if choice[0] has math tags in it?
+        ctext += choice.text		# TODO: fix order?
+        choices[choice.get("name")] = ctext
     context={'id':eid, 'value':value, 'state':status, 'type':type, 'choices':choices}
     html=render_to_string("choicegroup.html", context)
     return etree.XML(html)
