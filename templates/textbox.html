@@ -24,7 +24,12 @@
 // work. 
 $(function(){
   var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), 
-                                   {'mode':"python"});
+                                   {'mode':"${mode}"
+% if linenumbers=='true':
+                                     , lineNumbers: true
+% endif
+				   });
+  // codemirror_set["${id}"] = cm;	// track it for refreshes
 });
 </script>
 <style type="text/css">
