@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>edX gitupdate</title>
+</head>
+
+<body>
+<hr>
+<h1>edX gitupdate</h1>
+<hr>
+
+<h2>Coursename: ${coursename}</h2>
+
+% if msg:
+
+  ${msg}
+
+% else:
+<p>
+Do you REALLY want to overwrite all the course.xml + problems + html
+files with version from the main git repository?
+</p>
+
+<form method="post">
+<input type="submit" value="Do git update" name="gitupdate" />
+## <input type="submit" value="Cancel" name="cancel" />
+<input type="hidden" name="csrfmiddlewaretoken" value="${csrf}"/>
+</form>
+% endif
+
+<p><a href="${MITX_ROOT_URL}/courseware">Return to site</a></p>
+
+</body> </html>
