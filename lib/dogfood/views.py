@@ -80,7 +80,11 @@ def df_capa_problem(request, id=None):
     # Grab the XML corresponding to the request from course.xml
     module = 'problem'
 
-    xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
+    try:
+        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
+    except Exception,err:
+        print "[lib.dogfood.df_capa_problem] error in calling content_parser: %s" % err
+        xml = None
 
     # if problem of given ID does not exist, then create it
     # do this only if course.xml has a section named "DogfoodProblems"
@@ -95,7 +99,7 @@ def df_capa_problem(request, id=None):
         fn = settings.DATA_DIR + xp + 'course.xml'
         xml = etree.parse(fn)
         seq = xml.find('chapter/section[@name="DogfoodProblems"]/sequential')	# assumes simplistic course.xml structure!
-        if not seq:
+        if seq==None:
             raise Exception,"[lib.dogfood.views.df_capa_problem] missing DogfoodProblems section in course.xml!"
         newprob = etree.Element('problem')
         newprob.set('type','lecture')
@@ -110,16 +114,30 @@ def df_capa_problem(request, id=None):
         fp.close()
 
         # now create new problem file
-        update_problem(pfn,'<problem>\n<text>\nThis is a new problem\n</text>\n</problem>\n',coursename,overwrite=False)
+        # update_problem(pfn,'<problem>\n<text>\nThis is a new problem\n</text>\n</problem>\n',coursename,overwrite=False)
     
-        # flush cache entry
+        # reset cache entry
         user = request.user
         groups = content_parser.user_groups(user)
         options = {'dev_content':settings.DEV_CONTENT, 
                    'groups' : groups}
         filename = xp + 'course.xml'
         cache_key = filename + "_processed?dev_content:" + str(options['dev_content']) + "&groups:" + str(sorted(groups))
-        cache.delete(cache_key)
+        print '[lib.dogfood.df_capa_problem] cache_key = %s' % cache_key
+        #cache.delete(cache_key)
+        tree = content_parser.course_xml_process(xml)	# add ID tags
+        cache.set(cache_key,etree.tostring(tree),60)
+        # settings.DEFAULT_GROUPS.append('dev')	# force content_parser.course_file to not use cache
+
+    xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
+    if not xml:
+        print "[lib.dogfood.df_capa_problem] problem xml not found!"
 
     # hand over to quickedit to do the rest
+    try:
+        html = quickedit(request,id=id,qetemplate='dogfood.html',coursename=coursename)
+        return html
+    except Exception, err:
+        print '[lib.dogfood.df_capa_problem] Error generating html on first pass: %s' % err
+        
     return quickedit(request,id=id,qetemplate='dogfood.html',coursename=coursename)
