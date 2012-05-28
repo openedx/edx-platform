@@ -210,17 +210,21 @@ class LoncapaProblem(object):
         Problem XML goes to Python execution context. Runs everything in script tags
         '''
         random.seed(self.seed)
-		### IKE: Why do we need these two lines? 
         context = {'global_context':global_context}	# save global context in here also
-        global_context['context'] = context		# and put link to local context in the global one
+        context.update(global_context)			# initialize context to have stuff in global_context
+        context['__builtins__'] = globals()['__builtins__']	# put globals there also
+        context['I4xSystem'] = self.system
 
         #for script in tree.xpath('/problem/script'):
         for script in tree.findall('.//script'):
+            if 'javascript' in script.get('type'): continue	# skip javascript
+            if 'perl' in script.get('type'): continue		# skip perl
+            # TODO: evaluate only python 
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code,XMLESC)
             try:
-                exec code in global_context, context
+                exec code in context, context		# use "context" for global context; thus defs in code are global within code
             except Exception,err:
                 print "[courseware.capa.capa_problem.extract_context] error %s" % err
                 print "in doing exec of this code:",code
