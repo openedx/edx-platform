@@ -8,13 +8,17 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 
-MITX_ROOT_URL = '/mitx2'
+import socket
+
+if 'eecs1' in socket.gethostname():
+    MITX_ROOT_URL = '/mitx2'
 
 from envs.common import *
 from envs.logsettings import get_logger_config
 from dev import *
 
-MITX_ROOT_URL = '/mitx2'
+if 'eecs1' in socket.gethostname():
+    MITX_ROOT_URL = '/mitx2'
 
 #-----------------------------------------------------------------------------
 # ichuang
