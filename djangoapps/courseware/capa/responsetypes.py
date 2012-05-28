@@ -264,6 +264,7 @@ def sympy_check2():
         ## what's in xml. @id=id keeps us in the right customresponse. 
         self.answer_ids = xml.xpath('//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
+        self.answer_ids += [x.get('id') for x in xml.findall('textbox')]	# also allow textbox inputs
         self.context = context
 
         # if <customresponse> has an "expect" attribute then save that
@@ -313,7 +314,13 @@ def sympy_check2():
             return default
 
         idset = sorted(self.answer_ids)				# ordered list of answer id's
-        submission = [student_answers[k] for k in idset]	# ordered list of answers
+        try:
+            submission = [student_answers[k] for k in idset]	# ordered list of answers
+        except Exception, err:
+            msg = '[courseware.capa.responsetypes.customresponse] error getting student answer from %s' % student_answers
+            msg += '\n idset = %s, error = %s' % (idset,err)
+            raise Exception,msg
+
         fromjs = [ getkey2(student_answers,k+'_fromjs',None) for k in idset ]	# ordered list of fromjs_XXX responses (if exists)
 
         # if there is only one box, and it's empty, then don't evaluate
@@ -359,6 +366,8 @@ def sympy_check2():
                     ret = fn(self.expect,answer_given,student_answers)
                 else:
                     ret = fn(self.expect,answer_given)
+                if settings.DEBUG:
+                    print '[courseware.capa.responsetypes.customresponse] answer_given=%s' % answer_given
             except Exception,err:
                 print "oops in customresponse (cfn) error %s" % err
                 # print "context = ",self.context
