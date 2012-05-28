@@ -6,8 +6,9 @@ from django.conf.urls.static import static
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+if settings.DEBUG:
+    from django.contrib import admin
+    admin.autodiscover()
 
 urlpatterns = ('',
     url(r'^$', 'student.views.index'), # Main marketing page, or redirect to courseware
