@@ -374,7 +374,7 @@ def sympy_check2():
                 print traceback.format_exc()
             if settings.DEBUG: print "[courseware.capa.responsetypes.customresponse.get_score] ret = ",ret
             if type(ret)==dict:
-                correct[0] = 'correct' if ret['ok'] else 'incorrect'
+                correct = ['correct']*len(idset) if ret['ok'] else ['incorrect']*len(idset)
                 msg = ret['msg']
 
                 if 1:
@@ -387,7 +387,7 @@ def sympy_check2():
 
                 messages[0] = msg
             else:
-                correct[0] = 'correct' if ret else 'incorrect'
+                correct = ['correct']*len(idset) if ret else ['incorrect']*len(idset)
 
         # build map giving "correct"ness of the answer(s)
         #correct_map = dict(zip(idset, self.context['correct']))
