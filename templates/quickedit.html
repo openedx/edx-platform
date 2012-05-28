@@ -1,25 +1,43 @@
+<%namespace name='static' file='static_content.html'/>
+<!DOCTYPE html>
 <html>
+## -----------------------------------------------------------------------------
+## Template for courseware.views.quickedit
+##
+## Used for quick-edit link present when viewing capa-format assesment problems.
+## -----------------------------------------------------------------------------
 <head>
-  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
+##  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
+##  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
+
  <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
 
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script>
 <script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
   <script type="text/javascript" src="/static/js/schematic.js"></script>
-<%include file="mathjax_include.html" />
 
-<script>
-function postJSON(url, data, callback) {
-  $.ajax({type:'POST',
-      url: url,
-      dataType: 'json',
-      data: data,
-      success: callback,
-      headers : {'X-CSRFToken':'none'} // getCookie('csrftoken')}
-      });
-}
-</script>
+  <script type="text/javascript" src="/static/coffee/src/courseware.js"></script>
+  <script type="text/javascript" src="/static/coffee/src/feedback_form.js"></script>
+  <script type="text/javascript" src="/static/coffee/src/calculator.js"></script>
+  <script type="text/javascript" src="/static/coffee/src/main.js"></script>
+
+## <%include file="mathjax_include.html" />
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [["\\(","\\)"]],
+      displayMath: [["\\[","\\]"]]}
+    });
+  </script>
+  <%block name="headextra"/>
+
+  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
+       MathJax extension libraries -->
+  <script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script>
 
 </head>
 <body>
@@ -85,12 +103,50 @@ ${init_js}
 
 <style type="text/css">
   .staff {display:none;}
+  .correct {        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("/static/images/correct-icon.png") center center no-repeat;
+        height: 20px;
+        position: relative;
+        top: 6px;
+        width: 25px; }
+  .incorrect{
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("/static/images/incorrect-icon.png") center center no-repeat;
+        height: 20px;
+        width: 20px;
+        position: relative;
+        top: 6px; }
+
 }
 </style>
 
+<div id="seq_content">
 <form>
  ${phtml}
 </form>
+</div>
+
+  <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.leanModal.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.qtip.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.cookie.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/video_player.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/cktsim.js')}"></script>
+
+  <%block name="js_extra"/>
 
 </body>
 </html>
