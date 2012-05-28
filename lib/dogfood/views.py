@@ -8,6 +8,7 @@ df_capa_problem: accepts an XML file for a problem, and renders it.
 import logging
 import datetime
 import re
+import os	# FIXME - use OSFS instead
 
 from fs.osfs import OSFS
 
@@ -37,6 +38,26 @@ log = logging.getLogger("mitx.courseware")
 etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
                                          remove_comments = True))
 
+DOGFOOD_COURSENAME = 'edx_dogfood'	# FIXME - should not be here; maybe in settings
+
+def update_problem(pfn,pxml,coursename=None,overwrite=True,filestore=None):
+    '''
+    update problem with filename pfn, and content (xml) pxml.
+    '''
+    if not filestore:
+        if not coursename: coursename = DOGFOOD_COURSENAME
+        xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+        pfn2 = settings.DATA_DIR + xp + 'problems/%s.xml' % pfn
+        fp = open(pfn2,'w')
+    else:
+        pfn2 = 'problems/%s.xml' % pfn
+        fp = filestore.open(pfn2,'w')
+
+    if os.path.exists(pfn2) and not overwrite: return		# don't overwrite if already exists and overwrite=False
+    pxmls = pxml if type(pxml) in [str,unicode] else etree.tostring(pxml,pretty_print=True)
+    fp.write(pxmls)
+    fp.close()
+
 def df_capa_problem(request, id=None):
     '''
     dogfood capa problem.
@@ -49,9 +70,11 @@ def df_capa_problem(request, id=None):
     print "We need a setting to disable for production where there is"
     print "a load balanacer"
     
-    coursename = 'edx_dogfood'	# FIXME - should not be hardcoded
+    if not 'coursename' in request.session:
+        coursename = DOGFOOD_COURSENAME
+    else:
+        coursename = request.session['coursename']
 
-    request.session['coursename'] = coursename
     xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
 
     # Grab the XML corresponding to the request from course.xml
@@ -60,6 +83,7 @@ def df_capa_problem(request, id=None):
     xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
 
     # if problem of given ID does not exist, then create it
+    # do this only if course.xml has a section named "DogfoodProblems"
     if not xml:
         m = re.match('filename([A-Za-z0-9_]+)$',id)	# extract problem filename from ID given
         if not m:
@@ -70,7 +94,9 @@ def df_capa_problem(request, id=None):
         # add problem to course.xml
         fn = settings.DATA_DIR + xp + 'course.xml'
         xml = etree.parse(fn)
-        seq = xml.find('chapter/section/sequential')	# assumes simplistic course.xml structure!
+        seq = xml.find('chapter/section[@name="DogfoodProblems"]/sequential')	# assumes simplistic course.xml structure!
+        if not seq:
+            raise Exception,"[lib.dogfood.views.df_capa_problem] missing DogfoodProblems section in course.xml!"
         newprob = etree.Element('problem')
         newprob.set('type','lecture')
         newprob.set('showanswer','attempted')
@@ -84,10 +110,7 @@ def df_capa_problem(request, id=None):
         fp.close()
 
         # now create new problem file
-        pfn2 = settings.DATA_DIR + xp + 'problems/%s.xml' % pfn
-        fp = open(pfn2,'w')
-        fp.write('<problem>\n<text>\nThis is a new problem\n</text>\n</problem>\n')
-        fp.close()
+        update_problem(pfn,'<problem>\n<text>\nThis is a new problem\n</text>\n</problem>\n',coursename,overwrite=False)
     
         # flush cache entry
         user = request.user
@@ -99,4 +122,4 @@ def df_capa_problem(request, id=None):
         cache.delete(cache_key)
 
     # hand over to quickedit to do the rest
-    return quickedit(request,id)
+    return quickedit(request,id=id,qetemplate='dogfood.html',coursename=coursename)
