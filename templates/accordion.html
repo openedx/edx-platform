@@ -23,3 +23,9 @@
 % for chapter in toc:
     ${make_chapter(chapter)}
 % endfor
+
+## add a link to allow course.xml to be reloaded from the git content repo
+% if settings.QUICKEDIT:
+    <h3><a href="#">quickedit</a></h3>
+    <ul><li><a href="${MITX_ROOT_URL}/quickedit/course.xml">gitreload</a></li></ul>
+% endif
