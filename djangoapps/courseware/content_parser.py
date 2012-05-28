@@ -203,6 +203,9 @@ def course_file(user,coursename=None):
     else: 
         tree_string = None
 
+    if settings.DEBUG:
+        print '[courseware.content_parser.course_file] filename=%s, cache_key=%s' % (filename,cache_key)
+
     if not tree_string:
         tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
         tree_string = etree.tostring(tree)
