@@ -208,7 +208,7 @@ def textline(element, value, state, msg=""):
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
-    context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size}
+    context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size, 'msg': msg}
     html=render_to_string("textinput.html", context)
     return etree.XML(html)
 
