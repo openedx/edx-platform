@@ -65,11 +65,11 @@ def df_capa_problem(request, id=None):
     Accepts XML for a problem, inserts it into the dogfood course.xml.
     Returns rendered problem.
     '''
-    print "WARNING: UNDEPLOYABLE CODE. FOR DEV USE ONLY."
-    print "In deployed use, this will only edit on one server"
-    print "We need a setting to disable for production where there is"
-    print "a load balanacer"
+    # "WARNING: UNDEPLOYABLE CODE. FOR DEV USE ONLY."
     
+    if settings.DEBUG:
+        print '[lib.dogfood.df_capa_problem] id=%s' % id
+
     if not 'coursename' in request.session:
         coursename = DOGFOOD_COURSENAME
     else:
@@ -133,11 +133,8 @@ def df_capa_problem(request, id=None):
     if not xml:
         print "[lib.dogfood.df_capa_problem] problem xml not found!"
 
+    # add problem ID to list so that is_staff check can be bypassed
+    request.session['dogfood_id'] = id
+
     # hand over to quickedit to do the rest
-    try:
-        html = quickedit(request,id=id,qetemplate='dogfood.html',coursename=coursename)
-        return html
-    except Exception, err:
-        print '[lib.dogfood.df_capa_problem] Error generating html on first pass: %s' % err
-        
     return quickedit(request,id=id,qetemplate='dogfood.html',coursename=coursename)
