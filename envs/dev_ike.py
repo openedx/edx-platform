@@ -7,9 +7,14 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
+
+MITX_ROOT_URL = '/mitx2'
+
 from envs.common import *
 from envs.logsettings import get_logger_config
 from dev import *
+
+MITX_ROOT_URL = '/mitx2'
 
 #-----------------------------------------------------------------------------
 # ichuang
@@ -17,7 +22,6 @@ from dev import *
 DEBUG = True
 ENABLE_MULTICOURSE = True     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 QUICKEDIT = True
-MITX_ROOT_URL = ''
 
 COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
                                           'title'  :  'Circuits and Electronics',
@@ -53,3 +57,18 @@ COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
 
 #-----------------------------------------------------------------------------
 
+MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
+    'ssl_auth.ssl_auth.NginxProxyHeaderMiddleware',		# ssl authentication behind nginx proxy
+    )
+
+AUTHENTICATION_BACKENDS = (
+    'ssl_auth.ssl_auth.SSLLoginBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    )
+
+INSTALLED_APPS = INSTALLED_APPS + (
+    'ssl_auth',
+    )
+
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/'
+LOGIN_URL = MITX_ROOT_URL + '/'
