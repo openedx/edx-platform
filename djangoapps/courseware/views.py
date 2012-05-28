@@ -227,7 +227,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
 
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic view for extensions. '''
+    ''' Generic view for extensions. This is where AJAX calls go.'''
     if not request.user.is_authenticated():
         return redirect('/')
 
@@ -281,6 +281,8 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                                                              state=oldstate)
     except:
         log.exception("Unable to load module instance during ajax call")
+        log.exception('module=%s, dispatch=%s, id=%s' % (module,dispatch,id))
+        # log.exception('xml = %s' % xml)
         if accepts(request, 'text/html'):
             return render_to_response("module-error.html", {})
         else:
@@ -298,12 +300,15 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
 
-def quickedit(request, id=None):
+def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
     '''
     quick-edit capa problem.
 
     Maybe this should be moved into capa/views.py
     Or this should take a "module" argument, and the quickedit moved into capa_module.
+
+    id is passed in from url resolution
+    qetemplate is used by dogfood.views.dj_capa_problem, to override normal template
     '''
     print "WARNING: UNDEPLOYABLE CODE. FOR DEV USE ONLY."
     print "In deployed use, this will only edit on one server"
@@ -313,7 +318,8 @@ def quickedit(request, id=None):
         return redirect('/')
 
     # get coursename if stored
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    if not coursename:
+        coursename = multicourse_settings.get_coursename_from_request(request)
     xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
 
     def get_lcp(coursename,id):
@@ -379,6 +385,8 @@ def quickedit(request, id=None):
 
     # get the rendered problem HTML
     phtml = instance.get_problem_html()
+    init_js = instance.get_init_js()
+    destory_js = instance.get_destroy_js()
 
     context = {'id':id,
                'msg' : msg,
@@ -386,9 +394,10 @@ def quickedit(request, id=None):
                'filename' : lcp.fileobject.name,
                'pxmls' : pxmls,
                'phtml' : phtml,
-               'init_js':instance.get_init_js(),
+               "destroy_js":destory_js,
+               'init_js':init_js, 
                'csrf':csrf(request)['csrf_token'],
                }
 
-    result = render_to_response('quickedit.html', context)
+    result = render_to_response(qetemplate, context)
     return result
