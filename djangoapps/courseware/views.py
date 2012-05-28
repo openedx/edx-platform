@@ -340,6 +340,17 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
                                                              xml, 
                                                              id,
                                                              state=None)
+
+        # create empty student state for this problem, if not previously existing
+        s = StudentModule.objects.filter(student=request.user, 
+                                         module_id=id)
+        if len(s) == 0 or s is None:
+            smod=StudentModule(student=request.user, 
+                               module_type = 'problem',
+                               module_id=id, 
+                               state=instance.get_state())
+            smod.save()
+
         lcp = instance.lcp
         pxml = lcp.tree
         pxmls = etree.tostring(pxml,pretty_print=True)
