@@ -314,8 +314,10 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
     print "In deployed use, this will only edit on one server"
     print "We need a setting to disable for production where there is"
     print "a load balanacer"
+
     if not request.user.is_staff:
-        return redirect('/')
+        if not ('dogfood_id' in request.session and request.session['dogfood_id']==id):
+            return redirect('/')
 
     # get coursename if stored
     if not coursename:
