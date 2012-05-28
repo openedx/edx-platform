@@ -319,6 +319,9 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
         if not ('dogfood_id' in request.session and request.session['dogfood_id']==id):
             return redirect('/')
 
+    if id=='course.xml':
+        return quickedit_git_reload(request)
+
     # get coursename if stored
     if not coursename:
         coursename = multicourse_settings.get_coursename_from_request(request)
@@ -413,4 +416,38 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
                }
 
     result = render_to_response(qetemplate, context)
+    return result
+
+def quickedit_git_reload(request):
+    '''
+    reload course.xml and all courseware files for this course, from the git repo.
+    assumes the git repo has already been setup.
+    staff only.
+    '''
+    if not request.user.is_staff:
+        return redirect('/')
+
+    # get coursename if stored
+    coursename = multicourse_settings.get_coursename_from_request(request)
+    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+
+    msg = ""
+    if 'cancel' in request.POST:
+        return redirect("/courseware")
+        
+    if 'gitupdate' in request.POST:
+        import os			# FIXME - put at top?
+        cmd = "cd ../data%s; git pull origin %s" % (xp,xp.replace('/',''))
+        msg += '<p>cmd: %s</p>' % cmd
+        ret = os.popen(cmd).read()
+        msg += '<p><pre>%s</pre></p>' % ret.replace('<','&lt;')
+        msg += "<p>git update done!</p>"
+
+    context = {'id':id,
+               'msg' : msg,
+               'coursename' : coursename,
+               'csrf':csrf(request)['csrf_token'],
+               }
+
+    result = render_to_response("gitupdate.html", context)
     return result
