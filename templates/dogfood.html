@@ -1,0 +1,108 @@
+<%namespace name='static' file='static_content.html'/>
+<!DOCTYPE html>
+<html>
+## -----------------------------------------------------------------------------
+## Template for lib.dogfood.views.dj_capa_problem
+##
+## Used for viewing assesment problems in "dogfood" self-evaluation mode
+## -----------------------------------------------------------------------------
+<head>
+  <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
+##  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
+##  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
+ <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
+
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script>
+<script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
+  <script type="text/javascript" src="/static/js/schematic.js"></script>
+
+  <script type="text/javascript" src="/static/coffee/src/courseware.js"></script>
+  <script type="text/javascript" src="/static/coffee/src/feedback_form.js"></script>
+  <script type="text/javascript" src="/static/coffee/src/calculator.js"></script>
+  <script type="text/javascript" src="/static/coffee/src/main.js"></script>
+
+<%include file="mathjax_include.html" />
+
+</head>
+<body>
+
+  <!--[if lt IE 9]>
+  <script src="/static/js/html5shiv.js"></script>
+  <![endif]-->
+
+## -----------------------------------------------------------------------------
+## information
+
+## <hr width="100%">
+## <h2>Rendition of your problem code</h2>
+## <hr width="100%">
+
+## -----------------------------------------------------------------------------
+## rendered problem display
+
+<script>
+ ${init_js} 
+</script>
+
+<style type="text/css">
+  .problem-header {display:none;}
+  .staff {display:none;}
+  .correct {        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("/static/images/correct-icon.png") center center no-repeat;
+        height: 20px;
+        position: relative;
+        top: 6px;
+        width: 25px; }
+  .incorrect{
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("/static/images/incorrect-icon.png") center center no-repeat;
+        height: 20px;
+        width: 20px;
+        position: relative;
+        top: 6px; }
+  .unanswered {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("/static/images/unanswered-icon.png") center center no-repeat;
+        height: 14px;
+        position: relative;
+        top: 4px;
+        width: 14px; }
+}
+</style>
+
+<form>
+ ${phtml}
+</form>
+
+  <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.leanModal.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.qtip.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.cookie.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/video_player.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/cktsim.js')}"></script>
+
+  <%block name="js_extra"/>
+
+</body>
+</html>
