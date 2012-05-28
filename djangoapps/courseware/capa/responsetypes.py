@@ -358,6 +358,7 @@ def sympy_check2():
 
             # this is an interface to the Tutor2 check functions
             fn = self.code
+            ret = None
             try:
                 answer_given = submission[0] if (len(idset)==1) else submission
                 if fn.func_code.co_argcount>=4:	# does it want four arguments (the answers dict, myname)?
@@ -372,6 +373,7 @@ def sympy_check2():
                 print "oops in customresponse (cfn) error %s" % err
                 # print "context = ",self.context
                 print traceback.format_exc()
+                raise Exception,"oops in customresponse (cfn) error %s" % err
             if settings.DEBUG: print "[courseware.capa.responsetypes.customresponse.get_score] ret = ",ret
             if type(ret)==dict:
                 correct = ['correct']*len(idset) if ret['ok'] else ['incorrect']*len(idset)
