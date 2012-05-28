@@ -216,45 +216,45 @@ def textline(element, value, state, msg=""):
 
 @register_render_function
 def js_textline(element, value, status, msg=''):
-        '''
-        Plan: We will inspect element to figure out type
-        '''
-        # TODO: Make a wrapper for <formulainput>
-        # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-		## TODO: Code should follow PEP8 (4 spaces per indentation level)
-        '''
-        textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
-        '''
-        eid=element.get('id')
-        count = int(eid.split('_')[-2])-1 # HACK
-        size = element.get('size')
-        dojs = element.get('dojs')	# dojs is used for client-side javascript display & return
-        				# when dojs=='math', a <span id=display_eid>`{::}`</span>
-                                        # and a hidden textarea with id=input_eid_fromjs will be output
-        context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
-                   'dojs':dojs,
-                   'msg':msg,
-                   }
-        html=render_to_string("jstext.html", context)
-        return etree.XML(html)
+    '''
+    Plan: We will inspect element to figure out type
+    '''
+    # TODO: Make a wrapper for <formulainput>
+    # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
+    	## TODO: Code should follow PEP8 (4 spaces per indentation level)
+    '''
+    textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
+    '''
+    eid=element.get('id')
+    count = int(eid.split('_')[-2])-1 # HACK
+    size = element.get('size')
+    dojs = element.get('dojs')	# dojs is used for client-side javascript display & return
+    				# when dojs=='math', a <span id=display_eid>`{::}`</span>
+                                    # and a hidden textarea with id=input_eid_fromjs will be output
+    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
+               'dojs':dojs,
+               'msg':msg,
+               }
+    html=render_to_string("jstext.html", context)
+    return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 ## TODO: Make a wrapper for <codeinput>
 @register_render_function
 def textbox(element, value, status, msg=''):
-        '''
-        The textbox is used for code input.  The message is the return HTML string from
-        evaluating the code, eg error messages, and output from the code tests.
+    '''
+    The textbox is used for code input.  The message is the return HTML string from
+    evaluating the code, eg error messages, and output from the code tests.
 
-        TODO: make this use rows and cols attribs, not size
-        '''
-        eid=element.get('id')
-        count = int(eid.split('_')[-2])-1 # HACK
-        size = element.get('size')
-        if not value: value = element.text	# if no student input yet, then use the default input given by the problem
-        context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg}
-        html=render_to_string("textbox.html", context)
-        return etree.XML(html)
+    TODO: make this use rows and cols attribs, not size
+    '''
+    eid=element.get('id')
+    count = int(eid.split('_')[-2])-1 # HACK
+    size = element.get('size')
+    if not value: value = element.text	# if no student input yet, then use the default input given by the problem
+    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg}
+    html=render_to_string("textbox.html", context)
+    return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 @register_render_function
