@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from mitxmako.shortcuts import render_to_response, render_to_string
 
 from x_module import XModule
@@ -25,7 +26,10 @@ class Module(XModule):
             filename="html/"+self.filename
             return self.filestore.open(filename).read()
         except: # For backwards compatibility. TODO: Remove
-            return render_to_string(self.filename, {'id': self.item_id})
+            if settings.DEBUG:
+                print '[courseware.modules.html_module] filename=%s' % self.filename
+            #return render_to_string(self.filename, {'id': self.item_id})
+            return render_to_string(self.filename, {'id': self.item_id},namespace='course')
 
     def __init__(self, system, xml, item_id, state=None):
         XModule.__init__(self, system, xml, item_id, state)
