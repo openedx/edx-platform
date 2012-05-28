@@ -78,6 +78,4 @@ def get_course_title(coursename):
 def get_course_number(coursename):
     return get_course_property(coursename,'number')
     
-def is_dogfood(coursename):
-    return True if get_course_property(coursename,'is_dogfood') else False
 
