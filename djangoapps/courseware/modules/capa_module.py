@@ -16,6 +16,7 @@ import traceback
 from lxml import etree
 
 ## TODO: Abstract out from Django
+from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 
 from x_module import XModule
@@ -201,7 +202,11 @@ class Module(XModule):
             fp = self.filestore.open(self.filename)
         except Exception,err:
             print '[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename)
-            raise Exception,err
+            if settings.DEBUG:
+                # create a dummy problem instead of failing
+                fp = StringIO.StringIO('<problem><text>Problem file %s is missing</text></problem>' % self.filename)
+            else:
+                raise Exception,err
         self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
 
     def handle_ajax(self, dispatch, get):
