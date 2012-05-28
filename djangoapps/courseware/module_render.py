@@ -33,6 +33,8 @@ class I4xSystem(object):
             self.filestore = OSFS(settings.DATA_DIR)
         else:
             self.filestore = filestore
+            if settings.DEBUG:
+                print "[courseware.module_render.I4xSystem] filestore path = %s" % filestore
         self.render_function = render_function
         self.exception404 = Http404
     def __repr__(self):
