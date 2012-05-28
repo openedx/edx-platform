@@ -251,8 +251,11 @@ def textbox(element, value, status, msg=''):
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
+    mode = element.get('mode')	or 'python' 	# mode for CodeMirror, eg "python" or "xml"
+    linenumbers = element.get('linenumbers')	# for CodeMirror
     if not value: value = element.text	# if no student input yet, then use the default input given by the problem
-    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg}
+    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg,
+               'mode':mode, 'linenumbers':linenumbers }
     html=render_to_string("textbox.html", context)
     return etree.XML(html)
 
