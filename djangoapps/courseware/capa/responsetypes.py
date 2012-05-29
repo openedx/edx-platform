@@ -635,7 +635,7 @@ class ImageResponse(GenericResponse):
             # parse given answer
             m = re.match('\[([0-9]+),([0-9]+)]',given.strip().replace(' ',''))
             if not m:
-                raise Exception,'[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (err,aid,given)
+                raise Exception,'[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (aid,given)
             (gx,gy) = [int(x) for x in m.groups()]
             
             # answer is correct if (x,y) is within the specified rectangle
