@@ -5,17 +5,32 @@
   <%block name="title"><title>MITx 6.002x</title></%block>
 
   <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
+
+## these two lines are broken (28may12)
+## <%static:css group='application'/>
+## <%static:js group='application'/>
+
+## replace with this one line
   <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
 
   <script type="text/javascript" src="${static.url('js/jquery-1.6.2.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery-ui-1.8.16.custom.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script>
- <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
-<script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
+  <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
+  <script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
+
+## and these four lines
   <script type="text/javascript" src="/static/coffee/src/courseware.js"></script>
   <script type="text/javascript" src="/static/coffee/src/feedback_form.js"></script>
   <script type="text/javascript" src="/static/coffee/src/calculator.js"></script>
   <script type="text/javascript" src="/static/coffee/src/main.js"></script>
+
+## image input: for clicking on images (see imageinput.html)
+  <script type="text/javascript" src="/static/js/imageinput.js"></script>
+
+##  <script type="text/javascript">
+##    var codemirror_set = {};		// track all codemirror textareas, so they can be refreshed on page changes
+##  </script>
 
   <!--[if lt IE 9]>
   <script src="${static.url('js/html5shiv.js')}"></script>
