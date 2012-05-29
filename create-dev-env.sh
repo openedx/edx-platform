@@ -41,8 +41,8 @@ RUBY_VER="1.9.3"
 NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 LOG="/var/tmp/install.log"
-BREW_PKGS="readline sqlite gdbm pkg-config gfortran mercurial python yuicompressor "
-APT_PKGS="curl git mercurial python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor"
+BREW_PKGS="readline sqlite gdbm pkg-config gfortran mercurial python yuicompressor node"
+APT_PKGS="curl git mercurial python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript"
 
 ARGS=$(getopt "cvh" "$*")
 if [[ $? != 0 ]]; then
