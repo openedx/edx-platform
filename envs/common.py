@@ -316,6 +316,9 @@ PIPELINE_YUI_BINARY = 'yui-compressor'
 PIPELINE_SASS_BINARY = 'sass'
 PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
 
+# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
+PIPELINE_COMPILE_INPLACE = True
+
 ################################### APPS #######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
