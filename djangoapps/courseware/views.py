@@ -12,6 +12,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
+from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
 from lxml import etree
@@ -148,6 +149,7 @@ def render_section(request, section):
     return result
 
 
+@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course=None, chapter="Using the System", section="Hints"): 
     ''' Displays courseware accordion, and any associated content. 
