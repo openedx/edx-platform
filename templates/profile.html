@@ -339,11 +339,11 @@ $(function() {
   </form>
 </div>
 
-
+%if grade_sheet['grade']:
 <div id="cert_request" class="leanModal_box">
   <h1>Request a 6.002x Certificate</h1>
-  <p>You can request a certificate verifying your grade in this course. The certificate can be sent to your email, or directly to any other email address.</p>
-  <p>The certificate will indicate that <strong>${name}</strong> has earned a grade of <strong>${grade_sheet['grade']}</strong> in the Fall 2012 offering of <strong>6.002x Beta - Circuits and Electronics</strong>. Please ensure that this is correct.</p>
+  <p>You can request a certificate which verifies that you passed this course. When the certificate has been generated, it will be emailed. Later, the certificate can be downloaded from your Profile page.</p>
+  <p>The certificate will indicate that <strong>${name}</strong> has successfully completed the Fall 2012 offering of <strong>Circuits and Electronics 6.002x</strong>. Please ensure that this is correct.</p>
   
   <form id="cert_request_form">
     <div id="cert_request_error"> </div>
@@ -364,4 +364,5 @@ $(function() {
     </fieldset>
   </form>
 </div>
+%endif
 
