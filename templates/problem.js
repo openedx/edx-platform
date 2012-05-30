@@ -5,6 +5,11 @@ function ${ id }_content_updated() {
   $('#check_${ id }').unbind('click').click(function() {
   $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
   $(".CodeMirror").each(function(index,element){ if (element.CodeMirror.save) element.CodeMirror.save(); });
+
+//  for (var key in codemirror_set) {
+//      codemirror_set[key].refresh();
+//  }
+
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
 	    if (value.type==="checkbox"){
