@@ -5,10 +5,11 @@ import uuid
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from mitxmako.shortcuts import render_to_response
-
 import courseware.grades as grades
 from certificates.models import GeneratedCertificate
 
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 log = logging.getLogger("mitx.certificates")
 
@@ -32,11 +33,10 @@ def certificate_request(request):
     
     if verification_checked != 'true':
         error += 'You must verify that you have followed the honor code to receive a certificate. '
-    
-    # TODO: Check e-mail format is correct. 
-    if len(destination_email) < 5:
+    try:
+        validate_email(destination_email)
+    except ValidationError:
         error += 'Please provide a valid email address to send the certificate. '
-        
     grade = None
     if len(error) == 0:
         student_gradesheet = grades.grade_sheet(request.user)
