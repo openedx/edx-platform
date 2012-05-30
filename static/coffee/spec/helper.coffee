@@ -25,7 +25,7 @@ jasmine.stubRequests = ->
     else if match = settings.url.match /static\/subs\/(.+)\.srt\.sjson/
       settings.success jasmine.stubbedCaption
     else if settings.url == '/calculate' ||
-      settings.url == '/6002x/modx/sequential/1/goto_position' ||
+      settings.url == '/6002x/modx/sequence/1/goto_position' ||
       settings.url.match(/event$/) ||
       settings.url.match(/6002x\/modx\/problem\/.+\/problem_(check|reset|show|save)$/)
       # do nothing
