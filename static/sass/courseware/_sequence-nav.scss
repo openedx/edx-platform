@@ -222,7 +222,7 @@ nav.sequence-nav {
       &.next {
         a {
           background-image: url('../images/sequence-nav/next-icon.png');
-          @include border-top-right-radius(4px);
+          // @include border-top-right-radius(4px);
 
           &:hover {
             background-color: none;
@@ -236,6 +236,13 @@ nav.sequence-nav {
 
 section.course-content {
   position: relative;
+
+  ol.vert-mod {
+    nav.sequence-nav {
+      margin-top: -15px;
+      @include border-radius(0);
+    }
+  }
 
   nav.sequence-bottom {
     margin: lh(2) 0 0;

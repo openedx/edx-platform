@@ -17,9 +17,7 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
-    overflow: hidden;
-    @include border-top-right-radius(4px);
-    @include border-bottom-right-radius(4px);
+    @include border-radius(0 4px 4px 0);
 
     h1 {
       margin: 0 0 lh();
@@ -186,6 +184,7 @@ div.course-wrapper {
             margin-top: 8px;
             text-align: right;
             padding-right: 0;
+            border-right: 0;
           }
         }
 
