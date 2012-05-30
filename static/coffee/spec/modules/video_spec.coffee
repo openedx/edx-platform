@@ -9,6 +9,7 @@ describe 'Video', ->
 
   describe 'constructor', ->
     beforeEach ->
+      @stubVideoPlayer = jasmine.createSpy('VideoPlayer')
       $.cookie.andReturn '0.75'
       window.player = 100
 
@@ -49,7 +50,6 @@ describe 'Video', ->
       beforeEach ->
         @originalYT = window.YT
         window.YT = { Player: true }
-        @stubVideoPlayer = jasmine.createSpy('VideoPlayer')
         spyOn(window, 'VideoPlayer').andReturn(@stubVideoPlayer)
         @video = new Video 'example', '.75:abc123,1.0:def456'
 
@@ -62,17 +62,26 @@ describe 'Video', ->
 
     describe 'when the Youtube API is not ready', ->
       beforeEach ->
+        @originalYT = window.YT
+        window.YT = {}
         @video = new Video 'example', '.75:abc123,1.0:def456'
+
+      afterEach ->
+        window.YT = @originalYT
 
       it 'set the callback on the window object', ->
         expect(window.onYouTubePlayerAPIReady).toEqual jasmine.any(Function)
 
     describe 'when the Youtube API becoming ready', ->
       beforeEach ->
-        @stubVideoPlayer = jasmine.createSpy('VideoPlayer')
+        @originalYT = window.YT
+        window.YT = {}
         spyOn(window, 'VideoPlayer').andReturn(@stubVideoPlayer)
         @video = new Video 'example', '.75:abc123,1.0:def456'
         window.onYouTubePlayerAPIReady()
+
+      afterEach ->
+        window.YT = @originalYT
 
       it 'create the Video Player for all video elements', ->
         expect(window.VideoPlayer).toHaveBeenCalledWith @video
