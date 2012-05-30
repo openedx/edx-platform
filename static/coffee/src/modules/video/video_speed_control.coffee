@@ -12,8 +12,10 @@ class @VideoSpeedControl
     if onTouchBasedDevice()
       @$('.speeds').click -> $(this).toggleClass('open')
     else
-      @$('.speeds').mouseover -> $(this).addClass('open')
-      @$('.speeds').mouseout -> $(this).removeClass('open')
+      @$('.speeds').mouseenter ->
+        $(this).addClass('open')
+      @$('.speeds').mouseleave ->
+        $(this).removeClass('open')
       @$('.speeds').click (event) ->
         event.preventDefault()
         $(this).removeClass('open')

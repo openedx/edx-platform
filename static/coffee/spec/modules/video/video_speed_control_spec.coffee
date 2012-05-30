@@ -46,17 +46,17 @@ describe 'VideoSpeedControl', ->
         @speedControl = new VideoSpeedControl @player, @video.speeds
 
       it 'open the speed toggle on hover', ->
-        $('.speeds').mouseover()
+        $('.speeds').mouseenter()
         expect($('.speeds')).toHaveClass 'open'
-        $('.speeds').mouseout()
+        $('.speeds').mouseleave()
         expect($('.speeds')).not.toHaveClass 'open'
 
       it 'close the speed toggle on mouse out', ->
-        $('.speeds').mouseover().mouseout()
+        $('.speeds').mouseenter().mouseleave()
         expect($('.speeds')).not.toHaveClass 'open'
 
       it 'close the speed toggle on click', ->
-        $('.speeds').mouseover().click()
+        $('.speeds').mouseenter().click()
         expect($('.speeds')).not.toHaveClass 'open'
 
   describe 'changeVideoSpeed', ->
