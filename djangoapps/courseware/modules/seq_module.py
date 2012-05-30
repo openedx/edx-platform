@@ -34,7 +34,8 @@ class Module(XModule):
         self.render()
         return self.destroy_js
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, get):		# TODO: bounds checking
+        ''' get = request.POST instance '''
         if dispatch=='goto_position':
             self.position = int(get['position'])
             return json.dumps({'success':True})
