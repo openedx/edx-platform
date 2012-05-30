@@ -305,9 +305,11 @@ div.course-wrapper {
   &.closed {
     section.course-index {
       width: flex-grid(.6);
+      overflow: hidden;
 
       header#open_close_accordion {
         padding: 0;
+        min-height: 47px;
 
         a {
           background-image: url('../images/slide-right-icon.png');
@@ -316,7 +318,7 @@ div.course-wrapper {
         h2 {
           visibility: hidden;
           width: 10px;
-          padding: 0;
+          // white-space: nowrap;
         }
       }
 
@@ -324,6 +326,16 @@ div.course-wrapper {
         visibility: hidden;
         width: 10px;
         padding: 0;
+
+       nav {
+         white-space: pre;
+         overflow: hidden;
+
+         ul {
+           overflow: hidden;
+           white-space: nowrap;
+         }
+        }
       }
     }
 
