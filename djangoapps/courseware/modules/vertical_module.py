@@ -13,7 +13,7 @@ class Module(XModule):
 
     @classmethod
     def get_xml_tags(c):
-        return ["vertical"]
+        return ["vertical", "problemset"]
         
     def get_html(self):
         return render_to_string('vert_module.html',{'items':self.contents})

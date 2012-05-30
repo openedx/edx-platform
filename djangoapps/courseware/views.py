@@ -60,7 +60,6 @@ def profile(request, student_id = None):
     if student_id == None:
         student = request.user
     else: 
-        print content_parser.user_groups(request.user)
         if 'course_admin' not in content_parser.user_groups(request.user):
             raise Http404
         student = User.objects.get( id = int(student_id))
@@ -184,16 +183,28 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
         log.exception("Unable to parse courseware xml")
         return render_to_response('courseware-error.html', {})
 
-    dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
+    #dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
+    dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]", 
                            course=course, chapter=chapter, section=section)
+
+    #print "DM", dom_module
 
     if len(dom_module) == 0:
-        module = None
+        module_wrapper = None
     else:
-        module = dom_module[0]
+        module_wrapper = dom_module[0]
 
-    module_ids = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]//@id", 
-                           course=course, chapter=chapter, section=section)
+    if module_wrapper == None:
+        module = None
+    elif module_wrapper.get("src"):
+        module = content_parser.section_file(user=user, section=module_wrapper.get("src"), coursename=course)
+    else:
+        module = etree.XML(etree.tostring(module_wrapper[0])) # Copy the element out of the tree
+
+    module_ids = []
+    if module:
+        module_ids = module.xpath("//@id", 
+                                  course=course, chapter=chapter, section=section)
 
     if user.is_authenticated():
         module_object_preload = list(StudentModule.objects.filter(student=user, 
@@ -305,7 +316,7 @@ def quickedit(request, id=None):
     Maybe this should be moved into capa/views.py
     Or this should take a "module" argument, and the quickedit moved into capa_module.
     '''
-    print "WARNING: UNDEPLOYABLE CODE. FOR DEV USE ONLY."
+    print "WARNING: UNDEPLOYABLE CODE. FOR CONTENT DEV USE ONLY."
     print "In deployed use, this will only edit on one server"
     print "We need a setting to disable for production where there is"
     print "a load balanacer"
