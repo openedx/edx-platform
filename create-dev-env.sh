@@ -2,7 +2,7 @@
 set -e
 
 error() {
-      printf '\E[36m'; echo "$@"; printf '\E[0m' 
+      printf '\E[31m'; echo "$@"; printf '\E[0m' 
 }
 output() {
       printf '\E[36m'; echo "$@"; printf '\E[0m' 
@@ -29,10 +29,10 @@ info() {
     Ruby ver : $RUBY_VER
 
 EO
-
-
-
 }
+
+
+
 PROG=${0##*/}
 BASE="$HOME/mitx_all"
 PYTHON_DIR="$BASE/python"
@@ -43,6 +43,12 @@ SCIPY_VER="0.10.1"
 LOG="/var/tmp/install.log"
 BREW_PKGS="readline sqlite gdbm pkg-config gfortran mercurial python yuicompressor node"
 APT_PKGS="curl git mercurial python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript"
+
+if [[ $EUID -eq 0 ]]; then
+    error "This script should not be run using sudo or as the root user"
+    usage
+    exit 1
+fi
 
 ARGS=$(getopt "cvh" "$*")
 if [[ $? != 0 ]]; then
