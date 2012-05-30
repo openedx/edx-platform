@@ -20,7 +20,9 @@ class Module(XModule):
 
     @classmethod
     def get_xml_tags(c):
-        return ["sequential", 'tab']
+        obsolete_tags = ["sequential", 'tab']
+        modern_tags = ["videosequence"]
+        return obsolete_tags + modern_tags
         
     def get_html(self):
         self.render()
@@ -81,7 +83,8 @@ class Module(XModule):
         params={'items':self.contents,
                 'id':self.item_id,
                 'position': self.position,
-                'titles':self.titles}
+                'titles':self.titles, 
+                'tag':self.xmltree.tag}
 
         # TODO/BUG: Destroy JavaScript should only be called for the active view
         # This calls it for all the views
@@ -90,7 +93,7 @@ class Module(XModule):
         # IDs to sequences. 
         destroy_js="".join([e['destroy_js'] for e in self.contents if 'destroy_js' in e])
 
-        if self.xmltree.tag == 'sequential':
+        if self.xmltree.tag in ['sequential', 'videosequence']:
             self.init_js=js+render_to_string('seq_module.js',params)
             self.destroy_js=destroy_js
             self.content=render_to_string('seq_module.html',params)
