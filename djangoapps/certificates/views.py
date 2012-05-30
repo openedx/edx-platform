@@ -12,6 +12,13 @@ from certificates.models import GeneratedCertificate
 
 log = logging.getLogger("mitx.certificates")
 
+# @login_required
+# def record_exit_survey(request):
+#     if request.method != "POST":
+#         raise Http404
+#     
+#     
+
 
 @login_required
 def certificate_request(request):

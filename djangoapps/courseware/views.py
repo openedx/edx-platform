@@ -21,6 +21,7 @@ from django_future.csrf import ensure_csrf_cookie
 from lxml import etree
 
 from module_render import render_module, modx_dispatch
+from certificates.models import GeneratedCertificate
 from models import StudentModule
 from student.models import UserProfile
 
@@ -69,6 +70,21 @@ def profile(request, student_id = None):
         student = User.objects.get( id = int(student_id))
 
     user_info = UserProfile.objects.get(user=student) # request.user.profile_cache # 
+    
+    grade_sheet = grades.grade_sheet(student)
+    
+    generated_certificate = None
+    certificate_download_url = None
+    certificate_requested = False
+    if grade_sheet['grade']:
+        try:
+            generated_certificate = GeneratedCertificate.objects.get(user = student)
+            certificate_requested = True
+            certificate_download_url = generated_certificate.download_url
+        except GeneratedCertificate.DoesNotExist:
+            #They haven't submited the request form
+            certificate_requested = False
+    
 
     context={'name':user_info.name,
              'username':student.username,
@@ -78,7 +94,9 @@ def profile(request, student_id = None):
              'format_url_params' : content_parser.format_url_params,
              'csrf':csrf(request)['csrf_token'],
              'grade_cutoffs' : course_settings.GRADE_CUTOFFS,
-             'grade_sheet' : grades.grade_sheet(student),
+             'grade_sheet' : grade_sheet,
+             'certificate_requested' : certificate_requested,
+             'certificate_download_url' : certificate_download_url,
              }
 
     return render_to_response('profile.html', context)

@@ -158,8 +158,14 @@ $(function() {
       <div id="grade">
         %if grade_sheet['grade']:
           <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
-
-          <a rel="leanModal" class="cert_request" href="#cert_request">Request Certificate</a>
+          
+          %if not certificate_requested:
+            <a rel="leanModal" class="cert_request" href="#cert_request">Request Certificate</a>
+          %elif certificate_download_url:
+            <a class="cert_request" href="${certificate_download_url}">Download Certificate</a>
+          %else:
+            <a class="cert_request" href="#">Certificate is being generated...</a>
+          %endif
         %else:
           <p> No letter grade has been earned for this course </p>
         %endif
@@ -365,4 +371,35 @@ $(function() {
   </form>
 </div>
 %endif
+
+<div id="survey" class="leanModal_box">
+  <h1>6.002x Student Survey</h1>
+  <p>Please take this short survey about 6.002x.</p>
+  
+  <form id="survey_form">
+    <div id="survey_error"> </div>
+    <fieldset>
+      <ul>
+        <li>
+          <input type="checkbox" id="survey_future_classes"/>
+          <label> Please inform me of future classes offered by edX.</label>
+        </li>
+        <li>
+          <input type="checkbox" id="survey_future_offerings"/>
+          <label> Please inform me of opportunities to help with future offerings of 6.002x, such as staffing discussiong forums or developing content. </label>
+        </li>
+        <li>
+          <input type="checkbox" id="survey_6002x_updates"/>
+          <label> Please subscribe me to periodic updates about additional topics, refreshers, and follow-ups for topics in 6.002x. </label>
+        </li>
+        
+        <li>
+          <input type="submit" id="" value="Record Survey Response" />
+        </li>
+      </ul>
+    </fieldset>
+  </form>
+</div>
+
+
 

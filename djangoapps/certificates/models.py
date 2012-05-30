@@ -18,6 +18,4 @@ class GeneratedCertificate(models.Model):
     user = models.ForeignKey(User, db_index=True)
     certificate_id = models.CharField(max_length=32)
     
-    # TODO: Maybe we store the grade when the certificate was
-    # generated, so we can tell the user if their grade improves?
-    # Can a grade improve?
+    download_url = models.CharField(max_length=128, null=True)
