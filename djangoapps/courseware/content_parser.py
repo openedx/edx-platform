@@ -204,7 +204,8 @@ def course_file(user,coursename=None):
         tree_string = None
 
     if settings.DEBUG:
-        print '[courseware.content_parser.course_file] filename=%s, cache_key=%s' % (filename,cache_key)
+        log.info('[courseware.content_parser.course_file] filename=%s, cache_key=%s' % (filename,cache_key))
+        # print '[courseware.content_parser.course_file] tree_string = ',tree_string
 
     if not tree_string:
         tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
@@ -233,7 +234,7 @@ def section_file(user, section, coursename=None, dironly=False):
     if dironly: return dirname
 
     if filename not in os.listdir(dirname):
-        print filename+" not in "+str(os.listdir(dirname))
+        log.error(filename+" not in "+str(os.listdir(dirname)))
         return None
 
     options = {'dev_content':settings.DEV_CONTENT, 
@@ -273,9 +274,14 @@ def module_xml(user, module, id_tag, module_id, coursename=None):
                 break
 
     if len(result_set)>1:
-        print "WARNING: Potentially malformed course file", module, module_id
+        log.error("WARNING: Potentially malformed course file", module, module_id)
     if len(result_set)==0:
+        if settings.DEBUG:
+            log.error('[courseware.content_parser.module_xml] cannot find %s in course.xml tree' % xpath_search)
+            log.error('tree = %s' % etree.tostring(doc,pretty_print=True))
         return None
+    if settings.DEBUG:
+        log.info('[courseware.content_parser.module_xml] found %s' % result_set)
     return etree.tostring(result_set[0])
     #return result_set[0].serialize()
 
