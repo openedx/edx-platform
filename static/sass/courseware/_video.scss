@@ -184,7 +184,18 @@ section.course-content {
             float: left;
             position: relative;
 
-            a {
+            &.open {
+              &>a {
+                background: url('../images/open-arrow.png') 10px center no-repeat;
+              }
+
+              ol.video_speeds {
+                display: block;
+                opacity: 1;
+              }
+            }
+
+            &>a {
               background: url('../images/closed-arrow.png') 10px center no-repeat;
               border-left: 1px solid #000;
               border-right: 1px solid #000;
@@ -200,15 +211,6 @@ section.course-content {
               @include transition();
               -webkit-font-smoothing: antialiased;
               width: 110px;
-
-              &.open {
-                background: url('../images/open-arrow.png') 10px center no-repeat;
-
-                ol.video_speeds {
-                  display: block;
-                  opacity: 1;
-                }
-              }
 
               h3 {
                 color: #999;

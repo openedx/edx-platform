@@ -16,15 +16,12 @@
     <script src="{{ url }}"></script>
     {% endfor %}
 
+    {% load compressed %}
     {# static files #}
-    {% for url in suite.static_files %}
-    <script src="{{ STATIC_URL }}{{ url }}"></script>
-    {% endfor %}
+    {% compressed_js 'application' %}
 
     {# spec files #}
-    {% for file in files %}
-    <script src="{% url jasmine_test file %}"></script>
-    {% endfor %}
+    {% compressed_js 'spec' %}
 
 </head>
 <body>
