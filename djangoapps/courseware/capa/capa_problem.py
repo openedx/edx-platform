@@ -109,6 +109,7 @@ class LoncapaProblem(object):
             self.seed=struct.unpack('i', os.urandom(4))[0]
 
         ## Parse XML file
+        log.info("[courseware.capa.capa_problem.lcp.init]  fileobject = %s" % fileobject)
         file_text = fileobject.read()
         self.fileobject = fileobject	# save it, so we can use for debugging information later
         # Convert startouttext and endouttext to proper <text></text>
@@ -226,8 +227,8 @@ class LoncapaProblem(object):
             try:
                 exec code in context, context		# use "context" for global context; thus defs in code are global within code
             except Exception,err:
-                print "[courseware.capa.capa_problem.extract_context] error %s" % err
-                print "in doing exec of this code:",code
+                log.exception("[courseware.capa.capa_problem.extract_context] error %s" % err)
+                log.exception("in doing exec of this code: %s" % code)
         return context
 
     def get_html(self):
