@@ -17,7 +17,7 @@ from django.views.decorators.cache import cache_control
 
 from lxml import etree
 
-from module_render import render_module, make_track_function, I4xSystem
+from module_render import render_module, make_track_function, I4xSystem, get_state_from_module_object_preload
 from models import StudentModule
 from student.models import UserProfile
 from util.views import accepts
@@ -151,8 +151,17 @@ def render_section(request, section):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def index(request, course=None, chapter="Using the System", section="Hints"): 
-    ''' Displays courseware accordion, and any associated content. 
+def index(request, course=None, chapter="Using the System", section="Hints",position=None): 
+    ''' Displays courseware accordion, and any associated content.
+
+    Arguments:
+
+     - request    : HTTP request
+     - course     : coursename (str)
+     - chapter    : chapter name (str)
+     - section    : section name (str)
+     - position   : position in sequence, ie of <sequential> module (int)
+
     ''' 
     user = request.user
     if not settings.COURSEWARE_ENABLED:
@@ -181,17 +190,20 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     request.session['coursename'] = course		# keep track of current course being viewed in django's request.session
 
     try:
+        # this is the course.xml etree 
         dom = content_parser.course_file(user,course)	# also pass course to it, for course-specific XML path
     except:
         log.exception("Unable to parse courseware xml")
         return render_to_response('courseware-error.html', {})
 
+    # this is the module's parent's etree
     dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
                            course=course, chapter=chapter, section=section)
 
     if len(dom_module) == 0:
         module = None
     else:
+        # this is the module's etree
         module = dom_module[0]
 
     module_ids = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]//@id", 
@@ -203,6 +215,21 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     else:
         module_object_preload = []
 
+    if position and module and module.tag=='sequential':
+        smod, state = get_state_from_module_object_preload(user, module, module_object_preload)
+        newstate = json.dumps({ 'position':position })
+        if smod:
+            smod.state = newstate
+        elif user.is_authenticated():
+            smod=StudentModule(student=user, 
+                               module_type = module.tag,
+                               module_id= module.get('id'),
+                               state = newstate)
+        smod.save()
+        # now regenerate module_object_preload
+        module_object_preload = list(StudentModule.objects.filter(student=user, 
+                                                                  module_id__in=module_ids))
+
     context = {
         'csrf': csrf(request)['csrf_token'],
         'accordion': render_accordion(request, course, chapter, section),
@@ -210,7 +237,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     }
 
     try:
-        module = render_module(user, request, module, module_object_preload)
+        module = render_module(user, request, module, module_object_preload)	# ugh - shouldn't overload module
     except:
         log.exception("Unable to load module")
         context.update({
@@ -301,6 +328,44 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         s.save()
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
+
+def jump_to(request, probname=None):
+    '''
+    Jump to viewing a specific problem.  The problem is specified by a problem name - currently the filename (minus .xml)
+    of the problem.  Maybe this should change to a more generic tag, eg "name" given as an attribute in <problem>.
+
+    We do the jump by (1) reading course.xml to find the first instance of <problem> with the given filename, then
+    (2) finding the parent element of the problem, then (3) rendering that parent element with a specific computed position
+    value (if it is <sequential>).
+
+    '''
+    # get coursename if stored
+    coursename = multicourse_settings.get_coursename_from_request(request)
+
+    # begin by getting course.xml tree
+    xml = content_parser.course_file(request.user,coursename)
+
+    # look for problem of given name
+    pxml = xml.xpath('//problem[@filename="%s"]' % probname)
+    if pxml: pxml = pxml[0]
+
+    # get the parent element
+    parent = pxml.getparent()
+
+    # figure out chapter and section names
+    chapter = None
+    section = None
+    branch = parent
+    for k in range(4):	# max depth of recursion
+        if branch.tag=='section': section = branch.get('name')
+        if branch.tag=='chapter': chapter = branch.get('name')
+        branch = branch.getparent()
+
+    position = None
+    if parent.tag=='sequential':
+        position = parent.index(pxml)+1	# position in sequence
+        
+    return index(request,course=coursename,chapter=chapter,section=section,position=position)
 
 def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
     '''

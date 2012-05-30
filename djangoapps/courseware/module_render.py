@@ -80,8 +80,7 @@ def grade_histogram(module_id):
         return []
     return grades
 
-def render_x_module(user, request, xml_module, module_object_preload):
-    ''' Generic module for extensions. This renders to HTML. '''
+def get_state_from_module_object_preload(user, xml_module, module_object_preload):
     # Check if problem has an instance in DB
     module_type=xml_module.tag
     module_class=courseware.modules.get_module_class(module_type)
@@ -97,6 +96,29 @@ def render_x_module(user, request, xml_module, module_object_preload):
         state=None
     else:
         state = smod.state
+    
+    return smod, state
+
+def render_x_module(user, request, xml_module, module_object_preload):
+    ''' Generic module for extensions. This renders to HTML.
+
+    modules include sequential, vertical, problem, video, html
+
+    Note that modules can recurse.  problems, video, html, can be inside sequential or vertical.
+
+    Arguments:
+
+      - user                  : current django User
+      - request               : current django HTTPrequest
+      - xml_module            : lxml etree of xml subtree for the current module
+      - module_object_preload : list of StudentModule objects, one of which may match this module type and id
+
+    '''
+    module_type=xml_module.tag
+    module_class=courseware.modules.get_module_class(module_type)
+    module_id=xml_module.get('id') #module_class.id_attribute) or "" 
+
+    smod, state = get_state_from_module_object_preload(user, xml_module, module_object_preload)
 
     # get coursename if stored
     coursename = multicourse_settings.get_coursename_from_request(request)
@@ -136,7 +158,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
     destory_js = instance.get_destroy_js()
 
     # special extra information about each problem, only for users who are staff 
-    if user.is_staff:
+    if False and user.is_staff:
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
         content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
