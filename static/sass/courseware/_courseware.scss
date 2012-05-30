@@ -120,11 +120,20 @@ div.course-wrapper {
         > span {
           display: block;
           margin-bottom: lh(.5);
+
+          &[answer] {
+            border-top: 1px solid #ededed;
+            border-bottom: 1px solid #ededed;
+            background: #f3f3f3;
+            margin: 0 (-(lh()));
+            padding: lh(.5) lh();
+          }
         }
       }
 
       input[type="text"] {
         display: inline-block;
+        width: 50%;
       }
 
       center {
@@ -136,6 +145,11 @@ div.course-wrapper {
 
       section.action {
         margin-top: lh();
+
+        input[type="button"] {
+          padding: lh(.4) lh();
+          text-shadow: 0 -1px 0 #666;
+        }
       }
     }
 
@@ -172,6 +186,7 @@ div.course-wrapper {
 
         header {
           @extend h1.top-header;
+          @include border-radius(0 4px 0 0);
           margin-bottom: -16px;
 
           h1 {
