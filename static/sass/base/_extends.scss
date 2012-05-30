@@ -16,6 +16,11 @@
   div.table-wrapper {
     display: table;
     width: flex-grid(12);
+    overflow: hidden;
+
+    @media screen and (min-width: 1400px) {
+      @include border-radius(4px);
+    }
   }
 }
 
@@ -83,6 +88,7 @@ h1.top-header {
   padding: lh();
   vertical-align: top;
   width: flex-grid(9) + flex-gutter();
+  overflow: hidden;
 
   @media print {
     @include box-shadow(none);
@@ -196,7 +202,8 @@ h1.top-header {
   @extend .clearfix;
   background: $cream;
   border-bottom: 1px solid darken($cream, 10%);
-  @include box-shadow(inset 0 1px 0 #fff, inset 1px 0 0 #fff);
+  border-top: 1px solid #fff;
+  // @include box-shadow(inset 0 1px 0 #fff, inset 1px 0 0 #fff);
   font-size: 12px;
   height:46px;
   line-height: 46px;
