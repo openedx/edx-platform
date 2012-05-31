@@ -671,6 +671,11 @@ section.index-content section.course h2 {
 @media screen and (min-width: 500px) and (max-width: 781px) {
   section.index-content section.course h2 {
     padding-top: 207.104px; } }
+section.index-content section.course div.announcement p.announcement-button a {
+  margin-top: 0; }
+section.index-content section.course div.announcement img {
+  max-width: 100%;
+  margin-bottom: 25.888px; }
 section.index-content section.about-course {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;

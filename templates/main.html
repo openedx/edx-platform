@@ -4,7 +4,7 @@
   <%block name="title"><title>MITx 6.002x</title></%block>
 
   <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
-  <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="/static/css/application.css?v4" type="text/css" media="all" />
 
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
   <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
@@ -26,7 +26,7 @@
   <script type="text/javascript" src="${ settings.LIB_URL }mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script>
 </head>
 
-<body class="<%block name="bodyclass"/>">
+<body class="<%block name='bodyclass'/>">
   <!--[if lte IE 9]>
   <p class="ie-warning">You are using a browser that is not supported by <em>MITx</em>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p>
   <![endif]-->
@@ -127,15 +127,11 @@ $(function() {
         $("#feedback_div").html("Feedback submitted. Thank you");
         });
       });
-    });
 
 // Calculator
-$(function() {
-
-    $("#calculator_wrapper").hide();
 
     $(".calc").click(function(){
-      $("#calculator_wrapper").slideToggle("fast");
+      $("li.calc-main").toggleClass('open');
       $("#calculator_wrapper #calculator_input").focus();
       $(this).toggleClass("closed");
       return false;
@@ -156,10 +152,9 @@ $(function() {
         $("#calculator_output").attr("value",data.result);
         });
       });
-    });
 
-$(function(){
     $("a[rel*=leanModal]").leanModal();
+
     });
 </script>
 

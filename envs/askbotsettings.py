@@ -1,4 +1,10 @@
-# askbot livesettings
+"""
+There are other askbot settings in common.py that covers things like where the
+templates are located, etc. This file is purely for askbot forum *behavior*.
+This means things like karma limits, the ability to post questions as wikis, 
+anonymous questions, etc.
+"""
+
 LIVESETTINGS_OPTIONS = {
     1: {
         'DB' : False,
@@ -88,9 +94,9 @@ LIVESETTINGS_OPTIONS = {
                 'MIN_TITLE_LENGTH' : 1,
                 'MIN_QUESTION_BODY_LENGTH' : 1,
                 'MIN_ANSWER_BODY_LENGTH' : 1,
-                'WIKI_ON' : True,
+                'WIKI_ON' : False,
                 'ALLOW_ASK_ANONYMOUSLY' : True,
-                'ALLOW_POSTING_BEFORE_LOGGING_IN' : True,
+                'ALLOW_POSTING_BEFORE_LOGGING_IN' : False,
                 'ALLOW_SWAPPING_QUESTION_WITH_ANSWER' : False,
                 'MAX_TAG_LENGTH' : 20,
                 'MIN_TITLE_LENGTH' : 1,
@@ -172,8 +178,8 @@ LIVESETTINGS_OPTIONS = {
             },
             'MARKUP' : {
                 'MARKUP_CODE_FRIENDLY' : False,
-                'ENABLE_MATHJAX' : False,  # FIXME: Test with this enabled
-                'MATHJAX_BASE_URL' : u'',
+                'ENABLE_MATHJAX' : True,
+                'MATHJAX_BASE_URL' : u'/static/js/mathjax-MathJax-c9db6ac/',
                 'ENABLE_AUTO_LINKING' : False,
                 'AUTO_LINK_PATTERNS' : u'',
                 'AUTO_LINK_URLS' : u'',
@@ -181,21 +187,21 @@ LIVESETTINGS_OPTIONS = {
             'MIN_REP' : {
                 'MIN_REP_TO_ACCEPT_OWN_ANSWER' : 1,
                 'MIN_REP_TO_ANSWER_OWN_QUESTION' : 1,
-                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 100,
+                'MIN_REP_TO_CLOSE_OTHERS_QUESTIONS' : 1200,
                 'MIN_REP_TO_CLOSE_OWN_QUESTIONS' : 1,
-                'MIN_REP_TO_DELETE_OTHERS_COMMENTS' : 2000,
-                'MIN_REP_TO_DELETE_OTHERS_POSTS' : 5000,
-                'MIN_REP_TO_EDIT_OTHERS_POSTS' : 2000,
-                'MIN_REP_TO_EDIT_WIKI' : 1,
+                'MIN_REP_TO_DELETE_OTHERS_COMMENTS' : 5000,
+                'MIN_REP_TO_DELETE_OTHERS_POSTS' : 10000,
+                'MIN_REP_TO_EDIT_OTHERS_POSTS' : 5000,
+                'MIN_REP_TO_EDIT_WIKI' : 200,
                 'MIN_REP_TO_FLAG_OFFENSIVE' : 1,
                 'MIN_REP_TO_HAVE_STRONG_URL' : 250,
                 'MIN_REP_TO_LEAVE_COMMENTS' : 1,
-                'MIN_REP_TO_LOCK_POSTS' : 4000,
+                'MIN_REP_TO_LOCK_POSTS' : 10000,
                 'MIN_REP_TO_REOPEN_OWN_QUESTIONS' : 1,
-                'MIN_REP_TO_RETAG_OTHERS_QUESTIONS' : 1,
+                'MIN_REP_TO_RETAG_OTHERS_QUESTIONS' : 100,
                 'MIN_REP_TO_UPLOAD_FILES' : 1,
                 'MIN_REP_TO_VIEW_OFFENSIVE_FLAGS' : 2000,
-                'MIN_REP_TO_VOTE_DOWN' : 1,
+                'MIN_REP_TO_VOTE_DOWN' : 15,
                 'MIN_REP_TO_VOTE_UP' : 1,
             },
             'QA_SITE_SETTINGS' : {
@@ -275,7 +281,7 @@ LIVESETTINGS_OPTIONS = {
             'VOTE_RULES' : {
                 'MAX_VOTES_PER_USER_PER_DAY' : 30,
                 'MAX_FLAGS_PER_USER_PER_DAY' : 5,
-                'MIN_DAYS_FOR_STAFF_TO_ACCEPT_ANSWER' : 7,
+                'MIN_DAYS_FOR_STAFF_TO_ACCEPT_ANSWER' : 0,
                 'MIN_DAYS_TO_ANSWER_OWN_QUESTION' : 0,
                 'MIN_FLAGS_TO_DELETE_POST' : 5,
                 'MIN_FLAGS_TO_HIDE_POST' : 3,

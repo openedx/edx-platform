@@ -24,7 +24,7 @@ from django_future.csrf import ensure_csrf_cookie
 
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange
 
-log = logging.getLogger("mitx.user")
+log = logging.getLogger("mitx.student")
 
 def csrf_token(context):
     ''' A csrf token that can be included in a form. 

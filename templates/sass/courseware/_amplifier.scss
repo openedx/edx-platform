@@ -1,101 +1,247 @@
 // JM MOSFET AMPLIFIER
-div#graph-container {
+section.tool-wrapper {
+  background: #073642;
+  border-top: 1px solid darken(#002b36, 10%);
+  border-bottom: 1px solid darken(#002b36, 10%);
+  @include box-shadow(inset 0 0 0 4px darken(#094959, 2%));
+  margin: lh() (-(lh())) 0;
+  color: #839496;
   @extend .clearfix;
-  border-top: 1px solid #ddd;
-  padding-top: lh(1.0);
-   
-  canvas#graph {
+  display: table;
+
+  div#graph-container {
+    background: none;
+    @include box-sizing(border-box);
+    display: table-cell;
+    padding: lh();
+    vertical-align: top;
+    width: flex-grid(4.5, 9) + flex-gutter(9);
+
+    .ui-widget-content {
+      background: none;
+      border: none;
+      @include border-radius(0);
+    }
+
+    canvas {
+      width: 100%;
+    }
+
+    ul.ui-tabs-nav {
+      background: darken(#073642, 2%);
+      margin: (-(lh())) (-(lh())) 0;
+      padding: 0;
+      position: relative;
+      width: 110%;
+      @include border-radius(0);
+      border-bottom: 1px solid darken(#073642, 8%);
+
+      li {
+        margin-bottom: 0;
+        background: none;
+        color: #fff;
+        border: none;
+        @include border-radius(0);
+
+        &.ui-tabs-selected {
+          border-right: 1px solid darken(#073642, 8%);
+          border-left: 1px solid darken(#073642, 8%);
+          background-color: #073642;
+
+          &:first-child {
+            border-left: none;
+          }
+
+          a {
+            color: #eee8d5;
+          }
+        }
+
+        a {
+          border: none;
+          font: bold 12px $body-font-family;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #839496;
+
+          &:hover {
+            color: #eee8d5;
+          }
+        }
+      }
+    }
+  }
+
+  div#controlls-container {
+    @extend .clearfix;
+    background: darken(#073642, 2%);
+    border-right: 1px solid darken(#002b36, 6%);
+    @include box-shadow(1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%));
+    @include box-sizing(border-box);
+    display: table-cell;
+    padding: lh();
+    vertical-align: top;
     width: flex-grid(4.5, 9);
-    float: left;
-    margin-right: flex-gutter(9); 
-  }
 
-  div.graph-controls {
-    width: flex-grid(4.5, 9);
-    float: left;
+    div.graph-controls {
 
-    select#musicTypeSelect {
-      display: block;
-      margin-bottom: lh();
+      div.music-wrapper {
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
+
+        input#playButton {
+          display: block;
+          @include button(simple, lighten( #586e75, 5% ));
+          font: bold 14px $body-font-family;
+          border-color: darken(#002b36, 6%);
+          float: right;
+
+          &:active {
+            @include box-shadow(none);
+          }
+
+          &[value="Stop"] {
+            @include button(simple, darken(#268bd2, 30%));
+            font: bold 14px $body-font-family;
+
+            &:active {
+              @include box-shadow(none);
+            }
+          }
+        }
+      }
+
+      div.inputs-wrapper {
+        @include clearfix;
+        margin-bottom: lh();
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
+      }
+
+      p {
+        @include inline-block();
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+        font-weight: bold;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+      }
+
+      ul {
+        @include inline-block();
+        margin-bottom: 0;
+
+        li {
+          @include inline-block();
+          margin-bottom: 0;
+
+          input {
+            margin-right: 5px;
+          }
+        }
+      }
+
+      div#graph-listen {
+        margin-top: 8px;
+        margin-right: 20px;
+        display: block;
+        text-align: right;
+        float: left;
+        margin-bottom: 0;
+      }
     }
 
-    div#graph-output {
-      display: block;
-      margin-bottom: lh();
+    label {
+      @include border-radius(2px);
+      font-weight: bold;
+      color: #fff;
+      padding: 3px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    div#graph-listen {
-      display: block;
-      margin-bottom: lh();
-    }
-
-    p {
-      margin-bottom: lh(.5);
-    }
-
-    div#label {
-      display: inline-block;
-    }
-
-    input#playButton {
-      display: block;
-    }
-  }
-}
-
-div#schematic-container {
-  @extend .clearfix;
-
-  canvas {
-    width: flex-grid(4.5, 9);
-    float: left;
-    margin-right: flex-gutter(9); 
-  }
-
-  div.schematic-sliders {
-    width: flex-grid(4.5, 9);
-    float: left;
-
-    div.slider-label#vs {
-      margin-top: lh(2.0);
-    }
-
-    div.slider-label {
-      margin-bottom: lh(0.5);
-    }
-
-    div.slider {
-      margin-bottom: lh(1);
-    }
-  }
-}
-//End JM MOSFET AMPLIFIER
-
-// Labels
-div.graph-controls, div#graph-listen {
-
-  label {
-    @include border-radius(2px);
-    font-weight: bold;
-    padding: 3px;
-  }
-  //MOSFET AMPLIFIER
-  label[for="vinCheckbox"], label[for="vinRadioButton"]{
+    //MOSFET AMPLIFIER
+    label[for="vinCheckbox"], label[for="vinRadioButton"]{
       color: desaturate(#00bfff, 50%);
-  }
-  label[for="voutCheckbox"], label[for="voutRadioButton"]{
+    }
+
+    label[for="voutCheckbox"], label[for="voutRadioButton"]{
       color: darken(#ffcf48, 20%);
-  }
-  label[for="vrCheckbox"], label[for="vrRadioButton"]{
+    }
+
+    label[for="vrCheckbox"], label[for="vrRadioButton"]{
       color: desaturate(#1df914, 40%);
-  }
-  //RC Filters
-  label[for="vcCheckbox"], label[for="vcRadioButton"]{
+    }
+
+    //RC Filters
+    label[for="vcCheckbox"], label[for="vcRadioButton"]{
       color: darken(#ffcf48, 20%);
-  }
-  //RLC Series
-  label[for="vlCheckbox"], label[for="vlRadioButton"]{
+    }
+
+    //RLC Series
+    label[for="vlCheckbox"], label[for="vlRadioButton"]{
       color: desaturate(#d33682, 40%);
+    }
+
+    div.schematic-sliders {
+
+      div.top-sliders {
+        padding: 0 0 lh();
+        margin-bottom: lh();
+        border-bottom: 1px solid darken(#073642, 10%);
+        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        @extend .clearfix;
+
+      select#musicTypeSelect {
+        @include inline-block();
+        font: 16px $body-font-family;
+        margin-bottom: 0;
+      }
+
+      p {
+        @include inline-block();
+        -webkit-font-smoothing: antialiased;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+        margin: 0 lh(.5) lh() 0;
+        font-weight: bold;
+      }
+
+      }
+
+      div.slider-label {
+        margin-bottom: lh(0.5);
+        font-weight: bold;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      div.slider {
+        margin-bottom: lh(1);
+
+        &.ui-slider-horizontal {
+          height: 0.4em;
+          background: darken(#002b36, 2%);
+          border: 1px solid darken(#002b36, 8%);
+          @include box-shadow(none);
+        }
+
+        .ui-slider-handle {
+          background: lighten( #586e75, 5% ) url('/static/images/amplifier-slider-handle.png') center no-repeat;
+          border: 1px solid darken(#002b36, 8%);
+          @include box-shadow(inset 0 1px 0 lighten( #586e75, 20% ));
+          margin-top: -.3em;
+
+          &:hover, &:active {
+            background-color: lighten( #586e75, 10% );
+          }
+        }
+      }
+    }
   }
 }
+
 

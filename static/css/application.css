@@ -1,5 +1,5 @@
 /* 
-html5doctor.com Reset Stylesheet 
+html5doctor.com Reset Stylesheet
 v1.6.1
 Last Updated: 2010-09-17
 Author: Richard Clark - http://richclarkdesign.com 
@@ -116,7 +116,7 @@ input, select {
   font-weight: 800;
   font-style: italic; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.profile-wrapper section.course-info div#grade:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, div#graph-container:after, div#schematic-container:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.book-wrapper section.book nav:after, div.profile-wrapper section.course-info div#grade:after, div.wiki-wrapper section.wiki-body header:after, html body section.main-content:after, html body section.outside-app:after, div.header-wrapper header:after, div.header-wrapper header hgroup:after, div.header-wrapper header nav ul:after, footer:after, li.calc-main div#calculator_wrapper form:after, li.calc-main div#calculator_wrapper form div.input-wrapper:after, div.leanModal_box#enroll ol:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls:after, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:after, section.course-content nav.sequence-bottom ul:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after, div.book-wrapper section.book nav ul:after, div.info-wrapper section.updates > ol > li:after, div.info-wrapper section.handouts ol li:after, div.profile-wrapper section.course-info header:after, div.profile-wrapper section.course-info > ol > li:after, div#wiki_panel div#wiki_create_form:after, div.wiki-wrapper section.wiki-body:after, ul.badge-list li.badge:after {
   content: ".";
   display: block;
   height: 0;
@@ -133,7 +133,7 @@ input, select {
   display: table;
   width: 100%; }
 
-h1.top-header, div.course-wrapper section.course-content h1, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info header, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
+h1.top-header, div.course-wrapper section.course-content ol.vert-mod > li header, div.info-wrapper section.updates > h1, div.profile-wrapper section.course-info header, div.gradebook-wrapper section.gradebook-content h1, div.question-list-header {
   background: #f3f3f3;
   border-bottom: 1px solid #e3e3e3;
   margin: -22.652px -22.652px 22.652px;
@@ -465,8 +465,7 @@ a:visited {
 a:link, a:visited {
   text-decoration: none; }
 p a, li > a, span > a, a .inline {
-  border-bottom: 1px solid #bbb;
-  font-style: italic; }
+  border-bottom: 1px solid #bbb; }
 a:hover, a:focus {
   color: #000; }
 
@@ -505,6 +504,13 @@ html body section.main-content, html body section.outside-app {
     -o-border-radius: 4px;
     border-radius: 4px;
     margin-top: 11.326px; } }
+html body div.qtip div.ui-tooltip-content {
+  border: none;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font: 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  margin-top: -30px;
+  margin-right: -20px; }
 html body section.outside-app {
   max-width: 600px;
   padding: 22.652px; }
@@ -703,10 +709,36 @@ footer nav ul.social li.linkedin a {
   background: url("/static/images/linkedin.png") 0 0 no-repeat; }
 
 li.calc-main {
-  bottom: -36px;
+  bottom: -126px;
   left: 0;
   position: fixed;
-  width: 100%; }
+  width: 100%;
+  -webkit-transition-property: bottom;
+  -moz-transition-property: bottom;
+  -ms-transition-property: bottom;
+  -o-transition-property: bottom;
+  transition-property: bottom;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  z-index: 99;
+  -webkit-appearance: none; }
+li.calc-main.open {
+  bottom: -36px; }
+li.calc-main.open div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
+  display: block; }
 li.calc-main a.calc {
   text-indent: -9999px;
   overflow: hidden;
@@ -741,9 +773,13 @@ li.calc-main div#calculator_wrapper {
   background: rgba(17, 17, 17, 0.9);
   position: relative;
   top: -36px;
-  clear: both; }
+  clear: both;
+  max-height: 90px; }
 li.calc-main div#calculator_wrapper form {
-  padding: 22.652px; }
+  padding: 22.652px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
 li.calc-main div#calculator_wrapper form input#calculator_button {
   background: #111;
   border: 1px solid #000;
@@ -759,13 +795,14 @@ li.calc-main div#calculator_wrapper form input#calculator_button {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   color: #fff;
+  float: left;
   font-size: 30px;
   font-weight: bold;
+  margin: 0 1.012%;
   padding: 0;
   text-shadow: none;
-  width: 4.251%;
-  float: left;
-  margin: 0 1.012%; }
+  -webkit-appearance: none;
+  width: 4.251%; }
 li.calc-main div#calculator_wrapper form input#calculator_button:hover {
   color: #333; }
 li.calc-main div#calculator_wrapper form input#calculator_output {
@@ -783,12 +820,13 @@ li.calc-main div#calculator_wrapper form input#calculator_output {
   font-weight: bold;
   margin: 1px 0 0;
   padding: 10px;
+  -webkit-appearance: none;
   width: 31.984%; }
 li.calc-main div#calculator_wrapper form div.input-wrapper {
-  position: relative;
-  width: 61.741%;
+  float: left;
   margin: 0;
-  float: left; }
+  position: relative;
+  width: 61.741%; }
 li.calc-main div#calculator_wrapper form div.input-wrapper input#calculator_input {
   border: none;
   -webkit-box-shadow: none;
@@ -799,6 +837,7 @@ li.calc-main div#calculator_wrapper form div.input-wrapper input#calculator_inpu
   box-sizing: border-box;
   font-size: 16px;
   padding: 10px;
+  -webkit-appearance: none;
   width: 100%; }
 li.calc-main div#calculator_wrapper form div.input-wrapper input#calculator_input:focus {
   outline: none;
@@ -831,6 +870,7 @@ li.calc-main div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
   right: -40px;
   top: -110px;
   width: 500px;
+  display: none;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
@@ -2663,8 +2703,20 @@ button.ui-button::-moz-focus-inner {
   border-color: #AAA;
   color: #111; }
 
+html {
+  height: 100%;
+  max-height: 100%; }
+
+body.courseware {
+  height: 100%;
+  max-height: 100%; }
+
 div.course-wrapper ul, div.course-wrapper ol {
   list-style: none; }
+div.course-wrapper section.course-content {
+  overflow: hidden; }
+div.course-wrapper section.course-content h1 {
+  margin: 0 0 22.652px; }
 div.course-wrapper section.course-content p {
   margin-bottom: 22.652px; }
 div.course-wrapper section.course-content p:empty {
@@ -2778,13 +2830,44 @@ div.course-wrapper section.course-content ol.vert-mod > li {
   border-bottom: 1px solid #ddd;
   margin-bottom: 15px;
   padding: 0 0 15px; }
+div.course-wrapper section.course-content ol.vert-mod > li header {
+  margin-bottom: 0; }
+div.course-wrapper section.course-content ol.vert-mod > li header h1 {
+  margin: 0; }
+div.course-wrapper section.course-content ol.vert-mod > li header h2 {
+  float: right;
+  margin-right: 0;
+  margin-top: 8px;
+  text-align: right;
+  padding-right: 0; }
 div.course-wrapper section.course-content ol.vert-mod > li:last-child {
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0; }
-div.course-wrapper section.course-content section.tutorials ul {
+div.course-wrapper section.course-content ol.vert-mod > li ul {
   list-style: disc outside none;
-  margin-left: 22.652px; }
+  padding-left: 1em; }
+div.course-wrapper section.course-content section.tutorials h2 {
+  margin-bottom: 22.652px; }
+div.course-wrapper section.course-content section.tutorials ul {
+  margin: 0;
+  zoom: 1; }
+div.course-wrapper section.course-content section.tutorials ul:before, div.course-wrapper section.course-content section.tutorials ul:after {
+  content: "";
+  display: table; }
+div.course-wrapper section.course-content section.tutorials ul:after {
+  clear: both; }
+div.course-wrapper section.course-content section.tutorials ul li {
+  width: 31.522%;
+  float: left;
+  margin-right: 2.717%;
+  margin-bottom: 22.652px; }
+div.course-wrapper section.course-content section.tutorials ul li:nth-child(3n) {
+  margin-right: 0; }
+div.course-wrapper section.course-content section.tutorials ul li:nth-child(3n+1) {
+  clear: both; }
+div.course-wrapper section.course-content section.tutorials ul li a {
+  font-weight: bold; }
 div.course-wrapper section.course-content div.staff_info {
   zoom: 1;
   white-space: pre-wrap;
@@ -2819,6 +2902,26 @@ div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle {
 div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle:hover, div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle:focus {
   background-color: #bf4040;
   outline: none; }
+div.course-wrapper section.course-content div.ui-tabs {
+  border: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 0; }
+div.course-wrapper section.course-content div.ui-tabs .ui-tabs-nav {
+  background: none;
+  border: 0;
+  margin-bottom: 11.326px; }
+div.course-wrapper section.course-content div.ui-tabs .ui-tabs-panel {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  padding: 0; }
 div.course-wrapper.closed section.course-index {
   width: 3.077%; }
 div.course-wrapper.closed section.course-index header#open_close_accordion {
@@ -2883,14 +2986,42 @@ section.course-index div#accordion ul.ui-accordion-content li a p {
 section.course-index div#accordion ul.ui-accordion-content li a p.subtitle {
   color: #666; }
 
+@-moz-document url-prefix() {
+  a.add-fullscreen {
+    display: none !important; } }
+
+section.course-content .dullify, section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
+  opacity: .4;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
+section.course-content .dullify:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr:hover, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls:hover {
+  opacity: 1; }
 section.course-content div.video-subtitles {
+  zoom: 1;
   padding: 6px 22.652px;
   margin: 0 -22.652px;
   border-top: 1px solid #e1e1e1;
   border-bottom: 1px solid #e1e1e1;
   background: #f3f3f3;
-  position: relative;
-  zoom: 1; }
+  display: block; }
 section.course-content div.video-subtitles:before, section.course-content div.video-subtitles:after {
   content: "";
   display: table; }
@@ -2926,6 +3057,8 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   border: 1px solid #000;
   border-top: 0;
   color: #ccc; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls:hover ul, section.course-content div.video-subtitles div.video-wrapper section.video-controls:hover div {
+  opacity: 1; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -2979,6 +3112,7 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   color: #fff;
   font: bold 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
   margin-bottom: 6px;
+  margin-right: 0;
   padding: 4px;
   text-align: center;
   -webkit-font-smoothing: antialiased;
@@ -3045,22 +3179,11 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:focus, section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider a.ui-slider-handle:hover {
   background-color: #bf4040;
   outline: none; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:hover {
-  height: 14px;
-  margin-top: -7px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div#slider:hover a.ui-slider-handle {
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  -ms-border-radius: 20px;
-  -o-border-radius: 20px;
-  border-radius: 20px;
-  height: 20px;
-  margin-left: -10px;
-  top: -4px;
-  width: 20px; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr {
   float: left;
-  margin-right: 22.652px; }
+  margin-right: 22.652px;
+  list-style: none;
+  padding: 0; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls ul.vcr li {
   float: left;
   margin-bottom: 0; }
@@ -3072,8 +3195,8 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   border-right: 1px solid #000;
   display: block;
   cursor: pointer;
-  height: 14px;
-  padding: 16.989px;
+  line-height: 46px;
+  padding: 0 16.989px;
   text-indent: -9999px;
   width: 14px;
   -webkit-transition-property: all;
@@ -3112,15 +3235,21 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls {
   float: right; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds {
+  float: left; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a {
+  background: url("/static/images/closed-arrow.png") 10px center no-repeat;
   border-left: 1px solid #000;
   border-right: 1px solid #000;
+  display: block;
   -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
   box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
-  float: left;
-  line-height: 0;
-  padding-right: 5.663px;
+  zoom: 1;
+  cursor: pointer;
+  line-height: 46px;
   margin-right: 0;
+  padding-left: 15px;
+  position: relative;
   -webkit-transition-property: all;
   -moz-transition-property: all;
   -ms-transition-property: all;
@@ -3141,55 +3270,125 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   -ms-transition-delay: 0;
   -o-transition-delay: 0;
   transition-delay: 0;
-  cursor: pointer;
-  -webkit-font-smoothing: antialiased; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds input[type="button"] {
-  float: left;
-  padding: 0 5.663px 0 11.326px;
-  font-weight: normal;
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 1px;
+  -webkit-font-smoothing: antialiased;
+  width: 110px;
+  color: #fff; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a:before, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a:after {
+  content: "";
+  display: table; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a:after {
+  clear: both; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a.open {
+  background: url("/static/images/open-arrow.png") 10px center no-repeat; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a.open ol#video_speeds {
+  opacity: 1;
+  display: block; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a h3, section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a div#wiki_panel input[type="button"], div#wiki_panel section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a input[type="button"] {
   color: #999;
-  line-height: 46px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds p.active {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
-  padding: 0 11.326px 0 0;
-  margin-bottom: 0;
-  font-weight: bold;
-  display: none; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li {
+  font-size: 12px;
+  font-weight: normal;
   float: left;
+  letter-spacing: 1px;
+  padding: 0 5.663px 0 11.326px;
+  text-transform: uppercase; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a p.active {
+  font-weight: bold;
+  float: left;
+  margin-bottom: 0;
+  padding: 0 11.326px 0 0; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds {
+  background-color: #444;
+  border: 1px solid #000;
+  -webkit-box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+  -moz-box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+  box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+  left: -1px;
+  display: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  opacity: 0; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li {
+  border-bottom: 1px solid #000;
+  -webkit-box-shadow: 0 1px 0 #555555;
+  -moz-box-shadow: 0 1px 0 #555555;
+  box-shadow: 0 1px 0 #555555;
   color: #fff;
   cursor: pointer;
-  padding: 0 5.663px;
-  line-height: 46px; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li.active {
+  padding: 0 11.326px; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li.active {
   font-weight: bold; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:last-child {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li:last-child {
   border-bottom: 0;
   margin-top: 0;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds ol#video_speeds li:hover {
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a ol#video_speeds li:hover {
+  color: #aaa;
+  background-color: #666; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds a:hover {
+  opacity: 1;
   background-color: #444; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls div.speeds:hover {
-  opacity: 1; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.add-fullscreen {
+  background: url(/static/images/fullscreen.png) center no-repeat;
+  border-right: 1px solid #000;
+  -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+  color: #797979;
+  display: block;
+  float: left;
+  line-height: 46px;
+  margin-left: 0;
+  padding: 0 11.326px;
+  text-indent: -9999px;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0;
+  width: 30px; }
+section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.add-fullscreen:hover {
+  color: #fff;
+  text-decoration: none;
+  background-color: #444; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
   float: left;
   display: block;
@@ -3224,50 +3423,27 @@ section.course-content div.video-subtitles div.video-wrapper section.video-contr
   transition-delay: 0;
   opacity: 1;
   position: relative; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:after {
-  text-indent: 0;
-  position: absolute;
-  top: 0;
-  right: -40px;
-  content: "turn off";
-  display: block;
-  width: 70px;
-  opacity: 0;
-  visibility: hidden;
-  -webkit-transition-property: all;
-  -moz-transition-property: all;
-  -ms-transition-property: all;
-  -o-transition-property: all;
-  transition-property: all;
-  -webkit-transition-duration: 0.15s;
-  -moz-transition-duration: 0.15s;
-  -ms-transition-duration: 0.15s;
-  -o-transition-duration: 0.15s;
-  transition-duration: 0.15s;
-  -webkit-transition-timing-function: ease-out;
-  -moz-transition-timing-function: ease-out;
-  -ms-transition-timing-function: ease-out;
-  -o-transition-timing-function: ease-out;
-  transition-timing-function: ease-out;
-  -webkit-transition-delay: 0;
-  -moz-transition-delay: 0;
-  -ms-transition-delay: 0;
-  -o-transition-delay: 0;
-  transition-delay: 0; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:hover {
   color: #fff;
   text-decoration: none;
-  background-color: #444;
-  padding-right: 80px;
-  background-position: 11px center; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:hover:after {
-  right: 0;
-  opacity: 1;
-  visibility: visible; }
+  background-color: #444; }
 section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles.off {
   opacity: .7; }
-section.course-content div.video-subtitles div.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles.off:after {
-  content: "turn on"; }
+section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls ul, section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls div {
+  opacity: 1; }
+section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls div#slider {
+  height: 14px;
+  margin-top: -7px; }
+section.course-content div.video-subtitles div.video-wrapper:hover section.video-controls div#slider a.ui-slider-handle {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
+  height: 20px;
+  margin-left: -10px;
+  top: -4px;
+  width: 20px; }
 section.course-content div.video-subtitles ol.subtitles {
   float: left;
   width: 31.522%;
@@ -3314,6 +3490,94 @@ section.course-content div.video-subtitles.closed div.video-wrapper {
 section.course-content div.video-subtitles.closed ol.subtitles {
   width: 0px;
   height: 0; }
+section.course-content div.video-subtitles.fullscreen {
+  background: rgba(0, 0, 0, 0.95);
+  border: 0;
+  margin: 0;
+  bottom: 0;
+  height: 100%;
+  left: 0;
+  max-height: 100%;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+  overflow: hidden; }
+section.course-content div.video-subtitles.fullscreen.closed ol.subtitles {
+  width: auto;
+  height: auto;
+  right: -31.984%; }
+section.course-content div.video-subtitles.fullscreen a.exit {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-style: 12px;
+  display: none; }
+section.course-content div.video-subtitles.fullscreen a.exit::after {
+  content: "✖";
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  padding-left: 6px; }
+section.course-content div.video-subtitles.fullscreen a.exit:hover {
+  color: #993333; }
+section.course-content div.video-subtitles.fullscreen div.tc-wrapper div.video-wrapper {
+  width: 100%; }
+section.course-content div.video-subtitles.fullscreen div.tc-wrapper object#myytplayer, section.course-content div.video-subtitles.fullscreen div.tc-wrapper iframe {
+  height: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden; }
+section.course-content div.video-subtitles.fullscreen div.tc-wrapper section.video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999; }
+section.course-content div.video-subtitles.fullscreen ol.subtitles {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 22.652px;
+  max-width: 23.482%;
+  max-height: 100%;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
+section.course-content div.video-subtitles.fullscreen ol.subtitles li {
+  color: #aaa; }
+section.course-content div.video-subtitles.fullscreen ol.subtitles li.current {
+  color: #fff; }
 
 div.course-wrapper.closed section.course-content div.video-subtitles ol.subtitles {
   max-height: 577px; }
@@ -3323,9 +3587,11 @@ nav.sequence-nav {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   margin-bottom: 22.652px;
-  position: relative; }
+  position: relative;
+  top: -1px; }
 nav.sequence-nav ol {
   border-bottom: 1px solid #e4d080;
+  border-top: 1px solid #e4d080;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -3469,6 +3735,7 @@ nav.sequence-nav ol li p::after {
   width: 10px; }
 nav.sequence-nav ul {
   margin-right: 1px;
+  list-style: none !important;
   position: absolute;
   right: 0;
   top: 0;
@@ -3507,27 +3774,30 @@ nav.sequence-nav ul li.next a {
 nav.sequence-nav ul li.next a:hover {
   background-color: none; }
 
-section.course-content div#seq_content {
-  margin-bottom: 60px; }
-section.course-content nav.sequence-bottom {
-  bottom: -22.652px;
+section.course-content {
   position: relative; }
+section.course-content nav.sequence-bottom {
+  margin: 45.304px 0 0;
+  text-align: center; }
 section.course-content nav.sequence-bottom ul {
   background-color: #f2e7bf;
   background-color: #f2e7bf;
   border: 1px solid #e4d080;
-  border-bottom: 0;
-  -webkit-border-radius: 3px 3px 0 0;
-  -moz-border-radius: 3px 3px 0 0;
-  -ms-border-radius: 3px 3px 0 0;
-  -o-border-radius: 3px 3px 0 0;
-  border-radius: 3px 3px 0 0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
   -webkit-box-shadow: inset 0 0 0 1px #faf7e9;
   -moz-box-shadow: inset 0 0 0 1px #faf7e9;
   box-shadow: inset 0 0 0 1px #faf7e9;
-  margin: 0 auto;
-  overflow: hidden;
-  width: 106px; }
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto; }
 section.course-content nav.sequence-bottom ul li {
   float: left; }
 section.course-content nav.sequence-bottom ul li.prev, section.course-content nav.sequence-bottom ul li.next {
@@ -3537,8 +3807,7 @@ section.course-content nav.sequence-bottom ul li.prev a, section.course-content 
   background-repeat: no-repeat;
   border-bottom: none;
   display: block;
-  display: block;
-  padding: 16.989px 4px;
+  padding: 11.326px 4px;
   text-indent: -9999px;
   -webkit-transition-property: all;
   -moz-transition-property: all;
@@ -3564,14 +3833,14 @@ section.course-content nav.sequence-bottom ul li.prev a, section.course-content 
 section.course-content nav.sequence-bottom ul li.prev a:hover, section.course-content nav.sequence-bottom ul li.next a:hover {
   background-color: #eddfaa;
   color: #7e691a;
-  color: #7e691a;
   opacity: .5;
   text-decoration: none; }
 section.course-content nav.sequence-bottom ul li.prev a.disabled, section.course-content nav.sequence-bottom ul li.next a.disabled {
   background-color: #fffffe;
   opacity: .4; }
 section.course-content nav.sequence-bottom ul li.prev a {
-  background-image: url("/static/images/sequence-nav/previous-icon.png"); }
+  background-image: url("/static/images/sequence-nav/previous-icon.png");
+  border-right: 1px solid #e4d080; }
 section.course-content nav.sequence-bottom ul li.prev a:hover {
   background-color: none; }
 section.course-content nav.sequence-bottom ul li.next a {
@@ -3579,64 +3848,313 @@ section.course-content nav.sequence-bottom ul li.next a {
 section.course-content nav.sequence-bottom ul li.next a:hover {
   background-color: none; }
 
-div#graph-container {
-  border-top: 1px solid #ddd;
-  padding-top: 22.652px; }
-div#graph-container canvas#graph {
-  width: 48.641%;
+section.tool-wrapper {
+  background: #073642;
+  border-top: 1px solid #000203;
+  border-bottom: 1px solid #000203;
+  -webkit-box-shadow: inset 0 0 0 4px #084150;
+  -moz-box-shadow: inset 0 0 0 4px #084150;
+  box-shadow: inset 0 0 0 4px #084150;
+  margin: 22.652px -22.652px 0;
+  color: #839496;
+  display: table; }
+section.tool-wrapper div#graph-container {
+  background: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table-cell;
+  padding: 22.652px;
+  vertical-align: top;
+  width: 51.359%; }
+section.tool-wrapper div#graph-container .ui-widget-content {
+  background: none;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0; }
+section.tool-wrapper div#graph-container canvas {
+  width: 100%; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav {
+  background: #062e39;
+  margin: -22.652px -22.652px 0;
+  padding: 0;
+  position: relative;
+  width: 110%;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  border-bottom: 1px solid #03181d; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li {
+  margin-bottom: 0;
+  background: none;
+  color: #fff;
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected {
+  border-right: 1px solid #03181d;
+  border-left: 1px solid #03181d;
+  background-color: #073642; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected:first-child {
+  border-left: none; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected a {
+  color: #eee8d5; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li a {
+  border: none;
+  font: bold 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #839496; }
+section.tool-wrapper div#graph-container ul.ui-tabs-nav li a:hover {
+  color: #eee8d5; }
+section.tool-wrapper div#controlls-container {
+  background: #062e39;
+  border-right: 1px solid #001317;
+  -webkit-box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+  -moz-box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+  box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table-cell;
+  padding: 22.652px;
+  vertical-align: top;
+  width: 48.641%; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper {
+  padding: 0 0 22.652px;
+  margin-bottom: 22.652px;
+  border-bottom: 1px solid #021014;
+  -webkit-box-shadow: 0 1px 0 #083e4b;
+  -moz-box-shadow: 0 1px 0 #083e4b;
+  box-shadow: 0 1px 0 #083e4b; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton {
+  display: block;
+  border: 1px solid #3d5962;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 0 0 #939da0;
+  -moz-box-shadow: inset 0 1px 0 0 #939da0;
+  box-shadow: inset 0 1px 0 0 #939da0;
+  color: white;
+  display: inline;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #637c84;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #637c84), color-stop(100%, #43626b));
+  background-image: -webkit-linear-gradient(top, #637c84, #43626b);
+  background-image: -moz-linear-gradient(top, #637c84, #43626b);
+  background-image: -ms-linear-gradient(top, #637c84, #43626b);
+  background-image: -o-linear-gradient(top, #637c84, #43626b);
+  background-image: linear-gradient(top, #637c84, #43626b);
+  padding: 6px 18px 7px;
+  text-shadow: 0 1px 0 #31505a;
+  -webkit-background-clip: padding-box;
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  border-color: #001317;
+  float: right; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:hover {
+  -webkit-box-shadow: inset 0 1px 0 0 #778589;
+  -moz-box-shadow: inset 0 1px 0 0 #778589;
+  box-shadow: inset 0 1px 0 0 #778589;
+  cursor: pointer;
+  background-color: #5c6c71;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #5c6c71), color-stop(100%, #3e5961));
+  background-image: -webkit-linear-gradient(top, #5c6c71, #3e5961);
+  background-image: -moz-linear-gradient(top, #5c6c71, #3e5961);
+  background-image: -ms-linear-gradient(top, #5c6c71, #3e5961);
+  background-image: -o-linear-gradient(top, #5c6c71, #3e5961);
+  background-image: linear-gradient(top, #5c6c71, #3e5961); }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:active {
+  border: 1px solid #3d5962;
+  -webkit-box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee;
+  -moz-box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee;
+  box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:active {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"] {
+  border: 1px solid #030d15;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 0 0 #215f8a;
+  -moz-box-shadow: inset 0 1px 0 0 #215f8a;
+  box-shadow: inset 0 1px 0 0 #215f8a;
+  color: white;
+  display: inline;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #0f3550;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0f3550), color-stop(100%, #041623));
+  background-image: -webkit-linear-gradient(top, #0f3550, #041623);
+  background-image: -moz-linear-gradient(top, #0f3550, #041623);
+  background-image: -ms-linear-gradient(top, #0f3550, #041623);
+  background-image: -o-linear-gradient(top, #0f3550, #041623);
+  background-image: linear-gradient(top, #0f3550, #041623);
+  padding: 6px 18px 7px;
+  text-shadow: 0 1px 0 #000203;
+  -webkit-background-clip: padding-box;
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:hover {
+  -webkit-box-shadow: inset 0 1px 0 0 #174362;
+  -moz-box-shadow: inset 0 1px 0 0 #174362;
+  box-shadow: inset 0 1px 0 0 #174362;
+  cursor: pointer;
+  background-color: #0c2739;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0c2739), color-stop(100%, #030d15));
+  background-image: -webkit-linear-gradient(top, #0c2739, #030d15);
+  background-image: -moz-linear-gradient(top, #0c2739, #030d15);
+  background-image: -ms-linear-gradient(top, #0c2739, #030d15);
+  background-image: -o-linear-gradient(top, #0c2739, #030d15);
+  background-image: linear-gradient(top, #0c2739, #030d15); }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:active {
+  border: 1px solid #030d15;
+  -webkit-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
+  -moz-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
+  box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee; }
+section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:active {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
+  zoom: 1;
+  margin-bottom: 22.652px;
+  padding: 0 0 22.652px;
+  margin-bottom: 22.652px;
+  border-bottom: 1px solid #021014;
+  -webkit-box-shadow: 0 1px 0 #083e4b;
+  -moz-box-shadow: 0 1px 0 #083e4b;
+  box-shadow: 0 1px 0 #083e4b; }
+section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:before, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after {
+  content: "";
+  display: table; }
+section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after {
+  clear: both; }
+section.tool-wrapper div#controlls-container div.graph-controls p {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 #021014; }
+section.tool-wrapper div#controlls-container div.graph-controls ul {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls ul li {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.graph-controls ul li input {
+  margin-right: 5px; }
+section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen {
+  margin-top: 8px;
+  margin-right: 20px;
+  display: block;
+  text-align: right;
   float: left;
-  margin-right: 2.717%; }
-div#graph-container div.graph-controls {
-  width: 48.641%;
-  float: left; }
-div#graph-container div.graph-controls select#musicTypeSelect {
-  display: block;
-  margin-bottom: 22.652px; }
-div#graph-container div.graph-controls div#graph-output {
-  display: block;
-  margin-bottom: 22.652px; }
-div#graph-container div.graph-controls div#graph-listen {
-  display: block;
-  margin-bottom: 22.652px; }
-div#graph-container div.graph-controls p {
-  margin-bottom: 11.326px; }
-div#graph-container div.graph-controls div#label {
-  display: inline-block; }
-div#graph-container div.graph-controls input#playButton {
-  display: block; }
-
-div#schematic-container canvas {
-  width: 48.641%;
-  float: left;
-  margin-right: 2.717%; }
-div#schematic-container div.schematic-sliders {
-  width: 48.641%;
-  float: left; }
-div#schematic-container div.schematic-sliders div.slider-label#vs {
-  margin-top: 45.304px; }
-div#schematic-container div.schematic-sliders div.slider-label {
-  margin-bottom: 11.326px; }
-div#schematic-container div.schematic-sliders div.slider {
-  margin-bottom: 22.652px; }
-
-div.graph-controls label, div#graph-listen label {
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container label {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   -ms-border-radius: 2px;
   -o-border-radius: 2px;
   border-radius: 2px;
   font-weight: bold;
-  padding: 3px; }
-div.graph-controls label[for="vinCheckbox"], div.graph-controls label[for="vinRadioButton"], div#graph-listen label[for="vinCheckbox"], div#graph-listen label[for="vinRadioButton"] {
+  color: #fff;
+  padding: 3px;
+  -webkit-font-smoothing: antialiased; }
+section.tool-wrapper div#controlls-container label[for="vinCheckbox"], section.tool-wrapper div#controlls-container label[for="vinRadioButton"] {
   color: #409fbf; }
-div.graph-controls label[for="voutCheckbox"], div.graph-controls label[for="voutRadioButton"], div#graph-listen label[for="voutCheckbox"], div#graph-listen label[for="voutRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="voutCheckbox"], section.tool-wrapper div#controlls-container label[for="voutRadioButton"] {
   color: #e1a600; }
-div.graph-controls label[for="vrCheckbox"], div.graph-controls label[for="vrRadioButton"], div#graph-listen label[for="vrCheckbox"], div#graph-listen label[for="vrRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vrCheckbox"], section.tool-wrapper div#controlls-container label[for="vrRadioButton"] {
   color: #49c944; }
-div.graph-controls label[for="vcCheckbox"], div.graph-controls label[for="vcRadioButton"], div#graph-listen label[for="vcCheckbox"], div#graph-listen label[for="vcRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vcCheckbox"], section.tool-wrapper div#controlls-container label[for="vcRadioButton"] {
   color: #e1a600; }
-div.graph-controls label[for="vlCheckbox"], div.graph-controls label[for="vlRadioButton"], div#graph-listen label[for="vlCheckbox"], div#graph-listen label[for="vlRadioButton"] {
+section.tool-wrapper div#controlls-container label[for="vlCheckbox"], section.tool-wrapper div#controlls-container label[for="vlRadioButton"] {
   color: #a26784; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders {
+  padding: 0 0 22.652px;
+  margin-bottom: 22.652px;
+  border-bottom: 1px solid #021014;
+  -webkit-box-shadow: 0 1px 0 #083e4b;
+  -moz-box-shadow: 0 1px 0 #083e4b;
+  box-shadow: 0 1px 0 #083e4b; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders select#musicTypeSelect {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  font: 16px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  margin-bottom: 0; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders p {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0 -1px 0 #021014;
+  margin: 0 11.326px 22.652px 0;
+  font-weight: bold; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label {
+  margin-bottom: 11.326px;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 #021014;
+  -webkit-font-smoothing: antialiased; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider {
+  margin-bottom: 22.652px; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider.ui-slider-horizontal {
+  height: 0.4em;
+  background: #00232c;
+  border: 1px solid #000b0d;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle {
+  background: #637c84 url("/static/images/amplifier-slider-handle.png") center no-repeat;
+  border: 1px solid #000b0d;
+  -webkit-box-shadow: inset 0 1px 0 #8ba1a8;
+  -moz-box-shadow: inset 0 1px 0 #8ba1a8;
+  box-shadow: inset 0 1px 0 #8ba1a8;
+  margin-top: -0.3em; }
+section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:hover, section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:active {
+  background-color: #6e8992; }
 
 div.book-wrapper section.book-sidebar {
   -webkit-box-sizing: border-box;

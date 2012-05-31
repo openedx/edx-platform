@@ -1,8 +1,9 @@
-% if name is not UNDEFINED and name != None: 
+% if name is not UNDEFINED and name != None:
   <h1> ${name} </h1>
 % endif
 
 <div class="video-subtitles">
+<div class="tc-wrapper">
 
   <div class="video-wrapper">
     <div class="video-player">
@@ -28,12 +29,16 @@
 
         <div class="secondary-controls">
         <div class="speeds">
-          <h3>Speed</h3>
-          <p class="active"></p>
-          <ol id="video_speeds"></ol>
+          <a href="#">
+            <h3>Speed</h3>
+            <p class="active"></p>
+            <ol id="video_speeds"></ol>
+          </a>
         </div>
 
-        <a href="#" class="hide-subtitles">Captions</a>
+        <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
+
+        <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
         </div>
       </section>
     </section>
@@ -57,18 +62,63 @@
     <li id="stt_p6"><div id="std_p7" onclick="title_seek( 7);"></div></li>
     <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li>
   </ol>
+</div>
 
 </div>
 
 <%block name="js_extra">
+<script src="/static/js/jquery.ui.touch-punch.min.js"></script>
 <script type="text/javascript" charset="utf-8">
   $(function() {
+      // tooltips for full browser and closed caption
+      $('.add-fullscreen, .hide-subtitles ').qtip({
+          position: {
+            my: 'top right',
+            at: 'top center'
+            }
+        });
+
+      //full browser
+      $('.add-fullscreen').click(function() {
+
+          $('div.video-subtitles').toggleClass('fullscreen');
+
+          if ($('div.video-subtitles').hasClass('fullscreen')) {
+            $('div.video-subtitles').append('<a href="#" class="exit">Exit</a>');
+            } else {
+            $('a.exit').remove();
+            }
+
+          $('.exit').click(function() {
+            $('div.video-subtitles').removeClass('fullscreen');
+            $(this).remove();
+            return false;
+            });
+
+          var link_title = $(this).attr('title');
+          $(this).attr('title', (link_title == 'Exit fill browser') ? 'Fill browser' : 'Exit fill browser');
+
+          return false;
+        });
+
+
+      //hide subtitles
       $('.hide-subtitles').click(function() {
         $('div.video-subtitles').toggleClass('closed');
 
-        $(this).toggleClass("off");
+        var link_title = $(this).attr('title');
+        $(this).attr('title', (link_title == 'Turn on captions') ? 'Turn off captions' : 'Turn on captions');
+
         return false;
        });
+
+      $("div.speeds a").hover(function() {
+        $(this).toggleClass("open");
+        });
+
+      $("div.speeds a").click(function() {
+        return false;
+        });
   });
 </script>
 </%block>

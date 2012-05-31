@@ -1,12 +1,30 @@
+@-moz-document url-prefix() {
+  a.add-fullscreen {
+    display: none !important;
+  }
+}
+
 section.course-content {
+  .dullify {
+    opacity: .4;
+    @include transition();
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  div.video {
+  }
+
   div.video-subtitles {
+    @include clearfix();
     padding: 6px lh();
     margin: 0 (-(lh()));
     border-top: 1px solid #e1e1e1;
     border-bottom: 1px solid #e1e1e1;
     background: #f3f3f3;
-    position: relative;
-    @include clearfix();
+    display: block;
 
     div.video-wrapper {
       float: left;
@@ -39,24 +57,6 @@ section.course-content {
         }
       }
 
-      // ul {
-      //   float: left;
-
-      //   li {
-      //     margin-top: 5px;
-      //     display: inline-block;
-      //     cursor: pointer;
-      //     border: 0;
-      //     padding: 0;
-
-      //     div {
-      //       &:empty {
-      //         display: none;
-      //       }
-      //     }
-      //   }
-      // }
-
       section.video-controls {
         @extend .clearfix;
         background: #333;
@@ -64,6 +64,12 @@ section.course-content {
         border: 1px solid #000;
         border-top: 0;
         color: #ccc;
+
+        &:hover {
+          ul, div {
+            opacity: 1;
+          }
+        }
 
         div#slider {
           @extend .clearfix;
@@ -89,6 +95,7 @@ section.course-content {
             color: #fff;
             font: bold 12px $body-font-family;
             margin-bottom: 6px;
+            margin-right: 0;
             padding: 4px;
             text-align: center;
             -webkit-font-smoothing: antialiased;
@@ -130,23 +137,14 @@ section.course-content {
             }
           }
 
-          &:hover {
-            height: 14px;
-            margin-top: -7px;
-
-            a.ui-slider-handle {
-              @include border-radius(20px);
-              height: 20px;
-              margin-left: -10px;
-              top: -4px;
-              width: 20px;
-            }
-          }
         }
 
         ul.vcr {
           float: left;
           margin-right: lh();
+          @extend .dullify;
+          list-style: none;
+          padding: 0;
 
           li {
             float: left;
@@ -158,8 +156,9 @@ section.course-content {
               border-right: 1px solid #000;
               display: block;
               cursor: pointer;
-              height: 14px;
-              padding: lh(.75);
+              // height: 14px;
+              line-height: 46px;
+              padding: 0 lh(.75);
               text-indent: -9999px;
               width: 14px;
               @include transition();
@@ -193,67 +192,118 @@ section.course-content {
 
         div.secondary-controls {
           float: right;
+          @extend .dullify;
 
           div.speeds {
-            border-left: 1px solid #000;
-            border-right: 1px solid #000;
-            @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
             float: left;
-            line-height: 0;
-            padding-right: lh(.25);
-            margin-right: 0;
-            @include transition();
-            cursor: pointer;
-            -webkit-font-smoothing: antialiased;
 
-            h3 {
-              float: left;
-              padding: 0 lh(.25) 0 lh(.5);
-              font-weight: normal;
-              text-transform: uppercase;
-              font-size: 12px;
-              letter-spacing: 1px;
-              color: #999;
+            a {
+              background: url('/static/images/closed-arrow.png') 10px center no-repeat;
+              border-left: 1px solid #000;
+              border-right: 1px solid #000;
+              display: block;
+              @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+              @include clearfix();
+              cursor: pointer;
               line-height: 46px; //height of play pause buttons
-            }
+              margin-right: 0;
+              padding-left: 15px;
+              position: relative;
+              @include transition();
+              -webkit-font-smoothing: antialiased;
+              width: 110px;
+              color: #fff;
 
-            p.active {
-              @include inline-block();
-              padding: 0 lh(.5) 0 0;
-              margin-bottom: 0;
-              font-weight: bold;
-              display: none;
-            }
+              &.open {
+                background: url('/static/images/open-arrow.png') 10px center no-repeat;
 
-            // fix for now
-            ol#video_speeds {
-              @include inline-block();
-
-              li {
-                float: left;
-                color: #fff;
-                cursor: pointer;
-                padding: 0 lh(.25);
-                line-height: 46px; //height of play pause buttons
-
-                &.active {
-                  font-weight: bold;
-                }
-
-                &:last-child {
-                  border-bottom: 0;
-                  margin-top: 0;
-                  @include box-shadow(none);
-                }
-
-                &:hover {
-                  background-color: #444;
+                ol#video_speeds {
+                  opacity: 1;
+                  display: block;
                 }
               }
+
+              h3 {
+                color: #999;
+                font-size: 12px;
+                font-weight: normal;
+                float: left;
+                letter-spacing: 1px;
+                padding: 0 lh(.25) 0 lh(.5);
+                text-transform: uppercase;
+              }
+
+              p.active {
+                font-weight: bold;
+                float: left;
+                margin-bottom: 0;
+                padding: 0 lh(.5) 0 0;
+              }
+
+              // fix for now
+              ol#video_speeds {
+                background-color: #444;
+                border: 1px solid #000;
+                @include box-shadow(inset 1px 0 0 #555, 0 3px 0 #444);
+                left: -1px;
+                display: none;
+                position: absolute;
+                top:0;
+                width: 100%;
+                z-index: 10;
+                @include transition();
+                opacity: 0;
+
+                li {
+                  border-bottom: 1px solid #000;
+                  @include box-shadow( 0 1px 0 #555);
+                  color: #fff;
+                  cursor: pointer;
+                  padding: 0 lh(.5);
+
+                  &.active {
+                    font-weight: bold;
+                  }
+
+                  &:last-child {
+                    border-bottom: 0;
+                    margin-top: 0;
+                    @include box-shadow(none);
+                  }
+
+                  &:hover {
+                    color: #aaa;
+                    background-color: #666;
+                  }
+                }
+              }
+
+              &:hover {
+                opacity: 1;
+                background-color: #444;
+              }
             }
+          }
+
+          a.add-fullscreen {
+            background: url(/static/images/fullscreen.png) center no-repeat;
+            border-right: 1px solid #000;
+            @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+            color: #797979;
+            display: block;
+            float: left;
+            line-height: 46px; //height of play pause buttons
+            margin-left: 0;
+            padding: 0 lh(.5);
+            text-indent: -9999px;
+            @include transition();
+            width: 30px;
+
 
             &:hover {
-              opacity: 1;
+              color: #fff;
+              text-decoration: none;
+              background-color: #444;
             }
           }
 
@@ -273,40 +323,34 @@ section.course-content {
             opacity: 1;
             position: relative;
 
-            &:after {
-              text-indent: 0;
-              position: absolute;
-              top: 0;
-              right: -40px;
-              content: "turn off";
-              display: block;
-              width: 70px;
-              opacity: 0;
-              visibility: hidden;
-              @include transition();
-            }
-
             &:hover {
               color: #fff;
               text-decoration: none;
               background-color: #444;
-              padding-right: 80px;
-              background-position: 11px center;
-
-              &:after {
-                right: 0;
-                opacity: 1;
-                visibility: visible;
-              }
             }
 
             &.off {
               opacity: .7;
-
-              &:after {
-                content: "turn on";
-              }
             }
+          }
+        }
+      }
+
+      &:hover section.video-controls {
+        ul, div {
+          opacity: 1;
+        }
+
+        div#slider {
+          height: 14px;
+          margin-top: -7px;
+
+          a.ui-slider-handle {
+            @include border-radius(20px);
+            height: 20px;
+            margin-left: -10px;
+            top: -4px;
+            width: 20px;
           }
         }
       }
@@ -356,6 +400,95 @@ section.course-content {
       ol.subtitles {
         width: 0px;
         height: 0;
+      }
+    }
+
+    &.fullscreen {
+      background: rgba(#000, .95);
+      border: 0;
+      margin: 0;
+      bottom: 0;
+      height: 100%;
+      left: 0;
+      max-height: 100%;
+      padding: 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 999;
+      overflow: hidden;
+
+      &.closed {
+        ol.subtitles {
+          width: auto;
+          height: auto;
+          right: -(flex-grid(4));
+        }
+      }
+
+      a.exit {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-style: 12px;
+        display: none;
+
+        &::after {
+          content: "✖";
+          @include inline-block();
+          padding-left: 6px;
+        }
+
+        &:hover {
+          color: $mit-red;
+        }
+      }
+
+      div.tc-wrapper {
+        div.video-wrapper {
+          width: 100%;
+        }
+
+        object#myytplayer, iframe {
+          height: 100%;
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          overflow: hidden;
+        }
+
+        section.video-controls {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          z-index: 9999;
+        }
+      }
+
+      ol.subtitles {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        background: rgba(#000, .8);
+        padding: lh();
+        max-width: flex-grid(3);
+        max-height: 100%;
+        @include transition();
+
+        li {
+          color: #aaa;
+
+          &.current {
+            color: #fff;
+          }
+        }
       }
     }
   }
