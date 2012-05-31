@@ -14,38 +14,29 @@ section.course-content {
     }
   }
 
-  div.video-subtitles {
+  div.video {
+    @include clearfix();
     background: #f3f3f3;
     border-bottom: 1px solid #e1e1e1;
     border-top: 1px solid #e1e1e1;
-    @include clearfix();
     display: block;
     margin: 0 (-(lh()));
     padding: 6px lh();
 
-    div.video-wrapper {
+    article.video-wrapper {
       float: left;
       margin-right: flex-gutter(9);
       width: flex-grid(6, 9);
 
-      div.video-player {
+      section.video-player {
         height: 0;
         overflow: hidden;
         padding-bottom: 56.25%;
         padding-top: 30px;
         position: relative;
 
-        object {
-          height: 100%;
-          left: 0;
-          position: absolute;
-          top: 0;
-          width: 100%;
-        }
-
-        iframe#html5_player {
+        object, iframe {
           border: none;
-          display: none;
           height: 100%;
           left: 0;
           position: absolute;
@@ -68,7 +59,7 @@ section.course-content {
           }
         }
 
-        div#slider {
+        div.slider {
           @extend .clearfix;
           background: #c2c2c2;
           border: none;
@@ -175,7 +166,8 @@ section.course-content {
               }
             }
 
-            div#vidtime {
+            div.vidtime {
+              padding-left: lh(.75);
               font-weight: bold;
               line-height: 46px; //height of play pause buttons
               padding-left: lh(.75);
@@ -190,8 +182,20 @@ section.course-content {
 
           div.speeds {
             float: left;
+            position: relative;
 
-            a {
+            &.open {
+              &>a {
+                background: url('../images/open-arrow.png') 10px center no-repeat;
+              }
+
+              ol.video_speeds {
+                display: block;
+                opacity: 1;
+              }
+            }
+
+            &>a {
               background: url('../images/closed-arrow.png') 10px center no-repeat;
               border-left: 1px solid #000;
               border-right: 1px solid #000;
@@ -207,15 +211,6 @@ section.course-content {
               @include transition();
               -webkit-font-smoothing: antialiased;
               width: 110px;
-
-              &.open {
-                background: url('../images/open-arrow.png') 10px center no-repeat;
-
-                ol#video_speeds {
-                  display: block;
-                  opacity: 1;
-                }
-              }
 
               h3 {
                 color: #999;
@@ -234,47 +229,52 @@ section.course-content {
                 padding: 0 lh(.5) 0 0;
               }
 
-              // fix for now
-              ol#video_speeds {
+              &:hover, &:active, &:focus {
+                opacity: 1;
                 background-color: #444;
-                border: 1px solid #000;
-                @include box-shadow(inset 1px 0 0 #555, 0 3px 0 #444);
-                display: none;
-                left: -1px;
-                opacity: 0;
-                position: absolute;
-                top:0;
-                @include transition();
-                width: 100%;
-                z-index: 10;
+              }
+            }
 
-                li {
-                  border-bottom: 1px solid #000;
-                  @include box-shadow( 0 1px 0 #555);
+            // fix for now
+            ol.video_speeds {
+              @include box-shadow(inset 1px 0 0 #555, 0 3px 0 #444);
+              @include transition();
+              background-color: #444;
+              border: 1px solid #000;
+              bottom: 46px;
+              display: none;
+              opacity: 0;
+              position: absolute;
+              width: 125px;
+              z-index: 10;
+
+              li {
+                @include box-shadow( 0 1px 0 #555);
+                border-bottom: 1px solid #000;
+                color: #fff;
+                cursor: pointer;
+
+                a {
+                  border: 0;
                   color: #fff;
-                  cursor: pointer;
-                  padding: 0 lh(.5);
-
-                  &.active {
-                    font-weight: bold;
-                  }
-
-                  &:last-child {
-                    border-bottom: 0;
-                    @include box-shadow(none);
-                    margin-top: 0;
-                  }
+                  display: block;
+                  padding: lh(.5);
 
                   &:hover {
                     background-color: #666;
                     color: #aaa;
                   }
                 }
-              }
 
-              &:hover {
-                background-color: #444;
-                opacity: 1;
+                &.active {
+                  font-weight: bold;
+                }
+
+                &:last-child {
+                  @include box-shadow(none);
+                  border-bottom: 0;
+                  margin-top: 0;
+                }
               }
             }
           }
@@ -334,7 +334,7 @@ section.course-content {
           opacity: 1;
         }
 
-        div#slider {
+        div.slider {
           height: 14px;
           margin-top: -7px;
 
@@ -352,15 +352,14 @@ section.course-content {
     ol.subtitles {
       float: left;
       max-height: 460px;
-      overflow: hidden;
-      padding-top: 10px;
+      overflow: auto;
       width: flex-grid(3, 9);
 
       li {
         border: 0;
         color: #666;
         cursor: pointer;
-        margin-bottom: 0px;
+        margin-bottom: 8px;
         padding: 0;
         @include transition(all, .5s, ease-in);
 
@@ -373,11 +372,7 @@ section.course-content {
           color: $mit-red;
         }
 
-        div {
-          margin-bottom: 8px;
-        }
-
-        div:empty {
+        &:empty {
           margin-bottom: 0px;
         }
       }
@@ -386,7 +381,7 @@ section.course-content {
     &.closed {
       @extend .trans;
 
-      div.video-wrapper {
+      article.video-wrapper {
         width: flex-grid(9,9);
       }
 
@@ -441,11 +436,11 @@ section.course-content {
       }
 
       div.tc-wrapper {
-        div.video-wrapper {
+        article.video-wrapper {
           width: 100%;
         }
 
-        object#myytplayer, iframe {
+        object, iframe {
           bottom: 0;
           height: 100%;
           left: 0;
@@ -487,7 +482,7 @@ section.course-content {
   }
 }
 
-div.course-wrapper.closed section.course-content div.video-subtitles {
+div.course-wrapper.closed section.course-content div.video {
   ol.subtitles {
     max-height: 577px;
   }
