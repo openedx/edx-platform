@@ -1,3 +1,4 @@
+import json
 import logging
 
 from lxml import etree
@@ -138,8 +139,6 @@ def render_x_module(user, request, xml_module, module_object_preload):
 
     # Grab content
     content = instance.get_html()
-    init_js = instance.get_init_js()
-    destory_js = instance.get_destroy_js()
 
     # special extra information about each problem, only for users who are staff 
     if user.is_staff:
@@ -147,14 +146,10 @@ def render_x_module(user, request, xml_module, module_object_preload):
         render_histogram = len(histogram) > 0
         content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
                                                                      'module_id' : module_id,
+                                                                     'histogram': json.dumps(histogram),
                                                                      'render_histogram' : render_histogram})
-        if render_histogram:
-            init_js = init_js+render_to_string("staff_problem_histogram.js", {'histogram' : histogram,
-                                                                              'module_id' : module_id})
-        
-    content = {'content':content, 
-               "destroy_js":destory_js,
-               'init_js':init_js, 
+
+    content = {'content':content,
                'type':module_type}
 
     return content

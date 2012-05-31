@@ -2,10 +2,10 @@ describe 'FeedbackForm', ->
   beforeEach ->
     loadFixtures 'feedback_form.html'
 
-  describe 'bind', ->
+  describe 'constructor', ->
     beforeEach ->
-      FeedbackForm.bind()
-      spyOn($, 'post').andCallFake (url, data, callback, format) ->
+      new FeedbackForm
+      spyOn($, 'postWithPrefix').andCallFake (url, data, callback, format) ->
         callback()
 
     it 'binds to the #feedback_button', ->
@@ -16,7 +16,7 @@ describe 'FeedbackForm', ->
       $('#feedback_message').val 'This site is really good.'
       $('#feedback_button').click()
 
-      expect($.post).toHaveBeenCalledWith '/send_feedback', {
+      expect($.postWithPrefix).toHaveBeenCalledWith '/send_feedback', {
         subject: 'Awesome!'
         message: 'This site is really good.'
         url: window.location.href
