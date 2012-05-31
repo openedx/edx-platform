@@ -1,6 +1,7 @@
 <%page args="grade_summary, grade_cutoffs, graph_div_id, **kwargs"/>
 <%!
   import json
+  import math
 %>
 
 $(function () {
@@ -89,7 +90,7 @@ $(function () {
   ticks += [ [overviewBarX, "Total"] ]
   tickIndex += 1 + sectionSpacer
   
-  totalScore = grade_summary['percent']
+  totalScore = math.floor(grade_summary['percent'] * 100) / 100 #We floor it to the nearest percent, 80.9 won't show up like a 90 (an A)
   detail_tooltips['Dropped Scores'] = dropped_score_tooltips
   
   
