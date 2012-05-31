@@ -110,7 +110,7 @@ $(function() {
                                 "rationale":rationale},
                function(data){
           if(data.success){
-          $("#apply_name_change").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail when approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
+          $("#survey").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail when approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
           } else {
             $("#change_name_error").html(data.error);
           }
@@ -122,12 +122,38 @@ $(function() {
     });
     
     
+    /*
+    There is a fieldset, #survey_fieldset, which contains an exit survey. This exist survey can be taken by iteself,
+    or as part of the certificate request. If they haven't taken the survey yet, it moves to the open modal dialogue.
+    Once it has been taken, it should dissapear.
+    */
+    $("a.cert_request_link").click(function(){
+      //If they haven't taken the survey yet, we move it to the certificate request form
+      if ($("#survey_fieldset").length>0) {
+        $("#cert_request_survey_holder").prepend( $("#survey_fieldset") );
+      }
+    });
+    $("a.survey_link").click(function(){
+      // They survey may have been "stolen" away to the certificate request form
+      if ($("#survey_fieldset").length>0) {
+        $("#survey_survey_holder").prepend( $("#survey_fieldset") );
+      }
+    });
+    
     $("#cert_request_form").submit(function(){
       var values = {'cert_request_verify' : $("#cert_request_verify").is(':checked'),
                     'cert_request_email': $("#cert_request_email").val() };
       
       postJSON('/certificate_request', values, function(data) {
         if (data.success) {
+          
+          //Now we move the survey_survey_holder back to a safer container, and submit the survey
+          if ($("#survey_fieldset").length>0) {
+            $("#survey_survey_holder").prepend( $("#survey_fieldset").remove() );
+            
+            $("#survey_form").submit();
+          }
+          
           $("#cert_request").html("<h1>Certificate Request Received</h1><p>A certificate will be sent to the specified email in a short time.</p>");
         } else {
           $("#cert_request_error").html(data.error);
@@ -138,7 +164,33 @@ $(function() {
       //                          "old_email":"${email}",
       //                          "new_email":new_email});
       return false;
+    });    
+    
+    $("#survey_form").submit(function(){
+      var values = {'survey_future_classes' : $("#survey_future_classes").is(':checked'),
+                    'survey_future_offerings' : $("#survey_future_offerings").is(':checked'),
+                    'survey_6002x_updates' : $("#survey_6002x_updates").is(':checked'), };
+      
+      postJSON('/record_exit_survey', values, function(data) {
+        if (true || data.success) {
+          $("#survey").html("<h1>Survey Response Recorded</h1><p>Thank you for filling out the survey!</p>");
+          
+          //Make sure that the survey fieldset is removed
+          $("#survey_fieldset").remove();
+          
+          //Remove the links to take the survey
+          $(".survey_offer").hide();
+        } else {
+          $("#survey_error").html(data.error);
+        }
+      });
+      //TODO: What do I log here?
+      // log_event("profile", {"type":"email_change_request", 
+      //                          "old_email":"${email}",
+      //                          "new_email":new_email});
+      return false;
     });
+    
     
 });
 </script>
@@ -160,16 +212,22 @@ $(function() {
           <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
           
           %if not certificate_requested:
-            <a rel="leanModal" class="cert_request" href="#cert_request">Request Certificate</a>
+            <a rel="leanModal" class="cert_request_link" href="#cert_request">Request Certificate</a>
           %elif certificate_download_url:
-            <a class="cert_request" href="${certificate_download_url}">Download Certificate</a>
+            <a href="${certificate_download_url}">Download Certificate</a>
           %else:
-            <a class="cert_request" href="#">Certificate is being generated...</a>
+            <a href="#">Certificate is being generated...</a>
           %endif
         %else:
           <p> No letter grade has been earned for this course </p>
         %endif
       </div>
+      
+      %if not took_survey:
+      <div class="survey_offer">
+      Take the <a class="survey_link" rel="leanModal" href="#survey">survey</a>.
+      </div>
+      %endif
 
       <div id="grade-detail-graph"></div>
 
@@ -352,8 +410,9 @@ $(function() {
   <p>The certificate will indicate that <strong>${name}</strong> has successfully completed the Fall 2012 offering of <strong>Circuits and Electronics 6.002x</strong>. Please ensure that this is correct.</p>
   
   <form id="cert_request_form">
-    <div id="cert_request_error"> </div>
     <fieldset>
+      <div id="cert_request_error"> </div>
+      
       <ul>
         <li class="verify">
           <input type="checkbox" id="cert_request_verify"/>
@@ -363,43 +422,49 @@ $(function() {
           <label> Please enter the email address to send the certificate to: </label>
           <input id="cert_request_email" type="email" value="${email}" />
         </li>
-        <li>
-          <input type="submit" id="" value="Send Certificate" />
-        </li>
       </ul>
     </fieldset>
+    
+    <div id="cert_request_survey_holder"> </div>
+    
+    <input type="submit" id="" value="Send Certificate" />
+    
   </form>
 </div>
 %endif
 
+%if not took_survey:
 <div id="survey" class="leanModal_box">
-  <h1>6.002x Student Survey</h1>
-  <p>Please take this short survey about 6.002x.</p>
-  
   <form id="survey_form">
-    <div id="survey_error"> </div>
-    <fieldset>
-      <ul>
-        <li>
-          <input type="checkbox" id="survey_future_classes"/>
-          <label> Please inform me of future classes offered by edX.</label>
-        </li>
-        <li>
-          <input type="checkbox" id="survey_future_offerings"/>
-          <label> Please inform me of opportunities to help with future offerings of 6.002x, such as staffing discussiong forums or developing content. </label>
-        </li>
-        <li>
-          <input type="checkbox" id="survey_6002x_updates"/>
-          <label> Please subscribe me to periodic updates about additional topics, refreshers, and follow-ups for topics in 6.002x. </label>
-        </li>
-        
-        <li>
-          <input type="submit" id="" value="Record Survey Response" />
-        </li>
-      </ul>
-    </fieldset>
+    <h1>6.002x Student Survey</h1>
+    
+    <div id="survey_survey_holder">    
+      <fieldset id="survey_fieldset">
+        <p>Please take this short survey about 6.002x.</p>
+            
+        <div id="survey_error"> </div>
+        <ul>
+          <li>
+            <input type="checkbox" id="survey_future_classes"/>
+            <label> Please inform me of future classes offered by edX.</label>
+          </li>
+          <li>
+            <input type="checkbox" id="survey_future_offerings"/>
+            <label> Please inform me of opportunities to help with future offerings of 6.002x, such as staffing discussiong forums or developing content. </label>
+          </li>
+          <li>
+            <input type="checkbox" id="survey_6002x_updates"/>
+            <label> Please subscribe me to periodic updates about additional topics, refreshers, and follow-ups for topics in 6.002x. </label>
+          </li>
+        </ul>
+      </fieldset>
+    </div>
+    
+    <input type="submit" id="" value="Record Survey Response" />
+    
   </form>
 </div>
+%endif
 
 
 

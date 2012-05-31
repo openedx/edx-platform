@@ -40,6 +40,9 @@ urlpatterns = ('',
     url(r'^send_feedback$', 'util.views.send_feedback'),
 )
 
+if True: # settings.END_COURSE_ENABLED:
+    urlpatterns += (url(r'^record_exit_survey$','student.views.record_exit_survey'),)
+
 if settings.PERFSTATS:
    urlpatterns=urlpatterns + (url(r'^reprofile$','perfstats.views.end_profile'),)
 

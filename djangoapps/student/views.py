@@ -456,3 +456,36 @@ def accept_name_change(request):
     pnc.delete()
 
     return HttpResponse(json.dumps({'success':True})) 
+    
+    
+    
+@login_required
+def record_exit_survey(request):
+    if request.method != "POST":
+        raise Http404
+    
+    default_responses = {
+        'survey_future_classes' : 'false',
+        'survey_future_offerings' : 'false',
+        'survey_6002x_updates' : 'false'
+    }
+    
+    response = { key : request.POST.get(key, default) for key,default in default_responses.items() }
+    
+    up = UserProfile.objects.get(user=request.user)
+    
+    meta = up.get_meta()
+    if '6002x_exit_response' in meta:
+        # Once we got a response, we don't show them the survey form again, so this is a really odd case anyway
+        return HttpResponse(json.dumps({'success':False, 'error':'You have already submitted a survey.'})) 
+        
+    else:
+        meta['6002x_exit_response'] = response
+        up.set_meta(meta)
+        up.save()
+        return HttpResponse(json.dumps({'success':True})) 
+    
+def student_took_survey(userprofile):
+    meta = userprofile.get_meta()
+    
+    return '6002x_exit_response' in meta

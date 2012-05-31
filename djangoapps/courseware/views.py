@@ -24,6 +24,7 @@ from module_render import render_module, modx_dispatch
 from certificates.models import GeneratedCertificate
 from models import StudentModule
 from student.models import UserProfile
+from student.views import student_took_survey
 
 import courseware.content_parser as content_parser
 import courseware.modules.capa_module
@@ -73,6 +74,8 @@ def profile(request, student_id = None):
     
     grade_sheet = grades.grade_sheet(student)
     
+    took_survey = student_took_survey(user_info)
+    
     generated_certificate = None
     certificate_download_url = None
     certificate_requested = False
@@ -97,6 +100,7 @@ def profile(request, student_id = None):
              'grade_sheet' : grade_sheet,
              'certificate_requested' : certificate_requested,
              'certificate_download_url' : certificate_download_url,
+             'took_survey' : took_survey,
              }
 
     return render_to_response('profile.html', context)
