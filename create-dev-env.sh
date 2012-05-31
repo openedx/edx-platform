@@ -41,7 +41,7 @@ RUBY_VER="1.9.3"
 NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 LOG="/var/tmp/install.log"
-BREW_PKGS="readline sqlite gdbm pkg-config gfortran mercurial python yuicompressor node"
+BREW_PKGS="$BASE/mit/brew-formulas.txt"
 APT_PKGS="curl git mercurial python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript"
 
 if [[ $EUID -eq 0 ]]; then
@@ -92,6 +92,10 @@ cat<<EO
 
   To compile scipy and numpy from source use the -c option
 
+  STDOUT is redirected to /var/tmp/install.log, run
+  $ tail -f /var/tmp/install.log
+  to monitor progress
+
 EO
 info
 output "Press return to begin or control-C to abort"
@@ -131,7 +135,7 @@ case `uname -s` in
         } 
         output "Installing OSX requirements"
         # brew errors if the package is already installed
-        for pkg in $BREW_PKGS; do
+        for pkg in $(cat $BREW_PKGS); do
             grep $pkg <(brew list) &>/dev/null || {
                 output "Installing $pkg"
                 brew install $pkg  >>$LOG 
@@ -151,16 +155,7 @@ case `uname -s` in
         exit 1
         ;;
 esac
-output "Installing rvm and ruby"
-curl -sL get.rvm.io | bash -s stable
-source $RUBY_DIR/scripts/rvm
-rvm install $RUBY_VER
-virtualenv "$PYTHON_DIR"
-source $PYTHON_DIR/bin/activate
-output "Installing ruby packages"
-gem install --version '0.8.3' rake
-gem install --version '3.1.15' sass
-gem install --version '1.3.6' bourbon
+
 cd "$BASE"
 output "Cloning mitx, askbot and data repos"
 if [[ -d "$BASE/mitx" ]]; then
@@ -175,6 +170,21 @@ if [[ -d "$BASE/data" ]]; then
     mv "$BASE/data" "${BASE}/data.bak.$$"
 fi
 hg clone ssh://hg-content@gp.mitx.mit.edu/data >>$LOG 
+
+
+output "Installing rvm and ruby"
+curl -sL get.rvm.io | bash -s stable
+source $RUBY_DIR/scripts/rvm
+rvm install $RUBY_VER
+virtualenv "$PYTHON_DIR"
+source $PYTHON_DIR/bin/activate
+output "Installing gem bundler"
+gem install bundler
+output "Installing ruby packages"
+cd $BASE/mitx
+bundle install
+
+cd $BASE
 
 if [[ -n $compile ]]; then
     output "Downloading numpy and scipy"
