@@ -78,25 +78,6 @@ class XModule(object):
         '''
         return "Unimplemented"
 
-    # TODO: 
-    # def get_header_js(self):
-    #     ''' Filename of common js that needs to be included in the header
-    #     '''
-    #     raise NotImplementedError
-
-    def get_init_js(self):
-        ''' JavaScript code to be run when problem is shown. Be aware
-        that this may happen several times on the same page
-        (e.g. student switching tabs). Common functions should be put
-        in the main course .js files for now. ''' 
-        return ""
-
-    def get_destroy_js(self):
-        ''' JavaScript called to destroy the problem (e.g. when a user switches to a different tab). 
-            We make an attempt, but not a promise, to call this when the user closes the web page. 
-        '''
-        return ""
-
     def handle_ajax(self, dispatch, get):
         ''' dispatch is last part of the URL. 
             get is a dictionary-like object ''' 
