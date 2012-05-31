@@ -3,7 +3,6 @@ sqlite
 gdbm 
 pkg-config 
 gfortran 
-mercurial 
 python 
 yuicompressor 
 node
