@@ -127,7 +127,7 @@ case `uname -s` in
     Darwin)
         command -v brew &>/dev/null || { 
             output "Installing brew"
-            /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)" >>$LOG 
+            /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)" 
         } 
         output "Installing OSX requirements"
         # brew errors if the package is already installed
