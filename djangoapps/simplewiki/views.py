@@ -210,6 +210,9 @@ def history(request, wiki_url, page=1):
     history = Revision.objects.filter(article__exact = article).order_by('-counter').select_related('previous_revision__counter', 'revision_user', 'wiki_article')
     
     if request.method == 'POST':
+        if wiki_settings.WIKI_REQUIRE_LOGIN_EDIT and not request.user.is_authenticated():
+            return HttpResponseRedirect('/')
+
         if request.POST.__contains__('revision'): #They selected a version, but they can be either deleting or changing the version
             perm_err = check_permissions(request, article, check_write=True, check_locked=True)
             if perm_err:
