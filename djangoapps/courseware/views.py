@@ -88,15 +88,19 @@ def profile(request, student_id = None):
     
     if settings.END_COURSE_ENABLED:
         took_survey = student_took_survey(user_info)
-    
-        generated_certificate = None
-        certificate_download_url = None
+        
+        # certificate_requested determines if the student has requested a certificate
         certificate_requested = False
+        # certificate_download_url determines if the certificate has been generated
+        certificate_download_url = None
+        
         if grade_sheet['grade']:
             try:
                 generated_certificate = GeneratedCertificate.objects.get(user = student)
-                certificate_requested = True
-                certificate_download_url = generated_certificate.download_url
+                #If enabled=False, it may have been pre-generated but not yet requested
+                if generated_certificate.enabled: 
+                    certificate_requested = True
+                    certificate_download_url = generated_certificate.download_url
             except GeneratedCertificate.DoesNotExist:
                 #They haven't submited the request form
                 certificate_requested = False

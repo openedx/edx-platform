@@ -156,6 +156,7 @@ $(function() {
           }
           
           $("#cert_request").html("<h1>Certificate Request Received</h1><p>A certificate will be sent to the specified email in a short time.</p>");
+          $(".cert_request_link").text("Certificate is being generated...");
         } else {
           $("#cert_request_error").html(data.error);
         }
@@ -216,7 +217,7 @@ $(function() {
           %if not certificate_requested:
             <a rel="leanModal" class="cert_request_link" href="#cert_request">Request Certificate</a>
           %elif certificate_download_url:
-            <a href="${certificate_download_url}">Download Certificate</a>
+            <a href="${certificate_download_url}" target="_blank">Download Certificate</a>
           %else:
             <a href="#">Certificate is being generated...</a>
           %endif

@@ -50,16 +50,20 @@ def certificate_request(request):
                                         'error': error }))
 
 
-# TODO: This method should be executed as an asynchronous task
+# This method should only be called if the user has a grade and has requested a certificate
 def generate_certificate(user, grade, destination_email):
+    # Make sure to see the comments in models.GeneratedCertificate to read about the valid
+    # states for a GeneratedCertificate object
     generated_certificate = None
     
     try:
         generated_certificate = GeneratedCertificate.objects.get(user = user)
     except GeneratedCertificate.DoesNotExist:
         generated_certificate = GeneratedCertificate(user = user, certificate_id = uuid.uuid4().hex)
-        generated_certificate.save()
-        
+
+    generated_certificate.enabled = True
+    generated_certificate.save()
+    
     certificate_id = generated_certificate.certificate_id
     
     log.debug("Generating certificate for " + str(user.username) + " with ID: " + certificate_id)
