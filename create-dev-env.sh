@@ -1,6 +1,21 @@
 #!/bin/bash
 set -e
+trap "ouch" ERR
 
+ouch() {
+    printf '\E[31m'
+
+    cat<<EOL
+    
+    !! ERROR !!
+
+    The last command did not complete successfully, 
+    see $LOG for more details or trying running the
+    script again with the -v flag.  
+
+EOL
+
+}
 error() {
       printf '\E[31m'; echo "$@"; printf '\E[0m' 
 }
@@ -31,7 +46,24 @@ info() {
 EO
 }
 
-
+clone_repos() {
+    cd "$BASE"
+    output "Cloning mitx"
+    if [[ -d "$BASE/mitx" ]]; then
+        mv "$BASE/mitx" "${BASE}/mitx.bak.$$"
+    fi
+    git clone git@github.com:MITx/mitx.git >>$LOG 
+    output "Cloning askbot-devel"
+    if [[ -d "$BASE/askbot-devel" ]]; then
+        mv "$BASE/askbot-devel" "${BASE}/askbot-devel.bak.$$"
+    fi
+    git clone git@github.com:MITx/askbot-devel >>$LOG 
+    output "Cloning data"
+    if [[ -d "$BASE/data" ]]; then
+        mv "$BASE/data" "${BASE}/data.bak.$$"
+    fi
+    hg clone ssh://hg-content@gp.mitx.mit.edu/data >>$LOG 
+}
 
 PROG=${0##*/}
 BASE="$HOME/mitx_all"
@@ -40,8 +72,8 @@ RUBY_DIR="$BASE/ruby"
 RUBY_VER="1.9.3"
 NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
+BREW_FILE="$BASE/mitx/brew-formulas.txt"
 LOG="/var/tmp/install.log"
-BREW_PKGS="$BASE/mit/brew-formulas.txt"
 APT_PKGS="curl git mercurial python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript"
 
 if [[ $EUID -eq 0 ]]; then
@@ -49,7 +81,6 @@ if [[ $EUID -eq 0 ]]; then
     usage
     exit 1
 fi
-
 ARGS=$(getopt "cvh" "$*")
 if [[ $? != 0 ]]; then
     usage
@@ -121,11 +152,12 @@ case `uname -s` in
                 output "Installing ubuntu requirements"
                 sudo apt-get -y update
                 sudo apt-get -y install $APT_PKGS 
+                clone_repos
                 ;;
             *)
                 error "Unsupported distribution - $distro"
                 exit 1
-                ;;
+               ;;
         esac
         ;;
     Darwin)
@@ -133,9 +165,24 @@ case `uname -s` in
             output "Installing brew"
             /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)" 
         } 
+        command -v git &>/dev/null || {
+            output "Installing git"
+            brew install git >> $LOG
+        }
+        command -v hg &>/dev/null || {
+            output "Installaing mercurial"
+            brew install mercurial >> $LOG
+        }
+
+        clone_repos
+
         output "Installing OSX requirements"
+        if [[ ! -r $BREW_FILE ]]; then
+            error "$BREW_FILE does not exist, needed to install brew deps"
+            exit 1
+        fi
         # brew errors if the package is already installed
-        for pkg in $(cat $BREW_PKGS); do
+        for pkg in $(cat $BREW_FILE); do
             grep $pkg <(brew list) &>/dev/null || {
                 output "Installing $pkg"
                 brew install $pkg  >>$LOG 
@@ -156,22 +203,6 @@ case `uname -s` in
         ;;
 esac
 
-cd "$BASE"
-output "Cloning mitx, askbot and data repos"
-if [[ -d "$BASE/mitx" ]]; then
-    mv "$BASE/mitx" "${BASE}/mitx.bak.$$"
-fi
-git clone git@github.com:MITx/mitx.git >>$LOG 
-if [[ -d "$BASE/askbot-devel" ]]; then
-    mv "$BASE/askbot-devel" "${BASE}/askbot-devel.bak.$$"
-fi
-git clone git@github.com:MITx/askbot-devel >>$LOG 
-if [[ -d "$BASE/data" ]]; then
-    mv "$BASE/data" "${BASE}/data.bak.$$"
-fi
-hg clone ssh://hg-content@gp.mitx.mit.edu/data >>$LOG 
-
-
 output "Installing rvm and ruby"
 curl -sL get.rvm.io | bash -s stable
 source $RUBY_DIR/scripts/rvm
@@ -181,7 +212,8 @@ source $PYTHON_DIR/bin/activate
 output "Installing gem bundler"
 gem install bundler
 output "Installing ruby packages"
-cd $BASE/mitx
+# hack :(
+cd $BASE/mitx  || true
 bundle install
 
 cd $BASE
