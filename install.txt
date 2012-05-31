@@ -1,0 +1,74 @@
+This document describes how to set up the MITx development environment
+for both Linux (Ubuntu) and MacOS (OSX Lion). 
+
+There is also a script "create-dev-env.sh" that automates these steps.
+
+1) Make an mitx_all directory and clone the repos
+  (download and install git and mercurial if you don't have them already)
+
+    mkdir ~/mitx_all
+    cd ~/mitx_all
+    git clone git@github.com:MITx/mitx.git
+    git clone git@github.com:MITx/askbot-devel 
+    hg clone ssh://hg-content@gp.mitx.mit.edu/data 
+
+2) Install OSX dependencies (Mac users only)
+
+    a) Install the brew utility if necessary
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)"
+
+    b) Install the brew package list
+    cat ~/mitx_all/mitx/brew-formulas.txt | xargs brew install
+
+    c) Install python pip if necessary
+    sudo easy_install pip  
+
+    d) Install python virtualenv if necessary
+    sudo pip install virtualenv virtualenvwrapper
+
+3) Install Ubuntu dependencies (Linux users only)
+    
+    sudo apt-get install curl python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript
+
+
+4) Install rvm, ruby, and libraries
+
+    echo "export rvm_path=$HOME/mitx_all/ruby" > $HOME/.rvmrc
+    curl -sL get.rvm.io | bash -s stable
+    source ~/mitx_all/ruby/scripts/rvm
+    rvm install 1.9.3
+    gem install bundler
+    cd ~/mitx_all/mitx
+    bundle install
+   
+5) Install python libraries
+    
+    source ~/mitx_all/python/bin/activate
+    cd ~/mitx_all
+    pip install -r askbot-devel/askbot_requirements.txt 
+    pip install -r askbot-devel/askbot_requirements_dev.txt 
+    pip install -r mitx/pre-requirements.txt 
+    pip install -r mitx/requirements.txt 
+
+6) Create log and db dirs
+
+    mkdir ~/mitx_all/log
+    mkdir ~/mitx_all/db
+
+7) Start the dev server
+
+   To start using Django you will need
+   to activate the local Python and Ruby
+   environment:
+
+        $ source ~/mitx_all/ruby/scripts/rvm
+        $ source ~/mitx_all/python/bin/activate
+  
+   To initialize and start a local instance of Django:
+        
+        $ cd ~/mitx_all/mitx
+        $ django-admin.py syncdb --settings=envs.dev --pythonpath=.
+        $ django-admin.py migrate --settings=envs.dev --pythonpath=.
+        $ django-admin.py runserver --settings=envs.dev --pythonpath=.   
+ 
+
