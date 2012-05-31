@@ -88,9 +88,7 @@ def grade_sheet(student):
     grade_summary = grader.grade(totaled_scores)
     
     letter_grade = grade_for_percentage(grade_summary['percent'])
-    
-    _log.debug("Final grade: " + str(letter_grade))
-    
+        
     return {'courseware_summary' : chapters,
             'grade_summary' : grade_summary,
             'grade' : letter_grade}

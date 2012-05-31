@@ -8,6 +8,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf

@@ -20,6 +20,7 @@ from django_future.csrf import ensure_csrf_cookie
 
 from lxml import etree
 
+from courseware import course_settings
 from module_render import render_module, modx_dispatch
 from certificates.models import GeneratedCertificate
 from models import StudentModule
@@ -218,51 +219,6 @@ def index(request, course="6.002 Spring 2012", chapter="Using the System", secti
 
     result = render_to_response('courseware.html', context)
     return result
-
-def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic view for extensions. '''
-    if not request.user.is_authenticated():
-        return redirect('/')
-
-    # Grab the student information for the module from the database
-    s = StudentModule.objects.filter(student=request.user, 
-                                     module_id=id)
-    #s = StudentModule.get_with_caching(request.user, id)
-    if len(s) == 0 or s is None:
-        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
-        raise Http404
-    s = s[0]
-
-    oldgrade = s.grade
-    oldstate = s.state
-
-    dispatch=dispatch.split('?')[0]
-
-    ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
-
-    # Grab the XML corresponding to the request from course.xml
-    xml = content_parser.module_xml(request.user, module, 'id', id)
-
-    # Create the module
-    system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = None, 
-                       ajax_url = ajax_url,
-                       filestore = None
-                       )
-    instance=courseware.modules.get_module_class(module)(system, 
-                                                         xml, 
-                                                         id, 
-                                                         state=oldstate)
-    # Let the module handle the AJAX
-    ajax_return=instance.handle_ajax(dispatch, request.POST)
-    # Save the state back to the database
-    s.state=instance.get_state()
-    if instance.get_score(): 
-        s.grade=instance.get_score()['score']
-    if s.grade != oldgrade or s.state != oldstate:
-        s.save()
-    # Return whatever the module wanted to return to the client/caller
-    return HttpResponse(ajax_return)
     
 def certificate_request(request):
     ''' Attempt to send a certificate. '''
