@@ -79,37 +79,10 @@
   </section>
 </section>
 
-  <div id="enroll" class="leanModal_box" name="enroll"><%include file="create_account.html" /></div>
-
 <script>
 $(function() {
 
     // TODO: Clean up as per http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
-
-    /* Handles when the user hits 'enroll'. Grabs form data. Does AJAX.
-            Either shows error, or shows success. */
-
-    $('form#enroll_form').submit(function(e) {
-      e.preventDefault();
-      var submit_data={};
-      $.each($("[id^=ca_]"), function(index,value){
-        submit_data[value.name]=value.value;
-      });
-      $.each($("[id^=cb_]"), function(index,value){
-        submit_data[value.name]=value.checked;
-      });
-
-        postJSON('/create_account',
-           submit_data,
-           function(json) {
-               if(json.success) {
-                  $('#enroll').html(json.value);
-               } else {
-                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
-               }
-             }
-        );
-    });
 
     /* Activate stupid spinner drop-downs in enrollment form */
     var spinner_array=$("[id^=spinner_]");
