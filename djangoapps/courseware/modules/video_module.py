@@ -9,6 +9,9 @@ from x_module import XModule
 
 log = logging.getLogger("mitx.courseware.modules")
 
+class ModuleDescriptor(XModuleDescriptor):
+    pass
+
 class Module(XModule):
     id_attribute = 'youtube'
     video_time = 0

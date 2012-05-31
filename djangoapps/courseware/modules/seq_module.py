@@ -10,6 +10,9 @@ from x_module import XModule
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
 
+class ModuleDescriptor(XModuleDescriptor):
+    pass
+
 class Module(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -66,8 +69,7 @@ class Module(XModule):
         self.titles = json.dumps(["\n".join([i.get("name").strip() for i in e.iter() if i.get("name") != None]) \
                            for e in self.xmltree])
 
-        self.contents = [j(self.render_function(e)) \
-                             for e in self.xmltree]
+        self.contents = self.rendered_children(self)
 
         print self.titles
 

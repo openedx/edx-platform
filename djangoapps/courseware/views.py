@@ -16,7 +16,7 @@ from django.views.decorators.cache import cache_control
 
 from lxml import etree
 
-from module_render import render_module, make_track_function, I4xSystem
+from module_render import render_module, make_track_function, I4xSystem, modx_dispatch
 from models import StudentModule
 from student.models import UserProfile
 from util.views import accepts
@@ -236,78 +236,6 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     result = render_to_response('courseware.html', context)
     return result
 
-
-def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic view for extensions. '''
-    if not request.user.is_authenticated():
-        return redirect('/')
-
-    # Grab the student information for the module from the database
-    s = StudentModule.objects.filter(student=request.user, 
-                                     module_id=id)
-    #s = StudentModule.get_with_caching(request.user, id)
-    if len(s) == 0 or s is None:
-        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
-        raise Http404
-    s = s[0]
-
-    oldgrade = s.grade
-    oldstate = s.state
-
-    dispatch=dispatch.split('?')[0]
-
-    ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
-
-    # get coursename if stored
-    coursename = multicourse_settings.get_coursename_from_request(request)
-
-    if coursename and settings.ENABLE_MULTICOURSE:
-        xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
-        data_root = settings.DATA_DIR + xp
-    else:
-        data_root = settings.DATA_DIR
-
-    # Grab the XML corresponding to the request from course.xml
-    try:
-        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
-    except:
-        log.exception("Unable to load module during ajax call")
-        if accepts(request, 'text/html'):
-            return render_to_response("module-error.html", {})
-        else:
-            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
-        return response
-
-    # Create the module
-    system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = None, 
-                       ajax_url = ajax_url,
-                       filestore = OSFS(data_root),
-                       )
-
-    try:
-        instance=courseware.modules.get_module_class(module)(system, 
-                                                             xml, 
-                                                             id, 
-                                                             state=oldstate)
-    except:
-        log.exception("Unable to load module instance during ajax call")
-        if accepts(request, 'text/html'):
-            return render_to_response("module-error.html", {})
-        else:
-            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
-        return response
-
-    # Let the module handle the AJAX
-    ajax_return=instance.handle_ajax(dispatch, request.POST)
-    # Save the state back to the database
-    s.state=instance.get_state()
-    if instance.get_score(): 
-        s.grade=instance.get_score()['score']
-    if s.grade != oldgrade or s.state != oldstate:
-        s.save()
-    # Return whatever the module wanted to return to the client/caller
-    return HttpResponse(ajax_return)
 
 def quickedit(request, id=None):
     '''

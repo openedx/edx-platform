@@ -31,6 +31,9 @@ class ComplexEncoder(json.JSONEncoder):
             return "{real:.7g}{imag:+.7g}*j".format(real = obj.real,imag = obj.imag)
         return json.JSONEncoder.default(self, obj)
 
+class ModuleDescriptor(XModuleDescriptor):
+    pass
+
 class Module(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
     meant to be refactored out, but it seems to be serving a useful
