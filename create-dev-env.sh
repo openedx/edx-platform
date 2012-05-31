@@ -196,6 +196,11 @@ case `uname -s` in
             output "Installing virtualenv"
             sudo pip install virtualenv virtualenvwrapper >> $LOG
         }
+        command -v coffee &>/dev/null || {
+            output "Installing coffee script"
+            curl http://npmjs.org/install.sh | sh
+            npm install -g coffee-script
+        }
         ;;
     *)
         error "Unsupported platform"
