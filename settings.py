@@ -5,6 +5,9 @@ import tempfile
 
 import djcelery
 
+# Enables certificate requests and the exit survey
+END_COURSE_ENABLED = False
+
 # from settings2.askbotsettings import LIVESETTINGS_OPTIONS
 DEFAULT_GROUPS = []
 

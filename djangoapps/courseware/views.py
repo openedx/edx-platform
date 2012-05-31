@@ -74,21 +74,6 @@ def profile(request, student_id = None):
     
     grade_sheet = grades.grade_sheet(student)
     
-    took_survey = student_took_survey(user_info)
-    
-    generated_certificate = None
-    certificate_download_url = None
-    certificate_requested = False
-    if grade_sheet['grade']:
-        try:
-            generated_certificate = GeneratedCertificate.objects.get(user = student)
-            certificate_requested = True
-            certificate_download_url = generated_certificate.download_url
-        except GeneratedCertificate.DoesNotExist:
-            #They haven't submited the request form
-            certificate_requested = False
-    
-
     context={'name':user_info.name,
              'username':student.username,
              'location':user_info.location,
@@ -98,10 +83,27 @@ def profile(request, student_id = None):
              'csrf':csrf(request)['csrf_token'],
              'grade_cutoffs' : course_settings.GRADE_CUTOFFS,
              'grade_sheet' : grade_sheet,
-             'certificate_requested' : certificate_requested,
-             'certificate_download_url' : certificate_download_url,
-             'took_survey' : took_survey,
              }
+    
+    
+    if settings.END_COURSE_ENABLED:
+        took_survey = student_took_survey(user_info)
+    
+        generated_certificate = None
+        certificate_download_url = None
+        certificate_requested = False
+        if grade_sheet['grade']:
+            try:
+                generated_certificate = GeneratedCertificate.objects.get(user = student)
+                certificate_requested = True
+                certificate_download_url = generated_certificate.download_url
+            except GeneratedCertificate.DoesNotExist:
+                #They haven't submited the request form
+                certificate_requested = False
+            
+        context.update({'certificate_requested' : certificate_requested,
+                 'certificate_download_url' : certificate_download_url,
+                 'took_survey' : took_survey})
 
     return render_to_response('profile.html', context)
 

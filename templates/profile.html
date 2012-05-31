@@ -5,6 +5,7 @@
 
 <%!
     from django.core.urlresolvers import reverse
+    from django.conf import settings
 %>
 
 <%block name="headextra">
@@ -121,7 +122,7 @@ $(function() {
        return false;
     });
     
-    
+    %if settings.END_COURSE_ENABLED:
     /*
     There is a fieldset, #survey_fieldset, which contains an exit survey. This exist survey can be taken by iteself,
     or as part of the certificate request. If they haven't taken the survey yet, it moves to the open modal dialogue.
@@ -190,7 +191,7 @@ $(function() {
       //                          "new_email":new_email});
       return false;
     });
-    
+    %endif
     
 });
 </script>
@@ -206,7 +207,8 @@ $(function() {
       <header>
         <h1>Course Progress</h1>
       </header>
-
+      
+      %if settings.END_COURSE_ENABLED:
       <div id="grade">
         %if grade_sheet['grade']:
           <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
@@ -227,6 +229,8 @@ $(function() {
       <div class="survey_offer">
       Take the <a class="survey_link" rel="leanModal" href="#survey">survey</a>.
       </div>
+      %endif
+      
       %endif
 
       <div id="grade-detail-graph"></div>

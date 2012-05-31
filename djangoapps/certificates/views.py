@@ -2,6 +2,7 @@ import json
 import logging
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from mitxmako.shortcuts import render_to_response
@@ -16,7 +17,7 @@ log = logging.getLogger("mitx.certificates")
 @login_required
 def certificate_request(request):
     ''' Attempt to send a certificate. '''
-    if request.method != "POST":
+    if request.method != "POST" or not settings.END_COURSE_ENABLED:
         raise Http404
     
     verification_checked = request.POST.get('cert_request_verify', 'false')

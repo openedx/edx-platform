@@ -15,7 +15,6 @@ urlpatterns = ('',
     url(r'^accept_name_change$', 'student.views.accept_name_change'),
     url(r'^reject_name_change$', 'student.views.reject_name_change'),
     url(r'^pending_name_changes$', 'student.views.pending_name_changes'),
-    url(r'^certificate_request$', 'certificates.views.certificate_request'),
     url(r'^gradebook$', 'courseware.views.gradebook'),
     url(r'^event$', 'track.views.user_track'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),
@@ -40,8 +39,11 @@ urlpatterns = ('',
     url(r'^send_feedback$', 'util.views.send_feedback'),
 )
 
-if True: # settings.END_COURSE_ENABLED:
-    urlpatterns += (url(r'^record_exit_survey$','student.views.record_exit_survey'),)
+if settings.END_COURSE_ENABLED:
+    urlpatterns += (
+        url(r'^certificate_request$', 'certificates.views.certificate_request'),
+        url(r'^record_exit_survey$','student.views.record_exit_survey'),
+    )
 
 if settings.PERFSTATS:
    urlpatterns=urlpatterns + (url(r'^reprofile$','perfstats.views.end_profile'),)

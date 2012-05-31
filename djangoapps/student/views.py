@@ -461,7 +461,7 @@ def accept_name_change(request):
     
 @login_required
 def record_exit_survey(request):
-    if request.method != "POST":
+    if request.method != "POST" or not settings.END_COURSE_ENABLED:
         raise Http404
     
     default_responses = {
