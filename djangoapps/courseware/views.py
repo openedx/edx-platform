@@ -16,6 +16,7 @@ from django.views.decorators.cache import cache_control
 from lxml import etree
 
 from module_render import render_x_module, make_track_function, I4xSystem
+from module_render import modx_dispatch #Note that this is not used in this file, but urls refers to courseware.views.modx_dispatch
 from models import StudentModule
 from student.models import UserProfile
 from multicourse import multicourse_settings
