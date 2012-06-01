@@ -202,7 +202,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
         module = etree.XML(etree.tostring(module_wrapper[0])) # Copy the element out of the tree
 
     module_ids = []
-    if module:
+    if module is not None:
         module_ids = module.xpath("//@id", 
                                   course=course, chapter=chapter, section=section)
 
