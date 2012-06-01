@@ -1,9 +1,9 @@
 class @VideoProgressSlider
   constructor: (@player) ->
-    @buildSlider()
-    @buildHandle()
+    @buildSlider() unless onTouchBasedDevice()
     $(@player).bind('updatePlayTime', @onUpdatePlayTime)
     $(@player).bind('ready', @onReady)
+    $(@player).bind('play', @onPlay)
 
   $: (selector) ->
     @player.$(selector)
@@ -14,6 +14,7 @@ class @VideoProgressSlider
       change: @onChange
       slide: @onSlide
       stop: @onStop
+    @buildHandle()
 
   buildHandle: ->
     @handle = @$('.ui-slider-handle')
@@ -30,10 +31,13 @@ class @VideoProgressSlider
         widget: true
 
   onReady: =>
-    @slider.slider('option', 'max', @player.duration())
+    @slider.slider('option', 'max', @player.duration()) if @slider
+
+  onPlay: =>
+    @buildSlider() unless @slider
 
   onUpdatePlayTime: (event, currentTime) =>
-    if !@frozen
+    if @slider && !@frozen
       @slider.slider('option', 'max', @player.duration())
       @slider.slider('value', currentTime)
 
