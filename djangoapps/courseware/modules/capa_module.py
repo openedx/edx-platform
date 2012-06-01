@@ -100,7 +100,7 @@ class Module(XModule):
             reset_button = False
 
         # We don't need a "save" button if infinite number of attempts and non-randomized
-        if self.max_attempts == None and self.rerandomize != "always":
+        if self.max_attempts is None and self.rerandomize != "always":
             save_button = False
 
         # Check if explanation is available, and if so, give a link
@@ -225,7 +225,7 @@ class Module(XModule):
         ''' Is the student still allowed to submit answers? '''
         if self.attempts == self.max_attempts:
             return True
-        if self.close_date != None and datetime.datetime.utcnow() > self.close_date:
+        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
             return True
 
         return False

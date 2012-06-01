@@ -12,6 +12,8 @@ $ ->
   window.onTouchBasedDevice = ->
     navigator.userAgent.match /iPhone|iPod|iPad/i
 
+  $('body').addClass 'touch-based-device' if onTouchBasedDevice()
+
   $("a[rel*=leanModal]").leanModal()
   $('#csrfmiddlewaretoken').attr 'value', $.cookie('csrftoken')
 
