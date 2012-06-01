@@ -16,7 +16,7 @@ from django.views.decorators.cache import cache_control
 
 from lxml import etree
 
-from module_render import render_module, make_track_function, I4xSystem, modx_dispatch
+from module_render import render_x_module, make_track_function, I4xSystem
 from models import StudentModule
 from student.models import UserProfile
 from util.views import accepts
@@ -129,7 +129,7 @@ def render_section(request, section):
         module_object_preload = []
     
     try:
-        module = render_module(user, request, dom, module_object_preload)
+        module = render_x_module(user, request, dom, module_object_preload)
     except:
         log.exception("Unable to load module")
         context.update({
@@ -219,7 +219,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     }
 
     try:
-        module = render_module(user, request, module, module_object_preload)
+        module = render_x_module(user, request, module, module_object_preload)
     except:
         log.exception("Unable to load module")
         context.update({
