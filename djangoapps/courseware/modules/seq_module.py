@@ -41,11 +41,9 @@ class Module(XModule):
         if self.rendered:
             return
         def j(m):
-            ''' jsonify contents so it can be embedded in a js array
-            We also need to split </script> tags so they don't break
-            mid-string'''
-            content=json.dumps(m['content'])
-            content=content.replace('</script>', '<"+"/script>')
+            ''' Split </script> tags -- browsers handle this as end
+            of script, even if it occurs mid-string'''
+            content=m['content'].replace('</script>', '<"+"/script>')
 
             return {'content':content,
                     'type': m['type']}
@@ -75,13 +73,6 @@ class Module(XModule):
                 'position': self.position,
                 'titles':titles,
                 'tag':self.xmltree.tag}
-
-        # TODO/BUG: Destroy JavaScript should only be called for the active view
-        # This calls it for all the views
-        # 
-        # To fix this, we'd probably want to have some way of assigning unique
-        # IDs to sequences. 
-        destroy_js="".join([e['destroy_js'] for e in self.contents if 'destroy_js' in e])
 
         if self.xmltree.tag in ['sequential', 'videosequence']:
             self.content=render_to_string('seq_module.html',params)
