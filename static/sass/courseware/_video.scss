@@ -137,6 +137,7 @@ section.course-content {
             float: left;
             margin-bottom: 0;
 
+
             a {
               border-bottom: none;
               border-right: 1px solid #000;
@@ -146,9 +147,14 @@ section.course-content {
               line-height: 46px;
               padding: 0 lh(.75);
               text-indent: -9999px;
-              @include transition();
+              @include transition(background-color, opacity);
               width: 14px;
               background: url('../images/vcr.png') 15px 15px no-repeat;
+
+              &:empty {
+                height: 46px;
+                background: url('../images/vcr.png') 15px 15px no-repeat;
+              }
 
               &.play {
                 background-position: 17px -114px;
