@@ -1,16 +1,8 @@
-import StringIO
 import datetime
 import dateutil
 import dateutil.parser
 import json
 import logging
-import math
-import numpy
-import os
-import random
-import scipy
-import struct
-import sys
 import traceback
 
 from lxml import etree
@@ -21,7 +13,6 @@ from mitxmako.shortcuts import render_to_string
 from x_module import XModule, XModuleDescriptor
 from capa.capa_problem import LoncapaProblem, StudentInputError
 import courseware.content_parser as content_parser
-from multicourse import multicourse_settings
 
 log = logging.getLogger("mitx.courseware")
 
