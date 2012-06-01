@@ -48,21 +48,45 @@ EO
 
 clone_repos() {
     cd "$BASE"
-    output "Cloning mitx"
-    if [[ -d "$BASE/mitx" ]]; then
-        mv "$BASE/mitx" "${BASE}/mitx.bak.$$"
-    fi
-    git clone git@github.com:MITx/mitx.git >>$LOG 
-    output "Cloning askbot-devel"
-    if [[ -d "$BASE/askbot-devel" ]]; then
-        mv "$BASE/askbot-devel" "${BASE}/askbot-devel.bak.$$"
-    fi
-    git clone git@github.com:MITx/askbot-devel >>$LOG 
-    output "Cloning data"
-    if [[ -d "$BASE/data" ]]; then
-        mv "$BASE/data" "${BASE}/data.bak.$$"
-    fi
-    hg clone ssh://hg-content@gp.mitx.mit.edu/data >>$LOG 
+	
+    if [[ -d "$BASE/mitx/.git" ]]; then
+	    output "Pulling mitx"
+	    cd "$BASE/mitx"
+		git pull >>$LOG
+	else
+	    output "Cloning mitx"
+	    if [[ -d "$BASE/mitx" ]]; then
+	        mv "$BASE/mitx" "${BASE}/mitx.bak.$$"
+	    fi
+	    git clone git@github.com:MITx/mitx.git >>$LOG 
+	fi
+	
+	cd "$BASE"
+	if [[ -d "$BASE/askbot-devel/.git" ]]; then
+	    output "Pulling askbot-devel"
+		cd "$BASE/askbot-devel"
+		git pull >>$LOG
+	else
+	    output "Cloning askbot-devel"
+	    if [[ -d "$BASE/askbot-devel" ]]; then
+	        mv "$BASE/askbot-devel" "${BASE}/askbot-devel.bak.$$"
+	    fi
+	    git clone git@github.com:MITx/askbot-devel >>$LOG 
+	fi
+	
+	cd "$BASE"
+    if [[ -d "$BASE/data/.hg" ]]; then
+	    output "Pulling data"
+		cd "$BASE/data"
+		hg pull >>$LOG
+		hg update >>$LOG
+	else
+	    output "Cloning data"
+	    if [[ -d "$BASE/data" ]]; then
+	        mv "$BASE/data" "${BASE}/data.bak.$$"
+	    fi
+	    hg clone ssh://hg-content@gp.mitx.mit.edu/data >>$LOG 
+	fi
 }
 
 PROG=${0##*/}
