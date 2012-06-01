@@ -10,7 +10,9 @@ class @VideoSpeedControl
     $(@player).bind('speedChange', @onSpeedChange)
     @$('.video_speeds a').click @changeVideoSpeed
     if onTouchBasedDevice()
-      @$('.speeds').click -> $(this).toggleClass('open')
+      @$('.speeds').click (event) ->
+        event.preventDefault()
+        $(this).toggleClass('open')
     else
       @$('.speeds').mouseenter ->
         $(this).addClass('open')
