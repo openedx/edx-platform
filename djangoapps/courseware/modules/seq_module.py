@@ -51,7 +51,7 @@ class Module(XModule):
         ## Returns a set of all types of all sub-children
         child_classes = [set([i.tag for i in e.iter()]) for e in self.xmltree]
 
-        titles = ["\n".join([i.get("name").strip() for i in e.iter() if i.get("name") != None]) \
+        titles = ["\n".join([i.get("name").strip() for i in e.iter() if i.get("name") is not None]) \
                        for e in self.xmltree]
 
         self.contents = [j(self.render_function(e)) for e in self.xmltree]
@@ -91,7 +91,7 @@ class Module(XModule):
 
         self.position = 1
 
-        if state != None:
+        if state is not None:
             state = json.loads(state)
             if 'position' in state: self.position = int(state['position'])
 

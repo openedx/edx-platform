@@ -109,7 +109,7 @@ class MultipleChoiceResponse(GenericResponse):
             if rtype not in ["MultipleChoice"]:
                 response.set("type", "MultipleChoice")		# force choicegroup to be MultipleChoice if not valid
             for choice in list(response):
-                if choice.get("name") == None:
+                if choice.get("name") is None:
                     choice.set("name", "choice_"+str(i))
                     i+=1
                 else:
@@ -121,7 +121,7 @@ class TrueFalseResponse(MultipleChoiceResponse):
         for response in self.xml.xpath("choicegroup"):
             response.set("type", "TrueFalse")
             for choice in list(response):
-                if choice.get("name") == None:
+                if choice.get("name") is None:
                     choice.set("name", "choice_"+str(i))
                     i+=1
                 else:
@@ -292,7 +292,7 @@ def sympy_check2():
                 self.code = ''
             else:
                 answer_src = answer.get('src')
-                if answer_src != None:
+                if answer_src is not None:
                     self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
                 else:
                     self.code = answer.text
@@ -418,7 +418,7 @@ class ExternalResponse(GenericResponse):
                            id=xml.get('id'))[0]
 
         answer_src = answer.get('src')
-        if answer_src != None:
+        if answer_src is not None:
             self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
         else:
             self.code = answer.text
@@ -489,7 +489,7 @@ class FormulaResponse(GenericResponse):
 
         self.context = context
         ts = xml.get('type')
-        if ts == None:
+        if ts is None:
             typeslist = []
         else:
             typeslist = ts.split(',')
@@ -558,7 +558,7 @@ class SchematicResponse(GenericResponse):
         answer = xml.xpath('//*[@id=$id]//answer',
                            id=xml.get('id'))[0]
         answer_src = answer.get('src')
-        if answer_src != None:
+        if answer_src is not None:
             self.code = self.system.filestore.open('src/'+answer_src).read() # Untested; never used
         else:
             self.code = answer.text

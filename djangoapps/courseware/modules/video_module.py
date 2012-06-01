@@ -47,7 +47,7 @@ class Module(XModule):
         self.youtube = xmltree.get('youtube')
         self.name = xmltree.get('name')
         self.position = 0
-        if state != None:
+        if state is not None:
             state = json.loads(state)
             if 'position' in state:
                 self.position = int(float(state['position']))
