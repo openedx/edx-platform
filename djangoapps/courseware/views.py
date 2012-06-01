@@ -57,7 +57,7 @@ def profile(request, student_id = None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
 
-    if student_id == None:
+    if student_id is None:
         student = request.user
     else: 
         if 'course_admin' not in content_parser.user_groups(request.user):
@@ -194,7 +194,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     else:
         module_wrapper = dom_module[0]
 
-    if module_wrapper == None:
+    if module_wrapper is None:
         module = None
     elif module_wrapper.get("src"):
         module = content_parser.section_file(user=user, section=module_wrapper.get("src"), coursename=course)
