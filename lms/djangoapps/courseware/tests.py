@@ -10,9 +10,9 @@ import os
 
 import numpy
 
-import courseware.modules
-import courseware.capa.calc as calc
-import courseware.capa.capa_problem as lcp
+import xmodule
+import capa.calc as calc
+import capa.capa_problem as lcp
 import courseware.graders as graders
 from courseware.graders import Score, CourseGrader, WeightedSubsectionsGrader, SingleSectionGrader, AssignmentFormatGrader
 from courseware.grades import aggregate_scores
@@ -41,10 +41,10 @@ class ModelsTest(unittest.TestCase):
         pass
 
     def test_get_module_class(self):
-        vc = courseware.modules.get_module_class('video')
-        vc_str = "<class 'courseware.modules.video_module.Module'>"
+        vc = xmodule.get_module_class('video')
+        vc_str = "<class 'xmodule.video_module.Module'>"
         self.assertEqual(str(vc), vc_str)
-        video_id = courseware.modules.get_default_ids()['video']
+        video_id = xmodule.get_default_ids()['video']
         self.assertEqual(video_id, 'youtube')
 
     def test_calc(self):

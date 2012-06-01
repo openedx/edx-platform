@@ -25,6 +25,7 @@ try: # This lets us do __name__ == ='__main__'
     from mitxmako.shortcuts import render_to_string
     from util.cache import cache
     from multicourse import multicourse_settings
+    import xmodule
 except: 
     print "Could not import/content_parser"
     settings = None 
@@ -103,8 +104,7 @@ def item(l, default="", process=lambda x:x):
 
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
-    import courseware.modules
-    default_ids = courseware.modules.get_default_ids()
+    default_ids = xmodule.get_default_ids()
 
     # Tag elements with unique IDs
     elements = course.xpath("|".join(['//'+c for c in default_ids]))
@@ -166,11 +166,20 @@ def user_groups(user):
 
     # return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
 
+def replace_custom_tags(tree):
+    tags = os.listdir(settings.DATA_DIR+'/custom_tags')
+    for tag in tags:
+        for element in tree.iter(tag):
+            element.tag = 'customtag'
+            impl = etree.SubElement(element, 'impl')
+            impl.text = tag
+
 def course_xml_process(tree):
     ''' Do basic pre-processing of an XML tree. Assign IDs to all
     items without. Propagate due dates, grace periods, etc. to child
     items. 
     '''
+    replace_custom_tags(tree)
     id_tag(tree)
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")

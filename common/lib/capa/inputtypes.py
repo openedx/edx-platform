@@ -25,9 +25,6 @@ Each input type takes the xml tree as 'element', the previous answer as 'value',
 import re
 import shlex # for splitting quoted strings
 
-from django.conf import settings
-
-from lxml.etree import Element
 from lxml import etree
 
 from mitxmako.shortcuts import render_to_string
@@ -166,8 +163,6 @@ def optioninput(element, value, status, msg=''):
 
     # osetdict = dict([('option_%s_%s' % (eid,x),oset[x]) for x in range(len(oset)) ])	# make dict with IDs
     osetdict = dict([(oset[x],oset[x]) for x in range(len(oset)) ])	# make dict with key,value same
-    if settings.DEBUG:
-        print '[courseware.capa.inputtypes.optioninput] osetdict=',osetdict
     
     context={'id':eid,
              'value':value,
@@ -383,7 +378,5 @@ def imageinput(element, value, status, msg=''):
         'state' : status,	# to change
         'msg': msg,			# to change
         }
-    if settings.DEBUG:
-        print '[courseware.capa.inputtypes.imageinput] context=',context
     html=render_to_string("imageinput.html", context)
     return etree.XML(html)

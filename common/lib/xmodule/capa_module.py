@@ -19,7 +19,7 @@ from lxml import etree
 from mitxmako.shortcuts import render_to_string
 
 from x_module import XModule, XModuleDescriptor
-from courseware.capa.capa_problem import LoncapaProblem, StudentInputError
+from capa.capa_problem import LoncapaProblem, StudentInputError
 import courseware.content_parser as content_parser
 from multicourse import multicourse_settings
 

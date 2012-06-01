@@ -47,6 +47,7 @@ GENERATE_PROFILE_SCORES = False
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname() # /mitx/lms
+COMMON_ROOT = PROJECT_ROOT.dirname() / "common"
 ENV_ROOT = PROJECT_ROOT.dirname().dirname() # virtualenv dir /mitx is in
 ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
 COURSES_ROOT = ENV_ROOT / "data"
@@ -59,6 +60,7 @@ sys.path.append(ASKBOT_ROOT)
 sys.path.append(ASKBOT_ROOT / "askbot" / "deps")
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
+sys.path.append(COMMON_ROOT / 'lib')
 
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako

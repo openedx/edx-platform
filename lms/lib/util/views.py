@@ -11,14 +11,14 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 
-import courseware.capa.calc
+import capa.calc
 import track.views
 
 def calculate(request):
     ''' Calculator in footer of every page. '''
     equation = request.GET['equation']
     try: 
-        result = courseware.capa.calc.evaluator({}, {}, equation)
+        result = capa.calc.evaluator({}, {}, equation)
     except:
         event = {'error':map(str,sys.exc_info()),
                  'equation':equation}
