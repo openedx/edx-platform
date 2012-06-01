@@ -161,10 +161,7 @@ $(function() {
           $("#cert_request_error").html(data.error);
         }
       });
-      //TODO: What do I log here?
-      // log_event("profile", {"type":"email_change_request", 
-      //                          "old_email":"${email}",
-      //                          "new_email":new_email});
+      log_event("certificate_request", values);
       return false;
     });    
     
@@ -186,10 +183,7 @@ $(function() {
           $("#survey_error").html(data.error);
         }
       });
-      //TODO: What do I log here?
-      // log_event("profile", {"type":"email_change_request", 
-      //                          "old_email":"${email}",
-      //                          "new_email":new_email});
+      log_event("exit_survey_submission", values);
       return false;
     });
     %endif
