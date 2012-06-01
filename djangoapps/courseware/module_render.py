@@ -128,14 +128,14 @@ def get_module(user, request, xml_module, module_object_preload):
         smod.save()
         module_object_preload.append(smod)
 
-    return smod
+    return (instance, smod)
 
 def render_x_module(user, request, xml_module, module_object_preload):
     ''' Generic module for extensions. This renders to HTML. '''
-    if module==None :
+    if xml_module==None :
         return {"content":""}
 
-    smod = get_module(user, request, xml_module, module_object_preload)
+    (instance, smod) = get_module(user, request, xml_module, module_object_preload)
 
     # Grab content
     content = instance.get_html()
