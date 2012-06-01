@@ -25,7 +25,7 @@ import glob2
 import djcelery
 from path import path
 
-from envs.askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
+from .askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
@@ -46,8 +46,8 @@ DEFAULT_GROUPS = []
 GENERATE_PROFILE_SCORES = False
 
 ############################# SET PATH INFORMATION #############################
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname() # /mitxweb
-ENV_ROOT = PROJECT_ROOT.dirname() # virtualenv dir /mitxweb is in
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname() # /mitx/lms
+ENV_ROOT = PROJECT_ROOT.dirname().dirname() # virtualenv dir /mitx is in
 ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
 COURSES_ROOT = ENV_ROOT / "data"
 
@@ -114,8 +114,6 @@ COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
 COURSE_TITLE = "Circuits and Electronics"
 
-ROOT_URLCONF = 'urls'
-
 ### Dark code. Should be enabled in local settings for devel. 
 
 ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
@@ -140,7 +138,7 @@ TEMPLATE_DEBUG = False
 SITE_ID = 1
 SITE_NAME = "localhost:8000"
 HTTPS = 'on'
-ROOT_URLCONF = 'mitx.urls'
+ROOT_URLCONF = 'mitx.lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
@@ -287,7 +285,7 @@ PIPELINE_CSS = {
 
 PIPELINE_JS = {
     'application': {
-        'source_filenames': [pth.replace('static/', '') for pth in glob2.glob('static/coffee/src/**/*.coffee')],
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
         'output_filename': 'js/application.js'
     },
     'spec': {

@@ -59,12 +59,17 @@ task :test => REPORT_DIR do
     sh("#{django_admin} test --settings=envs.test --pythonpath=. $(ls djangoapps)")
 end
 
-desc "Start a local server with the specified environment (defaults to dev). Other useful environments are devplus (for dev testing with a real local database)"
-task :runserver, [:env] => [] do |t, args|
+desc <<-desc
+    Start the lms locally with the specified environment (defaults to dev).
+    Other useful environments are devplus (for dev testing with a real local database)
+    desc
+task :lms, [:env] => [] do |t, args|
     args.with_defaults(:env => 'dev')
     django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    sh("#{django_admin} runserver --settings=envs.#{args.env} --pythonpath=.")
+    sh("#{django_admin} runserver --settings=lms.envs.#{args.env} --pythonpath=.")
 end
+
+task :runserver => :lms
 
 task :package do
     FileUtils.mkdir_p(BUILD_DIR)

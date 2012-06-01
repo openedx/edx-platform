@@ -1,1 +1,0 @@
-../../../data/js/schematic.js
