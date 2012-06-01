@@ -40,15 +40,6 @@ class Module(XModule):
     def render(self):
         if self.rendered:
             return
-        def j(m):
-            ''' Split </script> tags -- browsers handle this as end
-            of script, even if it occurs mid-string'''
-            content=m['content'].replace('</script>', '<"+"/script>')
-
-            return {'content':content,
-                    'type': m['type']}
-
-
         ## Returns a set of all types of all sub-children
         child_classes = [set([i.tag for i in e.iter()]) for e in self.xmltree]
 
@@ -56,7 +47,6 @@ class Module(XModule):
                        for e in self.xmltree]
 
         self.contents = self.rendered_children()
-        self.contents = [j(m) for m in self.contents]
 
         for contents, title in zip(self.contents, titles):
             contents['title'] = title
@@ -68,7 +58,10 @@ class Module(XModule):
                     new_class = c
             content['type'] = new_class
 
-        params={'items':self.contents,
+        # Split </script> tags -- browsers handle this as end
+        # of script, even if it occurs mid-string. Do this after json.dumps()ing
+        # so that we can be sure of the quotations being used
+        params={'items':json.dumps(self.contents).replace('</script>', '<"+"/script>'),
                 'id':self.item_id,
                 'position': self.position,
                 'titles':titles,
