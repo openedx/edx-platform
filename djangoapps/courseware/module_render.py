@@ -18,6 +18,7 @@ from models import StudentModule
 from multicourse import multicourse_settings
 
 import courseware.modules
+import courseware.content_parser as content_parser
 
 log = logging.getLogger("mitx.courseware")
 
@@ -128,14 +129,14 @@ def get_module(user, request, xml_module, module_object_preload):
         smod.save()
         module_object_preload.append(smod)
 
-    return (instance, smod)
+    return (instance, smod, module_type)
 
 def render_x_module(user, request, xml_module, module_object_preload):
     ''' Generic module for extensions. This renders to HTML. '''
     if xml_module==None :
         return {"content":""}
 
-    (instance, smod) = get_module(user, request, xml_module, module_object_preload)
+    (instance, smod, module_type) = get_module(user, request, xml_module, module_object_preload)
 
     # Grab content
     content = instance.get_html()
