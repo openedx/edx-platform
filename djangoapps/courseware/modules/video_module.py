@@ -5,9 +5,12 @@ from lxml import etree
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 
-from x_module import XModule
+from x_module import XModule, XModuleDescriptor
 
 log = logging.getLogger("mitx.courseware.modules")
+
+class ModuleDescriptor(XModuleDescriptor):
+    pass
 
 class Module(XModule):
     id_attribute = 'youtube'

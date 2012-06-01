@@ -18,6 +18,7 @@ from models import StudentModule
 from multicourse import multicourse_settings
 
 import courseware.modules
+import courseware.content_parser as content_parser
 
 log = logging.getLogger("mitx.courseware")
 
@@ -79,9 +80,8 @@ def grade_histogram(module_id):
         return []
     return grades
 
-def render_x_module(user, request, xml_module, module_object_preload):
-    ''' Generic module for extensions. This renders to HTML. '''
-    # Check if problem has an instance in DB
+
+def get_module(user, request, xml_module, module_object_preload):
     module_type=xml_module.tag
     module_class=courseware.modules.get_module_class(module_type)
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
@@ -110,7 +110,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module_type+'/'+module_id+'/'
     
     system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = lambda x: render_module(user, request, x, module_object_preload), 
+                       render_function = lambda x: render_x_module(user, request, x, module_object_preload), 
                        ajax_url = ajax_url,
                        filestore = OSFS(data_root),
                        )
@@ -129,6 +129,15 @@ def render_x_module(user, request, xml_module, module_object_preload):
         smod.save()
         module_object_preload.append(smod)
 
+    return (instance, smod, module_type)
+
+def render_x_module(user, request, xml_module, module_object_preload):
+    ''' Generic module for extensions. This renders to HTML. '''
+    if xml_module==None :
+        return {"content":""}
+
+    (instance, smod, module_type) = get_module(user, request, xml_module, module_object_preload)
+
     # Grab content
     content = instance.get_html()
 
@@ -146,8 +155,76 @@ def render_x_module(user, request, xml_module, module_object_preload):
 
     return content
 
-def render_module(user, request, module, module_object_preload):
-    ''' Generic dispatch for internal modules. '''
-    if module==None :
-        return {"content":""}
-    return render_x_module(user, request, module, module_object_preload)
+
+def modx_dispatch(request, module=None, dispatch=None, id=None):
+    ''' Generic view for extensions. '''
+    if not request.user.is_authenticated():
+        return redirect('/')
+
+    # Grab the student information for the module from the database
+    s = StudentModule.objects.filter(student=request.user, 
+                                     module_id=id)
+    #s = StudentModule.get_with_caching(request.user, id)
+    if len(s) == 0 or s is None:
+        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
+        raise Http404
+    s = s[0]
+
+    oldgrade = s.grade
+    oldstate = s.state
+
+    dispatch=dispatch.split('?')[0]
+
+    ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
+
+    # get coursename if stored
+    coursename = multicourse_settings.get_coursename_from_request(request)
+
+    if coursename and settings.ENABLE_MULTICOURSE:
+        xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+        data_root = settings.DATA_DIR + xp
+    else:
+        data_root = settings.DATA_DIR
+
+    # Grab the XML corresponding to the request from course.xml
+    try:
+        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
+    except:
+        log.exception("Unable to load module during ajax call")
+        if accepts(request, 'text/html'):
+            return render_to_response("module-error.html", {})
+        else:
+            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
+        return response
+
+    # Create the module
+    system = I4xSystem(track_function = make_track_function(request), 
+                       render_function = None, 
+                       ajax_url = ajax_url,
+                       filestore = OSFS(data_root),
+                       )
+
+    try:
+        instance=courseware.modules.get_module_class(module)(system, 
+                                                             xml, 
+                                                             id, 
+                                                             state=oldstate)
+    except:
+        log.exception("Unable to load module instance during ajax call")
+        if accepts(request, 'text/html'):
+            return render_to_response("module-error.html", {})
+        else:
+            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
+        return response
+
+    # Let the module handle the AJAX
+    ajax_return=instance.handle_ajax(dispatch, request.POST)
+    # Save the state back to the database
+    s.state=instance.get_state()
+    if instance.get_score(): 
+        s.grade=instance.get_score()['score']
+    if s.grade != oldgrade or s.state != oldstate:
+        s.save()
+    # Return whatever the module wanted to return to the client/caller
+    return HttpResponse(ajax_return)
+

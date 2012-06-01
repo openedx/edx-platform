@@ -1,3 +1,5 @@
+from lxml import etree
+
 import courseware.progress
 
 def dummy_track(event_type, event):
@@ -24,6 +26,21 @@ class XModule(object):
             or a CAPA input type '''
         return ['xmodule']
 
+    def get_name():
+        name = self.__xmltree.get(name)
+        if name: 
+            return name
+        else: 
+            raise "We should iterate through children and find a default name"
+
+    def rendered_children(self):
+        '''
+        Render all children. 
+        This really ought to return a list of xmodules, instead of dictionaries
+        '''
+        children = [self.render_function(e) for e in self.__xmltree]
+        return children            
+
     def __init__(self, system = None, xml = None, item_id = None, 
                  json = None, track_url=None, state=None):
         ''' In most cases, you must pass state or xml'''
@@ -38,6 +55,8 @@ class XModule(object):
         self.json = json
         self.item_id = item_id
         self.state = state
+        
+        self.__xmltree = etree.fromstring(xml) # PRIVATE
 
         if system: 
             ## These are temporary; we really should go 
@@ -83,14 +102,24 @@ class XModule(object):
             get is a dictionary-like object ''' 
         return ""
 
-    ### Functions used in the CMS
+
+class XModuleDescriptor(object):
+    def __init__(self, xml = None, json = None):
+        if not xml and not json:
+            raise "XModuleDescriptor must be initalized with XML or JSON"
+        if not xml:
+            raise NotImplementedError("Code does not have support for JSON yet")
+        
+        self.xml = xml
+        self.json = json
+
     def get_xml(self):
         ''' For conversions between JSON and legacy XML representations.
         '''
         if self.xml: 
             return self.xml
         else: 
-            raise NotImplementedError
+            raise NotImplementedError("JSON->XML Translation not implemented")
 
     def get_json(self):
         ''' For conversions between JSON and legacy XML representations.
@@ -99,14 +128,14 @@ class XModule(object):
             raise NotImplementedError
             return self.json # TODO: Return context as well -- files, etc. 
         else: 
-            raise NotImplementedError
+            raise NotImplementedError("XML->JSON Translation not implemented")
 
-    def handle_cms_json(self):
-        raise NotImplementedError
+    #def handle_cms_json(self):
+    #    raise NotImplementedError
 
-    def render(self, size):
-        ''' Size: [thumbnail, small, full] 
-        Small ==> what we drag around
-        Full ==> what we edit
-        '''
-        raise NotImplementedError
+    #def render(self, size):
+    #    ''' Size: [thumbnail, small, full] 
+    #    Small ==> what we drag around
+    #    Full ==> what we edit
+    #    '''
+    #    raise NotImplementedError
