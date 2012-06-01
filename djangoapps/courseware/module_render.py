@@ -34,7 +34,7 @@ class I4xSystem(object):
         else:
             self.filestore = filestore
             if settings.DEBUG:
-                print "[courseware.module_render.I4xSystem] filestore path = %s" % filestore
+                log.info("[courseware.module_render.I4xSystem] filestore path = %s" % filestore)
         self.render_function = render_function
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
