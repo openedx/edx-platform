@@ -18,7 +18,7 @@ from lxml import etree
 ## TODO: Abstract out from Django
 from mitxmako.shortcuts import render_to_string
 
-from x_module import XModule
+from x_module import XModule, XModuleDescriptor
 from courseware.capa.capa_problem import LoncapaProblem, StudentInputError
 import courseware.content_parser as content_parser
 from multicourse import multicourse_settings
@@ -30,6 +30,9 @@ class ComplexEncoder(json.JSONEncoder):
         if isinstance(obj, complex):
             return "{real:.7g}{imag:+.7g}*j".format(real = obj.real,imag = obj.imag)
         return json.JSONEncoder.default(self, obj)
+
+class ModuleDescriptor(XModuleDescriptor):
+    pass
 
 class Module(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
