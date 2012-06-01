@@ -58,6 +58,7 @@ class Module(XModule):
                        for e in self.xmltree]
 
         self.contents = self.rendered_children()
+        self.contents = [j(m) for m in self.contents]
 
         for contents, title in zip(self.contents, titles):
             contents['title'] = title
