@@ -3,34 +3,51 @@ describe 'VideoProgressSlider', ->
     @player = jasmine.stubVideoPlayer @
 
   describe 'constructor', ->
-    beforeEach ->
-      spyOn($.fn, 'slider').andCallThrough()
-      @slider = new VideoProgressSlider @player
+    describe 'on a non-touch based device', ->
+      beforeEach ->
+        spyOn($.fn, 'slider').andCallThrough()
+        spyOn(window, 'onTouchBasedDevice').andReturn false
+        @slider = new VideoProgressSlider @player
 
-    it 'build the slider', ->
-      expect(@slider.slider).toBe '.slider'
-      expect($.fn.slider).toHaveBeenCalledWith
-        range: 'min'
-        change: @slider.onChange
-        slide: @slider.onSlide
-        stop: @slider.onStop
+      it 'build the slider', ->
+        expect(@slider.slider).toBe '.slider'
+        expect($.fn.slider).toHaveBeenCalledWith
+          range: 'min'
+          change: @slider.onChange
+          slide: @slider.onSlide
+          stop: @slider.onStop
 
-    it 'build the seek handle', ->
-      expect(@slider.handle).toBe '.ui-slider-handle'
-      expect($.fn.qtip).toHaveBeenCalledWith
-        content: "0:00"
-        position:
-          my: 'bottom center'
-          at: 'top center'
-          container: @slider.handle
-        hide:
-          delay: 700
-        style:
-          classes: 'ui-tooltip-slider'
-          widget: true
+      it 'build the seek handle', ->
+        expect(@slider.handle).toBe '.ui-slider-handle'
+        expect($.fn.qtip).toHaveBeenCalledWith
+          content: "0:00"
+          position:
+            my: 'bottom center'
+            at: 'top center'
+            container: @slider.handle
+          hide:
+            delay: 700
+          style:
+            classes: 'ui-tooltip-slider'
+            widget: true
 
-    it 'bind player events', ->
-      expect($(@player)).toHandleWith 'updatePlayTime', @slider.onUpdatePlayTime
+      it 'bind player events', ->
+        expect($(@player)).toHandleWith 'updatePlayTime', @slider.onUpdatePlayTime
+        expect($(@player)).toHandleWith 'ready', @slider.onReady
+        expect($(@player)).toHandleWith 'play', @slider.onPlay
+
+    describe 'on a touch-based device', ->
+      beforeEach ->
+        spyOn($.fn, 'slider').andCallThrough()
+        spyOn(window, 'onTouchBasedDevice').andReturn true
+        @slider = new VideoProgressSlider @player
+
+      it 'does not build the slider', ->
+        expect(@slider.slider).toBeUndefined
+        expect($.fn.slider).not.toHaveBeenCalled()
+
+      it 'bind player events', ->
+        expect($(@player)).toHandleWith 'updatePlayTime', @slider.onUpdatePlayTime
 
   describe 'onReady', ->
     beforeEach ->
@@ -40,6 +57,45 @@ describe 'VideoProgressSlider', ->
 
     it 'set the max value to the length of video', ->
       expect(@slider.slider.slider('option', 'max')).toEqual 120
+
+  describe 'onPlay', ->
+    beforeEach ->
+      @slider = new VideoProgressSlider @player
+      spyOn($.fn, 'slider').andCallThrough()
+
+    describe 'when the slider was already built', ->
+      beforeEach ->
+        @slider.onPlay()
+
+      it 'does not build the slider', ->
+        expect($.fn.slider).not.toHaveBeenCalled
+
+    describe 'when the slider was not already built', ->
+      beforeEach ->
+        @slider.slider = null
+        @slider.onPlay()
+
+      it 'build the slider', ->
+        expect(@slider.slider).toBe '.slider'
+        expect($.fn.slider).toHaveBeenCalledWith
+          range: 'min'
+          change: @slider.onChange
+          slide: @slider.onSlide
+          stop: @slider.onStop
+
+      it 'build the seek handle', ->
+        expect(@slider.handle).toBe '.ui-slider-handle'
+        expect($.fn.qtip).toHaveBeenCalledWith
+          content: "0:00"
+          position:
+            my: 'bottom center'
+            at: 'top center'
+            container: @slider.handle
+          hide:
+            delay: 700
+          style:
+            classes: 'ui-tooltip-slider'
+            widget: true
 
   describe 'onUpdatePlayTime', ->
     beforeEach ->
