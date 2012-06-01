@@ -20,9 +20,9 @@ from module_render import render_x_module, make_track_function, I4xSystem
 from models import StudentModule
 from student.models import UserProfile
 from multicourse import multicourse_settings
+import xmodule
 
 import courseware.content_parser as content_parser
-import courseware.modules
 
 import courseware.grades as grades
 
@@ -288,4 +288,3 @@ def jump_to(request, probname=None):
         position = parent.index(pxml)+1	# position in sequence
         
     return index(request,course=coursename,chapter=chapter,section=section,position=position)
-

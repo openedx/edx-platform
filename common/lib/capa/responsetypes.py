@@ -21,12 +21,11 @@ import abc
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
-from django.conf import settings
 from util import contextualize_text
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	# uses Beautiful Soup!!! FIXME?
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 def compare_with_tolerance(v1, v2, tol):
     ''' Compare v1 to v2 with maximum tolerance tol
@@ -144,8 +143,6 @@ class OptionResponse(GenericResponse):
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.answer_fields = xml.findall('optioninput')
-        if settings.DEBUG:
-            print '[courseware.capa.responsetypes.OR.init] answer_fields=%s' % (self.answer_fields)
         self.context = context
 
     def get_score(self, student_answers):
@@ -274,7 +271,7 @@ def sympy_check2():
             # ie the comparison function is defined in the <script>...</script> stanza instead
             cfn = xml.get('cfn')
             if cfn:
-                if settings.DEBUG: log.info("[courseware.capa.responsetypes] cfn = %s" % cfn)
+                if settings.DEBUG: log.info("cfn = %s" % cfn)
                 if cfn in context:
                     self.code = context[cfn]
                 else:
@@ -779,8 +776,6 @@ class ImageResponse(GenericResponse):
                 correct_map[aid] = 'correct'
             else:
                 correct_map[aid] = 'incorrect'
-        if settings.DEBUG:
-            print "[capamodule.capa.responsetypes.imageinput] correct_map=",correct_map
         return correct_map
 
     def get_answers(self):

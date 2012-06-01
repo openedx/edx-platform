@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 from courseware.content_parser import course_file
 import courseware.module_render
-import courseware.modules
+import xmodule
 
 class Command(BaseCommand):
     help = "Does basic validity tests on course.xml."
@@ -25,7 +25,7 @@ class Command(BaseCommand):
                 check = False
         print "Confirming all modules render. Nothing should print during this step. "
         for module in course.xpath('//problem|//html|//video|//vertical|//sequential|/tab'):
-            module_class = courseware.modules.modx_modules[module.tag]
+            module_class = xmodule.modx_modules[module.tag]
             # TODO: Abstract this out in render_module.py
             try: 
                 module_class(etree.tostring(module), 

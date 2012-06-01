@@ -1,18 +1,6 @@
-import datetime
-import json
-import sys
-
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.context_processors import csrf
-from django.core.mail import send_mail
-from django.http import Http404
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response
 
-import courseware.capa.calc
-import track.views
 from multicourse import multicourse_settings
 
 def mitxhome(request):

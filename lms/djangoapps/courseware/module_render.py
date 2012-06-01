@@ -6,19 +6,18 @@ from lxml import etree
 from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.template import Context
-from django.template import Context, loader
 
 from fs.osfs import OSFS
 
 from django.conf import settings
-from mitxmako.shortcuts import render_to_string
+from mitxmako.shortcuts import render_to_string, render_to_response
 
 from models import StudentModule
 from multicourse import multicourse_settings
+from util.views import accepts
 
-import courseware.modules
 import courseware.content_parser as content_parser
+import xmodule
 
 log = logging.getLogger("mitx.courseware")
 
@@ -90,7 +89,7 @@ def grade_histogram(module_id):
 
 def get_module(user, request, xml_module, module_object_preload, position=None):
     module_type=xml_module.tag
-    module_class=courseware.modules.get_module_class(module_type)
+    module_class=xmodule.get_module_class(module_type)
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
 
     # Grab state from database
@@ -231,7 +230,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
                        )
 
     try:
-        instance=courseware.modules.get_module_class(module)(system, 
+        instance=xmodule.get_module_class(module)(system, 
                                                              xml, 
                                                              id, 
                                                              state=oldstate)

@@ -1,5 +1,5 @@
 #
-# File:   courseware/capa/capa_problem.py
+# File:   capa/capa_problem.py
 #
 '''
 Main module which shows problems (of "capa" type).
@@ -31,7 +31,7 @@ from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, Sc
 import calc
 import eia
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 response_types = {'numericalresponse':NumericalResponse, 
                   'formularesponse':FormulaResponse,
@@ -231,9 +231,8 @@ class LoncapaProblem(object):
             code = unescape(code,XMLESC)
             try:
                 exec code in context, context		# use "context" for global context; thus defs in code are global within code
-            except Exception,err:
-                log.exception("[courseware.capa.capa_problem.extract_context] error %s" % err)
-                log.exception("in doing exec of this code: %s" % code)
+            except Exception:
+                log.exception("Error while execing code: " + code)
         return context
 
     def get_html(self):
@@ -272,9 +271,6 @@ class LoncapaProblem(object):
                 msg = self.correct_map['msg_%s' % problemid]
             else:
                 msg = ''
-
-            #if settings.DEBUG:
-            #    print "[courseware.capa.capa_problem.extract_html] msg = ",msg
 
             # do the rendering
             # This should be broken out into a helper function
