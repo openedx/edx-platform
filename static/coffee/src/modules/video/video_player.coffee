@@ -1,5 +1,8 @@
 class @VideoPlayer
   constructor: (@video) ->
+    # Define a missing constant of Youtube API
+    YT.PlayerState.UNSTARTED = -1
+
     @currentTime = 0
     @element = $("#video_#{@video.id}")
     @render()
@@ -57,7 +60,7 @@ class @VideoPlayer
     switch event.data
       when YT.PlayerState.PLAYING
         $(@).trigger('play')
-      when YT.PlayerState.PAUSED
+      when YT.PlayerState.PAUSED, YT.PlayerState.UNSTARTED
         $(@).trigger('pause')
       when YT.PlayerState.ENDED
         $(@).trigger('ended')
