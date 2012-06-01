@@ -160,7 +160,11 @@ def index(request, course=None, chapter="Using the System", section="Hints",posi
      - course     : coursename (str)
      - chapter    : chapter name (str)
      - section    : section name (str)
-     - position   : position in sequence, ie of <sequential> module (int)
+     - position   : position in module, eg of <sequential> module (str)
+
+    Returns:
+
+     - HTTPresponse
 
     ''' 
     user = request.user
@@ -215,21 +219,6 @@ def index(request, course=None, chapter="Using the System", section="Hints",posi
     else:
         module_object_preload = []
 
-    if position and module and module.tag=='sequential':
-        smod, state = get_state_from_module_object_preload(user, module, module_object_preload)
-        newstate = json.dumps({ 'position':position })
-        if smod:
-            smod.state = newstate
-        elif user.is_authenticated():
-            smod=StudentModule(student=user, 
-                               module_type = module.tag,
-                               module_id= module.get('id'),
-                               state = newstate)
-        smod.save()
-        # now regenerate module_object_preload
-        module_object_preload = list(StudentModule.objects.filter(student=user, 
-                                                                  module_id__in=module_ids))
-
     context = {
         'csrf': csrf(request)['csrf_token'],
         'accordion': render_accordion(request, course, chapter, section),
@@ -237,7 +226,7 @@ def index(request, course=None, chapter="Using the System", section="Hints",posi
     }
 
     try:
-        module = render_module(user, request, module, module_object_preload)	# ugh - shouldn't overload module
+        module_context = render_module(user, request, module, module_object_preload, position)
     except:
         log.exception("Unable to load module")
         context.update({
@@ -247,8 +236,8 @@ def index(request, course=None, chapter="Using the System", section="Hints",posi
         return render_to_response('courseware.html', context)
 
     context.update({
-        'init': module.get('init_js', ''),
-        'content': module['content'],
+        'init': module_context.get('init_js', ''),
+        'content': module_context['content'],
     })
 
     result = render_to_response('courseware.html', context)

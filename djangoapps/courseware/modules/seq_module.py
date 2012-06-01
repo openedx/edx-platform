@@ -113,4 +113,8 @@ class Module(XModule):
             state = json.loads(state)
             if 'position' in state: self.position = int(state['position'])
 
+        # if position is specified in system, then use that instead
+        if system.get('position'):
+            self.position = int(system.get('position'))
+
         self.rendered = False

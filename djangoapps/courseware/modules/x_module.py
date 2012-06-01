@@ -68,6 +68,7 @@ class XModule(object):
         self.xml = xml
         self.item_id = item_id
         self.state = state
+        self.DEBUG = False
 
         if system: 
             ## These are temporary; we really should go 
@@ -76,4 +77,5 @@ class XModule(object):
             self.tracker = system.track_function
             self.filestore = system.filestore
             self.render_function = system.render_function
+            self.DEBUG = system.DEBUG
         self.system = system

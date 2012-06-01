@@ -38,6 +38,11 @@ class I4xSystem(object):
         self.render_function = render_function
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
+
+    def get(self,attr):			# uniform access to attributes (like etree)
+        return self.__dict__.get(attr)
+    def set(self,attr,val):		# uniform access to attributes (like etree)
+        self.__dict__[attr] = val
     def __repr__(self):
         return repr(self.__dict__)
     def __str__(self):
@@ -100,7 +105,7 @@ def get_state_from_module_object_preload(user, xml_module, module_object_preload
     
     return smod, state
 
-def render_x_module(user, request, xml_module, module_object_preload):
+def render_x_module(user, request, xml_module, module_object_preload,position=None):
     ''' Generic module for extensions. This renders to HTML.
 
     modules include sequential, vertical, problem, video, html
@@ -113,6 +118,11 @@ def render_x_module(user, request, xml_module, module_object_preload):
       - request               : current django HTTPrequest
       - xml_module            : lxml etree of xml subtree for the current module
       - module_object_preload : list of StudentModule objects, one of which may match this module type and id
+      - position   	      : extra information from URL for user-specified position within module
+
+    Returns:
+
+      -  dict which is context for HTML rendering of the specified module
 
     '''
     module_type=xml_module.tag
@@ -138,6 +148,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
                        ajax_url = ajax_url,
                        filestore = OSFS(data_root),
                        )
+    system.set('position',position)	# pass URL specified position along to module, through I4xSystem
     instance=module_class(system, 
                           etree.tostring(xml_module), 
                           module_id, 
@@ -176,8 +187,22 @@ def render_x_module(user, request, xml_module, module_object_preload):
 
     return content
 
-def render_module(user, request, module, module_object_preload):
-    ''' Generic dispatch for internal modules. '''
+def render_module(user, request, module, module_object_preload, position=None):
+    ''' Generic dispatch for internal modules.
+
+    Args:
+       
+     - user       : django User
+     - request    : HTTP request
+     - module	  : ElementTree (xml) for this module
+     - module_object_preload : list of StudentModule objects, one of which may match this module type and id
+     - position   : extra information from URL for user-specified position within module
+
+    Returns:
+
+      -  dict which is context for HTML rendering of the specified module
+
+    '''
     if module==None :
         return {"content":""}
-    return render_x_module(user, request, module, module_object_preload)
+    return render_x_module(user, request, module, module_object_preload, position)
