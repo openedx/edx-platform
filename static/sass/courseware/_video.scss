@@ -148,9 +148,10 @@ section.course-content {
               text-indent: -9999px;
               @include transition();
               width: 14px;
+              background: url('../images/vcr.png') 15px 15px no-repeat;
 
               &.play {
-                background: url('../images/play-icon.png') center center no-repeat;
+                background-position: 17px -114px;
 
                 &:hover {
                   background-color: #444;
@@ -158,7 +159,7 @@ section.course-content {
               }
 
               &.pause {
-                background: url('../images/pause-icon.png') center center no-repeat;
+                background-position: 16px -50px;
 
                 &:hover {
                   background-color: #444;
