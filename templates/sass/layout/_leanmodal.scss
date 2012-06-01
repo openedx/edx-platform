@@ -205,6 +205,7 @@ div#pwd_reset {
   }
 }
 
+div#survey,
 div#cert_request,
 div#apply_name_change,
 div#change_email,
@@ -251,10 +252,28 @@ div#feedback_div{
 }
 
 div#cert_request {
-  label {
-    font-weight: bold;
-    margin-bottom: 6px;
-    display: block;
+  fieldset#cert_request_fieldset {
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: block;
+    }
+    
+    li.verify{
+      @include clearfix;
+
+      input {
+        float: left;
+      }
+
+      label {
+        margin-left: 25px;
+      }
+    }
+  }
+  
+  fieldset#survey_fieldset {
+    margin-top: lh();
   }
 
   div#cert_request_error {
@@ -262,17 +281,5 @@ div#cert_request {
     color: $mit-red;
     font-weight: bold;
     margin-bottom: 6px;
-  }
-
-  li.verify {
-    @include clearfix;
-
-    input {
-      float: left;
-    }
-
-    label {
-      margin-left: 25px;
-    }
   }
 }

@@ -920,21 +920,21 @@ div#pwd_reset p {
 div#pwd_reset input[type="email"] {
   margin-bottom: 25.888px; }
 
-div#cert_request, div#apply_name_change, div#change_email, div#unenroll, div#deactivate-account {
+div#survey, div#cert_request, div#apply_name_change, div#change_email, div#unenroll, div#deactivate-account {
   max-width: 700px; }
-div#cert_request ul, div#apply_name_change ul, div#change_email ul, div#unenroll ul, div#deactivate-account ul {
+div#survey ul, div#cert_request ul, div#apply_name_change ul, div#change_email ul, div#unenroll ul, div#deactivate-account ul {
   list-style: none; }
-div#cert_request ul li, div#apply_name_change ul li, div#change_email ul li, div#unenroll ul li, div#deactivate-account ul li {
+div#survey ul li, div#cert_request ul li, div#apply_name_change ul li, div#change_email ul li, div#unenroll ul li, div#deactivate-account ul li {
   margin-bottom: 12.944px; }
-div#cert_request ul li textarea, div#cert_request ul li input[type="email"], div#cert_request ul li input[type="number"], div#cert_request ul li input[type="password"], div#cert_request ul li input[type="search"], div#cert_request ul li input[type="tel"], div#cert_request ul li input[type="text"], div#cert_request ul li input[type="url"], div#cert_request ul li input[type="color"], div#cert_request ul li input[type="date"], div#cert_request ul li input[type="datetime"], div#cert_request ul li input[type="datetime-local"], div#cert_request ul li input[type="month"], div#cert_request ul li input[type="time"], div#cert_request ul li input[type="week"], div#apply_name_change ul li textarea, div#apply_name_change ul li input[type="email"], div#apply_name_change ul li input[type="number"], div#apply_name_change ul li input[type="password"], div#apply_name_change ul li input[type="search"], div#apply_name_change ul li input[type="tel"], div#apply_name_change ul li input[type="text"], div#apply_name_change ul li input[type="url"], div#apply_name_change ul li input[type="color"], div#apply_name_change ul li input[type="date"], div#apply_name_change ul li input[type="datetime"], div#apply_name_change ul li input[type="datetime-local"], div#apply_name_change ul li input[type="month"], div#apply_name_change ul li input[type="time"], div#apply_name_change ul li input[type="week"], div#change_email ul li textarea, div#change_email ul li input[type="email"], div#change_email ul li input[type="number"], div#change_email ul li input[type="password"], div#change_email ul li input[type="search"], div#change_email ul li input[type="tel"], div#change_email ul li input[type="text"], div#change_email ul li input[type="url"], div#change_email ul li input[type="color"], div#change_email ul li input[type="date"], div#change_email ul li input[type="datetime"], div#change_email ul li input[type="datetime-local"], div#change_email ul li input[type="month"], div#change_email ul li input[type="time"], div#change_email ul li input[type="week"], div#unenroll ul li textarea, div#unenroll ul li input[type="email"], div#unenroll ul li input[type="number"], div#unenroll ul li input[type="password"], div#unenroll ul li input[type="search"], div#unenroll ul li input[type="tel"], div#unenroll ul li input[type="text"], div#unenroll ul li input[type="url"], div#unenroll ul li input[type="color"], div#unenroll ul li input[type="date"], div#unenroll ul li input[type="datetime"], div#unenroll ul li input[type="datetime-local"], div#unenroll ul li input[type="month"], div#unenroll ul li input[type="time"], div#unenroll ul li input[type="week"], div#deactivate-account ul li textarea, div#deactivate-account ul li input[type="email"], div#deactivate-account ul li input[type="number"], div#deactivate-account ul li input[type="password"], div#deactivate-account ul li input[type="search"], div#deactivate-account ul li input[type="tel"], div#deactivate-account ul li input[type="text"], div#deactivate-account ul li input[type="url"], div#deactivate-account ul li input[type="color"], div#deactivate-account ul li input[type="date"], div#deactivate-account ul li input[type="datetime"], div#deactivate-account ul li input[type="datetime-local"], div#deactivate-account ul li input[type="month"], div#deactivate-account ul li input[type="time"], div#deactivate-account ul li input[type="week"] {
+div#survey ul li textarea, div#survey ul li input[type="email"], div#survey ul li input[type="number"], div#survey ul li input[type="password"], div#survey ul li input[type="search"], div#survey ul li input[type="tel"], div#survey ul li input[type="text"], div#survey ul li input[type="url"], div#survey ul li input[type="color"], div#survey ul li input[type="date"], div#survey ul li input[type="datetime"], div#survey ul li input[type="datetime-local"], div#survey ul li input[type="month"], div#survey ul li input[type="time"], div#survey ul li input[type="week"], div#cert_request ul li textarea, div#cert_request ul li input[type="email"], div#cert_request ul li input[type="number"], div#cert_request ul li input[type="password"], div#cert_request ul li input[type="search"], div#cert_request ul li input[type="tel"], div#cert_request ul li input[type="text"], div#cert_request ul li input[type="url"], div#cert_request ul li input[type="color"], div#cert_request ul li input[type="date"], div#cert_request ul li input[type="datetime"], div#cert_request ul li input[type="datetime-local"], div#cert_request ul li input[type="month"], div#cert_request ul li input[type="time"], div#cert_request ul li input[type="week"], div#apply_name_change ul li textarea, div#apply_name_change ul li input[type="email"], div#apply_name_change ul li input[type="number"], div#apply_name_change ul li input[type="password"], div#apply_name_change ul li input[type="search"], div#apply_name_change ul li input[type="tel"], div#apply_name_change ul li input[type="text"], div#apply_name_change ul li input[type="url"], div#apply_name_change ul li input[type="color"], div#apply_name_change ul li input[type="date"], div#apply_name_change ul li input[type="datetime"], div#apply_name_change ul li input[type="datetime-local"], div#apply_name_change ul li input[type="month"], div#apply_name_change ul li input[type="time"], div#apply_name_change ul li input[type="week"], div#change_email ul li textarea, div#change_email ul li input[type="email"], div#change_email ul li input[type="number"], div#change_email ul li input[type="password"], div#change_email ul li input[type="search"], div#change_email ul li input[type="tel"], div#change_email ul li input[type="text"], div#change_email ul li input[type="url"], div#change_email ul li input[type="color"], div#change_email ul li input[type="date"], div#change_email ul li input[type="datetime"], div#change_email ul li input[type="datetime-local"], div#change_email ul li input[type="month"], div#change_email ul li input[type="time"], div#change_email ul li input[type="week"], div#unenroll ul li textarea, div#unenroll ul li input[type="email"], div#unenroll ul li input[type="number"], div#unenroll ul li input[type="password"], div#unenroll ul li input[type="search"], div#unenroll ul li input[type="tel"], div#unenroll ul li input[type="text"], div#unenroll ul li input[type="url"], div#unenroll ul li input[type="color"], div#unenroll ul li input[type="date"], div#unenroll ul li input[type="datetime"], div#unenroll ul li input[type="datetime-local"], div#unenroll ul li input[type="month"], div#unenroll ul li input[type="time"], div#unenroll ul li input[type="week"], div#deactivate-account ul li textarea, div#deactivate-account ul li input[type="email"], div#deactivate-account ul li input[type="number"], div#deactivate-account ul li input[type="password"], div#deactivate-account ul li input[type="search"], div#deactivate-account ul li input[type="tel"], div#deactivate-account ul li input[type="text"], div#deactivate-account ul li input[type="url"], div#deactivate-account ul li input[type="color"], div#deactivate-account ul li input[type="date"], div#deactivate-account ul li input[type="datetime"], div#deactivate-account ul li input[type="datetime-local"], div#deactivate-account ul li input[type="month"], div#deactivate-account ul li input[type="time"], div#deactivate-account ul li input[type="week"] {
   display: block;
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
-div#cert_request ul li textarea, div#apply_name_change ul li textarea, div#change_email ul li textarea, div#unenroll ul li textarea, div#deactivate-account ul li textarea {
+div#survey ul li textarea, div#cert_request ul li textarea, div#apply_name_change ul li textarea, div#change_email ul li textarea, div#unenroll ul li textarea, div#deactivate-account ul li textarea {
   height: 60px; }
-div#cert_request ul li input[type="submit"], div#apply_name_change ul li input[type="submit"], div#change_email ul li input[type="submit"], div#unenroll ul li input[type="submit"], div#deactivate-account ul li input[type="submit"] {
+div#survey ul li input[type="submit"], div#cert_request ul li input[type="submit"], div#apply_name_change ul li input[type="submit"], div#change_email ul li input[type="submit"], div#unenroll ul li input[type="submit"], div#deactivate-account ul li input[type="submit"] {
   white-space: normal; }
 
 div#feedback_div form ol li {
@@ -943,23 +943,25 @@ div#feedback_div form ol li {
 div#feedback_div form ol li textarea#feedback_message {
   height: 100px; }
 
-div#cert_request label {
+div#cert_request fieldset#cert_request_fieldset label {
   font-weight: bold;
   margin-bottom: 6px;
   display: block; }
+div#cert_request fieldset#cert_request_fieldset li.verify {
+  zoom: 1; }
+div#cert_request fieldset#cert_request_fieldset li.verify:before, div#cert_request fieldset#cert_request_fieldset li.verify:after {
+  content: "";
+  display: table; }
+div#cert_request fieldset#cert_request_fieldset li.verify:after {
+  clear: both; }
+div#cert_request fieldset#cert_request_fieldset li.verify input {
+  float: left; }
+div#cert_request fieldset#cert_request_fieldset li.verify label {
+  margin-left: 25px; }
+div#cert_request fieldset#survey_fieldset {
+  margin-top: 25.888px; }
 div#cert_request div#cert_request_error {
   display: block;
   color: #993333;
   font-weight: bold;
   margin-bottom: 6px; }
-div#cert_request li.verify {
-  zoom: 1; }
-div#cert_request li.verify:before, div#cert_request li.verify:after {
-  content: "";
-  display: table; }
-div#cert_request li.verify:after {
-  clear: both; }
-div#cert_request li.verify input {
-  float: left; }
-div#cert_request li.verify label {
-  margin-left: 25px; }
