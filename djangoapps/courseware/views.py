@@ -1,6 +1,5 @@
 import logging
 import urllib
-import json
 
 from fs.osfs import OSFS
 
@@ -8,7 +7,7 @@ from django.conf import settings
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -19,7 +18,6 @@ from lxml import etree
 from module_render import render_x_module, make_track_function, I4xSystem
 from models import StudentModule
 from student.models import UserProfile
-from util.views import accepts
 from multicourse import multicourse_settings
 
 import courseware.content_parser as content_parser
