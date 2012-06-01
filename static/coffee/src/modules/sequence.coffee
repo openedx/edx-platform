@@ -39,7 +39,7 @@ class @Sequence
         $.postWithPrefix "/modx/#{@tag}/#{@id}/goto_position", position: new_position
 
       @mark_active new_position
-      @$('#seq_content').html eval(@elements[new_position - 1].content)
+      @$('#seq_content').html @elements[new_position - 1].content
 
       MathJax.Hub.Queue(["Typeset", MathJax.Hub])
       @position = new_position
