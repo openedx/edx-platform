@@ -37,6 +37,7 @@ class I4xSystem(object):
                 print "[courseware.module_render.I4xSystem] filestore path = %s" % filestore
         self.render_function = render_function
         self.exception404 = Http404
+        self.DEBUG = settings.DEBUG
     def __repr__(self):
         return repr(self.__dict__)
     def __str__(self):
