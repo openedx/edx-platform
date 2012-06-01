@@ -110,7 +110,7 @@ def get_module(user, request, xml_module, module_object_preload):
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module_type+'/'+module_id+'/'
     
     system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = lambda x: render_module(user, request, x, module_object_preload), 
+                       render_function = lambda x: render_x_module(user, request, x, module_object_preload), 
                        ajax_url = ajax_url,
                        filestore = OSFS(data_root),
                        )
@@ -154,10 +154,6 @@ def render_x_module(user, request, xml_module, module_object_preload):
                'type':module_type}
 
     return content
-
-def render_module(user, request, module, module_object_preload):
-    ''' Generic dispatch for internal modules. '''
-    return render_x_module(user, request, module, module_object_preload)
 
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
