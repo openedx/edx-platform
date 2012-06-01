@@ -158,7 +158,7 @@ def render_x_module(user, request, xml_module, module_object_preload):
     destory_js = instance.get_destroy_js()
 
     # special extra information about each problem, only for users who are staff 
-    if False and user.is_staff:
+    if user.is_staff:
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
         content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
