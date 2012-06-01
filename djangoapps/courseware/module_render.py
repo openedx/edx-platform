@@ -76,7 +76,7 @@ def grade_histogram(module_id):
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x:x[0]) # Probably not necessary
-    if (len(grades) == 1 and grades[0][0] == None):
+    if (len(grades) == 1 and grades[0][0] is None):
         return []
     return grades
 

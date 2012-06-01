@@ -133,7 +133,7 @@ class SimpleInput():# XModule
 
 
 def register_render_function(fn, names=None, cls=SimpleInput):
-    if names == None:
+    if names is None:
         SimpleInput.xml_tags[fn.__name__] = fn
     else:
         raise NotImplementedError

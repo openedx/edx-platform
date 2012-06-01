@@ -126,6 +126,14 @@ describe 'VideoPlayer', ->
       it 'trigger pause event', ->
         expect('pause').toHaveBeenTriggeredOn @player
 
+    describe 'when the video is unstarted', ->
+      beforeEach ->
+        spyOnEvent @player, 'pause'
+        @player.onStateChange data: YT.PlayerState.UNSTARTED
+
+      it 'trigger pause event', ->
+        expect('pause').toHaveBeenTriggeredOn @player
+
     describe 'when the video is ended', ->
       beforeEach ->
         spyOnEvent @player, 'ended'

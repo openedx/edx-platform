@@ -123,7 +123,7 @@ nav.sequence-nav {
           background-position: center;
         }
 
-       p {
+        p {
           background: #333;
           color: #fff;
           display: none;
@@ -231,6 +231,10 @@ nav.sequence-nav {
       }
     }
   }
+
+  body.touch-based-device & ol li a:hover p {
+    display: none;
+  }
 }
 
 
@@ -304,3 +308,4 @@ section.course-content {
     }
   }
 }
+
