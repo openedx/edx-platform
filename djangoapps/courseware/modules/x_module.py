@@ -1,3 +1,5 @@
+from lxml import etree
+
 import courseware.progress
 
 def dummy_track(event_type, event):
@@ -36,7 +38,7 @@ class XModule(object):
         Render all children. 
         This really ought to return a list of xmodules, instead of dictionaries
         '''
-        children = [render_function(e) for e in self.__xmltree]
+        children = [self.render_function(e) for e in self.__xmltree]
         return children            
 
     def __init__(self, system = None, xml = None, item_id = None, 

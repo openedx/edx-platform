@@ -4,7 +4,7 @@ from lxml import etree
 
 from mitxmako.shortcuts import render_to_string
 
-from x_module import XModule
+from x_module import XModule, XModuleDescriptor
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -57,7 +57,7 @@ class Module(XModule):
         titles = ["\n".join([i.get("name").strip() for i in e.iter() if i.get("name") != None]) \
                        for e in self.xmltree]
 
-        self.contents = self.rendered_children(self)
+        self.contents = self.rendered_children()
 
         for contents, title in zip(self.contents, titles):
             contents['title'] = title
