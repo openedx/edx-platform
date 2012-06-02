@@ -221,7 +221,10 @@ class NumericalResponse(GenericResponse):
 
 class CustomResponse(GenericResponse):
     '''
-    Custom response.  The python code to be run should be in <answer>...</answer>.  Example:
+    Custom response.  The python code to be run should be in <answer>...</answer>
+    or in a <script>...</script>
+ 
+    Example:
 
     <customresponse>
     <startouttext/>
@@ -263,6 +266,7 @@ def sympy_check2():
     '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
+        self.system = system
         ## CRITICAL TODO: Should cover all entrytypes
         ## NOTE: xpath will look at root of XML tree, not just 
         ## what's in xml. @id=id keeps us in the right customresponse. 
@@ -271,8 +275,8 @@ def sympy_check2():
         self.answer_ids += [x.get('id') for x in xml.findall('textbox')]	# also allow textbox inputs
         self.context = context
 
-        # if <customresponse> has an "expect" attribute then save that
-        self.expect = xml.get('expect')
+        # if <customresponse> has an "expect" (or "answer") attribute then save that
+        self.expect = xml.get('expect') or xml.get('answer')
         self.myid = xml.get('id')
 
         if settings.DEBUG:
@@ -351,8 +355,13 @@ def sympy_check2():
                              'answers':student_answers,		# dict of student's responses, with keys being entry box IDs
                              'correct':correct,			# the list to be filled in by the check function
                              'messages':messages,		# the list of messages to be filled in by the check function
+                             'options':self.xml.get('options'),	# any options to be passed to the cfn
                              'testdat':'hello world',
                              })
+
+        # pass self.system.debug to cfn 
+        # if hasattr(self.system,'debug'): self.context['debug'] = self.system.debug
+        self.context['debug'] = settings.DEBUG
 
         # exec the check function
         if type(self.code)==str:
@@ -381,7 +390,7 @@ def sympy_check2():
 
                 if settings.DEBUG:
                     log.debug('[courseware.capa.responsetypes.customresponse] answer_given=%s' % answer_given)
-                    # log.info('nargs=%d, args=%s' % (nargs,args))
+                    log.info('nargs=%d, args=%s, kwargs=%s' % (nargs,args,kwargs))
 
                 ret = fn(*args[:nargs],**kwargs)
             except Exception,err:
@@ -433,6 +442,32 @@ def sympy_check2():
         if self.expect:
             return {self.answer_ids[0] : self.expect}
         return {}
+
+#-----------------------------------------------------------------------------
+
+class SymbolicResponse(CustomResponse):
+    """
+    Symbolic math response checking, using symmath library.
+
+    Example:
+
+    <problem>
+      <text>Compute \[ \exp\left(-i \frac{\theta}{2} \left[ \begin{matrix} 0 & 1 \\ 1 & 0 \end{matrix} \right] \right) \]
+      and give the resulting \(2\times 2\) matrix: <br/>
+        <symbolicresponse answer="">
+          <textline size="40" math="1" />
+        </symbolicresponse>
+      <br/>
+      Your input should be typed in as a list of lists, eg <tt>[[1,2],[3,4]]</tt>.
+      </text>
+    </problem>
+    """
+    def __init__(self, xml, context, system=None):
+        xml.set('cfn','symmath_check')
+        code = "from symmath import *"
+        exec code in context,context
+        CustomResponse.__init__(self,xml,context,system)
+        
 
 #-----------------------------------------------------------------------------
 
@@ -502,6 +537,30 @@ class StudentInputError(Exception):
 #-----------------------------------------------------------------------------
 
 class FormulaResponse(GenericResponse):
+    '''
+    Checking of symbolic math response using numerical sampling.
+
+    Example:
+
+    <problem>
+
+    <script type="loncapa/python">
+    I = "m*c^2"
+    </script>
+
+    <text>
+    <br/>
+    Give an equation for the relativistic energy of an object with mass m.
+    </text>
+    <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="$I">
+      <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+      <textline size="40" math="1" />    
+    </formularesponse>
+
+    </problem>
+
+    '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)

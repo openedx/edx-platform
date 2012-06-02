@@ -137,7 +137,7 @@ def check(expect,given,numerical=False,matrix=False,normphase=False,abcsym=False
 #
 # This is one of the main entry points to call.
 
-def symmath_check(expect,ans,adict={},abname=''):
+def symmath_check(expect,ans,dynamath=None,options=None,debug=None):
     '''
     Check a symbolic mathematical expression using sympy.
     The input may be presentation MathML.  Uses formula.
@@ -148,22 +148,27 @@ def symmath_check(expect,ans,adict={},abname=''):
     # msg += '<p/>adict=%s' % (repr(adict).replace('<','&lt;'))
 
     threshold = 1.0e-3
-    DEBUG = True
+    DEBUG = debug
+
+    # options
+    do_matrix = 'matrix' in (options or '')
+    do_qubit = 'qubit' in (options or '')
+    do_imaginary = 'imaginary' in (options or '')
 
     # parse expected answer
     try:
-        fexpect = my_sympify(str(expect))
+        fexpect = my_sympify(str(expect),matrix=do_matrix,do_qubit=do_qubit)
     except Exception,err:
         msg += '<p>Error %s in parsing OUR expected answer "%s"</p>' % (err,expect)
         return {'ok':False,'msg':msg}
 
     # if expected answer is a number, try parsing provided answer as a number also
     try:
-        fans = my_sympify(str(ans))
+        fans = my_sympify(str(ans),matrix=do_matrix,do_qubit=do_qubit)
     except Exception,err:
         fans = None
 
-    if fexpect.is_number and fans and fans.is_number:
+    if hasattr(fexpect,'is_number') and fexpect.is_number and fans and hasattr(fans,'is_number') and fans.is_number:
         if abs(abs(fans-fexpect)/fexpect)<threshold:
             return {'ok':True,'msg':msg}
         else:
@@ -175,10 +180,12 @@ def symmath_check(expect,ans,adict={},abname=''):
         return {'ok':True,'msg':msg}
 
     # convert mathml answer to formula
-    mmlbox = abname+'_fromjs'
-    if mmlbox in adict:
-        mmlans = adict[mmlbox]
-    f = formula(mmlans)
+    try:
+        if dynamath:
+            mmlans = dynamath[0]
+    except Exception,err:
+        return {'ok':False,'msg':'[symmath_check] failed to get MathML for input; dynamath=%s' % dynamath}
+    f = formula(mmlans,options=options)
     
     # get sympy representation of the formula
     # if DEBUG: msg += '<p/> mmlans=%s' % repr(mmlans).replace('<','&lt;')
@@ -186,13 +193,20 @@ def symmath_check(expect,ans,adict={},abname=''):
         fsym = f.sympy
         msg += '<p>You entered: %s</p>' % to_latex(f.sympy)
     except Exception,err:
-        msg += "<p>Error %s in converting to sympy</p>" % str(err).replace('<','&lt;')
-        if DEBUG: msg += "<p><pre>%s</pre></p>" % traceback.format_exc()
+        msg += "<p>Error %s in evaluating your expression '%s' as a valid equation</p>" % (str(err).replace('<','&lt;'),
+                                                                                           ans)
+        if DEBUG:
+            msg += '<hr>'
+            msg += '<p><font color="blue">DEBUG messages:</p>'
+            msg += "<p><pre>%s</pre></p>" % traceback.format_exc()
+            msg += '<p>cmathml=<pre>%s</pre></p>' % f.cmathml.replace('<','&lt;')
+            msg += '<p>pmathml=<pre>%s</pre></p>' % mmlans.replace('<','&lt;')
+            msg += '<hr>'
         return {'ok':False,'msg':msg}
 
     # compare with expected
-    if fexpect.is_number:
-        if fsym.is_number:
+    if hasattr(fexpect,'is_number') and fexpect.is_number:
+        if hasattr(fsym,'is_number') and fsym.is_number:
             if abs(abs(fsym-fexpect)/fexpect)<threshold:
                 return {'ok':True,'msg':msg}
             return {'ok':False,'msg':msg}
@@ -225,12 +239,15 @@ def symmath_check(expect,ans,adict={},abname=''):
         diff = None
 
     if DEBUG:
+        msg += '<hr>'
+        msg += '<p><font color="blue">DEBUG messages:</p>'
         msg += "<p>Got: %s</p>" % repr(fsym)
         # msg += "<p/>Got: %s" % str([type(x) for x in fsym.atoms()]).replace('<','&lt;')
         msg += "<p>Expecting: %s</p>" % repr(fexpect).replace('**','^').replace('hat(I)','hat(i)')
         # msg += "<p/>Expecting: %s" % str([type(x) for x in fexpect.atoms()]).replace('<','&lt;')
         if diff:
             msg += "<p>Difference: %s</p>" % to_latex(diff)
+        msg += '<hr>'
 
     return {'ok':False,'msg':msg,'ex':fexpect,'got':fsym}
 
