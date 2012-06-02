@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # File:   formula.py
-# Date:   04-May-12
+# Date:   04-May-12 (creation)
 # Author: I. Chuang <ichuang@mit.edu>
 #
 # flexible python representation of a symbolic mathematical formula.

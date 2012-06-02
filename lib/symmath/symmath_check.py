@@ -1,11 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# File:   sympy_check2.py
-# Date:   02-May-12
-# Author: I. Chuang <ichuang@mit.edu>
+# File:   symmath_check.py
+# Date:   02-May-12 (creation)
 #
-# Use sympy to check for expression equality
+# Symbolic mathematical expression checker for edX.  Uses sympy to check for expression equality.
 #
 # Takes in math expressions given as Presentation MathML (from ASCIIMathML), converts to Content MathML using SnuggleTeX
 
@@ -15,11 +14,13 @@ from formula import *
 
 #-----------------------------------------------------------------------------
 # check function interface
+#
+# This is one of the main entry points to call.
 
-def sympy_check_simple(expect,ans,adict={},symtab=None,extra_options=None):
+def symmath_check_simple(expect,ans,adict={},symtab=None,extra_options=None):
     '''
     Check a symbolic mathematical expression using sympy.
-    The input is an ascii string (not MathML)
+    The input is an ascii string (not MathML) converted to math using sympy.sympify.
     '''
 
     options = {'__MATRIX__':False,'__ABC__':False,'__LOWER__':False}
@@ -133,11 +134,13 @@ def check(expect,given,numerical=False,matrix=False,normphase=False,abcsym=False
 
 #-----------------------------------------------------------------------------
 # Check function interface, which takes pmathml input
+#
+# This is one of the main entry points to call.
 
-def sympy_check(expect,ans,adict={},abname=''):
+def symmath_check(expect,ans,adict={},abname=''):
     '''
     Check a symbolic mathematical expression using sympy.
-    The input may be presentation MathML
+    The input may be presentation MathML.  Uses formula.
     '''
 
     msg = ''
@@ -230,6 +233,9 @@ def sympy_check(expect,ans,adict={},abname=''):
             msg += "<p>Difference: %s</p>" % to_latex(diff)
 
     return {'ok':False,'msg':msg,'ex':fexpect,'got':fsym}
+
+#-----------------------------------------------------------------------------
+# tests
 
 def sctest1():
     x = "1/2*(1+(k_e* Q* q)/(m *g *h^2))"
