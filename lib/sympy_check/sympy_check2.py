@@ -16,7 +16,11 @@ from formula import *
 #-----------------------------------------------------------------------------
 # check function interface
 
-def sympy_check(expect,ans,adict={},symtab=None,extra_options=None):
+def sympy_check_simple(expect,ans,adict={},symtab=None,extra_options=None):
+    '''
+    Check a symbolic mathematical expression using sympy.
+    The input is an ascii string (not MathML)
+    '''
 
     options = {'__MATRIX__':False,'__ABC__':False,'__LOWER__':False}
     if extra_options: options.update(extra_options)
@@ -130,7 +134,11 @@ def check(expect,given,numerical=False,matrix=False,normphase=False,abcsym=False
 #-----------------------------------------------------------------------------
 # Check function interface, which takes pmathml input
 
-def sympy_check2(expect,ans,adict={},abname=''):
+def sympy_check(expect,ans,adict={},abname=''):
+    '''
+    Check a symbolic mathematical expression using sympy.
+    The input may be presentation MathML
+    '''
 
     msg = ''
     # msg += '<p/>abname=%s' % abname

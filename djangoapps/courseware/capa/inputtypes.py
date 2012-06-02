@@ -209,6 +209,11 @@ def choicegroup(element, value, status, msg=''):
 
 @register_render_function
 def textline(element, value, state, msg=""):
+    '''
+    Simple text line input, with optional size specification.
+    '''
+    if element.get('math') or element.get('dojs'):		# 'dojs' flag is temporary, for backwards compatibility with 8.02x
+        return SimpleInput.xml_tags['textline_dynamath'](element,value,state,msg)
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
@@ -219,27 +224,25 @@ def textline(element, value, state, msg=""):
 #-----------------------------------------------------------------------------
 
 @register_render_function
-def js_textline(element, value, status, msg=''):
+def textline_dynamath(element, value, status, msg=''):
     '''
-    Plan: We will inspect element to figure out type
+    Text line input with dynamic math display (equation rendered on client in real time during input).
     '''
     # TODO: Make a wrapper for <formulainput>
     # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
     	## TODO: Code should follow PEP8 (4 spaces per indentation level)
     '''
     textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
+    uses a <span id=display_eid>`{::}`</span>
+    and a hidden textarea with id=input_eid_fromjs for the mathjax rendering and return.
     '''
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
-    dojs = element.get('dojs')	# dojs is used for client-side javascript display & return
-    				# when dojs=='math', a <span id=display_eid>`{::}`</span>
-                                    # and a hidden textarea with id=input_eid_fromjs will be output
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
-               'dojs':dojs,
                'msg':msg,
                }
-    html=render_to_string("jstext.html", context)
+    html=render_to_string("textinput_dynamath.html", context)
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------

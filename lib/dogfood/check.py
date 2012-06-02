@@ -28,6 +28,12 @@ def check_problem_code(ans,the_lcp,correct_answers,false_answers):
     msg += '<hr width="100%"/>'
 
     is_ok = True
+    if (not correct_answers) or (not false_answers):
+        ret = {'ok':is_ok,
+               'msg': msg,
+               }
+        return ret
+
     try:
         # check correctness
         fp = the_lcp.system.filestore.open('problems/%s.xml' % pfn)
