@@ -3,11 +3,11 @@ function ${ id }_content_updated() {
   update_schematics();
 
   // dynamic math display: generate MathML on click
-  $.each($("[id^=input_${ id }_]"), function(index,value){
-      theid = value.id.replace("input_","");		// ID of the response
-      if (document.getElementById("display_" + theid)){
+  $.each($("[id^=display_${ id }_]"), function(index,value){
+      theid = value.id.replace("display_","");		// ID of the response
+      if (document.getElementById("input_" + theid)){
 	  MathJax.Hub.queue.Push(function () {
-	      math = MathJax.Hub.getAllJax("display_" + theid)[0];
+	      math = MathJax.Hub.getAllJax(value.id)[0];
 	      if (math){
 		  math.Text(document.getElementById("input_" + theid).value);
 	      }
