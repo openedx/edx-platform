@@ -325,7 +325,7 @@ class formula(object):
 
         # parser tree for Content MathML
         tag = gettag(xml)
-        print "tag = ",tag
+        # print "tag = ",tag
 
         # first do compound objects
 
