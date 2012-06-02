@@ -8,7 +8,9 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import inspect
 import json
+import logging
 import math
 import numbers
 import numpy
@@ -33,6 +35,8 @@ import calc
 import eia
 
 from util import contextualize_text
+
+log = logging.getLogger("mitx.courseware")
 
 def compare_with_tolerance(v1, v2, tol):
     ''' Compare v1 to v2 with maximum tolerance tol
@@ -271,6 +275,9 @@ def sympy_check2():
         self.expect = xml.get('expect')
         self.myid = xml.get('id')
 
+        if settings.DEBUG:
+            log.info('answer_ids=%s' % self.answer_ids)
+
         # the <answer>...</answer> stanza should be local to the current <customresponse>.  So try looking there first.
         self.code = None
         answer = None
@@ -283,7 +290,7 @@ def sympy_check2():
             # ie the comparison function is defined in the <script>...</script> stanza instead
             cfn = xml.get('cfn')
             if cfn:
-                if settings.DEBUG: print "[courseware.capa.responsetypes] cfn = ",cfn
+                if settings.DEBUG: log.info("[courseware.capa.responsetypes] cfn = %s" % cfn)
                 if cfn in context:
                     self.code = context[cfn]
                 else:
@@ -321,7 +328,8 @@ def sympy_check2():
             msg += '\n idset = %s, error = %s' % (idset,err)
             raise Exception,msg
 
-        fromjs = [ getkey2(student_answers,k+'_fromjs',None) for k in idset ]	# ordered list of fromjs_XXX responses (if exists)
+        # global variable in context which holds the Presentation MathML from dynamic math input
+        dynamath = [ student_answers.get(k+'_dynamath',None) for k in idset ]	# ordered list of dynamath responses
 
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset)==1 and not submission[0]:
@@ -339,7 +347,7 @@ def sympy_check2():
                              'expect': self.expect,		# expected answer (if given as attribute)
                              'submission':submission,		# ordered list of student answers from entry boxes in our subtree
                              'idset':idset,			# ordered list of ID's of all entry boxes in our subtree
-                             'fromjs':fromjs,			# ordered list of all javascript inputs in our subtree
+                             'dynamath':dynamath,		# ordered list of all javascript inputs in our subtree
                              'answers':student_answers,		# dict of student's responses, with keys being entry box IDs
                              'correct':correct,			# the list to be filled in by the check function
                              'messages':messages,		# the list of messages to be filled in by the check function
@@ -359,30 +367,41 @@ def sympy_check2():
             # this is an interface to the Tutor2 check functions
             fn = self.code
             ret = None
+            if settings.DEBUG: log.info(" submission = %s" % submission)
             try:
                 answer_given = submission[0] if (len(idset)==1) else submission
-                if fn.func_code.co_argcount>=4:	# does it want four arguments (the answers dict, myname)?
-                    ret = fn(self.expect,answer_given,student_answers,self.answer_ids[0])
-                elif fn.func_code.co_argcount>=3:	# does it want a third argument (the answers dict)?
-                    ret = fn(self.expect,answer_given,student_answers)
-                else:
-                    ret = fn(self.expect,answer_given)
+                # handle variable number of arguments in check function, for backwards compatibility
+                # with various Tutor2 check functions
+                args = [self.expect,answer_given,student_answers,self.answer_ids[0]]
+                argspec = inspect.getargspec(fn)
+                nargs = len(argspec.args)-len(argspec.defaults or [])
+                kwargs = {}
+                for argname in argspec.args[nargs:]:
+                    kwargs[argname] = self.context[argname] if argname in self.context else None
+
                 if settings.DEBUG:
-                    print '[courseware.capa.responsetypes.customresponse] answer_given=%s' % answer_given
+                    log.debug('[courseware.capa.responsetypes.customresponse] answer_given=%s' % answer_given)
+                    # log.info('nargs=%d, args=%s' % (nargs,args))
+
+                ret = fn(*args[:nargs],**kwargs)
             except Exception,err:
-                print "oops in customresponse (cfn) error %s" % err
+                log.error("oops in customresponse (cfn) error %s" % err)
                 # print "context = ",self.context
-                print traceback.format_exc()
+                log.error(traceback.format_exc())
                 raise Exception,"oops in customresponse (cfn) error %s" % err
-            if settings.DEBUG: print "[courseware.capa.responsetypes.customresponse.get_score] ret = ",ret
+            if settings.DEBUG: log.info("[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
             if type(ret)==dict:
                 correct = ['correct']*len(idset) if ret['ok'] else ['incorrect']*len(idset)
                 msg = ret['msg']
 
                 if 1:
                     # try to clean up message html
+                    log.info('unicode2html(msg) = %s' % msg)
                     msg = '<html>'+msg+'</html>'
-                    msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
+                    msg = msg.replace('&#60;','&lt;')
+                    #msg = msg.replace('&lt;','<')
+                    msg = etree.tostring(fromstring_bs(msg,convertEntities=None),pretty_print=True)
+                    #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
                     msg = msg.replace('&#13;','')
                     #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)	# python 2.7
                     msg = re.sub('(?ms)<html>(.*)</html>','\\1',msg)

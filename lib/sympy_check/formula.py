@@ -234,7 +234,10 @@ class formula(object):
         if self.the_cmathml: return self.the_cmathml
 
         # pre-process the presentation mathml before sending it to snuggletex to convert to content mathml
-        xml = self.preprocess_pmathml(self.expr)
+        try:
+            xml = self.preprocess_pmathml(self.expr)
+        except Exception,err:
+            return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml,pretty_print=True)
         self.the_pmathml = pmathml
 

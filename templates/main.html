@@ -36,18 +36,12 @@
   <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {inlineMath: [["\\(","\\)"]],
-      displayMath: [["\\[","\\]"]]}
-    });
-  </script>
-  <%block name="headextra"/>
+ <%block name="headextra"/>
 
   <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
        It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
        MathJax extension libraries -->
-  <script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script>
+  <%include file="mathjax_include.html" />
 </head>
 
 <body class="<%block name='bodyclass'/>">
