@@ -1,2 +1,2 @@
-This branch adds functionality for the edx4edx course.  Allows
-problems to be written about edX problems, with testing and preview.
+This branch (re-)adds dynamic math and symbolicresponse.
+Test cases included.
