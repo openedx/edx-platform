@@ -206,6 +206,7 @@ class Module(XModule):
             if self.DEBUG:
                 # create a dummy problem instead of failing
                 fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
+                fp.name = "StringIO"
             else:
                 raise Exception,err
         try:
@@ -218,6 +219,7 @@ class Module(XModule):
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
                 # create a dummy problem with error message instead of failing
                 fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename,msg))
+                fp.name = "StringIO"
                 self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
             else:
                 raise Exception,err
