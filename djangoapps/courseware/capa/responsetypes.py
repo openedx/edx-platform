@@ -405,7 +405,6 @@ def sympy_check2():
 
                 if 1:
                     # try to clean up message html
-                    log.info('unicode2html(msg) = %s' % msg)
                     msg = '<html>'+msg+'</html>'
                     msg = msg.replace('&#60;','&lt;')
                     #msg = msg.replace('&lt;','<')

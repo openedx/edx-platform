@@ -184,6 +184,8 @@ def symmath_check(expect,ans,dynamath=None,options=None,debug=None):
         if dynamath:
             mmlans = dynamath[0]
     except Exception,err:
+        mmlans = None
+    if not mmlans:
         return {'ok':False,'msg':'[symmath_check] failed to get MathML for input; dynamath=%s' % dynamath}
     f = formula(mmlans,options=options)
     
