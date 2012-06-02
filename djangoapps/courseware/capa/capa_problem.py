@@ -26,7 +26,7 @@ from mako.template import Template
 from util import contextualize_text
 import inputtypes
 
-from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse, ExternalResponse,ImageResponse,OptionResponse
+from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse, ExternalResponse,ImageResponse,OptionResponse, SymbolicResponse
 
 import calc
 import eia
@@ -42,6 +42,7 @@ response_types = {'numericalresponse':NumericalResponse,
                   'truefalseresponse':TrueFalseResponse,
                   'imageresponse':ImageResponse,
                   'optionresponse':OptionResponse,
+                  'symbolicresponse':SymbolicResponse,
                   }
 entry_types = ['textline', 'schematic', 'choicegroup','textbox','imageinput','optioninput']
 solution_types = ['solution']	# extra things displayed after "show answers" is pressed
@@ -55,6 +56,7 @@ html_transforms = {'problem': {'tag':'div'},
                    "externalresponse": {'tag':'span'},
                    "schematicresponse": {'tag':'span'}, 
                    "formularesponse": {'tag':'span'}, 
+                   "symbolicresponse": {'tag':'span'}, 
                    "multiplechoiceresponse": {'tag':'span'}, 
                    "text": {'tag':'span'},
                    "math": {'tag':'span'},
@@ -70,7 +72,7 @@ global_context={'random':random,
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["responseparam", "answer", "script"]
 # These should be removed from HTML output, but keeping subelements
-html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formularesponse", "text","externalresponse"]
+html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formularesponse", "text","externalresponse",'symbolicresponse']
 
 # removed in MC
 ## These should be transformed
@@ -218,8 +220,10 @@ class LoncapaProblem(object):
 
         #for script in tree.xpath('/problem/script'):
         for script in tree.findall('.//script'):
-            if 'javascript' in script.get('type'): continue	# skip javascript
-            if 'perl' in script.get('type'): continue		# skip perl
+            stype = script.get('type')
+            if stype:
+                if 'javascript' in stype: continue	# skip javascript
+                if 'perl' in stype: continue		# skip perl
             # TODO: evaluate only python 
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
