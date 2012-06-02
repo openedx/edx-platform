@@ -2,6 +2,19 @@ function ${ id }_content_updated() {
   MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   update_schematics();
 
+  // dynamic math display: generate MathML on click
+  $.each($("[id^=input_${ id }_]"), function(index,value){
+      theid = value.id.replace("input_","");		// ID of the response
+      if (document.getElementById("display_" + theid)){
+	  MathJax.Hub.queue.Push(function () {
+	      math = MathJax.Hub.getAllJax("display_" + theid)[0];
+	      if (math){
+		  math.Text(document.getElementById("input_" + theid).value);
+	      }
+	  });
+      };
+  });
+
 //  for (var key in codemirror_set) {
 //      codemirror_set[key].refresh();
 //  }
@@ -17,6 +30,7 @@ function ${ id }_content_updated() {
 	  MathJax.Hub.queue.Push(function () {
 	      math = MathJax.Hub.getAllJax("display_" + theid)[0];
 	      if (math){
+		  math.Text(document.getElementById("input_" + theid).value);
 		  UpdateMathML(math,theid);
 	      }
 	  });
