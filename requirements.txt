@@ -20,4 +20,5 @@ fs
 django-jasmine
 beautifulsoup
 requests
+sympy
 newrelic
