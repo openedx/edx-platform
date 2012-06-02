@@ -2,30 +2,26 @@ function ${ id }_content_updated() {
   MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   update_schematics();
 
-  // dynamic math display: add to jaxset for automatic rendering
+//  for (var key in codemirror_set) {
+//      codemirror_set[key].refresh();
+//  }
+
+  $('#check_${ id }').unbind('click').click(function() {
+  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
+  $(".CodeMirror").each(function(index,element){ if (element.CodeMirror.save) element.CodeMirror.save(); });
+
+  // dynamic math display: generate MathML on click
   $.each($("[id^=input_${ id }_]"), function(index,value){
       theid = value.id.replace("input_","");		// ID of the response
       if (document.getElementById("display_" + theid)){
 	  MathJax.Hub.queue.Push(function () {
 	      math = MathJax.Hub.getAllJax("display_" + theid)[0];
 	      if (math){
-		  jaxset[theid] = math;
-		  math.Text(document.getElementById(value.id).defaultValue);
-		  x = document.getElementById("input_" + theid + "_dynamath");
 		  UpdateMathML(math,theid);
 	      }
 	  });
       };
   });
-
-
-  $('#check_${ id }').unbind('click').click(function() {
-  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
-  $(".CodeMirror").each(function(index,element){ if (element.CodeMirror.save) element.CodeMirror.save(); });
-
-//  for (var key in codemirror_set) {
-//      codemirror_set[key].refresh();
-//  }
 
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
