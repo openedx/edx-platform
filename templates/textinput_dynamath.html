@@ -2,7 +2,7 @@
 ### version of textline.html which does dynammic math
 ###
 <section class="text-input-dynamath">
-<table><tr><td>
+<table style="display:inline; vertical-align:middle;"><tr><td>
  <input type="text" name="input_${id}" id="input_${id}" value="${value}" 
 	 % if size:
 	 size="${size}"
@@ -26,24 +26,23 @@
    </td></tr><tr><td>
       <span id="display_${id}">`{::}`</span>
     </td><td>
-      <textarea style="display:none" id="input_${id}_dynamath" name="input_${id}_dynamath">none</textarea>
+      <textarea style="display:none" id="input_${id}_dynamath" name="input_${id}_dynamath">  </textarea>
     </td></tr>
    </table>
 ##   
 ## javascript for dynamic math: add this math element to the MathJax rendering queue
 ## also adds to global jaxset js array
 ##   
-   <script>
-	  MathJax.Hub.queue.Push(function () {
+<script type="text/javascript">
+         MathJax.Hub.queue.Push(function () {
 	      math = MathJax.Hub.getAllJax("display_${id}")[0];
 	      if (math){
 		  jaxset["${id}"] = math;
-		  math.Text(document.getElementById("input_${id}_dynamath").defaultValue);    // initial render
-		  UpdateMathML(math,"${id}");	// initial MathML 
+		  math.Text(document.getElementById("input_${id}").value);
+                  // UpdateMathML(math,"${id}");
 	      }
 	  });
-  </script>
-
+</script>
   % if msg:
     <br/>
     <span class="debug">${msg|n}</span>
