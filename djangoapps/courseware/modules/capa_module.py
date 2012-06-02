@@ -202,13 +202,25 @@ class Module(XModule):
         try:
             fp = self.filestore.open(self.filename)
         except Exception,err:
-            print '[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename)
+            log.error('[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename))
             if self.DEBUG:
                 # create a dummy problem instead of failing
-                fp = StringIO.StringIO('<problem><text>Problem file %s is missing</text></problem>' % self.filename)
+                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
             else:
                 raise Exception,err
-        self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
+        try:
+            self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
+        except Exception,err:
+            msg = '[courseware.capa.capa_module.Module.init] error %s: cannot create LoncapaProblem %s' % (err,self.filename)
+            log.error(msg)
+            if self.DEBUG:
+                msg = '<p>%s</p>' % msg.replace('<','&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
+                # create a dummy problem with error message instead of failing
+                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename,msg))
+                self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
+            else:
+                raise Exception,err
 
     def handle_ajax(self, dispatch, get):
         '''
