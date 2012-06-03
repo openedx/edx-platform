@@ -471,13 +471,55 @@ class SymbolicResponse(CustomResponse):
 #-----------------------------------------------------------------------------
 
 class ExternalResponse(GenericResponse):
-    """
-    Grade the student's input using an external server.
+    '''
+    Grade the students input using an external server.
     
     Typically used by coding problems.
-    """
+
+    Example:
+  <externalresponse tests="repeat:10,generate">
+    <textbox rows="10" cols="70"  mode="python"/>
+    <answer><![CDATA[
+initial_display = """
+def inc(x):
+"""
+
+answer = """
+def inc(n):
+    return n+1
+"""
+preamble = """ 
+import sympy
+"""
+test_program = """
+import random
+
+def testInc(n = None):
+    if n is None:
+       n = random.randint(2, 20)
+    print 'Test is: inc(%d)'%n
+    return str(inc(n))
+
+def main():
+   f = os.fdopen(3,'w')
+   test = int(sys.argv[1])
+   rndlist = map(int,os.getenv('rndlist').split(','))
+   random.seed(rndlist[0])
+   if test == 1: f.write(testInc(0))
+   elif test == 2: f.write(testInc(1))
+   else:  f.write(testInc())
+   f.close()
+
+main()
+"""
+]]>
+    </answer>
+  </externalresponse>
+
+    '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
+        self.url = xml.get('url') or "http://eecs1.mit.edu:8889/pyloncapa"	# FIXME - hardcoded URL
         self.answer_ids = xml.xpath('//*[@id=$id]//textbox/@id|//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
         self.context = context
@@ -490,24 +532,29 @@ class ExternalResponse(GenericResponse):
         else:
             self.code = answer.text
 
-        self.tests = xml.get('answer')
+        self.tests = xml.get('tests')
 
     def get_score(self, student_answers):
-        submission = [student_answers[k] for k in sorted(self.answer_ids)]
+        try:
+            submission = [student_answers[k] for k in sorted(self.answer_ids)]
+        except Exception,err:
+            log.error('Error %s: cannot get student answer for %s; student_answers=%s' % (err,self.answer_ids,student_answers))
+            raise Exception,err
+
         self.context.update({'submission':submission})
 
         xmlstr = etree.tostring(self.xml, pretty_print=True)
 
         payload = {'xml': xmlstr, 
-				   ### Question: Is this correct/what we want? Shouldn't this be a json.dumps? 
-          	       'LONCAPA_student_response': ''.join(submission), 
-                   'LONCAPA_correct_answer': self.tests,
+                   'edX_cmd' : 'get_score',
+                   'edX_student_response': json.dumps(submission),
+                   'edX_tests': self.tests,
                    'processor' : self.code,
                    }
 
-        # call external server; TODO: get URL from settings.py
-        r = requests.post("http://eecs1.mit.edu:8889/pyloncapa",data=payload)
+        r = requests.post(self.url,data=payload)          # call external server
 
+        if settings.DEBUG: log.info('response = %s' % r.text)
         rxml = etree.fromstring(r.text)         # response is XML; prase it
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
@@ -520,15 +567,32 @@ class ExternalResponse(GenericResponse):
         # self.context['correct'] = ['correct','correct']
         correct_map = dict(zip(sorted(self.answer_ids), self.context['correct']))
         
-        # TODO: separate message for each answer_id?
-        correct_map['msg'] = rxml.find('message').text.replace('&nbsp;','&#160;')  # store message in correct_map
+        # store message in correct_map
+        correct_map['msg_%s' % self.answer_ids[0]] = rxml.find('message').text.replace('&nbsp;','&#160;')  
 
         return  correct_map
 
     def get_answers(self):
-        # Since this is explicitly specified in the problem, this will 
-        # be handled by capa_problem
-        return {}
+        '''
+        Use external server to get expected answers
+        '''
+        xmlstr = etree.tostring(self.xml, pretty_print=True)
+
+        payload = {'xml': xmlstr, 
+                   'edX_cmd' : 'get_answers',
+                   'edX_tests': self.tests,
+                   'processor' : self.code,
+                   }
+
+        r = requests.post(self.url,data=payload)          # call external server
+
+        if settings.DEBUG: log.info('response = %s' % r.text)
+        rxml = etree.fromstring(r.text)         # response is XML; prase it
+        exans = json.loads(rxml.find('expected').text)
+        if not (len(exans)==len(self.answer_ids)):
+            log.error('Expected %d answers from external server, only got %d!' % (len(self.answer_ids),len(exans)))
+            raise Exception,'Short response from external server'
+        return dict(zip(self.answer_ids,exans))
 
 class StudentInputError(Exception):
     pass
