@@ -534,6 +534,44 @@ main()
 
         self.tests = xml.get('tests')
 
+    def do_external_request(self,cmd,extra_payload):
+        '''
+        Perform HTTP request / post to external server.
+
+        cmd = remote command to perform (str)
+        extra_payload = dict of extra stuff to post.
+
+        Return XML tree of response (from response body)
+        '''
+        xmlstr = etree.tostring(self.xml, pretty_print=True)
+        payload = {'xml': xmlstr, 
+                   'edX_cmd' : cmd,
+                   'edX_tests': self.tests,
+                   'processor' : self.code,
+                   }
+        payload.update(extra_payload)
+
+        try:
+            r = requests.post(self.url,data=payload)          # call external server
+        except Exception,err:
+            msg = 'Error %s - cannot connect to external server url=%s' % (err,self.url)
+            log.error(msg)
+            raise Exception, msg
+
+        if settings.DEBUG: log.info('response = %s' % r.text)
+
+        if (not r.text ) or (not r.text.strip()):
+            raise Exception,'Error: no response from external server url=%s' % self.url
+
+        try:
+            rxml = etree.fromstring(r.text)         # response is XML; prase it
+        except Exception,err:
+            msg = 'Error %s - cannot parse response from external server r.text=%s' % (err,r.text)
+            log.error(msg)
+            raise Exception, msg
+
+        return rxml
+
     def get_score(self, student_answers):
         try:
             submission = [student_answers[k] for k in sorted(self.answer_ids)]
@@ -543,19 +581,17 @@ main()
 
         self.context.update({'submission':submission})
 
-        xmlstr = etree.tostring(self.xml, pretty_print=True)
+        extra_payload = {'edX_student_response': json.dumps(submission)}
 
-        payload = {'xml': xmlstr, 
-                   'edX_cmd' : 'get_score',
-                   'edX_student_response': json.dumps(submission),
-                   'edX_tests': self.tests,
-                   'processor' : self.code,
-                   }
+        try:
+            rxml = self.do_external_request('get_score',extra_payload)
+        except Exception, err:
+            log.error('Error %s' % err)
+            if settings.DEBUG:
+                correct_map = dict(zip(sorted(self.answer_ids), ['incorrect'] * len(self.answer_ids) ))
+                correct_map['msg_%s' % self.answer_ids[0]] = '<font color="red" size="+2">%s</font>' % str(err).replace('<','&lt;')
+                return correct_map
 
-        r = requests.post(self.url,data=payload)          # call external server
-
-        if settings.DEBUG: log.info('response = %s' % r.text)
-        rxml = etree.fromstring(r.text)         # response is XML; prase it
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
         	 'WRONG_FORMAT': 'incorrect',
@@ -576,19 +612,16 @@ main()
         '''
         Use external server to get expected answers
         '''
-        xmlstr = etree.tostring(self.xml, pretty_print=True)
-
-        payload = {'xml': xmlstr, 
-                   'edX_cmd' : 'get_answers',
-                   'edX_tests': self.tests,
-                   'processor' : self.code,
-                   }
-
-        r = requests.post(self.url,data=payload)          # call external server
-
-        if settings.DEBUG: log.info('response = %s' % r.text)
-        rxml = etree.fromstring(r.text)         # response is XML; prase it
-        exans = json.loads(rxml.find('expected').text)
+        try:
+            rxml = self.do_external_request('get_answers',{})
+            exans = json.loads(rxml.find('expected').text)
+        except Exception,err:
+            log.error('Error %s' % err)
+            if settings.DEBUG:
+                msg = '<font color=red size=+2>%s</font>' % str(err).replace('<','&lt;')
+                exans = [''] * len(self.answer_ids)
+                exans[0] = msg
+            
         if not (len(exans)==len(self.answer_ids)):
             log.error('Expected %d answers from external server, only got %d!' % (len(self.answer_ids),len(exans)))
             raise Exception,'Short response from external server'
