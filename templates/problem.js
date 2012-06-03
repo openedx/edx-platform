@@ -2,6 +2,7 @@ function ${ id }_content_updated() {
   MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   update_schematics();
 
+
   // dynamic math display: generate MathML on click
   $.each($("[id^=display_${ id }_]"), function(index,value){
       theid = value.id.replace("display_","");		// ID of the response
@@ -93,7 +94,8 @@ function ${ id }_content_updated() {
 		  $("label[for="+choice_id+"]").attr("correct_answer", "true");   
 	      }
 	  }
-	  $("#answer_"+key).text(data[key]);
+	  // $("#answer_"+key).text(data[key]);
+	  $("#answer_"+key).html(data[key]);
     }
   });
 
