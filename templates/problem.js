@@ -15,10 +15,6 @@ function ${ id }_content_updated() {
       };
   });
 
-//  for (var key in codemirror_set) {
-//      codemirror_set[key].refresh();
-//  }
-
   $('#check_${ id }').unbind('click').click(function() {
   $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
   $(".CodeMirror").each(function(index,element){ if (element.CodeMirror.save) element.CodeMirror.save(); });
@@ -67,7 +63,8 @@ function ${ id }_content_updated() {
           break;
         default:
           alert(json.success);
-      }}
+        }
+      }
     );
     log_event('problem_check', submit_data);
   });
@@ -99,6 +96,10 @@ function ${ id }_content_updated() {
 	  $("#answer_"+key).text(data[key]);
     }
   });
+
+  for (var key in codemirror_set) {
+      codemirror_set[key].refresh();
+  }
 
     log_event('problem_show', {'problem':'${ id }'});
   });
