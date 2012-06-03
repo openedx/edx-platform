@@ -351,8 +351,15 @@ class Module(XModule):
 
         self.tracker('save_problem_check', event_info)
 
+        try:
+            html = self.get_problem_html(encapsulate=False)
+        except Exception,err:
+            log.error('failed to generate html, error %s' % err)
+            raise Exception,err
+
         return json.dumps({'success': success,
-                           'contents': self.get_problem_html(encapsulate=False)})
+                           'contents': html,
+                           })
 
     def save_problem(self, get):
         event_info = dict()

@@ -253,16 +253,19 @@ def textbox(element, value, status, msg=''):
     The textbox is used for code input.  The message is the return HTML string from
     evaluating the code, eg error messages, and output from the code tests.
 
-    TODO: make this use rows and cols attribs, not size
     '''
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
+    rows = element.get('rows') or '30'
+    cols = element.get('cols') or '80'
     mode = element.get('mode')	or 'python' 	# mode for CodeMirror, eg "python" or "xml"
     linenumbers = element.get('linenumbers')	# for CodeMirror
     if not value: value = element.text	# if no student input yet, then use the default input given by the problem
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg,
-               'mode':mode, 'linenumbers':linenumbers }
+               'mode':mode, 'linenumbers':linenumbers,
+               'rows':rows, 'cols':cols,
+               }
     html=render_to_string("textbox.html", context)
     return etree.XML(html)
 
