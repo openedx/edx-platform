@@ -185,6 +185,10 @@ class OptionResponse(GenericResponse):
 class NumericalResponse(GenericResponse):
     def __init__(self, xml, context, system=None):
         self.xml = xml
+	if not xml.get('answer'):
+            msg = "Error in problem specification: numericalresponse missing required answer attribute\n"
+            msg += "See XML source line %s" % getattr(xml,'sourceline','<unavailable>')
+	    raise Exception,msg
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         try:
             self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
