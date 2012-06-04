@@ -90,7 +90,7 @@ describe 'VideoPlayer', ->
 
     describe 'when not on a touch based device', ->
       beforeEach ->
-        window.onTouchBasedDevice = -> false
+        spyOn(window, 'onTouchBasedDevice').andReturn false
         spyOn @player, 'play'
         @player.onReady()
 
@@ -99,7 +99,7 @@ describe 'VideoPlayer', ->
 
     describe 'when on a touch based device', ->
       beforeEach ->
-        window.onTouchBasedDevice = -> true
+        spyOn(window, 'onTouchBasedDevice').andReturn true
         spyOn @player, 'play'
         @player.onReady()
 
