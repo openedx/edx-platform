@@ -1,6 +1,3 @@
-import os
-import os.path
-
 import capa_module
 import html_module
 import schematic_module
@@ -8,8 +5,6 @@ import seq_module
 import template_module
 import vertical_module
 import video_module
-
-from courseware import content_parser
 
 # Import all files in modules directory, excluding backups (# and . in name) 
 # and __init__

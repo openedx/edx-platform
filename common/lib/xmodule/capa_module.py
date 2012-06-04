@@ -4,7 +4,9 @@ import dateutil.parser
 import json
 import logging
 import traceback
+import re
 
+from datetime import timedelta
 from lxml import etree
 
 ## TODO: Abstract out from Django
@@ -12,11 +14,29 @@ from mitxmako.shortcuts import render_to_string
 
 from x_module import XModule, XModuleDescriptor
 from capa.capa_problem import LoncapaProblem, StudentInputError
-import courseware.content_parser as content_parser
-
 log = logging.getLogger("mitx.courseware")
 
 #-----------------------------------------------------------------------------
+TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+
+def item(l, default="", process=lambda x:x):
+    if len(l)==0:
+        return default
+    elif len(l)==1:
+        return process(l[0])
+    else:
+        raise Exception('Malformed XML')
+
+def parse_timedelta(time_str):
+    parts = TIMEDELTA_REGEX.match(time_str)
+    if not parts:
+        return
+    parts = parts.groupdict()
+    time_params = {}
+    for (name, param) in parts.iteritems():
+        if param:
+            time_params[name] = int(param)
+    return timedelta(**time_params)
 
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -132,11 +152,11 @@ class Module(XModule):
         
         dom2 = etree.fromstring(xml)
         
-        self.explanation="problems/"+content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
-        # TODO: Should be converted to: self.explanation=content_parser.item(dom2.xpath('/problem/@explain'), default="closed")
-        self.explain_available=content_parser.item(dom2.xpath('/problem/@explain_available'))
+        self.explanation="problems/"+item(dom2.xpath('/problem/@explain'), default="closed")
+        # TODO: Should be converted to: self.explanation=item(dom2.xpath('/problem/@explain'), default="closed")
+        self.explain_available=item(dom2.xpath('/problem/@explain_available'))
 
-        display_due_date_string=content_parser.item(dom2.xpath('/problem/@due'))
+        display_due_date_string=item(dom2.xpath('/problem/@due'))
         if len(display_due_date_string)>0:
             self.display_due_date=dateutil.parser.parse(display_due_date_string)
             #log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
@@ -144,27 +164,27 @@ class Module(XModule):
             self.display_due_date=None
         
         
-        grace_period_string = content_parser.item(dom2.xpath('/problem/@graceperiod'))
+        grace_period_string = item(dom2.xpath('/problem/@graceperiod'))
         if len(grace_period_string)>0 and self.display_due_date:
-            self.grace_period = content_parser.parse_timedelta(grace_period_string)
+            self.grace_period = parse_timedelta(grace_period_string)
             self.close_date = self.display_due_date + self.grace_period
             #log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
         else:
             self.grace_period = None
             self.close_date = self.display_due_date
             
-        self.max_attempts=content_parser.item(dom2.xpath('/problem/@attempts'))
+        self.max_attempts=item(dom2.xpath('/problem/@attempts'))
         if len(self.max_attempts)>0:
             self.max_attempts=int(self.max_attempts)
         else:
             self.max_attempts=None
 
-        self.show_answer=content_parser.item(dom2.xpath('/problem/@showanswer'))
+        self.show_answer=item(dom2.xpath('/problem/@showanswer'))
 
         if self.show_answer=="":
             self.show_answer="closed"
 
-        self.rerandomize=content_parser.item(dom2.xpath('/problem/@rerandomize'))
+        self.rerandomize=item(dom2.xpath('/problem/@rerandomize'))
         if self.rerandomize=="" or self.rerandomize=="always" or self.rerandomize=="true":
             self.rerandomize="always"
         elif self.rerandomize=="false" or self.rerandomize=="per_student":
@@ -179,10 +199,10 @@ class Module(XModule):
         if state!=None and 'attempts' in state:
             self.attempts=state['attempts']
 
-        # TODO: Should be: self.filename=content_parser.item(dom2.xpath('/problem/@filename')) 
-        self.filename= "problems/"+content_parser.item(dom2.xpath('/problem/@filename'))+".xml"
-        self.name=content_parser.item(dom2.xpath('/problem/@name'))
-        self.weight=content_parser.item(dom2.xpath('/problem/@weight'))
+        # TODO: Should be: self.filename=item(dom2.xpath('/problem/@filename')) 
+        self.filename= "problems/"+item(dom2.xpath('/problem/@filename'))+".xml"
+        self.name=item(dom2.xpath('/problem/@name'))
+        self.weight=item(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
             seed = 1
         else:
