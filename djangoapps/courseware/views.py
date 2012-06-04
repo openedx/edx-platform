@@ -125,6 +125,10 @@ def profile(request, student_id = None):
             except GeneratedCertificate.DoesNotExist:
                 #They haven't submited the request form
                 certificate_requested = False
+                
+            if settings.DEBUG_SURVEY:
+                certificate_requested = False
+            
             
         context.update({'certificate_requested' : certificate_requested,
                  'certificate_download_url' : certificate_download_url,
