@@ -9,26 +9,20 @@ Does some caching (to be explained).
 
 import logging
 import os
-import re
 import sys
 import urllib
 
-from datetime import timedelta
 from lxml import etree
 from util.memcache import fasthash
 
-try: # This lets us do __name__ == ='__main__'
-    from django.conf import settings
+from django.conf import settings
 
-    from student.models import UserProfile
-    from student.models import UserTestGroup
-    from mitxmako.shortcuts import render_to_string
-    from util.cache import cache
-    from multicourse import multicourse_settings
-    import xmodule
-except: 
-    print "Could not import/content_parser"
-    settings = None 
+from student.models import UserProfile
+from student.models import UserTestGroup
+from mitxmako.shortcuts import render_to_string
+from util.cache import cache
+from multicourse import multicourse_settings
+import xmodule
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
@@ -41,23 +35,8 @@ class ContentException(Exception):
 
 log = logging.getLogger("mitx.courseware")
 
-
-timedelta_regex = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
-
 def format_url_params(params):
     return [ urllib.quote(string.replace(' ','_')) for string in params ]
-
-def parse_timedelta(time_str):
-    parts = timedelta_regex.match(time_str)
-    if not parts:
-        return
-    parts = parts.groupdict()
-    time_params = {}
-    for (name, param) in parts.iteritems():
-        if param:
-            time_params[name] = int(param)
-    return timedelta(**time_params)
-
 
 def xpath(xml, query_string, **args):
     ''' Safe xpath query into an xml tree:
@@ -93,14 +72,6 @@ def xpath_remove(tree, path):
 if __name__=='__main__':
     print xpath('<html><problem name="Bob"></problem></html>', '/{search}/problem[@name="{name}"]', 
                 search='html', name="Bob")
-
-def item(l, default="", process=lambda x:x):
-    if len(l)==0:
-        return default
-    elif len(l)==1:
-        return process(l[0])
-    else:
-        raise Exception('Malformed XML')
 
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
