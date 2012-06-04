@@ -25,13 +25,16 @@ import courseware.capa.calc
 import track.views
 from lxml import etree
 
-from courseware.module_render import render_module, make_track_function, I4xSystem
+
+from courseware.module_render import render_module, make_track_function, I4xSystem, get_state_from_module_object_preload
+from courseware.models import StudentModule
 from multicourse import multicourse_settings
+from student.models import UserProfile
 from util.cache import cache
+from util.views import accepts
 
 import courseware.content_parser as content_parser
 import courseware.modules
-from courseware.views import quickedit
 
 log = logging.getLogger("mitx.courseware")
 
@@ -138,3 +141,155 @@ def df_capa_problem(request, id=None):
 
     # hand over to quickedit to do the rest
     return quickedit(request,id=id,qetemplate='dogfood.html',coursename=coursename)
+
+def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
+    '''
+    quick-edit capa problem.
+
+    Maybe this should be moved into capa/views.py
+    Or this should take a "module" argument, and the quickedit moved into capa_module.
+
+    id is passed in from url resolution
+    qetemplate is used by dogfood.views.dj_capa_problem, to override normal template
+    '''
+    print "WARNING: UNDEPLOYABLE CODE. FOR DEV USE ONLY."
+    print "In deployed use, this will only edit on one server"
+    print "We need a setting to disable for production where there is"
+    print "a load balanacer"
+
+    if not request.user.is_staff:
+        if not ('dogfood_id' in request.session and request.session['dogfood_id']==id):
+            return redirect('/')
+
+    if id=='course.xml':
+        return quickedit_git_reload(request)
+
+    # get coursename if stored
+    if not coursename:
+        coursename = multicourse_settings.get_coursename_from_request(request)
+    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+
+    def get_lcp(coursename,id):
+        # Grab the XML corresponding to the request from course.xml
+        module = 'problem'
+        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
+    
+        ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
+    
+        # Create the module (instance of capa_module.Module)
+        system = I4xSystem(track_function = make_track_function(request), 
+                           render_function = None, 
+                           ajax_url = ajax_url,
+                           filestore = OSFS(settings.DATA_DIR + xp),
+                           #role = 'staff' if request.user.is_staff else 'student',		# TODO: generalize this
+                           )
+        instance=courseware.modules.get_module_class(module)(system, 
+                                                             xml, 
+                                                             id,
+                                                             state=None)
+
+        # create empty student state for this problem, if not previously existing
+        s = StudentModule.objects.filter(student=request.user, 
+                                         module_id=id)
+        if len(s) == 0 or s is None:
+            smod=StudentModule(student=request.user, 
+                               module_type = 'problem',
+                               module_id=id, 
+                               state=instance.get_state())
+            smod.save()
+
+        lcp = instance.lcp
+        pxml = lcp.tree
+        pxmls = etree.tostring(pxml,pretty_print=True)
+
+        return instance, pxmls
+
+    instance, pxmls = get_lcp(coursename,id)
+
+    # if there was a POST, then process it
+    msg = ''
+    if 'qesubmit' in request.POST:
+        action = request.POST['qesubmit']
+        if "Revert" in action:
+            msg = "Reverted to original"
+        elif action=='Change Problem':
+            key = 'quickedit_%s' % id
+            if not key in request.POST:
+                msg = "oops, missing code key=%s" % key
+            else:
+                newcode = request.POST[key]
+
+                # see if code changed
+                if str(newcode)==str(pxmls) or '<?xml version="1.0"?>\n'+str(newcode)==str(pxmls):
+                    msg = "No changes"
+                else:
+                    # check new code
+                    isok = False
+                    try:
+                        newxml = etree.fromstring(newcode)
+                        isok = True
+                    except Exception,err:
+                        msg = "Failed to change problem: XML error \"<font color=red>%s</font>\"" % err
+    
+                    if isok:
+                        filename = instance.lcp.fileobject.name
+                        fp = open(filename,'w')		# TODO - replace with filestore call?
+                        fp.write(newcode)
+                        fp.close()
+                        msg = "<font color=green>Problem changed!</font> (<tt>%s</tt>)"  % filename
+                        instance, pxmls = get_lcp(coursename,id)
+
+    lcp = instance.lcp
+
+    # get the rendered problem HTML
+    phtml = instance.get_problem_html()
+    init_js = instance.get_init_js()
+    destory_js = instance.get_destroy_js()
+
+    context = {'id':id,
+               'msg' : msg,
+               'lcp' : lcp,
+               'filename' : lcp.fileobject.name,
+               'pxmls' : pxmls,
+               'phtml' : phtml,
+               "destroy_js":destory_js,
+               'init_js':init_js, 
+               'csrf':csrf(request)['csrf_token'],
+               }
+
+    result = render_to_response(qetemplate, context)
+    return result
+
+def quickedit_git_reload(request):
+    '''
+    reload course.xml and all courseware files for this course, from the git repo.
+    assumes the git repo has already been setup.
+    staff only.
+    '''
+    if not request.user.is_staff:
+        return redirect('/')
+
+    # get coursename if stored
+    coursename = multicourse_settings.get_coursename_from_request(request)
+    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+
+    msg = ""
+    if 'cancel' in request.POST:
+        return redirect("/courseware")
+        
+    if 'gitupdate' in request.POST:
+        import os			# FIXME - put at top?
+        cmd = "cd ../data%s; git reset --hard HEAD; git pull origin %s" % (xp,xp.replace('/',''))
+        msg += '<p>cmd: %s</p>' % cmd
+        ret = os.popen(cmd).read()
+        msg += '<p><pre>%s</pre></p>' % ret.replace('<','&lt;')
+        msg += "<p>git update done!</p>"
+
+    context = {'id':id,
+               'msg' : msg,
+               'coursename' : coursename,
+               'csrf':csrf(request)['csrf_token'],
+               }
+
+    result = render_to_response("gitupdate.html", context)
+    return result

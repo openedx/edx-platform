@@ -77,7 +77,7 @@ if settings.ENABLE_MULTICOURSE:
 	urlpatterns += (url(r'^mitxhome$', 'multicourse.views.mitxhome'),)
 
 if settings.QUICKEDIT:
-	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'courseware.views.quickedit'),)
+	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
 	urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
 
 if settings.ASKBOT_ENABLED:
