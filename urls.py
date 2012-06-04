@@ -54,7 +54,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index', name="courseware_chapter"),
         url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index', name="courseware_course"),
         url(r'^section/(?P<section>[^/]*)/$', 'courseware.views.render_section'),
-        url(r'^modx/(?P<module>[^/]*)/(?P<id>[^/]*)/(?P<dispatch>[^/]*)$', 'courseware.views.modx_dispatch'), #reset_problem'),
+        url(r'^modx/(?P<module>[^/]*)/(?P<id>[^/]*)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
         url(r'^profile$', 'courseware.views.profile'),
         url(r'^profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
         url(r'^change_setting$', 'student.views.change_setting'),
