@@ -27,10 +27,15 @@ def check_problem_code(ans,the_lcp,correct_answers,false_answers):
     msg += '<iframe src="%s/dogfood/filename%s" width="95%%" frameborder="1">No iframe support!</iframe>' % (settings.MITX_ROOT_URL,pfn)
     msg += '<hr width="100%"/>'
 
+    endmsg = """<p><font size="-1" color="purple">Note: if the code text box disappears after clicking on "Check",
+		please click on "Show Answer" to make it refresh properly.  This is a
+                bug with Chrome; it does not happen with Firefox.  It is being fixed.
+                </font></p>"""
+
     is_ok = True
     if (not correct_answers) or (not false_answers):
         ret = {'ok':is_ok,
-               'msg': msg,
+               'msg': msg+endmsg,
                }
         return ret
 
@@ -49,7 +54,7 @@ def check_problem_code(ans,the_lcp,correct_answers,false_answers):
         msg += "<p><pre>%s</pre></p>" % traceback.format_exc().replace('<','&#60;')
         
     ret = {'ok':is_ok,
-           'msg': msg,
+           'msg': msg+endmsg,
            }
     return ret
            
