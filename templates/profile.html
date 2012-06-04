@@ -1,5 +1,6 @@
 <%inherit file="main.html" />
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
+<%namespace name="survey_questions" file="survey_questions.html"/>
 
 <%block name="title"><title>Profile - MITx 6.002x</title></%block>
 
@@ -145,7 +146,7 @@ $(function() {
       var values = {'cert_request_honor_code_verify' : $("#cert_request_honor_code_verify").is(':checked'),
                     'cert_request_name_verify' : $("#cert_request_name_verify").is(':checked'),
                     'cert_request_id_verify' : $("#cert_request_id_verify").is(':checked'),
-                    };
+                  };
       
       postJSON('/certificate_request', values, function(data) {
         if (data.success) {
@@ -170,7 +171,9 @@ $(function() {
     $("#survey_form").submit(function(){
       var values = {'survey_future_classes' : $("#survey_future_classes").is(':checked'),
                     'survey_future_offerings' : $("#survey_future_offerings").is(':checked'),
-                    'survey_6002x_updates' : $("#survey_6002x_updates").is(':checked'), };
+                    'survey_6002x_updates' : $("#survey_6002x_updates").is(':checked'),
+                    'survey_teach_ee' : $('input:radio[name=survey_teach_ee]:checked').val(),
+                  };
       
       postJSON('/record_exit_survey', values, function(data) {
         if (true || data.success) {
@@ -445,20 +448,9 @@ $(function() {
         <h1>Please take this short survey about 6.002x.</h1>
         
         <div id="survey_error"> </div>
-        <ul>
-          <li class="survey_checkbox">
-            <input type="checkbox" id="survey_future_classes"/>
-            <label> Please inform me of future classes offered by edX.</label>
-          </li>
-          <li class="survey_checkbox">
-            <input type="checkbox" id="survey_future_offerings"/>
-            <label> Please inform me of opportunities to help with future offerings of 6.002x, such as staffing discussiong forums or developing content. </label>
-          </li>
-          <li class="survey_checkbox">
-            <input type="checkbox" id="survey_6002x_updates"/>
-            <label> Please subscribe me to periodic updates about additional topics, refreshers, and follow-ups for topics in 6.002x. </label>
-          </li>
-        </ul>
+        
+        ${survey_questions.body(survey_list)}
+        
       </fieldset>
     </div>
     

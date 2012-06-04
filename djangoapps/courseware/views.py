@@ -27,6 +27,9 @@ from models import StudentModule
 from student.models import UserProfile
 from student.views import student_took_survey
 
+if settings.END_COURSE_ENABLED:
+    from courseware.survey_questions import exit_survey_questions
+
 import courseware.content_parser as content_parser
 import courseware.modules.capa_module
 
@@ -89,6 +92,18 @@ def profile(request, student_id = None):
     
     if settings.END_COURSE_ENABLED:
         took_survey = student_took_survey(user_info)
+        survey_list = []
+        if not took_survey:
+            
+            
+            common_questions = exit_survey_questions['common_questions']
+            randomized_questions = exit_survey_questions['random_questions']
+            
+            #If we use random.sample on randomized_questions directly, it will re-arrange the questions
+            chosen_indices = random.sample( range( len(randomized_questions) ), 15 )
+            chosen_questions = [ randomized_questions[i] for i in sorted(chosen_indices)]
+            
+            survey_list = common_questions + chosen_questions
         
         # certificate_requested determines if the student has requested a certificate
         certificate_requested = False
@@ -108,7 +123,8 @@ def profile(request, student_id = None):
             
         context.update({'certificate_requested' : certificate_requested,
                  'certificate_download_url' : certificate_download_url,
-                 'took_survey' : took_survey})
+                 'took_survey' : took_survey,
+                 'survey_list' : survey_list})
 
     return render_to_response('profile.html', context)
 
