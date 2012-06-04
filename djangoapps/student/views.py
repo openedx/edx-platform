@@ -465,14 +465,8 @@ def record_exit_survey(request):
     if request.method != "POST" or not settings.END_COURSE_ENABLED:
         raise Http404
     
-    default_responses = {
-        'survey_future_classes' : 'false',
-        'survey_future_offerings' : 'false',
-        'survey_6002x_updates' : 'false'
-    }
-    
-    response = { key : request.POST.get(key, default) for key,default in default_responses.items() }
-    
+    response = { key : value for key,value in request.POST.items() if key.startswith("survey_") }
+        
     up = UserProfile.objects.get(user=request.user)
     
     meta = up.get_meta()

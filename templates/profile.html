@@ -169,11 +169,21 @@ $(function() {
     });    
     
     $("#survey_form").submit(function(){
-      var values = {'survey_future_classes' : $("#survey_future_classes").is(':checked'),
-                    'survey_future_offerings' : $("#survey_future_offerings").is(':checked'),
-                    'survey_6002x_updates' : $("#survey_6002x_updates").is(':checked'),
-                    'survey_teach_ee' : $('input:radio[name=survey_teach_ee]:checked').val(),
-                  };
+      var values = {};
+      
+      //First we set the value of every input to null. This assures that even
+      //if a checkbox isn't checked or a question isn't answered, its name is
+      //still in the dictionary so we know the question was on the form.
+      var inputs = $("#survey_fieldset :input");
+      inputs.each( function(index, element) {
+        values[ element.getAttribute("name") ] = null;
+      });
+      
+      //Grab the values from the survey_fieldset
+      var serializedArray = inputs.serializeArray();
+      for (var i = 0; i < serializedArray.length; i++) {
+        values[ serializedArray[i]['name'] ] = serializedArray[i]['value'];
+      }
       
       postJSON('/record_exit_survey', values, function(data) {
         if (true || data.success) {

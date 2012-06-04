@@ -1,5 +1,6 @@
 <%page args="survey_list, **kwargs"/>
 
+
 <%def name="survey_radio(question_name, label, choices)">
   <li class="survey_radio">
     <label>${label}</label><br/>
@@ -11,7 +12,7 @@
 
 <%def name="survey_checkbox(question_name, label)">
   <li class="survey_checkbox">
-    <input type="checkbox" id="${question_name}"/>
+    <input type="checkbox" name="${question_name}" value="true"/>
     <label>${label}</label>
   </li>
 </%def>
@@ -24,8 +25,9 @@
 </%def>
 
 
+
+
 <ul>
-  
   %for survey_question in survey_list:
     %if survey_question['type'] == 'survey_radio':
       ${survey_radio(survey_question['question_name'], survey_question['label'], survey_question['choices']) }
@@ -35,11 +37,6 @@
       
     %elif survey_question['type'] == 'survey_short_field':
       ${survey_short_field(survey_question['question_name'], survey_question['label']) }
-    
-    
     %endif
   %endfor
-  
-
-  
 </ul>
