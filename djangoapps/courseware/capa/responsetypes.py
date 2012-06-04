@@ -330,6 +330,7 @@ def sympy_check2():
         except Exception, err:
             msg = '[courseware.capa.responsetypes.customresponse] error getting student answer from %s' % student_answers
             msg += '\n idset = %s, error = %s' % (idset,err)
+            log.error(msg)
             raise Exception,msg
 
         # global variable in context which holds the Presentation MathML from dynamic math input
