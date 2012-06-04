@@ -111,7 +111,7 @@ class LoncapaProblem(object):
             self.seed=struct.unpack('i', os.urandom(4))[0]
 
         ## Parse XML file
-        if hasattr(system,'DEBUG') and system.DEBUG:
+        if getattr(system,'DEBUG',False):
             log.info("[courseware.capa.capa_problem.lcp.init]  fileobject = %s" % fileobject)
         file_text = fileobject.read()
         self.fileobject = fileobject	# save it, so we can use for debugging information later
