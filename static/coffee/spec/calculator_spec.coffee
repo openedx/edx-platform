@@ -24,6 +24,7 @@ describe 'Calculator', ->
       expect($('form#calculator')).toHandleWith 'submit', @calculator.calculate
 
     it 'prevent default behavior on form submit', ->
+      jasmine.stubRequests()
       $('form#calculator').submit (e) ->
         expect(e.isDefaultPrevented()).toBeTruthy()
         e.preventDefault()
@@ -55,12 +56,12 @@ describe 'Calculator', ->
   describe 'calculate', ->
     beforeEach ->
       $('#calculator_input').val '1+2'
-      spyOn($, 'getJSON').andCallFake (url, data, callback) ->
+      spyOn($, 'getWithPrefix').andCallFake (url, data, callback) ->
         callback({ result: 3 })
       @calculator.calculate()
 
     it 'send data to /calculate', ->
-      expect($.getJSON).toHaveBeenCalledWith '/calculate',
+      expect($.getWithPrefix).toHaveBeenCalledWith '/calculate',
         equation: '1+2'
       , jasmine.any(Function)
 

@@ -1,3 +1,4 @@
+import json
 import logging
 
 from lxml import etree
@@ -17,6 +18,7 @@ from models import StudentModule
 from multicourse import multicourse_settings
 
 import courseware.modules
+import courseware.content_parser as content_parser
 
 log = logging.getLogger("mitx.courseware")
 
@@ -82,12 +84,11 @@ def grade_histogram(module_id):
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x:x[0]) # Probably not necessary
-    if (len(grades) == 1 and grades[0][0] == None):
+    if (len(grades) == 1 and grades[0][0] is None):
         return []
     return grades
 
-def get_state_from_module_object_preload(user, xml_module, module_object_preload):
-    # Check if problem has an instance in DB
+def get_module(user, request, xml_module, module_object_preload, position=None):
     module_type=xml_module.tag
     module_class=courseware.modules.get_module_class(module_type)
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
@@ -102,34 +103,6 @@ def get_state_from_module_object_preload(user, xml_module, module_object_preload
         state=None
     else:
         state = smod.state
-    
-    return smod, state
-
-def render_x_module(user, request, xml_module, module_object_preload,position=None):
-    ''' Generic module for extensions. This renders to HTML.
-
-    modules include sequential, vertical, problem, video, html
-
-    Note that modules can recurse.  problems, video, html, can be inside sequential or vertical.
-
-    Arguments:
-
-      - user                  : current django User
-      - request               : current django HTTPrequest
-      - xml_module            : lxml etree of xml subtree for the current module
-      - module_object_preload : list of StudentModule objects, one of which may match this module type and id
-      - position   	      : extra information from URL for user-specified position within module
-
-    Returns:
-
-      -  dict which is context for HTML rendering of the specified module
-
-    '''
-    module_type=xml_module.tag
-    module_class=courseware.modules.get_module_class(module_type)
-    module_id=xml_module.get('id') #module_class.id_attribute) or "" 
-
-    smod, state = get_state_from_module_object_preload(user, xml_module, module_object_preload)
 
     # get coursename if stored
     coursename = multicourse_settings.get_coursename_from_request(request)
@@ -144,7 +117,7 @@ def render_x_module(user, request, xml_module, module_object_preload,position=No
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module_type+'/'+module_id+'/'
     
     system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = lambda x: render_module(user, request, x, module_object_preload), 
+                       render_function = lambda x: render_x_module(user, request, x, module_object_preload, position), 
                        ajax_url = ajax_url,
                        filestore = OSFS(data_root),
                        )
@@ -164,45 +137,119 @@ def render_x_module(user, request, xml_module, module_object_preload,position=No
         smod.save()
         module_object_preload.append(smod)
 
-    # Grab content
-    content = instance.get_html()
-    init_js = instance.get_init_js()
-    destory_js = instance.get_destroy_js()
+    return (instance, smod, module_type)
 
-    # special extra information about each problem, only for users who are staff 
-    if user.is_staff:
-        histogram = grade_histogram(module_id)
-        render_histogram = len(histogram) > 0
-        content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
-                                                                     'module_id' : module_id,
-                                                                     'render_histogram' : render_histogram})
-        if render_histogram:
-            init_js = init_js+render_to_string("staff_problem_histogram.js", {'histogram' : histogram,
-                                                                              'module_id' : module_id})
-        
-    content = {'content':content, 
-               "destroy_js":destory_js,
-               'init_js':init_js, 
-               'type':module_type}
+def render_x_module(user, request, xml_module, module_object_preload, position=None):
+    ''' Generic module for extensions. This renders to HTML.
 
-    return content
+    modules include sequential, vertical, problem, video, html
 
-def render_module(user, request, module, module_object_preload, position=None):
-    ''' Generic dispatch for internal modules.
+    Note that modules can recurse.  problems, video, html, can be inside sequential or vertical.
 
-    Args:
-       
-     - user       : django User
-     - request    : HTTP request
-     - module	  : ElementTree (xml) for this module
-     - module_object_preload : list of StudentModule objects, one of which may match this module type and id
-     - position   : extra information from URL for user-specified position within module
+    Arguments:
+
+      - user                  : current django User
+      - request               : current django HTTPrequest
+      - xml_module            : lxml etree of xml subtree for the current module
+      - module_object_preload : list of StudentModule objects, one of which may match this module type and id
+      - position   	      : extra information from URL for user-specified position within module
 
     Returns:
 
       -  dict which is context for HTML rendering of the specified module
 
     '''
-    if module==None :
+    if xml_module==None :
         return {"content":""}
-    return render_x_module(user, request, module, module_object_preload, position)
+
+    (instance, smod, module_type) = get_module(user, request, xml_module, module_object_preload, position)
+
+    # Grab content
+    content = instance.get_html()
+
+    # special extra information about each problem, only for users who are staff 
+    if user.is_staff:
+        module_id = xml_module.get('id')
+        histogram = grade_histogram(module_id)
+        render_histogram = len(histogram) > 0
+        content=content+render_to_string("staff_problem_info.html", {'xml':etree.tostring(xml_module), 
+                                                                     'module_id' : module_id,
+                                                                     'histogram': json.dumps(histogram),
+                                                                     'render_histogram' : render_histogram})
+
+    content = {'content':content,
+               'type':module_type}
+
+    return content
+
+def modx_dispatch(request, module=None, dispatch=None, id=None):
+    ''' Generic view for extensions. This is where AJAX calls go.'''
+    if not request.user.is_authenticated():
+        return redirect('/')
+
+    # Grab the student information for the module from the database
+    s = StudentModule.objects.filter(student=request.user, 
+                                     module_id=id)
+    #s = StudentModule.get_with_caching(request.user, id)
+    if len(s) == 0 or s is None:
+        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
+        raise Http404
+    s = s[0]
+
+    oldgrade = s.grade
+    oldstate = s.state
+
+    dispatch=dispatch.split('?')[0]
+
+    ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
+
+    # get coursename if stored
+    coursename = multicourse_settings.get_coursename_from_request(request)
+
+    if coursename and settings.ENABLE_MULTICOURSE:
+        xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
+        data_root = settings.DATA_DIR + xp
+    else:
+        data_root = settings.DATA_DIR
+
+    # Grab the XML corresponding to the request from course.xml
+    try:
+        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
+    except:
+        log.exception("Unable to load module during ajax call. module=%s, dispatch=%s, id=%s" % (module, dispatch, id))
+        if accepts(request, 'text/html'):
+            return render_to_response("module-error.html", {})
+        else:
+            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
+        return response
+
+    # Create the module
+    system = I4xSystem(track_function = make_track_function(request), 
+                       render_function = None, 
+                       ajax_url = ajax_url,
+                       filestore = OSFS(data_root),
+                       )
+
+    try:
+        instance=courseware.modules.get_module_class(module)(system, 
+                                                             xml, 
+                                                             id, 
+                                                             state=oldstate)
+    except:
+        log.exception("Unable to load module instance during ajax call")
+        if accepts(request, 'text/html'):
+            return render_to_response("module-error.html", {})
+        else:
+            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
+        return response
+
+    # Let the module handle the AJAX
+    ajax_return=instance.handle_ajax(dispatch, request.POST)
+    # Save the state back to the database
+    s.state=instance.get_state()
+    if instance.get_score(): 
+        s.grade=instance.get_score()['score']
+    if s.grade != oldgrade or s.state != oldstate:
+        s.save()
+    # Return whatever the module wanted to return to the client/caller
+    return HttpResponse(ajax_return)

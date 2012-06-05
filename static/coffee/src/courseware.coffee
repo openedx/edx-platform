@@ -1,22 +1,29 @@
-class window.Courseware
-  @bind: ->
-    @Navigation.bind()
+class @Courseware
+  @prefix: ''
 
-  class @Navigation
-    @bind: ->
-      if $('#accordion').length
-        navigation = new Navigation
-        active = $('#accordion ul:has(li.active)').index('#accordion ul')
-        $('#accordion').bind('accordionchange', navigation.log).accordion
-          active: if active >= 0 then active else 1
-          header: 'h3'
-          autoHeight: false
-        $('#open_close_accordion a').click navigation.toggle
+  constructor: ->
+    Courseware.prefix = $("meta[name='path_prefix']").attr('content')
+    new Navigation
+    new Calculator
+    new FeedbackForm
+    Logger.bind()
+    @bind()
+    @render()
 
-    log: (event, ui) ->
-      log_event 'accordion',
-        newheader: ui.newHeader.text()
-        oldheader: ui.oldHeader.text()
+  @start: ->
+    new Courseware
 
-    toggle: ->
-      $('.course-wrapper').toggleClass('closed')
+  bind: ->
+    $('.course-content .sequence, .course-content .tab')
+      .bind 'contentChanged', @render
+
+  render: ->
+    $('.course-content .video').each ->
+      id = $(this).attr('id').replace(/video_/, '')
+      new Video id, $(this).data('streams')
+    $('.course-content .problems-wrapper').each ->
+      id = $(this).attr('id').replace(/problem_/, '')
+      new Problem id, $(this).data('url')
+    $('.course-content .histogram').each ->
+      id = $(this).attr('id').replace(/histogram_/, '')
+      new Histogram id, $(this).data('histogram')
