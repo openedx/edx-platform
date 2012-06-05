@@ -223,14 +223,20 @@ $(function() {
       <header>
         <h1>Course Progress</h1>
       </header>
-      
+
       %if settings.END_COURSE_ENABLED:
       <div id="grade">
         %if grade_sheet['grade']:
           <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
-          
+
           %if not certificate_requested:
             <a rel="leanModal" class="cert_request_link" href="#cert_request">Request Certificate</a>
+          %if not took_survey:
+          <div class="survey_offer">
+            <a class="survey_link" rel="leanModal" href="#survey">Take the survey</a>.
+          </div>
+          %endif
+
           %elif certificate_download_url:
             <a href="${certificate_download_url}" target="_blank">Download Certificate</a>
           %else:
@@ -240,13 +246,7 @@ $(function() {
           <p> No letter grade has been earned for this course </p>
         %endif
       </div>
-      
-      %if not took_survey:
-      <div class="survey_offer">
-      Take the <a class="survey_link" rel="leanModal" href="#survey">survey</a>.
-      </div>
-      %endif
-      
+
       %endif
 
       <div id="grade-detail-graph"></div>
@@ -476,6 +476,3 @@ $(function() {
   </form>
 </div>
 %endif
-
-
-

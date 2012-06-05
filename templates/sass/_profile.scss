@@ -178,12 +178,13 @@ div.profile-wrapper {
         background-color: darken($cream, 10%);
         border: 1px solid darken($cream, 30%);
         @include border-radius(3px);
+        @include box-shadow(inset 0 1px 0 lighten($cream, 5%));
         display: block;
         float: right;
         font-weight: bold;
         line-height: 1em;
+        margin-left: 10px;
         margin-top: 9px;
-        @include box-shadow(inset 0 1px 0 lighten($cream, 5%));
         padding: 8px;
         text-shadow: 0 1px 0 lighten($cream, 5%);
       }

@@ -1,0 +1,37 @@
+fieldset#survey_fieldset {
+  > ul {
+    > li {
+      border-top: 1px solid #eee;
+      padding: lh() 0;
+      margin-bottom: 0;
+
+      ul {
+        li {
+          margin-bottom: 6px;
+
+          label {
+            display: block;
+
+            input {
+              margin-top: -1px;
+              margin-right: 6px;
+            }
+          }
+        }
+      }
+
+      h2 {
+        margin-top: 0;
+      }
+
+      &.survey_short_field {
+        label {
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: 6px;
+        }
+      }
+    }
+  }
+}
