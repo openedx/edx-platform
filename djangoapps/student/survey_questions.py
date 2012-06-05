@@ -1,3 +1,4 @@
+import random
 import settings
 
 def exit_survey_list_for_student(student):
