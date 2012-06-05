@@ -1,6 +1,6 @@
 <%inherit file="main.html" />
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
-<%namespace name="survey_questions" file="survey_questions.html"/>
+<%namespace name="survey_fields" file="survey_fields.html"/>
 
 <%block name="title"><title>Profile - MITx 6.002x</title></%block>
 
@@ -466,7 +466,7 @@ $(function() {
         
         <div id="survey_error"> </div>
         
-        ${survey_questions.body(survey_list)}
+        ${survey_fields.body(survey_list)}
         
       </fieldset>
     </div>
