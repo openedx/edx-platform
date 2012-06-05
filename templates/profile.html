@@ -124,6 +124,20 @@ $(function() {
     });
     
     %if settings.END_COURSE_ENABLED:
+    //This is used to scroll error divs to the user's attention. It can be removed when we switch to the branch with jQuery.ScrollTo
+    jQuery.fn.scrollMinimal = function(smooth) {
+      var cTop = this.offset().top;
+      var cHeight = this.outerHeight(true);
+      var windowTop = $(window).scrollTop();
+      var visibleHeight = $(window).height();
+      
+      if (cTop < windowTop) {
+        $('body').animate({'scrollTop': cTop}, 'slow', 'swing');
+      } else if (cTop + cHeight > windowTop + visibleHeight) {
+        $('body').animate({'scrollTop': cTop - visibleHeight + cHeight}, 'slow', 'swing');
+      }
+    };
+    
     /*
     There is a fieldset, #survey_fieldset, which contains an exit survey. This exist survey can be taken by iteself,
     or as part of the certificate request. If they haven't taken the survey yet, it moves to the open modal dialogue.
@@ -161,7 +175,7 @@ $(function() {
           $("#cert_request").html("<h1>Certificate Request Received</h1><p>Thank you! A certificate is being generated. You will be notified when it is ready to download.</p>");
           $(".cert_request_link").text("Certificate is being generated...");
         } else {
-          $("#cert_request_error").html(data.error);
+          $("#cert_request_error").html(data.error).scrollMinimal();
         }
       });
       log_event("certificate_request", values);
@@ -201,7 +215,7 @@ $(function() {
           //Remove the links to take the survey
           $(".survey_offer").hide();
         } else {
-          $("#survey_error").html(data.error);
+          $("#survey_error").html(data.error).scrollMinimal();
         }
       });
       log_event("exit_survey_submission", values);
@@ -228,15 +242,9 @@ $(function() {
       <div id="grade">
         %if grade_sheet['grade']:
           <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
-
+          
           %if not certificate_requested:
             <a rel="leanModal" class="cert_request_link" href="#cert_request">Request Certificate</a>
-          %if not took_survey:
-          <div class="survey_offer">
-            <a class="survey_link" rel="leanModal" href="#survey">Take the survey</a>.
-          </div>
-          %endif
-
           %elif certificate_download_url:
             <a href="${certificate_download_url}" target="_blank">Download Certificate</a>
           %else:
@@ -244,6 +252,12 @@ $(function() {
           %endif
         %else:
           <p> No letter grade has been earned for this course </p>
+        %endif
+        
+        %if not took_survey:
+        <div class="survey_offer">
+          <a class="survey_link" rel="leanModal" href="#survey">Take the survey</a>.
+        </div>
         %endif
       </div>
 
@@ -461,7 +475,7 @@ $(function() {
   <form id="survey_form">    
     <div id="survey_survey_holder">    
       <fieldset id="survey_fieldset">
-        <h1>Please take this short survey about 6.002x.</h1>
+        <h1>Please take this optional survey about 6.002x.</h1>
         <p>This survey is collected only for research purposes. It is completely optional and will not affect your grade.</p>
         
         <div id="survey_error"> </div>
