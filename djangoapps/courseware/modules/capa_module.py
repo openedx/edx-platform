@@ -202,7 +202,7 @@ class Module(XModule):
         try:
             fp = self.filestore.open(self.filename)
         except Exception,err:
-            log.error('[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename))
+            log.exception('[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename))
             if self.DEBUG:
                 # create a dummy problem instead of failing
                 fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
@@ -213,7 +213,7 @@ class Module(XModule):
             self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
         except Exception,err:
             msg = '[courseware.capa.capa_module.Module.init] error %s: cannot create LoncapaProblem %s' % (err,self.filename)
-            log.error(msg)
+            log.exception(msg)
             if self.DEBUG:
                 msg = '<p>%s</p>' % msg.replace('<','&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
