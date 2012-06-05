@@ -1,20 +1,21 @@
 exit_survey_questions = {
     'common_questions' : [
-        {'type' : 'survey_checkbox',
-        'question_name' : 'survey_future_classes',
+        {'type' : 'checkbox',
+        'question_name' : 'future_classes',
         'label' : 'Please inform me of future classes offered by edX.'},
         
-        {'type' : 'survey_checkbox',
-        'question_name' : 'survey_future_offerings',
+        {'type' : 'checkbox',
+        'question_name' : 'future_offerings',
         'label' : 'Please inform me of opportunities to help with future offerings of 6.002x, such as staffing discussiong forums or developing content.'},
         
-        {'type' : 'survey_checkbox',
-        'question_name' : 'survey_6002x_updates',
+        #I think we should combine this question with the one above it. Mostly to shorten the survey
+        {'type' : 'checkbox',
+        'question_name' : '6002x_updates',
         'label' : 'Please subscribe me to periodic updates about additional topics, refreshers, and follow-ups for topics in 6.002x.'},
     ],
     'random_questions' : [
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_teach_ee',
+        {'type' : 'radio',
+        'question_name' : 'teach_ee',
         'label' : 'Do you teach electrical engineering (EE)?',
         'choices' : [
             'I teach EE in college/university.',
@@ -22,70 +23,71 @@ exit_survey_questions = {
             'I do not teach EE.',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_highest_degree',
+        {'type' : 'radio',
+        'question_name' : 'highest_degree',
         'label' : 'What is the highest degree you have completed?',
         'choices' : [
             'I have a PhD in a science or engineering field.',
             'I have a PhD in another field.',
-            'I have a masters or professional degree.',
-            'I have a bachelors degree.',
+            'I have a master\'s or professional degree.',
+            'I have a bachelor\'s degree.',
             'I completed secondary/high school.',
             'I completed junior secondary/high school.',
             'I completed elementary school.',
         ]},
         
-        {'type' : 'survey_short_field',
-        'question_name' : 'survey_age',
+        {'type' : 'short_field',
+        'question_name' : 'age',
         'label' : 'What is your age?',
         },
         
-        {'type' : 'survey_short_field',
-        'question_name' : 'survey_gender',
+        # We could also do this as a radio Male/Female/Other
+        {'type' : 'short_field',
+        'question_name' : 'gender',
         'label' : 'What is your gender?',
         },
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_scholarship_secondary',
-        'label' : 'Did you receive any scholarship or financial assistance to attend secondary school?',
+        {'type' : 'radio',
+        'question_name' : 'scholarship_secondary',
+        'label' : 'Did you receive any scholarship or financial assistance to attend <b>secondary school</b>?',
         'choices' : [
             'Yes',
             'No',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_scholarship_college',
-        'label' : 'Did you receive any scholarship or financial assistanche to attend college/university?',
+        {'type' : 'radio',
+        'question_name' : 'scholarship_college',
+        'label' : 'Did you receive any scholarship or financial assistanche to attend <b>college/university</b>?',
         'choices' : [
             'Yes',
             'No',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_ee_level',
+        {'type' : 'radio',
+        'question_name' : 'ee_level',
         'label' : 'What is the highest level electrical engineering (EE) course you have taken? ',
         'choices' : [
-            ' more than one year of EE in college/university',
-            ' one year or less of EE in college/university',
-            ' more than one year of EE in high school/secondary school',
-            ' one year or less of EE in high school/secondary school',
-            ' self-taught in EE',
-            ' none of the above',
+            'More than one year of EE in college/university',
+            'One year or less of EE in college/university',
+            'More than one year of EE in high school/secondary school',
+            'One year or less of EE in high school/secondary school',
+            'Self-taught in EE',
+            'None of the above',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_math_level',
+        {'type' : 'radio',
+        'question_name' : 'math_level',
         'label' : 'What is the highest level mathematics course you have taken?',
         'choices' : [
-            ' mathematics beyond calculus of a single variable in college/university',
-            ' single variable calculus',
-            ' algebra',
-            ' self-taught in mathematics',
-            ' none of the above',
+            'Mathematics beyond calculus of a single variable in college/university',
+            'Single variable calculus',
+            'Algebra',
+            'Self-taught in mathematics',
+            'None of the above',
         ]},
         
-        {'type' : 'survey_check',
-        'question_name' : 'survey_why_course',
+        {'type' : 'select_many',
+        'question_name' : 'why_course',
         'label' : 'Why are you taking this course? (Check all that apply.)',
         'choices' : [
             'Interest in topic only',
@@ -96,9 +98,9 @@ exit_survey_questions = {
             'Other',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_weekly_hours',
-        'label' : 'How many hours a week on average did you work on this course? ',
+        {'type' : 'radio',
+        'question_name' : 'weekly_hours',
+        'label' : 'How many hours per week on average did you work on this course?',
         'choices' : [
             '0-2',
             '3-5',
@@ -106,8 +108,8 @@ exit_survey_questions = {
             '10 or more',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_internet_access',
+        {'type' : 'radio',
+        'question_name' : 'internet_access',
         'label' : 'Where do you access the MITx website most frequently?',
         'choices' : [
             'At home',
@@ -117,9 +119,9 @@ exit_survey_questions = {
             'Other',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_work_offline',
-        'label' : 'Have you worked offline with anyone on the MITx material?',
+        {'type' : 'radio',
+        'question_name' : 'work_offline',
+        'label' : 'Have you worked <b>offline</b> with anyone on the MITx material?',
         'choices' : [
             'I worked with another person who is also completing the course.',
             'I worked with someone who teaches or has expertise in this area.',
@@ -127,8 +129,8 @@ exit_survey_questions = {
             'Other',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_online_course_count',
+        {'type' : 'radio',
+        'question_name' : 'online_course_count',
         'label' : 'How many online courses have you taken?',
         'choices' : [
             '1',
@@ -138,29 +140,31 @@ exit_survey_questions = {
             '5 or more',
         ]},
         
-        {'type' : 'survey_short_field',
-        'question_name' : 'survey_home_language',
+        {'type' : 'short_field',
+        'question_name' : 'home_language',
         'label' : 'Language most spoken in your home:',
         },
         
-        {'type' : 'survey_short_field',
-        'question_name' : 'survey_home_postal_code',
+        {'type' : 'short_field',
+        'question_name' : 'home_postal_code',
         'label' : 'Postal code (home address):',
         },
         
-        {'type' : 'survey_short_field',
-        'question_name' : 'survey_home_country',
+        # This question seems redundant with the above question. Remove it? Does the whole world have postal codes?
+        # Also, we already asked for a location
+        {'type' : 'short_field',
+        'question_name' : 'home_country',
         'label' : 'Country (home address):',
         },
         
-        {'type' : 'survey_short_field',
-        'question_name' : 'survey_race',
+        {'type' : 'short_field',
+        'question_name' : 'race',
         'label' : 'With what race/ethnic group do you most strongly identify?',
         },
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_online_course_count',
-        'label' : 'How many books are there in your home? (There are usually about 40 books per meter of shelving. Do not include magazines, newspapers, or schoolbooks in your estimate.)',
+        {'type' : 'radio',
+        'question_name' : 'book_count',
+        'label' : 'How many books are there in your home? <br/><i>(There are usually about 40 books per meter of shelving. Do not include magazines, newspapers, or schoolbooks in your estimate.)</i>',
         'choices' : [
             '0-10 books',
             '11-25 books',
@@ -170,16 +174,16 @@ exit_survey_questions = {
             'More than 500 books',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_computer_in_home',
+        {'type' : 'radio',
+        'question_name' : 'computer_in_home',
         'label' : 'Did you have a computer in your home?',
         'choices' : [
             'Yes',
             'No',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey_parents_engineering',
+        {'type' : 'radio',
+        'question_name' : 'parents_engineering',
         'label' : 'Do either of your parents have any training or experience in engineering?',
         'choices' : [
             'Yes',
@@ -187,8 +191,9 @@ exit_survey_questions = {
             'I don\'t know',
         ]},
         
-        {'type' : 'survey_radio',
-        'question_name' : 'survey__engineering',
+        #We used to have two of these questions, one for their mom and one for their dad. That might not make sense for some students.
+        {'type' : 'radio',
+        'question_name' : 'engineering',
         'label' : 'What is the highest level of schooling completed by one of your parents? (Please choose the answer you think fits best.)',
         'choices' : [
             'PhD degree',

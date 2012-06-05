@@ -5,7 +5,16 @@
   <li class="survey_radio">
     <label>${label}</label><br/>
     %for choice in choices:
-      <input type="radio" name="${question_name}" value="${choice}"/>${choice}<br>
+      <input type="radio" name="${question_name}" value="${choice}" align="BASELINE"/>${choice}<br>
+    %endfor
+  </li>
+</%def>
+
+<%def name="survey_select_many(question_name, label, choices)">
+  <li class="survey_select_many">
+    <label>${label}</label><br/>
+    %for choice in choices:
+      <input type="checkbox" name="${question_name}" value="${choice}" align="BASELINE"/>${choice}<br>
     %endfor
   </li>
 </%def>
@@ -29,13 +38,16 @@
 
 <ul>
   %for survey_question in survey_list:
-    %if survey_question['type'] == 'survey_radio':
+    %if survey_question['type'] == 'radio':
       ${survey_radio(survey_question['question_name'], survey_question['label'], survey_question['choices']) }
     
-    %elif survey_question['type'] == 'survey_checkbox':
+    %elif survey_question['type'] == 'select_many':
+      ${survey_select_many(survey_question['question_name'], survey_question['label'], survey_question['choices']) }
+    
+    %elif survey_question['type'] == 'checkbox':
       ${survey_checkbox(survey_question['question_name'], survey_question['label']) }
       
-    %elif survey_question['type'] == 'survey_short_field':
+    %elif survey_question['type'] == 'short_field':
       ${survey_short_field(survey_question['question_name'], survey_question['label']) }
     %endif
   %endfor

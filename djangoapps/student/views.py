@@ -465,7 +465,10 @@ def record_exit_survey(request):
     if request.method != "POST" or not settings.END_COURSE_ENABLED:
         raise Http404
     
-    response = { key : value for key,value in request.POST.items() if key.startswith("survey_") }
+    if 'survey_results' not in request.POST:
+         return HttpResponse(json.dumps({'success':False, 'error':'No survey responses were found.'})) 
+    
+    response = json.loads(request.POST['survey_results'])
         
     up = UserProfile.objects.get(user=request.user)
     

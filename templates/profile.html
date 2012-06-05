@@ -166,7 +166,7 @@ $(function() {
       });
       log_event("certificate_request", values);
       return false;
-    });    
+    });
     
     $("#survey_form").submit(function(){
       var values = {};
@@ -182,10 +182,16 @@ $(function() {
       //Grab the values from the survey_fieldset
       var serializedArray = inputs.serializeArray();
       for (var i = 0; i < serializedArray.length; i++) {
-        values[ serializedArray[i]['name'] ] = serializedArray[i]['value'];
+        var key = serializedArray[i]['name'];
+        var value = serializedArray[i]['value'];
+        if ( key in values && values[key] != null) {
+          values[key].push( value );
+        } else {
+          values[key] = [value];
+        }
       }
       
-      postJSON('/record_exit_survey', values, function(data) {
+      postJSON('/record_exit_survey', {'survey_results' : JSON.stringify(values)}, function(data) {
         if (true || data.success) {
           $("#survey").html("<h1>Survey Response Recorded</h1><p>Thank you for filling out the survey!</p>");
           
