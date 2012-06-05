@@ -8,7 +8,7 @@ def exit_survey_list_for_student(student):
             
     #If we use random.sample on randomized_questions directly, it will re-arrange the questions
     if not settings.DEBUG_SURVEY:
-        chosen_indices = random.sample( range( len(randomized_questions) ), 6 )
+        chosen_indices = random.sample( range( len(randomized_questions) ), 6)
     else:
         #In debug mode, we show all surveys
         chosen_indices = range( len(randomized_questions) )
@@ -30,7 +30,6 @@ exit_survey_questions = {
         'question_name' : 'future_offerings',
         'label' : 'Please inform me of opportunities to help with future offerings of 6.002x, such as staffing discussiong forums or developing content.'},
         
-        #I think we should combine this question with the one above it. Mostly to shorten the survey
         {'type' : 'checkbox',
         'question_name' : '6002x_updates',
         'label' : 'Please subscribe me to periodic updates about additional topics, refreshers, and follow-ups for topics in 6.002x.'},
@@ -42,6 +41,7 @@ exit_survey_questions = {
         'choices' : [
             'I teach EE in college/university.',
             'I teach EE in high school/secondary school.',
+            'I teach EE elsewhere.',
             'I do not teach EE.',
         ]},
         
@@ -49,13 +49,13 @@ exit_survey_questions = {
         'question_name' : 'highest_degree',
         'label' : 'What is the highest degree you have completed?',
         'choices' : [
-            'I have a PhD in a science or engineering field.',
-            'I have a PhD in another field.',
-            'I have a master\'s or professional degree.',
-            'I have a bachelor\'s degree.',
-            'I completed secondary/high school.',
-            'I completed junior secondary/high school.',
-            'I completed elementary school.',
+            'PhD in a science or engineering field.',
+            'PhD in another field.',
+            'Master\'s or professional degree.',
+            'Bachelor\'s degree.',
+            'Secondary/high school.',
+            'Junior secondary/high school.',
+            'Elementary/primary school.',
         ]},
         
         {'type' : 'short_field',
@@ -63,31 +63,18 @@ exit_survey_questions = {
         'label' : 'What is your age?',
         },
         
-        # We could also do this as a radio Male/Female/Other
-        {'type' : 'short_field',
-        'question_name' : 'gender',
-        'label' : 'What is your gender?',
-        },
-        
         {'type' : 'radio',
-        'question_name' : 'scholarship_secondary',
-        'label' : 'Did you receive any scholarship or financial assistance to attend <strong>secondary school</strong>?',
-        'choices' : [
-            'Yes',
-            'No',
-        ]},
-        
-        {'type' : 'radio',
-        'question_name' : 'scholarship_college',
-        'label' : 'Did you receive any scholarship or financial assistanche to attend <strong>college/university</strong>?',
-        'choices' : [
-            'Yes',
-            'No',
+                'question_name' : 'gender',
+                'label' : 'What is your gender?',
+                'choices' : [
+                    'Female',
+                    'Male',
+                    'Other',
         ]},
         
         {'type' : 'radio',
         'question_name' : 'ee_level',
-        'label' : 'What is the highest level electrical engineering (EE) course you have taken? ',
+        'label' : 'How much electrical engineering have you studied? ',
         'choices' : [
             'More than one year of EE in college/university',
             'One year or less of EE in college/university',
@@ -99,36 +86,28 @@ exit_survey_questions = {
         
         {'type' : 'radio',
         'question_name' : 'math_level',
-        'label' : 'What is the highest level mathematics course you have taken?',
+        'label' : 'What was your calculus background prior to this course?',
         'choices' : [
-            'Mathematics beyond calculus of a single variable in college/university',
+            'Vector calculus or differential equations',
             'Single variable calculus',
-            'Algebra',
-            'Self-taught in mathematics',
-            'None of the above',
+            'No calculus',
         ]},
         
         {'type' : 'select_many',
         'question_name' : 'why_course',
         'label' : 'Why are you taking this course? (Check all that apply.)',
         'choices' : [
-            'Interest in topic only',
-            'Preparation for advanced placement exam',
+            'Interest in topic',
             'Preparation for advanced standing exam',
             'Review of EE concepts',
             'Employment/job advancement opportunities',
             'Other',
         ]},
         
-        {'type' : 'radio',
+        {'type' : 'short_field',
         'question_name' : 'weekly_hours',
         'label' : 'How many hours per week on average did you work on this course?',
-        'choices' : [
-            '0-2',
-            '3-5',
-            '6-9',
-            '10 or more',
-        ]},
+        },
         
         {'type' : 'radio',
         'question_name' : 'internet_access',
@@ -141,6 +120,26 @@ exit_survey_questions = {
             'Other',
         ]},
         
+        # New, needs review
+        {'type' : 'select_many',
+        'question_name' : 'smartphone_usage',
+        'label' : 'Are you interested in taking edX courses from a mobile device, such as a smartphone? (Chech all that apply.)',
+        'choices' : [
+            'I would like to use a mobile device my <strong>primary</strong> way of taking edX courses.',
+            'I would like to use a mobile device to <strong>sometimes</strong> access edX courses.',
+            'I would <strong>not</strong> like to use a mobile device with edX courses.',
+            'I use an Android device.',
+            'I use an iPhone or iPod Touch.',
+            'I use an iPad.',
+            'I use a different internet-capable mobile device.',
+            'I do not use an internet-capable mobile device.',
+        ]},
+        
+        
+        # Level of bandwidth
+        # Speed of computer/RAM/etc. 
+        # Size of monitor
+        # Own a tablet? 
         {'type' : 'radio',
         'question_name' : 'work_offline',
         'label' : 'Have you worked <b>offline</b> with anyone on the MITx material?',
@@ -153,7 +152,7 @@ exit_survey_questions = {
         
         {'type' : 'radio',
         'question_name' : 'online_course_count',
-        'label' : 'How many online courses have you taken?',
+        'label' : 'Including 6.002x, how many online courses have you taken?',
         'choices' : [
             '1',
             '2',
@@ -161,23 +160,6 @@ exit_survey_questions = {
             '4',
             '5 or more',
         ]},
-        
-        {'type' : 'short_field',
-        'question_name' : 'home_language',
-        'label' : 'Language most spoken in your home:',
-        },
-        
-        {'type' : 'short_field',
-        'question_name' : 'home_postal_code',
-        'label' : 'Postal code (home address):',
-        },
-        
-        # This question seems redundant with the above question. Remove it? Does the whole world have postal codes?
-        # Also, we already asked for a location
-        {'type' : 'short_field',
-        'question_name' : 'home_country',
-        'label' : 'Country (home address):',
-        },
         
         {'type' : 'short_field',
         'question_name' : 'race',
