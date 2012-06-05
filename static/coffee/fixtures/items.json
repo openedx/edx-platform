@@ -1,14 +1,14 @@
 [
   {
-    "content": "\"Video 1\"",
+    "content": "Video 1",
     "type": "video",
     "title": "Video 1"
   }, {
-    "content": "\"Video 2\"",
+    "content": "Video 2",
     "type": "video",
     "title": "Video 2"
   }, {
-    "content": "\"Sample Problem\"",
+    "content": "Sample Problem",
     "type": "problem",
     "title": "Sample Problem"
   }
