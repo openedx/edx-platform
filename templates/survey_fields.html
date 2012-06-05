@@ -44,6 +44,12 @@
   </li>
 </%def>
 
+<%def name="survey_medium_field(question_name, label)">
+  <li class="survey_medium_field">
+    <label>${label}</label>
+    <textarea name="${question_name}"></textarea>
+  </li>
+</%def>
 
 
 
@@ -60,6 +66,10 @@
       
     %elif survey_question['type'] == 'short_field':
       ${survey_short_field(survey_question['question_name'], survey_question['label']) }
+      
+    %elif survey_question['type'] == 'medium_field':
+      ${survey_medium_field(survey_question['question_name'], survey_question['label']) }
+    
     %endif
   %endfor
 </ul>

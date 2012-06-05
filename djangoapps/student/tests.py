@@ -24,7 +24,7 @@ class ExitSurveyTest(TestCase):
             
             question_type = question['type']
             
-            if question_type == 'checkbox' or question_type == 'short_field':
+            if question_type == 'checkbox' or question_type == 'short_field' or question_type == 'medium_field':
                 # No other required fields
                 pass
             elif question_type == 'radio' or question_type == 'select_many':
