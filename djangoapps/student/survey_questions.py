@@ -1,3 +1,24 @@
+import settings
+
+def exit_survey_list_for_student(student):
+    # Right now, we just randomly pick some questions from random_questions
+    common_questions = exit_survey_questions['common_questions']
+    randomized_questions = exit_survey_questions['random_questions']
+            
+    #If we use random.sample on randomized_questions directly, it will re-arrange the questions
+    if not settings.DEBUG_SURVEY:
+        chosen_indices = random.sample( range( len(randomized_questions) ), 6 )
+    else:
+        #In debug mode, we show all surveys
+        chosen_indices = range( len(randomized_questions) )
+                
+    chosen_questions = [ randomized_questions[i] for i in sorted(chosen_indices)]
+    
+    survey_list = common_questions + chosen_questions
+    return survey_list
+    
+    
+
 exit_survey_questions = {
     'common_questions' : [
         {'type' : 'checkbox',

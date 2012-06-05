@@ -28,7 +28,7 @@ from student.models import UserProfile
 from student.views import student_took_survey
 
 if settings.END_COURSE_ENABLED:
-    from courseware.survey_questions import exit_survey_questions
+    from student.survey_questions import exit_survey_list_for_student
 
 import courseware.content_parser as content_parser
 import courseware.modules.capa_module
@@ -96,19 +96,7 @@ def profile(request, student_id = None):
             took_survey = False
         survey_list = []
         if not took_survey:
-            common_questions = exit_survey_questions['common_questions']
-            randomized_questions = exit_survey_questions['random_questions']
-            
-            #If we use random.sample on randomized_questions directly, it will re-arrange the questions
-            if not settings.DEBUG_SURVEY:
-                chosen_indices = random.sample( range( len(randomized_questions) ), 6 )
-            else:
-                #In debug mode, we show all surveys
-                chosen_indices = range( len(randomized_questions) )
-                
-            chosen_questions = [ randomized_questions[i] for i in sorted(chosen_indices)]
-            
-            survey_list = common_questions + chosen_questions
+            survey_list = exit_survey_list_for_student(student)
         
         # certificate_requested determines if the student has requested a certificate
         certificate_requested = False
