@@ -10,6 +10,7 @@ class @VideoCaption
     $(window).bind('resize', @onWindowResize)
     $(@player).bind('resize', @onWindowResize)
     $(@player).bind('updatePlayTime', @onUpdatePlayTime)
+    $(@player).bind('play', @onPlay)
     @$('.hide-subtitles').click @toggle
     @$('.subtitles').mouseenter(@onMouseEnter).mouseleave(@onMouseLeave)
       .mousemove(@onMovement).bind('mousewheel', @onMovement)
@@ -32,7 +33,11 @@ class @VideoCaption
     $.getWithPrefix @captionURL(), (captions) =>
       @captions = captions.text
       @start = captions.start
-      @renderCaption()
+
+      if onTouchBasedDevice()
+        $('.subtitles li').html "Caption will be displayed when you start playing the video."
+      else
+        @renderCaption()
 
   renderCaption: ->
     container = $('<ol>')
@@ -49,6 +54,8 @@ class @VideoCaption
     @$('.subtitles').prepend($('<li class="spacing">').height(@topSpacingHeight()))
       .append($('<li class="spacing">').height(@bottomSpacingHeight()))
 
+    @rendered = true
+
   search: (time) ->
     min = 0
     max = @start.length - 1
@@ -61,6 +68,9 @@ class @VideoCaption
         min = index
 
     return min
+
+  onPlay: =>
+    @renderCaption() unless @rendered
 
   onUpdatePlayTime: (event, time) =>
     # This 250ms offset is required to match the video speed
