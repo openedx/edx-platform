@@ -171,7 +171,7 @@ nav.sequence-nav {
   }
 
   ul {
-    list-style: none !important;
+    list-style: none;
     height: 100%;
     position: absolute;
     right: 0;
@@ -194,12 +194,10 @@ nav.sequence-nav {
           cursor: pointer;
           display: block;
           text-indent: -9999px;
+          @include transition(all, .2s, $ease-in-out-quad);
 
           &:hover {
-            background-color: none;
-            color: darken($cream, 60%);
-            text-decoration: none;
-            text-decoration: none;
+            opacity: .5;
           }
 
           &.disabled {
@@ -214,7 +212,7 @@ nav.sequence-nav {
           background-image: url('../images/sequence-nav/previous-icon.png');
 
           &:hover {
-            background-color: none;
+            background-color: $cream;
           }
         }
       }
@@ -222,10 +220,9 @@ nav.sequence-nav {
       &.next {
         a {
           background-image: url('../images/sequence-nav/next-icon.png');
-          @include border-top-right-radius(4px);
 
           &:hover {
-            background-color: none;
+            background-color: $cream;
           }
         }
       }
@@ -240,6 +237,13 @@ nav.sequence-nav {
 
 section.course-content {
   position: relative;
+
+  ol.vert-mod {
+    nav.sequence-nav {
+      margin-top: -15px;
+      @include border-radius(0);
+    }
+  }
 
   nav.sequence-bottom {
     margin: lh(2) 0 0;
@@ -267,11 +271,11 @@ section.course-content {
             display: block;
             padding: lh(.5) 4px;
             text-indent: -9999px;
-            @include transition(all, .4s, $ease-in-out-quad);
+            @include transition(all, .2s, $ease-in-out-quad);
             width: 45px;
 
             &:hover {
-              background-color: darken($cream, 10%);
+              background-color: $cream;
               color: darken($cream, 60%);
               opacity: .5;
               text-decoration: none;

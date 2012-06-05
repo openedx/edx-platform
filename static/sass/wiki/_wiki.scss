@@ -5,12 +5,14 @@ div.wiki-wrapper {
   section.wiki-body {
     @extend .clearfix;
     @extend .content;
+    @include border-radius(0 4px 4px 0);
     position: relative;
 
     header {
       @extend .topbar;
-      @include box-shadow(inset 0 1px 0 white);
+      @include border-radius(0 4px 0 0);
       height:46px;
+      overflow: hidden;
 
       &:empty {
         border-bottom: 0;

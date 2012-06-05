@@ -17,9 +17,7 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
-    overflow: hidden;
-    @include border-top-right-radius(4px);
-    @include border-bottom-right-radius(4px);
+    @include border-radius(0 4px 4px 0);
 
     h1 {
       margin: 0 0 lh();
@@ -129,11 +127,20 @@ div.course-wrapper {
         > span {
           display: block;
           margin-bottom: lh(.5);
+
+          &[answer] {
+            border-top: 1px solid #ededed;
+            border-bottom: 1px solid #ededed;
+            background: #f3f3f3;
+            margin: 0 (-(lh()));
+            padding: lh(.5) lh();
+          }
         }
       }
 
       input[type="text"] {
         display: inline-block;
+        width: 50%;
       }
 
       center {
@@ -145,6 +152,11 @@ div.course-wrapper {
 
       section.action {
         margin-top: lh();
+
+        input[type="button"] {
+          padding: lh(.4) lh();
+          text-shadow: 0 -1px 0 #666;
+        }
       }
     }
 
@@ -181,6 +193,7 @@ div.course-wrapper {
 
         header {
           @extend h1.top-header;
+          @include border-radius(0 4px 0 0);
           margin-bottom: -16px;
 
           h1 {
@@ -193,6 +206,7 @@ div.course-wrapper {
             margin-top: 8px;
             text-align: right;
             padding-right: 0;
+            border-right: 0;
           }
         }
 
@@ -302,9 +316,11 @@ div.course-wrapper {
   &.closed {
     section.course-index {
       width: flex-grid(.6);
+      overflow: hidden;
 
       header#open_close_accordion {
         padding: 0;
+        min-height: 47px;
 
         a {
           background-image: url('../images/slide-right-icon.png');
@@ -313,7 +329,6 @@ div.course-wrapper {
         h2 {
           visibility: hidden;
           width: 10px;
-          padding: 0;
         }
       }
 
@@ -321,6 +336,16 @@ div.course-wrapper {
         visibility: hidden;
         width: 10px;
         padding: 0;
+
+       nav {
+         white-space: pre;
+         overflow: hidden;
+
+         ul {
+           overflow: hidden;
+           white-space: nowrap;
+         }
+        }
       }
     }
 
