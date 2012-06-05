@@ -2,6 +2,14 @@ section.course-index {
   @extend .sidebar;
   @extend .tran;
 
+  header {
+    max-height: 47px;
+
+    h2 {
+      white-space: nowrap;
+    }
+  }
+
   div#accordion {
 
     h3 {
