@@ -126,7 +126,7 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
     child (A) already has that attribute, A will keep the same attribute and
     all of A's children will inherit A's attribute. This is a recursive call.'''
     
-    if (parent_attribute == None): #This is the entry call. Select all elements with this attribute
+    if (parent_attribute is None): #This is the entry call. Select all elements with this attribute
         all_attributed_elements = element.xpath("//*[@" + attribute_name +"]")
         for attributed_element in all_attributed_elements:
             attribute_value = attributed_element.get(attribute_name)
@@ -222,6 +222,7 @@ def section_file(user, section, coursename=None, dironly=False):
     Given a user and the name of a section, return that section.
     This is done specific to each course.
     If dironly=True then return the sections directory.
+    TODO: This is a bit weird; dironly should be scrapped. 
     '''
     filename = section+".xml"
 

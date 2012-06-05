@@ -18,4 +18,5 @@ coverage.xml
 cover/
 log/
 reports/
+/src/
 \#*\#

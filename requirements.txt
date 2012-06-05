@@ -13,7 +13,7 @@ python-memcached
 django-celery
 path.py
 django_debug_toolbar
-django-pipeline
+-e git://github.com/MITx/django-pipeline.git@incremental_compile#egg=django-pipeline
 django-staticfiles>=1.2.1
 django-masquerade
 fs
@@ -22,3 +22,4 @@ beautifulsoup
 requests
 sympy
 newrelic
+glob2

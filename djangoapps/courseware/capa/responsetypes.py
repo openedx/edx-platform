@@ -70,10 +70,8 @@ class GenericResponse(object):
 #-----------------------------------------------------------------------------
 
 class MultipleChoiceResponse(GenericResponse):
-    '''
-    Example: 
-
-    <multiplechoiceresponse direction="vertical" randomize="yes">
+    # TODO: handle direction and randomize
+    snippets = [{'snippet': '''<multiplechoiceresponse direction="vertical" randomize="yes">
      <choicegroup type="MultipleChoice">
         <choice location="random" correct="false"><span>`a+b`<br/></span></choice>
         <choice location="random" correct="true"><span><math>a+b^2</math><br/></span></choice>
@@ -81,10 +79,7 @@ class MultipleChoiceResponse(GenericResponse):
         <choice location="bottom" correct="false"><math>a+b+d</math></choice>
      </choicegroup>
     </multiplechoiceresponse>
-
-    TODO: handle direction and randomize
-
-    '''
+    '''}]
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
@@ -118,7 +113,7 @@ class MultipleChoiceResponse(GenericResponse):
             if rtype not in ["MultipleChoice"]:
                 response.set("type", "MultipleChoice")		# force choicegroup to be MultipleChoice if not valid
             for choice in list(response):
-                if choice.get("name") == None:
+                if choice.get("name") is None:
                     choice.set("name", "choice_"+str(i))
                     i+=1
                 else:
@@ -130,7 +125,7 @@ class TrueFalseResponse(MultipleChoiceResponse):
         for response in self.xml.xpath("choicegroup"):
             response.set("type", "TrueFalse")
             for choice in list(response):
-                if choice.get("name") == None:
+                if choice.get("name") is None:
                     choice.set("name", "choice_"+str(i))
                     i+=1
                 else:
@@ -149,16 +144,13 @@ class TrueFalseResponse(MultipleChoiceResponse):
 
 class OptionResponse(GenericResponse):
     '''
-    Example: 
-
-    <optionresponse direction="vertical" randomize="yes">
+    TODO: handle direction and randomize
+    '''
+    snippets = [{'snippet': '''<optionresponse direction="vertical" randomize="yes">
         <optioninput options="('Up','Down')" correct="Up"><text>The location of the sky</text></optioninput>
         <optioninput options="('Up','Down')" correct="Down"><text>The location of the earth</text></optioninput>
-    </optionresponse>
+    </optionresponse>'''}]
 
-    TODO: handle direction and randomize
-
-    '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.answer_fields = xml.findall('optioninput')
@@ -227,10 +219,8 @@ class CustomResponse(GenericResponse):
     '''
     Custom response.  The python code to be run should be in <answer>...</answer>
     or in a <script>...</script>
- 
-    Example:
-
-    <customresponse>
+    '''
+    snippets = [{'snippet': '''<customresponse>
     <startouttext/>
     <br/>
     Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
@@ -248,11 +238,8 @@ class CustomResponse(GenericResponse):
     if not(r=="IS*u(t-t0)"):
         correct[0] ='incorrect'
     </answer>
-    </customresponse>
-    
-    Alternatively, the check function can be defined in <script>...</script>  Example:
-
-<script type="loncapa/python"><![CDATA[
+    </customresponse>'''},
+    {'snippet': '''<script type="loncapa/python"><![CDATA[
 
 def sympy_check2():
   messages[0] = '%s:%s' % (submission[0],fromjs[0].replace('<','&lt;'))
@@ -265,9 +252,8 @@ def sympy_check2():
   <customresponse cfn="sympy_check2" type="cs" expect="2.27E-39" dojs="math" size="30" answer="2.27E-39">
     <textline size="40" dojs="math" />
     <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
-  </customresponse>
+  </customresponse>'''}]
 
-    '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.system = system
@@ -311,7 +297,7 @@ def sympy_check2():
                 self.code = ''
             else:
                 answer_src = answer.get('src')
-                if answer_src != None:
+                if answer_src is not None:
                     self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
                 else:
                     self.code = answer.text
@@ -452,10 +438,8 @@ def sympy_check2():
 class SymbolicResponse(CustomResponse):
     """
     Symbolic math response checking, using symmath library.
-
-    Example:
-
-    <problem>
+    """
+    snippets = [{'snippet': '''<problem>
       <text>Compute \[ \exp\left(-i \frac{\theta}{2} \left[ \begin{matrix} 0 & 1 \\ 1 & 0 \end{matrix} \right] \right) \]
       and give the resulting \(2\times 2\) matrix: <br/>
         <symbolicresponse answer="">
@@ -464,8 +448,7 @@ class SymbolicResponse(CustomResponse):
       <br/>
       Your input should be typed in as a list of lists, eg <tt>[[1,2],[3,4]]</tt>.
       </text>
-    </problem>
-    """
+    </problem>'''}]
     def __init__(self, xml, context, system=None):
         xml.set('cfn','symmath_check')
         code = "from symmath import *"
@@ -481,8 +464,8 @@ class ExternalResponse(GenericResponse):
     
     Typically used by coding problems.
 
-    Example:
-  <externalresponse tests="repeat:10,generate">
+    '''
+    snippets = [{'snippet', '''<externalresponse tests="repeat:10,generate">
     <textbox rows="10" cols="70"  mode="python"/>
     <answer><![CDATA[
 initial_display = """
@@ -519,9 +502,8 @@ main()
 """
 ]]>
     </answer>
-  </externalresponse>
+  </externalresponse>'''}]
 
-    '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.url = xml.get('url') or "http://eecs1.mit.edu:8889/pyloncapa"	# FIXME - hardcoded URL
@@ -532,7 +514,7 @@ main()
                            id=xml.get('id'))[0]
 
         answer_src = answer.get('src')
-        if answer_src != None:
+        if answer_src is not None:
             self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
         else:
             self.code = answer.text
@@ -640,10 +622,8 @@ class StudentInputError(Exception):
 class FormulaResponse(GenericResponse):
     '''
     Checking of symbolic math response using numerical sampling.
-
-    Example:
-
-    <problem>
+    '''
+    snippets = [{'snippet': '''<problem>
 
     <script type="loncapa/python">
     I = "m*c^2"
@@ -659,9 +639,8 @@ class FormulaResponse(GenericResponse):
       <textline size="40" math="1" />    
     </formularesponse>
 
-    </problem>
+    </problem>'''}]
 
-    '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -682,7 +661,7 @@ class FormulaResponse(GenericResponse):
 
         self.context = context
         ts = xml.get('type')
-        if ts == None:
+        if ts is None:
             typeslist = []
         else:
             typeslist = ts.split(',')
@@ -751,7 +730,7 @@ class SchematicResponse(GenericResponse):
         answer = xml.xpath('//*[@id=$id]//answer',
                            id=xml.get('id'))[0]
         answer_src = answer.get('src')
-        if answer_src != None:
+        if answer_src is not None:
             self.code = self.system.filestore.open('src/'+answer_src).read() # Untested; never used
         else:
             self.code = answer.text
@@ -780,15 +759,12 @@ class ImageResponse(GenericResponse):
     doesn't make sense to me (Ike).  Instead, let's have it such that <imageresponse>
     should contain one or more <imageinput> stanzas. Each <imageinput> should specify 
     a rectangle, given as an attribute, defining the correct answer.
-
-    Example:
-
-    <imageresponse>
+    """
+    snippets = [{'snippet': '''<imageresponse>
       <imageinput src="image1.jpg" width="200" height="100" rectangle="(10,10)-(20,30)" />
       <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
-    </imageresponse>
+    </imageresponse>'''}]
 
-    """
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.context = context

@@ -1,1 +1,1 @@
-django-admin.py runserver --settings=envs.dev --pythonpath=. 
+django-admin.py runserver --settings=envs.dev --pythonpath=.  || django-admin runserver --settings=envs.dev --pythonpath=.
