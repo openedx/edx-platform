@@ -208,7 +208,7 @@ class Module(XModule):
                 fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
                 fp.name = "StringIO"
             else:
-                raise Exception,err
+                raise
         try:
             self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
         except Exception,err:
@@ -222,7 +222,7 @@ class Module(XModule):
                 fp.name = "StringIO"
                 self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
             else:
-                raise Exception,err
+                raise
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -354,7 +354,7 @@ class Module(XModule):
         try:
             html = self.get_problem_html(encapsulate=False)
         except Exception,err:
-            log.error('failed to generate html, error %s' % err)
+            log.error('failed to generate html')
             raise Exception,err
 
         return json.dumps({'success': success,
