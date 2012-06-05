@@ -3,26 +3,37 @@
 
 <%def name="survey_radio(question_name, label, choices)">
   <li class="survey_radio">
-    <label>${label}</label><br/>
-    %for choice in choices:
-      <input type="radio" name="${question_name}" value="${choice}" align="BASELINE"/>${choice}<br>
-    %endfor
+    <h2>${label}</h2>
+    <ul>
+      %for choice in choices:
+      <li>
+        <label>
+          <input type="radio" name="${question_name}" value="${choice}" align="BASELINE"/>${choice}
+        </label>
+      </li>
+      %endfor
+    </ul>
   </li>
 </%def>
 
 <%def name="survey_select_many(question_name, label, choices)">
   <li class="survey_select_many">
-    <label>${label}</label><br/>
-    %for choice in choices:
-      <input type="checkbox" name="${question_name}" value="${choice}" align="BASELINE"/>${choice}<br>
-    %endfor
+    <h2>${label}</h2>
+    <ul>
+      %for choice in choices:
+      <li>
+        <label>
+          <input type="checkbox" name="${question_name}" value="${choice}" align="BASELINE"/>${choice}
+        </label>
+      </li>
+      %endfor
+    </ul>
   </li>
 </%def>
 
 <%def name="survey_checkbox(question_name, label)">
   <li class="survey_checkbox">
-    <input type="checkbox" name="${question_name}" value="true"/>
-    <label>${label}</label>
+    <label><input type="checkbox" name="${question_name}" value="true"/> ${label}</label>
   </li>
 </%def>
 
