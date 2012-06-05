@@ -70,7 +70,7 @@ exit_survey_questions = {
         
         {'type' : 'radio',
         'question_name' : 'scholarship_secondary',
-        'label' : 'Did you receive any scholarship or financial assistance to attend <b>secondary school</b>?',
+        'label' : 'Did you receive any scholarship or financial assistance to attend <strong>secondary school</strong>?',
         'choices' : [
             'Yes',
             'No',
@@ -78,7 +78,7 @@ exit_survey_questions = {
         
         {'type' : 'radio',
         'question_name' : 'scholarship_college',
-        'label' : 'Did you receive any scholarship or financial assistanche to attend <b>college/university</b>?',
+        'label' : 'Did you receive any scholarship or financial assistanche to attend <strong>college/university</strong>?',
         'choices' : [
             'Yes',
             'No',
@@ -185,7 +185,7 @@ exit_survey_questions = {
         
         {'type' : 'radio',
         'question_name' : 'book_count',
-        'label' : 'How many books are there in your home? <br/><i>(There are usually about 40 books per meter of shelving. Do not include magazines, newspapers, or schoolbooks in your estimate.)</i>',
+        'label' : 'How many books are there in your home? <br/><em>(There are usually about 40 books per meter of shelving. Do not include magazines, newspapers, or schoolbooks in your estimate.)</em>',
         'choices' : [
             '0-10 books',
             '11-25 books',
