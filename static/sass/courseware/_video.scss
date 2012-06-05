@@ -137,6 +137,7 @@ section.course-content {
             float: left;
             margin-bottom: 0;
 
+
             a {
               border-bottom: none;
               border-right: 1px solid #000;
@@ -146,11 +147,17 @@ section.course-content {
               line-height: 46px;
               padding: 0 lh(.75);
               text-indent: -9999px;
-              @include transition();
+              @include transition(background-color, opacity);
               width: 14px;
+              background: url('../images/vcr.png') 15px 15px no-repeat;
+
+              &:empty {
+                height: 46px;
+                background: url('../images/vcr.png') 15px 15px no-repeat;
+              }
 
               &.play {
-                background: url('../images/play-icon.png') center center no-repeat;
+                background-position: 17px -114px;
 
                 &:hover {
                   background-color: #444;
@@ -158,7 +165,7 @@ section.course-content {
               }
 
               &.pause {
-                background: url('../images/pause-icon.png') center center no-repeat;
+                background-position: 16px -50px;
 
                 &:hover {
                   background-color: #444;
@@ -361,7 +368,6 @@ section.course-content {
         cursor: pointer;
         margin-bottom: 8px;
         padding: 0;
-        @include transition(all, .5s, ease-in);
 
         &.current {
           color: #333;
@@ -386,7 +392,6 @@ section.course-content {
       }
 
       ol.subtitles {
-        height: 0;
         width: 0px;
       }
     }
@@ -408,7 +413,6 @@ section.course-content {
 
       &.closed {
         ol.subtitles {
-          height: auto;
           right: -(flex-grid(4));
           width: auto;
         }

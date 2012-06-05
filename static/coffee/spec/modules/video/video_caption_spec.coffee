@@ -9,66 +9,82 @@ describe 'VideoCaption', ->
   describe 'constructor', ->
     beforeEach ->
       spyOn($, 'getWithPrefix').andCallThrough()
-      @caption = new VideoCaption @player, 'def456'
 
-    it 'set the player', ->
-      expect(@caption.player).toEqual @player
+    describe 'always', ->
+      beforeEach ->
+        @caption = new VideoCaption @player, 'def456'
 
-    it 'set the youtube id', ->
-      expect(@caption.youtubeId).toEqual 'def456'
+      it 'set the player', ->
+        expect(@caption.player).toEqual @player
 
-    it 'create the caption element', ->
-      expect($('.video')).toContain 'ol.subtitles'
+      it 'set the youtube id', ->
+        expect(@caption.youtubeId).toEqual 'def456'
 
-    it 'add caption control to video player', ->
-      expect($('.video')).toContain 'a.hide-subtitles'
+      it 'create the caption element', ->
+        expect($('.video')).toContain 'ol.subtitles'
 
-    it 'fetch the caption', ->
-      expect($.getWithPrefix).toHaveBeenCalledWith @caption.captionURL(), jasmine.any(Function)
+      it 'add caption control to video player', ->
+        expect($('.video')).toContain 'a.hide-subtitles'
 
-    it 'render the caption', ->
-      expect($('.subtitles').html()).toMatch new RegExp('''
-        <li data-index="0" data-start="0">Caption at 0</li>
-        <li data-index="1" data-start="10000">Caption at 10000</li>
-        <li data-index="2" data-start="20000">Caption at 20000</li>
-        <li data-index="3" data-start="30000">Caption at 30000</li>
-        <li data-index="4" data-start="40000">Caption at 40000</li>
-        <li data-index="5" data-start="50000">Caption at 50000</li>
-        <li data-index="6" data-start="60000">Caption at 60000</li>
-        <li data-index="7" data-start="70000">Caption at 70000</li>
-        <li data-index="8" data-start="80000">Caption at 80000</li>
-        <li data-index="9" data-start="90000">Caption at 90000</li>
-        <li data-index="10" data-start="100000">Caption at 100000</li>
-        <li data-index="11" data-start="110000">Caption at 110000</li>
-        <li data-index="12" data-start="120000">Caption at 120000</li>
-      '''.replace(/\n/g, ''))
+      it 'fetch the caption', ->
+        expect($.getWithPrefix).toHaveBeenCalledWith @caption.captionURL(), jasmine.any(Function)
 
-    it 'add a padding element to caption', ->
-      expect($('.subtitles li:first')).toBe '.spacing'
-      expect($('.subtitles li:last')).toBe '.spacing'
+      it 'bind window resize event', ->
+        expect($(window)).toHandleWith 'resize', @caption.onWindowResize
 
-    it 'bind all the caption link', ->
-      $('.subtitles li[data-index]').each (index, link) =>
-        expect($(link)).toHandleWith 'click', @caption.seekPlayer
+      it 'bind player resize event', ->
+        expect($(@player)).toHandleWith 'resize', @caption.onWindowResize
 
-    it 'bind window resize event', ->
-      expect($(window)).toHandleWith 'resize', @caption.onWindowResize
+      it 'bind player updatePlayTime event', ->
+        expect($(@player)).toHandleWith 'updatePlayTime', @caption.onUpdatePlayTime
 
-    it 'bind player resize event', ->
-      expect($(@player)).toHandleWith 'resize', @caption.onWindowResize
+      it 'bind player play event', ->
+        expect($(@player)).toHandleWith 'play', @caption.onPlay
 
-    it 'bind player updatePlayTime event', ->
-      expect($(@player)).toHandleWith 'updatePlayTime', @caption.onUpdatePlayTime
+      it 'bind the hide caption button', ->
+        expect($('.hide-subtitles')).toHandleWith 'click', @caption.toggle
 
-    it 'bind the hide caption button', ->
-      expect($('.hide-subtitles')).toHandleWith 'click', @caption.toggle
+      it 'bind the mouse movement', ->
+        expect($('.subtitles')).toHandleWith 'mouseenter', @caption.onMouseEnter
+        expect($('.subtitles')).toHandleWith 'mouseleave', @caption.onMouseLeave
+        expect($('.subtitles')).toHandleWith 'mousemove', @caption.onMovement
+        expect($('.subtitles')).toHandleWith 'mousewheel', @caption.onMovement
+        expect($('.subtitles')).toHandleWith 'DOMMouseScroll', @caption.onMovement
 
-    it 'bind the mouse movement', ->
-      expect($('.subtitles')).toHandleWith 'mouseenter', @caption.onMouseEnter
-      expect($('.subtitles')).toHandleWith 'mouseleave', @caption.onMouseLeave
-      expect($('.subtitles')).toHandleWith 'mousemove', @caption.onMovement
-      expect($('.subtitles')).toHandleWith 'mousewheel', @caption.onMovement
-      expect($('.subtitles')).toHandleWith 'DOMMouseScroll', @caption.onMovement
+    describe 'when on a non touch-based device', ->
+      beforeEach ->
+        spyOn(window, 'onTouchBasedDevice').andReturn false
+        @caption = new VideoCaption @player, 'def456'
+
+      it 'render the caption', ->
+        expect($('.subtitles').html()).toMatch new RegExp('''
+          <li data-index="0" data-start="0">Caption at 0</li>
+          <li data-index="1" data-start="10000">Caption at 10000</li>
+          <li data-index="2" data-start="20000">Caption at 20000</li>
+          <li data-index="3" data-start="30000">Caption at 30000</li>
+        '''.replace(/\n/g, ''))
+
+      it 'add a padding element to caption', ->
+        expect($('.subtitles li:first')).toBe '.spacing'
+        expect($('.subtitles li:last')).toBe '.spacing'
+
+      it 'bind all the caption link', ->
+        $('.subtitles li[data-index]').each (index, link) =>
+          expect($(link)).toHandleWith 'click', @caption.seekPlayer
+
+      it 'set rendered to true', ->
+        expect(@caption.rendered).toBeTruthy()
+
+    describe 'when on a touch-based device', ->
+      beforeEach ->
+        spyOn(window, 'onTouchBasedDevice').andReturn true
+        @caption = new VideoCaption @player, 'def456'
+
+      it 'show explaination message', ->
+        expect($('.subtitles li')).toHaveHtml "Caption will be displayed when you start playing the video."
+
+      it 'does not set rendered to true', ->
+        expect(@caption.rendered).toBeFalsy()
 
   describe 'mouse movement', ->
     beforeEach ->
@@ -145,8 +161,34 @@ describe 'VideoCaption', ->
       expect(@caption.search(9999)).toEqual 0
       expect(@caption.search(10000)).toEqual 1
       expect(@caption.search(15000)).toEqual 1
-      expect(@caption.search(120000)).toEqual 12
-      expect(@caption.search(120001)).toEqual 12
+      expect(@caption.search(30000)).toEqual 3
+      expect(@caption.search(30001)).toEqual 3
+
+  describe 'onPlay', ->
+    describe 'when the caption was not rendered', ->
+      beforeEach ->
+        spyOn(window, 'onTouchBasedDevice').andReturn true
+        @caption = new VideoCaption @player, 'def456'
+        @caption.onPlay()
+
+      it 'render the caption', ->
+        expect($('.subtitles').html()).toMatch new RegExp('''
+          <li data-index="0" data-start="0">Caption at 0</li>
+          <li data-index="1" data-start="10000">Caption at 10000</li>
+          <li data-index="2" data-start="20000">Caption at 20000</li>
+          <li data-index="3" data-start="30000">Caption at 30000</li>
+        '''.replace(/\n/g, ''))
+
+      it 'add a padding element to caption', ->
+        expect($('.subtitles li:first')).toBe '.spacing'
+        expect($('.subtitles li:last')).toBe '.spacing'
+
+      it 'bind all the caption link', ->
+        $('.subtitles li[data-index]').each (index, link) =>
+          expect($(link)).toHandleWith 'click', @caption.seekPlayer
+
+      it 'set rendered to true', ->
+        expect(@caption.rendered).toBeTruthy()
 
   describe 'onUpdatePlayTime', ->
     beforeEach ->

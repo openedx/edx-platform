@@ -17,7 +17,7 @@ class @VideoControl
       <div class="slider"></div>
       <div>
         <ul class="vcr">
-          <li><a class="video_control play">Play</a></li>
+          <li><a class="video_control" href="#"></a></li>
           <li>
             <div class="vidtime">0:00 / 0:00</div>
           </li>
@@ -26,7 +26,10 @@ class @VideoControl
           <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
         </div>
       </div>
-     """
+      """
+
+    unless onTouchBasedDevice()
+      @$('.video_control').addClass('play').html('Play')
 
   onPlay: =>
     @$('.video_control').removeClass('play').addClass('pause').html('Pause')
@@ -36,7 +39,8 @@ class @VideoControl
 
   togglePlayback: (event) =>
     event.preventDefault()
-    if @player.isPlaying()
-      $(@player).trigger('pause')
-    else
-      $(@player).trigger('play')
+    if $('.video_control').hasClass('play') || $('.video_control').hasClass('pause')
+      if @player.isPlaying()
+        $(@player).trigger('pause')
+      else
+        $(@player).trigger('play')
