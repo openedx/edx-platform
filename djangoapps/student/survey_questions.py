@@ -28,13 +28,67 @@ exit_survey_questions = {
         
         {'type' : 'checkbox',
         'question_name' : 'future_offerings',
-        'label' : 'Please inform me of opportunities to help with future offerings of 6.002x, such as staffing discussiong forums or developing content.'},
+        'label' : 'Please inform me of opportunities to help with future offerings of this course, such as staffing discussiong forums or developing content.'},
         
         {'type' : 'checkbox',
-        'question_name' : '6002x_updates',
-        'label' : 'Please subscribe me to periodic updates about additional topics, refreshers, and follow-ups for topics in 6.002x.'},
+        'question_name' : 'future_updates',
+        'label' : 'Please subscribe me to periodic updates about additional topics, refreshers, and follow-ups for topics in this course.'},
+        
+        {'type' : 'medium_field',
+        'question_name' : 'favorite_parts',
+        'label' : 'What were your favorite parts of this course? We would love to hear your comments on the course or the platform.'},
+        
+        {'type' : 'radio',
+        'question_name' : 'rating',
+        'label' : 'How would you rate this course?',
+        'choices' : [
+            '1 - I hated it. I didn\'t learn anything.',
+            '2',
+            '3',
+            '4 - It was pretty good, but could use some improvement.',
+            '5',
+            '6',
+            '7 - Absolutely amazing. I learned a great deal.',
+        ]},
     ],
     'random_questions' : [
+        # New, needs review
+        {'type' : 'radio',
+        'question_name' : 'university_comparison',
+        'label' : 'How would you compare this course to an equivalent university course, if you have taken one?',
+        'choices' : [
+            'This course was <strong>much worse</strong> than the university class.',
+            'This course was <strong>on the same level</strong> as the university class.',
+            'This course was <strong>much better</strong> than the university class.',
+            'I have not taken an equivalent university class.',
+        ]},
+        
+        
+        {'type' : 'select_many',
+        'question_name' : 'smartphone_usage',
+        'label' : 'Are you interested in taking edX courses from a mobile device, such as a smartphone? (Chech all that apply.)',
+        'choices' : [
+            'I would like to use a mobile device my <strong>primary</strong> way of taking edX courses.',
+            'I would like to use a mobile device to <strong>sometimes</strong> access edX courses.',
+            'I would <strong>not</strong> like to use a mobile device with edX courses.',
+            'I use an Android device.',
+            'I use an iPhone or iPod Touch.',
+            'I use an iPad.',
+            'I use a different internet-capable mobile device.',
+            'I do not use an internet-capable mobile device.',
+        ]},
+        
+        {'type' : 'medium_field',
+        'question_name' : 'improvement_ideas',
+        'label' : 'Do you have any ideas on how to improve this course or the edX platform?'},
+        
+        
+        # Level of bandwidth
+        # Speed of computer/RAM/etc. 
+        # Size of monitor
+        # Own a tablet? 
+        
+        
         {'type' : 'radio',
         'question_name' : 'teach_ee',
         'label' : 'Do you teach electrical engineering (EE)?',
@@ -120,26 +174,7 @@ exit_survey_questions = {
             'Other',
         ]},
         
-        # New, needs review
-        {'type' : 'select_many',
-        'question_name' : 'smartphone_usage',
-        'label' : 'Are you interested in taking edX courses from a mobile device, such as a smartphone? (Chech all that apply.)',
-        'choices' : [
-            'I would like to use a mobile device my <strong>primary</strong> way of taking edX courses.',
-            'I would like to use a mobile device to <strong>sometimes</strong> access edX courses.',
-            'I would <strong>not</strong> like to use a mobile device with edX courses.',
-            'I use an Android device.',
-            'I use an iPhone or iPod Touch.',
-            'I use an iPad.',
-            'I use a different internet-capable mobile device.',
-            'I do not use an internet-capable mobile device.',
-        ]},
-        
-        
-        # Level of bandwidth
-        # Speed of computer/RAM/etc. 
-        # Size of monitor
-        # Own a tablet? 
+
         {'type' : 'radio',
         'question_name' : 'work_offline',
         'label' : 'Have you worked <b>offline</b> with anyone on the MITx material?',
