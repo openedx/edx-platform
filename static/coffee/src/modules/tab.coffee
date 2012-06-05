@@ -16,7 +16,7 @@ class @Tab
 
   onShow: (element, ui) =>
     @$('section.ui-tabs-hide').html('')
-    @$("##{@tabId(ui.index)}").html(eval(@items[ui.index]['content']))
+    @$("##{@tabId(ui.index)}").html(@items[ui.index]['content'])
     @element.trigger 'contentChanged'
 
   tabId: (index) ->
