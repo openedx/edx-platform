@@ -26,7 +26,7 @@ import track.views
 from lxml import etree
 
 
-from courseware.module_render import render_module, make_track_function, I4xSystem, get_state_from_module_object_preload
+from courseware.module_render import make_track_function, I4xSystem
 from courseware.models import StudentModule
 from multicourse import multicourse_settings
 from student.models import UserProfile

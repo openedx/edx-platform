@@ -465,7 +465,7 @@ class ExternalResponse(GenericResponse):
     Typically used by coding problems.
 
     '''
-    snippets = [{'snippet', '''<externalresponse tests="repeat:10,generate">
+    snippets = [{'snippet': '''<externalresponse tests="repeat:10,generate">
     <textbox rows="10" cols="70"  mode="python"/>
     <answer><![CDATA[
 initial_display = """
