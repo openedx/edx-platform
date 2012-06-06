@@ -10,6 +10,7 @@
 # Provides sympy representation.
 
 import os, sys, string, re
+import logging
 import operator
 import sympy
 from sympy.printing.latex import LatexPrinter
@@ -30,7 +31,9 @@ from lxml import etree
 import requests
 from copy import deepcopy
 
-print "[lib.symmath.formula] Warning: Dark code. Needs review before enabling in prod."
+log = logging.getLogger(__name__)
+
+log.warning("Dark code. Needs review before enabling in prod.")
 
 os.environ['PYTHONIOENCODING'] = 'utf-8'
 
