@@ -8,7 +8,9 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import inspect
 import json
+import logging
 import math
 import numbers
 import numpy
@@ -33,6 +35,8 @@ import calc
 import eia
 
 from util import contextualize_text
+
+log = logging.getLogger("mitx.courseware")
 
 def compare_with_tolerance(v1, v2, tol):
     ''' Compare v1 to v2 with maximum tolerance tol
@@ -140,16 +144,13 @@ class TrueFalseResponse(MultipleChoiceResponse):
 
 class OptionResponse(GenericResponse):
     '''
-    Example: 
-
-    <optionresponse direction="vertical" randomize="yes">
+    TODO: handle direction and randomize
+    '''
+    snippets = [{'snippet': '''<optionresponse direction="vertical" randomize="yes">
         <optioninput options="('Up','Down')" correct="Up"><text>The location of the sky</text></optioninput>
         <optioninput options="('Up','Down')" correct="Down"><text>The location of the earth</text></optioninput>
-    </optionresponse>
+    </optionresponse>'''}]
 
-    TODO: handle direction and randomize
-
-    '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.answer_fields = xml.findall('optioninput')
@@ -176,6 +177,10 @@ class OptionResponse(GenericResponse):
 class NumericalResponse(GenericResponse):
     def __init__(self, xml, context, system=None):
         self.xml = xml
+	if not xml.get('answer'):
+            msg = "Error in problem specification: numericalresponse missing required answer attribute\n"
+            msg += "See XML source line %s" % getattr(xml,'sourceline','<unavailable>')
+	    raise Exception,msg
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         try:
             self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
@@ -212,9 +217,9 @@ class NumericalResponse(GenericResponse):
 
 class CustomResponse(GenericResponse):
     '''
-    Custom response.  The python code to be run should be in <answer>...</answer>.  Example:
+    Custom response.  The python code to be run should be in <answer>...</answer>
+    or in a <script>...</script>
     '''
-
     snippets = [{'snippet': '''<customresponse>
     <startouttext/>
     <br/>
@@ -233,12 +238,8 @@ class CustomResponse(GenericResponse):
     if not(r=="IS*u(t-t0)"):
         correct[0] ='incorrect'
     </answer>
-    </customresponse>'''}]
-    
-
-    '''Footnote: the check function can also be defined in <script>...</script>  Example:
-
-<script type="loncapa/python"><![CDATA[
+    </customresponse>'''},
+    {'snippet': '''<script type="loncapa/python"><![CDATA[
 
 def sympy_check2():
   messages[0] = '%s:%s' % (submission[0],fromjs[0].replace('<','&lt;'))
@@ -251,21 +252,25 @@ def sympy_check2():
   <customresponse cfn="sympy_check2" type="cs" expect="2.27E-39" dojs="math" size="30" answer="2.27E-39">
     <textline size="40" dojs="math" />
     <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
-  </customresponse>
+  </customresponse>'''}]
 
-    '''
     def __init__(self, xml, context, system=None):
         self.xml = xml
+        self.system = system
         ## CRITICAL TODO: Should cover all entrytypes
         ## NOTE: xpath will look at root of XML tree, not just 
         ## what's in xml. @id=id keeps us in the right customresponse. 
         self.answer_ids = xml.xpath('//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
+        self.answer_ids += [x.get('id') for x in xml.findall('textbox')]	# also allow textbox inputs
         self.context = context
 
-        # if <customresponse> has an "expect" attribute then save that
-        self.expect = xml.get('expect')
+        # if <customresponse> has an "expect" (or "answer") attribute then save that
+        self.expect = xml.get('expect') or xml.get('answer')
         self.myid = xml.get('id')
+
+        if settings.DEBUG:
+            log.info('answer_ids=%s' % self.answer_ids)
 
         # the <answer>...</answer> stanza should be local to the current <customresponse>.  So try looking there first.
         self.code = None
@@ -279,7 +284,7 @@ def sympy_check2():
             # ie the comparison function is defined in the <script>...</script> stanza instead
             cfn = xml.get('cfn')
             if cfn:
-                if settings.DEBUG: print "[courseware.capa.responsetypes] cfn = ",cfn
+                if settings.DEBUG: log.info("[courseware.capa.responsetypes] cfn = %s" % cfn)
                 if cfn in context:
                     self.code = context[cfn]
                 else:
@@ -310,8 +315,16 @@ def sympy_check2():
             return default
 
         idset = sorted(self.answer_ids)				# ordered list of answer id's
-        submission = [student_answers[k] for k in idset]	# ordered list of answers
-        fromjs = [ getkey2(student_answers,k+'_fromjs',None) for k in idset ]	# ordered list of fromjs_XXX responses (if exists)
+        try:
+            submission = [student_answers[k] for k in idset]	# ordered list of answers
+        except Exception, err:
+            msg = '[courseware.capa.responsetypes.customresponse] error getting student answer from %s' % student_answers
+            msg += '\n idset = %s, error = %s' % (idset,err)
+            log.error(msg)
+            raise Exception,msg
+
+        # global variable in context which holds the Presentation MathML from dynamic math input
+        dynamath = [ student_answers.get(k+'_dynamath',None) for k in idset ]	# ordered list of dynamath responses
 
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset)==1 and not submission[0]:
@@ -329,12 +342,17 @@ def sympy_check2():
                              'expect': self.expect,		# expected answer (if given as attribute)
                              'submission':submission,		# ordered list of student answers from entry boxes in our subtree
                              'idset':idset,			# ordered list of ID's of all entry boxes in our subtree
-                             'fromjs':fromjs,			# ordered list of all javascript inputs in our subtree
+                             'dynamath':dynamath,		# ordered list of all javascript inputs in our subtree
                              'answers':student_answers,		# dict of student's responses, with keys being entry box IDs
                              'correct':correct,			# the list to be filled in by the check function
                              'messages':messages,		# the list of messages to be filled in by the check function
+                             'options':self.xml.get('options'),	# any options to be passed to the cfn
                              'testdat':'hello world',
                              })
+
+        # pass self.system.debug to cfn 
+        # if hasattr(self.system,'debug'): self.context['debug'] = self.system.debug
+        self.context['debug'] = settings.DEBUG
 
         # exec the check function
         if type(self.code)==str:
@@ -348,34 +366,48 @@ def sympy_check2():
 
             # this is an interface to the Tutor2 check functions
             fn = self.code
+            ret = None
+            if settings.DEBUG: log.info(" submission = %s" % submission)
             try:
                 answer_given = submission[0] if (len(idset)==1) else submission
-                if fn.func_code.co_argcount>=4:	# does it want four arguments (the answers dict, myname)?
-                    ret = fn(self.expect,answer_given,student_answers,self.answer_ids[0])
-                elif fn.func_code.co_argcount>=3:	# does it want a third argument (the answers dict)?
-                    ret = fn(self.expect,answer_given,student_answers)
-                else:
-                    ret = fn(self.expect,answer_given)
+                # handle variable number of arguments in check function, for backwards compatibility
+                # with various Tutor2 check functions
+                args = [self.expect,answer_given,student_answers,self.answer_ids[0]]
+                argspec = inspect.getargspec(fn)
+                nargs = len(argspec.args)-len(argspec.defaults or [])
+                kwargs = {}
+                for argname in argspec.args[nargs:]:
+                    kwargs[argname] = self.context[argname] if argname in self.context else None
+
+                if settings.DEBUG:
+                    log.debug('[courseware.capa.responsetypes.customresponse] answer_given=%s' % answer_given)
+                    log.info('nargs=%d, args=%s, kwargs=%s' % (nargs,args,kwargs))
+
+                ret = fn(*args[:nargs],**kwargs)
             except Exception,err:
-                print "oops in customresponse (cfn) error %s" % err
+                log.error("oops in customresponse (cfn) error %s" % err)
                 # print "context = ",self.context
-                print traceback.format_exc()
-            if settings.DEBUG: print "[courseware.capa.responsetypes.customresponse.get_score] ret = ",ret
+                log.error(traceback.format_exc())
+                raise Exception,"oops in customresponse (cfn) error %s" % err
+            if settings.DEBUG: log.info("[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
             if type(ret)==dict:
-                correct[0] = 'correct' if ret['ok'] else 'incorrect'
+                correct = ['correct']*len(idset) if ret['ok'] else ['incorrect']*len(idset)
                 msg = ret['msg']
 
                 if 1:
                     # try to clean up message html
                     msg = '<html>'+msg+'</html>'
-                    msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
+                    msg = msg.replace('&#60;','&lt;')
+                    #msg = msg.replace('&lt;','<')
+                    msg = etree.tostring(fromstring_bs(msg,convertEntities=None),pretty_print=True)
+                    #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
                     msg = msg.replace('&#13;','')
                     #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)	# python 2.7
                     msg = re.sub('(?ms)<html>(.*)</html>','\\1',msg)
 
                 messages[0] = msg
             else:
-                correct[0] = 'correct' if ret else 'incorrect'
+                correct = ['correct']*len(idset) if ret else ['incorrect']*len(idset)
 
         # build map giving "correct"ness of the answer(s)
         #correct_map = dict(zip(idset, self.context['correct']))
@@ -403,14 +435,78 @@ def sympy_check2():
 
 #-----------------------------------------------------------------------------
 
-class ExternalResponse(GenericResponse):
+class SymbolicResponse(CustomResponse):
     """
-    Grade the student's input using an external server.
+    Symbolic math response checking, using symmath library.
+    """
+    snippets = [{'snippet': '''<problem>
+      <text>Compute \[ \exp\left(-i \frac{\theta}{2} \left[ \begin{matrix} 0 & 1 \\ 1 & 0 \end{matrix} \right] \right) \]
+      and give the resulting \(2\times 2\) matrix: <br/>
+        <symbolicresponse answer="">
+          <textline size="40" math="1" />
+        </symbolicresponse>
+      <br/>
+      Your input should be typed in as a list of lists, eg <tt>[[1,2],[3,4]]</tt>.
+      </text>
+    </problem>'''}]
+    def __init__(self, xml, context, system=None):
+        xml.set('cfn','symmath_check')
+        code = "from symmath import *"
+        exec code in context,context
+        CustomResponse.__init__(self,xml,context,system)
+        
+
+#-----------------------------------------------------------------------------
+
+class ExternalResponse(GenericResponse):
+    '''
+    Grade the students input using an external server.
     
     Typically used by coding problems.
-    """
+
+    '''
+    snippets = [{'snippet': '''<externalresponse tests="repeat:10,generate">
+    <textbox rows="10" cols="70"  mode="python"/>
+    <answer><![CDATA[
+initial_display = """
+def inc(x):
+"""
+
+answer = """
+def inc(n):
+    return n+1
+"""
+preamble = """ 
+import sympy
+"""
+test_program = """
+import random
+
+def testInc(n = None):
+    if n is None:
+       n = random.randint(2, 20)
+    print 'Test is: inc(%d)'%n
+    return str(inc(n))
+
+def main():
+   f = os.fdopen(3,'w')
+   test = int(sys.argv[1])
+   rndlist = map(int,os.getenv('rndlist').split(','))
+   random.seed(rndlist[0])
+   if test == 1: f.write(testInc(0))
+   elif test == 2: f.write(testInc(1))
+   else:  f.write(testInc())
+   f.close()
+
+main()
+"""
+]]>
+    </answer>
+  </externalresponse>'''}]
+
     def __init__(self, xml, context, system=None):
         self.xml = xml
+        self.url = xml.get('url') or "http://eecs1.mit.edu:8889/pyloncapa"	# FIXME - hardcoded URL
         self.answer_ids = xml.xpath('//*[@id=$id]//textbox/@id|//*[@id=$id]//textline/@id',
                                     id=xml.get('id'))
         self.context = context
@@ -423,25 +519,66 @@ class ExternalResponse(GenericResponse):
         else:
             self.code = answer.text
 
-        self.tests = xml.get('answer')
+        self.tests = xml.get('tests')
 
-    def get_score(self, student_answers):
-        submission = [student_answers[k] for k in sorted(self.answer_ids)]
-        self.context.update({'submission':submission})
+    def do_external_request(self,cmd,extra_payload):
+        '''
+        Perform HTTP request / post to external server.
 
+        cmd = remote command to perform (str)
+        extra_payload = dict of extra stuff to post.
+
+        Return XML tree of response (from response body)
+        '''
         xmlstr = etree.tostring(self.xml, pretty_print=True)
-
         payload = {'xml': xmlstr, 
-				   ### Question: Is this correct/what we want? Shouldn't this be a json.dumps? 
-          	       'LONCAPA_student_response': ''.join(submission), 
-                   'LONCAPA_correct_answer': self.tests,
+                   'edX_cmd' : cmd,
+                   'edX_tests': self.tests,
                    'processor' : self.code,
                    }
+        payload.update(extra_payload)
 
-        # call external server; TODO: get URL from settings.py
-        r = requests.post("http://eecs1.mit.edu:8889/pyloncapa",data=payload)
+        try:
+            r = requests.post(self.url,data=payload)          # call external server
+        except Exception,err:
+            msg = 'Error %s - cannot connect to external server url=%s' % (err,self.url)
+            log.error(msg)
+            raise Exception, msg
 
-        rxml = etree.fromstring(r.text)         # response is XML; prase it
+        if settings.DEBUG: log.info('response = %s' % r.text)
+
+        if (not r.text ) or (not r.text.strip()):
+            raise Exception,'Error: no response from external server url=%s' % self.url
+
+        try:
+            rxml = etree.fromstring(r.text)         # response is XML; prase it
+        except Exception,err:
+            msg = 'Error %s - cannot parse response from external server r.text=%s' % (err,r.text)
+            log.error(msg)
+            raise Exception, msg
+
+        return rxml
+
+    def get_score(self, student_answers):
+        try:
+            submission = [student_answers[k] for k in sorted(self.answer_ids)]
+        except Exception,err:
+            log.error('Error %s: cannot get student answer for %s; student_answers=%s' % (err,self.answer_ids,student_answers))
+            raise Exception,err
+
+        self.context.update({'submission':submission})
+
+        extra_payload = {'edX_student_response': json.dumps(submission)}
+
+        try:
+            rxml = self.do_external_request('get_score',extra_payload)
+        except Exception, err:
+            log.error('Error %s' % err)
+            if settings.DEBUG:
+                correct_map = dict(zip(sorted(self.answer_ids), ['incorrect'] * len(self.answer_ids) ))
+                correct_map['msg_%s' % self.answer_ids[0]] = '<font color="red" size="+2">%s</font>' % str(err).replace('<','&lt;')
+                return correct_map
+
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
         	 'WRONG_FORMAT': 'incorrect',
@@ -453,15 +590,29 @@ class ExternalResponse(GenericResponse):
         # self.context['correct'] = ['correct','correct']
         correct_map = dict(zip(sorted(self.answer_ids), self.context['correct']))
         
-        # TODO: separate message for each answer_id?
-        correct_map['msg'] = rxml.find('message').text.replace('&nbsp;','&#160;')  # store message in correct_map
+        # store message in correct_map
+        correct_map['msg_%s' % self.answer_ids[0]] = rxml.find('message').text.replace('&nbsp;','&#160;')  
 
         return  correct_map
 
     def get_answers(self):
-        # Since this is explicitly specified in the problem, this will 
-        # be handled by capa_problem
-        return {}
+        '''
+        Use external server to get expected answers
+        '''
+        try:
+            rxml = self.do_external_request('get_answers',{})
+            exans = json.loads(rxml.find('expected').text)
+        except Exception,err:
+            log.error('Error %s' % err)
+            if settings.DEBUG:
+                msg = '<font color=red size=+2>%s</font>' % str(err).replace('<','&lt;')
+                exans = [''] * len(self.answer_ids)
+                exans[0] = msg
+            
+        if not (len(exans)==len(self.answer_ids)):
+            log.error('Expected %d answers from external server, only got %d!' % (len(self.answer_ids),len(exans)))
+            raise Exception,'Short response from external server'
+        return dict(zip(self.answer_ids,exans))
 
 class StudentInputError(Exception):
     pass
@@ -469,6 +620,27 @@ class StudentInputError(Exception):
 #-----------------------------------------------------------------------------
 
 class FormulaResponse(GenericResponse):
+    '''
+    Checking of symbolic math response using numerical sampling.
+    '''
+    snippets = [{'snippet': '''<problem>
+
+    <script type="loncapa/python">
+    I = "m*c^2"
+    </script>
+
+    <text>
+    <br/>
+    Give an equation for the relativistic energy of an object with mass m.
+    </text>
+    <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="$I">
+      <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+      <textline size="40" math="1" />    
+    </formularesponse>
+
+    </problem>'''}]
+
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -587,15 +759,12 @@ class ImageResponse(GenericResponse):
     doesn't make sense to me (Ike).  Instead, let's have it such that <imageresponse>
     should contain one or more <imageinput> stanzas. Each <imageinput> should specify 
     a rectangle, given as an attribute, defining the correct answer.
-
-    Example:
-
-    <imageresponse>
+    """
+    snippets = [{'snippet': '''<imageresponse>
       <imageinput src="image1.jpg" width="200" height="100" rectangle="(10,10)-(20,30)" />
       <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
-    </imageresponse>
+    </imageresponse>'''}]
 
-    """
     def __init__(self, xml, context, system=None):
         self.xml = xml
         self.context = context
@@ -621,7 +790,7 @@ class ImageResponse(GenericResponse):
             # parse given answer
             m = re.match('\[([0-9]+),([0-9]+)]',given.strip().replace(' ',''))
             if not m:
-                raise Exception,'[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (err,aid,given)
+                raise Exception,'[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (aid,given)
             (gx,gy) = [int(x) for x in m.groups()]
             
             # answer is correct if (x,y) is within the specified rectangle

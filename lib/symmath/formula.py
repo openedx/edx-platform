@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # File:   formula.py
-# Date:   04-May-12
+# Date:   04-May-12 (creation)
 # Author: I. Chuang <ichuang@mit.edu>
 #
 # flexible python representation of a symbolic mathematical formula.
@@ -30,7 +30,7 @@ from lxml import etree
 import requests
 from copy import deepcopy
 
-print "[lib.sympy_check.formula] Warning: Dark code. Needs review before enabling in prod."
+print "[lib.symmath.formula] Warning: Dark code. Needs review before enabling in prod."
 
 os.environ['PYTHONIOENCODING'] = 'utf-8'
 
@@ -143,11 +143,12 @@ class formula(object):
     Representation of a mathematical formula object.  Accepts mathml math expression for constructing,
     and can produce sympy translation.  The formula may or may not include an assignment (=).
     '''
-    def __init__(self,expr,asciimath=''):
+    def __init__(self,expr,asciimath='',options=None):
         self.expr = expr.strip()
         self.asciimath = asciimath
         self.the_cmathml = None
         self.the_sympy = None
+        self.options = options
 
     def is_presentation_mathml(self):
         return '<mstyle' in self.expr
@@ -234,7 +235,10 @@ class formula(object):
         if self.the_cmathml: return self.the_cmathml
 
         # pre-process the presentation mathml before sending it to snuggletex to convert to content mathml
-        xml = self.preprocess_pmathml(self.expr)
+        try:
+            xml = self.preprocess_pmathml(self.expr)
+        except Exception,err:
+            return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml,pretty_print=True)
         self.the_pmathml = pmathml
 
@@ -246,7 +250,8 @@ class formula(object):
 
     def make_sympy(self,xml=None):
         '''
-        Return sympy expression for the math formula
+        Return sympy expression for the math formula.
+        The math formula is converted to Content MathML then that is parsed.
         '''
 
         if self.the_sympy: return self.the_sympy
@@ -255,7 +260,11 @@ class formula(object):
             if not self.is_mathml():
                 return my_sympify(self.expr)
             if self.is_presentation_mathml():
-                xml = etree.fromstring(str(self.cmathml))
+                try:
+                    cmml = self.cmathml
+                    xml = etree.fromstring(str(cmml))
+                except Exception,err:
+                    raise Exception,'Err %s while converting cmathml to xml; cmml=%s' % (err,cmml)
                 xml = self.fix_greek_in_mathml(xml)
                 self.the_sympy = self.make_sympy(xml[0])
             else:
@@ -274,7 +283,7 @@ class formula(object):
             # print "divide: arg0=%s, arg1=%s" % (args[0],args[1])
             return sympy.Mul(args[0],sympy.Pow(args[1],-1))
 
-        def op_plus(*args): return sum(args)
+        def op_plus(*args): return args[0] if len(args)==1 else op_plus(*args[:-1])+args[-1]
         def op_times(*args): return reduce(operator.mul,args)
 
         def op_minus(*args):
@@ -314,9 +323,9 @@ class formula(object):
             elif tag=='msup': return '^'.join([parsePresentationMathMLSymbol(y) for y in xml])
             raise Exception,'[parsePresentationMathMLSymbol] unknown tag %s' % tag
 
-        # parser tree for content MathML
+        # parser tree for Content MathML
         tag = gettag(xml)
-        print "tag = ",tag
+        # print "tag = ",tag
 
         # first do compound objects
 
@@ -325,7 +334,13 @@ class formula(object):
             if opstr in opdict:
                 op = opdict[opstr]
                 args = [ self.make_sympy(x) for x in xml[1:]]
-                return op(*args)
+                try:
+                    res = op(*args)
+                except Exception,err:
+                    self.args = args
+                    self.op = op
+                    raise Exception,'[formula] error=%s failed to apply %s to args=%s' % (err,opstr,args)
+                return res
             else:
                 raise Exception,'[formula]: unknown operator tag %s' % (opstr)
 
@@ -348,7 +363,7 @@ class formula(object):
             return float(xml.text)
 
         elif tag=='ci':			# variable (symbol)
-            if len(xml)>0 and (gettag(xml[0])=='msub' or gettag(xml[0])=='msup'):
+            if len(xml)>0 and (gettag(xml[0])=='msub' or gettag(xml[0])=='msup'):	# subscript or superscript
                 usym = parsePresentationMathMLSymbol(xml[0])
                 sym = sympy.Symbol(str(usym))
             else:
@@ -356,7 +371,11 @@ class formula(object):
                 if 'hat' in usym:
                     sym = my_sympify(usym)
                 else:
-                    sym = sympy.Symbol(str(usym))
+                    if usym=='i': print "options=",self.options
+                    if usym=='i' and 'imaginary' in self.options:	# i = sqrt(-1)
+                        sym = sympy.I	
+                    else:
+                        sym = sympy.Symbol(str(usym))
             return sym
 
         else:				# unknown tag
@@ -459,3 +478,78 @@ def test4():
 </math>
 '''
     return formula(xmlstr)
+
+def test5():		# sum of two matrices
+    xmlstr = u'''
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+  <mstyle displaystyle="true">
+    <mrow>
+      <mi>cos</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>&#x3B8;</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>&#x22C5;</mo>
+    <mrow>
+      <mo>[</mo>
+      <mtable>
+        <mtr>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+        </mtr>
+      </mtable>
+      <mo>]</mo>
+    </mrow>
+    <mo>+</mo>
+    <mrow>
+      <mo>[</mo>
+      <mtable>
+        <mtr>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+        </mtr>
+      </mtable>
+      <mo>]</mo>
+    </mrow>
+  </mstyle>
+</math>
+'''
+    return formula(xmlstr)
+
+def test6():		# imaginary numbers
+    xmlstr = u'''
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+  <mstyle displaystyle="true">
+    <mn>1</mn>
+    <mo>+</mo>
+    <mi>i</mi>
+  </mstyle>
+</math>
+'''
+    return formula(xmlstr,options='imaginaryi')

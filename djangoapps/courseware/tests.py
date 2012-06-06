@@ -1,3 +1,10 @@
+#
+# unittests for courseware
+#
+# Note: run this using a like like this:
+#
+# django-admin.py test --settings=envs.test_ike --pythonpath=. courseware
+
 import unittest
 import os
 
@@ -126,6 +133,94 @@ class ImageResponseTest(unittest.TestCase):
                         }
         self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
         self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+        
+class SymbolicResponseTest(unittest.TestCase):
+    def test_sr_grade(self):
+        symbolicresponse_file = os.path.dirname(__file__)+"/test_files/symbolicresponse.xml"
+        test_lcp = lcp.LoncapaProblem(open(symbolicresponse_file), '1', system=i4xs)
+        correct_answers = {'1_2_1':'cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]',
+                           '1_2_1_dynamath': '''
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+  <mstyle displaystyle="true">
+    <mrow>
+      <mi>cos</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>&#x3B8;</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>&#x22C5;</mo>
+    <mrow>
+      <mo>[</mo>
+      <mtable>
+        <mtr>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+        </mtr>
+      </mtable>
+      <mo>]</mo>
+    </mrow>
+    <mo>+</mo>
+    <mi>i</mi>
+    <mo>&#x22C5;</mo>
+    <mrow>
+      <mi>sin</mi>
+      <mrow>
+        <mo>(</mo>
+        <mi>&#x3B8;</mi>
+        <mo>)</mo>
+      </mrow>
+    </mrow>
+    <mo>&#x22C5;</mo>
+    <mrow>
+      <mo>[</mo>
+      <mtable>
+        <mtr>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+        </mtr>
+      </mtable>
+      <mo>]</mo>
+    </mrow>
+  </mstyle>
+</math>
+''',
+                           }
+        wrong_answers = {'1_2_1':'2',
+                         '1_2_1_dynamath':'''
+                         <math xmlns="http://www.w3.org/1998/Math/MathML">
+  <mstyle displaystyle="true">
+    <mn>2</mn>
+  </mstyle>
+</math>''',
+                        }
+        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(wrong_answers)['1_2_1'], 'incorrect')
         
 class OptionResponseTest(unittest.TestCase):
     '''

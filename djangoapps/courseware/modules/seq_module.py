@@ -31,7 +31,16 @@ class Module(XModule):
         self.render()
         return self.content
 
-    def handle_ajax(self, dispatch, get):
+    def get_init_js(self):
+        self.render()
+        return self.init_js
+
+    def get_destroy_js(self):
+        self.render()
+        return self.destroy_js
+
+    def handle_ajax(self, dispatch, get):		# TODO: bounds checking
+        ''' get = request.POST instance '''
         if dispatch=='goto_position':
             self.position = int(get['position'])
             return json.dumps({'success':True})
@@ -82,5 +91,9 @@ class Module(XModule):
         if state is not None:
             state = json.loads(state)
             if 'position' in state: self.position = int(state['position'])
+
+        # if position is specified in system, then use that instead
+        if system.get('position'):
+            self.position = int(system.get('position'))
 
         self.rendered = False

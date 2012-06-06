@@ -16,4 +16,7 @@
   % elif state == 'incomplete':
   <span class="incorrect" id="status_${id}"></span>
   % endif
+  % if msg:
+      <span class="message">${msg|n}</span>
+  % endif
 </section>

@@ -8,7 +8,7 @@
     <ul>
       % for section in chapter['sections']:
         <li${' class="active"' if 'active' in section and section['active'] else ''}>
-          <a href="${reverse('courseware_section', args=format_url_params([course_name, chapter['name'], section['name']]))}">
+          <a href="${ MITX_ROOT_URL}${reverse('courseware_section', args=format_url_params([course_name, chapter['name'], section['name']]))}">
             <p>${section['name']}
             <span class="subtitle">
               ${section['format']} ${"due " + section['due'] if 'due' in section and section['due'] != '' else ''}
@@ -23,3 +23,9 @@
 % for chapter in toc:
     ${make_chapter(chapter)}
 % endfor
+
+## add a link to allow course.xml to be reloaded from the git content repo
+% if settings.QUICKEDIT:
+    <h3><a href="#">quickedit</a></h3>
+    <ul><li><a href="${MITX_ROOT_URL}/quickedit/course.xml">gitreload</a></li></ul>
+% endif

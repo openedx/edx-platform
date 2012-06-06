@@ -55,6 +55,7 @@ class XModule(object):
         self.json = json
         self.item_id = item_id
         self.state = state
+        self.DEBUG = False
         
         self.__xmltree = etree.fromstring(xml) # PRIVATE
 
@@ -65,6 +66,7 @@ class XModule(object):
             self.tracker = system.track_function
             self.filestore = system.filestore
             self.render_function = system.render_function
+            self.DEBUG = system.DEBUG
         self.system = system
 
     ### Functions used in the LMS

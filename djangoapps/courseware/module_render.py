@@ -35,8 +35,16 @@ class I4xSystem(object):
             self.filestore = OSFS(settings.DATA_DIR)
         else:
             self.filestore = filestore
+            if settings.DEBUG:
+                log.info("[courseware.module_render.I4xSystem] filestore path = %s" % filestore)
         self.render_function = render_function
         self.exception404 = Http404
+        self.DEBUG = settings.DEBUG
+
+    def get(self,attr):			# uniform access to attributes (like etree)
+        return self.__dict__.get(attr)
+    def set(self,attr,val):		# uniform access to attributes (like etree)
+        self.__dict__[attr] = val
     def __repr__(self):
         return repr(self.__dict__)
     def __str__(self):
@@ -80,8 +88,7 @@ def grade_histogram(module_id):
         return []
     return grades
 
-
-def get_module(user, request, xml_module, module_object_preload):
+def get_module(user, request, xml_module, module_object_preload, position=None):
     module_type=xml_module.tag
     module_class=courseware.modules.get_module_class(module_type)
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
@@ -110,10 +117,11 @@ def get_module(user, request, xml_module, module_object_preload):
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module_type+'/'+module_id+'/'
     
     system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = lambda x: render_x_module(user, request, x, module_object_preload), 
+                       render_function = lambda x: render_x_module(user, request, x, module_object_preload, position), 
                        ajax_url = ajax_url,
                        filestore = OSFS(data_root),
                        )
+    system.set('position',position)	# pass URL specified position along to module, through I4xSystem
     instance=module_class(system, 
                           etree.tostring(xml_module), 
                           module_id, 
@@ -131,12 +139,30 @@ def get_module(user, request, xml_module, module_object_preload):
 
     return (instance, smod, module_type)
 
-def render_x_module(user, request, xml_module, module_object_preload):
-    ''' Generic module for extensions. This renders to HTML. '''
+def render_x_module(user, request, xml_module, module_object_preload, position=None):
+    ''' Generic module for extensions. This renders to HTML.
+
+    modules include sequential, vertical, problem, video, html
+
+    Note that modules can recurse.  problems, video, html, can be inside sequential or vertical.
+
+    Arguments:
+
+      - user                  : current django User
+      - request               : current django HTTPrequest
+      - xml_module            : lxml etree of xml subtree for the current module
+      - module_object_preload : list of StudentModule objects, one of which may match this module type and id
+      - position   	      : extra information from URL for user-specified position within module
+
+    Returns:
+
+      -  dict which is context for HTML rendering of the specified module
+
+    '''
     if xml_module==None :
         return {"content":""}
 
-    (instance, smod, module_type) = get_module(user, request, xml_module, module_object_preload)
+    (instance, smod, module_type) = get_module(user, request, xml_module, module_object_preload, position)
 
     # Grab content
     content = instance.get_html()
@@ -156,9 +182,8 @@ def render_x_module(user, request, xml_module, module_object_preload):
 
     return content
 
-
 def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic view for extensions. '''
+    ''' Generic view for extensions. This is where AJAX calls go.'''
     if not request.user.is_authenticated():
         return redirect('/')
 
@@ -191,7 +216,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     try:
         xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
     except:
-        log.exception("Unable to load module during ajax call")
+        log.exception("Unable to load module during ajax call. module=%s, dispatch=%s, id=%s" % (module, dispatch, id))
         if accepts(request, 'text/html'):
             return render_to_response("module-error.html", {})
         else:
@@ -228,4 +253,3 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         s.save()
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
-

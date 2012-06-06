@@ -173,7 +173,8 @@ class SSLLoginBackend(ModelBackend):
         try:
             user = User.objects.get(username=username)	# if user already exists don't create it
         except User.DoesNotExist:
-            raise "User does not exist. Not creating user; potential schema consistency issues"
+            if not settings.DEBUG:
+                raise "User does not exist. Not creating user; potential schema consistency issues"
             #raise ImproperlyConfigured("[SSLLoginBackend] creating %s" % repr(info))
             user = User(username=username, password=GenPasswd())	# create new User
             user.is_staff = False

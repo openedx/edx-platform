@@ -26,7 +26,7 @@ from mako.template import Template
 from util import contextualize_text
 import inputtypes
 
-from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse, ExternalResponse,ImageResponse,OptionResponse
+from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse,  StudentInputError, TrueFalseResponse, ExternalResponse,ImageResponse,OptionResponse, SymbolicResponse
 
 import calc
 import eia
@@ -42,6 +42,7 @@ response_types = {'numericalresponse':NumericalResponse,
                   'truefalseresponse':TrueFalseResponse,
                   'imageresponse':ImageResponse,
                   'optionresponse':OptionResponse,
+                  'symbolicresponse':SymbolicResponse,
                   }
 entry_types = ['textline', 'schematic', 'choicegroup','textbox','imageinput','optioninput']
 solution_types = ['solution']	# extra things displayed after "show answers" is pressed
@@ -55,6 +56,7 @@ html_transforms = {'problem': {'tag':'div'},
                    "externalresponse": {'tag':'span'},
                    "schematicresponse": {'tag':'span'}, 
                    "formularesponse": {'tag':'span'}, 
+                   "symbolicresponse": {'tag':'span'}, 
                    "multiplechoiceresponse": {'tag':'span'}, 
                    "text": {'tag':'span'},
                    "math": {'tag':'span'},
@@ -70,7 +72,7 @@ global_context={'random':random,
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["responseparam", "answer", "script"]
 # These should be removed from HTML output, but keeping subelements
-html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formularesponse", "text","externalresponse"]
+html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formularesponse", "text","externalresponse",'symbolicresponse']
 
 # removed in MC
 ## These should be transformed
@@ -109,6 +111,8 @@ class LoncapaProblem(object):
             self.seed=struct.unpack('i', os.urandom(4))[0]
 
         ## Parse XML file
+        if getattr(system,'DEBUG',False):
+            log.info("[courseware.capa.capa_problem.lcp.init]  fileobject = %s" % fileobject)
         file_text = fileobject.read()
         self.fileobject = fileobject	# save it, so we can use for debugging information later
         # Convert startouttext and endouttext to proper <text></text>
@@ -210,20 +214,26 @@ class LoncapaProblem(object):
         Problem XML goes to Python execution context. Runs everything in script tags
         '''
         random.seed(self.seed)
-		### IKE: Why do we need these two lines? 
         context = {'global_context':global_context}	# save global context in here also
-        global_context['context'] = context		# and put link to local context in the global one
+        context.update(global_context)			# initialize context to have stuff in global_context
+        context['__builtins__'] = globals()['__builtins__']	# put globals there also
+        context['the_lcp'] = self				# pass instance of LoncapaProblem in 
 
         #for script in tree.xpath('/problem/script'):
         for script in tree.findall('.//script'):
+            stype = script.get('type')
+            if stype:
+                if 'javascript' in stype: continue	# skip javascript
+                if 'perl' in stype: continue		# skip perl
+            # TODO: evaluate only python 
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code,XMLESC)
             try:
-                exec code in global_context, context
+                exec code in context, context		# use "context" for global context; thus defs in code are global within code
             except Exception,err:
-                print "[courseware.capa.capa_problem.extract_context] error %s" % err
-                print "in doing exec of this code:",code
+                log.exception("[courseware.capa.capa_problem.extract_context] error %s" % err)
+                log.exception("in doing exec of this code: %s" % code)
         return context
 
     def get_html(self):

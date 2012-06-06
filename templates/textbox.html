@@ -1,5 +1,5 @@
 <section id="textbox_${id}" class="textbox">
-  <textarea rows="30" cols="80" name="input_${id}" id="input_${id}">${value|h}</textarea>
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}" id="input_${id}">${value|h}</textarea>
 
   <span id="answer_${id}"></span>
 
@@ -15,7 +15,7 @@
   <br/>
   <span class="debug">(${state})</span>
   <br/>
-  <span class="debug">${msg|n}</span>
+  <span class="message">${msg|n}</span>
   <br/>
 
   <br/>
@@ -27,7 +27,10 @@
     // Note: We need to make the area follow the CodeMirror for this to work.
     $(function(){
       var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), {
-        mode: "python"
+        % if linenumbers == 'true':
+        lineNumbers: true,
+        % endif
+        mode: "${mode}"
       });
     });
   </script>
