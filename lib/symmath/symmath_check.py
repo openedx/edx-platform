@@ -11,6 +11,9 @@
 import os, sys, string, re
 import traceback
 from formula import *
+import logging
+
+log = logging.getLogger(__name__)
 
 #-----------------------------------------------------------------------------
 # check function interface
@@ -195,6 +198,7 @@ def symmath_check(expect,ans,dynamath=None,options=None,debug=None):
         fsym = f.sympy
         msg += '<p>You entered: %s</p>' % to_latex(f.sympy)
     except Exception,err:
+        log.exception("Error evaluating expression '%s' as a valid equation" % ans)
         msg += "<p>Error %s in evaluating your expression '%s' as a valid equation</p>" % (str(err).replace('<','&lt;'),
                                                                                            ans)
         if DEBUG:
