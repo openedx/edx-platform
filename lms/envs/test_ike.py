@@ -7,8 +7,8 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
-from envs.common import *
-from envs.logsettings import get_logger_config
+from .common import *
+from .logsettings import get_logger_config
 import os
 
 DEBUG = True

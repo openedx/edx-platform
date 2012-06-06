@@ -13,9 +13,9 @@ import socket
 if 'eecs1' in socket.gethostname():
     MITX_ROOT_URL = '/mitx2'
 
-from envs.common import *
-from envs.logsettings import get_logger_config
-from dev import *
+from .common import *
+from .logsettings import get_logger_config
+from .dev import *
 
 if 'eecs1' in socket.gethostname():
     MITX_ROOT_URL = '/mitx2'
