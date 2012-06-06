@@ -34,6 +34,10 @@ def select_executable(*cmds)
     cmds.find_all{ |cmd| system("which #{cmd} > /dev/null 2>&1") }[0] || fail("No executables found from #{cmds.join(', ')}")
 end
 
+def django_admin(system, env, command, *args)
+    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
+    return "#{django_admin} #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
+end
 
 task :default => [:pep8, :pylint, :test]
 
@@ -57,8 +61,7 @@ end
 desc "Run all django tests on our djangoapps"
 task :test => LMS_REPORT_DIR do
     ENV['NOSE_XUNIT_FILE'] = File.join(LMS_REPORT_DIR, "nosetests.xml")
-    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    sh("#{django_admin} test --settings=lms.envs.test --pythonpath=. $(ls lms/djangoapps)")
+    sh(django_admin(:lms, :test, 'test', *Dir['lms/djangoapps'].each))
 end
 
 desc <<-desc
@@ -67,11 +70,16 @@ desc <<-desc
     desc
 task :lms, [:env] => [] do |t, args|
     args.with_defaults(:env => 'dev')
-    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    sh("#{django_admin} runserver --settings=lms.envs.#{args.env} --pythonpath=.")
+    sh(django_admin(:lms, args.env, 'runserver'))
 end
 
 task :runserver => :lms
+
+desc "Run django-admin <action> against the specified system and environment"
+task "django-admin", [:action, :system, :env, :options] do |t, args|
+    args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
+    sh(django_admin(args.system, args.env, args.action, args.options))
+end
 
 task :package do
     FileUtils.mkdir_p(BUILD_DIR)
