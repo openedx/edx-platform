@@ -6,13 +6,10 @@
 
   <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
 
-## these two lines need to run django-pipeline / sass 
 % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
  <%static:css group='application'/>
- <%static:js group='application'/>
 % endif
 
-## use this in case django-pipeline is broken
 % if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
   <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
 % endif
@@ -20,6 +17,18 @@
   <script type="text/javascript" src="${static.url('js/jquery-1.6.2.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery-ui-1.8.16.custom.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script>
+
+% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+ <%static:js group='application'/>
+% endif
+
+% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+  % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['application']['source_filenames'] ]:
+    <script type="text/javascript" src="${jsfn}"></script>
+  % endfor
+% endif
+
+## codemirror
   <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
   <script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
 
@@ -27,14 +36,6 @@
 ##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/lib/codemirror.js"></script>
 ##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/xml/xml.js"></script>
 ##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/python/python.js"></script>
-
-## use these four lines if django-pipeline is broken
-% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
-  <script type="text/javascript" src="/static/coffee/src/courseware.js"></script>
-  <script type="text/javascript" src="/static/coffee/src/feedback_form.js"></script>
-  <script type="text/javascript" src="/static/coffee/src/calculator.js"></script>
-  <script type="text/javascript" src="/static/coffee/src/main.js"></script>
-% endif
 
 ## image input: for clicking on images (see imageinput.html)
   <script type="text/javascript" src="/static/js/imageinput.js"></script>
