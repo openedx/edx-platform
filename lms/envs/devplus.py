@@ -13,7 +13,7 @@ Dir structure:
         /log  # Where we're going to write log files
 
 """
-from envs.dev import *
+from .dev import *
 
 DATABASES = {
     'default': {
