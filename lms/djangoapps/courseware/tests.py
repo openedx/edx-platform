@@ -110,7 +110,7 @@ class MultiChoiceTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
         
     def test_TF_grade(self):
-        truefalse_file =  os.getcwd()+"/djangoapps/courseware/test_files/truefalse.xml"
+        truefalse_file =  os.path.dirname(__file__)+"/test_files/truefalse.xml"
         test_lcp = lcp.LoncapaProblem(open(truefalse_file), '1', system=i4xs)
         correct_answers = {'1_2_1':['choice_foil2', 'choice_foil1']}
         self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
