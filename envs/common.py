@@ -287,11 +287,11 @@ PIPELINE_CSS = {
 
 PIPELINE_JS = {
     'application': {
-        'source_filenames': [path.replace('static/', '') for path in glob2.glob('static/coffee/src/**/*.coffee')],
+        'source_filenames': [pth.replace('static/', '') for pth in glob2.glob('static/coffee/src/**/*.coffee')],
         'output_filename': 'js/application.js'
     },
     'spec': {
-        'source_filenames': [path.replace('static/', '') for path in glob2.glob('static/coffee/spec/**/*.coffee')],
+        'source_filenames': [pth.replace('static/', '') for pth in glob2.glob('static/coffee/spec/**/*.coffee')],
         'output_filename': 'js/spec.js'
     }
 }
