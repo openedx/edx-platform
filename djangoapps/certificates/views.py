@@ -28,10 +28,6 @@ def certificate_request(request):
         name_verify = request.POST.get('cert_request_name_verify', 'false')
         id_verify = request.POST.get('cert_request_id_verify', 'false')
         error = ''
-    
-        survey_response = record_exit_survey(request, internal_request=True)
-        if not survey_response['success']:
-            error += survey_response['error']
         
         if honor_code_verify != 'true':
             error += 'Please verify that you have followed the honor code to receive a certificate. '
@@ -42,6 +38,10 @@ def certificate_request(request):
         if id_verify != 'true':
             error += 'Please certify that you understand the unique ID on the certificate. '
         
+        if len(error) == 0:
+            survey_response = record_exit_survey(request, internal_request=True)
+            if not survey_response['success']:
+                error += survey_response['error']
         
         grade = None
         if len(error) == 0:
