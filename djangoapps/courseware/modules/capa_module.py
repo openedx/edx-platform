@@ -129,7 +129,7 @@ class Module(XModule):
 
         html=render_to_string('problem.html', context)
         if encapsulate:
-            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id)+html+"</div>"
+            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id,ajax_url=self.ajax_url)+html+"</div>"
 
         return html
 
