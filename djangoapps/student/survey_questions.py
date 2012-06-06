@@ -5,14 +5,14 @@ def exit_survey_list_for_student(student):
     # Right now, we just randomly pick some questions from random_questions
     common_questions = exit_survey_questions['common_questions']
     randomized_questions = exit_survey_questions['random_questions']
-            
+    
     #If we use random.sample on randomized_questions directly, it will re-arrange the questions
     if not settings.DEBUG_SURVEY:
         chosen_indices = random.sample( range( len(randomized_questions) ), 6)
     else:
         #In debug mode, we show all surveys
         chosen_indices = range( len(randomized_questions) )
-                
+    
     chosen_questions = [ randomized_questions[i] for i in sorted(chosen_indices)]
     
     survey_list = common_questions + chosen_questions
@@ -149,7 +149,7 @@ exit_survey_questions = {
         
         {'type' : 'select_many',
         'question_name' : 'why_course',
-        'label' : 'Why are you taking this course? (Check all that apply.)',
+        'label' : 'Why did you take this course? (Check all that apply.)',
         'choices' : [
             'Interest in topic',
             'Preparation for advanced standing exam',
@@ -165,7 +165,7 @@ exit_survey_questions = {
         
         {'type' : 'radio',
         'question_name' : 'internet_access',
-        'label' : 'Where do you access the MITx website most frequently?',
+        'label' : 'Where did you access the MITx website most frequently?',
         'choices' : [
             'At home',
             'At the home of a friend or family member outside your home',
