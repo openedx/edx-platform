@@ -5,6 +5,7 @@ require 'tempfile'
 REPO_ROOT = File.dirname(__FILE__)
 BUILD_DIR = File.join(REPO_ROOT, "build")
 REPORT_DIR = File.join(REPO_ROOT, "reports")
+LMS_REPORT_DIR = File.join(REPORT_DIR, "lms")
 
 # Packaging constants
 DEPLOY_DIR = "/opt/wwc"
@@ -37,26 +38,27 @@ end
 task :default => [:pep8, :pylint, :test]
 
 directory REPORT_DIR
+directory LMS_REPORT_DIR
 
 desc "Run pep8 on all of djangoapps"
-task :pep8 => REPORT_DIR do
-    sh("pep8 --ignore=E501 djangoapps | tee #{REPORT_DIR}/pep8.report")
+task :pep8 => LMS_REPORT_DIR do
+    sh("pep8 --ignore=E501 lms/djangoapps | tee #{LMS_REPORT_DIR}/pep8.report")
 end
 
 desc "Run pylint on all of djangoapps"
-task :pylint => REPORT_DIR do
-    Dir.chdir("djangoapps") do
-        Dir["*"].each do |app|
-            sh("pylint -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
-        end
+task :pylint => LMS_REPORT_DIR do
+    ENV['PYTHONPATH'] = 'lms/djangoapps'
+    Dir["lms/djangoapps/*"].each do |app|
+        app = File.basename(app)
+        sh("pylint -f parseable #{app} | tee #{LMS_REPORT_DIR}/#{app}.pylint.report")
     end
 end
 
 desc "Run all django tests on our djangoapps"
-task :test => REPORT_DIR do
-    ENV['NOSE_XUNIT_FILE'] = File.join(REPORT_DIR, "nosetests.xml")
+task :test => LMS_REPORT_DIR do
+    ENV['NOSE_XUNIT_FILE'] = File.join(LMS_REPORT_DIR, "nosetests.xml")
     django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    sh("#{django_admin} test --settings=envs.test --pythonpath=. $(ls djangoapps)")
+    sh("#{django_admin} test --settings=lms.envs.test --pythonpath=. $(ls lms/djangoapps)")
 end
 
 desc <<-desc
