@@ -187,6 +187,7 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
                                                              xml, 
                                                              id,
                                                              state=None)
+        log.info('ajax_url = ' + instance.ajax_url)
 
         # create empty student state for this problem, if not previously existing
         s = StudentModule.objects.filter(student=request.user, 
@@ -242,9 +243,10 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
     lcp = instance.lcp
 
     # get the rendered problem HTML
-    phtml = instance.get_problem_html()
-    init_js = instance.get_init_js()
-    destory_js = instance.get_destroy_js()
+    phtml = instance.get_html()
+    # phtml = instance.get_problem_html()
+    # init_js = instance.get_init_js()
+    # destory_js = instance.get_destroy_js()
 
     context = {'id':id,
                'msg' : msg,
@@ -252,8 +254,8 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
                'filename' : lcp.fileobject.name,
                'pxmls' : pxmls,
                'phtml' : phtml,
-               "destroy_js":destory_js,
-               'init_js':init_js, 
+               "destroy_js":'',
+               'init_js':'', 
                'csrf':csrf(request)['csrf_token'],
                }
 

@@ -10,27 +10,52 @@
   <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
 ##  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
 ##  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
- <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
 
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
+% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+## <%static:css group='application'/>
+% endif
+
+% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+##  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
+% endif
+
+  <script type="text/javascript" src="${static.url('js/jquery-1.6.2.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery-ui-1.8.16.custom.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script>
-<script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
-  <script type="text/javascript" src="/static/js/schematic.js"></script>
 
-  <script type="text/javascript" src="/static/coffee/src/courseware.js"></script>
-  <script type="text/javascript" src="/static/coffee/src/feedback_form.js"></script>
-  <script type="text/javascript" src="/static/coffee/src/calculator.js"></script>
-  <script type="text/javascript" src="/static/coffee/src/main.js"></script>
+% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+ <%static:js group='application'/>
+% endif
+
+% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+  % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['application']['source_filenames'] ]:
+    <script type="text/javascript" src="${jsfn}"></script>
+  % endfor
+% endif
+
+## codemirror
+  <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
+  <script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
+
+## alternate codemirror
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/lib/codemirror.js"></script>
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/xml/xml.js"></script>
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/python/python.js"></script>
+
+## image input: for clicking on images (see imageinput.html)
+  <script type="text/javascript" src="/static/js/imageinput.js"></script>
+
 
 <%include file="mathjax_include.html" />
 
 </head>
-<body>
+<body class="courseware">
 
   <!--[if lt IE 9]>
   <script src="/static/js/html5shiv.js"></script>
   <![endif]-->
+
+<div class="courseware"></div>
 
 ## -----------------------------------------------------------------------------
 ## information
@@ -90,15 +115,19 @@
 }
 </style>
 
-<form>
- ${phtml}
-</form>
+<meta name="path_prefix" content="${MITX_ROOT_URL}">
+
+<section class="course-content">
+  <form>
+   ${phtml}
+  </form>
+</section>
 
   <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery.leanModal.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery.qtip.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery.cookie.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/video_player.js')}"></script>
+##  <script type="text/javascript" src="${static.url('js/video_player.js')}"></script>
   <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
   <script type="text/javascript" src="${static.url('js/cktsim.js')}"></script>
 

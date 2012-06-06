@@ -28,7 +28,7 @@ def check_problem_code(ans,the_lcp,correct_answers,false_answers):
     msg += '<hr width="100%"/>'
 
     endmsg = """<p><font size="-1" color="purple">Note: if the code text box disappears after clicking on "Check",
-		please click on "Show Answer" to make it refresh properly.  This is a
+		please type something in the box to make it refresh properly.  This is a
                 bug with Chrome; it does not happen with Firefox.  It is being fixed.
                 </font></p>"""
 
