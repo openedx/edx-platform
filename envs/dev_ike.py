@@ -27,6 +27,8 @@ DEBUG = True
 ENABLE_MULTICOURSE = True     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 QUICKEDIT = True
 
+MITX_FEATURES['USE_DJANGO_PIPELINE'] = False
+
 COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
                                           'title'  :  'Circuits and Electronics',
                                           'xmlpath': '/6002x/',
