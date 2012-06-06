@@ -11,15 +11,12 @@ Used by capa_problem.py
 import inspect
 import json
 import logging
-import math
 import numbers
 import numpy
 import random
 import re
 import requests
-import scipy
 import traceback
-import copy
 import abc
 
 # specific library imports
@@ -27,14 +24,7 @@ from calc import evaluator, UndefinedVariable
 from django.conf import settings
 from util import contextualize_text
 from lxml import etree
-from lxml.etree import Element
 from lxml.html.soupparser import fromstring as fromstring_bs	# uses Beautiful Soup!!! FIXME?
-
-# local imports
-import calc
-import eia
-
-from util import contextualize_text
 
 log = logging.getLogger("mitx.courseware")
 
@@ -186,12 +176,12 @@ class NumericalResponse(GenericResponse):
             self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                                            id=xml.get('id'))[0]
             self.tolerance = contextualize_text(self.tolerance_xml, context)
-        except Exception,err:
+        except Exception:
             self.tolerance = 0
         try:
             self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                        id=xml.get('id'))[0]
-        except Exception, err:
+        except Exception:
             self.answer_id = None
 
     def get_score(self, student_answers):
@@ -277,7 +267,7 @@ def sympy_check2():
         answer = None
         try:
             answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]
-        except IndexError,err:
+        except IndexError:
             # print "xml = ",etree.tostring(xml,pretty_print=True)
 
             # if we have a "cfn" attribute then look for the function specified by cfn, in the problem context
@@ -308,12 +298,6 @@ def sympy_check2():
         of each key removed (the string before the first "_").
         '''
 
-        def getkey2(dict,key,default):
-            """utilify function: get dict[key] if key exists, or return default"""
-            if dict.has_key(key):
-                return dict[key]
-            return default
-
         idset = sorted(self.answer_ids)				# ordered list of answer id's
         try:
             submission = [student_answers[k] for k in idset]	# ordered list of answers
@@ -329,8 +313,6 @@ def sympy_check2():
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset)==1 and not submission[0]:
             return {idset[0]:'no_answer_entered'}
-
-        gctxt = self.context['global_context']
 
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
@@ -649,13 +631,13 @@ class FormulaResponse(GenericResponse):
             self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                                            id=xml.get('id'))[0]
             self.tolerance = contextualize_text(self.tolerance_xml, context)
-        except Exception,err:
+        except Exception:
             self.tolerance = 0
 
         try:
             self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                        id=xml.get('id'))[0]
-        except Exception, err:
+        except Exception:
             self.answer_id = None
             raise Exception, "[courseware.capa.responsetypes.FormulaResponse] Error: missing answer_id!!"
 
@@ -680,7 +662,6 @@ class FormulaResponse(GenericResponse):
                          self.samples.split('@')[1].split('#')[0].split(':')))
 
         ranges=dict(zip(variables, sranges))
-        correct = True
         for i in range(numsamples):
             instructor_variables = self.strip_dict(dict(self.context))
             student_variables = dict()
