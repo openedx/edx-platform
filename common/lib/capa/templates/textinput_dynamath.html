@@ -2,49 +2,52 @@
 ### version of textline.html which does dynammic math
 ###
 <section class="text-input-dynamath">
-<table style="display:inline; vertical-align:middle;"><tr><td>
- <input type="text" name="input_${id}" id="input_${id}" value="${value}" 
-	 % if size:
-	 size="${size}"
-	 % endif 
-	 onkeyup="DoUpdateMath('${id}')"
-	 />
-   </td><td>
+  <table style="display:inline; vertical-align:middle;">
+    <tr>
+      <td>
+        <input type="text" name="input_${id}" id="input_${id}" value="${value}" size="${size if size else ''}" />
+      </td>
+      <td>
+        <span id="answer_${id}"></span>
 
-  <span id="answer_${id}"></span>
+        % if state == 'unsubmitted':
+        <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+        % elif state == 'correct':
+        <span class="correct" id="status_${id}"></span>
+        % elif state == 'incorrect':
+        <span class="incorrect" id="status_${id}"></span>
+        % elif state == 'incomplete':
+        <span class="incorrect" id="status_${id}"></span>
+        % endif
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span id="display_${id}">`{::}`</span>
+      </td>
+      <td>
+        <textarea style="display:none" id="input_${id}_dynamath" name="input_${id}_dynamath">  </textarea>
+      </td>
+    </tr>
+  </table>
 
-  % if state == 'unsubmitted':
-  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif state == 'correct': 
-  <span class="correct" id="status_${id}"></span>
-  % elif state == 'incorrect':
-  <span class="incorrect" id="status_${id}"></span>
-  % elif state == 'incomplete':
-  <span class="incorrect" id="status_${id}"></span>
-  % endif
-
-   </td></tr><tr><td>
-      <span id="display_${id}">`{::}`</span>
-    </td><td>
-      <textarea style="display:none" id="input_${id}_dynamath" name="input_${id}_dynamath">  </textarea>
-    </td></tr>
-   </table>
-##   
+##
 ## javascript for dynamic math: add this math element to the MathJax rendering queue
 ## also adds to global jaxset js array
-##   
-<script type="text/javascript">
-         MathJax.Hub.queue.Push(function () {
-	      math = MathJax.Hub.getAllJax("display_${id}")[0];
-	      if (math){
-		  jaxset["${id}"] = math;
-		  math.Text(document.getElementById("input_${id}").value);
-                  // UpdateMathML(math,"${id}");
-	      }
-	  });
-</script>
+##
+  <script type="text/javascript">
+    MathJax.Hub.queue.Push(function () {
+      math = MathJax.Hub.getAllJax("display_${id}")[0];
+      if (math){
+        jaxset["${id}"] = math;
+        math.Text(document.getElementById("input_${id}").value);
+        // UpdateMathML(math,"${id}");
+      }
+    });
+  </script>
+
   % if msg:
-    <br/>
-    <span class="debug">${msg|n}</span>
+  <br/>
+  <span class="debug">${msg|n}</span>
   % endif
 </section>
