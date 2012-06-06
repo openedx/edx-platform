@@ -61,7 +61,7 @@ def get_course_settings(coursename):
     return None
 
 def is_valid_course(coursename):
-    return not (get_course_settings==None)
+    return get_course_settings(coursename) != None
 
 def get_course_property(coursename,property):
     cs = get_course_settings(coursename)
