@@ -78,3 +78,4 @@ def get_course_title(coursename):
 def get_course_number(coursename):
     return get_course_property(coursename,'number')
     
+

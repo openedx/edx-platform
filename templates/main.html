@@ -5,29 +5,52 @@
   <%block name="title"><title>MITx 6.002x</title></%block>
 
   <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
-  <%static:css group='application'/>
+
+% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+ <%static:css group='application'/>
+% endif
+
+% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
+% endif
 
   <script type="text/javascript" src="${static.url('js/jquery-1.6.2.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery-ui-1.8.16.custom.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script>
-  <%static:js group='application'/>
+
+% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+ <%static:js group='application'/>
+% endif
+
+% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+  % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['application']['source_filenames'] ]:
+    <script type="text/javascript" src="${jsfn}"></script>
+  % endfor
+% endif
+
+## codemirror
+  <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
+  <script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
+
+## alternate codemirror
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/lib/codemirror.js"></script>
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/xml/xml.js"></script>
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/python/python.js"></script>
+
+## image input: for clicking on images (see imageinput.html)
+  <script type="text/javascript" src="/static/js/imageinput.js"></script>
+
+##  <script type="text/javascript">
+##    var codemirror_set = {};		// track all codemirror textareas, so they can be refreshed on page changes
+##  </script>
 
   <!--[if lt IE 9]>
   <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {inlineMath: [["\\(","\\)"]],
-      displayMath: [["\\[","\\]"]]}
-    });
-  </script>
-  <%block name="headextra"/>
+ <%block name="headextra"/>
 
-  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
-       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
-       MathJax extension libraries -->
-  <script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script>
+  <%include file="mathjax_include.html" />
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
 </head>
 
@@ -116,6 +139,11 @@
   <script type="text/javascript" src="${static.url('js/jquery.cookie.js')}"></script>
   <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
   <script type="text/javascript" src="${static.url('js/cktsim.js')}"></script>
+
+  <script type="text/javascript" >
+    var codemirror_set= {};                // associative array of codemirror objects 
+  </script>
+
   <script type="text/javascript" src="${static.url('js/jquery.scrollTo-1.4.2-min.js')}"></script>
   <%block name="js_extra"/>
 </body>

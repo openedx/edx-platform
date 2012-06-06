@@ -25,6 +25,8 @@ from multicourse import multicourse_settings
 
 log = logging.getLogger("mitx.courseware")
 
+#-----------------------------------------------------------------------------
+
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, complex):
@@ -127,7 +129,7 @@ class Module(XModule):
 
         html=render_to_string('problem.html', context)
         if encapsulate:
-            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id)+html+"</div>"
+            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id,ajax_url=self.ajax_url)+html+"</div>"
 
         return html
 
@@ -197,9 +199,27 @@ class Module(XModule):
         try:
             fp = self.filestore.open(self.filename)
         except Exception,err:
-            print '[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename)
-            raise Exception,err
-        self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
+            log.exception('[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename))
+            if self.DEBUG:
+                # create a dummy problem instead of failing
+                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
+                fp.name = "StringIO"
+            else:
+                raise
+        try:
+            self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
+        except Exception,err:
+            msg = '[courseware.capa.capa_module.Module.init] error %s: cannot create LoncapaProblem %s' % (err,self.filename)
+            log.exception(msg)
+            if self.DEBUG:
+                msg = '<p>%s</p>' % msg.replace('<','&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
+                # create a dummy problem with error message instead of failing
+                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename,msg))
+                fp.name = "StringIO"
+                self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
+            else:
+                raise
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -328,8 +348,15 @@ class Module(XModule):
 
         self.tracker('save_problem_check', event_info)
 
+        try:
+            html = self.get_problem_html(encapsulate=False)
+        except Exception,err:
+            log.error('failed to generate html')
+            raise Exception,err
+
         return json.dumps({'success': success,
-                           'contents': self.get_problem_html(encapsulate=False)})
+                           'contents': html,
+                           })
 
     def save_problem(self, get):
         event_info = dict()

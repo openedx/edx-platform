@@ -1,32 +1,68 @@
+<%namespace name='static' file='static_content.html'/>
+<!DOCTYPE html>
 <html>
+## -----------------------------------------------------------------------------
+## Template for courseware.views.quickedit
+##
+## Used for quick-edit link present when viewing capa-format assesment problems.
+## -----------------------------------------------------------------------------
 <head>
-  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
- <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
+##  <link rel="stylesheet" href="${ settings.LIB_URL }jquery.treeview.css" type="text/css" media="all" />
+##  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
 
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery-1.6.2.min.js"></script>
-  <script type="text/javascript" src="${ settings.LIB_URL }jquery-ui-1.8.16.custom.min.js"></script>
-<script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
-  <script type="text/javascript" src="/static/js/schematic.js"></script>
-<%include file="mathjax_include.html" />
+% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+ <%static:css group='application'/>
+% endif
 
-<script>
-function postJSON(url, data, callback) {
-  $.ajax({type:'POST',
-      url: url,
-      dataType: 'json',
-      data: data,
-      success: callback,
-      headers : {'X-CSRFToken':'none'} // getCookie('csrftoken')}
-      });
-}
-</script>
+% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+##  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
+% endif
 
-</head>
-<body>
+  <script type="text/javascript" src="${static.url('js/jquery-1.6.2.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery-ui-1.8.16.custom.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/swfobject/swfobject.js')}"></script>
+
+% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+ <%static:js group='application'/>
+% endif
+
+% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+  % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['application']['source_filenames'] ]:
+    <script type="text/javascript" src="${jsfn}"></script>
+  % endfor
+% endif
+
+## codemirror
+  <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
+  <script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
+
+## alternate codemirror
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/lib/codemirror.js"></script>
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/xml/xml.js"></script>
+##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/python/python.js"></script>
+
+## image input: for clicking on images (see imageinput.html)
+  <script type="text/javascript" src="/static/js/imageinput.js"></script>
+
+##  <script type="text/javascript">
+##    var codemirror_set = {};		// track all codemirror textareas, so they can be refreshed on page changes
+##  </script>
 
   <!--[if lt IE 9]>
-  <script src="/static/js/html5shiv.js"></script>
+  <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
+
+<%block name="headextra"/>
+
+  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
+       MathJax extension libraries -->
+  <%include file="mathjax_include.html" />
+
+</head>
+<body class="courseware">
+
 
 <style type="text/css">
   .CodeMirror {border-style: solid;
@@ -53,6 +89,7 @@ function postJSON(url, data, callback) {
 <br/>
 <input type="submit" value="Change Problem" name="qesubmit" />
 <input type="submit" value="Revert to original" name="qesubmit" />
+<input type="hidden" name="csrfmiddlewaretoken" value="${csrf}"/>
 </form>
 
 <span>${msg|n}</span>
@@ -84,12 +121,60 @@ ${init_js}
 
 <style type="text/css">
   .staff {display:none;}
+  .correct {        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("/static/images/correct-icon.png") center center no-repeat;
+        height: 20px;
+        position: relative;
+        top: 6px;
+        width: 25px; }
+  .incorrect{
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("/static/images/incorrect-icon.png") center center no-repeat;
+        height: 20px;
+        width: 20px;
+        position: relative;
+        top: 6px; }
+
 }
 </style>
 
-<form>
- ${phtml}
-</form>
+<meta name="path_prefix" content="${MITX_ROOT_URL}">
+
+<section class="course-content">
+ <div id="seq_content">
+  <form>
+   ${phtml}
+  </form>
+ </div>
+</section>
+
+  <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.leanModal.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.qtip.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.cookie.js')}"></script>
+##  <script type="text/javascript" src="${static.url('js/video_player.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/cktsim.js')}"></script>
+
+  <script type="text/javascript" >
+    var codemirror_set= {};                // associative array of codemirror objects 
+  </script>
+
+  <script type="text/javascript" src="${static.url('js/jquery.scrollTo-1.4.2-min.js')}"></script>
+
+  <%block name="js_extra"/>
 
 </body>
 </html>

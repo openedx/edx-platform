@@ -28,8 +28,8 @@
       // function to queue in MathJax to get put the MathML expression in in the right document element
       function UpdateMathML(jax,id) {
               	toMathML(jax,function (mml) {
-                    // document.getElementById(id+'_fromjs').value=math.originalText+ "\n\n=>\n\n"+ mml;
-                    delem = document.getElementById("input_" + id + "_fromjs");
+                    // document.getElementById(id+'_dynamath').value=math.originalText+ "\n\n=>\n\n"+ mml;
+                    delem = document.getElementById("input_" + id + "_dynamath");
 		    if (delem) { delem.value=mml; };
 		    mmlset[id] = mml;
               	})
@@ -79,11 +79,8 @@ function DoUpdateMath(inputId) {
 }
 
   </script>
-  <%block name="headextra"/>
 
-  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates -->
-  <!-- TODO: move to settings -->
-<script type="text/javascript"
-  src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full">
-</script>
-
+  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
+       MathJax extension libraries -->
+  <script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>

@@ -35,7 +35,8 @@ PERFSTATS = False
 
 # Features
 MITX_FEATURES = {
-    'SAMPLE' : False
+    'SAMPLE' : False,
+    'USE_DJANGO_PIPELINE' : True,
 }
 
 # Used for A/B testing

@@ -11,6 +11,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
+from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
 from lxml import etree
@@ -145,9 +146,23 @@ def render_section(request, section):
     return result
 
 
+@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def index(request, course=None, chapter="Using the System", section="Hints"): 
-    ''' Displays courseware accordion, and any associated content. 
+def index(request, course=None, chapter="Using the System", section="Hints",position=None): 
+    ''' Displays courseware accordion, and any associated content.
+
+    Arguments:
+
+     - request    : HTTP request
+     - course     : coursename (str)
+     - chapter    : chapter name (str)
+     - section    : section name (str)
+     - position   : position in module, eg of <sequential> module (str)
+
+    Returns:
+
+     - HTTPresponse
+
     ''' 
     user = request.user
     if not settings.COURSEWARE_ENABLED:
@@ -176,12 +191,13 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     request.session['coursename'] = course		# keep track of current course being viewed in django's request.session
 
     try:
+        # this is the course.xml etree 
         dom = content_parser.course_file(user,course)	# also pass course to it, for course-specific XML path
     except:
         log.exception("Unable to parse courseware xml")
         return render_to_response('courseware-error.html', {})
 
-    #dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
+    # this is the module's parent's etree
     dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]", 
                            course=course, chapter=chapter, section=section)
 
@@ -197,6 +213,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     elif module_wrapper.get("src"):
         module = content_parser.section_file(user=user, section=module_wrapper.get("src"), coursename=course)
     else:
+        # this is the module's etree
         module = etree.XML(etree.tostring(module_wrapper[0])) # Copy the element out of the tree
 
     module_ids = []
@@ -217,7 +234,7 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
     }
 
     try:
-        module = render_x_module(user, request, module, module_object_preload)
+        module_context = render_x_module(user, request, module, module_object_preload, position)
     except:
         log.exception("Unable to load module")
         context.update({
@@ -227,104 +244,48 @@ def index(request, course=None, chapter="Using the System", section="Hints"):
         return render_to_response('courseware.html', context)
 
     context.update({
-        'init': module.get('init_js', ''),
-        'content': module['content'],
+        'init': module_context.get('init_js', ''),
+        'content': module_context['content'],
     })
 
     result = render_to_response('courseware.html', context)
     return result
 
-
-def quickedit(request, id=None):
+def jump_to(request, probname=None):
     '''
-    quick-edit capa problem.
+    Jump to viewing a specific problem.  The problem is specified by a problem name - currently the filename (minus .xml)
+    of the problem.  Maybe this should change to a more generic tag, eg "name" given as an attribute in <problem>.
 
-    Maybe this should be moved into capa/views.py
-    Or this should take a "module" argument, and the quickedit moved into capa_module.
+    We do the jump by (1) reading course.xml to find the first instance of <problem> with the given filename, then
+    (2) finding the parent element of the problem, then (3) rendering that parent element with a specific computed position
+    value (if it is <sequential>).
+
     '''
-    print "WARNING: UNDEPLOYABLE CODE. FOR CONTENT DEV USE ONLY."
-    print "In deployed use, this will only edit on one server"
-    print "We need a setting to disable for production where there is"
-    print "a load balanacer"
-    if not request.user.is_staff:
-        return redirect('/')
-
     # get coursename if stored
     coursename = multicourse_settings.get_coursename_from_request(request)
-    xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
 
-    def get_lcp(coursename,id):
-        # Grab the XML corresponding to the request from course.xml
-        module = 'problem'
-        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
-    
-        ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
-    
-        # Create the module (instance of capa_module.Module)
-        system = I4xSystem(track_function = make_track_function(request), 
-                           render_function = None, 
-                           ajax_url = ajax_url,
-                           filestore = OSFS(settings.DATA_DIR + xp),
-                           #role = 'staff' if request.user.is_staff else 'student',		# TODO: generalize this
-                           )
-        instance=courseware.modules.get_module_class(module)(system, 
-                                                             xml, 
-                                                             id,
-                                                             state=None)
-        lcp = instance.lcp
-        pxml = lcp.tree
-        pxmls = etree.tostring(pxml,pretty_print=True)
+    # begin by getting course.xml tree
+    xml = content_parser.course_file(request.user,coursename)
 
-        return instance, pxmls
+    # look for problem of given name
+    pxml = xml.xpath('//problem[@filename="%s"]' % probname)
+    if pxml: pxml = pxml[0]
 
-    instance, pxmls = get_lcp(coursename,id)
+    # get the parent element
+    parent = pxml.getparent()
 
-    # if there was a POST, then process it
-    msg = ''
-    if 'qesubmit' in request.POST:
-        action = request.POST['qesubmit']
-        if "Revert" in action:
-            msg = "Reverted to original"
-        elif action=='Change Problem':
-            key = 'quickedit_%s' % id
-            if not key in request.POST:
-                msg = "oops, missing code key=%s" % key
-            else:
-                newcode = request.POST[key]
+    # figure out chapter and section names
+    chapter = None
+    section = None
+    branch = parent
+    for k in range(4):	# max depth of recursion
+        if branch.tag=='section': section = branch.get('name')
+        if branch.tag=='chapter': chapter = branch.get('name')
+        branch = branch.getparent()
 
-                # see if code changed
-                if str(newcode)==str(pxmls) or '<?xml version="1.0"?>\n'+str(newcode)==str(pxmls):
-                    msg = "No changes"
-                else:
-                    # check new code
-                    isok = False
-                    try:
-                        newxml = etree.fromstring(newcode)
-                        isok = True
-                    except Exception,err:
-                        msg = "Failed to change problem: XML error \"<font color=red>%s</font>\"" % err
-    
-                    if isok:
-                        filename = instance.lcp.fileobject.name
-                        fp = open(filename,'w')		# TODO - replace with filestore call?
-                        fp.write(newcode)
-                        fp.close()
-                        msg = "<font color=green>Problem changed!</font> (<tt>%s</tt>)"  % filename
-                        instance, pxmls = get_lcp(coursename,id)
+    position = None
+    if parent.tag=='sequential':
+        position = parent.index(pxml)+1	# position in sequence
+        
+    return index(request,course=coursename,chapter=chapter,section=section,position=position)
 
-    lcp = instance.lcp
-
-    # get the rendered problem HTML
-    phtml = instance.get_problem_html()
-
-    context = {'id':id,
-               'msg' : msg,
-               'lcp' : lcp,
-               'filename' : lcp.fileobject.name,
-               'pxmls' : pxmls,
-               'phtml' : phtml,
-               'init_js':instance.get_init_js(),
-               }
-
-    result = render_to_response('quickedit.html', context)
-    return result

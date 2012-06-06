@@ -197,63 +197,77 @@ def choicegroup(element, value, status, msg=''):
         type="radio"
     choices={}
     for choice in element:
-        assert choice.tag =="choice", "only <choice> tags should be immediate children of a <choicegroup>"
-        choices[choice.get("name")] = etree.tostring(choice[0])	# TODO: what if choice[0] has math tags in it?
+        if not choice.tag=='choice':
+            raise Exception,"[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag
+        ctext = ""
+        ctext += ''.join([etree.tostring(x) for x in choice])	# TODO: what if choice[0] has math tags in it?
+        ctext += choice.text		# TODO: fix order?
+        choices[choice.get("name")] = ctext
     context={'id':eid, 'value':value, 'state':status, 'type':type, 'choices':choices}
     html=render_to_string("choicegroup.html", context)
     return etree.XML(html)
 
 @register_render_function
 def textline(element, value, state, msg=""):
+    '''
+    Simple text line input, with optional size specification.
+    '''
+    if element.get('math') or element.get('dojs'):		# 'dojs' flag is temporary, for backwards compatibility with 8.02x
+        return SimpleInput.xml_tags['textline_dynamath'](element,value,state,msg)
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
-    context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size}
+    context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size, 'msg': msg}
     html=render_to_string("textinput.html", context)
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 
 @register_render_function
-def js_textline(element, value, status, msg=''):
-        '''
-        Plan: We will inspect element to figure out type
-        '''
-        # TODO: Make a wrapper for <formulainput>
-        # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-		## TODO: Code should follow PEP8 (4 spaces per indentation level)
-        '''
-        textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
-        '''
-        eid=element.get('id')
-        count = int(eid.split('_')[-2])-1 # HACK
-        size = element.get('size')
-        dojs = element.get('dojs')	# dojs is used for client-side javascript display & return
-        				# when dojs=='math', a <span id=display_eid>`{::}`</span>
-                                        # and a hidden textarea with id=input_eid_fromjs will be output
-        context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
-                   'dojs':dojs,
-                   'msg':msg,
-                   }
-        html=render_to_string("jstext.html", context)
-        return etree.XML(html)
+def textline_dynamath(element, value, status, msg=''):
+    '''
+    Text line input with dynamic math display (equation rendered on client in real time during input).
+    '''
+    # TODO: Make a wrapper for <formulainput>
+    # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
+    	## TODO: Code should follow PEP8 (4 spaces per indentation level)
+    '''
+    textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
+    uses a <span id=display_eid>`{::}`</span>
+    and a hidden textarea with id=input_eid_fromjs for the mathjax rendering and return.
+    '''
+    eid=element.get('id')
+    count = int(eid.split('_')[-2])-1 # HACK
+    size = element.get('size')
+    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
+               'msg':msg,
+               }
+    html=render_to_string("textinput_dynamath.html", context)
+    return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 ## TODO: Make a wrapper for <codeinput>
 @register_render_function
 def textbox(element, value, status, msg=''):
-        '''
-        The textbox is used for code input.  The message is the return HTML string from
-        evaluating the code, eg error messages, and output from the code tests.
+    '''
+    The textbox is used for code input.  The message is the return HTML string from
+    evaluating the code, eg error messages, and output from the code tests.
 
-        TODO: make this use rows and cols attribs, not size
-        '''
-        eid=element.get('id')
-        count = int(eid.split('_')[-2])-1 # HACK
-        size = element.get('size')
-        context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg}
-        html=render_to_string("textbox.html", context)
-        return etree.XML(html)
+    '''
+    eid=element.get('id')
+    count = int(eid.split('_')[-2])-1 # HACK
+    size = element.get('size')
+    rows = element.get('rows') or '30'
+    cols = element.get('cols') or '80'
+    mode = element.get('mode')	or 'python' 	# mode for CodeMirror, eg "python" or "xml"
+    linenumbers = element.get('linenumbers')	# for CodeMirror
+    if not value: value = element.text	# if no student input yet, then use the default input given by the problem
+    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg,
+               'mode':mode, 'linenumbers':linenumbers,
+               'rows':rows, 'cols':cols,
+               }
+    html=render_to_string("textbox.html", context)
+    return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 @register_render_function

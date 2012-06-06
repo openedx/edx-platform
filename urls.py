@@ -6,8 +6,9 @@ from django.conf.urls.static import static
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+if settings.DEBUG:
+    from django.contrib import admin
+    admin.autodiscover()
 
 urlpatterns = ('',
     url(r'^$', 'student.views.index'), # Main marketing page, or redirect to courseware
@@ -50,9 +51,11 @@ if settings.COURSEWARE_ENABLED:
         url(r'^info$', 'util.views.info'),
         url(r'^wiki/', include('simplewiki.urls')),
         url(r'^masquerade/', include('masquerade.urls')),
+        url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)$', 'courseware.views.index'),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index', name="courseware_chapter"),
         url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index', name="courseware_course"),
+        url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
         url(r'^section/(?P<section>[^/]*)/$', 'courseware.views.render_section'),
         url(r'^modx/(?P<module>[^/]*)/(?P<id>[^/]*)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
         url(r'^profile$', 'courseware.views.profile'),
@@ -74,7 +77,8 @@ if settings.ENABLE_MULTICOURSE:
 	urlpatterns += (url(r'^mitxhome$', 'multicourse.views.mitxhome'),)
 
 if settings.QUICKEDIT:
-	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'courseware.views.quickedit'),)
+	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
+	urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
 
 if settings.ASKBOT_ENABLED:
     urlpatterns += (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
