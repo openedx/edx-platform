@@ -76,10 +76,10 @@ function ${ id }goto(i) {
 
 function ${ id }setup_click(i) {
         $('#tt_'+i).click(function(eo) { ${ id }goto(i);});
-	$('#tt_'+i).addClass("seq_"+${ id }types[i]+"_inactive");
-	$('#tt_'+i).parent().append("<p>" + ${ id }titles[i-1] + "</p>");
-
-}
+        $('#tt_'+i).addClass("seq_"+${ id }types[i]+"_inactive");
+        var title_class = ${ id }titles[i-1].replace(/\s/g, '-');
+        $('#tt_'+i).parent().append("<p>" + ${ id }titles[i-1] + "</p>").addClass(title_class);
+      }
 
 function ${ id }next() { 
     var i=${ id }loc+1;
