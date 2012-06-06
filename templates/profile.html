@@ -122,107 +122,6 @@ $(function() {
                                "rationale":rationale});
        return false;
     });
-    
-    %if settings.END_COURSE_ENABLED:
-    //This is used to scroll error divs to the user's attention. It can be removed when we switch to the branch with jQuery.ScrollTo
-    jQuery.fn.scrollMinimal = function(smooth) {
-      var cTop = this.offset().top;
-      var cHeight = this.outerHeight(true);
-      var windowTop = $(window).scrollTop();
-      var visibleHeight = $(window).height();
-      
-      if (cTop < windowTop) {
-        $('body').animate({'scrollTop': cTop}, 'slow', 'swing');
-      } else if (cTop + cHeight > windowTop + visibleHeight) {
-        $('body').animate({'scrollTop': cTop - visibleHeight + cHeight}, 'slow', 'swing');
-      }
-    };
-    
-    /*
-    There is a fieldset, #survey_fieldset, which contains an exit survey. This exist survey can be taken by iteself,
-    or as part of the certificate request. If they haven't taken the survey yet, it moves to the open modal dialogue.
-    Once it has been taken, it should dissapear.
-    */
-    $("a.cert_request_link").click(function(){
-      //If they haven't taken the survey yet, we move it to the certificate request form
-      if ($("#survey_fieldset").length>0) {
-        $("#cert_request_survey_holder").prepend( $("#survey_fieldset") );
-      }
-    });
-    $("a.survey_link").click(function(){
-      // They survey may have been "stolen" away to the certificate request form
-      if ($("#survey_fieldset").length>0) {
-        $("#survey_survey_holder").prepend( $("#survey_fieldset") );
-      }
-    });
-    
-    $("#cert_request_form").submit(function(){
-      var values = {'cert_request_honor_code_verify' : $("#cert_request_honor_code_verify").is(':checked'),
-                    'cert_request_name_verify' : $("#cert_request_name_verify").is(':checked'),
-                    'cert_request_id_verify' : $("#cert_request_id_verify").is(':checked'),
-                  };
-      
-      postJSON('/certificate_request', values, function(data) {
-        if (data.success) {
-          
-          //Now we move the survey_survey_holder back to a safer container, and submit the survey
-          if ($("#survey_fieldset").length>0) {
-            $("#survey_survey_holder").prepend( $("#survey_fieldset").remove() );
-            
-            $("#survey_form").submit();
-          }
-          
-          $("#cert_request").html("<h1>Certificate Request Received</h1><p>Thank you! A certificate is being generated. You will be notified when it is ready to download.</p>");
-          $(".cert_request_link").text("Certificate is being generated...");
-        } else {
-          $("#cert_request_error").html(data.error).scrollMinimal();
-        }
-      });
-      log_event("certificate_request", values);
-      return false;
-    });
-    
-    $("#survey_form").submit(function(){
-      var values = {};
-      
-      //First we set the value of every input to null. This assures that even
-      //if a checkbox isn't checked or a question isn't answered, its name is
-      //still in the dictionary so we know the question was on the form.
-      var inputs = $("#survey_fieldset :input");
-      inputs.each( function(index, element) {
-        values[ element.getAttribute("name") ] = null;
-      });
-      
-      //Grab the values from the survey_fieldset
-      var serializedArray = inputs.serializeArray();
-      for (var i = 0; i < serializedArray.length; i++) {
-        var key = serializedArray[i]['name'];
-        var value = serializedArray[i]['value'];
-        if ( key in values && values[key] != null) {
-          values[key].push( value );
-        } else {
-          values[key] = [value];
-        }
-      }
-      
-      postJSON('/record_exit_survey', {'survey_results' : JSON.stringify(values)}, function(data) {
-        if (true || data.success) {
-          $("#survey").html("<h1>Survey Response Recorded</h1><p>Thank you for filling out the survey!</p>");
-          
-          //Make sure that the survey fieldset is removed
-          $("#survey_fieldset").remove();
-          
-          //Remove the links to take the survey
-          $(".survey_offer").hide();
-        } else {
-          $("#survey_error").html(data.error).scrollMinimal();
-        }
-      });
-      log_event("exit_survey_submission", values);
-      return false;
-    });
-    %endif
-    
 });
 </script>
 </%block>
@@ -243,20 +142,23 @@ $(function() {
         %if grade_sheet['grade']:
           <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
           
-          %if not certificate_requested:
-            <a rel="leanModal" class="cert_request_link" href="#cert_request">Request Certificate</a>
-          %elif certificate_download_url:
+          %if certificate_state == "requestable":
+            <a class="cert_request_link" href="/certificate_request">Request Certificate</a>
+          %elif certificate_state == "downloadable":
             <a href="${certificate_download_url}" target="_blank">Download Certificate</a>
-          %else:
+          %elif certificate_state == "generating":
             <a href="#">Certificate is being generated...</a>
+          %else:
+            <a href="#">No certificate available</a>
           %endif
+          
         %else:
           <p> No letter grade has been earned for this course </p>
         %endif
         
         %if not took_survey:
         <div class="survey_offer">
-          <a class="survey_link" rel="leanModal" href="#survey">Take the survey</a>
+          <a class="survey_link" href="/exit_survey">Take the survey</a>
         </div>
         %endif
       </div>
@@ -436,57 +338,3 @@ $(function() {
     </fieldset>
   </form>
 </div>
-
-%if grade_sheet['grade']:
-<div id="cert_request" class="leanModal_box">
-  <h1>Request a 6.002x Certificate</h1>
-  <p>You can request a certificate which verifies that you passed this course. When the certificate has been generated, you will receive an email notification that it can be downloaded from your Profile page.</p>
-  <p>The certificate will indicate that <strong>${name}</strong> has successfully completed the Fall 2012 offering of <strong>Circuits and Electronics 6.002x</strong>. Please ensure that this information is correct.</p>
-  
-  <form id="cert_request_form">
-    <fieldset id="cert_request_fieldset">
-      <div id="cert_request_error"> </div>
-      <ul>
-        <li class="verify">
-          <input type="checkbox" id="cert_request_honor_code_verify"/>
-          <label> I certify that I have not violated the Honor Code for this course. </label>
-        </li>
-        <li class="verify">
-          <input type="checkbox" id="cert_request_name_verify"/>
-          <label> The name shown above is correct. </label>
-        </li>
-        <li class="verify">
-          <input type="checkbox" id="cert_request_id_verify"/>
-          <label> I understand that my certificate contains my name a unique ID which will be visible on the certificate. I will give this ID only to those who I wish to visit the verification page on www.edXOnline.org to confirm that I passed Circuits and Electronics 6.002x. </label>
-        </li>
-      </ul>
-    </fieldset>
-    
-    <div id="cert_request_survey_holder"> </div>
-    
-    <input type="submit" id="" value="Generate Certificate" />
-    
-  </form>
-</div>
-%endif
-
-%if not took_survey:
-<div id="survey" class="leanModal_box">
-  <form id="survey_form">    
-    <div id="survey_survey_holder">    
-      <fieldset id="survey_fieldset">
-        <h1>Thank you for taking 6.002x! You could help us a lot by filling out this (optional) survey.</h1>
-        <p>This survey is collected only for research purposes. It is completely optional and will not affect your grade.</p>
-        
-        <div id="survey_error"> </div>
-        
-        ${survey_fields.body(survey_list)}
-        
-      </fieldset>
-    </div>
-    
-    <input type="submit" id="" value="Record Survey Response" />
-    
-  </form>
-</div>
-%endif

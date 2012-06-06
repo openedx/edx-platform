@@ -22,13 +22,10 @@ from lxml import etree
 
 from courseware import course_settings
 from module_render import render_module, modx_dispatch
-from certificates.models import GeneratedCertificate
+from certificates.models import GeneratedCertificate, certificate_state_for_student
 from models import StudentModule
 from student.models import UserProfile
 from student.views import student_took_survey
-
-if settings.END_COURSE_ENABLED:
-    from student.survey_questions import exit_survey_list_for_student
 
 import courseware.content_parser as content_parser
 import courseware.modules.capa_module
@@ -94,34 +91,12 @@ def profile(request, student_id = None):
         took_survey = student_took_survey(user_info)
         if settings.DEBUG_SURVEY:
             took_survey = False
-        survey_list = []
-        if not took_survey:
-            survey_list = exit_survey_list_for_student(student)
         
-        # certificate_requested determines if the student has requested a certificate
-        certificate_requested = False
-        # certificate_download_url determines if the certificate has been generated
-        certificate_download_url = None
-        
-        if grade_sheet['grade']:
-            try:
-                generated_certificate = GeneratedCertificate.objects.get(user = student)
-                #If enabled=False, it may have been pre-generated but not yet requested
-                if generated_certificate.enabled: 
-                    certificate_requested = True
-                    certificate_download_url = generated_certificate.download_url
-            except GeneratedCertificate.DoesNotExist:
-                #They haven't submited the request form
-                certificate_requested = False
-                
-            if settings.DEBUG_SURVEY:
-                certificate_requested = False
+        certificate_state, certificate_download_url = certificate_state_for_student(student, grade_sheet['grade'])
             
-            
-        context.update({'certificate_requested' : certificate_requested,
+        context.update({'certificate_state' : certificate_state,
                  'certificate_download_url' : certificate_download_url,
-                 'took_survey' : took_survey,
-                 'survey_list' : survey_list})
+                 'took_survey' : took_survey})
 
     return render_to_response('profile.html', context)
 

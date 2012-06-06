@@ -1,58 +1,91 @@
 import json
 import logging
+import settings
 import uuid
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
-from mitxmako.shortcuts import render_to_response
-import courseware.grades as grades
-from certificates.models import GeneratedCertificate
+from django.shortcuts import redirect
 
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
+import courseware.grades as grades
+from certificates.models import GeneratedCertificate, certificate_state_for_student
+from mitxmako.shortcuts import render_to_response
+from student.models import UserProfile
+from student.survey_questions import exit_survey_list_for_student
+from student.views import student_took_survey, record_exit_survey
 
 log = logging.getLogger("mitx.certificates")
 
 @login_required
 def certificate_request(request):
     ''' Attempt to send a certificate. '''
-    if request.method != "POST" or not settings.END_COURSE_ENABLED:
+    if not settings.END_COURSE_ENABLED:
         raise Http404
+        
+    if request.method == "POST":
+        honor_code_verify = request.POST.get('cert_request_honor_code_verify', 'false')
+        name_verify = request.POST.get('cert_request_name_verify', 'false')
+        id_verify = request.POST.get('cert_request_id_verify', 'false')
+        error = ''
     
-    honor_code_verify = request.POST.get('cert_request_honor_code_verify', 'false')
-    name_verify = request.POST.get('cert_request_name_verify', 'false')
-    id_verify = request.POST.get('cert_request_id_verify', 'false')
-    error = ''
+        survey_response = record_exit_survey(request, internal_request=True)
+        if not survey_response['success']:
+            error += survey_response['error']
+        
+        if honor_code_verify != 'true':
+            error += 'Please verify that you have followed the honor code to receive a certificate. '
     
+        if name_verify != 'true':
+            error += 'Please verify that your name is correct to receive a certificate. '
     
-    if honor_code_verify != 'true':
-        error += 'Please verify that you have followed the honor code to receive a certificate. '
-    
-    if name_verify != 'true':
-        error += 'Please verify that your name is correct to receive a certificate. '
-    
-    if id_verify != 'true':
-        error += 'Please certify that you understand the unique ID on the certificate. '
+        if id_verify != 'true':
+            error += 'Please certify that you understand the unique ID on the certificate. '
         
         
-    grade = None
-    if len(error) == 0:
-        student_gradesheet = grades.grade_sheet(request.user)
+        grade = None
+        if len(error) == 0:
+            student_gradesheet = grades.grade_sheet(request.user)
         
-        grade = student_gradesheet['grade']
+            grade = student_gradesheet['grade']
         
-        if not grade:
-            error += 'You have not earned a grade in this course. '
+            if not grade:
+                error += 'You have not earned a grade in this course. '
             
-    if len(error) == 0:
-        generate_certificate(request.user, grade)
+        if len(error) == 0:
+            generate_certificate(request.user, grade)
         
-        # TODO: Send the certificate email
-        return HttpResponse(json.dumps({'success':True}))
+            # TODO: Send the certificate email
+            return HttpResponse(json.dumps({'success':True}))
+        else:
+            return HttpResponse(json.dumps({'success':False,
+                                            'error': error }))
+    
     else:
-        return HttpResponse(json.dumps({'success':False,
-                                        'error': error }))
+        #This is a request for the page with the form
+        grade_sheet = grades.grade_sheet(request.user)
+        certificate_state, certificate_download_url = certificate_state_for_student(request.user, grade_sheet['grade'])
+        
+        if certificate_state != "requestable":
+            return redirect("/profile")
+        
+        user_info = UserProfile.objects.get(user=request.user)
+        
+        took_survey = student_took_survey(user_info)
+        if settings.DEBUG_SURVEY:
+            took_survey = False
+        survey_list = []
+        if not took_survey:
+            survey_list = exit_survey_list_for_student(request.user)
+        
+        
+        context = {'certificate_state' : certificate_state,
+                 'took_survey' : took_survey,
+                 'survey_list' : survey_list,
+                 'name' : user_info.name }
+        
+        
+        return render_to_response('cert_request.html', context)
 
 
 # This method should only be called if the user has a grade and has requested a certificate

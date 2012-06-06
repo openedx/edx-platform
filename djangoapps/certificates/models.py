@@ -1,3 +1,5 @@
+import settings
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -33,3 +35,45 @@ class GeneratedCertificate(models.Model):
     # enabled should only be true if the student has earned a grade in the course
     # The student must have a grade and request a certificate for enabled to be True
     enabled = models.BooleanField(default=False)
+
+
+def certificate_state_for_student(student, grade):
+    '''
+    This returns a tuple of (state, download_url). The state is one of the
+    following:
+    
+    unavailable - A student is not elligible for a certificate.
+    requestable - A student is elligible to request a certificate
+    generating - A student has requested a certificate, but it is not generated yet.
+    downloadable - The certificate has been requested and is available for download.
+    
+    In all states except "available", download_url is None
+
+    '''
+    
+    if grade:
+        #TODO: Remove the following after debugging
+        if settings.DEBUG_SURVEY:
+            return ("requestable", None)
+        
+        try:
+            generated_certificate = GeneratedCertificate.objects.get(user = student)
+            if generated_certificate.enabled:
+                if generated_certificate.download_url:
+                    return ("downloadable", generated_certificate.download_url)
+                else:
+                    return ("generating", None)
+            else:
+                # If enabled=False, it may have been pre-generated but not yet requested
+                # Our output will be the same as if the GeneratedCertificate did not exist
+                pass
+        except GeneratedCertificate.DoesNotExist:
+            pass
+        return ("requestable", None)
+    else:
+        # No grade, no certificate. No exceptions
+        return ("unavailable", None)
+    
+    
+    
+    
