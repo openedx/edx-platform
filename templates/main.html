@@ -49,10 +49,8 @@
 
  <%block name="headextra"/>
 
-  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
-       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
-       MathJax extension libraries -->
   <%include file="mathjax_include.html" />
+  <meta name="path_prefix" content="${MITX_ROOT_URL}">
 </head>
 
 <body class="<%block name='bodyclass'/>">
@@ -138,7 +136,6 @@
   <script type="text/javascript" src="${static.url('js/jquery.leanModal.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery.qtip.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery.cookie.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/video_player.js')}"></script>
   <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
   <script type="text/javascript" src="${static.url('js/cktsim.js')}"></script>
 
@@ -146,6 +143,7 @@
     var codemirror_set= {};                // associative array of codemirror objects 
   </script>
 
+  <script type="text/javascript" src="${static.url('js/jquery.scrollTo-1.4.2-min.js')}"></script>
   <%block name="js_extra"/>
 </body>
 </html>

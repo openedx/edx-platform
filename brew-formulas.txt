@@ -1,0 +1,8 @@
+readline 
+sqlite 
+gdbm 
+pkg-config 
+gfortran 
+python 
+yuicompressor 
+node

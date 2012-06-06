@@ -93,7 +93,7 @@ class LoncapaProblem(object):
         self.problem_id = id
         self.system = system
 
-        if seed != None:
+        if seed is not None:
             self.seed = seed
 
         if state:

@@ -75,7 +75,7 @@ $(function() {
       });
 
     $('#pwd_reset_button').click(function() {
-      $.post('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
+      $.postWithPrefix('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
                     "email"  : $('#id_email').val()}, function(data){
          $("#password_reset_complete_link").click();
          log_event("profile", {"type":"password_send"});

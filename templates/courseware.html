@@ -7,12 +7,10 @@
 </%block>
 
 <%block name="js_extra">
-##Is there a reason this isn't in header_extra? Is it important that the javascript is at the bottom of the generated document?
 <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
 <script type="text/javascript">
-  $(function() {
-    ${init}
-  });
+  document.write('\x3Cscript type="text/javascript" src="' +
+      document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
 </script>
 </%block>
 
@@ -26,7 +24,7 @@
         <a href="#">close</a>
       </header>
 
-      <div id="accordion">
+      <div id="accordion" style="display: none">
         <nav>
           ${accordion}
         </nav>

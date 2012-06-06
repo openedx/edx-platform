@@ -1,15 +1,15 @@
-<section class="text-input">
-  <input type="text" name="input_${id}" id="input_${id}" value="${value}" 
-	 % if size:
-	 size="${size}"
-	 % endif 
-	 />
+<section id="textinput_${id}" class="textinput">
+  <input type="text" name="input_${id}" id="input_${id}" value="${value}"
+   % if size:
+   size="${size}"
+   % endif
+   />
 
   <span id="answer_${id}"></span>
 
   % if state == 'unsubmitted':
   <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif state == 'correct': 
+  % elif state == 'correct':
   <span class="correct" id="status_${id}"></span>
   % elif state == 'incorrect':
   <span class="incorrect" id="status_${id}"></span>

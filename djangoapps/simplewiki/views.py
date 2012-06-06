@@ -482,7 +482,7 @@ def check_permissions(request, article, check_read=False, check_write=False, che
     
     locked_err = check_locked and article.locked
     
-    if revision == None:
+    if revision is None:
         revision = article.current_revision
     deleted_err = check_deleted and not (revision.deleted == 0)
     if (request.user.is_superuser):
