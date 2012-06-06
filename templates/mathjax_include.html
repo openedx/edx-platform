@@ -80,11 +80,7 @@ function DoUpdateMath(inputId) {
 
   </script>
 
-  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates -->
-  <!-- TODO: move to settings -->
-
-## next two lines are alternate mathjax sources and configurations
-## <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full">
-## <script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script>
-
+  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
+       MathJax extension libraries -->
   <script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>

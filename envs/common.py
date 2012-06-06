@@ -20,6 +20,7 @@ Longer TODO:
 """
 import sys
 import tempfile
+import glob2
 
 import djcelery
 from path import path
@@ -286,13 +287,12 @@ PIPELINE_CSS = {
 
 PIPELINE_JS = {
     'application': {
-        'source_filenames': [
-            'coffee/src/calculator.coffee',
-            'coffee/src/courseware.coffee',
-            'coffee/src/feedback_form.coffee',
-            'coffee/src/main.coffee'
-        ],
+        'source_filenames': [path.replace('static/', '') for path in glob2.glob('static/coffee/src/**/*.coffee')],
         'output_filename': 'js/application.js'
+    },
+    'spec': {
+        'source_filenames': [path.replace('static/', '') for path in glob2.glob('static/coffee/spec/**/*.coffee')],
+        'output_filename': 'js/spec.js'
     }
 }
 
@@ -316,6 +316,9 @@ STATICFILES_IGNORE_PATTERNS = (
 PIPELINE_YUI_BINARY = 'yui-compressor'
 PIPELINE_SASS_BINARY = 'sass'
 PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
+
+# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
+PIPELINE_COMPILE_INPLACE = True
 
 ################################### APPS #######################################
 INSTALLED_APPS = (

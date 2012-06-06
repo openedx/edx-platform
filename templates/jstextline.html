@@ -1,12 +1,12 @@
-<section class="text-input">
-  <input type="text" name="input_${id}" id="input_${id}" value="${value}" 
-	 % if size:
-	 size="${size}"
-	 % endif 
-         % if dojs == 'math':
-	 onkeyup="DoUpdateMath('${id}')"
-	 % endif 
-	 />
+<section id="jstextline_${id}" class="jstextline">
+  <input type="text" name="input_${id}" id="input_${id}" value="${value}"
+   % if size:
+   size="${size}"
+   % endif
+   % if dojs == 'math':
+   onkeyup="DoUpdateMath('${id}')"
+   % endif
+   />
 
   % if dojs == 'math':
     <span id="display_${id}">`{::}`</span>
@@ -20,7 +20,7 @@
 
   % if state == 'unsubmitted':
   <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif state == 'correct': 
+  % elif state == 'correct':
   <span class="correct" id="status_${id}"></span>
   % elif state == 'incorrect':
   <span class="incorrect" id="status_${id}"></span>

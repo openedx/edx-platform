@@ -190,7 +190,7 @@ def get_score(user, problem, cache, coursename=None):
             correct=float(response.grade)
         
     # Grab max grade from cache, or if it doesn't exist, compute and save to DB
-    if id in cache and response.max_grade != None:
+    if id in cache and response.max_grade is not None:
         total = response.max_grade
     else:
         ## HACK 1: We shouldn't specifically reference capa_module

@@ -1,6 +1,5 @@
 import logging
 import urllib
-import json
 
 from fs.osfs import OSFS
 
@@ -8,7 +7,7 @@ from django.conf import settings
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -17,10 +16,9 @@ from django.views.decorators.cache import cache_control
 
 from lxml import etree
 
-from module_render import render_module, make_track_function, I4xSystem, get_state_from_module_object_preload
+from module_render import render_x_module, make_track_function, I4xSystem
 from models import StudentModule
 from student.models import UserProfile
-from util.views import accepts
 from multicourse import multicourse_settings
 
 import courseware.content_parser as content_parser
@@ -58,10 +56,9 @@ def profile(request, student_id = None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
 
-    if student_id == None:
+    if student_id is None:
         student = request.user
     else: 
-        print content_parser.user_groups(request.user)
         if 'course_admin' not in content_parser.user_groups(request.user):
             raise Http404
         student = User.objects.get( id = int(student_id))
@@ -131,7 +128,7 @@ def render_section(request, section):
         module_object_preload = []
     
     try:
-        module = render_module(user, request, dom, module_object_preload)
+        module = render_x_module(user, request, dom, module_object_preload)
     except:
         log.exception("Unable to load module")
         context.update({
@@ -201,17 +198,28 @@ def index(request, course=None, chapter="Using the System", section="Hints",posi
         return render_to_response('courseware-error.html', {})
 
     # this is the module's parent's etree
-    dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]/*[1]", 
+    dom_module = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]", 
                            course=course, chapter=chapter, section=section)
+
+    #print "DM", dom_module
 
     if len(dom_module) == 0:
+        module_wrapper = None
+    else:
+        module_wrapper = dom_module[0]
+
+    if module_wrapper is None:
         module = None
+    elif module_wrapper.get("src"):
+        module = content_parser.section_file(user=user, section=module_wrapper.get("src"), coursename=course)
     else:
         # this is the module's etree
-        module = dom_module[0]
+        module = etree.XML(etree.tostring(module_wrapper[0])) # Copy the element out of the tree
 
-    module_ids = dom.xpath("//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]//@id", 
-                           course=course, chapter=chapter, section=section)
+    module_ids = []
+    if module is not None:
+        module_ids = module.xpath("//@id", 
+                                  course=course, chapter=chapter, section=section)
 
     if user.is_authenticated():
         module_object_preload = list(StudentModule.objects.filter(student=user, 
@@ -226,7 +234,7 @@ def index(request, course=None, chapter="Using the System", section="Hints",posi
     }
 
     try:
-        module_context = render_module(user, request, module, module_object_preload, position)
+        module_context = render_x_module(user, request, module, module_object_preload, position)
     except:
         log.exception("Unable to load module")
         context.update({
@@ -242,81 +250,6 @@ def index(request, course=None, chapter="Using the System", section="Hints",posi
 
     result = render_to_response('courseware.html', context)
     return result
-
-
-def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic view for extensions. This is where AJAX calls go.'''
-    if not request.user.is_authenticated():
-        return redirect('/')
-
-    # Grab the student information for the module from the database
-    s = StudentModule.objects.filter(student=request.user, 
-                                     module_id=id)
-    #s = StudentModule.get_with_caching(request.user, id)
-    if len(s) == 0 or s is None:
-        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
-        raise Http404
-    s = s[0]
-
-    oldgrade = s.grade
-    oldstate = s.state
-
-    dispatch=dispatch.split('?')[0]
-
-    ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
-
-    # get coursename if stored
-    coursename = multicourse_settings.get_coursename_from_request(request)
-
-    if coursename and settings.ENABLE_MULTICOURSE:
-        xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
-        data_root = settings.DATA_DIR + xp
-    else:
-        data_root = settings.DATA_DIR
-
-    # Grab the XML corresponding to the request from course.xml
-    try:
-        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
-    except:
-        log.exception("Unable to load module during ajax call")
-        if accepts(request, 'text/html'):
-            return render_to_response("module-error.html", {})
-        else:
-            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
-        return response
-
-    # Create the module
-    system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = None, 
-                       ajax_url = ajax_url,
-                       filestore = OSFS(data_root),
-                       )
-
-    try:
-        instance=courseware.modules.get_module_class(module)(system, 
-                                                             xml, 
-                                                             id, 
-                                                             state=oldstate)
-    except:
-        log.exception("Unable to load module instance during ajax call")
-        log.exception('module=%s, dispatch=%s, id=%s' % (module,dispatch,id))
-        # log.exception('xml = %s' % xml)
-        if accepts(request, 'text/html'):
-            return render_to_response("module-error.html", {})
-        else:
-            response = HttpResponse(json.dumps({'success': "We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible"}))
-        return response
-
-    # Let the module handle the AJAX
-    ajax_return=instance.handle_ajax(dispatch, request.POST)
-    # Save the state back to the database
-    s.state=instance.get_state()
-    if instance.get_score(): 
-        s.grade=instance.get_score()['score']
-    if s.grade != oldgrade or s.state != oldstate:
-        s.save()
-    # Return whatever the module wanted to return to the client/caller
-    return HttpResponse(ajax_return)
 
 def jump_to(request, probname=None):
     '''

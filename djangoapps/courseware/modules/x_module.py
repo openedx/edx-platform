@@ -1,3 +1,5 @@
+from lxml import etree
+
 import courseware.progress
 
 def dummy_track(event_type, event):
@@ -17,6 +19,58 @@ class XModule(object):
         ''' Tags in the courseware file guaranteed to correspond to the module '''
         return []
         
+    @classmethod
+    def get_usage_tags(c):
+        ''' We should convert to a real module system
+            For now, this tells us whether we use this as an xmodule, a CAPA response type
+            or a CAPA input type '''
+        return ['xmodule']
+
+    def get_name():
+        name = self.__xmltree.get(name)
+        if name: 
+            return name
+        else: 
+            raise "We should iterate through children and find a default name"
+
+    def rendered_children(self):
+        '''
+        Render all children. 
+        This really ought to return a list of xmodules, instead of dictionaries
+        '''
+        children = [self.render_function(e) for e in self.__xmltree]
+        return children            
+
+    def __init__(self, system = None, xml = None, item_id = None, 
+                 json = None, track_url=None, state=None):
+        ''' In most cases, you must pass state or xml'''
+        if not item_id: 
+            raise ValueError("Missing Index")
+        if not xml and not json:
+            raise ValueError("xml or json required")
+        if not system:
+            raise ValueError("System context required")
+
+        self.xml = xml
+        self.json = json
+        self.item_id = item_id
+        self.state = state
+        self.DEBUG = False
+        
+        self.__xmltree = etree.fromstring(xml) # PRIVATE
+
+        if system: 
+            ## These are temporary; we really should go 
+            ## through self.system. 
+            self.ajax_url = system.ajax_url
+            self.tracker = system.track_function
+            self.filestore = system.filestore
+            self.render_function = system.render_function
+            self.DEBUG = system.DEBUG
+        self.system = system
+
+    ### Functions used in the LMS
+
     def get_completion(self):
         ''' This is mostly unimplemented. 
             It gives a progress indication -- e.g. 30 minutes of 1.5 hours watched. 3 of 5 problems done, etc. '''
@@ -45,37 +99,45 @@ class XModule(object):
         '''
         return "Unimplemented"
 
-    def get_init_js(self):
-        ''' JavaScript code to be run when problem is shown. Be aware
-        that this may happen several times on the same page
-        (e.g. student switching tabs). Common functions should be put
-        in the main course .js files for now. ''' 
-        return ""
-
-    def get_destroy_js(self):
-        ''' JavaScript called to destroy the problem (e.g. when a user switches to a different tab). 
-            We make an attempt, but not a promise, to call this when the user closes the web page. 
-        '''
-        return ""
-
     def handle_ajax(self, dispatch, get):
         ''' dispatch is last part of the URL. 
             get is a dictionary-like object ''' 
         return ""
 
-    def __init__(self, system, xml, item_id, track_url=None, state=None):
-        ''' In most cases, you must pass state or xml'''
-        self.xml = xml
-        self.item_id = item_id
-        self.state = state
-        self.DEBUG = False
 
-        if system: 
-            ## These are temporary; we really should go 
-            ## through self.system. 
-            self.ajax_url = system.ajax_url
-            self.tracker = system.track_function
-            self.filestore = system.filestore
-            self.render_function = system.render_function
-            self.DEBUG = system.DEBUG
-        self.system = system
+class XModuleDescriptor(object):
+    def __init__(self, xml = None, json = None):
+        if not xml and not json:
+            raise "XModuleDescriptor must be initalized with XML or JSON"
+        if not xml:
+            raise NotImplementedError("Code does not have support for JSON yet")
+        
+        self.xml = xml
+        self.json = json
+
+    def get_xml(self):
+        ''' For conversions between JSON and legacy XML representations.
+        '''
+        if self.xml: 
+            return self.xml
+        else: 
+            raise NotImplementedError("JSON->XML Translation not implemented")
+
+    def get_json(self):
+        ''' For conversions between JSON and legacy XML representations.
+        '''
+        if self.json: 
+            raise NotImplementedError
+            return self.json # TODO: Return context as well -- files, etc. 
+        else: 
+            raise NotImplementedError("XML->JSON Translation not implemented")
+
+    #def handle_cms_json(self):
+    #    raise NotImplementedError
+
+    #def render(self, size):
+    #    ''' Size: [thumbnail, small, full] 
+    #    Small ==> what we drag around
+    #    Full ==> what we edit
+    #    '''
+    #    raise NotImplementedError

@@ -33,7 +33,7 @@ class Command(BaseCommand):
                              ajax_url='',
                              state=None, 
                              track_function = lambda x,y,z:None, 
-                             render_function = lambda x: {'content':'','destroy_js':'','init_js':'','type':'video'})
+                             render_function = lambda x: {'content':'','type':'video'})
             except:
                 print "==============> Error in ", etree.tostring(module)
                 check = False

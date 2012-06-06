@@ -18,7 +18,7 @@ from lxml import etree
 ## TODO: Abstract out from Django
 from mitxmako.shortcuts import render_to_string
 
-from x_module import XModule
+from x_module import XModule, XModuleDescriptor
 from courseware.capa.capa_problem import LoncapaProblem, StudentInputError
 import courseware.content_parser as content_parser
 from multicourse import multicourse_settings
@@ -32,6 +32,9 @@ class ComplexEncoder(json.JSONEncoder):
         if isinstance(obj, complex):
             return "{real:.7g}{imag:+.7g}*j".format(real = obj.real,imag = obj.imag)
         return json.JSONEncoder.default(self, obj)
+
+class ModuleDescriptor(XModuleDescriptor):
+    pass
 
 class Module(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
@@ -59,12 +62,6 @@ class Module(XModule):
 
     def get_html(self):
         return render_to_string('problem_ajax.html', 
-                              {'id':self.item_id, 
-                               'ajax_url':self.ajax_url,
-                               })
-
-    def get_init_js(self):
-        return render_to_string('problem.js', 
                               {'id':self.item_id, 
                                'ajax_url':self.ajax_url,
                                })
@@ -105,7 +102,7 @@ class Module(XModule):
             reset_button = False
 
         # We don't need a "save" button if infinite number of attempts and non-randomized
-        if self.max_attempts == None and self.rerandomize != "always":
+        if self.max_attempts is None and self.rerandomize != "always":
             save_button = False
 
         # Check if explanation is available, and if so, give a link
@@ -132,8 +129,8 @@ class Module(XModule):
 
         html=render_to_string('problem.html', context)
         if encapsulate:
-            html = '<div id="main_{id}">'.format(id=self.item_id)+html+"</div>"
-            
+            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id)+html+"</div>"
+
         return html
 
     def __init__(self, system, xml, item_id, state=None):
@@ -248,7 +245,7 @@ class Module(XModule):
         ''' Is the student still allowed to submit answers? '''
         if self.attempts == self.max_attempts:
             return True
-        if self.close_date != None and datetime.datetime.utcnow() > self.close_date:
+        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
             return True
 
         return False
