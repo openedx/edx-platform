@@ -24,10 +24,10 @@ def only_one(lst, default="", process=lambda x: x):
     If lst has a single element, applies process to that element and returns it
     Otherwise, raises an exeception
     """
-    if len(l) == 0:
+    if len(lst) == 0:
         return default
-    elif len(l) == 1:
-        return process(l[0])
+    elif len(lst) == 1:
+        return process(lst[0])
     else:
         raise Exception('Malformed XML')
 
