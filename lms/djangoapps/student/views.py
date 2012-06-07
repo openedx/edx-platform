@@ -94,7 +94,7 @@ def login_user(request, error=""):
 
 @ensure_csrf_cookie
 def logout_user(request):
-    ''' HTTP request to log in the user. Redirects to marketing page'''
+    ''' HTTP request to log out the user. Redirects to marketing page'''
     logout(request)
     return redirect('/')
 
