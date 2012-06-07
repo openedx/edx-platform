@@ -46,23 +46,23 @@ def certificate_request(request):
         grade = None
         if len(error) == 0:
             student_gradesheet = grades.grade_sheet(request.user)
-        
+            
             grade = student_gradesheet['grade']
-        
+            
             if not grade:
                 error += 'You have not earned a grade in this course. '
-            
+        
         if len(error) == 0:
             generate_certificate(request.user, grade)
-        
-            # TODO: Send the certificate email
+            
             return HttpResponse(json.dumps({'success':True}))
         else:
             return HttpResponse(json.dumps({'success':False,
                                             'error': error }))
     
     else:
-        #This is a request for the page with the form
+        #This is not a POST, we should render the page with the form
+        
         grade_sheet = grades.grade_sheet(request.user)
         certificate_state, certificate_download_url = certificate_state_for_student(request.user, grade_sheet['grade'])
         
@@ -88,21 +88,27 @@ def certificate_request(request):
         return render_to_response('cert_request.html', context)
 
 
+
 # This method should only be called if the user has a grade and has requested a certificate
 def generate_certificate(user, grade):
     # Make sure to see the comments in models.GeneratedCertificate to read about the valid
     # states for a GeneratedCertificate object
-    generated_certificate = None
+    if grade:
+        generated_certificate = None
     
-    try:
-        generated_certificate = GeneratedCertificate.objects.get(user = user)
-    except GeneratedCertificate.DoesNotExist:
-        generated_certificate = GeneratedCertificate(user = user, certificate_id = uuid.uuid4().hex)
+        try:
+            generated_certificate = GeneratedCertificate.objects.get(user = user)
+        except GeneratedCertificate.DoesNotExist:
+            generated_certificate = GeneratedCertificate(user = user, certificate_id = uuid.uuid4().hex)
 
-    generated_certificate.enabled = True
-    generated_certificate.save()
-    
-    certificate_id = generated_certificate.certificate_id
-    
-    log.debug("Generating certificate for " + str(user.username) + " with ID: " + certificate_id)
-    
+        generated_certificate.enabled = True
+        generated_certificate.save()
+        
+        certificate_id = generated_certificate.certificate_id
+        
+        log.debug("Generating certificate for " + str(user.username) + " with ID: " + certificate_id)
+        
+        # TODO: If the certificate was pre-generated, send the email that it is ready to download
+        
+    else:
+        log.warning("Asked to generate a certifite for student " + str(user.username) + " but without a grade.")

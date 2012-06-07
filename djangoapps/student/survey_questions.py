@@ -17,8 +17,8 @@ def exit_survey_list_for_student(student):
     
     survey_list = common_questions + chosen_questions
     return survey_list
-    
-    
+
+
 
 exit_survey_questions = {
     'common_questions' : [

@@ -73,7 +73,3 @@ def certificate_state_for_student(student, grade):
     else:
         # No grade, no certificate. No exceptions
         return ("unavailable", None)
-    
-    
-    
-    

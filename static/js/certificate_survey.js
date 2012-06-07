@@ -54,16 +54,7 @@ $(function() {
 
     postJSON('/certificate_request', values, function(data) {
       if (data.success) {
-
-        //Now we move the survey_survey_holder back to a safer container, and submit the survey
-        if ($("#survey_fieldset").length > 0) {
-          $("#survey_survey_holder").prepend($("#survey_fieldset").remove());
-
-          $("#survey_form").submit();
-        }
-
-        $("#cert_request").html("<h1>Certificate Request Received</h1><p>Thank you! A certificate is being generated. You will be notified when it is ready to download.</p>");
-        $(".cert_request_link").text("Certificate is being generated...");
+        $("#cert_request").html("<h1>Certificate Request Received</h1><p>Thank you! We will let you know when the certificate is ready to download <a href='/profile'>from the Profile page</a>.</p>");
       } else {
         $("#cert_request_error").html(data.error).scrollMinimal();
       }
@@ -78,12 +69,6 @@ $(function() {
     postJSON('/exit_survey', values, function(data) {
       if (data.success) {
         $("#survey").html("<h1>Survey Response Recorded</h1><p>Thank you for filling out the survey!</p>");
-
-        //Make sure that the survey fieldset is removed
-        $("#survey_fieldset").remove();
-
-        //Remove the links to take the survey
-        $(".survey_offer").hide();
       } else {
         $("#survey_error").html(data.error).scrollMinimal();
       }

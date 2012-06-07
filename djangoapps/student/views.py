@@ -492,7 +492,6 @@ def record_exit_survey(request, internal_request = False):
             return returnResults({'success':True})
             
         else:
-            log.debug("response values: " + str( response.values() ))
             if internal_request and all( value == None or value == [''] for value in response.values() ):
                 # If all values are empty, then the student didn't answer any questions.
                 # In the case of this being an internal request, we don't mark the survey as taken
