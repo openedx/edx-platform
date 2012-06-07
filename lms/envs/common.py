@@ -285,6 +285,8 @@ PIPELINE_CSS = {
     }
 }
 
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/marketing.scss', 'sass/marketing-ie.scss', 'sass/print.scss']
+
 PIPELINE_JS = {
     'application': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
