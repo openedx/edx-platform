@@ -12,6 +12,7 @@ import logging
 import math
 import numpy
 import os
+import os.path
 import random
 import re
 import scipy
@@ -125,6 +126,9 @@ class LoncapaProblem(object):
             responder = response_types[response.tag](response, self.context, self.system)
             responder.preprocess_response()
 
+    def __unicode__(self):
+        return u"LoncapaProblem ({0})".format(self.fileobject)
+
     def get_state(self):
         ''' Stored per-user session data neeeded to: 
             1) Recreate the problem
@@ -174,10 +178,11 @@ class LoncapaProblem(object):
         return self.correct_map
 
     def get_question_answers(self):
-        '''
-        Make a dict of (id,correct_answer) entries, for all the problems. 
-        Called by "show answers" button JSON request (see capa_module)
-        '''
+        """Returns a dict of answer_ids to answer values. If we can't generate
+        an answer (this sometimes happens in customresponses), that answer_id is 
+        not included. Called by "show answers" button JSON request 
+        (see capa_module)
+        """
         context=self.extract_context(self.tree)
         answer_map = dict()
         problems_simple = self.extract_problems(self.tree)	# purified (flat) XML tree of just response queries
@@ -200,6 +205,24 @@ class LoncapaProblem(object):
                 answer_map[entry.get('id')] = answer
 
         return answer_map
+
+    def get_answer_ids(self):
+        """Return the IDs of all the responses -- these are the keys used for 
+        the dicts returned by grade_answers and get_question_answers. (Though 
+        get_question_answers may only return a subset of these."""
+        answer_ids = []
+        context=self.extract_context(self.tree)
+        problems_simple = self.extract_problems(self.tree)
+        for response in problems_simple:
+            responder = response_types[response.tag](response, self.context)
+            if hasattr(responder, "answer_id"):
+                answer_ids.append(responder.answer_id)
+            # customresponse types can have multiple answer_ids
+            elif hasattr(responder, "answer_ids"):
+                answer_ids.extend(responder.answer_ids)
+
+        return answer_ids
+
 
     # ======= Private ========
 
