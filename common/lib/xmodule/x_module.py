@@ -1,7 +1,5 @@
 from lxml import etree
 
-import courseware.progress
-
 def dummy_track(event_type, event):
     pass
 
@@ -71,11 +69,6 @@ class XModule(object):
 
     ### Functions used in the LMS
 
-    def get_completion(self):
-        ''' This is mostly unimplemented. 
-            It gives a progress indication -- e.g. 30 minutes of 1.5 hours watched. 3 of 5 problems done, etc. '''
-        return courseware.progress.completion()
-    
     def get_state(self):
         ''' State of the object, as stored in the database 
         '''

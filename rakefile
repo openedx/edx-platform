@@ -58,10 +58,31 @@ task :pylint => LMS_REPORT_DIR do
     end
 end
 
-desc "Run all django tests on our djangoapps"
-task :test => LMS_REPORT_DIR do
-    ENV['NOSE_XUNIT_FILE'] = File.join(LMS_REPORT_DIR, "nosetests.xml")
-    sh(django_admin(:lms, :test, 'test', *Dir['lms/djangoapps'].each))
+[:lms].each do |system|
+    task_name = "test_#{system}"
+    report_dir = File.join(REPORT_DIR, task_name)
+    directory report_dir
+
+    desc "Run all django tests on our djangoapps for the #{system}"
+    task task_name => report_dir do
+        ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
+        sh(django_admin(:lms, :test, 'test', *Dir['lms/djangoapps'].each))
+    end
+    task :test => task_name
+end
+
+Dir["common/lib/*"].each do |lib|
+    task_name = "test_#{lib}"
+
+    report_dir = File.join(REPORT_DIR, task_name)
+    directory report_dir
+
+    desc "Run tests for common lib #{lib}"
+    task task_name do
+        ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
+        sh("nosetests #{lib}")
+    end
+    task :test => task_name
 end
 
 desc <<-desc

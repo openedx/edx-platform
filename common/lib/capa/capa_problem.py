@@ -21,8 +21,6 @@ from lxml import etree
 from lxml.etree import Element
 from xml.sax.saxutils import escape, unescape
 
-from mako.template import Template
-
 from util import contextualize_text
 import inputtypes
 
