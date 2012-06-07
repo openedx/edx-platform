@@ -54,7 +54,7 @@ $(function() {
 
     postJSON('/certificate_request', values, function(data) {
       if (data.success) {
-        $("#cert_request").html("<h1>Certificate Request Received</h1><p>Thank you! We will let you know when the certificate is ready to download <a href='/profile'>from the Profile page</a>.</p>");
+        $("#cert_request").html("<h1>Certificate Request Received</h1><p>Thank you! We will let you know when the certificate is ready to download from the <a href='/profile'>Profile page</a>.</p>");
       } else {
         $("#cert_request_error").html(data.error).scrollMinimal();
       }
@@ -68,7 +68,7 @@ $(function() {
 
     postJSON('/exit_survey', values, function(data) {
       if (data.success) {
-        $("#survey").html("<h1>Survey Response Recorded</h1><p>Thank you for filling out the survey!</p>");
+        $("#survey").html("<h1>Survey Response Recorded</h1><p>Thank you for filling out the survey! You can now return to the <a href='/profile'>Profile page</a>.</p>");
       } else {
         $("#survey_error").html(data.error).scrollMinimal();
       }
