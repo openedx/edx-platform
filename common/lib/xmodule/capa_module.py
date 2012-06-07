@@ -17,15 +17,31 @@ log = logging.getLogger("mitx.courseware")
 #-----------------------------------------------------------------------------
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
-def item(l, default="", process=lambda x:x):
-    if len(l)==0:
+
+def only_one(lst, default="", process=lambda x: x):
+    """
+    If lst is empty, returns default
+    If lst has a single element, applies process to that element and returns it
+    Otherwise, raises an exeception
+    """
+    if len(l) == 0:
         return default
-    elif len(l)==1:
+    elif len(l) == 1:
         return process(l[0])
     else:
         raise Exception('Malformed XML')
 
+
 def parse_timedelta(time_str):
+    """
+    time_str: A string with the following components:
+        <D> day[s] (optional)
+        <H> hour[s] (optional)
+        <M> minute[s] (optional)
+        <S> second[s] (optional)
+
+    Returns a datetime.timedelta parsed from the string
+    """
     parts = TIMEDELTA_REGEX.match(time_str)
     if not parts:
         return
@@ -36,20 +52,23 @@ def parse_timedelta(time_str):
             time_params[name] = int(param)
     return timedelta(**time_params)
 
+
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, complex):
-            return "{real:.7g}{imag:+.7g}*j".format(real = obj.real,imag = obj.imag)
+            return "{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
         return json.JSONEncoder.default(self, obj)
+
 
 class ModuleDescriptor(XModuleDescriptor):
     pass
+
 
 class Module(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
     meant to be refactored out, but it seems to be serving a useful
     prupose now. We can e.g .destroy and create the capa_problem on a
-    reset. 
+    reset.
     '''
 
     id_attribute = "filename"
@@ -77,31 +96,30 @@ class Module(XModule):
 
     def get_problem_html(self, encapsulate=True):
         html = self.lcp.get_html()
-        content={'name':self.name, 
-                 'html':html, 
-                 'weight': self.weight,
-                 }
-        
+        content = {'name': self.name,
+                   'html': html,
+                   'weight': self.weight,
+                  }
+
         # We using strings as truthy values, because the terminology of the check button
         # is context-specific.
         check_button = "Grade" if self.max_attempts else "Check"
         reset_button = True
         save_button = True
 
-        # If we're after deadline, or user has exhuasted attempts, 
-        # question is read-only. 
+        # If we're after deadline, or user has exhuasted attempts,
+        # question is read-only.
         if self.closed():
             check_button = False
             reset_button = False
             save_button = False
-            
 
         # User submitted a problem, and hasn't reset. We don't want
-        # more submissions. 
+        # more submissions.
         if self.lcp.done and self.rerandomize == "always":
             check_button = False
             save_button = False
-        
+
         # Only show the reset button if pressing it will show different values
         if self.rerandomize != 'always':
             reset_button = False
@@ -115,30 +133,30 @@ class Module(XModule):
             save_button = False
 
         # Check if explanation is available, and if so, give a link
-        explain=""
-        if self.lcp.done and self.explain_available=='attempted':
-            explain=self.explanation
-        if self.closed() and self.explain_available=='closed':
-            explain=self.explanation
-        
+        explain = ""
+        if self.lcp.done and self.explain_available == 'attempted':
+            explain = self.explanation
+        if self.closed() and self.explain_available == 'closed':
+            explain = self.explanation
+
         if len(explain) == 0:
             explain = False
 
-        context = {'problem' : content, 
-                   'id' : self.item_id, 
-                   'check_button' : check_button,
-                   'reset_button' : reset_button,
-                   'save_button' : save_button,
-                   'answer_available' : self.answer_available(),
-                   'ajax_url' : self.ajax_url,
-                   'attempts_used': self.attempts, 
-                   'attempts_allowed': self.max_attempts, 
+        context = {'problem': content,
+                   'id': self.item_id,
+                   'check_button': check_button,
+                   'reset_button': reset_button,
+                   'save_button': save_button,
+                   'answer_available': self.answer_available(),
+                   'ajax_url': self.ajax_url,
+                   'attempts_used': self.attempts,
+                   'attempts_allowed': self.max_attempts,
                    'explain': explain,
                    }
 
         html = self.system.render_template('problem.html', context)
         if encapsulate:
-            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id,ajax_url=self.ajax_url)+html+"</div>"
+            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id, ajax_url=self.ajax_url) + html + "</div>"
 
         return html
 
@@ -147,43 +165,42 @@ class Module(XModule):
 
         self.attempts = 0
         self.max_attempts = None
-        
-        dom2 = etree.fromstring(xml)
-        
-        self.explanation="problems/"+item(dom2.xpath('/problem/@explain'), default="closed")
-        # TODO: Should be converted to: self.explanation=item(dom2.xpath('/problem/@explain'), default="closed")
-        self.explain_available=item(dom2.xpath('/problem/@explain_available'))
 
-        display_due_date_string=item(dom2.xpath('/problem/@due'))
-        if len(display_due_date_string)>0:
-            self.display_due_date=dateutil.parser.parse(display_due_date_string)
+        dom2 = etree.fromstring(xml)
+
+        self.explanation = "problems/" + only_one(dom2.xpath('/problem/@explain'), default="closed")
+        # TODO: Should be converted to: self.explanation=only_one(dom2.xpath('/problem/@explain'), default="closed")
+        self.explain_available = only_one(dom2.xpath('/problem/@explain_available'))
+
+        display_due_date_string = only_one(dom2.xpath('/problem/@due'))
+        if len(display_due_date_string) > 0:
+            self.display_due_date = dateutil.parser.parse(display_due_date_string)
             #log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
         else:
-            self.display_due_date=None
-        
-        
-        grace_period_string = item(dom2.xpath('/problem/@graceperiod'))
-        if len(grace_period_string)>0 and self.display_due_date:
+            self.display_due_date = None
+
+        grace_period_string = only_one(dom2.xpath('/problem/@graceperiod'))
+        if len(grace_period_string) >0 and self.display_due_date:
             self.grace_period = parse_timedelta(grace_period_string)
             self.close_date = self.display_due_date + self.grace_period
             #log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
         else:
             self.grace_period = None
             self.close_date = self.display_due_date
-            
-        self.max_attempts=item(dom2.xpath('/problem/@attempts'))
+
+        self.max_attempts =only_one(dom2.xpath('/problem/@attempts'))
         if len(self.max_attempts)>0:
-            self.max_attempts=int(self.max_attempts)
+            self.max_attempts =int(self.max_attempts)
         else:
-            self.max_attempts=None
+            self.max_attempts =None
 
-        self.show_answer=item(dom2.xpath('/problem/@showanswer'))
+        self.show_answer =only_one(dom2.xpath('/problem/@showanswer'))
 
-        if self.show_answer=="":
-            self.show_answer="closed"
+        if self.show_answer =="":
+            self.show_answer ="closed"
 
-        self.rerandomize=item(dom2.xpath('/problem/@rerandomize'))
-        if self.rerandomize=="" or self.rerandomize=="always" or self.rerandomize=="true":
+        self.rerandomize =only_one(dom2.xpath('/problem/@rerandomize'))
+        if self.rerandomize =="" or self.rerandomize=="always" or self.rerandomize=="true":
             self.rerandomize="always"
         elif self.rerandomize=="false" or self.rerandomize=="per_student":
             self.rerandomize="per_student"
@@ -197,10 +214,10 @@ class Module(XModule):
         if state!=None and 'attempts' in state:
             self.attempts=state['attempts']
 
-        # TODO: Should be: self.filename=item(dom2.xpath('/problem/@filename')) 
-        self.filename= "problems/"+item(dom2.xpath('/problem/@filename'))+".xml"
-        self.name=item(dom2.xpath('/problem/@name'))
-        self.weight=item(dom2.xpath('/problem/@weight'))
+        # TODO: Should be: self.filename=only_one(dom2.xpath('/problem/@filename'))
+        self.filename= "problems/"+only_one(dom2.xpath('/problem/@filename'))+".xml"
+        self.name=only_one(dom2.xpath('/problem/@name'))
+        self.weight=only_one(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
             seed = 1
         else:
@@ -232,13 +249,13 @@ class Module(XModule):
 
     def handle_ajax(self, dispatch, get):
         '''
-        This is called by courseware.module_render, to handle an AJAX call.  "get" is request.POST 
+        This is called by courseware.module_render, to handle an AJAX call.  "get" is request.POST
         '''
         if dispatch=='problem_get':
             response = self.get_problem(get)
-        elif False: #self.close_date > 
+        elif False: #self.close_date >
             return json.dumps({"error":"Past due date"})
-        elif dispatch=='problem_check': 
+        elif dispatch=='problem_check':
             response = self.check_problem(get)
         elif dispatch=='problem_reset':
             response = self.reset_problem(get)
@@ -246,7 +263,7 @@ class Module(XModule):
             response = self.save_problem(get)
         elif dispatch=='problem_show':
             response = self.get_answer(get)
-        else: 
+        else:
             return "Error"
         return response
 
@@ -258,11 +275,11 @@ class Module(XModule):
             return True
 
         return False
-        
+
 
     def answer_available(self):
-        ''' Is the user allowed to see an answer? 
-        ''' 
+        ''' Is the user allowed to see an answer?
+        '''
         if self.show_answer == '':
             return False
         if self.show_answer == "never":
@@ -291,16 +308,16 @@ class Module(XModule):
         '''
         if not self.answer_available():
             raise self.system.exception404
-        else: 
+        else:
             answers = self.lcp.get_question_answers()
-            return json.dumps(answers, 
+            return json.dumps(answers,
                               cls=ComplexEncoder)
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
         ''' Same as get_problem_html -- if we want to reconfirm we
             have the right thing e.g. after several AJAX calls.'''
-        return self.get_problem_html(encapsulate=False)        
+        return self.get_problem_html(encapsulate=False)
 
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and
@@ -322,7 +339,7 @@ class Module(XModule):
             event_info['failure']='closed'
             self.tracker('save_problem_check_fail', event_info)
             raise self.system.exception404
-            
+
         # Problem submitted. Student should reset before checking
         # again.
         if self.lcp.done and self.rerandomize == "always":
@@ -334,19 +351,19 @@ class Module(XModule):
             old_state = self.lcp.get_state()
             lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
-        except StudentInputError as inst: 
+        except StudentInputError as inst:
             self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             return json.dumps({'success':inst.message})
-        except: 
+        except:
             self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             raise Exception,"error in capa_module"
             return json.dumps({'success':'Unknown Error'})
-            
+
         self.attempts = self.attempts + 1
         self.lcp.done=True
-        
+
         success = 'correct'
         for i in correct_map:
             if correct_map[i]!='correct':
@@ -382,7 +399,7 @@ class Module(XModule):
             event_info['failure']='closed'
             self.tracker('save_problem_fail', event_info)
             return "Problem is closed"
-            
+
         # Problem submitted. Student should reset before saving
         # again.
         if self.lcp.done and self.rerandomize == "always":
@@ -396,7 +413,7 @@ class Module(XModule):
         return json.dumps({'success':True})
 
     def reset_problem(self, get):
-        ''' Changes problem state to unfinished -- removes student answers, 
+        ''' Changes problem state to unfinished -- removes student answers,
             and causes problem to rerender itself. '''
         event_info = dict()
         event_info['old_state']=self.lcp.get_state()
@@ -406,7 +423,7 @@ class Module(XModule):
             event_info['failure']='closed'
             self.tracker('reset_problem_fail', event_info)
             return "Problem is closed"
-            
+
         if not self.lcp.done:
             event_info['failure']='not_done'
             self.tracker('reset_problem_fail', event_info)
@@ -420,7 +437,7 @@ class Module(XModule):
 
         if self.rerandomize == "always":
             self.lcp.context=dict()
-            self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid. 
+            self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid.
             self.lcp.seed=None
 
         self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state(), system=self.system)
