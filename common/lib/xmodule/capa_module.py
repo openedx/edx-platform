@@ -11,7 +11,8 @@ from datetime import timedelta
 from lxml import etree
 
 from x_module import XModule, XModuleDescriptor
-from capa.capa_problem import LoncapaProblem, StudentInputError
+from capa.capa_problem import LoncapaProblem
+from capa.responsetypes import StudentInputError
 log = logging.getLogger("mitx.courseware")
 
 #-----------------------------------------------------------------------------

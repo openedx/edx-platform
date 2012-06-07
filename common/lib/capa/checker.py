@@ -23,6 +23,7 @@ log = logging.getLogger('capa.checker')
 class DemoSystem(object):
     def __init__(self):
         self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
+        self.DEBUG = True
 
     def render_template(self, template_filename, dictionary, context=None):
         if context is None:

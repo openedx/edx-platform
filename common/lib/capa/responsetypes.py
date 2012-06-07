@@ -277,14 +277,14 @@ def sympy_check2():
                     print "can't find cfn in context = ",context
 
         if not self.code:
-            if not answer:
+            if answer is None:
                 # raise Exception,"[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid
                 print "[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid
                 self.code = ''
             else:
                 answer_src = answer.get('src')
                 if answer_src is not None:
-                    self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
+                    self.code = self.system.filesystem.open('src/'+answer_src).read()
                 else:
                     self.code = answer.text
 
@@ -329,8 +329,7 @@ def sympy_check2():
                              })
 
         # pass self.system.debug to cfn 
-        # if hasattr(self.system,'debug'): self.context['debug'] = self.system.debug
-        self.context['debug'] = settings.DEBUG
+        self.context['debug'] = self.system.DEBUG
 
         # exec the check function
         if type(self.code)==str:
@@ -492,7 +491,7 @@ main()
 
         answer_src = answer.get('src')
         if answer_src is not None:
-            self.code = open(settings.DATA_DIR+'src/'+answer_src).read()
+            self.code = self.system.filesystem.open('src/'+answer_src).read()
         else:
             self.code = answer.text
 
@@ -522,7 +521,7 @@ main()
             log.error(msg)
             raise Exception, msg
 
-        if settings.DEBUG: log.info('response = %s' % r.text)
+        if self.system.DEBUG: log.info('response = %s' % r.text)
 
         if (not r.text ) or (not r.text.strip()):
             raise Exception,'Error: no response from external server url=%s' % self.url
@@ -551,7 +550,7 @@ main()
             rxml = self.do_external_request('get_score',extra_payload)
         except Exception, err:
             log.error('Error %s' % err)
-            if settings.DEBUG:
+            if self.system.DEBUG:
                 correct_map = dict(zip(sorted(self.answer_ids), ['incorrect'] * len(self.answer_ids) ))
                 correct_map['msg_%s' % self.answer_ids[0]] = '<font color="red" size="+2">%s</font>' % str(err).replace('<','&lt;')
                 return correct_map
@@ -581,7 +580,7 @@ main()
             exans = json.loads(rxml.find('expected').text)
         except Exception,err:
             log.error('Error %s' % err)
-            if settings.DEBUG:
+            if self.system.DEBUG:
                 msg = '<font color=red size=+2>%s</font>' % str(err).replace('<','&lt;')
                 exans = [''] * len(self.answer_ids)
                 exans[0] = msg
