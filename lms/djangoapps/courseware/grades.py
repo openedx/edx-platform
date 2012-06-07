@@ -25,8 +25,8 @@ import types
 from django.conf import settings
 
 from courseware import global_course_settings
-from courseware import graders
-from courseware.graders import Score
+from xmodule import graders
+from xmodule.graders import Score
 from models import StudentModule
 import courseware.content_parser as content_parser
 import xmodule
@@ -116,7 +116,7 @@ def grade_sheet(student,coursename=None):
                         graded = False 
                     scores.append( Score(correct,total, graded, p.get("name")) )
 
-                section_total, graded_total = aggregate_scores(scores, s.get("name"))
+                section_total, graded_total = graders.aggregate_scores(scores, s.get("name"))
                 #Add the graded total to totaled_scores
                 format = s.get('format', "")
                 subtitle = s.get('subtitle', format)
@@ -145,27 +145,6 @@ def grade_sheet(student,coursename=None):
     
     return {'courseware_summary' : chapters,
             'grade_summary' : grade_summary}
-
-def aggregate_scores(scores, section_name = "summary"):    
-    total_correct_graded = sum(score.earned for score in scores if score.graded)
-    total_possible_graded = sum(score.possible for score in scores if score.graded)
-    
-    total_correct = sum(score.earned for score in scores)
-    total_possible = sum(score.possible for score in scores)
-        
-    #regardless of whether or not it is graded
-    all_total = Score(total_correct, 
-                          total_possible,
-                          False,
-                          section_name)
-    #selecting only graded things
-    graded_total = Score(total_correct_graded, 
-                         total_possible_graded, 
-                         True, 
-                         section_name)
-
-    return all_total, graded_total
-    
 
 def get_score(user, problem, cache, coursename=None):
     ## HACK: assumes max score is fixed per problem

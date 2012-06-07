@@ -27,7 +27,7 @@ class I4xSystem(object):
     of the courseware (e.g. import into other types of courseware, LMS, 
     or if we want to have a sandbox server for user-contributed content)
     '''
-    def __init__(self, ajax_url, track_function, render_function, filestore=None):
+    def __init__(self, ajax_url, track_function, render_function, render_template, filestore=None):
         self.ajax_url = ajax_url
         self.track_function = track_function
         if not filestore: 
@@ -37,6 +37,7 @@ class I4xSystem(object):
             if settings.DEBUG:
                 log.info("[courseware.module_render.I4xSystem] filestore path = %s" % filestore)
         self.render_function = render_function
+        self.render_template = render_template
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
 
@@ -117,6 +118,7 @@ def get_module(user, request, xml_module, module_object_preload, position=None):
     
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = lambda x: render_x_module(user, request, x, module_object_preload, position), 
+                       render_template = render_to_string,
                        ajax_url = ajax_url,
                        filestore = OSFS(data_root),
                        )
@@ -225,6 +227,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     # Create the module
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = None, 
+                       render_template = render_to_string,
                        ajax_url = ajax_url,
                        filestore = OSFS(data_root),
                        )
