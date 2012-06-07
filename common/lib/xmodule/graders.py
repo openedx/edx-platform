@@ -9,25 +9,33 @@ log = logging.getLogger("mitx.courseware")
 # Section either indicates the name of the problem or the name of the section
 Score = namedtuple("Score", "earned possible graded section")
 
-def aggregate_scores(scores, section_name = "summary"):
+
+def aggregate_scores(scores, section_name="summary"):
+    """
+    scores: A list of Score objects
+    returns: A tuple (all_total, graded_total).
+        all_total: A Score representing the total score summed over all input scores
+        graded_total: A Score representing the score summed over all graded input scores
+    """
     total_correct_graded = sum(score.earned for score in scores if score.graded)
     total_possible_graded = sum(score.possible for score in scores if score.graded)
-    
+
     total_correct = sum(score.earned for score in scores)
     total_possible = sum(score.possible for score in scores)
-        
+
     #regardless of whether or not it is graded
-    all_total = Score(total_correct, 
-                          total_possible,
-                          False,
-                          section_name)
+    all_total = Score(total_correct,
+                      total_possible,
+                      False,
+                      section_name)
     #selecting only graded things
-    graded_total = Score(total_correct_graded, 
-                         total_possible_graded, 
-                         True, 
+    graded_total = Score(total_correct_graded,
+                         total_possible_graded,
+                         True,
                          section_name)
 
     return all_total, graded_total
+
 
 def grader_from_conf(conf):
     """
