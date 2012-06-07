@@ -5,6 +5,7 @@ import json
 import logging
 import traceback
 import re
+import StringIO
 
 from datetime import timedelta
 from lxml import etree
