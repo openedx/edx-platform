@@ -66,6 +66,7 @@ end
     desc "Run all django tests on our djangoapps for the #{system}"
     task task_name => report_dir do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
+        ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
         sh(django_admin(:lms, :test, 'test', *Dir['lms/djangoapps'].each))
     end
     task :test => task_name
@@ -80,7 +81,7 @@ Dir["common/lib/*"].each do |lib|
     desc "Run tests for common lib #{lib}"
     task task_name => report_dir do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-        sh("nosetests #{lib} --cover-erase --with-xunit --with-xcoverage --cover-html --cover-inclusive --cover-package #{File.basename(lib)}")
+        sh("nosetests #{lib} --cover-erase --with-xunit --with-xcoverage --cover-html --cover-inclusive --cover-package #{File.basename(lib)} --cover-html-dir #{File.join(report_dir, "cover")}")
     end
     task :test => task_name
 end
