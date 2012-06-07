@@ -44,17 +44,17 @@ task :default => [:pep8, :pylint, :test]
 directory REPORT_DIR
 directory LMS_REPORT_DIR
 
-desc "Run pep8 on all of djangoapps"
-task :pep8 => LMS_REPORT_DIR do
-    sh("pep8 --ignore=E501 lms/djangoapps | tee #{LMS_REPORT_DIR}/pep8.report")
+desc "Run pep8 on all libraries"
+task :pep8 => REPORT_DIR do
+    sh("pep8 --ignore=E501 lms/djangoapps common/lib/* | tee #{REPORT_DIR}/pep8.report")
 end
 
-desc "Run pylint on all of djangoapps"
-task :pylint => LMS_REPORT_DIR do
-    ENV['PYTHONPATH'] = 'lms/djangoapps'
-    Dir["lms/djangoapps/*"].each do |app|
+desc "Run pylint on all libraries"
+task :pylint => REPORT_DIR do
+    Dir["lms/djangoapps/*", "common/lib/*"].each do |app|
+        ENV['PYTHONPATH'] = File.dirname(app)
         app = File.basename(app)
-        sh("pylint -f parseable #{app} | tee #{LMS_REPORT_DIR}/#{app}.pylint.report")
+        sh("pylint -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
     end
 end
 
