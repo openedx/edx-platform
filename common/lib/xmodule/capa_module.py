@@ -28,6 +28,15 @@ def item(l, default="", process=lambda x: x):
 
 
 def parse_timedelta(time_str):
+    """
+    time_str: A string with the following components:
+        <D> day[s] (optional)
+        <H> hour[s] (optional)
+        <M> minute[s] (optional)
+        <S> second[s] (optional)
+
+    Returns a datetime.timedelta parsed from the string
+    """
     parts = TIMEDELTA_REGEX.match(time_str)
     if not parts:
         return
