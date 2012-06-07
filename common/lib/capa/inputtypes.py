@@ -27,8 +27,6 @@ import shlex # for splitting quoted strings
 
 from lxml import etree
 
-from mitxmako.shortcuts import render_to_string
-
 def get_input_xml_tags():
     ''' Eventually, this will be for all registered input types '''
     return SimpleInput.get_xml_tags()
@@ -54,7 +52,7 @@ class SimpleInput():# XModule
         return ['capa_input', 'capa_transform']
 
     def get_html(self):
-        return self.xml_tags[self.tag](self.xml, self.value, self.status, self.msg)
+        return self.xml_tags[self.tag](self.xml, self.value, self.status, self.system.render_template, self.msg)
 
     def __init__(self, system, xml, item_id = None, track_url=None, state=None, use = 'capa_input'):
         self.xml = xml
@@ -144,7 +142,7 @@ def register_render_function(fn, names=None, cls=SimpleInput):
 #-----------------------------------------------------------------------------
 
 @register_render_function
-def optioninput(element, value, status, msg=''):
+def optioninput(element, value, status, render_template, msg=''):
     '''
     Select option input type.
 
@@ -171,12 +169,12 @@ def optioninput(element, value, status, msg=''):
              'options':osetdict,
              }
 
-    html=render_to_string("optioninput.html", context)
+    html = render_template("optioninput.html", context)
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 @register_render_function
-def choicegroup(element, value, status, msg=''):
+def choicegroup(element, value, status, render_template, msg=''):
     '''
     Radio button inputs: multiple choice or true/false
 
@@ -199,11 +197,11 @@ def choicegroup(element, value, status, msg=''):
         ctext += choice.text		# TODO: fix order?
         choices[choice.get("name")] = ctext
     context={'id':eid, 'value':value, 'state':status, 'type':type, 'choices':choices}
-    html=render_to_string("choicegroup.html", context)
+    html = render_template("choicegroup.html", context)
     return etree.XML(html)
 
 @register_render_function
-def textline(element, value, state, msg=""):
+def textline(element, value, state, render_template, msg=""):
     '''
     Simple text line input, with optional size specification.
     '''
@@ -213,13 +211,13 @@ def textline(element, value, state, msg=""):
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
     context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size, 'msg': msg}
-    html=render_to_string("textinput.html", context)
+    html = render_template("textinput.html", context)
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 
 @register_render_function
-def textline_dynamath(element, value, status, msg=''):
+def textline_dynamath(element, value, status, render_template, msg=''):
     '''
     Text line input with dynamic math display (equation rendered on client in real time during input).
     '''
@@ -237,13 +235,13 @@ def textline_dynamath(element, value, status, msg=''):
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
                'msg':msg,
                }
-    html=render_to_string("textinput_dynamath.html", context)
+    html = render_template("textinput_dynamath.html", context)
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 ## TODO: Make a wrapper for <codeinput>
 @register_render_function
-def textbox(element, value, status, msg=''):
+def textbox(element, value, status, render_template, msg=''):
     '''
     The textbox is used for code input.  The message is the return HTML string from
     evaluating the code, eg error messages, and output from the code tests.
@@ -261,12 +259,12 @@ def textbox(element, value, status, msg=''):
                'mode':mode, 'linenumbers':linenumbers,
                'rows':rows, 'cols':cols,
                }
-    html=render_to_string("textbox.html", context)
+    html = render_template("textbox.html", context)
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 @register_render_function
-def schematic(element, value, status, msg=''):
+def schematic(element, value, status, render_template, msg=''):
     eid = element.get('id')
     height = element.get('height')
     width = element.get('width')
@@ -285,13 +283,13 @@ def schematic(element, value, status, msg=''):
         'analyses':analyses,
         'submit_analyses':submit_analyses,
         }
-    html=render_to_string("schematicinput.html", context)
+    html = render_template("schematicinput.html", context)
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 ### TODO: Move out of inputtypes
 @register_render_function
-def math(element, value, status, msg=''):
+def math(element, value, status, render_template, msg=''):
     '''
     This is not really an input type.  It is a convention from Lon-CAPA, used for
     displaying a math equation.
@@ -316,7 +314,7 @@ def math(element, value, status, msg=''):
     #    mathstr = mathstr.replace('\\displaystyle','')
     #else:
     #    isinline = True
-    # html=render_to_string("mathstring.html",{'mathstr':mathstr,'isinline':isinline,'tail':element.tail})
+    # html = render_template("mathstring.html",{'mathstr':mathstr,'isinline':isinline,'tail':element.tail})
 
     html = '<html><html>%s</html><html>%s</html></html>' % (mathstr,element.tail)
     xhtml = etree.XML(html)
@@ -326,7 +324,7 @@ def math(element, value, status, msg=''):
 #-----------------------------------------------------------------------------
 
 @register_render_function
-def solution(element, value, status, msg=''):
+def solution(element, value, status, render_template, msg=''):
     '''
     This is not really an input type.  It is just a <span>...</span> which is given an ID,
     that is used for displaying an extended answer (a problem "solution") after "show answers"
@@ -341,13 +339,13 @@ def solution(element, value, status, msg=''):
                'size': size,
                'msg':msg,
                }
-    html=render_to_string("solutionspan.html", context)
+    html = render_template("solutionspan.html", context)
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
 
 @register_render_function
-def imageinput(element, value, status, msg=''):
+def imageinput(element, value, status, render_template, msg=''):
     '''
     Clickable image as an input field.  Element should specify the image source, height, and width, eg
     <imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg"  width="388" height="560" />
@@ -378,5 +376,5 @@ def imageinput(element, value, status, msg=''):
         'state' : status,	# to change
         'msg': msg,			# to change
         }
-    html=render_to_string("imageinput.html", context)
+    html = render_template("imageinput.html", context)
     return etree.XML(html)

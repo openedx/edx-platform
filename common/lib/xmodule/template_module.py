@@ -1,7 +1,5 @@
 import json
 
-from mitxmako.shortcuts import render_to_string
-
 from x_module import XModule, XModuleDescriptor
 from lxml import etree
 
@@ -24,4 +22,4 @@ class Module(XModule):
         xmltree = etree.fromstring(xml)
         filename = xmltree[0].text
         params = dict(xmltree.items())
-        self.html = render_to_string(filename, params, namespace = 'custom_tags')
+        self.html = self.system.render_template(filename, params, namespace = 'custom_tags')

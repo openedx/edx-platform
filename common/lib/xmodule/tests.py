@@ -13,9 +13,8 @@ import numpy
 import xmodule
 import capa.calc as calc
 import capa.capa_problem as lcp
-import courseware.graders as graders
-from courseware.graders import Score, CourseGrader, WeightedSubsectionsGrader, SingleSectionGrader, AssignmentFormatGrader
-from courseware.grades import aggregate_scores
+from xmodule import graders
+from xmodule.graders import Score, aggregate_scores
 from nose.plugins.skip import SkipTest
 
 class I4xSystem(object):

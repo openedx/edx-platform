@@ -3,8 +3,6 @@ import logging
 
 from lxml import etree
 
-from mitxmako.shortcuts import render_to_response, render_to_string
-
 from x_module import XModule, XModuleDescriptor
 
 log = logging.getLogger("mitx.courseware.modules")
@@ -38,11 +36,13 @@ class Module(XModule):
         return self.youtube
 
     def get_html(self):
-        return render_to_string('video.html',{'streams':self.video_list(),
-                                              'id':self.item_id,
-                                              'position':self.position,
-                                              'name':self.name,
-                                              'annotations':self.annotations})
+        return self.system.render_template('video.html', {
+            'streams': self.video_list(),
+            'id': self.item_id,
+            'position': self.position,
+            'name': self.name,
+            'annotations': self.annotations
+        })
 
     def __init__(self, system, xml, item_id, state=None):
         XModule.__init__(self, system, xml, item_id, state)

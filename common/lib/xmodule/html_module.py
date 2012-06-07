@@ -1,8 +1,6 @@
 import json
 import logging
 
-from mitxmako.shortcuts import render_to_response, render_to_string
-
 from x_module import XModule, XModuleDescriptor
 from lxml import etree
 
@@ -34,8 +32,7 @@ class Module(XModule):
         except: # For backwards compatibility. TODO: Remove
             if self.DEBUG:
                 log.info('[courseware.modules.html_module] filename=%s' % self.filename)
-            #return render_to_string(self.filename, {'id': self.item_id})
-            return render_to_string(self.filename, {'id': self.item_id},namespace='course')
+            return self.system.render_template(self.filename, {'id': self.item_id}, namespace='course')
 
     def __init__(self, system, xml, item_id, state=None):
         XModule.__init__(self, system, xml, item_id, state)

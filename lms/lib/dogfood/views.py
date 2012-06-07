@@ -179,6 +179,7 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
         # Create the module (instance of capa_module.Module)
         system = I4xSystem(track_function = make_track_function(request), 
                            render_function = None, 
+                           render_template = render_to_string,
                            ajax_url = ajax_url,
                            filestore = OSFS(settings.DATA_DIR + xp),
                            #role = 'staff' if request.user.is_staff else 'student',		# TODO: generalize this

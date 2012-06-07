@@ -256,8 +256,7 @@ def sympy_check2():
         self.expect = xml.get('expect') or xml.get('answer')
         self.myid = xml.get('id')
 
-        if settings.DEBUG:
-            log.info('answer_ids=%s' % self.answer_ids)
+        log.debug('answer_ids=%s' % self.answer_ids)
 
         # the <answer>...</answer> stanza should be local to the current <customresponse>.  So try looking there first.
         self.code = None
@@ -271,7 +270,7 @@ def sympy_check2():
             # ie the comparison function is defined in the <script>...</script> stanza instead
             cfn = xml.get('cfn')
             if cfn:
-                if settings.DEBUG: log.info("cfn = %s" % cfn)
+                log.debug("cfn = %s" % cfn)
                 if cfn in context:
                     self.code = context[cfn]
                 else:
@@ -346,7 +345,7 @@ def sympy_check2():
             # this is an interface to the Tutor2 check functions
             fn = self.code
             ret = None
-            if settings.DEBUG: log.info(" submission = %s" % submission)
+            log.debug(" submission = %s" % submission)
             try:
                 answer_given = submission[0] if (len(idset)==1) else submission
                 # handle variable number of arguments in check function, for backwards compatibility
@@ -358,9 +357,8 @@ def sympy_check2():
                 for argname in argspec.args[nargs:]:
                     kwargs[argname] = self.context[argname] if argname in self.context else None
 
-                if settings.DEBUG:
-                    log.debug('[courseware.capa.responsetypes.customresponse] answer_given=%s' % answer_given)
-                    log.info('nargs=%d, args=%s, kwargs=%s' % (nargs,args,kwargs))
+                log.debug('[customresponse] answer_given=%s' % answer_given)
+                log.debug('nargs=%d, args=%s, kwargs=%s' % (nargs,args,kwargs))
 
                 ret = fn(*args[:nargs],**kwargs)
             except Exception,err:
@@ -368,7 +366,7 @@ def sympy_check2():
                 # print "context = ",self.context
                 log.error(traceback.format_exc())
                 raise Exception,"oops in customresponse (cfn) error %s" % err
-            if settings.DEBUG: log.info("[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
+            log.debug("[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
             if type(ret)==dict:
                 correct = ['correct']*len(idset) if ret['ok'] else ['incorrect']*len(idset)
                 msg = ret['msg']
