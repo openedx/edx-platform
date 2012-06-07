@@ -1,3 +1,4 @@
+from numpy import exp, log
 import random
 import settings
 
@@ -7,17 +8,45 @@ def exit_survey_list_for_student(student):
     randomized_questions = exit_survey_questions['random_questions']
     
     #If we use random.sample on randomized_questions directly, it will re-arrange the questions
+    random_question_total = len(randomized_questions)
     if not settings.DEBUG_SURVEY:
-        chosen_indices = random.sample( range( len(randomized_questions) ), 6)
+        # Here we randomize how many questions the student gets. Half get 5, some get all, and the
+        # rest is a log distribution between 1 and all.
+        num_random = loguniform_with_bins(1, random_question_total, ((0.5, 5), (0.1, random_question_total)))
+        num_random = int(num_random)
+        
+        chosen_indices = random.sample( range( random_question_total ), num_random)
     else:
         #In debug mode, we show all surveys
-        chosen_indices = range( len(randomized_questions) )
+        chosen_indices = range( random_question_total )
     
     chosen_questions = [ randomized_questions[i] for i in sorted(chosen_indices)]
     
     survey_list = common_questions + chosen_questions
     return survey_list
 
+import random
+
+def loguniform(minimum, maximum):
+    ''' Give a random number between minimum and maximum with an
+    exponential distribution. 
+    '''
+    return round(exp(random.uniform(log(minimum-0.5), log(maximum+0.5))))
+
+def loguniform_with_bins(minimum, maximum, bins):
+    ''' Log random, but with additional high-probability bins. E.g.
+    loguniform(1, 30, ((0.5, 5), (0.1, 30)))
+    Is:
+     * The same as loguniform 40% of the time, 
+     * The 5 50% of the time
+     * 30 10% of the time
+     Note that 5 and 30 are also present in loguniform, so will in fact
+     appear more often than 50%/10%
+    '''
+    for (prob, value) in bins:
+        if random.random()<prob:
+            return value
+    return loguniform(minimum, maximum)
 
 
 exit_survey_questions = {
