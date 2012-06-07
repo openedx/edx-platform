@@ -6,16 +6,32 @@ from __future__ import unicode_literals
 
 import argparse
 import logging
-import os.path
 import sys
+from path import path
 
 from cStringIO import StringIO
+from collections import defaultdict
 
 from calc import UndefinedVariable
 from capa_problem import LoncapaProblem
+from mako.lookup import TemplateLookup
 
 logging.basicConfig(format="%(levelname)s %(message)s")
 log = logging.getLogger('capa.checker')
+
+
+class DemoSystem(object):
+    def __init__(self):
+        self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
+
+    def render_template(self, template_filename, dictionary, context=None):
+        if context is None:
+            context = {}
+
+        context_dict = {}
+        context_dict.update(dictionary)
+        context_dict.update(context)
+        return self.lookup.get_template(template_filename).render(**context_dict)
 
 def main():
     parser = argparse.ArgumentParser(description='Check Problem Files')
@@ -29,11 +45,13 @@ def main():
     args = parser.parse_args()
     log.setLevel(args.log_level.upper())
 
+    system = DemoSystem()
+
     for problem_file in args.files:
         log.info("Opening {0}".format(problem_file.name))
 
         try:
-            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed)
+            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, system=system)
         except Exception as ex:
             log.error("Could not parse file {0}".format(problem_file.name))
             log.exception(ex)
