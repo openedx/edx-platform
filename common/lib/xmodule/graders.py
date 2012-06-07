@@ -1,8 +1,6 @@
 import abc
 import logging
 
-from django.conf import settings
-
 from collections import namedtuple
 
 log = logging.getLogger("mitx.courseware")
@@ -10,6 +8,26 @@ log = logging.getLogger("mitx.courseware")
 # This is a tuple for holding scores, either from problems or sections.
 # Section either indicates the name of the problem or the name of the section
 Score = namedtuple("Score", "earned possible graded section")
+
+def aggregate_scores(scores, section_name = "summary"):
+    total_correct_graded = sum(score.earned for score in scores if score.graded)
+    total_possible_graded = sum(score.possible for score in scores if score.graded)
+    
+    total_correct = sum(score.earned for score in scores)
+    total_possible = sum(score.possible for score in scores)
+        
+    #regardless of whether or not it is graded
+    all_total = Score(total_correct, 
+                          total_possible,
+                          False,
+                          section_name)
+    #selecting only graded things
+    graded_total = Score(total_correct_graded, 
+                         total_possible_graded, 
+                         True, 
+                         section_name)
+
+    return all_total, graded_total
 
 def grader_from_conf(conf):
     """
@@ -162,18 +180,6 @@ class SingleSectionGrader(CourseGrader):
             percent = 0.0
             detail = "{name} - 0% (?/?)".format(name = self.name)
             
-            if settings.GENERATE_PROFILE_SCORES:
-                points_possible = random.randrange(50, 100)
-                points_earned = random.randrange(40, points_possible)
-                percent = points_earned / float(points_possible)
-                detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format( name = self.name, 
-                                                                        percent = percent,
-                                                                        earned = float(points_earned),
-                                                                        possible = float(points_possible))
-
-            
-            
-        
         breakdown = [{'percent': percent, 'label': self.short_label, 'detail': detail, 'category': self.category, 'prominent': True}]
             
         return {'percent' : percent,
@@ -243,17 +249,6 @@ class AssignmentFormatGrader(CourseGrader):
             else:
                 percentage = 0
                 summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index = i+1, section_type = self.section_type)
-        
-                if settings.GENERATE_PROFILE_SCORES:
-                    points_possible = random.randrange(10, 50)
-                    points_earned = random.randrange(5, points_possible)
-                    percentage = points_earned / float(points_possible)
-                    summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index = i+1, 
-                                                                    section_type = self.section_type,
-                                                                    name = "Randomly Generated",
-                                                                    percent = percentage, 
-                                                                    earned = float(points_earned), 
-                                                                    possible = float(points_possible) )
         
             short_label = "{short_label} {index:02d}".format(index = i+1, short_label = self.short_label)
             

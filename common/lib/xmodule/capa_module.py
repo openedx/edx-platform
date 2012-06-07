@@ -5,12 +5,10 @@ import json
 import logging
 import traceback
 import re
+import StringIO
 
 from datetime import timedelta
 from lxml import etree
-
-## TODO: Abstract out from Django
-from mitxmako.shortcuts import render_to_string
 
 from x_module import XModule, XModuleDescriptor
 from capa.capa_problem import LoncapaProblem, StudentInputError
@@ -72,10 +70,10 @@ class Module(XModule):
         return self.lcp.get_max_score()
 
     def get_html(self):
-        return render_to_string('problem_ajax.html', 
-                              {'id':self.item_id, 
-                               'ajax_url':self.ajax_url,
-                               })
+        return self.system.render_template('problem_ajax.html', {
+            'id': self.item_id,
+            'ajax_url': self.ajax_url,
+        })
 
     def get_problem_html(self, encapsulate=True):
         html = self.lcp.get_html()
@@ -138,7 +136,7 @@ class Module(XModule):
                    'explain': explain,
                    }
 
-        html=render_to_string('problem.html', context)
+        html = self.system.render_template('problem.html', context)
         if encapsulate:
             html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id,ajax_url=self.ajax_url)+html+"</div>"
 

@@ -2,8 +2,6 @@ import json
 
 from lxml import etree
 
-from mitxmako.shortcuts import render_to_string
-
 from x_module import XModule, XModuleDescriptor
 
 # HACK: This shouldn't be hard-coded to two types
@@ -77,9 +75,9 @@ class Module(XModule):
                 'tag':self.xmltree.tag}
 
         if self.xmltree.tag in ['sequential', 'videosequence']:
-            self.content=render_to_string('seq_module.html',params)
+            self.content = self.system.render_template('seq_module.html', params)
         if self.xmltree.tag == 'tab':
-            self.content=render_to_string('tab_module.html',params)
+            self.content = self.system.render_template('tab_module.html', params)
         self.rendered = True
 
     def __init__(self, system, xml, item_id, state=None):
