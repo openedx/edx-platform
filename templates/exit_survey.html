@@ -7,10 +7,11 @@
 <script type="text/javascript" src="${ settings.LIB_URL }certificate_survey.js"></script>
 </%block>
 
+<%block name="bodyclass">exit-survey</%block>
+
 <%include file="navigation.html" args="active_page=''" />
 
-<div id="survey">
-  
+<section id="survey" class="main-content">
   <form id="survey_form">
 
     %if not took_survey:
@@ -30,4 +31,4 @@
     <input type="submit" id="" value="Submit Survey" />
     
   </form>
-</div>
+</section>

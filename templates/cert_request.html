@@ -9,8 +9,11 @@
 
 <%include file="navigation.html" args="active_page=''" />
 
+<%block name="bodyclass">cert-req</%block>
+
+<section class="main-content">
 <div id="cert_request">
-  <p>You can request a certificate which verifies that you passed this course. When the certificate has been generated, you will receive an email notification that it can be downloaded from your Profile page.</p>
+  <h1>You can request a certificate which verifies that you passed this course. When the certificate has been generated, you will receive an email notification that it can be downloaded from your Profile page.</h1>
   <p>The certificate will indicate that <strong>${name}</strong> has successfully completed the Fall 2012 offering of <strong>Circuits and Electronics 6.002x</strong>. Please ensure that this information is correct.</p>
   
   <form id="cert_request_form">
@@ -48,3 +51,4 @@
     
   </form>
 </div>
+</section>
