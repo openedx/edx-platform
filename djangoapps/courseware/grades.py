@@ -87,6 +87,10 @@ def grade_sheet(student):
     grader = course_settings.GRADER
     grade_summary = grader.grade(totaled_scores)
     
+    # We round the grade here, to make sure that the grade is an whole percentage and
+    # doesn't get displayed differently than it gets grades
+    grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
+    
     letter_grade = grade_for_percentage(grade_summary['percent'])
         
     return {'courseware_summary' : chapters,
