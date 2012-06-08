@@ -58,7 +58,7 @@ task :pylint => REPORT_DIR do
     end
 end
 
-[:lms].each do |system|
+[:lms, :cms].each do |system|
     task_name = "test_#{system}"
     report_dir = File.join(REPORT_DIR, task_name)
     directory report_dir
@@ -70,6 +70,15 @@ end
         sh(django_admin(:lms, :test, 'test', *Dir['lms/djangoapps'].each))
     end
     task :test => task_name
+
+    desc <<-desc
+        Start the #{system} locally with the specified environment (defaults to dev).
+        Other useful environments are devplus (for dev testing with a real local database)
+        desc
+    task system, [:env, :options] => [] do |t, args|
+        args.with_defaults(:env => 'dev', :options => '')
+        sh(django_admin(system, args.env, 'runserver', args.options))
+    end
 end
 
 Dir["common/lib/*"].each do |lib|
@@ -84,15 +93,6 @@ Dir["common/lib/*"].each do |lib|
         sh("nosetests #{lib} --cover-erase --with-xunit --with-xcoverage --cover-html --cover-inclusive --cover-package #{File.basename(lib)} --cover-html-dir #{File.join(report_dir, "cover")}")
     end
     task :test => task_name
-end
-
-desc <<-desc
-    Start the lms locally with the specified environment (defaults to dev).
-    Other useful environments are devplus (for dev testing with a real local database)
-    desc
-task :lms, [:env] => [] do |t, args|
-    args.with_defaults(:env => 'dev')
-    sh(django_admin(:lms, args.env, 'runserver'))
 end
 
 task :runserver => :lms
