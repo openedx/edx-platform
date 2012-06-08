@@ -5,7 +5,7 @@ import string
 import traceback
 
 from django.conf import settings
-import courseware.capa.capa_problem as lcp
+import capa.capa_problem as lcp
 from dogfood.views import update_problem
 
 def GenID(length=8, chars=string.letters + string.digits):
