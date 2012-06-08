@@ -14,6 +14,7 @@ ouch() {
     script again with the -v flag.  
 
 EOL
+    printf '\E[0m'
 
 }
 error() {
@@ -235,7 +236,10 @@ esac
 output "Installing rvm and ruby"
 curl -sL get.rvm.io | bash -s stable
 source $RUBY_DIR/scripts/rvm
+# skip the intro 
+export LESS="-E"
 rvm install $RUBY_VER
+unset LESS
 virtualenv "$PYTHON_DIR"
 source $PYTHON_DIR/bin/activate
 output "Installing gem bundler"
