@@ -21,7 +21,6 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 
-import courseware.capa.calc
 import track.views
 from lxml import etree
 
@@ -34,7 +33,8 @@ from util.cache import cache
 from util.views import accepts
 
 import courseware.content_parser as content_parser
-import courseware.modules
+#import courseware.modules
+import xmodule
 
 log = logging.getLogger("mitx.courseware")
 
@@ -184,7 +184,7 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
                            filestore = OSFS(settings.DATA_DIR + xp),
                            #role = 'staff' if request.user.is_staff else 'student',		# TODO: generalize this
                            )
-        instance=courseware.modules.get_module_class(module)(system, 
+        instance=xmodule.get_module_class(module)(system, 
                                                              xml, 
                                                              id,
                                                              state=None)
