@@ -1,5 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
+
+# posix compliant sanity check
+if [ -z $BASH ] || [  $BASH = "/bin/sh" ]; then
+    echo "Please use the bash interpreter to run this script"
+    exit 1
+fi
+
 trap "ouch" ERR
 
 ouch() {
@@ -29,6 +36,7 @@ usage() {
     Usage: $PROG [-c] [-v] [-h]
     
             -c        compile scipy and numpy
+            -s        --system-site-packages for virtualenv
             -v        set -x + spew
             -h        this
 
@@ -106,7 +114,7 @@ if [[ $EUID -eq 0 ]]; then
     usage
     exit 1
 fi
-ARGS=$(getopt "cvh" "$*")
+ARGS=$(getopt "cvhs" "$*")
 if [[ $? != 0 ]]; then
     usage
     exit 1
@@ -116,6 +124,10 @@ while true; do
     case $1 in 
         -c)
             compile=true
+            shift
+            ;;
+        -s)
+            systempkgs=true
             shift
             ;;
         -v)
@@ -148,7 +160,7 @@ cat<<EO
 
   To compile scipy and numpy from source use the -c option
 
-  STDOUT is redirected to /var/tmp/install.log, run
+  Most of STDOUT is redirected to /var/tmp/install.log, run
   $ tail -f /var/tmp/install.log
   to monitor progress
 
@@ -238,7 +250,11 @@ curl -sL get.rvm.io | bash -s stable
 source $RUBY_DIR/scripts/rvm
 # skip the intro 
 LESS="-E" rvm install $RUBY_VER
-virtualenv "$PYTHON_DIR"
+if [[ -n $systempkgs ]]; then
+    virtualenv --system-site-packages "$PYTHON_DIR"
+else
+    virtualenv "$PYTHON_DIR"
+fi
 source $PYTHON_DIR/bin/activate
 output "Installing gem bundler"
 gem install bundler
@@ -277,23 +293,38 @@ mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true
 
 cat<<END
-   
    Success!!
 
-   To start using Django you will need
-   to activate the local Python and Ruby
-   environment:
+   To start using Django you will need to activate the local Python 
+   and Ruby environment (at this time rvm only supports bash) :
 
         $ source $RUBY_DIR/scripts/rvm
         $ source $PYTHON_DIR/bin/activate
   
-   To initialize and start a local instance of Django:
+   To initialize Django
         
         $ cd $BASE/mitx
-        $ django-admin.py syncdb --settings=envs.dev --pythonpath=.
-        $ django-admin.py migrate --settings=envs.dev --pythonpath=.
-        $ django-admin.py runserver --settings=envs.dev --pythonpath=.   
-       
+        $ rake django-admin[syncdb]
+        $ rake django-admin[migrate]
+
+   To start the Django on port 8000
+
+        $ rake lms
+   
+   Or to start Django on a different <port#>
+
+        $ rake django-admin[runserver,lms,dev,<port#>]   
+
+  If the Django development server starts properly you 
+  should see:
+
+      Development server is running at http://127.0.0.1:<port#>/
+      Quit the server with CONTROL-C.
+
+  Connect your browser to http://127.0.0.1:<port#> to 
+  view the Django site.
+
+
 END
 exit 0
 
