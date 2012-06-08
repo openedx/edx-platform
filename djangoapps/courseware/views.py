@@ -92,10 +92,9 @@ def profile(request, student_id = None):
         if settings.DEBUG_SURVEY:
             took_survey = False
         
-        certificate_state, certificate_download_url = certificate_state_for_student(student, grade_sheet['grade'])
+        certificate_state = certificate_state_for_student(student, grade_sheet['grade'])
             
         context.update({'certificate_state' : certificate_state,
-                 'certificate_download_url' : certificate_download_url,
                  'took_survey' : took_survey})
 
     return render_to_response('profile.html', context)

@@ -142,11 +142,17 @@ $(function() {
         %if grade_sheet['grade']:
           <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
           
-          %if certificate_state == "requestable":
+          %if certificate_state['state'] == "requestable":
             <a class="cert_request_link" href="/certificate_request">Request Certificate</a>
-          %elif certificate_state == "downloadable":
-            <a href="${certificate_download_url}" target="_blank">Download Certificate</a>
-          %elif certificate_state == "generating":
+          %elif certificate_state['state'] == "downloadable":
+            %if certificate_state['download_url']:
+              <a href="${certificate_state['download_url']}" target="_blank">Download Certificate</a>
+            %endif
+            %if certificate_state['graded_download_url']:
+              <a href="${certificate_state['graded_download_url']}" target="_blank">Download Certificate (with Grade)</a>
+            %endif
+            
+          %elif certificate_state['state'] == "generating":
             <a href="#">Certificate is being generated...</a>
           %else:
             <a href="#">No certificate available</a>

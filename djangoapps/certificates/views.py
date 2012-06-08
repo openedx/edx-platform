@@ -64,9 +64,9 @@ def certificate_request(request):
         #This is not a POST, we should render the page with the form
         
         grade_sheet = grades.grade_sheet(request.user)
-        certificate_state, certificate_download_url = certificate_state_for_student(request.user, grade_sheet['grade'])
+        certificate_state = certificate_state_for_student(request.user, grade_sheet['grade'])
         
-        if certificate_state != "requestable":
+        if certificate_state['state'] != "requestable":
             return redirect("/profile")
         
         user_info = UserProfile.objects.get(user=request.user)
@@ -102,6 +102,11 @@ def generate_certificate(user, grade):
             generated_certificate = GeneratedCertificate(user = user, certificate_id = uuid.uuid4().hex)
 
         generated_certificate.enabled = True
+        if generated_certificate.graded_download_url and (generated_certificate.grade != grade):
+            log.critical("A graded certificate has been pre-generated with the grade of " + str(generated_certificate.grade) + " but requested with grade " + str(grade) + \
+                "! The download URL is " + str(generated_certificate.graded_download_url))
+        
+        generated_certificate.grade = grade
         generated_certificate.save()
         
         certificate_id = generated_certificate.certificate_id
