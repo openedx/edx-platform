@@ -206,7 +206,7 @@ def textline(element, value, state, render_template, msg=""):
     Simple text line input, with optional size specification.
     '''
     if element.get('math') or element.get('dojs'):		# 'dojs' flag is temporary, for backwards compatibility with 8.02x
-        return SimpleInput.xml_tags['textline_dynamath'](element,value,state,msg)
+        return SimpleInput.xml_tags['textline_dynamath'](element,value,state,render_template,msg)
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
