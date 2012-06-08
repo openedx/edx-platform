@@ -1,6 +1,7 @@
 <%page args="grade_summary, graph_div_id, **kwargs"/>
 <%!
   import json
+  import math
 %>
 
 $(function () {
@@ -106,6 +107,8 @@ $(function () {
         
   ticks += [ [overviewBarX, "Total"] ]
   tickIndex += 1 + sectionSpacer
+  
+  totalScore = math.floor(totalScore * 100) / 100 #We floor it to the nearest percent, 80.9 won't show up like a 90 (an A)
   %>
   
   var series = ${ json.dumps(series) };
