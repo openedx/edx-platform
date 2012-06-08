@@ -6,6 +6,12 @@ from .common import *
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+KEYSTORE = {
+    'host': 'localhost',
+    'db': 'mongo_base',
+    'collection': 'key_store',
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
