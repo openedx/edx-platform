@@ -54,7 +54,7 @@ task :pylint => REPORT_DIR do
     Dir["lms/djangoapps/*", "common/lib/*"].each do |app|
         ENV['PYTHONPATH'] = File.dirname(app)
         app = File.basename(app)
-        sh("pylint -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
+        sh("pylint --rcfile=.pylintrc -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
     end
 end
 
