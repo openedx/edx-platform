@@ -1,0 +1,11 @@
+<form name="login" action="login", method="post">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+
+    % if next is not None:
+    <input type="hidden" name="next" value="${next}"/>
+    % endif
+
+    Username: <input type="text" name="username" />
+    Possword: <input type="password" name="password" />
+    <input type="submit" value="Submit" />
+</form>

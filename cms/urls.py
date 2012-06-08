@@ -4,6 +4,7 @@ from django.conf.urls.defaults import patterns, url
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('cms.views',
-    url(r'^(?P<course>[^/]+)/calendar/', 'calendar', name='calendar'),
+urlpatterns = patterns('',
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/calendar/', 'cms.views.calendar', name='calendar'),
+    url(r'^accounts/login/', 'instructor.views.do_login', name='login'),
 )
