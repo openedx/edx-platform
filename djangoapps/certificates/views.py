@@ -105,8 +105,15 @@ def generate_certificate(user, grade):
         if generated_certificate.graded_download_url and (generated_certificate.grade != grade):
             log.critical("A graded certificate has been pre-generated with the grade of " + str(generated_certificate.grade) + " but requested with grade " + str(grade) + \
                 "! The download URL is " + str(generated_certificate.graded_download_url))
+                
+        user_name = UserProfile.objects.get(user = s).name
+        if generated_certificate.download_url and (generated_certificate.name != user_name):
+            log.critical("A Certificate has been pre-generated with the name of " + str(generated_certificate.name) + " but current name is " + str(user_name) + \
+                "! The download URL is " + str(generated_certificate.download_url))
+            
         
         generated_certificate.grade = grade
+        generated_certificate.name = user_name
         generated_certificate.save()
         
         certificate_id = generated_certificate.certificate_id

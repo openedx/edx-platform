@@ -28,6 +28,9 @@ needs to be set to true.
 
 class GeneratedCertificate(models.Model):
     user = models.ForeignKey(User, db_index=True)
+    # This is the name at the time of request
+    name = models.CharField(blank=True, max_length=255)
+    
     certificate_id = models.CharField(max_length=32)
     graded_certificate_id = models.CharField(max_length=32, null=True)
     
