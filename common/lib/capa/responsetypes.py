@@ -63,6 +63,7 @@ class GenericResponse(object):
 
       - get_max_score       : if defined, this is called to obtain the maximum score possible for this question
       - setup_response      : find and note the answer input field IDs for the response; called by __init__
+       - __unicode__        : unicode representation of this Response
 
     Each response type may also specify the following attributes:
 
@@ -85,7 +86,6 @@ class GenericResponse(object):
           - inputfields : list of ElementTrees for each input entry field in this Response
           - context     : script processor context
           - system      : I4xSystem instance which provides OS, rendering, and user context 
-          - __unicode__ : unicode representation of this Response
 
         '''
         self.xml = xml
@@ -137,7 +137,7 @@ class GenericResponse(object):
         pass
 
     def __unicode__(self):
-        return 'LoncapaProblem Response %s' % self.xml.tag
+        return u'LoncapaProblem Response %s' % self.xml.tag
 
 #-----------------------------------------------------------------------------
 
