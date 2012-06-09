@@ -21,40 +21,123 @@ import abc
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
-from util import contextualize_text
+from util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	# uses Beautiful Soup!!! FIXME?
 
-log = logging.getLogger(__name__)
+#log = logging.getLogger(__name__)
+log = logging.getLogger('mitx.common.lib.capa.responsetypes')
 
-def compare_with_tolerance(v1, v2, tol):
-    ''' Compare v1 to v2 with maximum tolerance tol
-    tol is relative if it ends in %; otherwise, it is absolute
+#-----------------------------------------------------------------------------
+# Exceptions
+
+class LoncapaProblemError(Exception):
     '''
-    relative = "%" in tol
-    if relative: 
-        tolerance_rel = evaluator(dict(),dict(),tol[:-1]) * 0.01
-        tolerance = tolerance_rel * max(abs(v1), abs(v2))
-    else: 
-        tolerance = evaluator(dict(),dict(),tol)
-    return abs(v1-v2) <= tolerance
+    Error in specification of a problem
+    '''
+    pass
+
+class ResponseError(Exception):
+    '''
+    Error for failure in processing a response
+    '''
+    pass
+
+class StudentInputError(Exception):
+    pass
+
+#-----------------------------------------------------------------------------
+#
+# Main base class for CAPA responsetypes
 
 class GenericResponse(object):
+    '''
+    Base class for CAPA responsetypes.  Each response type (ie a capa question,
+    which is part of a capa problem) is represented as a superclass,
+    which should provide the following methods:
+
+      - get_score           : evaluate the given student answers, and return a CorrectMap
+      - get_answers         : provide a dict of the expected answers for this problem
+      
+    In addition, these methods are optional:
+
+      - get_max_score       : if defined, this is called to obtain the maximum score possible for this question
+      - setup_response      : find and note the answer input field IDs for the response; called by __init__
+
+    Each response type may also specify the following attributes:
+
+      - max_inputfields     : (int) maximum number of answer input fields (checked in __init__ if not None)
+      - allowed_inputfields : list of allowed input fields (each a string) for this Response
+      - required_attributes : list of required attributes (each a string) on the main response XML stanza
+
+    '''
     __metaclass__=abc.ABCMeta # abc = Abstract Base Class
+
+    max_inputfields = None
+    allowed_inputfields = []
+    required_attributes = []
+    
+    def __init__(self, xml, inputfields, context, system=None):
+        '''
+        Init is passed the following arguments:
+
+          - xml         : ElementTree of this Response
+          - inputfields : list of ElementTrees for each input entry field in this Response
+          - context     : script processor context
+          - system      : I4xSystem instance which provides OS, rendering, and user context 
+          - __unicode__ : unicode representation of this Response
+
+        '''
+        self.xml = xml
+        self.inputfields = inputfields
+        self.context = context
+        self.system = system
+
+        for abox in inputfields:
+            if not abox.tag in self.allowed_inputfields:
+                msg = "%s: cannot have input field %s" % (unicode(self),abox.tag)
+                msg += "\nSee XML source line %s" % getattr(xml,'sourceline','<unavailable>')
+                raise LoncapaProblemError(msg)
+
+        if self.max_inputfields and len(inputfields)>self.max_inputfields:
+            msg = "%s: cannot have more than %s input fields" % (unicode(self),self.max_inputfields)
+            msg += "\nSee XML source line %s" % getattr(xml,'sourceline','<unavailable>')
+            raise LoncapaProblemError(msg)
+
+        for prop in self.required_attributes:
+            if not xml.get(prop):
+                msg = "Error in problem specification: %s missing required attribute %s" % (unicode(self),prop)
+                msg += "\nSee XML source line %s" % getattr(xml,'sourceline','<unavailable>')
+                raise LoncapaProblemError(msg)
+
+        self.answer_ids = [x.get('id') for x in self.inputfields]
+        if self.max_inputfields==1:
+            self.answer_id = self.answer_ids[0]		# for convenience
+
+        if hasattr(self,'setup_response'):
+            self.setup_response()
 
     @abc.abstractmethod
     def get_score(self, student_answers):
+        '''
+        Return a CorrectMap for the answers expected vs given.  This includes
+        (correctness, npoints, msg) for each answer_id.
+        '''
         pass
 
     @abc.abstractmethod
     def get_answers(self):
+        '''
+        Return a dict of (answer_id,answer_text) for each answer for this question.
+        '''
         pass
 
     #not an abstract method because plenty of responses will not want to preprocess anything, and we should not require that they override this method.
-    def preprocess_response(self):
+    def setup_response(self):
         pass
 
-#Every response type needs methods "get_score" and "get_answers"     
+    def __unicode__(self):
+        return 'LoncapaProblem Response %s' % self.xml.tag
 
 #-----------------------------------------------------------------------------
 
@@ -69,30 +152,19 @@ class MultipleChoiceResponse(GenericResponse):
      </choicegroup>
     </multiplechoiceresponse>
     '''}]
-    def __init__(self, xml, context, system=None):
-        self.xml = xml
-        self.correct_choices = xml.xpath('//*[@id=$id]//choice[@correct="true"]',
-                                    id=xml.get('id'))
-        self.correct_choices = [choice.get('name') for choice in self.correct_choices]
-        self.context = context
 
-        self.answer_field = xml.find('choicegroup')	# assumes only ONE choicegroup within this response
-        self.answer_id = xml.xpath('//*[@id=$id]//choicegroup/@id',
-                                   id=xml.get('id'))
-        if not len(self.answer_id) == 1:
-            raise Exception("should have exactly one choice group per multiplechoicceresponse")
-        self.answer_id=self.answer_id[0]
+    max_inputfields = 1
+    allowed_inputfields = ['choicegroup']
 
-    def get_score(self, student_answers):
-        if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
-            return {self.answer_id:'correct'}
-        else:
-            return {self.answer_id:'incorrect'}
+    def setup_response(self):
+        self.mc_setup_response()	# call secondary setup for MultipleChoice questions, to set name attributes
 
-    def get_answers(self):
-        return {self.answer_id:self.correct_choices}
+        # define correct choices (after calling secondary setup)
+        xml = self.xml
+        cxml = xml.xpath('//*[@id=$id]//choice[@correct="true"]',id=xml.get('id'))
+        self.correct_choices = [choice.get('name') for choice in cxml]
 
-    def preprocess_response(self):
+    def mc_setup_response(self):
         '''
         Initialize name attributes in <choice> stanzas in the <choicegroup> in this response.
         '''
@@ -107,9 +179,22 @@ class MultipleChoiceResponse(GenericResponse):
                     i+=1
                 else:
                     choice.set("name", "choice_"+choice.get("name"))
-        
+
+    def get_score(self, student_answers):
+        '''
+        grade student response.
+        '''
+        # log.debug('%s: student_answers=%s, correct_choices=%s' % (unicode(self),student_answers,self.correct_choices))
+        if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
+            return {self.answer_id:'correct'}
+        else:
+            return {self.answer_id:'incorrect'}
+
+    def get_answers(self):
+        return {self.answer_id:self.correct_choices}
+
 class TrueFalseResponse(MultipleChoiceResponse):
-    def preprocess_response(self):
+    def mc_setup_response(self):
         i=0
         for response in self.xml.xpath("choicegroup"):
             response.set("type", "TrueFalse")
@@ -140,12 +225,13 @@ class OptionResponse(GenericResponse):
         <optioninput options="('Up','Down')" correct="Down"><text>The location of the earth</text></optioninput>
     </optionresponse>'''}]
 
-    def __init__(self, xml, context, system=None):
-        self.xml = xml
-        self.answer_fields = xml.findall('optioninput')
-        self.context = context
+    allowed_inputfields = ['optioninput']
+
+    def setup_response(self):
+        self.answer_fields = self.inputfields
 
     def get_score(self, student_answers):
+        # log.debug('%s: student_answers=%s' % (unicode(self),student_answers))
         cmap = {}
         amap = self.get_answers()
         for aid in amap:
@@ -157,17 +243,20 @@ class OptionResponse(GenericResponse):
 
     def get_answers(self):
         amap = dict([(af.get('id'),af.get('correct')) for af in self.answer_fields])
+        # log.debug('%s: expected answers=%s' % (unicode(self),amap))
         return amap
 
 #-----------------------------------------------------------------------------
 
 class NumericalResponse(GenericResponse):
-    def __init__(self, xml, context, system=None):
-        self.xml = xml
-	if not xml.get('answer'):
-            msg = "Error in problem specification: numericalresponse missing required answer attribute\n"
-            msg += "See XML source line %s" % getattr(xml,'sourceline','<unavailable>')
-	    raise Exception,msg
+
+    allowed_inputfields = ['textline']
+    required_attributes = ['answer']
+    max_inputfields = 1
+
+    def setup_response(self):
+        xml = self.xml
+        context = self.context
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         try:
             self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
@@ -182,7 +271,7 @@ class NumericalResponse(GenericResponse):
             self.answer_id = None
 
     def get_score(self, student_answers):
-        ''' Display HTML for a numeric response '''
+        '''Grade a numeric response '''
         student_answer = student_answers[self.answer_id]
         try:
             correct = compare_with_tolerance (evaluator(dict(),dict(),student_answer), complex(self.correct_answer), self.tolerance)
@@ -241,16 +330,11 @@ def sympy_check2():
     <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
   </customresponse>'''}]
 
-    def __init__(self, xml, context, system=None):
-        self.xml = xml
-        self.system = system
-        ## CRITICAL TODO: Should cover all entrytypes
-        ## NOTE: xpath will look at root of XML tree, not just 
-        ## what's in xml. @id=id keeps us in the right customresponse. 
-        self.answer_ids = xml.xpath('//*[@id=$id]//textline/@id',
-                                    id=xml.get('id'))
-        self.answer_ids += [x.get('id') for x in xml.findall('textbox')]	# also allow textbox inputs
-        self.context = context
+    allowed_inputfields = ['textline','textbox']
+
+    def setup_response(self):
+        xml = self.xml
+        context = self.context
 
         # if <customresponse> has an "expect" (or "answer") attribute then save that
         self.expect = xml.get('expect') or xml.get('answer')
@@ -271,15 +355,17 @@ def sympy_check2():
             cfn = xml.get('cfn')
             if cfn:
                 log.debug("cfn = %s" % cfn)
-                if cfn in context:
-                    self.code = context[cfn]
+                if cfn in self.context:
+                    self.code = self.context[cfn]
                 else:
-                    print "can't find cfn in context = ",context
+                    msg = "%s: can't find cfn in context = %s" % (unicode(self),self.context)
+                    msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
+                    raise LoncapaProblemError(msg)
 
         if not self.code:
             if answer is None:
                 # raise Exception,"[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid
-                print "[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid
+                log.error("[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid)
                 self.code = ''
             else:
                 answer_src = answer.get('src')
@@ -293,6 +379,8 @@ def sympy_check2():
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
         '''
+
+        log.debug('%s: student_answers=%s' % (unicode(self),student_answers))
 
         idset = sorted(self.answer_ids)				# ordered list of answer id's
         try:
@@ -425,12 +513,12 @@ class SymbolicResponse(CustomResponse):
       Your input should be typed in as a list of lists, eg <tt>[[1,2],[3,4]]</tt>.
       </text>
     </problem>'''}]
-    def __init__(self, xml, context, system=None):
-        xml.set('cfn','symmath_check')
+
+    def setup_response(self):
+        self.xml.set('cfn','symmath_check')
         code = "from symmath import *"
-        exec code in context,context
-        CustomResponse.__init__(self,xml,context,system)
-        
+        exec code in self.context,self.context
+        CustomResponse.setup_response(self)
 
 #-----------------------------------------------------------------------------
 
@@ -480,15 +568,13 @@ main()
     </answer>
   </externalresponse>'''}]
 
-    def __init__(self, xml, context, system=None):
-        self.xml = xml
-        self.url = xml.get('url') or "http://eecs1.mit.edu:8889/pyloncapa"	# FIXME - hardcoded URL
-        self.answer_ids = xml.xpath('//*[@id=$id]//textbox/@id|//*[@id=$id]//textline/@id',
-                                    id=xml.get('id'))
-        self.context = context
-        answer = xml.xpath('//*[@id=$id]//answer',
-                           id=xml.get('id'))[0]
+    allowed_inputfields = ['textline','textbox']
 
+    def setup_response(self):
+        xml = self.xml
+        self.url = xml.get('url') or "http://eecs1.mit.edu:8889/pyloncapa"	# FIXME - hardcoded URL
+
+        answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]	# FIXME - catch errors
         answer_src = answer.get('src')
         if answer_src is not None:
             self.code = self.system.filesystem.open('src/'+answer_src).read()
@@ -590,8 +676,6 @@ main()
             raise Exception,'Short response from external server'
         return dict(zip(self.answer_ids,exans))
 
-class StudentInputError(Exception):
-    pass
 
 #-----------------------------------------------------------------------------
 
@@ -617,8 +701,13 @@ class FormulaResponse(GenericResponse):
 
     </problem>'''}]
 
-    def __init__(self, xml, context, system=None):
-        self.xml = xml
+    allowed_inputfields = ['textline']
+    required_attributes = ['answer']
+    max_inputfields = 1
+
+    def setup_response(self):
+        xml = self.xml
+        context = self.context
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         self.samples = contextualize_text(xml.get('samples'), context)
         try:
@@ -628,14 +717,6 @@ class FormulaResponse(GenericResponse):
         except Exception:
             self.tolerance = 0
 
-        try:
-            self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
-                                       id=xml.get('id'))[0]
-        except Exception:
-            self.answer_id = None
-            raise Exception, "[courseware.capa.responsetypes.FormulaResponse] Error: missing answer_id!!"
-
-        self.context = context
         ts = xml.get('type')
         if ts is None:
             typeslist = []
@@ -647,7 +728,6 @@ class FormulaResponse(GenericResponse):
             self.case_sensitive = True
         else: # Default
             self.case_sensitive = False
-
 
     def get_score(self, student_answers):
         variables=self.samples.split('@')[0].split(',')
@@ -697,13 +777,12 @@ class FormulaResponse(GenericResponse):
 #-----------------------------------------------------------------------------
 
 class SchematicResponse(GenericResponse):
-    def __init__(self, xml, context, system=None):
-        self.xml = xml
-        self.answer_ids = xml.xpath('//*[@id=$id]//schematic/@id',
-                                    id=xml.get('id'))
-        self.context = context
-        answer = xml.xpath('//*[@id=$id]//answer',
-                           id=xml.get('id'))[0]
+
+    allowed_inputfields = ['schematic']
+
+    def setup_response(self):
+        xml = self.xml
+        answer = xml.xpath('//*[@id=$id]//answer', id=xml.get('id'))[0]
         answer_src = answer.get('src')
         if answer_src is not None:
             self.code = self.system.filestore.open('src/'+answer_src).read() # Untested; never used
@@ -740,10 +819,10 @@ class ImageResponse(GenericResponse):
       <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
     </imageresponse>'''}]
 
-    def __init__(self, xml, context, system=None):
-        self.xml = xml
-        self.context = context
-        self.ielements = xml.findall('imageinput')
+    allowed_inputfields = ['imageinput']
+
+    def setup_response(self):
+        self.ielements = self.inputfields
         self.answer_ids = [ie.get('id')  for ie in self.ielements]
 
     def get_score(self, student_answers):

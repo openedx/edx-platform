@@ -48,7 +48,7 @@ class @Problem
               @$("label[for='input_#{key}_#{choice}']").attr
                 correct_answer: 'true'
           else
-            @$("#answer_#{key}").text(value)
+            @$("#answer_#{key}").html(value)	// needs to be html, not text, for complex solutions (eg coding)
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
     else
