@@ -5,7 +5,16 @@
 
 class CorrectMap(object):
     '''
-    Stores (correctness, npoints, msg) for each answer_id.
+    Stores map between answer_id and response evaluation result for each question
+    in a capa problem.  The response evaluation result for each answer_id includes
+    (correctness, npoints, msg, hint, hintmode).
+
+    - correctness : either 'correct' or 'incorrect'
+    - npoints     : None, or integer specifying number of points awarded for this answer_id
+    - msg         : string (may have HTML) giving extra message response (displayed below textline or textbox)
+    - hint        : string (may have HTML) giving optional hint (displayed below textline or textbox, above msg)
+    - hintmode    : one of (None,'on_request','always') criteria for displaying hint
+
     Behaves as a dict.
     '''
     cmap = {}
@@ -13,11 +22,14 @@ class CorrectMap(object):
     def __init__(self,*args,**kwargs):
         self.set(*args,**kwargs)
 
-    def set(self,answer_id=None,correctness=None,npoints=None,msg=''):
+    def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None):
         if answer_id is not None:
             self.cmap[answer_id] = {'correctness': correctness,
                                     'npoints': npoints,
-                                    'msg': msg }
+                                    'msg': msg,
+                                    'hint' : hint,
+                                    'hintmode' : hintmode,
+                                    }
 
     def __repr__(self):
         return repr(self.cmap)
@@ -63,6 +75,20 @@ class CorrectMap(object):
 
     def get_msg(self,answer_id):
         return self.get_property(answer_id,'msg','')
+
+    def get_hint(self,answer_id):
+        return self.get_property(answer_id,'hint','')
+
+    def get_hintmode(self,answer_id):
+        return self.get_property(answer_id,'hintmode',None)
+
+    def set_hint_and_mode(self,answer_id,hint,hintmode):
+        '''
+          - hint     : (string) HTML text for hint
+          - hintmode : (string) mode for hint display ('always' or 'on_request')
+        '''
+        self.set_property(answer_id,'hint',hint)
+        self.set_property(answer_id,'hintmode',hintmode)
 
     def update(self,other_cmap):
         '''
