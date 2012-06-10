@@ -12,6 +12,8 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 '''
 
+from __future__ import division
+
 import copy
 import logging
 import math
@@ -32,20 +34,10 @@ import inputtypes
 from util import contextualize_text
 
 # to be replaced with auto-registering
-from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse
+import responsetypes
 
 # dict of tagname, Response Class -- this should come from auto-registering
-response_types = {'numericalresponse': NumericalResponse,
-                  'formularesponse': FormulaResponse,
-                  'customresponse': CustomResponse,
-                  'schematicresponse': SchematicResponse,
-                  'externalresponse': ExternalResponse,
-                  'multiplechoiceresponse': MultipleChoiceResponse,
-                  'truefalseresponse': TrueFalseResponse,
-                  'imageresponse': ImageResponse,
-                  'optionresponse': OptionResponse,
-                  'symbolicresponse': SymbolicResponse,
-                  }
+response_tag_dict = dict([(x.response_tag,x) for x in responsetypes.__all__])
 
 entry_types = ['textline', 'schematic', 'choicegroup', 'textbox', 'imageinput', 'optioninput']
 solution_types = ['solution']    			# extra things displayed after "show answers" is pressed
@@ -65,7 +57,7 @@ global_context = {'random': random,
                   'eia': eia}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["responseparam", "answer", "script"]
+html_problem_semantics = ["responseparam", "answer", "script","hintgroup"]
 
 #log = logging.getLogger(__name__)
 log = logging.getLogger('mitx.common.lib.capa.capa_problem')
@@ -209,7 +201,7 @@ class LoncapaProblem(object):
         oldcmap = self.correct_map				# old CorrectMap
         newcmap = CorrectMap()					# start new with empty CorrectMap
         for responder in self.responders.values():
-            results = responder.get_score(answers,oldcmap)      # call the responsetype instance to do the actual grading
+            results = responder.evaluate_answers(answers,oldcmap)      # call the responsetype instance to do the actual grading
             newcmap.update(results)
         self.correct_map = newcmap
         log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
@@ -248,7 +240,8 @@ class LoncapaProblem(object):
         '''
         return contextualize_text(etree.tostring(self.extract_html(self.tree)), self.context)
 
-    # ======= Private ========
+    # ======= Private Methods Below ========
+
     def extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
         '''
         Extract content of <script>...</script> from the problem.xml file, and exec it in the
@@ -296,15 +289,17 @@ class LoncapaProblem(object):
         problemid = problemtree.get('id')    # my ID
 
         if problemtree.tag in inputtypes.get_input_xml_tags():
-            # status is currently the answer for the problem ID for the input element,
-            # but it will turn into a dict containing both the answer and any associated message
-            # for the problem ID for the input element.
+
             status = "unsubmitted"
             msg = ''
+            hint = ''
+            hintmode = None
             if problemid in self.correct_map:
                 pid = problemtree.get('id')
                 status = self.correct_map.get_correctness(pid)
                 msg = self.correct_map.get_msg(pid)
+                hint = self.correct_map.get_hint(pid)
+                hintmode = self.correct_map.get_hintmode(pid)
 
             value = ""
             if self.student_answers and problemid in self.student_answers:
@@ -316,7 +311,10 @@ class LoncapaProblem(object):
                                                    state={'value': value,
                                                           'status': status,
                                                           'id': problemtree.get('id'),
-                                                          'feedback': {'message': msg}
+                                                          'feedback': {'message': msg,
+                                                                       'hint' : hint,
+                                                                       'hintmode' : hintmode,
+                                                                       }
                                                           },
                                                    use='capa_input')
             return render_object.get_html()  # function(problemtree, value, status, msg) # render the special response (textline, schematic,...)
@@ -352,7 +350,7 @@ class LoncapaProblem(object):
         '''
         response_id = 1
 	self.responders = {}
-        for response in tree.xpath('//' + "|//".join(response_types)):
+        for response in tree.xpath('//' + "|//".join(response_tag_dict)):
             response_id_str = self.problem_id + "_" + str(response_id)
             response.set('id',response_id_str)				# create and save ID for this response
             response_id += 1
@@ -366,7 +364,7 @@ class LoncapaProblem(object):
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
-            responder = response_types[response.tag](response, inputfields, self.context, self.system)	# instantiate capa Response
+            responder = response_tag_dict[response.tag](response, inputfields, self.context, self.system) # instantiate capa Response
 	    self.responders[response] = responder				# save in list in self
 
         # <solution>...</solution> may not be associated with any specific response; give IDs for those separately
