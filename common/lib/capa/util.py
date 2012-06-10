@@ -7,6 +7,11 @@ from calc import evaluator, UndefinedVariable
 def compare_with_tolerance(v1, v2, tol):
     ''' Compare v1 to v2 with maximum tolerance tol
     tol is relative if it ends in %; otherwise, it is absolute
+
+     - v1    :  student result (number)
+     - v2    :  instructor result (number)
+     - tol   :  tolerance (string or number)
+
     '''
     relative = "%" in tol
     if relative: 
