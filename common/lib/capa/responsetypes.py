@@ -51,7 +51,7 @@ class StudentInputError(Exception):
 #
 # Main base class for CAPA responsetypes
 
-class GenericResponse(object):
+class LoncapaResponse(object):
     '''
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
     which is part of a capa problem) is represented as a subclass,
@@ -60,21 +60,30 @@ class GenericResponse(object):
       - get_score           : evaluate the given student answers, and return a CorrectMap
       - get_answers         : provide a dict of the expected answers for this problem
       
+    Each subclass must also define the following attributes:
+
+      - response_tag         : xhtml tag identifying this response (used in auto-registering)
+
     In addition, these methods are optional:
 
-      - get_max_score       : if defined, this is called to obtain the maximum score possible for this question
-      - setup_response      : find and note the answer input field IDs for the response; called by __init__
-      - render_html         : render this Response as HTML (must return XHTML compliant string)
-      - __unicode__         : unicode representation of this Response
+      - get_max_score        : if defined, this is called to obtain the maximum score possible for this question
+      - setup_response       : find and note the answer input field IDs for the response; called by __init__
+      - check_hint_condition : check to see if the student's answers satisfy a particular condition for a hint to be displayed
+      - render_html          : render this Response as HTML (must return XHTML compliant string)
+      - __unicode__          : unicode representation of this Response
 
     Each response type may also specify the following attributes:
 
-      - max_inputfields     : (int) maximum number of answer input fields (checked in __init__ if not None)
-      - allowed_inputfields : list of allowed input fields (each a string) for this Response
-      - required_attributes : list of required attributes (each a string) on the main response XML stanza
+      - max_inputfields      : (int) maximum number of answer input fields (checked in __init__ if not None)
+      - allowed_inputfields  : list of allowed input fields (each a string) for this Response
+      - required_attributes  : list of required attributes (each a string) on the main response XML stanza
+      - hint_tag             : xhtml tag identifying hint associated with this response inside hintgroup
 
     '''
     __metaclass__=abc.ABCMeta # abc = Abstract Base Class
+
+    response_tag = None
+    hint_tag = None
 
     max_inputfields = None
     allowed_inputfields = []
@@ -85,7 +94,7 @@ class GenericResponse(object):
         Init is passed the following arguments:
 
           - xml         : ElementTree of this Response
-          - inputfields : list of ElementTrees for each input entry field in this Response
+          - inputfields : ordered list of ElementTrees for each input entry field in this Response
           - context     : script processor context
           - system      : I4xSystem instance which provides OS, rendering, and user context 
 
@@ -112,7 +121,7 @@ class GenericResponse(object):
                 msg += "\nSee XML source line %s" % getattr(xml,'sourceline','<unavailable>')
                 raise LoncapaProblemError(msg)
 
-        self.answer_ids = [x.get('id') for x in self.inputfields]
+        self.answer_ids = [x.get('id') for x in self.inputfields]	# ordered list of answer_id values for this response
         if self.max_inputfields==1:
             self.answer_id = self.answer_ids[0]		# for convenience
 
@@ -140,8 +149,85 @@ class GenericResponse(object):
         tree.tail = self.xml.tail
         return tree
 
+    def evaluate_answers(self,student_answers,old_cmap):
+        '''
+        Called by capa_problem.LoncapaProblem to evaluate student answers, and to
+        generate hints (if any).
+
+        Returns the new CorrectMap, with (correctness,msg,hint,hintmode) for each answer_id.
+        '''
+        new_cmap = self.get_score(student_answers)
+        self.get_hints(student_answers, new_cmap, old_cmap)
+        return new_cmap
+
+    def get_hints(self, student_answers, new_cmap, old_cmap):
+        '''
+        Generate adaptive hints for this problem based on student answers, the old CorrectMap,
+        and the new CorrectMap produced by get_score.
+
+        Does not return anything.
+
+        Modifies new_cmap, by adding hints to answer_id entries as appropriate.
+        '''
+        hintgroup = self.xml.find('hintgroup')
+        if hintgroup is None: return
+
+        # hint specified by function?
+        hintfn = hintgroup.get('hintfn')
+        if hintfn:
+            '''
+            Hint is determined by a function defined in the <script> context; evaluate that function to obtain
+            list of hint, hintmode for each answer_id.
+
+            The function should take arguments (answer_ids, student_answers, new_cmap, old_cmap)
+            and it should modify new_cmap as appropriate.
+
+            We may extend this in the future to add another argument which provides a callback procedure
+            to a social hint generation system.
+
+            '''
+            if not hintfn in self.context:
+                msg = 'missing specified hint function %s in script context' % hintfn
+                msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
+                raise LoncapaProblemError(msg)
+
+            try:
+                self.context[hintfn](self.answer_ids, student_answers, new_cmap, old_cmap)
+            except Exception, err:
+                msg = 'Error %s in evaluating hint function %s' % (err,hintfn)
+                msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
+                raise ResponseError(msg)
+            return
+
+        # hint specified by conditions and text dependent on conditions (a-la Loncapa design)
+        # see http://help.loncapa.org/cgi-bin/fom?file=291
+        #
+        # Example:
+        #
+        # <formularesponse samples="x@-5:5#11" id="11" answer="$answer">
+        #   <textline size="25" />
+        #   <hintgroup>
+        #     <formulahint samples="x@-5:5#11" answer="$wrongans" name="inversegrad"></formulahint>
+        #     <hintpart on="inversegrad">
+        #       <text>You have inverted the slope in the question.  The slope is
+        #             (y2-y1)/(x2 - x1) you have the slope as (x2-x1)/(y2-y1).</text>
+        #     </hintpart>
+        #   </hintgroup>     
+        # </formularesponse>
+
+        if self.hint_tag is not None and hintgroup.find(self.hint_tag) is not None and hasattr(self,'check_hint_condition'):
+            rephints = hintgroup.findall(self.hint_tag)
+            hints_to_show = self.check_hint_condition(rephints,student_answers)
+            hintmode = hintgroup.get('mode','always')	# can be 'on_request' or 'always' (default)
+            for hintpart in hintgroup.findall('hintpart'):
+                if hintpart.get('on') in hints_to_show:
+                    hint_text = hintpart.find('text').text
+                    aid = self.answer_ids[-1]		# make the hint appear after the last answer box in this response
+                    new_cmap.set_hint_and_mode(aid,hint_text,hintmode)
+            log.debug('after hint: new_cmap = %s' % new_cmap)
+
     @abc.abstractmethod
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         '''
         Return a CorrectMap for the answers expected vs given.  This includes
         (correctness, npoints, msg) for each answer_id.
@@ -161,6 +247,17 @@ class GenericResponse(object):
         '''
         pass
 
+    def check_hint_condition(self,hxml_set,student_answers):
+        '''
+        Return a list of hints to show.
+
+          - hxml_set        : list of Element trees, each specifying a condition to be satisfied for a named hint condition
+          - student_answers : dict of student answers
+
+        Returns a list of names of hint conditions which were satisfied.  Those are used to determine which hints are displayed.
+        '''
+        pass
+
     def setup_response(self):
         pass
 
@@ -169,7 +266,7 @@ class GenericResponse(object):
 
 #-----------------------------------------------------------------------------
 
-class MultipleChoiceResponse(GenericResponse):
+class MultipleChoiceResponse(LoncapaResponse):
     # TODO: handle direction and randomize
     snippets = [{'snippet': '''<multiplechoiceresponse direction="vertical" randomize="yes">
      <choicegroup type="MultipleChoice">
@@ -181,6 +278,7 @@ class MultipleChoiceResponse(GenericResponse):
     </multiplechoiceresponse>
     '''}]
 
+    response_tag = 'multiplechoiceresponse'
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
 
@@ -208,7 +306,7 @@ class MultipleChoiceResponse(GenericResponse):
                 else:
                     choice.set("name", "choice_"+choice.get("name"))
 
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         '''
         grade student response.
         '''
@@ -222,6 +320,9 @@ class MultipleChoiceResponse(GenericResponse):
         return {self.answer_id:self.correct_choices}
 
 class TrueFalseResponse(MultipleChoiceResponse):
+
+    response_tag = 'truefalseresponse'
+
     def mc_setup_response(self):
         i=0
         for response in self.xml.xpath("choicegroup"):
@@ -233,7 +334,7 @@ class TrueFalseResponse(MultipleChoiceResponse):
                 else:
                     choice.set("name", "choice_"+choice.get("name"))
     
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         correct = set(self.correct_choices)
         answers = set(student_answers.get(self.answer_id, []))
         
@@ -244,7 +345,7 @@ class TrueFalseResponse(MultipleChoiceResponse):
 
 #-----------------------------------------------------------------------------
 
-class OptionResponse(GenericResponse):
+class OptionResponse(LoncapaResponse):
     '''
     TODO: handle direction and randomize
     '''
@@ -253,12 +354,14 @@ class OptionResponse(GenericResponse):
         <optioninput options="('Up','Down')" correct="Down"><text>The location of the earth</text></optioninput>
     </optionresponse>'''}]
 
+    response_tag = 'optionresponse'
+    hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
 
     def setup_response(self):
         self.answer_fields = self.inputfields
 
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         # log.debug('%s: student_answers=%s' % (unicode(self),student_answers))
         cmap = CorrectMap()
         amap = self.get_answers()
@@ -276,8 +379,10 @@ class OptionResponse(GenericResponse):
 
 #-----------------------------------------------------------------------------
 
-class NumericalResponse(GenericResponse):
+class NumericalResponse(LoncapaResponse):
 
+    response_tag = 'numericalresponse'
+    hint_tag = 'numericalhint'
     allowed_inputfields = ['textline']
     required_attributes = ['answer']
     max_inputfields = 1
@@ -298,7 +403,7 @@ class NumericalResponse(GenericResponse):
         except Exception:
             self.answer_id = None
 
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         '''Grade a numeric response '''
         student_answer = student_answers[self.answer_id]
         try:
@@ -319,7 +424,7 @@ class NumericalResponse(GenericResponse):
 
 #-----------------------------------------------------------------------------
 
-class CustomResponse(GenericResponse):
+class CustomResponse(LoncapaResponse):
     '''
     Custom response.  The python code to be run should be in <answer>...</answer>
     or in a <script>...</script>
@@ -358,6 +463,7 @@ def sympy_check2():
     <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
   </customresponse>'''}]
 
+    response_tag = 'customresponse'
     allowed_inputfields = ['textline','textbox']
 
     def setup_response(self):
@@ -402,7 +508,7 @@ def sympy_check2():
                 else:
                     self.code = answer.text
 
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         '''
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
@@ -540,6 +646,8 @@ class SymbolicResponse(CustomResponse):
       </text>
     </problem>'''}]
 
+    response_tag = 'symbolicresponse'
+
     def setup_response(self):
         self.xml.set('cfn','symmath_check')
         code = "from symmath import *"
@@ -548,7 +656,7 @@ class SymbolicResponse(CustomResponse):
 
 #-----------------------------------------------------------------------------
 
-class ExternalResponse(GenericResponse):
+class ExternalResponse(LoncapaResponse):
     '''
     Grade the students input using an external server.
     
@@ -594,6 +702,7 @@ main()
     </answer>
   </externalresponse>'''}]
 
+    response_tag = 'externalresponse'
     allowed_inputfields = ['textline','textbox']
 
     def setup_response(self):
@@ -647,7 +756,7 @@ main()
 
         return rxml
 
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         idset = sorted(self.answer_ids)
         cmap = CorrectMap()
         try:
@@ -707,7 +816,7 @@ main()
 
 #-----------------------------------------------------------------------------
 
-class FormulaResponse(GenericResponse):
+class FormulaResponse(LoncapaResponse):
     '''
     Checking of symbolic math response using numerical sampling.
     '''
@@ -729,6 +838,8 @@ class FormulaResponse(GenericResponse):
 
     </problem>'''}]
 
+    response_tag = 'formularesponse'
+    hint_tag = 'formulahint'
     allowed_inputfields = ['textline']
     required_attributes = ['answer']
     max_inputfields = 1
@@ -743,7 +854,7 @@ class FormulaResponse(GenericResponse):
                                            id=xml.get('id'))[0]
             self.tolerance = contextualize_text(self.tolerance_xml, context)
         except Exception:
-            self.tolerance = 0
+            self.tolerance = '0.00001'
 
         ts = xml.get('type')
         if ts is None:
@@ -757,11 +868,16 @@ class FormulaResponse(GenericResponse):
         else: # Default
             self.case_sensitive = False
 
-    def get_score(self, student_answers, old_cmap):
-        variables=self.samples.split('@')[0].split(',')
-        numsamples=int(self.samples.split('@')[1].split('#')[1])
+    def get_score(self, student_answers):
+        given = student_answers[self.answer_id]
+        correctness = self.check_formula(self.correct_answer, given, self.samples)
+        return CorrectMap(self.answer_id, correctness)
+
+    def check_formula(self,expected, given, samples):
+        variables=samples.split('@')[0].split(',')
+        numsamples=int(samples.split('@')[1].split('#')[1])
         sranges=zip(*map(lambda x:map(float, x.split(",")), 
-                         self.samples.split('@')[1].split('#')[0].split(':')))
+                         samples.split('@')[1].split('#')[0].split(':')))
 
         ranges=dict(zip(variables, sranges))
         for i in range(numsamples):
@@ -771,23 +887,26 @@ class FormulaResponse(GenericResponse):
                 value = random.uniform(*ranges[var])
                 instructor_variables[str(var)] = value
                 student_variables[str(var)] = value
-            instructor_result = evaluator(instructor_variables,dict(),self.correct_answer, cs = self.case_sensitive)
+            #log.debug('formula: instructor_vars=%s, expected=%s' % (instructor_variables,expected))
+            instructor_result = evaluator(instructor_variables,dict(),expected, cs = self.case_sensitive)
             try: 
-                #print student_variables,dict(),student_answers[self.answer_id]
-                student_result = evaluator(student_variables,dict(),
-                                           student_answers[self.answer_id], 
+                #log.debug('formula: student_vars=%s, given=%s' % (student_variables,given))
+                student_result = evaluator(student_variables,
+                                           dict(),
+                                           given, 
                                            cs = self.case_sensitive)
             except UndefinedVariable as uv:
+                log.debbug('formularesponse: undefined variable in given=%s' % given)
                 raise StudentInputError(uv.message+" not permitted in answer")
-            except:
+            except Exception, err:
                 #traceback.print_exc()
+                log.debug('formularesponse: error %s in formula' % err)
                 raise StudentInputError("Error in formula")
             if numpy.isnan(student_result) or numpy.isinf(student_result):
-                return CorrectMap(self.answer_id, "incorrect")
+                return "incorrect"
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
-                return CorrectMap(self.answer_id, "incorrect")
- 
-        return CorrectMap(self.answer_id, "correct")
+                return "incorrect"
+        return "correct"
 
     def strip_dict(self, d):
         ''' Takes a dict. Returns an identical dict, with all non-word
@@ -799,13 +918,30 @@ class FormulaResponse(GenericResponse):
                     isinstance(d[k], numbers.Number)])
         return d
 
+    def check_hint_condition(self,hxml_set,student_answers):
+        given = student_answers[self.answer_id]
+        hints_to_show = []
+        for hxml in hxml_set:
+            samples = hxml.get('samples')
+            name = hxml.get('name')
+            correct_answer = contextualize_text(hxml.get('answer'),self.context)
+            try:
+                correctness = self.check_formula(correct_answer, given, samples)
+            except Exception,err:
+                correctness = 'incorrect'
+            if correctness=='correct':
+                hints_to_show.append(name)
+        log.debug('hints_to_show = %s' % hints_to_show)
+        return hints_to_show
+
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
 
 #-----------------------------------------------------------------------------
 
-class SchematicResponse(GenericResponse):
+class SchematicResponse(LoncapaResponse):
 
+    response_tag = 'schematicresponse'
     allowed_inputfields = ['schematic']
 
     def setup_response(self):
@@ -817,7 +953,7 @@ class SchematicResponse(GenericResponse):
         else:
             self.code = answer.text
 
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         from capa_problem import global_context
         submission = [json.loads(student_answers[k]) for k in sorted(self.answer_ids)]
         self.context.update({'submission':submission})
@@ -831,7 +967,7 @@ class SchematicResponse(GenericResponse):
 
 #-----------------------------------------------------------------------------
 
-class ImageResponse(GenericResponse):
+class ImageResponse(LoncapaResponse):
     """
     Handle student response for image input: the input is a click on an image,
     which produces an [x,y] coordinate pair.  The click is correct if it falls
@@ -847,13 +983,14 @@ class ImageResponse(GenericResponse):
       <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
     </imageresponse>'''}]
 
+    response_tag = 'imageresponse'
     allowed_inputfields = ['imageinput']
 
     def setup_response(self):
         self.ielements = self.inputfields
         self.answer_ids = [ie.get('id')  for ie in self.ielements]
 
-    def get_score(self, student_answers, old_cmap):
+    def get_score(self, student_answers):
         correct_map = CorrectMap()
         expectedset = self.get_answers()
 
@@ -884,3 +1021,10 @@ class ImageResponse(GenericResponse):
 
     def get_answers(self):
         return dict([(ie.get('id'),ie.get('rectangle')) for ie in self.ielements])
+
+#-----------------------------------------------------------------------------
+# TEMPORARY: List of all response subclasses
+# FIXME: To be replaced by auto-registration
+
+__all__ = [ NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse ]
+
