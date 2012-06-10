@@ -17,10 +17,16 @@ class CorrectMap(object):
 
     Behaves as a dict.
     '''
-    cmap = {}
-
     def __init__(self,*args,**kwargs):
+        self.cmap = dict()		# start with empty dict
+        self.__getitem__ = self.cmap.__getitem__
+        self.__iter__ = self.cmap.__iter__
+        self.items = self.cmap.items
+        self.keys = self.cmap.keys
         self.set(*args,**kwargs)
+
+    def __iter__(self):
+        return self.cmap.__iter__()
 
     def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None):
         if answer_id is not None:
@@ -47,7 +53,7 @@ class CorrectMap(object):
         dict of dicts format.
         '''
         if correct_map and not (type(correct_map[correct_map.keys()[0]])==dict):
-            for k in self.cmap.keys(): self.cmap.pop(k)				# empty current dict
+            self.__init__()							# empty current dict
             for k in correct_map: self.set(k,correct_map[k])			# create new dict entries
         else:
             self.cmap = correct_map
@@ -98,9 +104,5 @@ class CorrectMap(object):
             raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
         self.cmap.update(other_cmap.get_dict())
 
-    __getitem__ = cmap.__getitem__
-    __iter__ = cmap.__iter__
-    items = cmap.items
-    keys = cmap.keys
 
     

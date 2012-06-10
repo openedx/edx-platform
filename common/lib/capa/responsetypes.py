@@ -158,6 +158,7 @@ class LoncapaResponse(object):
         '''
         new_cmap = self.get_score(student_answers)
         self.get_hints(student_answers, new_cmap, old_cmap)
+        # log.debug('new_cmap = %s' % new_cmap)
         return new_cmap
 
     def get_hints(self, student_answers, new_cmap, old_cmap):
@@ -492,7 +493,7 @@ def sympy_check2():
                 if cfn in self.context:
                     self.code = self.context[cfn]
                 else:
-                    msg = "%s: can't find cfn in context = %s" % (unicode(self),self.context)
+                    msg = "%s: can't find cfn %s in context" % (unicode(self),cfn)
                     msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
                     raise LoncapaProblemError(msg)
 
@@ -896,7 +897,7 @@ class FormulaResponse(LoncapaResponse):
                                            given, 
                                            cs = self.case_sensitive)
             except UndefinedVariable as uv:
-                log.debbug('formularesponse: undefined variable in given=%s' % given)
+                log.debug('formularesponse: undefined variable in given=%s' % given)
                 raise StudentInputError(uv.message+" not permitted in answer")
             except Exception, err:
                 #traceback.print_exc()
