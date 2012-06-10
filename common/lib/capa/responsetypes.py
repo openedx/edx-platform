@@ -21,6 +21,7 @@ import abc
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
+from correctmap import CorrectMap
 from util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	# uses Beautiful Soup!!! FIXME?
@@ -53,7 +54,7 @@ class StudentInputError(Exception):
 class GenericResponse(object):
     '''
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
-    which is part of a capa problem) is represented as a superclass,
+    which is part of a capa problem) is represented as a subclass,
     which should provide the following methods:
 
       - get_score           : evaluate the given student answers, and return a CorrectMap
@@ -140,10 +141,16 @@ class GenericResponse(object):
         return tree
 
     @abc.abstractmethod
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
         '''
         Return a CorrectMap for the answers expected vs given.  This includes
         (correctness, npoints, msg) for each answer_id.
+
+        Arguments:
+
+         - student_answers : dict of (answer_id,answer) where answer = student input (string)
+         - old_cmap        : previous CorrectMap (may be empty); useful for analyzing or recording history of responses
+
         '''
         pass
 
@@ -201,15 +208,15 @@ class MultipleChoiceResponse(GenericResponse):
                 else:
                     choice.set("name", "choice_"+choice.get("name"))
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
         '''
         grade student response.
         '''
         # log.debug('%s: student_answers=%s, correct_choices=%s' % (unicode(self),student_answers,self.correct_choices))
         if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
-            return {self.answer_id:'correct'}
+            return CorrectMap(self.answer_id,'correct')
         else:
-            return {self.answer_id:'incorrect'}
+            return CorrectMap(self.answer_id,'incorrect')
 
     def get_answers(self):
         return {self.answer_id:self.correct_choices}
@@ -226,14 +233,14 @@ class TrueFalseResponse(MultipleChoiceResponse):
                 else:
                     choice.set("name", "choice_"+choice.get("name"))
     
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
         correct = set(self.correct_choices)
         answers = set(student_answers.get(self.answer_id, []))
         
         if correct == answers:
-            return { self.answer_id : 'correct'}
+            return CorrectMap( self.answer_id , 'correct')
         
-        return {self.answer_id : 'incorrect'}
+        return CorrectMap(self.answer_id ,'incorrect')
 
 #-----------------------------------------------------------------------------
 
@@ -251,15 +258,15 @@ class OptionResponse(GenericResponse):
     def setup_response(self):
         self.answer_fields = self.inputfields
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
         # log.debug('%s: student_answers=%s' % (unicode(self),student_answers))
-        cmap = {}
+        cmap = CorrectMap()
         amap = self.get_answers()
         for aid in amap:
             if aid in student_answers and student_answers[aid]==amap[aid]:
-                cmap[aid] = 'correct'
+                cmap.set(aid,'correct')
             else:
-                cmap[aid] = 'incorrect'
+                cmap.set(aid,'incorrect')
         return cmap
 
     def get_answers(self):
@@ -291,7 +298,7 @@ class NumericalResponse(GenericResponse):
         except Exception:
             self.answer_id = None
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
         '''Grade a numeric response '''
         student_answer = student_answers[self.answer_id]
         try:
@@ -303,9 +310,9 @@ class NumericalResponse(GenericResponse):
             raise StudentInputError('Invalid input -- please use a number only')
 
         if correct:
-            return {self.answer_id:'correct'}
+            return CorrectMap(self.answer_id,'correct')
         else:
-            return {self.answer_id:'incorrect'}
+            return CorrectMap(self.answer_id,'incorrect')
 
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
@@ -395,7 +402,7 @@ def sympy_check2():
                 else:
                     self.code = answer.text
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
         '''
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
@@ -495,12 +502,10 @@ def sympy_check2():
                 correct = ['correct']*len(idset) if ret else ['incorrect']*len(idset)
 
         # build map giving "correct"ness of the answer(s)
-        #correct_map = dict(zip(idset, self.context['correct']))
-        correct_map = {}
+        correct_map = CorrectMap()
         for k in range(len(idset)):
-            correct_map[idset[k]] = correct[k]
-            correct_map['msg_%s' % idset[k]] = messages[k]
-        return  correct_map
+            correct_map.set(idset[k], correct[k], msg=messages[k])
+        return correct_map
 
     def get_answers(self):
         '''
@@ -642,9 +647,11 @@ main()
 
         return rxml
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
+        idset = sorted(self.answer_ids)
+        cmap = CorrectMap()
         try:
-            submission = [student_answers[k] for k in sorted(self.answer_ids)]
+            submission = [student_answers[k] for k in idset]
         except Exception,err:
             log.error('Error %s: cannot get student answer for %s; student_answers=%s' % (err,self.answer_ids,student_answers))
             raise Exception,err
@@ -658,9 +665,9 @@ main()
         except Exception, err:
             log.error('Error %s' % err)
             if self.system.DEBUG:
-                correct_map = dict(zip(sorted(self.answer_ids), ['incorrect'] * len(self.answer_ids) ))
-                correct_map['msg_%s' % self.answer_ids[0]] = '<font color="red" size="+2">%s</font>' % str(err).replace('<','&lt;')
-                return correct_map
+                cmap.set_dict(dict(zip(sorted(self.answer_ids), ['incorrect'] * len(idset) )))
+                cmap.set_property(self.answer_ids[0],'msg','<font color="red" size="+2">%s</font>' % str(err).replace('<','&lt;'))
+                return cmap
 
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
@@ -670,13 +677,13 @@ main()
         if ad in admap:
             self.context['correct'][0] = admap[ad]
 
-        # self.context['correct'] = ['correct','correct']
-        correct_map = dict(zip(sorted(self.answer_ids), self.context['correct']))
-        
-        # store message in correct_map
-        correct_map['msg_%s' % self.answer_ids[0]] = rxml.find('message').text.replace('&nbsp;','&#160;')  
+        # create CorrectMap
+        for key in idset:
+            idx = idset.index(key)
+            msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
+            cmap.set(key, self.context['correct'][idx], msg=msg)
 
-        return  correct_map
+        return cmap
 
     def get_answers(self):
         '''
@@ -750,7 +757,7 @@ class FormulaResponse(GenericResponse):
         else: # Default
             self.case_sensitive = False
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
         variables=self.samples.split('@')[0].split(',')
         numsamples=int(self.samples.split('@')[1].split('#')[1])
         sranges=zip(*map(lambda x:map(float, x.split(",")), 
@@ -776,11 +783,11 @@ class FormulaResponse(GenericResponse):
                 #traceback.print_exc()
                 raise StudentInputError("Error in formula")
             if numpy.isnan(student_result) or numpy.isinf(student_result):
-                return {self.answer_id:"incorrect"}
+                return CorrectMap(self.answer_id, "incorrect")
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
-                return {self.answer_id:"incorrect"}
+                return CorrectMap(self.answer_id, "incorrect")
  
-        return {self.answer_id:"correct"}
+        return CorrectMap(self.answer_id, "correct")
 
     def strip_dict(self, d):
         ''' Takes a dict. Returns an identical dict, with all non-word
@@ -810,12 +817,13 @@ class SchematicResponse(GenericResponse):
         else:
             self.code = answer.text
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, old_cmap):
         from capa_problem import global_context
         submission = [json.loads(student_answers[k]) for k in sorted(self.answer_ids)]
         self.context.update({'submission':submission})
         exec self.code in global_context, self.context
-        return  zip(sorted(self.answer_ids), self.context['correct'])
+        cmap = CorrectMap()
+        return  cmap.set_dict(zip(sorted(self.answer_ids), self.context['correct']))
 
     def get_answers(self):
         # use answers provided in input elements
@@ -845,8 +853,8 @@ class ImageResponse(GenericResponse):
         self.ielements = self.inputfields
         self.answer_ids = [ie.get('id')  for ie in self.ielements]
 
-    def get_score(self, student_answers):
-        correct_map = {}
+    def get_score(self, student_answers, old_cmap):
+        correct_map = CorrectMap()
         expectedset = self.get_answers()
 
         for aid in self.answer_ids:	# loop through IDs of <imageinput> fields in our stanza
@@ -869,9 +877,9 @@ class ImageResponse(GenericResponse):
             
             # answer is correct if (x,y) is within the specified rectangle
             if (llx <= gx <= urx) and (lly <= gy <= ury):
-                correct_map[aid] = 'correct'
+                correct_map.set(aid, 'correct')
             else:
-                correct_map[aid] = 'incorrect'
+                correct_map.set(aid, 'incorrect')
         return correct_map
 
     def get_answers(self):
