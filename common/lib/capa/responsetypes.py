@@ -63,7 +63,8 @@ class GenericResponse(object):
 
       - get_max_score       : if defined, this is called to obtain the maximum score possible for this question
       - setup_response      : find and note the answer input field IDs for the response; called by __init__
-       - __unicode__        : unicode representation of this Response
+      - render_html         : render this Response as HTML (must return XHTML compliant string)
+      - __unicode__         : unicode representation of this Response
 
     Each response type may also specify the following attributes:
 
@@ -114,8 +115,29 @@ class GenericResponse(object):
         if self.max_inputfields==1:
             self.answer_id = self.answer_ids[0]		# for convenience
 
+        self.default_answer_map = {}			# dict for default answer map (provided in input elements)
+        for entry in self.inputfields:
+            answer = entry.get('correct_answer')        
+            if answer:
+                self.default_answer_map[entry.get('id')] = contextualize_text(answer, self.context)
+
         if hasattr(self,'setup_response'):
             self.setup_response()
+
+    def render_html(self,renderer):
+        '''
+        Return XHTML Element tree representation of this Response.
+
+        Arguments:
+
+          - renderer : procedure which produces HTML given an ElementTree
+        '''
+        tree = etree.Element('span')			# render ourself as a <span> + our content
+        for item in self.xml:
+            item_xhtml = renderer(item)			# call provided procedure to do the rendering
+            if item_xhtml is not None: tree.append(item_xhtml)
+        tree.tail = self.xml.tail
+        return tree
 
     @abc.abstractmethod
     def get_score(self, student_answers):
@@ -132,7 +154,6 @@ class GenericResponse(object):
         '''
         pass
 
-    #not an abstract method because plenty of responses will not want to preprocess anything, and we should not require that they override this method.
     def setup_response(self):
         pass
 
@@ -485,17 +506,17 @@ def sympy_check2():
         '''
         Give correct answer expected for this response.
 
-        capa_problem handles correct_answers from entry objects like textline, and that
-        is what should be used when this response has multiple entry objects.
+        use default_answer_map from entry elements (eg textline),
+        when this response has multiple entry objects.
 
         but for simplicity, if an "expect" attribute was given by the content author
-        ie <customresponse expect="foo" ...> then return it now.
+        ie <customresponse expect="foo" ...> then that.
         '''
         if len(self.answer_ids)>1:
-            return {}
+            return self.default_answer_map
         if self.expect:
             return {self.answer_ids[0] : self.expect}
-        return {}
+        return self.default_answer_map
 
 #-----------------------------------------------------------------------------
 
@@ -797,9 +818,8 @@ class SchematicResponse(GenericResponse):
         return  zip(sorted(self.answer_ids), self.context['correct'])
 
     def get_answers(self):
-        # Since this is explicitly specified in the problem, this will 
-        # be handled by capa_problem
-        return {}
+        # use answers provided in input elements
+        return self.default_answer_map
 
 #-----------------------------------------------------------------------------
 

@@ -33,26 +33,17 @@ def get_input_xml_tags():
 
 class SimpleInput():# XModule
     ''' Type for simple inputs -- plain HTML with a form element
+
     State is a dictionary with optional keys: 
     * Value
     * ID
     * Status (answered, unanswered, unsubmitted)
     * Feedback (dictionary containing keys for hints, errors, or other 
       feedback from previous attempt)
+
     '''
 
     xml_tags = {} ## Maps tags to functions
-    
-    @classmethod
-    def get_xml_tags(c):
-        return c.xml_tags.keys()
-
-    @classmethod
-    def get_uses(c):
-        return ['capa_input', 'capa_transform']
-
-    def get_html(self):
-        return self.xml_tags[self.tag](self.xml, self.value, self.status, self.system.render_template, self.msg)
 
     def __init__(self, system, xml, item_id = None, track_url=None, state=None, use = 'capa_input'):
         self.xml = xml
@@ -83,49 +74,16 @@ class SimpleInput():# XModule
         if 'status' in state:
             self.status = state['status']
 
-## TODO
-# class SimpleTransform():
-#     ''' Type for simple XML to HTML transforms. Examples:
-#     * Math tags, which go from LON-CAPA-style m-tags to MathJAX
-#     '''
-#     xml_tags = {} ## Maps tags to functions
-    
-#     @classmethod
-#     def get_xml_tags(c):
-#         return c.xml_tags.keys()
+    @classmethod
+    def get_xml_tags(c):
+        return c.xml_tags.keys()
 
-#     @classmethod
-#     def get_uses(c):
-#         return ['capa_transform']
+    @classmethod
+    def get_uses(c):
+        return ['capa_input', 'capa_transform']
 
-#     def get_html(self):
-#         return self.xml_tags[self.tag](self.xml, self.value, self.status, self.msg)
-
-#     def __init__(self, system, xml, item_id = None, track_url=None, state=None, use = 'capa_input'):
-#         self.xml = xml
-#         self.tag = xml.tag
-#         if not state:
-#             state = {}
-#         if item_id:
-#             self.id = item_id
-#         if xml.get('id'):
-#             self.id = xml.get('id')
-#         if 'id' in state:
-#             self.id = state['id']
-#         self.system = system
-
-#         self.value = ''
-#         if 'value' in state:
-#             self.value = state['value']
-
-#         self.msg = ''
-#         if 'feedback' in state and 'message' in state['feedback']:
-#             self.msg = state['feedback']['message']
-
-#         self.status = 'unanswered'
-#         if 'status' in state:
-#             self.status = state['status']
-
+    def get_html(self):
+        return self.xml_tags[self.tag](self.xml, self.value, self.status, self.system.render_template, self.msg)
 
 def register_render_function(fn, names=None, cls=SimpleInput):
     if names is None:
@@ -135,9 +93,6 @@ def register_render_function(fn, names=None, cls=SimpleInput):
     def wrapped():
         return fn
     return wrapped
-
-
-
 
 #-----------------------------------------------------------------------------
 
@@ -201,16 +156,16 @@ def choicegroup(element, value, status, render_template, msg=''):
     return etree.XML(html)
 
 @register_render_function
-def textline(element, value, state, render_template, msg=""):
+def textline(element, value, status, render_template, msg=""):
     '''
     Simple text line input, with optional size specification.
     '''
     if element.get('math') or element.get('dojs'):		# 'dojs' flag is temporary, for backwards compatibility with 8.02x
-        return SimpleInput.xml_tags['textline_dynamath'](element,value,state,render_template,msg)
+        return SimpleInput.xml_tags['textline_dynamath'](element,value,status,render_template,msg)
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
-    context = {'id':eid, 'value':value, 'state':state, 'count':count, 'size': size, 'msg': msg}
+    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg': msg}
     html = render_template("textinput.html", context)
     return etree.XML(html)
 
