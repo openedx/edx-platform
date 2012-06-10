@@ -23,7 +23,6 @@ import scipy
 import struct
 
 from lxml import etree
-from lxml.etree import Element
 from xml.sax.saxutils import unescape
 
 from util import contextualize_text
@@ -36,6 +35,7 @@ import eia
 
 log = logging.getLogger(__name__)
 
+# dict of tagname, Response Class -- this should come from auto-registering
 response_types = {'numericalresponse': NumericalResponse,
                   'formularesponse': FormulaResponse,
                   'customresponse': CustomResponse,
@@ -47,20 +47,13 @@ response_types = {'numericalresponse': NumericalResponse,
                   'optionresponse': OptionResponse,
                   'symbolicresponse': SymbolicResponse,
                   }
-entry_types = ['textline', 'schematic', 'choicegroup', 'textbox', 'imageinput', 'optioninput']
-solution_types = ['solution']    # extra things displayed after "show answers" is pressed
-response_properties = ["responseparam", "answer"]    # these get captured as student responses
 
-# How to convert from original XML to HTML
-# We should do this with xlst later
+entry_types = ['textline', 'schematic', 'choicegroup', 'textbox', 'imageinput', 'optioninput']
+solution_types = ['solution']    			# extra things displayed after "show answers" is pressed
+response_properties = ["responseparam", "answer"]    	# these get captured as student responses
+
+# special problem tags which should be turned into innocuous HTML
 html_transforms = {'problem': {'tag': 'div'},
-                   "numericalresponse": {'tag': 'span'},
-                   "customresponse": {'tag': 'span'},
-                   "externalresponse": {'tag': 'span'},
-                   "schematicresponse": {'tag': 'span'},
-                   "formularesponse": {'tag': 'span'},
-                   "symbolicresponse": {'tag': 'span'},
-                   "multiplechoiceresponse": {'tag': 'span'},
                    "text": {'tag': 'span'},
                    "math": {'tag': 'span'},
                    }
@@ -74,18 +67,6 @@ global_context = {'random': random,
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["responseparam", "answer", "script"]
-# These should be removed from HTML output, but keeping subelements
-html_skip = ["numericalresponse", "customresponse", "schematicresponse", "formularesponse", "text", "externalresponse", 'symbolicresponse']
-
-# removed in MC
-## These should be transformed
-#html_special_response = {"textline":inputtypes.textline.render,
-#                         "schematic":inputtypes.schematic.render,
-#                         "textbox":inputtypes.textbox.render,
-#                         "formulainput":inputtypes.jstextline.render,
-#                         "solution":inputtypes.solution.render,
-#                         }
-
 
 class LoncapaProblem(object):
     '''
@@ -142,7 +123,8 @@ class LoncapaProblem(object):
         self.context = self.extract_context(self.tree, seed=self.seed)
 
         # pre-parse the XML tree: modifies it to add ID's and perform some in-place transformations
-        # this also creates the list (self.responders) of Response instances for each question in the problem
+        # this also creates the dict (self.responders) of Response instances for each question in the problem.
+        # the dict has keys = xml subtree of Response, values = Response instance
         self.preprocess_problem(self.tree, correct_map=self.correct_map, answer_map=self.student_answers)
 
     def __unicode__(self):
@@ -166,7 +148,7 @@ class LoncapaProblem(object):
         used to give complex problems (eg programming questions) multiple points.
         '''
         maxscore = 0
-        for responder in self.responders:
+        for responder in self.responders.values():
             if hasattr(responder,'get_max_score'):
                 try:
                     maxscore += responder.get_max_score()
@@ -182,6 +164,10 @@ class LoncapaProblem(object):
         return maxscore
 
     def get_score(self):
+        '''
+        Compute score for this problem.  The score is the number of points awarded.
+        Returns an integer, from 0 to get_max_score().
+        '''
         correct = 0
         for key in self.correct_map:
             if self.correct_map[key] == u'correct':
@@ -206,7 +192,7 @@ class LoncapaProblem(object):
         self.student_answers = answers
         self.correct_map = dict()
         log.info('%s: in grade_answers, answers=%s' % (self,answers))
-        for responder in self.responders:
+        for responder in self.responders.values():
             results = responder.get_score(answers)        # call the responsetype instance to do the actual grading
             self.correct_map.update(results)
         return self.correct_map
@@ -218,24 +204,14 @@ class LoncapaProblem(object):
         (see capa_module)
         """
         answer_map = dict()
-        for responder in self.responders:
+        for responder in self.responders.values():
             results = responder.get_answers()
             answer_map.update(results)                # dict of (id,correct_answer)
 
-        # This should be handled in each responsetype, not here.
-        # example for the following: <textline size="5" correct_answer="saturated" />
-        for responder in self.responders:
-            for entry in responder.inputfields:
-                answer = entry.get('correct_answer')        # correct answer, when specified elsewhere, eg in a textline
-                if answer:
-                    answer_map[entry.get('id')] = contextualize_text(answer, self.context)
-
         # include solutions from <solution>...</solution> stanzas
-        # Tentative merge; we should figure out how we want to handle hints and solutions
         for entry in self.tree.xpath("//" + "|//".join(solution_types)):
             answer = etree.tostring(entry)
-            if answer:
-                answer_map[entry.get('id')] = answer
+            if answer: answer_map[entry.get('id')] = answer
 
         return answer_map
 
@@ -244,7 +220,7 @@ class LoncapaProblem(object):
         the dicts returned by grade_answers and get_question_answers. (Though
         get_question_answers may only return a subset of these."""
         answer_ids = []
-        for responder in self.responders:
+        for responder in self.responders.values():
             answer_ids.append(responder.get_answers().keys())
         return answer_ids
 
@@ -252,7 +228,7 @@ class LoncapaProblem(object):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        return contextualize_text(etree.tostring(self.extract_html(self.tree)[0]), self.context)
+        return contextualize_text(etree.tostring(self.extract_html(self.tree)), self.context)
 
     # ======= Private ========
     def extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
@@ -264,12 +240,11 @@ class LoncapaProblem(object):
         Problem XML goes to Python execution context. Runs everything in script tags
         '''
         random.seed(self.seed)
-        context = {'global_context': global_context}    # save global context in here also
-        context.update(global_context)            # initialize context to have stuff in global_context
-        context['__builtins__'] = globals()['__builtins__']    # put globals there also
-        context['the_lcp'] = self                # pass instance of LoncapaProblem in
+        context = {'global_context': global_context}    	# save global context in here also
+        context.update(global_context)            		# initialize context to have stuff in global_context
+        context['__builtins__'] = globals()['__builtins__']    	# put globals there also
+        context['the_lcp'] = self                		# pass instance of LoncapaProblem in
 
-        #for script in tree.xpath('/problem/script'):
         for script in tree.findall('.//script'):
             stype = script.get('type')
             if stype:
@@ -288,15 +263,19 @@ class LoncapaProblem(object):
         return context
 
     def extract_html(self, problemtree):  # private
-        ''' Helper function for get_html. Recursively converts XML tree to HTML
+        '''
+        Main (private) function which converts Problem XML tree to HTML.
+        Calls itself recursively.
+
+        Returns Element tree of XHTML representation of problemtree.
+        Calls render_html of Response instances to render responses into XHTML.
+
+        Used by get_html.
         '''
         if problemtree.tag in html_problem_semantics:
             return
 
         problemid = problemtree.get('id')    # my ID
-
-        # used to be
-        # if problemtree.tag in html_special_response:
 
         if problemtree.tag in inputtypes.get_input_xml_tags():
             # status is currently the answer for the problem ID for the input element,
@@ -334,31 +313,25 @@ class LoncapaProblem(object):
                                                    use='capa_input')
             return render_object.get_html()  # function(problemtree, value, status, msg) # render the special response (textline, schematic,...)
 
-        tree = Element(problemtree.tag)
+        if problemtree in self.responders:		# let each Response render itself
+            return self.responders[problemtree].render_html(self.extract_html)
+
+        tree = etree.Element(problemtree.tag)
         for item in problemtree:
-            subitems = self.extract_html(item)
-            if subitems is not None:
-                for subitem in subitems:
-                    tree.append(subitem)
-        for (key, value) in problemtree.items():
-            tree.set(key, value)
+            item_xhtml = self.extract_html(item)		# nothing special: recurse
+            if item_xhtml is not None:
+                    tree.append(item_xhtml)
+
+        if tree.tag in html_transforms:
+            tree.tag = html_transforms[problemtree.tag]['tag']
+        else:
+            for (key, value) in problemtree.items():	# copy attributes over if not innocufying
+                tree.set(key, value)
 
         tree.text = problemtree.text
         tree.tail = problemtree.tail
 
-        if problemtree.tag in html_transforms:
-            tree.tag = html_transforms[problemtree.tag]['tag']
-            # Reset attributes. Otherwise, we get metadata in HTML
-            # (e.g. answers)
-            # TODO: We should remove and not zero them.
-            # I'm not sure how to do that quickly with lxml
-            for k in tree.keys():
-                tree.set(k, "")
-
-        # TODO: Fix. This loses Element().tail
-        #if problemtree.tag in html_skip:
-        #    return tree
-        return [tree]
+        return tree
 
     def preprocess_problem(self, tree, correct_map=dict(), answer_map=dict()):  # private
         '''
@@ -370,7 +343,7 @@ class LoncapaProblem(object):
         Also create capa Response instances for each responsetype and save as self.responders
         '''
         response_id = 1
-	self.responders = []
+	self.responders = {}
         for response in tree.xpath('//' + "|//".join(response_types)):
             response_id_str = self.problem_id + "_" + str(response_id)
             response.attrib['id'] = response_id_str				# create and save ID for this response
@@ -389,7 +362,7 @@ class LoncapaProblem(object):
                 answer_id = answer_id + 1
 
             responder = response_types[response.tag](response, inputfields, self.context, self.system)	# instantiate capa Response
-	    self.responders.append(responder)				# save in list in self
+	    self.responders[response] = responder				# save in list in self
 
         # <solution>...</solution> may not be associated with any specific response; give IDs for those separately
         # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
