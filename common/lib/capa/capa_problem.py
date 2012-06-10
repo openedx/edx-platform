@@ -25,15 +25,14 @@ import struct
 from lxml import etree
 from xml.sax.saxutils import unescape
 
-from util import contextualize_text
-import inputtypes
-
-from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse
-
 import calc
+from correctmap import CorrectMap
 import eia
+import inputtypes
+from util import contextualize_text
 
-log = logging.getLogger(__name__)
+# to be replaced with auto-registering
+from responsetypes import NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse
 
 # dict of tagname, Response Class -- this should come from auto-registering
 response_types = {'numericalresponse': NumericalResponse,
@@ -68,6 +67,12 @@ global_context = {'random': random,
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["responseparam", "answer", "script"]
 
+#log = logging.getLogger(__name__)
+log = logging.getLogger('mitx.common.lib.capa.capa_problem')
+
+#-----------------------------------------------------------------------------
+# main class for this module
+
 class LoncapaProblem(object):
     '''
     Main class for capa Problems.
@@ -89,9 +94,7 @@ class LoncapaProblem(object):
         '''
 
         ## Initialize class variables from state
-        self.student_answers = dict()
-        self.correct_map = dict()
-        self.done = False
+        self.do_reset()
         self.problem_id = id
         self.system = system
         self.seed = seed
@@ -102,7 +105,7 @@ class LoncapaProblem(object):
             if 'student_answers' in state:
                 self.student_answers = state['student_answers']
             if 'correct_map' in state:
-                self.correct_map = state['correct_map']
+                self.correct_map.set_dict(state['correct_map'])
             if 'done' in state:
                 self.done = state['done']
 
@@ -125,7 +128,15 @@ class LoncapaProblem(object):
         # pre-parse the XML tree: modifies it to add ID's and perform some in-place transformations
         # this also creates the dict (self.responders) of Response instances for each question in the problem.
         # the dict has keys = xml subtree of Response, values = Response instance
-        self.preprocess_problem(self.tree, correct_map=self.correct_map, answer_map=self.student_answers)
+        self.preprocess_problem(self.tree, answer_map=self.student_answers)
+
+    def do_reset(self):
+        '''
+        Reset internal state to unfinished, with no answers
+        '''
+        self.student_answers = dict()
+        self.correct_map = CorrectMap()
+        self.done = False
 
     def __unicode__(self):
         return u"LoncapaProblem ({0})".format(self.fileobject)
@@ -134,9 +145,10 @@ class LoncapaProblem(object):
         ''' Stored per-user session data neeeded to:
             1) Recreate the problem
             2) Populate any student answers. '''
+
         return {'seed': self.seed,
                 'student_answers': self.student_answers,
-                'correct_map': self.correct_map,
+                'correct_map': self.correct_map.get_dict(),
                 'done': self.done}
 
     def get_max_score(self):
@@ -170,8 +182,12 @@ class LoncapaProblem(object):
         '''
         correct = 0
         for key in self.correct_map:
-            if self.correct_map[key] == u'correct':
-                correct += 1
+            try:
+                correct += self.correct_map.get_npoints(key)
+            except Exception,err:
+                log.error('key=%s, correct_map = %s' % (key,self.correct_map))
+                raise
+
         if (not self.student_answers) or len(self.student_answers) == 0:
             return {'score': 0,
                     'total': self.get_max_score()}
@@ -190,12 +206,14 @@ class LoncapaProblem(object):
         Calles the Response for each question in this problem, to do the actual grading.
         '''
         self.student_answers = answers
-        self.correct_map = dict()
-        log.info('%s: in grade_answers, answers=%s' % (self,answers))
+        oldcmap = self.correct_map				# old CorrectMap
+        newcmap = CorrectMap()					# start new with empty CorrectMap
         for responder in self.responders.values():
-            results = responder.get_score(answers)        # call the responsetype instance to do the actual grading
-            self.correct_map.update(results)
-        return self.correct_map
+            results = responder.get_score(answers,oldcmap)      # call the responsetype instance to do the actual grading
+            newcmap.update(results)
+        self.correct_map = newcmap
+        log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
+        return newcmap
 
     def get_question_answers(self):
         """Returns a dict of answer_ids to answer values. If we cannot generate
@@ -282,27 +300,17 @@ class LoncapaProblem(object):
             # but it will turn into a dict containing both the answer and any associated message
             # for the problem ID for the input element.
             status = "unsubmitted"
+            msg = ''
             if problemid in self.correct_map:
-                status = self.correct_map[problemtree.get('id')]
+                pid = problemtree.get('id')
+                status = self.correct_map.get_correctness(pid)
+                msg = self.correct_map.get_msg(pid)
 
             value = ""
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
 
-            #### This code is a hack. It was merged to help bring two branches
-            #### in sync, but should be replaced. msg should be passed in a
-            #### response_type
-            # prepare the response message, if it exists in correct_map
-            if 'msg' in self.correct_map:
-                msg = self.correct_map['msg']
-            elif ('msg_%s' % problemid) in self.correct_map:
-                msg = self.correct_map['msg_%s' % problemid]
-            else:
-                msg = ''
-
             # do the rendering
-            # This should be broken out into a helper function
-            # that handles all input objects
             render_object = inputtypes.SimpleInput(system=self.system,
                                                    xml=problemtree,
                                                    state={'value': value,
@@ -333,7 +341,7 @@ class LoncapaProblem(object):
 
         return tree
 
-    def preprocess_problem(self, tree, correct_map=dict(), answer_map=dict()):  # private
+    def preprocess_problem(self, tree, answer_map=dict()):  # private
         '''
         Assign IDs to all the responses
         Assign sub-IDs to all entries (textline, schematic, etc.)
@@ -346,11 +354,8 @@ class LoncapaProblem(object):
 	self.responders = {}
         for response in tree.xpath('//' + "|//".join(response_types)):
             response_id_str = self.problem_id + "_" + str(response_id)
-            response.attrib['id'] = response_id_str				# create and save ID for this response
-
-            # if response_id not in correct_map: correct = 'unsubmitted'	# unused - to be removed
-            # response.attrib['state'] = correct
-            response_id += response_id
+            response.set('id',response_id_str)				# create and save ID for this response
+            response_id += 1
 
             answer_id = 1
             inputfields = tree.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x for x in (entry_types + solution_types)]),
