@@ -200,12 +200,12 @@ class LoncapaProblem(object):
         self.student_answers = answers
         oldcmap = self.correct_map				# old CorrectMap
         newcmap = CorrectMap()					# start new with empty CorrectMap
-        log.debug('Responders: %s' % self.responders)
+        # log.debug('Responders: %s' % self.responders)
         for responder in self.responders.values():
             results = responder.evaluate_answers(answers,oldcmap)      # call the responsetype instance to do the actual grading
             newcmap.update(results)
         self.correct_map = newcmap
-        log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
+        # log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
         return newcmap
 
     def get_question_answers(self):
