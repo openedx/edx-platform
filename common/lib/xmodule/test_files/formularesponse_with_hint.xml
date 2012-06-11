@@ -1,6 +1,6 @@
 <problem>
 <script type="loncapa/python">
-from loncapa import *
+# from loncapa import *
 x1 = 4 # lc_random(2,4,1)
 y1 = 5 # lc_random(3,7,1)
 
