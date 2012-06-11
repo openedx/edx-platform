@@ -8,6 +8,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
@@ -21,6 +22,7 @@ from mako import exceptions
 
 from django_future.csrf import ensure_csrf_cookie
 
+from student.survey_questions import exit_survey_list_for_student
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange
 
 log = logging.getLogger("mitx.student")
@@ -456,3 +458,67 @@ def accept_name_change(request):
     pnc.delete()
 
     return HttpResponse(json.dumps({'success':True})) 
+    
+    
+    
+@login_required
+def record_exit_survey(request, internal_request = False):
+    if not settings.END_COURSE_ENABLED:
+        raise Http404 
+    
+    if request.method == "POST":
+        # If internal_request = True, this is a survey that was submitted with another form
+        # We will record it and return the results as a dictionary, instead of a json HttpResponse
+        def returnResults(return_data):
+            if internal_request:
+                return return_data
+            else:
+                return HttpResponse(json.dumps(return_data))
+        
+        if 'survey_results' not in request.POST:
+            if internal_request:
+                return returnResults({'success':True})
+            else:
+                return returnResults({'success':False, 'error':'There was a problem receiving your survey response.'}) 
+    
+        response = json.loads(request.POST['survey_results'])
+        
+        up = UserProfile.objects.get(user=request.user)
+    
+        meta = up.get_meta()
+        if '6002x_exit_response' in meta:
+            # Once we got a response, we don't show them the survey form again, so this is a really odd case anyway
+            log.warning("Received an extra survey response. " + request.POST['survey_results'])
+            return returnResults({'success':True})
+            
+        else:
+            if internal_request and all( value == None or value == [''] for value in response.values() ):
+                # If all values are empty, then the student didn't answer any questions.
+                # In the case of this being an internal request, we don't mark the survey as taken
+                return returnResults({'success':True})
+            
+            meta['6002x_exit_response'] = response
+            up.set_meta(meta)
+            up.save()
+            return returnResults({'success':True})
+    
+    else:
+        user_info = UserProfile.objects.get(user=request.user)
+        
+        took_survey = student_took_survey(user_info)
+        if settings.DEBUG_SURVEY:
+            took_survey = False
+        survey_list = []
+        if not took_survey:
+            survey_list = exit_survey_list_for_student(request.user)
+        
+        
+        context = {'took_survey' : took_survey,
+                 'survey_list' : survey_list}
+        
+        return render_to_response('exit_survey.html', context)
+    
+def student_took_survey(userprofile):
+    meta = userprofile.get_meta()
+    
+    return '6002x_exit_response' in meta

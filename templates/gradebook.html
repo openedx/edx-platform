@@ -6,10 +6,11 @@
   <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
   
   <style type="text/css">
-  .grade_a {color:green;}
-  .grade_b {color:Chocolate;}
-  .grade_c {color:DimGray;}
-  .grade_none {color:LightGray;}
+  .grade_A {color:green;}
+  .grade_B {color:Chocolate;}
+  .grade_C {color:DarkSlateGray;}
+  .grade_F {color:DimGray;}
+  .grade_None {color:LightGray;}
   </style>
   
 </%block>
@@ -29,27 +30,23 @@
       
       <tr> <!-- Header Row -->
         <th>Student</th>
-        %for section in templateSummary:
-          %if 'subscores' in section:
-            %for subsection in section['subscores']:
-              <th>${subsection['label']}</th>
-            %endfor
-            <th>${section['totallabel']}</th>
-          %else:
-            <th>${section['category']}</th>
-          %endif
+        %for section in templateSummary['section_breakdown']:
+          <th>${section['label']}</th>
         %endfor
+        <th>Total</th>
       </tr>
       
       <%def name="percent_data(percentage)">
         <%
-          data_class = "grade_none"
-          if percentage > .87:
-            data_class = "grade_a"
-          elif percentage > .70:
-            data_class = "grade_b"
-          elif percentage > .6:
-            data_class = "grade_c"
+          letter_grade = 'None'
+          if percentage > 0:
+            letter_grade = 'F'
+            for grade in ['A', 'B', 'C']:
+              if percentage >= grade_cutoffs[grade]:
+                letter_grade = grade
+                break
+          
+          data_class = "grade_" + letter_grade
         %>
         <td class="${data_class}">${ "{0:.0%}".format( percentage ) }</td>
       </%def>
@@ -57,16 +54,10 @@
       %for student in students:
       <tr>
         <td><a href="/profile/${student['id']}/">${student['username']}</a></td>
-        %for section in student['grade_info']['grade_summary']:
-          %if 'subscores' in section:
-            %for subsection in section['subscores']:
-              ${percent_data( subsection['percentage'] )}
-            %endfor
-            ${percent_data( section['totalscore'] )}
-          %else:
-            ${percent_data( section['totalscore'] )}
-          %endif
+        %for section in student['grade_info']['grade_summary']['section_breakdown']:
+          ${percent_data( section['percent'])}
         %endfor
+        <th>${percent_data( student['grade_info']['grade_summary']['percent'])}</th>
       </tr>
       %endfor
     </table>

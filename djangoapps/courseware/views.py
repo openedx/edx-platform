@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import random
@@ -17,12 +16,16 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import connection
 from django.views.decorators.cache import cache_control
+from django_future.csrf import ensure_csrf_cookie
 
 from lxml import etree
 
+from courseware import course_settings
 from module_render import render_module, modx_dispatch
+from certificates.models import GeneratedCertificate, certificate_state_for_student
 from models import StudentModule
 from student.models import UserProfile
+from student.views import student_took_survey
 
 import courseware.content_parser as content_parser
 import courseware.modules.capa_module
@@ -45,10 +48,13 @@ def gradebook(request):
                      'id' : s.id,
                      'email': s.email,
                      'grade_info' : grades.grade_sheet(s), 
-                     'realname' : UserProfile.objects.get(user = s).name
+                     'realname' : UserProfile.objects.get(user = s).name,
                      } for s in student_objects]
 
-    return render_to_response('gradebook.html',{'students':student_info})
+    return render_to_response('gradebook.html',
+        {'students':student_info,
+        'grade_cutoffs' : course_settings.GRADE_CUTOFFS,}
+    )
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile(request, student_id = None):
@@ -66,16 +72,30 @@ def profile(request, student_id = None):
         student = User.objects.get( id = int(student_id))
 
     user_info = UserProfile.objects.get(user=student) # request.user.profile_cache # 
-
+    
+    grade_sheet = grades.grade_sheet(student)
+    
     context={'name':user_info.name,
              'username':student.username,
              'location':user_info.location,
              'language':user_info.language,
              'email':student.email,
              'format_url_params' : content_parser.format_url_params,
-             'csrf':csrf(request)['csrf_token']
+             'csrf':csrf(request)['csrf_token'],
+             'grade_cutoffs' : course_settings.GRADE_CUTOFFS,
+             'grade_sheet' : grade_sheet,
              }
-    context.update(grades.grade_sheet(student))
+    
+    
+    if settings.END_COURSE_ENABLED:
+        took_survey = student_took_survey(user_info)
+        if settings.DEBUG_SURVEY:
+            took_survey = False
+        
+        certificate_state = certificate_state_for_student(student, grade_sheet['grade'])
+            
+        context.update({'certificate_state' : certificate_state,
+                 'took_survey' : took_survey})
 
     return render_to_response('profile.html', context)
 
