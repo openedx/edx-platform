@@ -9,7 +9,6 @@ class @Sequence
     $(selector, @element)
 
   bind: ->
-    @element.bind 'contentChanged', @toggleArrows
     @$('#sequence-list a').click @goto
 
   buildNavigation: ->
@@ -43,6 +42,7 @@ class @Sequence
 
       MathJax.Hub.Queue(["Typeset", MathJax.Hub])
       @position = new_position
+      @toggleArrows()
       @element.trigger 'contentChanged'
 
   goto: (event) =>
