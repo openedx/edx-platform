@@ -44,9 +44,9 @@ def check_problem_code(ans,the_lcp,correct_answers,false_answers):
         fp = the_lcp.system.filestore.open('problems/%s.xml' % pfn)
         test_lcp = lcp.LoncapaProblem(fp, '1', system=the_lcp.system)
     
-        if not (test_lcp.grade_answers(correct_answers)['1_2_1']=='correct'):
+        if not (test_lcp.grade_answers(correct_answers).get_correctness('1_2_1')=='correct'):
             is_ok = False
-        if (test_lcp.grade_answers(false_answers)['1_2_1']=='correct'):
+        if (test_lcp.grade_answers(false_answers).get_correctness('1_2_1')=='correct'):
             is_ok = False
     except Exception,err:
         is_ok = False
