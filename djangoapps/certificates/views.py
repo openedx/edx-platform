@@ -94,7 +94,7 @@ def certificate_request(request):
 def generate_certificate(user, grade):
     # Make sure to see the comments in models.GeneratedCertificate to read about the valid
     # states for a GeneratedCertificate object
-    if grade:
+    if grade and user.is_active:
         generated_certificate = None
     
         try:
@@ -130,4 +130,4 @@ def generate_certificate(user, grade):
             res=send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email,])
         
     else:
-        log.warning("Asked to generate a certificate for student " + str(user.username) + " but without a grade.")
+        log.warning("Asked to generate a certificate for student " + str(user.username) + " but with a grade of " + str(grade) + " and active status " + str(user.is_active))
