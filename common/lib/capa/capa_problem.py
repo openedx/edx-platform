@@ -224,6 +224,7 @@ class LoncapaProblem(object):
             answer = etree.tostring(entry)
             if answer: answer_map[entry.get('id')] = answer
 
+        log.debug('answer_map = %s' % answer_map)
         return answer_map
 
     def get_answer_ids(self):
