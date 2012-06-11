@@ -176,15 +176,16 @@ exit_survey_questions = {
             'No calculus',
         ]},
         
-        {'type' : 'select_many',
+        {'type' : 'radio',
         'question_name' : 'why_course',
-        'label' : 'Why did you take this course? (Check all that apply.)',
+        'label' : 'What is your <b>primary</b> motivation for taking 6.002x?',
         'choices' : [
-            'Interest in topic',
-            'Preparation for advanced standing exam',
-            'Review of EE concepts',
+            'The entertainment value of the course',
+            'The personal challenge',
+            'The knowledge and skills gained as a result from taking the course',
             'Employment/job advancement opportunities',
-            'To earn the certificate',
+            'Social understanding and friends gained as a result of taking the course',
+            'Preparation for advanced standing exam',
             'Other',
         ]},
         
