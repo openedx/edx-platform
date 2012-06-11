@@ -241,6 +241,21 @@ class OptionResponseTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
 
+class FormulaResponseWithHintTest(unittest.TestCase):
+    '''
+    Test Formula response problem with a hint
+    This problem also uses calc.
+    '''
+    def test_or_grade(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/formularesponse_with_hint.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file), '1', system=i4xs)
+        correct_answers = {'1_2_1':'2.5*x-5.0'}
+        test_answers = {'1_2_1':'0.4*x-5.0'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+        cmap = test_lcp.grade_answers(test_answers)
+        self.assertEquals(cmap.get_correctness('1_2_1'), 'incorrect')
+        self.assertTrue('You have inverted' in cmap.get_hint('1_2_1'))
+
 #-----------------------------------------------------------------------------
 # Grading tests
 
