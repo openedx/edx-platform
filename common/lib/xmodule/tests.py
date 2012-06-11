@@ -256,6 +256,20 @@ class FormulaResponseWithHintTest(unittest.TestCase):
         self.assertEquals(cmap.get_correctness('1_2_1'), 'incorrect')
         self.assertTrue('You have inverted' in cmap.get_hint('1_2_1'))
 
+class StringResponseWithHintTest(unittest.TestCase):
+    '''
+    Test String response problem with a hint
+    '''
+    def test_or_grade(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/stringresponse_with_hint.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file), '1', system=i4xs)
+        correct_answers = {'1_2_1':'Michigan'}
+        test_answers = {'1_2_1':'Minnesota'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+        cmap = test_lcp.grade_answers(test_answers)
+        self.assertEquals(cmap.get_correctness('1_2_1'), 'incorrect')
+        self.assertTrue('St. Paul' in cmap.get_hint('1_2_1'))
+
 #-----------------------------------------------------------------------------
 # Grading tests
 
