@@ -15,7 +15,7 @@ from django_future.csrf import ensure_csrf_cookie
 from lxml import etree
 
 from courseware import course_settings
-from module_render import render_module, modx_dispatch, make_track_function
+from module_render import render_module, make_track_function
 from certificates.models import GeneratedCertificate, certificate_state_for_student
 from models import StudentModule
 from student.models import UserProfile
