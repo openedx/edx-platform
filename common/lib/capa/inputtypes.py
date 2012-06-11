@@ -176,6 +176,10 @@ def textline(element, value, status, render_template, msg=""):
     if element.get('math') or element.get('dojs'):		# 'dojs' flag is temporary, for backwards compatibility with 8.02x
         return SimpleInput.xml_tags['textline_dynamath'](element,value,status,render_template,msg)
     eid=element.get('id')
+    if eid is None:
+        msg = 'textline has no id: it probably appears outside of a known response type'
+        msg += "\nSee problem XML source line %s" % getattr(element,'sourceline','<unavailable>')
+        raise Exception(msg)
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg': msg}

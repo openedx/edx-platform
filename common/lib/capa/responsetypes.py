@@ -425,6 +425,42 @@ class NumericalResponse(LoncapaResponse):
 
 #-----------------------------------------------------------------------------
 
+class StringResponse(LoncapaResponse):
+
+    response_tag = 'stringresponse'
+    hint_tag = 'stringhint'
+    allowed_inputfields = ['textline']
+    required_attributes = ['answer']
+    max_inputfields = 1
+
+    def setup_response(self):
+        self.correct_answer = contextualize_text(self.xml.get('answer'), self.context).strip()
+
+    def get_score(self, student_answers):
+        '''Grade a string response '''
+        student_answer = student_answers[self.answer_id].strip()
+        correct = self.check_string(self.correct_answer,student_answer)
+        return CorrectMap(self.answer_id,'correct' if correct else 'incorrect')
+
+    def check_string(self,expected,given):
+        if self.xml.get('type')=='ci': return given.lower() == expected.lower()
+        return given == expected
+
+    def check_hint_condition(self,hxml_set,student_answers):
+        given = student_answers[self.answer_id].strip()
+        hints_to_show = []
+        for hxml in hxml_set:
+            name = hxml.get('name')
+            correct_answer = contextualize_text(hxml.get('answer'),self.context).strip()
+            if self.check_string(correct_answer,given): hints_to_show.append(name)
+        log.debug('hints_to_show = %s' % hints_to_show)
+        return hints_to_show
+
+    def get_answers(self):
+        return {self.answer_id:self.correct_answer}
+
+#-----------------------------------------------------------------------------
+
 class CustomResponse(LoncapaResponse):
     '''
     Custom response.  The python code to be run should be in <answer>...</answer>
@@ -1028,5 +1064,5 @@ class ImageResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-__all__ = [ NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse ]
+__all__ = [ NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse ]
 
