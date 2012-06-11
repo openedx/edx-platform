@@ -505,7 +505,6 @@ def sympy_check2():
 
     def setup_response(self):
         xml = self.xml
-        context = self.context
 
         # if <customresponse> has an "expect" (or "answer") attribute then save that
         self.expect = xml.get('expect') or xml.get('answer')
@@ -560,7 +559,7 @@ def sympy_check2():
             msg = '[courseware.capa.responsetypes.customresponse] error getting student answer from %s' % student_answers
             msg += '\n idset = %s, error = %s' % (idset,err)
             log.error(msg)
-            raise Exception,msg
+            raise Exception(msg)
 
         # global variable in context which holds the Presentation MathML from dynamic math input
         dynamath = [ student_answers.get(k+'_dynamath',None) for k in idset ]	# ordered list of dynamath responses
@@ -623,7 +622,7 @@ def sympy_check2():
                 log.error("oops in customresponse (cfn) error %s" % err)
                 # print "context = ",self.context
                 log.error(traceback.format_exc())
-                raise Exception,"oops in customresponse (cfn) error %s" % err
+                raise Exception("oops in customresponse (cfn) error %s" % err)
             log.debug("[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
             if type(ret)==dict:
                 correct = ['correct']*len(idset) if ret['ok'] else ['incorrect']*len(idset)
@@ -777,19 +776,19 @@ main()
         except Exception,err:
             msg = 'Error %s - cannot connect to external server url=%s' % (err,self.url)
             log.error(msg)
-            raise Exception, msg
+            raise Exception(msg)
 
         if self.system.DEBUG: log.info('response = %s' % r.text)
 
         if (not r.text ) or (not r.text.strip()):
-            raise Exception,'Error: no response from external server url=%s' % self.url
+            raise Exception('Error: no response from external server url=%s' % self.url)
 
         try:
             rxml = etree.fromstring(r.text)         # response is XML; prase it
         except Exception,err:
             msg = 'Error %s - cannot parse response from external server r.text=%s' % (err,r.text)
             log.error(msg)
-            raise Exception, msg
+            raise Exception(msg)
 
         return rxml
 
@@ -800,7 +799,7 @@ main()
             submission = [student_answers[k] for k in idset]
         except Exception,err:
             log.error('Error %s: cannot get student answer for %s; student_answers=%s' % (err,self.answer_ids,student_answers))
-            raise Exception,err
+            raise Exception(err)
 
         self.context.update({'submission':submission})
 
@@ -817,7 +816,7 @@ main()
 
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
-        	 'WRONG_FORMAT': 'incorrect',
+                 'WRONG_FORMAT': 'incorrect',
                  }
         self.context['correct'] = ['correct']
         if ad in admap:
@@ -847,7 +846,7 @@ main()
             
         if not (len(exans)==len(self.answer_ids)):
             log.error('Expected %d answers from external server, only got %d!' % (len(self.answer_ids),len(exans)))
-            raise Exception,'Short response from external server'
+            raise Exception('Short response from external server')
         return dict(zip(self.answer_ids,exans))
 
 
@@ -964,7 +963,7 @@ class FormulaResponse(LoncapaResponse):
             correct_answer = contextualize_text(hxml.get('answer'),self.context)
             try:
                 correctness = self.check_formula(correct_answer, given, samples)
-            except Exception,err:
+            except Exception:
                 correctness = 'incorrect'
             if correctness=='correct':
                 hints_to_show.append(name)
@@ -1041,13 +1040,13 @@ class ImageResponse(LoncapaResponse):
             if not m:
                 msg = 'Error in problem specification! cannot parse rectangle in %s' % (etree.tostring(self.ielements[aid],
                                                                                                        pretty_print=True))
-                raise Exception,'[capamodule.capa.responsetypes.imageinput] '+msg
+                raise Exception('[capamodule.capa.responsetypes.imageinput] '+msg)
             (llx,lly,urx,ury) = [int(x) for x in m.groups()]
                 
             # parse given answer
             m = re.match('\[([0-9]+),([0-9]+)]',given.strip().replace(' ',''))
             if not m:
-                raise Exception,'[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (aid,given)
+                raise Exception('[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (aid,given))
             (gx,gy) = [int(x) for x in m.groups()]
             
             # answer is correct if (x,y) is within the specified rectangle

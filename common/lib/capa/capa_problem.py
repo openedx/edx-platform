@@ -14,7 +14,6 @@ This is used by capa_module.
 
 from __future__ import division
 
-import copy
 import logging
 import math
 import numpy
@@ -156,7 +155,7 @@ class LoncapaProblem(object):
             if hasattr(responder,'get_max_score'):
                 try:
                     maxscore += responder.get_max_score()
-                except Exception, err:
+                except Exception:
                     log.error('responder %s failed to properly return from get_max_score()' % responder)
                     raise
             else:
@@ -176,7 +175,7 @@ class LoncapaProblem(object):
         for key in self.correct_map:
             try:
                 correct += self.correct_map.get_npoints(key)
-            except Exception,err:
+            except Exception:
                 log.error('key=%s, correct_map = %s' % (key,self.correct_map))
                 raise
 
