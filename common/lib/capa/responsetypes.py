@@ -960,7 +960,8 @@ class SchematicResponse(LoncapaResponse):
         self.context.update({'submission':submission})
         exec self.code in global_context, self.context
         cmap = CorrectMap()
-        return  cmap.set_dict(zip(sorted(self.answer_ids), self.context['correct']))
+        cmap.set_dict(dict(zip(sorted(self.answer_ids), self.context['correct'])))
+        return cmap
 
     def get_answers(self):
         # use answers provided in input elements
