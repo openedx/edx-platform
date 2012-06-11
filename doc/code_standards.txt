@@ -2,7 +2,8 @@ Coding Standards
 
 Scope
 
-This document describes code quality standards for the i4x system. Code falls into four categories: 
+This document describes code quality standards for the i4x
+system. Code falls into four categories:
 
 * Deployed. Running on a live server. 
 * Production. Intended for deployment. 
@@ -22,7 +23,8 @@ deploying.
 
 Production
 
-All production code must be peer-reviewed. The code must meet the following standards: 
+All production code must be peer-reviewed. The code must meet the
+following standards:
 
 1) Test Suite. Code must have reasonable, although not complete, test
    coverage.
@@ -34,7 +36,7 @@ All production code must be peer-reviewed. The code must meet the following stan
 6) Maintainability/Deployability
 7) Robust. 
 
-All code paths must be manually or automatically verfied. 
+All code paths must be manually or automatically verified. 
 
 Scaffolding
 
@@ -45,7 +47,7 @@ following standards:
    code to be structured such that it is possible to build tests.
 2) Consistency. Code must follow PEP8
 3) Clean abstractions or obvious throw-away code. One of the goals 
-   of scaffolding is to define proper abstrations. 
+   of scaffolding is to define proper abstractions. 
 4) Future Compatibility. Code must not be incompatible with the
    long-term vision of either the codebase or of edX. 
 5) Somewhat documented
@@ -54,6 +56,6 @@ following standards:
 
 Prototype
 
-Prototype code should live in a seperate branch. It should strive
+Prototype code should live in a separate branch. It should strive
 to follow PEP8, be readable, testable, and future-proof, but we have
 no hard standards. 
