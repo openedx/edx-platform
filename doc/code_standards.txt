@@ -1,0 +1,59 @@
+Coding Standards
+
+Scope
+
+This document describes code quality standards for the i4x system. Code falls into four categories: 
+
+* Deployed. Running on a live server. 
+* Production. Intended for deployment. 
+* Scaffolding. Intended to define interfaces for future work, and
+  minimal implementations to support further development. 
+* Prototype. Experimental new features. 
+
+Deployed
+
+The standards for deployed code are identical to production. In
+general, we tend to do either:
+
+1) Perform a final verification QA cycle on changed parts of code
+before deploying.
+2) Use code on a staging or internal server for a week before
+deploying.
+
+Production
+
+All production code must be peer-reviewed. The code must meet the following standards: 
+
+1) Test Suite. Code must have reasonable, although not complete, test
+   coverage.
+2) Consistency. Code must follow PEP8
+3) Clean Abstractions. 
+4) Future Compatibility. Code must not be incompatible with the
+   long-term vision of either the codebase or of edX. 
+5) Properly Documented
+6) Maintainability/Deployability
+7) Robust. 
+
+All code paths must be manually or automatically verfied. 
+
+Scaffolding
+
+All scaffolding code should be peer-reviewed. The code must meet the
+following standards:
+
+1) Testable. We do not require test coverage, but we do require the
+   code to be structured such that it is possible to build tests.
+2) Consistency. Code must follow PEP8
+3) Clean abstractions or obvious throw-away code. One of the goals 
+   of scaffolding is to define proper abstrations. 
+4) Future Compatibility. Code must not be incompatible with the
+   long-term vision of either the codebase or of edX. 
+5) Somewhat documented
+6) Unpluggable. There should be a setting to disable scaffolding code
+   such that it is never run on production servers.
+
+Prototype
+
+Prototype code should live in a seperate branch. It should strive
+to follow PEP8, be readable, testable, and future-proof, but we have
+no hard standards. 
