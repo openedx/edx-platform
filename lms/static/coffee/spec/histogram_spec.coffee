@@ -11,7 +11,7 @@ describe 'Histogram', ->
 
   describe 'calculate', ->
     beforeEach ->
-      @histogram = new Histogram(1, [[1, 1], [2, 2], [3, 3]])
+      @histogram = new Histogram(1, [[null, 1], [1, 1], [2, 2], [3, 3]])
 
     it 'store the correct value for data', ->
       expect(@histogram.data).toEqual [[1, Math.log(2)], [2, Math.log(3)], [3, Math.log(4)]]
