@@ -30,6 +30,10 @@ def certificate_request(request):
         id_verify = request.POST.get('cert_request_id_verify', 'false')
         error = ''
         
+        def return_error(error):
+            return HttpResponse(json.dumps({'success':False,
+                                            'error': error }))
+        
         if honor_code_verify != 'true':
             error += 'Please verify that you have followed the honor code to receive a certificate. '
     
@@ -39,27 +43,23 @@ def certificate_request(request):
         if id_verify != 'true':
             error += 'Please certify that you understand the unique ID on the certificate. '
         
-        if len(error) == 0:
-            survey_response = record_exit_survey(request, internal_request=True)
-            if not survey_response['success']:
-                error += survey_response['error']
+        if len(error) > 0:
+            return return_error(error)
+        
+        survey_response = record_exit_survey(request, internal_request=True)
+        if not survey_response['success']:
+            return return_error( survey_response['error'] )
         
         grade = None
-        if len(error) == 0:
-            student_gradesheet = grades.grade_sheet(request.user)
+        student_gradesheet = grades.grade_sheet(request.user)
+        grade = student_gradesheet['grade']
             
-            grade = student_gradesheet['grade']
-            
-            if not grade:
-                error += 'You have not earned a grade in this course. '
+        if not grade:
+            return return_error('You have not earned a grade in this course. ')
         
-        if len(error) == 0:
-            generate_certificate(request.user, grade)
-            
-            return HttpResponse(json.dumps({'success':True}))
-        else:
-            return HttpResponse(json.dumps({'success':False,
-                                            'error': error }))
+        generate_certificate(request.user, grade)
+        
+        return HttpResponse(json.dumps({'success':True}))
     
     else:
         #This is not a POST, we should render the page with the form
