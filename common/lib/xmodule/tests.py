@@ -28,12 +28,13 @@ class I4xSystem(object):
         self.track_function = lambda x: None
         self.render_function = lambda x: {} # Probably incorrect
         self.exception404 = Exception
+        self.DEBUG = True
     def __repr__(self):
         return repr(self.__dict__)
     def __str__(self):
         return str(self.__dict__)
 
-i4xs = I4xSystem
+i4xs = I4xSystem()
 
 class ModelsTest(unittest.TestCase):
     def setUp(self):
@@ -136,7 +137,7 @@ class ImageResponseTest(unittest.TestCase):
         
 class SymbolicResponseTest(unittest.TestCase):
     def test_sr_grade(self):
-        raise SkipTest() # This test fails due to dependencies on a local copy of snuggletex-webapp. Until we have figured that out, we'll just skip this test
+        # raise SkipTest() # This test fails due to dependencies on a local copy of snuggletex-webapp. Until we have figured that out, we'll just skip this test
         symbolicresponse_file = os.path.dirname(__file__)+"/test_files/symbolicresponse.xml"
         test_lcp = lcp.LoncapaProblem(open(symbolicresponse_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]',
