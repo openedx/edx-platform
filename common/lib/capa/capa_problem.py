@@ -146,7 +146,7 @@ class LoncapaProblem(object):
     def get_max_score(self):
         '''
         Return maximum score for this problem.
-	We do this by counting the number of answers available for each question
+        We do this by counting the number of answers available for each question
         in the problem.  If the Response for a question has a get_max_score() method
         then we call that and add its return value to the count.  That can be
         used to give complex problems (eg programming questions) multiple points.
@@ -351,7 +351,7 @@ class LoncapaProblem(object):
         Also create capa Response instances for each responsetype and save as self.responders
         '''
         response_id = 1
-	self.responders = {}
+        self.responders = {}
         for response in tree.xpath('//' + "|//".join(response_tag_dict)):
             response_id_str = self.problem_id + "_" + str(response_id)
             response.set('id',response_id_str)				# create and save ID for this response
@@ -367,7 +367,7 @@ class LoncapaProblem(object):
                 answer_id = answer_id + 1
 
             responder = response_tag_dict[response.tag](response, inputfields, self.context, self.system) # instantiate capa Response
-	    self.responders[response] = responder				# save in list in self
+            self.responders[response] = responder                               # save in list in self
 
         # <solution>...</solution> may not be associated with any specific response; give IDs for those separately
         # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
