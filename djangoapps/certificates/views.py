@@ -5,12 +5,13 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 
 import courseware.grades as grades
 from certificates.models import GeneratedCertificate, certificate_state_for_student
-from mitxmako.shortcuts import render_to_response
+from mitxmako.shortcuts import render_to_response, render_to_string
 from student.models import UserProfile
 from student.survey_questions import exit_survey_list_for_student
 from student.views import student_took_survey, record_exit_survey
@@ -110,7 +111,7 @@ def generate_certificate(user, grade):
         if generated_certificate.download_url and (generated_certificate.name != user_name):
             log.critical("A Certificate has been pre-generated with the name of " + str(generated_certificate.name) + " but current name is " + str(user_name) + \
                 "! The download URL is " + str(generated_certificate.download_url))
-            
+        
         
         generated_certificate.grade = grade
         generated_certificate.name = user_name
@@ -121,6 +122,12 @@ def generate_certificate(user, grade):
         log.debug("Generating certificate for " + str(user.username) + " with ID: " + certificate_id)
         
         # TODO: If the certificate was pre-generated, send the email that it is ready to download
+        if certificate_state_for_student(user, grade)['state'] == "downloadable":
+            subject = render_to_string('emails/certificate_ready_subject.txt',{})
+            subject = ''.join(subject.splitlines())
+            message = render_to_string('emails/certificate_ready.txt',{})
+            
+            res=send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email,])
         
     else:
         log.warning("Asked to generate a certifite for student " + str(user.username) + " but without a grade.")

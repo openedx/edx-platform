@@ -1,0 +1,3 @@
+Congratulations on completing 6.002x! We have received your request 
+for a certifcate, and it is ready to download. Please visit your 
+<a href="http://6002x.mitx.mit.edu/Profile">Profile</a> to download your certificate.
