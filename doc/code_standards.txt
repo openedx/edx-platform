@@ -30,12 +30,12 @@ following standards:
 
 1) Test Suite. Code must have reasonable, although not complete, test
    coverage.
-2) Consistency. Code must follow PEP8
+2) Consistent. Code must follow PEP8
 3) Clean Abstractions. 
-4) Future Compatibility. Code must not be incompatible with the
+4) Future-Compatible. Code must not be incompatible with the
    long-term vision of either the codebase or of edX. 
 5) Properly Documented
-6) Maintainability/Deployability
+6) Maintainable and deployable
 7) Robust. 
 
 All code paths must be manually or automatically verified. 
@@ -47,14 +47,15 @@ following standards:
 
 1) Testable. We do not require test coverage, but we do require the
    code to be structured such that it is possible to build tests.
-2) Consistency. Code must follow PEP8
+2) Consistent. Code must follow PEP8
 3) Clean abstractions or obvious throw-away code. One of the goals 
    of scaffolding is to define proper abstractions. 
-4) Future Compatibility. Code must not be incompatible with the
+4) Future-Compatible. Code must not be incompatible with the
    long-term vision of either the codebase or of edX. 
 5) Somewhat documented
-6) Unpluggable. There should be a setting to disable scaffolding code
-   such that it is never run on production servers.
+6) Unpluggable. There should be a setting to disable scaffolding code. 
+   By default, and by policy, it should never be enabled on production 
+   servers.
 7) Purpose. The scaffolding must provide a clean reason for existence
    (e.g. define a specific interface, etc.)
 
@@ -75,3 +76,10 @@ no hard standards.
 * Each contributor is responsible for finding a person to review their
   code. If it is not clear to the contributor who is appropriate, each
   project has an owner
+
+3. Documentation Standards
+
+* Whenever possible, documentation should live in code. 
+* When impossible, it should live in the github repo. 
+* Discussion should live on github, Basecamp or Pivotal, depending on
+  context.
