@@ -130,4 +130,4 @@ def generate_certificate(user, grade):
             res=send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email,])
         
     else:
-        log.warning("Asked to generate a certifite for student " + str(user.username) + " but without a grade.")
+        log.warning("Asked to generate a certificate for student " + str(user.username) + " but without a grade.")
