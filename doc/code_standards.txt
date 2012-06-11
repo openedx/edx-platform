@@ -1,9 +1,11 @@
-Coding Standards
-
 Scope
 
 This document describes code quality standards for the i4x
-system. Code falls into four categories:
+system. 
+
+1. Coding Standards
+
+Code falls into four categories:
 
 * Deployed. Running on a live server. 
 * Production. Intended for deployment. 
@@ -11,7 +13,7 @@ system. Code falls into four categories:
   minimal implementations to support further development. 
 * Prototype. Experimental new features. 
 
-Deployed
+1.1 Deployed
 
 The standards for deployed code are identical to production. In
 general, we tend to do either:
@@ -21,7 +23,7 @@ before deploying.
 2) Use code on a staging or internal server for a week before
 deploying.
 
-Production
+1.2 Production
 
 All production code must be peer-reviewed. The code must meet the
 following standards:
@@ -38,7 +40,7 @@ following standards:
 
 All code paths must be manually or automatically verified. 
 
-Scaffolding
+1.3 Scaffolding
 
 All scaffolding code should be peer-reviewed. The code must meet the
 following standards:
@@ -56,8 +58,20 @@ following standards:
 7) Purpose. The scaffolding must provide a clean reason for existence
    (e.g. define a specific interface, etc.)
 
-Prototype
+1.4 Prototype
 
 Prototype code should live in a separate branch. It should strive
 to follow PEP8, be readable, testable, and future-proof, but we have
 no hard standards. 
+
+2. Process Standards
+
+* Code should be integrated in small pull requests. Large commits
+  should be broken down into small commits for integration.
+* Every piece of production and deployed code must be reviewed prior
+  to integration.
+* Anyone on the edX team competent to review a piece of code may
+  review it (this may change as the team grows). 
+* Each contributor is responsible for finding a person to review their
+  code. If it is not clear to the contributor who is appropriate, each
+  project has an owner
