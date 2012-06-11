@@ -48,11 +48,15 @@ class @Problem
               @$("label[for='input_#{key}_#{choice}']").attr
                 correct_answer: 'true'
           else
-            @$("#answer_#{key}").html(value)	// needs to be html, not text, for complex solutions (eg coding)
+            @$("#answer_#{key}").html(value)	# needs to be html, not text, for complex solutions (eg coding)
+            @$("#solution_#{key}").html(value)	# needs to be html, not text, for complex solutions (eg coding)
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub]
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
     else
       @$('[id^=answer_]').text ''
+      @$('[id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @element.removeClass 'showed'
       @$('.show').val 'Show Answer'
