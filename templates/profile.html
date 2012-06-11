@@ -1,10 +1,12 @@
 <%inherit file="main.html" />
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
+<%namespace name="survey_fields" file="survey_fields.html"/>
 
 <%block name="title"><title>Profile - MITx 6.002x</title></%block>
 
 <%!
     from django.core.urlresolvers import reverse
+    from django.conf import settings
 %>
 
 <%block name="headextra">
@@ -12,7 +14,7 @@
 <script type="text/javascript" src="/static/js/flot/jquery.flot.stack.js"></script>
 <script type="text/javascript" src="/static/js/flot/jquery.flot.symbol.js"></script>
 <script>
-${profile_graphs.body(grade_summary, "grade-detail-graph")}
+${profile_graphs.body(grade_sheet['grade_summary'], grade_cutoffs, "grade-detail-graph")}
 </script>
 
 <script>
@@ -100,6 +102,7 @@ $(function() {
                                "new_email":new_email});
        return false;
     });
+    
 
     $("#change_name_form").submit(function(){
       var new_name = $('#new_name_field').val();
@@ -119,7 +122,6 @@ $(function() {
                                "rationale":rationale});
        return false;
     });
-
 });
 </script>
 </%block>
@@ -135,10 +137,42 @@ $(function() {
         <h1>Course Progress</h1>
       </header>
 
+      %if settings.END_COURSE_ENABLED:
+      <div id="grade">
+        %if grade_sheet['grade']:
+          <p>Final Grade: <strong>${grade_sheet['grade']}</strong></p>
+          
+          %if certificate_state['state'] == "requestable":
+            <a class="cert_request_link" href="/certificate_request">Request Certificate</a>
+          %elif certificate_state['state'] == "downloadable":
+            %if certificate_state['download_url']:
+              <a href="${certificate_state['download_url']}" target="_blank">Download Certificate</a>
+            %endif
+            %if certificate_state['graded_download_url']:
+              <a href="${certificate_state['graded_download_url']}" target="_blank">Download Certificate (with Grade)</a>
+            %endif
+            
+          %elif certificate_state['state'] == "generating":
+            <a href="#">Certificate is being generated...</a>
+          %else:
+            <a href="#">No certificate available</a>
+          %endif
+          
+        %else:
+          <p> No letter grade has been earned for this course </p>
+        %endif
+        
+        %if not took_survey:
+          <a class="survey_link" href="/exit_survey">Take the survey</a>
+        %endif
+      </div>
+
+      %endif
+
       <div id="grade-detail-graph"></div>
 
       <ol class="chapters">
-        %for chapter in courseware_summary:
+        %for chapter in grade_sheet['courseware_summary']:
         %if not chapter['chapter'] == "hidden":
         <li>
           <h2><a href="${reverse('courseware_chapter', args=format_url_params([chapter['course'], chapter['chapter']])) }">
@@ -150,11 +184,11 @@ $(function() {
               <%
               earned = section['section_total'].earned
               total = section['section_total'].possible
-              percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 else ""
+              percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
               
               <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">
-                ${ section['section'] }</a> ${"({0:g}/{1:g}) {2}".format( earned, total, percentageString )}</h3>
+                ${ section['section'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
               ${section['subtitle']}
               %if 'due' in section and section['due']!="":
                 due ${section['due']}
@@ -164,7 +198,7 @@ $(function() {
                 <ol class="scores">
                   ${ "Problem Scores: " if section['graded'] else "Practice Scores: "}
                   %for score in section['scores']:
-                    <li class="score">${"{0:g}/{1:g}".format(score.earned,score.possible)}</li>
+                    <li class="score">${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
                   %endfor
                 </ol>
               %endif

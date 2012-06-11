@@ -1,0 +1,34 @@
+<%inherit file="main.html" />
+<%namespace name="survey_fields" file="survey_fields.html"/>
+
+<%block name="title"><title>Survey - MITx 6.002x</title></%block>
+
+<%block name="headextra">
+<script type="text/javascript" src="${ settings.LIB_URL }certificate_survey.js"></script>
+</%block>
+
+<%block name="bodyclass">exit-survey</%block>
+
+<%include file="navigation.html" args="active_page=''" />
+
+<section id="survey" class="main-content">
+  <form id="survey_form">
+
+    %if not took_survey:
+    <fieldset id="survey_fieldset">
+      <h1>Thank you for taking 6.002x! You could help us a lot by filling out this (optional) survey.</h1>
+      <p>This survey is collected only for research purposes. It is completely optional and will not affect your grade.</p>
+              
+      ${survey_fields.body(survey_list)}
+      
+    </fieldset>
+    %else:
+      <h1>You have already taken the survey.</h1>
+      <p>Thank you for your help! You can only take the survey once, and we already have your submission.</p>
+    %endif
+    
+    
+    <input type="submit" id="" value="Submit Survey" />
+    
+  </form>
+</section>

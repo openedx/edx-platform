@@ -5,6 +5,12 @@ import tempfile
 
 import djcelery
 
+# Enables certificate requests and the exit survey
+END_COURSE_ENABLED = False
+
+# If enabled, always shows all survey questions. Has no effect without END_COURSE_ENABLED
+DEBUG_SURVEY = False
+
 # from settings2.askbotsettings import LIVESETTINGS_OPTIONS
 DEFAULT_GROUPS = []
 
@@ -144,6 +150,7 @@ INSTALLED_APPS = (
     'simplewiki',
     'track',
     'circuit',
+    'certificates',
     'perfstats',
     'util',
     # Uncomment the next line to enable the admin:

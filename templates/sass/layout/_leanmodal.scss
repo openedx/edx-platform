@@ -205,6 +205,8 @@ div#pwd_reset {
   }
 }
 
+div#survey,
+div#cert_request,
 div#apply_name_change,
 div#change_email,
 div#unenroll,
@@ -249,3 +251,35 @@ div#feedback_div{
   }
 }
 
+div#cert_request {
+  fieldset#cert_request_fieldset {
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: block;
+    }
+    
+    li.verify{
+      @include clearfix;
+
+      input {
+        float: left;
+      }
+
+      label {
+        margin-left: 25px;
+      }
+    }
+  }
+  
+  fieldset#survey_fieldset {
+    margin-top: lh();
+  }
+
+  div#cert_request_error {
+    display: block;
+    color: $mit-red;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+}

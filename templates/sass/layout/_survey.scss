@@ -1,0 +1,79 @@
+body.exit-survey, body.cert-req {
+  div.header-wrapper {
+    height: 47px;
+
+    header {
+    max-width: 600px;
+
+    nav {
+      display: none;
+    }
+    }
+  }
+
+  section.main-content {
+    max-width: 600px;
+    padding: lh();
+
+    h1 {
+      margin-top: 0;
+    }
+
+    fieldset#survey_fieldset {
+
+      > ul {
+        list-style: none;
+
+        > li {
+          border-top: 1px solid #eee;
+          padding: lh() 0;
+          margin-bottom: 0;
+
+          ul {
+            list-style: none;
+
+            li {
+              margin-bottom: 6px;
+
+              label {
+                display: block;
+
+                input {
+                  margin-top: -1px;
+                  margin-right: 6px;
+                }
+              }
+            }
+          }
+
+          textarea {
+            display: block;
+            width: 100%;
+            margin-top: lh(.5);
+          }
+
+          h2 {
+            margin-top: 0;
+          }
+
+          &.survey_short_field, &.survey_medium_field {
+            label {
+              font-weight: bold;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 6px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+body.cert-req {
+  fieldset#survey_fieldset {
+    border-top: 2px solid #ccc;
+    padding-top: lh();
+  }
+}
+

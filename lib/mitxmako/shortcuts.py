@@ -27,13 +27,15 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     # collapse context_instance to a single dictionary for mako
     context_dictionary = {}
     context_instance['settings'] = settings
-    for d in mitxmako.middleware.requestcontext:
-        context_dictionary.update(d)
+    if mitxmako.middleware.requestcontext:
+        for d in mitxmako.middleware.requestcontext:
+            context_dictionary.update(d)
     for d in context_instance:
         context_dictionary.update(d)
     if context: 
         context_dictionary.update(context)
     # fetch and render template
+    print namespace, template_name
     template = middleware.lookup[namespace].get_template(template_name)
     return template.render(**context_dictionary)
 
