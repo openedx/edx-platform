@@ -184,6 +184,7 @@ exit_survey_questions = {
             'Preparation for advanced standing exam',
             'Review of EE concepts',
             'Employment/job advancement opportunities',
+            'To earn the certificate',
             'Other',
         ]},
         
