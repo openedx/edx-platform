@@ -53,6 +53,8 @@ following standards:
 5) Somewhat documented
 6) Unpluggable. There should be a setting to disable scaffolding code
    such that it is never run on production servers.
+7) Purpose. The scaffolding must provide a clean reason for existence
+   (e.g. define a specific interface, etc.)
 
 Prototype
 
