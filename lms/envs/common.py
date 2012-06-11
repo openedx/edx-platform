@@ -294,7 +294,7 @@ PIPELINE_JS = {
         'output_filename': 'js/application.js'
     },
     'spec': {
-        'source_filenames': [pth.replace('static/', '') for pth in glob2.glob('static/coffee/spec/**/*.coffee')],
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
         'output_filename': 'js/spec.js'
     }
 }
