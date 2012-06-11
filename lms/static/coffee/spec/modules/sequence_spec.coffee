@@ -24,7 +24,6 @@ describe 'Sequence', ->
       expect(titles).toEqual ['Video 1', 'Video 2', 'Sample Problem']
 
     it 'bind the page events', ->
-      expect(@sequence.element).toHandleWith 'contentChanged', @sequence.toggleArrows
       expect($('#sequence-list a')).toHandleWith 'click', @sequence.goto
 
     it 'render the active sequence content', ->
@@ -76,6 +75,7 @@ describe 'Sequence', ->
       spyOn $, 'postWithPrefix'
       @sequence = new Sequence '1', @items, 'sequence'
       spyOnEvent @sequence.element, 'contentChanged'
+      spyOn(@sequence, 'toggleArrows').andCallThrough()
 
     describe 'with a different position than the current one', ->
       beforeEach ->
@@ -104,6 +104,9 @@ describe 'Sequence', ->
 
       it 'update the position', ->
         expect(@sequence.position).toEqual 1
+
+      it 're-update the arrows', ->
+        expect(@sequence.toggleArrows).toHaveBeenCalled()
 
       it 'trigger contentChanged event', ->
         expect('contentChanged').toHaveBeenTriggeredOn @sequence.element
