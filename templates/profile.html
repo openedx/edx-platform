@@ -112,7 +112,7 @@ $(function() {
                                 "rationale":rationale},
                function(data){
           if(data.success){
-          $("#survey").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail when approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
+          $("#apply_name_change").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail when approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
           } else {
             $("#change_name_error").html(data.error);
           }
