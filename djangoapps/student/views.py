@@ -11,14 +11,13 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.validators import validate_email, validate_slug, ValidationError
-from django.db import connection
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
-from mako import exceptions
 
 from django_future.csrf import ensure_csrf_cookie
 
@@ -95,12 +94,11 @@ def logout_user(request):
     logout(request)
     return redirect('/')
 
+@login_required
 @ensure_csrf_cookie
 def change_setting(request):
     ''' JSON call to change a profile setting: Right now, location and language
     '''
-    if not request.user.is_authenticated():
-        return redirect('/')
     up = UserProfile.objects.get(user=request.user) #request.user.profile_cache
     if 'location' in request.POST:
         up.location=request.POST['location']

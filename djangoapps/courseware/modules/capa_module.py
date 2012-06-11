@@ -92,10 +92,13 @@ class Module(XModule):
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions. 
         if self.lcp.done and self.rerandomize == "always":
-            #print "!"
             check_button = False
             save_button = False
         
+        # Only show the reset button if pressing it will show different values
+        if self.rerandomize != 'always':
+            reset_button = False
+
         # User hasn't submitted an answer yet -- we don't want resets
         if not self.lcp.done:
             reset_button = False
@@ -241,7 +244,8 @@ class Module(XModule):
             return True
         if self.show_answer == 'closed' and not self.closed():
             return False
-        print "aa", self.show_answer
+        if self.show_answer == 'always':
+            return True
         raise Http404
 
     def get_answer(self, get):
@@ -270,15 +274,12 @@ class Module(XModule):
         for key in get:
             answers['_'.join(key.split('_')[1:])]=get[key]
 
-#        print "XXX", answers, get
-
         event_info['answers']=answers
 
         # Too late. Cannot submit
         if self.closed():
             event_info['failure']='closed'
             self.tracker('save_problem_check_fail', event_info)
-            print "cp"
             raise Http404
             
         # Problem submitted. Student should reset before checking
@@ -286,7 +287,6 @@ class Module(XModule):
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure']='unreset'
             self.tracker('save_problem_check_fail', event_info)
-            print "cpdr"
             raise Http404
 
         try:
@@ -297,10 +297,6 @@ class Module(XModule):
         except StudentInputError as inst: 
             self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
             traceback.print_exc()
-#            print {'error':sys.exc_info(),
-#                   'answers':answers, 
-#                   'seed':self.lcp.seed, 
-#                   'filename':self.lcp.filename}
             return json.dumps({'success':inst.message})
         except: 
             self.lcp = LoncapaProblem(filename, id=lcp_id, state=old_state)
@@ -310,21 +306,19 @@ class Module(XModule):
 
         self.attempts = self.attempts + 1
         self.lcp.done=True
-
+        
         success = 'correct'
         for i in correct_map:
             if correct_map[i]!='correct':
                 success = 'incorrect'
-
-        js=json.dumps({'correct_map' : correct_map,
-                       'success' : success})
 
         event_info['correct_map']=correct_map
         event_info['success']=success
 
         self.tracker('save_problem_check', event_info)
 
-        return js
+        return json.dumps({'success': success,
+                           'contents': self.get_problem_html(encapsulate=False)})
 
     def save_problem(self, get):
         event_info = dict()

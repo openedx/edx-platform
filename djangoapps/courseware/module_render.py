@@ -1,30 +1,11 @@
-import StringIO
-import json
 import logging
-import os
-import sys
-import sys
-import urllib
-import uuid
 
 from lxml import etree
 
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.context_processors import csrf
-from django.db import connection
-from django.http import Http404
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.template import Context
-from django.template import Context, loader
-from mitxmako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_string
 
 from models import StudentModule
-from student.models import UserProfile
 import track.views
-
-import courseware.content_parser as content_parser
 
 import courseware.modules
 
@@ -51,47 +32,6 @@ def make_track_function(request):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
 
-def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic view for extensions. '''
-    if not request.user.is_authenticated():
-        return redirect('/')
-
-    # Grab the student information for the module from the database
-    s = StudentModule.objects.filter(student=request.user, 
-                                     module_id=id)
-    #s = StudentModule.get_with_caching(request.user, id)
-    if len(s) == 0 or s is None:
-        log.debug("Couldnt find module for user and id " + str(module) + " " + str(request.user) + " "+ str(id))
-        raise Http404
-    s = s[0]
-
-    oldgrade = s.grade
-    oldstate = s.state
-
-    dispatch=dispatch.split('?')[0]
-
-    ajax_url = '/modx/'+module+'/'+id+'/'
-
-    # Grab the XML corresponding to the request from course.xml
-    xml = content_parser.module_xml(request.user, module, 'id', id)
-
-    # Create the module
-    instance=courseware.modules.get_module_class(module)(xml, 
-                                                         id, 
-                                                         ajax_url=ajax_url, 
-                                                         state=oldstate, 
-                                                         track_function = make_track_function(request), 
-                                                         render_function = None)
-    # Let the module handle the AJAX
-    ajax_return=instance.handle_ajax(dispatch, request.POST)
-    # Save the state back to the database
-    s.state=instance.get_state()
-    if instance.get_score(): 
-        s.grade=instance.get_score()['score']
-    if s.grade != oldgrade or s.state != oldstate:
-        s.save()
-    # Return whatever the module wanted to return to the client/caller
-    return HttpResponse(ajax_return)
 
 def grade_histogram(module_id):
     ''' Print out a histogram of grades on a given problem. 
@@ -134,8 +74,9 @@ def render_x_module(user, request, xml_module, module_object_preload):
                           track_function = make_track_function(request), 
                           render_function = lambda x: render_module(user, request, x, module_object_preload))
     
-    # If instance wasn't already in the database, create it
-    if not smod:
+    # If instance wasn't already in the database, and this
+    # isn't a guest user, create it
+    if not smod and user.is_authenticated():
         smod=StudentModule(student=user, 
                            module_type = module_type,
                            module_id=module_id, 

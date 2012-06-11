@@ -10,10 +10,14 @@
       <ul class="coursenav">
         <li class="courseware"><a href="/courseware">Courseware</a></li>
         <li class="info"><a href="/info">Course Info</a></li>
+% if user.is_authenticated():
         <li class="book"><a href="/book">Textbook</a></li>
         <li class="discussion"><a href="/discussion/questions">Discussion</a></li>
+% endif
         <li class="wiki"><a href="/wiki/view">Wiki</a></li>
+% if user.is_authenticated():
         <li class="profile"><a href="/profile">Profile</a></li>
+% endif
       </ul>
     </nav>
   </header>
