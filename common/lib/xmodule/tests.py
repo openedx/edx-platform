@@ -1,9 +1,9 @@
 #
-# unittests for courseware
+# unittests for xmodule (and capa)
 #
 # Note: run this using a like like this:
 #
-# django-admin.py test --settings=envs.test_ike --pythonpath=. courseware
+# django-admin.py test --settings=lms.envs.test_ike --pythonpath=. common/lib/xmodule
 
 import unittest
 import os
@@ -96,31 +96,31 @@ class MultiChoiceTest(unittest.TestCase):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multichoice.xml"
         test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'choice_foil3'}
-        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':'choice_foil2'}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
 
     def test_MC_bare_grades(self):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multi_bare.xml"
         test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'choice_2'}
-        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':'choice_1'}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         
     def test_TF_grade(self):
         truefalse_file =  os.path.dirname(__file__)+"/test_files/truefalse.xml"
         test_lcp = lcp.LoncapaProblem(open(truefalse_file), '1', system=i4xs)
         correct_answers = {'1_2_1':['choice_foil2', 'choice_foil1']}
-        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':['choice_foil1']}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         false_answers = {'1_2_1':['choice_foil1', 'choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         false_answers = {'1_2_1':['choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         false_answers = {'1_2_1':['choice_foil1', 'choice_foil2', 'choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         
 class ImageResponseTest(unittest.TestCase):
     def test_ir_grade(self):
@@ -131,8 +131,8 @@ class ImageResponseTest(unittest.TestCase):
         test_answers = {'1_2_1':'[500,20]',
                         '1_2_2':'[250,300]',
                         }
-        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
         
 class SymbolicResponseTest(unittest.TestCase):
     def test_sr_grade(self):
@@ -220,8 +220,8 @@ class SymbolicResponseTest(unittest.TestCase):
   </mstyle>
 </math>''',
                         }
-        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
-        self.assertEquals(test_lcp.grade_answers(wrong_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(wrong_answers).get_correctness('1_2_1'), 'incorrect')
         
 class OptionResponseTest(unittest.TestCase):
     '''
@@ -237,8 +237,8 @@ class OptionResponseTest(unittest.TestCase):
         test_answers = {'1_2_1':'True',
                         '1_2_2':'True',
                         }
-        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
 
 #-----------------------------------------------------------------------------
 # Grading tests
