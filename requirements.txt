@@ -23,3 +23,5 @@ requests
 sympy
 newrelic
 glob2
+django_nose
+nosexcover
