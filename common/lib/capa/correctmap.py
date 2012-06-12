@@ -19,11 +19,12 @@ class CorrectMap(object):
     '''
     def __init__(self,*args,**kwargs):
         self.cmap = dict()		# start with empty dict
-        self.__getitem__ = self.cmap.__getitem__
-        self.__iter__ = self.cmap.__iter__
         self.items = self.cmap.items
         self.keys = self.cmap.keys
         self.set(*args,**kwargs)
+
+    def __getitem__(self, *args, **kwargs):
+        return self.cmap.__getitem(*args, **kwargs)
 
     def __iter__(self):
         return self.cmap.__iter__()
