@@ -202,13 +202,13 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     Arguments:
 
       - request -- the django request.
-      - module -- the name of the module, as used in the course configuration xml.
+      - module -- the type of the module, as used in the course configuration xml.
+                  e.g. 'problem', 'video', etc
       - dispatch -- the command string to pass through to the module's handle_ajax call
            (e.g. 'problem_reset').  If this string contains '?', only pass
            through the part before the first '?'.
       - id -- the module id.  Used to look up the student module.
-
-      TODO: why are id and module not the same?
+            e.g. filenamexformularesponse
     '''
     if not request.user.is_authenticated():
         return redirect('/')
