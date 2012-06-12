@@ -24,7 +24,7 @@ class CorrectMap(object):
         self.set(*args,**kwargs)
 
     def __getitem__(self, *args, **kwargs):
-        return self.cmap.__getitem(*args, **kwargs)
+        return self.cmap.__getitem__(*args, **kwargs)
 
     def __iter__(self):
         return self.cmap.__iter__()
