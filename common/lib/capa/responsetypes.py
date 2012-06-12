@@ -104,7 +104,7 @@ class LoncapaResponse(object):
         self.system = system
 
         for abox in inputfields:
-            if not abox.tag in self.allowed_inputfields:
+            if abox.tag not in self.allowed_inputfields:
                 msg = "%s: cannot have input field %s" % (unicode(self),abox.tag)
                 msg += "\nSee XML source line %s" % getattr(xml,'sourceline','<unavailable>')
                 raise LoncapaProblemError(msg)
@@ -418,6 +418,8 @@ class NumericalResponse(LoncapaResponse):
             return CorrectMap(self.answer_id,'correct')
         else:
             return CorrectMap(self.answer_id,'incorrect')
+
+    # TODO: add check_hint_condition(self,hxml_set,student_answers)
 
     def get_answers(self):
         return {self.answer_id:self.correct_answer}
