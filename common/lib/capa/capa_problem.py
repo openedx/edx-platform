@@ -58,8 +58,7 @@ global_context = {'random': random,
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["responseparam", "answer", "script","hintgroup"]
 
-#log = logging.getLogger(__name__)
-log = logging.getLogger('mitx.common.lib.capa.capa_problem')
+log = logging.getLogger('mitx.' + __name__)
 
 #-----------------------------------------------------------------------------
 # main class for this module
