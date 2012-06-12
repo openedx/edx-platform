@@ -119,7 +119,7 @@ class LoncapaProblem(object):
         # pre-parse the XML tree: modifies it to add ID's and perform some in-place transformations
         # this also creates the dict (self.responders) of Response instances for each question in the problem.
         # the dict has keys = xml subtree of Response, values = Response instance
-        self.preprocess_problem(self.tree, answer_map=self.student_answers)
+        self.preprocess_problem(self.tree)
 
     def do_reset(self):
         '''
@@ -340,7 +340,7 @@ class LoncapaProblem(object):
 
         return tree
 
-    def preprocess_problem(self, tree, answer_map=dict()):  # private
+    def preprocess_problem(self, tree):  # private
         '''
         Assign IDs to all the responses
         Assign sub-IDs to all entries (textline, schematic, etc.)
