@@ -119,7 +119,7 @@ def generate_certificate(user, grade):
         
         certificate_id = generated_certificate.certificate_id
         
-        log.debug("Generating certificate for " + str(user.username) + " with ID: " + certificate_id)
+        log.debug("Generating certificate for " + str(user.username) + " with ID: " + str(certificate_id))
         
         # TODO: If the certificate was pre-generated, send the email that it is ready to download
         if certificate_state_for_student(user, grade)['state'] == "downloadable":
