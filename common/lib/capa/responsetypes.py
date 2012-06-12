@@ -26,8 +26,7 @@ from util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	# uses Beautiful Soup!!! FIXME?
 
-#log = logging.getLogger(__name__)
-log = logging.getLogger('mitx.common.lib.capa.responsetypes')
+log = logging.getLogger('mitx.' + __name__)
 
 #-----------------------------------------------------------------------------
 # Exceptions
