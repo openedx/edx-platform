@@ -113,12 +113,12 @@ class LoncapaProblem(object):
         self.tree = etree.XML(file_text)	# parse problem XML file into an element tree
 
         # construct script processor context (eg for customresponse problems)
-        self.context = self.extract_context(self.tree, seed=self.seed)
+        self.context = self._extract_context(self.tree, seed=self.seed)
 
         # pre-parse the XML tree: modifies it to add ID's and perform some in-place transformations
         # this also creates the dict (self.responders) of Response instances for each question in the problem.
         # the dict has keys = xml subtree of Response, values = Response instance
-        self.preprocess_problem(self.tree)
+        self._preprocess_problem(self.tree)
 
     def do_reset(self):
         '''
@@ -238,11 +238,11 @@ class LoncapaProblem(object):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        return contextualize_text(etree.tostring(self.extract_html(self.tree)), self.context)
+        return contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
 
     # ======= Private Methods Below ========
 
-    def extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
+    def _extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
         '''
         Extract content of <script>...</script> from the problem.xml file, and exec it in the
         context of this problem.  Provides ability to randomize problems, and also set
@@ -273,7 +273,7 @@ class LoncapaProblem(object):
                 log.exception("Error while execing code: " + code)
         return context
 
-    def extract_html(self, problemtree):  # private
+    def _extract_html(self, problemtree):  # private
         '''
         Main (private) function which converts Problem XML tree to HTML.
         Calls itself recursively.
@@ -320,11 +320,11 @@ class LoncapaProblem(object):
             return render_object.get_html()  # function(problemtree, value, status, msg) # render the special response (textline, schematic,...)
 
         if problemtree in self.responders:		# let each Response render itself
-            return self.responders[problemtree].render_html(self.extract_html)
+            return self.responders[problemtree].render_html(self._extract_html)
 
         tree = etree.Element(problemtree.tag)
         for item in problemtree:
-            item_xhtml = self.extract_html(item)		# nothing special: recurse
+            item_xhtml = self._extract_html(item)		# nothing special: recurse
             if item_xhtml is not None:
                     tree.append(item_xhtml)
 
@@ -339,7 +339,7 @@ class LoncapaProblem(object):
 
         return tree
 
-    def preprocess_problem(self, tree):  # private
+    def _preprocess_problem(self, tree):  # private
         '''
         Assign IDs to all the responses
         Assign sub-IDs to all entries (textline, schematic, etc.)
