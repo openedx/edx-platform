@@ -169,7 +169,7 @@ def render_x_module(user, request, xml_module, module_object_preload, position=N
     content = instance.get_html()
 
     # special extra information about each problem, only for users who are staff 
-    if user.is_staff:
+    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
         module_id = xml_module.get('id')
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
