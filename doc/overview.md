@@ -45,7 +45,8 @@ You should be familiar with the following.  If you're not, go read some docs...
 ### Common libraries 
 
 - x_modules -- generic learning modules. *x* can be sequence, video, template, html, vertical, capa, etc.  These are the things that one puts inside sections in the course structure.  Modules know how to render themselves to html, how to score themselves, and handle ajax calls from the front end. 
-      - x_modules take a 'system' context parameter, which is a reference to an object that knows how to render things, track events, complain about 404s, etc.  (TODO: figure out, document the necessary interface--different in `x_module.XModule.__init__` and in `x_module tests.py`)
+      - x_modules take a 'system context' parameter, which helps isolate xmodules from any particular application, so they can be used in many places. The modules should make no references to Django (though there are still a few left).  The system context knows how to render things, track events, complain about 404s, etc. 
+      - TODO: document the system context interface--it's different in `x_module.XModule.__init__` and in `x_module tests.py` (do this in the code, not here)
       - in `common/lib/xmodule`
 
 - capa modules -- defines `LoncapaProblem` and many related things.  
@@ -71,6 +72,10 @@ The LMS is a django site, with root in `lms/`.  It runs in many different enviro
   
   - ajax calls go to `module_render.py:modx_dispatch()`, which passes it to the module's `handle_ajax()` function, and then updates the grade and state if they changed.
 
+  - [This diagram](https://github.com/MITx/mitx/wiki/MITx-Architecture) visually shows how the clients communicate with problems + modules.
+  
+- See `lms/urls.py` for the wirings of urls to views.  
+
 - Tracking: there is support for basic tracking of client-side events in `lms/djangoapps/track`.  
 
 ### Other modules
@@ -81,22 +86,13 @@ The LMS is a django site, with root in `lms/`.  It runs in many different enviro
 
 See `testing.md`.
 
-
-## QUESTIONS:
-
-`common/lib/capa` : what is eia, `eia.py`?   Random lists of numbers?
-
-what is `lms/lib/dogfood`?  Looks like a way to test capa problems...  Is it being used?
-
-is lms/envs/README.txt out of date?
-
 ## TODO:
 
-- Only describes backend code so far.  How does the front-end work?
+- update lms/envs/README.txt
 
-- What big pieces are missing?
+- describe our production environment
 
-- Where should reader go next?
+- describe the front-end architecture, tools, etc.  Starting point: `lms/static`
 
 ---
 Note: this file uses markdown.  To convert to html, run:
