@@ -6,7 +6,7 @@ import tempfile
 import djcelery
 
 # Enables certificate requests and the exit survey
-END_COURSE_ENABLED = False
+END_COURSE_ENABLED = True
 
 # If enabled, always shows all survey questions. Has no effect without END_COURSE_ENABLED
 DEBUG_SURVEY = False
