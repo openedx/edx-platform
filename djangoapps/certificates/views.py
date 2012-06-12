@@ -100,7 +100,7 @@ def generate_certificate(user, grade):
         try:
             generated_certificate = GeneratedCertificate.objects.get(user = user)
         except GeneratedCertificate.DoesNotExist:
-            generated_certificate = GeneratedCertificate(user = user, certificate_id = uuid.uuid4().hex)
+            generated_certificate = GeneratedCertificate(user = user)
 
         generated_certificate.enabled = True
         if generated_certificate.graded_download_url and (generated_certificate.grade != grade):

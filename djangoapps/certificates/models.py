@@ -31,8 +31,8 @@ class GeneratedCertificate(models.Model):
     # This is the name at the time of request
     name = models.CharField(blank=True, max_length=255)
     
-    certificate_id = models.CharField(max_length=32)
-    graded_certificate_id = models.CharField(max_length=32, null=True)
+    certificate_id = models.CharField(max_length=32, null=True, default=None)
+    graded_certificate_id = models.CharField(max_length=32, null=True, default=None)
     
     download_url = models.CharField(max_length=128, null=True)
     graded_download_url = models.CharField(max_length=128, null=True)
