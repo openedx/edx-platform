@@ -45,14 +45,14 @@ class @Problem
         $.each response, (key, value) =>
           if $.isArray(value)
             for choice in value
-              @$("label[for='input_#{key}_#{choice}']").attr
-                correct_answer: 'true'
+              @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
           else
-            @$("#answer_#{key}").text(value)
+            @$("#answer_#{key}, #solution_#{key}").html(value)
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
     else
-      @$('[id^=answer_]').text ''
+      @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @element.removeClass 'showed'
       @$('.show').val 'Show Answer'

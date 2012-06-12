@@ -1,9 +1,9 @@
 #
-# unittests for courseware
+# unittests for xmodule (and capa)
 #
 # Note: run this using a like like this:
 #
-# django-admin.py test --settings=envs.test_ike --pythonpath=. courseware
+# django-admin.py test --settings=lms.envs.test_ike --pythonpath=. common/lib/xmodule
 
 import unittest
 import os
@@ -28,12 +28,13 @@ class I4xSystem(object):
         self.track_function = lambda x: None
         self.render_function = lambda x: {} # Probably incorrect
         self.exception404 = Exception
+        self.DEBUG = True
     def __repr__(self):
         return repr(self.__dict__)
     def __str__(self):
         return str(self.__dict__)
 
-i4xs = I4xSystem
+i4xs = I4xSystem()
 
 class ModelsTest(unittest.TestCase):
     def setUp(self):
@@ -96,31 +97,31 @@ class MultiChoiceTest(unittest.TestCase):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multichoice.xml"
         test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'choice_foil3'}
-        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':'choice_foil2'}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
 
     def test_MC_bare_grades(self):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multi_bare.xml"
         test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1', system=i4xs)
         correct_answers = {'1_2_1':'choice_2'}
-        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':'choice_1'}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         
     def test_TF_grade(self):
         truefalse_file =  os.path.dirname(__file__)+"/test_files/truefalse.xml"
         test_lcp = lcp.LoncapaProblem(open(truefalse_file), '1', system=i4xs)
         correct_answers = {'1_2_1':['choice_foil2', 'choice_foil1']}
-        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':['choice_foil1']}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         false_answers = {'1_2_1':['choice_foil1', 'choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         false_answers = {'1_2_1':['choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         false_answers = {'1_2_1':['choice_foil1', 'choice_foil2', 'choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
         
 class ImageResponseTest(unittest.TestCase):
     def test_ir_grade(self):
@@ -131,8 +132,8 @@ class ImageResponseTest(unittest.TestCase):
         test_answers = {'1_2_1':'[500,20]',
                         '1_2_2':'[250,300]',
                         }
-        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
         
 class SymbolicResponseTest(unittest.TestCase):
     def test_sr_grade(self):
@@ -220,8 +221,8 @@ class SymbolicResponseTest(unittest.TestCase):
   </mstyle>
 </math>''',
                         }
-        self.assertEquals(test_lcp.grade_answers(correct_answers)['1_2_1'], 'correct')
-        self.assertEquals(test_lcp.grade_answers(wrong_answers)['1_2_1'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(wrong_answers).get_correctness('1_2_1'), 'incorrect')
         
 class OptionResponseTest(unittest.TestCase):
     '''
@@ -237,8 +238,37 @@ class OptionResponseTest(unittest.TestCase):
         test_answers = {'1_2_1':'True',
                         '1_2_2':'True',
                         }
-        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_1'], 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers)['1_2_2'], 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
+
+class FormulaResponseWithHintTest(unittest.TestCase):
+    '''
+    Test Formula response problem with a hint
+    This problem also uses calc.
+    '''
+    def test_or_grade(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/formularesponse_with_hint.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file), '1', system=i4xs)
+        correct_answers = {'1_2_1':'2.5*x-5.0'}
+        test_answers = {'1_2_1':'0.4*x-5.0'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+        cmap = test_lcp.grade_answers(test_answers)
+        self.assertEquals(cmap.get_correctness('1_2_1'), 'incorrect')
+        self.assertTrue('You have inverted' in cmap.get_hint('1_2_1'))
+
+class StringResponseWithHintTest(unittest.TestCase):
+    '''
+    Test String response problem with a hint
+    '''
+    def test_or_grade(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/stringresponse_with_hint.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file), '1', system=i4xs)
+        correct_answers = {'1_2_1':'Michigan'}
+        test_answers = {'1_2_1':'Minnesota'}
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+        cmap = test_lcp.grade_answers(test_answers)
+        self.assertEquals(cmap.get_correctness('1_2_1'), 'incorrect')
+        self.assertTrue('St. Paul' in cmap.get_hint('1_2_1'))
 
 #-----------------------------------------------------------------------------
 # Grading tests
