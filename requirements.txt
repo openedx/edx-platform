@@ -24,3 +24,5 @@ sympy
 newrelic
 glob2
 pymongo
+django_nose
+nosexcover
