@@ -13,7 +13,7 @@ def compare_with_tolerance(v1, v2, tol):
      - tol   :  tolerance (string or number)
 
     '''
-    relative = "%" in tol
+    relative = tol.endswith('%')
     if relative: 
         tolerance_rel = evaluator(dict(),dict(),tol[:-1]) * 0.01
         tolerance = tolerance_rel * max(abs(v1), abs(v2))
