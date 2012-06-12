@@ -111,6 +111,107 @@ exit_survey_questions = {
         'question_name' : 'improvement_ideas',
         'label' : 'Do you have any ideas on how to improve this course or the edX platform?'},
         
+        {'type' : 'radio',
+        'question_name' : 'rating_tutorials',
+        'label' : 'How helpful were the tutorials?',
+        'choices' : [
+            '1 - Useless.',
+            '2',
+            '3',
+            '4 - Okay.',
+            '5',
+            '6',
+            '7 - Excellent.',
+            '0 - Not Applicable / I didn\'t use them',
+        ]},
+        
+        
+        
+        {'type' : 'medium_field',
+        'question_name' : 'improvement_tutorials',
+        'label' : 'What would you most like to see improved in the tutorials?'},
+        
+        {'type' : 'radio',
+        'question_name' : 'rating_lectures',
+        'label' : 'How helpful were the lectures?',
+        'choices' : [
+            '1 - Useless.',
+            '2',
+            '3',
+            '4 - Okay.',
+            '5',
+            '6',
+            '7 - Excellent.',
+            '0 - Not Applicable / I didn\'t use them',
+        ]},
+        
+        {'type' : 'medium_field',
+        'question_name' : 'improvement_lectures',
+        'label' : 'What would you most like to see improved in the lectures?'},
+        
+        
+        {'type' : 'radio',
+        'question_name' : 'rating_homework',
+        'label' : 'How helpful were the homeworks?',
+        'choices' : [
+            '1 - Useless.',
+            '2',
+            '3',
+            '4 - Okay.',
+            '5',
+            '6',
+            '7 - Excellent.',
+            '0 - Not Applicable / I didn\'t use them',
+        ]},
+        
+        {'type' : 'medium_field',
+        'question_name' : 'improvement_homework',
+        'label' : 'What would you most like to see improved in the homeworks?'},
+        
+        
+        {'type' : 'radio',
+        'question_name' : 'rating_labs',
+        'label' : 'How helpful were the labs?',
+        'choices' : [
+            '1 - Useless.',
+            '2',
+            '3',
+            '4 - Okay.',
+            '5',
+            '6',
+            '7 - Excellent.',
+            '0 - Not Applicable / I didn\'t use them',
+        ]},
+        
+        {'type' : 'medium_field',
+        'question_name' : 'improvement_labs',
+        'label' : 'What would you most like to see improved in the labs?'},
+        
+        
+        
+        
+        {'type' : 'radio',
+        'question_name' : 'rating_textbook',
+        'label' : 'How helpful was the textbook?',
+        'choices' : [
+            '1 - Useless.',
+            '2',
+            '3',
+            '4 - Okay.',
+            '5',
+            '6',
+            '7 - Excellent.',
+            '0 - Not Applicable / I didn\'t use them',
+        ]},
+        
+        {'type' : 'medium_field',
+        'question_name' : 'improvement_textbook',
+        'label' : 'What would you most like to see improved in the textbook?'},
+        
+        
+        
+        
+        
         
         # Level of bandwidth
         # Speed of computer/RAM/etc. 
