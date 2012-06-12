@@ -155,13 +155,13 @@ class LoncapaProblem(object):
                 try:
                     maxscore += responder.get_max_score()
                 except Exception:
-                    log.error('responder %s failed to properly return from get_max_score()' % responder)
+                    log.debug('responder %s failed to properly return from get_max_score()' % responder) # FIXME
                     raise
             else:
                 try:
                     maxscore += len(responder.get_answers())
                 except:
-                    log.error('responder %s failed to properly return get_answers()' % responder)
+                    log.debug('responder %s failed to properly return get_answers()' % responder) # FIXME
                     raise
         return maxscore
 
