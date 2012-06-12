@@ -51,7 +51,6 @@ class @Problem
             @$("#answer_#{key}").html(value)	# needs to be html, not text, for complex solutions (eg coding)
             @$("#solution_#{key}").html(value)	# needs to be html, not text, for complex solutions (eg coding)
         MathJax.Hub.Queue ["Typeset", MathJax.Hub]
-        MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
     else
