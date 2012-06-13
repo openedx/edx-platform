@@ -1,0 +1,83 @@
+{% block content %}
+<section class="week-edit">
+  <header>
+    <h1 class="editable">Week 3</h1>
+    <a href="/ui_prototype">Done</a>
+  </header>
+
+  <section class="sidebar">
+    <section class="goals">
+      <header>
+        <h2>Goals</h2>
+      </header>
+      <ul>
+        <li>Goal 1: This is the title of the first goal</li>
+        <li>Goal 2: This is the title</li>
+      </ul>
+      <p><a href="#">+ Add new goal</a></p>
+    </section>
+
+    <section class="scratch-pad">
+      <header>
+        <h2>Scratchpad</h2>
+      </header>
+
+      <ul>
+        <li>Problem title 11</li>
+        <li>Problem title 13</li>
+        <li>Problem title 14</li>
+        <li>Video 3</li>
+        {% include "widgets/new-module.html"%}
+      </ul>
+
+    </section>
+  </section>
+
+  <section class="weeks-content">
+    <header>
+      <h2>Weeks Content</h2>
+      <form>
+        <input type="search" name="" id="" value="" />
+      </form>
+    </header>
+
+    <section class="filters">
+      <ul>
+        <li>
+          <label for="">Sort by</label>
+          <select>
+            <option value="">Recently Modified</option>
+          </select>
+        </li>
+
+        <li>
+          <label for="">Display</label>
+          <select>
+            <option value="">All content</option>
+          </select>
+        </li>
+        <li>
+          <select>
+            <option value="">Internal Only</option>
+          </select>
+        </li>
+
+        <li class="advanced">
+          <a href="#">Advanced filters</a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="modules">
+      <ul>
+        <li><a href="#">Circuit Stuff</a></li>
+        <li><a href="#">Circuit Stuff</a></li>
+        <li><a href="#">Circuit Stuff</a></li>
+        <li><a href="#">Circuit Stuff</a></li>
+        <li><a href="#">Circuit Stuff</a></li>
+        <li><a href="#">Circuit Stuff</a></li>
+      </ul>
+    </section>
+  </section>
+</section>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Course Manager{% endblock %}
+
+{% block content %}
+<section class="main-container">
+
+  {% include "widgets/navigation.html"%}
+
+  <section class="main-content">
+    {% include "widgets/week-edit.html"%}
+    {% include "widgets/week-new.html"%}
+    {% include "widgets/video-edit.html"%}
+    {% include "widgets/video-new.html"%}
+    {% include "widgets/problem-edit.html"%}
+    {% include "widgets/problem-new.html"%}
+  </section>
+
+</section>
+{% endblock %}
