@@ -71,7 +71,7 @@
         <section class="used-videos" style="overflow: visible;">
           <ul id="used">
             <div class="title"><h4>Video clip in use</h4></div>
-            {% include "widgets/video-box.html" %}
+            <%include file="video-box.html"/>
           </ul>
           <p class="no-video">No video clip used. Select one from the list below, <a>upload</a> a new one or <a>import</a> an already uploaded video.</p>
         </section>
@@ -84,7 +84,7 @@
       <div class="step no-title">
         <section class="meta unused-videos"style="overflow: visible;" >
           <ul id="unused">
-            {% include "widgets/video-box-unused.html" %}
+            <%include file="video-box-unused.html"/>
           </ul>
         </section>
       </div>
@@ -129,7 +129,7 @@
 <aside id="video-selector" class="hidden">
   <input type="text" placeholder="Search video files..." />
   <ul class="raw-videos">
-    {% include "widgets/raw-videos.html" %}
+    <%include file="raw-videos.html"/>
   </ul>
 </aside>
 
@@ -140,7 +140,7 @@
     </div>
 
     <div id="view">
-      <img src="{{ STATIC_URL }}/img/video.jpg" />
+      <img src="${ STATIC_URL }/img/video.jpg" />
     </div>
 
     <div id="upload">
