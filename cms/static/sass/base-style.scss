@@ -3,16 +3,4 @@
 
 @import 'base';
 @import 'calendar';
-@import 'week', 'video', 'problem';
-
-body {
-  &.content {
-    section.main-content {
-      border-left: 2px solid #000;
-      @include box-sizing(border-box);
-      width: flex-grid(9);
-      float: left;
-      @include box-shadow( -2px 0 3px #ddd );
-    }
-  }
-}
+@import 'week', 'video', 'problem', 'module-header';

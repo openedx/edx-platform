@@ -1,40 +1,33 @@
 section.video-new, section.video-edit {
-  position: absolute;
-  top: 80px;
-  right: 0;
-  background: #fff;
-  width: flex-grid(5);
-  @include box-shadow(0 0 6px #666);
-  border: 1px solid #333;
-  border-right: 0;
-  z-index: 4;
+  > section {
 
-  > header {
-    background: #666;
-    @include clearfix;
-    color: #fff;
-    padding: 6px;
-    border-bottom: 1px solid #333;
-    -webkit-font-smoothing: antialiased;
+    section.upload {
+      padding: 6px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
 
-    h2 {
-      float: left;
-      font-size: 14px;
-    }
-
-    a {
-      float: right;
-    }
-  }
-
-  section {
-    ul {
-      list-style: none;
-
-      li {
-        border-bottom: 1px solid #333;
-        padding: 10px 25px;
+      a.upload-button {
+        @extend .button;
+        @include inline-block();
       }
+    }
+
+    section.in-use {
+      h2 {
+        font-size: 14px;
+      }
+
+      div {
+        background: #eee;
+        text-align: center;
+        padding: 6px;
+      }
+    }
+
+    a.save-update {
+      @extend .button;
+      @include inline-block();
+      margin-top: 20px;
     }
   }
 }
