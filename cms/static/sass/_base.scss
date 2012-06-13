@@ -32,7 +32,22 @@ body {
       h2 {
         font-size: 14px;
         text-transform: uppercase;
+        float: left;
       }
+
+      a.new-module {
+        float: right;
+      }
+    }
+  }
+
+  &.content {
+    section.main-content {
+      border-left: 2px solid #000;
+      @include box-sizing(border-box);
+      width: flex-grid(9);
+      float: left;
+      @include box-shadow( -2px 0 3px #ddd );
     }
   }
 }
@@ -48,4 +63,3 @@ input[type="submit"], .button {
   @include border-radius(3px);
   padding: 6px;
 }
-
