@@ -334,9 +334,9 @@ section.course-content {
               display: none;
               opacity: 0;
               position: absolute;
-              width: 35px;
+              width: 45px;
               height: 125px;
-              margin-left: 5px;
+              margin-left: -1px;
               z-index: 10;
 
               .volume-slider {
@@ -344,6 +344,9 @@ section.course-content {
                 border: 0;
                 width: 5px;
                 margin: 14px auto;
+                background: #666;
+                border: 1px solid #000;
+                @include box-shadow(0 1px 0 #333);
 
                 a.ui-slider-handle {
                   background: $mit-red url(../images/slider-handle.png) center center no-repeat;
@@ -359,7 +362,7 @@ section.course-content {
                 }
 
                 .ui-slider-range {
-                  background: #666;
+                  background: #ddd;
                 }
               }
             }
