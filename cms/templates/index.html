@@ -1,19 +1,19 @@
-{% extends "base.html" %}
-{% block title %}Course Manager{% endblock %}
+<%inherit file="base.html" />
+<%block name="title">Course Manager</%block>
 
-{% block content %}
+<%block name="content">
 <section class="main-container">
 
-  {% include "widgets/navigation.html"%}
+  <%include file="widgets/navigation.html"/>
 
   <section class="main-content">
-    {% include "widgets/week-edit.html"%}
-    {% include "widgets/week-new.html"%}
-    {% include "widgets/video-edit.html"%}
-    {% include "widgets/video-new.html"%}
-    {% include "widgets/problem-edit.html"%}
-    {% include "widgets/problem-new.html"%}
+    <%include file="widgets/week-edit.html"/>
+    <%include file="widgets/week-new.html"/>
+    <%include file="widgets/video-edit.html"/>
+    <%include file="widgets/video-new.html"/>
+    <%include file="widgets/problem-edit.html"/>
+    <%include file="widgets/problem-new.html"/>
   </section>
 
 </section>
-{% endblock %}
+</%block>
