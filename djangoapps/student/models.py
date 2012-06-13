@@ -27,7 +27,7 @@ class UserProfile(models.Model):
     name = models.CharField(blank=True, max_length=255, db_index=True)
     language = models.CharField(blank=True, max_length=255, db_index=True)
     location = models.CharField(blank=True, max_length=255, db_index=True)
-    meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
+    meta = models.TextField(blank=True) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
     def get_meta(self):
