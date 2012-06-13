@@ -1,0 +1,151 @@
+<section class="video-edit">
+
+  <div class="content">
+    <form class="editor">
+
+      <div class="step black">
+        <section class="half">
+          <strong>Created </strong><span>22/03/12</span>
+          <strong>by </strong><span>Piotr Mitros</span>
+        </section>
+
+        <section class="half">
+          <strong>Last edited </strong><span>22/03/12</span>
+          <strong>by </strong><span>David Ormsbee</span>
+        </section>
+      </div>
+      <div class="step">
+        <section>
+          <h2 class="editable">Video title</h2>
+
+          <div style="margin: 15px 0;">
+            <strong>Tag</strong> <span class="editable">mitx, s4v1, circuits, anant</span>
+          </div>
+
+        </section>
+        <section class="meta">
+          <span>Keyword
+            <strong class="editable">S4V1</strong>
+          </span>
+
+          <span>Due Date
+            <strong class="editable">21/03/12</strong>
+          </span>
+          Status
+          <select>
+            <option>Draft</option>
+            <option>Published</option>
+            <option>Checked</option>
+          </select>
+
+          <input type="button" value="Save" style="float: right; margin-top: -4px;" />
+        </section>
+
+      </div>
+
+      <div class="step">
+        <section>
+          <div>
+            <input type="button" id="new-upload" value="Upload a new video clip" /> or
+            <span >use an already <a id="show-sidebar" href="#">uploaded one</a></span>
+          </div>
+        </section>
+
+        <section class="meta selected-files">
+          <div>
+            <ul>
+              <li>video-name-@0-75x.extension</li>
+              <li>video-name-@1x.extension</li>
+              <li>video-name-@1-25x.extension</li>
+              <li>video-name-@1-5x.extension</li>
+            </ul>
+          </div>
+          <input type="file" />
+          <input type="button" value="Upload" id="new-upload" style="float: right; margin-top: -4px;" />
+          <a href="" id="new-upload" style="float: right; margin-right: 10px;">Cancel</a>
+        </section>
+
+      </div>
+
+      <div class="step">
+        <section class="used-videos" style="overflow: visible;">
+          <ul id="used">
+            <div class="title"><h4>Video clip in use</h4></div>
+            {% include "widgets/video-box.html" %}
+          </ul>
+          <p class="no-video">No video clip used. Select one from the list below, <a>upload</a> a new one or <a>import</a> an already uploaded video.</p>
+        </section>
+        <section class="meta">
+          <input type="submit" value="Save and publish"/>
+        </section>
+      </div>
+
+
+      <div class="step no-title">
+        <section class="meta unused-videos"style="overflow: visible;" >
+          <ul id="unused">
+            {% include "widgets/video-box-unused.html" %}
+          </ul>
+        </section>
+      </div>
+
+      <div id="testing"></div>
+
+      <div class="step">
+        <div class="title"><h4>Annotations</h4></div>
+        <textarea class="captions" style="margin-top: 10px">
+          <div id="std_p7" onclick="title_seek( 7);"></div>
+          <li id="stt_p6"><div id="std_p7" onclick="title_seek( 8);"></div></li>
+      </ol></div>
+      More information given in <a href="/book/243">the text</a>.
+    </textarea>
+
+    <section class="meta">
+      <input type="submit" value="Save"/>
+    </section>
+  </form>
+  </div>
+
+  <div class="step">
+    <div class="title"><h4>Notes</h4></div>
+
+    <textarea class="notes" style="margin: 10px 0;">
+    </textarea>
+
+    <section class="meta">
+      <input type="submit" value="Post"/>
+    </section>
+    <section>
+      <div class="note">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. 
+        <p><strong>By Piotr Mitros</strong> 10 hours ago</p>
+      </div>
+      <div class="note">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. <p><strong>By Piotr Mitros</strong> 10 hours ago</p>
+      </div>
+      <div class="note">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. <p><strong>By Piotr Mitros</strong> 10 hours ago</p>
+      </div>
+    </section>
+  </div>
+
+<aside id="video-selector" class="hidden">
+  <input type="text" placeholder="Search video files..." />
+  <ul class="raw-videos">
+    {% include "widgets/raw-videos.html" %}
+  </ul>
+</aside>
+
+    </div>
+
+    <div id="raw-file">
+      Select the source video <select><option>Select source video</option><option>video-title.webm</option><option>another-video-title.webm</option><option>video-title-2.webm</option></select> or directly enter its ID <input type="text" style="width: 200px;"/><button>Use video</button>
+    </div>
+
+    <div id="view">
+      <img src="{{ STATIC_URL }}/img/video.jpg" />
+    </div>
+
+    <div id="upload">
+      <input type="file" />
+      <input type="button" value="Upload" id="new-upload" style="float: right; margin-top: -4px;" />
+      <a href="" id="new-upload" style="float: right; margin-right: 10px;">Cancel</a>
+    </div>
+  </section>

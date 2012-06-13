@@ -1,0 +1,152 @@
+section.week-edit, section.week-new {
+
+  > header {
+    border-bottom: 1px solid #ccc;
+    @include clearfix();
+    padding: 6px;
+
+    h1 {
+      font-size: 18px;
+      float: left;
+      margin-top: 8px 6px;
+    }
+
+    a {
+      float: right;
+      @extend .button;
+      display: block;
+    }
+  }
+
+  section {
+    header {
+      background: #666;
+      color: #fff;
+      padding: 6px;
+      border-bottom: 1px solid #333;
+      -webkit-font-smoothing: antialiased;
+
+      h2 {
+        font-size: 14px;
+      }
+    }
+
+    &.sidebar {
+      width: flex-grid(3, 9) + flex-gutter(9);
+      float: left;
+      background: #ccc;
+      border-right: 1px solid #333;
+      @include box-sizing(border-box);
+
+      section {
+        height: 50%;
+
+        > ul {
+          list-style: none;
+
+          > li {
+            padding: 6px;
+            border-bottom: 1px solid #666;
+            background: #eee;
+
+            &.new-module {
+              position: relative;
+
+              ul.new-dropdown {
+                list-style: none;
+
+                li {
+                  display: none;
+
+                  &:first-child {
+                    display: block;
+                  }
+                }
+
+                &:hover {
+                  li {
+                    display: block;
+                    padding: 6px 0;
+
+                    &:first-child {
+                      padding-top: 0;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        p {
+          padding: 6px;
+          border-bottom: 1px solid #666;
+        }
+      }
+    }
+
+    &.weeks-content {
+      width: flex-grid(6, 9);
+      float: left;
+      @include box-sizing(border-box);
+
+      header {
+        @include clearfix;
+
+        h2 {
+          float: left;
+        }
+
+        form {
+          float: right;
+          margin: -2px 0;
+
+          input {
+            border: 1px solid #000;
+            background: #ddd;
+            padding: 2px 4px;
+            @include border-radius(2px);
+          }
+        }
+      }
+
+
+      section {
+        &.filters {
+          border-bottom: 1px solid #999;
+
+          ul {
+            @include clearfix();
+            list-style: none;
+            padding: 6px;
+
+            li {
+              @include inline-block();
+
+              &.advanced {
+                float: right;
+              }
+            }
+          }
+        }
+
+        &.modules {
+          ul {
+            list-style: none;
+
+            li {
+              padding: 6px;
+              font-weight: bold;
+              font-size: 16px;
+              border-bottom: 1px solid #333;
+
+              a {
+                color: #000;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
