@@ -33,16 +33,16 @@ describe 'Calculator', ->
   describe 'toggle', ->
     it 'toggle the calculator and focus the input', ->
       spyOn $.fn, 'focus'
-      @calculator.toggle()
+      @calculator.toggle(jQuery.Event("click"))
 
       expect($('li.calc-main')).toHaveClass('open')
       expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()
 
     it 'toggle the close button on the calculator button', ->
-      @calculator.toggle()
+      @calculator.toggle(jQuery.Event("click"))
       expect($('.calc')).toHaveClass('closed')
 
-      @calculator.toggle()
+      @calculator.toggle(jQuery.Event("click"))
       expect($('.calc')).not.toHaveClass('closed')
 
   describe 'helpToggle', ->
