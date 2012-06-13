@@ -89,6 +89,19 @@ def grade_histogram(module_id):
     return grades
 
 def get_module(user, request, xml_module, module_object_preload, position=None):
+    ''' Get the appropriate xmodule and StudentModule.
+
+    Arguments:
+      - user                  : current django User
+      - request               : current django HTTPrequest
+      - xml_module            : lxml etree of xml subtree for the current module
+      - module_object_preload : list of StudentModule objects, one of which may match this module type and id
+      - position   	      : extra information from URL for user-specified position within module
+
+    Returns:
+      - a tuple (xmodule instance, student module, module type).
+
+    '''
     module_type=xml_module.tag
     module_class=xmodule.get_module_class(module_type)
     module_id=xml_module.get('id') #module_class.id_attribute) or "" 
@@ -184,7 +197,19 @@ def render_x_module(user, request, xml_module, module_object_preload, position=N
     return content
 
 def modx_dispatch(request, module=None, dispatch=None, id=None):
-    ''' Generic view for extensions. This is where AJAX calls go.'''
+    ''' Generic view for extensions. This is where AJAX calls go.
+
+    Arguments:
+
+      - request -- the django request.
+      - module -- the type of the module, as used in the course configuration xml.
+                  e.g. 'problem', 'video', etc
+      - dispatch -- the command string to pass through to the module's handle_ajax call
+           (e.g. 'problem_reset').  If this string contains '?', only pass
+           through the part before the first '?'.
+      - id -- the module id.  Used to look up the student module.
+            e.g. filenamexformularesponse
+    '''
     if not request.user.is_authenticated():
         return redirect('/')
 
@@ -200,6 +225,8 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     oldgrade = s.grade
     oldstate = s.state
 
+    # TODO: if dispatch is left at default value None, this will go boom.  What's the correct
+    # behavior?
     dispatch=dispatch.split('?')[0]
 
     ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'

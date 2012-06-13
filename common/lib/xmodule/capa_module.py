@@ -281,6 +281,7 @@ class Module(XModule):
 
     def answer_available(self):
         ''' Is the user allowed to see an answer?
+        TODO: simplify. 
         '''
         if self.show_answer == '':
             return False
