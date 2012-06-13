@@ -21,6 +21,8 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 
 from django_future.csrf import ensure_csrf_cookie
 
+from courseware import grades
+from certificates.models import certificate_state_for_student
 from student.survey_questions import exit_survey_list_for_student
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange
 
@@ -510,9 +512,13 @@ def record_exit_survey(request, internal_request = False):
         if not took_survey:
             survey_list = exit_survey_list_for_student(request.user)
         
+        grade_sheet = grades.grade_sheet(request.user)
+        certificate_state = certificate_state_for_student(request.user, grade_sheet['grade'])
+        
         
         context = {'took_survey' : took_survey,
-                 'survey_list' : survey_list}
+                 'survey_list' : survey_list,
+                 'certificate_state' : certificate_state}
         
         return render_to_response('exit_survey.html', context)
     

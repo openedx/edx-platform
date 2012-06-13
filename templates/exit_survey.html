@@ -12,16 +12,20 @@
 <%include file="navigation.html" args="active_page=''" />
 
 <section id="survey" class="main-content">
-  <form id="survey_form">
-
-    if certificate_state['state'] == "downloadable":
-      %if certificate_state['download_url']:
-        <a href="${certificate_state['download_url']}" target="_blank">Download Certificate</a>
-      %endif
-      %if certificate_state['graded_download_url']:
-        <a href="${certificate_state['graded_download_url']}" target="_blank">Download Certificate (with Grade)</a>
-      %endif
+  
+  %if certificate_state['state'] == "downloadable":
+    <div class="download-links">
+    %if certificate_state['download_url']:
+      <a href="${certificate_state['download_url']}" target="_blank">Download Certificate</a>
     %endif
+    %if certificate_state['graded_download_url']:
+      <a href="${certificate_state['graded_download_url']}" target="_blank">Download Certificate (with Grade)</a>
+    %endif
+    </div>
+  %endif
+  
+  
+  <form id="survey_form">
 
     %if not took_survey:
     <fieldset id="survey_fieldset">
