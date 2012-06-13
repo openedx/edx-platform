@@ -33,14 +33,14 @@ jasmine.stubYoutubePlayer = ->
     'getCurrentTime', 'getPlayerState', 'getVolume', 'setVolume', 'loadVideoById',
     'playVideo', 'pauseVideo', 'seekTo']
 
-jasmine.stubVideoPlayer = (context, enableParts) ->
+jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   enableParts = [enableParts] unless $.isArray(enableParts)
 
   suite = context.suite
   currentPartName = suite.description while suite = suite.parentSuite
   enableParts.push currentPartName
 
-  for part in ['VideoCaption', 'VideoSpeedControl', 'VideoProgressSlider']
+  for part in ['VideoCaption', 'VideoSpeedControl', 'VideoVolumeControl', 'VideoProgressSlider']
     unless $.inArray(part, enableParts) >= 0
       spyOn window, part
 
@@ -49,7 +49,8 @@ jasmine.stubVideoPlayer = (context, enableParts) ->
   YT.Player = undefined
   context.video = new Video 'example', '.75:abc123,1.0:def456'
   jasmine.stubYoutubePlayer()
-  return new VideoPlayer context.video
+  if createPlayer
+    return new VideoPlayer context.video
 
 spyOn(window, 'onunload')
 
