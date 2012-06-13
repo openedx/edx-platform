@@ -30,7 +30,8 @@ jasmine.stubRequests = ->
 
 jasmine.stubYoutubePlayer = ->
   YT.Player = -> jasmine.createSpyObj 'YT.Player', ['cueVideoById', 'getVideoEmbedCode',
-    'getCurrentTime', 'getPlayerState', 'loadVideoById', 'playVideo', 'pauseVideo', 'seekTo']
+    'getCurrentTime', 'getPlayerState', 'getVolume', 'setVolume', 'loadVideoById',
+    'playVideo', 'pauseVideo', 'seekTo']
 
 jasmine.stubVideoPlayer = (context, enableParts) ->
   enableParts = [enableParts] unless $.isArray(enableParts)
