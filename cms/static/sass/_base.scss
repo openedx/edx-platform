@@ -1,0 +1,51 @@
+
+$fg-column: 70px;
+$fg-gutter: 26px;
+$fg-max-columns: 12;
+
+html {
+  height: 100%;
+}
+
+body {
+  @include clearfix();
+  height: 100%;
+  font: 14px "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+
+  > section {
+    display: table;
+    width: 100%;
+  }
+
+  > header {
+    background: #000;
+    color: #fff;
+    display: block;
+    float: none;
+    padding: 6px 20px;
+    width: 100%;
+    @include box-sizing(border-box);
+
+    nav {
+      @include clearfix;
+
+      h2 {
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+    }
+  }
+}
+
+a {
+  text-decoration: none;
+  color: #888;
+}
+
+input[type="submit"], .button {
+  border: 1px solid #ccc;
+  background: #efefef;
+  @include border-radius(3px);
+  padding: 6px;
+}
+
