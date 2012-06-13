@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}/css/base-style.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/js/markitup/skins/simple/style.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/js/markitup/sets/wiki/style.css" />
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+  </head>
+
+  <body>
+
+      {% include "widgets/header.html"%}
+
+      {% block content %}{% endblock %}
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/js/markitup/jquery.markitup.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/js/markitup/sets/wiki/set.js"></script>
+    <script src="{{ STATIC_URL }}/js/main.js"></script>
+    <script src="{{ STATIC_URL }}/js/jquery.inlineedit.js"></script>
+    <script src="{{ STATIC_URL }}/js/jquery.leanModal.min.js"></script>
+    <script src="{{ STATIC_URL }}/js/jquery.tablednd.js"></script>
+  </body>
+</html>
+
+
