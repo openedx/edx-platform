@@ -150,3 +150,9 @@ class @VideoPlayer extends Subview
 
   currentSpeed: ->
     @video.speed
+
+  volume: (value) ->
+    if value != undefined
+      @player.setVolume value
+    else
+      @player.getVolume()

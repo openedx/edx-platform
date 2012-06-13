@@ -433,3 +433,17 @@ describe 'VideoPlayer', ->
 
     it 'delegate to the video', ->
       expect(@player.currentSpeed()).toEqual '3.0'
+
+  describe 'volume', ->
+    beforeEach ->
+      @player = new VideoPlayer @video
+      @player.player.getVolume.andReturn 42
+
+    describe 'without value', ->
+      it 'return current volume', ->
+        expect(@player.volume()).toEqual 42
+
+    describe 'with value', ->
+      it 'set player volume', ->
+        @player.volume(60)
+        expect(@player.player.setVolume).toHaveBeenCalledWith(60)
