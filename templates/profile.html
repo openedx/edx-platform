@@ -145,11 +145,15 @@ $(function() {
           %if certificate_state['state'] == "requestable":
             <a class="cert_request_link" href="/certificate_request">Request Certificate</a>
           %elif certificate_state['state'] == "downloadable":
-            %if certificate_state['download_url']:
-              <a href="${certificate_state['download_url']}" target="_blank">Download Certificate</a>
-            %endif
-            %if certificate_state['graded_download_url']:
-              <a href="${certificate_state['graded_download_url']}" target="_blank">Download Certificate (with Grade)</a>
+            %if took_survey:
+              %if certificate_state['download_url']:
+                <a href="${certificate_state['download_url']}" target="_blank">Download Certificate</a>
+              %endif
+              %if certificate_state['graded_download_url']:
+                <a href="${certificate_state['graded_download_url']}" target="_blank">Download Certificate (with Grade)</a>
+              %endif
+            %else:
+              <a class="survey_link" href="/exit_survey">Download Certificates</a>
             %endif
             
           %elif certificate_state['state'] == "generating":

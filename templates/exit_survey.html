@@ -14,6 +14,15 @@
 <section id="survey" class="main-content">
   <form id="survey_form">
 
+    if certificate_state['state'] == "downloadable":
+      %if certificate_state['download_url']:
+        <a href="${certificate_state['download_url']}" target="_blank">Download Certificate</a>
+      %endif
+      %if certificate_state['graded_download_url']:
+        <a href="${certificate_state['graded_download_url']}" target="_blank">Download Certificate (with Grade)</a>
+      %endif
+    %endif
+
     %if not took_survey:
     <fieldset id="survey_fieldset">
       <h1>Thank you for taking 6.002x! You could help us a lot by filling out this (optional) survey.</h1>
