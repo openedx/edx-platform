@@ -17,6 +17,8 @@ $ ->
   # $("a[rel*=leanModal]").leanModal()
   $('#csrfmiddlewaretoken').attr 'value', $.cookie('csrftoken')
 
+  new Calculator
+  new FeedbackForm
   if $('body').hasClass('courseware')
     Courseware.start()
 
