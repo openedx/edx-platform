@@ -1,4 +1,4 @@
-{% block content %}
+<%block name="content">
 <section class="week-new">
   <header>
     <h1>Week 6</h1>
@@ -18,7 +18,7 @@
         <h2>Scratchpad</h2>
       </header>
       <ul>
-        {% include "widgets/new-module.html"%}
+        <%include file="new-module.html"/>
       </ul>
     </section>
   </section>
@@ -59,4 +59,4 @@
     </section>
   </section>
 </section>
-{% endblock %}
+</%block>
