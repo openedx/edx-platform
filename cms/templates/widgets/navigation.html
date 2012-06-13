@@ -1,9 +1,8 @@
 <section class="cal">
   <header>
-    <h1>Circuts &amp; Electronics</h1>
-
+    <h2>Filter content:</h2>
     <ul>
-      <li class="dropdown">
+      <li>
         <a href="#">Sequences</a>
 
         <ul>
@@ -17,9 +16,20 @@
 
       <li>
         <a href="#">Deadlines</a>
+
+        <ul>
+          <li>Today</li>
+          <li>Tomorrow</li>
+          <li>This week</li>
+          <li>In 2 weeks</li>
+          <li>This month</li>
+        </ul>
       </li>
       <li>
         <a href="#">Goals</a>
+        <ul>
+          <li>Hide</li>
+        </ul>
       </li>
     </ul>
   </header>
@@ -28,93 +38,131 @@
     <li>
       <header>
         <h1><a href="#">Week 1</a></h1>
+        <ul>
+          <li class="goal editable"><strong>Goal title:</strong> This is a goal that will be in the header of the week</li>
+          <li class="goal editable"><strong>Goal title two:</strong> This is another fgoal for this week so that students have two things to learn</li>
+        </ul>
       </header>
 
       <ul>
-        <li class="goal">Goal 1</li>
-        <li class="goal">Goal 2</li>
-        <li class="seq">Lecture Sequence</li>
-        <li class="seq">Lecture Sequence</li>
-        <li class="lab">Lab</li>
+        <li class="seq"><a href="#" class="sequence-edit">Lecture Sequence</a></li>
+        <li class="seq"><a href="#" class="sequence-edit">Lecture Sequence</a></li>
+        <li class="lab"><a href="#" class="lab-edit">Lab</a></li>
         <li class="hw">Homework</li>
-        <li class="new">+ Add new sequence</li>
+        <%include file="module-dropdown.html"/>
       </ul>
     </li>
     <li>
       <header>
         <h1><a href="#">Week 2</a></h1>
+        <ul>
+          <li class="goal editable"><strong>Another title</strong> This is the goal for the week</li>
+        </ul>
       </header>
 
       <ul>
-        <li class="goal">Goal 1</li>
         <li class="seq">Lecture Sequence</li>
         <li class="seq">Lecture Sequence</li>
         <li class="lab">Lab</li>
         <li class="hw">Homework</li>
-        <li class="new">+ Add new sequence</li>
+        <%include file="module-dropdown.html"/>
       </ul>
     </li>
     <li>
       <header>
       <h1><a href="#">Week 3</a></h1>
+        <ul>
+          <li class="goal editable"><strong>Another title</strong> This is the goal for the week</li>
+        </ul>
       </header>
 
       <ul>
-        <li class="goal">Goal 1</li>
         <li class="lab">Lab</li>
         <li class="lab">Lab</li>
         <li class="hw">Homework</li>
-        <li class="new">+ Add new sequence</li>
+        <%include file="module-dropdown.html"/>
       </ul>
     </li>
     <li>
       <header>
         <h1><a href="#">Week 4</a></h1>
+        <ul>
+          <li class="goal editable"><strong>Another title</strong> This is the goal for the week</li>
+          <li class="goal editable"><strong>Goal title two:</strong> This is another fgoal for this week so that students have two things to learn</li>
+        </ul>
       </header>
 
       <ul>
-        <li class="goal">Goal 1</li>
         <li class="seq">Lecture Sequence</li>
         <li class="lab">Lab</li>
         <li class="hw">Homework</li>
         <li class="hw">Homework</li>
-        <li class="new">+ Add new sequence</li>
+        <%include file="module-dropdown.html"/>
       </ul>
     </li>
 
     <li>
       <header>
         <h1><a>Week 5</a></h1>
+        <ul>
+          <li class="goal editable">Please create a learning goal for this week</li>
+        </ul>
       </header>
 
       <ul>
-        <li class="new">+ Add new sequence</li>
+        <%include file="module-dropdown.html"/>
       </ul>
     </li>
     <li>
-      <p class="add-new-week">
-        <a href="#" >+ Add New</a>
-      </p>
+      <header>
+        <h1><a>Week 6</a></h1>
+        <ul>
+          <li class="goal editable">Please create a learning goal for this week</li>
+        </ul>
+      </header>
 
-      <section class="new-week">
-        <header>
-          <h1 class="editable">Week 6</h1>
-        </header>
+      <ul>
+        <%include file="module-dropdown.html"/>
+      </ul>
+    </li>
+    <li>
+      <header>
+        <h1><a>Week 7</a></h1>
+        <ul>
+          <li class="goal editable">Please create a learning goal for this week</li>
+        </ul>
+      </header>
 
-        <form>
-          <select>
-            <option>Blank</option>
-            <option>6.002x</option>
-            <option>6.00x</option>
-          </select>
-          <div>
+      <ul>
+        <%include file="module-dropdown.html"/>
+      </ul>
+    </li>
+  </ol>
+
+  <section class="new-section">
+    <a href="#" >+ Add New Section</a>
+
+    <section>
+      <form>
+        <ul>
+          <li>
+            <input type="text" name="" id="" placeholder="Moldule title" />
+          </li>
+          <li>
+            <select>
+              <option>Blank</option>
+              <option>6.002x</option>
+              <option>6.00x</option>
+            </select>
+          </li>
+          <li>
             <input type="submit" value="Save and edit week" class="edit-week" />
             <a href="#" class="close">Save without edit</a>
             <a href="#" class="close">cancel</a>
-          </div>
-        </form>
-      </section>
-    </li>
-  </ol>
+          </li>
+        </ul>
+      </form>
+    </section>
+  </section>
 </section>
 

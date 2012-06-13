@@ -1,0 +1,85 @@
+<%block name="content">
+<section class="sequence-edit">
+  <header>
+    <a href="/ui_prototype">Done</a>
+    <h1 class="editable">Lecture Sequence name</h1>
+    <a href="">Settings</a>
+  </header>
+
+  <section class="sidebar">
+    <section class="goals">
+      <header>
+        <h2>Content</h2>
+      </header>
+      <ul>
+        <li><a href="#" class="video-edit">Video 1</a></li>
+        <li><a href="#" class="video-edit">Video 2</a></li>
+        <%include file="new-module.html"/>
+      </ul>
+    </section>
+
+    <section class="scratch-pad">
+      <header>
+        <h2>Scratchpad</h2>
+      </header>
+
+      <ul>
+        <li><a href="#" class="problem-edit">Problem title 11</a></li>
+        <li><a href="#" class="problem-edit">Problem title 13</a></li>
+        <li><a href="#" class="problem-edit">Problem title 14</a></li>
+        <li><a href="#" class="video-edit">Video 3</a></li>
+        <%include file="new-module.html"/>
+      </ul>
+
+    </section>
+  </section>
+
+  <section class="weeks-content">
+    <header>
+      <h2>Sequence Content</h2>
+      <form>
+        <input type="search" name="" id="" value="" />
+      </form>
+    </header>
+
+    <section class="filters">
+      <ul>
+        <li>
+          <label for="">Sort by</label>
+          <select>
+            <option value="">Recently Modified</option>
+          </select>
+        </li>
+
+        <li>
+          <label for="">Display</label>
+          <select>
+            <option value="">All content</option>
+          </select>
+        </li>
+        <li>
+          <select>
+            <option value="">Internal Only</option>
+          </select>
+        </li>
+
+        <li class="advanced">
+          <a href="#">Advanced filters</a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="modules">
+      <ul>
+        <li><a href="#" class="problem-edit">Problem 2</a></li>
+        <li><a href="#" class="problem-edit">Problem 4</a></li>
+        <li><a href="#" class="problem-edit">Problem 6</a></li>
+        <li><a href="#" class="video-edit">Video 5</a></li>
+        <li><a href="#" class="video-edit">Video 4</a></li>
+        <li><a href="#" class="problem-edit">Problem 9</a></li>
+      </ul>
+    </section>
+  </section>
+</section>
+</%block>
+
