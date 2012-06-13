@@ -1,37 +1,20 @@
-<%block name="content">
 <section class="week-edit">
   <header>
     <h1 class="editable">Week 3</h1>
-    <a href="/ui_prototype">Done</a>
+    <p><a href="#">+ new goal</a></p>
+
+    <section class="goals">
+      <h2>Weeks goals:</h2>
+      <ul>
+        <li>
+          <h3>Goal title</h2>
+          <p>This is the goal body</p>
+        </li>
+      </ul>
+    </section>
   </header>
 
-  <section class="sidebar">
-    <section class="goals">
-      <header>
-        <h2>Goals</h2>
-      </header>
-      <ul>
-        <li>Goal 1: This is the title of the first goal</li>
-        <li>Goal 2: This is the title</li>
-      </ul>
-      <p><a href="#">+ Add new goal</a></p>
-    </section>
 
-    <section class="scratch-pad">
-      <header>
-        <h2>Scratchpad</h2>
-      </header>
-
-      <ul>
-        <li>Problem title 11</li>
-        <li>Problem title 13</li>
-        <li>Problem title 14</li>
-        <li>Video 3</li>
-        <%include file="new-module.html"/>
-      </ul>
-
-    </section>
-  </section>
 
   <section class="weeks-content">
     <header>
@@ -70,14 +53,55 @@
 
     <section class="modules">
       <ul>
-        <li><a href="#">Circuit Stuff</a></li>
-        <li><a href="#">Circuit Stuff</a></li>
-        <li><a href="#">Circuit Stuff</a></li>
-        <li><a href="#">Circuit Stuff</a></li>
-        <li><a href="#">Circuit Stuff</a></li>
-        <li><a href="#">Circuit Stuff</a></li>
+        <li>
+          <h2><a href="#">Lecture Sequence</a></h2>
+
+          <ul>
+            <li><a href="#" class="problem-edit">Problem title 11</a></li>
+            <li><a href="#" class="problem-edit">Problem title 13</a></li>
+            <li><a href="#" class="problem-edit">Problem title 14</a></li>
+            <li><a href="#" class="video-edit">Video 3</a></li>
+          </ul>
+        </li>
+        <li>
+          <h2><a href="#">Lecture Sequence</a></h2>
+
+          <ul>
+            <li><a href="#" class="problem-edit">Problem title 11</a></li>
+            <li><a href="#" class="problem-edit">Problem title 13</a></li>
+            <li><a href="#" class="problem-edit">Problem title 14</a></li>
+            <li><a href="#" class="video-edit">Video 3</a></li>
+          </ul>
+        </li>
+        <li>
+          <h2><a href="#">Homework 1a</a></h2>
+
+          <ul>
+            <li><a href="#" class="problem-edit">Problem title 11</a></li>
+            <li><a href="#" class="problem-edit">Problem title 13</a></li>
+            <li><a href="#" class="problem-edit">Problem title 14</a></li>
+            <li><a href="#" class="video-edit">Video 3</a></li>
+          </ul>
+        </li>
+
+        <li class="new-module">
+          <%include file="new-module.html"/>
+        </li>
       </ul>
     </section>
   </section>
+
+  <section class="scratch-pad">
+    <header>
+      <h2>Scratchpad</h2>
+    </header>
+
+    <ul>
+      <li>Problem title 11</li>
+      <li>Problem title 13</li>
+      <li>Problem title 14</li>
+      <li>Video 3</li>
+      <%include file="new-module.html"/>
+    </ul>
+  </section>
 </section>
-</%block>

@@ -1,40 +1,23 @@
 section.problem-new, section.problem-edit {
-  position: absolute;
-  top: 80px;
-  right: 0;
-  background: #fff;
-  width: flex-grid(5);
-  @include box-shadow(0 0 6px #666);
-  border: 1px solid #333;
-  border-right: 0;
-  z-index: 4;
-
-  > header {
-    background: #666;
-    @include clearfix;
-    color: #fff;
-    padding: 6px;
-    border-bottom: 1px solid #333;
-    -webkit-font-smoothing: antialiased;
-
-    h2 {
-      float: left;
-      font-size: 14px;
+  > section {
+    textarea {
+      @include box-sizing(border-box);
+      display: block;
+      width: 100%;
     }
 
-    a {
-      float: right;
+    div.preview {
+      background: #eee;
+      @include box-sizing(border-box);
+      height: 40px;
+      padding: 10px;
+      width: 100%;
     }
-  }
 
-  section {
-    ul {
-      list-style: none;
-
-      li {
-        border-bottom: 1px solid #333;
-        padding: 10px 25px;
-      }
+    a.save {
+      @extend .button;
+      @include inline-block();
+      margin-top: 20px;
     }
   }
 }
