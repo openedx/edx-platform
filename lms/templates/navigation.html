@@ -1,30 +1,49 @@
 <%page args="active_page" />
-<div class="header-wrapper">
-  <header aria-label="Global Navigation">
-    <hgroup>
-      <h1><em>
-        % if settings.ENABLE_MULTICOURSE:
-            <a href="${ MITX_ROOT_URL }/mitxhome" style="color:black;">MITx</a>
-        % else:
-            MITx
-        % endif
-       </em></h1>
-      <h2><a href="${ MITX_ROOT_URL }/courseware/">${ settings.COURSE_TITLE }</a></h2>
-    </hgroup>
+<header class="app" aria-label="Global Navigation">
+  <nav>
+    <a href="${ MITX_ROOT_URL }/mitxhome" class="logo">
+      <img src="${ MITX_ROOT_URL}/static/images/logo.png" />
+    </a>
 
-    <nav class="${active_page}">
-      <ul class="coursenav">
-        <li class="courseware"><a href="${ MITX_ROOT_URL }/courseware/">Courseware</a></li>
-        <li class="info"><a href="${ MITX_ROOT_URL }/info">Course Info</a></li>
+    <h1>${ settings.COURSE_TITLE }</h1>
+    <ol class="user">
+      <li>
+        <a href="/dashboard.html" class="user-dashboard">
+          <span class="avatar"><img src="/static/images/profile.jpg" /></span>
+          Neil deGrasse Tyson
+        </a>
+      </li>
+      <li>
+        <a href="#" class="options">&#9662</a>
+        <ol class="user-options">
+          <li><a href="#">Account Settings</a></li>
+          <li><a href="/">Log Out</a></li>
+        </ol>
+      </li>
+    </ol>
+  </nav>
+</header>
+
+<%
+def url_class(url):
+  if url == active_page:
+    return "active"
+  return ""
+%>
+
+<nav class="${active_page} course-material">
+  <div class="inner-wrapper">
+    <ol class="course-tabs">
+      <li class="courseware"><a href="${ MITX_ROOT_URL }/courseware/" class="${url_class('courseware')}">Courseware</a></li>
+      <li class="info"><a href="${ MITX_ROOT_URL }/info" class="${url_class('info')}">Course Info</a></li>
 % if user.is_authenticated():
-        <li class="book"><a href="${ MITX_ROOT_URL }/book">Textbook</a></li>
-        <li class="discussion"><a href="${ MITX_ROOT_URL }/discussion/questions/">Discussion</a></li>
+      <li class="book"><a href="${ MITX_ROOT_URL }/book" class="${url_class('book')}">Textbook</a></li>
+      <li class="discussion"><a href="${ MITX_ROOT_URL }/discussion/questions/">Discussion</a></li>
 % endif
-        <li class="wiki"><a href="${ MITX_ROOT_URL }/wiki/view/">Wiki</a></li>
+      <li class="wiki"><a href="${ MITX_ROOT_URL }/wiki/view/" class="${url_class('wiki')}">Wiki</a></li>
 % if user.is_authenticated():
-        <li class="profile"><a href="${ MITX_ROOT_URL }/profile">Profile</a></li>
+      <li class="profile"><a href="${ MITX_ROOT_URL }/profile" class="${url_class('profile')}">Profile</a></li>
 % endif
-      </ul>
-    </nav>
-  </header>
-</div>
+    </ol>
+  </div>
+</nav>

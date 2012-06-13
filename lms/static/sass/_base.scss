@@ -1,0 +1,55 @@
+$gw-column: 60px;
+$gw-gutter: 25px;
+
+$fg-column: $gw-column;
+$fg-gutter: $gw-gutter;
+$fg-max-columns: 12;
+
+$sans-serif: 'Open Sans', $verdana;
+$serif: $georgia;
+
+$base-font-color: rgb(60,60,60);
+$lighter-base-font-color: rgb(160,160,160);
+
+$blue: rgb(29,157,217);
+$pink: rgb(182,37,104);
+
+html, body {
+  background: rgb(255,255,255);
+  font-size: 75%;
+  min-height: 100%;
+  margin: 0px 0px -140px 0px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: $base-font-color;
+  font: normal 1.6rem/2rem $serif;
+  margin: 0px;
+}
+
+p {
+  color: $base-font-color;
+  font: normal 1.3rem/2rem $serif;
+  margin: 0px;
+}
+
+p + p {
+  margin-top: 20px;
+}
+
+a:link, a:visited {
+  color: $blue;
+  font: normal 1rem/1.8rem $sans-serif;
+  text-decoration: none;
+
+  &:hover {
+    color: lighten($blue, 10%);
+  }
+}
+
+.container {
+  @include clearfix;
+  margin: 0 auto 0;
+  max-width: 1200px;
+  width: flex-grid(12);
+}

@@ -1,0 +1,242 @@
+.grid-container {
+  display: none;
+  
+  > * {
+    float: left;
+    height: 20px;
+  }
+  
+  .grid {
+    background: #FFD3DC;
+    margin-right: flex-gutter();
+    width: flex-grid(1);
+    
+    &:last-child {
+      margin-right: 0px;
+    };
+  }
+
+  .gutter {
+    background: #E3FFDA;
+    display:none;
+    width: $fg-gutter();
+  }
+}
+
+.container {
+  
+}
+
+.course-info {
+  font-size: 16px;
+  
+  .tab {
+    display: none;
+  }
+  
+  > * {
+    @include box-sizing(border-box);
+    clear: both;
+    margin-top: 20px;
+  }
+  
+  section {
+  }
+  
+  h2 {
+    font-size: 2em;
+  }
+  
+  h3 {
+    font-size: 1.4em;
+  }
+  
+  p {
+//    color: rgb(102,102,102);
+  }
+  
+  header {
+    background: rgb(240,240,240);
+    border: 1px solid rgb(200,200,200);
+    @include border-radius(4px);
+    @include box-shadow(inset 0 0 1px 1px rgb(255,255,255));
+    padding: 20px;
+    position: relative;
+    width: flex-grid(12);
+    
+    > img {
+      @include border-radius(10px);
+      display: none;
+      float: right;
+      height: 150px;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+    }
+    
+    h2 {
+      margin-bottom: .5em;
+    }
+    
+    h3 {
+      
+      .course-number {
+        color: $lighter-base-font-color;
+      }
+    }
+    
+    .course-abstract {
+      display: none;
+    }
+    
+    .course-times {
+      display: none;
+      
+      .start-time, .end-time, .duration, .separator {
+        color: rgb(102,102,102);
+      }
+      
+      .duration {
+      }
+      
+      .separator {
+      }
+    }
+    
+    .button {
+      @include button(simple, $blue);
+      display: block;
+      font-size: 1.6em;
+      padding: .5em inherit;
+      position: absolute;
+      right: 20px;
+      text-align: center;
+      top: 20%;
+      width: flex-grid(3);
+    }
+  } // header
+  
+  .main-info-wrap {
+    border-bottom: 1px solid #C2C2C2;
+    margin-top: none;
+    padding: 0 20px 20px;
+    
+    section.course-description, section.teacher-description {
+      @include box-sizing(border-box);
+      
+      h3 {
+        margin-bottom: 1em;
+      }
+
+    }
+  
+    .course-description {
+      float: left;
+      margin-right: flex-gutter();
+      width: flex-grid(8);
+    }
+  
+    .teacher-description {
+      clear: none;
+      float: left;
+      position: relative;
+      width: flex-grid(4);
+    
+      .teacher-image {
+        display: none;
+        text-align: center;
+        float: right;
+      
+        .teacher-name {
+          display: none;
+          font-weight: bold;
+          color: rgb(100,100,100);
+          position: relative;
+          top: 12px;
+        }
+      
+        img {
+          border: 1px solid rgb(102,102,102);
+          @include box-shadow(1px 1px 5px rgba(0,0,0,0.5));
+        }
+      }
+    } // .teacher-description
+  } //.main-info-wrap
+  
+  ul.tabs {
+    list-style-type: none;
+    font-size: 0;
+    padding: 0 20px;
+    
+    li {
+      background: #eee;
+      @include border-radius(2px);
+      display: inline-block;
+      color: #444;
+      font-size: 16px;
+      font-weight: bold;
+      margin-right: 10px;
+      padding: .3em 1em;
+      @include transition (all .2s ease-in-out, color .1s ease-in-out);
+      
+      &.enabled {
+        color: #fff;
+        @include linear-gradient($blue, darken($blue, 5%));
+      }
+      
+      &:hover {
+        cursor: pointer;
+        background: #ddd;
+        
+        &.enabled {
+          @include linear-gradient(darken($blue, 5%), darken($blue, 10%));
+          color: #fff;
+        }
+      }
+    }
+  }
+  
+  .tabs-content {
+    margin: 20px;
+    
+    section {
+      margin-top: 30px;
+      color: #666;
+    }
+  }
+  
+  .syllabus {
+    
+    ul {
+      list-style: none outside;
+      font-size: .9em;
+      line-height: 1.5em;
+      
+      li {
+      }
+    }
+  } //.syllabus
+  
+  .faq {
+    ul {
+      list-style: none outside;
+      
+      li {
+        margin-bottom: 1em;
+        
+        p {
+          font-family: $sans-serif;
+          margin-left: 2em;
+        }
+      }
+    }
+  } // .faq
+  
+  .more-info {
+    
+    p {
+      font-family: $sans-serif;
+      margin-left: 2em;
+    }
+  }
+}
