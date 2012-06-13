@@ -44,7 +44,7 @@ urlpatterns = ('',
 if settings.END_COURSE_ENABLED:
     urlpatterns += (
         url(r'^certificate_request$', 'certificates.views.certificate_request'),
-        url(r'^exit_survey$','student.views.record_exit_survey'),
+#        url(r'^exit_survey$','student.views.record_exit_survey'),
     )
 
 if settings.PERFSTATS:
