@@ -191,13 +191,28 @@ body {
         clear: both; }
       body > header nav h2 {
         font-size: 14px;
-        text-transform: uppercase; }
+        text-transform: uppercase;
+        float: left; }
+      body > header nav a.new-module {
+        float: right; }
+  body.content section.main-content {
+    border-left: 2px solid #000;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 74.423%;
+    float: left;
+    -webkit-box-shadow: -2px 0 3px #dddddd;
+    -moz-box-shadow: -2px 0 3px #dddddd;
+    box-shadow: -2px 0 3px #dddddd; }
 
 a {
   text-decoration: none;
   color: #888; }
 
-input[type="submit"], .button, section.week-edit > header a, section.week-new > header a {
+input[type="submit"], .button, section.cal section.new-section > a, section.week-edit > header a,
+section.week-new > header a,
+section.sequence-edit > header a, section.video-new > section section.upload a.upload-button, section.video-edit > section section.upload a.upload-button, section.video-new > section a.save-update, section.video-edit > section a.save-update, section.problem-new > section a.save, section.problem-edit > section a.save {
   border: 1px solid #ccc;
   background: #efefef;
   -webkit-border-radius: 3px;
@@ -221,17 +236,36 @@ section.cal {
     clear: both; }
   section.cal > header {
     zoom: 1;
-    margin-bottom: 10px; }
+    margin-bottom: 10px;
+    background: #efefef;
+    border: 1px solid #ddd; }
     section.cal > header:before, section.cal > header:after {
       content: "";
       display: table; }
     section.cal > header:after {
       clear: both; }
-    section.cal > header h1 {
-      float: left;
-      font-size: 18px; }
+    section.cal > header h2 {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 14px;
+      padding: 6px;
+      margin-left: 6px;
+      font-size: 12px; }
     section.cal > header ul {
-      float: right; }
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
       section.cal > header ul li {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
@@ -239,42 +273,37 @@ section.cal {
         vertical-align: baseline;
         zoom: 1;
         *display: inline;
-        *vertical-align: auto; }
+        *vertical-align: auto;
+        margin-left: 6px;
+        padding-left: 6px;
+        border-left: 1px solid #ddd;
+        padding: 6px; }
         section.cal > header ul li a {
-          padding: 6px;
-          border: 1px solid #ddd;
-          display: block;
-          -webkit-border-radius: 3px;
-          -moz-border-radius: 3px;
-          -ms-border-radius: 3px;
-          -o-border-radius: 3px;
-          border-radius: 3px;
-          background: #efefef; }
-        section.cal > header ul li.dropdown {
-          position: relative; }
-          section.cal > header ul li.dropdown ul {
-            display: none;
-            position: absolute;
-            background: #fff;
-            border: 1px solid #ddd; }
-            section.cal > header ul li.dropdown ul li {
-              padding: 6px;
-              display: block;
-              border-top: 1px solid transparent;
-              border-bottom: 1px solid transparent; }
-              section.cal > header ul li.dropdown ul li:hover {
-                background-color: #efefef;
-                border-top: 1px solid #ddd;
-                border-bottom: 1px solid #ddd; }
-          section.cal > header ul li.dropdown:hover ul {
-            display: block; }
-          section.cal > header ul li.dropdown:hover a {
-            -webkit-border-radius: 3px 3px 0 0;
-            -moz-border-radius: 3px 3px 0 0;
-            -ms-border-radius: 3px 3px 0 0;
-            -o-border-radius: 3px 3px 0 0;
-            border-radius: 3px 3px 0 0;
-            border-bottom: 0; }
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+        section.cal > header ul li ul {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+          section.cal > header ul li ul li {
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto;
+            padding: 0;
+            border-left: 0; }
   section.cal ol {
     list-style: none;
     zoom: 1;
@@ -297,75 +326,26 @@ section.cal {
       box-sizing: border-box;
       float: left;
       width: 25.0%; }
-      section.cal ol > li:last-child {
-        text-align: center;
-        background: #eee;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box; }
-        section.cal ol > li:last-child p {
-          width: 100%;
-          height: 100%;
-          -webkit-box-sizing: border-box;
-          -moz-box-sizing: border-box;
-          box-sizing: border-box; }
-          section.cal ol > li:last-child p a {
-            display: block;
-            width: 100%;
-            height: 100%; }
-        section.cal ol > li:last-child section.new-week header {
-          background: #fff;
-          text-align: left; }
-        section.cal ol > li:last-child section.new-week form {
-          background: #fff;
-          width: 50%;
-          padding: 6px;
-          border: 1px solid #000;
-          margin: 0 auto;
-          -webkit-box-shadow: 0 0 2px #333333;
-          -moz-box-shadow: 0 0 2px #333333;
-          box-shadow: 0 0 2px #333333;
-          position: relative; }
-          section.cal ol > li:last-child section.new-week form:before {
-            background: #fff;
-            border-left: 1px solid #000;
-            border-top: 1px solid #000;
-            content: "  ";
-            display: block;
-            height: 10px;
-            left: 50%;
-            position: absolute;
-            top: -6px;
-            -webkit-transform: rotate(45deg);
-            -moz-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            -o-transform: rotate(45deg);
-            transform: rotate(45deg);
-            width: 10px;
-            z-index: 0; }
-          section.cal ol > li:last-child section.new-week form select {
-            margin-bottom: 6px;
-            width: 100%; }
-            section.cal ol > li:last-child section.new-week form select option {
-              padding: 10px 0 !important; }
-          section.cal ol > li:last-child section.new-week form input[type="submit"] {
-            display: block;
-            margin-bottom: 6px;
-            width: 100%; }
-          section.cal ol > li:last-child section.new-week form a:first-child {
-            float: left; }
-          section.cal ol > li:last-child section.new-week form a:last-child {
-            float: right; }
       section.cal ol > li header {
         border-bottom: 1px solid #000;
-        -webkit-box-shadow: 0 1px 2px #cccccc;
-        -moz-box-shadow: 0 1px 2px #cccccc;
-        box-shadow: 0 1px 2px #cccccc;
+        -webkit-box-shadow: 0 1px 2px #aaaaaa;
+        -moz-box-shadow: 0 1px 2px #aaaaaa;
+        box-shadow: 0 1px 2px #aaaaaa;
         display: block;
-        margin-bottom: 2px;
-        padding: 6px; }
+        margin-bottom: 2px; }
         section.cal ol > li header h1 {
-          font-size: 14px; }
+          font-size: 14px;
+          text-transform: uppercase;
+          border-bottom: 1px solid #ccc;
+          padding: 6px; }
+          section.cal ol > li header h1 a {
+            color: #000;
+            display: block; }
+        section.cal ol > li header ul li {
+          background: #fff;
+          color: #888;
+          border-bottom: 0;
+          font-size: 12px; }
       section.cal ol > li ul {
         list-style: none;
         margin-bottom: 1px; }
@@ -373,8 +353,104 @@ section.cal {
           background: #efefef;
           border-bottom: 1px solid #666;
           padding: 6px; }
-          section.cal ol > li ul li.goal {
-            background: #fff; }
+          section.cal ol > li ul li.create-module {
+            position: relative; }
+            section.cal ol > li ul li.create-module > div {
+              display: none;
+              position: absolute;
+              top: 30px;
+              width: 90%;
+              background: rgba(0, 0, 0, 0.8);
+              padding: 10px;
+              -webkit-box-sizing: border-box;
+              -moz-box-sizing: border-box;
+              box-sizing: border-box;
+              -webkit-border-radius: 3px;
+              -moz-border-radius: 3px;
+              -ms-border-radius: 3px;
+              -o-border-radius: 3px;
+              border-radius: 3px;
+              z-index: 99; }
+              section.cal ol > li ul li.create-module > div ul li {
+                border-bottom: 0;
+                background: none; }
+                section.cal ol > li ul li.create-module > div ul li input {
+                  width: 100%;
+                  -webkit-box-sizing: border-box;
+                  -moz-box-sizing: border-box;
+                  box-sizing: border-box;
+                  border-color: #000;
+                  padding: 6px; }
+                section.cal ol > li ul li.create-module > div ul li select {
+                  width: 100%;
+                  -webkit-box-sizing: border-box;
+                  -moz-box-sizing: border-box;
+                  box-sizing: border-box; }
+                  section.cal ol > li ul li.create-module > div ul li select option {
+                    font-size: 14px; }
+                section.cal ol > li ul li.create-module > div ul li a {
+                  float: right; }
+                  section.cal ol > li ul li.create-module > div ul li a:first-child {
+                    float: left; }
+            section.cal ol > li ul li.create-module:hover div {
+              display: block; }
+  section.cal section.new-section {
+    margin-top: 10px; }
+    section.cal section.new-section > a {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
+    section.cal section.new-section section {
+      display: none; }
+      section.cal section.new-section section header {
+        background: #fff;
+        text-align: left; }
+      section.cal section.new-section section form {
+        background: #fff;
+        width: 50%;
+        padding: 6px;
+        border: 1px solid #000;
+        margin: 0 auto;
+        -webkit-box-shadow: 0 0 2px #333333;
+        -moz-box-shadow: 0 0 2px #333333;
+        box-shadow: 0 0 2px #333333;
+        position: relative; }
+        section.cal section.new-section section form:before {
+          background: #fff;
+          border-left: 1px solid #000;
+          border-top: 1px solid #000;
+          content: "  ";
+          display: block;
+          height: 10px;
+          left: 50%;
+          position: absolute;
+          top: -6px;
+          -webkit-transform: rotate(45deg);
+          -moz-transform: rotate(45deg);
+          -ms-transform: rotate(45deg);
+          -o-transform: rotate(45deg);
+          transform: rotate(45deg);
+          width: 10px;
+          z-index: 0; }
+        section.cal section.new-section section form select {
+          margin-bottom: 6px;
+          width: 100%; }
+          section.cal section.new-section section form select option {
+            padding: 10px 0 !important; }
+        section.cal section.new-section section form input[type="submit"] {
+          display: block;
+          margin-bottom: 6px;
+          width: 100%; }
+        section.cal section.new-section section form a:first-child {
+          float: left; }
+        section.cal section.new-section section form a:last-child {
+          float: right; }
+    section.cal section.new-section:hover section {
+      display: block; }
 
 body.content
 section.cal {
@@ -393,31 +469,49 @@ section.cal {
     box-sizing: border-box;
     width: 100%; }
 
-section.week-edit > header, section.week-new > header {
+section.week-edit > header,
+section.week-new > header,
+section.sequence-edit > header {
   border-bottom: 1px solid #ccc;
   zoom: 1;
   padding: 6px; }
-  section.week-edit > header:before, section.week-edit > header:after, section.week-new > header:before, section.week-new > header:after {
+  section.week-edit > header:before, section.week-edit > header:after,
+  section.week-new > header:before,
+  section.week-new > header:after,
+  section.sequence-edit > header:before,
+  section.sequence-edit > header:after {
     content: "";
     display: table; }
-  section.week-edit > header:after, section.week-new > header:after {
+  section.week-edit > header:after,
+  section.week-new > header:after,
+  section.sequence-edit > header:after {
     clear: both; }
-  section.week-edit > header h1, section.week-new > header h1 {
+  section.week-edit > header h1,
+  section.week-new > header h1,
+  section.sequence-edit > header h1 {
     font-size: 18px;
     float: left;
     margin-top: 8px 6px; }
-  section.week-edit > header a, section.week-new > header a {
+  section.week-edit > header a,
+  section.week-new > header a,
+  section.sequence-edit > header a {
     float: right;
     display: block; }
-section.week-edit section header, section.week-new section header {
+section.week-edit section header,
+section.week-new section header,
+section.sequence-edit section header {
   background: #666;
   color: #fff;
   padding: 6px;
   border-bottom: 1px solid #333;
   -webkit-font-smoothing: antialiased; }
-  section.week-edit section header h2, section.week-new section header h2 {
+  section.week-edit section header h2,
+  section.week-new section header h2,
+  section.sequence-edit section header h2 {
     font-size: 14px; }
-section.week-edit section.sidebar, section.week-new section.sidebar {
+section.week-edit section.sidebar,
+section.week-new section.sidebar,
+section.sequence-edit section.sidebar {
   width: 34.368%;
   float: left;
   background: #ccc;
@@ -425,49 +519,85 @@ section.week-edit section.sidebar, section.week-new section.sidebar {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
-  section.week-edit section.sidebar section, section.week-new section.sidebar section {
+  section.week-edit section.sidebar section,
+  section.week-new section.sidebar section,
+  section.sequence-edit section.sidebar section {
     height: 50%; }
-    section.week-edit section.sidebar section > ul, section.week-new section.sidebar section > ul {
+    section.week-edit section.sidebar section > ul,
+    section.week-new section.sidebar section > ul,
+    section.sequence-edit section.sidebar section > ul {
       list-style: none; }
-      section.week-edit section.sidebar section > ul > li, section.week-new section.sidebar section > ul > li {
+      section.week-edit section.sidebar section > ul > li,
+      section.week-new section.sidebar section > ul > li,
+      section.sequence-edit section.sidebar section > ul > li {
         padding: 6px;
         border-bottom: 1px solid #666;
         background: #eee; }
-        section.week-edit section.sidebar section > ul > li.new-module, section.week-new section.sidebar section > ul > li.new-module {
+        section.week-edit section.sidebar section > ul > li.new-module,
+        section.week-new section.sidebar section > ul > li.new-module,
+        section.sequence-edit section.sidebar section > ul > li.new-module {
           position: relative; }
-          section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown, section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown {
+          section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown,
+          section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown,
+          section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown {
             list-style: none; }
-            section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown li, section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown li {
+            section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown li,
+            section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown li,
+            section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown li {
               display: none; }
-              section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown li:first-child, section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown li:first-child {
+              section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown li:first-child,
+              section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown li:first-child,
+              section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown li:first-child {
                 display: block; }
-            section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li, section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown:hover li {
+            section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li,
+            section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown:hover li,
+            section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li {
               display: block;
               padding: 6px 0; }
-              section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li:first-child, section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown:hover li:first-child {
+              section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li:first-child,
+              section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown:hover li:first-child,
+              section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li:first-child {
                 padding-top: 0; }
-    section.week-edit section.sidebar section p, section.week-new section.sidebar section p {
+    section.week-edit section.sidebar section p,
+    section.week-new section.sidebar section p,
+    section.sequence-edit section.sidebar section p {
       padding: 6px;
       border-bottom: 1px solid #666; }
-section.week-edit section.weeks-content, section.week-new section.weeks-content {
+section.week-edit section.weeks-content,
+section.week-new section.weeks-content,
+section.sequence-edit section.weeks-content {
   width: 65.632%;
   float: left;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
-  section.week-edit section.weeks-content header, section.week-new section.weeks-content header {
+  section.week-edit section.weeks-content header,
+  section.week-new section.weeks-content header,
+  section.sequence-edit section.weeks-content header {
     zoom: 1; }
-    section.week-edit section.weeks-content header:before, section.week-edit section.weeks-content header:after, section.week-new section.weeks-content header:before, section.week-new section.weeks-content header:after {
+    section.week-edit section.weeks-content header:before, section.week-edit section.weeks-content header:after,
+    section.week-new section.weeks-content header:before,
+    section.week-new section.weeks-content header:after,
+    section.sequence-edit section.weeks-content header:before,
+    section.sequence-edit section.weeks-content header:after {
       content: "";
       display: table; }
-    section.week-edit section.weeks-content header:after, section.week-new section.weeks-content header:after {
+    section.week-edit section.weeks-content header:after,
+    section.week-new section.weeks-content header:after,
+    section.sequence-edit section.weeks-content header:after {
       clear: both; }
-    section.week-edit section.weeks-content header h2, section.week-new section.weeks-content header h2 {
+    section.week-edit section.weeks-content header h2,
+    section.week-new section.weeks-content header h2,
+    section.sequence-edit section.weeks-content header h2 {
       float: left; }
-    section.week-edit section.weeks-content header form, section.week-new section.weeks-content header form {
+    section.week-edit section.weeks-content header form,
+    section.week-new section.weeks-content header form,
+    section.sequence-edit section.weeks-content header form {
       float: right;
       margin: -2px 0; }
-      section.week-edit section.weeks-content header form input, section.week-new section.weeks-content header form input {
+      section.week-edit section.weeks-content header form input,
+      section.week-new section.weeks-content header form input,
+      section.sequence-edit section.weeks-content header form input {
         border: 1px solid #000;
         background: #ddd;
         padding: 2px 4px;
@@ -476,18 +606,30 @@ section.week-edit section.weeks-content, section.week-new section.weeks-content 
         -ms-border-radius: 2px;
         -o-border-radius: 2px;
         border-radius: 2px; }
-  section.week-edit section.weeks-content section.filters, section.week-new section.weeks-content section.filters {
+  section.week-edit section.weeks-content section.filters,
+  section.week-new section.weeks-content section.filters,
+  section.sequence-edit section.weeks-content section.filters {
     border-bottom: 1px solid #999; }
-    section.week-edit section.weeks-content section.filters ul, section.week-new section.weeks-content section.filters ul {
+    section.week-edit section.weeks-content section.filters ul,
+    section.week-new section.weeks-content section.filters ul,
+    section.sequence-edit section.weeks-content section.filters ul {
       zoom: 1;
       list-style: none;
       padding: 6px; }
-      section.week-edit section.weeks-content section.filters ul:before, section.week-edit section.weeks-content section.filters ul:after, section.week-new section.weeks-content section.filters ul:before, section.week-new section.weeks-content section.filters ul:after {
+      section.week-edit section.weeks-content section.filters ul:before, section.week-edit section.weeks-content section.filters ul:after,
+      section.week-new section.weeks-content section.filters ul:before,
+      section.week-new section.weeks-content section.filters ul:after,
+      section.sequence-edit section.weeks-content section.filters ul:before,
+      section.sequence-edit section.weeks-content section.filters ul:after {
         content: "";
         display: table; }
-      section.week-edit section.weeks-content section.filters ul:after, section.week-new section.weeks-content section.filters ul:after {
+      section.week-edit section.weeks-content section.filters ul:after,
+      section.week-new section.weeks-content section.filters ul:after,
+      section.sequence-edit section.weeks-content section.filters ul:after {
         clear: both; }
-      section.week-edit section.weeks-content section.filters ul li, section.week-new section.weeks-content section.filters ul li {
+      section.week-edit section.weeks-content section.filters ul li,
+      section.week-new section.weeks-content section.filters ul li,
+      section.sequence-edit section.weeks-content section.filters ul li {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
         display: inline-block;
@@ -495,95 +637,201 @@ section.week-edit section.weeks-content, section.week-new section.weeks-content 
         zoom: 1;
         *display: inline;
         *vertical-align: auto; }
-        section.week-edit section.weeks-content section.filters ul li.advanced, section.week-new section.weeks-content section.filters ul li.advanced {
+        section.week-edit section.weeks-content section.filters ul li.advanced,
+        section.week-new section.weeks-content section.filters ul li.advanced,
+        section.sequence-edit section.weeks-content section.filters ul li.advanced {
           float: right; }
-  section.week-edit section.weeks-content section.modules ul, section.week-new section.weeks-content section.modules ul {
+  section.week-edit section.weeks-content section.modules ul,
+  section.week-new section.weeks-content section.modules ul,
+  section.sequence-edit section.weeks-content section.modules ul {
     list-style: none; }
-    section.week-edit section.weeks-content section.modules ul li, section.week-new section.weeks-content section.modules ul li {
+    section.week-edit section.weeks-content section.modules ul li,
+    section.week-new section.weeks-content section.modules ul li,
+    section.sequence-edit section.weeks-content section.modules ul li {
       padding: 6px;
       font-weight: bold;
       font-size: 16px;
       border-bottom: 1px solid #333; }
-      section.week-edit section.weeks-content section.modules ul li a, section.week-new section.weeks-content section.modules ul li a {
+      section.week-edit section.weeks-content section.modules ul li a,
+      section.week-new section.weeks-content section.modules ul li a,
+      section.sequence-edit section.weeks-content section.modules ul li a {
         color: #000; }
 
-section.video-new, section.video-edit {
-  position: absolute;
-  top: 80px;
-  right: 0;
-  background: #fff;
-  width: 40.32%;
-  -webkit-box-shadow: 0 0 6px #666666;
-  -moz-box-shadow: 0 0 6px #666666;
-  box-shadow: 0 0 6px #666666;
-  border: 1px solid #333;
-  border-right: 0;
-  z-index: 4; }
-  section.video-new > header, section.video-edit > header {
-    background: #666;
+section.video-new > section section.upload, section.video-edit > section section.upload {
+  padding: 6px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd; }
+  section.video-new > section section.upload a.upload-button, section.video-edit > section section.upload a.upload-button {
+    display: -moz-inline-box;
+    -moz-box-orient: vertical;
+    display: inline-block;
+    vertical-align: baseline;
     zoom: 1;
-    color: #fff;
-    padding: 6px;
-    border-bottom: 1px solid #333;
-    -webkit-font-smoothing: antialiased; }
-    section.video-new > header:before, section.video-new > header:after, section.video-edit > header:before, section.video-edit > header:after {
-      content: "";
-      display: table; }
-    section.video-new > header:after, section.video-edit > header:after {
-      clear: both; }
-    section.video-new > header h2, section.video-edit > header h2 {
-      float: left;
-      font-size: 14px; }
-    section.video-new > header a, section.video-edit > header a {
-      float: right; }
-  section.video-new section ul, section.video-edit section ul {
-    list-style: none; }
-    section.video-new section ul li, section.video-edit section ul li {
-      border-bottom: 1px solid #333;
-      padding: 10px 25px; }
+    *display: inline;
+    *vertical-align: auto; }
+section.video-new > section section.in-use h2, section.video-edit > section section.in-use h2 {
+  font-size: 14px; }
+section.video-new > section section.in-use div, section.video-edit > section section.in-use div {
+  background: #eee;
+  text-align: center;
+  padding: 6px; }
+section.video-new > section a.save-update, section.video-edit > section a.save-update {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-top: 20px; }
 
-section.problem-new, section.problem-edit {
-  position: absolute;
-  top: 80px;
-  right: 0;
-  background: #fff;
-  width: 40.32%;
-  -webkit-box-shadow: 0 0 6px #666666;
-  -moz-box-shadow: 0 0 6px #666666;
-  box-shadow: 0 0 6px #666666;
-  border: 1px solid #333;
-  border-right: 0;
-  z-index: 4; }
-  section.problem-new > header, section.problem-edit > header {
-    background: #666;
-    zoom: 1;
-    color: #fff;
-    padding: 6px;
-    border-bottom: 1px solid #333;
-    -webkit-font-smoothing: antialiased; }
-    section.problem-new > header:before, section.problem-new > header:after, section.problem-edit > header:before, section.problem-edit > header:after {
-      content: "";
-      display: table; }
-    section.problem-new > header:after, section.problem-edit > header:after {
-      clear: both; }
-    section.problem-new > header h2, section.problem-edit > header h2 {
-      float: left;
-      font-size: 14px; }
-    section.problem-new > header a, section.problem-edit > header a {
-      float: right; }
-  section.problem-new section ul, section.problem-edit section ul {
-    list-style: none; }
-    section.problem-new section ul li, section.problem-edit section ul li {
-      border-bottom: 1px solid #333;
-      padding: 10px 25px; }
-
-body.content section.main-content {
-  border-left: 2px solid #000;
+section.problem-new > section textarea, section.problem-edit > section textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  width: 74.423%;
-  float: left;
-  -webkit-box-shadow: -2px 0 3px #dddddd;
-  -moz-box-shadow: -2px 0 3px #dddddd;
-  box-shadow: -2px 0 3px #dddddd; }
+  display: block;
+  width: 100%; }
+section.problem-new > section div.preview, section.problem-edit > section div.preview {
+  background: #eee;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 10px;
+  width: 100%; }
+section.problem-new > section a.save, section.problem-edit > section a.save {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-top: 20px; }
+
+section.video-new, section.video-edit, section.problem-new, section.problem-edit {
+  position: absolute;
+  top: 72px;
+  right: 0;
+  background: #fff;
+  width: 48.845%;
+  -webkit-box-shadow: 0 0 6px #666666;
+  -moz-box-shadow: 0 0 6px #666666;
+  box-shadow: 0 0 6px #666666;
+  border: 1px solid #333;
+  border-right: 0;
+  z-index: 4; }
+  section.video-new > header, section.video-edit > header, section.problem-new > header, section.problem-edit > header {
+    background: #666;
+    zoom: 1;
+    color: #fff;
+    padding: 6px;
+    border-bottom: 1px solid #333;
+    -webkit-font-smoothing: antialiased; }
+    section.video-new > header:before, section.video-new > header:after, section.video-edit > header:before, section.video-edit > header:after, section.problem-new > header:before, section.problem-new > header:after, section.problem-edit > header:before, section.problem-edit > header:after {
+      content: "";
+      display: table; }
+    section.video-new > header:after, section.video-edit > header:after, section.problem-new > header:after, section.problem-edit > header:after {
+      clear: both; }
+    section.video-new > header h2, section.video-edit > header h2, section.problem-new > header h2, section.problem-edit > header h2 {
+      float: left;
+      font-size: 14px; }
+    section.video-new > header a, section.video-edit > header a, section.problem-new > header a, section.problem-edit > header a {
+      color: #fff; }
+      section.video-new > header a.save-update, section.video-edit > header a.save-update, section.problem-new > header a.save-update, section.problem-edit > header a.save-update {
+        float: right; }
+      section.video-new > header a.cancel, section.video-edit > header a.cancel, section.problem-new > header a.cancel, section.problem-edit > header a.cancel {
+        float: left; }
+  section.video-new > section, section.video-edit > section, section.problem-new > section, section.problem-edit > section {
+    padding: 20px; }
+    section.video-new > section > header h1, section.video-edit > section > header h1, section.problem-new > section > header h1, section.problem-edit > section > header h1 {
+      font-size: 24px;
+      margin: 12px 0; }
+    section.video-new > section > header section.status-settings ul, section.video-edit > section > header section.status-settings ul, section.problem-new > section > header section.status-settings ul, section.problem-edit > section > header section.status-settings ul {
+      list-style: none;
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      -ms-border-radius: 2px;
+      -o-border-radius: 2px;
+      border-radius: 2px;
+      border: 1px solid #999;
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
+      section.video-new > section > header section.status-settings ul li, section.video-edit > section > header section.status-settings ul li, section.problem-new > section > header section.status-settings ul li, section.problem-edit > section > header section.status-settings ul li {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        border-right: 1px solid #999;
+        padding: 6px; }
+        section.video-new > section > header section.status-settings ul li:last-child, section.video-edit > section > header section.status-settings ul li:last-child, section.problem-new > section > header section.status-settings ul li:last-child, section.problem-edit > section > header section.status-settings ul li:last-child {
+          border-right: 0; }
+        section.video-new > section > header section.status-settings ul li.current, section.video-edit > section > header section.status-settings ul li.current, section.problem-new > section > header section.status-settings ul li.current, section.problem-edit > section > header section.status-settings ul li.current {
+          background: #eee; }
+    section.video-new > section > header section.status-settings a.settings, section.video-edit > section > header section.status-settings a.settings, section.problem-new > section > header section.status-settings a.settings, section.problem-edit > section > header section.status-settings a.settings {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      margin: 0 20px;
+      border: 1px solid #999;
+      padding: 6px; }
+    section.video-new > section > header section.status-settings select, section.video-edit > section > header section.status-settings select, section.problem-new > section > header section.status-settings select, section.problem-edit > section > header section.status-settings select {
+      float: right; }
+    section.video-new > section > header section.meta, section.video-edit > section > header section.meta, section.problem-new > section > header section.meta, section.problem-edit > section > header section.meta {
+      background: #eee;
+      padding: 10px;
+      margin: 20px 0;
+      zoom: 1; }
+      section.video-new > section > header section.meta:before, section.video-new > section > header section.meta:after, section.video-edit > section > header section.meta:before, section.video-edit > section > header section.meta:after, section.problem-new > section > header section.meta:before, section.problem-new > section > header section.meta:after, section.problem-edit > section > header section.meta:before, section.problem-edit > section > header section.meta:after {
+        content: "";
+        display: table; }
+      section.video-new > section > header section.meta:after, section.video-edit > section > header section.meta:after, section.problem-new > section > header section.meta:after, section.problem-edit > section > header section.meta:after {
+        clear: both; }
+      section.video-new > section > header section.meta div, section.video-edit > section > header section.meta div, section.problem-new > section > header section.meta div, section.problem-edit > section > header section.meta div {
+        float: left;
+        margin-right: 20px; }
+        section.video-new > section > header section.meta div h2, section.video-edit > section > header section.meta div h2, section.problem-new > section > header section.meta div h2, section.problem-edit > section > header section.meta div h2 {
+          font-size: 14px;
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+        section.video-new > section > header section.meta div p, section.video-edit > section > header section.meta div p, section.problem-new > section > header section.meta div p, section.problem-edit > section > header section.meta div p {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+    section.video-new > section section.notes, section.video-edit > section section.notes, section.problem-new > section section.notes, section.problem-edit > section section.notes {
+      margin-top: 20px;
+      padding: 6px;
+      background: #eee;
+      border: 1px solid #ccc; }
+      section.video-new > section section.notes textarea, section.video-edit > section section.notes textarea, section.problem-new > section section.notes textarea, section.problem-edit > section section.notes textarea {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        display: block;
+        width: 100%; }
+      section.video-new > section section.notes h2, section.video-edit > section section.notes h2, section.problem-new > section section.notes h2, section.problem-edit > section section.notes h2 {
+        font-size: 14px;
+        margin-bottom: 6px; }
+      section.video-new > section section.notes input[type="submit"], section.video-edit > section section.notes input[type="submit"], section.problem-new > section section.notes input[type="submit"], section.problem-edit > section section.notes input[type="submit"] {
+        margin-top: 10px; }
