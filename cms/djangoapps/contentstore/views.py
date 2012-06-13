@@ -10,3 +10,7 @@ def calendar(request, org, course):
         Location(['i4x', org, course, 'Course', 'course'])
     )
     return render_to_response('calendar.html', {'weeks': weeks})
+
+
+def index(request):
+    return render_to_response('index.html', {})

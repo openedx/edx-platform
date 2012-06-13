@@ -1,0 +1,206 @@
+section.cal {
+  @include box-sizing(border-box);
+  padding: 25px;
+  @include clearfix;
+  overflow: scroll;
+
+  > header {
+    @include clearfix;
+    margin-bottom: 10px;
+
+    h1 {
+      float: left;
+      font-size: 18px;
+    }
+
+    ul {
+      float: right;
+
+      li  {
+        @include inline-block;
+
+        a {
+          padding: 6px;
+          border: 1px solid #ddd;
+          display: block;
+          @include border-radius(3px);
+          background: #efefef;
+        }
+
+        &.dropdown {
+          position: relative;
+
+          ul {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ddd;
+
+            li {
+              padding: 6px;
+              display: block;
+              border-top: 1px solid transparent;
+              border-bottom: 1px solid transparent;
+
+              &:hover {
+                background-color: #efefef;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+              }
+            }
+          }
+
+          &:hover {
+
+            ul {
+              display: block;
+            }
+
+            a {
+              @include border-radius(3px 3px 0 0);
+              border-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ol {
+    list-style: none;
+    @include clearfix;
+    @include box-sizing(border-box);
+    border-left: 1px solid #333;
+    border-top: 1px solid #333;
+    width: 100%;
+
+    > li {
+      border-right: 1px solid #333;
+      border-bottom: 1px solid;
+      @include box-sizing(border-box);
+      float: left;
+      width: flex-grid(3) + ((flex-gutter() * 3) / 4);
+
+      &:last-child {
+        text-align: center;
+        background: #eee;
+        @include box-sizing(border-box);
+
+        p {
+          width: 100%;
+          height: 100%;
+          @include box-sizing(border-box);
+
+          a {
+            display: block;
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        section.new-week {
+          header {
+            background: #fff;
+            text-align: left;
+          }
+
+          form {
+            background: #fff;
+            width: 50%;
+            padding: 6px;
+            border: 1px solid #000;
+            margin: 0 auto;
+            @include box-shadow(0 0 2px #333);
+            position: relative;
+
+            &:before {
+              background: #fff;
+              border-left: 1px solid #000;
+              border-top: 1px solid #000;
+              content: "  ";
+              display: block;
+              height: 10px;
+              left: 50%;
+              position: absolute;
+              top: -6px;
+              @include transform(rotate(45deg));
+              width: 10px;
+              z-index: 0;
+            }
+
+            select {
+              margin-bottom: 6px;
+              width: 100%;
+
+              option {
+                padding: 10px 0 !important;
+              }
+            }
+
+            input[type="submit"] {
+              display: block;
+              margin-bottom: 6px;
+              width: 100%;
+            }
+
+            a {
+
+              &:first-child {
+                float: left;
+              }
+
+              &:last-child {
+                float: right;
+              }
+            }
+          }
+        }
+      }
+
+      header {
+        border-bottom: 1px solid #000;
+        @include box-shadow(0 1px 2px #ccc);
+        display: block;
+        margin-bottom: 2px;
+        padding: 6px;
+
+        h1 {
+          font-size: 14px;
+        }
+      }
+
+      ul {
+        list-style: none;
+        margin-bottom: 1px;
+
+        li {
+          background: #efefef;
+          border-bottom: 1px solid #666;
+          padding: 6px;
+
+          &.goal {
+            background: #fff;
+          }
+        }
+      }
+    }
+  }
+}
+
+body.content
+    section.cal {
+      width: flex-grid(3) + flex-gutter();
+      float: left;
+      @include box-sizing(border-box);
+
+      > header ul {
+        display: none;
+      }
+
+      ol {
+        li {
+          @include box-sizing(border-box);
+          width: 100%;
+        }
+      }
+    }
