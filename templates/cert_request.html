@@ -35,6 +35,18 @@
       </ul>
     </fieldset>
     
+    
+    %if not took_survey:
+    <fieldset id="survey_fieldset">
+      <h1>Thank you for taking 6.002x! You could help us a lot by filling out this (optional) survey.</h1>
+      <p>This survey is collected only for research purposes. It is completely optional and will not affect your grade.</p>
+              
+      ${survey_fields.body(survey_list)}
+      
+    </fieldset>
+    %endif
+    
+    
     <input type="submit" id="" value="Generate Certificate" />
     
   </form>

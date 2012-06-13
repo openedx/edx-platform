@@ -46,6 +46,10 @@ def certificate_request(request):
         if len(error) > 0:
             return return_error(error)
         
+        survey_response = record_exit_survey(request, internal_request=True)
+        if not survey_response['success']:
+            return return_error( survey_response['error'] )
+        
         grade = None
         student_gradesheet = grades.grade_sheet(request.user)
         grade = student_gradesheet['grade']
