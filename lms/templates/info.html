@@ -1,42 +1,26 @@
 <%inherit file="main.html" />
-
-<%block name="js_extra">
-<script>
-
-$(document).ready(function(){
-   //if(!page) {
-   //  cookie_page = $.cookie("book_page");
-   //  if(cookie_page) {
-   //    goto_page(cookie_page);
-   //  }
-   //}
-
-   $(".handouts ol").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
-});
-
-</script>
-</%block>
-
-<%block name="title"><title>Course Info - MITx 6.002x</title></%block>
-
 <%include file="navigation.html" args="active_page='info'" />
 
-<section class="main-content">
-  <div class="info-wrapper">
-    % if user.is_authenticated():
-    <section class="updates">
-      <%include file="updates.html" />
+<section class="container">
+  <section class="course-content">
+    <section class="courseware">
+      <div class="info-wrapper">
+        % if user.is_authenticated():
+        <section class="updates">
+          <%include file="updates.html" />
+        </section>
+        <section aria-label="Handout Navigation" class="handouts">
+          <%include file="handouts.html" />
+        </section>
+        % else:
+        <section class="updates">
+          <%include file="guest_updates.html" />
+        </section>
+        <section aria-label="Handout Navigation" class="handouts">
+          <%include file="guest_handouts.html" />
+        </section>
+        % endif
+      </div>
     </section>
-    <section aria-label="Handout Navigation" class="handouts">
-      <%include file="handouts.html" />
-    </section>
-    % else:
-    <section class="updates">
-      <%include file="guest_updates.html" />
-    </section>
-    <section aria-label="Handout Navigation" class="handouts">
-      <%include file="guest_handouts.html" />
-    </section>
-    % endif
-  </div>
+  </section>
 </section>

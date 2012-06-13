@@ -1,0 +1,43 @@
+footer {
+  background: rgb(240,240,240);
+  height: 100px;
+  padding: 20px 0px;
+  width: flex-grid(12);
+
+  nav {
+    @include clearfix;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: flex-grid(12);
+
+    a.logo {
+      @include box-sizing(border-box);
+      display: block;
+      float: left;
+      height: 100%;
+      margin: 0px 15px 0px 0px;
+    }
+
+    ol {
+      float: right;
+      font-size: 0em;
+      margin-top: 3px;
+
+      li {
+        border-right: 1px solid rgb(200,200,200);
+        @include inline-block;
+        list-style: none;
+
+        &:last-child {
+          border: none;
+        }
+
+        a:link, a:visited {
+          color: $lighter-base-font-color;
+          font: normal 1rem/1.6rem $serif;
+          padding: 5px 15px;
+        }
+      }
+    }
+  }
+}

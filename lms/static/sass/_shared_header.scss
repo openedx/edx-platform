@@ -1,0 +1,207 @@
+header.app {
+  border-bottom: 1px solid rgb(200,200,200);
+  @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(230,230,230)));
+  height: 55px;
+  width: 100%;
+
+  nav {
+    @include clearfix;
+    @include box-sizing(border-box);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0px 10px;
+    width: flex-grid(12);
+  }
+
+  a.logo {
+    @include box-sizing(border-box);
+    display: block;
+    float: left;
+    height: 100%;
+    margin: 15px 15px 0px 0px;
+  }
+
+  h1 {
+    border-left: 1px solid rgb(200,200,200);
+    font: bold 1rem/1.2rem $sans-serif;
+    float: left;
+    height: 15px;
+    margin-top: 10px;
+    padding: 10px 18px;
+  }
+
+  ol {
+    float: left;
+    font-size: 0em;
+
+    &.user {
+      float: right;
+    }
+
+    &.secondary {
+      > li {
+        border: none;
+
+        &:last-child {
+          border-right: none;
+        }
+
+        a {
+          font: normal italic 1rem/1.2rem $serif;
+          text-transform: lowercase;
+        }
+      }
+    }
+
+    > li {
+      border-left: 1px solid rgb(200,200,200);
+      @include inline-block;
+      margin-top: 10px;
+      padding: 0px 8px;
+      position: relative;
+      vertical-align: bottom;
+
+      &:last-child {
+        border-right: 1px solid rgb(200,200,200);
+      }
+
+      a {
+        @include border-radius(3px);
+        color: $lighter-base-font-color;
+        display: block;
+        font: normal 1rem/1.2rem $sans-serif;
+        height: 15px;
+        padding: 10px;
+        text-decoration: none;
+        text-transform: uppercase;
+        text-shadow: 0 1px rgba(255,255,255, 0.4);
+
+        &.user-dashboard {
+          padding: 10px 10px 10px 40px;
+
+          @media screen and (max-width: 768px) {
+            font-size: 0em;
+            padding: 10px 0px;
+            width: 38px;
+          }
+
+          .avatar {
+            background: rgb(220,220,220);
+            @include border-radius(3px);
+            border: 1px solid rgb(180,180,180);
+            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+            height: 22px;
+            @include inline-block;
+            left: 15px;
+            overflow: hidden;
+            position: absolute;
+            top: 5px;
+            width: 22px;
+
+            &::after {
+              @include background-image(linear-gradient((-60deg), rgba(0,0,0, 0) 0%, rgba(0,0,0, 0.1) 50%, rgba(0,0,0, 0.2) 50%, rgba(0,0,0, 0.3) 100%));
+              content: "";
+              display: block;
+              height: 100%;
+              position: absolute;
+              right: 0px;
+              top: 0px;
+              width: 100%;
+            }
+
+            img {
+              @include border-radius(4px);
+              display: block;
+              min-height: 100%;
+              min-width: 100%;
+              height: 100%;
+            }
+          }
+        }
+
+
+        &:hover {
+          background: rgb(220,220,220);
+          color: $base-font-color;
+        }
+
+        &.active {
+          background: rgb(220,220,220);
+          color: $base-font-color;
+        }
+      }
+
+      ol.user-options {
+        @include border-radius(4px);
+        @include box-shadow(0 1px 6px 0 rgba(0,0,0, 0.3));
+        border: 1px solid rgb(200,200,200);
+        background: rgb(220,220,220);
+        display: none;
+        right: 4px;
+        padding: 5px 10px;
+        position: absolute;
+        top: 50px;
+        width: 170px;
+        z-index: 3;
+
+        &.expanded {
+          display: block;
+        }
+
+        &::before {
+          background: transparent;
+          border: {
+            top: 8px solid rgb(220,220,220);
+            right: 8px solid rgb(220,220,220);
+            bottom: 8px solid transparent;
+            left: 8px solid transparent;
+          }
+          @include box-shadow(1px 0 0 0 rgb(200,200,200), 0 -1px 0 0 rgb(200,200,200));
+          content: "";
+          display: block;
+          height: 0px;
+          position: absolute;
+          @include transform(rotate(-45deg));
+          right: 10px;
+          top: -7px;
+          width: 0px;
+        }
+
+        li {
+          border: {
+            top: 1px solid rgb(200,200,200);
+            right: none;
+            bottom: none;
+            left: none;
+          }
+          margin: 0px;
+          padding: 0px;
+          width: 100%;
+
+          &:first-child {
+            border: none;
+          }
+
+          a {
+            @include box-sizing(border-box);
+            display: block;
+            font: normal 1rem/1.2rem $sans-serif;
+            height: auto;
+            margin: 5px 0px;
+            overflow: hidden;
+            padding: 5px;
+            text-overflow: ellipsis;
+            @include transition(padding, 0.1s, linear);
+            white-space: nowrap;
+            width: 100%;
+
+            &:hover {
+              background: rgb(255,255,255);
+              padding: 5px 8px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

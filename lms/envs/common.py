@@ -381,5 +381,5 @@ INSTALLED_APPS = (
     'askbot.deps.livesettings',
     'followit',
     'keyedcache',
-    'robots',
+    'robots'
 )

@@ -1,0 +1,443 @@
+.home {
+  margin: 30px 10px 100px;
+
+  > header {
+    height: 430px;
+    margin-bottom: 60px;
+    overflow: hidden;
+    position: relative;
+
+    h1 {
+      @extend .animation-title-appear;
+      color: $lighter-base-font-color;
+      font: normal 2.4rem/3rem $sans-serif;
+      letter-spacing: 1px;
+      position: relative;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .orginizations {
+      @extend .animation-home-appear;
+      height: 200px;
+      margin: 0 auto;
+      position: relative;
+      width: 680px;
+
+      > div {
+        @include inline-block;
+        vertical-align: middle;
+      }
+
+      .orginization {
+        position: absolute;
+        top: 20px;
+        width: 200px;
+
+        &.mit {
+          @extend .animation-mit-slide;
+          z-index: 3;
+        }
+
+        &.edx {
+          @extend .animation-edx-appear;
+          left: 240px;
+          z-index: 2;
+        }
+
+        &.harvard {
+          @extend .animation-harvard-slide;
+          z-index: 3;
+        }
+
+        img {
+          max-width: 100%;
+        }
+      }
+
+      .divider {
+        @extend .faded-vertical-divider;
+        position: absolute;
+        top: 0px;
+        z-index: 4;
+
+        &.left {
+          @extend .animation-divider-left-slide;
+        }
+
+        &.right {
+          @extend .animation-divider-right-slide;
+        }
+      }
+    }
+
+    .video-wrapper {
+      @extend .animation-video-appear;
+      height: 370px;
+      position: absolute;
+      width: 100%;
+
+      .video-player {
+        background: rgb(45,45,45);
+        @include border-top-radius(4px);
+        @include box-shadow(0 0 12px 0 rgba(0,0,0, 0.3));
+        height: 360px;
+        margin: 0 auto;
+        padding: 10px 10px 0px 10px;
+        width: 640px;
+
+        .video-inner {
+          background: rgb(235,235,235);
+          height: 360px;
+          margin: 0 auto;
+          width: 640px;
+        }
+      }
+    }
+
+    .bottom-divider {
+      @extend .faded-hr-divider;
+      bottom: 0px;
+      position: absolute;
+    }
+  }
+
+  .welcome {
+    border-right: 1px solid rgb(200,200,200);
+    font-size: 0em;
+    margin-bottom: 80px;
+
+    h2 {
+      color: $lighter-base-font-color;
+      font: normal 1.2rem/1.8rem $serif;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      border-right: 1px solid rgb(200,200,200);
+      @include box-sizing(border-box);
+      @include inline-block;
+      margin-right: flex-gutter();
+      width: flex-grid(8);
+      vertical-align: middle;
+      padding-right: flex-gutter();
+
+      p {
+        color: $base-font-color;
+        @include inline-block;
+        margin: 0px;
+        width: flex-grid(12);
+        vertical-align: top;
+      }
+    }
+
+    .signup-wrapper {
+      @include box-sizing(border-box);
+      @include inline-block;
+      padding-right: flex-gutter();
+      width: flex-grid(4);
+      vertical-align: middle;
+    }
+  }
+
+  .university-partners {
+    @include background-image(linear-gradient(180deg, rgba(255,255,255, 0) 0%, rgba(250,250,250, 0.8) 15%, rgb(250,250,250) 50%, rgba(250,250,250, 0.8) 85%, rgba(255,255,255, 0)));
+    margin-bottom: 60px;
+    padding-top: 5px;
+    position: relative;
+    width: flex-grid(12);
+
+    &:before {
+      @extend .faded-hr-divider;
+      content: "";
+      display: block;
+      position: absolute;
+      top: 0px;
+    }
+
+    &:after {
+      @extend .faded-hr-divider;
+      bottom: 0px;
+      content: "";
+      display: block;
+      position: absolute;
+    }
+
+    .partners {
+      font-size: 0em;
+      margin: 0 auto;
+      opacity: 0.7;
+      width: flex-grid(6);
+
+      img {
+        @include inline-block;
+        margin-right: flex-gutter();
+        max-width: flex-grid(4);
+
+        &:last-child {
+          margin-right: 0px;
+        }
+      }
+    }
+  }
+
+  .highlighted-courses {
+    @include border-radius(4px);
+    @include box-sizing(border-box);
+    @include clearfix;
+    margin-bottom: 40px;
+    width: flex-grid(12);
+
+    > article.course {
+      background: rgb(240,240,240);
+      border: 1px solid rgb(220,220,220);
+      @include border-radius(4px);
+      @include box-sizing(border-box);
+      float: left;
+      font-size: 0em;
+      min-height: 0px;
+      margin-bottom: 20px;
+      padding: 10px;
+      @include transition(all, 0.15s, linear);
+      width: flex-grid(6);
+
+      &:last-child {
+        margin-bottom: none;
+      }
+
+      @media only screen and (max-width: 768px) {
+        float: none;
+        margin-right: 0px;
+        width: flex-grid(12);
+      }
+
+      &:nth-child(odd) {
+        margin-right: flex-gutter();
+      }
+
+      > a {
+        @include clearfix;
+        display: block;
+        position: relative;
+      }
+
+      .cover {
+        background: rgb(225,225,225);
+        border: 1px solid rgb(150,150,150);
+        @include border-radius(4px);
+        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+        float: left;
+        height: 50px;
+        margin: 0px;
+        opacity: 0.8;
+        overflow: hidden;
+        position: relative;
+        @include transition(all, 0.15s, linear);
+        width: 100px;
+
+        @media only screen and (max-width: 320px) {
+          display: none;
+        }
+
+        .shade {
+          background: rgba(0,0,0, 0.3);
+          @include border-radius(4px);
+          bottom: 0px;
+          content: "";
+          display: block;
+          left: 0px;
+          opacity: 0;
+          position: absolute;
+          top: 0px;
+          @include transition(all, 0.15s, linear);
+          right: 0px;
+        }
+
+        .arrow {
+          border-top: 1px solid;
+          border-left: 1px solid;
+          border-color: rgb(255,255,255);
+          @include box-shadow(inset 1px 1px 0 0 rgba(255,255,255, 0.6));
+          content: "";
+          display: block;
+          height: 55px;
+          left: 40px;
+          opacity: 0;
+          position: absolute;
+          top: 23px;
+          @include transform(rotate(-45deg));
+          @include transition(all, 0.15s, linear);
+          width: 55px;
+        }
+
+        img {
+          @include border-radius(4px);
+          display: block;
+          min-height: 100%;
+          min-width: 100%;
+          width: 100%;
+        }
+      }
+
+      .info {
+        margin-left: 115px;
+
+        @media only screen and (max-width: 320px) {
+          margin: 0px;
+        }
+
+        > hgroup {
+          margin-right: 80px;
+
+          @media only screen and (max-width: 320px) {
+            margin: 0px;
+          }
+
+          h2 {
+            font: bold 1.8rem/2.5rem $sans-serif;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-shadow: 0 1px rgba(255,255,255, 0.6);
+            @include transition(color, 0.15s, linear);
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          p {
+            color: $base-font-color;
+            font: normal 1rem/1.6rem $sans-serif;
+            overflow: hidden;
+            text-shadow: 0 1px rgba(255,255,255, 0.6);
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
+        .edit, .register {
+          border: 1px solid rgb(220,220,220);
+          background: rgb(230,230,230);
+          color: $lighter-base-font-color;
+          display: block;
+          font: normal 12px/14px $sans-serif;
+          padding: 6px 10px;
+          position: absolute;
+          right: 0px;
+          top: 0px;
+          @include transition(all, 0.15s, linear);
+
+          @media only screen and (max-width: 320px) {
+            display: none;
+          }
+
+          &:hover {
+            background: rgb(255,255,255);
+            color: $blue;
+          }
+        }
+      }
+
+      &:hover {
+        background: rgb(245,245,245);
+        @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.2));
+        cursor: pointer;
+
+        .cover {
+          opacity: 1;
+
+          .shade, .arrow {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  .sign-up {
+    background: rgb(240,240,240);
+    border: 1px solid rgb(220,220,220);
+    @include border-radius(4px);
+    @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
+    @include box-sizing(border-box);
+    padding: 20px;
+    width: flex-grid(12);
+
+    h3 {
+      color: $base-font-color;
+      font: normal 1.6rem/2rem $sans-serif;
+      text-align: center;
+    }
+
+    &.top {
+      @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
+      @include box-sizing(border-box);
+      width: flex-grid(12);
+
+      a {
+        @include button(shiny, $pink);
+        @include border-radius(3px);
+        //@include box-sizing(border-box);
+        display: block;
+        font: normal italic 1.2rem/1.6rem $serif;
+        margin: 0 auto 0;
+        padding: 15px 0px;
+        text-transform: uppercase;
+        text-align: center;
+        width: flex-grid(12);
+      }
+    }
+
+    &.middle {
+      @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
+      @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
+      margin-bottom: 60px;
+      padding: 15px 20px;
+      @include transition(all, 0.15s, linear);
+
+      &:hover {
+        @include box-shadow(0 0 16px 0 rgba($blue, 0.35));
+      }
+
+      form {
+        input[type="submit"] {
+        }
+      }
+    }
+  }
+
+  .more-info {
+    margin-bottom: 60px;
+    width: flex-grid(12);
+
+    h2 {
+      border-bottom: 1px solid rgb(200,200,200);
+      color: $lighter-base-font-color;
+      font: normal 1.4rem/1.8rem $serif;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+    }
+
+    .news {
+      background: rgb(240,240,240);
+      height: 300px;
+    }
+  }
+
+  .social-media {
+    background: rgb(245,245,245);
+    border: 1px solid rgb(220,220,220);
+    @include border-radius(4px);
+    @include box-shadow(inset 0 1px 2px 0 rgba(0,0,0, 0.1));
+    height: 200px;
+    width: flex-grid(12);
+
+    h2 {
+      color: $lighter-base-font-color;
+      font: normal 1.6rem/2rem $sans-serif;
+      padding-top: 80px;
+      text-align: center;
+    }
+  }
+}
