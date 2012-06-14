@@ -1,0 +1,145 @@
+<%inherit file="main.html" />
+<%include file="navigation.html" args="active_page='dashboard'" />
+
+<%namespace name='static' file='static_content.html'/>
+
+<section class="container">
+  <section class="dashboard">
+
+    <section class="sidebar">
+      <header class="profile">
+        <section class="user-info">
+          <div class="avatar">
+            <img src="${static.url('images/profile.jpg')}" />
+          </div>
+          <section class="info">
+            <h2>SpaceMan024</h2>
+            <ul>
+              <li>
+                <h3>Email: <span>neil@planetarium.com</span></h3>
+              </li>
+              <li>
+                <h3>Location: <span>New York, NY</span></h3>
+              </li>
+              <li>
+                <h3>Language: <span>English</span></h3>
+              </li>
+            </ul>
+          </section>
+        </section>
+        <section class="meta-info">
+        </section>
+      </header>
+    </section>
+
+    <section class="courses">
+      <nav class="course-filters">
+        <ol class="filters">
+          <li class="selected">
+            <h2>All <span class="count">3</span></h2>
+          </li>
+          <li>
+            <h2>Current <span class="count">3</span></h2>
+          </li>
+          <li>
+            <h2>Upcoming <span class="count">0</span></h2>
+          </li>
+          <li>
+            <h2>Completed <span class="count">0</span></h2>
+          </li>
+        </ol>
+      </nav>
+
+      <article class="course">
+        <a href="/course.html">
+          <div class="cover">
+            <div class="shade"></div>
+            <div class="arrow"></div>
+            <img src="${static.url('images/history.png')}" />
+          </div>
+          <section class="info">
+            <hgroup>
+              <h2>18th Century History</h2>
+              <p>Adam Smith, Harvard University</p>
+            </hgroup>
+            <div class="edit">options</div>
+            <section class="meta">
+              <div class="complete">
+                <p>60% complete</p>
+              </div>
+              <div class="progress">
+                <div class="meter">
+                  <div class="meter-fill"></div>
+                </div>
+              </div>
+              <div class="end-date">
+                <p>End date: <time>6/10/12</time></p>
+              </div>
+            </section>
+          </section>
+        </a>
+      </article>
+
+      <article class="course">
+        <a href="/course.html">
+          <div class="cover">
+            <div class="shade"></div>
+            <div class="arrow"></div>
+            <img src="${static.url('images/math.png')}" />
+          </div>
+          <section class="info">
+            <hgroup>
+              <h2>Linear Algebra</h2>
+              <p>Adam Smith, Harvard University</p>
+            </hgroup>
+            <div class="edit">options</div>
+            <section class="meta">
+              <div class="complete">
+                <p>60% complete</p>
+              </div>
+              <div class="progress">
+                <div class="meter">
+                  <div class="meter-fill"></div>
+                </div>
+              </div>
+              <div class="end-date">
+                <p>End date: <time>6/10/12</time></p>
+              </div>
+            </section>
+          </section>
+        </a>
+      </article>
+
+      <article class="course">
+        <a href="/course.html">
+          <div class="cover">
+            <div class="shade"></div>
+            <div class="arrow"></div>
+            <img src="${static.url('images/python.png')}" />
+          </div>
+          <section class="info">
+            <hgroup>
+              <h2>CS 102 Python</h2>
+              <p>Adam Smith, Harvard University</p>
+            </hgroup>
+            <div class="edit">options</div>
+            <section class="meta">
+              <div class="complete">
+                <p>60% complete</p>
+              </div>
+              <div class="progress">
+                <div class="meter">
+                  <div class="meter-fill"></div>
+                </div>
+              </div>
+              <div class="end-date">
+                <p>End date: <time>6/10/12</time></p>
+              </div>
+            </section>
+          </section>
+        </a>
+      </article>
+    </section>
+
+  </section>
+</section>
