@@ -6,11 +6,13 @@
 #import mitxmako.middleware
 #from courseware import content_parser
 #from django.contrib.auth.models import User
+import os.path
+from StringIO import StringIO
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
 from django.core.management.base import BaseCommand
-from contentstore.models import create_item, update_item, update_children
+from keystore.django import keystore
 
 from lxml import etree
 
@@ -20,16 +22,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print args
         data_dir = args[0]
-        course_file = 'course.xml'
  
         parser = etree.XMLParser(remove_comments = True)
 
         lookup = TemplateLookup(directories=[data_dir])
         template = lookup.get_template("course.xml")
         course_string = template.render(groups=[])
-        course = etree.XML(course_string, parser=parser)
+        course = etree.parse(StringIO(course_string), parser=parser)
 
-        elements = course.xpath("//*")
+        elements = list(course.iter())
 
         tag_to_category = {# Inside HTML ==> Skip these
             # Custom tags
@@ -39,11 +40,11 @@ class Command(BaseCommand):
             'image': 'Custom',
             'discuss': 'Custom',
             # Simple lists
-            'chapter': 'Sequence',
-            'course': 'Sequence',
-            'sequential': 'Sequence',
-            'vertical': 'Sequence',
-            'section': 'Sequence',
+            'chapter': 'Chapter',
+            'course': 'Course',
+            'sequential': 'LectureSequence',
+            'vertical': 'ProblemSet',
+            'section': 'Section',
             # True types
             'video': 'VideoSegment',
             'html': 'HTML',
@@ -114,7 +115,7 @@ class Command(BaseCommand):
             results[e.attrib['url']] = {'data':{'text':text}}
 
         def handle_problem(e):
-            data = open(data_dir+'problems/'+e.attrib['filename']+'.xml').read()
+            data = open(os.path.join(data_dir, 'problems', e.attrib['filename']+'.xml')).read()
             results[e.attrib['url']] = {'data':{'statement':data}}
 
         element_actions = {# Inside HTML ==> Skip these
@@ -149,10 +150,8 @@ class Command(BaseCommand):
 
         for k in results:
             print k
-            create_item(k, 'Piotr Mitros')
+            keystore.create_item(k, 'Piotr Mitros')
             if 'data' in results[k]:
-                update_item(k, results[k]['data'])
+                keystore.update_item(k, results[k]['data'])
             if 'children' in results[k]:
-                update_children(k, results[k]['children'])
-            
-
+                keystore.update_children(k, results[k]['children'])
