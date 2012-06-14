@@ -2,7 +2,6 @@ section.cal {
   @include box-sizing(border-box);
   padding: 25px;
   @include clearfix;
-  overflow: scroll;
 
   > header {
     @include clearfix;
@@ -106,11 +105,21 @@ section.cal {
               display: none;
               @include position(absolute, 30px 0 0 0);
               width: 90%;
-              background: rgba(#000, .8);
+              background: rgba(#000, .9);
               padding: 10px;
               @include box-sizing(border-box);
               @include border-radius(3px);
               z-index: 99;
+
+              &:before {
+                content: "  ";
+                display: block;
+                background: rgba(#000, .8);
+                width: 10px;
+                height: 10px;
+                @include position(absolute, -5px 0 0 50%);
+                @include transform(rotate(45deg));
+              }
 
               ul {
                 li {
@@ -157,67 +166,67 @@ section.cal {
 
   section.new-section {
     margin-top: 10px;
+    @include inline-block();
+    position: relative;
 
     > a {
       @extend .button;
-      @include inline-block();
+      display: block;
     }
 
     section {
       display: none;
+      @include position(absolute, 32px 0 0 0);
+      background: rgba(#000, .8);
+      min-width: 300px;
+      padding: 10px;
+      @include box-sizing(border-box);
+      @include border-radius(3px);
+      z-index: 99;
 
-      header {
-        background: #fff;
-        text-align: left;
+      &:before {
+        content: "  ";
+        display: block;
+        background: rgba(#000, .8);
+        width: 10px;
+        height: 10px;
+        @include position(absolute, -5px 0 0 20%);
+        @include transform(rotate(45deg));
       }
 
       form {
-        background: #fff;
-        width: 50%;
-        padding: 6px;
-        border: 1px solid #000;
-        margin: 0 auto;
-        @include box-shadow(0 0 2px #333);
-        position: relative;
 
-        &:before {
-          background: #fff;
-          border-left: 1px solid #000;
-          border-top: 1px solid #000;
-          content: "  ";
-          display: block;
-          height: 10px;
-          left: 50%;
-          position: absolute;
-          top: -6px;
-          @include transform(rotate(45deg));
-          width: 10px;
-          z-index: 0;
-        }
+        ul {
+          list-style: none;
 
-        select {
-          margin-bottom: 6px;
-          width: 100%;
+          li {
+            border-bottom: 0;
+            background: none;
+            margin-bottom: 6px;
 
-          option {
-            padding: 10px 0 !important;
-          }
-        }
+            input {
+              width: 100%;
+              @include box-sizing(border-box);
+              border-color: #000;
+              padding: 6px;
+            }
 
-        input[type="submit"] {
-          display: block;
-          margin-bottom: 6px;
-          width: 100%;
-        }
+            select {
+              width: 100%;
+              @include box-sizing(border-box);
 
-        a {
+              option {
+                font-size: 14px;
+              }
+            }
 
-          &:first-child {
-            float: left;
-          }
+            a {
+              float: right;
 
-          &:last-child {
-            float: right;
+              &:first-child {
+                float: left;
+              }
+            }
           }
         }
       }
@@ -232,19 +241,24 @@ section.cal {
 }
 
 body.content
-    section.cal {
-      width: flex-grid(3) + flex-gutter();
-      float: left;
-      @include box-sizing(border-box);
+section.cal {
+  width: flex-grid(3) + flex-gutter();
+  float: left;
+  overflow: scroll;
+  @include box-sizing(border-box);
 
-      > header ul {
+  > header ul {
+    display: none;
+  }
+
+  ol {
+    li {
+      @include box-sizing(border-box);
+      width: 100%;
+
+      &.create-module {
         display: none;
       }
-
-      ol {
-        li {
-          @include box-sizing(border-box);
-          width: 100%;
-        }
-      }
     }
+  }
+}
