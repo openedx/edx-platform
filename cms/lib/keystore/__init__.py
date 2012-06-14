@@ -60,6 +60,40 @@ class KeyStore(object):
         with the specified location.
 
         If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
+
+        Searches for all matches of a partially specifed location, but raises an
+        keystore.exceptions.InsufficientSpecificationError if more
+        than a single object matches the query.
+
+        location: Something that can be passed to Location
+        """
+        raise NotImplementedError
+
+    def create_item(self, location, editor):
+        """
+        Create an empty item at the specified location with the supplied editor
+
+        location: Something that can be passed to Location
+        """
+        raise NotImplementedError
+
+    def update_item(self, location, data):
+        """
+        Set the data in the item specified by the location to
+        data
+
+        location: Something that can be passed to Location
+        data: A nested dictionary of problem data
+        """
+        raise NotImplementedError
+
+    def update_children(self, location, children):
+        """
+        Set the children for the item specified by the location to
+        data
+
+        location: Something that can be passed to Location
+        children: A list of child item identifiers
         """
         raise NotImplementedError
 
