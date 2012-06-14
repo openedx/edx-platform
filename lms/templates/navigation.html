@@ -1,4 +1,9 @@
 <%page args="active_page" />
+
+<%namespace name='static' file='static_content.html'/>
+<%block name="js_extra">
+  <script src="${static.url('js/my_courses_dropdown.js')}"></script>
+</%block>
 <header class="app" aria-label="Global Navigation">
   <nav>
     <a href="${ MITX_ROOT_URL }/mitxhome" class="logo">
@@ -6,11 +11,12 @@
     </a>
 
     <h1>${ settings.COURSE_TITLE }</h1>
+    %if user.is_authenticated():
     <ol class="user">
       <li>
         <a href="/dashboard" class="user-dashboard">
           <span class="avatar"><img src="/static/images/profile.jpg" /></span>
-          Neil deGrasse Tyson
+          ${ user.username }
         </a>
       </li>
       <li>
@@ -21,6 +27,7 @@
         </ol>
       </li>
     </ol>
+    %endif
   </nav>
 </header>
 
