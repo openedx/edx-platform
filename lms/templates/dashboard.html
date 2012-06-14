@@ -12,16 +12,16 @@
             <img src="${static.url('images/profile.jpg')}" />
           </div>
           <section class="info">
-            <h2>SpaceMan024</h2>
+            <h2>${ user.username }</h2>
             <ul>
               <li>
-                <h3>Email: <span>neil@planetarium.com</span></h3>
+                <h3>Email: <span>${ user.email }</span></h3>
               </li>
               <li>
-                <h3>Location: <span>New York, NY</span></h3>
+                <h3>Location: <span>${ user.profile.location }</span></h3>
               </li>
               <li>
-                <h3>Language: <span>English</span></h3>
+                <h3>Language: <span>${ user.profile.language }</span></h3>
               </li>
             </ul>
           </section>
