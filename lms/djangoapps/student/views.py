@@ -46,7 +46,6 @@ def index(request):
 
 @ensure_csrf_cookie
 def dashboard(request):
-  user = request.user
   csrf_token = csrf(request)['csrf_token']
   return render_to_response('dashboard.html', {'csrf': csrf_token})
 
