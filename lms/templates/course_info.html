@@ -1,0 +1,151 @@
+<%inherit file="main.html" />
+<%include file="guest_navigation.html" />
+
+<%namespace name='static' file='static_content.html'/>
+<%block name="js_extra">
+  <script src="${static.url('js/my_courses_dropdown.js')}"></script>
+  <script src="${static.url('js/course_info.js')}"></script>
+</%block>
+
+<section class="container">
+  <section class="course-info">
+    <header>
+      <img src="${static.url('images/harvard_cropped.png')}" />
+      <h2>18th Century History <span class="course-number">(HIS-223)</span></h3>
+      <h3>Harvard University</h3>
+      <div class="course-abstract">
+        <p>This course will examine the ways in which the world has grown more integrated yet more divided over the past 300 years.</p>
+      </div>
+      <a class="button sign-up" href="#">Sign up</a>
+    </header>
+
+    <section class="sidebar">
+      <div class="faded-vertical-divider"></div>
+      <section class="course-staff">
+        <h3>About the course staff</h3>
+        <div class="teacher">
+          <div class="teacher-image">
+            <img src="${static.url('images/anant.jpg')}" />
+          </div>
+          <h3 class="teacher-name">Anant Agarwal</h3>
+          <p>Director of MIT’s Computer Science and Artificial Intelligence Laboratory (CSAIL) and a professor of the Electrical Engineering and Computer Science department at MIT. His research focus is in parallel computer architectures and cloud software systems, and he is a founder of several successful startups, including Tilera, a company that produces scalable multicore processors. Prof. Agarwal won MIT’s Smullin and Jamieson prizes for teaching and co-authored the course textbook “Foundations of Analog and Digital Electronic Circuits.”</p>
+        </div> <!-- .teacher -->
+        <div class="teacher">
+          <div class="teacher-image">
+            <img src="${static.url('images/gerald.jpg')}" />
+          </div>
+          <h3 class="teacher-name">Gerald Sussman</h3>
+          <p>Professor of Electrical Engineering at MIT. He is a well known educator in the computer science community, perhaps best known as the author of Structure and Interpretation of Computer Programs, which is universally acknowledged as one of the top ten textbooks in computer science, and as the creator of Scheme, a popular teaching language. His research spans a range of topics, from artificial intelligence, to physics and chaotic systems, to supercomputer design.</p>
+        </div> <!-- .teacher -->
+        <div class="teacher">
+          <div class="teacher-image">
+            <img src="${static.url('images/piotr.jpg')}" />
+          </div>
+          <h3 class="teacher-name">Piotr Mitros</h3>
+          <p>Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Dr. Mitros has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p>
+        </div> <!-- .teacher -->
+      </section>
+    </section>
+
+    <section class="main-content-wrap">
+      <div class="video">
+        <iframe width="560" height="315" src="http://www.youtube.com/embed/p2Q6BrNhdh8" frameborder="0" allowfullscreen></iframe>
+      </div>
+
+      <section class="course-description">
+        <h3>About this course</h3>
+        <div class="course-times">
+          <div class="start">
+            <strong>Start</strong>
+            Aug 6th
+          </div>
+          <div class="length">
+            <strong>Length</strong>
+            15 weeks
+          </div>
+          <div class="final">
+            <strong>Final</strong>
+            Dec 24th
+          </div>
+        </div>
+      </div>
+      <p>This course explores the history of the modern world since Chinggis Khan. It focuses on the connections between societies from the time of the Mongol conquests and the gradual, but accelerating ways in which connections became ties of inter-dependence. The relations between societies are what will concern us. The forces pulling the world together vary from religious to economic, political to intellectual. These forces bring the world together, but they also create new divisions. Nowadays, we call this "globalization." That term has tended to emphasize the drive to worldwide integration; the view of globalization taken in this course emphasizes disintegration as well as integration. We will tackle some very basic questions: How do we explain the staggering wealth of China in the centuries up to 1750, as well as China's recent ascent? Where did the United States come from, and where is it headed? What are the significance and legacies of empire in the world? How have world wars and revolutions shaped the international system over time? What exactly is globalization, and how does today's globalization compare with the past? How has the relationship between humans and nature changed over the centuries?</p>
+      </section>
+
+      <div class="faded-hr-divider"></div>
+
+      <ul class="tabs">
+        <li data-class="requirements" class="enabled">Requirements</li>
+        <li data-class="syllabus">Syllabus</li>
+        <li data-class="textbook">Textbook</li>
+        <li data-class="faq">FAQ</li>
+        <li data-class="more-info">More info</li>
+      </ul>
+
+      <section class="tabs-content">
+        <section class="requirements tab" style="display: block;">
+          <h3>Requirements</h3>
+          <p>In order to succeed in this course, you must have taken an AP level physics course in electricity and magnetism. You must know basic calculus and linear algebra and have some background in differential equations. Since more advanced mathematics will not show up until the second half of the course, the first half of the course will include an optional remedial differential equations component for those who need it.</p>
+            <p>The course web site was developed and tested primarily with Google Chrome. We support current versions of Mozilla Firefox as well. The video player is designed to work with Flash. While we provide a partial non-Flash fallback for the video, as well as partial support for Internet Explorer, other browsers, and tablets, portions of the functionality will be unavailable.</p>
+        </section>
+
+        <section class="syllabus tab">
+          <h3>Syllabus</h3>
+          <ul>
+            <li><strong>Week 1:</strong> What is World History?</li>
+            <li><strong>Week 2:</strong> Peoples, Plagues and Plunders</li>
+            <li><strong>Week 3:</strong> Warfare and Motion</li>
+            <li><strong>Week 4:</strong> Conquests</li>
+            <li><strong>Week 5:</strong> The Beginnings of Globalization in the Atlantic Worlds</li>
+            <li><strong>Week 6:</strong> The Beginnings of Globalization in the Indian Ocean Worlds</li>
+            <li><strong>Week 7:</strong> The Worlds that Merchants Made</li>
+            <li><strong>Week 8:</strong> The Seventeenth-Century Crisis</li>
+            <li><strong>Week 9:</strong> Empire and Enlightenment</li>
+            <li><strong>Week 10:</strong> The Wealth of Nations</li>
+            <li><strong>Week 11:</strong> The World in Revolution</li>
+            <li><strong>Week 12:</strong> States and Nations</li>
+            <li><strong>Week 13:</strong> Global Frontiers</li>
+            <li><strong>Week 14:</strong> Empires and Nations</li>
+            <li><strong>Week 15:</strong> Back to the Future</li>
+          </ul>
+        </section>
+
+        <section class="textbook tab">
+          <h3>Textbook</h3>
+          <p>The course uses the textbook Foundations of Analog and Digital Electronic Circuits, by Anant Agarwal and Jeffrey H. Lang. Morgan Kaufmann Publishers, Elsevier, July 2005. While recommended, the book is not required: relevant sections will be provided electronically as part of the online course for personal use in connection with this course only. The copyright for the book is owned by Elsevier. The book can be purchased on <a href="http://www.amazon.com/exec/obidos/ASIN/1558607358/ref=nosim/mitopencourse-20">Amazon</a>.</p>
+        </section>
+
+        <section class="faq tab">
+          <h3>Frequently Asked Questions</h3>
+          <ul>
+            <li>What is the format of the class?
+              <p>The course will consist of 24 lectures, each lasting 50 minutes. There will be regular assignments consisting of map tests and short essays.</p>
+            </li>
+            <li>Are there any prerequisites?
+              <p>No - anyone and everyone is welcome to take this class.</p>
+            </li>
+            <li>What textbook should I buy?
+              <p>Although the lectures are designed to be self-contained, we recommend (but do not require) that students refer to the book Worlds Together, Worlds Apart: A History of the World: From 1000 CE to the Present (W W Norton, 3rd edition) -- Volume II, which was written specifically for this course.</p>
+            </li>
+            <li>Does Harvard award credentials or reports regarding my work in this course?
+              <p>Princeton does not award credentials or issue reports for student work in this course. However, Coursera could maintain a record of your score on the assessments and, with your permission, verify that score for authorized parties.</p>
+            </li>
+          </ul>
+        </section>
+
+        <section class="more-info tab">
+          <section class="who-should-take">
+            <h3>Who should take this?</h3>
+            <p>If you're one of the many who have a unquenched interest in the worlds history, you'll love this course.</p>
+          </section>
+
+          <section class="who-shouldnt-take">
+            <h3>Who shouldn't take this?</h3>
+            <p>No one. Anyone and everyone is welcome to take this course.</p>
+          </section>
+        </section>
+      </section> <!-- .tabs -->
+      <div class="clearfix"></div>
+    </section> <!-- .main-content-wrap -->
+  </section> <!-- .course-info -->
+</section> <!-- .container -->
