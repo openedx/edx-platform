@@ -1,0 +1,16 @@
+<nav class="askbot course-material">
+  <div class="inner-wrapper">
+    <ol class="course-tabs">
+      <li class="courseware"><a href="{{ MITX_ROOT_URL }}/courseware">Courseware</a></li>
+      <li class="info"><a href="{{ MITX_ROOT_URL }}/info">Course Info</a></li>
+      {% if user.is_authenticated(): %}
+      <li class="book"><a href="{{ MITX_ROOT_URL }}/book">Textbook</a></li>
+      <li class="discussion"><a href="{{ MITX_ROOT_URL }}/discussion/questions/" class="active">Discussion</a></li>
+      {% endif%}
+      <li class="wiki"><a href="{{ MITX_ROOT_URL }}/wiki/view/">Wiki</a></li>
+      {% if user.is_authenticated():%}
+      <li class="profile"><a href="{{ MITX_ROOT_URL }}/profile">Profile</a></li>
+      {% endif %}
+    </ol>
+  </div>
+</nav>

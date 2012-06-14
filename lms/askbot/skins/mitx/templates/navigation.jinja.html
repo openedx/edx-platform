@@ -1,0 +1,46 @@
+<header class="app" aria-label="Global Navigation">
+  <nav>
+    <a href="{{ MITX_ROOT_URL }}" class="logo">
+      <img src="/static/images/logo.png" />
+    </a>
+
+    {%if request.user.is_authenticated(): %}
+    <h1>Circuits and Electronics</h1>
+    <ol class="user">
+      <li>
+        <a href="/dashboard" class="user-dashboard">
+          <span class="avatar"><img src="/static/images/profile.jpg" /></span>
+          {{ request.user.username }}
+        </a>
+      </li>
+      <li>
+        <a href="#" class="options">&#9662</a>
+        <ol class="user-options">
+          <li><a href="#">Account Settings</a></li>
+          <li><a href="/logout">Log Out</a></li>
+        </ol>
+      </li>
+    </ol>
+    {%else:%}
+    <ol>
+      <li><a href="/courses">Courses</a></li>
+      <li><a href="#">How It Works</a></li>
+    </ol>
+    <ol class="user">
+      <li><a href="/dashboard">Log In</a></li>
+      <li><a href="#">Sign Up</a></li>
+    </ol>
+    <ol class="secondary">
+      <li>
+        <a href="#">About</a>
+      </li>
+      <li>
+        <a href="#">Jobs</a>
+      </li>
+      <li>
+        <a href="#">faq</a>
+      </li>
+    </ol>
+    {%endif %}
+  </nav>
+</header>
