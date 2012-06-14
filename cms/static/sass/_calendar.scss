@@ -246,9 +246,15 @@ section.cal {
   float: left;
   overflow: scroll;
   @include box-sizing(border-box);
+  opacity: .4;
+  @include transition();
 
   > header ul {
     display: none;
+  }
+
+  &:hover {
+    opacity: 1;
   }
 
   ol {
