@@ -9,7 +9,7 @@
       <section>
         <h1>Circuits &amp; Electronics</h1>
         <h2>6.002x</h2>
-        <a class="enroll" rel="leanModal" href="/info">View 6.002x Circuits <span>&amp;</span> Electronics as a guest</a>
+        <a class="enroll" rel="leanModal" href="#enroll"><noscript>In order to</noscript> Enroll in 6.002x Circuits <span>&amp;</span> Electronics <noscript>you need to have javascript enabled</noscript></a>
       </section>
       <p>6.002x (Circuits and Electronics) is an experimental on-line adaptation of MIT&rsquo;s first undergraduate analog design course: 6.002. This course is running, free of charge, for students worldwide from March 5, 2012 through June 8, 2012.</p>
     </section>
@@ -51,7 +51,7 @@
     </section>
 
     <section class="cta">
-      <a class="enroll" rel="leanModal" href="/info">View 6.002x Circuits &amp; Electronics as a guest</a>
+      <a class="enroll" rel="leanModal" href="#enroll"><noscript>In order to</noscript> Enroll in 6.002x Circuits &amp; Electronics <noscript>you need to have javascript enabled</noscript></a>
     </section>
 
   </section>
@@ -79,10 +79,37 @@
   </section>
 </section>
 
+  <div id="enroll" class="leanModal_box" name="enroll"><%include file="create_account.html" /></div>
+
 <script>
 $(function() {
 
     // TODO: Clean up as per http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
+
+    /* Handles when the user hits 'enroll'. Grabs form data. Does AJAX.
+            Either shows error, or shows success. */
+
+    $('form#enroll_form').submit(function(e) {
+      e.preventDefault();
+      var submit_data={};
+      $.each($("[id^=ca_]"), function(index,value){
+        submit_data[value.name]=value.value;
+      });
+      $.each($("[id^=cb_]"), function(index,value){
+        submit_data[value.name]=value.checked;
+      });
+
+        postJSON('/create_account',
+           submit_data,
+           function(json) {
+               if(json.success) {
+                  $('#enroll').html(json.value);
+               } else {
+                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+               }
+             }
+        );
+    });
 
     /* Activate stupid spinner drop-downs in enrollment form */
     var spinner_array=$("[id^=spinner_]");

@@ -1,71 +1,68 @@
-function ${ id }_content_updated() {
+function ${ id }_load() {
+  $('#main_${ id }').load('${ ajax_url }problem_get?id=${ id }', 
+  function() {
   MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
   update_schematics();
 
-  $('#check_${ id }').unbind('click').click(function() {
-    $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
+  $('#check_${ id }').click(function() {
+  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
       submit_data[value.id]=value.value;
     });
     postJSON('/modx/problem/${ id }/problem_check',
-      submit_data,
-      function(json) {
-        switch(json.success) {
-        case 'incorrect': // Worked, but answer not 
-        case 'correct':
-          $('#main_${ id }').html(json.contents);
-          ${ id }_content_updated();
+    submit_data,
+    function(json) {
+      switch(json.success) {
+      case 'incorrect': // Worked, but answer not 
+      case 'correct':
+	  ${ id }_load();
+      //alert("!!"+json.success);  
           break;
-        default:
-          alert(json.success);
-      }}
-    );
+      default:
+        alert(json.success);  
+      }
+    });
     log_event('problem_check', submit_data);
   });
 
-  $('#reset_${ id }').unbind('click').click(function() {
+  $('#reset_${ id }').click(function() {
     var submit_data={};
     $.each($("[id^=input_${ id }_]"), function(index,value){
       submit_data[value.id]=value.value;
     });
 
-    postJSON('/modx/problem/${ id }/problem_reset', {'id':'${ id }'}, function(html_as_json) {
-      $('#main_${ id }').html(html_as_json);
-      ${ id }_content_updated();
+    postJSON('/modx/problem/${ id }/problem_reset', {'id':'${ id }'}, function(json) {
+      ${ id }_load();
     });
     log_event('problem_reset', submit_data);
   });
 
-  $('#show_${ id }').unbind('click').click(function() {
+  $('#show_${ id }').click(function() {
     postJSON('/modx/problem/${ id }/problem_show', {}, function(data) {
       for (var key in data) {
-        $("#answer_"+key).text(data[key]);
-      }
-    });
-
-    log_event('problem_show', {'problem':'${ id }'});
+      $("#answer_"+key).text(data[key]);
+    }
   });
 
-  $('#save_${ id }').unbind('click').click(function() {
-    $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
-    var submit_data={};
-    $.each($("[id^=input_${ id }_]"), function(index,value) {
-      submit_data[value.id]=value.value;
-    });
+  log_event('problem_show', {'problem':'${ id }'});
+});
+
+$('#save_${ id }').click(function() {
+  $("input.schematic").each(function(index,element){ element.schematic.update_value(); });
+  var submit_data={};
+  $.each($("[id^=input_${ id }_]"), function(index,value){
+    submit_data[value.id]=value.value;});
     postJSON('/modx/problem/${ id }/problem_save',
-      submit_data,
-      function(data) {
-        if(data.success) {
-          alert('Saved');
-    }});
+    submit_data, function(data){
+      if(data.success) {
+        alert('Saved');
+      }}
+    );
     log_event('problem_save', submit_data);
   });
 }
-
-function ${ id }_load() {
-  $('#main_${ id }').load('${ ajax_url }problem_get?id=${ id }', ${ id }_content_updated);
-}
+);}
 
 $(function() {
   ${ id }_load();
