@@ -133,7 +133,7 @@ LIVESETTINGS_OPTIONS = {
                 'SHOW_LOGO' : False,
                 'LOCAL_LOGIN_ICON' : u'/images/pw-login.gif',
                 'ALWAYS_SHOW_ALL_UI_FUNCTIONS' : False,
-                'ASKBOT_DEFAULT_SKIN' : u'default',
+                'ASKBOT_DEFAULT_SKIN' : u'mitx',
                 'USE_CUSTOM_HTML_HEAD' : False,
                 'FOOTER_MODE' : u'default',
                 'USE_CUSTOM_CSS' : False,
