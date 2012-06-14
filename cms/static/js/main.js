@@ -31,29 +31,28 @@ $(document).ready(function(){
 
   setHeight = function(){
     var windowHeight = $(this).height();
-    var calHeight = windowHeight - 29;
-    var sidebarHeight = windowHeight - 73;
+    var contentHeight = windowHeight - 29;
 
-    $('.sidebar').css('height', sidebarHeight);
-    $('body.content .cal').css('height', calHeight);
+    $('section.main-content > section').css('min-height', contentHeight);
+    $('body.content .cal').css('height', contentHeight);
 
     $('.edit-week').click( function() {
       $('body').addClass('content');
-      $('body.content .cal').css('height', calHeight);
+      $('body.content .cal').css('height', contentHeight);
       $('section.week-new').show();
       return false;
     });
 
     $('.cal ol li header h1 a').click( function() {
       $('body').addClass('content');
-      $('body.content .cal').css('height', calHeight);
+      $('body.content .cal').css('height', contentHeight);
       $('section.week-edit').show();
       return false;
     });
 
     $('a.sequence-edit').click(function(){
       $('body').addClass('content');
-      $('body.content .cal').css('height', calHeight);
+      $('body.content .cal').css('height', contentHeight);
       $('section.sequence-edit').show();
       return false;
     });
