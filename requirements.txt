@@ -28,5 +28,4 @@ pymongo
 django_nose
 nosexcover
 rednose
--e common/lib/xmodule
 PyYAML
