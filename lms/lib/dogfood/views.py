@@ -282,7 +282,8 @@ def quickedit_git_reload(request):
         
     if 'gitupdate' in request.POST:
         import os			# FIXME - put at top?
-        cmd = "cd ../data%s; git reset --hard HEAD; git pull origin %s" % (xp,xp.replace('/',''))
+        #cmd = "cd ../data%s; git reset --hard HEAD; git pull origin %s" % (xp,xp.replace('/',''))
+        cmd = "cd ../data%s; ./GITRELOAD '%s'" % (xp,xp.replace('/',''))
         msg += '<p>cmd: %s</p>' % cmd
         ret = os.popen(cmd).read()
         msg += '<p><pre>%s</pre></p>' % ret.replace('<','&lt;')
