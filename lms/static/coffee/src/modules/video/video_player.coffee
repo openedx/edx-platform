@@ -135,7 +135,7 @@ class @VideoPlayer
     @video.speed
 
   volume: (value) ->
-    if value != undefined
+    if value?
       @player.setVolume value
     else
       @player.getVolume()
