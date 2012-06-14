@@ -1,0 +1,68 @@
+{% extends "two_column_body.html" %}
+<!-- question_retag.html -->
+{% block title %}{% spaceless %}{% trans %}Change tags{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1>{% trans %}Change tags{% endtrans %} [<a href="{{ question.get_absolute_url() }}">{% trans %}back{% endtrans %}</a>]</h1>
+<form id="fmretag" action="{% url retag_question question.id %}" method="post" >{% csrf_token %}
+    <h2>
+        {{ question.thread.get_title()|escape }}
+    </h2>
+    <div id="description" class="edit-content-html">
+        {{ question.html }}
+    </div>
+    <div class="form-item">
+        <strong>{{ form.tags.label_tag() }}:</strong> <span class="form-error"></span><br/>
+        {{ form.tags }}  {{ form.tags.errors }}
+        <div class="title-desc">
+            {{ form.tags.help_text }}
+        </div>
+    </div>
+    <div class="error" ></div>
+    <input type="submit" value="{% trans %}Retag{% endtrans %}" class="submit" />&nbsp;
+    <input type="button" value="{% trans %}Cancel{% endtrans %}" class="submit" onclick="history.back(-1);" />
+</form>
+{% endblock %}
+
+{% block sidebar %}
+<div class="boxC">
+    <h2>{% trans %}Why use and modify tags?{% endtrans %}</h2>
+    <ul>
+        <li>{% trans %}Tags help to keep the content better organized and searchable{% endtrans %}</li>
+        <li>
+            {% trans %}tag editors receive special awards from the community{% endtrans %}
+        </li>
+    </ul>
+    <p class='info-box-follow-up-links'>
+        <a href="{% url faq %}">faq »</a>
+    </p>
+</div>
+{% endblock %}
+{% block endjs %}
+    <script type='text/javascript' src='{{"/js/editor.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/post.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/jquery.validate.min.js"|media}}'></script>
+    <script type="text/javascript">
+        $().ready(function(){
+            $("#nav_questions").attr('className',"on");
+            {% import "macros.html" as macros %}
+            {{ macros.tag_autocomplete_js(id = '#id_tags') }}
+            $("#fmretag").validate({
+               rules: {
+                   tags: {
+                       required: true,
+                       maxength: 105
+                   }
+               },
+               messages: {
+                   tags: {
+                           required: "{% trans %}tags are required{% endtrans %}",
+                           maxlength: "{% trans %}up to 5 tags, less than 20 characters each{% endtrans %}"
+                       }
+                   }
+                   
+               });
+               lanai.highlightSyntax();
+           });
+    </script>
+{% endblock %}
+<!-- end question_retag.html -->

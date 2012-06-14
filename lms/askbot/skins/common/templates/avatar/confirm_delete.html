@@ -1,0 +1,15 @@
+{% extends "user_profile/user.html" %}
+{% block profilesection %}{% trans %}delete avatar{% endtrans %}{% endblock %}
+{% block usercontent %}
+    <p>{% trans %}Please select the avatars that you would like to delete.{% endtrans %}</p>
+    {% if not avatars %}
+        <p>{% trans avatar_change_url="avatar_change"|url %}You have no avatars to delete. Please <a href="{{ avatar_change_url }}">upload one</a> now.{% endtrans %}</p>
+    {% else %}
+        <form method="POST" action="{% url avatar_delete %}">{% csrf_token %}
+            <ul>
+                {{ delete_avatar_form.as_ul() }}
+            </ul>
+            <p><input type="submit" value="{% trans %}Delete These{% endtrans %}" /></p>
+        </form>
+    {% endif %}
+{% endblock %}

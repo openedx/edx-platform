@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <style type="text/css">
+        {{settings.QUESTIONS_WIDGET_CSS|safe}}
+    </style>
+</head>
+<body>
+    {{settings.QUESTIONS_WIDGET_HEADER|safe}}
+    <div id="container">
+        <ul>
+            {% for thread in threads %}
+                <li><a href="{{settings.APP_URL|strip_path}}{{ thread.get_absolute_url() }}">
+                  {{ thread.title|escape }}</a></li>
+            {% endfor %}
+        </ul>
+    </div> 
+    {{settings.QUESTIONS_WIDGET_FOOTER|safe}}
+</body>
+</html>

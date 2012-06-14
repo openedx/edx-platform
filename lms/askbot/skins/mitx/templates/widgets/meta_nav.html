@@ -1,0 +1,15 @@
+<a 
+  id="navTags"
+  href="{% url tags %}"
+  {% if active_tab == 'tags' %}class="on"{% endif %}
+>{% trans %}tags{% endtrans %}</a>
+<a 
+  id="navUsers"
+  href="{% url users %}"
+  {% if active_tab == 'users' %}class="on"{% endif %}
+>{% trans %}users{% endtrans %}</a>
+<a 
+  id="navBadges"
+  href="{% url badges %}"
+  {% if active_tab == 'badges' %}class="on"{% endif %}
+>{% trans %}badges{% endtrans %}</a>

@@ -1,0 +1,31 @@
+{% extends "one_column_body.html" %}
+<!-- template logout.html -->
+{% block title %}{% spaceless %}{% trans %}Logout{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1 class="section-title">{% trans %}You have successfully logged out{% endtrans %}</h1>
+{% if have_federated_login_methods %}
+    <p>{% trans %}However, you still may be logged in to your OpenID provider. Please logout of your provider if you wish to do so.{% endtrans %}</p>
+    {% if settings.FACEBOOK_KEY and settings.FACEBOOK_SECRET %}
+        <div id="fb-root"></div>
+        <script src="http://connect.facebook.net/en_US/all.js"></script>
+        <script>
+            FB.init({appId: '{{settings.FACEBOOK_KEY}}', status: true, cookie: true, xfbml: true});
+        </script>
+    {% endif %}
+{% endif %}
+{% endblock %}
+{% block endjs %}
+    <script type="text/javascript">
+    $(document).ready(function(){
+        //logout user from facebook
+        if (typeof FB != 'undefined'){
+            FB.getLoginStatus(function(response){
+                if (response.session){
+                    FB.logout();
+                }
+            });
+        }
+    });
+    </script>
+{% endblock %}
+<!-- end logout.html -->

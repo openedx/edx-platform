@@ -1,0 +1,120 @@
+{% extends "one_column_body.html" %}
+{% import "macros.html" as macros %}
+<!-- user_edit.html -->
+{% block title %}{% spaceless %}{% trans %}Edit user profile{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1 class="section-title">
+    {{ request.user.username }} - {% trans %}edit profile{% endtrans %}
+</h1>
+
+<div id="main-body" style="width:100%;padding-top:10px">
+    <form name="" action="{% url edit_user request.user.id %}" method="post">{% csrf_token %}
+        <div id="left" style="float:left;width:180px">
+            <div class='avatar'>
+                {{ macros.gravatar(view_user, 128) }}
+                {% if request.user == view_user %}
+                    <p><a
+                        {% if support_custom_avatars %}
+                            href="{% url avatar_change %}"
+                        {% else %}
+                            href="{% url faq %}#gravatar"
+                        {% endif %}
+                    >{% trans %}change picture{% endtrans %}</a></p>
+                    {% if support_custom_avatars %}
+                    <p><a
+                        href="{% url avatar_delete %}"
+                        >{% trans %}remove{% endtrans %}</a>
+                    </p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div style="float:right;width:750px;text-align:left;">
+            <h2>{% trans %}Registered user{% endtrans %}</h2>
+            <table class="user-details">
+                <tr>
+                    <th width="100px"></th>
+                    <th></th>
+                </tr>
+                <tr>
+                <td>{% trans %}Screen Name{% endtrans %}:</td>
+                <td>
+                {% if settings.EDITABLE_SCREEN_NAME %}
+                    {{ form.username }}
+                    <span class="form-error"></span> {{ form.username.errors }} </td>
+                {% else %}
+                    {{ view_user.username }}
+                {% endif %}
+                </td>
+                </tr>
+                <tr>
+                    <td>
+                        {{ form.email.label_tag() }}:
+                    </td>
+                    <td>
+                        {% if settings.EDITABLE_EMAIL %}
+                            {{ form.email }}
+                            <span class="form-error"></span>
+                            {{ form.email.errors }}
+                        {% else %}
+                            {{ view_user.email }}
+                            {% trans %}(cannot be changed){% endtrans %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ form.realname.label_tag() }}:</td>
+                    <td>{{ form.realname }} <span class="form-error"></span> {{ form.realname.errors }} </td>
+                </tr>
+                <tr>
+                    <td>{{ form.website.label_tag() }}:</td>
+                    <td>{{ form.website }} <span class="form-error"></span> {{ form.website.errors }} </td>
+                </tr>
+                <tr>
+                    <td>{{ form.city.label_tag() }}:</td>
+                    <td>{{ form.city }} <span class="form-error"></span> {{ form.city.errors }} </td>
+                </tr>
+                <tr>
+                    <td>{{ form.country.label_tag() }}:</td>
+                    <td>{{ form.country }} <span class="form-error"></span> {{ form.country.errors }} </td>
+                </tr>
+                <tr>
+                    <td>{{ form.show_country.label_tag() }}:</td>
+                    <td>{{ form.show_country }} <span class="form-error"></span> {{ form.show_country.errors }} </td>
+                </tr>
+                <tr>
+                    <td>{{ form.birthday.label_tag() }}:</td>
+                    <td>{{ form.birthday }} <span class="form-error"></span> {{ form.birthday.errors }} </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td class="title-desc">{{ form.birthday.help_text }}</td>
+                </tr>
+                <tr style="height:10px">
+                    <td colspan="2">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="vertical-align:top">{{ form.about.label_tag() }}:</td>
+                    <td>{{ form.about }} <span class="form-error"></span> {{ form.about.errors }} </td>
+                </tr>
+            </table>
+            <div style="margin:30px 0 60px 0">
+                <input type="submit" value="{% trans %}Update{% endtrans %}" class="submit" >&nbsp;
+                <input id="cancel" type="button" value="{% trans %}Cancel{% endtrans %}" class="submit" >
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block endjs %}
+        <script type="text/javascript">
+            $().ready(function(){
+                $("#nav_profile").attr('className',"on");
+                $("#cancel").bind('click', function(){history.go(-1);})
+            });     
+        </script>
+        {% block userjs %}
+        {% endblock %}
+{% endblock %}
+<!-- end user_edit.html -->

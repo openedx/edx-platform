@@ -1,0 +1,25 @@
+{% extends "user_profile/user.html" %}
+{% import "macros.html" as macros %}
+<!-- user_network.html -->
+{% block profileseciton %}
+    {% trans %}network{% endtrans %}
+{% endblock %}
+{% block usercontent %}
+    {% if followed_users or followers %}
+        {% if followers %}
+            <h2>{% trans count=followers|length %}Followed by {{count}} person{% pluralize count %}Followed by {{count}} people{% endtrans %}</h2>
+            {{ macros.user_list(followers, profile_section = 'network') }}
+        {% endif %}
+        {% if followed_users %}
+            <h2>{% trans count=followed_users|length %}Following {{count}} person{% pluralize count %}Following {{count}} people{% endtrans %}</h2>
+            {{ macros.user_list(followed_users, profile_section = 'network') }}
+        {% endif %}
+    {% else %}
+        {% if request.user == view_user %}
+            <p>{% trans %}Your network is empty. Would you like to follow someone? - Just visit their profiles and click "follow"{% endtrans %}</p>
+        {% else %}
+            <p>{% trans username = view_user.username %}{{username}}'s network is empty{% endtrans %}</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+<!-- end user_network.html -->

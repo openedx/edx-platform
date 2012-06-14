@@ -1,0 +1,23 @@
+{% if request.user.is_authenticated() %}
+    <p>
+        {{ answer.email_notify }}
+        <label for="question-subscribe-updates">
+            {% set email_feed_frequency = request.user.get_followed_question_alert_frequency() %}
+            {% if email_feed_frequency =='n' %}
+                {% trans %}Notify me once a day when there are any new answers{% endtrans %}
+                {% elif email_feed_frequency =='d' %}
+                {% trans %}Notify me once a day when there are any new answers{% endtrans %}
+                {% elif email_feed_frequency =='w' %}
+                {% trans %}Notify me weekly when there are any new answers{% endtrans %}
+                {% elif email_feed_frequency =='i' %}
+                {% trans %}Notify me immediately when there are any new answers{% endtrans %}
+            {% endif %}
+        </label>
+        {% trans profile_url=request.user.get_profile_url() %}You can always adjust frequency of email updates from your {{profile_url}}{% endtrans %}
+    </p>
+{% else %}
+    <p>
+        {{ answer.email_notify }}
+        <label>{% trans %}once you sign in you will be able to subscribe for any updates here{% endtrans %}</label>
+    </p>
+{% endif %}

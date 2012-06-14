@@ -1,0 +1,84 @@
+{% extends "one_column_body.html" %}
+<!-- complete.html -->
+{#
+views calling this template: 
+* django_authopenid.views.register with login_type='openid'
+* django_authopenid.views.signin - with login_type='legacy'
+
+purpose of this template is to allow user enter his/her name
+email and sign up for email alerts at the initial registratio
+
+parameters:
+* provider 
+* login_type openid|legacy
+* username (same as screen name or username in the models, and nickname in openid sreg)
+* openid_register_form
+* openid_verify_form - not clear what this form is supposed to do, not used for legacy
+* email_feeds_form forum.forms.SimpleEmailSubscribeForm
+* openid_username_exists
+#}
+{% block head %}{% endblock %}
+{% block title %}{% spaceless %}{% trans %}Registration{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+    <h1>{% trans %}Registration{% endtrans %}</h1>
+    <div id="completetxt" >
+        <div class="message">
+            {% if login_type=='openid' %}
+                {% trans %}register new {{provider}} account info, see {{gravatar_faq_url}}{% endtrans %}
+            {% elif login_type=='legacy' %}
+                    {% if external_login_name_is_taken %}
+                        {% trans %}{{username}} already exists, choose another name for 
+                            {{provider}}. Email is required too, see {{gravatar_faq_url}}
+                        {% endtrans %} 
+                    {% else %}
+                        {% trans %}register new external {{provider}} account info, see {{gravatar_faq_url}}{% endtrans %}
+                    {% endif %}
+            {% else %}
+                {% trans %}register new Facebook connect account info, see {{gravatar_faq_url}}{% endtrans %}
+            {% endif %}
+        </div>
+        <p style="display:none">{% trans %}This account already exists, please use another.{% endtrans %}</p>
+    </div>
+    {% if openid_register_form.errors %}
+        <ul class="errorlist">
+        {% for error in openid_register_form.non_field_errors() %}
+            <li>{{error}}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <div class="login">
+        {% if login_type=='openid' %}
+        <form name="fregister" action="{% url user_register %}" method="POST">{% csrf_token %}
+        {% elif login_type=='facebook' %}
+        <form name="fregister" action="" method="POST">{% csrf_token %}
+        {% else %}
+        <form name="fregister" action="{{ settings.LOGIN_URL }}" method="POST">{% csrf_token %}
+        {% endif %}
+            {{ openid_register_form.next }}
+            <div class="form-row-vertical">
+                <label for="id_username">{% trans %}Screen name label{% endtrans %}</label>
+                {% if openid_register_form.username.errors %} 
+                    <p class="error">{{ openid_register_form.username.errors|join(", ") }}</p>
+                {% endif %}
+                {{ openid_register_form.username }}
+            </div>
+            <div class="form-row-vertical margin-bottom">
+                <label for="id_email">{% trans %}Email address label{% endtrans %}</label>
+                {% if openid_register_form.email.errors %} 
+                    <p class="error">{{ openid_register_form.email.errors|join(", ") }}</p>
+                {% endif %}
+                {{ openid_register_form.email }}
+            </div>
+            <p>{% trans %}receive updates motivational blurb{% endtrans %}</p>
+            <div class='simple-subscribe-options'>
+            {{email_feeds_form.subscribe}}
+            {% if email_feeds_form.errors %}
+            <p class="error">{% trans %}please select one of the options above{% endtrans %}</p>
+            {% endif %}
+            </div>
+            <p class='space-above'>{% trans %}Tag filter tool will be your right panel, once you log in.{% endtrans %}</p>
+            <div class="submit-row"><input type="submit" class="submit" name="bnewaccount" value="{% trans %}create account{% endtrans %}"/></div>
+        </form>
+    </div>
+{% endblock %}
+<!-- end complete.html -->

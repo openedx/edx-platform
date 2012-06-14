@@ -1,0 +1,8 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+{% block meta_description %}
+<meta name="description" content="{{settings.APP_DESCRIPTION|escape}}" />
+{% endblock %}
+<meta name="keywords" content="{%block keywords%}{%endblock%},{{settings.APP_KEYWORDS|escape}}" />
+{% if settings.GOOGLE_SITEMAP_CODE %}
+<meta name="google-site-verification" content="{{settings.GOOGLE_SITEMAP_CODE}}" />
+{% endif %}

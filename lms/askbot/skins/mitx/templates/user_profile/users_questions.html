@@ -1,0 +1,9 @@
+<!-- users_questions.html -->
+{% import "macros.html" as macros %}
+
+<ul class="question-list">
+    {% for question in questions %}
+    {{macros.question_summary(question.thread, question, extra_class='narrow', search_state=search_state)}}
+    {% endfor %}
+</ul>
+<!-- end users_questions.html -->

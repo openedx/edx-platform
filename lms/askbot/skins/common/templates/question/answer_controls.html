@@ -1,0 +1,42 @@
+{% set pipe=joiner('<span class="sep">|</span>') %}
+<span class="linksopt">{{ pipe() }}
+  <a  class="permant-link"
+    href="{{ answer.get_absolute_url(question_post=question) }}"
+    title="{% trans %}answer permanent link{% endtrans %}">
+    &#10150;
+  </a>
+</span>
+
+{% if request.user|can_edit_post(answer) %}{{ pipe() }}
+<span class="action-link"><a class="question-edit" href="{% url edit_answer answer.id %}">{% trans %}edit{% endtrans %}</a></span>
+{% endif %}
+{% if question.offensive_flag_count == 0 %}{{ pipe() }}
+<span id="answer-offensive-flag-{{ answer.id }}" class="offensive-flag"
+  title="{% trans %}report as offensive (i.e containing spam, advertising, malicious text, etc.){% endtrans %}">
+  <a class="question-flag">{# {% trans %}flag offensive{% endtrans %} #} flag</a>
+  {% if request.user|can_see_offensive_flags(answer) %}
+  <span class="darkred">{% if answer.offensive_flag_count > 0 %}({{ answer.offensive_flag_count }}){% endif %}</span>
+  {% endif %}
+</span>
+{% elif question.offensive_flag_count > 0 %}{{ pipe() }}
+<span id="answer-offensive-flag-remove-{{ answer.id }}" class="offensive-flag"
+  title="{% trans %}report as offensive (i.e containing spam, advertising, malicious text, etc.){% endtrans %}">
+  <a class="question-flag">{# {% trans %}remove flag{% endtrans %} #} unflag</a>
+  {% if request.user|can_see_offensive_flags(answer) %}
+  <span class="darkred">{% if answer.offensive_flag_count > 0 %}({{ answer.offensive_flag_count }}){% endif %}</span>
+  {% endif %}
+</span>
+{% endif %}
+{% if request.user|can_delete_post(answer) %}{{ pipe() }}
+{% spaceless %}
+<span class="action-link">
+  <a class="question-delete" id="answer-delete-link-{{answer.id}}">
+    {% if answer.deleted %}{% trans %}undelete{% endtrans %}{% else %}&#10006;{% endif %}</a>
+</span>
+{% endspaceless %}
+{% endif %}
+{% if settings.ALLOW_SWAPPING_QUESTION_WITH_ANSWER and request.user.is_authenticated() and request.user.is_administrator_or_moderator() %}{{ pipe() }}
+<span class="action-link">
+  <a id="swap-question-with-answer-{{answer.id}}">{% trans %}swap with question{% endtrans %}</a>
+</span>
+{% endif %}

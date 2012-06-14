@@ -1,0 +1,84 @@
+{% extends "two_column_body.html" %}
+{% import "macros.html" as macros %}
+<!-- template answer_edit.html -->
+{% block title %}{% spaceless %}{% trans %}Edit answer{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+
+
+  <div class="question-list-header">
+    <h1 class="section-title"> {% trans %}Edit answer{% endtrans %} <a class="light-button" href="{{ answer.thread._question_post().get_absolute_url() }}#{{ answer.id }}">{% trans %}back{% endtrans %}</a>
+    </h1>
+  </div>
+
+<form id="fmedit" class="question-form" action="{% url edit_answer answer.id %}" method="post" >{% csrf_token %}
+
+
+  <div class="question-options">
+    {{ macros.edit_post(form) }}
+    {% if settings.WIKI_ON and answer.wiki == False %}
+    {{ macros.checkbox_in_div(form.wiki) }}
+    {% endif %}
+  </div>
+
+  <div class="after-editor form-item">
+    <input type="submit" value="{% trans %}Save edit{% endtrans %}" class="submit" />&nbsp;
+    <input type="button" value="{% trans %}Cancel{% endtrans %}" class="submit" onclick="history.back(-1);" />
+  </div>
+
+</form>
+{% endblock %}
+
+{% block sidebar %}
+{% include "widgets/answer_edit_tips.html" %}
+{% endblock %}
+
+{% block endjs %}
+{% include "meta/editor_data.html" %}
+<script type='text/javascript' src='{{"/js/editor.js"|media}}'></script>
+<script type='text/javascript' src='{{"/js/jquery.validate.min.js"|media}}'></script>
+<script type='text/javascript' src='{{"/js/post.js"|media}}'></script>
+<script type='text/javascript'>
+  {% if settings.ENABLE_MATHJAX or settings.MARKUP_CODE_FRIENDLY %}
+  var codeFriendlyMarkdown = true;
+{% else %}
+var codeFriendlyMarkdown = false;
+{% endif %}
+</script>
+<script type='text/javascript' src='{{"/js/wmd/showdown.js"|media}}'></script>
+<script type='text/javascript' src='{{"/js/wmd/wmd.js"|media}}'></script>
+<script type="text/javascript">
+  $().ready(function(){
+      $("#nav_questions").attr('className',"on");
+      $('#editor').TextAreaResizer();
+
+      //highlight code synctax when editor has new text
+      $("#editor").typeWatch({highlight: false, wait: 3000,
+        captureLength: 5, callback: lanai.highlightSyntax});
+
+      //toggle preview of editor
+      var display = true;
+      var txt = "{% trans %}hide preview{% endtrans %}";
+      $('#pre-collapse').text(txt);
+      $('#pre-collapse').bind('click', function(){
+        txt = display ? "{% trans %}show preview{% endtrans %}" : "{% trans %}hide preview{% endtrans %}";
+        display = !display;
+        $('#previewer').toggle();
+        $('#pre-collapse').text(txt);
+        });
+
+      setupFormValidation(
+        $("#fmedit"),
+        CPValidator.getAnswerFormRules(),
+        CPValidator.getAnswerFormMessages()
+        );
+
+      $('#id_revision').unbind().change(function(){
+          $("#select_revision").click();
+          });
+
+      lanai.highlightSyntax();
+
+  });
+</script>
+{% endblock %}
+<!-- end template answer_edit.html -->
