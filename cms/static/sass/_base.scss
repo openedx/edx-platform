@@ -2,6 +2,7 @@
 $fg-column: 70px;
 $fg-gutter: 26px;
 $fg-max-columns: 12;
+$body-font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
 
 html {
   height: 100%;
@@ -10,7 +11,7 @@ html {
 body {
   @include clearfix();
   height: 100%;
-  font: 14px "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  font: 14px $body-font-family;
 
   > section {
     display: table;
@@ -55,6 +56,10 @@ body {
 a {
   text-decoration: none;
   color: #888;
+}
+
+input {
+  font-family: $body-font-family;
 }
 
 input[type="submit"], .button {

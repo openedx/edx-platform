@@ -210,9 +210,10 @@ a {
   text-decoration: none;
   color: #888; }
 
-input[type="submit"], .button, section.cal section.new-section > a, section.week-edit > header a,
-section.week-new > header a,
-section.sequence-edit > header a, section.video-new > section section.upload a.upload-button, section.video-edit > section section.upload a.upload-button, section.video-new > section a.save-update, section.video-edit > section a.save-update, section.problem-new > section a.save, section.problem-edit > section a.save {
+input {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+
+input[type="submit"], .button, section.cal section.new-section > a, section.video-new > section section.upload a.upload-button, section.video-edit > section section.upload a.upload-button, section.video-new > section a.save-update, section.video-edit > section a.save-update, section.problem-new > section a.save, section.problem-edit > section a.save {
   border: 1px solid #ccc;
   background: #efefef;
   -webkit-border-radius: 3px;
@@ -227,8 +228,7 @@ section.cal {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   padding: 25px;
-  zoom: 1;
-  overflow: scroll; }
+  zoom: 1; }
   section.cal:before, section.cal:after {
     content: "";
     display: table; }
@@ -360,7 +360,7 @@ section.cal {
               position: absolute;
               top: 30px;
               width: 90%;
-              background: rgba(0, 0, 0, 0.8);
+              background: rgba(0, 0, 0, 0.9);
               padding: 10px;
               -webkit-box-sizing: border-box;
               -moz-box-sizing: border-box;
@@ -371,6 +371,20 @@ section.cal {
               -o-border-radius: 3px;
               border-radius: 3px;
               z-index: 99; }
+              section.cal ol > li ul li.create-module > div:before {
+                content: "  ";
+                display: block;
+                background: rgba(0, 0, 0, 0.8);
+                width: 10px;
+                height: 10px;
+                position: absolute;
+                top: -5px;
+                left: 50%;
+                -webkit-transform: rotate(45deg);
+                -moz-transform: rotate(45deg);
+                -ms-transform: rotate(45deg);
+                -o-transform: rotate(45deg);
+                transform: rotate(45deg); }
               section.cal ol > li ul li.create-module > div ul li {
                 border-bottom: 0;
                 background: none; }
@@ -395,60 +409,71 @@ section.cal {
             section.cal ol > li ul li.create-module:hover div {
               display: block; }
   section.cal section.new-section {
-    margin-top: 10px; }
+    margin-top: 10px;
+    display: -moz-inline-box;
+    -moz-box-orient: vertical;
+    display: inline-block;
+    vertical-align: baseline;
+    zoom: 1;
+    *display: inline;
+    *vertical-align: auto;
+    position: relative; }
     section.cal section.new-section > a {
-      display: -moz-inline-box;
-      -moz-box-orient: vertical;
-      display: inline-block;
-      vertical-align: baseline;
-      zoom: 1;
-      *display: inline;
-      *vertical-align: auto; }
+      display: block; }
     section.cal section.new-section section {
-      display: none; }
-      section.cal section.new-section section header {
-        background: #fff;
-        text-align: left; }
-      section.cal section.new-section section form {
-        background: #fff;
-        width: 50%;
-        padding: 6px;
-        border: 1px solid #000;
-        margin: 0 auto;
-        -webkit-box-shadow: 0 0 2px #333333;
-        -moz-box-shadow: 0 0 2px #333333;
-        box-shadow: 0 0 2px #333333;
-        position: relative; }
-        section.cal section.new-section section form:before {
-          background: #fff;
-          border-left: 1px solid #000;
-          border-top: 1px solid #000;
-          content: "  ";
-          display: block;
-          height: 10px;
-          left: 50%;
-          position: absolute;
-          top: -6px;
-          -webkit-transform: rotate(45deg);
-          -moz-transform: rotate(45deg);
-          -ms-transform: rotate(45deg);
-          -o-transform: rotate(45deg);
-          transform: rotate(45deg);
-          width: 10px;
-          z-index: 0; }
-        section.cal section.new-section section form select {
-          margin-bottom: 6px;
-          width: 100%; }
-          section.cal section.new-section section form select option {
-            padding: 10px 0 !important; }
-        section.cal section.new-section section form input[type="submit"] {
-          display: block;
-          margin-bottom: 6px;
-          width: 100%; }
-        section.cal section.new-section section form a:first-child {
-          float: left; }
-        section.cal section.new-section section form a:last-child {
-          float: right; }
+      display: none;
+      position: absolute;
+      top: 32px;
+      background: rgba(0, 0, 0, 0.8);
+      min-width: 300px;
+      padding: 10px;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      z-index: 99; }
+      section.cal section.new-section section:before {
+        content: "  ";
+        display: block;
+        background: rgba(0, 0, 0, 0.8);
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        top: -5px;
+        left: 20%;
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        transform: rotate(45deg); }
+      section.cal section.new-section section form ul {
+        list-style: none; }
+        section.cal section.new-section section form ul li {
+          border-bottom: 0;
+          background: none;
+          margin-bottom: 6px; }
+          section.cal section.new-section section form ul li input {
+            width: 100%;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            border-color: #000;
+            padding: 6px; }
+          section.cal section.new-section section form ul li select {
+            width: 100%;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box; }
+            section.cal section.new-section section form ul li select option {
+              font-size: 14px; }
+          section.cal section.new-section section form ul li a {
+            float: right; }
+            section.cal section.new-section section form ul li a:first-child {
+              float: left; }
     section.cal section.new-section:hover section {
       display: block; }
 
@@ -456,6 +481,7 @@ body.content
 section.cal {
   width: 25.577%;
   float: left;
+  overflow: scroll;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
@@ -468,13 +494,15 @@ section.cal {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     width: 100%; }
+    body.content
+    section.cal ol li.create-module {
+      display: none; }
 
 section.week-edit > header,
 section.week-new > header,
 section.sequence-edit > header {
-  border-bottom: 1px solid #ccc;
-  zoom: 1;
-  padding: 6px; }
+  border-bottom: 2px solid #333;
+  zoom: 1; }
   section.week-edit > header:before, section.week-edit > header:after,
   section.week-new > header:before,
   section.week-new > header:after,
@@ -490,146 +518,87 @@ section.sequence-edit > header {
   section.week-new > header h1,
   section.sequence-edit > header h1 {
     font-size: 18px;
-    float: left;
-    margin-top: 8px 6px; }
-  section.week-edit > header a,
-  section.week-new > header a,
-  section.sequence-edit > header a {
-    float: right;
-    display: block; }
-section.week-edit section header,
-section.week-new section header,
-section.sequence-edit section header {
-  background: #666;
-  color: #fff;
-  padding: 6px;
-  border-bottom: 1px solid #333;
-  -webkit-font-smoothing: antialiased; }
-  section.week-edit section header h2,
-  section.week-new section header h2,
-  section.sequence-edit section header h2 {
-    font-size: 14px; }
-section.week-edit section.sidebar,
-section.week-new section.sidebar,
-section.sequence-edit section.sidebar {
-  width: 34.368%;
-  float: left;
-  background: #ccc;
-  border-right: 1px solid #333;
+    margin: 8px 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px; }
+  section.week-edit > header section.goals,
+  section.week-new > header section.goals,
+  section.sequence-edit > header section.goals {
+    background: #eee;
+    padding: 6px;
+    border-top: 1px solid #ccc; }
+    section.week-edit > header section.goals header h2,
+    section.week-new > header section.goals header h2,
+    section.sequence-edit > header section.goals header h2 {
+      font-size: 14px;
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
+    section.week-edit > header section.goals header p,
+    section.week-new > header section.goals header p,
+    section.sequence-edit > header section.goals header p {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
+    section.week-edit > header section.goals ul,
+    section.week-new > header section.goals ul,
+    section.sequence-edit > header section.goals ul {
+      list-style: none;
+      margin-top: 6px;
+      color: #999; }
+section.week-edit > section.content,
+section.week-new > section.content,
+section.sequence-edit > section.content {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  box-sizing: border-box; }
-  section.week-edit section.sidebar section,
-  section.week-new section.sidebar section,
-  section.sequence-edit section.sidebar section {
-    height: 50%; }
-    section.week-edit section.sidebar section > ul,
-    section.week-new section.sidebar section > ul,
-    section.sequence-edit section.sidebar section > ul {
-      list-style: none; }
-      section.week-edit section.sidebar section > ul > li,
-      section.week-new section.sidebar section > ul > li,
-      section.sequence-edit section.sidebar section > ul > li {
-        padding: 6px;
-        border-bottom: 1px solid #666;
-        background: #eee; }
-        section.week-edit section.sidebar section > ul > li.new-module,
-        section.week-new section.sidebar section > ul > li.new-module,
-        section.sequence-edit section.sidebar section > ul > li.new-module {
-          position: relative; }
-          section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown,
-          section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown,
-          section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown {
-            list-style: none; }
-            section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown li,
-            section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown li,
-            section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown li {
-              display: none; }
-              section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown li:first-child,
-              section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown li:first-child,
-              section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown li:first-child {
-                display: block; }
-            section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li,
-            section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown:hover li,
-            section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li {
-              display: block;
-              padding: 6px 0; }
-              section.week-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li:first-child,
-              section.week-new section.sidebar section > ul > li.new-module ul.new-dropdown:hover li:first-child,
-              section.sequence-edit section.sidebar section > ul > li.new-module ul.new-dropdown:hover li:first-child {
-                padding-top: 0; }
-    section.week-edit section.sidebar section p,
-    section.week-new section.sidebar section p,
-    section.sequence-edit section.sidebar section p {
-      padding: 6px;
-      border-bottom: 1px solid #666; }
-section.week-edit section.weeks-content,
-section.week-new section.weeks-content,
-section.sequence-edit section.weeks-content {
-  width: 65.632%;
-  float: left;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box; }
-  section.week-edit section.weeks-content header,
-  section.week-new section.weeks-content header,
-  section.sequence-edit section.weeks-content header {
-    zoom: 1; }
-    section.week-edit section.weeks-content header:before, section.week-edit section.weeks-content header:after,
-    section.week-new section.weeks-content header:before,
-    section.week-new section.weeks-content header:after,
-    section.sequence-edit section.weeks-content header:before,
-    section.sequence-edit section.weeks-content header:after {
+  box-sizing: border-box;
+  padding: 20px; }
+  section.week-edit > section.content section.filters,
+  section.week-new > section.content section.filters,
+  section.sequence-edit > section.content section.filters {
+    zoom: 1;
+    margin-bottom: 10px;
+    background: #efefef;
+    border: 1px solid #ddd; }
+    section.week-edit > section.content section.filters:before, section.week-edit > section.content section.filters:after,
+    section.week-new > section.content section.filters:before,
+    section.week-new > section.content section.filters:after,
+    section.sequence-edit > section.content section.filters:before,
+    section.sequence-edit > section.content section.filters:after {
       content: "";
       display: table; }
-    section.week-edit section.weeks-content header:after,
-    section.week-new section.weeks-content header:after,
-    section.sequence-edit section.weeks-content header:after {
+    section.week-edit > section.content section.filters:after,
+    section.week-new > section.content section.filters:after,
+    section.sequence-edit > section.content section.filters:after {
       clear: both; }
-    section.week-edit section.weeks-content header h2,
-    section.week-new section.weeks-content header h2,
-    section.sequence-edit section.weeks-content header h2 {
-      float: left; }
-    section.week-edit section.weeks-content header form,
-    section.week-new section.weeks-content header form,
-    section.sequence-edit section.weeks-content header form {
-      float: right;
-      margin: -2px 0; }
-      section.week-edit section.weeks-content header form input,
-      section.week-new section.weeks-content header form input,
-      section.sequence-edit section.weeks-content header form input {
-        border: 1px solid #000;
-        background: #ddd;
-        padding: 2px 4px;
-        -webkit-border-radius: 2px;
-        -moz-border-radius: 2px;
-        -ms-border-radius: 2px;
-        -o-border-radius: 2px;
-        border-radius: 2px; }
-  section.week-edit section.weeks-content section.filters,
-  section.week-new section.weeks-content section.filters,
-  section.sequence-edit section.weeks-content section.filters {
-    border-bottom: 1px solid #999; }
-    section.week-edit section.weeks-content section.filters ul,
-    section.week-new section.weeks-content section.filters ul,
-    section.sequence-edit section.weeks-content section.filters ul {
+    section.week-edit > section.content section.filters ul,
+    section.week-new > section.content section.filters ul,
+    section.sequence-edit > section.content section.filters ul {
       zoom: 1;
       list-style: none;
       padding: 6px; }
-      section.week-edit section.weeks-content section.filters ul:before, section.week-edit section.weeks-content section.filters ul:after,
-      section.week-new section.weeks-content section.filters ul:before,
-      section.week-new section.weeks-content section.filters ul:after,
-      section.sequence-edit section.weeks-content section.filters ul:before,
-      section.sequence-edit section.weeks-content section.filters ul:after {
+      section.week-edit > section.content section.filters ul:before, section.week-edit > section.content section.filters ul:after,
+      section.week-new > section.content section.filters ul:before,
+      section.week-new > section.content section.filters ul:after,
+      section.sequence-edit > section.content section.filters ul:before,
+      section.sequence-edit > section.content section.filters ul:after {
         content: "";
         display: table; }
-      section.week-edit section.weeks-content section.filters ul:after,
-      section.week-new section.weeks-content section.filters ul:after,
-      section.sequence-edit section.weeks-content section.filters ul:after {
+      section.week-edit > section.content section.filters ul:after,
+      section.week-new > section.content section.filters ul:after,
+      section.sequence-edit > section.content section.filters ul:after {
         clear: both; }
-      section.week-edit section.weeks-content section.filters ul li,
-      section.week-new section.weeks-content section.filters ul li,
-      section.sequence-edit section.weeks-content section.filters ul li {
+      section.week-edit > section.content section.filters ul li,
+      section.week-new > section.content section.filters ul li,
+      section.sequence-edit > section.content section.filters ul li {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
         display: inline-block;
@@ -637,25 +606,136 @@ section.sequence-edit section.weeks-content {
         zoom: 1;
         *display: inline;
         *vertical-align: auto; }
-        section.week-edit section.weeks-content section.filters ul li.advanced,
-        section.week-new section.weeks-content section.filters ul li.advanced,
-        section.sequence-edit section.weeks-content section.filters ul li.advanced {
+        section.week-edit > section.content section.filters ul li.advanced,
+        section.week-new > section.content section.filters ul li.advanced,
+        section.sequence-edit > section.content section.filters ul li.advanced {
           float: right; }
-  section.week-edit section.weeks-content section.modules ul,
-  section.week-new section.weeks-content section.modules ul,
-  section.sequence-edit section.weeks-content section.modules ul {
-    list-style: none; }
-    section.week-edit section.weeks-content section.modules ul li,
-    section.week-new section.weeks-content section.modules ul li,
-    section.sequence-edit section.weeks-content section.modules ul li {
-      padding: 6px;
-      font-weight: bold;
-      font-size: 16px;
-      border-bottom: 1px solid #333; }
-      section.week-edit section.weeks-content section.modules ul li a,
-      section.week-new section.weeks-content section.modules ul li a,
-      section.sequence-edit section.weeks-content section.modules ul li a {
-        color: #000; }
+  section.week-edit > section.content > div,
+  section.week-new > section.content > div,
+  section.sequence-edit > section.content > div {
+    display: table;
+    border: 1px solid;
+    width: 100%; }
+    section.week-edit > section.content > div section header,
+    section.week-new > section.content > div section header,
+    section.sequence-edit > section.content > div section header {
+      background: #eee;
+      padding: 10px;
+      border-bottom: 1px solid #ccc; }
+      section.week-edit > section.content > div section header h2,
+      section.week-new > section.content > div section header h2,
+      section.sequence-edit > section.content > div section header h2 {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 12px; }
+    section.week-edit > section.content > div section.modules,
+    section.week-new > section.content > div section.modules,
+    section.sequence-edit > section.content > div section.modules {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      display: table-cell;
+      width: 65.632%;
+      border-right: 1px solid #333; }
+      section.week-edit > section.content > div section.modules ol,
+      section.week-new > section.content > div section.modules ol,
+      section.sequence-edit > section.content > div section.modules ol {
+        list-style: none;
+        border-bottom: 1px solid #333; }
+        section.week-edit > section.content > div section.modules ol li,
+        section.week-new > section.content > div section.modules ol li,
+        section.sequence-edit > section.content > div section.modules ol li {
+          border-bottom: 1px solid #333; }
+          section.week-edit > section.content > div section.modules ol li:last-child,
+          section.week-new > section.content > div section.modules ol li:last-child,
+          section.sequence-edit > section.content > div section.modules ol li:last-child {
+            border-bottom: 0; }
+          section.week-edit > section.content > div section.modules ol li a,
+          section.week-new > section.content > div section.modules ol li a,
+          section.sequence-edit > section.content > div section.modules ol li a {
+            color: #000; }
+          section.week-edit > section.content > div section.modules ol li ol,
+          section.week-new > section.content > div section.modules ol li ol,
+          section.sequence-edit > section.content > div section.modules ol li ol {
+            list-style: none; }
+            section.week-edit > section.content > div section.modules ol li ol li,
+            section.week-new > section.content > div section.modules ol li ol li,
+            section.sequence-edit > section.content > div section.modules ol li ol li {
+              padding: 6px 0 6px 6px; }
+              section.week-edit > section.content > div section.modules ol li ol li h3,
+              section.week-new > section.content > div section.modules ol li ol li h3,
+              section.sequence-edit > section.content > div section.modules ol li ol li h3 {
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 12px; }
+              section.week-edit > section.content > div section.modules ol li ol li ol,
+              section.week-new > section.content > div section.modules ol li ol li ol,
+              section.sequence-edit > section.content > div section.modules ol li ol li ol {
+                border-left: 1px solid; }
+    section.week-edit > section.content > div section.scratch-pad,
+    section.week-new > section.content > div section.scratch-pad,
+    section.sequence-edit > section.content > div section.scratch-pad {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      display: table-cell;
+      width: 34.368%; }
+      section.week-edit > section.content > div section.scratch-pad ol,
+      section.week-new > section.content > div section.scratch-pad ol,
+      section.sequence-edit > section.content > div section.scratch-pad ol {
+        list-style: none;
+        border-bottom: 1px solid #999; }
+        section.week-edit > section.content > div section.scratch-pad ol li,
+        section.week-new > section.content > div section.scratch-pad ol li,
+        section.sequence-edit > section.content > div section.scratch-pad ol li {
+          border-bottom: 1px solid #999;
+          background: #f9f9f9; }
+          section.week-edit > section.content > div section.scratch-pad ol li:last-child,
+          section.week-new > section.content > div section.scratch-pad ol li:last-child,
+          section.sequence-edit > section.content > div section.scratch-pad ol li:last-child {
+            border-bottom: 0; }
+          section.week-edit > section.content > div section.scratch-pad ol li ul,
+          section.week-new > section.content > div section.scratch-pad ol li ul,
+          section.sequence-edit > section.content > div section.scratch-pad ol li ul {
+            list-style: none; }
+            section.week-edit > section.content > div section.scratch-pad ol li ul li,
+            section.week-new > section.content > div section.scratch-pad ol li ul li,
+            section.sequence-edit > section.content > div section.scratch-pad ol li ul li {
+              padding: 6px; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li a,
+              section.week-new > section.content > div section.scratch-pad ol li ul li a,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li a {
+                color: #000; }
+          section.week-edit > section.content > div section.scratch-pad ol li.new-module,
+          section.week-new > section.content > div section.scratch-pad ol li.new-module,
+          section.sequence-edit > section.content > div section.scratch-pad ol li.new-module {
+            position: relative; }
+            section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown,
+            section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown,
+            section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown {
+              list-style: none; }
+              section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li,
+              section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li,
+              section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li {
+                display: none; }
+                section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li:first-child,
+                section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li:first-child,
+                section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li:first-child {
+                  display: block; }
+              section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li,
+              section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li,
+              section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li {
+                display: block;
+                padding: 6px 0; }
+                section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li:first-child,
+                section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li:first-child,
+                section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li:first-child {
+                  padding-top: 0; }
+      section.week-edit > section.content > div section.scratch-pad p,
+      section.week-new > section.content > div section.scratch-pad p,
+      section.sequence-edit > section.content > div section.scratch-pad p {
+        padding: 6px;
+        border-bottom: 1px solid #666; }
 
 section.video-new > section section.upload, section.video-edit > section section.upload {
   padding: 6px;
