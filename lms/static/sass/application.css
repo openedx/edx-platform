@@ -2141,14 +2141,17 @@ nav.course-material {
 
 .course-info {
   font-size: 16px; }
-  .course-info .tab {
-    display: none; }
+  .course-info h1, .course-info h2, .course-info h3, .course-info h4, .course-info h5, .course-info h6 {
+    font-family: "Open Sans", Verdana, Geneva, sans-serif;
+    font-weight: bold; }
   .course-info > * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    clear: both;
     margin-top: 20px; }
+  .course-info a {
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+    font-size: 16px; }
   .course-info h2 {
     font-size: 2em; }
   .course-info h3 {
@@ -2163,28 +2166,24 @@ nav.course-material {
     -moz-box-shadow: inset 0 0 1px 1px white;
     box-shadow: inset 0 0 1px 1px white;
     padding: 20px;
+    padding-left: 11.055%;
+    padding-right: 34.171%;
     position: relative;
     width: 100%; }
     .course-info header > img {
-      -webkit-border-radius: 10px;
-      -moz-border-radius: 10px;
-      border-radius: 10px;
-      display: none;
-      float: right;
-      height: 150px;
+      float: left;
+      max-height: 86px;
+      max-width: 8.543%;
       position: absolute;
-      right: 20px;
-      top: 20px; }
+      top: 10px;
+      left: 10px;
+      vertical-align: middle; }
     .course-info header h2 {
       margin-bottom: .5em; }
-    .course-info header h3 .course-number {
-      color: #a0a0a0; }
+      .course-info header h2 .course-number {
+        color: #a0a0a0; }
     .course-info header .course-abstract {
       display: none; }
-    .course-info header .course-times {
-      display: none; }
-      .course-info header .course-times .start-time, .course-info header .course-times .end-time, .course-info header .course-times .duration, .course-info header .course-times .separator {
-        color: #666666; }
     .course-info header .button {
       border: 1px solid #0d72a2;
       -webkit-border-radius: 3px;
@@ -2208,14 +2207,27 @@ nav.course-material {
       text-decoration: none;
       text-shadow: 0 1px 0 #076794;
       -webkit-background-clip: padding-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      -moz-border-radius-bottomleft: 0px;
+      -webkit-border-bottom-left-radius: 0px;
+      -moz-border-bottom-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+      -moz-border-radius-topleft: 0px;
+      -webkit-border-top-left-radius: 0px;
+      -moz-border-top-left-radius: 0px;
+      border-top-left-radius: 0px;
       display: block;
       font-size: 1.6em;
-      padding: .5em inherit;
+      left: 68.342%;
+      padding-top: 1.5em;
       position: absolute;
-      right: 20px;
+      top: -1px;
+      right: -1px;
+      bottom: -1px;
       text-align: center;
-      top: 20%;
-      width: 23.116%; }
+      vertical-align: middle; }
       .course-info header .button:hover:not(:disabled) {
         -webkit-box-shadow: inset 0 1px 0 0 #35a6db;
         -moz-box-shadow: inset 0 1px 0 0 #35a6db;
@@ -2236,97 +2248,138 @@ nav.course-material {
       .course-info header .button:disabled {
         opacity: 0.5;
         cursor: not-allowed; }
-  .course-info .main-info-wrap {
-    border-bottom: 1px solid #C2C2C2;
-    margin-top: none;
-    padding: 0 20px 20px; }
-    .course-info .main-info-wrap section.course-description, .course-info .main-info-wrap section.teacher-description {
+  .course-info .sidebar {
+    background: white;
+    float: right;
+    margin: 93px 0 0 2.513%;
+    padding: 0 0 20px 2.513%;
+    padding-bottom: 20px;
+    position: relative;
+    width: 31.658%; }
+    .course-info .sidebar .faded-vertical-divider, .course-info .sidebar .home > header .orginizations .divider, .home > header .orginizations .course-info .sidebar .divider, .course-info .sidebar .find-courses > header .universities span.divider, .find-courses > header .universities .course-info .sidebar span.divider {
+      background-image: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
+      background-image: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
+      background-image: -ms-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
+      background-image: -o-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
+      background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
+      position: absolute;
+      top: 0px;
+      bottom: 0px;
+      left: 0px; }
+    .course-info .sidebar h3 {
+      color: #999;
+      font-size: 1em;
+      margin-bottom: .5em; }
+    .course-info .sidebar .course-staff {
+      clear: none;
+      position: relative; }
+      .course-info .sidebar .course-staff .teacher {
+        margin-bottom: 1em; }
+        .course-info .sidebar .course-staff .teacher .teacher-image {
+          float: left;
+          margin: 0 10px 5px 0; }
+        .course-info .sidebar .course-staff .teacher .teacher-name {
+          color: #646464;
+          font-size: 1.5em;
+          font-weight: bold;
+          line-height: 1.3em; }
+  .course-info .main-content-wrap {
+    float: right;
+    margin-top: 40px;
+    padding-bottom: 20px;
+    width: 65.829%; }
+    .course-info .main-content-wrap .video iframe {
+      border: 10px solid #6a6a6a;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto 20px; }
+    .course-info .main-content-wrap .course-description {
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
-      box-sizing: border-box; }
-      .course-info .main-info-wrap section.course-description h3, .course-info .main-info-wrap section.teacher-description h3 {
+      box-sizing: border-box;
+      margin-bottom: 40px;
+      position: relative; }
+      .course-info .main-content-wrap .course-description h3 {
+        font-size: 2em;
+        font-weight: bold;
         margin-bottom: 1em; }
-    .course-info .main-info-wrap .course-description {
-      float: left;
-      margin-right: 2.513%;
-      width: 65.829%; }
-    .course-info .main-info-wrap .teacher-description {
-      clear: none;
-      float: left;
-      position: relative;
-      width: 31.658%; }
-      .course-info .main-info-wrap .teacher-description .teacher-image {
-        display: none;
-        text-align: center;
-        float: right; }
-        .course-info .main-info-wrap .teacher-description .teacher-image .teacher-name {
-          display: none;
-          font-weight: bold;
-          color: #646464;
-          position: relative;
-          top: 12px; }
-        .course-info .main-info-wrap .teacher-description .teacher-image img {
-          border: 1px solid #666666;
-          -webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-          -moz-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-          box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5); }
-  .course-info ul.tabs {
-    list-style-type: none;
-    font-size: 0;
-    padding: 0 20px; }
-    .course-info ul.tabs li {
-      background: #eee;
-      -webkit-border-radius: 2px;
-      -moz-border-radius: 2px;
-      border-radius: 2px;
-      display: inline-block;
-      color: #444;
-      font-size: 16px;
-      font-weight: bold;
-      margin-right: 10px;
-      padding: .3em 1em;
-      -webkit-transition: all 0.2s ease-in-out, color 0.1s ease-in-out;
-      -moz-transition: all 0.2s ease-in-out, color 0.1s ease-in-out;
-      -ms-transition: all 0.2s ease-in-out, color 0.1s ease-in-out;
-      -o-transition: all 0.2s ease-in-out, color 0.1s ease-in-out;
-      transition: all 0.2s ease-in-out, color 0.1s ease-in-out; }
-      .course-info ul.tabs li.enabled {
-        color: #fff;
-        background-color: #1d9dd9;
-        background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1d9dd9), color-stop(100%, #1a8dc3));
-        background-image: -webkit-linear-gradient(top, #1d9dd9, #1a8dc3);
-        background-image: -moz-linear-gradient(top, #1d9dd9, #1a8dc3);
-        background-image: -ms-linear-gradient(top, #1d9dd9, #1a8dc3);
-        background-image: -o-linear-gradient(top, #1d9dd9, #1a8dc3);
-        background-image: linear-gradient(top, #1d9dd9, #1a8dc3); }
-      .course-info ul.tabs li:hover {
-        cursor: pointer;
-        background: #ddd; }
-        .course-info ul.tabs li:hover.enabled {
-          background-color: #1a8dc3;
-          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1a8dc3), color-stop(100%, #177cac));
-          background-image: -webkit-linear-gradient(top, #1a8dc3, #177cac);
-          background-image: -moz-linear-gradient(top, #1a8dc3, #177cac);
-          background-image: -ms-linear-gradient(top, #1a8dc3, #177cac);
-          background-image: -o-linear-gradient(top, #1a8dc3, #177cac);
-          background-image: linear-gradient(top, #1a8dc3, #177cac);
-          color: #fff; }
-  .course-info .tabs-content {
-    margin: 20px; }
-    .course-info .tabs-content section {
+      .course-info .main-content-wrap .course-description .course-times {
+        background: #F0F0F0;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        color: #7A7A7A;
+        font-size: .8em;
+        padding: .3em 1em;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        text-shadow: -1px -1px 0px #e9e9e9; }
+        .course-info .main-content-wrap .course-description .course-times .start, .course-info .main-content-wrap .course-description .course-times .length, .course-info .main-content-wrap .course-description .course-times .final {
+          float: left;
+          margin-right: 1em; }
+          .course-info .main-content-wrap .course-description .course-times .start strong, .course-info .main-content-wrap .course-description .course-times .length strong, .course-info .main-content-wrap .course-description .course-times .final strong {
+            display: block; }
+        .course-info .main-content-wrap .course-description .course-times .final {
+          margin: 0; }
+    .course-info .main-content-wrap ul.tabs {
+      list-style-type: none;
+      font-size: 0;
+      padding: 0;
+      margin-top: 40px; }
+      .course-info .main-content-wrap ul.tabs li {
+        background: #eee;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+        display: inline-block;
+        color: #444;
+        font-size: 16px;
+        font-weight: bold;
+        margin-right: 10px;
+        padding: .3em 1em; }
+        .course-info .main-content-wrap ul.tabs li.enabled {
+          color: #fff;
+          background-color: #1d9dd9;
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1d9dd9), color-stop(100%, #1a8dc3));
+          background-image: -webkit-linear-gradient(top, #1d9dd9, #1a8dc3);
+          background-image: -moz-linear-gradient(top, #1d9dd9, #1a8dc3);
+          background-image: -ms-linear-gradient(top, #1d9dd9, #1a8dc3);
+          background-image: -o-linear-gradient(top, #1d9dd9, #1a8dc3);
+          background-image: linear-gradient(top, #1d9dd9, #1a8dc3); }
+        .course-info .main-content-wrap ul.tabs li:hover {
+          cursor: pointer;
+          background: #ddd; }
+          .course-info .main-content-wrap ul.tabs li:hover.enabled {
+            background-color: #1a8dc3;
+            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1a8dc3), color-stop(100%, #177cac));
+            background-image: -webkit-linear-gradient(top, #1a8dc3, #177cac);
+            background-image: -moz-linear-gradient(top, #1a8dc3, #177cac);
+            background-image: -ms-linear-gradient(top, #1a8dc3, #177cac);
+            background-image: -o-linear-gradient(top, #1a8dc3, #177cac);
+            background-image: linear-gradient(top, #1a8dc3, #177cac);
+            color: #fff; }
+    .course-info .main-content-wrap .tabs-content section.tab {
+      display: none;
+      margin-top: 0;
+      padding-top: 30px; }
+      .course-info .main-content-wrap .tabs-content section.tab h3 {
+        margin-bottom: .5em;
+        font-size: 1.5em;
+        font-weight: bold; }
+    .course-info .main-content-wrap .tabs-content section {
       margin-top: 30px;
       color: #666; }
-  .course-info .syllabus ul {
-    list-style: none outside;
-    font-size: .9em;
-    line-height: 1.5em; }
-  .course-info .faq ul {
-    list-style: none outside; }
-    .course-info .faq ul li {
-      margin-bottom: 1em; }
-      .course-info .faq ul li p {
-        font-family: "Open Sans", Verdana, Geneva, sans-serif;
-        margin-left: 2em; }
-  .course-info .more-info p {
-    font-family: "Open Sans", Verdana, Geneva, sans-serif;
-    margin-left: 2em; }
+    .course-info .main-content-wrap .syllabus ul {
+      list-style: none outside;
+      line-height: 1.5em; }
+    .course-info .main-content-wrap .faq ul {
+      list-style: none outside; }
+      .course-info .main-content-wrap .faq ul li {
+        margin-bottom: 1em; }
+        .course-info .main-content-wrap .faq ul li p {
+          margin-left: 2em; }
+    .course-info .main-content-wrap .more-info p {
+      margin-left: 2em; }
