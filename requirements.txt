@@ -26,3 +26,4 @@ glob2
 pymongo
 django_nose
 nosexcover
+rednose
