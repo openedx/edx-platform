@@ -49,8 +49,8 @@ def certificate_state_for_student(student, grade):
     This returns a dictionary with a key for state, and other information. The state is one of the
     following:
     
-    unavailable - A student is not elligible for a certificate.
-    requestable - A student is elligible to request a certificate
+    unavailable - A student is not eligible for a certificate.
+    requestable - A student is eligible to request a certificate
     generating - A student has requested a certificate, but it is not generated yet.
     downloadable - The certificate has been requested and is available for download.
     

@@ -104,14 +104,32 @@ def generate_certificate(user, grade):
 
         generated_certificate.enabled = True
         if generated_certificate.graded_download_url and (generated_certificate.grade != grade):
-            log.critical("A graded certificate has been pre-generated with the grade of " + str(generated_certificate.grade) + " but requested with grade " + str(grade) + \
-                "! The download URL is " + str(generated_certificate.graded_download_url))
+            log.critical("A graded certificate has been pre-generated with the grade "
+                         "of {gen_grade} but requested by user id {userid} with grade "
+                         "{req_grade}! The download URLs were {graded_dl_url} and "
+                         "{ungraded_dl_url}".format(
+                             gen_grade=generated_certificate.grade,
+                             req_grade=grade,
+                             graded_dl_url=generated_certificate.graded_download_url,
+                             ungraded_dl_url=generated_certificate.download_url,
+                             userid=user.id))
+            generated_certificate.graded_download_url = None
+            generated_certificate.download_url = None
                 
         user_name = UserProfile.objects.get(user = user).name
         if generated_certificate.download_url and (generated_certificate.name != user_name):
-            log.critical("A Certificate has been pre-generated with the name of " + str(generated_certificate.name) + " but current name is " + str(user_name) + \
-                "! The download URL is " + str(generated_certificate.download_url))
-        
+            log.critical("A Certificate has been pre-generated with the name of "
+                         "{gen_name} but current name is {user_name} (user id is "
+                         "{userid})! The download URLs were {graded_dl_url} and "
+                         "{ungraded_dl_url}".format(
+                             gen_name=generated_certificate.name,
+                             user_name=user_name.encode('utf-8'),
+                             graded_dl_url=generated_certificate.graded_download_url,
+                             ungraded_dl_url=generated_certificate.download_url,
+                             userid=user.id))
+            generated_certificate.graded_download_url = None
+            generated_certificate.download_url = None
+
         
         generated_certificate.grade = grade
         generated_certificate.name = user_name
