@@ -1,0 +1,40 @@
+{% extends "two_column_body.html" %}
+{% import "macros.html" as macros %}
+{%from "macros.html" import gravatar %}
+<!-- template badge.html -->
+{% block title %}{% spaceless %}{% trans name=badge.name %}{{name}}{% endtrans %} - {% trans %}Badge{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<div class="question-list-header">
+  <h1 class="section-title">{% trans name=badge.name %}Badge "{{name}}"{% endtrans %}</h1>
+</div>
+
+
+
+<div class="badge-intro">
+  {% if badge.awarded_count %}
+  <p><strong>{{ badge_recipients|length|intcomma }}</strong>
+  {% trans num_awardees=badge_recipients|length %}user received this badge:{% pluralize %}users received this badge:{% endtrans %}</p>
+  {% endif %}
+</div>
+
+<div id="award-list">
+  {% for recipient in badge_recipients %}
+  <div class="user">
+    <ul>
+      <li class="username"><a href="{{ recipient.get_absolute_url() }}">{{recipient.username}}</a></li>
+      <li>{{ macros.user_score_and_badge_summary(recipient) }}</li>
+    </ul>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+{% block sidebar %}
+<h1>Description</h1>
+<div class="box badge-intro">
+  <p>
+  {% trans description=badge.description %}{{description}}{% endtrans %}
+  </p>
+</div>
+{% endblock %}
+<!-- end template badge.html -->

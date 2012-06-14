@@ -1,0 +1,49 @@
+{% import "macros.html" as macros %}
+
+<div class="question-list-header">
+  <h1>Ask a question <a href="/discussion" class="light-button">Cancel</a></h1>
+</div>
+
+<form id="fmask" class="question-form" action="" method="post" >{% csrf_token %}
+    <div class="form-item">
+            <!-- {% if not request.user.is_authenticated() %} -->
+            <!--     <p>{% trans %}login to post question info{% endtrans %}</p> -->
+            <!-- {% else %} -->
+                {% if settings.EMAIL_VALIDATION %}
+                    {% if not request.user.email_isvalid %}
+                            {% trans email=request.user.email %}must have valid {{email}} to post, 
+                            see {{email_validation_faq_url}}
+                            {% endtrans %}
+                    {% endif %}
+                {% endif %}
+            <!-- {% endif %} -->
+            <span class="form-error">{{ form.title.errors }}</span></br>
+            <input type="text" id="id_title" class="questionTitleInput" name="title" autocomplete="off"
+                value="{% if form.initial.title %}{{form.initial.title|escape}}{% endif %}"/>
+        <div class="title-desc">
+            {{ form.title.help_text }}
+        </div>
+    </div>
+    <div  id="question-list"></div>
+    {{
+        macros.edit_post(
+            form,
+            post_type = 'question',
+            edit_title = False,
+            mandatory_tags = mandatory_tags
+        )
+    }}
+    <div class="question-options">
+        {% if settings.WIKI_ON %}
+            {{ macros.checkbox_in_div(form.wiki) }}
+        {% endif %}
+        {% if settings.ALLOW_ASK_ANONYMOUSLY %}
+            {{ macros.checkbox_in_div(form.ask_anonymously) }}
+        {% endif %}
+    </div>
+    {% if not request.user.is_authenticated() %}
+    <input type="submit" name="post_anon" value="{% trans %}Login/signup to post your question{% endtrans %}" class="submit" />
+    {% else %}
+    <input type="submit" name="post" value="{% trans %}Ask your question{% endtrans %}" class="submit" />
+    {% endif %}
+</form>

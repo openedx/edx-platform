@@ -1,0 +1,101 @@
+{# most, if not all javascripts should go here
+   this template is included at the very bottow of the
+   main template "base.html"
+#}
+<div id="no-javascript">
+  <noscript class="noscript">
+    {% trans app_name = settings.APP_SHORT_NAME %}Please note: {{app_name}} requires javascript to work properly, please enable javascript in your browser, <a href="{{noscript_url}}">here is how</a>{% endtrans %}
+  </noscript>
+</div>
+<script type="text/javascript">
+    var i18nLang = '{{settings.LANGUAGE_CODE}}';
+    var scriptUrl = '/{{settings.ASKBOT_URL}}'
+    var askbotSkin = '{{settings.ASKBOT_DEFAULT_SKIN}}';
+    var enableMathJax = {% if settings.ENABLE_MATHJAX %}true{% else %}false{% endif %};
+    {% if request.user.is_authenticated() %}
+        askbot['data']['userIsAuthenticated'] = true;
+        askbot['data']['userId'] = {{request.user.id}};
+        askbot['data']['userIsAdminOrMod'] = {% if 
+                                                request.user.is_administrator()
+                                                or request.user.is_moderator()
+                                            %}true{% else %}false{% endif %};
+    {% else %}
+        askbot['data']['userIsAuthenticated'] = false;
+    {% endif %}
+    askbot['urls']['mark_read_message'] = '{% url "read_message" %}';
+    askbot['urls']['get_tags_by_wildcard'] = '{% url "get_tags_by_wildcard" %}';
+    askbot['urls']['get_tag_list'] = '{% url "get_tag_list" %}';
+    askbot['urls']['follow_user'] = '/followit/follow/user/{{'{{'}}userId{{'}}'}}/';
+    askbot['urls']['unfollow_user'] = '/followit/unfollow/user/{{'{{'}}userId{{'}}'}}/';
+    askbot['urls']['user_signin'] = '{{ settings.LOGIN_URL }}';
+    askbot['settings']['static_url'] = '{{ settings.STATIC_URL }}';
+</script>
+<!-- Quick fix -- we should reference askbot jquery properly -->
+<script 
+    type="text/javascript"
+    src="{{ settings.STATIC_URL }}/js/askbot_jquery.min.js"
+></script>
+<!-- History.js --> 
+<script type='text/javascript' src="{{"/js/jquery.history.js"|media }}"></script>
+<script type='text/javascript' src="{{"/js/utils.js"|media }}"></script>
+<script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
+{% if settings.ENABLE_MATHJAX %}
+    <script type='text/javascript' src="{{settings.MATHJAX_BASE_URL}}/MathJax.js">
+        MathJax.Hub.Config({
+            extensions: ["tex2jax.js"],
+            jax: ["input/TeX","output/HTML-CSS"],
+            tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+        });
+    </script>
+{% endif %}
+<script type="text/javascript">
+{% if active_tab != "tags" and active_tab != "users" %}
+    $(document).ready(function(){
+        if (Modernizr.history) {
+          // history management works!
+        } else {
+          // no history support :(
+          //hash = unescape(window.location.hash).replace('#','').split("?")[0]
+          hash = History.unescapeHash(window.location.hash).replace('#','').split("?")[0]
+          if (hash.substring(0,11)==askbot['urls']['questions']){
+            url = hash
+          }else{
+            url = askbot['urls']['questions']+hash
+          }
+          if (hash !== ''){
+              window.location = 'http://'+window.location.host+url
+          }
+        }
+
+        // focus input on the search bar endcomment
+        {% if active_tab != "ask" %}
+            $('#keywords').focus();
+        {% else %}
+            $('#id_title').focus();
+        {% endif %}
+        animateHashes();
+    });
+{% endif %}
+{% if user_messages %}
+    $('#validate_email_alert').click(function(){notify.close(true)})
+    notify.show();
+{% endif %}
+</script>
+{% if settings.USE_CUSTOM_JS %}
+<script 
+    src="{% url "custom_js"%}?v={{ settings.MEDIA_RESOURCE_REVISION }}"
+    type="text/javascript"
+></script>
+{% endif %}
+{% if settings.GOOGLE_ANALYTICS_KEY %}
+<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker('{{ settings.GOOGLE_ANALYTICS_KEY }}');
+    pageTracker._trackPageview();
+    } catch(err) {}
+</script>
+{% endif %}

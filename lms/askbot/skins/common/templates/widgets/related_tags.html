@@ -1,0 +1,21 @@
+{% cache 0 "tags" tags search_tags scope sort query context.page language_code %}
+  <div class="box">
+    <h2>{% trans %}Related tags{% endtrans %}</h2>
+    {% if tag_list_type == 'list' %}
+      <ul id="related-tags" class="tags">
+        {% for tag in tags %}
+        <li>
+        {{ macros.tag_widget(
+              tag.name,
+              html_tag = 'div',
+              search_state = search_state
+        )}}
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {{ macros.tag_cloud(tags = tags, font_sizes = font_size) }}
+    {% endif %}
+  </div>
+  {% endcache %}
+  {# extra_content = '<span class="tag-number">&#215; ' ~ tag.local_used_count|intcomma ~ '</span>',#}

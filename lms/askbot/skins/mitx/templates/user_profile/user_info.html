@@ -1,0 +1,90 @@
+<!-- user_info.html -->
+{% import "macros.html" as macros %}
+
+<!-- <div class='avatar'> -->
+  <!--     {{ macros.gravatar(view_user, 128) }} -->
+  <!--     {% if request.user == view_user %} -->
+  <!--         <p><a --> 
+      <!--             {% if support_custom_avatars %} -->
+      <!--                 href="{% url avatar_change %}" -->
+      <!--             {% else %} -->
+      <!--                 href="{% url faq %}#gravatar" -->
+      <!--             {% endif %} -->
+      <!--         >{% trans %}change picture{% endtrans %}</a></p> -->
+  <!--         {% if support_custom_avatars %} -->
+  <!--         <p><a --> 
+      <!--             href="{% url avatar_delete %}" -->
+      <!--             >{% trans %}remove{% endtrans %}</a> -->
+    <!--         </p> -->
+  <!--         {% endif %} -->
+  <!--     {% endif %} -->
+  <!-- </div> -->
+
+<h1>
+  {% trans username=view_user.username %}{{username}}&rsquo;s profile{% endtrans %} <!-- {% block profilesection %}{% endblock %}-->
+</h1>
+
+<div class="box user-info">
+      <div class="meta">
+        <h2>{{user_status_for_display}}</h2>
+        <p>{% trans %}member for{% endtrans %} <strong>{{ view_user.date_joined|diff_date }}</strong></p>
+      </div>
+      <div class="karma">
+        <p><strong>{{view_user.reputation|intcomma}}</strong> {% trans %}reputation{% endtrans %}</p>
+      </div>
+
+</div>
+
+<div class="box user-stats">
+  <ul>
+    <h2>User stats</h2>
+    <!-- {% if user_follow_feature_on %} -->
+    <!--  {{ macros.follow_user_toggle(visitor = request.user, subject = view_user) }} -->
+    <!-- {% endif %} -->
+
+    <!-- {% if request.user == view_user %} -->
+    <!-- <a href="{% url edit_user view_user.id %}"> -->
+      <!--   {% trans %}update profile{% endtrans %} -->
+      <!-- </a> -->
+    <!-- {% if settings.USE_ASKBOT_LOGIN_SYSTEM and request.user == view_user and settings.ALLOW_ADD_REMOVE_LOGIN_METHODS %} -->
+    <!-- | <a href="{{ settings.LOGIN_URL }}?next={{ settings.LOGIN_URL }}"> -->
+      <!--   {% trans %}manage login methods{% endtrans %} -->
+      <!-- </a> -->
+    <!-- {% endif %} -->
+    <!-- {% endif %} -->
+
+
+  {% if view_user.real_name %}
+  <li>{% trans %}real name{% endtrans %} <strong>{{view_user.real_name}}</strong></li>
+  {% endif %}
+
+
+  <!-- {% if view_user.last_seen %} -->
+  <!-- <li>{% trans %}last seen{% endtrans %} <strong title="{{ view_user.last_seen }}">{{view_user.last_seen|diff_date}}</strong></li> -->
+  <!-- {% endif %} -->
+
+  {% if view_user.website %}
+  <li>{% trans %}user website{% endtrans %} {{ macros.user_website_link(view_user, max_display_length = 30) }}</li>
+  {% endif  %}
+
+  {% if view_user.location or view_user.country %}
+  <li>{% trans %}location{% endtrans %} {{ macros.user_full_location(view_user) }}</li>
+  {% endif %}
+
+  {% if view_user.date_of_birth %}
+  <!--todo  - redo this with whole sentence translation -->
+  <li>{% trans %}age{% endtrans %} {{view_user.date_of_birth|get_age}} {% trans %}age unit{% endtrans %}</li>
+  {% endif %}
+
+  {% if votes_today_left %}
+  <li>{% trans %}todays unused votes{% endtrans %} <strong>{{ votes_today_left }}</strong> </li>
+  {% endif %}
+
+  <!-- <div class="user-about"> -->
+    <!-- {% if view_user.about %} -->
+    <!--     {{view_user.about|linebreaks}} -->
+    <!-- {% endif %} -->
+    <!-- </div> -->
+  <!-- end user_info.html -->
+  </ul>
+</div>
