@@ -122,7 +122,7 @@ def generate_certificate(user, grade):
                          "{gen_name} but current name is {user_name} (user id is "
                          "{userid})! The download URLs were {graded_dl_url} and "
                          "{ungraded_dl_url}".format(
-                             gen_name=generated_certificate.name,
+                             gen_name=generated_certificate.name.encode('utf-8'),
                              user_name=user_name.encode('utf-8'),
                              graded_dl_url=generated_certificate.graded_download_url,
                              ungraded_dl_url=generated_certificate.download_url,
