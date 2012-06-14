@@ -1,0 +1,48 @@
+{% if active_tab != "ask" %}
+{% spaceless %}
+    {# url action depends on which tab is active #}
+    <form 
+        {% if active_tab == "tags" %}
+            action="{% url tags %}" 
+        {% elif active_tab == "users" %}
+            action="{% url users %}" 
+        {% else %}
+            action="{% url questions %}" id="searchForm"
+        {% endif %}
+        method="get">
+
+        {% if active_tab == "tags" %}
+
+        <input type="hidden" name="t" value="tag"/>
+
+        {% else %}
+        {% if active_tab == "users" %}
+        <input type="hidden" name="t" value="user"/>
+        {% endif %}
+
+        {% endif %}
+        {# class was searchInput #}
+
+        <input type="submit" value="Search" name="search" class="searchBtn" />
+
+        <input 
+        {% if query %}
+        class="searchInputCancelable"
+        {% else %}
+        class="searchInput" 
+        {% endif %}
+        type="text" autocomplete="off" value="{{ query|default_if_none('') }}" name="query" id="keywords"
+        />
+
+
+        <input id="clear" type="button" value="&#10005;" name="reset_query" class="cancelSearchBtn"
+        {% if not query %}{# query is only defined by questions view (active_tab) #}
+        style="display: none;"
+        {% endif %}
+        />
+
+
+
+    </form>
+{% endspaceless %}
+{% endif %}

@@ -1,0 +1,40 @@
+<!-- template header.html -->
+{% import "macros.html" as macros %}
+<div class="header-wrapper">
+  <header>
+    <hgroup>
+      <h1><em>MITx</em></h1>
+      <h2><a href="/courseware">Circuits and Electronics!!!!</a></h2>
+    </hgroup>
+
+    <nav class="discussion">
+
+      <ul class="coursenav">
+        <li class="courseware"><a href="/courseware">Courseware</a></li>
+        <li class="info"><a href="/info">Course Info</a></li>
+        <li class="book"><a href="/book">Textbook</a></li>
+        <li class="discussion"><a href="/discussion">Discussion</a></li>
+        <li class="wiki"><a href="/wiki">Wiki</a></li>
+        <li class="profile"><a href="/profile">Profile</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+<!--<div 
+    id="header"
+    class="{% if settings.SHOW_LOGO %}with-logo{% else %}without-logo{% endif %}"
+>
+    <div class="content-wrapper">
+        <div id="userToolsNav">
+            {% include "widgets/user_navigation.html" %}
+        </div>
+        {% if settings.SHOW_LOGO %}
+            {% include "widgets/logo.html" %}
+        {% endif %}
+        <div id="metaNav">
+            {% include "widgets/meta_nav.html" %}
+        </div>
+        <div class="clean"></div>
+    </div>
+  </div>-->
+<!-- end template header.html -->

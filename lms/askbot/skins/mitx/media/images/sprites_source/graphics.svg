@@ -1,0 +1,1291 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg5653"
+   version="1.1"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="graphics.svg">
+  <defs
+     id="defs5655">
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5675"
+       id="radialGradient5683"
+       cx="-2600.8416"
+       cy="2819.7468"
+       fx="-2600.8416"
+       fy="2819.7468"
+       r="16.18819"
+       gradientTransform="matrix(0.58002994,0.69397701,-0.72276743,0.59013931,945.88619,2917.0459)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient5675">
+      <stop
+         style="stop-color:#9f9f8d;stop-opacity:1"
+         offset="0"
+         id="stop5677" />
+      <stop
+         style="stop-color:#757563;stop-opacity:1"
+         offset="1"
+         id="stop5679" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3815"
+       id="radialGradient3821"
+       cx="222.6344"
+       cy="161.02299"
+       fx="222.6344"
+       fy="161.02299"
+       r="11.136931"
+       gradientTransform="matrix(1.0362639,-1.062432,1.063838,1.0176009,-176.68455,228.7811)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3815">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0"
+         id="stop3817" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0"
+         offset="1"
+         id="stop3819" />
+    </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5733">
+      <rect
+         style="opacity:0.42723006;fill:#436871;fill-opacity:1;stroke:none"
+         id="rect5735"
+         width="5.5"
+         height="60.5"
+         x="-1266"
+         y="3940.3623"
+         ry="0" />
+    </clipPath>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5704"
+       id="linearGradient5765"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,6.3333332,234,-21267.853)"
+       x1="-1477"
+       y1="3997.8623"
+       x2="-1477"
+       y2="3976.8623" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient5704">
+      <stop
+         style="stop-color:#436871;stop-opacity:1"
+         offset="0"
+         id="stop5706" />
+      <stop
+         style="stop-color:#c9dbdf;stop-opacity:0;"
+         offset="1"
+         id="stop5708" />
+    </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5776">
+      <rect
+         style="opacity:0.42723006;fill:#436871;fill-opacity:1;stroke:none"
+         id="rect5778"
+         width="5.75"
+         height="56.625"
+         x="-1260.375"
+         y="3997.4873"
+         ry="0" />
+    </clipPath>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5704"
+       id="linearGradient5710"
+       x1="-1477"
+       y1="3997.8623"
+       x2="-1477"
+       y2="3976.8623"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,6.3333332,1641.7716,-25185.268)" />
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:collect="always"
+       id="filter4997-0">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.65508698"
+         id="feGaussianBlur4999-3" />
+    </filter>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath9960">
+      <rect
+         style="fill:#f5f3ec;fill-opacity:1;stroke:none"
+         id="rect9962"
+         width="20.85965"
+         height="94.752304"
+         x="-2784.9399"
+         y="6649.8193"
+         ry="3.2879989" />
+    </clipPath>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:collect="always"
+       id="filter4997-0-8">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.65508698"
+         id="feGaussianBlur4999-3-5" />
+    </filter>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath6787">
+      <rect
+         style="opacity:0.82075471;fill:#c9dbdf;fill-opacity:1;stroke:none"
+         id="rect6789"
+         width="10.960155"
+         height="84.145706"
+         x="-2780.344"
+         y="6657.5977"
+         ry="0" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath6872">
+      <rect
+         ry="2.12871"
+         y="5082.5171"
+         x="-2746.7561"
+         height="67.882248"
+         width="15.202796"
+         id="rect6874"
+         style="opacity:0.85990337;fill:#d5caaf;fill-opacity:1;stroke:#dbb427;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath6868">
+      <rect
+         style="opacity:0.85990337;fill:#d5caaf;fill-opacity:1;stroke:#dbb427;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="rect6870"
+         width="15.202796"
+         height="67.882248"
+         x="-2825.9521"
+         y="5085.3457"
+         ry="2.12871" />
+    </clipPath>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient9108"
+       id="linearGradient6935"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,-1,2027.8145,5533.7182)"
+       x1="-1913.8787"
+       y1="5211.7261"
+       x2="-1913.3484"
+       y2="5230.998" />
+    <linearGradient
+       id="linearGradient9108"
+       inkscape:collect="always">
+      <stop
+         id="stop9110"
+         offset="0"
+         style="stop-color:#a5a594;stop-opacity:1" />
+      <stop
+         id="stop9112"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:0;" />
+    </linearGradient>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:collect="always"
+       id="filter9148"
+       x="-0.50734389"
+       width="2.0146878"
+       y="-0.46755219"
+       height="1.9351044">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.483871"
+         id="feGaussianBlur9150" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient9108"
+       id="linearGradient6927"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,-1,1988.8145,5533.7182)"
+       x1="-1913.8787"
+       y1="5211.7261"
+       x2="-1913.3484"
+       y2="5230.998" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient9108"
+       id="linearGradient6921"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(1986.8145,-4949.5058)"
+       x1="-1913.8787"
+       y1="5211.7261"
+       x2="-1913.3484"
+       y2="5230.998" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient9108"
+       id="linearGradient6919"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(1986.8145,-4947.5054)"
+       x1="-1913.8787"
+       y1="5211.7261"
+       x2="-1913.3484"
+       y2="5230.998" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient8841"
+       id="linearGradient6795"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(2027.8145,-4951.5058)"
+       x1="-1913.8787"
+       y1="5211.7261"
+       x2="-1913.3484"
+       y2="5230.998" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient8841">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0"
+         id="stop8843" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop8845" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient9108"
+       id="linearGradient6793"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-804.6557,-1200.3848)"
+       x1="-1913.8787"
+       y1="5211.7261"
+       x2="-1913.3484"
+       y2="5230.998" />
+    <linearGradient
+       y2="5230.998"
+       x2="-1913.3484"
+       y1="5211.7261"
+       x1="-1913.8787"
+       gradientTransform="translate(2027.8145,-4949.5054)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient6217"
+       xlink:href="#linearGradient9108"
+       inkscape:collect="always" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient9260"
+       id="linearGradient6086"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-311.65571,-3170.8852)"
+       x1="-2606.3955"
+       y1="7401.1206"
+       x2="-2606.5723"
+       y2="7429.0513" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient9260">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0"
+         id="stop9262" />
+      <stop
+         style="stop-color:#f0f0f0;stop-opacity:1"
+         offset="1"
+         id="stop9264" />
+    </linearGradient>
+    <linearGradient
+       gradientTransform="translate(4962.2497,-3220.8074)"
+       inkscape:collect="always"
+       xlink:href="#linearGradient6707"
+       id="linearGradient6713"
+       x1="-4761"
+       y1="3553.7373"
+       x2="-4732.4961"
+       y2="3553.405"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient6707">
+      <stop
+         style="stop-color:#b3c7c7;stop-opacity:1"
+         offset="0"
+         id="stop6709" />
+      <stop
+         style="stop-color:#e8eeee;stop-opacity:1"
+         offset="1"
+         id="stop6711" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="347.21441"
+     inkscape:cy="963.81447"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1316"
+     inkscape:window-height="744"
+     inkscape:window-x="50"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1">
+    <sodipodi:guide
+       orientation="0,1"
+       position="1,1061.5"
+       id="guide6194" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="62.5,992"
+       id="guide3030" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5658">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       ry="4.1932693"
+       y="85.811653"
+       x="61.593872"
+       height="43.25"
+       width="200.58887"
+       id="rect4912"
+       style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4914"
+       d="m 65.5187,85.57437 c -2.3021,0 -4.1543,2.0202 -4.1543,4.5312 l 0,17.9688 200.5856,0 0,-17.9688 c 0,-2.511 -1.8521,-4.5312 -4.1543,-4.5312 l -192.277,0 z"
+       style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       transform="matrix(0.91683189,0,0,1,2410.5066,-1212.0862)"
+       style="fill:#555753;fill-opacity:0.68306011;stroke:none;filter:url(#filter4997-0)"
+       id="rect4917"
+       width="218.78479"
+       height="43.25"
+       x="-2560"
+       y="1248.6122"
+       ry="4.1932693"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="4.1932693"
+       y="35.276001"
+       x="62.729492"
+       height="43.25"
+       width="200.58887"
+       id="rect4919"
+       style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4921"
+       d="m 66.6543,35.03887 c -2.3021,0 -4.1543,2.0202 -4.1543,4.5312 l 0,17.9688 200.5856,0 0,-17.9688 c 0,-2.511 -1.8521,-4.5312 -4.1543,-4.5312 l -192.277,0 z"
+       style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       style="fill:url(#linearGradient5710);fill-opacity:1;stroke:none"
+       id="rect5702"
+       width="200.58887"
+       height="42.75"
+       x="62.729492"
+       y="35.276001"
+       ry="4.1447921" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       xml:space="preserve"
+       style="font-size:18.32528687px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#c6d9dd;fill-opacity:1;stroke:none;font-family:Arial Rounded MT Bold;-inkscape-font-specification:Arial Rounded MT Bold"
+       x="105.31578"
+       y="63.835571"
+       id="text5782"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5784"
+         x="105.31578"
+         y="63.835571"
+         style="font-size:23px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#c6d9dd;fill-opacity:1;font-family:Yanone Kaffeesatz;-inkscape-font-specification:Yanone Kaffeesatz">ASK A QUESTION</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4923"
+       y="62.951782"
+       x="105.31578"
+       style="font-size:18.32528687px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#314e55;fill-opacity:1;stroke:none;font-family:Arial Rounded MT Bold;-inkscape-font-specification:Arial Rounded MT Bold"
+       xml:space="preserve"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:23px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#314e55;fill-opacity:1;font-family:Yanone Kaffeesatz;-inkscape-font-specification:Yanone Kaffeesatz"
+         y="62.951782"
+         x="105.31578"
+         id="tspan4926"
+         sodipodi:role="line">ASK A QUESTION</tspan></text>
+    <g
+       id="g5771"
+       clip-path="url(#clipPath5776)"
+       transform="matrix(0.95652174,0,0,0.9658003,1507.3465,-3782.1495)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/bigbutton.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="4.1932693"
+         y="4000.7271"
+         x="-1346.1777"
+         height="43.25"
+         width="200.58887"
+         id="rect5712"
+         style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5714"
+         d="m -1342.2529,4000.4898 c -2.3021,0 -4.1543,2.0202 -4.1543,4.5312 l 0,17.9688 200.5856,0 0,-17.9688 c 0,-2.511 -1.8521,-4.5312 -4.1543,-4.5312 l -192.277,0 z"
+         style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+    </g>
+    <g
+       id="g5728"
+       clip-path="url(#clipPath5733)"
+       transform="matrix(1,0,0,0.96580351,1567.7716,-3777.7682)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/bigbutton.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="4.1932693"
+         y="3952.6914"
+         x="-1345.0421"
+         height="43.25"
+         width="200.58887"
+         id="rect5718"
+         style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5720"
+         d="m -1341.1173,3952.4543 c -2.3021,0 -4.1543,2.0202 -4.1543,4.5312 l 0,17.9688 200.5856,0 0,-17.9688 c 0,-2.511 -1.8521,-4.5312 -4.1543,-4.5312 l -192.277,0 z"
+         style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         style="fill:url(#linearGradient5765);fill-opacity:1;stroke:none"
+         id="rect5722"
+         width="200.58887"
+         height="42.75"
+         x="-1345.0421"
+         y="3952.6914"
+         ry="4.1447921" />
+    </g>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       style="fill:#eceeeb;fill-opacity:1;stroke:none"
+       id="rect8138"
+       width="200"
+       height="34"
+       x="62.5"
+       y="187.99463" />
+    <path
+       style="fill:#cfcdcb;fill-opacity:1;stroke:none"
+       d="m 91.168127,194.64836 c -4.1222,0 -7.6717,2.6492 -9.375,6.5 -0.6289,-0.2342 -1.2957,-0.375 -2,-0.375 -1.9564,0 -3.7033,0.9745 -4.8125,2.5 l -11.8437,0.125 0,7.3125 11.5312,-0.094 c 1.0734,1.8106 2.9601,3.0313 5.125,3.0313 1.022,0 1.9677,-0.2764 2.8125,-0.75 1.8902,3.0125 5.0068,4.9687 8.5625,4.9687 3.7337,0 7.0246,-2.1669 8.875003,-5.4374 l -4.812503,0 c -1.0612,0.806 -2.5249,0.8124 -3.9063,0.8124 -3.6563,0 -4.8124,-2.9663 -4.8124,-7.0312 0,-4.0647 1.4686,-6.625 5.125,-6.625 1.7505,0 3.2224,0.1762 4.4062,1.4062 l 4.468803,0 c -1.728703,-3.7705 -5.274403,-6.3437 -9.343803,-6.3437 z"
+       id="rect5882"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/contributorsback.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       ry="4.1932693"
+       y="1248.6122"
+       x="-2560"
+       height="43.25"
+       width="218.78479"
+       id="rect9929"
+       style="fill:#555753;fill-opacity:0.68306011;stroke:none;filter:url(#filter4997-0-8)"
+       transform="matrix(0.2721041,0,0,0.50764927,1221.6765,-580.43915)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#e2dbc8;fill-opacity:1;stroke:none"
+       id="rect9931"
+       width="59.532242"
+       height="21.955832"
+       x="524.88599"
+       y="52.783974"
+       ry="2.12871"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#f1e8d0;fill-opacity:1;stroke:none"
+       d="m 526.05089,52.66314 c -0.6832,0 -1.2329,1.025 -1.2329,2.3 l 0,9.122 59.5311,0 0,-9.122 c 0,-1.275 -0.5496,-2.3 -1.2328,-2.3 l -57.0654,0 z"
+       id="path9933"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:12.2430687px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#5e5e5d;fill-opacity:1;stroke:none;font-family:Arial Rounded MT Bold;-inkscape-font-specification:Arial Rounded MT Bold"
+       x="539.28296"
+       y="68.574982"
+       id="text9935"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan9937"
+         x="539.28296"
+         y="68.574982"
+         style="font-size:15.36623001px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#5e5e5d;fill-opacity:1;font-family:Yanone Kaffeesatz;-inkscape-font-specification:Yanone Kaffeesatz">cancel</tspan></text>
+    <g
+       id="g9939"
+       transform="translate(3311.2858,-6575.2047)">
+      <g
+         id="g9953"
+         clip-path="url(#clipPath9960)"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/medium-button-follow.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90">
+        <rect
+           ry="3.2879989"
+           y="6698.9902"
+           x="-2867.251"
+           height="33.912907"
+           width="182.7612"
+           id="rect9941"
+           style="fill:#f5f3ec;fill-opacity:1;stroke:none"
+           inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
+        <rect
+           inkscape:export-ydpi="90"
+           inkscape:export-xdpi="90"
+           inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+           style="fill:#e2dbc8;fill-opacity:1;stroke:none"
+           id="rect9943"
+           width="182.7612"
+           height="33.912907"
+           x="-2867.376"
+           y="6698.2402"
+           ry="3.2879989" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path9945"
+           d="m -2863.6754,6698.8032 c -2.0974,0 -3.7849,1.584 -3.7849,3.553 l 0,14.09 182.7576,0 0,-14.09 c 0,-1.969 -1.6874,-3.553 -3.7847,-3.553 l -175.188,0 z"
+           style="fill:#f1e8d0;fill-opacity:1;stroke:none"
+           inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
+        <rect
+           inkscape:export-ydpi="90"
+           inkscape:export-xdpi="90"
+           inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+           style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+           id="rect9947"
+           width="182.7612"
+           height="33.912907"
+           x="-2868.0818"
+           y="6664.9019"
+           ry="3.2879989" />
+        <path
+           inkscape:export-ydpi="90"
+           inkscape:export-xdpi="90"
+           inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+           style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+           d="m -2864.5062,6664.7148 c -2.0974,0 -3.7849,1.584 -3.7849,3.553 l 0,14.09 182.7576,0 0,-14.09 c 0,-1.969 -1.6874,-3.553 -3.7847,-3.553 l -175.188,0 z"
+           id="path9949"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+       id="rect6733"
+       width="182.7612"
+       height="33.912907"
+       x="525.1394"
+       y="212.09119"
+       ry="3.2879989" />
+    <rect
+       ry="3.2879989"
+       y="211.34119"
+       x="525.0144"
+       height="33.912907"
+       width="182.7612"
+       id="rect6763"
+       style="fill:#a4bbc1;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       style="fill:#bfd2d6;fill-opacity:1;stroke:none"
+       d="m 528.71502,211.90415 c -2.0974,0 -3.7849,1.584 -3.7849,3.553 l 0,14.09 182.7576,0 0,-14.09 c 0,-1.969 -1.6874,-3.553 -3.7847,-3.553 l -175.188,0 z"
+       id="path6735"
+       inkscape:connector-curvature="0" />
+    <rect
+       ry="3.2879989"
+       y="178.00281"
+       x="524.30859"
+       height="33.912907"
+       width="182.7612"
+       id="rect6759"
+       style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path6761"
+       d="m 527.88422,177.81575 c -2.0974,0 -3.7849,1.584 -3.7849,3.553 l 0,14.09 182.7576,0 0,-14.09 c 0,-1.969 -1.6874,-3.553 -3.7847,-3.553 l -175.188,0 z"
+       style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g6772"
+       transform="translate(3310.4945,-6405.9945)"
+       clip-path="url(#clipPath6787)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/medium-button.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+         id="rect6774"
+         width="182.7612"
+         height="33.912907"
+         x="-2867.251"
+         y="6698.9902"
+         ry="3.2879989" />
+      <rect
+         ry="3.2879989"
+         y="6698.2402"
+         x="-2867.376"
+         height="33.912907"
+         width="182.7612"
+         id="rect6777"
+         style="fill:#a4bbc1;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         style="fill:#bfd2d6;fill-opacity:1;stroke:none"
+         d="m -2863.6754,6698.8032 c -2.0974,0 -3.7849,1.584 -3.7849,3.553 l 0,14.09 182.7576,0 0,-14.09 c 0,-1.969 -1.6874,-3.553 -3.7847,-3.553 l -175.188,0 z"
+         id="path6779"
+         inkscape:connector-curvature="0" />
+      <rect
+         ry="3.2879989"
+         y="6664.9019"
+         x="-2868.0818"
+         height="33.912907"
+         width="182.7612"
+         id="rect6781"
+         style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6783"
+         d="m -2864.5062,6664.7148 c -2.0974,0 -3.7849,1.584 -3.7849,3.553 l 0,14.09 182.7576,0 0,-14.09 c 0,-1.969 -1.6874,-3.553 -3.7847,-3.553 l -175.188,0 z"
+         style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+    </g>
+    <rect
+       style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+       id="rect6799"
+       width="84.178032"
+       height="21.955832"
+       x="355.97711"
+       y="39.400673"
+       ry="2.12871"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+       d="m 357.62409,39.2807 c -0.9661,0 -1.7433,1.025 -1.7433,2.3 l 0,9.122 84.1764,0 0,-9.122 c 0,-1.275 -0.7772,-2.3 -1.7432,-2.3 l -80.6899,0 z"
+       id="path6801"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#e2dbc8;fill-opacity:1;stroke:none"
+       id="rect6809"
+       width="59.532242"
+       height="21.955832"
+       x="443.17215"
+       y="38.692047"
+       ry="2.12871"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#f1e8d0;fill-opacity:1;stroke:none"
+       d="m 444.33704,38.57123 c -0.6832,0 -1.2329,1.025 -1.2329,2.3 l 0,9.122 59.5311,0 0,-9.122 c 0,-1.275 -0.5496,-2.3 -1.2328,-2.3 l -57.0654,0 z"
+       id="path6811"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       ry="2.12871"
+       y="61.465118"
+       x="356.40265"
+       height="21.955832"
+       width="84.178032"
+       id="rect6828"
+       style="fill:#a4bbc1;fill-opacity:1;stroke:none" />
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:connector-curvature="0"
+       id="path6830"
+       d="m 358.04959,61.3453 c -0.9661,0 -1.7433,1.025 -1.7433,2.3 l 0,9.122 84.1764,0 0,-9.122 c 0,-1.275 -0.7772,-2.3 -1.7432,-2.3 l -80.6899,0 z"
+       style="fill:#bfd2d6;fill-opacity:1;stroke:none" />
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       ry="2.12871"
+       y="60.785797"
+       x="442.92215"
+       height="21.955832"
+       width="59.532242"
+       id="rect6832"
+       style="fill:#d5caaf;fill-opacity:1;stroke:none" />
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:connector-curvature="0"
+       id="path6834"
+       d="m 444.08704,60.66493 c -0.6832,0 -1.2329,1.025 -1.2329,2.3 l 0,9.122 59.5311,0 0,-9.122 c 0,-1.275 -0.5496,-2.3 -1.2328,-2.3 l -57.0654,0 z"
+       style="fill:#eee4c7;fill-opacity:1;stroke:none" />
+    <g
+       transform="translate(3181.9228,-5006.4125)"
+       id="g6854"
+       clip-path="url(#clipPath6868)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/small-button.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="fill:#c9dbdf;fill-opacity:1;stroke:none"
+         id="rect6838"
+         width="84.178032"
+         height="21.955832"
+         x="-2853.5227"
+         y="5098.1392"
+         ry="2.12871"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         style="fill:#d6e5e8;fill-opacity:1;stroke:none"
+         d="m -2851.8758,5098.0191 c -0.9661,0 -1.7433,1.025 -1.7433,2.3 l 0,9.122 84.1764,0 0,-9.122 c 0,-1.275 -0.7772,-2.3 -1.7432,-2.3 l -80.6899,0 z"
+         id="path6840"
+         inkscape:connector-curvature="0"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         ry="2.12871"
+         y="5120.2036"
+         x="-2853.0972"
+         height="21.955832"
+         width="84.178032"
+         id="rect6846"
+         style="fill:#a4bbc1;fill-opacity:1;stroke:none" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:connector-curvature="0"
+         id="path6848"
+         d="m -2851.4503,5120.0837 c -0.9661,0 -1.7433,1.025 -1.7433,2.3 l 0,9.122 84.1764,0 0,-9.122 c 0,-1.275 -0.7772,-2.3 -1.7432,-2.3 l -80.6899,0 z"
+         style="fill:#bfd2d6;fill-opacity:1;stroke:none" />
+    </g>
+    <g
+       transform="translate(3192.5294,-5005.7054)"
+       id="g6860"
+       clip-path="url(#clipPath6872)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/small-button-cancel.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="fill:#e2dbc8;fill-opacity:1;stroke:none"
+         id="rect6842"
+         width="59.532242"
+         height="21.955832"
+         x="-2761.3779"
+         y="5093.895"
+         ry="2.12871"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <path
+         style="fill:#f1e8d0;fill-opacity:1;stroke:none"
+         d="m -2760.2131,5093.7741 c -0.6832,0 -1.2329,1.025 -1.2329,2.3 l 0,9.122 59.5311,0 0,-9.122 c 0,-1.275 -0.5496,-2.3 -1.2328,-2.3 l -57.0654,0 z"
+         id="path6844"
+         inkscape:connector-curvature="0"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         ry="2.12871"
+         y="5115.9888"
+         x="-2761.6279"
+         height="21.955832"
+         width="59.532242"
+         id="rect6850"
+         style="fill:#d5caaf;fill-opacity:1;stroke:none" />
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         inkscape:connector-curvature="0"
+         id="path6852"
+         d="m -2760.4631,5115.8678 c -0.6832,0 -1.2329,1.025 -1.2329,2.3 l 0,9.122 59.5311,0 0,-9.122 c 0,-1.275 -0.5496,-2.3 -1.2328,-2.3 l -57.0654,0 z"
+         style="fill:#eee4c7;fill-opacity:1;stroke:none" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path6789"
+       d="m 103.5,277.85641 10,-12.5 10.5,13.5"
+       style="fill:url(#linearGradient6217);fill-opacity:1;stroke:#ffffff;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/vote-arrow-up-new.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path6791"
+       d="m 103.5,275.85641 10,-12.5 10.5,13.5"
+       style="fill:url(#linearGradient6795);fill-opacity:1;stroke:#a5a594;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/vote-arrow-up-new.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:url(#linearGradient6919);fill-opacity:1;stroke:#ffffff;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none"
+       d="m 62.5,279.85641 10,-12.5 10.5,13.5"
+       id="path6915"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/vote-arrow-up-on-new.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:url(#linearGradient6921);fill-opacity:1;stroke:#7abb64;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none"
+       d="m 62.5,277.85641 10,-12.5 10.5,13.5"
+       id="path6917"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/vote-arrow-up-on-new.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:url(#linearGradient6927);fill-opacity:1;stroke:#ffffff;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none"
+       d="m 64.5,306.35641 10,12.5 10.5,-13.5"
+       id="path6923"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/vote-arrow-down-on-new.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path6925"
+       d="m 64.5,304.35641 10,12.5 10.5,-13.5"
+       style="fill:none;stroke:#d45f35;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/vote-arrow-down-on-new.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="arc"
+       style="opacity:0.38967136;fill:#c9c9bf;fill-opacity:1;stroke:none;filter:url(#filter9148)"
+       id="path6929"
+       sodipodi:cx="-2606.375"
+       sodipodi:cy="7247.7373"
+       sodipodi:rx="5.875"
+       sodipodi:ry="6.375"
+       d="m -2600.5,7247.7373 a 5.875,6.375 0 1 1 -0,-0.1982 l -5.8722,0.1982 z"
+       sodipodi:start="0"
+       sodipodi:end="6.2520846"
+       transform="matrix(1.2987029,0,0,1,3497.2427,-6935.2056)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path6931"
+       d="m 103.5,306.35641 10,12.5 10.5,-13.5"
+       style="fill:url(#linearGradient6935);fill-opacity:1;stroke:#ffffff;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/vote-arrow-down-new.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#a5a594;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none"
+       d="m 103.5,304.35641 10,12.5 10.5,-13.5"
+       id="path6933"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/vote-arrow-down-new.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <image
+       width="24"
+       height="24"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAk9JREFU SImtVT2LE1EUPe+9O5+ZJG4WbbQRO7s1IGpjlcbFRcFmrdRKA4qFlSD+BcFGbGwFu4WtRP+Bv0QR 1OxmPt6712LiJLPZJBPMhRT33nnnvHPPnYm6dutZjzz/rSF/TymdYAMhwmNni0NbZEMKo/abVmf7 fhAl0JoApf4XHcwuytLRvaPfPwzF7a3dpHsWXhBBKb0JARBheEEEiOySH8SGKACkbGwqiHz4QeyT KAWBbBT8X4hSIGEBM681e99TeHS3j53L59FJQgDA8TjHw5efoA1NCURAwg7CrjEBs8P+7Su4efVS /bYiKLJj+GFrWmMHYmHwGgRFnuL6zsVTOgJrMxCHM5fhUsE6BLZI0e3EVX7nwWt8/zlCECVIuudK rJoCZrBr7oGzrpb/SQnd3gVoImjjl1izCpibjYidxcH7J3P1Lx9fAQCOxhn2n3+on1lnRHk+XtrH xGQvmI5P2IEcOzi2AJYT2CJbgS8oihya/KrmKg/YrSQAgBt7L5CNR/j2+V1V6w8eQxsDL4gRt7dr JjO7mRGtIFCGECZbtRcJAKLkDLwghtIGSpv6FgmDmGXi/CoFCsYEMFTUqoZCkDeZu6C+RY5B3FBB dYh5Lp+99ckeiTT3AABY3Fy+kEDczLeoIQFOglXnT392skVNPChDoNAfDGGLFOSFCFrdubFV+Cwg EQFLcwKlDby4DeIWlNbl5iz4L2EpPXCyhoJym3zAzKhaoECYc83sDpkZIhv+ld4ckC2yp9p4vjbe QCnVayhjeYj8cs5+tUU6/At+vZy8XOCT4gAAAABJRU5ErkJggg== "
+       id="image6062"
+       x="328.89932"
+       y="196.4718"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/socialsprite.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <image
+       width="24"
+       height="24"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAApFJREFU SIm1lb1rFUEUxX8zO7v7XkyiIGnED1QQ+yfY2FkGBFEs1EYRQW38A0QsLQQtRLASLIRYCoK12FoI fhQqgo2CgmhM8t7u3Hst1rxkdgUjiRcu7Jk5e+6cO3tZt/vSzZksD7d8CEec85NsQJjpT43xkdTx cigm+nd7U9NH834f7zNw61UHVZmsl5ZODud/9EM5OTXb37yFrChwbr3qyw6MUJSY2WwIZa9wIces 2diocCEnlL0imDlMDWPjxJfDzOHVFNE0o0TODnbx9MJhzg52ESV2OGtJNcWrGCqaZBxVnBrsIc88 pwZ7iKOqw1lbGl5UEUkz1pH7z16yMKq5/+wlsY4dzppSFbf/6gPLJzYlvZO6pvr5gzgaEsoexeQ0 WZ4nnG3TPQ7s2Mrrz99593Ue/vAF1osLBFHDiyYbasbb62fGeP+1OV5dOQbA849fePPpG6cP7hvv P3z+nmtPXuCcTw+qhtc/WIujKiGOFhfHz4OdM4k4wInBXmZ6oaOjonhRQSTNGOtEII6GCT509R7H b8wla9unSmKMqZYKoXEgaYvaLdMUf/i2yKf51GXuDIkR51fapKKEKIrFVECkjVtDGEqGralXMWIU Vl+DiDYO+EcHqgatyVcTRBS3allFCaKK/VWw5aiFGw7dAvrbQbtAt2C7Hd0Cps1Xs9qYieK2nL9t rihTcqyw4QJWV7i8gFBArMbY9ZrBXOaQBXw5gStKVl+CVaOmRa5zIg/5BBZ6zQvOQR7G2PgtMuY4 1GegBqxomSrBRDHftYzLwGUrjh0rWFMOgBkgrcsXJYhpc0P/I0wJKlbhtPgvBcSqYKpPTPXI+v/2 7TCc6uNgsTpn+Dvm/Sy4/gaJLznVx8Tq4i8Jskgejj6lmQAAAABJRU5ErkJggg== "
+       id="image6066"
+       x="354.89932"
+       y="196.2218"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/socialsprite.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g6080"
+       transform="translate(3312.045,-4036.3892)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/socialsprite.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         ry="2.6516504"
+         y="4233.0288"
+         x="-2930.5173"
+         height="22.955488"
+         width="22.955488"
+         id="rect6070"
+         style="fill:url(#linearGradient6086);fill-opacity:1;stroke:#dfdfdf;stroke-width:1.04451096;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/bcorrales/personal/askbot/templates/question_page_20_oct.png"
+         transform="matrix(0.06751632,0,0,0.06751632,-2752.3707,3732.1503)"
+         id="g6072">
+        <path
+           inkscape:connector-curvature="0"
+           id="path6074"
+           d="m -2400,7710.8489 c -11.4183,-15.4118 -11.539,-15.5335 -17,-17.1332 -21.8069,-6.3881 -37.9666,-22.6782 -43.4493,-43.7998 -0.849,-3.2706 -1.8827,-6.2655 -2.2971,-6.6554 -0.4145,-0.3899 -3.6786,-0.076 -7.2536,0.6976 -16.3091,3.5289 -34.2379,2.738 -50.2783,-2.2181 -4.5219,-1.3972 -9.5717,-2.762 -11.2217,-3.0329 -2.1658,-0.3555 -11.5967,2.5969 -33.9141,10.6173 -17.0027,6.1103 -31.2523,10.7561 -31.6657,10.3238 -0.4134,-0.4322 2.5564,-17.052 6.5997,-36.9327 l 7.3513,-36.1468 -2.4938,-7.3532 c -12.7521,-37.601 -0.4061,-81.0084 30.0743,-105.7386 17.9864,-14.5931 37.2628,-21.9286 60.0483,-22.851 46.5752,-1.8854 86.7865,26.7449 100.0519,71.2364 3.8826,13.0219 4.492,31.8654 1.4997,46.3727 -1.1767,5.705 -1.9384,10.5738 -1.6926,10.8196 0.2457,0.2458 3.078,1.1324 6.2939,1.9702 21.007,5.4732 37.5608,21.4722 43.7347,42.269 1.9938,6.7161 2.1312,23.5425 0.2497,30.5685 -2.594,9.6865 -7.4651,17.5841 -16.0134,25.9626 l -8.1239,7.9626 -8.0193,19.0274 c -4.7845,11.352 -8.6167,19.1341 -9.5,19.2917 -0.9031,0.1612 -5.9671,-5.7911 -12.9807,-15.2577 z m 12.5246,-32.0468 c 3.3554,-8.0108 5.2517,-11.0418 9.7707,-15.6182 4.3861,-4.4419 5.9681,-6.9198 7.2643,-11.3785 3.4232,-11.7755 -0.01,-24.9432 -8.7843,-33.7204 -12.9481,-12.9481 -34.4569,-14.3908 -47.5437,-3.189 -7.9413,6.7975 -11.8367,19.6068 -9.2464,30.4045 2.6367,10.9911 12.8415,21.7661 24.2909,25.6482 4.0663,1.3787 5.7555,2.8737 11.3674,10.0606 3.6253,4.6428 7.0699,8.2819 7.6546,8.087 0.5847,-0.1949 2.9366,-4.8273 5.2265,-10.2942 z m -153.7546,-66.5331 20.5185,-7.0934 6.6058,2.2364 c 9.1576,3.1003 27.0332,3.8346 37.3688,1.5352 23.2353,-5.1694 42.4183,-22.4564 49.3796,-44.4989 2.3798,-7.5355 2.8308,-22.4778 0.9232,-30.586 -4.2389,-18.0173 -17.1262,-34.2631 -33.5783,-42.3287 -12.4889,-6.1227 -19.2928,-7.658 -33.4876,-7.5564 -10.089,0.072 -13.2774,0.5033 -20.0211,2.7067 -20.4053,6.6671 -35.7986,21.2171 -43.0363,40.6784 -2.4303,6.5349 -2.7984,8.9798 -2.8603,19 -0.057,9.3058 0.3681,12.931 2.2308,19 l 2.3019,7.5 -4.5575,21.1857 c -4.835,22.4755 -5.2198,25.3143 -3.4318,25.3143 0.6191,0 10.3591,-3.192 21.6443,-7.0933 z"
+           style="fill:#8ca637" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path6076"
+           d="m -2398.2799,7710.9966 c -5.8554,-7.8416 -11.4503,-14.9754 -12.4331,-15.8528 -0.9829,-0.8775 -3.812,-2.1295 -6.287,-2.7822 -14.9244,-3.9361 -30.4299,-16.4425 -37.2733,-30.0639 -11.9803,-23.8461 -9.2568,-46.7534 7.7083,-64.8332 9.522,-10.1477 22.8992,-16.5522 37.0968,-17.7604 12.5916,-1.0715 29.3436,4.209 41.1587,12.974 29.7656,22.0816 31.2801,67.2286 2.998,89.3683 -5.0526,3.9552 -5.3954,4.5633 -13.0877,23.2219 -4.3445,10.5382 -8.1996,19.346 -8.5668,19.573 -0.3672,0.2269 -5.4585,-6.0032 -11.3139,-13.8447 z m 11.3804,-30.3843 c 3.4776,-8.6528 5.1619,-11.5157 8.6336,-14.6753 2.3723,-2.1589 5.6923,-6.7266 7.3778,-10.1504 3.9038,-7.9298 4.1961,-16.822 0.8521,-25.9243 -3.038,-8.2695 -13.0131,-18.2334 -21.4942,-21.4701 -6.7847,-2.5894 -17.3563,-3.1073 -24.1324,-1.1824 -9.3464,2.6551 -18.9409,12.275 -21.4332,21.4899 -1.7896,6.6167 -0.655,17.6077 2.4788,24.0129 3.7396,7.6435 12.86,15.9016 20.732,18.7719 5.5982,2.0412 6.71,2.9809 13.0784,11.0543 3.8281,4.8529 7.5511,8.8235 8.2734,8.8235 0.7349,0 3.2159,-4.7341 5.6337,-10.75 z"
+           style="fill:#780208" />
+      </g>
+    </g>
+    <image
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAldJREFU SIm1lctqFFEQhr86ffoyTKLkImYj+ASKuBBcxZ0QCAiK4E7Iyr1bX8KV7xBciJGAIC4UJD6Fl0UC iYqayXSfS7nomclMpmckZvyhoM+l/jr11znV8vDVrwvtIjxNE9aNSIsZIKoeVZ6tTpk8sgvt8Gy5 ndyZyw2JgMjZyFUhKK3fZby7fxgSu9hO1pbnDYUVzBnJjzOAIjNEWLOtTLI0ERQIOpsAAGkitDLJ LMLMyQcQsFEVr/+DHaIq1iv4Bv6ocHM55dpiysd9x843d+oaeQUblMYMuk65spACcH0p5e1eSZGe LkJQsE7BxfHFIw9Jj89Ib5ycLgOnYL0qrkGiKo5OPrk6NzLuBmXnwPF+v5oonVfFhF4NTtrfblWR CDeWUrpeG/37HNZHbZTIx+kRqqBsfykpvSJmQgZRsW6CRG6o8FHhwevvJENEiYF2Icy3pNG/z2E9 NG7wQ99GYOmcqU/a01sErAE1kwN4wNQSjZuPyo/qWLt7lwvOF0KaQpqCtYCpC9nk3+ewXpszCMCH PcftSzkAqys5qyv5YL0Mypu9ipe73Ykd2CsY32sVJ00Fnn/u8PUwNDrniXDrYkYZmv37ZnysH9pJ iwKHwOOdn2x96rLbGb9qLz51qbw2+rsIPoLcf3egedacY4zgnFJV4Lyise68UBc+z4WikIkvvKy0 34uaNyBgUiFLwMb6bzW0hEmEKKPzwwjTmt0IDIgZ3NABFCXUH1MDVEbJpkf4NwSlskF120RZHzve WaFQc3fchou6GVSrgDITU61c1M3YcRt/ALN5wfipVVpyAAAAAElFTkSuQmCC "
+       width="24"
+       height="24"
+       id="image6101"
+       x="302.99454"
+       y="196.60706"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/socialsprite.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       d="m 320.36387,375.26941 0,20 15.1563,0.031 c 2.5812,0.01 4.6563,-2.075 4.6563,-4.6562 l 0,-10.6875 c 0,-2.5812 -2.0751,-4.6462 -4.6563,-4.6563 l -15.1563,-0.031 z"
+       id="path6921"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/close-tag-hover.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path6913"
+       d="m 321.07097,375.09261 0,20 15.1563,0.031 c 2.5812,0.01 4.6563,-2.075 4.6563,-4.6562 l 0,-10.6875 c 0,-2.5812 -2.0751,-4.6462 -4.6563,-4.6563 l -15.1563,-0.031 z"
+       style="fill:#b32f2f;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/close-tag-hover.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text6915"
+       y="389.2395"
+       x="326.8063"
+       style="font-size:15.42768478px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Arial Rounded MT Bold;-inkscape-font-specification:Arial Rounded MT Bold"
+       xml:space="preserve"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/close-tag-hover.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Trebuchet MS;-inkscape-font-specification:Trebuchet MS Bold"
+         y="389.2395"
+         x="326.8063"
+         id="tspan6917"
+         sodipodi:role="line">x</tspan></text>
+    <path
+       sodipodi:nodetypes="cssssccc"
+       inkscape:connector-curvature="0"
+       id="path6672"
+       d="m 226.90888,322.0549 72.1816,0 c 2.5812,0 4.6592,2.078 4.6592,4.6592 l 0,10.6816 c 0,2.58121 -2.078,4.65921 -4.6592,4.65921 l -72.1816,0 c -4.5726,-2.623 -5.0981,-3.9968 -10.9166,-9.59081 4.5078,-5.94 6.3909,-7.5808 10.9166,-10.4092 z"
+       style="fill:url(#linearGradient6713);fill-opacity:1;stroke:none" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text6674"
+       y="335.0752"
+       x="238.2316"
+       style="font-size:11.9597311px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#717179;fill-opacity:1;stroke:none;font-family:Arial Rounded MT Bold;-inkscape-font-specification:Arial Rounded MT Bold"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#717179;fill-opacity:1;font-family:Trebuchet MS;-inkscape-font-specification:Trebuchet MS"
+         y="335.0752"
+         x="238.2316"
+         id="tspan6676"
+         sodipodi:role="line">example</tspan></text>
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 228.10868,323.1729 69.4173,0 c 2.4823,0 4.4807,1.8453 4.4807,4.1376 l 0,9.4853 c 0,2.29241 -1.9984,4.13761 -4.4807,4.13761 l -69.4173,0 c -4.3974,-2.3293 -4.9027,-3.54931 -10.4984,-8.51691 4.3351,-5.2749 6.1462,-6.7319 10.4984,-9.2436 z"
+       id="path6678"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cssssccc" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path6680"
+       d="m 299.64738,322.1743 0,19.87501 c 2.2641,-0.3207 4,-2.2695 4,-4.62501 l 0,-10.6563 c 0,-2.3554 -1.7359,-4.273 -4,-4.5937 z"
+       style="fill:#dde6e6;fill-opacity:1;stroke:none" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path6691"
+       d="m 322.64937,341.4088 0,20 15.1563,0.031 c 2.5812,0.01 4.6563,-2.075 4.6563,-4.6562 l 0,-10.6875 c 0,-2.5812 -2.0751,-4.6462 -4.6563,-4.6563 l -15.1563,-0.031 z"
+       style="fill:#bbcdcd;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/close-tag.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text6693"
+       y="355.55566"
+       x="328.38492"
+       style="font-size:15.42768478px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Arial Rounded MT Bold;-inkscape-font-specification:Arial Rounded MT Bold"
+       xml:space="preserve"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/close-tag.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Trebuchet MS;-inkscape-font-specification:Trebuchet MS Bold"
+         y="355.55566"
+         x="328.38492"
+         id="tspan6695"
+         sodipodi:role="line">x</tspan></text>
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/close-tag.png"
+       style="fill:#b32f2f;fill-opacity:1;stroke:none"
+       d="m 322.64937,321.4088 0,20 15.1563,0.031 c 2.5812,0.01 4.6563,-2.075 4.6563,-4.6562 l 0,-10.6875 c 0,-2.5812 -2.0751,-4.6462 -4.6563,-4.6563 l -15.1563,-0.031 z"
+       id="path6697"
+       inkscape:connector-curvature="0" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/close-tag.png"
+       xml:space="preserve"
+       style="font-size:15.42768478px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Arial Rounded MT Bold;-inkscape-font-specification:Arial Rounded MT Bold"
+       x="328.38492"
+       y="335.55566"
+       id="text6699"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan6701"
+         x="328.38492"
+         y="335.55566"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Trebuchet MS;-inkscape-font-specification:Trebuchet MS Bold">x</tspan></text>
+    <path
+       style="fill:#828282;fill-opacity:1"
+       d="m 325.82092,260.55332 -1.5741,-1.574 1.9168,-2.0007 1.9168,-2.0007 -1.9168,-2.0007 -1.9168,-2.0006 1.5741,-1.5741 1.5741,-1.5741 2.0006,1.9168 2.0007,1.9168 2.0007,-1.9168 2.0007,-1.9168 1.574,1.5741 1.5741,1.5741 -1.9168,2.0006 -1.9168,2.0007 1.9168,2.0007 1.9168,2.0007 -1.5741,1.574 -1.574,1.5741 -2.0007,-1.9168 -2.0007,-1.9168 -2.0007,1.9168 -2.0006,1.9168 -1.5741,-1.5741 z"
+       id="path10031"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/delete.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g10033"
+       transform="matrix(-0.28748368,0,0,0.28748368,-181.42468,-1918.3933)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/edit.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       style="fill:#828282;fill-opacity:1">
+      <path
+         inkscape:connector-curvature="0"
+         id="path10035"
+         d="m -2048.3116,7564.8156 -6.8943,15.5564 15.2028,-7.6014 z"
+         style="fill:#828282;fill-opacity:1;stroke:none" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path10037"
+         d="m -2046.8974,7563.0479 27.0469,-27.2236 9.1924,8.8388 -27.4004,27.5772 z"
+         style="fill:#828282;fill-opacity:1;stroke:none" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path10039"
+         d="m -2018.4363,7534.5868 9.1924,9.1924 1.591,-1.591 -9.546,-9.0156 z"
+         style="fill:#828282;fill-opacity:1;stroke:none" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path10041"
+         d="m -2015.7847,7531.9352 6.0104,-5.4801 4.5962,0 4.2427,5.3033 0,4.0659 -5.6569,5.48 z"
+         style="fill:#828282;fill-opacity:1;stroke:none" />
+    </g>
+    <g
+       id="g10043"
+       transform="matrix(0.64732851,0,0,0.64732851,1969.7476,-4641.6704)"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/flag.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       style="fill:#828282;fill-opacity:1">
+      <path
+         inkscape:connector-curvature="0"
+         id="path10045"
+         d="m -2350.25,7554.3622 12.625,19 1.5,-1.25 -12.75,-18.875 z"
+         style="fill:#828282;fill-opacity:1;stroke:none" />
+      <path
+         sodipodi:nodetypes="ccscsc"
+         inkscape:connector-curvature="0"
+         id="path10047"
+         d="m -2347.75,7552.4872 6.75,9.25 c 0,0 3.2662,-2.5859 7.875,-2.125 6.25,0.625 5.875,-5 5.875,-5 0,0 -5.75,2 -12.75,-2.5 -4.5845,-2.9472 -7.75,0.375 -7.75,0.375 z"
+         style="fill:#828282;fill-opacity:1;stroke:none" />
+    </g>
+    <path
+       inkscape:transform-center-y="-0.20715839"
+       inkscape:transform-center-x="0.37862082"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/retag.png"
+       id="path10051"
+       d="m 354.55812,252.43382 c -0.6722,-0.5536 -1.6696,-0.4519 -2.2213,0.2224 -0.5545,0.6736 -0.453,1.6717 0.2228,2.2239 0.6733,0.5547 1.6709,0.453 2.2237,-0.2228 0.5499,-0.6762 0.4517,-1.6714 -0.2226,-2.2237 z m 4.2174,11.5196 -8.378,-6.8534 c -0.288,-0.2342 -0.4294,-0.5843 -0.4091,-0.9296 -0.035,-0.071 -0.06,-0.1547 -0.081,-0.2526 l -1.0996,-5.4028 c -0.1184,-0.5806 0.2687,-1.0535 0.8625,-1.0521 l 5.5129,0.011 c 0.238,3e-4 0.9398,0.2614 1.1238,0.4093 l 8.3771,6.8533 c 0.4786,0.3892 0.5492,1.0986 0.1579,1.5771 l -4.4899,5.4885 c -0.3888,0.4781 -1.0975,0.5479 -1.5745,0.1576 z"
+       clip-rule="evenodd"
+       style="fill:#828282;fill-opacity:1;fill-rule:evenodd"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#828282;fill-opacity:1"
+       d="m 370.47592,263.85742 c -0.2934,-0.088 -0.5972,-0.5809 -0.6937,-1.1247 -0.4587,-2.5815 -0.9349,-8.0249 -0.7491,-8.5642 0.1908,-0.5536 0.5546,-0.6213 4.0853,-0.7597 l 3.8758,-0.152 -2.8463,-0.7344 c -5.1478,-1.3285 -4.9011,-1.2344 -4.5009,-1.7165 1.1071,-1.3341 8.7959,0.9043 8.7959,2.5607 0,0.1591 -0.2437,0.2255 -0.5416,0.1475 -0.4615,-0.1206 -0.5263,0.03 -0.4387,1.0161 0.1282,1.443 -0.3683,8.837 -0.6097,9.0784 -0.236,0.236 -5.7111,0.4495 -6.377,0.2488 z m 0.7925,-4.7509 c -0.1797,-3.137 -0.4413,-4.2608 -0.8878,-3.8143 -0.095,0.095 -0.077,1.7604 0.039,3.7023 0.1605,2.6855 0.3108,3.5307 0.6277,3.5307 0.3399,0 0.3805,-0.6301 0.2208,-3.4187 z m 2.3123,-0.2278 c 0,-2.2285 -0.1182,-3.6465 -0.3039,-3.6465 -0.1856,0 -0.3039,1.418 -0.3039,3.6465 0,2.2283 0.1183,3.6465 0.3039,3.6465 0.1857,0 0.3039,-1.4182 0.3039,-3.6465 z m 2.6686,-0.1008 c 0.086,-3.5529 -0.2893,-4.7818 -0.652,-2.1359 -0.3471,2.5318 -0.2374,5.9485 0.1865,5.8079 0.2683,-0.089 0.4051,-1.1688 0.4655,-3.672 z m -1.9089,-8.2393 c -1.1448,-0.3535 -1.4701,-1.0017 -0.4345,-0.8656 0.9103,0.1196 2.1059,0.6835 2.1059,0.9934 0,0.3681 -0.087,0.3615 -1.6714,-0.1278 z"
+       id="path10120"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/delete.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g6783"
+       transform="matrix(0.31185487,0,0,0.31185487,1122.0021,-2104.3562)"
+       style="fill:#edd400"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/comment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         id="path6785"
+         d="m -2630.4375,7542 c -5.0926,0 -9.1875,4.1262 -9.1875,9.2188 l 0,25.9687 c 0,5.0926 4.0949,9.1875 9.1875,9.1875 l 2.3125,0 0,12.75 13.375,-12.75 24.4375,0 c 5.0926,0 9.1875,-4.0949 9.1875,-9.1875 l 0,-25.9687 c 0,-5.0926 -4.0949,-9.2188 -9.1875,-9.2188 l -40.125,0 z m 19.9375,5.8438 c 2.3421,-0.029 4.7258,0.3795 7.0312,1.25 9.2048,3.4751 13.6322,13.1811 9.9063,21.7187 l -0.031,0.031 c -3.7579,8.5444 -14.2777,12.6692 -23.5,9.1874 -9.2221,-3.4817 -13.6329,-13.2367 -9.875,-21.7812 2.8186,-6.4084 9.4425,-10.3203 16.4688,-10.4062 z"
+         style="fill:#edd400;fill-opacity:1;stroke:none"
+         inkscape:connector-curvature="0" />
+      <path
+         id="path6787"
+         d="m -2612.9375,7556.5 0,6.0312 -6,0 0,5.125 6,0 0,6 5.125,0 0,-6 6,0 0,-5.125 -6,0 0,-6.0312 -5.125,0 z"
+         style="fill:#edd400;fill-opacity:1;stroke:none"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#828282;fill-opacity:1"
+       d="m 440.51622,261.65022 c 1.5762,-0.5762 2.628,-2.7166 2.1909,-4.4584 -0.247,-0.9842 -3.3286,-4.4196 -4.5145,-5.0329 -1.881,-0.9726 -4.2623,-0.4285 -4.2623,0.9739 0,0.9278 0.6347,1.2303 2.0057,0.9562 0.909,-0.1819 1.1896,-0.013 2.7953,1.6853 1.798,1.9013 2.1162,2.6817 1.3898,3.4082 -0.606,0.6059 -1.2964,0.4753 -2.2338,-0.4228 -0.7485,-0.7171 -1.0291,-0.788 -2.2761,-0.5752 l -1.4223,0.2428 1.8267,1.7277 c 1.8257,1.7266 2.8954,2.0819 4.5006,1.4952 z m -4.2837,-4.473 c 1.0155,-0.5139 1.2528,-1.533 0.4872,-2.0928 -0.4049,-0.296 -0.7569,-0.3234 -1.1884,-0.093 -0.8168,0.4372 -1.4451,0.069 -3.3435,-1.9608 -1.6088,-1.7199 -1.8244,-2.2678 -1.1552,-2.937 0.6274,-0.6275 1.7329,-0.4613 2.5226,0.3792 0.6595,0.7021 0.8495,0.7419 2.0335,0.4259 l 1.3059,-0.3486 -1.2352,-1.2874 c -2.5512,-2.6592 -5.0343,-2.7443 -6.7659,-0.2319 -1.2037,1.7466 -0.5952,3.5075 2.1302,6.1649 2.3554,2.2966 3.6282,2.7807 5.2088,1.9811 z"
+       id="path6934"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/bcorrales/personal/askbot/link.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+  </g>
+</svg>

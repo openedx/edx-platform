@@ -1,0 +1,42 @@
+{% trans %}<p>Dear {{receiving_user_name}},</p>{% endtrans %}
+    {% if update_type == 'question_comment' %}
+{% trans %}
+<p>{{update_author_name}} left a <a href="{{post_url}}">new comment</a>:</p>
+{% endtrans %}
+    {% endif %}
+    {% if update_type == 'answer_comment' %}
+{% trans %}
+<p>{{update_author_name}} left a <a href="{{post_url}}">new comment</a></p>
+{% endtrans %}
+    {% endif %}
+    {% if update_type == 'new_answer' %}
+{% trans %}
+<p>{{update_author_name}} answered a question 
+<a href="{{post_url}}">{{origin_post_title}}</a></p>
+{% endtrans %}
+    {% endif %}
+    {% if update_type == 'new_question' %}
+{% trans %}
+<p>{{update_author_name}} posted a new question 
+<a href="{{post_url}}">{{origin_post_title}}</a></p>
+{% endtrans %}
+    {% endif %}
+    {%if update_type == 'answer_update' %}
+{% trans %}
+<p>{{update_author_name}} updated an answer to the question
+<a href="{{post_url}}">{{origin_post_title}}</a></p>
+{% endtrans %}
+    {% endif %}
+    {% if update_type == 'question_update' %}
+{% trans %}
+<p>{{update_author_name}} updated a question 
+<a href="{{post_url}}">{{origin_post_title}}</a></p>
+{% endtrans %}
+    {% endif %}
+<p></p>
+{% trans %}
+<div>{{content_preview}}</div>
+<p>Please note - you can easily <a href="{{user_subscriptions_url}}">change</a>
+how often you receive these notifications or unsubscribe. Thank you for your interest in our forum!</p>
+{% endtrans %}
+{% trans %}<p>Sincerely,<br/>Forum Administrator</p>{% endtrans %}

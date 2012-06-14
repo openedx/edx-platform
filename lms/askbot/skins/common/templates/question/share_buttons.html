@@ -1,0 +1,5 @@
+{% if settings.ENABLE_SHARING_TWITTER %}{{ macros.share(site = 'twitter', icon = True) }}{% endif %}
+{% if settings.ENABLE_SHARING_FACEBOOK %}{{ macros.share(site = 'facebook', icon = True) }}{% endif %}
+{% if settings.ENABLE_SHARING_LINKEDIN %}{{ macros.share(site = 'linkedin', icon = True) }}{% endif %}
+{% if settings.ENABLE_SHARING_IDENTICA %}{{ macros.share(site = 'identica', icon = True) }}{% endif %}
+{% if settings.ENABLE_SHARING_GOOGLE %}<g:plusone size="small" count="false"></g:plusone>{% endif %}

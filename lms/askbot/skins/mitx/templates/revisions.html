@@ -1,0 +1,102 @@
+{% extends "two_column_body.html" %}
+{% import "macros.html" as macros %}
+<!-- revisions.html -->
+{% block title %}{% spaceless %}{% trans %}Revision history{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1 class="section-title">
+    {% trans %}Revision history{% endtrans %} [<a href="{{ post.get_absolute_url() }}">{% trans %}back{% endtrans %}</a>]
+</h1>
+<div id="revisions">
+{% for revision in revisions %}
+  <div class="revision">
+    <div 
+        id="rev-header-{{ revision.revision }}"
+        class="header {% if post.author_id == revision.author_id %}author{% endif %}"
+    >
+      <div class="header-controls">
+        <table width="100%">
+            <tr>
+                <td width="20" style="vertical-align:middle">
+                    <img 
+                        id="rev-arrow-{{ revision.revision }}" 
+                        src="{{"/images/expander-arrow-show.gif"|media}}"
+                        alt="{% trans %}click to hide/show revision{% endtrans %}"
+                        />
+                </td>
+                <td width="30px" style="vertical-align:middle">
+                    <span 
+                        class="revision-number" 
+                        title="{% trans number=revision.revision %}revision {{number}}{% endtrans %}">{{ revision.revision }}</span></td>
+                <td width="200px" style="vertical-align:middle">
+                    {% if revision.summary %}
+                        <div class="summary">
+                            <span>{{ revision.summary|escape }}</span>
+                        </div>
+                    {% endif %}
+                    {% if request.user|can_edit_post(post) %}
+                        {% if post.post_type == 'answer' %}
+                            <a href="{% url edit_answer post.id %}?revision={{ revision.revision }}">{% trans %}edit{% endtrans %}</a>
+                        {% endif %}
+                        {% if post.post_type == 'question' %}
+                            <a href="{% url edit_question post.id %}?revision={{ revision.revision }}">{% trans %}edit{% endtrans %}</a>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td align="right">
+                    <div class="revision-mark" >
+                        {% if revision.revision == 1 %}
+                            {% set contributor_type = "original_author" %}
+                        {% else %}
+                            {% set contributor_type = "last_updater" %}
+                        {% endif %}
+                        {{ macros.post_contributor_info(
+                                    revision,
+                                    contributor_type,
+                                    False,
+                                    0
+                                )
+                        }}
+                    </div>
+                </td>
+            </tr>
+        </table>
+      </div>
+    </div>
+    <div id="rev-body-{{ revision.revision }}" class="answerbody">
+        {{ revision.diff }}
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block endjs %}
+    <script type='text/javascript' src='{{"/js/editor.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/post.js"|media}}'></script>
+    <script type="text/javascript">
+    //todo - take this out into .js file 
+    $(document).ready(function(){
+        $("#nav_questions").attr('className',"on");
+        $('div.revision div[id^=rev-header-]').bind('click', function(){
+            var revId = this.id.substr(11);
+            toggleRev(revId); 
+        
+        });
+        lanai.highlightSyntax();
+    });
+
+    function toggleRev(id) {
+        var arrow = $("#rev-arrow-" + id);
+        var visible = arrow.attr("src").indexOf("hide") > -1;
+        var path = mediaUrl(
+                            "media/images/expander-arrow-" + 
+                            (visible ? "show" : "hide") + 
+                            ".gif" + 
+                            "?v={{settings.MEDIA_RESOURCE_REVISION}}"
+                        );
+        arrow.attr("src", path);
+        $("#rev-body-" + id).slideToggle("fast");
+    }
+</script>
+{% endblock %}
+<!-- end revisions.html -->

@@ -1,0 +1,23 @@
+{% extends "two_column_body.html" %}
+<!-- question.html -->
+{% block title %}{% spaceless %}{{ question.get_question_title()|escape }}{% endspaceless %}{% endblock %}
+{% block meta_description %}
+        <meta name="description" content="{{question.summary|striptags|escape}}" />
+{% endblock %}
+{% block keywords %}{{thread.tagname_meta_generator()}}{% endblock %}
+{% block forestyle %}
+    <link rel="canonical" href="{{settings.APP_URL|strip_path}}{{question.get_absolute_url()}}" />
+    <link rel="stylesheet" type="text/css" href="{{'/js/wmd/wmd.css'|media}}" />
+{% endblock %}
+{% block content %}
+    {# ==== BEGIN: question/content.html ==== #}
+    {% include "question/content.html" %}
+    {# ==== END: question/content.html ==== #}
+{% endblock %}
+{% block sidebar %}
+    {%include "question/sidebar.html" %}
+{% endblock %}
+{% block endjs %}
+    {%include "question/javascript.html" %}
+{% endblock %}
+

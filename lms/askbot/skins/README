@@ -1,0 +1,71 @@
+=============================
+Customization of Askbot skins
+=============================
+
+The default skin at the moment is in the development, however
+it is already possible to start customizing your site without 
+incurring much maintenance overhead.
+
+Current status of templates
+===========================
+The two busiest templates are - the "main" page and the "question" page,
+the main page is more or less complete. "Question" page will be significantly
+refactored in the near future.
+
+How skins work in Askbot
+========================
+
+The skins reside in up to two directories:
+
+* `askbot/skins` in the source code (contains any stock skins)
+* directory pointed to by a ASKBOT_EXTRA_SKINS_DIR in your settings.py
+  with any other skins
+
+Currently, the skin is selected by the site administrator in the live settings.
+Also, at the moment skin default is special - it serves any resources
+absent in other skins. In a way - all other skins inherit from the "default".
+
+Templates and media are resolved in the following way:
+* check in skin named as in settings.ASKBOT_DEFAULT_SKIN
+* then skin named 'default'
+
+How to customize a skin
+=======================
+
+There are three options:
+
+* edit custom css via the settings interface - good for small tweaks 
+ (no need to directly log in to the server)
+* create a new skin in separate files (need direct access to the server
+  files, more maintenance overhead)
+* directly modify the "default" skin (as in the previous option - need
+  direct access to the server, less maintenance overhead, some 
+  knowledge of git system is required)
+
+The first option only allows to modify css and add custom javascript.
+The latter two options allow changing the templates as well.
+
+If you wish to follow the second option, create a directory named the same
+way as the skin you are building and start adding files with the same names
+and relative locations as those in the "default" skin.
+
+NO NEED TO CREATE ALL TEMPLATES/MEDIA FILES AT ONCE as your skin will inherit
+pieces from the "default".
+
+The disadvantage of thil second approach is that you will be on your own maintaining
+the synchrony of your template, stylesheet and the core code.
+
+Third approach is the best, but it requires (the most basic) use of 
+git source code management software. With git you will easily merge the updates
+from the development repository.
+
+Structure of the skin directories
+=================================
+Todo.
+
+To simplify maintenance of the css as the skin is being developed,
+populate css file `media/style/extra.css` with any rules that will
+override those in the `media/style/style.css` file. If you do that
+
+media does not have to be composed of files named the same way as in default skin
+whatever media you link to from your templates - will be in operation
