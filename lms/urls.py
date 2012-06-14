@@ -12,6 +12,8 @@ if settings.DEBUG:
 
 urlpatterns = ('',
     url(r'^$', 'student.views.index'), # Main marketing page, or redirect to courseware
+    url(r'^course_info$', 'student.views.course_info'),
+    url(r'^courses$', 'student.views.courses'),
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),

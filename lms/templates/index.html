@@ -1,130 +1,87 @@
-<%inherit file="marketing.html" />
-<%namespace name='static' file='static_content.html'/>
+<%inherit file="main.html" />
+<%include file="guest_navigation.html" args="active_page='info'" />
 
-<%block name="title">MITx 6.002x: Circuits & Electronics</%block>
-<%block name="description">6.002x (Circuits and Electronics) is an experimental on-line adaptation of MIT's first undergraduate analog design course: 6.002.</%block>
-<%block name="keywords">MITx, circuits, electronics, EECS, electrical engineering, analog circuits, digital circuits, online learning, MIT, online laboratory, education, learners, undergraduate, certificate</%block>
-
-<%block name="header_text">
-    <section class="course">
-      <section>
-        <h1>Circuits &amp; Electronics</h1>
-        <h2>6.002x</h2>
-        <a class="enroll" rel="leanModal" href="/info">View 6.002x Circuits <span>&amp;</span> Electronics as a guest</a>
-        <a class="enroll" rel="leanModal" href="#enroll"><noscript>In order to</noscript> Enroll in 6.002x Circuits <span>&amp;</span> Electronics <noscript>you need to have javascript enabled</noscript></a>
+<section class="container">
+  <section class="home">
+    <header>
+      <h1>The Future of Online Education</h1>
+      <div class="orginizations">
+        <div class="orginization mit"><img src="/static/images/mit.png" /></div>
+        <div class="divider left"></div>
+        <div class="orginization edx"><img src="/static/images/edx.png" /></div>
+        <div class="divider right"></div>
+        <div class="orginization harvard"><img src="/static/images/harvard.png" /></div>
+      </div>
+      <section class="video-wrapper">
+        <div class="video-player">
+          <div class="video-inner">
+            <iframe width="640" height="360" src="http://www.youtube.com/embed/SA6ELdIRkRU" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
       </section>
-      <p>6.002x (Circuits and Electronics) is an experimental on-line adaptation of MIT&rsquo;s first undergraduate analog design course: 6.002. This course is running, free of charge, for students worldwide from March 5, 2012 through June 8, 2012.</p>
-    </section>
-</%block>
+      <div class="bottom-divider"></div>
+    </header>
 
-<%block name="header_class">course</%block>
-
-<section class="index-content">
-  <section class="about-course">
-
-    <section class="about-info">
-      <h1>About 6.002x</h1>
-
-      <p>6.002x (Circuits and Electronics) is designed to serve as a first course in an undergraduate electrical engineering (EE), or electrical engineering and computer science (EECS) curriculum. At MIT, 6.002 is in the core of department subjects required for all undergraduates in EECS.</p>
-
-<p>The course introduces engineering in the context of the lumped circuit abstraction. Topics covered include: resistive elements and networks; independent and dependent sources; switches and MOS transistors; digital abstraction; amplifiers; energy storage elements; dynamics of first- and second-order networks; design in the time and frequency domains; and analog and digital circuits and applications. Design and lab exercises are also significant components of the course. You should expect to spend approximately 10  hours per week on the course.</p>
-
-    </section>
-
-    <section class="on-mitx">
-      <h1>6.002x on <em>MITx</em></h1> <!-- Link doesn't need to be here, but there should be some way to get back to main MITx site -->
-
-      <p>If you successfully complete the course, you will receive an electronic certificate of accomplishment from <em>MITx</em>. This certificate will indicate that you earned it from <em>MITx&rsquo;s</em> pilot course. In this prototype version, <em>MITx</em> will not require that you be tested in a testing center or otherwise have your identity certified in order to receive this certificate.</p>
-
-<p>The course uses the textbook Foundations of Analog and Digital Electronic Circuits, by Anant Agarwal and Jeffrey H. Lang. Morgan Kaufmann Publishers, Elsevier, July 2005.  While recommended, the book is not required: relevant sections will be provided electronically as part of the online course for personal use in connection with this course only. The copyright for the book is owned by Elsevier. The book can be purchased on <a href="http://www.amazon.com/exec/obidos/ASIN/1558607358/ref=nosim/mitopencourse-20" target="_blank">Amazon</a>.</p>
+    <section class="welcome">
+      <div class="intro">
+        <h2>"The single biggest change in education since the printing press."</h2>
+        <p>
+          EdX is a joint partnership between The Massachusetts Institute of Technology (MIT) and Harvard University to offer online learning to millions of people around the world. EdX will offer Harvard and MIT classes online for free. Through this partnership, the institutions aim to extend their collective reach to build a global community of online learners and to improve education for everyone.
+        </p>
+      </div>
+      <div class="signup-wrapper">
+        <section class="sign-up top">
+            <a href="#">Sign Up Now</a>
+        </section>
+      </div>
     </section>
 
-    <section class="requirements">
-      <h1> Requirements </h1>
-
-      <p>In order to succeed in this course, you  must have taken an AP level physics course in electricity and magnetism. You  must know basic calculus and linear algebra and have some background in differential equations. Since more advanced mathematics will not show up until the second half of the course, the first half of the course will include an optional remedial differential equations component for those who need it.</p>
-
-      <p>The course web site was developed and tested primarily with
-      Google Chrome. We support current versions of Mozilla Firefox as
-      well. The video player is designed to work with Flash. While we
-      provide a partial non-Flash fallback for the video, as well as
-      partial support for Internet Explorer, other browsers, and
-      tablets, portions of the functionality will be unavailable. </p>
+    <section class="university-partners">
+      <section class="partners">
+        <img src="/static/images/mit_bw.png" />
+        <img src="/static/images/edx_bw.png" />
+        <img src="/static/images/harvard_bw.png" />
+      </section>
     </section>
 
-    <section class="cta">
-      <a class="enroll" rel="leanModal" href="/info">View 6.002x Circuits &amp; Electronics as a guest</a>
-      <a class="enroll" rel="leanModal" href="#enroll"><noscript>In order to</noscript> Enroll in 6.002x Circuits &amp; Electronics <noscript>you need to have javascript enabled</noscript></a>
+    <section class="highlighted-courses">
+      <article class="course">
+        <a href="/course_info">
+          <div class="cover">
+            <div class="shade"></div>
+            <div class="arrow"></div>
+            <img src="/static/images/history.png" />
+          </div>
+          <section class="info">
+            <hgroup>
+              <h2>18th Century History</h2>
+              <p>Adam Smith, Harvard University</p>
+            </hgroup>
+          </section>
+        </a>
+      </article>
     </section>
 
-  </section>
+    <section class="sign-up middle">
+      <form>
+        <input type="text" placeholder="Full Name">
+        <input type="email" placeholder="email">
+        <input type="password" placeholder="password">
+        <input type="submit" value="Sign Up">
+      </form>
+    </section>
 
-  <section class="staff">
-    <h1>About the course staff</h1>
+    <section class="more-info">
+      <h2>More Information & News</h2>
+      <section class="news">
+        <article></article>
+        <article></article>
+        <article></article>
+      </section>
+    </section>
 
-    <ul>
-      <li>
-        <img src="${static.url('staff/agarwal-mit-news-small.jpg')}" alt="Anant Agarwal">
-        <h2>Anant Agarwal</h2>
-        <p>Director of MIT&rsquo;s Computer Science and Artificial Intelligence Laboratory (CSAIL) and a professor of the Electrical Engineering and Computer Science department at MIT. His research focus is in parallel computer architectures and cloud software systems, and he is a founder of several successful startups, including  Tilera, a company that produces scalable multicore  processors.  Prof. Agarwal won MIT&rsquo;s  Smullin and Jamieson prizes for teaching and co-authored  the course textbook &ldquo;Foundations of Analog and Digital Electronic Circuits.&rdquo;</p></li>
-
-      <li>
-        <img src="${static.url('staff/gjs-small.jpg')}" alt="Gerald Sussman">
-        <h2>Gerald Sussman</h2>
-        <p>Professor of Electrical Engineering at MIT. He is a well known educator in the computer science community, perhaps best known as the author of Structure and Interpretation of Computer Programs, which is universally acknowledged as one of the top ten textbooks in computer science, and as the creator of Scheme, a popular teaching language. His research spans a range of topics, from artificial intelligence, to physics and chaotic systems, to supercomputer design.</p></li>
-
-      <li>
-        <img src="${static.url('staff/pmitros-small.jpg')}" alt="Piotr Mitros">
-        <h2>Piotr Mitros</h2>
-        <p>Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Dr. Mitros has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p></li>
-    </ul>
-
+    <section class="social-media">
+      <h2>Social Media</h2>
+    </section>
   </section>
 </section>
-
-  <div id="enroll" class="leanModal_box" name="enroll"><%include file="create_account.html" /></div>
-
-<script>
-$(function() {
-
-    // TODO: Clean up as per http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
-
-    /* Handles when the user hits 'enroll'. Grabs form data. Does AJAX.
-            Either shows error, or shows success. */
-
-    $('form#enroll_form').submit(function(e) {
-      e.preventDefault();
-      var submit_data={};
-      $.each($("[id^=ca_]"), function(index,value){
-        submit_data[value.name]=value.value;
-      });
-      $.each($("[id^=cb_]"), function(index,value){
-        submit_data[value.name]=value.checked;
-      });
-
-        postJSON('/create_account',
-           submit_data,
-           function(json) {
-               if(json.success) {
-                  $('#enroll').html(json.value);
-               } else {
-                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
-               }
-             }
-        );
-    });
-
-    /* Activate stupid spinner drop-downs in enrollment form */
-    var spinner_array=$("[id^=spinner_]");
-       spinner_array.each(function(i) {
-          var s=spinner_array[i];
-          $("#"+s.id).click(function(){
-             $("#sregion"+s.id.substring(7)).toggle();
-          });
-        })
-
-
-   /*$("sregion"+$("[id^=spinner_]")[1].id.substring(7)) */
-});
-
-</script>
