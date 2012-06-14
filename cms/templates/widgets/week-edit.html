@@ -1,107 +1,145 @@
 <section class="week-edit">
   <header>
     <h1 class="editable">Week 3</h1>
-    <p><a href="#">+ new goal</a></p>
 
     <section class="goals">
-      <h2>Weeks goals:</h2>
+      <header>
+        <h2>Weeks goals:</h2>
+        <p><a href="#">+ new goal</a></p>
+      </header>
+
       <ul>
         <li>
-          <h3>Goal title</h2>
-          <p>This is the goal body</p>
+          <p><strong>Goal title:</strong> This is the goal body and is wehre the goal will be further explained</p>
         </li>
       </ul>
     </section>
   </header>
 
+  <section class="content">
+  <section class="filters">
+    <ul>
+      <li>
+        <label for="">Sort by</label>
+        <select>
+          <option value="">Recently Modified</option>
+        </select>
+      </li>
 
+      <li>
+        <label for="">Display</label>
+        <select>
+          <option value="">All content</option>
+        </select>
+      </li>
+      <li>
+        <select>
+          <option value="">Internal Only</option>
+        </select>
+      </li>
 
-  <section class="weeks-content">
-    <header>
-      <h2>Weeks Content</h2>
-      <form>
+      <li class="advanced">
+        <a href="#">Advanced filters</a>
+      </li>
+
+      <li>
         <input type="search" name="" id="" value="" />
-      </form>
-    </header>
-
-    <section class="filters">
-      <ul>
-        <li>
-          <label for="">Sort by</label>
-          <select>
-            <option value="">Recently Modified</option>
-          </select>
-        </li>
-
-        <li>
-          <label for="">Display</label>
-          <select>
-            <option value="">All content</option>
-          </select>
-        </li>
-        <li>
-          <select>
-            <option value="">Internal Only</option>
-          </select>
-        </li>
-
-        <li class="advanced">
-          <a href="#">Advanced filters</a>
-        </li>
-      </ul>
-    </section>
-
+      </li>
+    </ul>
+  </section>
+    <div>
     <section class="modules">
-      <ul>
+      <ol>
         <li>
-          <h2><a href="#">Lecture Sequence</a></h2>
+          <header>
+            <h2><a href="#">Lecture Sequence</a></h2>
+          </header>
 
-          <ul>
+          <ol>
             <li><a href="#" class="problem-edit">Problem title 11</a></li>
             <li><a href="#" class="problem-edit">Problem title 13</a></li>
             <li><a href="#" class="problem-edit">Problem title 14</a></li>
             <li><a href="#" class="video-edit">Video 3</a></li>
-          </ul>
+          </ol>
         </li>
         <li>
+          <header>
           <h2><a href="#">Lecture Sequence</a></h2>
+          </header>
 
-          <ul>
-            <li><a href="#" class="problem-edit">Problem title 11</a></li>
+          <ol>
+            <li>
+              <header>
+                <h3>
+                  <a href="#" class="problem-edit">Problem group</a>
+                </h3>
+              </header>
+              <ol>
+                <li>
+                  <a href="#" class="problem-edit">Problem title 11</a>
+                </li>
+                <li>
+                  <a href="#" class="problem-edit">Problem title 11</a>
+                </li>
+                <li>
+                  <a href="#" class="problem-edit">Problem title 11</a>
+                </li>
+              </ol>
+            </li>
             <li><a href="#" class="problem-edit">Problem title 13</a></li>
             <li><a href="#" class="problem-edit">Problem title 14</a></li>
             <li><a href="#" class="video-edit">Video 3</a></li>
-          </ul>
+          </ol>
         </li>
         <li>
+          <header>
           <h2><a href="#">Homework 1a</a></h2>
+          </header>
 
-          <ul>
+          <ol>
             <li><a href="#" class="problem-edit">Problem title 11</a></li>
             <li><a href="#" class="problem-edit">Problem title 13</a></li>
             <li><a href="#" class="problem-edit">Problem title 14</a></li>
             <li><a href="#" class="video-edit">Video 3</a></li>
-          </ul>
+          </ol>
         </li>
 
         <li class="new-module">
           <%include file="new-module.html"/>
         </li>
-      </ul>
+      </ol>
     </section>
-  </section>
 
   <section class="scratch-pad">
-    <header>
-      <h2>Scratchpad</h2>
-    </header>
+    <ol>
+      <li>
+        <header>
+        <h2>Section Scratch</h2>
+        </header>
+        <ul>
+          <li>Problem title 11</li>
+          <li>Problem title 13</li>
+          <li>Problem title 14</li>
+          <li>Video 3</li>
+        </ul>
+      </li>
+      <li>
+        <header>
+        <h2>Course Scratch</h2>
+        </header>
+        <ul>
+          <li>Problem title 11</li>
+          <li>Problem title 13</li>
+          <li>Problem title 14</li>
+          <li>Video 3</li>
+        </ul>
+      </li>
 
-    <ul>
-      <li>Problem title 11</li>
-      <li>Problem title 13</li>
-      <li>Problem title 14</li>
-      <li>Video 3</li>
-      <%include file="new-module.html"/>
-    </ul>
+      <li class="new-module">
+        <%include file="new-module.html"/>
+      </li>
+    </ol>
+  </section>
+    </div>
   </section>
 </section>
