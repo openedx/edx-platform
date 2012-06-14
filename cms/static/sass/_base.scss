@@ -1,4 +1,3 @@
-
 $fg-column: 70px;
 $fg-gutter: 26px;
 $fg-max-columns: 12;
@@ -36,8 +35,17 @@ body {
         float: left;
       }
 
-      a.new-module {
-        float: right;
+      ul {
+        float: left;
+
+        &.user-nav {
+          float: right;
+        }
+
+        li {
+          @include inline-block();
+          margin-left: 15px;
+        }
       }
     }
   }
@@ -67,4 +75,37 @@ input[type="submit"], .button {
   background: #efefef;
   @include border-radius(3px);
   padding: 6px;
+}
+
+.new-module {
+  position: relative;
+
+  a {
+    padding: 6px;
+    display: block;
+  }
+
+  ul.new-dropdown {
+    list-style: none;
+    position: absolute;
+
+    li {
+      display: none;
+      padding: 6px;
+    }
+
+  }
+
+  &:hover {
+    ul.new-dropdown {
+      display: block;
+    }
+  }
+}
+
+.draggable {
+  width: 7px;
+  min-height: 14px;
+  background: url('../img/drag-handle.png') no-repeat center;
+  text-indent: -9999px;
 }
