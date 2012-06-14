@@ -86,6 +86,17 @@ section.sequence-edit {
           width: flex-grid(6, 9);
           border-right: 1px solid #333;
 
+          &.empty {
+            text-align: center;
+            vertical-align: middle;
+
+            a {
+              @extend .button;
+              @include inline-block();
+              margin-top: 10px;
+            }
+          }
+
           ol {
             list-style: none;
             border-bottom: 1px solid #333;
@@ -105,16 +116,30 @@ section.sequence-edit {
                 list-style: none;
 
                 li {
-                  padding: 6px 0 6px 6px;
+                  padding: 6px;
 
-                  h3 {
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    font-size: 12px;
-                  }
+                  &.group {
+                    padding: 0;
+                    border-left: 4px solid #999;
 
-                  ol {
-                    border-left: 1px solid;
+                    header {
+                      padding: 3px 6px;
+                      background: none;
+
+                      h3 {
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        font-size: 12px;
+                      }
+                    }
+
+                    ol {
+                      li {
+                        &:last-child {
+                          border-bottom: 0;
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -126,6 +151,7 @@ section.sequence-edit {
           @include box-sizing(border-box);
           display: table-cell;
           width: flex-grid(3, 9) + flex-gutter(9);
+          vertical-align: top;
 
           ol {
             list-style: none;
@@ -145,48 +171,41 @@ section.sequence-edit {
                 li {
                   padding: 6px;
 
+                  &:last-child {
+                    border-bottom: 0;
+                  }
+
+                  &:hover {
+                    a.draggable {
+                      opacity: 1;
+                    }
+                  }
+
+                  &.empty {
+                    padding: 12px;
+
+                    a {
+                    @extend .button;
+                    display: block;
+                    text-align: center;
+                    }
+                  }
+
+                  a.draggable {
+                    float: right;
+                    opacity: .3;
+                  }
+
                   a {
                     color: #000;
                   }
                 }
               }
 
-              &.new-module {
-                position: relative;
-
-                ul.new-dropdown {
-                  list-style: none;
-
-                  li {
-                    display: none;
-
-                    &:first-child {
-                      display: block;
-                    }
-                  }
-
-                  &:hover {
-                    li {
-                      display: block;
-                      padding: 6px 0;
-
-                      &:first-child {
-                        padding-top: 0;
-                      }
-                    }
-                  }
-                }
-              }
             }
-          }
-
-          p {
-            padding: 6px;
-            border-bottom: 1px solid #666;
           }
         }
       }
     }
   }
 }
-

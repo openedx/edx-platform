@@ -193,8 +193,19 @@ body {
         font-size: 14px;
         text-transform: uppercase;
         float: left; }
-      body > header nav a.new-module {
-        float: right; }
+      body > header nav ul {
+        float: left; }
+        body > header nav ul.user-nav {
+          float: right; }
+        body > header nav ul li {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin-left: 15px; }
   body.content section.main-content {
     border-left: 2px solid #000;
     -webkit-box-sizing: border-box;
@@ -213,7 +224,11 @@ a {
 input {
   font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
 
-input[type="submit"], .button, section.cal section.new-section > a, section.video-new > section section.upload a.upload-button, section.video-edit > section section.upload a.upload-button, section.video-new > section a.save-update, section.video-edit > section a.save-update, section.problem-new > section a.save, section.problem-edit > section a.save {
+input[type="submit"], .button, section.cal section.new-section > a, section.week-edit > section.content > div section.modules.empty a,
+section.week-new > section.content > div section.modules.empty a,
+section.sequence-edit > section.content > div section.modules.empty a, section.week-edit > section.content > div section.scratch-pad ol li ul li.empty a,
+section.week-new > section.content > div section.scratch-pad ol li ul li.empty a,
+section.sequence-edit > section.content > div section.scratch-pad ol li ul li.empty a, section.video-new > section section.upload a.upload-button, section.video-edit > section section.upload a.upload-button, section.video-new > section a.save-update, section.video-edit > section a.save-update, section.problem-new > section a.save, section.problem-edit > section a.save {
   border: 1px solid #ccc;
   background: #efefef;
   -webkit-border-radius: 3px;
@@ -222,6 +237,26 @@ input[type="submit"], .button, section.cal section.new-section > a, section.vide
   -o-border-radius: 3px;
   border-radius: 3px;
   padding: 6px; }
+
+.new-module {
+  position: relative; }
+  .new-module a {
+    padding: 6px;
+    display: block; }
+  .new-module ul.new-dropdown {
+    list-style: none;
+    position: absolute; }
+    .new-module ul.new-dropdown li {
+      display: none;
+      padding: 6px; }
+  .new-module:hover ul.new-dropdown {
+    display: block; }
+
+.draggable {
+  width: 7px;
+  min-height: 14px;
+  background: url("../img/drag-handle.png") no-repeat center;
+  text-indent: -9999px; }
 
 section.cal {
   -webkit-box-sizing: border-box;
@@ -484,10 +519,34 @@ section.cal {
   overflow: scroll;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  opacity: .4;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
   body.content
   section.cal > header ul {
     display: none; }
+  body.content
+  section.cal:hover {
+    opacity: 1; }
   body.content
   section.cal ol li {
     -webkit-box-sizing: border-box;
@@ -637,6 +696,22 @@ section.sequence-edit > section.content {
       display: table-cell;
       width: 65.632%;
       border-right: 1px solid #333; }
+      section.week-edit > section.content > div section.modules.empty,
+      section.week-new > section.content > div section.modules.empty,
+      section.sequence-edit > section.content > div section.modules.empty {
+        text-align: center;
+        vertical-align: middle; }
+        section.week-edit > section.content > div section.modules.empty a,
+        section.week-new > section.content > div section.modules.empty a,
+        section.sequence-edit > section.content > div section.modules.empty a {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin-top: 10px; }
       section.week-edit > section.content > div section.modules ol,
       section.week-new > section.content > div section.modules ol,
       section.sequence-edit > section.content > div section.modules ol {
@@ -661,17 +736,27 @@ section.sequence-edit > section.content {
             section.week-edit > section.content > div section.modules ol li ol li,
             section.week-new > section.content > div section.modules ol li ol li,
             section.sequence-edit > section.content > div section.modules ol li ol li {
-              padding: 6px 0 6px 6px; }
-              section.week-edit > section.content > div section.modules ol li ol li h3,
-              section.week-new > section.content > div section.modules ol li ol li h3,
-              section.sequence-edit > section.content > div section.modules ol li ol li h3 {
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                font-size: 12px; }
-              section.week-edit > section.content > div section.modules ol li ol li ol,
-              section.week-new > section.content > div section.modules ol li ol li ol,
-              section.sequence-edit > section.content > div section.modules ol li ol li ol {
-                border-left: 1px solid; }
+              padding: 6px; }
+              section.week-edit > section.content > div section.modules ol li ol li.group,
+              section.week-new > section.content > div section.modules ol li ol li.group,
+              section.sequence-edit > section.content > div section.modules ol li ol li.group {
+                padding: 0;
+                border-left: 4px solid #999; }
+                section.week-edit > section.content > div section.modules ol li ol li.group header,
+                section.week-new > section.content > div section.modules ol li ol li.group header,
+                section.sequence-edit > section.content > div section.modules ol li ol li.group header {
+                  padding: 3px 6px;
+                  background: none; }
+                  section.week-edit > section.content > div section.modules ol li ol li.group header h3,
+                  section.week-new > section.content > div section.modules ol li ol li.group header h3,
+                  section.sequence-edit > section.content > div section.modules ol li ol li.group header h3 {
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    font-size: 12px; }
+                section.week-edit > section.content > div section.modules ol li ol li.group ol li:last-child,
+                section.week-new > section.content > div section.modules ol li ol li.group ol li:last-child,
+                section.sequence-edit > section.content > div section.modules ol li ol li.group ol li:last-child {
+                  border-bottom: 0; }
     section.week-edit > section.content > div section.scratch-pad,
     section.week-new > section.content > div section.scratch-pad,
     section.sequence-edit > section.content > div section.scratch-pad {
@@ -679,7 +764,8 @@ section.sequence-edit > section.content {
       -moz-box-sizing: border-box;
       box-sizing: border-box;
       display: table-cell;
-      width: 34.368%; }
+      width: 34.368%;
+      vertical-align: top; }
       section.week-edit > section.content > div section.scratch-pad ol,
       section.week-new > section.content > div section.scratch-pad ol,
       section.sequence-edit > section.content > div section.scratch-pad ol {
@@ -702,40 +788,32 @@ section.sequence-edit > section.content {
             section.week-new > section.content > div section.scratch-pad ol li ul li,
             section.sequence-edit > section.content > div section.scratch-pad ol li ul li {
               padding: 6px; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li:last-child,
+              section.week-new > section.content > div section.scratch-pad ol li ul li:last-child,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li:last-child {
+                border-bottom: 0; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li:hover a.draggable,
+              section.week-new > section.content > div section.scratch-pad ol li ul li:hover a.draggable,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li:hover a.draggable {
+                opacity: 1; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li.empty,
+              section.week-new > section.content > div section.scratch-pad ol li ul li.empty,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li.empty {
+                padding: 12px; }
+                section.week-edit > section.content > div section.scratch-pad ol li ul li.empty a,
+                section.week-new > section.content > div section.scratch-pad ol li ul li.empty a,
+                section.sequence-edit > section.content > div section.scratch-pad ol li ul li.empty a {
+                  display: block;
+                  text-align: center; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li a.draggable,
+              section.week-new > section.content > div section.scratch-pad ol li ul li a.draggable,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li a.draggable {
+                float: right;
+                opacity: .3; }
               section.week-edit > section.content > div section.scratch-pad ol li ul li a,
               section.week-new > section.content > div section.scratch-pad ol li ul li a,
               section.sequence-edit > section.content > div section.scratch-pad ol li ul li a {
                 color: #000; }
-          section.week-edit > section.content > div section.scratch-pad ol li.new-module,
-          section.week-new > section.content > div section.scratch-pad ol li.new-module,
-          section.sequence-edit > section.content > div section.scratch-pad ol li.new-module {
-            position: relative; }
-            section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown,
-            section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown,
-            section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown {
-              list-style: none; }
-              section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li,
-              section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li,
-              section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li {
-                display: none; }
-                section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li:first-child,
-                section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li:first-child,
-                section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown li:first-child {
-                  display: block; }
-              section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li,
-              section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li,
-              section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li {
-                display: block;
-                padding: 6px 0; }
-                section.week-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li:first-child,
-                section.week-new > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li:first-child,
-                section.sequence-edit > section.content > div section.scratch-pad ol li.new-module ul.new-dropdown:hover li:first-child {
-                  padding-top: 0; }
-      section.week-edit > section.content > div section.scratch-pad p,
-      section.week-new > section.content > div section.scratch-pad p,
-      section.sequence-edit > section.content > div section.scratch-pad p {
-        padding: 6px;
-        border-bottom: 1px solid #666; }
 
 section.video-new > section section.upload, section.video-edit > section section.upload {
   padding: 6px;
