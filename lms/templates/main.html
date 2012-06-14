@@ -56,6 +56,7 @@
 </head>
 
 <body class="<%block name='bodyclass'/>">
+  <%include file="navigation.html" />
   <!--[if lte IE 9]>
   <p class="ie-warning">You are using a browser that is not supported by <em>MITx</em>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p>
   <![endif]-->
@@ -63,6 +64,7 @@
   ${self.body()}
   <%block name="bodyextra"/>
   <%block name="js_extra"/>
+  <script src="${static.url('js/my_courses_dropdown.js')}"></script>
 
 </body>
 </html>

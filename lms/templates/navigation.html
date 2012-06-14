@@ -1,17 +1,12 @@
-<%page args="active_page" />
-
 <%namespace name='static' file='static_content.html'/>
-<%block name="js_extra">
-  <script src="${static.url('js/my_courses_dropdown.js')}"></script>
-</%block>
 <header class="app" aria-label="Global Navigation">
   <nav>
-    <a href="${ MITX_ROOT_URL }/mitxhome" class="logo">
-      <img src="${ MITX_ROOT_URL}/static/images/logo.png" />
+    <a href="${ MITX_ROOT_URL }" class="logo">
+      <img src="${static.url('images/logo.png')}" />
     </a>
 
-    <h1>${ settings.COURSE_TITLE }</h1>
     %if user.is_authenticated():
+    <h1>${ settings.COURSE_TITLE }</h1>
     <ol class="user">
       <li>
         <a href="/dashboard" class="user-dashboard">
@@ -23,34 +18,30 @@
         <a href="#" class="options">&#9662</a>
         <ol class="user-options">
           <li><a href="#">Account Settings</a></li>
-          <li><a href="/">Log Out</a></li>
+          <li><a href="/logout">Log Out</a></li>
         </ol>
+      </li>
+    </ol>
+    %else:
+    <ol>
+      <li><a href="/courses">Courses</a></li>
+      <li><a href="#">How It Works</a></li>
+    </ol>
+    <ol class="user">
+      <li><a href="/dashboard">Log In</a></li>
+      <li><a href="#">Sign Up</a></li>
+    </ol>
+    <ol class="secondary">
+      <li>
+        <a href="#">About</a>
+      </li>
+      <li>
+        <a href="#">Jobs</a>
+      </li>
+      <li>
+        <a href="#">faq</a>
       </li>
     </ol>
     %endif
   </nav>
 </header>
-
-<%
-def url_class(url):
-  if url == active_page:
-    return "active"
-  return ""
-%>
-
-<nav class="${active_page} course-material">
-  <div class="inner-wrapper">
-    <ol class="course-tabs">
-      <li class="courseware"><a href="${ MITX_ROOT_URL }/courseware/" class="${url_class('courseware')}">Courseware</a></li>
-      <li class="info"><a href="${ MITX_ROOT_URL }/info" class="${url_class('info')}">Course Info</a></li>
-% if user.is_authenticated():
-      <li class="book"><a href="${ MITX_ROOT_URL }/book" class="${url_class('book')}">Textbook</a></li>
-      <li class="discussion"><a href="${ MITX_ROOT_URL }/discussion/questions/">Discussion</a></li>
-% endif
-      <li class="wiki"><a href="${ MITX_ROOT_URL }/wiki/view/" class="${url_class('wiki')}">Wiki</a></li>
-% if user.is_authenticated():
-      <li class="profile"><a href="${ MITX_ROOT_URL }/profile" class="${url_class('profile')}">Profile</a></li>
-% endif
-    </ol>
-  </div>
-</nav>

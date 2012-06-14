@@ -1,0 +1,25 @@
+<%page args="active_page" />
+
+<%
+def url_class(url):
+  if url == active_page:
+    return "active"
+  return ""
+%>
+
+<nav class="${active_page} course-material">
+  <div class="inner-wrapper">
+    <ol class="course-tabs">
+      <li class="courseware"><a href="${ MITX_ROOT_URL }/courseware/" class="${url_class('courseware')}">Courseware</a></li>
+      <li class="info"><a href="${ MITX_ROOT_URL }/info" class="${url_class('info')}">Course Info</a></li>
+% if user.is_authenticated():
+      <li class="book"><a href="${ MITX_ROOT_URL }/book" class="${url_class('book')}">Textbook</a></li>
+      <li class="discussion"><a href="${ MITX_ROOT_URL }/discussion/questions/">Discussion</a></li>
+% endif
+      <li class="wiki"><a href="${ MITX_ROOT_URL }/wiki/view/" class="${url_class('wiki')}">Wiki</a></li>
+% if user.is_authenticated():
+      <li class="profile"><a href="${ MITX_ROOT_URL }/profile" class="${url_class('profile')}">Profile</a></li>
+% endif
+    </ol>
+  </div>
+</nav>
