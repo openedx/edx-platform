@@ -108,4 +108,6 @@ input[type="submit"], .button {
   min-height: 14px;
   background: url('../img/drag-handle.png') no-repeat center;
   text-indent: -9999px;
+  display: block;
+  float: right;
 }
