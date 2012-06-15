@@ -1,47 +1,20 @@
-<%block name="content">
 <section class="sequence-edit">
   <header>
-    <a href="/ui_prototype">Done</a>
-    <h1 class="editable">Lecture Sequence name</h1>
-    <a href="">Settings</a>
+    <div class="week">
+      <h2><a href="">Week 1</a></h2>
+      <ul>
+        <li>
+          <p class="editable"><strong>Goal title:</strong> This is the goal body and is where the goal will be further explained</p>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <h1 class="editable">Lecture sequence</h1>
+      <p><strong>Group type:</strong> Ordered Sequence</p>
+    </div>
   </header>
 
-  <section class="sidebar">
-    <section class="goals">
-      <header>
-        <h2>Content</h2>
-      </header>
-      <ul>
-        <li><a href="#" class="video-edit">Video 1</a></li>
-        <li><a href="#" class="video-edit">Video 2</a></li>
-        <%include file="new-module.html"/>
-      </ul>
-    </section>
-
-    <section class="scratch-pad">
-      <header>
-        <h2>Scratchpad</h2>
-      </header>
-
-      <ul>
-        <li><a href="#" class="problem-edit">Problem title 11</a></li>
-        <li><a href="#" class="problem-edit">Problem title 13</a></li>
-        <li><a href="#" class="problem-edit">Problem title 14</a></li>
-        <li><a href="#" class="video-edit">Video 3</a></li>
-        <%include file="new-module.html"/>
-      </ul>
-
-    </section>
-  </section>
-
-  <section class="weeks-content">
-    <header>
-      <h2>Sequence Content</h2>
-      <form>
-        <input type="search" name="" id="" value="" />
-      </form>
-    </header>
-
+  <section class="content">
     <section class="filters">
       <ul>
         <li>
@@ -66,20 +39,149 @@
         <li class="advanced">
           <a href="#">Advanced filters</a>
         </li>
+
+        <li>
+          <input type="search" name="" id="" value="" />
+        </li>
       </ul>
     </section>
 
-    <section class="modules">
-      <ul>
-        <li><a href="#" class="problem-edit">Problem 2</a></li>
-        <li><a href="#" class="problem-edit">Problem 4</a></li>
-        <li><a href="#" class="problem-edit">Problem 6</a></li>
-        <li><a href="#" class="video-edit">Video 5</a></li>
-        <li><a href="#" class="video-edit">Video 4</a></li>
-        <li><a href="#" class="problem-edit">Problem 9</a></li>
-      </ul>
-    </section>
+    <div>
+      <section class="modules">
+        <ol>
+          <li>
+            <ol>
+              <li>
+                <a href="" class="problem-edit">Problem title 11</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="sequence-edit">Problem Group</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="problem-edit">Problem title 14</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="video-edit">Video 3</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li class="group">
+                <header>
+                  <h3>
+                    <a href="#" class="problem-edit">Problem group</a>
+                    <a href="#" class="draggable">handle</a>
+                  </h3>
+                </header>
+                <ol>
+                  <li>
+                    <a href="#" class="problem-edit">Problem title 11</a>
+                    <a href="#" class="draggable">handle</a>
+                  </li>
+                  <li>
+                    <a href="#" class="problem-edit">Problem title 11</a>
+                    <a href="#" class="draggable">handle</a>
+                  </li>
+                  <li>
+                    <a href="#" class="problem-edit">Problem title 11</a>
+                    <a href="#" class="draggable">handle</a>
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <a href="#" class="problem-edit">Problem title 13</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="problem-edit">Problem title 14</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="video-edit">Video 3</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="" class="problem-edit">Problem title 11</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="sequence-edit">Problem Group</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="problem-edit">Problem title 14</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="video-edit">Video 3</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+            </ol>
+          </li>
+
+          <!-- <li class="new-module"> -->
+          <!--   <%include file="new-module.html"/> -->
+          <!-- </li> -->
+        </ol>
+      </section>
+
+      <section class="scratch-pad">
+        <ol>
+          <li>
+            <header>
+              <h2>Section Scratch</h2>
+            </header>
+            <ul>
+              <li>
+                <a href="#" class="problem-edit">Problem title 11</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="problem-edit">Problem title 13 </a>
+              <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="problem-edit"> Problem title 14</a>
+              <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="" class="video-edit">Video 3</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <header>
+              <h2>Course Scratch</h2>
+            </header>
+
+            <ul>
+              <li>
+                <a href="#" class="problem-edit">Problem title 11</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="problem-edit">Problem title 13 </a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="#" class="problem-edit"> Problem title 14</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+              <li>
+                <a href="" class="video-edit">Video 3</a>
+                <a href="#" class="draggable">handle</a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- <li class="new-module"> -->
+          <!--   <%include file="new-module.html"/> -->
+          <!-- </li> -->
+        </ol>
+      </section>
+    </div>
   </section>
 </section>
-</%block>
 
