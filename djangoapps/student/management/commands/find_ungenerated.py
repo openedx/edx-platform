@@ -7,4 +7,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         l = GeneratedCertificate.objects.filter( download_url = None ).values()
         sl = [{'user_id':x['user_id'], 'name':x['name']} for x in l]
-        sys.stdout.write(simplejson.dumps(sl))
+        sys.stdout.write(simplejson.dumps(sl) + "\n")
