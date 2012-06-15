@@ -27,7 +27,7 @@ DEBUG = True
 ENABLE_MULTICOURSE = True     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 QUICKEDIT = True
 
-# MITX_FEATURES['USE_DJANGO_PIPELINE'] = False
+MITX_FEATURES['USE_DJANGO_PIPELINE'] = False
 MITX_FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF'] = False
 
 COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
@@ -58,6 +58,11 @@ COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
                     'edx4edx': {'number' : 'edX.01',
                                     'title'  : 'edx4edx: edX Author Course',
                                     'xmlpath': '/edx4edx/',
+                                    'active' : True,
+                                    },
+                    '7.03x_Fall_2012': {'number' : '7.03x',
+                                    'title'  : 'Genetics',
+                                    'xmlpath': '/7.03x/',
                                     'active' : True,
                                     },
                     }
