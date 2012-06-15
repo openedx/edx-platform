@@ -6,34 +6,64 @@ section.sequence-edit {
     border-bottom: 2px solid #333;
     @include clearfix();
 
-    h1 {
-      font-size: 18px;
-      margin: 8px 6px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    div {
+      @include clearfix();
+      padding: 6px 20px;
+
+      h1 {
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        float: left;
+      }
+
+      p {
+        float: right;
+      }
+
+      &.week {
+        background: #eee;
+        font-size: 12px;
+        border-bottom: 1px solid #ccc;
+
+        h2 {
+          font-size: 12px;
+          @include inline-block();
+          margin-right: 20px;
+        }
+
+        ul {
+          list-style: none;
+          @include inline-block();
+
+          li {
+            @include inline-block();
+            margin-right: 10px;
+
+            p {
+              float: none;
+            }
+          }
+        }
+      }
     }
 
     section.goals {
       background: #eee;
-      padding: 6px;
+      padding: 6px 20px;
       border-top: 1px solid #ccc;
-
-      header {
-        h2 {
-          font-size: 14px;
-          @include inline-block();
-        }
-
-        p {
-          @include inline-block();
-        }
-
-      }
 
       ul {
         list-style: none;
-        margin-top: 6px;
         color: #999;
+
+        li {
+          margin-bottom: 6px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
       }
     }
   }
