@@ -1,0 +1,50 @@
+<!DOCTYPE html> <html> <head> <title>MITx 6.002x</title> <link rel="stylesheet" href="/static/js/jquery.treeview.css" type="text/css" media="all" /> <link rel="stylesheet" href="/static/css/application.css?v2" type="text/css" media="all" /> <script type="text/javascript" src="/static/js/jquery-1.6.2.min.js"></script> <script type="text/javascript" src="/static/js/jquery-ui-1.8.16.custom.min.js"></script> <script type="text/javascript" src="/static/js/swfobject/swfobject.js"></script> <!--[if lt IE 9]> <script src="/static/js/html5shiv.js"></script> <![endif]--> <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [["\\(","\\)"]],
+      displayMath: [["\\[","\\]"]]}
+    });
+  </script> <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates --> <script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-AMS_HTML-full"></script> </head> <body class=""> <!--[if lte IE 9]> <p class="ie-warning">You are using a browser that is not supported by <em>MITx</em>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p> <![endif]--> <section class="outside-app"> <h1>Currently the <em>MITx</em> servers are down</h1> <p>Our staff is currently working to get the site back up as soon as possible. Please email us at <a href="mailto:technical@mitx.mit.edu">technical@mitx.mit.edu</a> to report any problems or downtime.</p> </section> <footer> <!-- Template based on a design from http://www.dotemplate.com/ - Donated $10 (pmitros) so we don't need to include credit. --> <p> Copyright &copy; 2012. MIT. <a href="/t/copyright.html">Some rights reserved.</a> </p> <nav> <ul class="social"> <li class="linkedin"> <a href="http://www.linkedin.com/groups/Friends-Alumni-MITx-4316538">Linked In</a> </li> <li class="twitter"> <a href="https://twitter.com/#!/MyMITx">Twitter</a> </li> <li class="facebook"> <a href="http://www.facebook.com/pages/MITx/378592442151504">Facebook</a> </li> </ul> <ul> <li><a href="#feedback_div" rel="leanModal">Feedback</a></li> <li class="calc-main"> <a href="#" class="calc">Calculator</a> <div id="calculator_wrapper"> <form id="calculator"> <div class="input-wrapper"> <input type="text" id="calculator_input" /> <div class="help-wrapper"> <a href="#">Hints</a> <dl class="help"> <dt>Suffixes:</dt> <dd> %kMGTcmunp</dd> <dt>Operations:</dt> <dd>^ * / + - ()</dd> <dt>Functions:</dt> <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd> <dt>Constants</dt> <dd>e, pi</dd> <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.
+
+                  <dt>Unsupported:</dt> <dd>||, j </dd>  --> </dl> </div> </div> <input id="calculator_button" type="submit" value="="/> <input type="text" id="calculator_output"  readonly /> </form> </div> </li> <li><a href="/s/help.html">Help</a></li> <li><a href="/logout">Log out</a></li> </ul> </nav> </footer> <div id="feedback_div" class="leanModal_box"> <h1>Feedback for MITx</h1> <p>Found a bug? Got an idea for improving our system? Let us know.</p> <form> <ol> <li><label>Subject:</label> <input type="text" id="feedback_subject"></li> <li><label>Feedback: </label><textarea id="feedback_message"></textarea></li> <li><input id="feedback_button" type="button" value="Submit"></li> </ol> </form> </div> <script type="text/javascript" src="/static/js/jquery.treeview.js"></script> <script type="text/javascript" src="/static/js/jquery.leanModal.min.js"></script> <script type="text/javascript" src="/static/js/jquery.qtip.min.js"></script> <script type="text/javascript" src="/static/js/jquery.cookie.js"></script> <script type="text/javascript" src="/static/js/video_player.js"></script> <script type="text/javascript" src="/static/js/schematic.js"></script> <script type="text/javascript" src="/static/js/cktsim.js"></script> <script>
+  // Feedback form
+$(function() {
+    $("#feedback_button").click(function(){
+      postJSON("/send_feedback", {"subject":$("#feedback_subject").attr("value"),
+        "url":document.URL,
+        "message":$("#feedback_message").attr("value")},
+        function(data){
+        $("#feedback_subject").attr("value","");
+        $("#feedback_message").attr("value","");
+        $("#feedback_div").html("Feedback submitted. Thank you");
+        });
+      });
+
+// Calculator
+
+    $(".calc").click(function(){
+      $("li.calc-main").toggleClass('open');
+      $("#calculator_wrapper #calculator_input").focus();
+      $(this).toggleClass("closed");
+      return false;
+      });
+
+    $("div.help-wrapper a").hover(function(){
+      $(".help").toggleClass("shown");
+
+      });
+
+    $("div.help-wrapper a").click(function(){
+      return false;
+      });
+    $("form#calculator").submit(function(e){
+      e.preventDefault();
+      $.getJSON("/calculate", {"equation":$("#calculator_input").attr("value")},
+        function(data){
+        $("#calculator_output").attr("value",data.result);
+        });
+      });
+
+    $("a[rel*=leanModal]").leanModal();
+
+    });
+</script> </body> </html>
