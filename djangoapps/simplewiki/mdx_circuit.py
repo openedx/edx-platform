@@ -17,7 +17,7 @@ circuit-schematic:[["r",[128,48,0],{"r":"1","_json_":0},["2","1"]],["view",0,0,2
 import markdown
 import re
 
-import simplewiki.settings as settings
+import simplewiki.wiki_settings as settings
 
 from django.utils.html import escape
 

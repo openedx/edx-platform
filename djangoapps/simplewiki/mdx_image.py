@@ -15,7 +15,7 @@ Ex:
 Requires Python-Markdown 1.6+
 '''
 
-import simplewiki.settings as settings
+import simplewiki.wiki_settings as settings
 
 import markdown
 try:
