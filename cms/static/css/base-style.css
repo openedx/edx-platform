@@ -460,7 +460,7 @@ section.cal {
     section.cal section.new-section section {
       display: none;
       position: absolute;
-      top: 32px;
+      top: 30px;
       background: rgba(0, 0, 0, 0.8);
       min-width: 300px;
       padding: 10px;
@@ -575,46 +575,96 @@ section.sequence-edit > header {
   section.week-new > header:after,
   section.sequence-edit > header:after {
     clear: both; }
-  section.week-edit > header h1,
-  section.week-new > header h1,
-  section.sequence-edit > header h1 {
-    font-size: 18px;
-    margin: 8px 6px;
-    text-transform: uppercase;
-    letter-spacing: 1px; }
+  section.week-edit > header div,
+  section.week-new > header div,
+  section.sequence-edit > header div {
+    zoom: 1;
+    padding: 6px 20px; }
+    section.week-edit > header div:before, section.week-edit > header div:after,
+    section.week-new > header div:before,
+    section.week-new > header div:after,
+    section.sequence-edit > header div:before,
+    section.sequence-edit > header div:after {
+      content: "";
+      display: table; }
+    section.week-edit > header div:after,
+    section.week-new > header div:after,
+    section.sequence-edit > header div:after {
+      clear: both; }
+    section.week-edit > header div h1,
+    section.week-new > header div h1,
+    section.sequence-edit > header div h1 {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      float: left; }
+    section.week-edit > header div p,
+    section.week-new > header div p,
+    section.sequence-edit > header div p {
+      float: right; }
+    section.week-edit > header div.week,
+    section.week-new > header div.week,
+    section.sequence-edit > header div.week {
+      background: #eee;
+      font-size: 12px;
+      border-bottom: 1px solid #ccc; }
+      section.week-edit > header div.week h2,
+      section.week-new > header div.week h2,
+      section.sequence-edit > header div.week h2 {
+        font-size: 12px;
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        margin-right: 20px; }
+      section.week-edit > header div.week ul,
+      section.week-new > header div.week ul,
+      section.sequence-edit > header div.week ul {
+        list-style: none;
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto; }
+        section.week-edit > header div.week ul li,
+        section.week-new > header div.week ul li,
+        section.sequence-edit > header div.week ul li {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin-right: 10px; }
+          section.week-edit > header div.week ul li p,
+          section.week-new > header div.week ul li p,
+          section.sequence-edit > header div.week ul li p {
+            float: none; }
   section.week-edit > header section.goals,
   section.week-new > header section.goals,
   section.sequence-edit > header section.goals {
     background: #eee;
-    padding: 6px;
+    padding: 6px 20px;
     border-top: 1px solid #ccc; }
-    section.week-edit > header section.goals header h2,
-    section.week-new > header section.goals header h2,
-    section.sequence-edit > header section.goals header h2 {
-      font-size: 14px;
-      display: -moz-inline-box;
-      -moz-box-orient: vertical;
-      display: inline-block;
-      vertical-align: baseline;
-      zoom: 1;
-      *display: inline;
-      *vertical-align: auto; }
-    section.week-edit > header section.goals header p,
-    section.week-new > header section.goals header p,
-    section.sequence-edit > header section.goals header p {
-      display: -moz-inline-box;
-      -moz-box-orient: vertical;
-      display: inline-block;
-      vertical-align: baseline;
-      zoom: 1;
-      *display: inline;
-      *vertical-align: auto; }
     section.week-edit > header section.goals ul,
     section.week-new > header section.goals ul,
     section.sequence-edit > header section.goals ul {
       list-style: none;
-      margin-top: 6px;
       color: #999; }
+      section.week-edit > header section.goals ul li,
+      section.week-new > header section.goals ul li,
+      section.sequence-edit > header section.goals ul li {
+        margin-bottom: 6px; }
+        section.week-edit > header section.goals ul li:last-child,
+        section.week-new > header section.goals ul li:last-child,
+        section.sequence-edit > header section.goals ul li:last-child {
+          margin-bottom: 0; }
 section.week-edit > section.content,
 section.week-new > section.content,
 section.sequence-edit > section.content {
