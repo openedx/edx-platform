@@ -256,7 +256,9 @@ section.sequence-edit > section.content > div section.scratch-pad ol li ul li.em
   width: 7px;
   min-height: 14px;
   background: url("../img/drag-handle.png") no-repeat center;
-  text-indent: -9999px; }
+  text-indent: -9999px;
+  display: block;
+  float: right; }
 
 section.cal {
   -webkit-box-sizing: border-box;
@@ -679,14 +681,27 @@ section.sequence-edit > section.content {
     section.week-new > section.content > div section header,
     section.sequence-edit > section.content > div section header {
       background: #eee;
-      padding: 10px;
-      border-bottom: 1px solid #ccc; }
+      padding: 6px;
+      border-bottom: 1px solid #ccc;
+      zoom: 1; }
+      section.week-edit > section.content > div section header:before, section.week-edit > section.content > div section header:after,
+      section.week-new > section.content > div section header:before,
+      section.week-new > section.content > div section header:after,
+      section.sequence-edit > section.content > div section header:before,
+      section.sequence-edit > section.content > div section header:after {
+        content: "";
+        display: table; }
+      section.week-edit > section.content > div section header:after,
+      section.week-new > section.content > div section header:after,
+      section.sequence-edit > section.content > div section header:after {
+        clear: both; }
       section.week-edit > section.content > div section header h2,
       section.week-new > section.content > div section header h2,
       section.sequence-edit > section.content > div section header h2 {
         text-transform: uppercase;
         letter-spacing: 1px;
-        font-size: 12px; }
+        font-size: 12px;
+        float: left; }
     section.week-edit > section.content > div section.modules,
     section.week-new > section.content > div section.modules,
     section.sequence-edit > section.content > div section.modules {
@@ -737,26 +752,37 @@ section.sequence-edit > section.content {
             section.week-new > section.content > div section.modules ol li ol li,
             section.sequence-edit > section.content > div section.modules ol li ol li {
               padding: 6px; }
+              section.week-edit > section.content > div section.modules ol li ol li:hover a.draggable,
+              section.week-new > section.content > div section.modules ol li ol li:hover a.draggable,
+              section.sequence-edit > section.content > div section.modules ol li ol li:hover a.draggable {
+                opacity: 1; }
+              section.week-edit > section.content > div section.modules ol li ol li a.draggable,
+              section.week-new > section.content > div section.modules ol li ol li a.draggable,
+              section.sequence-edit > section.content > div section.modules ol li ol li a.draggable {
+                float: right;
+                opacity: .5; }
               section.week-edit > section.content > div section.modules ol li ol li.group,
               section.week-new > section.content > div section.modules ol li ol li.group,
               section.sequence-edit > section.content > div section.modules ol li ol li.group {
-                padding: 0;
-                border-left: 4px solid #999; }
+                padding: 0; }
                 section.week-edit > section.content > div section.modules ol li ol li.group header,
                 section.week-new > section.content > div section.modules ol li ol li.group header,
                 section.sequence-edit > section.content > div section.modules ol li ol li.group header {
-                  padding: 3px 6px;
+                  padding: 6px;
                   background: none; }
                   section.week-edit > section.content > div section.modules ol li ol li.group header h3,
                   section.week-new > section.content > div section.modules ol li ol li.group header h3,
                   section.sequence-edit > section.content > div section.modules ol li ol li.group header h3 {
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    font-size: 12px; }
-                section.week-edit > section.content > div section.modules ol li ol li.group ol li:last-child,
-                section.week-new > section.content > div section.modules ol li ol li.group ol li:last-child,
-                section.sequence-edit > section.content > div section.modules ol li ol li.group ol li:last-child {
+                    font-size: 14px; }
+                section.week-edit > section.content > div section.modules ol li ol li.group ol,
+                section.week-new > section.content > div section.modules ol li ol li.group ol,
+                section.sequence-edit > section.content > div section.modules ol li ol li.group ol {
+                  border-left: 4px solid #999;
                   border-bottom: 0; }
+                  section.week-edit > section.content > div section.modules ol li ol li.group ol li:last-child,
+                  section.week-new > section.content > div section.modules ol li ol li.group ol li:last-child,
+                  section.sequence-edit > section.content > div section.modules ol li ol li.group ol li:last-child {
+                    border-bottom: 0; }
     section.week-edit > section.content > div section.scratch-pad,
     section.week-new > section.content > div section.scratch-pad,
     section.sequence-edit > section.content > div section.scratch-pad {

@@ -67,16 +67,19 @@ section.sequence-edit {
       display: table;
       border: 1px solid;
       width: 100%;
+
       section {
         header {
           background: #eee;
-          padding: 10px;
+          padding: 6px;
           border-bottom: 1px solid #ccc;
+          @include clearfix;
 
           h2 {
             text-transform: uppercase;
             letter-spacing: 1px;
             font-size: 12px;
+            float: left;
           }
         }
 
@@ -118,22 +121,34 @@ section.sequence-edit {
                 li {
                   padding: 6px;
 
+                  &:hover {
+                    a.draggable {
+                      opacity: 1;
+                    }
+                  }
+
+                  a.draggable {
+                    float: right;
+                    opacity: .5;
+                  }
+
                   &.group {
                     padding: 0;
-                    border-left: 4px solid #999;
 
                     header {
-                      padding: 3px 6px;
+                      padding: 6px;
                       background: none;
 
                       h3 {
-                        text-transform: uppercase;
-                        letter-spacing: 1px;
-                        font-size: 12px;
+                        font-size: 14px;
                       }
                     }
 
+
                     ol {
+                    border-left: 4px solid #999;
+                    border-bottom: 0;
+
                       li {
                         &:last-child {
                           border-bottom: 0;
@@ -185,9 +200,9 @@ section.sequence-edit {
                     padding: 12px;
 
                     a {
-                    @extend .button;
-                    display: block;
-                    text-align: center;
+                      @extend .button;
+                      display: block;
+                      text-align: center;
                     }
                   }
 
