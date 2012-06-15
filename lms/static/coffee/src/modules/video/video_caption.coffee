@@ -17,7 +17,8 @@ class @VideoCaption
       .bind('DOMMouseScroll', @onMovement)
 
   captionURL: ->
-    "/static/subs/#{@youtubeId}.srt.sjson"
+    "http://www.universalsubtitles.org/api/1.0/subtitles/?video_url=http://www.youtube.com/watch?v=69rDtSpshAw"
+    # "/static/subs/#{@youtubeId}.srt.sjson"
 
   render: ->
     @$('.video-wrapper').after """
@@ -30,15 +31,24 @@ class @VideoCaption
     @fetchCaption()
 
   fetchCaption: ->
-    $.getWithPrefix @captionURL(), (captions) =>
-      @captions = captions.text
-      @start = captions.start
-
-      if onTouchBasedDevice()
-        $('.subtitles li').html "Caption will be displayed when you start playing the video."
-      else
-        @renderCaption()
-
+    $.ajax
+      dataType: 'jsonp' 
+      url: @captionURL()
+      success: (captions) =>
+        # We take the captions that are each in a dictionary with a key,
+        # and create two arrays. One with all the start times, and one with
+        # all the texts. Their indices correspond.
+        @captions = []
+        @start = []
+        record = (single_caption) =>
+          @captions.push single_caption.text
+          @start.push single_caption.start_time * 1000
+        record single_caption for single_caption in captions
+        if onTouchBasedDevice()
+          $('.subtitles li').html "Caption will be displayed when you start playing the video."
+        else
+          @renderCaption()
+        
   renderCaption: ->
     container = $('<ol>')
 
@@ -59,7 +69,7 @@ class @VideoCaption
   search: (time) ->
     min = 0
     max = @start.length - 1
-
+    
     while min < max
       index = Math.ceil((max + min) / 2)
       if time < @start[index]
