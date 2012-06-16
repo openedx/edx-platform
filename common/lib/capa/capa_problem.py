@@ -111,6 +111,7 @@ class LoncapaProblem(object):
         file_text = re.sub("endouttext\s*/", "/text", file_text)
 
         self.tree = etree.XML(file_text)	# parse problem XML file into an element tree
+        self._process_includes()		# handle any <include file="foo"> tags
 
         # construct script processor context (eg for customresponse problems)
         self.context = self._extract_context(self.tree, seed=self.seed)
@@ -241,6 +242,36 @@ class LoncapaProblem(object):
         return contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
 
     # ======= Private Methods Below ========
+
+    def _process_includes(self):
+        '''
+        Handle any <include file="foo"> tags by reading in the specified file and inserting it
+        into our XML tree.  Fail gracefully if debugging.
+        '''
+        includes = self.tree.findall('.//include')
+        for inc in includes:
+            file = inc.get('file')
+            if file is not None:
+                try:
+                    ifp = self.system.filestore.open(file)	# open using I4xSystem OSFS filestore
+                except Exception,err:
+                    log.error('Error %s in problem xml include: %s' % (err,etree.tostring(inc,pretty_print=True)))
+                    log.error('Cannot find file %s in %s' % (file,self.system.filestore))
+                    if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
+                        raise
+                    else: continue
+                try:
+                    incxml = etree.XML(ifp.read())		# read in and convert to XML
+                except Exception,err:
+                    log.error('Error %s in problem xml include: %s' % (err,etree.tostring(inc,pretty_print=True)))
+                    log.error('Cannot parse XML in %s' % (file))
+                    if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
+                        raise
+                    else: continue
+                parent = inc.getparent()			# insert  new XML into tree in place of inlcude
+                parent.insert(parent.index(inc),incxml)
+                parent.remove(inc)
+                log.debug('Included %s into %s' % (file,self.fileobject))
 
     def _extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
         '''
