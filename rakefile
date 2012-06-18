@@ -66,7 +66,7 @@ end
     desc "Run all django tests on our djangoapps for the #{system}"
     task task_name => report_dir do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-        sh(django_admin(:lms, :test, 'test', *Dir['lms/djangoapps'].each))
+        sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
     end
     task :test => task_name
 
