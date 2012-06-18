@@ -88,6 +88,8 @@ we would be uncomfortable placing on a server).
 * Either the requester or the puller takes ownership for guaranteeing
 that those issues are resolved within a short timeframe.
 * Both the requester and the puller must be comfortable with it. 
+* Both the requester and the owner must have a history of/ability to 
+resolve remaining issues quickly. 
 
 If code qualified, it can be merged, and repaired in master. 
 
