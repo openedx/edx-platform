@@ -164,11 +164,10 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
 
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + module_type + '/' + module_id + '/'
-    def render_x_module_wrapper(module_xml):
-        return render_x_module(user, request, module_xml, student_module_cache, position)
-    
+
     system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = render_x_module_wrapper, 
+                       render_function = lambda xml: render_x_module(
+                           user, request, xml, student_module_cache, position),
                        render_template = render_to_string,
                        ajax_url = ajax_url,
                        request = request,
