@@ -1,0 +1,113 @@
+$fg-column: 70px;
+$fg-gutter: 26px;
+$fg-max-columns: 12;
+$body-font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+
+html {
+  height: 100%;
+}
+
+body {
+  @include clearfix();
+  height: 100%;
+  font: 14px $body-font-family;
+
+  > section {
+    display: table;
+    width: 100%;
+  }
+
+  > header {
+    background: #000;
+    color: #fff;
+    display: block;
+    float: none;
+    padding: 6px 20px;
+    width: 100%;
+    @include box-sizing(border-box);
+
+    nav {
+      @include clearfix;
+
+      h2 {
+        font-size: 14px;
+        text-transform: uppercase;
+        float: left;
+      }
+
+      ul {
+        float: left;
+
+        &.user-nav {
+          float: right;
+        }
+
+        li {
+          @include inline-block();
+          margin-left: 15px;
+        }
+      }
+    }
+  }
+
+  &.content {
+    section.main-content {
+      border-left: 2px solid #000;
+      @include box-sizing(border-box);
+      width: flex-grid(9);
+      float: left;
+      @include box-shadow( -2px 0 3px #ddd );
+    }
+  }
+}
+
+a {
+  text-decoration: none;
+  color: #888;
+}
+
+input {
+  font-family: $body-font-family;
+}
+
+input[type="submit"], .button {
+  border: 1px solid #ccc;
+  background: #efefef;
+  @include border-radius(3px);
+  padding: 6px;
+}
+
+.new-module {
+  position: relative;
+
+  a {
+    padding: 6px;
+    display: block;
+  }
+
+  ul.new-dropdown {
+    list-style: none;
+    position: absolute;
+
+    li {
+      display: none;
+      padding: 6px;
+    }
+
+  }
+
+  &:hover {
+    ul.new-dropdown {
+      display: block;
+    }
+  }
+}
+
+.draggable {
+  width: 7px;
+  min-height: 14px;
+  background: url('../img/drag-handle.png') no-repeat center;
+  text-indent: -9999px;
+  display: block;
+  float: right;
+}

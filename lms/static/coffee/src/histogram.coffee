@@ -8,6 +8,7 @@ class @Histogram
 
   calculate: ->
     for [score, count] in @rawData
+      continue if score == null
       log_count = Math.log(count + 1)
       @data.push [score, log_count]
       @xTicks.push [score, score.toString()]

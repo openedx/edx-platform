@@ -5,16 +5,6 @@ describe 'Courseware', ->
       Courseware.start()
       expect(window.Navigation).toHaveBeenCalled()
 
-    it 'create the calculator', ->
-      spyOn(window, 'Calculator')
-      Courseware.start()
-      expect(window.Calculator).toHaveBeenCalled()
-
-    it 'creates the FeedbackForm', ->
-      spyOn(window, 'FeedbackForm')
-      Courseware.start()
-      expect(window.FeedbackForm).toHaveBeenCalled()
-
     it 'binds the Logger', ->
       spyOn(Logger, 'bind')
       Courseware.start()
