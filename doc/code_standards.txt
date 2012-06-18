@@ -84,14 +84,22 @@ development. We have an experimental procedure for handling rapid
 pulls and merges. To qualify:
 
 * A piece of code must only have minor issues remaining (nothing which
-we would be uncomfortable placing on a server).  
+  we would be uncomfortable placing on a server).  
 * Either the requester or the puller takes ownership for guaranteeing
-that those issues are resolved within a short timeframe.
+  that those issues are resolved within a short timeframe.
 * Both the requester and the puller must be comfortable with it. 
 * Both the requester and the owner must have a history of/ability to 
-resolve remaining issues quickly. 
+  resolve remaining issues quickly. 
 
-If code qualified, it can be merged, and repaired in master. 
+If code qualifies: 
+* It can be merged, and repaired in master. 
+* The pull message should specify '## pending fixes/OWNER' where ## is
+  the pull request number, and OWNER is the owner. 
+* All required fixes are documented in github in the (now closed) pull
+  request, and should be marked off there when applied (potentially,
+  directly to master).
+* Once all fixes are applied, the final commit should specify 
+  '## closed'. 
 
 3. Documentation Standards
 
