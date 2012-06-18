@@ -32,7 +32,7 @@ class Command(BaseCommand):
 
         elements = list(course.iter())
 
-        tag_to_category = {# Inside HTML ==> Skip these
+        tag_to_category = {
             # Custom tags
             'videodev': 'Custom',
             'slides': 'Custom',
@@ -40,33 +40,44 @@ class Command(BaseCommand):
             'image': 'Custom',
             'discuss': 'Custom',
             # Simple lists
-            'chapter': 'Chapter',
+            'chapter': 'Week',
             'course': 'Course',
             'sequential': 'LectureSequence',
             'vertical': 'ProblemSet',
-            'section': 'Section',
+            'section': {
+                'Lab': 'Lab',
+                'Lecture Sequence': 'LectureSequence',
+                'Homework': 'Homework',
+                'Tutorial Index': 'TutorialIndex',
+                'Video': 'VideoSegment',
+                'Midterm': 'Exam',
+                'Final': 'Exam',
+                None: 'Section',
+            },
             # True types
             'video': 'VideoSegment',
             'html': 'HTML',
             'problem': 'Problem',
             }
 
-
-        name_index=0
+        name_index = 0
         for e in elements:
             name = e.attrib.get('name', None)
             for f in elements:
                 if f != e and f.attrib.get('name', None) == name:
                     name = None
             if not name:
-                name = "{tag}_{index}".format(tag = e.tag,index = name_index)
+                name = "{tag}_{index}".format(tag=e.tag, index=name_index)
                 name_index = name_index + 1
             if e.tag in tag_to_category:
                 category = tag_to_category[e.tag]
+                if isinstance(category, dict):
+                    category = category[e.get('format')]
                 category = category.replace('/', '-')
                 name = name.replace('/', '-')
-                e.set('url', 'i4x://mit.edu/6002xs12/{category}/{name}'.format(category = category, 
-                                                                               name = name))
+                e.set('url', 'i4x://mit.edu/6002xs12/{category}/{name}'.format(
+                    category=category,
+                    name=name))
 
 
         def handle_skip(e):

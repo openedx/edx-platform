@@ -57,3 +57,7 @@ class Module(XModule):
 
         self.annotations=[(e.get("name"),self.render_function(e)) \
                       for e in xmltree]
+
+
+class VideoSegmentDescriptor(XModuleDescriptor):
+    pass
