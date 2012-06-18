@@ -35,9 +35,10 @@
   </header>
 
   <ol>
+    % for week in weeks:
     <li>
       <header>
-        <h1><a href="#">Week 1</a></h1>
+        <h1><a href="#">${week.name}</a></h1>
         <ul>
           <li class="goal editable"><strong>Goal title:</strong> This is a goal that will be in the header of the week</li>
           <li class="goal editable"><strong>Goal title two:</strong> This is another goal for this week so that students have two things to learn</li>
@@ -64,125 +65,7 @@
         <%include file="module-dropdown.html"/>
       </ul>
     </li>
-    <li>
-      <header>
-        <h1><a href="#">Week 2</a></h1>
-        <ul>
-          <li class="goal editable"><strong>Another title</strong> This is the goal for the week</li>
-        </ul>
-      </header>
-
-      <ul>
-        <li class="seq">
-          <a href="#" class="sequence-edit">Lecture Sequence</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <li class="seq">
-          <a href="#" class="sequence-edit">Lecture Sequence
-          <a href="#" class="draggable">handle</a>
-        </a></li>
-        <li class="lab">
-          <a href="#" class="lab-edit">Lab</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <li class="hw">
-          <a href="#">Homework</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <%include file="module-dropdown.html"/>
-      </ul>
-    </li>
-    <li>
-      <header>
-      <h1><a href="#">Week 3</a></h1>
-        <ul>
-          <li class="goal editable"><strong>Another title</strong> This is the goal for the week</li>
-        </ul>
-      </header>
-
-      <ul>
-        <li class="lab">
-          <a href="#" class="lab-edit">Lab</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <li class="lab">
-          <a href="#" class="lab-edit">Lab</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <li class="hw">
-          <a href="#">Homework</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-
-        <%include file="module-dropdown.html"/>
-      </ul>
-    </li>
-    <li>
-      <header>
-        <h1><a href="#">Week 4</a></h1>
-        <ul>
-          <li class="goal editable"><strong>Another title</strong> This is the goal for the week</li>
-          <li class="goal editable"><strong>Goal title two:</strong> This is another fgoal for this week so that students have two things to learn</li>
-        </ul>
-      </header>
-
-      <ul>
-        <li class="seq">
-          <a href="#" class="sequence-edit">Lecture Sequence</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <li class="lab">
-          <a href="#" class="lab-edit">Lab</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <li class="hw">
-          <a href="#">Homework</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <li class="hw">
-          <a href="#">Homework</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <%include file="module-dropdown.html"/>
-      </ul>
-    </li>
-
-    <li>
-      <header>
-        <h1><a>Week 5</a></h1>
-        <ul>
-          <li class="goal editable">Please create a learning goal for this week</li>
-        </ul>
-      </header>
-
-      <ul>
-        <%include file="module-dropdown.html"/>
-      </ul>
-    </li>
-    <li>
-      <header>
-        <h1><a>Week 6</a></h1>
-        <ul>
-          <li class="goal editable">Please create a learning goal for this week</li>
-        </ul>
-      </header>
-
-      <ul>
-        <%include file="module-dropdown.html"/>
-      </ul>
-    </li>
-    <li>
-      <header>
-        <h1><a>Week 7</a></h1>
-        <ul>
-          <li class="goal editable">Please create a learning goal for this week</li>
-        </ul>
-      </header>
-
-      <ul>
-        <%include file="module-dropdown.html"/>
-      </ul>
-    </li>
+    %endfor
     <li>
       <header>
         <h1>Course Scratch Pad</h1>
