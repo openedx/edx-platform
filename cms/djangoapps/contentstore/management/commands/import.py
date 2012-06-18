@@ -160,9 +160,8 @@ class Command(BaseCommand):
             element_actions[e.tag](e)
 
         for k in results:
-            print k
-            keystore.create_item(k, 'Piotr Mitros')
+            keystore().create_item(k, 'Piotr Mitros')
             if 'data' in results[k]:
-                keystore.update_item(k, results[k]['data'])
+                keystore().update_item(k, results[k]['data'])
             if 'children' in results[k]:
-                keystore.update_children(k, results[k]['children'])
+                keystore().update_children(k, results[k]['children'])
