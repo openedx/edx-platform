@@ -15,10 +15,25 @@ class @VideoCaption
     @$('.subtitles').mouseenter(@onMouseEnter).mouseleave(@onMouseLeave)
       .mousemove(@onMovement).bind('mousewheel', @onMovement)
       .bind('DOMMouseScroll', @onMovement)
+    @$('.caption-menu').click @toggleLanguageMenu
 
   captionURL: ->
-    "http://www.universalsubtitles.org/api/1.0/subtitles/?video_url=http://www.youtube.com/watch?v=69rDtSpshAw"
+    "http://www.universalsubtitles.org/api/1.0/subtitles/"
     # "/static/subs/#{@youtubeId}.srt.sjson"
+  languagesURL: ->
+    "http://www.universalsubtitles.org/api/1.0/subtitles/languages/"
+    
+  getLanguageCode: ->
+    if not @_languageCode?
+      cookied = $.cookie("video_caption_language_code")
+      @_languageCode = if cookied? cookied else "en"
+          
+    return @_languageCode
+    
+  setLanguageCode: (newCode) ->
+    @_languageCode = newCode
+    $.cookie('video_caption_language_code', "#{newCode}", expires: 3650, path: '/')
+    @fetchCaptions()
 
   render: ->
     @$('.video-wrapper').after """
@@ -28,12 +43,39 @@ class @VideoCaption
       <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
       """
     @$('.subtitles').css maxHeight: @$('.video-wrapper').height() - 5
-    @fetchCaption()
-
-  fetchCaption: ->
+    @$('.subtitles').before """
+      <a href="#" class="caption-menu">English</a>
+      """
+    @language_menu = $("""
+      <div class="language-menu">
+        <ol class="language-list"></ol>
+        <div class="caption-links">
+          <a href="#">Caption This Video</a>
+        </div>
+      </div>
+      """).hide()
+    $('body').append(@language_menu)
+    @fetchCaptions()
+    @fetchLanguages()
+    
+  fetchLanguages: ->
+    $.ajax
+      dataType: 'jsonp' 
+      url: @languagesURL()
+      data:
+        video_url: 'http://www.youtube.com/watch?v=69rDtSpshAw'
+      success: (languages) =>
+        # We put the available languages into 
+        @languages = languages
+        @renderLanguagesMenu()
+  
+  fetchCaptions: ->
     $.ajax
       dataType: 'jsonp' 
       url: @captionURL()
+      data:
+        video_url: 'http://www.youtube.com/watch?v=69rDtSpshAw'
+        language: @getLanguageCode()
       success: (captions) =>
         # We take the captions that are each in a dictionary with a key,
         # and create two arrays. One with all the start times, and one with
@@ -65,6 +107,45 @@ class @VideoCaption
       .append($('<li class="spacing">').height(@bottomSpacingHeight()))
 
     @rendered = true
+
+  renderLanguagesMenu: ->
+    list = $("<ol>")
+    
+    $.each @languages, (index, language) =>
+      # Would string concatenation be faster here?
+      element = $('<li>')
+        .attr
+          'data-language-code' : language.code
+        .append(
+          $('<span>').text(language.name),
+          $('<span>').text(language.completion)
+        )
+          
+      list.append element
+    
+    language_list = $(".language-list", @language_menu)
+    language_list.html( list.html() )
+    
+    $('.language-list li[data-language-code]', @language_menu).click @selectLanguage
+  
+  toggleLanguageMenu: (event) =>
+    event.preventDefault()
+    if @language_menu.is(":hidden")
+      pos = @$('.caption-menu').offset()
+      height = @$('.caption-menu').outerHeight()
+    
+      @language_menu.css
+        position: "absolute"
+        top: (pos.top + height) + "px"
+        left: pos.left + "px"
+      .show();
+    else
+      @language_menu.hide()
+      
+  selectLanguage: (event) =>
+    language_code = $(event.currentTarget).data('language-code')
+    @setLanguageCode(language_code)
+    
 
   search: (time) ->
     min = 0
