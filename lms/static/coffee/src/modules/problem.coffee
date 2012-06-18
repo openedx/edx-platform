@@ -15,6 +15,7 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
+    @$('input.math').keyup(@refreshMath).each(@refreshMath)
 
   render: (content) ->
     if content
@@ -44,14 +45,14 @@ class @Problem
         $.each response, (key, value) =>
           if $.isArray(value)
             for choice in value
-              @$("label[for='input_#{key}_#{choice}']").attr
-                correct_answer: 'true'
+              @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
           else
-            @$("#answer_#{key}").text(value)
+            @$("#answer_#{key}, #solution_#{key}").html(value)
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
     else
-      @$('[id^=answer_]').text ''
+      @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @element.removeClass 'showed'
       @$('.show').val 'Show Answer'
@@ -61,6 +62,20 @@ class @Problem
     $.postWithPrefix "/modx/problem/#{@id}/problem_save", @answers, (response) =>
       if response.success
         alert 'Saved'
+
+  refreshMath: (event, element) =>
+    element = event.target unless element
+    target = "display_#{element.id.replace(/^input_/, '')}"
+
+    if jax = MathJax.Hub.getAllJax(target)[0]
+      MathJax.Hub.Queue ['Text', jax, $(element).val()]
+
+      try
+        output = jax.root.toMathML ''
+        $("##{element.id}_dynamath").val(output)
+      catch exception
+        throw exception unless exception.restart
+        MathJax.Callback.After [@refreshMath, jax], exception.restart
 
   refreshAnswers: =>
     @$('input.schematic').each (index, element) ->

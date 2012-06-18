@@ -1,7 +1,11 @@
 describe 'Problem', ->
   beforeEach ->
     # Stub MathJax
-    window.MathJax = { Hub: { Queue: -> } }
+    window.MathJax =
+      Hub: jasmine.createSpyObj('MathJax.Hub', ['getAllJax', 'Queue'])
+      Callback: jasmine.createSpyObj('MathJax.Callback', ['After'])
+    @stubbedJax = root: jasmine.createSpyObj('jax.root', ['toMathML'])
+    MathJax.Hub.getAllJax.andReturn [@stubbedJax]
     window.update_schematics = ->
 
     loadFixtures 'problem.html'
@@ -25,8 +29,8 @@ describe 'Problem', ->
 
   describe 'bind', ->
     beforeEach ->
-      spyOn MathJax.Hub, 'Queue'
       spyOn window, 'update_schematics'
+      MathJax.Hub.getAllJax.andReturn [@stubbedJax]
       @problem = new Problem 1, '/problem/url/'
 
     it 'set mathjax typeset', ->
@@ -49,6 +53,12 @@ describe 'Problem', ->
 
     it 'bind the save button', ->
       expect($('section.action input.save')).toHandleWith 'click', @problem.save
+
+    it 'bind the math input', ->
+      expect($('input.math')).toHandleWith 'keyup', @problem.refreshMath
+
+    it 'display the math input', ->
+      expect(@stubbedJax.root.toMathML).toHaveBeenCalled()
 
   describe 'render', ->
     beforeEach ->
@@ -222,6 +232,30 @@ describe 'Problem', ->
       spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'OK')
       @problem.save()
       expect(window.alert).toHaveBeenCalledWith 'Saved'
+
+  describe 'refreshMath', ->
+    beforeEach ->
+      @problem = new Problem 1, '/problem/url/'
+      @stubbedJax.root.toMathML.andReturn '<MathML>'
+      $('#input_example_1').val 'E=mc^2'
+
+    describe 'when there is no exception', ->
+      beforeEach ->
+        @problem.refreshMath target: $('#input_example_1').get(0)
+
+      it 'should convert and display the MathML object', ->
+        expect(MathJax.Hub.Queue).toHaveBeenCalledWith ['Text', @stubbedJax, 'E=mc^2']
+
+      it 'should display debug output in hidden div', ->
+        expect($('#input_example_1_dynamath')).toHaveValue '<MathML>'
+
+    describe 'when there is an exception', ->
+      beforeEach ->
+        @stubbedJax.root.toMathML.andThrow {restart: true}
+        @problem.refreshMath target: $('#input_example_1').get(0)
+
+      it 'should queue up the exception', ->
+        expect(MathJax.Callback.After).toHaveBeenCalledWith [@problem.refreshMath, @stubbedJax], true
 
   describe 'refreshAnswers', ->
     beforeEach ->

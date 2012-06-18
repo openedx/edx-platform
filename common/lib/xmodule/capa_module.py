@@ -13,6 +13,7 @@ from lxml import etree
 from x_module import XModule, XModuleDescriptor
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
+
 log = logging.getLogger("mitx.courseware")
 
 #-----------------------------------------------------------------------------
@@ -280,6 +281,7 @@ class Module(XModule):
 
     def answer_available(self):
         ''' Is the user allowed to see an answer?
+        TODO: simplify. 
         '''
         if self.show_answer == '':
             return False
@@ -365,18 +367,17 @@ class Module(XModule):
         self.attempts = self.attempts + 1
         self.lcp.done=True
 
-        success = 'correct'
-        for i in correct_map:
-            if correct_map[i]!='correct':
+        success = 'correct'				# success = correct if ALL questions in this problem are correct
+        for answer_id in correct_map:
+            if not correct_map.is_correct(answer_id):
                 success = 'incorrect'
 
-        event_info['correct_map']=correct_map
+        event_info['correct_map']=correct_map.get_dict()	# log this in the tracker
         event_info['success']=success
-
         self.tracker('save_problem_check', event_info)
 
         try:
-            html = self.get_problem_html(encapsulate=False)
+            html = self.get_problem_html(encapsulate=False)	# render problem into HTML
         except Exception,err:
             log.error('failed to generate html')
             raise Exception,err
@@ -430,17 +431,10 @@ class Module(XModule):
             self.tracker('reset_problem_fail', event_info)
             return "Refresh the page and make an attempt before resetting."
 
-        self.lcp.done=False
-        self.lcp.answers=dict()
-        self.lcp.correct_map=dict()
-        self.lcp.student_answers = dict()
-
-
+        self.lcp.do_reset()		# call method in LoncapaProblem to reset itself
         if self.rerandomize == "always":
-            self.lcp.context=dict()
-            self.lcp.questions=dict() # Detailed info about questions in problem instance. TODO: Should be by id and not lid.
-            self.lcp.seed=None
-
+            self.lcp.seed=None		# reset random number generator seed (note the self.lcp.get_state() in next line)
+ 
         self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state(), system=self.system)
 
         event_info['new_state']=self.lcp.get_state()

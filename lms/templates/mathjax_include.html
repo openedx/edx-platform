@@ -5,82 +5,22 @@
 ##
 ## This enables ASCIIMathJAX, and is used by js_textbox
 
- <script type="text/x-mathjax-config">
-
-//  (function () {
-    var QUEUE = MathJax.Hub.queue;  // shorthand for the queue
-    var math = null;
-    var jaxset = {};                // associative array of the element jaxs for the math output.
-    var mmlset = {};		// associative array of mathml from each jax
-
-      // constructs mathML of the specified jax element
-        function toMathML(jax,callback) {
-          var mml;
-          try {
-            mml = jax.root.toMathML("");
-          } catch(err) {
-            if (!err.restart) {throw err} // an actual error
-            return MathJax.Callback.After([toMathML,jax,callback],err.restart);
-          }
-          MathJax.Callback(callback)(mml);
-        }
-
-      // function to queue in MathJax to get put the MathML expression in in the right document element
-      function UpdateMathML(jax,id) {
-              	toMathML(jax,function (mml) {
-                    // document.getElementById(id+'_dynamath').value=math.originalText+ "\n\n=>\n\n"+ mml;
-                    delem = document.getElementById("input_" + id + "_dynamath");
-		    if (delem) { delem.value=mml; };
-		    mmlset[id] = mml;
-              	})
-      }
-
-MathJax.Hub.Config({
-  tex2jax: {
-    inlineMath: [
-	["\\(","\\)"],
-      ['[mathjaxinline]','[/mathjaxinline]']
-    ],
-   displayMath: [
-	["\\[","\\]"],
-     ['[mathjax]','[/mathjax]']
-    ]
-  }
-});
-
-    //
-    //  The onchange event handler that typesets the
-    //  math entered by the user
-    //
-    window.UpdateMath = function (Am,id) {
-      QUEUE.Push(["Text",jaxset[id],Am]);
-      QUEUE.Push(UpdateMathML(jaxset[id],id));
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [
+        ["\\(","\\)"],
+        ['[mathjaxinline]','[/mathjaxinline]']
+      ],
+      displayMath: [
+        ["\\[","\\]"],
+        ['[mathjax]','[/mathjax]']
+      ]
     }
+  });
+</script>
 
-//  })();
-
-function DoUpdateMath(inputId) {
-  var str = document.getElementById("input_"+inputId).value;
-
-  // make sure the input field is in the jaxset
-  if ($.inArray(inputId,jaxset) == -1){
-      //alert('missing '+inputId);
-    if (document.getElementById("display_" + inputId)){
-	  MathJax.Hub.queue.Push(function () {
-	      math = MathJax.Hub.getAllJax("display_" + inputId)[0];
-	      if (math){
-		  jaxset[inputId] = math;
-	      }
-	 });
-      };
- }
-
-  UpdateMath(str,inputId)
-}
-
-  </script>
-
-  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
-       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
-       MathJax extension libraries -->
-  <script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
+<!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+     It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
+     MathJax extension libraries -->
+<script type="text/javascript" src="/static/js/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>

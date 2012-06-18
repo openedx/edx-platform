@@ -37,6 +37,7 @@ PERFSTATS = False
 MITX_FEATURES = {
     'SAMPLE' : False,
     'USE_DJANGO_PIPELINE' : True,
+    'DISPLAY_HISTOGRAMS_TO_STAFF' : True,
 }
 
 # Used for A/B testing
@@ -287,13 +288,15 @@ PIPELINE_CSS = {
     }
 }
 
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/marketing.scss', 'sass/marketing-ie.scss', 'sass/print.scss']
+
 PIPELINE_JS = {
     'application': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
         'output_filename': 'js/application.js'
     },
     'spec': {
-        'source_filenames': [pth.replace('static/', '') for pth in glob2.glob('static/coffee/spec/**/*.coffee')],
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
         'output_filename': 'js/spec.js'
     }
 }
