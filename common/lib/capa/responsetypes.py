@@ -746,12 +746,20 @@ main()
         xml = self.xml
         self.url = xml.get('url') or "http://eecs1.mit.edu:8889/pyloncapa"	# FIXME - hardcoded URL
 
-        answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]	# FIXME - catch errors
-        answer_src = answer.get('src')
-        if answer_src is not None:
-            self.code = self.system.filesystem.open('src/'+answer_src).read()
-        else:
-            self.code = answer.text
+        # answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]	# FIXME - catch errors
+        answer = xml.find('answer')
+        if answer is not None:
+            answer_src = answer.get('src')
+            if answer_src is not None:
+                self.code = self.system.filesystem.open('src/'+answer_src).read()
+            else:
+                self.code = answer.text
+        else:					# no <answer> stanza; get code from <script>
+            self.code = self.context['script_code']
+            if not self.code:
+                msg = '%s: Missing answer script code for externalresponse' % unicode(self)
+                msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
+                raise LoncapaProblemError(msg)
 
         self.tests = xml.get('tests')
 
