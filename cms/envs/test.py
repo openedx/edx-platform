@@ -1,10 +1,21 @@
 """
-This config file runs the simplest dev environment"""
+This config file runs the simplest dev environment using sqlite, and db-based
+sessions. Assumes structure:
 
+/envroot/
+        /db   # This is where it'll write the database file
+        /mitx # The location of this repo
+        /log  # Where we're going to write log files
+"""
 from .common import *
+import os
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+# Nose Test Runner
+INSTALLED_APPS += ('django_nose',)
+NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html', '--cover-inclusive']
+for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
+    NOSE_ARGS += ['--cover-package', app]
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 KEYSTORE = {
     'host': 'localhost',
