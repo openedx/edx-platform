@@ -75,7 +75,21 @@ no hard standards.
   review it (this may change as the team grows). 
 * Each contributor is responsible for finding a person to review their
   code. If it is not clear to the contributor who is appropriate, each
-  project has an owner
+  project has an owner who is the default go-to. 
+
+2.1 Rapid pull
+
+Unmerged code can lead to merge conflicts, and slow down
+development. We have an experimental procedure for handling rapid
+pulls and merges. To qualify:
+
+* A piece of code must only have minor issues remaining (nothing which
+we would be uncomfortable placing on a server).  
+* Either the requester or the puller takes ownership for guaranteeing
+that those issues are resolved within a short timeframe.
+* Both the requester and the puller must be comfortable with it. 
+
+If code qualified, it can be merged, and repaired in master. 
 
 3. Documentation Standards
 
