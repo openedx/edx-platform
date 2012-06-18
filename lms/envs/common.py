@@ -37,6 +37,7 @@ PERFSTATS = False
 MITX_FEATURES = {
     'SAMPLE' : False,
     'USE_DJANGO_PIPELINE' : True,
+    'DISPLAY_HISTOGRAMS_TO_STAFF' : True,
 }
 
 # Used for A/B testing
@@ -60,6 +61,7 @@ sys.path.append(ASKBOT_ROOT)
 sys.path.append(ASKBOT_ROOT / "askbot" / "deps")
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
+sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
 ################################## MITXWEB #####################################
@@ -294,7 +296,7 @@ PIPELINE_JS = {
         'output_filename': 'js/application.js'
     },
     'spec': {
-        'source_filenames': [pth.replace('static/', '') for pth in glob2.glob('static/coffee/spec/**/*.coffee')],
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
         'output_filename': 'js/spec.js'
     }
 }

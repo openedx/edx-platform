@@ -6,7 +6,8 @@ class @Calculator
     $('div.help-wrapper a').hover(@helpToggle).click (e) ->
       e.preventDefault()
 
-  toggle: ->
+  toggle: (event) ->
+    event.preventDefault()
     $('li.calc-main').toggleClass 'open'
     $('#calculator_wrapper #calculator_input').focus()
     if $('.calc.closed').length

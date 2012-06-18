@@ -20,10 +20,10 @@ from django.conf import settings
 requestcontext = None
 lookup = {}
 
+
 class MakoMiddleware(object):
     def __init__(self):
         """Setup mako variables and lookup object"""
-        from django.conf import settings
         # Set all mako variables based on django settings
         template_locations = settings.MAKO_TEMPLATES
         module_directory = getattr(settings, 'MAKO_MODULE_DIR', None)
@@ -32,17 +32,17 @@ class MakoMiddleware(object):
             module_directory = tempfile.mkdtemp()
 
         for location in template_locations:
-            lookup[location] = TemplateLookup(directories=template_locations[location], 
+            lookup[location] = TemplateLookup(directories=template_locations[location],
                                 module_directory=module_directory,
-                                output_encoding='utf-8', 
-                                input_encoding='utf-8', 
+                                output_encoding='utf-8',
+                                input_encoding='utf-8',
                                 encoding_errors='replace',
                                 )
 
         import mitxmako
         mitxmako.lookup = lookup
 
-    def process_request (self, request):
+    def process_request(self, request):
         global requestcontext
         requestcontext = RequestContext(request)
         requestcontext['is_secure'] = request.is_secure()
