@@ -29,6 +29,9 @@ class I4xSystem(object):
 
     I4xSystem objects are passed to x_modules to provide access to system
     functionality.
+
+    Note that these functions can be closures over e.g. a django request
+    and user, or other environment-specific info.
     '''
     def __init__(self, ajax_url, track_function, render_function,
                  render_template, filestore=None):
@@ -91,12 +94,9 @@ def smod_cache_lookup(cache, module_type, module_id):
     return None
 
 def make_track_function(request):
-    ''' We want the capa problem (and other modules) to be able to
-    track/log what happens inside them without adding dependencies on
-    Django or the rest of the codebase.
-
-    To do this in a clean way, we pass a tracking function to the module,
-    which calls it to log events.
+    ''' 
+    Make a tracking function that logs what happened.
+    For use in I4xSystem.
     '''
     import track.views
 
@@ -162,11 +162,11 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
 
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + module_type + '/' + module_id + '/'
-    def render_function(module_xml):
+    def render_x_module_wrapper(module_xml):
         return render_x_module(user, request, module_xml, student_module_cache, position)
     
     system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = render_function, 
+                       render_function = render_x_module_wrapper, 
                        render_template = render_to_string,
                        ajax_url = ajax_url,
                        filestore = OSFS(data_root),
@@ -251,7 +251,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         return redirect('/')
 
     # python concats adjacent strings
-    error_msg = ("We're sorry, this module is temporarily unavailable."
+    error_msg = ("We're sorry, this module is temporarily unavailable. "
                  "Our staff is working to fix it as soon as possible")
 
 
@@ -259,7 +259,6 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     s = StudentModule.objects.filter(student=request.user, 
                                      module_id=id)
 
-    # s = StudentModule.get_with_caching(request.user, id)
     if s is None or len(s) == 0:
         log.debug("Couldn't find module '%s' for user '%s' and id '%s'",
                   module, request.user, id)
@@ -270,8 +269,7 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
     oldstate = s.state
 
     # If there are arguments, get rid of them
-    if '?' in dispatch:
-        dispatch = dispatch.split('?')[0]
+    dispatch, _, _ = dispatch.partition('?')
 
     ajax_url = '{root}/modx/{module}/{id}'.format(root = settings.MITX_ROOT_URL,
                                                   module=module, id=id)
