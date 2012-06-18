@@ -286,6 +286,7 @@ class LoncapaProblem(object):
         context.update(global_context)            		# initialize context to have stuff in global_context
         context['__builtins__'] = globals()['__builtins__']    	# put globals there also
         context['the_lcp'] = self                		# pass instance of LoncapaProblem in
+        context['script_code'] = ''
 
         for script in tree.findall('.//script'):
             stype = script.get('type')
@@ -298,8 +299,9 @@ class LoncapaProblem(object):
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code, XMLESC)
+            context['script_code'] += code		# store code source in context
             try:
-                exec code in context, context        # use "context" for global context; thus defs in code are global within code
+                exec code in context, context        	# use "context" for global context; thus defs in code are global within code
             except Exception:
                 log.exception("Error while execing code: " + code)
         return context
