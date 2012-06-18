@@ -67,7 +67,7 @@ end
     task task_name => report_dir do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
-        sh(django_admin(:lms, :test, 'test', *Dir['lms/djangoapps'].each))
+        sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
     end
     task :test => task_name
 
