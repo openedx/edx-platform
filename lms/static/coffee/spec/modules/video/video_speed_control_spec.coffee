@@ -3,8 +3,6 @@ describe 'VideoSpeedControl', ->
     @player = jasmine.stubVideoPlayer @
     $('.speeds').remove()
 
-  afterEach ->
-
   describe 'constructor', ->
     describe 'always', ->
       beforeEach ->
