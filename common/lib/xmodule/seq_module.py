@@ -95,3 +95,11 @@ class Module(XModule):
             self.position = int(system.get('position'))
 
         self.rendered = False
+
+
+class CourseModuleDescriptor(XModuleDescriptor):
+    pass
+
+
+class ChapterModuleDescriptor(XModuleDescriptor):
+    pass

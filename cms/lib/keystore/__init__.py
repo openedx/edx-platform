@@ -37,7 +37,7 @@ class Location(object):
             self.update(location.list())
 
     def url(self):
-        return "i4x://{org}/{course}/{category}/{name}".format(**self.dict())
+        return "{tag}://{org}/{course}/{category}/{name}".format(**self.dict())
 
     def list(self):
         return [self.tag, self.org, self.course, self.category, self.name]
@@ -54,10 +54,9 @@ class Location(object):
 
 
 class KeyStore(object):
-    def get_children_for_item(self, location):
+    def get_item(self, location):
         """
-        Returns the children for the most recent revision of the object
-        with the specified location.
+        Returns an XModuleDescriptor instance for the item at location
 
         If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
 
