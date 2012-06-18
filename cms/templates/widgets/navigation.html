@@ -40,28 +40,19 @@
       <header>
         <h1><a href="#">${week.name}</a></h1>
         <ul>
-          <li class="goal editable"><strong>Goal title:</strong> This is a goal that will be in the header of the week</li>
-          <li class="goal editable"><strong>Goal title two:</strong> This is another goal for this week so that students have two things to learn</li>
+          % for goal in week.get_goals():
+          <li class="goal editable"><strong>${goal.name}:</strong>${goal.data}</li>
+          % endfor
         </ul>
       </header>
 
       <ul>
-        <li class="seq">
-          <a href="#" class="sequence-edit">Lecture Sequence</a>
-          <a href="#" class="draggable">handle</a>
+        % for module in week.get_non_goals():
+        <li class="${module.type}">
+            <a href="#" class="${module.type}-edit">${module.name}</a>
+            <a href="#" class="draggable">handle</a>
         </li>
-        <li class="seq">
-          <a href="#" class="sequence-edit">Lecture Sequence
-          <a href="#" class="draggable">handle</a>
-        </a></li>
-        <li class="lab">
-          <a href="#" class="lab-edit">Lab</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
-        <li class="hw">
-          <a href="#">Homework</a>
-          <a href="#" class="draggable">handle</a>
-        </li>
+        % endfor
         <%include file="module-dropdown.html"/>
       </ul>
     </li>
