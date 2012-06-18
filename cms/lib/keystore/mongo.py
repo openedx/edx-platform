@@ -1,6 +1,7 @@
 import pymongo
 from . import KeyStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
+from xmodule.x_module import XModuleDescriptor
 
 
 class MongoKeyStore(KeyStore):
@@ -12,11 +13,22 @@ class MongoKeyStore(KeyStore):
             host=host,
             port=port
         )[db][collection]
-        
+
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
 
-    def get_children_for_item(self, location):
+    def get_item(self, location):
+        """
+        Returns an XModuleDescriptor instance for the item at location
+
+        If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
+
+        Searches for all matches of a partially specifed location, but raises an
+        keystore.exceptions.InsufficientSpecificationError if more
+        than a single object matches the query.
+
+        location: Something that can be passed to Location
+        """
         query = dict(
             ('location.{key}'.format(key=key), val)
             for (key, val)
@@ -25,7 +37,6 @@ class MongoKeyStore(KeyStore):
         )
         items = self.collection.find(
             query,
-            fields={'children': True},
             sort=[('revision', pymongo.ASCENDING)],
             limit=1,
         )
@@ -35,7 +46,7 @@ class MongoKeyStore(KeyStore):
         if items.count() == 0:
             raise ItemNotFoundError(location)
 
-        return items[0]['children']
+        return XModuleDescriptor.load_from_json(items[0], self.get_item)
 
     def create_item(self, location, editor):
         """

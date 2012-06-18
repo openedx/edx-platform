@@ -1,7 +1,33 @@
 from lxml import etree
+import pkg_resources
+import logging
+from keystore import Location
+
+log = logging.getLogger('mitx.' + __name__)
 
 def dummy_track(event_type, event):
     pass
+
+
+class ModuleMissingError(Exception):
+    pass
+
+
+class Plugin(object):
+    @classmethod
+    def load_class(cls, identifier):
+        classes = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
+        if len(classes) > 1:
+            log.warning("Found multiple classes for {entry_point} with identifier {id}: {classes}. Returning the first one.".format(
+                entry_point=cls.entry_point,
+                id=identifier,
+                classes=", ".join([class_.module_name for class_ in classes])))
+
+        if len(classes) == 0:
+            raise ModuleMissingError(identifier)
+
+        return classes[0].load()
+
 
 class XModule(object):
     ''' Implements a generic learning module. 
@@ -24,8 +50,8 @@ class XModule(object):
             or a CAPA input type '''
         return ['xmodule']
 
-    def get_name():
-        name = self.__xmltree.get(name)
+    def get_name(self):
+        name = self.__xmltree.get('name')
         if name: 
             return name
         else: 
@@ -98,15 +124,42 @@ class XModule(object):
         return ""
 
 
-class XModuleDescriptor(object):
-    def __init__(self, xml = None, json = None):
-        if not xml and not json:
-            raise "XModuleDescriptor must be initalized with XML or JSON"
-        if not xml:
-            raise NotImplementedError("Code does not have support for JSON yet")
-        
-        self.xml = xml
-        self.json = json
+class XModuleDescriptor(Plugin):
+
+    entry_point = "xmodule.v1"
+
+    @staticmethod
+    def load_from_json(json_data, load_item):
+        class_ = XModuleDescriptor.load_class(json_data['location']['category'])
+        return class_.from_json(json_data, load_item)
+
+    @classmethod
+    def from_json(cls, json_data, load_item):
+        """
+        Creates an instance of this descriptor from the supplied json_data.
+
+        json_data: Json data specifying the data, children, and metadata for the descriptor
+        load_item: A function that takes an i4x url and returns a module descriptor
+        """
+        return cls(load_item=load_item, **json_data)
+
+    def __init__(self,
+                 load_item,
+                 data=None,
+                 children=None,
+                 **kwargs):
+        self.load_item = load_item
+        self.data = data if data is not None else {}
+        self.children = children if children is not None else []
+        self.name = Location(kwargs.get('location')).name
+        self._child_instances = None
+
+    def get_children(self):
+        """Returns a list of XModuleDescriptor instances for the children of this module"""
+        if self._child_instances is None:
+            self._child_instances = [self.load_item(child) for child in self.children]
+        return self._child_instances
+
 
     def get_xml(self):
         ''' For conversions between JSON and legacy XML representations.

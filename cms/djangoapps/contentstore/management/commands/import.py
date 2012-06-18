@@ -82,7 +82,7 @@ class Command(BaseCommand):
         def handle_list(e):
             if e.attrib.get("class", None) == "tutorials":
                 return
-            children = [{'url':le.attrib['url']} for le in e.getchildren()]
+            children = [le.attrib['url'] for le in e.getchildren()]
             results[e.attrib['url']] = {'children':children}
 
         def handle_video(e):
