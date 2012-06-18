@@ -15,10 +15,9 @@
 from django.template import Context
 from django.http import HttpResponse
 
-import mitxmako.middleware as middleware
+from . import middleware
 from django.conf import settings
 
-import mitxmako.middleware
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance = Context(dictionary)
@@ -28,15 +27,12 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_dictionary = {}
     context_instance['settings'] = settings
     context_instance['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
-    for d in mitxmako.middleware.requestcontext:
+    for d in middleware.requestcontext:
         context_dictionary.update(d)
     for d in context_instance:
         context_dictionary.update(d)
-    if context: 
+    if context:
         context_dictionary.update(context)
-    ## HACK
-    ## We should remove this, and possible set COURSE_TITLE in the middleware from the session. 
-    if 'COURSE_TITLE' not in context_dictionary: context_dictionary['COURSE_TITLE'] = ''
     # fetch and render template
     template = middleware.lookup[namespace].get_template(template_name)
     return template.render(**context_dictionary)

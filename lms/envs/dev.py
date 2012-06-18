@@ -44,7 +44,7 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
-        'KEY_FUNCTION': 'util.cache.memcache_safe_key',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
 

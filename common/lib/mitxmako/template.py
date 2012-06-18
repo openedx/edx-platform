@@ -14,10 +14,11 @@
 
 from mako.template import Template as MakoTemplate
 
-import middleware
+from . import middleware
 
-django_variables = ['lookup', 'template_dirs', 'output_encoding', 
-                    'module_directory', 'encoding_errors',]
+django_variables = ['lookup', 'template_dirs', 'output_encoding',
+                    'module_directory', 'encoding_errors']
+
 
 class Template(MakoTemplate):
     def __init__(self, *args, **kwargs):
@@ -25,4 +26,4 @@ class Template(MakoTemplate):
         if not kwargs.get('no_django', False):
             overrides = dict([(k, getattr(middleware, k, None),) for k in django_variables])
             kwargs.update(overrides)
-        super(Template, self).__init__(*args, **kwargs)    
+        super(Template, self).__init__(*args, **kwargs)

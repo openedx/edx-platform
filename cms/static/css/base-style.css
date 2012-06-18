@@ -1,0 +1,1071 @@
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  vertical-align: baseline;
+  background: transparent; }
+
+html, body {
+  font-size: 100%; }
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section {
+  display: block; }
+
+audio, canvas, video {
+  display: inline-block; }
+
+audio:not([controls]) {
+  display: none; }
+
+[hidden] {
+  display: none; }
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%; }
+
+html, button, input, select, textarea {
+  font-family: sans-serif; }
+
+a:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px; }
+a:hover, a:active {
+  outline: 0; }
+
+abbr[title] {
+  border-bottom: 1px dotted; }
+
+b, strong {
+  font-weight: bold; }
+
+blockquote {
+  margin: 1em 40px; }
+
+dfn {
+  font-style: italic; }
+
+mark {
+  background: #ff0;
+  color: #000; }
+
+pre, code, kbd, samp {
+  font-family: monospace, serif;
+  _font-family: 'courier new', monospace;
+  font-size: 1em; }
+
+pre {
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word; }
+
+blockquote, q {
+  quotes: none; }
+  blockquote:before, blockquote:after, q:before, q:after {
+    content: '';
+    content: none; }
+
+small {
+  font-size: 75%; }
+
+sub, sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline; }
+
+sup {
+  top: -0.5em; }
+
+sub {
+  bottom: -0.25em; }
+
+nav ul, nav ol {
+  list-style: none;
+  list-style-image: none; }
+
+img {
+  border: 0;
+  height: auto;
+  max-width: 100%;
+  -ms-interpolation-mode: bicubic; }
+
+svg:not(:root) {
+  overflow: hidden; }
+
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em; }
+
+legend {
+  border: 0;
+  padding: 0;
+  white-space: normal; }
+
+button, input, select, textarea {
+  font-size: 100%;
+  margin: 0;
+  vertical-align: baseline; }
+
+button, input {
+  line-height: normal; }
+
+button, input[type="button"], input[type="reset"], input[type="submit"] {
+  cursor: pointer;
+  -webkit-appearance: button; }
+
+button[disabled], input[disabled] {
+  cursor: default; }
+
+input[type="checkbox"], input[type="radio"] {
+  box-sizing: border-box;
+  padding: 0; }
+
+input[type="search"] {
+  -webkit-appearance: textfield;
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box; }
+
+input[type="search"]::-webkit-search-decoration, input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none; }
+
+button::-moz-focus-inner, input::-moz-focus-inner {
+  border: 0;
+  padding: 0; }
+
+textarea {
+  overflow: auto;
+  vertical-align: top; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+html {
+  height: 100%; }
+
+body {
+  zoom: 1;
+  height: 100%;
+  font: 14px "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+  body:before, body:after {
+    content: "";
+    display: table; }
+  body:after {
+    clear: both; }
+  body > section {
+    display: table;
+    width: 100%; }
+  body > header {
+    background: #000;
+    color: #fff;
+    display: block;
+    float: none;
+    padding: 6px 20px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; }
+    body > header nav {
+      zoom: 1; }
+      body > header nav:before, body > header nav:after {
+        content: "";
+        display: table; }
+      body > header nav:after {
+        clear: both; }
+      body > header nav h2 {
+        font-size: 14px;
+        text-transform: uppercase;
+        float: left; }
+      body > header nav ul {
+        float: left; }
+        body > header nav ul.user-nav {
+          float: right; }
+        body > header nav ul li {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin-left: 15px; }
+  body.content section.main-content {
+    border-left: 2px solid #000;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 74.423%;
+    float: left;
+    -webkit-box-shadow: -2px 0 3px #dddddd;
+    -moz-box-shadow: -2px 0 3px #dddddd;
+    box-shadow: -2px 0 3px #dddddd; }
+
+a {
+  text-decoration: none;
+  color: #888; }
+
+input {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+
+input[type="submit"], .button, section.cal section.new-section > a, section.week-edit > section.content > div section.modules.empty a,
+section.week-new > section.content > div section.modules.empty a,
+section.sequence-edit > section.content > div section.modules.empty a, section.week-edit > section.content > div section.scratch-pad ol li ul li.empty a,
+section.week-new > section.content > div section.scratch-pad ol li ul li.empty a,
+section.sequence-edit > section.content > div section.scratch-pad ol li ul li.empty a, section.video-new > section section.upload a.upload-button, section.video-edit > section section.upload a.upload-button, section.video-new > section a.save-update, section.video-edit > section a.save-update, section.problem-new > section a.save, section.problem-edit > section a.save {
+  border: 1px solid #ccc;
+  background: #efefef;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  padding: 6px; }
+
+.new-module {
+  position: relative; }
+  .new-module a {
+    padding: 6px;
+    display: block; }
+  .new-module ul.new-dropdown {
+    list-style: none;
+    position: absolute; }
+    .new-module ul.new-dropdown li {
+      display: none;
+      padding: 6px; }
+  .new-module:hover ul.new-dropdown {
+    display: block; }
+
+.draggable {
+  width: 7px;
+  min-height: 14px;
+  background: url("../img/drag-handle.png") no-repeat center;
+  text-indent: -9999px;
+  display: block;
+  float: right; }
+
+section.cal {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 25px;
+  zoom: 1; }
+  section.cal:before, section.cal:after {
+    content: "";
+    display: table; }
+  section.cal:after {
+    clear: both; }
+  section.cal > header {
+    zoom: 1;
+    margin-bottom: 10px;
+    background: #efefef;
+    border: 1px solid #ddd; }
+    section.cal > header:before, section.cal > header:after {
+      content: "";
+      display: table; }
+    section.cal > header:after {
+      clear: both; }
+    section.cal > header h2 {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 14px;
+      padding: 6px;
+      margin-left: 6px;
+      font-size: 12px; }
+    section.cal > header ul {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
+      section.cal > header ul li {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        margin-left: 6px;
+        padding-left: 6px;
+        border-left: 1px solid #ddd;
+        padding: 6px; }
+        section.cal > header ul li a {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+        section.cal > header ul li ul {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+          section.cal > header ul li ul li {
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto;
+            padding: 0;
+            border-left: 0; }
+  section.cal ol {
+    list-style: none;
+    zoom: 1;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-left: 1px solid #333;
+    border-top: 1px solid #333;
+    width: 100%; }
+    section.cal ol:before, section.cal ol:after {
+      content: "";
+      display: table; }
+    section.cal ol:after {
+      clear: both; }
+    section.cal ol > li {
+      border-right: 1px solid #333;
+      border-bottom: 1px solid;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      float: left;
+      width: 25.0%; }
+      section.cal ol > li header {
+        border-bottom: 1px solid #000;
+        -webkit-box-shadow: 0 1px 2px #aaaaaa;
+        -moz-box-shadow: 0 1px 2px #aaaaaa;
+        box-shadow: 0 1px 2px #aaaaaa;
+        display: block;
+        margin-bottom: 2px; }
+        section.cal ol > li header h1 {
+          font-size: 14px;
+          text-transform: uppercase;
+          border-bottom: 1px solid #ccc;
+          padding: 6px; }
+          section.cal ol > li header h1 a {
+            color: #000;
+            display: block; }
+        section.cal ol > li header ul li {
+          background: #fff;
+          color: #888;
+          border-bottom: 0;
+          font-size: 12px; }
+      section.cal ol > li ul {
+        list-style: none;
+        margin-bottom: 1px; }
+        section.cal ol > li ul li {
+          background: #efefef;
+          border-bottom: 1px solid #666;
+          padding: 6px; }
+          section.cal ol > li ul li.create-module {
+            position: relative; }
+            section.cal ol > li ul li.create-module > div {
+              display: none;
+              position: absolute;
+              top: 30px;
+              width: 90%;
+              background: rgba(0, 0, 0, 0.9);
+              padding: 10px;
+              -webkit-box-sizing: border-box;
+              -moz-box-sizing: border-box;
+              box-sizing: border-box;
+              -webkit-border-radius: 3px;
+              -moz-border-radius: 3px;
+              -ms-border-radius: 3px;
+              -o-border-radius: 3px;
+              border-radius: 3px;
+              z-index: 99; }
+              section.cal ol > li ul li.create-module > div:before {
+                content: "  ";
+                display: block;
+                background: rgba(0, 0, 0, 0.8);
+                width: 10px;
+                height: 10px;
+                position: absolute;
+                top: -5px;
+                left: 50%;
+                -webkit-transform: rotate(45deg);
+                -moz-transform: rotate(45deg);
+                -ms-transform: rotate(45deg);
+                -o-transform: rotate(45deg);
+                transform: rotate(45deg); }
+              section.cal ol > li ul li.create-module > div ul li {
+                border-bottom: 0;
+                background: none; }
+                section.cal ol > li ul li.create-module > div ul li input {
+                  width: 100%;
+                  -webkit-box-sizing: border-box;
+                  -moz-box-sizing: border-box;
+                  box-sizing: border-box;
+                  border-color: #000;
+                  padding: 6px; }
+                section.cal ol > li ul li.create-module > div ul li select {
+                  width: 100%;
+                  -webkit-box-sizing: border-box;
+                  -moz-box-sizing: border-box;
+                  box-sizing: border-box; }
+                  section.cal ol > li ul li.create-module > div ul li select option {
+                    font-size: 14px; }
+                section.cal ol > li ul li.create-module > div ul li a {
+                  float: right; }
+                  section.cal ol > li ul li.create-module > div ul li a:first-child {
+                    float: left; }
+            section.cal ol > li ul li.create-module:hover div {
+              display: block; }
+  section.cal section.new-section {
+    margin-top: 10px;
+    display: -moz-inline-box;
+    -moz-box-orient: vertical;
+    display: inline-block;
+    vertical-align: baseline;
+    zoom: 1;
+    *display: inline;
+    *vertical-align: auto;
+    position: relative; }
+    section.cal section.new-section > a {
+      display: block; }
+    section.cal section.new-section section {
+      display: none;
+      position: absolute;
+      top: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      min-width: 300px;
+      padding: 10px;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      z-index: 99; }
+      section.cal section.new-section section:before {
+        content: "  ";
+        display: block;
+        background: rgba(0, 0, 0, 0.8);
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        top: -5px;
+        left: 20%;
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        transform: rotate(45deg); }
+      section.cal section.new-section section form ul {
+        list-style: none; }
+        section.cal section.new-section section form ul li {
+          border-bottom: 0;
+          background: none;
+          margin-bottom: 6px; }
+          section.cal section.new-section section form ul li input {
+            width: 100%;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            border-color: #000;
+            padding: 6px; }
+          section.cal section.new-section section form ul li select {
+            width: 100%;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box; }
+            section.cal section.new-section section form ul li select option {
+              font-size: 14px; }
+          section.cal section.new-section section form ul li a {
+            float: right; }
+            section.cal section.new-section section form ul li a:first-child {
+              float: left; }
+    section.cal section.new-section:hover section {
+      display: block; }
+
+body.content
+section.cal {
+  width: 25.577%;
+  float: left;
+  overflow: scroll;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  opacity: .4;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
+  body.content
+  section.cal > header ul {
+    display: none; }
+  body.content
+  section.cal:hover {
+    opacity: 1; }
+  body.content
+  section.cal ol li {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%; }
+    body.content
+    section.cal ol li.create-module {
+      display: none; }
+
+section.week-edit > header,
+section.week-new > header,
+section.sequence-edit > header {
+  border-bottom: 2px solid #333;
+  zoom: 1; }
+  section.week-edit > header:before, section.week-edit > header:after,
+  section.week-new > header:before,
+  section.week-new > header:after,
+  section.sequence-edit > header:before,
+  section.sequence-edit > header:after {
+    content: "";
+    display: table; }
+  section.week-edit > header:after,
+  section.week-new > header:after,
+  section.sequence-edit > header:after {
+    clear: both; }
+  section.week-edit > header div,
+  section.week-new > header div,
+  section.sequence-edit > header div {
+    zoom: 1;
+    padding: 6px 20px; }
+    section.week-edit > header div:before, section.week-edit > header div:after,
+    section.week-new > header div:before,
+    section.week-new > header div:after,
+    section.sequence-edit > header div:before,
+    section.sequence-edit > header div:after {
+      content: "";
+      display: table; }
+    section.week-edit > header div:after,
+    section.week-new > header div:after,
+    section.sequence-edit > header div:after {
+      clear: both; }
+    section.week-edit > header div h1,
+    section.week-new > header div h1,
+    section.sequence-edit > header div h1 {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      float: left; }
+    section.week-edit > header div p,
+    section.week-new > header div p,
+    section.sequence-edit > header div p {
+      float: right; }
+    section.week-edit > header div.week,
+    section.week-new > header div.week,
+    section.sequence-edit > header div.week {
+      background: #eee;
+      font-size: 12px;
+      border-bottom: 1px solid #ccc; }
+      section.week-edit > header div.week h2,
+      section.week-new > header div.week h2,
+      section.sequence-edit > header div.week h2 {
+        font-size: 12px;
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        margin-right: 20px; }
+      section.week-edit > header div.week ul,
+      section.week-new > header div.week ul,
+      section.sequence-edit > header div.week ul {
+        list-style: none;
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto; }
+        section.week-edit > header div.week ul li,
+        section.week-new > header div.week ul li,
+        section.sequence-edit > header div.week ul li {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin-right: 10px; }
+          section.week-edit > header div.week ul li p,
+          section.week-new > header div.week ul li p,
+          section.sequence-edit > header div.week ul li p {
+            float: none; }
+  section.week-edit > header section.goals,
+  section.week-new > header section.goals,
+  section.sequence-edit > header section.goals {
+    background: #eee;
+    padding: 6px 20px;
+    border-top: 1px solid #ccc; }
+    section.week-edit > header section.goals ul,
+    section.week-new > header section.goals ul,
+    section.sequence-edit > header section.goals ul {
+      list-style: none;
+      color: #999; }
+      section.week-edit > header section.goals ul li,
+      section.week-new > header section.goals ul li,
+      section.sequence-edit > header section.goals ul li {
+        margin-bottom: 6px; }
+        section.week-edit > header section.goals ul li:last-child,
+        section.week-new > header section.goals ul li:last-child,
+        section.sequence-edit > header section.goals ul li:last-child {
+          margin-bottom: 0; }
+section.week-edit > section.content,
+section.week-new > section.content,
+section.sequence-edit > section.content {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 20px; }
+  section.week-edit > section.content section.filters,
+  section.week-new > section.content section.filters,
+  section.sequence-edit > section.content section.filters {
+    zoom: 1;
+    margin-bottom: 10px;
+    background: #efefef;
+    border: 1px solid #ddd; }
+    section.week-edit > section.content section.filters:before, section.week-edit > section.content section.filters:after,
+    section.week-new > section.content section.filters:before,
+    section.week-new > section.content section.filters:after,
+    section.sequence-edit > section.content section.filters:before,
+    section.sequence-edit > section.content section.filters:after {
+      content: "";
+      display: table; }
+    section.week-edit > section.content section.filters:after,
+    section.week-new > section.content section.filters:after,
+    section.sequence-edit > section.content section.filters:after {
+      clear: both; }
+    section.week-edit > section.content section.filters ul,
+    section.week-new > section.content section.filters ul,
+    section.sequence-edit > section.content section.filters ul {
+      zoom: 1;
+      list-style: none;
+      padding: 6px; }
+      section.week-edit > section.content section.filters ul:before, section.week-edit > section.content section.filters ul:after,
+      section.week-new > section.content section.filters ul:before,
+      section.week-new > section.content section.filters ul:after,
+      section.sequence-edit > section.content section.filters ul:before,
+      section.sequence-edit > section.content section.filters ul:after {
+        content: "";
+        display: table; }
+      section.week-edit > section.content section.filters ul:after,
+      section.week-new > section.content section.filters ul:after,
+      section.sequence-edit > section.content section.filters ul:after {
+        clear: both; }
+      section.week-edit > section.content section.filters ul li,
+      section.week-new > section.content section.filters ul li,
+      section.sequence-edit > section.content section.filters ul li {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto; }
+        section.week-edit > section.content section.filters ul li.advanced,
+        section.week-new > section.content section.filters ul li.advanced,
+        section.sequence-edit > section.content section.filters ul li.advanced {
+          float: right; }
+  section.week-edit > section.content > div,
+  section.week-new > section.content > div,
+  section.sequence-edit > section.content > div {
+    display: table;
+    border: 1px solid;
+    width: 100%; }
+    section.week-edit > section.content > div section header,
+    section.week-new > section.content > div section header,
+    section.sequence-edit > section.content > div section header {
+      background: #eee;
+      padding: 6px;
+      border-bottom: 1px solid #ccc;
+      zoom: 1; }
+      section.week-edit > section.content > div section header:before, section.week-edit > section.content > div section header:after,
+      section.week-new > section.content > div section header:before,
+      section.week-new > section.content > div section header:after,
+      section.sequence-edit > section.content > div section header:before,
+      section.sequence-edit > section.content > div section header:after {
+        content: "";
+        display: table; }
+      section.week-edit > section.content > div section header:after,
+      section.week-new > section.content > div section header:after,
+      section.sequence-edit > section.content > div section header:after {
+        clear: both; }
+      section.week-edit > section.content > div section header h2,
+      section.week-new > section.content > div section header h2,
+      section.sequence-edit > section.content > div section header h2 {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 12px;
+        float: left; }
+    section.week-edit > section.content > div section.modules,
+    section.week-new > section.content > div section.modules,
+    section.sequence-edit > section.content > div section.modules {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      display: table-cell;
+      width: 65.632%;
+      border-right: 1px solid #333; }
+      section.week-edit > section.content > div section.modules.empty,
+      section.week-new > section.content > div section.modules.empty,
+      section.sequence-edit > section.content > div section.modules.empty {
+        text-align: center;
+        vertical-align: middle; }
+        section.week-edit > section.content > div section.modules.empty a,
+        section.week-new > section.content > div section.modules.empty a,
+        section.sequence-edit > section.content > div section.modules.empty a {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin-top: 10px; }
+      section.week-edit > section.content > div section.modules ol,
+      section.week-new > section.content > div section.modules ol,
+      section.sequence-edit > section.content > div section.modules ol {
+        list-style: none;
+        border-bottom: 1px solid #333; }
+        section.week-edit > section.content > div section.modules ol li,
+        section.week-new > section.content > div section.modules ol li,
+        section.sequence-edit > section.content > div section.modules ol li {
+          border-bottom: 1px solid #333; }
+          section.week-edit > section.content > div section.modules ol li:last-child,
+          section.week-new > section.content > div section.modules ol li:last-child,
+          section.sequence-edit > section.content > div section.modules ol li:last-child {
+            border-bottom: 0; }
+          section.week-edit > section.content > div section.modules ol li a,
+          section.week-new > section.content > div section.modules ol li a,
+          section.sequence-edit > section.content > div section.modules ol li a {
+            color: #000; }
+          section.week-edit > section.content > div section.modules ol li ol,
+          section.week-new > section.content > div section.modules ol li ol,
+          section.sequence-edit > section.content > div section.modules ol li ol {
+            list-style: none; }
+            section.week-edit > section.content > div section.modules ol li ol li,
+            section.week-new > section.content > div section.modules ol li ol li,
+            section.sequence-edit > section.content > div section.modules ol li ol li {
+              padding: 6px; }
+              section.week-edit > section.content > div section.modules ol li ol li:hover a.draggable,
+              section.week-new > section.content > div section.modules ol li ol li:hover a.draggable,
+              section.sequence-edit > section.content > div section.modules ol li ol li:hover a.draggable {
+                opacity: 1; }
+              section.week-edit > section.content > div section.modules ol li ol li a.draggable,
+              section.week-new > section.content > div section.modules ol li ol li a.draggable,
+              section.sequence-edit > section.content > div section.modules ol li ol li a.draggable {
+                float: right;
+                opacity: .5; }
+              section.week-edit > section.content > div section.modules ol li ol li.group,
+              section.week-new > section.content > div section.modules ol li ol li.group,
+              section.sequence-edit > section.content > div section.modules ol li ol li.group {
+                padding: 0; }
+                section.week-edit > section.content > div section.modules ol li ol li.group header,
+                section.week-new > section.content > div section.modules ol li ol li.group header,
+                section.sequence-edit > section.content > div section.modules ol li ol li.group header {
+                  padding: 6px;
+                  background: none; }
+                  section.week-edit > section.content > div section.modules ol li ol li.group header h3,
+                  section.week-new > section.content > div section.modules ol li ol li.group header h3,
+                  section.sequence-edit > section.content > div section.modules ol li ol li.group header h3 {
+                    font-size: 14px; }
+                section.week-edit > section.content > div section.modules ol li ol li.group ol,
+                section.week-new > section.content > div section.modules ol li ol li.group ol,
+                section.sequence-edit > section.content > div section.modules ol li ol li.group ol {
+                  border-left: 4px solid #999;
+                  border-bottom: 0; }
+                  section.week-edit > section.content > div section.modules ol li ol li.group ol li:last-child,
+                  section.week-new > section.content > div section.modules ol li ol li.group ol li:last-child,
+                  section.sequence-edit > section.content > div section.modules ol li ol li.group ol li:last-child {
+                    border-bottom: 0; }
+    section.week-edit > section.content > div section.scratch-pad,
+    section.week-new > section.content > div section.scratch-pad,
+    section.sequence-edit > section.content > div section.scratch-pad {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      display: table-cell;
+      width: 34.368%;
+      vertical-align: top; }
+      section.week-edit > section.content > div section.scratch-pad ol,
+      section.week-new > section.content > div section.scratch-pad ol,
+      section.sequence-edit > section.content > div section.scratch-pad ol {
+        list-style: none;
+        border-bottom: 1px solid #999; }
+        section.week-edit > section.content > div section.scratch-pad ol li,
+        section.week-new > section.content > div section.scratch-pad ol li,
+        section.sequence-edit > section.content > div section.scratch-pad ol li {
+          border-bottom: 1px solid #999;
+          background: #f9f9f9; }
+          section.week-edit > section.content > div section.scratch-pad ol li:last-child,
+          section.week-new > section.content > div section.scratch-pad ol li:last-child,
+          section.sequence-edit > section.content > div section.scratch-pad ol li:last-child {
+            border-bottom: 0; }
+          section.week-edit > section.content > div section.scratch-pad ol li ul,
+          section.week-new > section.content > div section.scratch-pad ol li ul,
+          section.sequence-edit > section.content > div section.scratch-pad ol li ul {
+            list-style: none; }
+            section.week-edit > section.content > div section.scratch-pad ol li ul li,
+            section.week-new > section.content > div section.scratch-pad ol li ul li,
+            section.sequence-edit > section.content > div section.scratch-pad ol li ul li {
+              padding: 6px; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li:last-child,
+              section.week-new > section.content > div section.scratch-pad ol li ul li:last-child,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li:last-child {
+                border-bottom: 0; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li:hover a.draggable,
+              section.week-new > section.content > div section.scratch-pad ol li ul li:hover a.draggable,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li:hover a.draggable {
+                opacity: 1; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li.empty,
+              section.week-new > section.content > div section.scratch-pad ol li ul li.empty,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li.empty {
+                padding: 12px; }
+                section.week-edit > section.content > div section.scratch-pad ol li ul li.empty a,
+                section.week-new > section.content > div section.scratch-pad ol li ul li.empty a,
+                section.sequence-edit > section.content > div section.scratch-pad ol li ul li.empty a {
+                  display: block;
+                  text-align: center; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li a.draggable,
+              section.week-new > section.content > div section.scratch-pad ol li ul li a.draggable,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li a.draggable {
+                float: right;
+                opacity: .3; }
+              section.week-edit > section.content > div section.scratch-pad ol li ul li a,
+              section.week-new > section.content > div section.scratch-pad ol li ul li a,
+              section.sequence-edit > section.content > div section.scratch-pad ol li ul li a {
+                color: #000; }
+
+section.video-new > section section.upload, section.video-edit > section section.upload {
+  padding: 6px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd; }
+  section.video-new > section section.upload a.upload-button, section.video-edit > section section.upload a.upload-button {
+    display: -moz-inline-box;
+    -moz-box-orient: vertical;
+    display: inline-block;
+    vertical-align: baseline;
+    zoom: 1;
+    *display: inline;
+    *vertical-align: auto; }
+section.video-new > section section.in-use h2, section.video-edit > section section.in-use h2 {
+  font-size: 14px; }
+section.video-new > section section.in-use div, section.video-edit > section section.in-use div {
+  background: #eee;
+  text-align: center;
+  padding: 6px; }
+section.video-new > section a.save-update, section.video-edit > section a.save-update {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-top: 20px; }
+
+section.problem-new > section textarea, section.problem-edit > section textarea {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block;
+  width: 100%; }
+section.problem-new > section div.preview, section.problem-edit > section div.preview {
+  background: #eee;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 10px;
+  width: 100%; }
+section.problem-new > section a.save, section.problem-edit > section a.save {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  margin-top: 20px; }
+
+section.video-new, section.video-edit, section.problem-new, section.problem-edit {
+  position: absolute;
+  top: 72px;
+  right: 0;
+  background: #fff;
+  width: 48.845%;
+  -webkit-box-shadow: 0 0 6px #666666;
+  -moz-box-shadow: 0 0 6px #666666;
+  box-shadow: 0 0 6px #666666;
+  border: 1px solid #333;
+  border-right: 0;
+  z-index: 4; }
+  section.video-new > header, section.video-edit > header, section.problem-new > header, section.problem-edit > header {
+    background: #666;
+    zoom: 1;
+    color: #fff;
+    padding: 6px;
+    border-bottom: 1px solid #333;
+    -webkit-font-smoothing: antialiased; }
+    section.video-new > header:before, section.video-new > header:after, section.video-edit > header:before, section.video-edit > header:after, section.problem-new > header:before, section.problem-new > header:after, section.problem-edit > header:before, section.problem-edit > header:after {
+      content: "";
+      display: table; }
+    section.video-new > header:after, section.video-edit > header:after, section.problem-new > header:after, section.problem-edit > header:after {
+      clear: both; }
+    section.video-new > header h2, section.video-edit > header h2, section.problem-new > header h2, section.problem-edit > header h2 {
+      float: left;
+      font-size: 14px; }
+    section.video-new > header a, section.video-edit > header a, section.problem-new > header a, section.problem-edit > header a {
+      color: #fff; }
+      section.video-new > header a.save-update, section.video-edit > header a.save-update, section.problem-new > header a.save-update, section.problem-edit > header a.save-update {
+        float: right; }
+      section.video-new > header a.cancel, section.video-edit > header a.cancel, section.problem-new > header a.cancel, section.problem-edit > header a.cancel {
+        float: left; }
+  section.video-new > section, section.video-edit > section, section.problem-new > section, section.problem-edit > section {
+    padding: 20px; }
+    section.video-new > section > header h1, section.video-edit > section > header h1, section.problem-new > section > header h1, section.problem-edit > section > header h1 {
+      font-size: 24px;
+      margin: 12px 0; }
+    section.video-new > section > header section.status-settings ul, section.video-edit > section > header section.status-settings ul, section.problem-new > section > header section.status-settings ul, section.problem-edit > section > header section.status-settings ul {
+      list-style: none;
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      -ms-border-radius: 2px;
+      -o-border-radius: 2px;
+      border-radius: 2px;
+      border: 1px solid #999;
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
+      section.video-new > section > header section.status-settings ul li, section.video-edit > section > header section.status-settings ul li, section.problem-new > section > header section.status-settings ul li, section.problem-edit > section > header section.status-settings ul li {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        border-right: 1px solid #999;
+        padding: 6px; }
+        section.video-new > section > header section.status-settings ul li:last-child, section.video-edit > section > header section.status-settings ul li:last-child, section.problem-new > section > header section.status-settings ul li:last-child, section.problem-edit > section > header section.status-settings ul li:last-child {
+          border-right: 0; }
+        section.video-new > section > header section.status-settings ul li.current, section.video-edit > section > header section.status-settings ul li.current, section.problem-new > section > header section.status-settings ul li.current, section.problem-edit > section > header section.status-settings ul li.current {
+          background: #eee; }
+    section.video-new > section > header section.status-settings a.settings, section.video-edit > section > header section.status-settings a.settings, section.problem-new > section > header section.status-settings a.settings, section.problem-edit > section > header section.status-settings a.settings {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      margin: 0 20px;
+      border: 1px solid #999;
+      padding: 6px; }
+    section.video-new > section > header section.status-settings select, section.video-edit > section > header section.status-settings select, section.problem-new > section > header section.status-settings select, section.problem-edit > section > header section.status-settings select {
+      float: right; }
+    section.video-new > section > header section.meta, section.video-edit > section > header section.meta, section.problem-new > section > header section.meta, section.problem-edit > section > header section.meta {
+      background: #eee;
+      padding: 10px;
+      margin: 20px 0;
+      zoom: 1; }
+      section.video-new > section > header section.meta:before, section.video-new > section > header section.meta:after, section.video-edit > section > header section.meta:before, section.video-edit > section > header section.meta:after, section.problem-new > section > header section.meta:before, section.problem-new > section > header section.meta:after, section.problem-edit > section > header section.meta:before, section.problem-edit > section > header section.meta:after {
+        content: "";
+        display: table; }
+      section.video-new > section > header section.meta:after, section.video-edit > section > header section.meta:after, section.problem-new > section > header section.meta:after, section.problem-edit > section > header section.meta:after {
+        clear: both; }
+      section.video-new > section > header section.meta div, section.video-edit > section > header section.meta div, section.problem-new > section > header section.meta div, section.problem-edit > section > header section.meta div {
+        float: left;
+        margin-right: 20px; }
+        section.video-new > section > header section.meta div h2, section.video-edit > section > header section.meta div h2, section.problem-new > section > header section.meta div h2, section.problem-edit > section > header section.meta div h2 {
+          font-size: 14px;
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+        section.video-new > section > header section.meta div p, section.video-edit > section > header section.meta div p, section.problem-new > section > header section.meta div p, section.problem-edit > section > header section.meta div p {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+    section.video-new > section section.notes, section.video-edit > section section.notes, section.problem-new > section section.notes, section.problem-edit > section section.notes {
+      margin-top: 20px;
+      padding: 6px;
+      background: #eee;
+      border: 1px solid #ccc; }
+      section.video-new > section section.notes textarea, section.video-edit > section section.notes textarea, section.problem-new > section section.notes textarea, section.problem-edit > section section.notes textarea {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        display: block;
+        width: 100%; }
+      section.video-new > section section.notes h2, section.video-edit > section section.notes h2, section.problem-new > section section.notes h2, section.problem-edit > section section.notes h2 {
+        font-size: 14px;
+        margin-bottom: 6px; }
+      section.video-new > section section.notes input[type="submit"], section.video-edit > section section.notes input[type="submit"], section.problem-new > section section.notes input[type="submit"], section.problem-edit > section section.notes input[type="submit"] {
+        margin-top: 10px; }

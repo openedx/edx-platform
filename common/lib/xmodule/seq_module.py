@@ -95,3 +95,24 @@ class Module(XModule):
             self.position = int(system.get('position'))
 
         self.rendered = False
+
+
+class WeekDescriptor(XModuleDescriptor):
+
+    def get_goals(self):
+        """
+        Return a list of Goal XModuleDescriptors that are children
+        of this Week
+        """
+        return [child for child in self.get_children() if child.type == 'Goal']
+
+    def get_non_goals(self):
+        """
+        Return a list of non-Goal XModuleDescriptors that are children of
+        this Week
+        """
+        return [child for child in self.get_children() if child.type != 'Goal']
+
+
+class SectionDescriptor(XModuleDescriptor):
+    pass

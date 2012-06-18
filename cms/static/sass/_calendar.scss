@@ -1,0 +1,270 @@
+section.cal {
+  @include box-sizing(border-box);
+  padding: 25px;
+  @include clearfix;
+
+  > header {
+    @include clearfix;
+    margin-bottom: 10px;
+    background: #efefef;
+    border: 1px solid #ddd;
+
+    h2 {
+      @include inline-block();
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 14px;
+      padding: 6px;
+      margin-left: 6px;
+      font-size: 12px;
+    }
+
+    ul {
+      @include inline-block;
+
+      li  {
+        @include inline-block;
+        margin-left: 6px;
+        padding-left: 6px;
+        border-left: 1px solid #ddd;
+        padding: 6px;
+
+        a {
+          @include inline-block();
+        }
+
+        ul {
+          @include inline-block();
+
+          li {
+            @include inline-block();
+            padding: 0;
+            border-left: 0;
+          }
+        }
+      }
+    }
+  }
+
+  ol {
+    list-style: none;
+    @include clearfix;
+    @include box-sizing(border-box);
+    border-left: 1px solid #333;
+    border-top: 1px solid #333;
+    width: 100%;
+
+    > li {
+      border-right: 1px solid #333;
+      border-bottom: 1px solid;
+      @include box-sizing(border-box);
+      float: left;
+      width: flex-grid(3) + ((flex-gutter() * 3) / 4);
+
+      header {
+        border-bottom: 1px solid #000;
+        @include box-shadow(0 1px 2px #aaa);
+        display: block;
+        margin-bottom: 2px;
+
+        h1 {
+          font-size: 14px;
+          text-transform: uppercase;
+          border-bottom: 1px solid #ccc;
+          padding: 6px;
+
+          a {
+            color: #000;
+            display: block;
+          }
+        }
+
+        ul {
+          li {
+            background: #fff;
+            color: #888;
+            border-bottom: 0;
+            font-size: 12px;
+          }
+        }
+      }
+
+      ul {
+        list-style: none;
+        margin-bottom: 1px;
+
+        li {
+          background: #efefef;
+          border-bottom: 1px solid #666;
+          padding: 6px;
+
+          &.create-module {
+            position: relative;
+
+            > div {
+              display: none;
+              @include position(absolute, 30px 0 0 0);
+              width: 90%;
+              background: rgba(#000, .9);
+              padding: 10px;
+              @include box-sizing(border-box);
+              @include border-radius(3px);
+              z-index: 99;
+
+              &:before {
+                content: "  ";
+                display: block;
+                background: rgba(#000, .8);
+                width: 10px;
+                height: 10px;
+                @include position(absolute, -5px 0 0 50%);
+                @include transform(rotate(45deg));
+              }
+
+              ul {
+                li {
+                  border-bottom: 0;
+                  background: none;
+
+                  input {
+                    width: 100%;
+                    @include box-sizing(border-box);
+                    border-color: #000;
+                    padding: 6px;
+                  }
+
+                  select {
+                    width: 100%;
+                    @include box-sizing(border-box);
+
+                    option {
+                      font-size: 14px;
+                    }
+                  }
+
+                  a {
+                    float: right;
+
+                    &:first-child {
+                      float: left;
+                    }
+                  }
+                }
+              }
+            }
+
+            &:hover {
+              div {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  section.new-section {
+    margin-top: 10px;
+    @include inline-block();
+    position: relative;
+
+    > a {
+      @extend .button;
+      display: block;
+    }
+
+    section {
+      display: none;
+      @include position(absolute, 30px 0 0 0);
+      background: rgba(#000, .8);
+      min-width: 300px;
+      padding: 10px;
+      @include box-sizing(border-box);
+      @include border-radius(3px);
+      z-index: 99;
+
+      &:before {
+        content: "  ";
+        display: block;
+        background: rgba(#000, .8);
+        width: 10px;
+        height: 10px;
+        @include position(absolute, -5px 0 0 20%);
+        @include transform(rotate(45deg));
+      }
+
+      form {
+
+        ul {
+          list-style: none;
+
+          li {
+            border-bottom: 0;
+            background: none;
+            margin-bottom: 6px;
+
+            input {
+              width: 100%;
+              @include box-sizing(border-box);
+              border-color: #000;
+              padding: 6px;
+            }
+
+            select {
+              width: 100%;
+              @include box-sizing(border-box);
+
+              option {
+                font-size: 14px;
+              }
+            }
+
+            a {
+              float: right;
+
+              &:first-child {
+                float: left;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &:hover {
+      section {
+        display: block;
+      }
+    }
+  }
+}
+
+body.content
+section.cal {
+  width: flex-grid(3) + flex-gutter();
+  float: left;
+  overflow: scroll;
+  @include box-sizing(border-box);
+  opacity: .4;
+  @include transition();
+
+  > header ul {
+    display: none;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+
+  ol {
+    li {
+      @include box-sizing(border-box);
+      width: 100%;
+
+      &.create-module {
+        display: none;
+      }
+    }
+  }
+}
