@@ -152,13 +152,18 @@ class XModuleDescriptor(Plugin):
         self.data = data if data is not None else {}
         self.children = children if children is not None else []
         self.name = Location(kwargs.get('location')).name
+        self.type = Location(kwargs.get('location')).category
         self._child_instances = None
 
-    def get_children(self):
+    def get_children(self, categories=None):
         """Returns a list of XModuleDescriptor instances for the children of this module"""
         if self._child_instances is None:
             self._child_instances = [self.load_item(child) for child in self.children]
-        return self._child_instances
+
+        if categories is None:
+            return self._child_instances
+        else:
+            return [child for child in self._child_instances if child.type in categories]
 
 
     def get_xml(self):
