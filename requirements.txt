@@ -25,3 +25,6 @@ newrelic
 glob2
 pymongo
 -e common/lib/xmodule
+django_nose
+nosexcover
+rednose

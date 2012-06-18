@@ -44,17 +44,17 @@ task :default => [:pep8, :pylint, :test]
 directory REPORT_DIR
 directory LMS_REPORT_DIR
 
-desc "Run pep8 on all of djangoapps"
-task :pep8 => LMS_REPORT_DIR do
-    sh("pep8 --ignore=E501 lms/djangoapps | tee #{LMS_REPORT_DIR}/pep8.report")
+desc "Run pep8 on all libraries"
+task :pep8 => REPORT_DIR do
+    sh("pep8 --ignore=E501 lms/djangoapps common/lib/* | tee #{REPORT_DIR}/pep8.report")
 end
 
-desc "Run pylint on all of djangoapps"
-task :pylint => LMS_REPORT_DIR do
-    ENV['PYTHONPATH'] = 'lms/djangoapps'
-    Dir["lms/djangoapps/*"].each do |app|
+desc "Run pylint on all libraries"
+task :pylint => REPORT_DIR do
+    Dir["lms/djangoapps/*", "common/lib/*"].each do |app|
+        ENV['PYTHONPATH'] = File.dirname(app)
         app = File.basename(app)
-        sh("pylint -f parseable #{app} | tee #{LMS_REPORT_DIR}/#{app}.pylint.report")
+        sh("pylint --rcfile=.pylintrc -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
     end
 end
 
@@ -66,6 +66,7 @@ end
     desc "Run all django tests on our djangoapps for the #{system}"
     task task_name => report_dir do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
+        ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
         sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
     end
     task :test => task_name
@@ -83,13 +84,13 @@ end
 Dir["common/lib/*"].each do |lib|
     task_name = "test_#{lib}"
 
-    report_dir = File.join(REPORT_DIR, task_name)
+    report_dir = File.join(REPORT_DIR, task_name.gsub('/', '_'))
     directory report_dir
 
     desc "Run tests for common lib #{lib}"
-    task task_name do
+    task task_name => report_dir do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-        sh("nosetests #{lib}")
+        sh("nosetests #{lib} --cover-erase --with-xunit --with-xcoverage --cover-html --cover-inclusive --cover-package #{File.basename(lib)} --cover-html-dir #{File.join(report_dir, "cover")}")
     end
     task :test => task_name
 end

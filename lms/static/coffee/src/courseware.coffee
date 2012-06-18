@@ -4,8 +4,6 @@ class @Courseware
   constructor: ->
     Courseware.prefix = $("meta[name='path_prefix']").attr('content')
     new Navigation
-    new Calculator
-    new FeedbackForm
     Logger.bind()
     @bind()
     @render()

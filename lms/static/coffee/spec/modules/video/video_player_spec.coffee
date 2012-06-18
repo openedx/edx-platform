@@ -1,6 +1,6 @@
 describe 'VideoPlayer', ->
   beforeEach ->
-    jasmine.stubVideoPlayer @
+    jasmine.stubVideoPlayer @, [], false
 
   afterEach ->
     YT.Player = undefined
@@ -11,68 +11,93 @@ describe 'VideoPlayer', ->
       spyOn YT, 'Player'
       $.fn.qtip.andCallFake ->
         $(this).data('qtip', true)
-      $('.video').append $('<div class="hide-subtitles" />')
-      @player = new VideoPlayer @video
+      $('.video').append $('<div class="add-fullscreen" /><div class="hide-subtitles" />')
 
-    it 'instanticate current time to zero', ->
-      expect(@player.currentTime).toEqual 0
+    describe 'always', ->
+      beforeEach ->
+        @player = new VideoPlayer @video
 
-    it 'set the element', ->
-      expect(@player.element).toBe '#video_example'
+      it 'instanticate current time to zero', ->
+        expect(@player.currentTime).toEqual 0
 
-    it 'create video control', ->
-      expect(window.VideoControl).toHaveBeenCalledWith @player
+      it 'set the element', ->
+        expect(@player.element).toBe '#video_example'
 
-    it 'create video caption', ->
-      expect(window.VideoCaption).toHaveBeenCalledWith @player, 'def456'
+      it 'create video control', ->
+        expect(window.VideoControl).toHaveBeenCalledWith @player
 
-    it 'create video speed control', ->
-      expect(window.VideoSpeedControl).toHaveBeenCalledWith @player, ['0.75', '1.0']
+      it 'create video caption', ->
+        expect(window.VideoCaption).toHaveBeenCalledWith @player, 'def456'
 
-    it 'create video progress slider', ->
-      expect(window.VideoProgressSlider).toHaveBeenCalledWith @player
+      it 'create video speed control', ->
+        expect(window.VideoSpeedControl).toHaveBeenCalledWith @player, ['0.75', '1.0']
 
-    it 'create Youtube player', ->
-      expect(YT.Player).toHaveBeenCalledWith 'example'
-        playerVars:
-          controls: 0
-          wmode: 'transparent'
-          rel: 0
-          showinfo: 0
-          enablejsapi: 1
-        videoId: 'def456'
-        events:
-          onReady: @player.onReady
-          onStateChange: @player.onStateChange
+      it 'create video progress slider', ->
+        expect(window.VideoProgressSlider).toHaveBeenCalledWith @player
 
-    it 'bind to seek event', ->
-      expect($(@player)).toHandleWith 'seek', @player.onSeek
+      it 'create Youtube player', ->
+        expect(YT.Player).toHaveBeenCalledWith 'example'
+          playerVars:
+            controls: 0
+            wmode: 'transparent'
+            rel: 0
+            showinfo: 0
+            enablejsapi: 1
+          videoId: 'def456'
+          events:
+            onReady: @player.onReady
+            onStateChange: @player.onStateChange
 
-    it 'bind to updatePlayTime event', ->
-      expect($(@player)).toHandleWith 'updatePlayTime', @player.onUpdatePlayTime
+      it 'bind to seek event', ->
+        expect($(@player)).toHandleWith 'seek', @player.onSeek
 
-    it 'bidn to speedChange event', ->
-      expect($(@player)).toHandleWith 'speedChange', @player.onSpeedChange
+      it 'bind to updatePlayTime event', ->
+        expect($(@player)).toHandleWith 'updatePlayTime', @player.onUpdatePlayTime
 
-    it 'bind to play event', ->
-      expect($(@player)).toHandleWith 'play', @player.onPlay
+      it 'bidn to speedChange event', ->
+        expect($(@player)).toHandleWith 'speedChange', @player.onSpeedChange
 
-    it 'bind to paused event', ->
-      expect($(@player)).toHandleWith 'pause', @player.onPause
+      it 'bind to play event', ->
+        expect($(@player)).toHandleWith 'play', @player.onPlay
 
-    it 'bind to ended event', ->
-      expect($(@player)).toHandleWith 'ended', @player.onPause
+      it 'bind to paused event', ->
+        expect($(@player)).toHandleWith 'pause', @player.onPause
 
-    it 'bind to key press', ->
-      expect($(document)).toHandleWith 'keyup', @player.bindExitFullScreen
+      it 'bind to ended event', ->
+        expect($(@player)).toHandleWith 'ended', @player.onPause
 
-    it 'bind to fullscreen switching button', ->
-      expect($('.add-fullscreen')).toHandleWith 'click', @player.toggleFullScreen
+      it 'bind to key press', ->
+        expect($(document)).toHandleWith 'keyup', @player.bindExitFullScreen
+
+      it 'bind to fullscreen switching button', ->
+        console.debug $('.add-fullscreen')
+        expect($('.add-fullscreen')).toHandleWith 'click', @player.toggleFullScreen
 
     describe 'when not on a touch based device', ->
+      beforeEach ->
+        spyOn(window, 'onTouchBasedDevice').andReturn false
+        $('.add-fullscreen, .hide-subtitles').removeData 'qtip'
+        @player = new VideoPlayer @video
+
       it 'add the tooltip to fullscreen and subtitle button', ->
         expect($('.add-fullscreen')).toHaveData 'qtip'
         expect($('.hide-subtitles')).toHaveData 'qtip'
+
+      it 'create video volume control', ->
+        expect(window.VideoVolumeControl).toHaveBeenCalledWith @player
+
+    describe 'when on a touch based device', ->
+      beforeEach ->
+        spyOn(window, 'onTouchBasedDevice').andReturn true
+        $('.add-fullscreen, .hide-subtitles').removeData 'qtip'
+        @player = new VideoPlayer @video
+
+      it 'does not add the tooltip to fullscreen and subtitle button', ->
+        expect($('.add-fullscreen')).not.toHaveData 'qtip'
+        expect($('.hide-subtitles')).not.toHaveData 'qtip'
+
+      it 'does not create video volume control', ->
+        expect(window.VideoVolumeControl).not.toHaveBeenCalled()
 
   describe 'onReady', ->
     beforeEach ->
@@ -387,3 +412,17 @@ describe 'VideoPlayer', ->
 
     it 'delegate to the video', ->
       expect(@player.currentSpeed()).toEqual '3.0'
+
+  describe 'volume', ->
+    beforeEach ->
+      @player = new VideoPlayer @video
+      @player.player.getVolume.andReturn 42
+
+    describe 'without value', ->
+      it 'return current volume', ->
+        expect(@player.volume()).toEqual 42
+
+    describe 'with value', ->
+      it 'set player volume', ->
+        @player.volume(60)
+        expect(@player.player.setVolume).toHaveBeenCalledWith(60)
