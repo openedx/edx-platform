@@ -1,0 +1,115 @@
+<section class="cal">
+  <header>
+    <h2>Filter content:</h2>
+    <ul>
+      <li>
+        <a href="#">Sequences</a>
+
+        <ul>
+          <li>Hide all</li>
+          <li>Lectures</li>
+          <li>Labs</li>
+          <li>Homeworks</li>
+          <li>Exams</li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="#">Deadlines</a>
+
+        <ul>
+          <li>Today</li>
+          <li>Tomorrow</li>
+          <li>This week</li>
+          <li>In 2 weeks</li>
+          <li>This month</li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Goals</a>
+        <ul>
+          <li>Hide</li>
+        </ul>
+      </li>
+    </ul>
+  </header>
+
+  <ol>
+    % for week in weeks:
+    <li>
+      <header>
+        <h1><a href="#">${week.name}</a></h1>
+        <ul>
+          % for goal in week.get_goals():
+          <li class="goal editable"><strong>${goal.name}:</strong>${goal.data}</li>
+          % endfor
+        </ul>
+      </header>
+
+      <ul>
+        % for module in week.get_non_goals():
+        <li class="${module.type}">
+            <a href="#" class="${module.type}-edit">${module.name}</a>
+            <a href="#" class="draggable">handle</a>
+        </li>
+        % endfor
+        <%include file="module-dropdown.html"/>
+      </ul>
+    </li>
+    %endfor
+    <li>
+      <header>
+        <h1>Course Scratch Pad</h1>
+      </header>
+
+      <ul>
+        <li>
+          <a href="#" class="problem-edit">Problem title 11</a>
+          <a href="#" class="draggable">handle</a>
+        </li>
+        <li>
+          <a href="#" class="problem-edit">Problem title 13 </a>
+          <a href="#" class="draggable">handle</a>
+        </li>
+        <li>
+          <a href="#" class="problem-edit"> Problem title 14</a>
+          <a href="#" class="draggable">handle</a>
+        </li>
+        <li>
+          <a href="" class="video-edit">Video 3</a>
+          <a href="#" class="draggable">handle</a>
+        </li>
+      </ul>
+    </li>
+  </ol>
+
+  <section class="new-section">
+    <a href="#" >+ Add New Section</a>
+
+    <section>
+      <form>
+        <ul>
+          <li>
+            <input type="text" name="" id="" placeholder="Section title" />
+          </li>
+          <li>
+            <select>
+              <option>Blank</option>
+              <option>6.002x</option>
+              <option>6.00x</option>
+            </select>
+          </li>
+          <li>
+            <input type="submit" value="Save and edit week" class="edit-week" />
+
+            <div>
+              <a href="#" class="close">Save without edit</a>
+              <a href="#" class="close">cancel</a>
+            </div>
+          </li>
+        </ul>
+      </form>
+    </section>
+  </section>
+</section>
+

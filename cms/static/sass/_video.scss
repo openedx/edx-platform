@@ -1,0 +1,33 @@
+section.video-new, section.video-edit {
+  > section {
+
+    section.upload {
+      padding: 6px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+
+      a.upload-button {
+        @extend .button;
+        @include inline-block();
+      }
+    }
+
+    section.in-use {
+      h2 {
+        font-size: 14px;
+      }
+
+      div {
+        background: #eee;
+        text-align: center;
+        padding: 6px;
+      }
+    }
+
+    a.save-update {
+      @extend .button;
+      @include inline-block();
+      margin-top: 20px;
+    }
+  }
+}
