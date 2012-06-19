@@ -21,7 +21,7 @@ class Plugin(object):
             log.warning("Found multiple classes for {entry_point} with identifier {id}: {classes}. Returning the first one.".format(
                 entry_point=cls.entry_point,
                 id=identifier,
-                classes=", ".join([class_.module_name for class_ in classes])))
+                classes=", ".join(class_.module_name for class_ in classes)))
 
         if len(classes) == 0:
             raise ModuleMissingError(identifier)
@@ -125,46 +125,81 @@ class XModule(object):
 
 
 class XModuleDescriptor(Plugin):
+    """
+    An XModuleDescriptor is a specification for an element of a course. This could
+    be a problem, an organizational element (a group of content), or a segment of video,
+    for example.
 
+    XModuleDescriptors are independent and agnostic to the current student state on a
+    problem. They handle the editing interface used by instructors to create a problem,
+    and can generate XModules (which do know about student state).
+    """
     entry_point = "xmodule.v1"
 
     @staticmethod
-    def load_from_json(json_data, load_item):
+    def load_from_json(json_data, system):
+        """
+        This method instantiates the correct subclass of XModuleDescriptor based
+        on the contents of json_data.
+
+        json_data must contain a 'location' element, and must be suitable to be
+        passed into the subclasses `from_json` method.
+        """
         class_ = XModuleDescriptor.load_class(json_data['location']['category'])
-        return class_.from_json(json_data, load_item)
+        return class_.from_json(json_data, system)
 
     @classmethod
-    def from_json(cls, json_data, load_item):
+    def from_json(cls, json_data, system):
         """
         Creates an instance of this descriptor from the supplied json_data.
+        This may be overridden by subclasses
 
         json_data: Json data specifying the data, children, and metadata for the descriptor
-        load_item: A function that takes an i4x url and returns a module descriptor
+        system: An XModuleSystem for interacting with external resources
         """
-        return cls(load_item=load_item, **json_data)
+        return cls(system=system, **json_data)
 
     def __init__(self,
-                 load_item,
-                 data=None,
-                 children=None,
+                 system,
+                 definition=None,
                  **kwargs):
-        self.load_item = load_item
-        self.data = data if data is not None else {}
-        self.children = children if children is not None else []
+        """
+        Construct a new XModuleDescriptor. The only required arguments are the
+        system, used for interaction with external resources, and the definition,
+        which specifies all the data needed to edit and display the problem (but none
+        of the associated metadata that handles recordkeeping around the problem).
+
+        This allows for maximal flexibility to add to the interface while preserving
+        backwards compatibility.
+
+        system: An XModuleSystem for interacting with external resources
+        definition: A dict containing `data` and `children` representing the problem definition
+
+        Current arguments passed in kwargs:
+            location: A keystore.Location object indicating the name and ownership of this problem
+            goals: A list of strings of learning goals associated with this module
+        """
+        self.system = system
+        self.definition = definition if definition is not None else {}
         self.name = Location(kwargs.get('location')).name
         self.type = Location(kwargs.get('location')).category
+
+        # For now, we represent goals as a list of strings, but this
+        # is one of the things that we are going to be iterating on heavily
+        # to find the best teaching method
+        self.goals = kwargs.get('goals', [])
+
         self._child_instances = None
 
     def get_children(self, categories=None):
         """Returns a list of XModuleDescriptor instances for the children of this module"""
         if self._child_instances is None:
-            self._child_instances = [self.load_item(child) for child in self.children]
+            self._child_instances = [self.system.load_item(child) for child in self.definition['children']]
 
         if categories is None:
             return self._child_instances
         else:
             return [child for child in self._child_instances if child.type in categories]
-
 
     def get_xml(self):
         ''' For conversions between JSON and legacy XML representations.
@@ -192,3 +227,12 @@ class XModuleDescriptor(Plugin):
     #    Full ==> what we edit
     #    '''
     #    raise NotImplementedError
+
+
+class DescriptorSystem(object):
+    def __init__(self, load_item):
+        """
+        load_item: Takes a Location and returns and XModuleDescriptor
+        """
+
+        self.load_item = load_item
