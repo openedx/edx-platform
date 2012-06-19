@@ -7,9 +7,11 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 KEYSTORE = {
-    'host': 'localhost',
-    'db': 'mongo_base',
-    'collection': 'key_store',
+    'default': {
+        'host': 'localhost',
+        'db': 'mongo_base',
+        'collection': 'key_store',
+    }
 }
 
 DATABASES = {
