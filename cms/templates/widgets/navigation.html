@@ -40,14 +40,18 @@
       <header>
         <h1><a href="#">${week.name}</a></h1>
         <ul>
-          % for goal in week.get_goals():
-          <li class="goal editable"><strong>${goal.name}:</strong>${goal.data}</li>
-          % endfor
+          % if week.goals:
+            % for goal in week.goals:
+            <li class="goal editable">${goal}</li>
+            % endfor
+          % else:
+            <li class="goal editable">Please create a learning goal for this week</li>
+          % endif
         </ul>
       </header>
 
       <ul>
-        % for module in week.get_non_goals():
+        % for module in week.get_children():
         <li class="${module.type}">
             <a href="#" class="${module.type}-edit">${module.name}</a>
             <a href="#" class="draggable">handle</a>
