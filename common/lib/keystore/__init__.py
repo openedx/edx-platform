@@ -1,13 +1,6 @@
 """
-This module provides an abstraction for working objects that conceptually have
-the following attributes:
-
-    location: An identifier for an item, of which there might be many revisions
-    children: A list of urls for other items required to fully define this object
-    data: A set of nested data needed to define this object
-    editor: The editor/owner of the object
-    parents: Url pointers for objects that this object was derived from
-    revision: What revision of the item this is
+This module provides an abstraction for working with XModuleDescriptors
+that are stored in a database an accessible using their Location as an identifier
 """
 
 import re
@@ -123,27 +116,26 @@ class Location(object):
                 'revision': self.revision}
 
 
-class KeyStore(object):
+class ModuleStore(object):
+    """
+    An abstract interface for a database backend that stores XModuleDescriptor instances
+    """
     def get_item(self, location):
         """
-        Returns an XModuleDescriptor instance for the item at location
+        Returns an XModuleDescriptor instance for the item at location.
+        If location.revision is None, returns the most item with the most
+        recent revision
 
+        If any segment of the location is None except revision, raises
+            keystore.exceptions.InsufficientSpecificationError
         If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
-
-        Searches for all matches of a partially specifed location, but raises an
-        keystore.exceptions.InsufficientSpecificationError if more
-        than a single object matches the query.
 
         location: Something that can be passed to Location
         """
         raise NotImplementedError
 
+    # TODO (cpennington): Replace with clone_item
     def create_item(self, location, editor):
-        """
-        Create an empty item at the specified location with the supplied editor
-
-        location: Something that can be passed to Location
-        """
         raise NotImplementedError
 
     def update_item(self, location, data):
