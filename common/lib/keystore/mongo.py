@@ -1,7 +1,7 @@
 import pymongo
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
-from xmodule.x_module import XModuleDescriptor, XModuleSystem
+from xmodule.x_module import XModuleDescriptor, DescriptorSystem
 
 
 class MongoModuleStore(ModuleStore):
@@ -45,7 +45,7 @@ class MongoModuleStore(ModuleStore):
         if item is None:
             raise ItemNotFoundError(location)
 
-        return XModuleDescriptor.load_from_json(item, XModuleSystem(self.get_item))
+        return XModuleDescriptor.load_from_json(item, DescriptorSystem(self.get_item))
 
     def create_item(self, location, editor):
         """
