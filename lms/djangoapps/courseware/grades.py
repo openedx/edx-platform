@@ -174,6 +174,8 @@ def get_score(user, problem, cache, coursename=None):
     else:
         ## HACK 1: We shouldn't specifically reference capa_module
         ## HACK 2: Backwards-compatibility: This should be written when a grade is saved, and removed from the system
+        # TODO: These are no longer correct params for I4xSystem -- figure out what this code
+        # does, clean it up.
         from module_render import I4xSystem
         system = I4xSystem(None, None, None, coursename=coursename)
         total=float(xmodule.capa_module.Module(system, etree.tostring(problem), "id").max_score())
