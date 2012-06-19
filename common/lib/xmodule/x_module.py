@@ -1,7 +1,9 @@
 from lxml import etree
 import pkg_resources
 import logging
+
 from keystore import Location
+from progress import Progress
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -117,6 +119,15 @@ class XModule(object):
         ''' HTML, as shown in the browser. This is the only method that must be implemented
         '''
         return "Unimplemented"
+
+    def get_progress(self):
+        ''' Return a progress.Progress object that represents how far the student has gone
+        in this module.  Must be implemented to get correct progress tracking behavior in
+        nesting modules like sequence and vertical.
+
+        If this module has no notion of progress, return None.
+        '''
+        return None
 
     def handle_ajax(self, dispatch, get):
         ''' dispatch is last part of the URL. 
