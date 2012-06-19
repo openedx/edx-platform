@@ -67,6 +67,9 @@ class MongoKeyStore(KeyStore):
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
+
+        # See http://www.mongodb.org/display/DOCS/Updating for
+        # atomic update syntax
         self.collection.update(
             {'location': Location(location).dict()},
             {'$set': {'data': data}}
@@ -80,6 +83,9 @@ class MongoKeyStore(KeyStore):
         location: Something that can be passed to Location
         children: A list of child item identifiers
         """
+
+        # See http://www.mongodb.org/display/DOCS/Updating for
+        # atomic update syntax
         self.collection.update(
             {'location': Location(location).dict()},
             {'$set': {'children': children}}
