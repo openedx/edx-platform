@@ -9,3 +9,6 @@ class ItemNotFoundError(Exception):
 
 class InsufficientSpecificationError(Exception):
     pass
+
+class InvalidLocationError(Exception):
+    pass
