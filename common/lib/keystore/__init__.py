@@ -165,19 +165,3 @@ class KeyStore(object):
         children: A list of child item identifiers
         """
         raise NotImplementedError
-
-
-class KeyStoreItem(object):
-    """
-    An object from a KeyStore, which can be saved back to that keystore
-    """
-    def __init__(self, location, children, data, editor, parents, revision):
-        self.location = location
-        self.children = children
-        self.data = data
-        self.editor = editor
-        self.parents = parents
-        self.revision = revision
-
-    def save(self):
-        raise NotImplementedError
