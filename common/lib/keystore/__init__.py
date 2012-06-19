@@ -123,7 +123,7 @@ class ModuleStore(object):
     def get_item(self, location):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the most item with the most
+        If location.revision is None, returns the item with the most
         recent revision
 
         If any segment of the location is None except revision, raises
