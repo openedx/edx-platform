@@ -21,7 +21,7 @@ def compressed_css(package_name):
         return render_individual_css(package, paths)
 
 def render_css(package, path):
-    template_name = package.template_name or "pipeline_mako/css.html"
+    template_name = package.template_name or "mako/css.html"
     context = package.extra_context
     context.update({
         'type': guess_type(path, 'text/css'),
@@ -50,7 +50,7 @@ def compressed_js(package_name):
         return render_individual_js(package, paths, templates)
 
 def render_js(package, path):
-    template_name = package.template_name or "pipeline_mako/js.html"
+    template_name = package.template_name or "mako/js.html"
     context = package.extra_context
     context.update({
         'type': guess_type(path, 'text/javascript'),
@@ -63,7 +63,7 @@ def render_inline_js(package, js):
     context.update({
         'source': js
     })
-    return render_to_string("pipeline_mako/inline_js.html", context)
+    return render_to_string("mako/inline_js.html", context)
 
 def render_individual_js(package, paths, templates=None):
     tags = [render_js(package, js) for js in paths]
