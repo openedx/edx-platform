@@ -15,10 +15,10 @@
   <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
 % endif
 
-  <script type="text/javascript" src="${static.url('js/vendor/jquery-1.6.2.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery-ui-1.8.16.custom.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.cookie.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-ui.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/swfobject/swfobject.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.cookie.js')}"></script>
 
 % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
  <%static:js group='application'/>
