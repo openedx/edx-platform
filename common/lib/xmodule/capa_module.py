@@ -11,6 +11,7 @@ from datetime import timedelta
 from lxml import etree
 
 from x_module import XModule, XModuleDescriptor
+from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
 
@@ -79,16 +80,29 @@ class Module(XModule):
     def get_xml_tags(c):
         return ["problem"]
 
+
     def get_state(self):
         state = self.lcp.get_state()
         state['attempts'] = self.attempts
         return json.dumps(state)
 
+
     def get_score(self):
         return self.lcp.get_score()
 
+
     def max_score(self):
         return self.lcp.get_max_score()
+
+
+    def get_progress(self):
+        ''' For now, just return score / max_score
+        '''
+        d = self.get_score()
+        score = d['score']
+        total = d['total']
+        return Progress(score, total)
+
 
     def get_html(self):
         return self.system.render_template('problem_ajax.html', {
@@ -96,7 +110,11 @@ class Module(XModule):
             'ajax_url': self.ajax_url,
         })
 
+
     def get_problem_html(self, encapsulate=True):
+        '''Return html for the problem.  Adds check, reset, save buttons
+        as necessary based on the problem config and state.'''
+
         html = self.lcp.get_html()
         content = {'name': self.name,
                    'html': html,
@@ -109,7 +127,7 @@ class Module(XModule):
         reset_button = True
         save_button = True
 
-        # If we're after deadline, or user has exhuasted attempts,
+        # If we're after deadline, or user has exhausted attempts,
         # question is read-only.
         if self.closed():
             check_button = False
@@ -154,11 +172,13 @@ class Module(XModule):
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
                    'explain': explain,
+                   'progress': self.get_progress(),
                    }
 
         html = self.system.render_template('problem.html', context)
         if encapsulate:
-            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(id=self.item_id, ajax_url=self.ajax_url) + html + "</div>"
+            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
+                id=self.item_id, ajax_url=self.ajax_url) + html + "</div>"
 
         return html
 
@@ -170,7 +190,8 @@ class Module(XModule):
 
         dom2 = etree.fromstring(xml)
 
-        self.explanation = "problems/" + only_one(dom2.xpath('/problem/@explain'), default="closed")
+        self.explanation = "problems/" + only_one(dom2.xpath('/problem/@explain'),
+                                                  default="closed")
         # TODO: Should be converted to: self.explanation=only_one(dom2.xpath('/problem/@explain'), default="closed")
         self.explain_available = only_one(dom2.xpath('/problem/@explain_available'))
 
@@ -190,19 +211,19 @@ class Module(XModule):
             self.grace_period = None
             self.close_date = self.display_due_date
 
-        self.max_attempts =only_one(dom2.xpath('/problem/@attempts'))
-        if len(self.max_attempts)>0:
-            self.max_attempts =int(self.max_attempts)
+        self.max_attempts = only_one(dom2.xpath('/problem/@attempts'))
+        if len(self.max_attempts) > 0:
+            self.max_attempts = int(self.max_attempts)
         else:
-            self.max_attempts =None
+            self.max_attempts = None
 
-        self.show_answer =only_one(dom2.xpath('/problem/@showanswer'))
+        self.show_answer = only_one(dom2.xpath('/problem/@showanswer'))
 
-        if self.show_answer =="":
-            self.show_answer ="closed"
+        if self.show_answer == "":
+            self.show_answer = "closed"
 
-        self.rerandomize =only_one(dom2.xpath('/problem/@rerandomize'))
-        if self.rerandomize =="" or self.rerandomize=="always" or self.rerandomize=="true":
+        self.rerandomize = only_one(dom2.xpath('/problem/@rerandomize'))
+        if self.rerandomize == "" or self.rerandomize=="always" or self.rerandomize=="true":
             self.rerandomize="always"
         elif self.rerandomize=="false" or self.rerandomize=="per_student":
             self.rerandomize="per_student"
@@ -253,23 +274,33 @@ class Module(XModule):
 
     def handle_ajax(self, dispatch, get):
         '''
-        This is called by courseware.module_render, to handle an AJAX call.  "get" is request.POST
+        This is called by courseware.module_render, to handle an AJAX call.
+        "get" is request.POST.
+
+        Returns a json dictionary:
+        { 'progress_changed' : True/False,
+          'progress' : 'none'/'in_progress'/'done',
+          <other request-specific values here > }
         '''
-        if dispatch=='problem_get':
-            response = self.get_problem(get)
-        elif False: #self.close_date >
-            return json.dumps({"error":"Past due date"})
-        elif dispatch=='problem_check':
-            response = self.check_problem(get)
-        elif dispatch=='problem_reset':
-            response = self.reset_problem(get)
-        elif dispatch=='problem_save':
-            response = self.save_problem(get)
-        elif dispatch=='problem_show':
-            response = self.get_answer(get)
-        else:
-            return "Error"
-        return response
+        handlers = {
+            'problem_get': self.get_problem,
+            'problem_check': self.check_problem,
+            'problem_reset': self.reset_problem,
+            'problem_save': self.save_problem,
+            'problem_show': self.get_answer,
+            }
+
+        if dispatch not in handlers:
+            return 'Error'
+
+        before = self.get_progress()
+        d = handlers[dispatch](get)
+        after = self.get_progress()
+        d.update({
+            'progress_changed' : after != before,
+            'progress' : after.ternary_str(),
+            })
+        return json.dumps(d, cls=ComplexEncoder)
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
@@ -283,24 +314,22 @@ class Module(XModule):
 
     def answer_available(self):
         ''' Is the user allowed to see an answer?
-        TODO: simplify. 
         '''
         if self.show_answer == '':
             return False
+
         if self.show_answer == "never":
             return False
-        if self.show_answer == 'attempted' and self.attempts == 0:
-            return False
-        if self.show_answer == 'attempted' and self.attempts > 0:
-            return True
-        if self.show_answer == 'answered' and self.lcp.done:
-            return True
-        if self.show_answer == 'answered' and not self.lcp.done:
-            return False
-        if self.show_answer == 'closed' and self.closed():
-            return True
-        if self.show_answer == 'closed' and not self.closed():
-            return False
+
+        if self.show_answer == 'attempted':
+            return self.attempts > 0
+
+        if self.show_answer == 'answered':
+            return self.lcp.done
+
+        if self.show_answer == 'closed':
+            return self.closed()
+
         if self.show_answer == 'always':
             return True
         raise self.system.exception404 #TODO: Not 404
@@ -310,45 +339,64 @@ class Module(XModule):
         For the "show answer" button.
 
         TODO: show answer events should be logged here, not just in the problem.js
+
+        Returns the answers: {'answers' : answers}
         '''
         if not self.answer_available():
             raise self.system.exception404
         else:
             answers = self.lcp.get_question_answers()
-            return json.dumps(answers,
-                              cls=ComplexEncoder)
+            return {'answers' : answers}
+
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
-        ''' Same as get_problem_html -- if we want to reconfirm we
-            have the right thing e.g. after several AJAX calls.'''
-        return self.get_problem_html(encapsulate=False)
+        ''' Return results of get_problem_html, as a simple dict for json-ing.
+        { 'html': <the-html> }
+
+            Used if we want to reconfirm we have the right thing e.g. after
+            several AJAX calls.
+        ''' 
+        return {'html' : self.get_problem_html(encapsulate=False)}
+
+    @staticmethod
+    def make_dict_of_responses(get):
+        '''Make dictionary of student responses (aka "answers")
+        get is POST dictionary.
+        '''
+        answers = dict()
+        for key in get:
+            # e.g. input_resistor_1 ==> resistor_1
+            answers['_'.join(key.split('_')[1:])] = get[key]
+
+        return answers
 
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and
-            returns a map of correct/incorrect answers'''
+            returns a map of correct/incorrect answers:
+
+            {'success' : bool,
+             'contents' : html}
+            '''
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['filename'] = self.filename
 
-        # make a dict of all the student responses ("answers").
-        answers=dict()
-        # input_resistor_1 ==> resistor_1
-        for key in get:
-            answers['_'.join(key.split('_')[1:])]=get[key]
+        answers = self.make_dict_of_responses(get)
 
-        event_info['answers']=answers
+        event_info['answers'] = answers
 
         # Too late. Cannot submit
         if self.closed():
-            event_info['failure']='closed'
+            event_info['failure'] = 'closed'
             self.tracker('save_problem_check_fail', event_info)
+            # TODO: probably not 404?
             raise self.system.exception404
 
         # Problem submitted. Student should reset before checking
         # again.
         if self.lcp.done and self.rerandomize == "always":
-            event_info['failure']='unreset'
+            event_info['failure'] = 'unreset'
             self.tracker('save_problem_check_fail', event_info)
             raise self.system.exception404
 
@@ -357,89 +405,107 @@ class Module(XModule):
             lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
-            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state, system=self.system)
+            # TODO: why is this line here?
+            self.lcp = LoncapaProblem(self.filestore.open(self.filename),
+                                      id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
-            return json.dumps({'success':inst.message})
+            return {'success': inst.message}
         except:
-            self.lcp = LoncapaProblem(self.filestore.open(self.filename), id=lcp_id, state=old_state, system=self.system)
+            # TODO: why is this line here?
+            self.lcp = LoncapaProblem(self.filestore.open(self.filename),
+                                      id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             raise Exception,"error in capa_module"
-            return json.dumps({'success':'Unknown Error'})
+            # TODO: Dead code...  is this a bug, or just old?
+            return {'success':'Unknown Error'}
 
         self.attempts = self.attempts + 1
-        self.lcp.done=True
+        self.lcp.done = True
 
-        success = 'correct'				# success = correct if ALL questions in this problem are correct
+        # success = correct if ALL questions in this problem are correct
+        success = 'correct'
         for answer_id in correct_map:
             if not correct_map.is_correct(answer_id):
                 success = 'incorrect'
 
-        event_info['correct_map']=correct_map.get_dict()	# log this in the tracker
-        event_info['success']=success
+        event_info['correct_map'] = correct_map.get_dict()	# log this in the tracker
+        event_info['success'] = success
         self.tracker('save_problem_check', event_info)
 
         try:
             html = self.get_problem_html(encapsulate=False)	# render problem into HTML
         except Exception,err:
             log.error('failed to generate html')
-            raise Exception,err
+            raise Exception, err
 
-        return json.dumps({'success': success,
-                           'contents': html,
-                           })
+        return {'success': success,
+                'contents': html,
+                }
+
 
     def save_problem(self, get):
+        '''
+        Save the passed in answers.
+        Returns a dict { 'success' : bool, ['error' : error-msg]},
+        with the error key only present if success is False.
+        '''
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['filename'] = self.filename
 
-        answers=dict()
-        for key in get:
-            answers['_'.join(key.split('_')[1:])]=get[key]
+        answers = self.make_dict_of_responses(get)
         event_info['answers'] = answers
 
         # Too late. Cannot submit
         if self.closed():
-            event_info['failure']='closed'
+            event_info['failure'] = 'closed'
             self.tracker('save_problem_fail', event_info)
-            return "Problem is closed"
+            return {'success': False,
+                    'error': "Problem is closed"}
 
         # Problem submitted. Student should reset before saving
         # again.
         if self.lcp.done and self.rerandomize == "always":
-            event_info['failure']='done'
+            event_info['failure'] = 'done'
             self.tracker('save_problem_fail', event_info)
-            return "Problem needs to be reset prior to save."
+            return {'success' : False,
+                    'error' : "Problem needs to be reset prior to save."}
 
-        self.lcp.student_answers=answers
+        self.lcp.student_answers = answers
 
+        # TODO: should this be save_problem_fail?  Looks like success to me...
         self.tracker('save_problem_fail', event_info)
-        return json.dumps({'success':True})
+        return {'success': True}
 
     def reset_problem(self, get):
         ''' Changes problem state to unfinished -- removes student answers,
-            and causes problem to rerender itself. '''
+            and causes problem to rerender itself.
+
+            Returns problem html as { 'html' : html-string }.
+        ''' 
         event_info = dict()
-        event_info['old_state']=self.lcp.get_state()
-        event_info['filename']=self.filename
+        event_info['old_state'] = self.lcp.get_state()
+        event_info['filename'] = self.filename
 
         if self.closed():
-            event_info['failure']='closed'
+            event_info['failure'] = 'closed'
             self.tracker('reset_problem_fail', event_info)
             return "Problem is closed"
 
         if not self.lcp.done:
-            event_info['failure']='not_done'
+            event_info['failure'] = 'not_done'
             self.tracker('reset_problem_fail', event_info)
             return "Refresh the page and make an attempt before resetting."
 
-        self.lcp.do_reset()		# call method in LoncapaProblem to reset itself
+        self.lcp.do_reset()
         if self.rerandomize == "always":
-            self.lcp.seed=None		# reset random number generator seed (note the self.lcp.get_state() in next line)
- 
-        self.lcp=LoncapaProblem(self.filestore.open(self.filename), self.item_id, self.lcp.get_state(), system=self.system)
+            # reset random number generator seed (note the self.lcp.get_state() in next line)
+            self.lcp.seed=None
+            
+        self.lcp = LoncapaProblem(self.filestore.open(self.filename),
+                                  self.item_id, self.lcp.get_state(), system=self.system)
 
-        event_info['new_state']=self.lcp.get_state()
+        event_info['new_state'] = self.lcp.get_state()
         self.tracker('reset_problem', event_info)
 
-        return json.dumps(self.get_problem_html(encapsulate=False))
+        return {'html' : self.get_problem_html(encapsulate=False)}

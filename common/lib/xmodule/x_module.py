@@ -59,6 +59,13 @@ class XModule(object):
         else: 
             raise "We should iterate through children and find a default name"
 
+    def get_children(self):
+        '''
+        Return module instances for all the children of this module.
+        '''
+        children = [self.module_from_xml(e) for e in self.__xmltree]
+        return children            
+
     def rendered_children(self):
         '''
         Render all children. 
@@ -92,6 +99,7 @@ class XModule(object):
             self.tracker = system.track_function
             self.filestore = system.filestore
             self.render_function = system.render_function
+            self.module_from_xml = system.module_from_xml
             self.DEBUG = system.DEBUG
         self.system = system
 
