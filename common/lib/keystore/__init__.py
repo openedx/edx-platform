@@ -44,6 +44,9 @@ class Location(object):
             Location: another Location object
 
         None of the components of a location may contain the '/' character
+
+        Components may be set to None, which may be interpreted by some contexts to mean
+        wildcard selection
         """
         self.update(location)
 
