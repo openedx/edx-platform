@@ -255,8 +255,6 @@ def index(request, course=None, chapter=None, section=None,
         If there's an error, returns
         {'content': module-error message}
         '''
-        # Can't modify variables of outer scope, so need new ones
-
         user = request.user
         
         module_xml = get_module_xml(user, course, chapter, section)
