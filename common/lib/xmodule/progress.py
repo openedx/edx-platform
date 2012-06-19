@@ -13,6 +13,8 @@ class Progress(object):
 
     Progress can only represent Progress for modules where that makes sense.  Other
     modules (e.g. html) should return None from get_progress().
+
+    TODO: add tag for module type?  Would allow for smarter merging.
     '''
 
     def __init__(self, a, b):
