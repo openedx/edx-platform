@@ -23,6 +23,12 @@ import sys
 import tempfile
 from path import path
 
+############################ FEATURE CONFIGURATION #############################
+
+MITX_FEATURES = {
+    'USE_DJANGO_PIPELINE': True,
+}
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
 COMMON_ROOT = PROJECT_ROOT.dirname() / "common"
@@ -43,7 +49,10 @@ sys.path.append(COMMON_ROOT / 'lib')
 # This is where we stick our compiled template files.
 MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 MAKO_TEMPLATES = {}
-MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates']
+MAKO_TEMPLATES['main'] = [
+    PROJECT_ROOT / 'templates',
+    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates'
+]
 
 MITX_ROOT_URL = ''
 
@@ -59,8 +68,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -132,14 +141,60 @@ USE_L10N = True
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
+############################### Pipeline #######################################
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+PIPELINE_CSS = {
+    'base-style': {
+        'source_filenames': ['sass/base-style.scss'],
+        'output_filename': 'css/base-style.css',
+    },
+}
+
+PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
+
+PIPELINE_JS = {
+}
+
+PIPELINE_COMPILERS = [
+    'pipeline.compilers.sass.SASSCompiler',
+    'pipeline.compilers.coffee.CoffeeScriptCompiler',
+]
+
+PIPELINE_SASS_ARGUMENTS = '-t compressed -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+
+PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
+
+STATICFILES_IGNORE_PATTERNS = (
+    "sass/*",
+    "coffee/*",
+    "*.py",
+    "*.pyc"
+)
+
+PIPELINE_YUI_BINARY = 'yui-compressor'
+PIPELINE_SASS_BINARY = 'sass'
+PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
+
+# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
+PIPELINE_COMPILE_INPLACE = True
+
 ############################ APPS #####################################
 
 INSTALLED_APPS = (
+    # Standard apps
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+
+    # For CMS
     'contentstore',
+
+    # For asset pipelining
+    'pipeline',
+    'staticfiles',
 )
