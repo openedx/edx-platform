@@ -121,6 +121,18 @@ div.course-wrapper {
             top: 6px;
           }
         }
+
+        ul {
+          list-style: disc outside none;
+        }
+
+        ol {
+          list-style: upper-roman outside none;
+        }
+
+        p {
+          margin-bottom: lh();
+        }
       }
 
       div {
