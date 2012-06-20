@@ -1,43 +1,19 @@
 <%inherit file="main.html" />
-<%include file="guest_navigation.html" args="active_page='info'" />
 
 <%namespace name='static' file='static_content.html'/>
 
-<section class="container">
-  <section class="find-courses">
-    <header>
-      <section class="universities">
-        <img src="${static.url('images/schools.png')}" />
-      </section>
+<section class="find-courses">
+  <header>
+    <div class="inner-wrapper">
+      <img src="${static.url('images/edx_bw.png')}" />
+      <h1>Explore courses from universities around the world.</h1>
+    </div>
+  </header>
 
-      <div class="faded-hr-divider"></div>
-    </header>
-
-    <h2 class="title">Current Courses offered by <em>MIT</em> and <em>Harvard University</em></h2>
-
+  <section class="container">
+    <%include file="course_filter.html" />
     <section class="courses">
-      <article class="course">
-        <a href="/course_info">
-          <div class="cover">
-            <div class="shade"></div>
-            <div class="arrow"></div>
-            <img src="${static.url('images/history.png')}" />
-          </div>
-          <section class="info">
-            <hgroup>
-              <h2>Circuits and Electronics</h2>
-              <p>Adam Smith, Harvard University</p>
-            </hgroup>
-            <div class="edit">Register</div>
-            <section class="meta">
-              <div class="dates">
-                <p>Starts: <time>6/10/12</time></p>
-                <p>Ends: <time>9/23/12</time></p>
-              </div>
-            </section>
-          </section>
-        </a>
-      </article>
+      <%include file="course.html" />
     </section>
   </section>
 </section>

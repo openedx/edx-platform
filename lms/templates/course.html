@@ -1,0 +1,26 @@
+<%namespace name='static' file='static_content.html'/>
+
+%for i in xrange(6):
+<article class="course">
+  <a href="/course_info">
+    <div class="cover">
+      <div class="shade"></div>
+      <div class="arrow"></div>
+      <img src="${static.url('images/history.png')}" />
+    </div>
+    <section class="info">
+      <hgroup>
+        <h2>18th Century History</h2>
+        <p>Adam Smith, Harvard University</p>
+      </hgroup>
+      <div class="edit">Register</div>
+      <section class="meta">
+        <div class="dates">
+          <p>Starts: <time>6/10/12</time></p>
+          <p>Ends: <time>9/23/12</time></p>
+        </div>
+      </section>
+    </section>
+  </a>
+</article>
+%endfor

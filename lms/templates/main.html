@@ -4,6 +4,7 @@
 <head>
   <%block name="title"><title>MITx 6.002x</title></%block>
 
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:800italic,400,800' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
 
 % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
@@ -63,8 +64,11 @@
 
   ${self.body()}
   <%block name="bodyextra"/>
+  <%include file="footer.html" />
   <%block name="js_extra"/>
   <script src="${static.url('js/my_courses_dropdown.js')}"></script>
+  <script src="${static.url('js/sticky_footer.js')}"></script>
+  <script src="${static.url('js/sticky_filter.js')}"></script>
 
 </body>
 </html>
