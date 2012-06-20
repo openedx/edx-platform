@@ -1,6 +1,7 @@
 @import 'bourbon/bourbon';
 @import 'reset';
 @import 'base';
+@import 'base_mixins';
 @import 'base_extends';
 @import 'base_animations';
 
@@ -9,6 +10,7 @@
 @import 'shared_header';
 @import 'shared_list_of_courses';
 @import 'shared_course_filter';
+@import 'shared_login_modal';
 
 // pages
 @import "courseware/courseware", "courseware/sidebar", "courseware/video", "courseware/sequence-nav", "courseware/amplifier", "courseware/problems";

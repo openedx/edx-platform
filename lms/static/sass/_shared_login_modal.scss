@@ -1,0 +1,185 @@
+.modal-wrapper {
+  @include background-image(radial-gradient(50% 50%, circle cover, rgba(0,0,0, 0.3), rgba(0,0,0, 0.7)));
+  bottom: 0;
+  content: "";
+  //display: none;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 5;
+
+  &.visible {
+    display: block;
+  }
+
+  .login-modal {
+    background: rgba(200, 200, 200, 1);
+    @include border-radius(4px);
+    @include box-shadow(0 5px 35px 0px rgba(0,0,0, 0.2));
+    color: #fff;
+    padding: 6px;
+    width: grid-width(8);
+    @include vertically-and-horizontally-centered(430px, grid-width(8));
+    z-index: 10;
+
+    .inner-wrapper {
+      background: rgba(235, 235, 235, 1);
+      border: 1px solid rgba(180, 180, 180, 1);
+      @include border-radius(4px);
+      @include box-shadow(inset 0 1px 0 0 rgba(255, 255, 255, 0.6), 0 1px 0 0 rgba(255, 255, 255, 0.3));
+      height: 410px;
+      padding: 30px;
+      position: relative;
+
+      header {
+        margin-bottom: 30px;
+        position: relative;
+
+        &::after {
+          @extend .faded-hr-divider;
+          bottom: 0px;
+          content: "";
+          display: block;
+          position: absolute;
+        }
+
+        h3 {
+          color: $base-font-color;
+          font: normal 2.2rem/2.4rem $sans-serif;
+          padding-bottom: 20px;
+          text-align: center;
+          text-shadow: 0 1px rgba(255,255,255, 0.4);
+          text-transform: uppercase;
+          vertical-align: middle;
+
+          img {
+            @include inline-block;
+            display: none;
+            height: 60px;
+            margin-right: 10px;
+            vertical-align: middle;
+          }
+        }
+
+      }
+
+      form {
+        @include clearfix;
+
+        label {
+          display: none;
+        }
+
+        label.remember-me {
+          background: rgb(230,230,230);
+          border: 1px solid rgb(200,200,200);
+          @include border-radius(3px);
+          display: block;
+          margin-bottom: 40px;
+          padding: 6px 10px;
+        }
+
+        input[type="checkbox"] {
+          margin-right: 5px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+          display: block;
+          height: 45px;
+          margin-bottom: 20px;
+          width: 100%;
+        }
+
+        input[type="submit"] {
+          display: block;
+          height: 45px;
+          margin: 0 auto;
+          width: 50%;
+        }
+      }
+
+      .login-extra {
+        margin-top: 40px;
+        padding: 20px 0px;
+        position: relative;
+        @include transition(opacity 0.15s linear);
+
+        &:hover {
+          p {
+            opacity: 1;
+          }
+        }
+
+        &::before {
+          @extend .faded-hr-divider;
+          content: "";
+          display: block;
+          position: absolute;
+          top: 0px;
+        }
+
+        p {
+          color: $lighter-base-font-color;
+          font: normal italic 1.2rem/1.6rem $serif;
+          opacity: 0.7;
+          text-align: center;
+
+          a {
+            color: $lighter-base-font-color;
+            font: normal italic 1.2rem/1.6rem $serif;
+            text-decoration: underline;
+          }
+
+          span + a {
+            border-left: 1px solid rgb(200,200,200);
+            margin-left: 10px;
+            padding-left: 10px;
+          }
+        }
+      }
+
+      .close-modal {
+        background: rgba(200,200,200, 0.7);
+        border: 1px solid rgba(180,180,180, 0.7);
+        @include border-radius(50px);
+        @include inline-block;
+        padding: 4px;
+        position: absolute;
+        right: -16px;
+        top: -16px;
+        @include transition(all, 0.15s, ease-out);
+
+        .inner {
+          background: rgb(255,255,255);
+          border: 1px solid rgb(180,180,180);
+          @include border-radius(50px);
+          @include box-shadow(0 1px 0 0 rgba(255, 255, 255, 0.3));
+          height: 26px;
+          width: 26px;
+
+          p {
+            color: rgb(210,210,210);
+            font: normal 15px/17px $sans-serif;
+            padding-top: 4px;
+            text-align: center;
+            text-shadow: 0 -1px rgba(0,0,0, 0.3);
+            @include transition(all, 0.15s, ease-out);
+          }
+        }
+
+        &:hover {
+          background: rgba(200,200,200, 1);
+          border: 1px solid rgba(180,180,180, 1);
+          cursor: pointer;
+          @include box-shadow(0 1px 3px 0 rgba(0,0,0, 0.15));
+
+          p {
+            color: lighten(red, 15%);
+          }
+        }
+      }
+    }
+  }
+}
