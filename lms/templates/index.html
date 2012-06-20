@@ -1,77 +1,52 @@
 <%inherit file="main.html" />
 
+<%namespace name='static' file='static_content.html'/>
+
 <section class="container">
   <section class="home">
     <header>
-      <h1>The Future of Online Education</h1>
-      <div class="orginizations">
-        <div class="orginization mit"><img src="/static/images/mit.png" /></div>
-        <div class="divider left"></div>
-        <div class="orginization edx"><img src="/static/images/edx.png" /></div>
-        <div class="divider right"></div>
-        <div class="orginization harvard"><img src="/static/images/harvard.png" /></div>
-      </div>
       <section class="video-wrapper">
         <div class="video-player">
           <div class="video-inner">
-            <iframe width="640" height="360" src="http://www.youtube.com/embed/SA6ELdIRkRU" frameborder="0" allowfullscreen></iframe>
+            <iframe width="560" height="315" src="http://www.youtube.com/embed/SA6ELdIRkRU" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
       </section>
-      <div class="bottom-divider"></div>
+      <section class="welcome">
+        <div class="intro">
+          <h1>The Future of Online Education</h1>
+          <p>
+            EdX is a joint partnership between The Massachusetts Institute of Technology (MIT) and Harvard University to offer online learning to millions of people around the world. EdX will offer Harvard and MIT classes online for free. Through this partnership, the institutions aim to extend their collective reach to build a global community of online learners and to improve education.
+          </p>
+        </div>
+        <div class="signup-wrapper">
+          <section class="sign-up">
+              <a href="#" class="find-courses">Find Courses</a>
+              <a href="#" class="create-account">Sign Up</a>
+          </section>
+        </div>
+      </section>
     </header>
-
-    <section class="welcome">
-      <div class="intro">
-        <h2>"The single biggest change in education since the printing press."</h2>
-        <p>
-          EdX is a joint partnership between The Massachusetts Institute of Technology (MIT) and Harvard University to offer online learning to millions of people around the world. EdX will offer Harvard and MIT classes online for free. Through this partnership, the institutions aim to extend their collective reach to build a global community of online learners and to improve education for everyone.
-        </p>
-      </div>
-      <div class="signup-wrapper">
-        <section class="sign-up top">
-            <a href="#">Sign Up Now</a>
-        </section>
-      </div>
-    </section>
 
     <section class="university-partners">
       <section class="partners">
-        <img src="/static/images/mit_bw.png" />
-        <img src="/static/images/edx_bw.png" />
-        <img src="/static/images/harvard_bw.png" />
+        <a href="/university_profile.html">
+          <img src="${static.url('images/mit_bw.png')}" />
+          <div class="name">MITx</div>
+        </a>
+        <a href="/university_profile.html">
+          <img src="${static.url('images/harvard_bw.png')}" />
+          <div class="name">HarvardX</div>
+        </a>
       </section>
     </section>
 
-    <section class="highlighted-courses">
-      <article class="course">
-        <a href="/course_info">
-          <div class="cover">
-            <div class="shade"></div>
-            <div class="arrow"></div>
-            <img src="/static/images/history.png" />
-          </div>
-          <section class="info">
-            <hgroup>
-              <h2>18th Century History</h2>
-              <p>Adam Smith, Harvard University</p>
-            </hgroup>
-          </section>
-        </a>
-      </article>
-    </section>
-
-    <section class="sign-up middle">
-      <form>
-        <input type="text" placeholder="Full Name">
-        <input type="email" placeholder="email">
-        <input type="password" placeholder="password">
-        <input type="submit" value="Sign Up">
-      </form>
+    <section class="courses">
+      <%include file="course.html" />
     </section>
 
     <section class="more-info">
-      <h2>More Information & News</h2>
+      <h2>edX News & Announcements</h2>
       <section class="news">
         <article></article>
         <article></article>
@@ -79,8 +54,7 @@
       </section>
     </section>
 
-    <section class="social-media">
-      <h2>Social Media</h2>
-    </section>
+    <%include file="login_modal.html" />
+
   </section>
 </section>

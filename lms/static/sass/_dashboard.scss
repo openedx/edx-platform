@@ -1,100 +1,104 @@
 .dashboard {
   @include clearfix;
   margin: 40px 10px;
-}
 
-.sidebar {
-  background: rgb(240,240,240);
-  float: left;
-  margin-right: flex-gutter();
-  width: flex-grid(3);
+  .sidebar {
+    background: rgb(240,240,240);
+    margin-right: flex-gutter();
+    position: absolute;
+    width: 250px;
 
-  @media screen and (max-width: 768px) {
-    float: none;
-    margin: 0 0 30px 0;
-    width: flex-grid(12);
-  }
+    @media screen and (max-width: 768px) {
+      float: none;
+      margin: 0 0 30px 0;
+      position: static;
+      width: flex-grid(12);
+    }
 
-  header.profile {
-    .user-info {
-      @include clearfix;
-      padding: 10px;
+    header.profile {
+      .user-info {
+        @include clearfix;
+        padding: 10px;
 
-      .avatar {
-        background: rgb(220,220,220);
-        border: 1px solid rgb(180,180,180);
-        @include border-radius(4px);
-        @include box-sizing(border-box);
-        margin: 0 0 15px 0;
-        max-width: 100%;
-        overflow: hidden;
-
-        @media screen and (max-width: 768px) {
-          float: left;
-          margin: 0px;
-          margin-right: flex-gutter();
-          width: flex-grid(3);
-        }
-
-        img {
+        .avatar {
+          background: rgb(220,220,220);
+          border: 1px solid rgb(180,180,180);
           @include border-radius(4px);
-          display: block;
+          @include box-sizing(border-box);
+          margin: 0 0 15px 0;
           max-width: 100%;
-        }
-      }
-
-      .info {
-        @media screen and (max-width: 768px) {
-          float: left;
-          width: flex-grid(9);
-        }
-
-        h2 {
-          border-bottom: 1px solid rgb(200,200,200);
-          @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.4));
-          font: bold 1.2rem/1.4rem $sans-serif;
-          margin-bottom: 15px;
           overflow: hidden;
-          padding-bottom: 15px;
-          text-align: center;
-          text-wrap: nowrap;
-          text-overflow: ellipsis;
 
           @media screen and (max-width: 768px) {
-            text-align: left;
+            margin: 0px;
+            margin-right: flex-gutter();
+            position: absolute;
+            width: 100px;
+          }
+
+          img {
+            @include border-radius(4px);
+            display: block;
+            max-width: 100%;
           }
         }
 
-        > ul {
-          @include clearfix;
-          margin: 0px;
-          padding: 0 0 10px 0;
-
+        .info {
           @media screen and (max-width: 768px) {
-            padding: 0px;
+            @include box-sizing(border-box);
+            float: left;
+            min-height: 100px;
+            padding-left: 110px;
+            width: 100%;
           }
 
-          li {
-            list-style: none;
-            margin-bottom: 10px;
+          h2 {
+            border-bottom: 1px solid rgb(200,200,200);
+            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.4));
+            font: bold 1.2rem/1.4rem $sans-serif;
+            margin-bottom: 15px;
+            overflow: hidden;
+            padding-bottom: 15px;
+            text-align: center;
+            text-wrap: nowrap;
+            text-overflow: ellipsis;
 
             @media screen and (max-width: 768px) {
-              float: left;
-              margin-right: 10px;
+              text-align: left;
+            }
+          }
+
+          > ul {
+            @include clearfix;
+            margin: 0px;
+            padding: 0 0 10px 0;
+
+            @media screen and (max-width: 768px) {
+              padding: 0px;
             }
 
-            &:last-child {
-              margin-bottom: 0px;
-            }
+            li {
+              list-style: none;
+              margin-bottom: 10px;
 
-            h3 {
-              color: $lighter-base-font-color;
-              font: bold 1rem/1.2rem $sans-serif;
-              text-shadow: 0 1px rgba(255,255,255, 0.8);
+              @media screen and (max-width: 768px) {
+                float: left;
+                margin-right: 10px;
+              }
 
-              span {
-                font-weight: normal;
-                text-transform: none;
+              &:last-child {
+                margin-bottom: 0px;
+              }
+
+              h3 {
+                color: $lighter-base-font-color;
+                font: bold 1rem/1.2rem $sans-serif;
+                text-shadow: 0 1px rgba(255,255,255, 0.8);
+
+                span {
+                  font-weight: normal;
+                  text-transform: none;
+                }
               }
             }
           }
@@ -102,58 +106,66 @@
       }
     }
   }
-}
 
+  .courses {
+    @include box-sizing(border-box);
+    margin: 0px;
+    padding-left: 270px;
 
-.courses {
-  float: left;
-  width: flex-grid(9);
+    @media screen and (max-width: 768px) {
+      padding: 0px;
+    }
 
-  @media only screen and (max-width: 768px) {
-    float: none;
-    width: flex-grid(12);
-  }
+    @media only screen and (max-width: 768px) {
+      float: none;
+      width: flex-grid(12);
+    }
 
-  nav.course-filters {
-    background: rgb(230,230,230);
-    margin-bottom: 30px;
-    position: relative;
+    nav.course-toggle {
+      background: rgb(230,230,230);
+      margin-bottom: 30px;
+      position: relative;
 
-    ol.filters {
-      @include clearfix;
+      ol.filters {
+        @include clearfix;
 
-      li {
-        border-right: 1px solid rgb(200,200,200);
-        @include box-sizing(border-box);
-        list-style: none;
-        float: left;
-        padding: 15px 10px;
-        width: 25%;
-        text-align: center;
+        li {
+          border-right: 1px solid rgb(200,200,200);
+          @include box-sizing(border-box);
+          list-style: none;
+          float: left;
+          padding: 15px 10px;
+          width: 25%;
+          text-align: center;
 
-        &:last-child {
-          border: none;
-        }
+          &:last-child {
+            border: none;
+          }
 
-        &:hover {
-          background: rgb(220,220,220);
-          cursor: pointer;
-        }
+          &:hover {
+            background: rgb(220,220,220);
+            cursor: pointer;
+          }
 
-        &.selected {
-          background: rgb(220,220,220);
-        }
+          &.selected {
+            background: rgb(220,220,220);
+          }
 
-        h2 {
-          font: normal 1rem/1.2rem $sans-serif;
-          text-transform: none;
-        }
+          h2 {
+            font: normal 1rem/1.2rem $sans-serif;
+            text-transform: none;
+          }
 
-        span.count {
-          margin: 5px 0 0 0;
-          display: block;
+          span.count {
+            margin: 5px 0 0 0;
+            display: block;
+          }
         }
       }
+    }
+
+    .course {
+      width: flex-grid(12);
     }
   }
 }

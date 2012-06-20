@@ -1,0 +1,36 @@
+<%namespace name='static' file='static_content.html'/>
+
+<section class="modal-wrapper">
+  <section class="login-modal">
+    <div class="inner-wrapper">
+      <header>
+        <h3><img src="${static.url('images/edx_bw.png')}">Log In</h3>
+      </header>
+
+      <form id="login_form" method="post">
+        <label>E-mail</label>
+        <input name="email" type="email" placeholder="e-mail">
+        <label>Password</label>
+        <input name="password" type="password" placeholder="password">
+        <label class="remember-me">
+          <input name="remember" type="checkbox">
+          Remember me
+        </label>
+        <input name="submit" type="submit" value="Log In">
+      </form>
+
+      <section class="login-extra">
+        <p>
+          <span>Not enrolled? <a href="#">Sign up here.</a></span>
+          <a href="#" class="pwd-reset">Forgot your password?</a>
+        </p>
+      </section>
+
+      <div class="close-modal">
+        <div class="inner">
+          <p>✖</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
