@@ -74,8 +74,8 @@ class Module(XModule):
 
         for contents, title, progress in zip(self.contents, titles, progresses):
             contents['title'] = title
-            contents['progress_str'] = str(progress) if progress is not None else ""
-            contents['progress_stat'] = progress.ternary_str() if progress is not None else ""
+            contents['progress_status'] = Progress.to_js_status_str(progress)
+            contents['progress_detail'] = Progress.to_js_detail_str(progress)
 
         for (content, element_class) in zip(self.contents, child_classes):
             new_class = 'other'

@@ -20,8 +20,16 @@ class @Sequence
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
 
   mergeProgress: (p1, p2) ->
+    # if either is "NA", return the other one
+    if p1 == "NA"
+      return p2
+    if p2 == "NA"
+      return p1
+
+    # Both real progresses
     if p1 == "done" and p2 == "done"
       return "done"
+
     # not done, so if any progress on either, in_progress
     w1 = p1 == "done" or p1 == "in_progress"
     w2 = p2 == "done" or p2 == "in_progress"
@@ -31,7 +39,7 @@ class @Sequence
     return "none"
 
   updateProgress: =>
-    new_progress = "none"
+    new_progress = "NA"
     _this = this
     $('.problems-wrapper').each (index) ->
       progress = $(this).attr 'progress'
@@ -41,6 +49,7 @@ class @Sequence
     @setProgress(new_progress, @link_for(@position))
 
   setProgress: (progress, element) ->
+      # If progress is "NA", don't add any css class
       element.removeClass('progress-none')
              .removeClass('progress-some')
              .removeClass('progress-done')
@@ -53,10 +62,12 @@ class @Sequence
     $.each @elements, (index, item) =>
       link = $('<a>').attr class: "seq_#{item.type}_inactive", 'data-element': index + 1
       title = $('<p>').html(item.title)
-      # TODO: add item.progress_str either to the title or somewhere else.
-      # Make sure it gets updated after ajax calls
+      # TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
+      # Make sure it gets updated after ajax calls.
+      # implementation note: will need to figure out how to handle combining detail
+      # statuses of multiple modules in js. 
       list_item = $('<li>').append(link.append(title))
-      @setProgress item.progress_stat, link
+      @setProgress item.progress_status, link
         
       @$('#sequence-list').append list_item
 
