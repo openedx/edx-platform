@@ -155,6 +155,10 @@ PIPELINE_CSS = {
 PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
 
 PIPELINE_JS = {
+    'main': {
+        'source_filenames': ['coffee/main.coffee'],
+        'output_filename': 'js/main.js',
+    },
 }
 
 PIPELINE_COMPILERS = [
