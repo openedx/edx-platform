@@ -1,58 +1,47 @@
 .find-courses {
-  margin: 0 10px;
+  header {
+    background: rgb(240,240,240);
+    border-bottom: 1px solid rgb(200,200,200);
+    @include box-shadow(inset 0 1px 5px 0 rgba(0,0,0, 0.1));
+    width: 100%;
 
-  > header {
-    margin-bottom: 30px;
+    .inner-wrapper {
+      height: 120px;
+      margin: 0 auto;
+      max-width: 1200px;
+      overflow: hidden;
+      padding: 40px 0px 30px;
+      position: relative;
+      width: flex-grid(12);
 
-    .universities {
-      margin: 10px auto;
-      opacity: 0.7;
-      width: flex-grid(4);
+      &::before {
+        @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 1) 0%, rgba(255,255,255, 0) 100%));
+        bottom: -300px;
+        content: "";
+        display: block;
+        height: 600px;
+        margin: 0 auto;
+        position: absolute;
+        width: 100%;
+        z-index: 1;
+      }
 
       img {
-        max-width: 100%;
+        display: block;
+        margin: 0 auto;
+        position: relative;
+        width: 100px;
+        z-index: 2;
       }
 
-      span.divider {
-        @extend .faded-vertical-divider;
-        @include inline-block;
-        height: 120px;
-        vertical-align: middle;
-      }
-    }
-
-    &:hover {
-      .university {
-      }
-    }
-  }
-
-  h2.title {
-    color: $lighter-base-font-color;
-    font: normal 1.2rem/1.8rem $serif;
-    letter-spacing: 1px;
-    margin-bottom: 50px;
-    text-transform: uppercase;
-    text-align: center;
-  }
-
-  .courses {
-    @include clearfix;
-    width: flex-grid(12);
-
-    .course {
-      @include box-sizing(border-box);
-      float: left;
-      width: flex-grid(6);
-
-      @media only screen and (max-width: 768px) {
-        float: none;
-        margin-right: 0px;
-        width: flex-grid(12);
-      }
-
-      &:nth-child(odd) {
-        margin-right: flex-gutter();
+      h1 {
+        color: $lighter-base-font-color;
+        font: normal 1.2rem/1.8rem $serif;
+        letter-spacing: 1px;
+        position: relative;
+        text-transform: uppercase;
+        text-align: center;
+        z-index: 2;
       }
     }
   }

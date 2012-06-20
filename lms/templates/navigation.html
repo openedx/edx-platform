@@ -1,47 +1,51 @@
 <%namespace name='static' file='static_content.html'/>
 <header class="app" aria-label="Global Navigation">
-  <nav>
+  <section class="wrapper">
     <a href="${ MITX_ROOT_URL }" class="logo">
       <img src="${static.url('images/logo.png')}" />
     </a>
+    <a href="/courses" class="discover-courses">Find Courses</a>
 
     %if user.is_authenticated():
     <h1>${ settings.COURSE_TITLE }</h1>
-    <ol class="user">
-      <li>
-        <a href="/dashboard" class="user-dashboard">
-          <span class="avatar"><img src="/static/images/profile.jpg" /></span>
-          ${ user.username }
-        </a>
-      </li>
-      <li>
-        <a href="#" class="options">&#9662</a>
-        <ol class="user-options">
-          <li><a href="#">Account Settings</a></li>
-          <li><a href="/logout">Log Out</a></li>
-        </ol>
-      </li>
-    </ol>
+    <nav class="user">
+      <ol>
+        <li>
+          <a href="/dashboard" class="user-link">
+            <span class="avatar"><img src="${static.url('images/profile.jpg')}" /></span>
+            Neil deGrasse Tyson
+          </a>
+        </li>
+        <li>
+          <a href="#" class="options">&#9662</a>
+          <ol class="user-options">
+            <li><a href="#">Help</a></li>
+            <li><a href="/logout">Log Out</a></li>
+          </ol>
+        </li>
+      </ol>
+    </nav>
+
     %else:
-    <ol>
-      <li><a href="/courses">Courses</a></li>
-      <li><a href="#">How It Works</a></li>
-    </ol>
-    <ol class="user">
-      <li><a href="/dashboard">Log In</a></li>
-      <li><a href="#">Sign Up</a></li>
-    </ol>
-    <ol class="secondary">
-      <li>
-        <a href="#">About</a>
-      </li>
-      <li>
-        <a href="#">Jobs</a>
-      </li>
-      <li>
-        <a href="#">faq</a>
-      </li>
-    </ol>
+    <nav class="guest">
+      <ol>
+        <li>
+          <a href="#">About</a>
+        </li>
+        <li>
+          <a href="#">Blog</a>
+        </li>
+        <li>
+          <a href="#">Jobs</a>
+        </li>
+        <li>
+          <a href="/dashboard">Log In</a>
+        </li>
+        <li>
+          <a href="#">Sign Up</a>
+        </li>
+      </ol>
+    </nav>
     %endif
-  </nav>
+  </section>
 </header>

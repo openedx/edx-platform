@@ -4,7 +4,7 @@ header.app {
   height: 55px;
   width: 100%;
 
-  nav {
+  .wrapper {
     @include clearfix;
     @include box-sizing(border-box);
     max-width: 1200px;
@@ -18,186 +18,236 @@ header.app {
     display: block;
     float: left;
     height: 100%;
-    margin: 15px 15px 0px 0px;
-  }
+    margin: 16px 30px 0px 0px;
+    position: relative;
 
-  h1 {
-    border-left: 1px solid rgb(200,200,200);
-    font: bold 1rem/1.2rem $sans-serif;
-    float: left;
-    height: 15px;
-    margin-top: 10px;
-    padding: 10px 18px;
-  }
-
-  ol {
-    float: left;
-    font-size: 0em;
-
-    &.user {
-      float: right;
+    &::after {
+      @extend .faded-vertical-divider;
+      content: "";
+      display: block;
+      height: 50px;
+      position: absolute;
+      right: -15px;
+      top: -12px;
     }
+  }
 
-    &.secondary {
-      > li {
-        border: none;
+  a.discover-courses {
+    @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
+    border: 1px solid rgb(200,200,200);
+    @include border-radius(3px);
+    @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+    color: $base-font-color;
+    display: block;
+    float: left;
+    font: normal 1rem/1.2rem $sans-serif;
+    height: 15px;
+    margin-top: 12px;
+    padding: 8px 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-shadow: 0 1px rgba(255,255,255, 0.6);
+
+    &:hover {
+    }
+  }
+
+  nav.guest {
+    float: right;
+
+    ol {
+      font-size: 0em;
+
+      li {
+        @include inline-block;
+        margin-top: 12px;
+        padding: 0px 5px;
+        position: relative;
+        vertical-align: bottom;
 
         &:last-child {
-          border-right: none;
+          padding-right: 0px;
         }
 
         a {
-          font: normal italic 1rem/1.2rem $serif;
+          @include border-radius(3px);
+          border: 1px solid transparent;
+          color: $base-font-color;
+          display: block;
+          font: normal italic 1.2rem/1.2rem $serif;
+          height: 15px;
+          padding: 8px;
+          text-decoration: none;
           text-transform: lowercase;
+          text-shadow: 0 1px rgba(255,255,255, 0.6);
+
+          &:hover {
+            background: rgb(220,220,220);
+            @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
+            border-color: rgb(200,200,200);
+            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+            color: $base-font-color;
+          }
         }
       }
     }
+  }
 
-    > li {
-      border-left: 1px solid rgb(200,200,200);
-      @include inline-block;
-      margin-top: 10px;
-      padding: 0px 8px;
-      position: relative;
-      vertical-align: bottom;
+  nav.user {
+    float: right;
 
-      &:last-child {
+    ol {
+      font-size: 0em;
+
+      li {
         border-right: 1px solid rgb(200,200,200);
-      }
+        @include inline-block;
+        margin-top: 10px;
+        padding: 0px 5px;
+        position: relative;
+        vertical-align: bottom;
 
-      a {
-        @include border-radius(3px);
-        color: $lighter-base-font-color;
-        display: block;
-        font: normal 1rem/1.2rem $sans-serif;
-        height: 15px;
-        padding: 10px;
-        text-decoration: none;
-        text-transform: uppercase;
-        text-shadow: 0 1px rgba(255,255,255, 0.4);
+        a {
+          @include border-radius(3px);
+          color: $lighter-base-font-color;
+          display: block;
+          font: normal italic 1.2rem/1.2rem $serif;
+          height: 15px;
+          padding: 10px;
+          text-decoration: none;
+          text-transform: lowercase;
+          text-shadow: 0 1px rgba(255,255,255, 0.4);
 
-        &.user-dashboard {
-          padding: 10px 10px 10px 40px;
-
-          @media screen and (max-width: 768px) {
-            font-size: 0em;
-            padding: 10px 0px;
-            width: 38px;
-          }
-
-          .avatar {
+          &:hover {
             background: rgb(220,220,220);
-            @include border-radius(3px);
-            border: 1px solid rgb(180,180,180);
-            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-            height: 22px;
-            @include inline-block;
-            left: 15px;
-            overflow: hidden;
-            position: absolute;
-            top: 5px;
-            width: 22px;
+            color: $base-font-color;
+          }
 
-            &::after {
-              @include background-image(linear-gradient((-60deg), rgba(0,0,0, 0) 0%, rgba(0,0,0, 0.1) 50%, rgba(0,0,0, 0.2) 50%, rgba(0,0,0, 0.3) 100%));
-              content: "";
-              display: block;
-              height: 100%;
+          &.active {
+            background: rgb(220,220,220);
+            color: $base-font-color;
+          }
+
+          &.options {
+            font: normal 1.2rem/1.2rem $sans-serif;
+            padding-right: 10px;
+            text-transform: none;
+          }
+
+          &.user-link {
+            font: normal 1.2rem/1.2rem $sans-serif;
+            padding: 10px 10px 10px 45px;
+            text-transform: none;
+
+            @media screen and (max-width: 768px) {
+              font-size: 0em;
+              padding: 10px 0px;
+              width: 38px;
+            }
+
+            .avatar {
+              background: rgb(220,220,220);
+              @include border-radius(3px);
+              border: 1px solid rgb(180,180,180);
+              @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+              height: 22px;
+              @include inline-block;
+              left: 15px;
+              overflow: hidden;
               position: absolute;
-              right: 0px;
-              top: 0px;
-              width: 100%;
-            }
+              top: 5px;
+              width: 22px;
 
-            img {
-              @include border-radius(4px);
-              display: block;
-              min-height: 100%;
-              min-width: 100%;
-              height: 100%;
+              &::after {
+                @include background-image(linear-gradient((-60deg), rgba(0,0,0, 0) 0%, rgba(0,0,0, 0.1) 50%, rgba(0,0,0, 0.2) 50%, rgba(0,0,0, 0.3) 100%));
+                content: "";
+                display: block;
+                height: 100%;
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                width: 100%;
+              }
+
+              img {
+                @include border-radius(4px);
+                display: block;
+                min-height: 100%;
+                min-width: 100%;
+                height: 100%;
+              }
             }
           }
         }
 
-
-        &:hover {
+        ol.user-options {
+          @include border-radius(4px);
+          @include box-shadow(0 1px 6px 0 rgba(0,0,0, 0.3));
+          border: 1px solid rgb(200,200,200);
           background: rgb(220,220,220);
-          color: $base-font-color;
-        }
-
-        &.active {
-          background: rgb(220,220,220);
-          color: $base-font-color;
-        }
-      }
-
-      ol.user-options {
-        @include border-radius(4px);
-        @include box-shadow(0 1px 6px 0 rgba(0,0,0, 0.3));
-        border: 1px solid rgb(200,200,200);
-        background: rgb(220,220,220);
-        display: none;
-        right: 4px;
-        padding: 5px 10px;
-        position: absolute;
-        top: 50px;
-        width: 170px;
-        z-index: 3;
-
-        &.expanded {
-          display: block;
-        }
-
-        &::before {
-          background: transparent;
-          border: {
-            top: 8px solid rgb(220,220,220);
-            right: 8px solid rgb(220,220,220);
-            bottom: 8px solid transparent;
-            left: 8px solid transparent;
-          }
-          @include box-shadow(1px 0 0 0 rgb(200,200,200), 0 -1px 0 0 rgb(200,200,200));
-          content: "";
-          display: block;
-          height: 0px;
+          display: none;
+          right: 4px;
+          padding: 5px 10px;
           position: absolute;
-          @include transform(rotate(-45deg));
-          right: 10px;
-          top: -7px;
-          width: 0px;
-        }
+          top: 50px;
+          width: 170px;
+          z-index: 3;
 
-        li {
-          border: {
-            top: 1px solid rgb(200,200,200);
-            right: none;
-            bottom: none;
-            left: none;
-          }
-          margin: 0px;
-          padding: 0px;
-          width: 100%;
-
-          &:first-child {
-            border: none;
-          }
-
-          a {
-            @include box-sizing(border-box);
+          &.expanded {
             display: block;
-            font: normal 1rem/1.2rem $sans-serif;
-            height: auto;
-            margin: 5px 0px;
-            overflow: hidden;
-            padding: 5px;
-            text-overflow: ellipsis;
-            @include transition(padding, 0.1s, linear);
-            white-space: nowrap;
+          }
+
+          &::before {
+            background: transparent;
+            border: {
+              top: 8px solid rgb(220,220,220);
+              right: 8px solid rgb(220,220,220);
+              bottom: 8px solid transparent;
+              left: 8px solid transparent;
+            }
+            @include box-shadow(1px 0 0 0 rgb(200,200,200), 0 -1px 0 0 rgb(200,200,200));
+            content: "";
+            display: block;
+            height: 0px;
+            position: absolute;
+            @include transform(rotate(-45deg));
+            right: 10px;
+            top: -7px;
+            width: 0px;
+          }
+
+          li {
+            border: {
+              top: 1px solid rgb(200,200,200);
+              right: none;
+              bottom: none;
+              left: none;
+            }
+            margin: 0px;
+            padding: 0px;
             width: 100%;
 
-            &:hover {
-              background: rgb(255,255,255);
-              padding: 5px 8px;
+            &:first-child {
+              border: none;
+            }
+
+            a {
+              @include box-sizing(border-box);
+              display: block;
+              font: normal 1rem/1.2rem $sans-serif;
+              height: auto;
+              margin: 5px 0px;
+              overflow: hidden;
+              padding: 5px;
+              text-overflow: ellipsis;
+              @include transition(padding, 0.1s, linear);
+              white-space: nowrap;
+              width: 100%;
+
+              &:hover {
+                background: rgb(255,255,255);
+                padding: 5px 8px;
+              }
             }
           }
         }
