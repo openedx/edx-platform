@@ -1,6 +1,13 @@
 form {
   font-size: 0em;
 
+  label {
+    color: $base-font-color;
+    font: normal 1.2rem/1.6rem $serif;
+    margin-bottom: 5px;
+    text-shadow: 0 1px rgba(255,255,255, 0.4);
+  }
+
   input[type="text"],
   input[type="email"],
   input[type="password"] {
