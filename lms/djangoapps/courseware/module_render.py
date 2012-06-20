@@ -34,7 +34,8 @@ class I4xSystem(object):
     and user, or other environment-specific info.
     '''
     def __init__(self, ajax_url, track_function, render_function,
-                 render_template, request=None, filestore=None):
+                 module_from_xml, render_template, request=None,
+                 filestore=None):
         '''
         Create a closure around the system environment.
 
@@ -43,6 +44,8 @@ class I4xSystem(object):
                          or otherwise tracking the event.
                          TODO: Not used, and has inconsistent args in different
                          files.  Update or remove.
+        module_from_xml - function that takes (module_xml) and returns a corresponding
+                          module instance object.
         render_function - function that takes (module_xml) and renders it,
                           returning a dictionary with a context for rendering the
                           module to html.  Dictionary will contain keys 'content'
@@ -62,6 +65,7 @@ class I4xSystem(object):
             if settings.DEBUG:
                 log.info("[courseware.module_render.I4xSystem] filestore path = %s",
                          filestore)
+        self.module_from_xml = module_from_xml
         self.render_function = render_function
         self.render_template = render_template
         self.exception404 = Http404
@@ -127,6 +131,18 @@ def grade_histogram(module_id):
         return []
     return grades
 
+
+def make_module_from_xml_fn(user, request, student_module_cache, position):
+    '''Create the make_from_xml() function'''
+    def module_from_xml(xml):
+        '''Modules need a way to convert xml to instance objects.
+        Pass the rest of the context through.'''
+        (instance, sm, module_type) = get_module(
+            user, request, xml, student_module_cache, position)
+        return instance
+    return module_from_xml
+
+
 def get_module(user, request, module_xml, student_module_cache, position=None):
     ''' Get an instance of the xmodule class corresponding to module_xml,
     setting the state based on an existing StudentModule, or creating one if none
@@ -165,6 +181,9 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + module_type + '/' + module_id + '/'
 
+    module_from_xml = make_module_from_xml_fn(
+        user, request, student_module_cache, position)
+    
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = lambda xml: render_x_module(
                            user, request, xml, student_module_cache, position),
@@ -172,6 +191,7 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
                        ajax_url = ajax_url,
                        request = request,
                        filestore = OSFS(data_root),
+                       module_from_xml = module_from_xml,
                        )
     # pass position specified in URL to module through I4xSystem
     system.set('position', position) 
@@ -295,9 +315,17 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
             response = HttpResponse(json.dumps({'success': error_msg}))
         return response
 
+    # TODO: This doesn't have a cache of child student modules.  Just
+    # passing the current one.  If ajax calls end up needing children,
+    # this won't work (but fixing it may cause performance issues...)
+    # Figure out :)
+    module_from_xml = make_module_from_xml_fn(
+        request.user, request, [s], None)
+
     # Create the module
     system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = None, 
+                       render_function = None,
+                       module_from_xml = module_from_xml,
                        render_template = render_to_string,
                        ajax_url = ajax_url,
                        request = request,
@@ -316,7 +344,11 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         return response
 
     # Let the module handle the AJAX
-    ajax_return = instance.handle_ajax(dispatch, request.POST)
+    try:
+        ajax_return = instance.handle_ajax(dispatch, request.POST)
+    except:
+        log.exception("error processing ajax call")
+        raise
 
     # Save the state back to the database
     s.state = instance.get_state()
