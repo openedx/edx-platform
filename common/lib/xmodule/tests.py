@@ -568,6 +568,22 @@ class ProgressTest(unittest.TestCase):
         self.assertEqual(self.half_done.ternary_str(), "in_progress")
         self.assertEqual(self.done.ternary_str(), "done")
 
+    def test_to_js_status(self):
+        '''Test the Progress.to_js_status_str() method'''
+        
+        self.assertEqual(Progress.to_js_status_str(self.not_started), "none")
+        self.assertEqual(Progress.to_js_status_str(self.half_done), "in_progress")
+        self.assertEqual(Progress.to_js_status_str(self.done), "done")
+        self.assertEqual(Progress.to_js_status_str(None), "NA")
+
+    def test_to_js_detail_str(self):
+        '''Test the Progress.to_js_detail_str() method'''
+        f = Progress.to_js_detail_str
+        for p in (self.not_started, self.half_done, self.done):
+            self.assertEqual(f(p), str(p))
+        # But None should be encoded as NA
+        self.assertEqual(f(None), "NA")
+
     def test_add(self):
         '''Test the Progress.add_counts() method'''
         p = Progress(0, 2)
