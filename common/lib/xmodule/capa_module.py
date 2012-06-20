@@ -101,7 +101,9 @@ class Module(XModule):
         d = self.get_score()
         score = d['score']
         total = d['total']
-        return Progress(score, total)
+        if total > 0:
+            return Progress(score, total)
+        return None
 
 
     def get_html(self):
