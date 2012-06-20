@@ -367,7 +367,8 @@ class Module(XModule):
         answers = dict()
         for key in get:
             # e.g. input_resistor_1 ==> resistor_1
-            answers['_'.join(key.split('_')[1:])] = get[key]
+            _, _, name = key.partition('_')
+            answers[name] = get[key]
 
         return answers
 
@@ -390,7 +391,7 @@ class Module(XModule):
         if self.closed():
             event_info['failure'] = 'closed'
             self.tracker('save_problem_check_fail', event_info)
-            # TODO: probably not 404?
+            # TODO (vshnayder): probably not 404?
             raise self.system.exception404
 
         # Problem submitted. Student should reset before checking
@@ -405,7 +406,7 @@ class Module(XModule):
             lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
-            # TODO: why is this line here?
+            # TODO (vshnayder): why is this line here?
             self.lcp = LoncapaProblem(self.filestore.open(self.filename),
                                       id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
@@ -436,7 +437,7 @@ class Module(XModule):
             html = self.get_problem_html(encapsulate=False)	# render problem into HTML
         except Exception,err:
             log.error('failed to generate html')
-            raise Exception, err
+            raise
 
         return {'success': success,
                 'contents': html,
