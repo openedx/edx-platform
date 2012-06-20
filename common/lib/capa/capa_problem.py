@@ -168,7 +168,8 @@ class LoncapaProblem(object):
     def get_score(self):
         '''
         Compute score for this problem.  The score is the number of points awarded.
-        Returns an integer, from 0 to get_max_score().
+        Returns a dictionary {'score': integer, from 0 to get_max_score(),
+                              'total': get_max_score()}.
         '''
         correct = 0
         for key in self.correct_map:
