@@ -43,6 +43,8 @@ class Location(object):
             }
             Location: another Location object
 
+        In both the dict and list forms, the revision is optional, and can be ommitted.
+
         None of the components of a location may contain the '/' character
 
         Components may be set to None, which may be interpreted by some contexts to mean
