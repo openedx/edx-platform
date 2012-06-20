@@ -255,16 +255,12 @@ def index(request, course=None, chapter=None, section=None,
         If there's an error, returns
         {'content': module-error message}
         '''
-        # Can't modify variables of outer scope, so need new ones
-        chapter_ = clean(chapter)
-        section_ = clean(section)
-
         user = request.user
         
-        module_xml = get_module_xml(user, course, chapter_, section_)
+        module_xml = get_module_xml(user, course, chapter, section)
         if module_xml is None:
             log.exception("couldn't get module_xml: course/chapter/section: '%s/%s/%s'",
-                          course, chapter_, section_)
+                          course, chapter, section)
             return {'content' : render_to_string("module-error.html", {})}
         
         student_module_cache = preload_student_modules(module_xml)
@@ -288,6 +284,9 @@ def index(request, course=None, chapter=None, section=None,
 
     # keep track of current course being viewed in django's request.session
     request.session['coursename'] = course
+
+    chapter = clean(chapter)
+    section = clean(section)
 
     context = {
         'csrf': csrf(request)['csrf_token'],
