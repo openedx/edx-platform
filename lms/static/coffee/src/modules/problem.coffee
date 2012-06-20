@@ -19,7 +19,7 @@ class @Problem
 
   update_progress: (response) =>
     if response.progress_changed
-        @element.attr progress: response.progress
+        @element.attr progress: response.progress_status
         @element.trigger('progressChanged')
 
   render: (content) ->
