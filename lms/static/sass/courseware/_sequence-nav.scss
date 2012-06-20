@@ -66,6 +66,26 @@ nav.sequence-nav {
         @include transition(all, .4s, $ease-in-out-quad);
         width: 100%;
 
+        &.progress {
+          border-bottom-style: solid;
+          border-bottom-width: 4px;
+        }
+
+        &.progress-none {
+          @extend .progress;
+          border-bottom-color: red;
+        }
+
+        &.progress-some {
+          @extend .progress;
+          border-bottom-color: yellow;
+        }
+
+        &.progress-done {
+          @extend .progress;
+          border-bottom-color: green;
+        }
+
         //video
         &.seq_video_inactive {
           @extend .inactive;
