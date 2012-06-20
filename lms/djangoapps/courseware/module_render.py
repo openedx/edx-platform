@@ -199,7 +199,7 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
                             etree.tostring(module_xml), 
                             module_id, 
                             state=state)
-    
+
     # If StudentModule for this instance wasn't already in the database,
     # and this isn't a guest user, create it.
     if not smod and user.is_authenticated():
