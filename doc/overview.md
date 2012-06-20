@@ -44,10 +44,27 @@ You should be familiar with the following.  If you're not, go read some docs...
 
 ### Common libraries 
 
-- x_modules -- generic learning modules. *x* can be sequence, video, template, html, vertical, capa, etc.  These are the things that one puts inside sections in the course structure.  Modules know how to render themselves to html, how to score themselves, and handle ajax calls from the front end. 
-      - x_modules take a 'system context' parameter, which helps isolate xmodules from any particular application, so they can be used in many places. The modules should make no references to Django (though there are still a few left).  The system context knows how to render things, track events, complain about 404s, etc. 
-      - TODO: document the system context interface--it's different in `x_module.XModule.__init__` and in `x_module tests.py` (do this in the code, not here)
-      - in `common/lib/xmodule`
+- xmodule: generic learning modules. *x* can be sequence, video, template, html,
+           vertical, capa, etc.  These are the things that one puts inside sections
+           in the course structure.
+
+    - XModuleDescriptor: This defines the problem and all data and UI needed to edit
+           that problem. It is unaware of any student data, but can be used to retrieve
+           an XModule, which is aware of that student state.
+             
+    - XModule: The XModule is a problem instance that is particular to a student. It knows
+           how to render itself to html to display the problem, how to score itself,
+           and how to handle ajax calls from the front end.
+
+    - Both XModule and XModuleDescriptor take system context parameters. These are named
+           ModuleSystem and DescriptorSystem respectively. These help isolate the XModules
+           from any interactions with external resources that they require.
+           
+           For instance, the DescriptorSystem has a function to load an XModuleDescriptor
+           from a Location object, and the ModuleSystem knows how to render things,
+           track events, and complain about 404s
+    - TODO: document the system context interface--it's different in `x_module.XModule.__init__` and in `x_module tests.py` (do this in the code, not here)
+    - in `common/lib/xmodule`
 
 - capa modules -- defines `LoncapaProblem` and many related things.  
     - in `common/lib/capa`
@@ -76,7 +93,14 @@ The LMS is a django site, with root in `lms/`.  It runs in many different enviro
   
 - See `lms/urls.py` for the wirings of urls to views.  
 
-- Tracking: there is support for basic tracking of client-side events in `lms/djangoapps/track`.  
+- Tracking: there is support for basic tracking of client-side events in `lms/djangoapps/track`.
+
+### CMS
+
+The CMS is a django site, with root in `cms`. It can run in a number of different
+environments, defined in `cms/envs`.
+
+- Core rendering path: Still TBD
 
 ### Other modules
 
