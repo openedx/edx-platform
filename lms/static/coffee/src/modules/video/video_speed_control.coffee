@@ -1,13 +1,5 @@
-class @VideoSpeedControl
-  constructor: (@player, @speeds) ->
-    @render()
-    @bind()
-
-  $: (selector) ->
-    @player.$(selector)
-
+class @VideoSpeedControl extends Subview
   bind: ->
-    $(@player).bind('speedChange', @onSpeedChange)
     @$('.video_speeds a').click @changeVideoSpeed
     if onTouchBasedDevice()
       @$('.speeds').click (event) ->
@@ -23,7 +15,7 @@ class @VideoSpeedControl
         $(this).removeClass('open')
 
   render: ->
-    @$('.secondary-controls').prepend """
+    @element.prepend """
       <div class="speeds">
         <a href="#">
           <h3>Speed</h3>
@@ -36,15 +28,14 @@ class @VideoSpeedControl
     $.each @speeds, (index, speed) =>
       link = $('<a>').attr(href: "#").html("#{speed}x")
       @$('.video_speeds').prepend($('<li>').attr('data-speed', speed).html(link))
-    @setSpeed(@player.currentSpeed())
+    @setSpeed(@currentSpeed)
 
   changeVideoSpeed: (event) =>
     event.preventDefault()
     unless $(event.target).parent().hasClass('active')
-      $(@player).trigger 'speedChange', $(event.target).parent().data('speed')
-
-  onSpeedChange: (event, speed) =>
-    @setSpeed(parseFloat(speed).toFixed(2).replace /\.00$/, '.0')
+      @currentSpeed = $(event.target).parent().data('speed')
+      $(@).trigger 'speedChange', $(event.target).parent().data('speed')
+      @setSpeed(parseFloat(@currentSpeed).toFixed(2).replace /\.00$/, '.0')
 
   setSpeed: (speed) ->
     @$('.video_speeds li').removeClass('active')

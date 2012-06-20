@@ -52,7 +52,7 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   context.video = new Video 'example', '.75:abc123,1.0:def456'
   jasmine.stubYoutubePlayer()
   if createPlayer
-    return new VideoPlayer context.video
+    return new VideoPlayer(video: context.video)
 
 spyOn(window, 'onunload')
 

@@ -57,7 +57,7 @@ describe 'Video', ->
         window.YT = @originalYT
 
       it 'create the Video Player', ->
-        expect(window.VideoPlayer).toHaveBeenCalledWith @video
+        expect(window.VideoPlayer).toHaveBeenCalledWith(video: @video)
         expect(@video.player).toEqual @stubVideoPlayer
 
     describe 'when the Youtube API is not ready', ->
@@ -84,7 +84,7 @@ describe 'Video', ->
         window.YT = @originalYT
 
       it 'create the Video Player for all video elements', ->
-        expect(window.VideoPlayer).toHaveBeenCalledWith @video
+        expect(window.VideoPlayer).toHaveBeenCalledWith(video: @video)
         expect(@video.player).toEqual @stubVideoPlayer
 
   describe 'youtubeId', ->

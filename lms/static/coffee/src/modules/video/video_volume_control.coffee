@@ -1,14 +1,8 @@
-class @VideoVolumeControl
-  constructor: (@player) ->
-    @previousVolume = 100
-    @render()
-    @bind()
-
-  $: (selector) ->
-    @player.$(selector)
+class @VideoVolumeControl extends Subview
+  initialize: ->
+    @currentVolume = 100
 
   bind: ->
-    $(@player).bind('ready', @onReady)
     @$('.volume').mouseenter ->
       $(this).addClass('open')
     @$('.volume').mouseleave ->
@@ -16,7 +10,7 @@ class @VideoVolumeControl
     @$('.volume>a').click(@toggleMute)
 
   render: ->
-    @$('.secondary-controls').prepend """
+    @element.prepend """
       <div class="volume">
         <a href="#"></a>
         <div class="volume-slider-container">
@@ -33,16 +27,14 @@ class @VideoVolumeControl
       change: @onChange
       slide: @onChange
 
-  onReady: =>
-    @slider.slider 'option', 'max', @player.volume()
-
   onChange: (event, ui) =>
-    @player.volume ui.value
-    @$('.secondary-controls .volume').toggleClass 'muted', ui.value == 0
+    @currentVolume = ui.value
+    $(@).trigger 'volumeChange', @currentVolume
+    @$('.volume').toggleClass 'muted', @currentVolume == 0
 
   toggleMute: =>
-    if @player.volume() > 0
-      @previousVolume = @player.volume()
+    if @currentVolume > 0
+      @previousVolume = @currentVolume
       @slider.slider 'option', 'value', 0
     else
       @slider.slider 'option', 'value', @previousVolume

@@ -36,7 +36,7 @@ class @Video
       @speed = '1.0'
 
   embed: ->
-    @player = new VideoPlayer(this)
+    @player = new VideoPlayer video: this
 
   fetchMetadata: (url) ->
     @metadata = {}
