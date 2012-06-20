@@ -82,7 +82,11 @@ def profile(request, student_id=None):
 
 def render_accordion(request, course, chapter, section):
     ''' Draws navigation bar. Takes current position in accordion as
-        parameter. Returns (initialization_javascript, content)'''
+        parameter.
+
+        If chapter and section are '' or None, renders a default accordion.
+
+        Returns (initialization_javascript, content)'''
     if not course:
         course = "6.002 Spring 2012"
 
@@ -221,10 +225,8 @@ def index(request, course=None, chapter=None, section=None,
         ''' Fixes URLs -- we convert spaces to _ in URLs to prevent
         funny encoding characters and keep the URLs readable.  This undoes
         that transformation.
-
-        TODO: Properly replace underscores.  (Q: what is properly?)
         '''
-        return s.replace('_', ' ')
+        return s.replace('_', ' ') if s is not None else None
 
     def get_submodule_ids(module_xml):
         '''
