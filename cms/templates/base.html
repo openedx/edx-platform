@@ -26,7 +26,11 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="${ STATIC_URL }/js/markitup/jquery.markitup.js"></script>
     <script type="text/javascript" src="${ STATIC_URL }/js/markitup/sets/wiki/set.js"></script>
+    % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+    <%static:js group='main'/>
+    % else:
     <script src="${ STATIC_URL }/js/main.js"></script>
+    % endif
     <script src="${ STATIC_URL }/js/jquery.inlineedit.js"></script>
     <script src="${ STATIC_URL }/js/jquery.leanModal.min.js"></script>
     <script src="${ STATIC_URL }/js/jquery.tablednd.js"></script>

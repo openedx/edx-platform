@@ -183,6 +183,7 @@ class XModuleDescriptor(Plugin):
         self.definition = definition if definition is not None else {}
         self.name = Location(kwargs.get('location')).name
         self.type = Location(kwargs.get('location')).category
+        self.url = Location(kwargs.get('location')).url()
 
         # For now, we represent goals as a list of strings, but this
         # is one of the things that we are going to be iterating on heavily
