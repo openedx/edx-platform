@@ -24,6 +24,7 @@ $ ->
         $.get('/edit_item', {id: id}, (data) ->
             $('section.edit-pane').empty().append(data)
             $('section.edit-pane').show()
+            $('body').addClass('content')
         )
 
     setHeight = ->
