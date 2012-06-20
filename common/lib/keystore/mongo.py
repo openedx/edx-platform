@@ -1,12 +1,12 @@
 import pymongo
-from . import KeyStore, Location
+from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import XModuleDescriptor, DescriptorSystem
 
 
-class MongoKeyStore(KeyStore):
+class MongoModuleStore(ModuleStore):
     """
-    A Mongodb backed KeyStore
+    A Mongodb backed ModuleStore
     """
     def __init__(self, host, db, collection, port=27017):
         self.collection = pymongo.connection.Connection(
@@ -19,34 +19,33 @@ class MongoKeyStore(KeyStore):
 
     def get_item(self, location):
         """
-        Returns an XModuleDescriptor instance for the item at location
+        Returns an XModuleDescriptor instance for the item at location.
+        If location.revision is None, returns the most item with the most
+        recent revision
 
+        If any segment of the location is None except revision, raises
+            keystore.exceptions.InsufficientSpecificationError
         If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
-
-        Searches for all matches of a partially specifed location, but raises an
-        keystore.exceptions.InsufficientSpecificationError if more
-        than a single object matches the query.
 
         location: Something that can be passed to Location
         """
-        query = dict(
-            ('location.{key}'.format(key=key), val)
-            for (key, val)
-            in Location(location).dict().items()
-            if val is not None
-        )
-        items = self.collection.find(
+
+        query = {}
+        for key, val in Location(location).dict().iteritems():
+            if key != 'revision' and val is None:
+                raise InsufficientSpecificationError(location)
+
+            if val is not None:
+                query['location.{key}'.format(key=key)] = val
+
+        item = self.collection.find_one(
             query,
             sort=[('revision', pymongo.ASCENDING)],
-            limit=1,
         )
-        if items.count() > 1:
-            raise InsufficientSpecificationError(location)
-
-        if items.count() == 0:
+        if item is None:
             raise ItemNotFoundError(location)
 
-        return XModuleDescriptor.load_from_json(items[0], self.get_item)
+        return XModuleDescriptor.load_from_json(item, DescriptorSystem(self.get_item))
 
     def create_item(self, location, editor):
         """
@@ -67,9 +66,12 @@ class MongoKeyStore(KeyStore):
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
+
+        # See http://www.mongodb.org/display/DOCS/Updating for
+        # atomic update syntax
         self.collection.update(
             {'location': Location(location).dict()},
-            {'$set': {'data': data}}
+            {'$set': {'definition.data': data}}
         )
 
     def update_children(self, location, children):
@@ -80,7 +82,10 @@ class MongoKeyStore(KeyStore):
         location: Something that can be passed to Location
         children: A list of child item identifiers
         """
+
+        # See http://www.mongodb.org/display/DOCS/Updating for
+        # atomic update syntax
         self.collection.update(
             {'location': Location(location).dict()},
-            {'$set': {'children': children}}
+            {'$set': {'definition.children': children}}
         )

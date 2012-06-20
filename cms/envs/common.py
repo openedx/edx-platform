@@ -27,15 +27,12 @@ from path import path
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
 COMMON_ROOT = PROJECT_ROOT.dirname() / "common"
 ENV_ROOT = PROJECT_ROOT.dirname().dirname()  # virtualenv dir /mitx is in
-ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
 COURSES_ROOT = ENV_ROOT / "data"
 
 # FIXME: To support multiple courses, we should walk the courses dir at startup
 DATA_DIR = COURSES_ROOT
 
 sys.path.append(ENV_ROOT)
-sys.path.append(ASKBOT_ROOT)
-sys.path.append(ASKBOT_ROOT / "askbot" / "deps")
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
@@ -145,5 +142,4 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'contentstore',
-    'instructor',
 )
