@@ -476,6 +476,7 @@ section.course-content {
 
       ol.subtitles {
         width: 0px;
+        display: none;
       }
     }
 
@@ -498,6 +499,7 @@ section.course-content {
         ol.subtitles {
           right: -(flex-grid(4));
           width: auto;
+          display: block;
         }
       }
 

@@ -1,12 +1,12 @@
 describe 'VideoSpeedControl', ->
   beforeEach ->
-    @player = jasmine.stubVideoPlayer @
+    jasmine.stubVideoPlayer @
     $('.speeds').remove()
 
   describe 'constructor', ->
     describe 'always', ->
       beforeEach ->
-        @speedControl = new VideoSpeedControl @player, @video.speeds
+        @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
       it 'add the video speed control to player', ->
         expect($('.secondary-controls').html()).toContain '''
@@ -19,9 +19,6 @@ describe 'VideoSpeedControl', ->
           </div>
         '''
 
-      it 'bind to player speedChange event', ->
-        expect($(@player)).toHandleWith 'speedChange', @speedControl.onSpeedChange
-
       it 'bind to change video speed link', ->
         expect($('.video_speeds a')).toHandleWith 'click', @speedControl.changeVideoSpeed
 
@@ -29,7 +26,7 @@ describe 'VideoSpeedControl', ->
       beforeEach ->
         spyOn(window, 'onTouchBasedDevice').andReturn true
         $('.speeds').removeClass 'open'
-        @speedControl = new VideoSpeedControl @player, @video.speeds
+        @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
       it 'open the speed toggle on click', ->
         $('.speeds').click()
@@ -41,7 +38,7 @@ describe 'VideoSpeedControl', ->
       beforeEach ->
         spyOn(window, 'onTouchBasedDevice').andReturn false
         $('.speeds').removeClass 'open'
-        @speedControl = new VideoSpeedControl @player, @video.speeds
+        @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
       it 'open the speed toggle on hover', ->
         $('.speeds').mouseenter()
@@ -59,31 +56,31 @@ describe 'VideoSpeedControl', ->
 
   describe 'changeVideoSpeed', ->
     beforeEach ->
-      @speedControl = new VideoSpeedControl @player, @video.speeds
+      @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
       @video.setSpeed '1.0'
 
     describe 'when new speed is the same', ->
       beforeEach ->
-        spyOnEvent @player, 'speedChange'
+        spyOnEvent @speedControl, 'speedChange'
         $('li[data-speed="1.0"] a').click()
 
       it 'does not trigger speedChange event', ->
-        expect('speedChange').not.toHaveBeenTriggeredOn @player
+        expect('speedChange').not.toHaveBeenTriggeredOn @speedControl
 
     describe 'when new speed is not the same', ->
       beforeEach ->
         @newSpeed = null
-        $(@player).bind 'speedChange', (event, newSpeed) => @newSpeed = newSpeed
-        spyOnEvent @player, 'speedChange'
+        $(@speedControl).bind 'speedChange', (event, newSpeed) => @newSpeed = newSpeed
+        spyOnEvent @speedControl, 'speedChange'
         $('li[data-speed="0.75"] a').click()
 
-      it 'trigger player speedChange event', ->
-        expect('speedChange').toHaveBeenTriggeredOn @player
+      it 'trigger speedChange event', ->
+        expect('speedChange').toHaveBeenTriggeredOn @speedControl
         expect(@newSpeed).toEqual 0.75
 
   describe 'onSpeedChange', ->
     beforeEach ->
-      @speedControl = new VideoSpeedControl @player, @video.speeds
+      @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
       $('li[data-speed="1.0"] a').addClass 'active'
       @speedControl.setSpeed '0.75'
 
