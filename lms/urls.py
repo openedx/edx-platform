@@ -76,6 +76,7 @@ if settings.COURSEWARE_ENABLED:
         # Multicourse related:
         url(r'^courses$', 'courseware.views.courses'),
         url(r'^courses/(?P<course_id>[^/]*)/info$', 'util.views.info'),
+        url(r'^courses/(?P<course_id>[^/]*)/courseware$', 'courseware.views.index'),
 
     )
 
