@@ -3,7 +3,6 @@ import pkg_resources
 import logging
 
 from keystore import Location
-from progress import Progress
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -29,6 +28,12 @@ class Plugin(object):
             raise ModuleMissingError(identifier)
 
         return classes[0].load()
+
+    @classmethod
+    def load_classes(cls):
+        return [class_.load()
+                for class_
+                in pkg_resources.iter_entry_points(cls.entry_point)]
 
 
 class XModule(object):
@@ -154,6 +159,7 @@ class XModuleDescriptor(Plugin):
     and can generate XModules (which do know about student state).
     """
     entry_point = "xmodule.v1"
+    js = {}
 
     @staticmethod
     def load_from_json(json_data, system):
@@ -177,6 +183,19 @@ class XModuleDescriptor(Plugin):
         system: An XModuleSystem for interacting with external resources
         """
         return cls(system=system, **json_data)
+
+    @classmethod
+    def get_javascript(cls):
+        """
+        Return a dictionary containing some of the following keys:
+            coffee: A list of coffeescript fragments that should be compiled and
+                    placed on the page
+            js: A list of javascript fragments that should be included on the page
+
+        All of these will be loaded onto the page in the CMS
+        """
+        return cls.js
+
 
     def __init__(self,
                  system,
@@ -221,21 +240,27 @@ class XModuleDescriptor(Plugin):
         else:
             return [child for child in self._child_instances if child.type in categories]
 
+    def get_html(self):
+        """
+        Return the html used to edit this module
+        """
+        raise NotImplementedError("get_html() must be provided by specific modules")
+
     def get_xml(self):
         ''' For conversions between JSON and legacy XML representations.
         '''
-        if self.xml: 
+        if self.xml:
             return self.xml
-        else: 
+        else:
             raise NotImplementedError("JSON->XML Translation not implemented")
 
     def get_json(self):
         ''' For conversions between JSON and legacy XML representations.
         '''
-        if self.json: 
+        if self.json:
             raise NotImplementedError
-            return self.json # TODO: Return context as well -- files, etc. 
-        else: 
+            return self.json  # TODO: Return context as well -- files, etc.
+        else:
             raise NotImplementedError("XML->JSON Translation not implemented")
 
     #def handle_cms_json(self):

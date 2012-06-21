@@ -19,6 +19,9 @@ setup(
             "TutorialIndex = seq_module:SectionDescriptor",
             "Exam = seq_module:SectionDescriptor",
             "VideoSegment = video_module:VideoSegmentDescriptor",
+            "ProblemSet = seq_module:SectionDescriptor",
+            "Problem = capa_module:CapaModuleDescriptor",
+            "HTML = html_module:HtmlModuleDescriptor",
         ]
     }
 )

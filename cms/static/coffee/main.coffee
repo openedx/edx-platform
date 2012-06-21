@@ -1,3 +1,17 @@
+bind_edit_links = ->
+    $('a.module-edit').click ->
+        edit_item($(this).attr('id'))
+        return false
+
+edit_item = (id) ->
+    $.get('/edit_item', {id: id}, (data) ->
+        $('#module-html').empty().append(data)
+        bind_edit_links()
+        $('section.edit-pane').show()
+        $('body').addClass('content')
+        window['construct_html']('module-html')
+    )
+
 $ ->
     $('section.main-content').children().hide()
     $('.editable').inlineEdit()
@@ -20,12 +34,6 @@ $ ->
         $(this).parent().parent().hide()
         return false
 
-    edit_item = (id) ->
-        $.get('/edit_item', {id: id}, (data) ->
-            $('section.edit-pane').empty().append(data)
-            $('section.edit-pane').show()
-            $('body').addClass('content')
-        )
 
     setHeight = ->
         windowHeight = $(this).height()
@@ -55,10 +63,6 @@ $ ->
     $(document).ready(setHeight)
     $(window).bind('resize', setHeight)
 
-    $('a.module-edit').click ->
-        edit_item($(this).attr('id'))
-        return false
-
     $('.video-new a').click ->
         $('section.edit-pane').show()
         return false
@@ -66,3 +70,6 @@ $ ->
     $('.problem-new a').click ->
         $('section.edit-pane').show()
         return false
+
+    bind_edit_links()
+
