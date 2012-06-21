@@ -49,3 +49,7 @@
     %endif
   </section>
 </header>
+
+%if not user.is_authenticated():
+  <%include file="login_modal.html" />
+%endif
