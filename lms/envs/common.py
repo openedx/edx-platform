@@ -65,8 +65,9 @@ sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
 ######### EDX dormsbee/portal changes #################
-from courseware.courses import load_courses
+from courseware.courses import create_lookup_table, load_courses
 COURSES = load_courses(ENV_ROOT / "data")
+COURSES_BY_ID = create_lookup_table(COURSES)
 #######################################################
 
 ################################## MITXWEB #####################################
