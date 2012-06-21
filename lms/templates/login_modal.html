@@ -7,7 +7,7 @@
         <h3><img src="${static.url('images/edx_bw.png')}">Log In</h3>
       </header>
 
-      <form id="login_form" method="post" action="/login">
+      <form id="login_form" method="post">
         <label>E-mail</label>
         <input name="email" type="email" placeholder="e-mail">
         <label>Password</label>
@@ -35,5 +35,52 @@
   </section>
 </section>
 <script type="text/javascript">
-  new Modal({el: $(".login-modal")}).render()
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = jQuery.trim(cookies[i]);
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+function postJSON(url, data, callback) {
+  $.ajax({type:'POST',
+      url: url,
+      dataType: 'json',
+      data: data,
+      success: callback,
+      headers : {'X-CSRFToken':getCookie('csrftoken')}
+      });
+}
+  $('form#login_form').submit(function(e) {
+      console.log("WOMBAT")
+    e.preventDefault();
+    var submit_data={};
+    $.each($("[id^=li_]"), function(index,value){
+      submit_data[value.name]=value.value;
+      });
+    submit_data["remember"] = ($('#remember').attr("checked")? true : false);
+
+    postJSON('/login',
+      submit_data,
+      function(json) {
+      if(json.success) {
+      location.href="/info";
+      } else if($('#login_error').length == 0) {
+      $('#login_form').prepend('<div id="login_error">Email or password is incorrect.</div>');
+      } else {
+      $('#login_error').stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+      }
+      }
+      );
+    });
+  // new Modal({el: $(".login-modal")}).render()
 </script>
