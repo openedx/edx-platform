@@ -1,6 +1,6 @@
 <%namespace name='static' file='static_content.html'/>
 
-%for i in xrange(6):
+%for course in courses:
 <article class="course">
   <a href="/course_info">
     <div class="cover">
@@ -10,8 +10,8 @@
     </div>
     <section class="info">
       <hgroup>
-        <h2>18th Century History</h2>
-        <p>Adam Smith, Harvard University</p>
+        <h2>${course.title}</h2>
+        <p>${",".join(course.instructors)} &mdash; ${course.institution}</p>
       </hgroup>
       <div class="edit">Register</div>
       <section class="meta">

@@ -14,7 +14,6 @@ urlpatterns = ('',
     url(r'^$', 'student.views.index'), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard'),
     url(r'^course_info$', 'student.views.course_info'),
-    url(r'^courses$', 'student.views.courses'),
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
@@ -73,6 +72,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
         url(r'^calculate$', 'util.views.calculate'),
         url(r'^heartbeat$', include('heartbeat.urls')),
+
+        # Multicourse related:
+        url(r'^courses$', 'courseware.views.courses'),
     )
 
 if settings.ENABLE_MULTICOURSE:

@@ -49,6 +49,14 @@ def format_url_params(params):
     return [urllib.quote(string.replace(' ', '_')) for string in params]
 
 
+@ensure_csrf_cookie
+def courses(request):
+  csrf_token = csrf(request)['csrf_token']
+  # TODO: Clean up how 'error' is done.
+  context = {'courses' : settings.COURSES,
+             'csrf' : csrf_token}
+  return render_to_response("courses.html", context)
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request):
     if 'course_admin' not in user_groups(request.user):
