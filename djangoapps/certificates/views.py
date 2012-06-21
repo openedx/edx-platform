@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 
 import courseware.grades as grades
-from certificates.models import GeneratedCertificate, certificate_state_for_student
+from certificates.models import GeneratedCertificate, certificate_state_for_student, revoke_certificate
 from mitxmako.shortcuts import render_to_response, render_to_string
 from student.models import UserProfile
 from student.survey_questions import exit_survey_list_for_student
@@ -104,7 +104,7 @@ def generate_certificate(user, grade):
 
         generated_certificate.enabled = True
         if generated_certificate.graded_download_url and (generated_certificate.grade != grade):
-            log.critical("A graded certificate has been pre-generated with the grade "
+            log.critical(u"A graded certificate has been pre-generated with the grade "
                          "of {gen_grade} but requested by user id {userid} with grade "
                          "{req_grade}! The download URLs were {graded_dl_url} and "
                          "{ungraded_dl_url}".format(
@@ -113,12 +113,11 @@ def generate_certificate(user, grade):
                              graded_dl_url=generated_certificate.graded_download_url,
                              ungraded_dl_url=generated_certificate.download_url,
                              userid=user.id))
-            generated_certificate.graded_download_url = None
-            generated_certificate.download_url = None
+            revoke_certificate(generated_certificate, "The grade on this certificate may be inaccurate.")
                 
         user_name = UserProfile.objects.get(user = user).name
         if generated_certificate.download_url and (generated_certificate.name != user_name):
-            log.critical("A Certificate has been pre-generated with the name of "
+            log.critical(u"A Certificate has been pre-generated with the name of "
                          "{gen_name} but current name is {user_name} (user id is "
                          "{userid})! The download URLs were {graded_dl_url} and "
                          "{ungraded_dl_url}".format(
@@ -127,8 +126,7 @@ def generate_certificate(user, grade):
                              graded_dl_url=generated_certificate.graded_download_url,
                              ungraded_dl_url=generated_certificate.download_url,
                              userid=user.id))
-            generated_certificate.graded_download_url = None
-            generated_certificate.download_url = None
+            revoke_certificate(generated_certificate, "The name on this certificate may be inaccurate.")
 
         
         generated_certificate.grade = grade
