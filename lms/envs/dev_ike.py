@@ -65,6 +65,11 @@ COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
                                     'xmlpath': '/7.03x/',
                                     'active' : True,
                                     },
+                    '18.06x_Linear_Algebra': {'number' : '18.06x',
+                                    'title'  : 'Linear Algebra',
+                                    'xmlpath': '/18.06x/',
+                                    'active' : True,
+                                    },
                     }
 
 #-----------------------------------------------------------------------------
