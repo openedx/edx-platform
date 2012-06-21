@@ -461,6 +461,7 @@ def accept_name_change(request):
         
         revoke_certificate(generated_certificate, u"The name on this certificate has been changed to {name}.".format(name = up.name))
         generated_certificate.name = up.name
+        generated_certificate.enabled = False # They will need to re-request it to certify their name is correct
         generated_certificate.save()
         
     except GeneratedCertificate.DoesNotExist:
