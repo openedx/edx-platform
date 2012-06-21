@@ -29,7 +29,7 @@ class Course(namedtuple('Course', _FIELDS)):
     """ 
     @property
     def id(self):
-        return "{0.institution},{0.number},{0.run_id}".format(self)
+        return "{0.institution},{0.number},{0.run_id}".format(self).replace(" ", "_")
 
     @classmethod
     def load_from_path(cls, course_path):
