@@ -18,75 +18,87 @@ header.app {
     display: block;
     float: left;
     height: 100%;
-    margin: 16px 30px 0px 0px;
-    position: relative;
-
-    &::after {
-      @extend .faded-vertical-divider;
-      content: "";
-      display: block;
-      height: 50px;
-      position: absolute;
-      right: -15px;
-      top: -12px;
-    }
+    margin: 16px 15px 0px 0px;
   }
 
-  a.discover-courses {
-    @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
-    border: 1px solid rgb(200,200,200);
-    @include border-radius(3px);
-    @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-    color: $base-font-color;
-    display: block;
-    float: left;
-    font: normal 1rem/1.2rem $sans-serif;
-    height: 15px;
-    margin-top: 12px;
-    padding: 8px 10px;
-    text-decoration: none;
-    text-transform: uppercase;
-    text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-    &:hover {
-    }
+  .divider {
+    @extend .vertical-divider;
+    @include inline-block;
+    height: 40px;
+    vertical-align: middle;
   }
 
-  nav.guest {
-    float: right;
+
+  nav {
+    height: 40px;
+    margin-top: 8px;
+
+    &.find-courses {
+      float: left;
+    }
+
+    &.guest {
+      float: right;
+    }
 
     ol {
       font-size: 0em;
 
       li {
         @include inline-block;
-        margin-top: 12px;
-        padding: 0px 5px;
-        position: relative;
-        vertical-align: bottom;
+        vertical-align: top;
+      }
 
-        &:last-child {
-          padding-right: 0px;
-        }
+      li.secondary {
+        margin: 0px 15px;
 
         a {
           @include border-radius(3px);
           border: 1px solid transparent;
-          color: $base-font-color;
+          @include box-sizing(border-box);
+          color: $lighter-base-font-color;
           display: block;
-          font: normal italic 1.2rem/1.2rem $serif;
-          height: 15px;
-          padding: 8px;
+          font: normal italic 1.2rem/1.4rem $serif;
+          height: 30px;
+          @include inline-block;
+          margin: 5px 15px 5px 0px;
+          padding: 7px 2px;
           text-decoration: none;
           text-transform: lowercase;
           text-shadow: 0 1px rgba(255,255,255, 0.6);
+          vertical-align: middle;
+
+          &:last-child {
+            margin-right: 0px;
+          }
 
           &:hover {
-            background: rgb(220,220,220);
+            color: $base-font-color;
+          }
+        }
+      }
+
+      li.primary {
+        a {
+          border: 1px solid transparent;
+          @include border-radius(3px);
+          @include box-sizing(border-box);
+          color: $base-font-color;
+          display: block;
+          font: normal 1.2rem/1.4rem $sans-serif;
+          height: 30px;
+          @include inline-block;
+          margin: 5px;
+          padding: 6px 8px;
+          text-decoration: none;
+          text-transform: uppercase;
+          text-shadow: 0 1px rgba(255,255,255, 0.6);
+          vertical-align: middle;
+
+          &:hover {
             @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
             border-color: rgb(200,200,200);
             @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-            color: $base-font-color;
           }
         }
       }

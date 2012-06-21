@@ -87,7 +87,7 @@
           }
 
           a {
-            @include button(shiny, $pink);
+            @include button(shiny, $blue);
             @include box-sizing(border-box);
             @include border-radius(3px);
             @include inline-block;
@@ -95,20 +95,7 @@
             padding: 15px 0px;
             text-transform: uppercase;
             text-align: center;
-            width: flex-grid(6);
-
-            &:first-child {
-              margin-right: flex-gutter();
-            }
-
-            &.find-courses {
-              @include button(shiny, $blue);
-              @include box-sizing(border-box);
-              @include border-radius(3px);
-              @include inline-block;
-              font: normal italic 1.2rem/1.6rem $serif;
-              padding: 15px 0px;
-            }
+            width: flex-grid(12);
           }
 
           form {
