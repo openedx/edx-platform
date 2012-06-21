@@ -2,17 +2,26 @@
 
 <section class="html-edit">
   <header>
-    <a href="#" class="cancel">Cancel</a>
-    <a href="#" class="save-update">Save &amp; Update</a>
+    <h1 class="editable">${module.name}</h1>
+    <p>Unit type: HTML</p>
+    <!-- <div class="actions"> -->
+    <!--   <a href="#" class="cancel">Cancel</a> -->
+    <!--   <a href="#" class="save-update">Save &amp; Update</a> -->
+    <!-- </div> -->
   </header>
 
   <section>
     <header>
-      <h1 class="editable">${module.name}</h1>
+    </header>
+
     <section>
       <textarea name="" id="edit-box" rows="8" cols="40">${module.definition['data']['text']}</textarea>
       <div id="edit-preview" class="preview">${module.definition['data']['text']}</div>
     </section>
-    <a href="" class="save-update">Save &amp; Update</a>
+
+    <div class="actions">
+      <a href="" class="save-update">Save &amp; Update</a>
+      <a href="#" class="cancel">Cancel</a>
+    </div>
   </section>
 </section>
