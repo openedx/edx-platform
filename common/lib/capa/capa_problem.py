@@ -316,6 +316,10 @@ class LoncapaProblem(object):
 
         Used by get_html.
         '''
+        if problemtree.tag=='script' and problemtree.get('type') and 'javascript' in problemtree.get('type'):
+            # leave javascript intact.
+            return problemtree
+
         if problemtree.tag in html_problem_semantics:
             return
 
