@@ -50,7 +50,6 @@ if settings.PERFSTATS:
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         url(r'^courseware/$', 'courseware.views.index', name="courseware"),
-        url(r'^info$', 'util.views.info'),
         url(r'^wiki/', include('simplewiki.urls')),
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)$', 'courseware.views.index'),
@@ -75,6 +74,8 @@ if settings.COURSEWARE_ENABLED:
 
         # Multicourse related:
         url(r'^courses$', 'courseware.views.courses'),
+        url(r'^courses/(?P<course_id>[^/]*)/info$', 'util.views.info'),
+
     )
 
 if settings.ENABLE_MULTICOURSE:
