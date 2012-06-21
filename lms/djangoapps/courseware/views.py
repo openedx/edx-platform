@@ -161,7 +161,7 @@ def get_course(request, course):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course=None, chapter=None, section=None,
-          position=None):
+          position=None, course_id=None):
     ''' Displays courseware accordion, and any associated content.
     If course, chapter, and section aren't all specified, just returns
     the accordion.  If they are specified, returns an error if they don't
