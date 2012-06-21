@@ -471,8 +471,3 @@ def course_info(request):
   # TODO: Couse should be a model
   return render_to_response('course_info.html', {'csrf': csrf_token })
 
-@ensure_csrf_cookie
-def courses(request):
-  csrf_token = csrf(request)['csrf_token']
-  # TODO: Clean up how 'error' is done.
-  return render_to_response('courses.html', {'csrf': csrf_token })
