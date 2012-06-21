@@ -42,7 +42,8 @@ def index(request):
     else:
         csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done.
-        return render_to_response('index.html', {'csrf': csrf_token })
+        return render_to_response('index.html', {'courses' : settings.COURSES,
+                                                 'csrf': csrf_token })
 
 @ensure_csrf_cookie
 def dashboard(request):
