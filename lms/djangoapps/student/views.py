@@ -38,7 +38,7 @@ def index(request):
     ''' Redirects to main page -- info page if user authenticated, or marketing if not
     '''
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
-        return redirect('/info')
+        return redirect('/courses')
     else:
         csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done.
