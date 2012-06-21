@@ -61,13 +61,8 @@ function postJSON(url, data, callback) {
       });
 }
   $('form#login_form').submit(function(e) {
-      console.log("WOMBAT")
     e.preventDefault();
-    var submit_data={};
-    $.each($("[id^=li_]"), function(index,value){
-      submit_data[value.name]=value.value;
-      });
-    submit_data["remember"] = ($('#remember').attr("checked")? true : false);
+    var submit_data = $('#login_form').serialize();
 
     postJSON('/login',
       submit_data,
