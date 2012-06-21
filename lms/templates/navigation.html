@@ -7,7 +7,20 @@
     <a href="${ MITX_ROOT_URL }" class="logo">
       <img src="${static.url('images/logo.png')}" />
     </a>
-    <a href="/courses" class="discover-courses">Find Courses</a>
+    <nav class="find-courses">
+      <ol>
+        <li class="primary">
+          <div class="divider"></div>
+          <a href="/courses">Find Courses</a>
+          <div class="divider"></div>
+        </li>
+        <li class="secondary">
+          <a href="/about">About</a>
+          <a href="#">Blog</a>
+          <a href="/jobs">Jobs</a>
+        </li>
+      </ol>
+    </nav>
 
     %if user.is_authenticated():
     <nav class="user">
@@ -31,20 +44,12 @@
     %else:
     <nav class="guest">
       <ol>
-        <li>
-          <a href="#">About</a>
-        </li>
-        <li>
-          <a href="#">Blog</a>
-        </li>
-        <li>
-          <a href="#">Jobs</a>
-        </li>
-        <li>
+        <li class="primary">
+          <div class="divider"></div>
           <a href="#" class="login">Log In</a>
-        </li>
-        <li>
-          <a href="#">Sign Up</a>
+          <div class="divider"></div>
+          <a href="#" class="signup">Sign Up</a>
+          <div class="divider"></div>
         </li>
       </ol>
     </nav>
