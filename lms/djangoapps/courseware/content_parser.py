@@ -26,9 +26,12 @@ import xmodule
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
-
-TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
+
+# ==== This section has no direct dependencies on django ====================================
+# NOTE: it does still have some indirect dependencies:
+# util.memcache.fasthash (which does not depend on memcache at all)
+# 
 
 class ContentException(Exception):
     pass
@@ -166,12 +169,15 @@ def parse_course_file(filename, options, namespace):
     '''
     Parse a course file with the given options, and return the resulting
     xml tree object.
-    
+
     Options should be a dictionary including keys
         'dev_content': bool,
         'groups' : [list, of, user, groups]
+
+    namespace is used to in searching for the file.  Could be e.g. 'course',
+    'sections'.
     '''
-    xml = etree.XML(render_to_string(filename, options, namespace = 'course'))
+    xml = etree.XML(render_to_string(filename, options, namespace=namespace))
     return course_xml_process(xml)
 
 
@@ -197,7 +203,9 @@ def get_module(tree, module, id_tag, module_id, sections_dirname, options):
     Given the xml tree of the course, get the xml string for a module
     with the specified module type, id_tag, module_id.  Looks in
     sections_dirname for sections.
-    ''' 
+
+    id_tag -- use id_tag if the place the module stores its id is not 'id'
+    '''
         # Sanitize input
     if not module.isalnum():
         raise Exception("Module is not alphanumeric")
