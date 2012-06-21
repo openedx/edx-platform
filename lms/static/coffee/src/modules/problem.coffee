@@ -17,12 +17,20 @@ class @Problem
     @$('section.action input.save').click @save
     @$('input.math').keyup(@refreshMath).each(@refreshMath)
 
+  update_progress: (response) =>
+    if response.progress_changed
+        @element.attr progress: response.progress_status
+        @element.trigger('progressChanged')
+
   render: (content) ->
     if content
       @element.html(content)
       @bind()
     else
-      @element.load @content_url, @bind
+      $.postWithPrefix "/modx/problem/#{@id}/problem_get", '', (response) =>
+        @element.html(response.html)
+        @bind()
+      
 
   check: =>
     Logger.log 'problem_check', @answers
@@ -30,19 +38,22 @@ class @Problem
       switch response.success
         when 'incorrect', 'correct'
           @render(response.contents)
+          @update_progress response
         else
           alert(response.success)
 
   reset: =>
     Logger.log 'problem_reset', @answers
-    $.postWithPrefix "/modx/problem/#{@id}/problem_reset", id: @id, (content) =>
-      @render(content)
+    $.postWithPrefix "/modx/problem/#{@id}/problem_reset", id: @id, (response) =>
+        @render(response.html)
+        @update_progress response
 
   show: =>
     if !@element.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
       $.postWithPrefix "/modx/problem/#{@id}/problem_show", (response) =>
-        $.each response, (key, value) =>
+        answers = response.answers
+        $.each answers, (key, value) =>
           if $.isArray(value)
             for choice in value
               @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
@@ -51,6 +62,7 @@ class @Problem
         MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
+        @update_progress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
@@ -62,6 +74,7 @@ class @Problem
     $.postWithPrefix "/modx/problem/#{@id}/problem_save", @answers, (response) =>
       if response.success
         alert 'Saved'
+      @update_progress response
 
   refreshMath: (event, element) =>
     element = event.target unless element

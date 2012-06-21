@@ -75,7 +75,31 @@ no hard standards.
   review it (this may change as the team grows). 
 * Each contributor is responsible for finding a person to review their
   code. If it is not clear to the contributor who is appropriate, each
-  project has an owner
+  project has an owner who is the default go-to. 
+
+2.1 Rapid pull
+
+Unmerged code can lead to merge conflicts, and slow down
+development. We have an experimental procedure for handling rapid
+pulls and merges. To qualify:
+
+* A piece of code must only have minor issues remaining (nothing which
+  we would be uncomfortable placing on a server).  
+* Either the requester or the puller takes ownership for guaranteeing
+  that those issues are resolved within a short timeframe.
+* Both the requester and the puller must be comfortable with it. 
+* Both the requester and the owner must have a history of/ability to 
+  resolve remaining issues quickly. 
+
+If code qualifies: 
+* It can be merged, and repaired in master. 
+* The pull message should specify '## pending fixes/OWNER' where ## is
+  the pull request number, and OWNER is the owner. 
+* All required fixes are documented in github in the (now closed) pull
+  request, and should be marked off there when applied (potentially,
+  directly to master).
+* Once all fixes are applied, the final commit should specify 
+  '## closed'. 
 
 3. Documentation Standards
 
@@ -83,3 +107,6 @@ no hard standards.
 * When impossible, it should live in the github repo. 
 * Discussion should live on github, Basecamp or Pivotal, depending on
   context.
+* Notes for later fixes should in general be put into Pivotal as stories.
+  If they are left in the code, they should be prefixed by
+  # TODO (<name>)

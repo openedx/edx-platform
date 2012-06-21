@@ -1,8 +1,12 @@
 import json
+import logging
 
 from lxml import etree
 
 from x_module import XModule, XModuleDescriptor
+from xmodule.progress import Progress
+
+log = logging.getLogger("mitx.common.lib.seq_module")
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -37,6 +41,16 @@ class Module(XModule):
         self.render()
         return self.destroy_js
 
+    def get_progress(self):
+        ''' Return the total progress, adding total done and total available.
+        (assumes that each submodule uses the same "units" for progress.)
+        '''
+        # TODO: Cache progress or children array?
+        children = self.get_children()
+        progresses = [child.get_progress() for child in children]
+        progress = reduce(Progress.add_counts, progresses)
+        return progress
+
     def handle_ajax(self, dispatch, get):		# TODO: bounds checking
         ''' get = request.POST instance '''
         if dispatch=='goto_position':
@@ -53,10 +67,15 @@ class Module(XModule):
         titles = ["\n".join([i.get("name").strip() for i in e.iter() if i.get("name") is not None]) \
                        for e in self.xmltree]
 
+        children = self.get_children()
+        progresses = [child.get_progress() for child in children]
+        
         self.contents = self.rendered_children()
 
-        for contents, title in zip(self.contents, titles):
+        for contents, title, progress in zip(self.contents, titles, progresses):
             contents['title'] = title
+            contents['progress_status'] = Progress.to_js_status_str(progress)
+            contents['progress_detail'] = Progress.to_js_detail_str(progress)
 
         for (content, element_class) in zip(self.contents, child_classes):
             new_class = 'other'
@@ -68,16 +87,17 @@ class Module(XModule):
         # Split </script> tags -- browsers handle this as end
         # of script, even if it occurs mid-string. Do this after json.dumps()ing
         # so that we can be sure of the quotations being used
-        params={'items':json.dumps(self.contents).replace('</script>', '<"+"/script>'),
-                'id':self.item_id,
+        params={'items': json.dumps(self.contents).replace('</script>', '<"+"/script>'),
+                'id': self.item_id,
                 'position': self.position,
-                'titles':titles,
-                'tag':self.xmltree.tag}
+                'titles': titles,
+                'tag': self.xmltree.tag}
 
         if self.xmltree.tag in ['sequential', 'videosequence']:
             self.content = self.system.render_template('seq_module.html', params)
         if self.xmltree.tag == 'tab':
             self.content = self.system.render_template('tab_module.html', params)
+        log.debug("rendered content: %s", content)
         self.rendered = True
 
     def __init__(self, system, xml, item_id, state=None):
@@ -95,3 +115,7 @@ class Module(XModule):
             self.position = int(system.get('position'))
 
         self.rendered = False
+
+
+class SectionDescriptor(XModuleDescriptor):
+    pass

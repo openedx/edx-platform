@@ -20,3 +20,4 @@ log/
 reports/
 /src/
 \#*\#
+*.egg-info
