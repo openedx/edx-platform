@@ -30,6 +30,7 @@ class @VideoPlayer
   render: ->
     new VideoControl @
     new VideoCaption @, @video.youtubeId('1.0')
+    new VideoVolumeControl @ unless onTouchBasedDevice()
     new VideoSpeedControl @, @video.speeds
     new VideoProgressSlider @
     @player = new YT.Player @video.id,
@@ -132,3 +133,9 @@ class @VideoPlayer
 
   currentSpeed: ->
     @video.speed
+
+  volume: (value) ->
+    if value?
+      @player.setVolume value
+    else
+      @player.getVolume()

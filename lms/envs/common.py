@@ -61,6 +61,7 @@ sys.path.append(ASKBOT_ROOT)
 sys.path.append(ASKBOT_ROOT / "askbot" / "deps")
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
+sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
 ################################## MITXWEB #####################################
@@ -72,7 +73,9 @@ MAKO_TEMPLATES['course'] = [DATA_DIR]
 MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
 MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
+                          COMMON_ROOT / 'templates',
                           COMMON_ROOT / 'lib' / 'capa' / 'templates',
+                          COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
                           DATA_DIR / 'info',
                           DATA_DIR / 'problems']
 
