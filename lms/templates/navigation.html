@@ -25,15 +25,17 @@
     %if user.is_authenticated():
     <nav class="user">
       <ol>
-        <li>
+        <li class="primary">
+          <div class="divider"></div>
           <a href="/dashboard" class="user-link">
             <span class="avatar"><img src="${static.url('images/profile.jpg')}" /></span>
             Neil deGrasse Tyson
           </a>
-        </li>
-        <li>
+          <div class="divider"></div>
           <a href="#" class="options">&#9662</a>
+          <div class="divider"></div>
           <ol class="user-options">
+            <li><a href="#">Account Settings</a></li>
             <li><a href="#">Help</a></li>
             <li><a href="/logout">Log Out</a></li>
           </ol>
