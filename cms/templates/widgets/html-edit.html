@@ -1,0 +1,18 @@
+<%namespace name='static' file='../static_content.html'/>
+
+<section class="html-edit">
+  <header>
+    <a href="#" class="cancel">Cancel</a>
+    <a href="#" class="save-update">Save &amp; Update</a>
+  </header>
+
+  <section>
+    <header>
+      <h1 class="editable">${module.name}</h1>
+    <section>
+      <textarea name="" id="edit-box" rows="8" cols="40">${module.definition['data']['text']}</textarea>
+      <div id="edit-preview" class="preview">${module.definition['data']['text']}</div>
+    </section>
+    <a href="" class="save-update">Save &amp; Update</a>
+  </section>
+</section>

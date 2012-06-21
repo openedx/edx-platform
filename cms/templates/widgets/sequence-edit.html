@@ -1,16 +1,8 @@
 <section class="sequence-edit">
   <header>
-    <div class="week">
-      <h2><a href="">Week 1</a></h2>
-      <ul>
-        <li>
-          <p class="editable"><strong>Goal title:</strong> This is the goal body and is where the goal will be further explained</p>
-        </li>
-      </ul>
-    </div>
     <div>
-      <h1 class="editable">Lecture sequence</h1>
-      <p><strong>Group type:</strong> Ordered Sequence</p>
+      <h1 class="editable">${module.name}</h1>
+      <p><strong>Module Type:</strong>${module.type}</p>
     </div>
   </header>
 
@@ -51,72 +43,12 @@
         <ol>
           <li>
             <ol>
+              % for child in module.get_children():
               <li>
-                <a href="" class="problem-edit">Problem title 11</a>
+                <a href="#" class="module-edit" id="${child.url}">${child.name}</a>
                 <a href="#" class="draggable">handle</a>
               </li>
-              <li>
-                <a href="#" class="sequence-edit">Problem Group</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="problem-edit">Problem title 14</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="video-edit">Video 3</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li class="group">
-                <header>
-                  <h3>
-                    <a href="#" class="problem-edit">Problem group</a>
-                    <a href="#" class="draggable">handle</a>
-                  </h3>
-                </header>
-                <ol>
-                  <li>
-                    <a href="#" class="problem-edit">Problem title 11</a>
-                    <a href="#" class="draggable">handle</a>
-                  </li>
-                  <li>
-                    <a href="#" class="problem-edit">Problem title 11</a>
-                    <a href="#" class="draggable">handle</a>
-                  </li>
-                  <li>
-                    <a href="#" class="problem-edit">Problem title 11</a>
-                    <a href="#" class="draggable">handle</a>
-                  </li>
-                </ol>
-              </li>
-              <li>
-                <a href="#" class="problem-edit">Problem title 13</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="problem-edit">Problem title 14</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="video-edit">Video 3</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="" class="problem-edit">Problem title 11</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="sequence-edit">Problem Group</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="problem-edit">Problem title 14</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="video-edit">Video 3</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
+              %endfor
             </ol>
           </li>
 

@@ -1,14 +1,28 @@
 import json
 import logging
 
-from x_module import XModule, XModuleDescriptor
+from x_module import XModule
+from mako_module import MakoModuleDescriptor
 from lxml import etree
 
 log = logging.getLogger("mitx.courseware")
 
+
 #-----------------------------------------------------------------------------
-class ModuleDescriptor(XModuleDescriptor):
-    pass
+class HtmlModuleDescriptor(MakoModuleDescriptor):
+    """
+    Module for putting raw html in a course
+    """
+    mako_template = "widgets/html-edit.html"
+
+    # TODO (cpennington): Make this into a proper module
+    js = {'coffee': ["""
+        window.construct_html = (id) ->
+            $('#' + id + " #edit-box").on('input', ->
+                $('#' + id + ' #edit-preview').empty().append($(this).val())
+            )
+    """]}
+
 
 class Module(XModule):
     id_attribute = 'filename'

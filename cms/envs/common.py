@@ -21,6 +21,7 @@ Longer TODO:
 
 import sys
 import tempfile
+import os.path
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -154,11 +155,30 @@ PIPELINE_CSS = {
 
 PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
 
+from x_module import XModuleDescriptor
+js_file_dir = tempfile.mkdtemp('js', dir=PROJECT_ROOT / "static")
+module_js_sources = []
+for xmodule in XModuleDescriptor.load_classes():
+    js = xmodule.get_javascript()
+    for filetype in ('coffee', 'js'):
+        for idx, fragment in enumerate(js.get(filetype, [])):
+            path = os.path.join(js_file_dir, "{name}.{idx}.{type}".format(
+                name=xmodule.__name__,
+                idx=idx,
+                type=filetype))
+            with open(path, 'w') as js_file:
+                js_file.write(fragment)
+            module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+
 PIPELINE_JS = {
     'main': {
         'source_filenames': ['coffee/main.coffee'],
         'output_filename': 'js/main.js',
     },
+    'module-js': {
+        'source_filenames': module_js_sources,
+        'output_filename': 'js/modules.js',
+    }
 }
 
 PIPELINE_COMPILERS = [

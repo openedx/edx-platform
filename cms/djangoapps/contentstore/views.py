@@ -17,4 +17,4 @@ def index(request):
 def edit_item(request):
     item_id = request.GET['id']
     item = keystore().get_item(item_id)
-    return HttpResponse("<section>Problem content</section>")
+    return HttpResponse(item.get_html())
