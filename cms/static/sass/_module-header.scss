@@ -1,18 +1,15 @@
-section.video-new, section.video-edit, section.problem-new, section.problem-edit  {
-  position: absolute;
-  top: 72px;
-  right: 0;
+section.video-new, 
+section.video-edit, 
+section.problem-new, 
+section.problem-edit,
+section.html-edit {
   background: #fff;
-  width: flex-grid(6);
-  @include box-shadow(0 0 6px #666);
   border: 1px solid #333;
   border-right: 0;
-  z-index: 4;
 
   > header {
-    background: #666;
+    background: #eee;
     @include clearfix;
-    color: #fff;
     padding: 6px;
     border-bottom: 1px solid #333;
     -webkit-font-smoothing: antialiased;
