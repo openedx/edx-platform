@@ -5,6 +5,9 @@ setup(
     version="0.1",
     packages=find_packages(),
     install_requires=['distribute'],
+    package_data={
+        '': ['js/*']
+    },
 
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points
