@@ -111,3 +111,7 @@ input[type="submit"], .button {
   display: block;
   float: right;
 }
+
+textarea {
+  overflow: auto;
+}
