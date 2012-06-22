@@ -12,7 +12,11 @@ div.course-wrapper {
   @extend .table-wrapper;
 
   ul, ol {
-    list-style: none;
+    padding-left: lh();
+
+    li {
+      margin-bottom: lh(.5);
+    }
   }
 
   section.course-content {
@@ -32,12 +36,6 @@ div.course-wrapper {
       }
     }
 
-    ul {
-      li {
-        margin-bottom: lh(.5);
-      }
-    }
-
     div#seq_content {
       h1 {
         background: none;
@@ -48,6 +46,9 @@ div.course-wrapper {
     }
 
     ol.vert-mod {
+      list-style: none;
+      padding-left: 0;
+
       > li {
         @extend .clearfix;
         @extend .problem-set;
@@ -85,10 +86,6 @@ div.course-wrapper {
           height: 150px;
         }
 
-        ul {
-          list-style: disc outside none;
-          padding-left: 1em;
-        }
 
         nav.sequence-bottom {
           ul {
