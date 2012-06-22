@@ -108,7 +108,9 @@ class Module(XModule):
         d = self.get_score()
         score = d['score']
         total = d['total']
-        return Progress(score, total)
+        if total > 0:
+            return Progress(score, total)
+        return None
 
 
     def get_html(self):
@@ -305,7 +307,7 @@ class Module(XModule):
         after = self.get_progress()
         d.update({
             'progress_changed' : after != before,
-            'progress' : after.ternary_str(),
+            'progress_status' : Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
 
