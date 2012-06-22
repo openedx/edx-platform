@@ -1,27 +1,4 @@
-<%namespace name='static' file='../static_content.html'/>
-
 <section class="html-edit">
-  <header>
-    <h1 class="editable">${module.name}</h1>
-    <p>Unit type: HTML</p>
-    <!-- <div class="actions"> -->
-    <!--   <a href="#" class="cancel">Cancel</a> -->
-    <!--   <a href="#" class="save-update">Save &amp; Update</a> -->
-    <!-- </div> -->
-  </header>
-
-  <section>
-    <header>
-    </header>
-
-    <section>
-      <textarea name="" id="edit-box" rows="8" cols="40">${module.definition['data']['text']}</textarea>
-      <div id="edit-preview" class="preview">${module.definition['data']['text']}</div>
-    </section>
-
-    <div class="actions">
-      <a href="" class="save-update">Save &amp; Update</a>
-      <a href="#" class="cancel">Cancel</a>
-    </div>
-  </section>
+  <textarea name="" class="edit-box" rows="8" cols="40">${module.definition['data']['text']}</textarea>
+  <div class="preview">${module.definition['data']['text']}</div>
 </section>

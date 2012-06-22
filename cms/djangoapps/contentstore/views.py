@@ -1,7 +1,5 @@
 from mitxmako.shortcuts import render_to_response
 from keystore.django import keystore
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 
 
 def index(request):
@@ -20,4 +18,5 @@ def edit_item(request):
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'type': item.type,
+        'name': item.name,
     })
