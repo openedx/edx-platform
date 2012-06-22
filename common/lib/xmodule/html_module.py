@@ -4,6 +4,7 @@ import logging
 from x_module import XModule
 from mako_module import MakoModuleDescriptor
 from lxml import etree
+from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.courseware")
 
@@ -16,12 +17,7 @@ class HtmlModuleDescriptor(MakoModuleDescriptor):
     mako_template = "widgets/html-edit.html"
 
     # TODO (cpennington): Make this into a proper module
-    js = {'coffee': ["""
-        window.construct_html = (id) ->
-            $('#' + id + " #edit-box").on('input', ->
-                $('#' + id + ' #edit-preview').empty().append($(this).val())
-            )
-    """]}
+    js = {'coffee': [resource_string(__name__, 'js/module/html.coffee')]}
 
 
 class Module(XModule):

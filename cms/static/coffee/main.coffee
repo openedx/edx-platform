@@ -9,7 +9,7 @@ edit_item = (id) ->
         bind_edit_links()
         $('section.edit-pane').show()
         $('body').addClass('content')
-        window['construct_html']('module-html')
+        new window[$('#unit-wrapper').attr('class')] 'module-html'
     )
 
 $ ->

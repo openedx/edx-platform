@@ -17,4 +17,7 @@ def index(request):
 def edit_item(request):
     item_id = request.GET['id']
     item = keystore().get_item(item_id)
-    return HttpResponse(item.get_html())
+    return render_to_response('unit.html', {
+        'contents': item.get_html(),
+        'type': item.type,
+    })
