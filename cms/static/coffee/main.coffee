@@ -3,16 +3,18 @@ bind_edit_links = ->
         edit_item($(this).attr('id'))
         return false
 
-edit_item = (id) ->
-    $.get('/edit_item', {id: id}, (data) ->
+edit_item = (id) =>
+    $.get('/edit_item', {id: id}, (data) =>
         $('#module-html').empty().append(data)
         bind_edit_links()
         $('section.edit-pane').show()
         $('body').addClass('content')
-        new window[$('#unit-wrapper').attr('class')] 'module-html'
+        new @Unit('unit-wrapper', id)
     )
 
 $ ->
+    $.ajaxSetup
+        headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
     $('section.main-content').children().hide()
     $('.editable').inlineEdit()
     $('.editable-textarea').inlineEdit({control: 'textarea'})

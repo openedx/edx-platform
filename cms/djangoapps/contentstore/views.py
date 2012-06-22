@@ -1,7 +1,11 @@
 from mitxmako.shortcuts import render_to_response
 from keystore.django import keystore
+from django_future.csrf import ensure_csrf_cookie
+from django.http import HttpResponse
+import json
 
 
+@ensure_csrf_cookie
 def index(request):
     # TODO (cpennington): These need to be read in from the active user
     org = 'mit.edu'
@@ -20,3 +24,10 @@ def edit_item(request):
         'type': item.type,
         'name': item.name,
     })
+
+
+def save_item(request):
+    item_id = request.POST['id']
+    data = json.loads(request.POST['data'])
+    keystore().update_item(item_id, data)
+    return HttpResponse(json.dumps({}))
