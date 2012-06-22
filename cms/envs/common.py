@@ -22,6 +22,8 @@ Longer TODO:
 import sys
 import tempfile
 import os.path
+import os
+import errno
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -156,7 +158,15 @@ PIPELINE_CSS = {
 PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
 
 from x_module import XModuleDescriptor
-js_file_dir = tempfile.mkdtemp('js', dir=PROJECT_ROOT / "static")
+js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
+try:
+    os.makedirs(js_file_dir)
+except OSError as exc:
+    if exc.errno == errno.EEXIST:
+        pass
+    else:
+        raise
+
 module_js_sources = []
 for xmodule in XModuleDescriptor.load_classes():
     js = xmodule.get_javascript()
@@ -172,7 +182,7 @@ for xmodule in XModuleDescriptor.load_classes():
 
 PIPELINE_JS = {
     'main': {
-        'source_filenames': ['coffee/main.coffee'],
+        'source_filenames': ['coffee/main.coffee', 'coffee/unit.coffee'],
         'output_filename': 'js/main.js',
     },
     'module-js': {
