@@ -1,23 +1,70 @@
-section.problem-new, section.problem-edit {
+section#unit-wrapper {
+  > header {
+    border-bottom: 2px solid #333;
+    @include clearfix();
+    padding: 6px 20px;
+
+    h1 {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      float: left;
+    }
+
+    p {
+      float: right;
+    }
+  }
   > section {
-    textarea {
-      @include box-sizing(border-box);
-      display: block;
-      width: 100%;
-    }
-
-    div.preview {
-      background: #eee;
-      @include box-sizing(border-box);
-      height: 40px;
-      padding: 10px;
-      width: 100%;
-    }
-
-    a.save {
+    padding: 20px;
+    a.save-update {
       @extend .button;
       @include inline-block();
       margin-top: 20px;
+    }
+  }
+}
+
+section.problem-new,
+section.problem-edit,
+section.html-edit {
+  textarea {
+    @include box-sizing(border-box);
+    display: block;
+    width: 100%;
+  }
+
+
+  div.preview {
+    background: #eee;
+    @include box-sizing(border-box);
+    min-height: 40px;
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 1em;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 1em;
+    }
+
+    h3 {
+      font-size: 18;
+      margin-bottom: 1em;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 1em;
+    }
+
+    p {
+      margin-bottom: 1em;
     }
   }
 }

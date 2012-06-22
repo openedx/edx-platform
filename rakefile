@@ -58,6 +58,11 @@ task :pylint => REPORT_DIR do
     end
 end
 
+default_options = {
+    :lms => '8000',
+    :cms => '8001',
+}
+
 [:lms, :cms].each do |system|
     task_name = "test_#{system}"
     report_dir = File.join(REPORT_DIR, task_name)
@@ -76,7 +81,7 @@ end
         Other useful environments are devplus (for dev testing with a real local database)
         desc
     task system, [:env, :options] => [] do |t, args|
-        args.with_defaults(:env => 'dev', :options => '')
+        args.with_defaults(:env => 'dev', :options => default_options[system])
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
 end
