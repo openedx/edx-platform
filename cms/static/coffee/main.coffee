@@ -1,16 +1,17 @@
-bind_edit_links = ->
-    $('a.module-edit').click ->
-        edit_item($(this).attr('id'))
-        return false
+class @CMS
+    @bind = =>
+        $('a.module-edit').click ->
+            CMS.edit_item($(this).attr('id'))
+            return false
 
-edit_item = (id) =>
-    $.get('/edit_item', {id: id}, (data) =>
-        $('#module-html').empty().append(data)
-        bind_edit_links()
-        $('section.edit-pane').show()
-        $('body').addClass('content')
-        new @Unit('unit-wrapper', id)
-    )
+    @edit_item = (id) =>
+        $.get('/edit_item', {id: id}, (data) =>
+            $('#module-html').empty().append(data)
+            CMS.bind()
+            $('section.edit-pane').show()
+            $('body').addClass('content')
+            new Unit('unit-wrapper', id)
+        )
 
 $ ->
     $.ajaxSetup
@@ -73,5 +74,5 @@ $ ->
         $('section.edit-pane').show()
         return false
 
-    bind_edit_links()
+    CMS.bind()
 
