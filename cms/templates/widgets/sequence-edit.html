@@ -1,119 +1,106 @@
 <section class="sequence-edit">
-  <header>
-    <div>
-      <h1 class="editable">${module.name}</h1>
-      <p><strong>Module Type:</strong>${module.type}</p>
-    </div>
-  </header>
+  <section class="filters">
+    <ul>
+      <li>
+        <label for="">Sort by</label>
+        <select>
+          <option value="">Recently Modified</option>
+        </select>
+      </li>
 
-  <section class="content">
-    <section class="filters">
-      <ul>
+      <li>
+        <label for="">Display</label>
+        <select>
+          <option value="">All content</option>
+        </select>
+      </li>
+      <li>
+        <select>
+          <option value="">Internal Only</option>
+        </select>
+      </li>
+
+      <li class="advanced">
+        <a href="#">Advanced filters</a>
+      </li>
+
+      <li>
+        <input type="search" name="" id="" value="" />
+      </li>
+    </ul>
+  </section>
+
+  <div>
+    <section class="modules">
+      <ol>
         <li>
-          <label for="">Sort by</label>
-          <select>
-            <option value="">Recently Modified</option>
-          </select>
+          <ol>
+            % for child in module.get_children():
+            <li>
+              <a href="#" class="module-edit" id="${child.url}">${child.name}</a>
+              <a href="#" class="draggable">handle</a>
+            </li>
+            %endfor
+          </ol>
         </li>
 
-        <li>
-          <label for="">Display</label>
-          <select>
-            <option value="">All content</option>
-          </select>
-        </li>
-        <li>
-          <select>
-            <option value="">Internal Only</option>
-          </select>
-        </li>
-
-        <li class="advanced">
-          <a href="#">Advanced filters</a>
-        </li>
-
-        <li>
-          <input type="search" name="" id="" value="" />
-        </li>
-      </ul>
+      </ol>
     </section>
 
-    <div>
-      <section class="modules">
-        <ol>
-          <li>
-            <ol>
-              % for child in module.get_children():
-              <li>
-                <a href="#" class="module-edit" id="${child.url}">${child.name}</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              %endfor
-            </ol>
-          </li>
-
-          <!-- <li class="new-module"> -->
-          <!--   <%include file="new-module.html"/> -->
-          <!-- </li> -->
-        </ol>
-      </section>
-
-      <section class="scratch-pad">
-        <ol>
-          <li>
-            <header>
-              <h2>Section Scratch</h2>
-            </header>
-            <ul>
-              <li>
-                <a href="#" class="problem-edit">Problem title 11</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="problem-edit">Problem title 13 </a>
+    <section class="scratch-pad">
+      <ol>
+        <li class="new-module">
+          <%include file="new-module.html"/>
+        </li>
+        <li>
+          <header>
+            <h2>Section Scratch</h2>
+          </header>
+          <ul>
+            <li>
+              <a href="#" class="problem-edit">Problem title 11</a>
               <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="problem-edit"> Problem title 14</a>
+            </li>
+            <li>
+              <a href="#" class="problem-edit">Problem title 13 </a>
               <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="" class="video-edit">Video 3</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <header>
-              <h2>Course Scratch</h2>
-            </header>
+            </li>
+            <li>
+              <a href="#" class="problem-edit"> Problem title 14</a>
+              <a href="#" class="draggable">handle</a>
+            </li>
+            <li>
+              <a href="" class="video-edit">Video 3</a>
+              <a href="#" class="draggable">handle</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <header>
+            <h2>Course Scratch</h2>
+          </header>
 
-            <ul>
-              <li>
-                <a href="#" class="problem-edit">Problem title 11</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="problem-edit">Problem title 13 </a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="#" class="problem-edit"> Problem title 14</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-              <li>
-                <a href="" class="video-edit">Video 3</a>
-                <a href="#" class="draggable">handle</a>
-              </li>
-            </ul>
-          </li>
-
-          <!-- <li class="new-module"> -->
-          <!--   <%include file="new-module.html"/> -->
-          <!-- </li> -->
-        </ol>
-      </section>
-    </div>
-  </section>
+          <ul>
+            <li>
+              <a href="#" class="problem-edit">Problem title 11</a>
+              <a href="#" class="draggable">handle</a>
+            </li>
+            <li>
+              <a href="#" class="problem-edit">Problem title 13 </a>
+              <a href="#" class="draggable">handle</a>
+            </li>
+            <li>
+              <a href="#" class="problem-edit"> Problem title 14</a>
+              <a href="#" class="draggable">handle</a>
+            </li>
+            <li>
+              <a href="" class="video-edit">Video 3</a>
+              <a href="#" class="draggable">handle</a>
+            </li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+  </div>
 </section>
 

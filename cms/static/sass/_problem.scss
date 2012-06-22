@@ -4,68 +4,200 @@ section#unit-wrapper {
     @include clearfix();
     padding: 6px 20px;
 
-    h1 {
-      font-size: 18px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    section {
       float: left;
+
+      h1 {
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        @include inline-block();
+      }
+
+      p {
+        @include inline-block();
+        margin-left: 10px;
+        color: #999;
+        font-size: 12px;
+        font-style: italic;
+      }
     }
 
-    p {
+    div {
       float: right;
+      color: #666;
     }
   }
+
   > section {
     padding: 20px;
-    a.save-update {
-      @extend .button;
-      @include inline-block();
+
+    section.meta {
+      section {
+        &.status-settings {
+          float: left;
+          margin-bottom: 10px;
+
+          ul {
+            list-style: none;
+            @include border-radius(2px);
+            border: 1px solid #999;
+            @include inline-block();
+
+            li {
+              @include inline-block();
+              border-right: 1px solid #999;
+              padding: 6px;
+
+              &:last-child {
+                border-right: 0;
+              }
+
+              &.current {
+                background: #eee;
+              }
+            }
+          }
+
+          a.settings {
+            @include inline-block();
+            margin: 0 20px;
+            border: 1px solid #999;
+            padding: 6px;
+          }
+
+          select {
+            float: right;
+          }
+        }
+
+        &.author {
+          float: right;
+
+          dl {
+            dt {
+              font-weight: bold;
+            }
+
+            dd, dt {
+              @include inline-block();
+            }
+          }
+        }
+
+        &.tags {
+          background: #eee;
+          padding: 10px;
+          margin: 0 0 20px;
+          @include clearfix();
+          clear: both;
+
+          div {
+            float: left;
+            margin-right: 20px;
+
+            h2 {
+              font-size: 14px;
+              @include inline-block();
+            }
+
+            p {
+              @include inline-block();
+            }
+          }
+        }
+      }
+    }
+
+    //general styles for main content
+    textarea {
+      @include box-sizing(border-box);
+      display: block;
+      width: 100%;
+    }
+
+    div.preview {
+      background: #eee;
+      @include box-sizing(border-box);
+      min-height: 40px;
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 1em;
+      }
+
+      h2 {
+        font-size: 20px;
+        margin-bottom: 1em;
+      }
+
+      h3 {
+        font-size: 18;
+        margin-bottom: 1em;
+      }
+
+      ul {
+        padding-left: 20px;
+        margin-bottom: 1em;
+      }
+
+      p {
+        margin-bottom: 1em;
+      }
+    }
+
+    //notes
+    section.notes {
       margin-top: 20px;
+      padding: 20px 0 0;
+      border-top: 1px solid #ccc;
+
+      h2 {
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+
+      form {
+        margin-bottom: 20px;
+
+        textarea {
+          @include box-sizing(border-box);
+          display: block;
+          width: 100%;
+        }
+
+        input[type="submit"]{
+          margin-top: 10px;
+        }
+      }
+
+      ul {
+        list-style: none;
+
+        li {
+          margin-bottom: 20px;
+
+          p {
+            margin-bottom: 10px;
+
+            &.author {
+              font-style: italic;
+              color: #999;
+            }
+          }
+        }
+      }
+    }
+
+    div.actions {
+      a.save-update {
+        @extend .button;
+        @include inline-block();
+        margin-top: 20px;
+      }
     }
   }
 }
-
-section.problem-new,
-section.problem-edit,
-section.html-edit {
-  textarea {
-    @include box-sizing(border-box);
-    display: block;
-    width: 100%;
-  }
-
-
-  div.preview {
-    background: #eee;
-    @include box-sizing(border-box);
-    min-height: 40px;
-    padding: 10px;
-    width: 100%;
-    margin-top: 10px;
-
-    h1 {
-      font-size: 24px;
-      margin-bottom: 1em;
-    }
-
-    h2 {
-      font-size: 20px;
-      margin-bottom: 1em;
-    }
-
-    h3 {
-      font-size: 18;
-      margin-bottom: 1em;
-    }
-
-    ul {
-      padding-left: 20px;
-      margin-bottom: 1em;
-    }
-
-    p {
-      margin-bottom: 1em;
-    }
-  }
-}
-
