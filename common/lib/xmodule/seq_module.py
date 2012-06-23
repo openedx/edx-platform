@@ -77,6 +77,7 @@ class Module(XModule):
             contents['progress_status'] = Progress.to_js_status_str(progress)
             contents['progress_detail'] = Progress.to_js_detail_str(progress)
 
+        content = None
         for (content, element_class) in zip(self.contents, child_classes):
             new_class = 'other'
             for c in class_priority:

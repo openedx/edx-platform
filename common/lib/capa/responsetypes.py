@@ -567,7 +567,7 @@ def sympy_check2():
 
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset)==1 and not submission[0]:
-            return {idset[0]:'no_answer_entered'}
+            return CorrectMap(idset[0],'incorrect',msg='<font color="red">No answer entered!</font>')
 
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
