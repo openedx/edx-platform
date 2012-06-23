@@ -409,18 +409,21 @@ class Module(XModule):
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?
-            self.lcp = LoncapaProblem(self.filestore.open(self.filename),
-                                      id=lcp_id, state=old_state, system=self.system)
+            #self.lcp = LoncapaProblem(self.filestore.open(self.filename),
+            #                          id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             return {'success': inst.message}
-        except:
+        except Exception, err:
             # TODO: why is this line here?
-            self.lcp = LoncapaProblem(self.filestore.open(self.filename),
-                                      id=lcp_id, state=old_state, system=self.system)
+            #self.lcp = LoncapaProblem(self.filestore.open(self.filename),
+            #                          id=lcp_id, state=old_state, system=self.system)
+            if self.DEBUG:
+                msg = "Error checking problem: " + str(err)
+                msg += '\nTraceback:\n' + traceback.format_exc()
+                return {'success':msg}
+                
             traceback.print_exc()
             raise Exception,"error in capa_module"
-            # TODO: Dead code...  is this a bug, or just old?
-            return {'success':'Unknown Error'}
 
         self.attempts = self.attempts + 1
         self.lcp.done = True

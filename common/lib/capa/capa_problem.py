@@ -304,7 +304,8 @@ class LoncapaProblem(object):
             try:
                 exec code in context, context        	# use "context" for global context; thus defs in code are global within code
             except Exception:
-                log.exception("Error while execing code: " + code)
+                log.exception("Error while execing script code: " + code)
+                raise responsetypes.LoncapaProblemError("Error while executing script code")
         return context
 
     def _extract_html(self, problemtree):  # private
