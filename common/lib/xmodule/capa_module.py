@@ -117,7 +117,18 @@ class Module(XModule):
         '''Return html for the problem.  Adds check, reset, save buttons
         as necessary based on the problem config and state.'''
 
-        html = self.lcp.get_html()
+        try:
+            html = self.lcp.get_html()
+        except Exception, err:
+            if self.DEBUG:
+                log.exception(err)
+                msg = '[courseware.capa.capa_module] <font size="+1" color="red">Failed to generate HTML for problem %s</font>' % (self.filename)
+                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<','&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
+                html = msg
+            else:
+                raise
+                
         content = {'name': self.name,
                    'html': html,
                    'weight': self.weight,
