@@ -247,10 +247,24 @@ def render_x_module(user, request, module_xml, student_module_cache, position=No
         render_histogram = len(histogram) > 0
         staff_context = {'xml': etree.tostring(module_xml), 
                          'module_id': module_id,
+                         'edit_link': False,
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram}
         content += render_to_string("staff_problem_info.html", staff_context)
 
+    # the following if block is for summer 2012 edX course development; it will change when the CMS comes online
+    if settings.MITX_FEATURES.get('DISPLAY_EDIT_LINK') and settings.DEBUG and module_xml.get('filename') is not None:
+        coursename = multicourse_settings.get_coursename_from_request(request)
+        github_url = multicourse_settings.get_course_github_url(coursename)
+        fn = module_xml.get('filename')
+        if module_xml.tag=='problem': fn = 'problems/' + fn	# grrr
+        edit_link = (github_url + '/tree/master/' + fn) if github_url is not None else None
+        if module_xml.tag=='problem': edit_link += '.xml'	# grrr
+        staff_context = {'edit_link': edit_link,
+                         'xml': '', # etree.tostring(module_xml), 
+                         'render_histogram': False}
+        content += render_to_string("staff_problem_info.html", staff_context)
+        
     context = {'content': content, 'type': module_type}
     return context
 
