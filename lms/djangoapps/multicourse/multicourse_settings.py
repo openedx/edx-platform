@@ -77,5 +77,8 @@ def get_course_title(coursename):
 
 def get_course_number(coursename):
     return get_course_property(coursename,'number')
+
+def get_course_github_url(coursename):
+    return get_course_property(coursename,'github_url')
     
 
