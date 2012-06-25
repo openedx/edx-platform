@@ -10,6 +10,7 @@ class @VideoCaption
     $(window).bind('resize', @onWindowResize)
     $(@player).bind('resize', @onWindowResize)
     $(@player).bind('updatePlayTime', @onUpdatePlayTime)
+    $(@player).bind('seek', @onUpdatePlayTime)
     $(@player).bind('play', @onPlay)
     @$('.hide-subtitles').click @toggle
     @$('.subtitles').mouseenter(@onMouseEnter).mouseleave(@onMouseLeave)
