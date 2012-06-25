@@ -1708,29 +1708,15 @@ header.app {
   box-shadow: 0 15px 80px 15px rgba(0, 0, 0, 0.5);
   color: #fff;
   display: none;
+  left: 50%;
+  margin-left: -242.5px;
   padding: 8px;
+  position: absolute;
+  top: 170px;
   width: 485px;
   z-index: 10; }
   .modal.visible {
     display: block; }
-  .modal.login-modal {
-    left: 50%;
-    margin-left: -242.5px;
-    min-height: 410px;
-    min-width: 485px;
-    position: absolute;
-    top: 150px; }
-    .modal.login-modal .inner-wrapper {
-      height: 410px; }
-  .modal.signup-modal {
-    left: 50%;
-    margin-left: -242.5px;
-    min-height: 965px;
-    min-width: 485px;
-    position: absolute;
-    top: 150px; }
-    .modal.signup-modal .inner-wrapper {
-      height: 965px; }
   .modal .inner-wrapper {
     background: #f0f0f0;
     -webkit-border-radius: 0px;
@@ -1741,6 +1727,7 @@ header.app {
     -moz-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
     box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
     overflow: hidden;
+    padding-bottom: 30px;
     position: relative; }
     .modal .inner-wrapper header {
       margin-bottom: 30px;
@@ -1786,7 +1773,7 @@ header.app {
         z-index: 2; }
     .modal .inner-wrapper form {
       margin-bottom: 12px;
-      padding: 0px 20px;
+      padding: 0px 40px;
       position: relative;
       z-index: 2; }
       .modal .inner-wrapper form label {
@@ -1826,7 +1813,7 @@ header.app {
           text-decoration: underline; }
       .modal .inner-wrapper form .honor-code-summary {
         margin-bottom: 20px;
-        padding: 0px 10px;
+        padding: 0px;
         position: relative; }
         .modal .inner-wrapper form .honor-code-summary p {
           color: #a0a0a0;
@@ -1856,12 +1843,12 @@ header.app {
             .modal .inner-wrapper form .honor-code-summary ul li:last-child {
               margin-bottom: 0px; }
       .modal .inner-wrapper form .submit {
-        padding-top: 18px; }
+        padding-top: 10px; }
         .modal .inner-wrapper form .submit input[type="submit"] {
           display: block;
           height: 45px;
           margin: 0 auto;
-          width: 70%; }
+          width: 100%; }
     .modal .inner-wrapper .login-extra {
       position: relative;
       z-index: 2; }
