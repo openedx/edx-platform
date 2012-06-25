@@ -340,23 +340,57 @@ a:link, a:visited {
   .container:after {
     clear: both; }
 
-.faded-hr-divider, .modal-wrapper .login-modal .inner-wrapper header::after, .modal-wrapper .login-modal .inner-wrapper form label.remember-me::before, .home .university-partners:before, .home .university-partners:after {
-  background-image: -webkit-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.8) 15%, #c8c8c8 50%, rgba(200, 200, 200, 0.8) 85%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.8) 15%, #c8c8c8 50%, rgba(200, 200, 200, 0.8) 85%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.8) 15%, #c8c8c8 50%, rgba(200, 200, 200, 0.8) 85%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.8) 15%, #c8c8c8 50%, rgba(200, 200, 200, 0.8) 85%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.8) 15%, #c8c8c8 50%, rgba(200, 200, 200, 0.8) 85%, rgba(255, 255, 255, 0));
+.faded-hr-divider, .horizontal-divider, .modal .inner-wrapper header hr::after, .modal .inner-wrapper form .honor-code-summary hr::after, .home .university-partners:before, .home .university-partners:after {
+  background-image: -webkit-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+  background-image: -moz-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+  background-image: -ms-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+  background-image: -o-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+  background-image: linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   height: 1px;
   width: 100%; }
 
-.faded-vertical-divider, header.app a.logo::after {
-  background-image: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 25%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 75%, rgba(255, 255, 255, 0));
-  background-image: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 25%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 75%, rgba(255, 255, 255, 0));
-  background-image: -ms-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 25%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 75%, rgba(255, 255, 255, 0));
-  background-image: -o-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 25%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 75%, rgba(255, 255, 255, 0));
-  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 25%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 75%, rgba(255, 255, 255, 0));
+.faded-hr-divider-light, .horizontal-divider::after, .modal .inner-wrapper header hr, .modal .inner-wrapper form .honor-code-summary hr {
+  background-image: -webkit-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
+  height: 1px;
+  width: 100%; }
+
+.faded-vertical-divider, .vertical-divider, header.app .divider {
+  background-image: -webkit-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+  background-image: -moz-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+  background-image: -ms-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+  background-image: -o-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+  background-image: linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   height: 100%;
   width: 1px; }
+
+.faded-vertical-divider-light, .vertical-divider::after, header.app .divider::after {
+  background-image: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0));
+  background-image: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0));
+  background-image: -ms-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0));
+  background-image: -o-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0));
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0));
+  height: 100%;
+  width: 1px; }
+
+.vertical-divider, header.app .divider {
+  position: relative; }
+  .vertical-divider::after, header.app .divider::after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 1px; }
+
+.horizontal-divider {
+  position: relative; }
+  .horizontal-divider::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 1px; }
 
 .animation-title-appear {
   -webkit-animation: title-appear 4.65s ease-out;
@@ -843,29 +877,29 @@ form {
       box-shadow: 0 0 6px 0 rgba(29, 157, 217, 0.4), inset 0 0 4px 0 rgba(0, 0, 0, 0.15);
       outline: none; }
   form input[type="submit"] {
-    border: 1px solid #410017;
-    border-bottom: 1px solid #380000;
+    border: 1px solid #002e88;
+    border-bottom: 1px solid #001e5f;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
-    -webkit-box-shadow: inset 0 1px 0 0 #db4274;
-    -moz-box-shadow: inset 0 1px 0 0 #db4274;
-    box-shadow: inset 0 1px 0 0 #db4274;
+    -webkit-box-shadow: inset 0 1px 0 0 #42bae5;
+    -moz-box-shadow: inset 0 1px 0 0 #42bae5;
+    box-shadow: inset 0 1px 0 0 #42bae5;
     color: white;
     display: inline-block;
     font-size: 14px;
     font-weight: bold;
-    background-color: #b62568;
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #b62568), color-stop(50%, #7e0047), color-stop(50%, #600038), color-stop(100%, #67003a));
-    background-image: -webkit-linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
-    background-image: -moz-linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
-    background-image: -ms-linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
-    background-image: -o-linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
-    background-image: linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
+    background-color: #1d9dd9;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1d9dd9), color-stop(50%, #006bb8), color-stop(50%, #0052a9), color-stop(100%, #0057ab));
+    background-image: -webkit-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+    background-image: -moz-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+    background-image: -ms-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+    background-image: -o-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+    background-image: linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
     padding: 8px 20px;
     text-align: center;
     text-decoration: none;
-    text-shadow: 0 -1px 1px #2a0000;
+    text-shadow: 0 -1px 1px #001067;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
@@ -880,17 +914,17 @@ form {
     vertical-align: top; }
     form input[type="submit"]:hover:not(:disabled) {
       cursor: pointer;
-      background-color: #a91656;
-      background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #a91656), color-stop(50%, #740035), color-stop(50%, #590026), color-stop(100%, #600029));
-      background-image: -webkit-linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%);
-      background-image: -moz-linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%);
-      background-image: -ms-linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%);
-      background-image: -o-linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%);
-      background-image: linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%); }
+      background-color: #108ec7;
+      background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #108ec7), color-stop(50%, #005fa6), color-stop(50%, #004897), color-stop(100%, #004d9a));
+      background-image: -webkit-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+      background-image: -moz-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+      background-image: -ms-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+      background-image: -o-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+      background-image: linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%); }
     form input[type="submit"]:active:not(:disabled) {
-      -webkit-box-shadow: inset 0 0 20px 0 #470000, 0 1px 0 white;
-      -moz-box-shadow: inset 0 0 20px 0 #470000, 0 1px 0 white;
-      box-shadow: inset 0 0 20px 0 #470000, 0 1px 0 white; }
+      -webkit-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
+      -moz-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
+      box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
     form input[type="submit"]:disabled {
       opacity: 0.5;
       cursor: not-allowed; }
@@ -996,69 +1030,104 @@ header.app {
     display: block;
     float: left;
     height: 100%;
-    margin: 16px 30px 0px 0px;
+    margin: 16px 15px 0px 0px;
     position: relative; }
-    header.app a.logo::after {
+    header.app a.logo img {
+      position: relative;
+      z-index: 2; }
+    header.app a.logo:hover::before {
+      background-image: -webkit-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+      background-image: -moz-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+      background-image: -ms-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+      background-image: -o-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+      background-image: radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
       content: "";
       display: block;
-      height: 50px;
+      height: 90px;
+      left: -20px;
       position: absolute;
-      right: -15px;
-      top: -12px; }
-  header.app a.discover-courses {
-    background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    background-image: -moz-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    background-image: -ms-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    background-image: -o-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    background-image: linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    border: 1px solid #c8c8c8;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-    -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-    color: #3c3c3c;
-    display: block;
-    float: left;
-    font: normal 1rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif;
-    height: 15px;
-    margin-top: 12px;
-    padding: 8px 10px;
-    text-decoration: none;
-    text-transform: uppercase;
-    text-shadow: 0 1px rgba(255, 255, 255, 0.6); }
-  header.app nav.guest {
-    float: right; }
-    header.app nav.guest ol {
+      top: -32px;
+      width: 90px;
+      z-index: 1; }
+  header.app .divider {
+    display: inline-block;
+    vertical-align: baseline;
+    zoom: 1;
+    *display: inline;
+    *vertical-align: auto;
+    height: 40px;
+    vertical-align: middle; }
+  header.app nav {
+    height: 40px;
+    margin-top: 8px; }
+    header.app nav.find-courses {
+      float: left; }
+    header.app nav.guest {
+      float: right; }
+    header.app nav ol {
       font-size: 0em; }
-      header.app nav.guest ol li {
+      header.app nav ol li {
         display: inline-block;
         vertical-align: baseline;
         zoom: 1;
         *display: inline;
         *vertical-align: auto;
-        margin-top: 12px;
-        padding: 0px 5px;
-        position: relative;
-        vertical-align: bottom; }
-        header.app nav.guest ol li:last-child {
-          padding-right: 0px; }
-        header.app nav.guest ol li a {
+        vertical-align: top; }
+      header.app nav ol li.secondary {
+        margin: 0px 15px; }
+        header.app nav ol li.secondary a {
           -webkit-border-radius: 3px;
           -moz-border-radius: 3px;
           border-radius: 3px;
           border: 1px solid transparent;
-          color: #3c3c3c;
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box;
+          color: #a0a0a0;
           display: block;
-          font: normal italic 1.2rem/1.2rem Georgia, Cambria, "Times New Roman", Times, serif;
-          height: 15px;
-          padding: 8px;
+          font: normal italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
+          height: 30px;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin: 5px 15px 5px 0px;
+          padding: 7px 2px;
           text-decoration: none;
           text-transform: lowercase;
-          text-shadow: 0 1px rgba(255, 255, 255, 0.6); }
-          header.app nav.guest ol li a:hover {
-            background: #dcdcdc;
+          text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+          vertical-align: middle; }
+          header.app nav ol li.secondary a:last-child {
+            margin-right: 0px; }
+          header.app nav ol li.secondary a:hover {
+            color: #3c3c3c; }
+      header.app nav ol li.primary {
+        position: relative; }
+        header.app nav ol li.primary a {
+          border: 1px solid transparent;
+          -webkit-border-radius: 3px;
+          -moz-border-radius: 3px;
+          border-radius: 3px;
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box;
+          color: #3c3c3c;
+          display: block;
+          font: normal 1.2rem/1.4rem "Open Sans", Verdana, Geneva, sans-serif;
+          height: 38px;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin: 1px 5px;
+          padding: 10px 8px;
+          text-decoration: none;
+          text-transform: uppercase;
+          text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+          vertical-align: middle; }
+          header.app nav ol li.primary a:hover, header.app nav ol li.primary a.active {
             background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
             background-image: -moz-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
             background-image: -ms-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
@@ -1067,165 +1136,147 @@ header.app {
             border-color: #c8c8c8;
             -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-            color: #3c3c3c; }
-  header.app nav.user {
-    float: right; }
-    header.app nav.user ol {
-      font-size: 0em; }
-      header.app nav.user ol li {
-        border-right: 1px solid #c8c8c8;
-        display: inline-block;
-        vertical-align: baseline;
-        zoom: 1;
-        *display: inline;
-        *vertical-align: auto;
-        margin-top: 10px;
-        padding: 0px 5px;
+            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6); }
+    header.app nav.user {
+      float: right; }
+      header.app nav.user a.user-link {
+        padding: 9px 8px 11px 40px;
         position: relative;
-        vertical-align: bottom; }
-        header.app nav.user ol li a {
+        text-transform: none; }
+        @media screen and (max-width: 768px) {
+          header.app nav.user a.user-link {
+            font-size: 0em;
+            padding: 10px 0px;
+            width: 38px; } }
+        header.app nav.user a.user-link .avatar {
+          background: #dcdcdc;
           -webkit-border-radius: 3px;
           -moz-border-radius: 3px;
           border-radius: 3px;
-          color: #a0a0a0;
-          display: block;
-          font: normal italic 1.2rem/1.2rem Georgia, Cambria, "Times New Roman", Times, serif;
-          height: 15px;
-          padding: 10px;
-          text-decoration: none;
-          text-transform: lowercase;
-          text-shadow: 0 1px rgba(255, 255, 255, 0.4); }
-          header.app nav.user ol li a:hover {
-            background: #dcdcdc;
-            color: #3c3c3c; }
-          header.app nav.user ol li a.active {
-            background: #dcdcdc;
-            color: #3c3c3c; }
-          header.app nav.user ol li a.options {
-            font: normal 1.2rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif;
-            padding-right: 10px;
-            text-transform: none; }
-          header.app nav.user ol li a.user-link {
-            font: normal 1.2rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif;
-            padding: 10px 10px 10px 45px;
-            text-transform: none; }
-            @media screen and (max-width: 768px) {
-              header.app nav.user ol li a.user-link {
-                font-size: 0em;
-                padding: 10px 0px;
-                width: 38px; } }
-            header.app nav.user ol li a.user-link .avatar {
-              background: #dcdcdc;
-              -webkit-border-radius: 3px;
-              -moz-border-radius: 3px;
-              border-radius: 3px;
-              border: 1px solid #b4b4b4;
-              -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-              -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-              box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-              height: 22px;
-              display: inline-block;
-              vertical-align: baseline;
-              zoom: 1;
-              *display: inline;
-              *vertical-align: auto;
-              left: 15px;
-              overflow: hidden;
-              position: absolute;
-              top: 5px;
-              width: 22px; }
-              header.app nav.user ol li a.user-link .avatar::after {
-                background-image: -webkit-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-                background-image: -moz-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-                background-image: -ms-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-                background-image: -o-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-                background-image: linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-                content: "";
-                display: block;
-                height: 100%;
-                position: absolute;
-                right: 0px;
-                top: 0px;
-                width: 100%; }
-              header.app nav.user ol li a.user-link .avatar img {
-                -webkit-border-radius: 4px;
-                -moz-border-radius: 4px;
-                border-radius: 4px;
-                display: block;
-                min-height: 100%;
-                min-width: 100%;
-                height: 100%; }
-        header.app nav.user ol li ol.user-options {
-          -webkit-border-radius: 4px;
-          -moz-border-radius: 4px;
-          border-radius: 4px;
-          -webkit-box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
-          -moz-box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
-          box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
-          border: 1px solid #c8c8c8;
-          background: #dcdcdc;
-          display: none;
-          right: 4px;
-          padding: 5px 10px;
+          border: 1px solid #b4b4b4;
+          -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+          -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+          box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+          height: 22px;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          left: 8px;
+          overflow: hidden;
           position: absolute;
-          top: 50px;
-          width: 170px;
-          z-index: 3; }
-          header.app nav.user ol li ol.user-options.expanded {
-            display: block; }
-          header.app nav.user ol li ol.user-options::before {
-            background: transparent;
-            border-top: 8px solid #dcdcdc;
-            border-right: 8px solid #dcdcdc;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid transparent;
-            -webkit-box-shadow: 1px 0 0 0 #c8c8c8, 0 -1px 0 0 #c8c8c8;
-            -moz-box-shadow: 1px 0 0 0 #c8c8c8, 0 -1px 0 0 #c8c8c8;
-            box-shadow: 1px 0 0 0 #c8c8c8, 0 -1px 0 0 #c8c8c8;
+          top: 6px;
+          width: 22px; }
+          header.app nav.user a.user-link .avatar::after {
+            background-image: -webkit-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
+            background-image: -moz-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
+            background-image: -ms-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
+            background-image: -o-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
+            background-image: linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
             content: "";
             display: block;
-            height: 0px;
+            height: 100%;
             position: absolute;
-            -webkit-transform: rotate(-45deg);
-            -moz-transform: rotate(-45deg);
-            -ms-transform: rotate(-45deg);
-            -o-transform: rotate(-45deg);
-            transform: rotate(-45deg);
-            right: 10px;
-            top: -7px;
-            width: 0px; }
-          header.app nav.user ol li ol.user-options li {
-            border-top: 1px solid #c8c8c8;
-            border-right: none;
-            border-bottom: none;
-            border-left: none;
-            margin: 0px;
-            padding: 0px;
+            right: 0px;
+            top: 0px;
             width: 100%; }
-            header.app nav.user ol li ol.user-options li:first-child {
-              border: none; }
-            header.app nav.user ol li ol.user-options li a {
-              -webkit-box-sizing: border-box;
-              -moz-box-sizing: border-box;
-              box-sizing: border-box;
-              display: block;
-              font: normal 1rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif;
-              height: auto;
-              margin: 5px 0px;
-              overflow: hidden;
-              padding: 5px;
-              text-overflow: ellipsis;
-              -webkit-transition: padding, 0.1s, linear;
-              -moz-transition: padding, 0.1s, linear;
-              -ms-transition: padding, 0.1s, linear;
-              -o-transition: padding, 0.1s, linear;
-              transition: padding, 0.1s, linear;
-              white-space: nowrap;
-              width: 100%; }
-              header.app nav.user ol li ol.user-options li a:hover {
-                background: white;
-                padding: 5px 8px; }
+          header.app nav.user a.user-link .avatar img {
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+            display: block;
+            min-height: 100%;
+            min-width: 100%;
+            height: 100%; }
+      header.app nav.user ol.user-options {
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
+        box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
+        border: 1px solid black;
+        background-image: -webkit-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        background-image: -moz-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        background-image: -ms-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        background-image: -o-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        background-image: linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        display: none;
+        right: 0px;
+        padding: 5px 10px;
+        position: absolute;
+        top: 52px;
+        width: 150px;
+        z-index: 3; }
+        header.app nav.user ol.user-options.expanded {
+          display: block; }
+        header.app nav.user ol.user-options::before {
+          background: transparent;
+          border-top: 6px solid black;
+          border-right: 6px solid black;
+          border-bottom: 6px solid transparent;
+          border-left: 6px solid transparent;
+          -webkit-box-shadow: 1px 0 0 0 black, 0 -1px 0 0 black;
+          -moz-box-shadow: 1px 0 0 0 black, 0 -1px 0 0 black;
+          box-shadow: 1px 0 0 0 black, 0 -1px 0 0 black;
+          content: "";
+          display: block;
+          height: 0px;
+          position: absolute;
+          -webkit-transform: rotate(-45deg);
+          -moz-transform: rotate(-45deg);
+          -ms-transform: rotate(-45deg);
+          -o-transform: rotate(-45deg);
+          transform: rotate(-45deg);
+          right: 12px;
+          top: -6px;
+          width: 0px; }
+        header.app nav.user ol.user-options li {
+          display: block;
+          border-top: 1px solid rgba(0, 0, 0, 0.4);
+          -webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+          -moz-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+          box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05); }
+          header.app nav.user ol.user-options li:first-child {
+            border: none;
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none; }
+          header.app nav.user ol.user-options li > a {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            color: rgba(255, 255, 255, 0.9);
+            display: block;
+            font: normal italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
+            height: auto;
+            margin: 5px 0px;
+            overflow: hidden;
+            padding: 3px 5px 4px;
+            text-shadow: none;
+            text-overflow: ellipsis;
+            text-transform: none;
+            -webkit-transition: padding, 0.1s, linear;
+            -moz-transition: padding, 0.1s, linear;
+            -ms-transition: padding, 0.1s, linear;
+            -o-transition: padding, 0.1s, linear;
+            transition: padding, 0.1s, linear;
+            white-space: nowrap;
+            width: 100%; }
+            header.app nav.user ol.user-options li > a:hover {
+              background: #1d9dd9;
+              background-image: -webkit-linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
+              background-image: -moz-linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
+              background-image: -ms-linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
+              background-image: -o-linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
+              background-image: linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
+              border-color: black;
+              -webkit-box-shadow: none;
+              -moz-box-shadow: none;
+              box-shadow: none;
+              padding-left: 8px;
+              text-shadow: 0 -1px rgba(0, 0, 0, 0.2); }
 
 .courses {
   -webkit-box-sizing: border-box;
@@ -1629,12 +1680,12 @@ header.app {
         border-radius: 0px 3px 3px 0px;
         height: 36px; }
 
-.modal-wrapper {
-  background-image: -webkit-radial-gradient(50% 50%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
-  background-image: -moz-radial-gradient(50% 50%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
-  background-image: -ms-radial-gradient(50% 50%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
-  background-image: -o-radial-gradient(50% 50%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
-  background-image: radial-gradient(50% 50%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+.modal-overlay {
+  background-image: -webkit-radial-gradient(50% 30%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
+  background-image: -moz-radial-gradient(50% 30%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
+  background-image: -ms-radial-gradient(50% 30%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
+  background-image: -o-radial-gradient(50% 30%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
+  background-image: radial-gradient(50% 30%, circle cover, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
   bottom: 0;
   content: "";
   display: none;
@@ -1643,163 +1694,203 @@ header.app {
   right: 0;
   top: 0;
   z-index: 5; }
-  .modal-wrapper.visible {
+  .modal-overlay.visible {
     display: block; }
-  .modal-wrapper .login-modal {
-    background: rgba(0, 0, 0, 0.6);
+
+.modal {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-box-shadow: 0 15px 80px 15px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 15px 80px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 80px 15px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: none;
+  left: 50%;
+  margin-left: -242.5px;
+  padding: 8px;
+  position: absolute;
+  top: 170px;
+  width: 485px;
+  z-index: 10; }
+  .modal.visible {
+    display: block; }
+  .modal .inner-wrapper {
+    background: #f0f0f0;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
     border: 1px solid rgba(0, 0, 0, 0.9);
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    -webkit-box-shadow: 0 10px 60px 10px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 10px 60px 10px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 10px 60px 10px rgba(0, 0, 0, 0.5);
-    color: #fff;
-    padding: 10px;
-    width: 570px;
-    left: 50%;
-    margin-left: -285px;
-    margin-top: -200px;
-    min-height: 400px;
-    min-width: 570px;
-    position: fixed;
-    top: 35%;
-    z-index: 10; }
-    .modal-wrapper .login-modal .inner-wrapper {
-      background-image: -webkit-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
-      background-image: -moz-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
-      background-image: -ms-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
-      background-image: -o-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
-      background-image: linear-gradient(-90deg, #f5f5f5, #e1e1e1);
-      -webkit-border-radius: 4px;
-      -moz-border-radius: 4px;
-      border-radius: 4px;
-      border: 1px solid rgba(0, 0, 0, 0.9);
-      -webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
-      -moz-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
-      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
-      height: 380px;
+    -webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+    -moz-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+    padding-bottom: 30px;
+    position: relative; }
+    .modal .inner-wrapper header {
+      margin-bottom: 30px;
       overflow: hidden;
-      padding: 30px;
-      position: relative; }
-      .modal-wrapper .login-modal .inner-wrapper::before {
-        background-image: -webkit-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-        background-image: -moz-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-        background-image: -ms-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-        background-image: -o-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-        background-image: radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+      padding: 28px 20px 0px;
+      position: relative;
+      z-index: 2; }
+      .modal .inner-wrapper header::before {
+        background-image: -webkit-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+        background-image: -moz-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+        background-image: -ms-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+        background-image: -o-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+        background-image: radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
         content: "";
         display: block;
         height: 400px;
         left: 0px;
         margin: 0 auto;
         position: absolute;
-        bottom: -140px;
-        width: 100%; }
-      .modal-wrapper .login-modal .inner-wrapper header {
-        margin-bottom: 30px;
-        padding-top: 5px;
+        top: -140px;
+        width: 100%;
+        z-index: 1; }
+      .modal .inner-wrapper header hr {
+        border: none;
+        margin: 0px;
         position: relative;
         z-index: 2; }
-        .modal-wrapper .login-modal .inner-wrapper header::after {
+        .modal .inner-wrapper header hr::after {
           bottom: 0px;
           content: "";
           display: block;
-          position: absolute; }
-        .modal-wrapper .login-modal .inner-wrapper header h3 {
-          color: #a0a0a0;
-          font: normal 1.4rem/1.8rem Georgia, Cambria, "Times New Roman", Times, serif;
-          padding-bottom: 20px;
-          text-align: center;
-          text-shadow: 0 1px rgba(255, 255, 255, 0.4);
-          text-transform: uppercase;
-          vertical-align: middle; }
-      .modal-wrapper .login-modal .inner-wrapper form {
-        zoom: 1;
+          position: absolute;
+          top: -1px; }
+      .modal .inner-wrapper header h3 {
+        color: #a0a0a0;
+        font: normal 1.4rem/1.8rem Georgia, Cambria, "Times New Roman", Times, serif;
+        padding-bottom: 20px;
+        text-align: center;
+        text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        vertical-align: middle;
         position: relative;
         z-index: 2; }
-        .modal-wrapper .login-modal .inner-wrapper form:before, .modal-wrapper .login-modal .inner-wrapper form:after {
-          content: "";
-          display: table; }
-        .modal-wrapper .login-modal .inner-wrapper form:after {
-          clear: both; }
-        .modal-wrapper .login-modal .inner-wrapper form label {
-          display: none; }
-        .modal-wrapper .login-modal .inner-wrapper form label.remember-me {
-          background: #e6e6e6;
-          border: 1px solid #c8c8c8;
-          -webkit-border-radius: 3px;
-          -moz-border-radius: 3px;
-          border-radius: 3px;
-          -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-          -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-          box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-          display: block;
-          margin-bottom: 60px;
-          padding: 8px 10px;
-          position: relative; }
-          .modal-wrapper .login-modal .inner-wrapper form label.remember-me::before {
-            bottom: -30px;
+    .modal .inner-wrapper form {
+      margin-bottom: 12px;
+      padding: 0px 40px;
+      position: relative;
+      z-index: 2; }
+      .modal .inner-wrapper form label {
+        display: none; }
+      .modal .inner-wrapper form input[type="checkbox"] {
+        margin-right: 5px; }
+      .modal .inner-wrapper form input[type="email"],
+      .modal .inner-wrapper form input[type="text"],
+      .modal .inner-wrapper form input[type="password"] {
+        background: white;
+        display: block;
+        height: 45px;
+        margin-bottom: 20px;
+        width: 100%; }
+      .modal .inner-wrapper form label.remember-me,
+      .modal .inner-wrapper form label.terms-of-service,
+      .modal .inner-wrapper form label.honor-code {
+        background: #e9e9e9;
+        border: 1px solid #c8c8c8;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+        -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+        display: block;
+        margin-bottom: 20px;
+        padding: 8px 10px; }
+        .modal .inner-wrapper form label.remember-me:hover,
+        .modal .inner-wrapper form label.terms-of-service:hover,
+        .modal .inner-wrapper form label.honor-code:hover {
+          background: #e6e6e6; }
+        .modal .inner-wrapper form label.remember-me a,
+        .modal .inner-wrapper form label.terms-of-service a,
+        .modal .inner-wrapper form label.honor-code a {
+          font: normal 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+          text-decoration: underline; }
+      .modal .inner-wrapper form .honor-code-summary {
+        margin-bottom: 20px;
+        padding: 0px;
+        position: relative; }
+        .modal .inner-wrapper form .honor-code-summary p {
+          color: #a0a0a0;
+          font: 300 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif; }
+        .modal .inner-wrapper form .honor-code-summary hr {
+          border: none;
+          margin-top: 30px;
+          position: relative;
+          z-index: 2; }
+          .modal .inner-wrapper form .honor-code-summary hr::after {
+            bottom: 0px;
             content: "";
             display: block;
-            position: absolute; }
-        .modal-wrapper .login-modal .inner-wrapper form input[type="checkbox"] {
-          margin-right: 5px; }
-        .modal-wrapper .login-modal .inner-wrapper form input[type="email"],
-        .modal-wrapper .login-modal .inner-wrapper form input[type="password"] {
-          display: block;
-          height: 45px;
-          margin-bottom: 20px;
+            position: absolute;
+            top: -1px; }
+        .modal .inner-wrapper form .honor-code-summary ul {
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0 0 0 20px;
           width: 100%; }
-        .modal-wrapper .login-modal .inner-wrapper form input[type="submit"] {
+          .modal .inner-wrapper form .honor-code-summary ul li {
+            color: #a0a0a0;
+            font: 300 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
+            margin-bottom: 10px; }
+            .modal .inner-wrapper form .honor-code-summary ul li:last-child {
+              margin-bottom: 0px; }
+      .modal .inner-wrapper form .submit {
+        padding-top: 10px; }
+        .modal .inner-wrapper form .submit input[type="submit"] {
           display: block;
           height: 45px;
           margin: 0 auto;
-          width: 70%; }
-      .modal-wrapper .login-modal .inner-wrapper .login-extra {
-        padding: 15px 0px;
-        position: relative; }
-        .modal-wrapper .login-modal .inner-wrapper .login-extra p {
+          width: 100%; }
+    .modal .inner-wrapper .login-extra {
+      position: relative;
+      z-index: 2; }
+      .modal .inner-wrapper .login-extra p {
+        color: #a0a0a0;
+        font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+        text-align: center; }
+        .modal .inner-wrapper .login-extra p a {
           color: #a0a0a0;
           font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
-          text-align: center; }
-          .modal-wrapper .login-modal .inner-wrapper .login-extra p a {
-            color: #a0a0a0;
-            font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
-            text-decoration: underline; }
-          .modal-wrapper .login-modal .inner-wrapper .login-extra p span + a {
-            margin-left: 15px; }
-      .modal-wrapper .login-modal .inner-wrapper .close-modal {
-        -webkit-border-radius: 2px;
-        -moz-border-radius: 2px;
-        border-radius: 2px;
-        cursor: pointer;
-        display: inline-block;
-        vertical-align: baseline;
-        zoom: 1;
-        *display: inline;
-        *vertical-align: auto;
-        padding: 5px 10px;
-        position: absolute;
-        right: 5px;
-        top: 5px;
+          text-decoration: underline; }
+          .modal .inner-wrapper .login-extra p a:hover {
+            color: #3c3c3c; }
+        .modal .inner-wrapper .login-extra p span + a {
+          margin-left: 15px; }
+    .modal .inner-wrapper .close-modal {
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      cursor: pointer;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      padding: 10px;
+      position: absolute;
+      right: 2px;
+      top: 0px;
+      z-index: 3; }
+      .modal .inner-wrapper .close-modal .inner p {
+        color: #a0a0a0;
+        font: normal 1.2rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif;
+        text-align: center;
+        text-shadow: 0 1px rgba(255, 255, 255, 0.8);
         -webkit-transition: all, 0.15s, ease-out;
         -moz-transition: all, 0.15s, ease-out;
         -ms-transition: all, 0.15s, ease-out;
         -o-transition: all, 0.15s, ease-out;
         transition: all, 0.15s, ease-out; }
-        .modal-wrapper .login-modal .inner-wrapper .close-modal .inner p {
-          color: #a0a0a0;
-          font: normal 1.2rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif;
-          text-align: center;
-          text-shadow: 0 1px rgba(255, 255, 255, 0.8);
-          -webkit-transition: all, 0.15s, ease-out;
-          -moz-transition: all, 0.15s, ease-out;
-          -ms-transition: all, 0.15s, ease-out;
-          -o-transition: all, 0.15s, ease-out;
-          transition: all, 0.15s, ease-out; }
-        .modal-wrapper .login-modal .inner-wrapper .close-modal:hover p {
-          color: #3c3c3c; }
+      .modal .inner-wrapper .close-modal:hover p {
+        color: #3c3c3c; }
 
 .home {
   margin: 50px 10px 100px; }
@@ -1900,29 +1991,29 @@ header.app {
             -moz-box-shadow: 0 0 16px 0 rgba(29, 157, 217, 0.35);
             box-shadow: 0 0 16px 0 rgba(29, 157, 217, 0.35); }
           .home > header .welcome .signup-wrapper .sign-up a {
-            border: 1px solid #410017;
-            border-bottom: 1px solid #380000;
+            border: 1px solid #002e88;
+            border-bottom: 1px solid #001e5f;
             -webkit-border-radius: 5px;
             -moz-border-radius: 5px;
             border-radius: 5px;
-            -webkit-box-shadow: inset 0 1px 0 0 #db4274;
-            -moz-box-shadow: inset 0 1px 0 0 #db4274;
-            box-shadow: inset 0 1px 0 0 #db4274;
+            -webkit-box-shadow: inset 0 1px 0 0 #42bae5;
+            -moz-box-shadow: inset 0 1px 0 0 #42bae5;
+            box-shadow: inset 0 1px 0 0 #42bae5;
             color: white;
             display: inline-block;
             font-size: 14px;
             font-weight: bold;
-            background-color: #b62568;
-            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #b62568), color-stop(50%, #7e0047), color-stop(50%, #600038), color-stop(100%, #67003a));
-            background-image: -webkit-linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
-            background-image: -moz-linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
-            background-image: -ms-linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
-            background-image: -o-linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
-            background-image: linear-gradient(top, #b62568 0%, #7e0047 50%, #600038 50%, #67003a 100%);
+            background-color: #1d9dd9;
+            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1d9dd9), color-stop(50%, #006bb8), color-stop(50%, #0052a9), color-stop(100%, #0057ab));
+            background-image: -webkit-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+            background-image: -moz-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+            background-image: -ms-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+            background-image: -o-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+            background-image: linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
             padding: 8px 20px;
             text-align: center;
             text-decoration: none;
-            text-shadow: 0 -1px 1px #2a0000;
+            text-shadow: 0 -1px 1px #001067;
             -webkit-box-sizing: border-box;
             -moz-box-sizing: border-box;
             box-sizing: border-box;
@@ -1938,78 +2029,23 @@ header.app {
             padding: 15px 0px;
             text-transform: uppercase;
             text-align: center;
-            width: 48.744%; }
+            width: 100%; }
             .home > header .welcome .signup-wrapper .sign-up a:hover:not(:disabled) {
               cursor: pointer;
-              background-color: #a91656;
-              background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #a91656), color-stop(50%, #740035), color-stop(50%, #590026), color-stop(100%, #600029));
-              background-image: -webkit-linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%);
-              background-image: -moz-linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%);
-              background-image: -ms-linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%);
-              background-image: -o-linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%);
-              background-image: linear-gradient(top, #a91656 0%, #740035 50%, #590026 50%, #600029 100%); }
+              background-color: #108ec7;
+              background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #108ec7), color-stop(50%, #005fa6), color-stop(50%, #004897), color-stop(100%, #004d9a));
+              background-image: -webkit-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+              background-image: -moz-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+              background-image: -ms-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+              background-image: -o-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+              background-image: linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%); }
             .home > header .welcome .signup-wrapper .sign-up a:active:not(:disabled) {
-              -webkit-box-shadow: inset 0 0 20px 0 #470000, 0 1px 0 white;
-              -moz-box-shadow: inset 0 0 20px 0 #470000, 0 1px 0 white;
-              box-shadow: inset 0 0 20px 0 #470000, 0 1px 0 white; }
+              -webkit-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
+              -moz-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
+              box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
             .home > header .welcome .signup-wrapper .sign-up a:disabled {
               opacity: 0.5;
               cursor: not-allowed; }
-            .home > header .welcome .signup-wrapper .sign-up a:first-child {
-              margin-right: 2.513%; }
-            .home > header .welcome .signup-wrapper .sign-up a.find-courses {
-              border: 1px solid #002e88;
-              border-bottom: 1px solid #001e5f;
-              -webkit-border-radius: 5px;
-              -moz-border-radius: 5px;
-              border-radius: 5px;
-              -webkit-box-shadow: inset 0 1px 0 0 #42bae5;
-              -moz-box-shadow: inset 0 1px 0 0 #42bae5;
-              box-shadow: inset 0 1px 0 0 #42bae5;
-              color: white;
-              display: inline-block;
-              font-size: 14px;
-              font-weight: bold;
-              background-color: #1d9dd9;
-              background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1d9dd9), color-stop(50%, #006bb8), color-stop(50%, #0052a9), color-stop(100%, #0057ab));
-              background-image: -webkit-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-              background-image: -moz-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-              background-image: -ms-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-              background-image: -o-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-              background-image: linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-              padding: 8px 20px;
-              text-align: center;
-              text-decoration: none;
-              text-shadow: 0 -1px 1px #001067;
-              -webkit-box-sizing: border-box;
-              -moz-box-sizing: border-box;
-              box-sizing: border-box;
-              -webkit-border-radius: 3px;
-              -moz-border-radius: 3px;
-              border-radius: 3px;
-              display: inline-block;
-              vertical-align: baseline;
-              zoom: 1;
-              *display: inline;
-              *vertical-align: auto;
-              font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
-              padding: 15px 0px; }
-              .home > header .welcome .signup-wrapper .sign-up a.find-courses:hover:not(:disabled) {
-                cursor: pointer;
-                background-color: #108ec7;
-                background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #108ec7), color-stop(50%, #005fa6), color-stop(50%, #004897), color-stop(100%, #004d9a));
-                background-image: -webkit-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
-                background-image: -moz-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
-                background-image: -ms-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
-                background-image: -o-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
-                background-image: linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%); }
-              .home > header .welcome .signup-wrapper .sign-up a.find-courses:active:not(:disabled) {
-                -webkit-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
-                -moz-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
-                box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
-              .home > header .welcome .signup-wrapper .sign-up a.find-courses:disabled {
-                opacity: 0.5;
-                cursor: not-allowed; }
           .home > header .welcome .signup-wrapper .sign-up form input[type="text"],
           .home > header .welcome .signup-wrapper .sign-up form input[type="email"],
           .home > header .welcome .signup-wrapper .sign-up form input[type="password"] {
@@ -2555,7 +2591,7 @@ nav.course-material {
     padding-bottom: 20px;
     position: relative;
     width: 31.658%; }
-    .course-info .sidebar .faded-vertical-divider, .course-info .sidebar header.app a.logo::after, header.app .course-info .sidebar a.logo::after {
+    .course-info .sidebar .faded-vertical-divider, .course-info .sidebar .vertical-divider, .course-info .sidebar header.app .divider, header.app .course-info .sidebar .divider {
       background-image: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
       background-image: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
       background-image: -ms-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));

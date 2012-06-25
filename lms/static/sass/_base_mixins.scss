@@ -1,9 +1,9 @@
 @mixin vertically-and-horizontally-centered ( $height, $width ) {
   left: 50%;
   margin-left: -$width / 2;
-  margin-top: -$height / 2;
+  //margin-top: -$height / 2;
   min-height: $height;
   min-width: $width;
-  position: fixed;
-  top: 35%;
+  position: absolute;
+  top: 150px;
 }

@@ -7,21 +7,35 @@
     <a href="${ MITX_ROOT_URL }" class="logo">
       <img src="${static.url('images/logo.png')}" />
     </a>
-    <a href="/courses" class="discover-courses">Find Courses</a>
+    <nav class="find-courses">
+      <ol>
+        <li class="primary">
+          <div class="divider"></div>
+          <a href="/courses">Find Courses</a>
+          <div class="divider"></div>
+        </li>
+        <li class="secondary">
+          <a href="/about">About</a>
+          <a href="#">Blog</a>
+          <a href="/jobs">Jobs</a>
+        </li>
+      </ol>
+    </nav>
 
     %if user.is_authenticated():
-    <h1>${ settings.COURSE_TITLE }</h1>
     <nav class="user">
       <ol>
-        <li>
+        <li class="primary">
+          <div class="divider"></div>
           <a href="/dashboard" class="user-link">
             <span class="avatar"><img src="${static.url('images/profile.jpg')}" /></span>
             Neil deGrasse Tyson
           </a>
-        </li>
-        <li>
+          <div class="divider"></div>
           <a href="#" class="options">&#9662</a>
+          <div class="divider"></div>
           <ol class="user-options">
+            <li><a href="#">Account Settings</a></li>
             <li><a href="#">Help</a></li>
             <li><a href="/logout">Log Out</a></li>
           </ol>
@@ -32,20 +46,12 @@
     %else:
     <nav class="guest">
       <ol>
-        <li>
-          <a href="#">About</a>
-        </li>
-        <li>
-          <a href="#">Blog</a>
-        </li>
-        <li>
-          <a href="#">Jobs</a>
-        </li>
-        <li>
-          <a href="#" class="login">Log In</a>
-        </li>
-        <li>
-          <a href="#">Sign Up</a>
+        <li class="primary">
+          <div class="divider"></div>
+          <a href="#" id="login">Log In</a>
+          <div class="divider"></div>
+          <a href="#" id="signup">Sign Up</a>
+          <div class="divider"></div>
         </li>
       </ol>
     </nav>
@@ -55,4 +61,8 @@
 
 %if not user.is_authenticated():
   <%include file="login_modal.html" />
+  <%include file="signup_modal.html" />
+
+  <section class="modal-overlay">
+  </section>
 %endif
