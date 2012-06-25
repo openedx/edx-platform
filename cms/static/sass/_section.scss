@@ -1,32 +1,4 @@
-section.week-edit,
-section.week-new,
-section.sequence-edit {
-
-  > header {
-    border-bottom: 2px solid #333;
-    @include clearfix();
-
-
-    section.goals {
-      background: #eee;
-      padding: 6px 20px;
-      border-top: 1px solid #ccc;
-
-      ul {
-        list-style: none;
-        color: #999;
-
-        li {
-          margin-bottom: 6px;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-        }
-      }
-    }
-  }
-
+section#unit-wrapper {
   section.filters {
     @include clearfix;
     margin-bottom: 10px;
@@ -48,7 +20,7 @@ section.sequence-edit {
     }
   }
 
-  > div {
+  div.content {
     display: table;
     border: 1px solid;
     width: 100%;

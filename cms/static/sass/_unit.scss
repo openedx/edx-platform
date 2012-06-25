@@ -26,6 +26,14 @@ section#unit-wrapper {
     div {
       float: right;
       color: #666;
+
+      a {
+       &.cancel {
+         margin-right: 20px;
+         font-style: italic;
+         font-size: 12px;
+       }
+      }
     }
   }
 
@@ -110,12 +118,6 @@ section#unit-wrapper {
     }
 
     //general styles for main content
-    textarea {
-      @include box-sizing(border-box);
-      display: block;
-      width: 100%;
-    }
-
     div.preview {
       background: #eee;
       @include box-sizing(border-box);
@@ -162,12 +164,6 @@ section#unit-wrapper {
 
       form {
         margin-bottom: 20px;
-
-        textarea {
-          @include box-sizing(border-box);
-          display: block;
-          width: 100%;
-        }
 
         input[type="submit"]{
           margin-top: 10px;

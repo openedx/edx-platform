@@ -63,6 +63,9 @@ $ ->
             $('section.edit-pane').show()
             return false
 
+        $('a.module-edit').click ->
+          $('body.content .cal').css('height', contentHeight)
+
     $(document).ready(setHeight)
     $(window).bind('resize', setHeight)
 
