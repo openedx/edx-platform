@@ -9,9 +9,11 @@ footer {
   }
 
   nav {
+    @include box-sizing(border-box);
     @include clearfix;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 10px;
     width: flex-grid(12);
 
     a.logo {
@@ -27,17 +29,8 @@ footer {
       font-size: 0em;
       margin-top: 6px;
 
-      &.right {
-        float: right;
-
-        li:first-child {
-          border: none;
-        }
-      }
-
       &.social {
         float: right;
-        margin: 0px 30px 0px 0px;
 
         li {
           border: none;
@@ -65,17 +58,33 @@ footer {
   }
 
   .copyright {
-    background: rgb(230,230,230);
     height: 50px;
     margin-top: 80px;
     width: 100%;
+
+    hr {
+      @extend .faded-hr-divider-light;
+      border: none;
+      margin: 0px;
+      position: relative;
+      z-index: 2;
+
+      &::after {
+        @extend .faded-hr-divider;
+        bottom: 0px;
+        content: "";
+        display: block;
+        position: absolute;
+        top: -1px;
+      }
+    }
 
     p {
       color: $lighter-base-font-color;
       font: normal 1rem/1.6rem $sans-serif;
       margin: 0 auto;
       padding-top: 15px;
-      //text-align: center;
+      text-align: center;
       max-width: 1200px;
 
       a {
