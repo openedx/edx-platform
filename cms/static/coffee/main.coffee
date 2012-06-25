@@ -37,6 +37,8 @@ $ ->
         $(this).parent().parent().hide()
         return false
 
+    # $('html').keypress ->
+    #   $('.wip').css('visibility', 'visible')
 
     setHeight = ->
         windowHeight = $(this).height()
@@ -62,6 +64,9 @@ $ ->
             $('body.content .cal').css('height', contentHeight)
             $('section.edit-pane').show()
             return false
+
+        $('a.module-edit').click ->
+          $('body.content .cal').css('height', contentHeight)
 
     $(document).ready(setHeight)
     $(window).bind('resize', setHeight)
