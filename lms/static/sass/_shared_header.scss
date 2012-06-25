@@ -18,236 +18,233 @@ header.app {
     display: block;
     float: left;
     height: 100%;
-    margin: 16px 30px 0px 0px;
+    margin: 16px 15px 0px 0px;
     position: relative;
 
-    &::after {
-      @extend .faded-vertical-divider;
-      content: "";
-      display: block;
-      height: 50px;
-      position: absolute;
-      right: -15px;
-      top: -12px;
+    img {
+      position: relative;
+      z-index: 2;
     }
-  }
-
-  a.discover-courses {
-    @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
-    border: 1px solid rgb(200,200,200);
-    @include border-radius(3px);
-    @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-    color: $base-font-color;
-    display: block;
-    float: left;
-    font: normal 1rem/1.2rem $sans-serif;
-    height: 15px;
-    margin-top: 12px;
-    padding: 8px 10px;
-    text-decoration: none;
-    text-transform: uppercase;
-    text-shadow: 0 1px rgba(255,255,255, 0.6);
 
     &:hover {
-    }
-  }
-
-  nav.guest {
-    float: right;
-
-    ol {
-      font-size: 0em;
-
-      li {
-        @include inline-block;
-        margin-top: 12px;
-        padding: 0px 5px;
-        position: relative;
-        vertical-align: bottom;
-
-        &:last-child {
-          padding-right: 0px;
-        }
-
-        a {
-          @include border-radius(3px);
-          border: 1px solid transparent;
-          color: $base-font-color;
-          display: block;
-          font: normal italic 1.2rem/1.2rem $serif;
-          height: 15px;
-          padding: 8px;
-          text-decoration: none;
-          text-transform: lowercase;
-          text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-          &:hover {
-            background: rgb(220,220,220);
-            @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
-            border-color: rgb(200,200,200);
-            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-            color: $base-font-color;
-          }
-        }
+      &::before {
+        @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 0.8) 0%, rgba(255,255,255, 0) 100%));
+        content: "";
+        display: block;
+        height: 90px;
+        left: -20px;
+        position: absolute;
+        top: -32px;
+        width: 90px;
+        z-index: 1;
       }
     }
   }
 
-  nav.user {
-    float: right;
+  .divider {
+    @extend .vertical-divider;
+    @include inline-block;
+    height: 40px;
+    vertical-align: middle;
+  }
+
+
+  nav {
+    height: 40px;
+    margin-top: 8px;
+
+    &.find-courses {
+      float: left;
+    }
+
+    &.guest {
+      float: right;
+    }
 
     ol {
       font-size: 0em;
 
       li {
-        border-right: 1px solid rgb(200,200,200);
         @include inline-block;
-        margin-top: 10px;
-        padding: 0px 5px;
-        position: relative;
-        vertical-align: bottom;
+        vertical-align: top;
+      }
+
+      li.secondary {
+        margin: 0px 15px;
 
         a {
           @include border-radius(3px);
+          border: 1px solid transparent;
+          @include box-sizing(border-box);
           color: $lighter-base-font-color;
           display: block;
-          font: normal italic 1.2rem/1.2rem $serif;
-          height: 15px;
-          padding: 10px;
+          font: normal italic 1.2rem/1.4rem $serif;
+          height: 30px;
+          @include inline-block;
+          margin: 5px 15px 5px 0px;
+          padding: 7px 2px;
           text-decoration: none;
           text-transform: lowercase;
-          text-shadow: 0 1px rgba(255,255,255, 0.4);
+          text-shadow: 0 1px rgba(255,255,255, 0.6);
+          vertical-align: middle;
+
+          &:last-child {
+            margin-right: 0px;
+          }
 
           &:hover {
-            background: rgb(220,220,220);
             color: $base-font-color;
-          }
-
-          &.active {
-            background: rgb(220,220,220);
-            color: $base-font-color;
-          }
-
-          &.options {
-            font: normal 1.2rem/1.2rem $sans-serif;
-            padding-right: 10px;
-            text-transform: none;
-          }
-
-          &.user-link {
-            font: normal 1.2rem/1.2rem $sans-serif;
-            padding: 10px 10px 10px 45px;
-            text-transform: none;
-
-            @media screen and (max-width: 768px) {
-              font-size: 0em;
-              padding: 10px 0px;
-              width: 38px;
-            }
-
-            .avatar {
-              background: rgb(220,220,220);
-              @include border-radius(3px);
-              border: 1px solid rgb(180,180,180);
-              @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-              height: 22px;
-              @include inline-block;
-              left: 15px;
-              overflow: hidden;
-              position: absolute;
-              top: 5px;
-              width: 22px;
-
-              &::after {
-                @include background-image(linear-gradient((-60deg), rgba(0,0,0, 0) 0%, rgba(0,0,0, 0.1) 50%, rgba(0,0,0, 0.2) 50%, rgba(0,0,0, 0.3) 100%));
-                content: "";
-                display: block;
-                height: 100%;
-                position: absolute;
-                right: 0px;
-                top: 0px;
-                width: 100%;
-              }
-
-              img {
-                @include border-radius(4px);
-                display: block;
-                min-height: 100%;
-                min-width: 100%;
-                height: 100%;
-              }
-            }
           }
         }
+      }
 
-        ol.user-options {
-          @include border-radius(4px);
-          @include box-shadow(0 1px 6px 0 rgba(0,0,0, 0.3));
-          border: 1px solid rgb(200,200,200);
-          background: rgb(220,220,220);
-          display: none;
-          right: 4px;
-          padding: 5px 10px;
-          position: absolute;
-          top: 50px;
-          width: 170px;
-          z-index: 3;
+      li.primary {
+        position: relative;
 
-          &.expanded {
-            display: block;
+        a {
+          border: 1px solid transparent;
+          @include border-radius(3px);
+          @include box-sizing(border-box);
+          color: $base-font-color;
+          display: block;
+          font: normal 1.2rem/1.4rem $sans-serif;
+          height: 38px;
+          @include inline-block;
+          margin: 1px 5px;
+          padding: 10px 8px;
+          text-decoration: none;
+          text-transform: uppercase;
+          text-shadow: 0 1px rgba(255,255,255, 0.6);
+          vertical-align: middle;
+
+          &:hover, &.active {
+            @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
+            border-color: rgb(200,200,200);
+            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
           }
+        }
+      }
+    }
 
-          &::before {
-            background: transparent;
-            border: {
-              top: 8px solid rgb(220,220,220);
-              right: 8px solid rgb(220,220,220);
-              bottom: 8px solid transparent;
-              left: 8px solid transparent;
-            }
-            @include box-shadow(1px 0 0 0 rgb(200,200,200), 0 -1px 0 0 rgb(200,200,200));
+    &.user {
+      float: right;
+
+      a.user-link {
+        padding: 9px 8px 11px 40px;
+        position: relative;
+        text-transform: none;
+
+        @media screen and (max-width: 768px) {
+          font-size: 0em;
+          padding: 10px 0px;
+          width: 38px;
+        }
+
+        .avatar {
+          background: rgb(220,220,220);
+          @include border-radius(3px);
+          border: 1px solid rgb(180,180,180);
+          @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+          height: 22px;
+          @include inline-block;
+          left: 8px;
+          overflow: hidden;
+          position: absolute;
+          top: 6px;
+          width: 22px;
+
+          &::after {
+            @include background-image(linear-gradient((-60deg), rgba(0,0,0, 0) 0%, rgba(0,0,0, 0.1) 50%, rgba(0,0,0, 0.2) 50%, rgba(0,0,0, 0.3) 100%));
             content: "";
             display: block;
-            height: 0px;
+            height: 100%;
             position: absolute;
-            @include transform(rotate(-45deg));
-            right: 10px;
-            top: -7px;
-            width: 0px;
+            right: 0px;
+            top: 0px;
+            width: 100%;
           }
 
-          li {
-            border: {
-              top: 1px solid rgb(200,200,200);
-              right: none;
-              bottom: none;
-              left: none;
-            }
-            margin: 0px;
-            padding: 0px;
+          img {
+            @include border-radius(4px);
+            display: block;
+            min-height: 100%;
+            min-width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
+      ol.user-options {
+        @include border-radius(4px);
+        @include box-shadow(0 1px 6px 0 rgba(0,0,0, 0.3));
+        border: 1px solid rgb(0,0,0);
+        @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
+                                                          rgba(0,0,0, 0.7) 100%));
+        display: none;
+        right: 0px;
+        padding: 5px 10px;
+        position: absolute;
+        top: 52px;
+        width: 150px;
+        z-index: 3;
+
+        &.expanded {
+          display: block;
+        }
+
+        &::before {
+          background: transparent;
+          border: {
+            top: 6px solid rgba(0,0,0, 1);
+            right: 6px solid rgba(0,0,0, 1);
+            bottom: 6px solid transparent;
+            left: 6px solid transparent;
+          }
+          @include box-shadow(1px 0 0 0 rgb(0,0,0), 0 -1px 0 0 rgb(0,0,0));
+          content: "";
+          display: block;
+          height: 0px;
+          position: absolute;
+          @include transform(rotate(-45deg));
+          right: 12px;
+          top: -6px;
+          width: 0px;
+        }
+
+        li {
+          display: block;
+          border-top: 1px solid rgba(0,0,0, 0.4);
+          @include box-shadow(inset 0 1px 0 0 rgba(255,255,255, 0.05));
+
+          &:first-child {
+            border: none;
+            @include box-shadow(none);
+          }
+
+          > a {
+            @include box-sizing(border-box);
+            color: rgba(255,255,255, 0.9);
+            display: block;
+            font: normal italic 1.2rem/1.4rem $serif;
+            height: auto;
+            margin: 5px 0px;
+            overflow: hidden;
+            padding: 3px 5px 4px;
+            text-shadow: none;
+            text-overflow: ellipsis;
+            text-transform: none;
+            @include transition(padding, 0.1s, linear);
+            white-space: nowrap;
             width: 100%;
 
-            &:first-child {
-              border: none;
-            }
-
-            a {
-              @include box-sizing(border-box);
-              display: block;
-              font: normal 1rem/1.2rem $sans-serif;
-              height: auto;
-              margin: 5px 0px;
-              overflow: hidden;
-              padding: 5px;
-              text-overflow: ellipsis;
-              @include transition(padding, 0.1s, linear);
-              white-space: nowrap;
-              width: 100%;
-
-              &:hover {
-                background: rgb(255,255,255);
-                padding: 5px 8px;
-              }
+            &:hover {
+              background: $blue;
+              @include background-image(linear-gradient(-90deg, lighten($blue, 15%) 0%,
+                                                                rgba($blue, 1) 100%));
+              border-color: rgba(0,0,0, 1);
+              @include box-shadow(none);
+              padding-left: 8px;
+              text-shadow: 0 -1px rgba(0,0,0, 0.2);
             }
           }
         }

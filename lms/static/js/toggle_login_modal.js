@@ -1,8 +1,20 @@
 $(document).ready(function () {
-  $('a.login').click(function() {
-    $('.modal-wrapper').addClass("visible");
+  $('a#login').click(function() {
+    $('.modal.login-modal').addClass("visible");
+    $('.modal-overlay').addClass("visible");
   });
   $('div.close-modal').click(function() {
-    $('.modal-wrapper').removeClass("visible");
+    $('.modal.login-modal').removeClass("visible");
+    $('.modal-overlay').removeClass("visible");
+  });
+
+  $('a#signup').click(function() {
+    $('.modal.signup-modal').addClass("visible");
+    $('.modal-overlay').addClass("visible");
+  });
+  $('div.close-modal').click(function() {
+    $('.modal.signup-modal').removeClass("visible");
+    $('.modal-overlay').removeClass("visible");
   });
 });
+
