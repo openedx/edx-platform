@@ -144,7 +144,7 @@ describe 'VideoPlayer', ->
       beforeEach ->
         @anotherPlayer = jasmine.createSpyObj 'AnotherPlayer', ['pauseVideo']
         window.player = @anotherPlayer
-        spyOn Logger, 'log'
+        spyOn @video, 'log'
         spyOn(window, 'setInterval').andReturn 100
         spyOn @player.control, 'play'
         @player.caption.play = jasmine.createSpy('VideoCaption.play')
@@ -153,7 +153,7 @@ describe 'VideoPlayer', ->
         @player.onStateChange data: YT.PlayerState.PLAYING
 
       it 'log the play_video event', ->
-        expect(Logger.log).toHaveBeenCalledWith 'play_video', id: @player.currentTime, code: 'embedCode'
+        expect(@video.log).toHaveBeenCalledWith 'play_video', id: @player.currentTime, code: 'embedCode'
 
       it 'pause other video player', ->
         expect(@anotherPlayer.pauseVideo).toHaveBeenCalled()
@@ -178,7 +178,7 @@ describe 'VideoPlayer', ->
       beforeEach ->
         @player = new VideoPlayer video: @video
         window.player = @player.player
-        spyOn Logger, 'log'
+        spyOn @video, 'log'
         spyOn window, 'clearInterval'
         spyOn @player.control, 'pause'
         @player.caption.pause = jasmine.createSpy('VideoCaption.pause')
@@ -187,7 +187,7 @@ describe 'VideoPlayer', ->
         @player.onStateChange data: YT.PlayerState.PAUSED
 
       it 'log the pause_video event', ->
-        expect(Logger.log).toHaveBeenCalledWith 'pause_video', id: @player.currentTime, code: 'embedCode'
+         expect(@video.log).toHaveBeenCalledWith 'pause_video'
 
       it 'set current video player as inactive', ->
         expect(window.player).toBeNull()

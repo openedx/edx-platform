@@ -45,3 +45,10 @@ class @Video
 
   getDuration: ->
     @metadata[@youtubeId()].duration
+
+  log: (eventName) ->
+    Logger.log eventName,
+      id: @id
+      code: @youtubeId()
+      currentTime: @player.currentTime
+      speed: @speed

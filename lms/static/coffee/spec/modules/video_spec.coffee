@@ -128,3 +128,18 @@ describe 'Video', ->
 
     it 'return duration for current video', ->
       expect(@video.getDuration()).toEqual 200
+
+  describe 'log', ->
+    beforeEach ->
+      @video = new Video 'example', '.75:abc123,1.0:def456'
+      @video.setSpeed '1.0'
+      spyOn Logger, 'log'
+      @video.player = { currentTime: 25 }
+      @video.log 'someEvent'
+
+    it 'call the logger with valid parameters', ->
+      expect(Logger.log).toHaveBeenCalledWith 'someEvent',
+        id: 'example'
+        code: 'def456'
+        currentTime: 25
+        speed: '1.0'
