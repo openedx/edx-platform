@@ -340,7 +340,7 @@ a:link, a:visited {
   .container:after {
     clear: both; }
 
-.faded-hr-divider, .horizontal-divider, .modal .inner-wrapper header hr::after, .modal .inner-wrapper form .honor-code-summary hr::after, .home .university-partners:before, .home .university-partners:after {
+.faded-hr-divider, .horizontal-divider, footer .copyright hr::after, .modal .inner-wrapper header hr::after, .modal .inner-wrapper form .honor-code-summary hr::after {
   background-image: -webkit-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -moz-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -ms-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
@@ -349,7 +349,7 @@ a:link, a:visited {
   height: 1px;
   width: 100%; }
 
-.faded-hr-divider-light, .horizontal-divider::after, .modal .inner-wrapper header hr, .modal .inner-wrapper form .honor-code-summary hr {
+.faded-hr-divider-light, .horizontal-divider::after, footer .copyright hr, .modal .inner-wrapper header hr, .modal .inner-wrapper form .honor-code-summary hr {
   background-image: -webkit-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
   background-image: -moz-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
   background-image: -ms-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
@@ -937,9 +937,13 @@ footer {
     position: absolute;
     bottom: 0px; }
   footer nav {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     zoom: 1;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 10px;
     width: 100%; }
     footer nav:before, footer nav:after {
       content: "";
@@ -958,13 +962,8 @@ footer {
       float: left;
       font-size: 0em;
       margin-top: 6px; }
-      footer nav ol.right {
-        float: right; }
-        footer nav ol.right li:first-child {
-          border: none; }
       footer nav ol.social {
-        float: right;
-        margin: 0px 30px 0px 0px; }
+        float: right; }
         footer nav ol.social li {
           border: none;
           padding: 0px 5px; }
@@ -984,15 +983,26 @@ footer {
           font: normal 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
           padding: 5px 0px; }
   footer .copyright {
-    background: #e6e6e6;
     height: 50px;
     margin-top: 80px;
     width: 100%; }
+    footer .copyright hr {
+      border: none;
+      margin: 0px;
+      position: relative;
+      z-index: 2; }
+      footer .copyright hr::after {
+        bottom: 0px;
+        content: "";
+        display: block;
+        position: absolute;
+        top: -1px; }
     footer .copyright p {
       color: #a0a0a0;
       font: normal 1rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
       margin: 0 auto;
       padding-top: 15px;
+      text-align: center;
       max-width: 1200px; }
       footer .copyright p a {
         border-bottom: 1px solid #c8c8c8;
@@ -1035,20 +1045,6 @@ header.app {
     header.app a.logo img {
       position: relative;
       z-index: 2; }
-    header.app a.logo:hover::before {
-      background-image: -webkit-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
-      background-image: -moz-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
-      background-image: -ms-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
-      background-image: -o-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
-      background-image: radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
-      content: "";
-      display: block;
-      height: 90px;
-      left: -20px;
-      position: absolute;
-      top: -32px;
-      width: 90px;
-      z-index: 1; }
   header.app .divider {
     display: inline-block;
     vertical-align: baseline;
@@ -1906,7 +1902,7 @@ header.app {
     .home > header:after {
       clear: both; }
     .home > header .video-wrapper {
-      right: 0px;
+      left: 0px;
       position: absolute;
       top: 0px; }
       .home > header .video-wrapper .video-player {
@@ -1931,10 +1927,10 @@ header.app {
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
-      float: left;
+      float: right;
       font-size: 0em;
       width: 100%;
-      padding-right: 600px;
+      padding-left: 600px;
       padding-top: 20px; }
       .home > header .welcome h1 {
         color: #a0a0a0;
@@ -1942,7 +1938,6 @@ header.app {
         letter-spacing: 1px;
         margin-bottom: 20px;
         position: relative;
-        text-align: center;
         text-transform: uppercase; }
       .home > header .welcome .intro {
         -webkit-box-sizing: border-box;
@@ -1953,14 +1948,12 @@ header.app {
         .home > header .welcome .intro p {
           color: #3c3c3c;
           margin: 0px;
-          text-align: center;
           width: 100%; }
       .home > header .welcome .signup-wrapper {
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
-        margin: 0 auto;
-        width: 82.915%; }
+        width: 91.457%; }
         .home > header .welcome .signup-wrapper .sign-up {
           background: #f0f0f0;
           background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
@@ -2046,43 +2039,17 @@ header.app {
             .home > header .welcome .signup-wrapper .sign-up a:disabled {
               opacity: 0.5;
               cursor: not-allowed; }
-          .home > header .welcome .signup-wrapper .sign-up form input[type="text"],
-          .home > header .welcome .signup-wrapper .sign-up form input[type="email"],
-          .home > header .welcome .signup-wrapper .sign-up form input[type="password"] {
-            height: 45px;
-            margin-right: 2.513%;
-            width: 23.116%; }
-            .home > header .welcome .signup-wrapper .sign-up form input[type="text"]:last-child,
-            .home > header .welcome .signup-wrapper .sign-up form input[type="email"]:last-child,
-            .home > header .welcome .signup-wrapper .sign-up form input[type="password"]:last-child {
-              margin-right: 0px; }
-          .home > header .welcome .signup-wrapper .sign-up form input[type="submit"] {
-            height: 45px;
-            width: 23.116%; }
-          .home > header .welcome .signup-wrapper .sign-up h3 {
-            color: #3c3c3c;
-            font: normal 1.6rem/2rem "Open Sans", Verdana, Geneva, sans-serif;
-            text-align: center; }
   .home .university-partners {
-    background-image: -webkit-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(250, 250, 250, 0.8) 15%, #fafafa 50%, rgba(250, 250, 250, 0.8) 85%, rgba(255, 255, 255, 0));
-    background-image: -moz-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(250, 250, 250, 0.8) 15%, #fafafa 50%, rgba(250, 250, 250, 0.8) 85%, rgba(255, 255, 255, 0));
-    background-image: -ms-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(250, 250, 250, 0.8) 15%, #fafafa 50%, rgba(250, 250, 250, 0.8) 85%, rgba(255, 255, 255, 0));
-    background-image: -o-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(250, 250, 250, 0.8) 15%, #fafafa 50%, rgba(250, 250, 250, 0.8) 85%, rgba(255, 255, 255, 0));
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(250, 250, 250, 0.8) 15%, #fafafa 50%, rgba(250, 250, 250, 0.8) 85%, rgba(255, 255, 255, 0));
+    background: #f5f5f5;
+    border: 1px solid #d2d2d2;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
     margin-bottom: 60px;
+    overflow: hidden;
     padding: 10px 0px;
     position: relative;
     width: 100%; }
-    .home .university-partners:before {
-      content: "";
-      display: block;
-      position: absolute;
-      top: 0px; }
-    .home .university-partners:after {
-      bottom: 0px;
-      content: "";
-      display: block;
-      position: absolute; }
     .home .university-partners .partners {
       font-size: 0em;
       margin: 0 auto;
@@ -2094,11 +2061,28 @@ header.app {
         *display: inline;
         *vertical-align: auto;
         margin-right: 40px;
-        opacity: 0.7; }
+        opacity: 0.7;
+        position: relative; }
         .home .university-partners .partners a:last-child {
           margin-right: 0px; }
         .home .university-partners .partners a:hover {
           opacity: 0.9; }
+          .home .university-partners .partners a:hover::before {
+            background-image: -webkit-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+            background-image: -moz-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+            background-image: -ms-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+            background-image: -o-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+            background-image: radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+            content: "";
+            display: block;
+            height: 200px;
+            left: 50%;
+            margin-left: -100px;
+            margin-top: -100px;
+            width: 200px;
+            position: absolute;
+            top: 50%;
+            z-index: 1; }
       .home .university-partners .partners .name {
         display: inline-block;
         vertical-align: baseline;
@@ -2109,6 +2093,8 @@ header.app {
         font: 800 italic 2rem/2.2rem "Open Sans", Verdana, Geneva, sans-serif;
         text-align: center;
         text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+        position: relative;
+        z-index: 2;
         vertical-align: middle; }
       .home .university-partners .partners img {
         display: inline-block;
@@ -2117,7 +2103,9 @@ header.app {
         *display: inline;
         *vertical-align: auto;
         max-width: 100px;
-        vertical-align: middle; }
+        vertical-align: middle;
+        position: relative;
+        z-index: 2; }
   .home .highlighted-courses {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;

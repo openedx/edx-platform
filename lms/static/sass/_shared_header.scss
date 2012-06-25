@@ -25,20 +25,6 @@ header.app {
       position: relative;
       z-index: 2;
     }
-
-    &:hover {
-      &::before {
-        @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 0.8) 0%, rgba(255,255,255, 0) 100%));
-        content: "";
-        display: block;
-        height: 90px;
-        left: -20px;
-        position: absolute;
-        top: -32px;
-        width: 90px;
-        z-index: 1;
-      }
-    }
   }
 
   .divider {
