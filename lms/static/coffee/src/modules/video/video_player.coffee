@@ -68,7 +68,7 @@ class @VideoPlayer extends Subview
     @caption.pause()
 
   onPlay: =>
-    Logger.log 'play_video', id: @currentTime, code: @player.getVideoEmbedCode()
+    @video.log 'play_video'
     window.player.pauseVideo() if window.player && window.player != @player
     window.player = @player
     unless @player.interval
@@ -78,7 +78,7 @@ class @VideoPlayer extends Subview
     @progressSlider.play()
 
   onPause: =>
-    Logger.log 'pause_video', id: @currentTime, code: @player.getVideoEmbedCode()
+    @video.log 'pause_video'
     window.player = null if window.player == @player
     clearInterval(@player.interval)
     @player.interval = null
