@@ -34,7 +34,7 @@ form {
   }
 
   input[type="submit"] {
-    @include button(shiny, $pink);
+    @include button(shiny, $blue);
     @include border-radius(3px);
     font: normal italic 1.2rem/1.6rem $serif;
     height: 35px;

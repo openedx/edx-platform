@@ -1,40 +1,41 @@
 <%namespace name='static' file='static_content.html'/>
 
-<section class="modal-wrapper">
-  <section class="login-modal">
-    <div class="inner-wrapper">
-      <header>
-        <h3>Log In</h3>
-        <hr>
-      </header>
+<section class="modal login-modal">
+  <div class="inner-wrapper">
+    <header>
+      <h3>Log In</h3>
+      <hr>
+    </header>
 
-      <form id="login_form" method="post">
-        <label>E-mail</label>
-        <input name="email" type="email" placeholder="e-mail">
-        <label>Password</label>
-        <input name="password" type="password" placeholder="password">
-        <label class="remember-me">
-          <input name="remember" type="checkbox">
-          Remember me
-        </label>
+    <form id="login_form" method="post">
+      <label>E-mail</label>
+      <input name="email" type="email" placeholder="E-mail">
+      <label>Password</label>
+      <input name="password" type="password" placeholder="Password">
+      <label class="remember-me">
+        <input name="remember" type="checkbox">
+        Remember me
+      </label>
+      <div class="submit">
         <input name="submit" type="submit" value="Submit">
-      </form>
+      </div>
+    </form>
 
-      <section class="login-extra">
-        <p>
-          <span>Not enrolled? <a href="#">Sign up.</a></span>
-          <a href="#" class="pwd-reset">Forgot password?</a>
-        </p>
-      </section>
+    <section class="login-extra">
+      <p>
+        <span>Not enrolled? <a href="#">Sign up.</a></span>
+        <a href="#" class="pwd-reset">Forgot password?</a>
+      </p>
+    </section>
 
-      <div class="close-modal">
-        <div class="inner">
-          <p>&#10005;</p>
-        </div>
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
       </div>
     </div>
-  </section>
+  </div>
 </section>
+
 <script type="text/javascript">
   function getCookie(name) {
     var cookieValue = null;
