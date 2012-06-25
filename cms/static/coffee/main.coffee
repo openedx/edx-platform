@@ -37,6 +37,8 @@ $ ->
         $(this).parent().parent().hide()
         return false
 
+    # $('html').keypress ->
+    #   $('.wip').css('visibility', 'visible')
 
     setHeight = ->
         windowHeight = $(this).height()
