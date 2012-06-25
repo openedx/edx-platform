@@ -69,5 +69,15 @@ textarea {
 }
 
 .wip {
-  outline: 1px solid #ff0 !important;
+  outline: 1px solid #f00 !important;
+  position: relative;
+
+  &:after {
+   content: "WIP";
+   font-size: 8px;
+   padding: 2px;
+   background: #f00;
+   color: #fff;
+   @include position(absolute, 0px 0px 0 0);
+  }
 }
