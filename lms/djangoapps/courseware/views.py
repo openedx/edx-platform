@@ -70,7 +70,7 @@ def gradebook(request):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
 
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    course = settings.COURSES_BY_ID[course_id]
 
     student_objects = User.objects.all()[:100]
     student_info = []
@@ -89,15 +89,15 @@ def gradebook(request):
             'realname': UserProfile.objects.get(user=student).name
         })
 
-    return render_to_response('gradebook.html', {'students': student_info})
+    return render_to_response('gradebook.html', {'students': student_info, 'course': course})
 
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, student_id=None):
+def profile(request, course_id=None, student_id=None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
-
+    course = settings.COURSES_BY_ID[course_id]
     if student_id is None:
         student = request.user
     else:
@@ -197,12 +197,16 @@ def index(request, course=None, chapter=None, section=None,
     if not settings.COURSEWARE_ENABLED:
         return redirect('/')
 
-    course = clean(get_course(request, course))
-    if not multicourse_settings.is_valid_course(course):
-        return redirect('/')
+    # course = clean(get_course(request, course))
+    # if not multicourse_settings.is_valid_course(course):
+    #     return redirect('/')
+    try:
+        course = settings.COURSES_BY_ID[course_id]
+    except KeyError:
+        raise Http404("Course not found")
 
     # keep track of current course being viewed in django's request.session
-    request.session['coursename'] = course
+    request.session['coursename'] = course.title
 
     chapter = clean(chapter)
     section = clean(section)
@@ -210,7 +214,8 @@ def index(request, course=None, chapter=None, section=None,
     context = {
         'csrf': csrf(request)['csrf_token'],
         'accordion': render_accordion(request, course, chapter, section),
-        'COURSE_TITLE': multicourse_settings.get_course_title(course),
+        'COURSE_TITLE': course.title,
+        'course': course,
         'init': '',
         'content': ''
     }

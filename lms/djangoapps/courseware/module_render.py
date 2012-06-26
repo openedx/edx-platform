@@ -44,6 +44,7 @@ class I4xSystem(object):
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
         '''
+        self.course = course
         self.ajax_url = ajax_url
         self.track_function = track_function
         self.filestore = filestore
