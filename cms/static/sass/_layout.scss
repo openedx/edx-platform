@@ -1,0 +1,53 @@
+body {
+  @include clearfix();
+  height: 100%;
+  font: 14px $body-font-family;
+
+  > section {
+    display: table;
+    width: 100%;
+  }
+
+  > header {
+    background: #000;
+    color: #fff;
+    display: block;
+    float: none;
+    padding: 6px 20px;
+    width: 100%;
+    @include box-sizing(border-box);
+
+    nav {
+      @include clearfix;
+
+      h2 {
+        font-size: 14px;
+        text-transform: uppercase;
+        float: left;
+      }
+
+      ul {
+        float: left;
+
+        &.user-nav {
+          float: right;
+        }
+
+        li {
+          @include inline-block();
+          margin-left: 15px;
+        }
+      }
+    }
+  }
+
+  &.content {
+    section.main-content {
+      border-left: 2px solid #000;
+      @include box-sizing(border-box);
+      width: flex-grid(9);
+      float: left;
+      @include box-shadow( -2px 0 3px #ddd );
+    }
+  }
+}
