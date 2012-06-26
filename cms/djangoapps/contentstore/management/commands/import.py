@@ -5,10 +5,15 @@
 from django.core.management.base import BaseCommand
 from keystore.django import keystore
 from raw_module import RawDescriptor
+from lxml import etree
 
 from path import path
 from x_module import XModuleDescriptor, DescriptorSystem
 
+unnamed_modules = 0
+
+etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                         remove_comments=True))
 
 class Command(BaseCommand):
     help = \
@@ -22,7 +27,18 @@ class Command(BaseCommand):
             system = DescriptorSystem(keystore().get_item)
 
             def process_xml(xml):
-                module = XModuleDescriptor.load_from_xml(xml, system, org, course, RawDescriptor)
+                try:
+                    xml_data = etree.fromstring(xml)
+                except:
+                    print xml
+                    raise
+                if not xml_data.get('name'):
+                    global unnamed_modules
+                    unnamed_modules += 1
+                    xml_data.set('name', 'Unnamed module %d' % unnamed_modules)
+
+
+                module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), system, org, course, RawDescriptor)
                 keystore().create_item(module.url)
                 if 'data' in module.definition:
                     keystore().update_item(module.url, module.definition['data'])
