@@ -8,7 +8,7 @@ class MongoModuleStore(ModuleStore):
     """
     A Mongodb backed ModuleStore
     """
-    def __init__(self, host, db, collection, port=27017):
+    def __init__(self, host, db, collection, port=27017, default_class=None):
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port
@@ -16,6 +16,7 @@ class MongoModuleStore(ModuleStore):
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
+        self.default_class = default_class
 
     def get_item(self, location):
         """
@@ -28,6 +29,8 @@ class MongoModuleStore(ModuleStore):
         If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
+        default_class: An XModuleDescriptor subclass to use if no plugin matching the
+            location is found
         """
 
         query = {}
@@ -45,9 +48,10 @@ class MongoModuleStore(ModuleStore):
         if item is None:
             raise ItemNotFoundError(location)
 
-        return XModuleDescriptor.load_from_json(item, DescriptorSystem(self.get_item))
+        return XModuleDescriptor.load_from_json(
+            item, DescriptorSystem(self.get_item), self.default_class)
 
-    def create_item(self, location, editor):
+    def create_item(self, location):
         """
         Create an empty item at the specified location with the supplied editor
 
@@ -55,7 +59,6 @@ class MongoModuleStore(ModuleStore):
         """
         self.collection.insert({
             'location': Location(location).dict(),
-            'editor': editor
         })
 
     def update_item(self, location, data):

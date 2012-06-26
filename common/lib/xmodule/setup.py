@@ -13,18 +13,8 @@ setup(
     # for a description of entry_points
     entry_points={
         'xmodule.v1': [
-            "Course = seq_module:SectionDescriptor",
-            "Week = seq_module:SectionDescriptor",
-            "Section = seq_module:SectionDescriptor",
-            "LectureSequence = seq_module:SectionDescriptor",
-            "Lab = seq_module:SectionDescriptor",
-            "Homework = seq_module:SectionDescriptor",
-            "TutorialIndex = seq_module:SectionDescriptor",
-            "Exam = seq_module:SectionDescriptor",
-            "VideoSegment = video_module:VideoSegmentDescriptor",
-            "ProblemSet = seq_module:SectionDescriptor",
-            "Problem = capa_module:CapaModuleDescriptor",
-            "HTML = html_module:HtmlModuleDescriptor",
+            "course = seq_module:SequenceDescriptor",
+            "html = html_module:HtmlModuleDescriptor",
         ]
     }
 )

@@ -158,6 +158,7 @@ PIPELINE_CSS = {
 PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
 
 from x_module import XModuleDescriptor
+from raw_module import RawDescriptor
 js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
 try:
     os.makedirs(js_file_dir)
@@ -168,7 +169,7 @@ except OSError as exc:
         raise
 
 module_js_sources = []
-for xmodule in XModuleDescriptor.load_classes():
+for xmodule in XModuleDescriptor.load_classes() + [RawDescriptor]:
     js = xmodule.get_javascript()
     for filetype in ('coffee', 'js'):
         for idx, fragment in enumerate(js.get(filetype, [])):

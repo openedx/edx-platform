@@ -115,5 +115,23 @@ class Module(XModule):
         self.rendered = False
 
 
-class SectionDescriptor(MakoModuleDescriptor):
+class SequenceDescriptor(MakoModuleDescriptor):
     mako_template = 'widgets/sequence-edit.html'
+
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        xml_object = etree.fromstring(xml_data)
+
+        children = [
+            system.process_xml(etree.tostring(child_module))
+            for child_module in xml_object
+        ]
+
+        return cls(
+            system, {'children': children},
+            location=['i4x',
+                      org,
+                      course,
+                      xml_object.tag,
+                      xml_object.get('name')]
+        )
