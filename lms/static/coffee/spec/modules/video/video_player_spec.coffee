@@ -27,7 +27,7 @@ describe 'VideoPlayer', ->
         expect(window.VideoControl).toHaveBeenCalledWith el: $('.video-controls', @player.el)
 
       it 'create video caption', ->
-        expect(window.VideoCaption).toHaveBeenCalledWith el: @player.el, youtubeId: 'def456', currentSpeed: '1.0'
+        expect(window.VideoCaption).toHaveBeenCalledWith el: @player.el, youtubeId: 'normalSpeedYoutubeId', currentSpeed: '1.0'
 
       it 'create video speed control', ->
         expect(window.VideoSpeedControl).toHaveBeenCalledWith el: $('.secondary-controls', @player.el), speeds: ['0.75', '1.0'], currentSpeed: '1.0'
@@ -43,7 +43,7 @@ describe 'VideoPlayer', ->
             rel: 0
             showinfo: 0
             enablejsapi: 1
-          videoId: 'def456'
+          videoId: 'normalSpeedYoutubeId'
           events:
             onReady: @player.onReady
             onStateChange: @player.onStateChange
@@ -153,7 +153,7 @@ describe 'VideoPlayer', ->
         @player.onStateChange data: YT.PlayerState.PLAYING
 
       it 'log the play_video event', ->
-        expect(@video.log).toHaveBeenCalledWith 'play_video', id: @player.currentTime, code: 'embedCode'
+        expect(@video.log).toHaveBeenCalledWith 'play_video'
 
       it 'pause other video player', ->
         expect(@anotherPlayer.pauseVideo).toHaveBeenCalled()
@@ -187,7 +187,7 @@ describe 'VideoPlayer', ->
         @player.onStateChange data: YT.PlayerState.PAUSED
 
       it 'log the pause_video event', ->
-         expect(@video.log).toHaveBeenCalledWith 'pause_video'
+        expect(@video.log).toHaveBeenCalledWith 'pause_video'
 
       it 'set current video player as inactive', ->
         expect(window.player).toBeNull()
@@ -270,7 +270,7 @@ describe 'VideoPlayer', ->
         @player.onSpeedChange {}, '0.75'
 
       it 'load the video', ->
-        expect(@player.player.loadVideoById).toHaveBeenCalledWith 'abc123', '80.000'
+        expect(@player.player.loadVideoById).toHaveBeenCalledWith 'slowerSpeedYoutubeId', '80.000'
 
       it 'trigger updatePlayTime event', ->
         expect(@player.updatePlayTime).toHaveBeenCalledWith '80.000'
@@ -281,7 +281,7 @@ describe 'VideoPlayer', ->
         @player.onSpeedChange {}, '0.75'
 
       it 'cue the video', ->
-        expect(@player.player.cueVideoById).toHaveBeenCalledWith 'abc123', '80.000'
+        expect(@player.player.cueVideoById).toHaveBeenCalledWith 'slowerSpeedYoutubeId', '80.000'
 
       it 'trigger updatePlayTime event', ->
         expect(@player.updatePlayTime).toHaveBeenCalledWith '80.000'
