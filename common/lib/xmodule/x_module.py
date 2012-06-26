@@ -15,8 +15,24 @@ class ModuleMissingError(Exception):
 
 
 class Plugin(object):
+    """
+    Base class for a system that uses entry_points to load plugins.
+
+    Implementing classes are expected to have the following attributes:
+
+        entry_point: The name of the entry point to load plugins from
+    """
     @classmethod
-    def load_class(cls, identifier):
+    def load_class(cls, identifier, default=None):
+        """
+        Loads a single class intance specified by identifier. If identifier
+        specifies more than a single class, then logs a warning and returns the first
+        class identified.
+
+        If default is not None, will return default if no entry_point matching identifier
+        is found. Otherwise, will raise a ModuleMissingError
+        """
+        identifier = identifier.lower()
         classes = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
         if len(classes) > 1:
             log.warning("Found multiple classes for {entry_point} with identifier {id}: {classes}. Returning the first one.".format(
@@ -25,6 +41,8 @@ class Plugin(object):
                 classes=", ".join(class_.module_name for class_ in classes)))
 
         if len(classes) == 0:
+            if default is not None:
+                return default
             raise ModuleMissingError(identifier)
 
         return classes[0].load()
@@ -160,9 +178,10 @@ class XModuleDescriptor(Plugin):
     """
     entry_point = "xmodule.v1"
     js = {}
+    js_module = None
 
     @staticmethod
-    def load_from_json(json_data, system):
+    def load_from_json(json_data, system, default_class=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of json_data.
@@ -170,7 +189,10 @@ class XModuleDescriptor(Plugin):
         json_data must contain a 'location' element, and must be suitable to be
         passed into the subclasses `from_json` method.
         """
-        class_ = XModuleDescriptor.load_class(json_data['location']['category'])
+        class_ = XModuleDescriptor.load_class(
+            json_data['location']['category'],
+            default_class
+        )
         return class_.from_json(json_data, system)
 
     @classmethod
@@ -184,6 +206,36 @@ class XModuleDescriptor(Plugin):
         """
         return cls(system=system, **json_data)
 
+    @staticmethod
+    def load_from_xml(xml_data, system, org=None, course=None, default_class=None):
+        """
+        This method instantiates the correct subclass of XModuleDescriptor based
+        on the contents of xml_data.
+
+        xml_data must be a string containing valid xml
+        org and course are optional strings that will be used in the generated modules
+            url identifiers
+        """
+        class_ = XModuleDescriptor.load_class(
+            etree.fromstring(xml_data).tag,
+            default_class
+        )
+        return class_.from_xml(xml_data, system, org, course)
+
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        """
+        Creates an instance of this descriptor from the supplied xml_data.
+        This may be overridden by subclasses
+
+        xml_data: A string of xml that will be translated into data and children for
+            this module
+        system: An XModuleSystem for interacting with external resources
+        org and course are optional strings that will be used in the generated modules
+            url identifiers
+        """
+        raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
+
     @classmethod
     def get_javascript(cls):
         """
@@ -196,6 +248,12 @@ class XModuleDescriptor(Plugin):
         """
         return cls.js
 
+    def js_module_name(self):
+        """
+        Return the name of the javascript class to instantiate when
+        this module descriptor is loaded for editing
+        """
+        return self.js_module
 
     def __init__(self,
                  system,
@@ -230,15 +288,12 @@ class XModuleDescriptor(Plugin):
 
         self._child_instances = None
 
-    def get_children(self, categories=None):
+    def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of this module"""
         if self._child_instances is None:
-            self._child_instances = [self.system.load_item(child) for child in self.definition['children']]
+            self._child_instances = [self.system.load_item(child) for child in self.definition.get('children', [])]
 
-        if categories is None:
-            return self._child_instances
-        else:
-            return [child for child in self._child_instances if child.type in categories]
+        return self._child_instances
 
     def get_html(self):
         """
@@ -275,9 +330,11 @@ class XModuleDescriptor(Plugin):
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item):
+    def __init__(self, load_item, process_xml=None):
         """
-        load_item: Takes a Location and returns and XModuleDescriptor
+        load_item: Takes a Location and returns an XModuleDescriptor
+        process_xml: Takes an xml string, and returns the url of the XModuleDescriptor created from that xml
         """
 
         self.load_item = load_item
+        self.process_xml = process_xml

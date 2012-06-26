@@ -1,15 +1,21 @@
 class @CMS
+    @setHeight = =>
+        windowHeight = $(this).height()
+        @contentHeight = windowHeight - 29
+
     @bind = =>
         $('a.module-edit').click ->
             CMS.edit_item($(this).attr('id'))
             return false
+        $(window).bind('resize', CMS.setHeight)
 
     @edit_item = (id) =>
         $.get('/edit_item', {id: id}, (data) =>
             $('#module-html').empty().append(data)
             CMS.bind()
-            $('section.edit-pane').show()
+            $('body.content .cal').css('height', @contentHeight)
             $('body').addClass('content')
+            $('section.edit-pane').show()
             new Unit('unit-wrapper', id)
         )
 
@@ -78,6 +84,7 @@ $ ->
     $('.problem-new a').click ->
         $('section.edit-pane').show()
         return false
-
+    
+    CMS.setHeight()
     CMS.bind()
 

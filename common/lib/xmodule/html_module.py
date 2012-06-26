@@ -16,8 +16,8 @@ class HtmlModuleDescriptor(MakoModuleDescriptor):
     """
     mako_template = "widgets/html-edit.html"
 
-    # TODO (cpennington): Make this into a proper module
     js = {'coffee': [resource_string(__name__, 'js/module/html.coffee')]}
+    js_module = 'HTML'
 
 
 class Module(XModule):

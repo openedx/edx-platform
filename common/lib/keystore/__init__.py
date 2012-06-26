@@ -125,7 +125,7 @@ class ModuleStore(object):
     """
     An abstract interface for a database backend that stores XModuleDescriptor instances
     """
-    def get_item(self, location):
+    def get_item(self, location, default_class=None):
         """
         Returns an XModuleDescriptor instance for the item at location.
         If location.revision is None, returns the item with the most
@@ -136,6 +136,8 @@ class ModuleStore(object):
         If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
+        default_class: An XModuleDescriptor subclass to use if no plugin matching the
+            location is found
         """
         raise NotImplementedError
 
