@@ -1,7 +1,6 @@
 class @Problem
   constructor: (@id, url) ->
     @element = $("#problem_#{id}")
-    @content_url = "#{url}problem_get?id=#{@id}"
     @render()
 
   $: (selector) ->
@@ -27,10 +26,9 @@ class @Problem
       @element.html(content)
       @bind()
     else
-      $.postWithPrefix "/modx/problem/#{@id}/problem_get", '', (response) =>
+      $.postWithPrefix "/modx/problem/#{@id}/problem_get", (response) =>
         @element.html(response.html)
         @bind()
-      
 
   check: =>
     Logger.log 'problem_check', @answers
