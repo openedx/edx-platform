@@ -16,7 +16,7 @@ class @Problem
     @$('section.action input.save').click @save
     @$('input.math').keyup(@refreshMath).each(@refreshMath)
 
-  update_progress: (response) =>
+  updateProgress: (response) =>
     if response.progress_changed
         @element.attr progress: response.progress_status
         @element.trigger('progressChanged')
@@ -36,7 +36,7 @@ class @Problem
       switch response.success
         when 'incorrect', 'correct'
           @render(response.contents)
-          @update_progress response
+          @updateProgress response
         else
           alert(response.success)
 
@@ -44,7 +44,7 @@ class @Problem
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "/modx/problem/#{@id}/problem_reset", id: @id, (response) =>
         @render(response.html)
-        @update_progress response
+        @updateProgress response
 
   show: =>
     if !@element.hasClass 'showed'
@@ -60,7 +60,7 @@ class @Problem
         MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
-        @update_progress response
+        @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
@@ -72,7 +72,7 @@ class @Problem
     $.postWithPrefix "/modx/problem/#{@id}/problem_save", @answers, (response) =>
       if response.success
         alert 'Saved'
-      @update_progress response
+      @updateProgress response
 
   refreshMath: (event, element) =>
     element = event.target unless element
