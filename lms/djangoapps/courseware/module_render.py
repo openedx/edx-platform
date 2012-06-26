@@ -35,7 +35,7 @@ class I4xSystem(object):
     '''
     def __init__(self, ajax_url, track_function, render_function,
                  module_from_xml, render_template, request=None,
-                 filestore=None):
+                 filestore=None, course=None):
         '''
         Create a closure around the system environment.
 
@@ -56,6 +56,7 @@ class I4xSystem(object):
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
         '''
+        self.course = course
         self.ajax_url = ajax_url
         self.track_function = track_function
         if not filestore: 
@@ -169,14 +170,14 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
     state = smod.state if smod else None
 
     # get coursename if present in request
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    # coursename = multicourse_settings.get_coursename_from_request(request)
 
-    if coursename and settings.ENABLE_MULTICOURSE:
-        # path to XML for the course
-        xp = multicourse_settings.get_course_xmlpath(coursename)
-        data_root = settings.DATA_DIR + xp
-    else:
-        data_root = settings.DATA_DIR
+    # if coursename and settings.ENABLE_MULTICOURSE:
+    #     # path to XML for the course
+    #     xp = multicourse_settings.get_course_xmlpath(coursename)
+    #     data_root = settings.DATA_DIR + xp
+    # else:
+    data_root = settings.DATA_DIR+"/"+os.path.basename(course.path)
 
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + module_type + '/' + module_id + '/'

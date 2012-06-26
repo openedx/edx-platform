@@ -67,7 +67,7 @@ def info(request, course_id=None):
     # We're bypassing the templating system for this part. We should cache
     # this.
     sections = ["updates", "handouts", "guest_updates", "guest_handouts"]
-    sections_to_content = {}
+    sections_to_content = { 'course': course }
     for section in sections:
         filename = section + ".html"
         with open(course.path / "info" / filename) as f:

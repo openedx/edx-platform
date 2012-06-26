@@ -67,7 +67,7 @@ course_settings = Settings()
 
 
 
-def grade_sheet(student,coursename=None):
+def grade_sheet(student,course=None):
     """
     This pulls a summary of all problems in the course. It returns a dictionary with two datastructures:
     
@@ -77,9 +77,9 @@ def grade_sheet(student,coursename=None):
     
     - grade_summary is the output from the course grader. More information on the format is in the docstring for CourseGrader.
     """
-    dom=content_parser.course_file(student,coursename)
-    course = dom.xpath('//course/@name')[0]
-    xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=course)
+    dom=content_parser.course_file(student,course)
+    dom_course = dom.xpath('//course/@name')[0]
+    xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=dom_course)
 
     responses=StudentModule.objects.filter(student=student)
     response_by_id = {}
@@ -95,15 +95,15 @@ def grade_sheet(student,coursename=None):
         
         
         for s in dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section', 
-                           course=course, chname=chname):
+                           course=dom_course, chname=chname):
             problems=dom.xpath('//course[@name=$course]/chapter[@name=$chname]/section[@name=$section]//problem', 
-                           course=course, chname=chname, section=s.get('name'))
+                           course=dom_course, chname=chname, section=s.get('name'))
 
             graded = True if s.get('graded') == "true" else False
             scores=[]
             if len(problems)>0:
                 for p in problems:
-                    (correct,total) = get_score(student, p, response_by_id, coursename=coursename)
+                    (correct,total) = get_score(student, p, response_by_id, course=course)
                     
                     if settings.GENERATE_PROFILE_SCORES:
                         if total > 1:
@@ -146,7 +146,7 @@ def grade_sheet(student,coursename=None):
     return {'courseware_summary' : chapters,
             'grade_summary' : grade_summary}
 
-def get_score(user, problem, cache, coursename=None):
+def get_score(user, problem, cache, course=None):
     ## HACK: assumes max score is fixed per problem
     id = problem.get('id')
     correct = 0.0
@@ -177,7 +177,7 @@ def get_score(user, problem, cache, coursename=None):
         # TODO: These are no longer correct params for I4xSystem -- figure out what this code
         # does, clean it up.
         from module_render import I4xSystem
-        system = I4xSystem(None, None, None, coursename=coursename)
+        system = I4xSystem(None, None, None, course=course)
         total=float(xmodule.capa_module.Module(system, etree.tostring(problem), "id").max_score())
         response.max_grade = total
         response.save()

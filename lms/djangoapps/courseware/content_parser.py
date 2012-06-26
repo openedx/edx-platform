@@ -137,20 +137,20 @@ def user_groups(user):
 
     # return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
 
-def replace_custom_tags(tree):
-    tags = os.listdir(settings.DATA_DIR+'/custom_tags')
+def replace_custom_tags(course, tree):
+    tags = os.listdir(course.path+'/custom_tags')
     for tag in tags:
         for element in tree.iter(tag):
             element.tag = 'customtag'
             impl = etree.SubElement(element, 'impl')
             impl.text = tag
 
-def course_xml_process(tree):
+def course_xml_process(course, tree):
     ''' Do basic pre-processing of an XML tree. Assign IDs to all
     items without. Propagate due dates, grace periods, etc. to child
     items. 
     '''
-    replace_custom_tags(tree)
+    replace_custom_tags(course, tree)
     id_tag(tree)
     propogate_downward_tag(tree, "due")
     propogate_downward_tag(tree, "graded")
@@ -159,18 +159,18 @@ def course_xml_process(tree):
     propogate_downward_tag(tree, "rerandomize")
     return tree
 
-def course_file(user,coursename=None):
+def course_file(user,course=None):
     ''' Given a user, return course.xml'''
 
     if user.is_authenticated():
-        filename = UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
+        filename = os.path.basename(course.path)+"/"+UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
     else:
         filename = 'guest_course.xml'
 
     # if a specific course is specified, then use multicourse to get the right path to the course XML directory
-    if coursename and settings.ENABLE_MULTICOURSE:
-        xp = multicourse_settings.get_course_xmlpath(coursename)
-        filename = xp + filename	# prefix the filename with the path
+    # if coursename and settings.ENABLE_MULTICOURSE:
+    #     xp = multicourse_settings.get_course_xmlpath(coursename)
+    #     filename = xp + filename	# prefix the filename with the path
 
     groups = user_groups(user)
     options = {'dev_content':settings.DEV_CONTENT, 
@@ -188,7 +188,7 @@ def course_file(user,coursename=None):
         # print '[courseware.content_parser.course_file] tree_string = ',tree_string
 
     if not tree_string:
-        tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
+        tree = course_xml_process(course, etree.XML(render_to_string(filename, options, namespace = 'course')))
         tree_string = etree.tostring(tree)
         
         cache.set(cache_key, tree_string, 60)
@@ -197,7 +197,7 @@ def course_file(user,coursename=None):
 
     return tree
 
-def section_file(user, section, coursename=None, dironly=False):
+def section_file(user, section, course=None, dironly=False):
     '''
     Given a user and the name of a section, return that section.
     This is done specific to each course.
@@ -221,7 +221,7 @@ def section_file(user, section, coursename=None, dironly=False):
     options = {'dev_content':settings.DEV_CONTENT, 
                'groups' : user_groups(user)}
 
-    tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'sections')))
+    tree = course_xml_process(course, etree.XML(render_to_string(filename, options, namespace = 'sections')))
     return tree
 
 

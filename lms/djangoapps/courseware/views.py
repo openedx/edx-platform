@@ -46,24 +46,24 @@ def gradebook(request):
     if 'course_admin' not in content_parser.user_groups(request.user):
         raise Http404
 
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    course = settings.COURSES_BY_ID[course_id]
 
     student_objects = User.objects.all()[:100]
     student_info = [{'username': s.username,
                      'id': s.id,
                      'email': s.email,
-                     'grade_info': grades.grade_sheet(s, coursename),
+                     'grade_info': grades.grade_sheet(s, course),
                      'realname': UserProfile.objects.get(user = s).name
                      } for s in student_objects]
 
-    return render_to_response('gradebook.html', {'students': student_info})
+    return render_to_response('gradebook.html', {'students': student_info, 'course': course})
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, student_id=None):
+def profile(request, course_id=None, student_id=None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
-
+    course = settings.COURSES_BY_ID[course_id]
     if student_id is None:
         student = request.user
     else:
@@ -73,17 +73,18 @@ def profile(request, student_id=None):
 
     user_info = UserProfile.objects.get(user=student) # request.user.profile_cache #
 
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    # coursename = multicourse_settings.get_coursename_from_request(request)
 
     context = {'name': user_info.name,
                'username': student.username,
                'location': user_info.location,
                'language': user_info.language,
                'email': student.email,
+               'course': course,
                'format_url_params': content_parser.format_url_params,
                'csrf': csrf(request)['csrf_token']
                }
-    context.update(grades.grade_sheet(student, coursename))
+    context.update(grades.grade_sheet(student, course))
 
     return render_to_response('profile.html', context)
 
@@ -95,8 +96,8 @@ def render_accordion(request, course, chapter, section):
         If chapter and section are '' or None, renders a default accordion.
 
         Returns (initialization_javascript, content)'''
-    if not course:
-        course = "6.002 Spring 2012"
+    # if not course:
+    #     course = "6.002 Spring 2012"
 
     toc = content_parser.toc_from_xml(
         content_parser.course_file(request.user, course), chapter, section)
@@ -106,9 +107,11 @@ def render_accordion(request, course, chapter, section):
         if toc[i]['active']:
             active_chapter = i
 
+    log.info(course.title)
     context=dict([('active_chapter', active_chapter),
                   ('toc', toc),
-                  ('course_name', course),
+                  ('course_name', course.title),
+                  ('course_id', course.id),
                   ('format_url_params', content_parser.format_url_params),
                   ('csrf', csrf(request)['csrf_token'])] +
                      template_imports.items())
@@ -133,7 +136,7 @@ def render_section(request, section):
 
     context = {
         'csrf': csrf(request)['csrf_token'],
-        'accordion': render_accordion(request, '', '', '')
+        'accordion': render_accordion(request, course, '', '')
     }
 
     module_ids = dom.xpath("//@id")
@@ -288,12 +291,16 @@ def index(request, course=None, chapter=None, section=None,
     if not settings.COURSEWARE_ENABLED:
         return redirect('/')
 
-    course = clean(get_course(request, course))
-    if not multicourse_settings.is_valid_course(course):
-        return redirect('/')
+    # course = clean(get_course(request, course))
+    # if not multicourse_settings.is_valid_course(course):
+    #     return redirect('/')
+    try:
+        course = settings.COURSES_BY_ID[course_id]
+    except KeyError:
+        raise Http404("Course not found")
 
     # keep track of current course being viewed in django's request.session
-    request.session['coursename'] = course
+    request.session['coursename'] = course.title
 
     chapter = clean(chapter)
     section = clean(section)
@@ -301,7 +308,8 @@ def index(request, course=None, chapter=None, section=None,
     context = {
         'csrf': csrf(request)['csrf_token'],
         'accordion': render_accordion(request, course, chapter, section),
-        'COURSE_TITLE': multicourse_settings.get_course_title(course),
+        'COURSE_TITLE': course.title,
+        'course': course,
         'init': '',
         'content': ''
     }
