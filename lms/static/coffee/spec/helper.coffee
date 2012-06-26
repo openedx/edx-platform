@@ -1,14 +1,14 @@
 jasmine.getFixtures().fixturesPath = "/_jasmine/fixtures/"
 
 jasmine.stubbedMetadata =
-  abc123:
-    id: 'abc123'
-    duration: 100
-  def456:
-    id: 'def456'
+  slowerSpeedYoutubeId:
+    id: 'slowerSpeedYoutubeId'
+    duration: 300
+  normalSpeedYoutubeId:
+    id: 'normalSpeedYoutubeId'
     duration: 200
   bogus:
-    duration: 300
+    duration: 100
 
 jasmine.stubbedCaption =
   start: [0, 10000, 20000, 30000]
@@ -49,7 +49,7 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   loadFixtures 'video.html'
   jasmine.stubRequests()
   YT.Player = undefined
-  context.video = new Video 'example', '.75:abc123,1.0:def456'
+  context.video = new Video 'example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
   jasmine.stubYoutubePlayer()
   if createPlayer
     return new VideoPlayer(video: context.video)
