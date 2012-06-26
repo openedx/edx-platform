@@ -79,14 +79,15 @@ class @Problem
     target = "display_#{element.id.replace(/^input_/, '')}"
 
     if jax = MathJax.Hub.getAllJax(target)[0]
-      MathJax.Hub.Queue ['Text', jax, $(element).val()]
+      MathJax.Hub.Queue ['Text', jax, $(element).val()],
+        [@updateMathML, jax, element]
 
-      try
-        output = jax.root.toMathML ''
-        $("##{element.id}_dynamath").val(output)
-      catch exception
-        throw exception unless exception.restart
-        MathJax.Callback.After [@refreshMath, jax], exception.restart
+  updateMathML: (jax, element) =>
+    try
+      $("##{element.id}_dynamath").val(jax.root.toMathML '')
+    catch exception
+      throw exception unless exception.restart
+      MathJax.Callback.After [@refreshMath, jax], exception.restart
 
   refreshAnswers: =>
     @$('input.schematic').each (index, element) ->

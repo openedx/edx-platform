@@ -52,8 +52,11 @@ describe 'Problem', ->
     it 'bind the math input', ->
       expect($('input.math')).toHandleWith 'keyup', @problem.refreshMath
 
-    it 'display the math input', ->
-      expect(@stubbedJax.root.toMathML).toHaveBeenCalled()
+    it 'replace math content on the page', ->
+      expect(MathJax.Hub.Queue.mostRecentCall.args).toEqual [
+        ['Text', @stubbedJax, ''],
+        [@problem.updateMathML, @stubbedJax, $('#input_example_1').get(0)]
+      ]
 
   describe 'render', ->
     beforeEach ->
@@ -238,23 +241,29 @@ describe 'Problem', ->
   describe 'refreshMath', ->
     beforeEach ->
       @problem = new Problem 1, '/problem/url/'
-      @stubbedJax.root.toMathML.andReturn '<MathML>'
       $('#input_example_1').val 'E=mc^2'
+      @problem.refreshMath target: $('#input_example_1').get(0)
+
+    it 'should queue the conversion and MathML element update', ->
+      expect(MathJax.Hub.Queue).toHaveBeenCalledWith ['Text', @stubbedJax, 'E=mc^2'],
+        [@problem.updateMathML, @stubbedJax, $('#input_example_1').get(0)]
+
+  describe 'updateMathML', ->
+    beforeEach ->
+      @problem = new Problem 1, '/problem/url/'
+      @stubbedJax.root.toMathML.andReturn '<MathML>'
 
     describe 'when there is no exception', ->
       beforeEach ->
-        @problem.refreshMath target: $('#input_example_1').get(0)
+        @problem.updateMathML @stubbedJax, $('#input_example_1').get(0)
 
-      it 'should convert and display the MathML object', ->
-        expect(MathJax.Hub.Queue).toHaveBeenCalledWith ['Text', @stubbedJax, 'E=mc^2']
-
-      it 'should display debug output in hidden div', ->
+      it 'convert jax to MathML', ->
         expect($('#input_example_1_dynamath')).toHaveValue '<MathML>'
 
     describe 'when there is an exception', ->
       beforeEach ->
         @stubbedJax.root.toMathML.andThrow {restart: true}
-        @problem.refreshMath target: $('#input_example_1').get(0)
+        @problem.updateMathML @stubbedJax, $('#input_example_1').get(0)
 
       it 'should queue up the exception', ->
         expect(MathJax.Callback.After).toHaveBeenCalledWith [@problem.refreshMath, @stubbedJax], true
