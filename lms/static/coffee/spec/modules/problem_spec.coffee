@@ -13,6 +13,7 @@ describe 'Problem', ->
     spyOn($.fn, 'load').andCallFake (url, callback) ->
       $(@).html readFixtures('problem_content.html')
       callback()
+    jasmine.stubRequests()
 
   describe 'constructor', ->
     beforeEach ->
@@ -20,12 +21,6 @@ describe 'Problem', ->
 
     it 'set the element', ->
       expect(@problem.element).toBe '#problem_1'
-
-    it 'set the content url', ->
-      expect(@problem.content_url).toEqual '/problem/url/problem_get?id=1'
-
-    it 'render the content', ->
-      expect($.fn.load).toHaveBeenCalledWith @problem.content_url, @problem.bind
 
   describe 'bind', ->
     beforeEach ->
@@ -77,12 +72,19 @@ describe 'Problem', ->
         expect(@problem.bind).toHaveBeenCalled()
 
     describe 'with no content given', ->
+      beforeEach ->
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+          callback html: "Hello World"
+        @problem.render()
+
       it 'load the content via ajax', ->
-        expect($.fn.load).toHaveBeenCalledWith @problem.content_url, @bind
+        expect(@problem.element.html()).toEqual 'Hello World'
+
+      it 're-bind the content', ->
+        expect(@problem.bind).toHaveBeenCalled()
 
   describe 'check', ->
     beforeEach ->
-      jasmine.stubRequests()
       @problem = new Problem 1, '/problem/url/'
       @problem.answers = 'foo=1&bar=2'
 
@@ -116,7 +118,6 @@ describe 'Problem', ->
 
   describe 'reset', ->
     beforeEach ->
-      jasmine.stubRequests()
       @problem = new Problem 1, '/problem/url/'
 
     it 'log the problem_reset event', ->
@@ -130,13 +131,13 @@ describe 'Problem', ->
       expect($.postWithPrefix).toHaveBeenCalledWith '/modx/problem/1/problem_reset', { id: 1 }, jasmine.any(Function)
 
     it 'render the returned content', ->
-      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback("Reset!")
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        callback html: "Reset!"
       @problem.reset()
       expect(@problem.element.html()).toEqual 'Reset!'
 
   describe 'show', ->
     beforeEach ->
-      jasmine.stubRequests()
       @problem = new Problem 1, '/problem/url/'
       @problem.element.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
 
@@ -154,18 +155,19 @@ describe 'Problem', ->
         expect($.postWithPrefix).toHaveBeenCalledWith '/modx/problem/1/problem_show', jasmine.any(Function)
 
       it 'show the answers', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback('1_1': 'One', '1_2': 'Two')
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+          callback answers: '1_1': 'One', '1_2': 'Two'
         @problem.show()
         expect($('#answer_1_1')).toHaveHtml 'One'
         expect($('#answer_1_2')).toHaveHtml 'Two'
 
       it 'toggle the show answer button', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback({})
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect($('.show')).toHaveValue 'Hide Answer'
 
       it 'add the showed class to element', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback({})
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect(@problem.element).toHaveClass 'showed'
 
@@ -179,7 +181,8 @@ describe 'Problem', ->
           '''
 
         it 'set the correct_answer attribute on the choice', ->
-          spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback('1_1': [2, 3])
+          spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+            callback answers: '1_1': [2, 3]
           @problem.show()
           expect($('label[for="input_1_1_1"]')).not.toHaveAttr 'correct_answer', 'true'
           expect($('label[for="input_1_1_2"]')).toHaveAttr 'correct_answer', 'true'
@@ -214,7 +217,6 @@ describe 'Problem', ->
 
   describe 'save', ->
     beforeEach ->
-      jasmine.stubRequests()
       @problem = new Problem 1, '/problem/url/'
       @problem.answers = 'foo=1&bar=2'
 
