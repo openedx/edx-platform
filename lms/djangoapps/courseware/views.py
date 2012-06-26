@@ -88,7 +88,7 @@ def render_accordion(request, course, chapter, section):
 
         Returns (initialization_javascript, content)'''
     if not course:
-        course = "6.002 Spring 2012"
+        course = "edx4edx"
 
     toc = content_parser.toc_from_xml(
         content_parser.course_file(request.user, course), chapter, section)
@@ -163,7 +163,7 @@ def get_course(request, course):
 
     if course==None:
         if not settings.ENABLE_MULTICOURSE:
-            course = "6.002 Spring 2012"
+            course = "edx4edx"
         elif 'coursename' in request.session:
             course = request.session['coursename']
         else:
