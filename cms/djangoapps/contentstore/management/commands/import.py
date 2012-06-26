@@ -39,8 +39,7 @@ class Command(BaseCommand):
                     if not xml_data.get('name'):
                         global unnamed_modules
                         unnamed_modules += 1
-                        xml_data.set('name', 'Unnamed module %d' % unnamed_modules)
-
+                        xml_data.set('name', '{tag}_{count}'.format(tag=xml_data.tag, count=unnamed_modules))
 
                     module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, RawDescriptor)
                     keystore().create_item(module.url)
