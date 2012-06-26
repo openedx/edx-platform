@@ -49,18 +49,15 @@ if settings.PERFSTATS:
 
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
-        url(r'^courseware/$', 'courseware.views.index', name="courseware"),
         url(r'^wiki/', include('simplewiki.urls')),
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)$', 'courseware.views.index'),
-        url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
+        # url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
         url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index', name="courseware_chapter"),
         url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index', name="courseware_course"),
         url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
         url(r'^section/(?P<section>[^/]*)/$', 'courseware.views.render_section'),
         url(r'^modx/(?P<module>[^/]*)/(?P<id>[^/]*)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
-        url(r'^profile$', 'courseware.views.profile'),
-        url(r'^profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
         url(r'^change_setting$', 'student.views.change_setting'),
         url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
         url(r'^book/(?P<page>[^/]*)$', 'staticbook.views.index'), 
@@ -75,8 +72,12 @@ if settings.COURSEWARE_ENABLED:
 
         # Multicourse related:
         url(r'^courses$', 'courseware.views.courses'),
-        url(r'^courses/(?P<course_id>[^/]*)/info$', 'util.views.info'),
-        url(r'^courses/(?P<course_id>[^/]*)/courseware$', 'courseware.views.index'),
+        url(r'^courses/(?P<course_id>[^/]*)/info$', 'util.views.info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]*)/book$', 'staticbook.views.index', name="book"), 
+        url(r'^courses/(?P<course_id>[^/]*)/courseware/?$', 'courseware.views.index', name="courseware"),
+        url(r'^courses/(?P<course_id>[^/]*)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]*)/profile$', 'courseware.views.profile', name="profile"),
+        url(r'^courses/(?P<course_id>[^/]*)/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
 
     )
 
