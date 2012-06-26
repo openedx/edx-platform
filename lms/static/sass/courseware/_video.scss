@@ -442,6 +442,8 @@ section.course-content {
       max-height: 460px;
       overflow: auto;
       width: flex-grid(3, 9);
+      padding-left: 0;
+      list-style: none;
 
       li {
         border: 0;
