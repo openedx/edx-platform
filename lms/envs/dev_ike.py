@@ -21,6 +21,12 @@ if 'eecs1' in socket.gethostname():
     MITX_ROOT_URL = '/mitx2'
 
 #-----------------------------------------------------------------------------
+# edx4edx content server
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_BACKEND = 'django_ses.SESBackend'
+
+#-----------------------------------------------------------------------------
 # ichuang
 
 DEBUG = True
