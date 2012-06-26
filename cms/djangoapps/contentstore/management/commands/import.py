@@ -6,9 +6,10 @@ from django.core.management.base import BaseCommand
 from keystore.django import keystore
 from raw_module import RawDescriptor
 from lxml import etree
+from fs.osfs import OSFS
 
 from path import path
-from x_module import XModuleDescriptor, DescriptorSystem
+from x_module import XModuleDescriptor, XMLParsingSystem
 
 unnamed_modules = 0
 
@@ -24,27 +25,29 @@ class Command(BaseCommand):
         data_dir = path(data_dir)
         with open(data_dir / "course.xml") as course_file:
 
-            system = DescriptorSystem(keystore().get_item)
+            class ImportSystem(XMLParsingSystem):
+                def __init__(self):
+                    self.load_item = keystore().get_item
+                    self.fs = OSFS(data_dir)
 
-            def process_xml(xml):
-                try:
-                    xml_data = etree.fromstring(xml)
-                except:
-                    print xml
-                    raise
-                if not xml_data.get('name'):
-                    global unnamed_modules
-                    unnamed_modules += 1
-                    xml_data.set('name', 'Unnamed module %d' % unnamed_modules)
+                def process_xml(self, xml):
+                    try:
+                        xml_data = etree.fromstring(xml)
+                    except:
+                        print xml
+                        raise
+                    if not xml_data.get('name'):
+                        global unnamed_modules
+                        unnamed_modules += 1
+                        xml_data.set('name', 'Unnamed module %d' % unnamed_modules)
 
 
-                module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), system, org, course, RawDescriptor)
-                keystore().create_item(module.url)
-                if 'data' in module.definition:
-                    keystore().update_item(module.url, module.definition['data'])
-                if 'children' in module.definition:
-                    keystore().update_children(module.url, module.definition['children'])
-                return module.url
+                    module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, RawDescriptor)
+                    keystore().create_item(module.url)
+                    if 'data' in module.definition:
+                        keystore().update_item(module.url, module.definition['data'])
+                    if 'children' in module.definition:
+                        keystore().update_children(module.url, module.definition['children'])
+                    return module
 
-            system.process_xml = process_xml
-            system.process_xml(course_file.read())
+            ImportSystem().process_xml(course_file.read())

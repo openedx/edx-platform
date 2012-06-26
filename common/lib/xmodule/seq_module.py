@@ -123,7 +123,7 @@ class SequenceDescriptor(MakoModuleDescriptor):
         xml_object = etree.fromstring(xml_data)
 
         children = [
-            system.process_xml(etree.tostring(child_module))
+            system.process_xml(etree.tostring(child_module)).url
             for child_module in xml_object
         ]
 
