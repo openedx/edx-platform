@@ -35,6 +35,9 @@ describe 'VideoCaption', ->
       it 'bind player resize event', ->
         expect($(@player)).toHandleWith 'resize', @caption.onWindowResize
 
+      it 'bind player seek event', ->
+        expect($(@player)).toHandleWith 'seek', @caption.onUpdatePlayTime
+
       it 'bind player updatePlayTime event', ->
         expect($(@player)).toHandleWith 'updatePlayTime', @caption.onUpdatePlayTime
 
