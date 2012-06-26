@@ -13,6 +13,7 @@ setup(
     # for a description of entry_points
     entry_points={
         'xmodule.v1': [
+            "section = translation_module:SemanticSectionDescriptor",
             "chapter = seq_module:SequenceDescriptor",
             "course = seq_module:SequenceDescriptor",
             "html = html_module:HtmlModuleDescriptor",

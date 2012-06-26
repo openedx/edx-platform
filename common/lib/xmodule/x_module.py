@@ -213,6 +213,7 @@ class XModuleDescriptor(Plugin):
         on the contents of xml_data.
 
         xml_data must be a string containing valid xml
+        system is an XMLParsingSystem
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
@@ -230,7 +231,7 @@ class XModuleDescriptor(Plugin):
 
         xml_data: A string of xml that will be translated into data and children for
             this module
-        system: An XModuleSystem for interacting with external resources
+        system is an XMLParsingSystem
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
@@ -330,11 +331,20 @@ class XModuleDescriptor(Plugin):
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item, process_xml=None):
+    def __init__(self, load_item):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
-        process_xml: Takes an xml string, and returns the url of the XModuleDescriptor created from that xml
         """
 
         self.load_item = load_item
+
+
+class XMLParsingSystem(DescriptorSystem):
+    def __init__(self, load_item, process_xml, fs):
+        """
+        process_xml: Takes an xml string, and returns the the XModuleDescriptor created from that xml
+        fs: A Filesystem object that contains all of the xml resources needed to parse
+            the course
+        """
         self.process_xml = process_xml
+        self.fs = fs
