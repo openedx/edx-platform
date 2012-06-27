@@ -11,7 +11,9 @@ if settings.DEBUG:
     admin.autodiscover()
 
 urlpatterns = ('',
-    url(r'^$', 'student.views.index'), # Main marketing page, or redirect to courseware
+    url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
+    url(r'^about$', 'student.views.about', name="about"),
+    url(r'^jobs$', 'student.views.jobs', name="jobs"),
     url(r'^dashboard$', 'student.views.dashboard'),
     url(r'^course_info$', 'student.views.course_info'),
     url(r'^change_email$', 'student.views.change_email_request'),
