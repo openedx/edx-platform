@@ -88,7 +88,7 @@ class @Sequence
     if @position != new_position
       if @position != undefined
         @mark_visited @position
-        $.postWithPrefix "/modx/#{@tag}/#{@id}/goto_position", position: new_position
+        $.postWithPrefix "/modx/#{@id}/goto_position", position: new_position
         
       @mark_active new_position
       @$('#seq_content').html @elements[new_position - 1].content

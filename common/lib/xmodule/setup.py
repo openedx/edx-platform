@@ -19,9 +19,10 @@ setup(
             "section = xmodule.translation_module:SemanticSectionDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",
+            "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
-            "videosequence = xmodule.seq_module:SequenceDescriptor",
             "video = xmodule.video_module:VideoDescriptor",
+            "videosequence = xmodule.seq_module:SequenceDescriptor",
         ]
     }
 )

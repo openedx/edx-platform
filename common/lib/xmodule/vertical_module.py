@@ -10,6 +10,9 @@ class_priority = ['video', 'problem']
 class VerticalModule(XModule):
     ''' Layout module for laying out submodules vertically.'''
     def get_html(self):
+        if self.contents is None:
+            self.contents = [child.get_html() for child in self.get_display_items()]
+
         return self.system.render_template('vert_module.html', {
             'items': self.contents
         })
@@ -31,7 +34,7 @@ class VerticalModule(XModule):
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
-        self.contents = [child.get_html() for child in self.get_display_items()]
+        self.contents = None
 
 
 class VerticalDescriptor(SequenceDescriptor):

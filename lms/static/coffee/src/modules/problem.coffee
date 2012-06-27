@@ -1,6 +1,6 @@
 class @Problem
-  constructor: (@id, url) ->
-    @element = $("#problem_#{id}")
+  constructor: (@id, @element_id, url) ->
+    @element = $("##{element_id}")
     @render()
 
   $: (selector) ->
@@ -26,13 +26,13 @@ class @Problem
       @element.html(content)
       @bind()
     else
-      $.postWithPrefix "/modx/problem/#{@id}/problem_get", (response) =>
+      $.postWithPrefix "/modx/#{@id}/problem_get", (response) =>
         @element.html(response.html)
         @bind()
 
   check: =>
     Logger.log 'problem_check', @answers
-    $.postWithPrefix "/modx/problem/#{@id}/problem_check", @answers, (response) =>
+    $.postWithPrefix "/modx/#{@id}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
           @render(response.contents)
@@ -42,14 +42,14 @@ class @Problem
 
   reset: =>
     Logger.log 'problem_reset', @answers
-    $.postWithPrefix "/modx/problem/#{@id}/problem_reset", id: @id, (response) =>
+    $.postWithPrefix "/modx/#{@id}/problem_reset", id: @id, (response) =>
         @render(response.html)
         @updateProgress response
 
   show: =>
     if !@element.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
-      $.postWithPrefix "/modx/problem/#{@id}/problem_show", (response) =>
+      $.postWithPrefix "/modx/#{@id}/problem_show", (response) =>
         answers = response.answers
         $.each answers, (key, value) =>
           if $.isArray(value)
@@ -69,7 +69,7 @@ class @Problem
 
   save: =>
     Logger.log 'problem_save', @answers
-    $.postWithPrefix "/modx/problem/#{@id}/problem_save", @answers, (response) =>
+    $.postWithPrefix "/modx/#{@id}/problem_save", @answers, (response) =>
       if response.success
         alert 'Saved'
       @updateProgress response
@@ -94,4 +94,4 @@ class @Problem
       element.schematic.update_value()
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
-    @answers = @$("[id^=input_#{@id}_]").serialize()
+    @answers = @$("[id^=input_#{@element_id}_]").serialize()

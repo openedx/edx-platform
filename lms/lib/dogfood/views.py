@@ -174,7 +174,7 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
         module = 'problem'
         xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
     
-        ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
+        ajax_url = settings.MITX_ROOT_URL + '/modx/'+id+'/'
     
         # Create the module (instance of capa_module.Module)
         system = I4xSystem(track_function = make_track_function(request), 
