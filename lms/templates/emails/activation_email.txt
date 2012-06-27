@@ -11,4 +11,4 @@ this address into your web browser's address bar:
 
 If you didn't request this, you don't need to do anything; you won't
 receive any more email from us. Please do not reply to this e-mail; if
-you require assistance, check the help section of the MITx web site.
+you require assistance, check the help section of the edX web site.
