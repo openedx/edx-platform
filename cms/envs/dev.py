@@ -8,9 +8,13 @@ TEMPLATE_DEBUG = DEBUG
 
 KEYSTORE = {
     'default': {
-        'host': 'localhost',
-        'db': 'mongo_base',
-        'collection': 'key_store',
+        'ENGINE': 'keystore.mongo.MongoModuleStore',
+        'OPTIONS': {
+            'default_class': 'xmodule.raw_module.RawDescriptor',
+            'host': 'localhost',
+            'db': 'mongo_base',
+            'collection': 'key_store',
+        }
     }
 }
 

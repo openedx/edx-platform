@@ -1,7 +1,9 @@
 import pymongo
+from importlib import import_module
+from xmodule.x_module import XModuleDescriptor, DescriptorSystem
+
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
-from xmodule.x_module import XModuleDescriptor, DescriptorSystem
 
 
 class MongoModuleStore(ModuleStore):
@@ -16,7 +18,10 @@ class MongoModuleStore(ModuleStore):
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
-        self.default_class = default_class
+
+        module_path, _, class_name = default_class.rpartition('.')
+        class_ = getattr(import_module(module_path), class_name)
+        self.default_class = class_
 
     def get_item(self, location):
         """
@@ -29,8 +34,6 @@ class MongoModuleStore(ModuleStore):
         If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
-        default_class: An XModuleDescriptor subclass to use if no plugin matching the
-            location is found
         """
 
         query = {}

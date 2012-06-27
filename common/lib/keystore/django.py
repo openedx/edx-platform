@@ -6,9 +6,9 @@ Passes settings.KEYSTORE as kwargs to MongoModuleStore
 
 from __future__ import absolute_import
 
+from importlib import import_module
+
 from django.conf import settings
-from .mongo import MongoModuleStore
-from raw_module import RawDescriptor
 
 _KEYSTORES = {}
 
@@ -17,9 +17,10 @@ def keystore(name='default'):
     global _KEYSTORES
 
     if name not in _KEYSTORES:
-        # TODO (cpennington): Load the default class from a string
-        _KEYSTORES[name] = MongoModuleStore(
-            default_class=RawDescriptor,
-            **settings.KEYSTORE[name])
+        class_path = settings.KEYSTORE[name]['ENGINE']
+        module_path, _, class_name = class_path.rpartition('.')
+        class_ = getattr(import_module(module_path), class_name)
+        _KEYSTORES[name] = class_(
+            **settings.KEYSTORE[name]['OPTIONS'])
 
     return _KEYSTORES[name]
