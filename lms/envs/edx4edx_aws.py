@@ -8,7 +8,7 @@ COURSE_TITLE = "edx4edx: edX Author Course"
 ### Dark code. Should be enabled in local settings for devel. 
 
 ENABLE_MULTICOURSE = True # set to False to disable multicourse display (see lib.util.views.mitxhome)
-QUICKEDIT = False
+QUICKEDIT = True
 
 ###
 
