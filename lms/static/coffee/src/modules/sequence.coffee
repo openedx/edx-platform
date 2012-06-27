@@ -1,6 +1,6 @@
 class @Sequence
-  constructor: (@id, @elements, @tag, position) ->
-    @element = $("#sequence_#{@id}")
+  constructor: (@id, @element_id, @elements, @tag, position) ->
+    @element = $("#sequence_#{@element_id}")
     @buildNavigation()
     @initProgress()
     @bind()

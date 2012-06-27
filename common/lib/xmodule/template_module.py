@@ -31,18 +31,11 @@ class Module(XModule):
     Renders to::
         More information given in <a href="/book/234">the text</a>
     """
-    def get_state(self):
-        return json.dumps({})
-
-    @classmethod
-    def get_xml_tags(c):
-        return ['customtag']
-
     def get_html(self):
         return self.html
 
-    def __init__(self, system, xml, item_id, state=None):
-        XModule.__init__(self, system, xml, item_id, state)
+    def __init__(self, system, xml, item_id, instance_state=None, shared_state=None):
+        XModule.__init__(self, system, xml, item_id, instance_state, shared_state)
         xmltree = etree.fromstring(xml)
         filename = xmltree.find('impl').text
         params = dict(xmltree.items())

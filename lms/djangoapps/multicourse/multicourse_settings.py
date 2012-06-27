@@ -31,11 +31,13 @@ if hasattr(settings,'COURSE_SETTINGS'):    	# in the future, this could be repla
 elif hasattr(settings,'COURSE_NAME'):		# backward compatibility
     COURSE_SETTINGS = {settings.COURSE_NAME: {'number': settings.COURSE_NUMBER,
                                               'title':  settings.COURSE_TITLE,
+                                              'location': settings.COURSE_LOCATION,
                                               },
                        }
 else:						# default to 6.002_Spring_2012
     COURSE_SETTINGS = {'6.002_Spring_2012': {'number': '6.002x',
                                               'title':  'Circuits and Electronics',
+                                              'location': 'i4x://edx/6002xs12/course/6.002 Spring 2012',
                                               },
                        }
 
@@ -51,31 +53,47 @@ def get_coursename_from_request(request):
 
 def get_course_settings(coursename):
     if not coursename:
-        if hasattr(settings,'COURSE_DEFAULT'):
+        if hasattr(settings, 'COURSE_DEFAULT'):
             coursename = settings.COURSE_DEFAULT
         else:
             coursename = '6.002_Spring_2012'
-    if coursename in COURSE_SETTINGS: return COURSE_SETTINGS[coursename]
-    coursename = coursename.replace(' ','_')
-    if coursename in COURSE_SETTINGS: return COURSE_SETTINGS[coursename]
+    if coursename in COURSE_SETTINGS:
+        return COURSE_SETTINGS[coursename]
+    coursename = coursename.replace(' ', '_')
+    if coursename in COURSE_SETTINGS:
+        return COURSE_SETTINGS[coursename]
     return None
+
 
 def is_valid_course(coursename):
     return get_course_settings(coursename) != None
 
-def get_course_property(coursename,property):
+
+def get_course_property(coursename, property):
     cs = get_course_settings(coursename)
-    if not cs: return ''	# raise exception instead?
-    if property in cs: return cs[property]
-    return ''	# default
+
+    # raise exception instead?
+    if not cs:
+        return ''
+
+    if property in cs:
+        return cs[property]
+
+    # default
+    return ''
+
 
 def get_course_xmlpath(coursename):
-    return get_course_property(coursename,'xmlpath')
+    return get_course_property(coursename, 'xmlpath')
+
 
 def get_course_title(coursename):
-    return get_course_property(coursename,'title')
+    return get_course_property(coursename, 'title')
+
 
 def get_course_number(coursename):
-    return get_course_property(coursename,'number')
-    
+    return get_course_property(coursename, 'number')
 
+
+def get_course_location(coursename):
+    return get_course_property(coursename, 'location')
