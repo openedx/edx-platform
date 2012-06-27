@@ -31,26 +31,25 @@ class Command(BaseCommand):
 
             class ImportSystem(XMLParsingSystem):
                 def __init__(self):
-                    self.load_item = keystore().get_item
-                    self.fs = OSFS(data_dir)
+                    def process_xml(xml):
+                        try:
+                            xml_data = etree.fromstring(xml)
+                        except:
+                            raise CommandError("Unable to parse xml: " + xml)
 
-                def process_xml(self, xml):
-                    try:
-                        xml_data = etree.fromstring(xml)
-                    except:
-                        raise CommandError("Unable to parse xml: " + xml)
+                        if not xml_data.get('name'):
+                            global unnamed_modules
+                            unnamed_modules += 1
+                            xml_data.set('name', '{tag}_{count}'.format(tag=xml_data.tag, count=unnamed_modules))
 
-                    if not xml_data.get('name'):
-                        global unnamed_modules
-                        unnamed_modules += 1
-                        xml_data.set('name', '{tag}_{count}'.format(tag=xml_data.tag, count=unnamed_modules))
+                        module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, RawDescriptor)
+                        keystore().create_item(module.url)
+                        if 'data' in module.definition:
+                            keystore().update_item(module.url, module.definition['data'])
+                        if 'children' in module.definition:
+                            keystore().update_children(module.url, module.definition['children'])
+                        return module
 
-                    module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, RawDescriptor)
-                    keystore().create_item(module.url)
-                    if 'data' in module.definition:
-                        keystore().update_item(module.url, module.definition['data'])
-                    if 'children' in module.definition:
-                        keystore().update_children(module.url, module.definition['children'])
-                    return module
+                    XMLParsingSystem.__init__(self, keystore().get_item, OSFS(data_dir), process_xml)
 
             ImportSystem().process_xml(course_file.read())
