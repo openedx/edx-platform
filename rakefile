@@ -115,14 +115,11 @@ task :package do
         set -x
 
         chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
-        chmod +x #{INSTALL_DIR_PATH}/collect_static_resources
 
         service gunicorn stop || echo "Unable to stop gunicorn. Continuing"
         rm -f #{LINK_PATH}
         ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
         chown makeitso:makeitso #{LINK_PATH}
-
-        /opt/wwc/mitx/collect_static_resources
 
         # Delete mako temp files
         rm -rf /tmp/tmp*mako
