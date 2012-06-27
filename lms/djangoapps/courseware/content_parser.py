@@ -138,12 +138,16 @@ def user_groups(user):
     # return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
 
 def replace_custom_tags(course, tree):
-    tags = os.listdir(course.path+'/custom_tags')
-    for tag in tags:
-        for element in tree.iter(tag):
-            element.tag = 'customtag'
-            impl = etree.SubElement(element, 'impl')
-            impl.text = tag
+    try:
+        tags = os.listdir(course.path+'/custom_tags')
+        for tag in tags:
+            for element in tree.iter(tag):
+                element.tag = 'customtag'
+                impl = etree.SubElement(element, 'impl')
+                impl.text = tag
+    except os.error:
+        # The directory must not exist. This is okay, as it is optional. If it is empty, git has trouble tracking it
+        pass
 
 def course_xml_process(course, tree):
     ''' Do basic pre-processing of an XML tree. Assign IDs to all
