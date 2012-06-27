@@ -16,7 +16,7 @@ form {
     @include border-radius(3px);
     @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1));
     @include box-sizing(border-box);
-    font: normal italic 1.2rem/1.6rem $serif;
+    font: italic 1.2rem/1.6rem $serif;
     height: 35px;
     @include inline-block;
     padding: 5px 12px;
@@ -36,7 +36,7 @@ form {
   input[type="submit"] {
     @include button(shiny, $blue);
     @include border-radius(3px);
-    font: normal italic 1.2rem/1.6rem $serif;
+    font: italic 1.2rem/1.6rem $serif;
     height: 35px;
     @include inline-block;
     text-transform: uppercase;

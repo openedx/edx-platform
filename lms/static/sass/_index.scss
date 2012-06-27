@@ -88,7 +88,7 @@
             @include box-sizing(border-box);
             @include border-radius(3px);
             @include inline-block;
-            font: normal italic 1.2rem/1.6rem $serif;
+            font: italic 1.2rem/1.6rem $serif;
             padding: 15px 0px;
             text-transform: uppercase;
             text-align: center;
