@@ -63,6 +63,8 @@ class XModule(object):
 
         See the HTML module for a simple example
     '''
+    icon_class = 'other'
+
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         '''
         Construct a new xmodule
@@ -120,7 +122,7 @@ class XModule(object):
         '''
         Return a class identifying this module in the context of an icon
         '''
-        return 'other'
+        return self.icon_class
 
     ### Functions used in the LMS
 

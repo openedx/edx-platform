@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 
 class VideoModule(XModule):
     video_time = 0
+    icon_class = 'video'
 
     def handle_ajax(self, dispatch, get):
         '''

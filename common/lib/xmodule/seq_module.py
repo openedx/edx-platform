@@ -61,8 +61,6 @@ class SequenceModule(XModule):
                 'type': child.get_icon_class(),
             })
 
-        print json.dumps(contents, indent=4)
-
         # Split </script> tags -- browsers handle this as end
         # of script, even if it occurs mid-string. Do this after json.dumps()ing
         # so that we can be sure of the quotations being used
