@@ -21,8 +21,9 @@ html, body {
 
 h1, h2, h3, h4, h5, h6 {
   color: $base-font-color;
-  font: normal 1.6rem/2rem $serif;
+  font: normal 1.4rem/2rem $serif;
   margin: 0px;
+  -webkit-font-smoothing: antialiased;
 }
 
 p {
@@ -39,9 +40,10 @@ a:link, a:visited {
   color: $blue;
   font: normal 1rem/1.8rem $sans-serif;
   text-decoration: none;
+  @include transition(all, 0.1s, linear);
 
   &:hover {
-    color: lighten($blue, 10%);
+    color: $base-font-color;
   }
 }
 

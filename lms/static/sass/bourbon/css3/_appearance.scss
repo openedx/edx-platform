@@ -1,3 +1,7 @@
 @mixin appearance ($value) {
-  @include prefixer(appearance, $value, webkit, moz, ms, o);
+  -webkit-appearance: $value;
+     -moz-appearance: $value;
+      -ms-appearance: $value;
+       -o-appearance: $value;
+          appearance: $value;
 }
