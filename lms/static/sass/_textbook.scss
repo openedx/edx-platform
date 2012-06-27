@@ -62,6 +62,8 @@ div.book-wrapper {
         @extend .clearfix;
 
         li {
+          background-color: darken($cream, 4%);
+
           &.last {
             display: block;
             float: left;
@@ -76,6 +78,10 @@ div.book-wrapper {
           &.next {
             display: block;
             float: right;
+          }
+
+          &:hover {
+            background: none;
           }
         }
       }

@@ -2,63 +2,12 @@ $fg-column: 70px;
 $fg-gutter: 26px;
 $fg-max-columns: 12;
 $body-font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+$body-font-size: 14px;
+$body-line-height: 20px;
 
+// Base html styles
 html {
   height: 100%;
-}
-
-body {
-  @include clearfix();
-  height: 100%;
-  font: 14px $body-font-family;
-
-  > section {
-    display: table;
-    width: 100%;
-  }
-
-  > header {
-    background: #000;
-    color: #fff;
-    display: block;
-    float: none;
-    padding: 6px 20px;
-    width: 100%;
-    @include box-sizing(border-box);
-
-    nav {
-      @include clearfix;
-
-      h2 {
-        font-size: 14px;
-        text-transform: uppercase;
-        float: left;
-      }
-
-      ul {
-        float: left;
-
-        &.user-nav {
-          float: right;
-        }
-
-        li {
-          @include inline-block();
-          margin-left: 15px;
-        }
-      }
-    }
-  }
-
-  &.content {
-    section.main-content {
-      border-left: 2px solid #000;
-      @include box-sizing(border-box);
-      width: flex-grid(9);
-      float: left;
-      @include box-shadow( -2px 0 3px #ddd );
-    }
-  }
 }
 
 a {
@@ -77,6 +26,13 @@ input[type="submit"], .button {
   padding: 6px;
 }
 
+textarea {
+  @include box-sizing(border-box);
+  display: block;
+  width: 100%;
+}
+
+// Extends
 .new-module {
   position: relative;
 
@@ -110,4 +66,18 @@ input[type="submit"], .button {
   text-indent: -9999px;
   display: block;
   float: right;
+}
+
+.wip {
+  outline: 1px solid #f00 !important;
+  position: relative;
+
+  &:after {
+   content: "WIP";
+   font-size: 8px;
+   padding: 2px;
+   background: #f00;
+   color: #fff;
+   @include position(absolute, 0px 0px 0 0);
+  }
 }

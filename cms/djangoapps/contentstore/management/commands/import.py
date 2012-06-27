@@ -10,6 +10,7 @@ import os.path
 from StringIO import StringIO
 from mako.template import Template
 from mako.lookup import TemplateLookup
+from collections import defaultdict
 
 from django.core.management.base import BaseCommand
 from keystore.django import keystore
@@ -42,9 +43,7 @@ class Command(BaseCommand):
             # Simple lists
             'chapter': 'Week',
             'course': 'Course',
-            'sequential': 'LectureSequence',
-            'vertical': 'ProblemSet',
-            'section': {
+            'section': defaultdict(lambda: 'Section', {
                 'Lab': 'Lab',
                 'Lecture Sequence': 'LectureSequence',
                 'Homework': 'Homework',
@@ -52,8 +51,13 @@ class Command(BaseCommand):
                 'Video': 'VideoSegment',
                 'Midterm': 'Exam',
                 'Final': 'Exam',
-                None: 'Section',
-            },
+                'Problems': 'ProblemSet',
+            }),
+            'videosequence': 'VideoSequence',
+            'problemset': 'ProblemSet',
+            'vertical': 'Section',
+            'sequential': 'Section',
+            'tab': 'Section',
             # True types
             'video': 'VideoSegment',
             'html': 'HTML',
@@ -78,6 +82,8 @@ class Command(BaseCommand):
                 e.set('url', 'i4x://mit.edu/6002xs12/{category}/{name}'.format(
                     category=category,
                     name=name))
+            else:
+                print "Skipping element with tag", e.tag
 
 
         def handle_skip(e):
@@ -150,6 +156,9 @@ class Command(BaseCommand):
             'sequential': handle_list,
             'vertical': handle_list,
             'section': handle_list,
+            'videosequence': handle_list,
+            'problemset': handle_list,
+            'tab': handle_list,
             # True types
             'video': handle_video,
             'html': handle_html,
