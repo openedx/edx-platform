@@ -38,6 +38,7 @@ MITX_FEATURES = {
     'SAMPLE' : False,
     'USE_DJANGO_PIPELINE' : True,
     'DISPLAY_HISTOGRAMS_TO_STAFF' : True,
+    'REROUTE_ACTIVATION_EMAIL' : False,		# nonempty string = address for all activation emails 
 }
 
 # Used for A/B testing
