@@ -44,6 +44,44 @@ class Course(namedtuple('Course', _FIELDS)):
             log.exception(ex)
             raise CourseInfoLoadError("Could not read course info: {0}:{1}"
                                       .format(type(ex).__name__, ex))
+    
+    
+    
+    def get_about_section(self, section_key):
+        """ 
+        This returns the snippet of html to be rendered on the course about page, given the key for the section.
+        Valid keys:
+        - title
+        - university
+        - number
+        - short_description
+        - description
+        - key_dates (includes start, end, exams, etc)
+        - video
+        - course_staff_short
+        - course_staff_extended
+        - requirements
+        - syllabus
+        - textbook
+        - faq
+        - more_info
+        """
+        
+        if section_key in ['short_description', 'description', 'key_dates', 'video', 'course_staff_short', 'course_staff_extended', 
+                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info']:
+            try:
+                with open(self.path / "about" / section_key + ".html") as htmlFile:
+                    return htmlFile.read()
+            except IOError:
+                return "! About section missing !"
+        elif section_key == "title":
+            return self.title
+        elif section_key == "university":
+            return self.institution
+        elif section_key == "number":
+            return self.number
+            
+        raise KeyError("Invalid about key " + str(section_key))
 
 def load_courses(courses_path):
     """Given a directory of courses, returns a list of Course objects. For the
