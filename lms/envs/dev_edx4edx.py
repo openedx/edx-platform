@@ -24,7 +24,7 @@ if 'eecs1' in socket.gethostname():
 # edx4edx content server
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-MITX_FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'ichuang@mit.edu'
+MITX_FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'ichuang@mitx.mit.edu'
 #EMAIL_BACKEND = 'django_ses.SESBackend'
 
 #-----------------------------------------------------------------------------
