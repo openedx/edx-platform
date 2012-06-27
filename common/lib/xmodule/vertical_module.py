@@ -1,23 +1,10 @@
-import json
-
-from x_module import XModule, XModuleDescriptor
+from xmodule.x_module import XModule
+from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
-from lxml import etree
 
-class ModuleDescriptor(XModuleDescriptor):
-    pass
 
-class Module(XModule):
+class VerticalModule(XModule):
     ''' Layout module for laying out submodules vertically.'''
-    id_attribute = 'id'
-
-    def get_state(self):
-        return json.dumps({ })
-
-    @classmethod
-    def get_xml_tags(c):
-        return ["vertical", "problemset"]
-        
     def get_html(self):
         return self.system.render_template('vert_module.html', {
             'items': self.contents
@@ -30,8 +17,10 @@ class Module(XModule):
         progress = reduce(Progress.add_counts, progresses)
         return progress
 
-    def __init__(self, system, xml, item_id, state=None):
-        XModule.__init__(self, system, xml, item_id, state)
-        xmltree=etree.fromstring(xml)
-        self.contents=[(e.get("name"),self.render_function(e)) \
-                      for e in xmltree]
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+        self.contents = [child.get_html() for child in self.get_display_items()]
+
+
+class VerticalDescriptor(SequenceDescriptor):
+    module_class = VerticalModule

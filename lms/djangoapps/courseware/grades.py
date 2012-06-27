@@ -81,12 +81,12 @@ def grade_sheet(student,coursename=None):
     course = dom.xpath('//course/@name')[0]
     xmlChapters = dom.xpath('//course[@name=$course]/chapter', course=course)
 
-    responses=StudentModule.objects.filter(student=student)
+    responses = StudentModule.objects.filter(student=student)
     response_by_id = {}
     for response in responses:
-        response_by_id[response.module_id] = response
-    
-    
+        response_by_id[response.module_state_key] = response
+
+
     totaled_scores = {}
     chapters=[]
     for c in xmlChapters:
@@ -147,27 +147,39 @@ def grade_sheet(student,coursename=None):
             'grade_summary' : grade_summary}
 
 def get_score(user, problem, cache, coursename=None):
+    """
+    Return the score for a user on a problem
+
+    user: a Student object
+    problem: the xml for the problem
+    cache: a dictionary mapping module_state_key tuples to instantiated StudentModules
+           module_state_key is either the problem_id, or a key used by the problem
+           to share state across instances
+    """
     ## HACK: assumes max score is fixed per problem
-    id = problem.get('id')
+    module_type = problem.tag
+    module_class = xmodule.get_module_class(module_type)
+    module_id = problem.get('id')
+    module_state_key = problem.get(module_class.state_key, module_id)
     correct = 0.0
-    
+
     # If the ID is not in the cache, add the item
-    if id not in cache:
-        module = StudentModule(module_type = 'problem',  # TODO: Move into StudentModule.__init__?
-                               module_id = id,
-                               student = user, 
-                               state = None, 
-                               grade = 0,
-                               max_grade = None,
-                               done = 'i')
-        cache[id] = module
+    if module_state_key not in cache:
+        module = StudentModule(module_type='problem',  # TODO: Move into StudentModule.__init__?
+                               module_state_key=id,
+                               student=user,
+                               state=None,
+                               grade=0,
+                               max_grade=None,
+                               done='i')
+        cache[module_id] = module
 
     # Grab the # correct from cache
     if id in cache:
         response = cache[id]
-        if response.grade!=None:
-            correct=float(response.grade)
-        
+        if response.grade != None:
+            correct = float(response.grade)
+
     # Grab max grade from cache, or if it doesn't exist, compute and save to DB
     if id in cache and response.max_grade is not None:
         total = response.max_grade

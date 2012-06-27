@@ -19,10 +19,12 @@ from django.conf import settings
 
 from student.models import UserProfile
 from student.models import UserTestGroup
+from courseware.models import StudentModuleCache
 from mitxmako.shortcuts import render_to_string
 from util.cache import cache
 from multicourse import multicourse_settings
 import xmodule
+from keystore.django import keystore
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
@@ -103,6 +105,7 @@ def course_xml_process(tree):
     items without. Propagate due dates, grace periods, etc. to child
     items. 
     '''
+    process_includes(tree)
     replace_custom_tags(tree)
     id_tag(tree)
     propogate_downward_tag(tree, "due")
@@ -113,45 +116,32 @@ def course_xml_process(tree):
     return tree
 
 
-def toc_from_xml(dom, active_chapter, active_section):
-    '''
-    Create a table of contents from the course xml.
-
-    Return format:
-    [ {'name': name, 'sections': SECTIONS, 'active': bool}, ... ]
-
-    where SECTIONS is a list
-    [ {'name': name, 'format': format, 'due': due, 'active' : bool}, ...]
-
-    active is set for the section and chapter corresponding to the passed
-    parameters.  Everything else comes from the xml, or defaults to "".
-
-    chapters with name 'hidden' are skipped.
-    '''
-    name = dom.xpath('//course/@name')[0]
-
-    chapters = dom.xpath('//course[@name=$name]/chapter', name=name)
-    ch = list()
-    for c in chapters:
-        if c.get('name') == 'hidden':
-            continue
-        sections = list()
-        for s in dom.xpath('//course[@name=$name]/chapter[@name=$chname]/section',
-                           name=name, chname=c.get('name')):
-            
-            format = s.get("subtitle") if s.get("subtitle") else s.get("format") or ""
-            active = (c.get("name") == active_chapter and
-                      s.get("name") == active_section)
-
-            sections.append({'name': s.get("name") or "", 
-                             'format': format, 
-                             'due': s.get("due") or "",
-                             'active': active})
-            
-        ch.append({'name': c.get("name"), 
-                   'sections': sections,
-                   'active': c.get("name") == active_chapter})
-    return ch
+def process_includes_dir(tree, dir):
+    """
+    Process tree to replace all <include file=""> tags
+    with the contents of the file specified, relative to dir
+    """
+    includes = tree.findall('.//include')
+    for inc in includes:
+        file = inc.get('file')
+        if file is not None:
+            try:
+                ifp = open(os.path.join(dir, file))
+            except Exception:
+                log.exception('Error in problem xml include: %s' % (etree.tostring(inc, pretty_print=True)))
+                log.exception('Cannot find file %s in %s' % (file, dir))
+                raise
+            try:
+                # read in and convert to XML
+                incxml = etree.XML(ifp.read())
+            except Exception:
+                log.exception('Error in problem xml include: %s' % (etree.tostring(inc, pretty_print=True)))
+                log.exception('Cannot parse XML in %s' % (file))
+                raise
+            # insert  new XML into tree in place of inlcude
+            parent = inc.getparent()
+            parent.insert(parent.index(inc), incxml)
+            parent.remove(inc)
 
 
 def replace_custom_tags_dir(tree, dir):
@@ -181,78 +171,6 @@ def parse_course_file(filename, options, namespace):
     return course_xml_process(xml)
 
 
-def get_section(section, options, dirname):
-    '''
-    Given the name of a section, an options dict containing keys
-    'dev_content' and 'groups', and a directory to look in,
-    returns the xml tree for the section, or None if there's no
-    such section.
-    ''' 
-    filename = section + ".xml"
-
-    if filename not in os.listdir(dirname):
-        log.error(filename + " not in " + str(os.listdir(dirname)))
-        return None
-
-    tree = parse_course_file(filename, options, namespace='sections')
-    return tree
-
-
-def get_module(tree, module, id_tag, module_id, sections_dirname, options):
-    '''
-    Given the xml tree of the course, get the xml string for a module
-    with the specified module type, id_tag, module_id.  Looks in
-    sections_dirname for sections.
-
-    id_tag -- use id_tag if the place the module stores its id is not 'id'
-    '''
-        # Sanitize input
-    if not module.isalnum():
-        raise Exception("Module is not alphanumeric")
-        
-    if not module_id.isalnum():
-        raise Exception("Module ID is not alphanumeric")
-
-    # Generate search
-    xpath_search='//{module}[(@{id_tag} = "{id}") or (@id = "{id}")]'.format(
-        module=module, 
-        id_tag=id_tag,
-        id=module_id)
-    
-
-    result_set = tree.xpath(xpath_search)
-    if len(result_set) < 1:
-        # Not found in main tree.  Let's look in the section files.
-        section_list = (s[:-4] for s in os.listdir(sections_dirname) if s.endswith('.xml'))
-        for section in section_list:
-            try: 
-                s = get_section(section, options, sections_dirname)
-            except etree.XMLSyntaxError: 
-                ex = sys.exc_info()
-                raise ContentException("Malformed XML in " + section +
-                                       "(" + str(ex[1].msg) + ")")
-            result_set = s.xpath(xpath_search)
-            if len(result_set) != 0:
-                break
-
-    if len(result_set) > 1:
-        log.error("WARNING: Potentially malformed course file", module, module_id)
-        
-    if len(result_set)==0:
-        log.error('[content_parser.get_module] cannot find %s in course.xml tree',
-                      xpath_search)
-        log.error('tree = %s' % etree.tostring(tree, pretty_print=True))
-        return None
-
-    # log.debug('[courseware.content_parser.module_xml] found %s' % result_set)
-
-    return etree.tostring(result_set[0])
-
-
-
-
-
-
 # ==== All Django-specific code below =============================================
 
 def user_groups(user):
@@ -276,6 +194,11 @@ def user_groups(user):
 def get_options(user):
     return {'dev_content': settings.DEV_CONTENT, 
             'groups': user_groups(user)}
+
+
+def process_includes(tree):
+    '''Replace <include> tags with the contents from the course directory'''
+    process_includes_dir(tree, settings.DATA_DIR)
 
 
 def replace_custom_tags(tree):
@@ -337,29 +260,3 @@ def sections_dir(coursename=None):
         xp = multicourse_settings.get_course_xmlpath(coursename)
 
     return settings.DATA_DIR + xp + '/sections/'
-    
-
-
-def section_file(user, section, coursename=None):
-    '''
-    Given a user and the name of a section, return that section.
-    This is done specific to each course.
-
-    Returns the xml tree for the section, or None if there's no such section.
-    '''
-    dirname = sections_dir(coursename)
-
-
-    return get_section(section, options, dirname)
-
-
-def module_xml(user, module, id_tag, module_id, coursename=None):
-    ''' Get XML for a module based on module and module_id. Assumes
-        module occurs once in courseware XML file or hidden section.
-    ''' 
-    tree = course_file(user, coursename)
-    sdirname = sections_dir(coursename)
-    options = get_options(user)
-
-    return get_module(tree, module, id_tag, module_id, sdirname, options)
-

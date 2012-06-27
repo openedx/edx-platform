@@ -3,6 +3,7 @@ import pkg_resources
 import logging
 
 from keystore import Location
+from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -56,85 +57,87 @@ class Plugin(object):
 
 class XModule(object):
     ''' Implements a generic learning module. 
-        Initialized on access with __init__, first time with state=None, and
-        then with state
+        Initialized on access with __init__, first time with instance_state=None, and
+        shared_state=None. In later instantiations, instance_state will not be None,
+        but shared_state may be
 
         See the HTML module for a simple example
     '''
-    id_attribute='id' # An attribute guaranteed to be unique
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        '''
+        Construct a new xmodule
 
-    @classmethod
-    def get_xml_tags(c):
-        ''' Tags in the courseware file guaranteed to correspond to the module '''
-        return []
-        
-    @classmethod
-    def get_usage_tags(c):
-        ''' We should convert to a real module system
-            For now, this tells us whether we use this as an xmodule, a CAPA response type
-            or a CAPA input type '''
-        return ['xmodule']
+        system: An I4xSystem allowing access to external resources
+        location: Something Location-like that identifies this xmodule
+        definition: A dictionary containing 'data' and 'children'. Both are optional
+            'data': is a json object specifying the behavior of this xmodule
+            'children': is a list of xmodule urls for child modules that this module depends on
+        '''
+        self.system = system
+        self.location = Location(location)
+        self.definition = definition
+        self.instance_state = instance_state
+        self.shared_state = shared_state
+        self.id = self.location.url()
+        self.name = self.location.name
+        self.display_name = kwargs.get('display_name', '')
+        self._loaded_children = None
 
     def get_name(self):
         name = self.__xmltree.get('name')
-        if name: 
+        if name:
             return name
-        else: 
+        else:
             raise "We should iterate through children and find a default name"
 
     def get_children(self):
         '''
         Return module instances for all the children of this module.
         '''
-        children = [self.module_from_xml(e) for e in self.__xmltree]
-        return children            
+        if self._loaded_children is None:
+            self._loaded_children = [self.system.get_module(child) for child in self.definition.get('children', [])]
+        return self._loaded_children
 
-    def rendered_children(self):
+    def get_display_items(self):
         '''
-        Render all children. 
-        This really ought to return a list of xmodules, instead of dictionaries
+        Returns a list of descendent module instances that will display immediately
+        inside this module
         '''
-        children = [self.render_function(e) for e in self.__xmltree]
-        return children            
+        items = []
+        for child in self.get_children():
+            items.extend(child.displayable_items())
 
-    def __init__(self, system = None, xml = None, item_id = None, 
-                 json = None, track_url=None, state=None):
-        ''' In most cases, you must pass state or xml'''
-        if not item_id: 
-            raise ValueError("Missing Index")
-        if not xml and not json:
-            raise ValueError("xml or json required")
-        if not system:
-            raise ValueError("System context required")
+        return items
 
-        self.xml = xml
-        self.json = json
-        self.item_id = item_id
-        self.state = state
-        self.DEBUG = False
-        
-        self.__xmltree = etree.fromstring(xml) # PRIVATE
+    def displayable_items(self):
+        '''
+        Returns list of displayable modules contained by this module. If this module
+        is visible, should return [self]
+        '''
+        return [self]
 
-        if system: 
-            ## These are temporary; we really should go 
-            ## through self.system. 
-            self.ajax_url = system.ajax_url
-            self.tracker = system.track_function
-            self.filestore = system.filestore
-            self.render_function = system.render_function
-            self.module_from_xml = system.module_from_xml
-            self.DEBUG = system.DEBUG
-        self.system = system
+    def get_icon_class(self):
+        '''
+        Return a class identifying this module in the context of an icon
+        '''
+        return 'other'
 
     ### Functions used in the LMS
 
-    def get_state(self):
-        ''' State of the object, as stored in the database 
+    def get_instance_state(self):
+        ''' State of the object, as stored in the database
         '''
-        return ""
+        return '{}'
+
+    def get_shared_state(self):
+        '''
+        Get state that should be shared with other instances
+        using the same 'shared_state_key' attribute.
+        '''
+        return '{}'
 
     def get_score(self):
-        ''' Score the student received on the problem. 
+        ''' Score the student received on the problem.
         '''
         return None
 
@@ -281,6 +284,7 @@ class XModuleDescriptor(Plugin):
         self.name = Location(kwargs.get('location')).name
         self.type = Location(kwargs.get('location')).category
         self.url = Location(kwargs.get('location')).url()
+        self.display_name = kwargs.get('display_name')
 
         # For now, we represent goals as a list of strings, but this
         # is one of the things that we are going to be iterating on heavily
@@ -302,33 +306,13 @@ class XModuleDescriptor(Plugin):
         """
         raise NotImplementedError("get_html() must be provided by specific modules")
 
-    def get_xml(self):
-        ''' For conversions between JSON and legacy XML representations.
-        '''
-        if self.xml:
-            return self.xml
-        else:
-            raise NotImplementedError("JSON->XML Translation not implemented")
-
-    def get_json(self):
-        ''' For conversions between JSON and legacy XML representations.
-        '''
-        if self.json:
-            raise NotImplementedError
-            return self.json  # TODO: Return context as well -- files, etc.
-        else:
-            raise NotImplementedError("XML->JSON Translation not implemented")
-
-    #def handle_cms_json(self):
-    #    raise NotImplementedError
-
-    #def render(self, size):
-    #    ''' Size: [thumbnail, small, full] 
-    #    Small ==> what we drag around
-    #    Full ==> what we edit
-    #    '''
-    #    raise NotImplementedError
-
+    def xmodule_constructor(self, system):
+        """
+        Returns a constructor for an XModule. This constructor takes two arguments:
+        instance_state and shared_state, and returns a fully nstantiated XModule
+        """
+        return partial(self.module_class, system, self.url, self.definition,
+            display_name=self.display_name)
 
 class DescriptorSystem(object):
     def __init__(self, load_item, resources_fs):

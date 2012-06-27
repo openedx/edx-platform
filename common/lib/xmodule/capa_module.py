@@ -81,14 +81,7 @@ class Module(XModule):
     reset.
     '''
 
-    id_attribute = "filename"
-
-    @classmethod
-    def get_xml_tags(c):
-        return ["problem"]
-
-
-    def get_state(self):
+    def get_instance_state(self):
         state = self.lcp.get_state()
         state['attempts'] = self.attempts
         return json.dumps(state)
@@ -191,8 +184,8 @@ class Module(XModule):
 
         return html
 
-    def __init__(self, system, xml, item_id, state=None):
-        XModule.__init__(self, system, xml, item_id, state)
+    def __init__(self, system, xml, item_id, instance_state=None, shared_state=None):
+        XModule.__init__(self, system, xml, item_id, instance_state, shared_state)
 
         self.attempts = 0
         self.max_attempts = None
@@ -232,19 +225,19 @@ class Module(XModule):
             self.show_answer = "closed"
 
         self.rerandomize = only_one(dom2.xpath('/problem/@rerandomize'))
-        if self.rerandomize == "" or self.rerandomize=="always" or self.rerandomize=="true":
-            self.rerandomize="always"
-        elif self.rerandomize=="false" or self.rerandomize=="per_student":
-            self.rerandomize="per_student"
-        elif self.rerandomize=="never":
-            self.rerandomize="never"
+        if self.rerandomize == "" or self.rerandomize == "always" or self.rerandomize == "true":
+            self.rerandomize = "always"
+        elif self.rerandomize == "false" or self.rerandomize == "per_student":
+            self.rerandomize = "per_student"
+        elif self.rerandomize == "never":
+            self.rerandomize = "never"
         else:
-            raise Exception("Invalid rerandomize attribute "+self.rerandomize)
+            raise Exception("Invalid rerandomize attribute " + self.rerandomize)
 
-        if state!=None:
-            state=json.loads(state)
-        if state!=None and 'attempts' in state:
-            self.attempts=state['attempts']
+        if instance_state != None:
+            instance_state = json.loads(instance_state)
+        if instance_state != None and 'attempts' in instance_state:
+            self.attempts = instance_state['attempts']
 
         # TODO: Should be: self.filename=only_one(dom2.xpath('/problem/@filename'))
         self.filename= "problems/"+only_one(dom2.xpath('/problem/@filename'))+".xml"
@@ -267,7 +260,7 @@ class Module(XModule):
             else:
                 raise
         try:
-            self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
+            self.lcp=LoncapaProblem(fp, self.item_id, instance_state, seed = seed, system=self.system)
         except Exception,err:
             msg = '[courseware.capa.capa_module.Module.init] error %s: cannot create LoncapaProblem %s' % (err,self.filename)
             log.exception(msg)
@@ -277,7 +270,7 @@ class Module(XModule):
                 # create a dummy problem with error message instead of failing
                 fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename,msg))
                 fp.name = "StringIO"
-                self.lcp=LoncapaProblem(fp, self.item_id, state, seed = seed, system=self.system)
+                self.lcp=LoncapaProblem(fp, self.item_id, instance_state, seed = seed, system=self.system)
             else:
                 raise
 
