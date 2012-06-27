@@ -22,7 +22,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 
 from courseware import grades
-from certificates.models import certificate_state_for_student
+from certificates.models import GeneratedCertificate, certificate_state_for_student, revoke_certificate
 from student.survey_questions import exit_survey_list_for_student
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange
 
@@ -454,6 +454,21 @@ def accept_name_change(request):
     up.set_meta(meta)
 
     up.name = pnc.new_name
+    
+    #Revoke the certificate, if necessary
+    try:
+        generated_certificate = GeneratedCertificate.objects.get(user = u)
+        
+        revoke_certificate(generated_certificate, u"The name on this certificate has been changed to {name}.".format(name = up.name))
+        generated_certificate.name = up.name
+        generated_certificate.enabled = False # They will need to re-request it to certify their name is correct
+        generated_certificate.save()
+        
+    except GeneratedCertificate.DoesNotExist:
+        # Cool, they didn't have a certificate anyway
+        pass
+    
+    
     up.save()
     pnc.delete()
 

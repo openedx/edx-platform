@@ -42,6 +42,66 @@ class GeneratedCertificate(models.Model):
     # enabled should only be true if the student has earned a grade in the course
     # The student must have a grade and request a certificate for enabled to be True
     enabled = models.BooleanField(default=False)
+    
+class RevokedCertificate(models.Model):
+    """
+    This model is for when a GeneratedCertificate must be regenerated. This model
+    contains all the same fields, to store a record of what the GeneratedCertificate
+    was before it was revoked (at which time all of it's information can change when
+    it is regenerated).
+    
+    GeneratedCertificate may be deleted once they are revoked, and then created again.
+    For this reason, the only link between a GeneratedCertificate and RevokedCertificate
+    is that they share the same user.
+    """
+    ####-------------------New Fields--------------------####
+    explanation = models.TextField(blank=True)
+    
+    ####---------Fields from GeneratedCertificate---------####
+    user = models.ForeignKey(User, db_index=True)
+    # This is the name at the time of request
+    name = models.CharField(blank=True, max_length=255)
+    
+    certificate_id = models.CharField(max_length=32, null=True, default=None)
+    graded_certificate_id = models.CharField(max_length=32, null=True, default=None)
+    
+    download_url = models.CharField(max_length=128, null=True)
+    graded_download_url = models.CharField(max_length=128, null=True)
+    
+    grade = models.CharField(max_length=5, null=True)
+    
+    enabled = models.BooleanField(default=False)
+    
+
+def revoke_certificate(certificate, explanation):
+    """
+    This method takes a GeneratedCertificate. It records its information from the certificate
+    into a RevokedCertificate, and then marks the certificate as needing regenerating. 
+    When the new certificiate is regenerated it will have new IDs and download URLS.
+    
+    Once this method has been called, it is safe to delete the certificate, or modify the 
+    certificate's name or grade until it has been generated again.
+    """
+    revoked = RevokedCertificate(   user = certificate.user,
+                                    name = certificate.name,
+                                    certificate_id = certificate.certificate_id,
+                                    graded_certificate_id = certificate.graded_certificate_id,
+                                    download_url = certificate.download_url,
+                                    graded_download_url = certificate.graded_download_url,
+                                    grade = certificate.grade,
+                                    enabled = certificate.enabled)
+    
+    revoked.explanation = explanation
+    
+    certificate.certificate_id = None
+    certificate.graded_certificate_id = None
+    certificate.download_url = None
+    certificate.graded_download_url = None
+    
+    certificate.save()
+    revoked.save()
+    
+    
 
 
 def certificate_state_for_student(student, grade):
