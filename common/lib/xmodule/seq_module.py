@@ -67,7 +67,7 @@ class SequenceModule(XModule):
         # of script, even if it occurs mid-string. Do this after json.dumps()ing
         # so that we can be sure of the quotations being used
         params = {'items': json.dumps(contents).replace('</script>', '<"+"/script>'),
-                  'element_id': "-".join(str(v) for v in self.location.list()),
+                  'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,
                   'tag': self.location.category}

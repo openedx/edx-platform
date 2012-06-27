@@ -46,7 +46,7 @@ class VideoModule(XModule):
     def get_html(self):
         return self.system.render_template('video.html', {
             'streams': self.video_list(),
-            'id': self.id,
+            'id': self.location.html_id(),
             'position': self.position,
             'name': self.name,
             'annotations': self.annotations,

@@ -113,6 +113,12 @@ class Location(object):
             url += "/" + self.revision
         return url
 
+    def html_id(self):
+        """
+        Return a string with a version of the location that is safe for use in html id attributes
+        """
+        return "-".join(str(v) for v in self.list() if v is not None)
+
     def list(self):
         """
         Return a list representing this location
