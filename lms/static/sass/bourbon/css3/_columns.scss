@@ -1,47 +1,67 @@
 @mixin columns($arg: auto) {
 // <column-count> || <column-width>
-  @include prefixer(columns, $arg);
+  -webkit-columns: $arg;
+     -moz-columns: $arg;
+          columns: $arg;
 }
 
 @mixin column-count($int: auto) {
 // auto || integer
-  @include prefixer(column-count, $int);
+  -webkit-column-count: $int;
+     -moz-column-count: $int;
+          column-count: $int;
 }
 
 @mixin column-gap($length: normal) {
 // normal || length
-  @include prefixer(column-gap, $length);
+  -webkit-column-gap: $length;
+     -moz-column-gap: $length;
+          column-gap: $length;
 }
 
 @mixin column-fill($arg: auto) {
 // auto || length
-  @include prefixer(columns-fill, $arg);
+  -webkit-columns-fill: $arg;
+     -moz-columns-fill: $arg;
+          columns-fill: $arg;
 }
 
 @mixin column-rule($arg) {
 // <border-width> || <border-style> || <color>
-  @include prefixer(column-rule, $arg);
+  -webkit-column-rule: $arg;
+     -moz-column-rule: $arg;
+          column-rule: $arg;
 }
 
 @mixin column-rule-color($color) {
-  @include prefixer(column-rule-color, $color);
+  -webkit-column-rule-color: $color;
+     -moz-column-rule-color: $color;
+          column-rule-color: $color;
 }
 
 @mixin column-rule-style($style: none) {
 // none | hidden | dashed | dotted | double | groove | inset | inset | outset | ridge | solid
-  @include prefixer(column-rule-style, $style);
+  -webkit-column-rule-style: $style;
+     -moz-column-rule-style: $style;
+          column-rule-style: $style;
 }
 
 @mixin column-rule-width ($width: none) {
-  @include prefixer(column-rule-width, $width);
+  -webkit-column-rule-width: $width;
+     -moz-column-rule-width: $width;
+          column-rule-width: $width;
 }
 
 @mixin column-span($arg: none) {
 // none || all
-  @include prefixer(column-span, $arg);
+  -webkit-column-span: $arg;
+     -moz-column-span: $arg;
+          column-span: $arg;
 }
 
 @mixin column-width($length: auto) {
 // auto || length
-  @include prefixer(column-width, $length);
+  -webkit-column-width: $length;
+     -moz-column-width: $length;
+          column-width: $length;
 }

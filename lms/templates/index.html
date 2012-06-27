@@ -28,25 +28,39 @@
     </header>
 
     <section class="university-partners">
-      <section class="partners">
-        <a href="/university_profile.html">
-          <img src="${static.url('images/mit_bw.png')}" />
-          <div class="name">MITx</div>
-        </a>
-        <a href="/university_profile.html">
-          <img src="${static.url('images/harvard_bw.png')}" />
-          <div class="name">HarvardX</div>
-        </a>
-      </section>
+      <ol class="partners">
+        <li class="partner">
+          <a href="/university_profile.html">
+            <img src="${static.url('images/berkeley_bw.png')}" />
+            <div class="name">BerkeleyX</div>
+          </a>
+        </li>
+        <li class="partner mit">
+          <a href="/university_profile.html">
+            <img src="${static.url('images/mit_bw.png')}" />
+            <div class="name">MITx</div>
+          </a>
+        </li>
+        <li class="partner">
+          <a href="/university_profile.html">
+            <img src="${static.url('images/harvard_bw.png')}" />
+            <div class="name">HarvardX</div>
+          </a>
+        </li>
+      </ol>
     </section>
 
-    <section class="courses">
-      <%include file="course.html" />
+    <section class="highlighted-courses">
+      <h2>Explore courses from edX universities</h2>
+      <section class="courses">
+        <%include file="course.html" />
+      </section>
     </section>
 
     <section class="more-info">
       <h2>edX News & Announcements</h2>
       <section class="news">
+        <article></article>
         <article></article>
         <article></article>
         <article></article>
