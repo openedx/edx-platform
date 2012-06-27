@@ -15,7 +15,6 @@ urlpatterns = ('',
     url(r'^about$', 'student.views.about', name="about"),
     url(r'^jobs$', 'student.views.jobs', name="jobs"),
     url(r'^dashboard$', 'student.views.dashboard'),
-    url(r'^course_info$', 'student.views.course_info'),
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
@@ -80,7 +79,8 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]*)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
         url(r'^courses/(?P<course_id>[^/]*)/profile$', 'courseware.views.profile', name="profile"),
         url(r'^courses/(?P<course_id>[^/]*)/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
-
+        
+        url(r'^courses/(?P<course_id>[^/]*)/about$', 'courseware.views.course_info', name="about_course"),
     )
 
 if settings.ENABLE_MULTICOURSE:
