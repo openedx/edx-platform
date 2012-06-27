@@ -94,4 +94,4 @@ class @Problem
       element.schematic.update_value()
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
-    @answers = @$("[id^=input_#{@element_id}_]").serialize()
+    @answers = @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]").serialize()
