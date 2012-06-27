@@ -15,6 +15,8 @@ URL_RE = re.compile("""
     (/(?P<revision>[^/]+))?
     """, re.VERBOSE)
 
+INVALID_CHARS = re.compile(r"[^\w-]")
+
 
 class Location(object):
     '''
@@ -26,6 +28,14 @@ class Location(object):
     However, they can also be represented a dictionaries (specifying each component),
     tuples or list (specified in order), or as strings of the url
     '''
+
+    @classmethod
+    def clean(cls, value):
+        """
+        Return value, made into a form legal for locations
+        """
+        return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
+
     def __init__(self, location):
         """
         Create a new location that is a clone of the specifed one.
@@ -45,7 +55,7 @@ class Location(object):
 
         In both the dict and list forms, the revision is optional, and can be ommitted.
 
-        None of the components of a location may contain the '/' character
+        Components must be composed of alphanumeric characters, or the characters _, and -
 
         Components may be set to None, which may be interpreted by some contexts to mean
         wildcard selection
@@ -88,7 +98,7 @@ class Location(object):
             raise InvalidLocationError(location)
 
         for val in self.list():
-            if val is not None and '/' in val:
+            if val is not None and INVALID_CHARS.search(val) is not None:
                 raise InvalidLocationError(location)
 
     def __str__(self):
