@@ -10,7 +10,8 @@ import StringIO
 from datetime import timedelta
 from lxml import etree
 
-from x_module import XModule, XModuleDescriptor
+from x_module import XModule
+from mako_module import MakoModuleDescriptor
 from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
@@ -63,8 +64,14 @@ class ComplexEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class ModuleDescriptor(XModuleDescriptor):
-    pass
+class CapaModuleDescriptor(MakoModuleDescriptor):
+    """
+    Module implementing problems in the LON-CAPA format,
+    as implemented by capa.capa_problem
+    """
+
+    mako_template = 'widgets/problem-edit.html'
+
 
 
 class Module(XModule):

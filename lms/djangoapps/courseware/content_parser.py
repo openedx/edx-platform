@@ -26,9 +26,12 @@ import xmodule
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
-
-TODO: Shift everything from xml.dom.minidom to XPath (or XQuery)
 '''
+
+# ==== This section has no direct dependencies on django ====================================
+# NOTE: it does still have some indirect dependencies:
+# util.memcache.fasthash (which does not depend on memcache at all)
+# 
 
 class ContentException(Exception):
     pass
@@ -38,29 +41,6 @@ log = logging.getLogger("mitx.courseware")
 def format_url_params(params):
     return [ urllib.quote(string.replace(' ','_')) for string in params ]
 
-def xpath(xml, query_string, **args):
-    ''' Safe xpath query into an xml tree:
-        * xml is the tree.
-        * query_string is the query
-        * args are the parameters. Substitute for {params}. 
-        We should remove this with the move to lxml. 
-        We should also use lxml argument passing. '''
-    doc = etree.fromstring(xml)
-    #print type(doc)
-    def escape(x):
-        # TODO: This should escape the string. For now, we just assume it's made of valid characters. 
-        # Couldn't figure out how to escape for lxml in a few quick Googles
-        valid_chars="".join(map(chr, range(ord('a'),ord('z')+1)+range(ord('A'),ord('Z')+1)+range(ord('0'), ord('9')+1)))+"_ "
-        for e in x:
-            if e not in valid_chars:
-                raise Exception("Invalid char in xpath expression. TODO: Escape")
-        return x
-
-    args=dict( ((k, escape(args[k])) for k in args) )
-    #print args
-    results = doc.xpath(query_string.format(**args))
-    return results
-
 def xpath_remove(tree, path):
     ''' Remove all items matching path from lxml tree.  Works in
         place.'''
@@ -69,35 +49,34 @@ def xpath_remove(tree, path):
         item.getparent().remove(item)
     return tree
 
-if __name__=='__main__':
-    print xpath('<html><problem name="Bob"></problem></html>', '/{search}/problem[@name="{name}"]', 
-                search='html', name="Bob")
-
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
     default_ids = xmodule.get_default_ids()
 
     # Tag elements with unique IDs
-    elements = course.xpath("|".join(['//'+c for c in default_ids]))
+    elements = course.xpath("|".join('//' + c for c in default_ids))
     for elem in elements:
         if elem.get('id'):
             pass
         elif elem.get(default_ids[elem.tag]):
-            new_id = elem.get(default_ids[elem.tag]) 
-            new_id = "".join([a for a in new_id if a.isalnum()]) # Convert to alphanumeric
-            # Without this, a conflict may occur between an hmtl or youtube id
+            new_id = elem.get(default_ids[elem.tag])
+            # Convert to alphanumeric
+            new_id = "".join(a for a in new_id if a.isalnum()) 
+
+            # Without this, a conflict may occur between an html or youtube id
             new_id = default_ids[elem.tag] + new_id
             elem.set('id', new_id)
         else:
-            elem.set('id', "id"+fasthash(etree.tostring(elem)))
+            elem.set('id', "id" + fasthash(etree.tostring(elem)))
             
 def propogate_downward_tag(element, attribute_name, parent_attribute = None):
     ''' This call is to pass down an attribute to all children. If an element
     has this attribute, it will be "inherited" by all of its children. If a
     child (A) already has that attribute, A will keep the same attribute and
     all of A's children will inherit A's attribute. This is a recursive call.'''
-    
-    if (parent_attribute is None): #This is the entry call. Select all elements with this attribute
+
+    if (parent_attribute is None):
+        #This is the entry call. Select all elements with this attribute
         all_attributed_elements = element.xpath("//*[@" + attribute_name +"]")
         for attributed_element in all_attributed_elements:
             attribute_value = attributed_element.get(attribute_name)
@@ -118,6 +97,164 @@ def propogate_downward_tag(element, attribute_name, parent_attribute = None):
             #to its children later.
             return
 
+
+def course_xml_process(tree):
+    ''' Do basic pre-processing of an XML tree. Assign IDs to all
+    items without. Propagate due dates, grace periods, etc. to child
+    items. 
+    '''
+    replace_custom_tags(tree)
+    id_tag(tree)
+    propogate_downward_tag(tree, "due")
+    propogate_downward_tag(tree, "graded")
+    propogate_downward_tag(tree, "graceperiod")
+    propogate_downward_tag(tree, "showanswer")
+    propogate_downward_tag(tree, "rerandomize")
+    return tree
+
+
+def toc_from_xml(dom, active_chapter, active_section):
+    '''
+    Create a table of contents from the course xml.
+
+    Return format:
+    [ {'name': name, 'sections': SECTIONS, 'active': bool}, ... ]
+
+    where SECTIONS is a list
+    [ {'name': name, 'format': format, 'due': due, 'active' : bool}, ...]
+
+    active is set for the section and chapter corresponding to the passed
+    parameters.  Everything else comes from the xml, or defaults to "".
+
+    chapters with name 'hidden' are skipped.
+    '''
+    name = dom.xpath('//course/@name')[0]
+
+    chapters = dom.xpath('//course[@name=$name]/chapter', name=name)
+    ch = list()
+    for c in chapters:
+        if c.get('name') == 'hidden':
+            continue
+        sections = list()
+        for s in dom.xpath('//course[@name=$name]/chapter[@name=$chname]/section',
+                           name=name, chname=c.get('name')):
+            
+            format = s.get("subtitle") if s.get("subtitle") else s.get("format") or ""
+            active = (c.get("name") == active_chapter and
+                      s.get("name") == active_section)
+
+            sections.append({'name': s.get("name") or "", 
+                             'format': format, 
+                             'due': s.get("due") or "",
+                             'active': active})
+            
+        ch.append({'name': c.get("name"), 
+                   'sections': sections,
+                   'active': c.get("name") == active_chapter})
+    return ch
+
+
+def replace_custom_tags_dir(tree, dir):
+    '''
+    Process tree to replace all custom tags defined in dir.
+    '''
+    tags = os.listdir(dir)
+    for tag in tags:
+        for element in tree.iter(tag):
+            element.tag = 'customtag'
+            impl = etree.SubElement(element, 'impl')
+            impl.text = tag
+
+def parse_course_file(filename, options, namespace):
+    '''
+    Parse a course file with the given options, and return the resulting
+    xml tree object.
+
+    Options should be a dictionary including keys
+        'dev_content': bool,
+        'groups' : [list, of, user, groups]
+
+    namespace is used to in searching for the file.  Could be e.g. 'course',
+    'sections'.
+    '''
+    xml = etree.XML(render_to_string(filename, options, namespace=namespace))
+    return course_xml_process(xml)
+
+
+def get_section(section, options, dirname):
+    '''
+    Given the name of a section, an options dict containing keys
+    'dev_content' and 'groups', and a directory to look in,
+    returns the xml tree for the section, or None if there's no
+    such section.
+    ''' 
+    filename = section + ".xml"
+
+    if filename not in os.listdir(dirname):
+        log.error(filename + " not in " + str(os.listdir(dirname)))
+        return None
+
+    tree = parse_course_file(filename, options, namespace='sections')
+    return tree
+
+
+def get_module(tree, module, id_tag, module_id, sections_dirname, options):
+    '''
+    Given the xml tree of the course, get the xml string for a module
+    with the specified module type, id_tag, module_id.  Looks in
+    sections_dirname for sections.
+
+    id_tag -- use id_tag if the place the module stores its id is not 'id'
+    '''
+        # Sanitize input
+    if not module.isalnum():
+        raise Exception("Module is not alphanumeric")
+        
+    if not module_id.isalnum():
+        raise Exception("Module ID is not alphanumeric")
+
+    # Generate search
+    xpath_search='//{module}[(@{id_tag} = "{id}") or (@id = "{id}")]'.format(
+        module=module, 
+        id_tag=id_tag,
+        id=module_id)
+    
+
+    result_set = tree.xpath(xpath_search)
+    if len(result_set) < 1:
+        # Not found in main tree.  Let's look in the section files.
+        section_list = (s[:-4] for s in os.listdir(sections_dirname) if s[-4:]=='.xml')
+        for section in section_list:
+            try: 
+                s = get_section(section, options, sections_dirname)
+            except etree.XMLSyntaxError: 
+                ex = sys.exc_info()
+                raise ContentException("Malformed XML in " + section +
+                                       "(" + str(ex[1].msg) + ")")
+            result_set = s.xpath(xpath_search)
+            if len(result_set) != 0:
+                break
+
+    if len(result_set) > 1:
+        log.error("WARNING: Potentially malformed course file", module, module_id)
+        
+    if len(result_set)==0:
+        log.error('[content_parser.get_module] cannot find %s in course.xml tree',
+                      xpath_search)
+        log.error('tree = %s' % etree.tostring(tree, pretty_print=True))
+        return None
+
+    # log.debug('[courseware.content_parser.module_xml] found %s' % result_set)
+
+    return etree.tostring(result_set[0])
+
+
+
+
+
+
+# ==== All Django-specific code below =============================================
+
 def user_groups(user):
     if not user.is_authenticated():
         return []
@@ -135,154 +272,94 @@ def user_groups(user):
 
     return group_names
 
-    # return [u.name for u in UserTestGroup.objects.raw("select * from auth_user, student_usertestgroup, student_usertestgroup_users where auth_user.id = student_usertestgroup_users.user_id and student_usertestgroup_users.usertestgroup_id = student_usertestgroup.id and auth_user.id = %s", [user.id])]
+
+def get_options(user):
+    return {'dev_content': settings.DEV_CONTENT, 
+            'groups': user_groups(user)}
+
 
 def replace_custom_tags(tree):
-    tags = os.listdir(settings.DATA_DIR+'/custom_tags')
-    for tag in tags:
-        for element in tree.iter(tag):
-            element.tag = 'customtag'
-            impl = etree.SubElement(element, 'impl')
-            impl.text = tag
+    '''Replace custom tags defined in our custom_tags dir'''
+    replace_custom_tags_dir(tree, settings.DATA_DIR+'/custom_tags')
 
-def course_xml_process(tree):
-    ''' Do basic pre-processing of an XML tree. Assign IDs to all
-    items without. Propagate due dates, grace periods, etc. to child
-    items. 
+
+def course_file(user, coursename=None):
+    ''' Given a user, return an xml tree object for the course file.
+
+    Handles getting the right file, and processing it depending on the
+    groups the user is in.  Does caching of the xml strings.
     '''
-    replace_custom_tags(tree)
-    id_tag(tree)
-    propogate_downward_tag(tree, "due")
-    propogate_downward_tag(tree, "graded")
-    propogate_downward_tag(tree, "graceperiod")
-    propogate_downward_tag(tree, "showanswer")
-    propogate_downward_tag(tree, "rerandomize")
-    return tree
-
-def course_file(user,coursename=None):
-    ''' Given a user, return course.xml'''
 
     if user.is_authenticated():
-        filename = UserProfile.objects.get(user=user).courseware # user.profile_cache.courseware 
+        # use user.profile_cache.courseware?
+        filename = UserProfile.objects.get(user=user).courseware 
     else:
         filename = 'guest_course.xml'
 
-    # if a specific course is specified, then use multicourse to get the right path to the course XML directory
+    # if a specific course is specified, then use multicourse to get
+    # the right path to the course XML directory
     if coursename and settings.ENABLE_MULTICOURSE:
         xp = multicourse_settings.get_course_xmlpath(coursename)
         filename = xp + filename	# prefix the filename with the path
 
     groups = user_groups(user)
-    options = {'dev_content':settings.DEV_CONTENT, 
-               'groups' : groups}
+    options = get_options(user)
 
+    # Try the cache...
+    cache_key = "{0}_processed?dev_content:{1}&groups:{2}".format(
+        filename,
+        options['dev_content'],
+        sorted(groups))
     
-    cache_key = filename + "_processed?dev_content:" + str(options['dev_content']) + "&groups:" + str(sorted(groups))
-    if "dev" not in settings.DEFAULT_GROUPS:
-        tree_string = cache.get(cache_key)
-    else: 
+    if "dev" in settings.DEFAULT_GROUPS:
         tree_string = None
+    else: 
+        tree_string = cache.get(cache_key)
 
-    if settings.DEBUG:
-        log.info('[courseware.content_parser.course_file] filename=%s, cache_key=%s' % (filename,cache_key))
-        # print '[courseware.content_parser.course_file] tree_string = ',tree_string
-
-    if not tree_string:
-        tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'course')))
-        tree_string = etree.tostring(tree)
-        
-        cache.set(cache_key, tree_string, 60)
-    else:
+    if tree_string:
         tree = etree.XML(tree_string)
+    else:
+        tree = parse_course_file(filename, options, namespace='course')
+        # Cache it
+        tree_string = etree.tostring(tree)
+        cache.set(cache_key, tree_string, 60)
 
     return tree
 
-def section_file(user, section, coursename=None, dironly=False):
+
+def sections_dir(coursename=None):
+    ''' Get directory where sections information is stored.
+    '''
+    # if a specific course is specified, then use multicourse to get the
+    # right path to the course XML directory
+    xp = ''
+    if coursename and settings.ENABLE_MULTICOURSE:
+        xp = multicourse_settings.get_course_xmlpath(coursename)
+
+    return settings.DATA_DIR + xp + '/sections/'
+    
+
+
+def section_file(user, section, coursename=None):
     '''
     Given a user and the name of a section, return that section.
     This is done specific to each course.
-    If dironly=True then return the sections directory.
-    TODO: This is a bit weird; dironly should be scrapped. 
+
+    Returns the xml tree for the section, or None if there's no such section.
     '''
-    filename = section+".xml"
+    dirname = sections_dir(coursename)
 
-    # if a specific course is specified, then use multicourse to get the right path to the course XML directory
-    xp = ''
-    if coursename and settings.ENABLE_MULTICOURSE: xp = multicourse_settings.get_course_xmlpath(coursename)
 
-    dirname = settings.DATA_DIR + xp + '/sections/'
-
-    if dironly: return dirname
-
-    if filename not in os.listdir(dirname):
-        log.error(filename+" not in "+str(os.listdir(dirname)))
-        return None
-
-    options = {'dev_content':settings.DEV_CONTENT, 
-               'groups' : user_groups(user)}
-
-    tree = course_xml_process(etree.XML(render_to_string(filename, options, namespace = 'sections')))
-    return tree
+    return get_section(section, options, dirname)
 
 
 def module_xml(user, module, id_tag, module_id, coursename=None):
     ''' Get XML for a module based on module and module_id. Assumes
-        module occurs once in courseware XML file or hidden section. '''
-    # Sanitize input
-    if not module.isalnum():
-        raise Exception("Module is not alphanumeric")
-    if not module_id.isalnum():
-        raise Exception("Module ID is not alphanumeric")
-    # Generate search
-    xpath_search='//{module}[(@{id_tag} = "{id}") or (@id = "{id}")]'.format(module=module, 
-                                                                             id_tag=id_tag,
-                                                                             id=module_id)
-    #result_set=doc.xpathEval(xpath_search)
-    doc = course_file(user,coursename)
-    sdirname = section_file(user,'',coursename,True)	# get directory where sections information is stored
-    section_list = (s[:-4] for s in os.listdir(sdirname) if s[-4:]=='.xml')
+        module occurs once in courseware XML file or hidden section.
+    ''' 
+    tree = course_file(user, coursename)
+    sdirname = sections_dir(coursename)
+    options = get_options(user)
 
-    result_set=doc.xpath(xpath_search)
-    if len(result_set)<1:
-        for section in section_list:
-            try: 
-                s = section_file(user, section, coursename)
-            except etree.XMLSyntaxError: 
-                ex= sys.exc_info()
-                raise ContentException("Malformed XML in " + section+ "("+str(ex[1].msg)+")")
-            result_set = s.xpath(xpath_search)
-            if len(result_set) != 0: 
-                break
-
-    if len(result_set)>1:
-        log.error("WARNING: Potentially malformed course file", module, module_id)
-    if len(result_set)==0:
-        if settings.DEBUG:
-            log.error('[courseware.content_parser.module_xml] cannot find %s in course.xml tree' % xpath_search)
-            log.error('tree = %s' % etree.tostring(doc,pretty_print=True))
-        return None
-    if settings.DEBUG:
-        log.info('[courseware.content_parser.module_xml] found %s' % result_set)
-    return etree.tostring(result_set[0])
-    #return result_set[0].serialize()
-
-def toc_from_xml(dom, active_chapter, active_section):
-    name = dom.xpath('//course/@name')[0]
-
-    chapters = dom.xpath('//course[@name=$name]/chapter', name=name)
-    ch=list()
-    for c in chapters:
-        if c.get('name') == 'hidden':
-            continue
-        sections=list()
-        for s in dom.xpath('//course[@name=$name]/chapter[@name=$chname]/section', name=name, chname=c.get('name')): 
-            sections.append({'name':s.get("name") or "", 
-                             'format':s.get("subtitle") if s.get("subtitle") else s.get("format") or "", 
-                             'due':s.get("due") or "",
-                             'active':(c.get("name")==active_chapter and \
-                                           s.get("name")==active_section)})
-        ch.append({'name':c.get("name"), 
-                   'sections':sections,
-                   'active':(c.get("name")==active_chapter)})
-    return ch
+    return get_module(tree, module, id_tag, module_id, sdirname, options)
 

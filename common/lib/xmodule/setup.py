@@ -5,6 +5,9 @@ setup(
     version="0.1",
     packages=find_packages(),
     install_requires=['distribute'],
+    package_data={
+        '': ['js/*']
+    },
 
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points
@@ -19,6 +22,9 @@ setup(
             "TutorialIndex = seq_module:SectionDescriptor",
             "Exam = seq_module:SectionDescriptor",
             "VideoSegment = video_module:VideoSegmentDescriptor",
+            "ProblemSet = seq_module:SectionDescriptor",
+            "Problem = capa_module:CapaModuleDescriptor",
+            "HTML = html_module:HtmlModuleDescriptor",
         ]
     }
 )

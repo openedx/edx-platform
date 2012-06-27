@@ -1,14 +1,24 @@
 import json
 import logging
 
-from x_module import XModule, XModuleDescriptor
+from x_module import XModule
+from mako_module import MakoModuleDescriptor
 from lxml import etree
+from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.courseware")
 
+
 #-----------------------------------------------------------------------------
-class ModuleDescriptor(XModuleDescriptor):
-    pass
+class HtmlModuleDescriptor(MakoModuleDescriptor):
+    """
+    Module for putting raw html in a course
+    """
+    mako_template = "widgets/html-edit.html"
+
+    # TODO (cpennington): Make this into a proper module
+    js = {'coffee': [resource_string(__name__, 'js/module/html.coffee')]}
+
 
 class Module(XModule):
     id_attribute = 'filename'

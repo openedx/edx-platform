@@ -3,7 +3,8 @@ import logging
 
 from lxml import etree
 
-from x_module import XModule, XModuleDescriptor
+from x_module import XModule
+from mako_module import MakoModuleDescriptor
 from xmodule.progress import Progress
 
 log = logging.getLogger("mitx.common.lib.seq_module")
@@ -11,9 +12,6 @@ log = logging.getLogger("mitx.common.lib.seq_module")
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
-
-class ModuleDescriptor(XModuleDescriptor):
-    pass
 
 class Module(XModule):
     ''' Layout module which lays out content in a temporal sequence
@@ -118,5 +116,5 @@ class Module(XModule):
         self.rendered = False
 
 
-class SectionDescriptor(XModuleDescriptor):
-    pass
+class SectionDescriptor(MakoModuleDescriptor):
+    mako_template = 'widgets/sequence-edit.html'
