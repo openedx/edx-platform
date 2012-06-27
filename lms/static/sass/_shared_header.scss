@@ -64,7 +64,7 @@ header.app {
           @include box-sizing(border-box);
           color: $lighter-base-font-color;
           display: block;
-          font: normal italic 1.2rem/1.4rem $serif;
+          font: italic 1.2rem/1.4rem $serif;
           height: 30px;
           @include inline-block;
           margin: 5px 15px 5px 0px;
@@ -211,7 +211,7 @@ header.app {
             @include box-sizing(border-box);
             color: rgba(255,255,255, 0.9);
             display: block;
-            font: normal italic 1.2rem/1.4rem $serif;
+            font: italic 1.2rem/1.4rem $serif;
             height: auto;
             margin: 5px 0px;
             overflow: hidden;

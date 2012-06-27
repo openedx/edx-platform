@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* HTML5 Boilerplate  */
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section {
   display: block; }
@@ -252,14 +253,14 @@ td {
 .invisible {
   visibility: hidden; }
 
-.clearfix:before, .clearfix:after {
+.clearfix:before, .topbar:before, nav.sequence-nav:before, div.course-wrapper section.course-content .problem-set:before, div.course-wrapper section.course-content section.problems-wrapper:before, div.course-wrapper section.course-content div#seq_content:before, div.course-wrapper section.course-content ol.vert-mod > li:before, section.course-content nav.sequence-bottom ul:before, section.course-content div.video article.video-wrapper section.video-controls:before, section.course-content div.video article.video-wrapper section.video-controls div.slider:before, section.tool-wrapper:before, section.tool-wrapper div#controlls-container:before, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:before, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:before, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:before, .clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after {
   content: "";
   display: table; }
 
-.clearfix:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after {
   clear: both; }
 
-.clearfix {
+.clearfix, .topbar, nav.sequence-nav, div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li, section.course-content nav.sequence-bottom ul, section.course-content div.video article.video-wrapper section.video-controls, section.course-content div.video article.video-wrapper section.video-controls div.slider, section.tool-wrapper, section.tool-wrapper div#controlls-container, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders {
   *zoom: 1; }
 
 @media print {
@@ -864,6 +865,307 @@ a:link, a:visited {
   100% {
     bottom: 0px; } }
 
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after {
+  clear: both;
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden; }
+
+.wrapper {
+  margin: 0 auto;
+  max-width: 1400px;
+  min-width: 810px;
+  text-align: left;
+  width: 100%; }
+  .wrapper div.table-wrapper, .wrapper div.course-wrapper {
+    display: table;
+    width: 100%;
+    overflow: hidden; }
+    @media screen and (min-width: 1400px) {
+      .wrapper div.table-wrapper, .wrapper div.course-wrapper {
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        -ms-border-radius: 4px;
+        -o-border-radius: 4px;
+        border-radius: 4px; } }
+
+h1.top-header, div.course-wrapper section.course-content ol.vert-mod > li header {
+  background: #f3f3f3;
+  border-bottom: 1px solid #e3e3e3;
+  margin: -lh() -lh() lh();
+  padding: lh(); }
+
+.button {
+  border: 1px solid #6f6f6f;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
+  -moz-box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
+  box-shadow: inset 0 1px 0 #a2a2a2, 0 0 3px #cccccc;
+  color: #fff;
+  cursor: pointer;
+  font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  background-color: #959595;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #959595), color-stop(100%, #7b7b7b));
+  background-image: -webkit-linear-gradient(top, #959595, #7b7b7b);
+  background-image: -moz-linear-gradient(top, #959595, #7b7b7b);
+  background-image: -ms-linear-gradient(top, #959595, #7b7b7b);
+  background-image: -o-linear-gradient(top, #959595, #7b7b7b);
+  background-image: linear-gradient(top, #959595, #7b7b7b);
+  padding: 4px 8px;
+  text-decoration: none;
+  text-shadow: none;
+  -webkit-font-smoothing: antialiased; }
+  .button:hover, .button:focus {
+    border: 1px solid #555555;
+    -webkit-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
+    -moz-box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
+    box-shadow: inset 0 1px 0 #bbbbbb, 0 0 3px #cccccc;
+    background-color: #a2a2a2;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #a2a2a2), color-stop(100%, #7b7b7b));
+    background-image: -webkit-linear-gradient(top, #a2a2a2, #7b7b7b);
+    background-image: -moz-linear-gradient(top, #a2a2a2, #7b7b7b);
+    background-image: -ms-linear-gradient(top, #a2a2a2, #7b7b7b);
+    background-image: -o-linear-gradient(top, #a2a2a2, #7b7b7b);
+    background-image: linear-gradient(top, #a2a2a2, #7b7b7b); }
+
+.light-button, a.light-button {
+  border: 1px solid #ccc;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 0 white;
+  -moz-box-shadow: inset 0 1px 0 white;
+  box-shadow: inset 0 1px 0 white;
+  color: #666;
+  cursor: pointer;
+  font: normal 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  background-color: white;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #eeeeee));
+  background-image: -webkit-linear-gradient(top, white, #eeeeee);
+  background-image: -moz-linear-gradient(top, white, #eeeeee);
+  background-image: -ms-linear-gradient(top, white, #eeeeee);
+  background-image: -o-linear-gradient(top, white, #eeeeee);
+  background-image: linear-gradient(top, white, #eeeeee);
+  padding: 4px 8px;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased; }
+  .light-button:hover, .light-button:focus, a.light-button:hover, a.light-button:focus {
+    border: 1px solid #ccc;
+    background-color: white;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #e6e6e6));
+    background-image: -webkit-linear-gradient(top, white, #e6e6e6);
+    background-image: -moz-linear-gradient(top, white, #e6e6e6);
+    background-image: -ms-linear-gradient(top, white, #e6e6e6);
+    background-image: -o-linear-gradient(top, white, #e6e6e6);
+    background-image: linear-gradient(top, white, #e6e6e6);
+    text-decoration: none; }
+
+.action-link a {
+  color: #993333; }
+  .action-link a:hover {
+    color: #4d1919;
+    text-decoration: none; }
+
+.content, div.course-wrapper section.course-content {
+  -webkit-box-shadow: inset 0 0 2px 3px #f3f3f3;
+  -moz-box-shadow: inset 0 0 2px 3px #f3f3f3;
+  box-shadow: inset 0 0 2px 3px #f3f3f3;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table-cell;
+  padding: lh();
+  vertical-align: top;
+  width: 76.518%;
+  overflow: hidden; }
+  @media print {
+    .content, div.course-wrapper section.course-content {
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      box-shadow: none; } }
+
+.sidebar, section.course-index {
+  background: #e3e3e3;
+  -webkit-border-radius: 4px 0 0 4px;
+  -moz-border-radius: 4px 0 0 4px;
+  -ms-border-radius: 4px 0 0 4px;
+  -o-border-radius: 4px 0 0 4px;
+  border-radius: 4px 0 0 4px;
+  border-right: 1px solid #d3d3d3;
+  -webkit-box-shadow: inset 0 0 0 1px #f6f6f6;
+  -moz-box-shadow: inset 0 0 0 1px #f6f6f6;
+  box-shadow: inset 0 0 0 1px #f6f6f6;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: table-cell;
+  font-family: "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  position: relative;
+  text-shadow: 0 1px 0 #f1f1f1;
+  vertical-align: top;
+  width: 23.482%; }
+  .sidebar h1, section.course-index h1, .sidebar h2, section.course-index h2 {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0;
+    text-transform: none; }
+  .sidebar a, section.course-index a {
+    border: none;
+    font-style: normal; }
+  .sidebar .bottom-border, section.course-index .bottom-border {
+    border-bottom: 1px solid #d3d3d3;
+    -webkit-box-shadow: 0 1px 0 #eeeeee;
+    -moz-box-shadow: 0 1px 0 #eeeeee;
+    box-shadow: 0 1px 0 #eeeeee; }
+  @media print {
+    .sidebar, section.course-index {
+      display: none; } }
+  .sidebar h3, section.course-index h3 {
+    background: none;
+    border: none;
+    color: #000;
+    font-weight: normal;
+    margin: 0;
+    overflow: hidden; }
+    .sidebar h3 a, section.course-index h3 a {
+      color: #4d4d4d;
+      display: block;
+      font-size: 14px;
+      padding: 7px 7px 7px 30px;
+      text-decoration: none;
+      -webkit-transition-property: all;
+      -moz-transition-property: all;
+      -ms-transition-property: all;
+      -o-transition-property: all;
+      transition-property: all;
+      -webkit-transition-duration: 0.15s;
+      -moz-transition-duration: 0.15s;
+      -ms-transition-duration: 0.15s;
+      -o-transition-duration: 0.15s;
+      transition-duration: 0.15s;
+      -webkit-transition-timing-function: ease-out;
+      -moz-transition-timing-function: ease-out;
+      -ms-transition-timing-function: ease-out;
+      -o-transition-timing-function: ease-out;
+      transition-timing-function: ease-out;
+      -webkit-transition-delay: 0;
+      -moz-transition-delay: 0;
+      -ms-transition-delay: 0;
+      -o-transition-delay: 0;
+      transition-delay: 0; }
+    .sidebar h3 span.ui-icon, section.course-index h3 span.ui-icon {
+      background-image: url(../images/ui-icons_454545_256x240.png); }
+    .sidebar h3.active, section.course-index h3.active, .sidebar section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion .sidebar h3.ui-accordion-header.ui-state-active, section.course-index div#accordion h3.ui-accordion-header.ui-state-active {
+      background: none;
+      background-image: -webkit-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      background-image: -moz-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      background-image: -ms-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      background-image: -o-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      background-image: linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      border-bottom: 1px solid #d3d3d3;
+      -webkit-box-shadow: inset 0 1px 0 0 #eeeeee;
+      -moz-box-shadow: inset 0 1px 0 0 #eeeeee;
+      box-shadow: inset 0 1px 0 0 #eeeeee;
+      color: #000;
+      font-weight: bold; }
+      .sidebar h3.active a, section.course-index h3.active a, .sidebar section.course-index div#accordion h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion .sidebar h3.ui-accordion-header.ui-state-active a, section.course-index div#accordion h3.ui-accordion-header.ui-state-active a {
+        color: #000; }
+  .sidebar header#open_close_accordion, section.course-index header#open_close_accordion {
+    border-bottom: 1px solid #d3d3d3;
+    -webkit-box-shadow: 0 1px 0 #eeeeee;
+    -moz-box-shadow: 0 1px 0 #eeeeee;
+    box-shadow: 0 1px 0 #eeeeee;
+    padding: lh(0.5) lh();
+    position: relative; }
+    .sidebar header#open_close_accordion h2, section.course-index header#open_close_accordion h2 {
+      margin: 0;
+      padding-right: 20px; }
+    .sidebar header#open_close_accordion a, section.course-index header#open_close_accordion a {
+      background: #eeeeee url("../images/slide-left-icon.png") center center no-repeat;
+      border: 1px solid #D3D3D3;
+      -webkit-border-radius: 3px 0 0 3px;
+      -moz-border-radius: 3px 0 0 3px;
+      -ms-border-radius: 3px 0 0 3px;
+      -o-border-radius: 3px 0 0 3px;
+      border-radius: 3px 0 0 3px;
+      height: 16px;
+      padding: 8px;
+      position: absolute;
+      right: -1px;
+      text-indent: -9999px;
+      top: 6px;
+      width: 16px; }
+      .sidebar header#open_close_accordion a:hover, section.course-index header#open_close_accordion a:hover {
+        background-color: white; }
+  .sidebar a.button, section.course-index a.button {
+    text-decoration: none; }
+
+.topbar, nav.sequence-nav {
+  background: #f6efd4;
+  border-bottom: 1px solid #eddfaa;
+  border-top: 1px solid #fff;
+  font-size: 12px;
+  height: 46px;
+  line-height: 46px;
+  margin: -22.652px -22.652px 22.652px;
+  text-shadow: 0 1px 0 #fff; }
+  @media print {
+    .topbar, nav.sequence-nav {
+      display: none; } }
+  .topbar a, nav.sequence-nav a {
+    border-bottom: 0;
+    color: #292309; }
+    .topbar a:hover, nav.sequence-nav a:hover {
+      color: #7e691a;
+      text-decoration: none; }
+    .topbar a.block-link, nav.sequence-nav a.block-link, .topbar nav.sequence-nav ol a, nav.sequence-nav ol .topbar a, nav.sequence-nav ol a {
+      background: #f2e7bf;
+      border-left: 1px solid #e4d080;
+      -webkit-box-shadow: inset 1px 0 0 #faf7e9;
+      -moz-box-shadow: inset 1px 0 0 #faf7e9;
+      box-shadow: inset 1px 0 0 #faf7e9;
+      display: block;
+      text-transform: uppercase; }
+      .topbar a.block-link:hover, nav.sequence-nav a.block-link:hover, .topbar nav.sequence-nav ol a:hover, nav.sequence-nav ol .topbar a:hover, nav.sequence-nav ol a:hover {
+        background: none; }
+
+.tran, section.course-index {
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -ms-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  -moz-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  -ms-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  -o-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
+
+p.ie-warning {
+  background: yellow;
+  display: block !important;
+  line-height: 1.3em;
+  margin-bottom: 0;
+  padding: lh();
+  text-align: left; }
+
 form {
   font-size: 0em; }
   form label {
@@ -887,7 +1189,7 @@ form {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+    font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
     height: 35px;
     display: -moz-inline-box;
     -moz-box-orient: vertical;
@@ -941,7 +1243,7 @@ form {
     -ms-border-radius: 3px;
     -o-border-radius: 3px;
     border-radius: 3px;
-    font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+    font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
     height: 35px;
     display: -moz-inline-box;
     -moz-box-orient: vertical;
@@ -1176,7 +1478,7 @@ header.app {
           box-sizing: border-box;
           color: #a0a0a0;
           display: block;
-          font: normal italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
+          font: italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
           height: 30px;
           display: -moz-inline-box;
           -moz-box-orient: vertical;
@@ -1224,7 +1526,7 @@ header.app {
           text-transform: uppercase;
           text-shadow: 0 1px rgba(255, 255, 255, 0.6);
           vertical-align: middle; }
-          header.app nav ol li.primary a:hover, header.app nav ol li.primary a.active {
+          header.app nav ol li.primary a:hover, header.app nav ol li.primary a.active, header.app nav.sequence-nav ol li.primary a.seq_video_active, header.app nav.sequence-nav ol li.primary a.seq_other_active, header.app nav.sequence-nav ol li.primary a.seq_vertical_active, header.app nav.sequence-nav ol li.primary a.seq_problem_active {
             background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
             background-image: -moz-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
             background-image: -ms-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
@@ -1354,7 +1656,7 @@ header.app {
             box-sizing: border-box;
             color: rgba(255, 255, 255, 0.9);
             display: block;
-            font: normal italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
+            font: italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
             height: auto;
             margin: 5px 0px;
             overflow: hidden;
@@ -1422,9 +1724,9 @@ header.app {
     box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
     float: left;
     font-size: 0em;
-    margin-right: 2.513%;
+    margin-right: 2.024%;
     margin-bottom: 25px;
-    width: 31.658%;
+    width: 31.984%;
     -webkit-transition-property: all;
     -moz-transition-property: all;
     -ms-transition-property: all;
@@ -1925,11 +2227,11 @@ header.app {
       z-index: 2; }
       .modal .inner-wrapper .login-extra p {
         color: #a0a0a0;
-        font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+        font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
         text-align: center; }
         .modal .inner-wrapper .login-extra p a {
           color: #a0a0a0;
-          font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+          font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
           text-decoration: underline; }
           .modal .inner-wrapper .login-extra p a:hover {
             color: #3c3c3c; }
@@ -2049,7 +2351,7 @@ header.app {
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
-        width: 91.457%; }
+        width: 91.498%; }
         .home > header .welcome .signup-wrapper .sign-up {
           background: #f0f0f0;
           background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
@@ -2137,7 +2439,7 @@ header.app {
             zoom: 1;
             *display: inline;
             *vertical-align: auto;
-            font: normal italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+            font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
             padding: 15px 0px;
             text-transform: uppercase;
             text-align: center;
@@ -2397,8 +2699,8 @@ header.app {
         *display: inline;
         *vertical-align: auto;
         height: 150px;
-        margin-right: 2.513%;
-        width: 23.116%; }
+        margin-right: 2.024%;
+        width: 23.482%; }
         .home .more-info .news > article:last-child {
           margin-right: 0px; }
   .home .social-media {
@@ -2428,26 +2730,26 @@ header.app {
     display: table; }
   .dashboard:after {
     clear: both; }
-  .dashboard .sidebar {
+  .dashboard .sidebar, .dashboard section.course-index {
     background: #f0f0f0;
-    margin-right: 2.513%;
+    margin-right: 2.024%;
     position: absolute;
     width: 250px; }
     @media screen and (max-width: 768px) {
-      .dashboard .sidebar {
+      .dashboard .sidebar, .dashboard section.course-index {
         float: none;
         margin: 0 0 30px 0;
         position: static;
         width: 100%; } }
-    .dashboard .sidebar header.profile .user-info {
+    .dashboard .sidebar header.profile .user-info, .dashboard section.course-index header.profile .user-info {
       zoom: 1;
       padding: 10px; }
-      .dashboard .sidebar header.profile .user-info:before, .dashboard .sidebar header.profile .user-info:after {
+      .dashboard .sidebar header.profile .user-info:before, .dashboard section.course-index header.profile .user-info:before, .dashboard .sidebar header.profile .user-info:after, .dashboard section.course-index header.profile .user-info:after {
         content: "";
         display: table; }
-      .dashboard .sidebar header.profile .user-info:after {
+      .dashboard .sidebar header.profile .user-info:after, .dashboard section.course-index header.profile .user-info:after {
         clear: both; }
-      .dashboard .sidebar header.profile .user-info .avatar {
+      .dashboard .sidebar header.profile .user-info .avatar, .dashboard section.course-index header.profile .user-info .avatar {
         background: #dcdcdc;
         border: 1px solid #b4b4b4;
         -webkit-border-radius: 4px;
@@ -2462,12 +2764,12 @@ header.app {
         max-width: 100%;
         overflow: hidden; }
         @media screen and (max-width: 768px) {
-          .dashboard .sidebar header.profile .user-info .avatar {
+          .dashboard .sidebar header.profile .user-info .avatar, .dashboard section.course-index header.profile .user-info .avatar {
             margin: 0px;
-            margin-right: 2.513%;
+            margin-right: 2.024%;
             position: absolute;
             width: 100px; } }
-        .dashboard .sidebar header.profile .user-info .avatar img {
+        .dashboard .sidebar header.profile .user-info .avatar img, .dashboard section.course-index header.profile .user-info .avatar img {
           -webkit-border-radius: 4px;
           -moz-border-radius: 4px;
           -ms-border-radius: 4px;
@@ -2476,7 +2778,7 @@ header.app {
           display: block;
           max-width: 100%; }
       @media screen and (max-width: 768px) {
-        .dashboard .sidebar header.profile .user-info .info {
+        .dashboard .sidebar header.profile .user-info .info, .dashboard section.course-index header.profile .user-info .info {
           -webkit-box-sizing: border-box;
           -moz-box-sizing: border-box;
           box-sizing: border-box;
@@ -2484,7 +2786,7 @@ header.app {
           min-height: 100px;
           padding-left: 110px;
           width: 100%; } }
-      .dashboard .sidebar header.profile .user-info .info h2 {
+      .dashboard .sidebar header.profile .user-info .info h2, .dashboard section.course-index header.profile .user-info .info h2 {
         border-bottom: 1px solid #c8c8c8;
         -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.4);
         -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.4);
@@ -2497,34 +2799,34 @@ header.app {
         text-wrap: nowrap;
         text-overflow: ellipsis; }
         @media screen and (max-width: 768px) {
-          .dashboard .sidebar header.profile .user-info .info h2 {
+          .dashboard .sidebar header.profile .user-info .info h2, .dashboard section.course-index header.profile .user-info .info h2 {
             text-align: left; } }
-      .dashboard .sidebar header.profile .user-info .info > ul {
+      .dashboard .sidebar header.profile .user-info .info > ul, .dashboard section.course-index header.profile .user-info .info > ul {
         zoom: 1;
         margin: 0px;
         padding: 0 0 10px 0; }
-        .dashboard .sidebar header.profile .user-info .info > ul:before, .dashboard .sidebar header.profile .user-info .info > ul:after {
+        .dashboard .sidebar header.profile .user-info .info > ul:before, .dashboard section.course-index header.profile .user-info .info > ul:before, .dashboard .sidebar header.profile .user-info .info > ul:after, .dashboard section.course-index header.profile .user-info .info > ul:after {
           content: "";
           display: table; }
-        .dashboard .sidebar header.profile .user-info .info > ul:after {
+        .dashboard .sidebar header.profile .user-info .info > ul:after, .dashboard section.course-index header.profile .user-info .info > ul:after {
           clear: both; }
         @media screen and (max-width: 768px) {
-          .dashboard .sidebar header.profile .user-info .info > ul {
+          .dashboard .sidebar header.profile .user-info .info > ul, .dashboard section.course-index header.profile .user-info .info > ul {
             padding: 0px; } }
-        .dashboard .sidebar header.profile .user-info .info > ul li {
+        .dashboard .sidebar header.profile .user-info .info > ul li, .dashboard section.course-index header.profile .user-info .info > ul li {
           list-style: none;
           margin-bottom: 10px; }
           @media screen and (max-width: 768px) {
-            .dashboard .sidebar header.profile .user-info .info > ul li {
+            .dashboard .sidebar header.profile .user-info .info > ul li, .dashboard section.course-index header.profile .user-info .info > ul li {
               float: left;
               margin-right: 10px; } }
-          .dashboard .sidebar header.profile .user-info .info > ul li:last-child {
+          .dashboard .sidebar header.profile .user-info .info > ul li:last-child, .dashboard section.course-index header.profile .user-info .info > ul li:last-child {
             margin-bottom: 0px; }
-          .dashboard .sidebar header.profile .user-info .info > ul li h3 {
+          .dashboard .sidebar header.profile .user-info .info > ul li h3, .dashboard section.course-index header.profile .user-info .info > ul li h3 {
             color: #a0a0a0;
             font: bold 1rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif;
             text-shadow: 0 1px rgba(255, 255, 255, 0.8); }
-            .dashboard .sidebar header.profile .user-info .info > ul li h3 span {
+            .dashboard .sidebar header.profile .user-info .info > ul li h3 span, .dashboard section.course-index header.profile .user-info .info > ul li h3 span {
               font-weight: normal;
               text-transform: none; }
   .dashboard .my-courses {
@@ -2587,7 +2889,7 @@ header.app {
       box-sizing: border-box;
       float: left;
       font-size: 0em;
-      margin-right: 2.513%;
+      margin-right: 2.024%;
       min-height: 120px;
       margin-bottom: 25px;
       overflow: hidden;
@@ -2921,16 +3223,16 @@ header.app {
                 color: #3c3c3c;
                 font-family: "Open Sans", Verdana, Geneva, sans-serif;
                 margin-left: 3px; }
-          .dashboard .my-courses .my-course .info .meta .progress {
+          .dashboard .my-courses .my-course .info .meta .progress, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done {
             -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             left: 90px;
             right: 140px; }
             @media only screen and (max-width: 320px) {
-              .dashboard .my-courses .my-course .info .meta .progress {
+              .dashboard .my-courses .my-course .info .meta .progress, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done {
                 right: 0px; } }
-            .dashboard .my-courses .my-course .info .meta .progress .meter {
+            .dashboard .my-courses .my-course .info .meta .progress .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done .meter {
               background: #e6e6e6;
               border: 1px solid #c8c8c8;
               -webkit-border-radius: 3px;
@@ -2943,7 +3245,7 @@ header.app {
               box-sizing: border-box;
               height: 100%;
               padding: 2px; }
-              .dashboard .my-courses .my-course .info .meta .progress .meter .meter-fill {
+              .dashboard .my-courses .my-course .info .meta .progress .meter .meter-fill, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none .meter .meter-fill, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none .meter .meter-fill, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some .meter .meter-fill, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some .meter .meter-fill, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done .meter .meter-fill, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done .meter .meter-fill {
                 -webkit-border-radius: 3px;
                 -moz-border-radius: 3px;
                 -ms-border-radius: 3px;
@@ -3021,7 +3323,7 @@ nav.course-material {
         text-shadow: 0 1px rgba(255, 255, 255, 0.4); }
         nav.course-material ol.course-tabs li a:hover {
           color: #3c3c3c; }
-        nav.course-material ol.course-tabs li a.active {
+        nav.course-material ol.course-tabs li a.active, nav.course-material nav.sequence-nav ol.course-tabs li a.seq_video_active, nav.sequence-nav nav.course-material ol.course-tabs li a.seq_video_active, nav.course-material nav.sequence-nav ol.course-tabs li a.seq_other_active, nav.sequence-nav nav.course-material ol.course-tabs li a.seq_other_active, nav.course-material nav.sequence-nav ol.course-tabs li a.seq_vertical_active, nav.sequence-nav nav.course-material ol.course-tabs li a.seq_vertical_active, nav.course-material nav.sequence-nav ol.course-tabs li a.seq_problem_active, nav.sequence-nav nav.course-material ol.course-tabs li a.seq_problem_active {
           background: white;
           border: 1px solid #c8c8c8;
           border-bottom: 0px;
@@ -3099,8 +3401,8 @@ nav.course-material {
     height: 20px; }
   .grid-container .grid {
     background: #FFD3DC;
-    margin-right: 2.513%;
-    width: 6.03%; }
+    margin-right: 2.024%;
+    width: 6.478%; }
     .grid-container .grid:last-child {
       margin-right: 0px; }
   .grid-container .gutter {
@@ -3137,14 +3439,14 @@ nav.course-material {
     -moz-box-shadow: inset 0 0 1px 1px white;
     box-shadow: inset 0 0 1px 1px white;
     padding: 20px;
-    padding-left: 11.055%;
-    padding-right: 34.171%;
+    padding-left: 10.526%;
+    padding-right: 34.008%;
     position: relative;
     width: 100%; }
     .course-info header > img {
       float: left;
       max-height: 86px;
-      max-width: 8.543%;
+      max-width: 8.502%;
       position: absolute;
       top: 10px;
       left: 10px;
@@ -3196,7 +3498,7 @@ nav.course-material {
       border-top-left-radius: 0px;
       display: block;
       font-size: 1.6em;
-      left: 68.342%;
+      left: 68.016%;
       padding-top: 1.5em;
       position: absolute;
       top: -1px;
@@ -3221,15 +3523,15 @@ nav.course-material {
         -webkit-box-shadow: inset 0 0 8px 4px #0d6892, inset 0 0 8px 4px #0d6892, 0 1px 1px 0 #eeeeee;
         -moz-box-shadow: inset 0 0 8px 4px #0d6892, inset 0 0 8px 4px #0d6892, 0 1px 1px 0 #eeeeee;
         box-shadow: inset 0 0 8px 4px #0d6892, inset 0 0 8px 4px #0d6892, 0 1px 1px 0 #eeeeee; }
-  .course-info .sidebar {
+  .course-info .sidebar, .course-info section.course-index {
     background: white;
     float: right;
-    margin: 93px 0 0 2.513%;
-    padding: 0 0 20px 2.513%;
+    margin: 93px 0 0 2.024%;
+    padding: 0 0 20px 2.024%;
     padding-bottom: 20px;
     position: relative;
-    width: 31.658%; }
-    .course-info .sidebar .faded-vertical-divider, .course-info .sidebar .vertical-divider, .course-info .sidebar header.app .divider, header.app .course-info .sidebar .divider, .course-info .sidebar footer nav .copyright a.logo::after, footer nav .copyright .course-info .sidebar a.logo::after, .course-info .sidebar footer nav ol li::after, footer nav ol .course-info .sidebar li::after, .course-info .sidebar .home .university-partners .partners li.partner::before, .home .university-partners .partners .course-info .sidebar li.partner::before {
+    width: 31.984%; }
+    .course-info .sidebar .faded-vertical-divider, .course-info section.course-index .faded-vertical-divider, .course-info .sidebar .vertical-divider, .course-info section.course-index .vertical-divider, .course-info .sidebar header.app .divider, header.app .course-info .sidebar .divider, .course-info section.course-index header.app .divider, header.app .course-info section.course-index .divider, .course-info .sidebar footer nav .copyright a.logo::after, footer nav .copyright .course-info .sidebar a.logo::after, .course-info section.course-index footer nav .copyright a.logo::after, footer nav .copyright .course-info section.course-index a.logo::after, .course-info .sidebar footer nav ol li::after, footer nav ol .course-info .sidebar li::after, .course-info section.course-index footer nav ol li::after, footer nav ol .course-info section.course-index li::after, .course-info .sidebar .home .university-partners .partners li.partner::before, .home .university-partners .partners .course-info .sidebar li.partner::before, .course-info section.course-index .home .university-partners .partners li.partner::before, .home .university-partners .partners .course-info section.course-index li.partner::before {
       background-image: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
       background-image: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
       background-image: -ms-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(200, 200, 200, 0.6) 10%, #c8c8c8 50%, rgba(200, 200, 200, 0.6) 90%, rgba(255, 255, 255, 0));
@@ -3239,19 +3541,19 @@ nav.course-material {
       top: 0px;
       bottom: 0px;
       left: 0px; }
-    .course-info .sidebar h3 {
+    .course-info .sidebar h3, .course-info section.course-index h3 {
       color: #999;
       font-size: 1em;
       margin-bottom: .5em; }
-    .course-info .sidebar .course-staff {
+    .course-info .sidebar .course-staff, .course-info section.course-index .course-staff {
       clear: none;
       position: relative; }
-      .course-info .sidebar .course-staff .teacher {
+      .course-info .sidebar .course-staff .teacher, .course-info section.course-index .course-staff .teacher {
         margin-bottom: 1em; }
-        .course-info .sidebar .course-staff .teacher .teacher-image {
+        .course-info .sidebar .course-staff .teacher .teacher-image, .course-info section.course-index .course-staff .teacher .teacher-image {
           float: left;
           margin: 0 10px 5px 0; }
-        .course-info .sidebar .course-staff .teacher .teacher-name {
+        .course-info .sidebar .course-staff .teacher .teacher-name, .course-info section.course-index .course-staff .teacher .teacher-name {
           color: #646464;
           font-size: 1.5em;
           font-weight: bold;
@@ -3260,7 +3562,7 @@ nav.course-material {
     float: right;
     margin-top: 40px;
     padding-bottom: 20px;
-    width: 65.829%; }
+    width: 65.992%; }
     .course-info .main-content-wrap .video iframe {
       border: 10px solid #6a6a6a;
       -webkit-border-radius: 10px;
@@ -3362,3 +3664,1747 @@ nav.course-material {
           margin-left: 2em; }
     .course-info .main-content-wrap .more-info p {
       margin-left: 2em; }
+
+html {
+  height: 100%;
+  max-height: 100%; }
+
+body.courseware {
+  height: 100%;
+  max-height: 100%; }
+  body.courseware .container {
+    margin-bottom: 40px;
+    margin-top: 20px; }
+  body.courseware footer.fixed-bottom {
+    Position: static; }
+
+div.course-wrapper ul, div.course-wrapper ol {
+  list-style: none; }
+div.course-wrapper section.course-content {
+  -webkit-border-radius: 0 4px 4px 0;
+  -moz-border-radius: 0 4px 4px 0;
+  -ms-border-radius: 0 4px 4px 0;
+  -o-border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 0; }
+  div.course-wrapper section.course-content h1 {
+    margin: 0 0 22.652px; }
+  div.course-wrapper section.course-content p {
+    margin-bottom: 22.652px; }
+    div.course-wrapper section.course-content p:empty {
+      display: none;
+      margin-bottom: 0; }
+  div.course-wrapper section.course-content ul li {
+    margin-bottom: 11.326px; }
+  div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li {
+    position: relative; }
+    div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      width: 20.109%;
+      padding-right: 2.717%;
+      border-right: 1px dashed #ddd;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      display: table-cell;
+      vertical-align: top; }
+      div.course-wrapper section.course-content .problem-set h2.problem-header section.staff, div.course-wrapper section.course-content section.problems-wrapper h2.problem-header section.staff, div.course-wrapper section.course-content div#seq_content h2.problem-header section.staff, div.course-wrapper section.course-content ol.vert-mod > li h2.problem-header section.staff {
+        margin-top: 30px;
+        font-size: 80%; }
+      @media screen and (max-width:1120px) {
+        div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+          display: block;
+          width: auto;
+          border-right: 0; } }
+      @media print {
+        div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+          display: block;
+          width: auto;
+          border-right: 0; } }
+    div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+      display: table-cell;
+      width: 77.174%;
+      padding-left: 2.717%; }
+      @media screen and (max-width:1120px) {
+        div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+          display: block;
+          width: auto;
+          padding: 0; } }
+      @media print {
+        div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+          display: block;
+          width: auto;
+          padding: 0; }
+          div.course-wrapper section.course-content .problem-set section.problem canvas, div.course-wrapper section.course-content section.problems-wrapper section.problem canvas, div.course-wrapper section.course-content div#seq_content section.problem canvas, div.course-wrapper section.course-content ol.vert-mod > li section.problem canvas, div.course-wrapper section.course-content .problem-set section.problem img, div.course-wrapper section.course-content section.problems-wrapper section.problem img, div.course-wrapper section.course-content div#seq_content section.problem img, div.course-wrapper section.course-content ol.vert-mod > li section.problem img {
+            page-break-inside: avoid; } }
+      div.course-wrapper section.course-content .problem-set section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.unanswered, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-bullet, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-bullet, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-bullet, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-bullet {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("../images/unanswered-icon.png") center center no-repeat;
+        height: 14px;
+        position: relative;
+        top: 4px;
+        width: 14px; }
+      div.course-wrapper section.course-content .problem-set section.problem span.correct, div.course-wrapper section.course-content section.problems-wrapper section.problem span.correct, div.course-wrapper section.course-content div#seq_content section.problem span.correct, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.correct, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-check, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-check, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-check, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-check {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("../images/correct-icon.png") center center no-repeat;
+        height: 20px;
+        position: relative;
+        top: 6px;
+        width: 25px; }
+      div.course-wrapper section.course-content .problem-set section.problem span.incorrect, div.course-wrapper section.course-content section.problems-wrapper section.problem span.incorrect, div.course-wrapper section.course-content div#seq_content section.problem span.incorrect, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.incorrect, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-close, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-close, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-close, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-close {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        background: url("../images/incorrect-icon.png") center center no-repeat;
+        height: 20px;
+        width: 20px;
+        position: relative;
+        top: 6px; }
+    div.course-wrapper section.course-content .problem-set div > span, div.course-wrapper section.course-content section.problems-wrapper div > span, div.course-wrapper section.course-content div#seq_content div > span, div.course-wrapper section.course-content ol.vert-mod > li div > span {
+      display: block;
+      margin-bottom: 11.326px; }
+      div.course-wrapper section.course-content .problem-set div > span[answer], div.course-wrapper section.course-content section.problems-wrapper div > span[answer], div.course-wrapper section.course-content div#seq_content div > span[answer], div.course-wrapper section.course-content ol.vert-mod > li div > span[answer] {
+        border-top: 1px solid #ededed;
+        border-bottom: 1px solid #ededed;
+        background: #f3f3f3;
+        margin: 0 -22.652px;
+        padding: 11.326px 22.652px; }
+    div.course-wrapper section.course-content .problem-set input[type="text"], div.course-wrapper section.course-content section.problems-wrapper input[type="text"], div.course-wrapper section.course-content div#seq_content input[type="text"], div.course-wrapper section.course-content ol.vert-mod > li input[type="text"] {
+      display: inline-block;
+      width: 50%; }
+    div.course-wrapper section.course-content .problem-set center, div.course-wrapper section.course-content section.problems-wrapper center, div.course-wrapper section.course-content div#seq_content center, div.course-wrapper section.course-content ol.vert-mod > li center {
+      display: block;
+      margin: 22.652px 0;
+      border: 1px solid #ccc;
+      padding: 22.652px; }
+    div.course-wrapper section.course-content .problem-set section.action, div.course-wrapper section.course-content section.problems-wrapper section.action, div.course-wrapper section.course-content div#seq_content section.action, div.course-wrapper section.course-content ol.vert-mod > li section.action {
+      margin-top: 22.652px; }
+      div.course-wrapper section.course-content .problem-set section.action input[type="button"], div.course-wrapper section.course-content section.problems-wrapper section.action input[type="button"], div.course-wrapper section.course-content div#seq_content section.action input[type="button"], div.course-wrapper section.course-content ol.vert-mod > li section.action input[type="button"] {
+        padding: 9.061px 22.652px;
+        text-shadow: 0 -1px 0 #666666; }
+  div.course-wrapper section.course-content section.problems-wrapper {
+    display: table;
+    width: 100%; }
+    @media screen and (max-width:1120px) {
+      div.course-wrapper section.course-content section.problems-wrapper {
+        display: block;
+        width: auto; } }
+  div.course-wrapper section.course-content div#seq_content h1 {
+    background: none;
+    margin-bottom: 22.652px;
+    padding-bottom: 0;
+    border-bottom: none; }
+  div.course-wrapper section.course-content ol.vert-mod > li {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 15px;
+    padding: 0 0 15px; }
+    div.course-wrapper section.course-content ol.vert-mod > li header {
+      -webkit-border-radius: 0 4px 0 0;
+      -moz-border-radius: 0 4px 0 0;
+      -ms-border-radius: 0 4px 0 0;
+      -o-border-radius: 0 4px 0 0;
+      border-radius: 0 4px 0 0;
+      margin-bottom: -16px; }
+      div.course-wrapper section.course-content ol.vert-mod > li header h1 {
+        margin: 0; }
+      div.course-wrapper section.course-content ol.vert-mod > li header h2 {
+        float: right;
+        margin-right: 0;
+        margin-top: 8px;
+        text-align: right;
+        padding-right: 0;
+        border-right: 0; }
+    div.course-wrapper section.course-content ol.vert-mod > li:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0; }
+    div.course-wrapper section.course-content ol.vert-mod > li .histogram {
+      width: 200px;
+      height: 150px; }
+    div.course-wrapper section.course-content ol.vert-mod > li ul {
+      list-style: disc outside none;
+      padding-left: 1em; }
+    div.course-wrapper section.course-content ol.vert-mod > li nav.sequence-bottom ul {
+      list-style: none;
+      padding: 0; }
+  div.course-wrapper section.course-content section.tutorials h2 {
+    margin-bottom: 22.652px; }
+  div.course-wrapper section.course-content section.tutorials ul {
+    margin: 0;
+    zoom: 1; }
+    div.course-wrapper section.course-content section.tutorials ul:before, div.course-wrapper section.course-content section.tutorials ul:after {
+      content: "";
+      display: table; }
+    div.course-wrapper section.course-content section.tutorials ul:after {
+      clear: both; }
+    div.course-wrapper section.course-content section.tutorials ul li {
+      width: 31.522%;
+      float: left;
+      margin-right: 2.717%;
+      margin-bottom: 22.652px; }
+      div.course-wrapper section.course-content section.tutorials ul li:nth-child(3n) {
+        margin-right: 0; }
+      div.course-wrapper section.course-content section.tutorials ul li:nth-child(3n+1) {
+        clear: both; }
+      div.course-wrapper section.course-content section.tutorials ul li a {
+        font-weight: bold; }
+  div.course-wrapper section.course-content div.staff_info {
+    zoom: 1;
+    white-space: pre-wrap;
+    border-top: 1px solid #ccc;
+    padding-top: 22.652px;
+    margin-top: 22.652px;
+    line-height: 22.652px;
+    font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace; }
+    div.course-wrapper section.course-content div.staff_info:before, div.course-wrapper section.course-content div.staff_info:after {
+      content: "";
+      display: table; }
+    div.course-wrapper section.course-content div.staff_info:after {
+      clear: both; }
+  div.course-wrapper section.course-content div.ui-slider {
+    border: 1px solid #aaa;
+    background: #ddd;
+    -webkit-box-shadow: inset 0 1px 0 #eeeeee;
+    -moz-box-shadow: inset 0 1px 0 #eeeeee;
+    box-shadow: inset 0 1px 0 #eeeeee;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    -o-border-radius: 0;
+    border-radius: 0; }
+    div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle {
+      -webkit-box-shadow: inset 0 1px 0 #bf4040;
+      -moz-box-shadow: inset 0 1px 0 #bf4040;
+      box-shadow: inset 0 1px 0 #bf4040;
+      background: #993333 url(../images/slider-bars.png) center center no-repeat;
+      border: 1px solid #4d1919;
+      cursor: pointer; }
+      div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle:hover, div.course-wrapper section.course-content div.ui-slider a.ui-slider-handle:focus {
+        background-color: #bf4040;
+        outline: none; }
+  div.course-wrapper section.course-content div.ui-tabs {
+    border: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    -o-border-radius: 0;
+    border-radius: 0;
+    margin: 0;
+    padding: 0; }
+    div.course-wrapper section.course-content div.ui-tabs .ui-tabs-nav {
+      background: none;
+      border: 0;
+      margin-bottom: 11.326px; }
+    div.course-wrapper section.course-content div.ui-tabs .ui-tabs-panel {
+      -webkit-border-radius: 0;
+      -moz-border-radius: 0;
+      -ms-border-radius: 0;
+      -o-border-radius: 0;
+      border-radius: 0;
+      padding: 0; }
+div.course-wrapper.closed section.course-index {
+  width: 3.077%;
+  overflow: hidden; }
+  div.course-wrapper.closed section.course-index header#open_close_accordion {
+    padding: 0;
+    min-height: 47px; }
+    div.course-wrapper.closed section.course-index header#open_close_accordion a {
+      background-image: url("../images/slide-right-icon.png"); }
+    div.course-wrapper.closed section.course-index header#open_close_accordion h2 {
+      visibility: hidden;
+      width: 10px; }
+  div.course-wrapper.closed section.course-index div#accordion {
+    visibility: hidden;
+    width: 10px;
+    padding: 0; }
+    div.course-wrapper.closed section.course-index div#accordion nav {
+      white-space: pre;
+      overflow: hidden; }
+      div.course-wrapper.closed section.course-index div#accordion nav ul {
+        overflow: hidden;
+        white-space: nowrap; }
+div.course-wrapper.closed section.course-content {
+  width: 97.773%; }
+
+nav.sequence-nav {
+  border-bottom: 1px solid #e4d080;
+  margin-bottom: 22.652px;
+  position: relative;
+  -webkit-border-top-right-radius: 4px;
+  -moz-border-top-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  -ms-border-top-right-radius: 4px;
+  -o-border-top-right-radius: 4px;
+  border-top-right-radius: 4px; }
+  nav.sequence-nav ol {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table;
+    height: 100%;
+    padding-right: 8.696%;
+    width: 100%; }
+    nav.sequence-nav ol li {
+      border-left: 1px solid #e4d080;
+      display: table-cell;
+      min-width: 20px; }
+      nav.sequence-nav ol li:first-child {
+        border-left: none; }
+      nav.sequence-nav ol li .inactive, nav.sequence-nav ol li a.seq_video_inactive, nav.sequence-nav ol li a.seq_other_inactive, nav.sequence-nav ol li a.seq_vertical_inactive, nav.sequence-nav ol li a.seq_problem_inactive {
+        background-repeat: no-repeat; }
+        nav.sequence-nav ol li .inactive:hover, nav.sequence-nav ol li a.seq_video_inactive:hover, nav.sequence-nav ol li a.seq_other_inactive:hover, nav.sequence-nav ol li a.seq_vertical_inactive:hover, nav.sequence-nav ol li a.seq_problem_inactive:hover {
+          background-color: #f9f4e1; }
+      nav.sequence-nav ol li .visited, nav.sequence-nav ol li a.seq_video_visited, nav.sequence-nav ol li a.seq_other_visited, nav.sequence-nav ol li a.seq_vertical_visited, nav.sequence-nav ol li a.seq_problem_visited {
+        background-color: #DCCDA2;
+        background-repeat: no-repeat;
+        -webkit-box-shadow: inset 0 0 3px #ceb97d;
+        -moz-box-shadow: inset 0 0 3px #ceb97d;
+        box-shadow: inset 0 0 3px #ceb97d; }
+        nav.sequence-nav ol li .visited:hover, nav.sequence-nav ol li a.seq_video_visited:hover, nav.sequence-nav ol li a.seq_other_visited:hover, nav.sequence-nav ol li a.seq_vertical_visited:hover, nav.sequence-nav ol li a.seq_problem_visited:hover {
+          background-color: #f6efd4;
+          background-position: center center; }
+      nav.sequence-nav ol li .active, nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li a.seq_problem_active, nav.sequence-nav ol li section.course-index div#accordion h3.ui-accordion-header.ui-state-active, section.course-index div#accordion nav.sequence-nav ol li h3.ui-accordion-header.ui-state-active {
+        background-color: #fff;
+        background-repeat: no-repeat;
+        -webkit-box-shadow: 0 1px 0 white;
+        -moz-box-shadow: 0 1px 0 white;
+        box-shadow: 0 1px 0 white; }
+        nav.sequence-nav ol li .active:hover, nav.sequence-nav ol li a.seq_video_active:hover, nav.sequence-nav ol li a.seq_other_active:hover, nav.sequence-nav ol li a.seq_vertical_active:hover, nav.sequence-nav ol li a.seq_problem_active:hover, nav.sequence-nav ol li section.course-index div#accordion h3.ui-accordion-header.ui-state-active:hover, section.course-index div#accordion nav.sequence-nav ol li h3.ui-accordion-header.ui-state-active:hover {
+          background-color: #fff;
+          background-position: center; }
+      nav.sequence-nav ol li a {
+        background-position: center center;
+        border: none;
+        cursor: pointer;
+        display: block;
+        height: 17px;
+        padding: 15px 0 14px;
+        position: relative;
+        -webkit-transition-property: all;
+        -moz-transition-property: all;
+        -ms-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-duration: 0.4s;
+        -moz-transition-duration: 0.4s;
+        -ms-transition-duration: 0.4s;
+        -o-transition-duration: 0.4s;
+        transition-duration: 0.4s;
+        -webkit-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        -moz-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        -ms-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        -o-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        -webkit-transition-delay: 0;
+        -moz-transition-delay: 0;
+        -ms-transition-delay: 0;
+        -o-transition-delay: 0;
+        transition-delay: 0;
+        width: 100%; }
+        nav.sequence-nav ol li a.progress, nav.sequence-nav ol li a.progress-none, nav.sequence-nav ol li a.progress-some, nav.sequence-nav ol li a.progress-done {
+          border-bottom-style: solid;
+          border-bottom-width: 4px; }
+        nav.sequence-nav ol li a.progress-none {
+          border-bottom-color: red; }
+        nav.sequence-nav ol li a.progress-some {
+          border-bottom-color: yellow; }
+        nav.sequence-nav ol li a.progress-done {
+          border-bottom-color: green; }
+        nav.sequence-nav ol li a.seq_video_inactive {
+          background-image: url("../images/sequence-nav/video-icon-normal.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_video_visited {
+          background-image: url("../images/sequence-nav/video-icon-visited.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_video_active {
+          background-image: url("../images/sequence-nav/video-icon-current.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_other_inactive {
+          background-image: url("../images/sequence-nav/document-icon-normal.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_other_visited {
+          background-image: url("../images/sequence-nav/document-icon-visited.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_other_active {
+          background-image: url("../images/sequence-nav/document-icon-current.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_vertical_inactive, nav.sequence-nav ol li a.seq_problem_inactive {
+          background-image: url("../images/sequence-nav/list-icon-normal.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_vertical_visited, nav.sequence-nav ol li a.seq_problem_visited {
+          background-image: url("../images/sequence-nav/list-icon-visited.png");
+          background-position: center; }
+        nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li a.seq_problem_active {
+          background-image: url("../images/sequence-nav/list-icon-current.png");
+          background-position: center; }
+        nav.sequence-nav ol li a p {
+          background: #333;
+          color: #fff;
+          display: none;
+          line-height: 22.652px;
+          left: 0px;
+          opacity: 0;
+          padding: 6px;
+          position: absolute;
+          top: 48px;
+          text-shadow: 0 -1px 0 black;
+          -webkit-transition-property: all;
+          -moz-transition-property: all;
+          -ms-transition-property: all;
+          -o-transition-property: all;
+          transition-property: all;
+          -webkit-transition-duration: 0.1s;
+          -moz-transition-duration: 0.1s;
+          -ms-transition-duration: 0.1s;
+          -o-transition-duration: 0.1s;
+          transition-duration: 0.1s;
+          -webkit-transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+          -moz-transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+          -ms-transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+          -o-transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+          transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+          -webkit-transition-delay: 0;
+          -moz-transition-delay: 0;
+          -ms-transition-delay: 0;
+          -o-transition-delay: 0;
+          transition-delay: 0;
+          white-space: pre;
+          z-index: 99; }
+          nav.sequence-nav ol li a p:empty {
+            background: none; }
+            nav.sequence-nav ol li a p:empty::after {
+              display: none; }
+          nav.sequence-nav ol li a p::after {
+            background: #333;
+            content: " ";
+            display: block;
+            height: 10px;
+            left: 18px;
+            position: absolute;
+            top: -5px;
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+            width: 10px; }
+        nav.sequence-nav ol li a:hover p {
+          display: block;
+          margin-top: 4px;
+          opacity: 1; }
+  nav.sequence-nav ul {
+    list-style: none;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 8.696%; }
+    nav.sequence-nav ul li {
+      float: left;
+      width: 50%; }
+      nav.sequence-nav ul li.prev a, nav.sequence-nav ul li.next a {
+        background-color: #f2e7bf;
+        background-position: center center;
+        background-repeat: no-repeat;
+        border-left: 1px solid #e4d080;
+        -webkit-box-shadow: inset 1px 0 0 #faf7e9;
+        -moz-box-shadow: inset 1px 0 0 #faf7e9;
+        box-shadow: inset 1px 0 0 #faf7e9;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: block;
+        text-indent: -9999px;
+        -webkit-transition-property: all;
+        -moz-transition-property: all;
+        -ms-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-duration: 0.2s;
+        -moz-transition-duration: 0.2s;
+        -ms-transition-duration: 0.2s;
+        -o-transition-duration: 0.2s;
+        transition-duration: 0.2s;
+        -webkit-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        -moz-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        -ms-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        -o-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        -webkit-transition-delay: 0;
+        -moz-transition-delay: 0;
+        -ms-transition-delay: 0;
+        -o-transition-delay: 0;
+        transition-delay: 0; }
+        nav.sequence-nav ul li.prev a:hover, nav.sequence-nav ul li.next a:hover {
+          opacity: .5; }
+        nav.sequence-nav ul li.prev a.disabled, nav.sequence-nav ul li.next a.disabled {
+          cursor: normal;
+          opacity: .4; }
+      nav.sequence-nav ul li.prev a {
+        background-image: url("../images/sequence-nav/previous-icon.png"); }
+        nav.sequence-nav ul li.prev a:hover {
+          background-color: #f6efd4; }
+      nav.sequence-nav ul li.next a {
+        background-image: url("../images/sequence-nav/next-icon.png"); }
+        nav.sequence-nav ul li.next a:hover {
+          background-color: #f6efd4; }
+  body.touch-based-device nav.sequence-nav ol li a:hover p {
+    display: none; }
+
+section.course-content {
+  position: relative; }
+  section.course-content ol.vert-mod nav.sequence-nav {
+    margin-top: -15px;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    -o-border-radius: 0;
+    border-radius: 0; }
+  section.course-content nav.sequence-bottom {
+    margin: 45.304px 0 0;
+    text-align: center; }
+    section.course-content nav.sequence-bottom ul {
+      background-color: #f2e7bf;
+      background-color: #f2e7bf;
+      border: 1px solid #e4d080;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      -webkit-box-shadow: inset 0 0 0 1px #faf7e9;
+      -moz-box-shadow: inset 0 0 0 1px #faf7e9;
+      box-shadow: inset 0 0 0 1px #faf7e9;
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto; }
+      section.course-content nav.sequence-bottom ul li {
+        float: left; }
+        section.course-content nav.sequence-bottom ul li.prev, section.course-content nav.sequence-bottom ul li.next {
+          margin-bottom: 0; }
+          section.course-content nav.sequence-bottom ul li.prev a, section.course-content nav.sequence-bottom ul li.next a {
+            background-position: center center;
+            background-repeat: no-repeat;
+            border-bottom: none;
+            display: block;
+            padding: 11.326px 4px;
+            text-indent: -9999px;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.2s;
+            -moz-transition-duration: 0.2s;
+            -ms-transition-duration: 0.2s;
+            -o-transition-duration: 0.2s;
+            transition-duration: 0.2s;
+            -webkit-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+            -moz-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+            -ms-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+            -o-transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+            transition-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            width: 45px; }
+            section.course-content nav.sequence-bottom ul li.prev a:hover, section.course-content nav.sequence-bottom ul li.next a:hover {
+              background-color: #f6efd4;
+              color: #7e691a;
+              opacity: .5;
+              text-decoration: none; }
+            section.course-content nav.sequence-bottom ul li.prev a.disabled, section.course-content nav.sequence-bottom ul li.next a.disabled {
+              background-color: #fffffe;
+              opacity: .4; }
+        section.course-content nav.sequence-bottom ul li.prev a {
+          background-image: url("../images/sequence-nav/previous-icon.png");
+          border-right: 1px solid #e4d080; }
+          section.course-content nav.sequence-bottom ul li.prev a:hover {
+            background-color: none; }
+        section.course-content nav.sequence-bottom ul li.next a {
+          background-image: url("../images/sequence-nav/next-icon.png"); }
+          section.course-content nav.sequence-bottom ul li.next a:hover {
+            background-color: none; }
+
+section.course-index header {
+  max-height: 47px; }
+  section.course-index header h2 {
+    white-space: nowrap; }
+section.course-index div#accordion h3 {
+  -webkit-box-shadow: inset 0 1px 0 0 #eeeeee;
+  -moz-box-shadow: inset 0 1px 0 0 #eeeeee;
+  box-shadow: inset 0 1px 0 0 #eeeeee;
+  border-top: 1px solid #d3d3d3;
+  overflow: hidden;
+  margin: 0; }
+  section.course-index div#accordion h3:first-child {
+    border: none; }
+  section.course-index div#accordion h3:hover {
+    background-image: -webkit-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+    background-image: -moz-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+    background-image: -ms-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+    background-image: -o-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+    background-image: linear-gradient(-90deg, #f5f5f5, #e1e1e1); }
+  section.course-index div#accordion h3.ui-accordion-header {
+    color: #000; }
+    section.course-index div#accordion h3.ui-accordion-header a {
+      font-size: 14px;
+      color: #4d4d4d; }
+    section.course-index div#accordion h3.ui-accordion-header.ui-state-active {
+      background-image: -webkit-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      background-image: -moz-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      background-image: -ms-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      background-image: -o-linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      background-image: linear-gradient(-90deg, #f5f5f5, #e1e1e1);
+      border-bottom: 1px solid #d3d3d3; }
+section.course-index div#accordion ul.ui-accordion-content {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: inset -1px 0 0 #e6e6e6;
+  -moz-box-shadow: inset -1px 0 0 #e6e6e6;
+  box-shadow: inset -1px 0 0 #e6e6e6;
+  background: #dadada;
+  border: none;
+  font-size: 12px;
+  margin: 0;
+  padding: 1em 1.5em; }
+  section.course-index div#accordion ul.ui-accordion-content li {
+    background: transparent;
+    border: 1px solid transparent;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    border-radius: 4px;
+    margin-bottom: 11.326px;
+    position: relative;
+    padding: 5px 36px 5px 10px; }
+    section.course-index div#accordion ul.ui-accordion-content li a {
+      text-decoration: none;
+      display: block;
+      color: #666; }
+      section.course-index div#accordion ul.ui-accordion-content li a p {
+        font-weight: bold;
+        margin-bottom: 0; }
+        section.course-index div#accordion ul.ui-accordion-content li a p span.subtitle {
+          color: #666;
+          font-weight: normal;
+          display: block; }
+    section.course-index div#accordion ul.ui-accordion-content li:after {
+      background: transparent;
+      border-top: 1px solid #b4b4b4;
+      border-right: 1px solid #b4b4b4;
+      content: "";
+      display: block;
+      height: 12px;
+      margin-top: -6px;
+      opacity: 0;
+      position: absolute;
+      top: 50%;
+      right: 30px;
+      -webkit-transform: rotate(45deg);
+      -moz-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      -o-transform: rotate(45deg);
+      transform: rotate(45deg);
+      width: 12px; }
+    section.course-index div#accordion ul.ui-accordion-content li:hover {
+      background-image: -webkit-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+      background-image: -moz-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+      background-image: -ms-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+      background-image: -o-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+      background-image: linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+      border-color: #c8c8c8; }
+      section.course-index div#accordion ul.ui-accordion-content li:hover:after {
+        opacity: 1;
+        right: 15px;
+        -webkit-transition-property: all;
+        -moz-transition-property: all;
+        -ms-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-duration: 0.2s;
+        -moz-transition-duration: 0.2s;
+        -ms-transition-duration: 0.2s;
+        -o-transition-duration: 0.2s;
+        transition-duration: 0.2s;
+        -webkit-transition-timing-function: linear;
+        -moz-transition-timing-function: linear;
+        -ms-transition-timing-function: linear;
+        -o-transition-timing-function: linear;
+        transition-timing-function: linear;
+        -webkit-transition-delay: 0;
+        -moz-transition-delay: 0;
+        -ms-transition-delay: 0;
+        -o-transition-delay: 0;
+        transition-delay: 0; }
+      section.course-index div#accordion ul.ui-accordion-content li:hover > a p {
+        color: #333; }
+    section.course-index div#accordion ul.ui-accordion-content li:active {
+      -webkit-box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1);
+      -moz-box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1);
+      top: 1px; }
+      section.course-index div#accordion ul.ui-accordion-content li:active:after {
+        opacity: 1;
+        right: 15px; }
+    section.course-index div#accordion ul.ui-accordion-content li.active {
+      background: #f0f0f0;
+      background-image: -webkit-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+      background-image: -moz-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+      background-image: -ms-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+      background-image: -o-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+      background-image: linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+      border-color: #c8c8c8;
+      font-weight: bold; }
+      section.course-index div#accordion ul.ui-accordion-content li.active > a p {
+        color: #333; }
+      section.course-index div#accordion ul.ui-accordion-content li.active span.subtitle {
+        font-weight: normal; }
+      section.course-index div#accordion ul.ui-accordion-content li.active:after {
+        opacity: 1;
+        right: 15px; }
+
+@-moz-document url-prefix() {
+  a.add-fullscreen {
+    display: none !important; } }
+
+section.course-content .dullify, section.course-content div.video article.video-wrapper section.video-controls ul.vcr, section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls {
+  opacity: .4;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -ms-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.15s;
+  -moz-transition-duration: 0.15s;
+  -ms-transition-duration: 0.15s;
+  -o-transition-duration: 0.15s;
+  transition-duration: 0.15s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  -ms-transition-timing-function: ease-out;
+  -o-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+  -webkit-transition-delay: 0;
+  -moz-transition-delay: 0;
+  -ms-transition-delay: 0;
+  -o-transition-delay: 0;
+  transition-delay: 0; }
+  section.course-content .dullify:hover, section.course-content div.video article.video-wrapper section.video-controls ul.vcr:hover, section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls:hover {
+    opacity: 1; }
+section.course-content div.video {
+  zoom: 1;
+  background: #f3f3f3;
+  border-bottom: 1px solid #e1e1e1;
+  border-top: 1px solid #e1e1e1;
+  display: block;
+  margin: 0 -22.652px;
+  padding: 6px 22.652px; }
+  section.course-content div.video:before, section.course-content div.video:after {
+    content: "";
+    display: table; }
+  section.course-content div.video:after {
+    clear: both; }
+  section.course-content div.video article.video-wrapper {
+    float: left;
+    margin-right: 2.717%;
+    width: 65.761%; }
+    section.course-content div.video article.video-wrapper section.video-player {
+      height: 0;
+      overflow: hidden;
+      padding-bottom: 56.25%;
+      padding-top: 30px;
+      position: relative; }
+      section.course-content div.video article.video-wrapper section.video-player object, section.course-content div.video article.video-wrapper section.video-player iframe {
+        border: none;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%; }
+    section.course-content div.video article.video-wrapper section.video-controls {
+      background: #333;
+      border: 1px solid #000;
+      border-top: 0;
+      color: #ccc;
+      position: relative; }
+      section.course-content div.video article.video-wrapper section.video-controls:hover ul, section.course-content div.video article.video-wrapper section.video-controls:hover div {
+        opacity: 1; }
+      section.course-content div.video article.video-wrapper section.video-controls div.slider {
+        background: #c2c2c2;
+        border: none;
+        border-bottom: 1px solid #000;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        -ms-border-radius: 0;
+        -o-border-radius: 0;
+        border-radius: 0;
+        border-top: 1px solid #000;
+        -webkit-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
+        -moz-box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
+        box-shadow: inset 0 1px 0 #eeeeee, 0 1px 0 #555555;
+        height: 7px;
+        -webkit-transition-property: height, 2s, ease-in-out;
+        -moz-transition-property: height, 2s, ease-in-out;
+        -ms-transition-property: height, 2s, ease-in-out;
+        -o-transition-property: height, 2s, ease-in-out;
+        transition-property: height, 2s, ease-in-out;
+        -webkit-transition-duration: 0.15s;
+        -moz-transition-duration: 0.15s;
+        -ms-transition-duration: 0.15s;
+        -o-transition-duration: 0.15s;
+        transition-duration: 0.15s;
+        -webkit-transition-timing-function: ease-out;
+        -moz-transition-timing-function: ease-out;
+        -ms-transition-timing-function: ease-out;
+        -o-transition-timing-function: ease-out;
+        transition-timing-function: ease-out;
+        -webkit-transition-delay: 0;
+        -moz-transition-delay: 0;
+        -ms-transition-delay: 0;
+        -o-transition-delay: 0;
+        transition-delay: 0; }
+        section.course-content div.video article.video-wrapper section.video-controls div.slider div.ui-widget-header {
+          background: #777;
+          -webkit-box-shadow: inset 0 1px 0 #999999;
+          -moz-box-shadow: inset 0 1px 0 #999999;
+          box-shadow: inset 0 1px 0 #999999; }
+        section.course-content div.video article.video-wrapper section.video-controls div.slider .ui-tooltip.qtip .ui-tooltip-content {
+          background: #993333;
+          border: 1px solid #4d1919;
+          -webkit-border-radius: 2px;
+          -moz-border-radius: 2px;
+          -ms-border-radius: 2px;
+          -o-border-radius: 2px;
+          border-radius: 2px;
+          -webkit-box-shadow: inset 0 1px 0 #bf4040;
+          -moz-box-shadow: inset 0 1px 0 #bf4040;
+          box-shadow: inset 0 1px 0 #bf4040;
+          color: #fff;
+          font: bold 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+          margin-bottom: 6px;
+          margin-right: 0;
+          overflow: visible;
+          padding: 4px;
+          text-align: center;
+          text-shadow: 0 -1px 0 #732626;
+          -webkit-font-smoothing: antialiased; }
+          section.course-content div.video article.video-wrapper section.video-controls div.slider .ui-tooltip.qtip .ui-tooltip-content::after {
+            background: #993333;
+            border-bottom: 1px solid #4d1919;
+            border-right: 1px solid #4d1919;
+            bottom: -5px;
+            content: " ";
+            display: block;
+            height: 7px;
+            left: 50%;
+            margin-left: -3px;
+            position: absolute;
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+            width: 7px; }
+        section.course-content div.video article.video-wrapper section.video-controls div.slider a.ui-slider-handle {
+          background: #993333 url(../images/slider-handle.png) center center no-repeat;
+          -webkit-background-size: 50%;
+          -moz-background-size: 50%;
+          -ms-background-size: 50%;
+          -o-background-size: 50%;
+          background-size: 50%;
+          border: 1px solid #4d1919;
+          -webkit-border-radius: 15px;
+          -moz-border-radius: 15px;
+          -ms-border-radius: 15px;
+          -o-border-radius: 15px;
+          border-radius: 15px;
+          -webkit-box-shadow: inset 0 1px 0 #bf4040;
+          -moz-box-shadow: inset 0 1px 0 #bf4040;
+          box-shadow: inset 0 1px 0 #bf4040;
+          cursor: pointer;
+          height: 15px;
+          margin-left: -7px;
+          top: -4px;
+          -webkit-transition-property: height, 2s, ease-in-out;
+          -moz-transition-property: height, 2s, ease-in-out;
+          -ms-transition-property: height, 2s, ease-in-out;
+          -o-transition-property: height, 2s, ease-in-out;
+          transition-property: height, 2s, ease-in-out;
+          -webkit-transition-duration: width, 2s, ease-in-out;
+          -moz-transition-duration: width, 2s, ease-in-out;
+          -ms-transition-duration: width, 2s, ease-in-out;
+          -o-transition-duration: width, 2s, ease-in-out;
+          transition-duration: width, 2s, ease-in-out;
+          -webkit-transition-timing-function: ease-out;
+          -moz-transition-timing-function: ease-out;
+          -ms-transition-timing-function: ease-out;
+          -o-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+          -webkit-transition-delay: 0;
+          -moz-transition-delay: 0;
+          -ms-transition-delay: 0;
+          -o-transition-delay: 0;
+          transition-delay: 0;
+          width: 15px; }
+          section.course-content div.video article.video-wrapper section.video-controls div.slider a.ui-slider-handle:focus, section.course-content div.video article.video-wrapper section.video-controls div.slider a.ui-slider-handle:hover {
+            background-color: #bf4040;
+            outline: none; }
+      section.course-content div.video article.video-wrapper section.video-controls ul.vcr {
+        float: left;
+        list-style: none;
+        margin-right: 22.652px;
+        padding: 0; }
+        section.course-content div.video article.video-wrapper section.video-controls ul.vcr li {
+          float: left;
+          margin-bottom: 0; }
+          section.course-content div.video article.video-wrapper section.video-controls ul.vcr li a {
+            border-bottom: none;
+            border-right: 1px solid #000;
+            -webkit-box-shadow: 1px 0 0 #555555;
+            -moz-box-shadow: 1px 0 0 #555555;
+            box-shadow: 1px 0 0 #555555;
+            cursor: pointer;
+            display: block;
+            line-height: 46px;
+            padding: 0 16.989px;
+            text-indent: -9999px;
+            -webkit-transition-property: background-color;
+            -moz-transition-property: background-color;
+            -ms-transition-property: background-color;
+            -o-transition-property: background-color;
+            transition-property: background-color;
+            -webkit-transition-duration: opacity;
+            -moz-transition-duration: opacity;
+            -ms-transition-duration: opacity;
+            -o-transition-duration: opacity;
+            transition-duration: opacity;
+            -webkit-transition-timing-function: ease-out;
+            -moz-transition-timing-function: ease-out;
+            -ms-transition-timing-function: ease-out;
+            -o-transition-timing-function: ease-out;
+            transition-timing-function: ease-out;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            width: 14px;
+            background: url("../images/vcr.png") 15px 15px no-repeat; }
+            section.course-content div.video article.video-wrapper section.video-controls ul.vcr li a:empty {
+              height: 46px;
+              background: url("../images/vcr.png") 15px 15px no-repeat; }
+            section.course-content div.video article.video-wrapper section.video-controls ul.vcr li a.play {
+              background-position: 17px -114px; }
+              section.course-content div.video article.video-wrapper section.video-controls ul.vcr li a.play:hover {
+                background-color: #444; }
+            section.course-content div.video article.video-wrapper section.video-controls ul.vcr li a.pause {
+              background-position: 16px -50px; }
+              section.course-content div.video article.video-wrapper section.video-controls ul.vcr li a.pause:hover {
+                background-color: #444; }
+          section.course-content div.video article.video-wrapper section.video-controls ul.vcr li div.vidtime {
+            padding-left: 16.989px;
+            font-weight: bold;
+            line-height: 46px;
+            padding-left: 16.989px;
+            -webkit-font-smoothing: antialiased; }
+      section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls {
+        float: right; }
+        section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds {
+          float: left;
+          position: relative; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds.open > a {
+            background: url("../images/open-arrow.png") 10px center no-repeat; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds.open ol.video_speeds {
+            display: block;
+            opacity: 1; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a {
+            background: url("../images/closed-arrow.png") 10px center no-repeat;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+            -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+            box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+            zoom: 1;
+            color: #fff;
+            cursor: pointer;
+            display: block;
+            line-height: 46px;
+            margin-right: 0;
+            padding-left: 15px;
+            position: relative;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: ease-out;
+            -moz-transition-timing-function: ease-out;
+            -ms-transition-timing-function: ease-out;
+            -o-transition-timing-function: ease-out;
+            transition-timing-function: ease-out;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            -webkit-font-smoothing: antialiased;
+            width: 110px; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a:before, section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a:after {
+              content: "";
+              display: table; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a:after {
+              clear: both; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a h3 {
+              color: #999;
+              float: left;
+              font-size: 12px;
+              font-weight: normal;
+              letter-spacing: 1px;
+              padding: 0 5.663px 0 11.326px;
+              text-transform: uppercase; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a p.active {
+              float: left;
+              font-weight: bold;
+              margin-bottom: 0;
+              padding: 0 11.326px 0 0; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a:hover, section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a:active, section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds > a:focus {
+              opacity: 1;
+              background-color: #444; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds ol.video_speeds {
+            -webkit-box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+            -moz-box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+            box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: ease-out;
+            -moz-transition-timing-function: ease-out;
+            -ms-transition-timing-function: ease-out;
+            -o-transition-timing-function: ease-out;
+            transition-timing-function: ease-out;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            background-color: #444;
+            border: 1px solid #000;
+            bottom: 46px;
+            display: none;
+            opacity: 0;
+            position: absolute;
+            width: 125px;
+            z-index: 10; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds ol.video_speeds li {
+              -webkit-box-shadow: 0 1px 0 #555555;
+              -moz-box-shadow: 0 1px 0 #555555;
+              box-shadow: 0 1px 0 #555555;
+              border-bottom: 1px solid #000;
+              color: #fff;
+              cursor: pointer; }
+              section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds ol.video_speeds li a {
+                border: 0;
+                color: #fff;
+                display: block;
+                padding: 11.326px; }
+                section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds ol.video_speeds li a:hover {
+                  background-color: #666;
+                  color: #aaa; }
+              section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds ol.video_speeds li.active {
+                font-weight: bold; }
+              section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.speeds ol.video_speeds li:last-child {
+                -webkit-box-shadow: none;
+                -moz-box-shadow: none;
+                box-shadow: none;
+                border-bottom: 0;
+                margin-top: 0; }
+        section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume {
+          float: left;
+          position: relative; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume.open .volume-slider-container {
+            display: block;
+            opacity: 1; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume.muted > a {
+            background: url("../images/mute.png") 10px center no-repeat; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume > a {
+            background: url("../images/volume.png") 10px center no-repeat;
+            border-right: 1px solid #000;
+            -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+            -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+            box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+            zoom: 1;
+            color: #fff;
+            cursor: pointer;
+            display: block;
+            height: 46px;
+            margin-right: 0;
+            padding-left: 15px;
+            position: relative;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: ease-out;
+            -moz-transition-timing-function: ease-out;
+            -ms-transition-timing-function: ease-out;
+            -o-transition-timing-function: ease-out;
+            transition-timing-function: ease-out;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            -webkit-font-smoothing: antialiased;
+            width: 30px; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume > a:before, section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume > a:after {
+              content: "";
+              display: table; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume > a:after {
+              clear: both; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume > a:hover, section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume > a:active, section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume > a:focus {
+              background-color: #444; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume .volume-slider-container {
+            -webkit-box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+            -moz-box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+            box-shadow: inset 1px 0 0 #555555, 0 3px 0 #444444;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: ease-out;
+            -moz-transition-timing-function: ease-out;
+            -ms-transition-timing-function: ease-out;
+            -o-transition-timing-function: ease-out;
+            transition-timing-function: ease-out;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            background-color: #444;
+            border: 1px solid #000;
+            bottom: 46px;
+            display: none;
+            opacity: 0;
+            position: absolute;
+            width: 45px;
+            height: 125px;
+            margin-left: -1px;
+            z-index: 10; }
+            section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume .volume-slider-container .volume-slider {
+              height: 100px;
+              border: 0;
+              width: 5px;
+              margin: 14px auto;
+              background: #666;
+              border: 1px solid #000;
+              -webkit-box-shadow: 0 1px 0 #333333;
+              -moz-box-shadow: 0 1px 0 #333333;
+              box-shadow: 0 1px 0 #333333; }
+              section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume .volume-slider-container .volume-slider a.ui-slider-handle {
+                background: #993333 url(../images/slider-handle.png) center center no-repeat;
+                -webkit-background-size: 50%;
+                -moz-background-size: 50%;
+                -ms-background-size: 50%;
+                -o-background-size: 50%;
+                background-size: 50%;
+                border: 1px solid #4d1919;
+                -webkit-border-radius: 15px;
+                -moz-border-radius: 15px;
+                -ms-border-radius: 15px;
+                -o-border-radius: 15px;
+                border-radius: 15px;
+                -webkit-box-shadow: inset 0 1px 0 #bf4040;
+                -moz-box-shadow: inset 0 1px 0 #bf4040;
+                box-shadow: inset 0 1px 0 #bf4040;
+                cursor: pointer;
+                height: 15px;
+                left: -6px;
+                -webkit-transition-property: height, 2s, ease-in-out;
+                -moz-transition-property: height, 2s, ease-in-out;
+                -ms-transition-property: height, 2s, ease-in-out;
+                -o-transition-property: height, 2s, ease-in-out;
+                transition-property: height, 2s, ease-in-out;
+                -webkit-transition-duration: width, 2s, ease-in-out;
+                -moz-transition-duration: width, 2s, ease-in-out;
+                -ms-transition-duration: width, 2s, ease-in-out;
+                -o-transition-duration: width, 2s, ease-in-out;
+                transition-duration: width, 2s, ease-in-out;
+                -webkit-transition-timing-function: ease-out;
+                -moz-transition-timing-function: ease-out;
+                -ms-transition-timing-function: ease-out;
+                -o-transition-timing-function: ease-out;
+                transition-timing-function: ease-out;
+                -webkit-transition-delay: 0;
+                -moz-transition-delay: 0;
+                -ms-transition-delay: 0;
+                -o-transition-delay: 0;
+                transition-delay: 0;
+                width: 15px; }
+              section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls div.volume .volume-slider-container .volume-slider .ui-slider-range {
+                background: #ddd; }
+        section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls a.add-fullscreen {
+          background: url(../images/fullscreen.png) center no-repeat;
+          border-right: 1px solid #000;
+          -webkit-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+          -moz-box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+          box-shadow: 1px 0 0 #555555, inset 1px 0 0 #555555;
+          color: #797979;
+          display: block;
+          float: left;
+          line-height: 46px;
+          margin-left: 0;
+          padding: 0 11.326px;
+          text-indent: -9999px;
+          -webkit-transition-property: all;
+          -moz-transition-property: all;
+          -ms-transition-property: all;
+          -o-transition-property: all;
+          transition-property: all;
+          -webkit-transition-duration: 0.15s;
+          -moz-transition-duration: 0.15s;
+          -ms-transition-duration: 0.15s;
+          -o-transition-duration: 0.15s;
+          transition-duration: 0.15s;
+          -webkit-transition-timing-function: ease-out;
+          -moz-transition-timing-function: ease-out;
+          -ms-transition-timing-function: ease-out;
+          -o-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+          -webkit-transition-delay: 0;
+          -moz-transition-delay: 0;
+          -ms-transition-delay: 0;
+          -o-transition-delay: 0;
+          transition-delay: 0;
+          width: 30px; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls a.add-fullscreen:hover {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none; }
+        section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
+          background: url("../images/cc.png") center no-repeat;
+          color: #797979;
+          display: block;
+          float: left;
+          font-weight: 800;
+          line-height: 46px;
+          margin-left: 0;
+          opacity: 1;
+          padding: 0 11.326px;
+          position: relative;
+          text-indent: -9999px;
+          -webkit-transition-property: all;
+          -moz-transition-property: all;
+          -ms-transition-property: all;
+          -o-transition-property: all;
+          transition-property: all;
+          -webkit-transition-duration: 0.15s;
+          -moz-transition-duration: 0.15s;
+          -ms-transition-duration: 0.15s;
+          -o-transition-duration: 0.15s;
+          transition-duration: 0.15s;
+          -webkit-transition-timing-function: ease-out;
+          -moz-transition-timing-function: ease-out;
+          -ms-transition-timing-function: ease-out;
+          -o-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+          -webkit-transition-delay: 0;
+          -moz-transition-delay: 0;
+          -ms-transition-delay: 0;
+          -o-transition-delay: 0;
+          transition-delay: 0;
+          -webkit-font-smoothing: antialiased;
+          width: 30px; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles:hover {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none; }
+          section.course-content div.video article.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles.off {
+            opacity: .7; }
+    section.course-content div.video article.video-wrapper:hover section.video-controls ul, section.course-content div.video article.video-wrapper:hover section.video-controls div {
+      opacity: 1; }
+    section.course-content div.video article.video-wrapper:hover section.video-controls div.slider {
+      height: 14px;
+      margin-top: -7px; }
+      section.course-content div.video article.video-wrapper:hover section.video-controls div.slider a.ui-slider-handle {
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        -ms-border-radius: 20px;
+        -o-border-radius: 20px;
+        border-radius: 20px;
+        height: 20px;
+        margin-left: -10px;
+        top: -4px;
+        width: 20px; }
+  section.course-content div.video ol.subtitles {
+    float: left;
+    max-height: 460px;
+    overflow: auto;
+    width: 31.522%; }
+    section.course-content div.video ol.subtitles li {
+      border: 0;
+      color: #666;
+      cursor: pointer;
+      margin-bottom: 8px;
+      padding: 0; }
+      section.course-content div.video ol.subtitles li.current {
+        color: #333;
+        font-weight: 700; }
+      section.course-content div.video ol.subtitles li:hover {
+        color: #993333; }
+      section.course-content div.video ol.subtitles li:empty {
+        margin-bottom: 0px; }
+  section.course-content div.video.closed article.video-wrapper {
+    width: 100%; }
+  section.course-content div.video.closed ol.subtitles {
+    width: 0px; }
+  section.course-content div.video.fullscreen {
+    background: rgba(0, 0, 0, 0.95);
+    border: 0;
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    max-height: 100%;
+    overflow: hidden;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999; }
+    section.course-content div.video.fullscreen.closed ol.subtitles {
+      right: -31.984%;
+      width: auto; }
+    section.course-content div.video.fullscreen a.exit {
+      color: #aaa;
+      display: none;
+      font-style: 12px;
+      left: 20px;
+      letter-spacing: 1px;
+      position: absolute;
+      text-transform: uppercase;
+      top: 20px; }
+      section.course-content div.video.fullscreen a.exit::after {
+        content: "✖";
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        padding-left: 6px; }
+      section.course-content div.video.fullscreen a.exit:hover {
+        color: #993333; }
+    section.course-content div.video.fullscreen div.tc-wrapper article.video-wrapper {
+      width: 100%; }
+    section.course-content div.video.fullscreen div.tc-wrapper object, section.course-content div.video.fullscreen div.tc-wrapper iframe {
+      bottom: 0;
+      height: 100%;
+      left: 0;
+      overflow: hidden;
+      position: fixed;
+      top: 0; }
+    section.course-content div.video.fullscreen div.tc-wrapper section.video-controls {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      width: 100%;
+      z-index: 9999; }
+    section.course-content div.video.fullscreen ol.subtitles {
+      background: rgba(0, 0, 0, 0.8);
+      bottom: 0;
+      height: 100%;
+      max-height: 100%;
+      max-width: 23.482%;
+      padding: 22.652px;
+      position: fixed;
+      right: 0;
+      top: 0;
+      -webkit-transition-property: all;
+      -moz-transition-property: all;
+      -ms-transition-property: all;
+      -o-transition-property: all;
+      transition-property: all;
+      -webkit-transition-duration: 0.15s;
+      -moz-transition-duration: 0.15s;
+      -ms-transition-duration: 0.15s;
+      -o-transition-duration: 0.15s;
+      transition-duration: 0.15s;
+      -webkit-transition-timing-function: ease-out;
+      -moz-transition-timing-function: ease-out;
+      -ms-transition-timing-function: ease-out;
+      -o-transition-timing-function: ease-out;
+      transition-timing-function: ease-out;
+      -webkit-transition-delay: 0;
+      -moz-transition-delay: 0;
+      -ms-transition-delay: 0;
+      -o-transition-delay: 0;
+      transition-delay: 0; }
+      section.course-content div.video.fullscreen ol.subtitles li {
+        color: #aaa; }
+        section.course-content div.video.fullscreen ol.subtitles li.current {
+          color: #fff; }
+
+div.course-wrapper.closed section.course-content div.video ol.subtitles {
+  max-height: 577px; }
+
+section.tool-wrapper {
+  background: #073642;
+  border-bottom: 1px solid #000203;
+  border-top: 1px solid #000203;
+  -webkit-box-shadow: inset 0 0 0 4px #084150;
+  -moz-box-shadow: inset 0 0 0 4px #084150;
+  box-shadow: inset 0 0 0 4px #084150;
+  color: #839496;
+  display: table;
+  margin: 22.652px -22.652px 0; }
+  section.tool-wrapper div#graph-container {
+    background: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table-cell;
+    padding: 22.652px;
+    vertical-align: top;
+    width: 51.359%; }
+    section.tool-wrapper div#graph-container .ui-widget-content {
+      background: none;
+      border: none;
+      -webkit-border-radius: 0;
+      -moz-border-radius: 0;
+      -ms-border-radius: 0;
+      -o-border-radius: 0;
+      border-radius: 0; }
+    section.tool-wrapper div#graph-container canvas {
+      width: 100%; }
+    section.tool-wrapper div#graph-container ul.ui-tabs-nav {
+      background: #062e39;
+      border-bottom: 1px solid #03181d;
+      -webkit-border-radius: 0;
+      -moz-border-radius: 0;
+      -ms-border-radius: 0;
+      -o-border-radius: 0;
+      border-radius: 0;
+      margin: -22.652px -22.652px 0;
+      padding: 0;
+      position: relative;
+      width: 110%; }
+      section.tool-wrapper div#graph-container ul.ui-tabs-nav li {
+        background: none;
+        border: none;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        -ms-border-radius: 0;
+        -o-border-radius: 0;
+        border-radius: 0;
+        color: #fff;
+        margin-bottom: 0; }
+        section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected {
+          background-color: #073642;
+          border-left: 1px solid #03181d;
+          border-right: 1px solid #03181d; }
+          section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected:first-child {
+            border-left: none; }
+          section.tool-wrapper div#graph-container ul.ui-tabs-nav li.ui-tabs-selected a {
+            color: #eee8d5; }
+        section.tool-wrapper div#graph-container ul.ui-tabs-nav li a {
+          border: none;
+          color: #839496;
+          font: bold 12px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+          letter-spacing: 1px;
+          text-transform: uppercase; }
+          section.tool-wrapper div#graph-container ul.ui-tabs-nav li a:hover {
+            color: #eee8d5; }
+  section.tool-wrapper div#controlls-container {
+    background: #062e39;
+    border-right: 1px solid #001317;
+    -webkit-box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+    -moz-box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+    box-shadow: 1px 0 0 #004355, inset 0 0 0 4px #06323d;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table-cell;
+    padding: 22.652px;
+    vertical-align: top;
+    width: 48.641%; }
+    section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper {
+      border-bottom: 1px solid #021014;
+      -webkit-box-shadow: 0 1px 0 #083e4b;
+      -moz-box-shadow: 0 1px 0 #083e4b;
+      box-shadow: 0 1px 0 #083e4b;
+      margin-bottom: 22.652px;
+      padding: 0 0 22.652px; }
+      section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton {
+        border-color: #001317;
+        border: 1px solid #3d5962;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+        border-radius: 3px;
+        -webkit-box-shadow: inset 0 1px 0 0 #939da0;
+        -moz-box-shadow: inset 0 1px 0 0 #939da0;
+        box-shadow: inset 0 1px 0 0 #939da0;
+        color: white;
+        display: inline;
+        font-size: 11px;
+        font-weight: bold;
+        background-color: #637c84;
+        background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #637c84), color-stop(100%, #43626b));
+        background-image: -webkit-linear-gradient(top, #637c84, #43626b);
+        background-image: -moz-linear-gradient(top, #637c84, #43626b);
+        background-image: -ms-linear-gradient(top, #637c84, #43626b);
+        background-image: -o-linear-gradient(top, #637c84, #43626b);
+        background-image: linear-gradient(top, #637c84, #43626b);
+        padding: 6px 18px 7px;
+        text-shadow: 0 1px 0 #31505a;
+        -webkit-background-clip: padding-box;
+        display: block;
+        float: right;
+        font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+        section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:hover {
+          -webkit-box-shadow: inset 0 1px 0 0 #778589;
+          -moz-box-shadow: inset 0 1px 0 0 #778589;
+          box-shadow: inset 0 1px 0 0 #778589;
+          cursor: pointer;
+          background-color: #5c6c71;
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #5c6c71), color-stop(100%, #3e5961));
+          background-image: -webkit-linear-gradient(top, #5c6c71, #3e5961);
+          background-image: -moz-linear-gradient(top, #5c6c71, #3e5961);
+          background-image: -ms-linear-gradient(top, #5c6c71, #3e5961);
+          background-image: -o-linear-gradient(top, #5c6c71, #3e5961);
+          background-image: linear-gradient(top, #5c6c71, #3e5961); }
+        section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:active {
+          border: 1px solid #3d5962;
+          -webkit-box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee;
+          -moz-box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee;
+          box-shadow: inset 0 0 8px 4px #395057, inset 0 0 8px 4px #395057, 0 1px 1px 0 #eeeeee; }
+        section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton:active {
+          -webkit-box-shadow: none;
+          -moz-box-shadow: none;
+          box-shadow: none; }
+        section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"] {
+          border: 1px solid #030d15;
+          -webkit-border-radius: 3px;
+          -moz-border-radius: 3px;
+          -ms-border-radius: 3px;
+          -o-border-radius: 3px;
+          border-radius: 3px;
+          -webkit-box-shadow: inset 0 1px 0 0 #215f8a;
+          -moz-box-shadow: inset 0 1px 0 0 #215f8a;
+          box-shadow: inset 0 1px 0 0 #215f8a;
+          color: white;
+          display: inline;
+          font-size: 11px;
+          font-weight: bold;
+          background-color: #0f3550;
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0f3550), color-stop(100%, #041623));
+          background-image: -webkit-linear-gradient(top, #0f3550, #041623);
+          background-image: -moz-linear-gradient(top, #0f3550, #041623);
+          background-image: -ms-linear-gradient(top, #0f3550, #041623);
+          background-image: -o-linear-gradient(top, #0f3550, #041623);
+          background-image: linear-gradient(top, #0f3550, #041623);
+          padding: 6px 18px 7px;
+          text-shadow: 0 1px 0 #000203;
+          -webkit-background-clip: padding-box;
+          font: bold 14px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif; }
+          section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:hover {
+            -webkit-box-shadow: inset 0 1px 0 0 #174362;
+            -moz-box-shadow: inset 0 1px 0 0 #174362;
+            box-shadow: inset 0 1px 0 0 #174362;
+            cursor: pointer;
+            background-color: #0c2739;
+            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0c2739), color-stop(100%, #030d15));
+            background-image: -webkit-linear-gradient(top, #0c2739, #030d15);
+            background-image: -moz-linear-gradient(top, #0c2739, #030d15);
+            background-image: -ms-linear-gradient(top, #0c2739, #030d15);
+            background-image: -o-linear-gradient(top, #0c2739, #030d15);
+            background-image: linear-gradient(top, #0c2739, #030d15); }
+          section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:active {
+            border: 1px solid #030d15;
+            -webkit-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
+            -moz-box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee;
+            box-shadow: inset 0 0 8px 4px #010507, inset 0 0 8px 4px #010507, 0 1px 1px 0 #eeeeee; }
+          section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper input#playButton[value="Stop"]:active {
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none; }
+    section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper {
+      border-bottom: 1px solid #021014;
+      -webkit-box-shadow: 0 1px 0 #083e4b;
+      -moz-box-shadow: 0 1px 0 #083e4b;
+      box-shadow: 0 1px 0 #083e4b;
+      zoom: 1;
+      margin-bottom: 22.652px;
+      margin-bottom: 22.652px;
+      padding: 0 0 22.652px; }
+      section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:before, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after {
+        content: "";
+        display: table; }
+      section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after {
+        clear: both; }
+    section.tool-wrapper div#controlls-container div.graph-controls p {
+      font-weight: bold;
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      margin: 0;
+      text-shadow: 0 -1px 0 #021014;
+      -webkit-font-smoothing: antialiased; }
+    section.tool-wrapper div#controlls-container div.graph-controls ul {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      margin-bottom: 0; }
+      section.tool-wrapper div#controlls-container div.graph-controls ul li {
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        margin-bottom: 0; }
+        section.tool-wrapper div#controlls-container div.graph-controls ul li input {
+          margin-right: 5px; }
+    section.tool-wrapper div#controlls-container div.graph-controls div#graph-listen {
+      display: block;
+      float: left;
+      margin-bottom: 0;
+      margin-right: 20px;
+      margin-top: 8px;
+      text-align: right; }
+    section.tool-wrapper div#controlls-container label {
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      -ms-border-radius: 2px;
+      -o-border-radius: 2px;
+      border-radius: 2px;
+      color: #fff;
+      font-weight: bold;
+      padding: 3px;
+      -webkit-font-smoothing: antialiased; }
+    section.tool-wrapper div#controlls-container label[for="vinCheckbox"], section.tool-wrapper div#controlls-container label[for="vinRadioButton"] {
+      color: #409fbf; }
+    section.tool-wrapper div#controlls-container label[for="voutCheckbox"], section.tool-wrapper div#controlls-container label[for="voutRadioButton"] {
+      color: #e1a600; }
+    section.tool-wrapper div#controlls-container label[for="vrCheckbox"], section.tool-wrapper div#controlls-container label[for="vrRadioButton"] {
+      color: #49c944; }
+    section.tool-wrapper div#controlls-container label[for="vcCheckbox"], section.tool-wrapper div#controlls-container label[for="vcRadioButton"] {
+      color: #e1a600; }
+    section.tool-wrapper div#controlls-container label[for="vlCheckbox"], section.tool-wrapper div#controlls-container label[for="vlRadioButton"] {
+      color: #a26784; }
+    section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders {
+      border-bottom: 1px solid #021014;
+      -webkit-box-shadow: 0 1px 0 #083e4b;
+      -moz-box-shadow: 0 1px 0 #083e4b;
+      box-shadow: 0 1px 0 #083e4b;
+      margin-bottom: 22.652px;
+      padding: 0 0 22.652px; }
+      section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders select#musicTypeSelect {
+        font: 16px "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        margin-bottom: 0; }
+      section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders p {
+        font-weight: bold;
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        margin: 0 11.326px 22.652px 0;
+        text-shadow: 0 -1px 0 #021014;
+        -webkit-font-smoothing: antialiased; }
+    section.tool-wrapper div#controlls-container div.schematic-sliders div.slider-label {
+      font-weight: bold;
+      margin-bottom: 11.326px;
+      text-shadow: 0 -1px 0 #021014;
+      -webkit-font-smoothing: antialiased; }
+    section.tool-wrapper div#controlls-container div.schematic-sliders div.slider {
+      margin-bottom: 22.652px; }
+      section.tool-wrapper div#controlls-container div.schematic-sliders div.slider.ui-slider-horizontal {
+        background: #00232c;
+        border: 1px solid #000b0d;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+        height: 0.4em; }
+      section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle {
+        background: #637c84 url("../images/amplifier-slider-handle.png") center no-repeat;
+        border: 1px solid #000b0d;
+        -webkit-box-shadow: inset 0 1px 0 #8ba1a8;
+        -moz-box-shadow: inset 0 1px 0 #8ba1a8;
+        box-shadow: inset 0 1px 0 #8ba1a8;
+        margin-top: -0.3em; }
+        section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:hover, section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:active {
+          background-color: #6e8992; }
