@@ -247,7 +247,7 @@ class CapaModule(XModule):
             else:
                 raise
         try:
-            self.lcp = LoncapaProblem(fp, self.id, instance_state, seed=seed, system=self.system)
+            self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
         except Exception:
             msg = 'cannot create LoncapaProblem %s' % self.filename
             log.exception(msg)
@@ -257,7 +257,7 @@ class CapaModule(XModule):
                 # create a dummy problem with error message instead of failing
                 fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename, msg))
                 fp.name = "StringIO"
-                self.lcp = LoncapaProblem(fp, self.id, instance_state, seed=seed, system=self.system)
+                self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
             else:
                 raise
 
@@ -378,7 +378,7 @@ class CapaModule(XModule):
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
-            self.tracker('save_problem_check_fail', event_info)
+            self.system.track_function('save_problem_check_fail', event_info)
             # TODO (vshnayder): probably not 404?
             raise self.system.exception404
 
@@ -386,7 +386,7 @@ class CapaModule(XModule):
         # again.
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
-            self.tracker('save_problem_check_fail', event_info)
+            self.system.track_function('save_problem_check_fail', event_info)
             raise self.system.exception404
 
         try:
@@ -415,10 +415,10 @@ class CapaModule(XModule):
             if not correct_map.is_correct(answer_id):
                 success = 'incorrect'
 
-        # log this in the tracker
+        # log this in the track_function
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
-        self.tracker('save_problem_check', event_info)
+        self.system.track_function('save_problem_check', event_info)
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
@@ -443,7 +443,7 @@ class CapaModule(XModule):
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
-            self.tracker('save_problem_fail', event_info)
+            self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
                     'error': "Problem is closed"}
 
@@ -451,14 +451,14 @@ class CapaModule(XModule):
         # again.
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure'] = 'done'
-            self.tracker('save_problem_fail', event_info)
+            self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
                     'error': "Problem needs to be reset prior to save."}
 
         self.lcp.student_answers = answers
 
         # TODO: should this be save_problem_fail?  Looks like success to me...
-        self.tracker('save_problem_fail', event_info)
+        self.system.track_function('save_problem_fail', event_info)
         return {'success': True}
 
     def reset_problem(self, get):
@@ -473,12 +473,12 @@ class CapaModule(XModule):
 
         if self.closed():
             event_info['failure'] = 'closed'
-            self.tracker('reset_problem_fail', event_info)
+            self.system.track_function('reset_problem_fail', event_info)
             return "Problem is closed"
 
         if not self.lcp.done:
             event_info['failure'] = 'not_done'
-            self.tracker('reset_problem_fail', event_info)
+            self.system.track_function('reset_problem_fail', event_info)
             return "Refresh the page and make an attempt before resetting."
 
         self.lcp.do_reset()
@@ -487,10 +487,10 @@ class CapaModule(XModule):
             self.lcp.seed = None
 
         self.lcp = LoncapaProblem(self.system.filestore.open(self.filename),
-                                  self.id, self.lcp.get_state(), system=self.system)
+                                  self.location.html_id(), self.lcp.get_state(), system=self.system)
 
         event_info['new_state'] = self.lcp.get_state()
-        self.tracker('reset_problem', event_info)
+        self.system.track_function('reset_problem', event_info)
 
         return {'html': self.get_problem_html(encapsulate=False)}
 

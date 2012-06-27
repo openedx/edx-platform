@@ -7,6 +7,9 @@ from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError
 
+etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                         remove_comments=True))
+
 
 class XMLModuleStore(ModuleStore):
     """
