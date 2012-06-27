@@ -1,7 +1,6 @@
 class @Problem
   constructor: (@id, url) ->
     @element = $("#problem_#{id}")
-    @content_url = "#{url}problem_get?id=#{@id}"
     @render()
 
   $: (selector) ->
@@ -17,7 +16,7 @@ class @Problem
     @$('section.action input.save').click @save
     @$('input.math').keyup(@refreshMath).each(@refreshMath)
 
-  update_progress: (response) =>
+  updateProgress: (response) =>
     if response.progress_changed
         @element.attr progress: response.progress_status
         @element.trigger('progressChanged')
@@ -27,10 +26,9 @@ class @Problem
       @element.html(content)
       @bind()
     else
-      $.postWithPrefix "/modx/problem/#{@id}/problem_get", '', (response) =>
+      $.postWithPrefix "/modx/problem/#{@id}/problem_get", (response) =>
         @element.html(response.html)
         @bind()
-      
 
   check: =>
     Logger.log 'problem_check', @answers
@@ -38,7 +36,7 @@ class @Problem
       switch response.success
         when 'incorrect', 'correct'
           @render(response.contents)
-          @update_progress response
+          @updateProgress response
         else
           alert(response.success)
 
@@ -46,7 +44,7 @@ class @Problem
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "/modx/problem/#{@id}/problem_reset", id: @id, (response) =>
         @render(response.html)
-        @update_progress response
+        @updateProgress response
 
   show: =>
     if !@element.hasClass 'showed'
@@ -62,7 +60,7 @@ class @Problem
         MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
         @element.addClass 'showed'
-        @update_progress response
+        @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
@@ -74,21 +72,22 @@ class @Problem
     $.postWithPrefix "/modx/problem/#{@id}/problem_save", @answers, (response) =>
       if response.success
         alert 'Saved'
-      @update_progress response
+      @updateProgress response
 
   refreshMath: (event, element) =>
     element = event.target unless element
     target = "display_#{element.id.replace(/^input_/, '')}"
 
     if jax = MathJax.Hub.getAllJax(target)[0]
-      MathJax.Hub.Queue ['Text', jax, $(element).val()]
+      MathJax.Hub.Queue ['Text', jax, $(element).val()],
+        [@updateMathML, jax, element]
 
-      try
-        output = jax.root.toMathML ''
-        $("##{element.id}_dynamath").val(output)
-      catch exception
-        throw exception unless exception.restart
-        MathJax.Callback.After [@refreshMath, jax], exception.restart
+  updateMathML: (jax, element) =>
+    try
+      $("##{element.id}_dynamath").val(jax.root.toMathML '')
+    catch exception
+      throw exception unless exception.restart
+      MathJax.Callback.After [@refreshMath, jax], exception.restart
 
   refreshAnswers: =>
     @$('input.schematic').each (index, element) ->

@@ -20,10 +20,12 @@ jasmine.stubRequests = ->
       settings.success data: jasmine.stubbedMetadata[match[1]]
     else if match = settings.url.match /static\/subs\/(.+)\.srt\.sjson/
       settings.success jasmine.stubbedCaption
+    else if settings.url.match /modx\/problem\/.+\/problem_get$/
+      settings.success html: readFixtures('problem_content.html')
     else if settings.url == '/calculate' ||
       settings.url == '/6002x/modx/sequence/1/goto_position' ||
       settings.url.match(/event$/) ||
-      settings.url.match(/6002x\/modx\/problem\/.+\/problem_(check|reset|show|save)$/)
+      settings.url.match(/modx\/problem\/.+\/problem_(check|reset|show|save)$/)
       # do nothing
     else
       throw "External request attempted for #{settings.url}, which is not defined."
