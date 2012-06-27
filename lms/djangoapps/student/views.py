@@ -472,3 +472,8 @@ def course_info(request):
   # TODO: Couse should be a model
   return render_to_response('course_info.html', {'csrf': csrf_token })
 
+def about(request):
+  return render_to_response('about.html', None)
+
+def jobs(request):
+  return render_to_response('jobs.html', None)

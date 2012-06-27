@@ -2,9 +2,10 @@
 ## one for people who aren't. Assume a Course object is passed to the former,
 ## instead of using settings.COURSE_TITLE
 <%namespace name='static' file='static_content.html'/>
+<%! from django.core.urlresolvers import reverse %>
 <header class="app" aria-label="Global Navigation">
   <section class="wrapper">
-    <a href="${ MITX_ROOT_URL }" class="logo">
+    <a href="${reverse('root')}" class="logo">
       <img src="${static.url('images/logo.png')}" />
     </a>
     <nav class="find-courses">

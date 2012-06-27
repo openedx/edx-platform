@@ -6,9 +6,7 @@ def url_class(url):
     return "active"
   return ""
 %>
-<%!
-    from django.core.urlresolvers import reverse
-%>
+<%! from django.core.urlresolvers import reverse %>
 
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
