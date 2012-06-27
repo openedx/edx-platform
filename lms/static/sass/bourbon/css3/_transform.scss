@@ -1,11 +1,19 @@
 @mixin transform($property: none) {
 //  none | <transform-function>
-  @include prefixer(transform, $property, webkit, moz, ms, o);
+  -webkit-transform: $property;
+     -moz-transform: $property;
+      -ms-transform: $property;
+       -o-transform: $property;
+          transform: $property;
 }
 
 @mixin transform-origin($axes: 50%) {
 // x-axis - left | center | right  | length | %
 // y-axis - top  | center | bottom | length | %
 // z-axis -                          length
-  @include prefixer(transform-origin, $axes, webkit, moz, ms, o);
+  -webkit-transform-origin: $axes;
+     -moz-transform-origin: $axes;
+      -ms-transform-origin: $axes;
+       -o-transform-origin: $axes;
+          transform-origin: $axes;
 }

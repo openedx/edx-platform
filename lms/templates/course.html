@@ -2,27 +2,55 @@
 
 %for course in courses:
 <article class="course">
-  <a href="/course_info">
-    <div class="cover">
-      <div class="shade"></div>
-      <div class="arrow"></div>
-      <img src="${static.url('images/history.png')}" />
-    </div>
+  <div class="inner-wrapper">
+    <header class="course-preview">
+      <a href="#">
+        <hgroup>
+          <h2>${course.title}</h2>
+          <p>${course.institution}</p>
+        </hgroup>
+        <div href="" class="info-link">&#x2794;</div>
+      </a>
+    </header>
     <section class="info">
-      <hgroup>
-        <h2>${course.title}</h2>
-        <p>${",".join(course.instructors)} &mdash; ${course.institution}</p>
-        <p>${course.id}</p>
-      </hgroup>
-      <div class="edit">Register</div>
-      <section class="meta">
-        <div class="dates">
-          <p>Starts: <time>6/10/12</time></p>
-          <p>Ends: <time>9/23/12</time></p>
-        </div>
-      </section>
+      <div class="meta-info">
+        <p class="university">HarvardX</p>
+        <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
+      </div>
+      <div class="cover-image">
+        <img src="${static.url('images/history.png')}">
+      </div>
+      <div class="desc">
+        <p>An advanced intorduction to analog circuits.</p>
+      </div>
     </section>
-  </a>
-  <p><a href="courses/${course.id}/info">Hackish temp link to courseware</a></p>
+  </div>
 </article>
 %endfor
+
+<!--
+   -<article class="course">
+   -  <a href="/course_info">
+   -    <div class="cover">
+   -      <div class="shade"></div>
+   -      <div class="arrow"></div>
+   -      <img src="${static.url('images/history.png')}" />
+   -    </div>
+   -    <section class="info">
+   -      <hgroup>
+   -        <h2>${course.title}</h2>
+   -        <p>${",".join(course.instructors)} &mdash; ${course.institution}</p>
+   -        <p>${course.id}</p>
+   -        <p><a href="courses/${course.id}/info">courseware</a></p>
+   -      </hgroup>
+   -      <div class="edit">Register</div>
+   -      <section class="meta">
+   -        <div class="dates">
+   -          <p>Starts: <time>6/10/12</time></p>
+   -          <p>Ends: <time>9/23/12</time></p>
+   -        </div>
+   -      </section>
+   -    </section>
+   -  </a>
+   -</article>
+   -->
