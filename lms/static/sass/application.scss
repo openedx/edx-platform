@@ -5,6 +5,13 @@
 @import 'base_extends';
 @import 'base_animations';
 
+@import 'sass_old/base/variables';
+//@import 'sass_old/base/base';
+@import 'sass_old/base/extends';
+//@import 'sass_old/base/font-face';
+@import 'sass_old/base/functions';
+//@import 'sass_old/base/reset';
+
 @import 'shared_forms';
 @import 'shared_footer';
 @import 'shared_header';
@@ -17,3 +24,9 @@
 @import 'course';
 @import 'find_courses';
 @import 'course_info';
+
+@import 'sass_old/courseware/courseware';
+@import 'sass_old/courseware/sequence-nav';
+@import 'sass_old/courseware/sidebar';
+@import 'sass_old/courseware/video';
+@import 'sass_old/courseware/amplifier';
