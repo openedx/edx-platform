@@ -51,8 +51,9 @@ class MongoModuleStore(ModuleStore):
         if item is None:
             raise ItemNotFoundError(location)
 
+        # TODO (cpennington): Pass a proper resources_fs to the system
         return XModuleDescriptor.load_from_json(
-            item, DescriptorSystem(self.get_item), self.default_class)
+            item, DescriptorSystem(self.get_item, None), self.default_class)
 
     def create_item(self, location):
         """

@@ -331,20 +331,21 @@ class XModuleDescriptor(Plugin):
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item):
+    def __init__(self, load_item, resources_fs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
+        resources_fs: A Filesystem object that contains all of the
+            resources needed for the course
         """
 
         self.load_item = load_item
+        self.resources_fs = resources_fs
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, process_xml, fs):
+    def __init__(self, load_item, resources_fs, process_xml):
         """
         process_xml: Takes an xml string, and returns the the XModuleDescriptor created from that xml
-        fs: A Filesystem object that contains all of the xml resources needed to parse
-            the course
         """
+        DescriptorSystem.__init__(self, load_item, resources_fs)
         self.process_xml = process_xml
-        self.fs = fs

@@ -23,7 +23,7 @@ def process_includes(fn):
             file = next_include.get('file')
             if file is not None:
                 try:
-                    ifp = system.fs.open(file)
+                    ifp = system.resources_fs.open(file)
                 except Exception:
                     log.exception('Error in problem xml include: %s' % (etree.tostring(next_include, pretty_print=True)))
                     log.exception('Cannot find file %s in %s' % (file, dir))
