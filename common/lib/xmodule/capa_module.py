@@ -10,8 +10,8 @@ import StringIO
 from datetime import timedelta
 from lxml import etree
 
-from x_module import XModule
-from mako_module import MakoModuleDescriptor
+from xmodule.x_module import XModule
+from xmodule.raw_module import RawDescriptor
 from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
@@ -64,36 +64,24 @@ class ComplexEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class CapaModuleDescriptor(MakoModuleDescriptor):
-    """
-    Module implementing problems in the LON-CAPA format,
-    as implemented by capa.capa_problem
-    """
-
-    mako_template = 'widgets/problem-edit.html'
-
-
-
-class Module(XModule):
+class CapaModule(XModule):
     ''' Interface between capa_problem and x_module. Originally a hack
     meant to be refactored out, but it seems to be serving a useful
     prupose now. We can e.g .destroy and create the capa_problem on a
     reset.
     '''
+    icon_class = 'problem'
 
     def get_instance_state(self):
         state = self.lcp.get_state()
         state['attempts'] = self.attempts
         return json.dumps(state)
 
-
     def get_score(self):
         return self.lcp.get_score()
 
-
     def max_score(self):
         return self.lcp.get_max_score()
-
 
     def get_progress(self):
         ''' For now, just return score / max_score
@@ -105,13 +93,12 @@ class Module(XModule):
             return Progress(score, total)
         return None
 
-
     def get_html(self):
         return self.system.render_template('problem_ajax.html', {
-            'id': self.item_id,
-            'ajax_url': self.ajax_url,
+            'element_id': self.location.html_id(),
+            'id': self.id,
+            'ajax_url': self.system.ajax_url,
         })
-
 
     def get_problem_html(self, encapsulate=True):
         '''Return html for the problem.  Adds check, reset, save buttons
@@ -165,12 +152,12 @@ class Module(XModule):
             explain = False
 
         context = {'problem': content,
-                   'id': self.item_id,
+                   'id': self.id,
                    'check_button': check_button,
                    'reset_button': reset_button,
                    'save_button': save_button,
                    'answer_available': self.answer_available(),
-                   'ajax_url': self.ajax_url,
+                   'ajax_url': self.system.ajax_url,
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
                    'explain': explain,
@@ -180,17 +167,17 @@ class Module(XModule):
         html = self.system.render_template('problem.html', context)
         if encapsulate:
             html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
-                id=self.item_id, ajax_url=self.ajax_url) + html + "</div>"
+                id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
         return html
 
-    def __init__(self, system, xml, item_id, instance_state=None, shared_state=None):
-        XModule.__init__(self, system, xml, item_id, instance_state, shared_state)
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
 
         self.attempts = 0
         self.max_attempts = None
 
-        dom2 = etree.fromstring(xml)
+        dom2 = etree.fromstring(definition['data'])
 
         self.explanation = "problems/" + only_one(dom2.xpath('/problem/@explain'),
                                                   default="closed")
@@ -205,7 +192,7 @@ class Module(XModule):
             self.display_due_date = None
 
         grace_period_string = only_one(dom2.xpath('/problem/@graceperiod'))
-        if len(grace_period_string) >0 and self.display_due_date:
+        if len(grace_period_string) > 0 and self.display_due_date:
             self.grace_period = parse_timedelta(grace_period_string)
             self.close_date = self.display_due_date + self.grace_period
             #log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
@@ -240,9 +227,9 @@ class Module(XModule):
             self.attempts = instance_state['attempts']
 
         # TODO: Should be: self.filename=only_one(dom2.xpath('/problem/@filename'))
-        self.filename= "problems/"+only_one(dom2.xpath('/problem/@filename'))+".xml"
-        self.name=only_one(dom2.xpath('/problem/@name'))
-        self.weight=only_one(dom2.xpath('/problem/@weight'))
+        self.filename = "problems/" + only_one(dom2.xpath('/problem/@filename')) + ".xml"
+        self.name = only_one(dom2.xpath('/problem/@name'))
+        self.weight = only_one(dom2.xpath('/problem/@weight'))
         if self.rerandomize == 'never':
             seed = 1
         elif self.rerandomize == "per_student" and hasattr(system, 'id'):
@@ -250,27 +237,27 @@ class Module(XModule):
         else:
             seed = None
         try:
-            fp = self.filestore.open(self.filename)
-        except Exception,err:
-            log.exception('[courseware.capa.capa_module.Module.init] error %s: cannot open file %s' % (err,self.filename))
-            if self.DEBUG:
+            fp = self.system.filestore.open(self.filename)
+        except Exception:
+            log.exception('cannot open file %s' % self.filename)
+            if self.system.DEBUG:
                 # create a dummy problem instead of failing
                 fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
                 fp.name = "StringIO"
             else:
                 raise
         try:
-            self.lcp=LoncapaProblem(fp, self.item_id, instance_state, seed = seed, system=self.system)
-        except Exception,err:
-            msg = '[courseware.capa.capa_module.Module.init] error %s: cannot create LoncapaProblem %s' % (err,self.filename)
+            self.lcp = LoncapaProblem(fp, self.id, instance_state, seed=seed, system=self.system)
+        except Exception:
+            msg = 'cannot create LoncapaProblem %s' % self.filename
             log.exception(msg)
-            if self.DEBUG:
-                msg = '<p>%s</p>' % msg.replace('<','&lt;')
-                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
+            if self.system.DEBUG:
+                msg = '<p>%s</p>' % msg.replace('<', '&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 # create a dummy problem with error message instead of failing
-                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename,msg))
+                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename, msg))
                 fp.name = "StringIO"
-                self.lcp=LoncapaProblem(fp, self.item_id, instance_state, seed = seed, system=self.system)
+                self.lcp = LoncapaProblem(fp, self.id, instance_state, seed=seed, system=self.system)
             else:
                 raise
 
@@ -299,8 +286,8 @@ class Module(XModule):
         d = handlers[dispatch](get)
         after = self.get_progress()
         d.update({
-            'progress_changed' : after != before,
-            'progress_status' : Progress.to_js_status_str(after),
+            'progress_changed': after != before,
+            'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
 
@@ -312,7 +299,6 @@ class Module(XModule):
             return True
 
         return False
-
 
     def answer_available(self):
         ''' Is the user allowed to see an answer?
@@ -334,7 +320,8 @@ class Module(XModule):
 
         if self.show_answer == 'always':
             return True
-        raise self.system.exception404 #TODO: Not 404
+        #TODO: Not 404
+        raise self.system.exception404
 
     def get_answer(self, get):
         '''
@@ -348,8 +335,7 @@ class Module(XModule):
             raise self.system.exception404
         else:
             answers = self.lcp.get_question_answers()
-            return {'answers' : answers}
-
+            return {'answers': answers}
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
@@ -358,8 +344,8 @@ class Module(XModule):
 
             Used if we want to reconfirm we have the right thing e.g. after
             several AJAX calls.
-        ''' 
-        return {'html' : self.get_problem_html(encapsulate=False)}
+        '''
+        return {'html': self.get_problem_html(encapsulate=False)}
 
     @staticmethod
     def make_dict_of_responses(get):
@@ -409,18 +395,16 @@ class Module(XModule):
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?
-            self.lcp = LoncapaProblem(self.filestore.open(self.filename),
+            self.lcp = LoncapaProblem(self.system.filestore.open(self.filename),
                                       id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             return {'success': inst.message}
         except:
             # TODO: why is this line here?
-            self.lcp = LoncapaProblem(self.filestore.open(self.filename),
+            self.lcp = LoncapaProblem(self.system.filestore.open(self.filename),
                                       id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
-            raise Exception,"error in capa_module"
-            # TODO: Dead code...  is this a bug, or just old?
-            return {'success':'Unknown Error'}
+            raise Exception("error in capa_module")
 
         self.attempts = self.attempts + 1
         self.lcp.done = True
@@ -431,20 +415,17 @@ class Module(XModule):
             if not correct_map.is_correct(answer_id):
                 success = 'incorrect'
 
-        event_info['correct_map'] = correct_map.get_dict()	# log this in the tracker
+        # log this in the tracker
+        event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         self.tracker('save_problem_check', event_info)
 
-        try:
-            html = self.get_problem_html(encapsulate=False)	# render problem into HTML
-        except Exception,err:
-            log.error('failed to generate html')
-            raise
+        # render problem into HTML
+        html = self.get_problem_html(encapsulate=False)
 
         return {'success': success,
                 'contents': html,
                 }
-
 
     def save_problem(self, get):
         '''
@@ -471,8 +452,8 @@ class Module(XModule):
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure'] = 'done'
             self.tracker('save_problem_fail', event_info)
-            return {'success' : False,
-                    'error' : "Problem needs to be reset prior to save."}
+            return {'success': False,
+                    'error': "Problem needs to be reset prior to save."}
 
         self.lcp.student_answers = answers
 
@@ -485,7 +466,7 @@ class Module(XModule):
             and causes problem to rerender itself.
 
             Returns problem html as { 'html' : html-string }.
-        ''' 
+        '''
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
         event_info['filename'] = self.filename
@@ -503,12 +484,21 @@ class Module(XModule):
         self.lcp.do_reset()
         if self.rerandomize == "always":
             # reset random number generator seed (note the self.lcp.get_state() in next line)
-            self.lcp.seed=None
-            
-        self.lcp = LoncapaProblem(self.filestore.open(self.filename),
-                                  self.item_id, self.lcp.get_state(), system=self.system)
+            self.lcp.seed = None
+
+        self.lcp = LoncapaProblem(self.system.filestore.open(self.filename),
+                                  self.id, self.lcp.get_state(), system=self.system)
 
         event_info['new_state'] = self.lcp.get_state()
         self.tracker('reset_problem', event_info)
 
-        return {'html' : self.get_problem_html(encapsulate=False)}
+        return {'html': self.get_problem_html(encapsulate=False)}
+
+
+class CapaDescriptor(RawDescriptor):
+    """
+    Module implementing problems in the LON-CAPA format,
+    as implemented by capa.capa_problem
+    """
+
+    module_class = CapaModule

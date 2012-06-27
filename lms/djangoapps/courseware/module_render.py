@@ -60,13 +60,7 @@ class I4xSystem(object):
         '''
         self.ajax_url = ajax_url
         self.track_function = track_function
-        if not filestore:
-            self.filestore = OSFS(settings.DATA_DIR)
-        else:
-            self.filestore = filestore
-            if settings.DEBUG:
-                log.info("[courseware.module_render.I4xSystem] filestore path = %s",
-                         filestore)
+        self.filestore = filestore
         self.get_module = get_module
         self.render_function = render_function
         self.render_template = render_template
@@ -241,7 +235,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     shared_state = shared_module.state if shared_module is not None else None
 
     # Setup system context for module instance
-    ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.type + '/' + descriptor.url + '/'
+    ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.url + '/'
 
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
@@ -330,94 +324,33 @@ def render_x_module(user, request, module_xml, student_module_cache, position=No
     return context
 
 
-def modx_dispatch(request, module=None, dispatch=None, id=None):
+def modx_dispatch(request, dispatch=None, id=None):
     ''' Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
 
       - request -- the django request.
-      - module -- the type of the module, as used in the course configuration xml.
-                  e.g. 'problem', 'video', etc
       - dispatch -- the command string to pass through to the module's handle_ajax call
            (e.g. 'problem_reset').  If this string contains '?', only pass
            through the part before the first '?'.
-      - id -- the module id.  Used to look up the student module.
-            e.g. filenamexformularesponse
+      - id -- the module id. Used to look up the XModule instance
     '''
     # ''' (fix emacs broken parsing)
-    if not request.user.is_authenticated():
-        return redirect('/')
-
-    # python concats adjacent strings
-    error_msg = ("We're sorry, this module is temporarily unavailable. "
-                 "Our staff is working to fix it as soon as possible")
 
     # If there are arguments, get rid of them
     dispatch, _, _ = dispatch.partition('?')
 
-    ajax_url = '{root}/modx/{module}/{id}'.format(root=settings.MITX_ROOT_URL,
-                                                  module=module, id=id)
-    coursename = multicourse_settings.get_coursename_from_request(request)
-    if coursename and settings.ENABLE_MULTICOURSE:
-        xp = multicourse_settings.get_course_xmlpath(coursename)
-        data_root = settings.DATA_DIR + xp
-    else:
-        data_root = settings.DATA_DIR
+    student_module_cache = StudentModuleCache(request.user, keystore().get_item(id))
+    instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
 
-    # Grab the XML corresponding to the request from course.xml
-    try:
-        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
-    except:
-        log.exception(
-            "Unable to load module during ajax call. module=%s, dispatch=%s, id=%s",
-            module, dispatch, id)
-        if accepts(request, 'text/html'):
-            return render_to_response("module-error.html", {})
-        else:
-            response = HttpResponse(json.dumps({'success': error_msg}))
-        return response
-
-    module_xml = etree.fromstring(xml)
-    student_module_cache = StudentModuleCache(request.user, module_xml)
-    (instance, instance_state, shared_state, module_type) = get_module(
-            request.user, request, module_xml,
-            student_module_cache, None)
-
-    if instance_state is None:
-        log.debug("Couldn't find module '%s' for user '%s' and id '%s'",
-                  module, request.user, id)
+    if instance_module is None:
+        log.debug("Couldn't find module '%s' for user '%s'",
+                  id, request.user)
         raise Http404
 
-    oldgrade = instance_state.grade
-    old_instance_state = instance_state.state
-    old_shared_state = shared_state.state if shared_state is not None else None
-
-    module_from_xml = make_module_from_xml_fn(
-        request.user, request, student_module_cache, None)
-
-    # Create the module
-    system = I4xSystem(track_function=make_track_function(request),
-                       render_function=None,
-                       module_from_xml=module_from_xml,
-                       render_template=render_to_string,
-                       ajax_url=ajax_url,
-                       request=request,
-                       filestore=OSFS(data_root),
-                       )
-
-    try:
-        module_class = xmodule.get_module_class(module)
-        instance = module_class(
-            system, xml, id,
-            instance_state=old_instance_state,
-            shared_state=old_shared_state)
-    except:
-        log.exception("Unable to load module instance during ajax call")
-        if accepts(request, 'text/html'):
-            return render_to_response("module-error.html", {})
-        else:
-            response = HttpResponse(json.dumps({'success': error_msg}))
-        return response
+    oldgrade = instance_module.grade
+    old_instance_state = instance_module.state
+    old_shared_state = shared_module.state if shared_module is not None else None
 
     # Let the module handle the AJAX
     try:
@@ -427,16 +360,16 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         raise
 
     # Save the state back to the database
-    instance_state.state = instance.get_instance_state()
+    instance_module.state = instance.get_instance_state()
     if instance.get_score():
-        instance_state.grade = instance.get_score()['score']
-    if instance_state.grade != oldgrade or instance_state.state != old_instance_state:
-        instance_state.save()
+        instance_module.grade = instance.get_score()['score']
+    if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
+        instance_module.save()
 
-    if shared_state is not None:
-        shared_state.state = instance.get_shared_state()
-        if shared_state.state != old_shared_state:
-            shared_state.save()
+    if shared_module is not None:
+        shared_module.state = instance.get_shared_state()
+        if shared_module.state != old_shared_state:
+            shared_module.save()
 
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
