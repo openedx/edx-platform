@@ -4,20 +4,19 @@
 %>
 
 %for course in courses:
-<article class="course">
+<article id="${course.id}"class="course">
   <div class="inner-wrapper">
     <header class="course-preview">
       <a href="${reverse('about_course', args=[course.id])}">
         <hgroup>
           <h2>${course.title}</h2>
-          <p>${course.institution}</p>
         </hgroup>
-        <div href="" class="info-link">&#x2794;</div>
+        <div class="info-link">&#x2794;</div>
       </a>
     </header>
     <section class="info">
       <div class="meta-info">
-        <p class="university">HarvardX</p>
+        <p class="university">${course.institution}</p>
         <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
       </div>
       <div class="cover-image">
