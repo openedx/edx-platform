@@ -10,6 +10,8 @@ from .exceptions import ItemNotFoundError
 etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
                                          remove_comments=True))
 
+log = logging.getLogger(__name__)
+
 
 class XMLModuleStore(ModuleStore):
     """
@@ -23,7 +25,7 @@ class XMLModuleStore(ModuleStore):
         class_ = getattr(import_module(module_path), class_name)
         self.default_class = class_
 
-        with open(data_dir / "course.xml") as course_file:
+        with open(self.data_dir / "course.xml") as course_file:
             class ImportSystem(XMLParsingSystem):
                 def __init__(self, keystore):
                     self.unnamed_modules = 0
@@ -32,7 +34,7 @@ class XMLModuleStore(ModuleStore):
                         try:
                             xml_data = etree.fromstring(xml)
                         except:
-                            print xml
+                            log.exception("Unable to parse xml:" + xml)
                             raise
                         if xml_data.get('name'):
                             xml_data.set('slug', Location.clean(xml_data.get('name')))
