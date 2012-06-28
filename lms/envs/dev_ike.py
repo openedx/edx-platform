@@ -86,6 +86,12 @@ COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
                                     'github_url': 'https://github.com/MITx/18.06x',
                                     'active' : True,
                                     },
+                    '6.00x_Fall_2012': {'number' : '6.00x',
+                                    'title'  : 'Introduction to Computer Science and Programming',
+                                    'xmlpath': '/6.00x/',
+                                    'github_url': 'https://github.com/MITx/6.00x',
+                                    'active' : True,
+                                    },
                     }
 
 #-----------------------------------------------------------------------------
