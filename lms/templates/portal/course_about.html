@@ -3,7 +3,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%inherit file="main.html" />
+<%inherit file="../main.html" />
 
 <section class="course-info">
   <header class="course-profile">
@@ -96,7 +96,7 @@
           <img src="${static.url('images/history.png')}" />
           <div class="play-intro"></div>
         </div>
-        <%include file="video_modal.html" />
+        <%include file="../video_modal.html" />
         ${course.get_about_section("video")}
       </div>
 
