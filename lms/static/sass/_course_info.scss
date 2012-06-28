@@ -1,301 +1,283 @@
-.grid-container {
-  display: none;
-  
-  > * {
-    float: left;
-    height: 20px;
-  }
-  
-  .grid {
-    background: #FFD3DC;
-    margin-right: flex-gutter();
-    width: flex-grid(1);
-    
-    &:last-child {
-      margin-right: 0px;
-    };
-  }
-
-  .gutter {
-    background: #E3FFDA;
-    display:none;
-    width: $fg-gutter();
-  }
-}
-
-.container {
-  
-}
-
 .course-info {
-  h1, h2, h3, h4, h5, h6 {
-    font-family: $sans-serif;
-    font-weight: bold;
+  .container {
+    margin-bottom: 60px;
   }
-  
-  font-size: 16px;
-  
-  > * {
-    @include box-sizing(border-box);
-    margin-top: 20px;
-  }
-  
-  a {
-    font-family: $serif;
-    font-size: 16px;
-  }
-  
-  section {
-  }
-  
-  h2 {
-    font-size: 2em;
-  }
-  
-  h3 {
-    font-size: 1.4em;
-  }
-  
-  p {
-//    color: rgb(102,102,102);
-  }
-  
-  header {
+
+  header.course-profile {
     background: rgb(240,240,240);
-    border: 1px solid rgb(200,200,200);
-    @include border-radius(4px);
-    @include box-shadow(inset 0 0 1px 1px rgb(255,255,255));
-    padding: 20px;
-    padding-left: flex-grid(1) + flex-gutter() * 2;
-    padding-right: flex-grid(4) + flex-gutter();
-    position: relative;
-    width: flex-grid(12);
-    
-    > img {
-      float: left;
-      max-height: 86px;
-      max-width: flex-grid(1) + flex-gutter();
-      @include position(absolute, 10px 0 0 10px);
-      vertical-align: middle;
-    }
-    
-    h2 {
-      margin-bottom: .5em;
-      
-      .course-number {
-        color: $lighter-base-font-color;
-      }
-    }
-    
-    h3 {
-    }
-    
-    .course-abstract {
-      display: none;
-    }
-    
-    .button {
-      @include button(simple, $blue);
-      @include box-sizing(border-box);
-      @include border-bottom-left-radius(0px);
-      @include border-top-left-radius(0px);
-      display: block;
-      font-size: 1.6em;
-      left: flex-grid(8) + flex-gutter();
-      padding-top: 1.5em;
-      @include position(absolute, -1px -1px -1px 0);
-      text-align: center;
-      vertical-align: middle;
-    }
-  } // header
-  
-  .sidebar {
-    background: white;
-    float: right;
-    margin: 93px 0 0 flex-gutter();
-    padding: 0 0 20px flex-gutter();
-    padding-bottom: 20px;
-    position: relative;
-    width: flex-grid(4);
-    
-    .faded-vertical-divider {
-      @include background-image(linear-gradient(90deg, rgba(255,255,255, 0) 0%, rgba(200,200,200, 0.6) 10%, rgb(200,200,200) 50%, rgba(200,200,200, 0.6) 90%, rgba(255,255,255, 0)));
-      @include position(absolute, 0px 0 0px 0px);
-    }
-    
-    h3 {
-      color: #999;
-      font-size: 1em;
-      margin-bottom: .5em;
-    }
-    
-    .course-staff {
-      clear: none;
+    @include background-image(linear-gradient(-90deg, rgb(230,230,230), rgb(245,245,245)));
+    @include box-shadow(0 1px 80px 0 rgba(0,0,0, 0.5));
+    border-bottom: 1px solid rgb(200,200,200);
+    @include box-shadow(inset 0 1px 5px 0 rgba(0,0,0, 0.1));
+    overflow: hidden;
+    width: 100%;
+
+    .intro-inner-wrapper {
+      @include clearfix;
+      margin: 0 auto;
+      max-width: 1200px;
+      padding: 40px 0px 40px;
       position: relative;
-      
-      .teacher {
-        margin-bottom: 1em;
-        
-        .teacher-image {
-          // display: none;
-          float: left;
-          margin: 0 10px 5px 0;
-      
-          img {
-          }
-        }
-        
-        .teacher-name {
-          color: rgb(100,100,100);
-          font-size: 1.5em;
-          font-weight: bold;
-          line-height: 1.3em;
-        }
-      }
-    } // .course-staff
-  }
-  
-  .main-content-wrap {
-    float: right;
-    margin-top: 40px;
-    padding-bottom: 20px;
-    width: flex-grid(8);
-    
-    .video {
-      iframe {
-        border: 10px solid rgb(106,106,106);
-        @include border-radius(10px);
+      width: flex-grid(12);
+
+      &::before {
+        @include background-image(radial-gradient(50% 50%, ellipse closest-side, rgba(#fff, 1), rgba(#fff, 0)));
+        content: "";
         display: block;
-        margin: 0 auto 20px;
+        height: 200%;
+        left: 0px;
+        position: absolute;
+        top: 80px;
+        width: flex-grid(8);
+        z-index: 1;
+      }
+
+      .intro {
+        @include clearfix;
+        float: left;
+        margin-right: flex-gutter();
+        position: relative;
+        width: flex-grid(8);
+        z-index: 2;
+
+        > hgroup {
+          //@include inline-block;
+          //padding: 0 30px;
+          position: relative;
+
+          hr {
+            @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
+                                                              rgba(200,200,200, 1) 50%,
+                                                              rgba(200,200,200, 1)));
+            border: none;
+            height: 1px;
+            margin: 10px 0;
+            position: relative;
+
+            &::after {
+              @include background-image(linear-gradient(180deg, rgba(255,255,255, 0) 0%,
+                                                                rgba(255,255,255, 0.6) 50%,
+                                                                rgba(255,255,255, 0.6)));
+              bottom: -1px;
+              content: "";
+              display: block;
+              height: 1px;
+              position: absolute;
+              width: 100%;
+            }
+          }
+
+          h1 {
+            font: bold 2.8rem/3.2rem $sans-serif;
+            margin-bottom: 0px;
+            text-shadow: 0 1px rgba(255,255,255, 0.6);
+            //text-align: center;
+
+            span {
+              color: $lighter-base-font-color;
+              display: none;
+              font: 300 1.2rem/3rem $sans-serif;
+            }
+          }
+
+          h2 {
+            //text-align: center;
+
+            a {
+              color: $lighter-base-font-color;
+              font: italic bold 1.4rem/1.6rem $sans-serif;
+              text-shadow: 0 1px rgba(255,255,255, 0.6);
+
+              &:hover {
+                color: $blue;
+              }
+            }
+          }
+        }
+      }
+
+      .actions {
+        float: left;
+        padding-top: 5px;
+        position: relative;
+        width: flex-grid(4);
+        z-index: 2;
+
+        a.register {
+          @include button(shiny, $blue);
+          @include box-sizing(border-box);
+          @include border-radius(3px);
+          display: block;
+          font: italic 1.2rem/1.6rem $serif;
+          margin-bottom: 10px;
+          padding: 10px 0px;
+          text-transform: uppercase;
+          text-align: center;
+          width: flex-grid(12);
+        }
+
+        .social-sharing {
+          background: rgb(230,230,230);
+          height: 40px;
+        }
       }
     }
-    
-    .course-description {
+  }
+
+  .container {
+    @include clearfix;
+
+    nav {
+      border-bottom: 1px solid rgb(220,220,220);
       @include box-sizing(border-box);
+      @include clearfix;
       margin-bottom: 40px;
-      position: relative;
-      
-      h3 {
-        font-size: 2em;
-        font-weight: bold;
-        margin-bottom: 1em;
-      }
-      
-      .course-times {
-        background: #F0F0F0;
-        @include border-radius(4px);
-        color: #7A7A7A;
-        font-size: .8em;
-        padding: .3em 1em;
-        @include position(absolute, 0px 0px 0 0);
-        text-shadow: -1px -1px 0px #e9e9e9;
-      
-        .start, .length, .final {
-          float: left;
-          margin-right: 1em;
-          
-          strong {
-            display: block;
-          }
-        }
-      
-        .start {
-          
-        }
-      
-        .length {
-        
-        }
-      
-        .final {
-          margin: 0;
-        }
-      } // .course-times
-    }
-    
-    ul.tabs {
-      list-style-type: none;
-      font-size: 0;
-      padding: 0;
-      margin-top: 40px;
-      
-      li {
-        background: #eee;
-        @include border-radius(2px);
-        display: inline-block;
-        color: #444;
-        font-size: 16px;
-        font-weight: bold;
-        margin-right: 10px;
-        padding: .3em 1em;
-      
-        &.enabled {
-          color: #fff;
-          @include linear-gradient($blue, darken($blue, 5%));
-        }
-      
-        &:hover {
-          cursor: pointer;
-          background: #ddd;
-        
-          &.enabled {
-            @include linear-gradient(darken($blue, 5%), darken($blue, 10%));
-            color: #fff;
-          }
-        }
-      }
-    }
-  
-    .tabs-content {
-      
-      section.tab {
+      //text-align: center;
+      width: flex-grid(12);
+
+      &::after {
+        @extend .faded-hr-divider;
+        content: "";
         display: none;
-        margin-top: 0;
-        padding-top: 30px;
-        
-        h3 {
-          margin-bottom: .5em;
-          font-size: 1.5em;
-          font-weight: bold;
-        }
       }
-    
-      section {
-        margin-top: 30px;
-        color: #666;
+
+      a {
+        color: $lighter-base-font-color;
+        @include inline-block;
+        font: normal 1.2rem/1.6rem $sans-serif;
+        padding: 30px 20px;
+        text-align: center;
+
+        &:hover, &.active {
+          background: rgb(240,240,240);
+          color: $base-font-color;
+        }
       }
     }
-  
-    .syllabus {
-    
-      ul {
-        list-style: none outside;
-        line-height: 1.5em;
-      
-        li {
+
+    h2 {
+      color: $lighter-base-font-color;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      color: $base-font-color;
+      font-weight: 300;
+      font-family: $sans-serif;
+      margin-bottom: 10px;
+    }
+  }
+
+  .details {
+    float: left;
+    margin-right: flex-gutter();
+    width: flex-grid(8);
+
+    .inner-wrapper {
+      //padding: 0 60px;
+
+      > section {
+
+        &::after {
+          @extend .faded-hr-divider;
+          content: "";
+          display: none;
+          margin-top: 60px;
+        }
+        margin-bottom: 60px;
+
+
+        p + h2 {
+          margin-top: 40px;
         }
       }
-    } //.syllabus
-  
-    .faq {
-      ul {
-        list-style: none outside;
-      
-        li {
-          margin-bottom: 1em;
-        
-          p {
-            margin-left: 2em;
+    }
+
+    .course-staff {
+      .teacher {
+        margin-bottom: 30px;
+
+        &::after {
+          @extend .faded-hr-divider;
+          content: "";
+          display: block;
+          margin-top: 30px;
+        }
+
+        &:last-child {
+          &::after {
+            display: none;
+          }
+        }
+
+        .teacher-image {
+          background: rgb(255,255,255);
+          border: 1px solid rgb(200,200,200);
+          float: left;
+          margin: 0 15px 15px 0;
+          padding: 1px;
+        }
+      }
+    }
+  }
+
+  .course-sidebar {
+    @include box-sizing(border-box);
+    float: left;
+    padding-top: 40px;
+    width: flex-grid(4);
+
+    h3 {
+      color: $lighter-base-font-color;
+      font-family: $serif;
+      font-weight: 300;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    > section {
+      border: 1px solid rgb(220,220,220);
+      @include border-radius(4px);
+      background: rgb(245,245,245);
+      margin-bottom: 20px;
+      padding: 15px;
+
+      &.dates {
+        p {
+          border-bottom: 1px solid rgb(220,220,220);
+          margin-bottom: 15px;
+          margin-top: 0px;
+          padding-bottom: 5px;
+
+          &:last-child {
+            border: none;
+            margin: 0;
+            padding: 0;
+          }
+
+          > span {
+            margin-left: 20px;
           }
         }
       }
-    } // .faq
-  
-    .more-info {
-    
-      p {
-        margin-left: 2em;
+    }
+
+    .media {
+      border: 1px solid rgb(200,200,200);
+      @include box-sizing(border-box);
+      margin-bottom: 20px;
+      padding: 1px;
+      width: flex-grid(12);
+
+      .hero {
+        height: 180px;
+        overflow: hidden;
+
+        img {
+          min-width: 100%;
+        }
       }
     }
-  } //.main-info-wrap
+  }
 }
