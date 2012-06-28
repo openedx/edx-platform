@@ -295,6 +295,7 @@ class XModuleDescriptor(Plugin):
         self.display_name = kwargs.get('display_name')
         self.format = kwargs.get('format')
         self.graded = kwargs.get('graded', False)
+        self.shared_state_key = kwargs.get('shared_state_key')
 
         # For now, we represent goals as a list of strings, but this
         # is one of the things that we are going to be iterating on heavily

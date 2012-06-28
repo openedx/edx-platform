@@ -13,6 +13,7 @@ setup(
     # for a description of entry_points
     entry_points={
         'xmodule.v1': [
+            "abtest = xmodule.abtest_module:ABTestDescriptor",
             "book = xmodule.translation_module:TranslateCustomTagDescriptor",
             "chapter = xmodule.seq_module:SequenceDescriptor",
             "course = xmodule.seq_module:SequenceDescriptor",
