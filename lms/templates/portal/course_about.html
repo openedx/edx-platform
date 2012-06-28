@@ -67,7 +67,7 @@
           </div>
         </div>
       </div>
-      <p>This course explores the history of the modern world since Chinggis Khan. It focuses on the connections between societies from the time of the Mongol conquests and the gradual, but accelerating ways in which connections became ties of inter-dependence. The relations between societies are what will concern us. The forces pulling the world together vary from religious to economic, political to intellectual. These forces bring the world together, but they also create new divisions. Nowadays, we call this "globalization." That term has tended to emphasize the drive to worldwide integration; the view of globalization taken in this course emphasizes disintegration as well as integration. We will tackle some very basic questions: How do we explain the staggering wealth of China in the centuries up to 1750, as well as China's recent ascent? Where did the United States come from, and where is it headed? What are the significance and legacies of empire in the world? How have world wars and revolutions shaped the international system over time? What exactly is globalization, and how does today's globalization compare with the past? How has the relationship between humans and nature changed over the centuries?</p>
+      <p>${course.get_about_section("description")}</p>
       </section>
 
       <div class="faded-hr-divider"></div>
@@ -83,34 +83,17 @@
       <section class="tabs-content">
         <section class="requirements tab" style="display: block;">
           <h3>Requirements</h3>
-          <p>In order to succeed in this course, you must have taken an AP level physics course in electricity and magnetism. You must know basic calculus and linear algebra and have some background in differential equations. Since more advanced mathematics will not show up until the second half of the course, the first half of the course will include an optional remedial differential equations component for those who need it.</p>
-            <p>The course web site was developed and tested primarily with Google Chrome. We support current versions of Mozilla Firefox as well. The video player is designed to work with Flash. While we provide a partial non-Flash fallback for the video, as well as partial support for Internet Explorer, other browsers, and tablets, portions of the functionality will be unavailable.</p>
+          ${course.get_about_section("requirements")}
         </section>
 
         <section class="syllabus tab">
           <h3>Syllabus</h3>
-          <ul>
-            <li><strong>Week 1:</strong> What is World History?</li>
-            <li><strong>Week 2:</strong> Peoples, Plagues and Plunders</li>
-            <li><strong>Week 3:</strong> Warfare and Motion</li>
-            <li><strong>Week 4:</strong> Conquests</li>
-            <li><strong>Week 5:</strong> The Beginnings of Globalization in the Atlantic Worlds</li>
-            <li><strong>Week 6:</strong> The Beginnings of Globalization in the Indian Ocean Worlds</li>
-            <li><strong>Week 7:</strong> The Worlds that Merchants Made</li>
-            <li><strong>Week 8:</strong> The Seventeenth-Century Crisis</li>
-            <li><strong>Week 9:</strong> Empire and Enlightenment</li>
-            <li><strong>Week 10:</strong> The Wealth of Nations</li>
-            <li><strong>Week 11:</strong> The World in Revolution</li>
-            <li><strong>Week 12:</strong> States and Nations</li>
-            <li><strong>Week 13:</strong> Global Frontiers</li>
-            <li><strong>Week 14:</strong> Empires and Nations</li>
-            <li><strong>Week 15:</strong> Back to the Future</li>
-          </ul>
+          ${course.get_about_section("syllabus")}
         </section>
 
         <section class="textbook tab">
           <h3>Textbook</h3>
-          <p>The course uses the textbook Foundations of Analog and Digital Electronic Circuits, by Anant Agarwal and Jeffrey H. Lang. Morgan Kaufmann Publishers, Elsevier, July 2005. While recommended, the book is not required: relevant sections will be provided electronically as part of the online course for personal use in connection with this course only. The copyright for the book is owned by Elsevier. The book can be purchased on <a href="http://www.amazon.com/exec/obidos/ASIN/1558607358/ref=nosim/mitopencourse-20">Amazon</a>.</p>
+          ${course.get_about_section("textbook")}
         </section>
 
         <section class="faq tab">
@@ -132,15 +115,7 @@
         </section>
 
         <section class="more-info tab">
-          <section class="who-should-take">
-            <h3>Who should take this?</h3>
-            <p>If you're one of the many who have a unquenched interest in the worlds history, you'll love this course.</p>
-          </section>
-
-          <section class="who-shouldnt-take">
-            <h3>Who shouldn't take this?</h3>
-            <p>No one. Anyone and everyone is welcome to take this course.</p>
-          </section>
+          ${course.get_about_section("more_info")}
         </section>
       </section> <!-- .tabs -->
       <div class="clearfix"></div>
