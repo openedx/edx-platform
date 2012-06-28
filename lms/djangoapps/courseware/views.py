@@ -39,12 +39,21 @@ def gradebook(request):
     coursename = multicourse_settings.get_coursename_from_request(request)
 
     student_objects = User.objects.all()[:100]
-    student_info = [{'username': s.username,
-                     'id': s.id,
-                     'email': s.email,
-                     'grade_info': grades.grade_sheet(s, coursename),
-                     'realname': UserProfile.objects.get(user = s).name
-                     } for s in student_objects]
+    student_info = []
+    
+    coursename = multicourse_settings.get_coursename_from_request(request)
+    course_location = multicourse_settings.get_course_location(coursename)
+
+    for student in student_objects:
+        student_module_cache = StudentModuleCache(student, keystore().get_item(course_location))
+        course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
+        student_info.append({
+            'username': student.username,
+            'id': student.id,
+            'email': student.email,
+            'grade_info': grades.grade_sheet(student, course, student_module_cache),
+            'realname': UserProfile.objects.get(user = student).name
+        })
 
     return render_to_response('gradebook.html', {'students': student_info})
 
