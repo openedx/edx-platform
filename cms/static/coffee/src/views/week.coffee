@@ -11,11 +11,11 @@ class CMS.Views.Week extends Backbone.View
     @$('.modules .module').each ->
       new CMS.Views.Module el: this
 
-    CMS.on('showContent', @resetHeight)
-    CMS.on('hideContent', @setHeight)
+    CMS.on('content.show', @resetHeight)
+    CMS.on('content.hide', @setHeight)
 
   edit: =>
-    CMS.trigger('showContent', new CMS.Views.WeekEdit(model: @model))
+    CMS.replaceView(new CMS.Views.WeekEdit(model: @model))
 
   setHeight: =>
     @$el.height(@options.height)

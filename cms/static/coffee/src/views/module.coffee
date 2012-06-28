@@ -6,4 +6,4 @@ class CMS.Views.Module extends Backbone.View
     @model = new CMS.Models.Module(id: @$el.data('id'), type: @$el.data('type'))
 
   edit: =>
-    CMS.trigger('showContent', new CMS.Views.ModuleEdit(model: @model))
+    CMS.replaceView(new CMS.Views.ModuleEdit(model: @model))
