@@ -85,6 +85,8 @@ class XModule(object):
         self.display_name = kwargs.get('display_name', '')
         self.type = self.location.category
         self._loaded_children = None
+        self.graded = kwargs.get('graded', False)
+        self.format = kwargs.get('format')
 
     def get_name(self):
         name = self.__xmltree.get('name')
@@ -281,6 +283,9 @@ class XModuleDescriptor(Plugin):
         Current arguments passed in kwargs:
             location: A keystore.Location object indicating the name and ownership of this problem
             goals: A list of strings of learning goals associated with this module
+            display_name: The name to use for displaying this module to the user
+            format: The format of this module ('Homework', 'Lab', etc)
+            graded (bool): Whether this module is should be graded or not
         """
         self.system = system
         self.definition = definition if definition is not None else {}
@@ -288,6 +293,8 @@ class XModuleDescriptor(Plugin):
         self.type = Location(kwargs.get('location')).category
         self.url = Location(kwargs.get('location')).url()
         self.display_name = kwargs.get('display_name')
+        self.format = kwargs.get('format')
+        self.graded = kwargs.get('graded', False)
 
         # For now, we represent goals as a list of strings, but this
         # is one of the things that we are going to be iterating on heavily
@@ -315,7 +322,9 @@ class XModuleDescriptor(Plugin):
         instance_state and shared_state, and returns a fully nstantiated XModule
         """
         return partial(self.module_class, system, self.url, self.definition,
-            display_name=self.display_name)
+            display_name=self.display_name,
+            format=self.format,
+            graded=self.graded)
 
 class DescriptorSystem(object):
     def __init__(self, load_item, resources_fs):

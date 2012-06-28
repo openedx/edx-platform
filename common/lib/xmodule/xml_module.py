@@ -37,5 +37,7 @@ class XmlDescriptor(XModuleDescriptor):
                       course,
                       xml_object.tag,
                       xml_object.get('slug')],
-            display_name=xml_object.get('name')
+            display_name=xml_object.get('name'),
+            format=xml_object.get('format'),
+            graded=xml_object.get('graded') == 'true',
         )
