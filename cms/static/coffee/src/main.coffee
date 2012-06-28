@@ -27,6 +27,8 @@
 _.extend CMS, Backbone.Events
 
 $ ->
+  Backbone.emulateHTTP = true
+
   $.ajaxSetup
       headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
 
