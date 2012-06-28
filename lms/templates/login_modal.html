@@ -37,34 +37,23 @@
 </section>
 
 <script type="text/javascript">
-  (function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-      var cookies = document.cookie.split(';');
-      for (var i = 0; i < cookies.length; i++) {
-        var cookie = jQuery.trim(cookies[i]);
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) == (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
+(function() {
+   function getCookie(name) {
+     return $.cookie(name);
+   }
+   function postJSON(url, data, callback) {
+     $.ajax({type:'POST',
+       url: url,
+       dataType: 'json',
+       data: data,
+       success: callback,
+       headers : {'X-CSRFToken':getCookie('csrftoken')}
+     });
+   }
 
-function postJSON(url, data, callback) {
-  $.ajax({type:'POST',
-      url: url,
-      dataType: 'json',
-      data: data,
-      success: callback,
-      headers : {'X-CSRFToken':getCookie('csrftoken')}
-      });
-}
-  $('form#login_form').submit(function(e) {
-    e.preventDefault();
-    var submit_data = $('#login_form').serialize();
+   $('form#login_form').submit(function(e) {
+     e.preventDefault();
+     var submit_data = $('#login_form').serialize();
 
     postJSON('/login',
       submit_data,
