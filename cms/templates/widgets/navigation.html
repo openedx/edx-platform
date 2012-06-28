@@ -36,7 +36,7 @@
 
   <ol id="weeks">
     % for week in weeks:
-    <li id="${week.location.url()}">
+    <li class="week" data-id="${week.location.url()}">
       <header>
         <h1><a href="#" class="module-edit">${week.name}</a></h1>
         <ul>
@@ -50,9 +50,9 @@
         </ul>
       </header>
 
-      <ul id="modules">
+      <ul class="modules">
         % for module in week.get_children():
-        <li class="module" data-type="${module.category}" data-id="${module.location.url()}">
+        <li class="module" data-id="${module.location.url()}" data-type="${module.category}">
             <a href="#" class="module-edit">${module.name}</a>
             <a href="#" class="draggable">handle</a>
         </li>

@@ -3,4 +3,4 @@ class CMS.Views.WeekEdit extends Backbone.View
   className: 'edit-pane'
 
   initialize: ->
-    CMS.trigger 'week.edit'
+    CMS.trigger('week.edit')

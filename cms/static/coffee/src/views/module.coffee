@@ -3,7 +3,7 @@ class CMS.Views.Module extends Backbone.View
     "click .module-edit": "edit"
 
   initialize: ->
-    @model = new CMS.Models.Module(id: @el.id)
+    @model = new CMS.Models.Module(id: @$el.data('id'), type: @$el.data('type'))
 
   edit: =>
     CMS.trigger('showContent', new CMS.Views.ModuleEdit(model: @model))
