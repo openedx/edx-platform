@@ -67,6 +67,9 @@ class Course(namedtuple('Course', _FIELDS)):
         - more_info
         """
         
+        # Many of these are stored as html files instead of some semantic markup. This can change without effecting
+        # this interface when we find a good format for defining so many snippets of text/html.
+        
         if section_key in ['short_description', 'description', 'key_dates', 'video', 'course_staff_short', 'course_staff_extended', 
                             'requirements', 'syllabus', 'textbook', 'faq', 'more_info']:
             try:
