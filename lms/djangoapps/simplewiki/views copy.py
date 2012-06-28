@@ -9,13 +9,11 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
 
-from multicourse import multicourse_settings
-
 from models import Revision, Article, CreateArticleForm, RevisionFormWithTitle, RevisionForm
 import wiki_settings
 
-def view(request, course_id, slug, namespace=None):
-    (article, err) = get_article(request, slug, namespace if namespace else course_id )
+def view(request, wiki_url):
+    (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
     
@@ -27,13 +25,13 @@ def view(request, course_id, slug, namespace=None):
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
             'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
-            'wiki_title' : article.title + " - MITX %s Wiki" % course_number
+            'wiki_title' : article.title + " - MITX 6.002x Wiki"
 			}
     d.update(csrf(request))
-    return render_to_response('simplewiki/simplewiki_view.html', d)
+    return render_to_response('simplewiki_view.html', d)
     
-def view_revision(request, course_id, slug, revision_number, namespace=None):
-    (article, err) = get_article(request, slug, namespace if namespace else course_id )
+def view_revision(request, revision_number, wiki_url, revision=None):
+    (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
     
@@ -43,7 +41,7 @@ def view_revision(request, course_id, slug, revision_number, namespace=None):
         d = {'wiki_article': article,
 	            'wiki_err_norevision': revision_number,}
         d.update(csrf(request))
-        return render_to_response('simplewiki/simplewiki_error.html', d)
+        return render_to_response('simplewiki_error.html', d)
         
     
     perm_err = check_permissions(request, article, check_read=True, check_deleted=True, revision=revision)
@@ -57,11 +55,10 @@ def view_revision(request, course_id, slug, revision_number, namespace=None):
             'wiki_current_revision_deleted' : not (revision.deleted == 0),
 			}
     d.update(csrf(request))
-    return render_to_response('simplewiki/simplewiki_view.html', d)
+    return render_to_response('simplewiki_view.html', d)
 
 
 def root_redirect(request):
-    # TODO: What is going on here? Why don't we just return the redirect?
     try:
         root = Article.get_root()
     except:
@@ -78,7 +75,7 @@ def create(request, wiki_url):
             d = {'wiki_err_keyword': True,
                 'wiki_url': '/'.join(url_path) }
             d.update(csrf(request))
-            return render_to_response('simplewiki/simplewiki_error.html', d)        
+            return render_to_response('simplewiki_error.html', d)        
 
     # Lookup path
     try:
@@ -93,7 +90,7 @@ def create(request, wiki_url):
             d = {'wiki_err_noparent': True,
                 'wiki_url_parent': '/'.join(url_path[:-1]) }
             d.update(csrf(request))
-            return render_to_response('simplewiki/simplewiki_error.html', d)
+            return render_to_response('simplewiki_error.html', d)
         
         perm_err = check_permissions(request, path[-1], check_locked=False, check_write=True, check_deleted=True)
         if perm_err:
@@ -140,11 +137,10 @@ def create(request, wiki_url):
         }
     d.update(csrf(request))
 
-    return render_to_response('simplewiki/simplewiki_edit.html', d)
+    return render_to_response('simplewiki_edit.html', d)
 
-def edit(request, course_id, slug, namespace = None):
-    (article, err) = get_article(request, slug, namespace if namespace else course_id )
-    
+def edit(request, wiki_url):
+    (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
 
@@ -192,10 +188,10 @@ def edit(request, course_id, slug, namespace = None):
         	}
     d.update(csrf(request))
 
-    return render_to_response('simplewiki/simplewiki_edit.html', d)
+    return render_to_response('simplewiki_edit.html', d)
 
-def history(request, course_id, slug, namespace = None, page=1):
-    (article, err) = get_article(request, slug, namespace if namespace else course_id )
+def history(request, wiki_url, page=1):
+    (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
 
@@ -214,6 +210,9 @@ def history(request, course_id, slug, namespace = None, page=1):
     history = Revision.objects.filter(article__exact = article).order_by('-counter').select_related('previous_revision__counter', 'revision_user', 'wiki_article')
     
     if request.method == 'POST':
+        if wiki_settings.WIKI_REQUIRE_LOGIN_EDIT and not request.user.is_authenticated():
+            return HttpResponseRedirect('/')
+
         if request.POST.__contains__('revision'): #They selected a version, but they can be either deleting or changing the version
             perm_err = check_permissions(request, article, check_write=True, check_locked=True)
             if perm_err:
@@ -275,7 +274,7 @@ def history(request, course_id, slug, namespace = None, page=1):
             'show_delete_revision' : request.user.is_superuser,}
     d.update(csrf(request))
 
-    return render_to_response('simplewiki/simplewiki_history.html', d)
+    return render_to_response('simplewiki_history.html', d)
     
     
 def revision_feed(request, page=1):
@@ -303,9 +302,9 @@ def revision_feed(request, page=1):
             'show_delete_revision' : request.user.is_superuser,}
     d.update(csrf(request))
 
-    return render_to_response('simplewiki/simplewiki_revision_feed.html', d)
+    return render_to_response('simplewiki_revision_feed.html', d)
 
-def search_articles(request, course_id):
+def search_articles(request):
     # blampe: We should check for the presence of other popular django search
     # apps and use those if possible. Only fall back on this as a last resort.
     # Adding some context to results (eg where matches were) would also be nice.
@@ -318,7 +317,7 @@ def search_articles(request, course_id):
         querystring = ""
         
         
-    results = Article.objects.filter(namespace__exact = course_id)
+    results = Article.objects.all()
     
     if request.user.is_superuser:
         results = results.order_by('current_revision__deleted')
@@ -348,11 +347,11 @@ def search_articles(request, course_id):
         d = {'wiki_search_results': results,
             	'wiki_search_query': querystring,}
         d.update(csrf(request))
-        return render_to_response('simplewiki/simplewiki_searchresults.html', d)
+        return render_to_response('simplewiki_searchresults.html', d)
         
 
-def search_add_related(request, course_id, slug, namespace=None):
-    (article, err) = get_article(request, slug, namespace if namespace else course_id )
+def search_add_related(request, wiki_url):
+    (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
 
@@ -381,8 +380,9 @@ def search_add_related(request, course_id, slug, namespace=None):
     json = simplejson.dumps({'results': results})
     return HttpResponse(json, mimetype='application/json')
 
-def add_related(request, course_id, slug, namespace=None):
-    (article, err) = get_article(request, slug, namespace if namespace else course_id )
+def add_related(request, wiki_url):
+
+    (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
     
@@ -402,9 +402,8 @@ def add_related(request, course_id, slug, namespace=None):
     finally:
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
-def remove_related(request, course_id, slug, related_id, namespace=None,):
-    (article, err) = get_article(request, slug, namespace if namespace else course_id )
-    
+def remove_related(request, wiki_url, related_id):
+    (article, path, err) = fetch_from_url(request, wiki_url)
     if err:
         return err
 
@@ -422,7 +421,7 @@ def remove_related(request, course_id, slug, related_id, namespace=None,):
     finally:
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
-def random_article(request, course_id):
+def random_article(request):
     from random import randint
     num_arts = Article.objects.count()
     article = Article.objects.all()[randint(0, num_arts-1)]
@@ -431,26 +430,46 @@ def random_article(request, course_id):
 def encode_err(request, url):
     d = {'wiki_err_encode': True}
     d.update(csrf(request))
-    return render_to_response('simplewiki/simplewiki_error.html', d)
+    return render_to_response('simplewiki_error.html', d)
     
 def not_found(request, wiki_url):
     """Generate a NOT FOUND message for some URL"""
     d = {'wiki_err_notfound': True,
          'wiki_url': wiki_url}
     d.update(csrf(request))
-    return render_to_response('simplewiki/simplewiki_error.html', d)
-    
-def get_article(request, slug, namespace):
+    return render_to_response('simplewiki_error.html', d)
+
+def get_url_path(url):
+    """Return a list of all actual elements of a url, safely ignoring
+    double-slashes (//) """
+    return filter(lambda x: x!='', url.split('/'))
+
+def fetch_from_url(request, url):
+    """Analyze URL, returning the article and the articles in its path
+    If something goes wrong, return an error HTTP response"""
+
     err = None
     article = None
+    path = None
     
+    url_path = get_url_path(url)
+
     try:
-        article = Article.objects.get(slug__exact == slug )#, namespace__name__exact = namespace)
+        root = Article.get_root()
     except:
-        #TODO: We need to pass a url for creating the article here
-        err = not_found(request, slug)
-        
-    return (article, err)
+        err = not_found(request, '/')
+        return (article, path, err)
+
+    if url_path and root.slug == url_path[0]:
+        url_path = url_path[1:]
+
+    path = Article.get_url_reverse(url_path, root)
+    if not path:
+        err = not_found(request, '/' + '/'.join(url_path))
+    else:
+        article = path[-1]
+    return (article, path, err)
+
 
 def check_permissions(request, article, check_read=False, check_write=False, check_locked=False, check_deleted=False, revision = None):    
     read_err = check_read and not article.can_read(request.user)
@@ -459,7 +478,7 @@ def check_permissions(request, article, check_read=False, check_write=False, che
     
     locked_err = check_locked and article.locked
     
-    if revision is None:
+    if revision == None:
         revision = article.current_revision
     deleted_err = check_deleted and not (revision.deleted == 0)
     if (request.user.is_superuser):
@@ -477,14 +496,13 @@ def check_permissions(request, article, check_read=False, check_write=False, che
         #       on the current page? (no such redirect happens for an anon upload yet)
         # benjaoming: I think this is the nicest way of displaying an error, but
         # these errors shouldn't occur, but rather be prevented on the other pages.
-        return render_to_response('simplewiki/simplewiki_error.html', d)
+        return render_to_response('simplewiki_error.html', d)
     else:
         return None
 
 ####################
 # LOGIN PROTECTION #
 ####################
-
 
 if wiki_settings.WIKI_REQUIRE_LOGIN_VIEW:
     view               = login_required(view)
