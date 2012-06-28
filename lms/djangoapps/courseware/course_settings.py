@@ -64,11 +64,11 @@ global_settings_json = """
 class Settings(object):
     def __init__(self):
         
-        #Load the global settings as a dictionary
+        # Load the global settings as a dictionary
         global_settings = json.loads(global_settings_json)
         
         
-        #Load the course settings as a dictionary
+        # Load the course settings as a dictionary
         course_settings = {}
         try:
             with open( settings.DATA_DIR + "/course_settings.json") as course_settings_file:
@@ -78,14 +78,12 @@ class Settings(object):
             log.warning("Unable to load course settings file from " + str(settings.DATA_DIR) + "/course_settings.json")
         
         
-        #First, set the properties from the global settings on ourselves
+        # Override any global settings with the course settings
+        global_settings.update(course_settings)
+        
+        # Now, set the properties from the course settings on ourselves
         for setting in global_settings:
             setting_value = global_settings[setting]
-            setattr(self, setting, setting_value)
-        
-        #Now, set the properties from the course settings on ourselves, possibly overriding global values
-        for setting in course_settings:
-            setting_value = course_settings[setting]
             setattr(self, setting, setting_value)
                 
         # Here is where we should parse any configurations, so that we can fail early
