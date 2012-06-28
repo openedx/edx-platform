@@ -92,6 +92,9 @@ def grade_sheet(student, course, student_module_cache):
             for module in yield_descendents(s):
                 (correct, total) = get_score(student, module, student_module_cache)
 
+                if correct is None and total is None:
+                    continue
+
                 if settings.GENERATE_PROFILE_SCORES:
                     if total > 1:
                         correct = random.randrange(max(total - 2, 1), total + 1)
@@ -102,14 +105,13 @@ def grade_sheet(student, course, student_module_cache):
                     #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                     graded = False
 
-                if correct is not None and total is not None:
-                    scores.append(Score(correct, total, graded, module.display_name))
+                scores.append(Score(correct, total, graded, module.display_name))
 
             section_total, graded_total = graders.aggregate_scores(scores, s.display_name)
             #Add the graded total to totaled_scores
             format = getattr(s, 'format', "")
             subtitle = getattr(s, 'subtitle', format)
-            if format and graded_total[1] > 0:
+            if format and graded_total.possible > 0:
                 format_scores = totaled_scores.get(format, [])
                 format_scores.append(graded_total)
                 totaled_scores[format] = format_scores
