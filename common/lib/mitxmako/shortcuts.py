@@ -14,7 +14,7 @@
 
 import logging
 
-log = logging.getLogger("mitx.common.lib.mitxmako")
+log = logging.getLogger("mitx." + __name__)
 
 from django.template import Context
 from django.http import HttpResponse
