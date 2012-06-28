@@ -21,7 +21,7 @@ setup(
             "html = xmodule.html_module:HtmlDescriptor",
             "image = xmodule.translation_module:TranslateCustomTagDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
-            "problemset = xmodule.seq_module:SequenceDescriptor",
+            "problemset = xmodule.vertical_module:VerticalDescriptor",
             "section = xmodule.translation_module:SemanticSectionDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "slides = xmodule.translation_module:TranslateCustomTagDescriptor",
