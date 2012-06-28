@@ -29,7 +29,7 @@ class I4xSystem(object):
     and user, or other environment-specific info.
     '''
     def __init__(self, ajax_url, track_function, render_function,
-                 get_module, render_template, request=None,
+                 get_module, render_template, user=None,
                  filestore=None):
         '''
         Create a closure around the system environment.
@@ -47,7 +47,7 @@ class I4xSystem(object):
                           and 'type'.
         render_template - a function that takes (template_file, context), and returns
                           rendered html.
-        request - the request in progress
+        user - The user to base the seed off of for this request
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
         '''
@@ -59,7 +59,7 @@ class I4xSystem(object):
         self.render_template = render_template
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
-        self.id = request.user.id if request is not None else 0
+        self.seed = user.id if user is not None else 0
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
@@ -234,13 +234,13 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     system = I4xSystem(track_function=make_track_function(request),
                        render_function=lambda xml: render_x_module(
-                           user, request, xml, student_module_cache, position),
+                           user, xml, student_module_cache, position),
                        render_template=render_to_string,
                        ajax_url=ajax_url,
-                       request=request,
                        # TODO (cpennington): Figure out how to share info between systems
                        filestore=descriptor.system.resources_fs,
                        get_module=_get_module,
+                       user=user,
                        )
     # pass position specified in URL to module through I4xSystem
     system.set('position', position)
@@ -272,7 +272,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     return (module, instance_module, shared_module, descriptor.type)
 
 
-def render_x_module(user, request, module_xml, student_module_cache, position=None):
+def render_x_module(user, module, student_module_cache, position=None):
     ''' Generic module for extensions. This renders to HTML.
 
     modules include sequential, vertical, problem, video, html
@@ -282,10 +282,9 @@ def render_x_module(user, request, module_xml, student_module_cache, position=No
     Arguments:
 
       - user                  : current django User
-      - request               : current django HTTPrequest
-      - module_xml            : lxml etree of xml subtree for the current module
-      - student_module_cache : list of StudentModule objects, one of which may match this module type and id
-      - position   	      : extra information from URL for user-specified position within module
+      - module                : lxml etree of xml subtree for the current module
+      - student_module_cache  : list of StudentModule objects, one of which may match this module type and id
+      - position   	          : extra information from URL for user-specified position within module
 
     Returns:
 
@@ -296,7 +295,7 @@ def render_x_module(user, request, module_xml, student_module_cache, position=No
         return {"content": ""}
 
     (instance, _, _, module_type) = get_module(
-        user, request, module_xml, student_module_cache, position)
+        user, module_xml, student_module_cache, position)
 
     content = instance.get_html()
 

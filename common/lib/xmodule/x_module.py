@@ -83,6 +83,7 @@ class XModule(object):
         self.id = self.location.url()
         self.name = self.location.name
         self.display_name = kwargs.get('display_name', '')
+        self.type = self.location.category
         self._loaded_children = None
 
     def get_name(self):

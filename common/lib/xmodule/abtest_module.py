@@ -88,8 +88,5 @@ class Module(XModule):
     def get_children(self):
         return [self.module_from_xml(child) for child in self._xml_children()]
 
-    def rendered_children(self):
-        return [self.render_function(child) for child in self._xml_children()]
-
     def get_html(self):
         return '\n'.join(child.get_html() for child in self.get_children())

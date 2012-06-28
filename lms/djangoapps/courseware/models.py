@@ -75,8 +75,16 @@ class StudentModuleCache(object):
         '''
         if user.is_authenticated():
             module_ids = self._get_module_state_keys(descriptor, depth)
-            self.cache = list(StudentModule.objects.filter(student=user,
-                                                           module_state_key__in=module_ids))
+
+            # This works around a limitation in sqlite3 on the number of parameters
+            # that can be put into a single query
+            self.cache = []
+            chunk_size = 500
+            for id_chunk in [module_ids[i:i+chunk_size] for i in xrange(0, len(module_ids), chunk_size)]:
+                self.cache.extend(StudentModule.objects.filter(
+                    student=user,
+                    module_state_key__in=id_chunk)
+                )
         else:
             self.cache = []
 
