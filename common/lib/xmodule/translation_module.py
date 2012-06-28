@@ -65,3 +65,20 @@ class SemanticSectionDescriptor(XModuleDescriptor):
         else:
             xml_object.tag = 'sequence'
             return system.process_xml(etree.tostring(xml_object))
+
+
+class TranslateCustomTagDescriptor(XModuleDescriptor):
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        """
+        Transforms the xml_data from <$custom_tag attr="" attr=""/> to
+        <customtag attr="" attr=""><impl>$custom_tag</impl></customtag>
+        """
+
+        xml_object = etree.fromstring(xml_data)
+        tag = xml_object.tag
+        xml_object.tag = 'customtag'
+        impl = etree.SubElement(xml_object, 'impl')
+        impl.text = tag
+
+        return system.process_xml(etree.tostring(xml_object))
