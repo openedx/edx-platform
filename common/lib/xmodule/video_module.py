@@ -50,7 +50,6 @@ class VideoModule(XModule):
             'id': self.location.html_id(),
             'position': self.position,
             'name': self.name,
-            'annotations': self.annotations,
         })
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
@@ -64,9 +63,6 @@ class VideoModule(XModule):
             state = json.loads(instance_state)
             if 'position' in state:
                 self.position = int(float(state['position']))
-
-        self.annotations = [(e.get("name"), self.render_function(e)) \
-                      for e in xmltree]
 
 
 class VideoDescriptor(RawDescriptor):

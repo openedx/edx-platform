@@ -20,17 +20,16 @@ from module_render import render_x_module, toc_for_course, get_module, get_secti
 from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
+from keystore.django import keystore
 
-import courseware.content_parser as content_parser
-
-import courseware.grades as grades
+from courseware import grades, content_parser
 
 log = logging.getLogger("mitx.courseware")
 
 etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                         remove_comments = True))
+                                         remove_comments=True))
 
-template_imports={'urllib':urllib}
+template_imports = {'urllib': urllib}
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request):
@@ -49,6 +48,7 @@ def gradebook(request):
 
     return render_to_response('gradebook.html', {'students': student_info})
 
+
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile(request, student_id=None):
@@ -60,11 +60,14 @@ def profile(request, student_id=None):
     else:
         if 'course_admin' not in content_parser.user_groups(request.user):
             raise Http404
-        student = User.objects.get( id = int(student_id))
+        student = User.objects.get(id=int(student_id))
 
-    user_info = UserProfile.objects.get(user=student) # request.user.profile_cache #
+    user_info = UserProfile.objects.get(user=student)
 
     coursename = multicourse_settings.get_coursename_from_request(request)
+    course_location = multicourse_settings.get_course_location(coursename)
+    student_module_cache = StudentModuleCache(request.user, keystore().get_item(course_location))
+    course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
 
     context = {'name': user_info.name,
                'username': student.username,
@@ -74,7 +77,7 @@ def profile(request, student_id=None):
                'format_url_params': content_parser.format_url_params,
                'csrf': csrf(request)['csrf_token']
                }
-    context.update(grades.grade_sheet(student, coursename))
+    context.update(grades.grade_sheet(student, course, student_module_cache))
 
     return render_to_response('profile.html', context)
 
@@ -127,7 +130,7 @@ def render_section(request, section):
     student_module_cache = StudentModuleCache(request.user, dom)
 
     try:
-        module = render_x_module(user, request, dom, student_module_cache)
+        module = render_x_module(user, dom, student_module_cache)
     except:
         log.exception("Unable to load module")
         context.update({

@@ -229,7 +229,13 @@ class CapaModule(XModule):
         # TODO: Should be: self.filename=only_one(dom2.xpath('/problem/@filename'))
         self.filename = "problems/" + only_one(dom2.xpath('/problem/@filename')) + ".xml"
         self.name = only_one(dom2.xpath('/problem/@name'))
-        self.weight = only_one(dom2.xpath('/problem/@weight'))
+
+        weight_string = only_one(dom2.xpath('/problem/@weight'))
+        if weight_string:
+            self.weight = float(weight_string)
+        else:
+            self.weight = 1
+
         if self.rerandomize == 'never':
             seed = 1
         elif self.rerandomize == "per_student" and hasattr(system, 'id'):
