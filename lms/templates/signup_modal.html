@@ -16,18 +16,18 @@
       <label>Public Username</label>
       <input name="username" type="text" placeholder="Public Username">
       <label>Full Name</label>
-      <input name="full-name" type="text" placeholder="Full Name">
+      <input name="name" type="text" placeholder="Full Name">
       <label>Your Location</label>
       <input name="location" type="text" placeholder="Your Location">
       <label>Prefered Language</label>
       <input name="language" type="text" placeholder="Prefered Language">
       <label class="terms-of-service">
-        <input name="terms" type="checkbox">
+        <input name="terms_of_service" type="checkbox" value="true">
         I agree to the
         <a href="#">Terms of Service</a>
       </label>
       <label class="honor-code">
-        <input name="honor-code" type="checkbox">
+        <input name="honor_code" type="checkbox" value="true">
         I agree to the
         <a href="#">Honor Code</a>
         , sumarized below as:
@@ -73,39 +73,34 @@
 
 <script type="text/javascript">
   (function() {
-   function getCookie(name) {
-   return $.cookie(name);
-  }
-  function postJSON(url, data, callback) {
-    $.ajax({type:'POST',
-      url: url,
-      dataType: 'json',
-      data: data,
-      success: callback,
-      headers : {'X-CSRFToken':getCookie('csrftoken')}
-    });
-  }
+    function getCookie(name) {
+      return $.cookie(name);
+    }
 
-  $('form#enroll_form').submit(function(e) {
+    function postJSON(url, data, callback) {
+      $.ajax({type:'POST',
+        url: url,
+        dataType: 'json',
+        data: data,
+        success: callback,
+        headers : {'X-CSRFToken':getCookie('csrftoken')}
+      });
+    }
+
+    $('form#enroll_form').submit(function(e) {
       e.preventDefault();
-      var submit_data={};
-      $.each($("[id^=ca_]"), function(index,value){
-        submit_data[value.name]=value.value;
-      });
-      $.each($("[id^=cb_]"), function(index,value){
-        submit_data[value.name]=value.checked;
-      });
+      var submit_data = $('#enroll_form').serialize();
 
-        postJSON('/create_account',
-           submit_data,
-           function(json) {
-               if(json.success) {
-                  $('#enroll').html(json.value);
-               } else {
-                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
-               }
-             }
-        );
-        });
+      postJSON('/create_account',
+        submit_data,
+        function(json) {
+          if(json.success) {
+            $('#enroll').html(json.value);
+          } else {
+            $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+          }
+        }
+      );
+    });
   })(this)
 </script>
