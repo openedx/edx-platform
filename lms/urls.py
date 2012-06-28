@@ -73,7 +73,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^heartbeat$', include('heartbeat.urls')),
 
         # Multicourse related:
-        url(r'^courses$', 'courseware.views.courses'),
+        url(r'^courses/?$', 'courseware.views.courses'),
         url(r'^courses/(?P<course_id>[^/]*)/info$', 'util.views.info', name="info"),
         url(r'^courses/(?P<course_id>[^/]*)/book$', 'staticbook.views.index', name="book"), 
         url(r'^courses/(?P<course_id>[^/]*)/courseware/?$', 'courseware.views.index', name="courseware"),
