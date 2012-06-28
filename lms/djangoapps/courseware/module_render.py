@@ -5,19 +5,12 @@ from lxml import etree
 
 from django.http import Http404
 from django.http import HttpResponse
-from django.shortcuts import redirect
-
-from fs.osfs import OSFS
 
 from django.conf import settings
-from mitxmako.shortcuts import render_to_string, render_to_response
+from mitxmako.shortcuts import render_to_string
 
 from models import StudentModule, StudentModuleCache
-from multicourse import multicourse_settings
-from util.views import accepts
 
-import courseware.content_parser as content_parser
-import xmodule
 from keystore.django import keystore
 
 log = logging.getLogger("mitx.courseware")
@@ -81,8 +74,6 @@ class I4xSystem(object):
 
     def __str__(self):
         return str(self.__dict__)
-
-
 
 
 def make_track_function(request):
