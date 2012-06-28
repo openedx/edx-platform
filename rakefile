@@ -39,7 +39,7 @@ def django_admin(system, env, command, *args)
     return "#{django_admin} #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
 end
 
-task :default => [:pep8, :pylint, :test]
+task :default => [:test, :pep8, :pylint]
 
 directory REPORT_DIR
 directory LMS_REPORT_DIR
