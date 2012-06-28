@@ -2,6 +2,7 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from django_future.csrf import ensure_csrf_cookie
 from django.http import HttpResponse
+from util.json_request import expect_json
 import json
 
 from fs.osfs import OSFS
@@ -28,6 +29,7 @@ def edit_item(request):
     })
 
 
+@expect_json
 def save_item(request):
     item_id = request.POST['id']
     data = json.loads(request.POST['data'])

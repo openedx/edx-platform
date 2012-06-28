@@ -5,9 +5,16 @@ class CMS.Views.ModuleEdit extends Backbone.View
   events:
     'click .cancel': 'cancel'
     'click .module-edit': 'editSubmodule'
+    'click .save-update': 'save'
 
   initialize: ->
-    @$el.append($("""<div id="#{@model.get('id')}">""").load(@model.editUrl()))
+    @$el.load @model.editUrl(), =>
+      @model.loadModule(@el)
+
+  save: (event) ->
+    event.preventDefault()
+    @model.save().success ->
+      console.log "Saved"
 
   cancel: ->
     CMS.popView()
