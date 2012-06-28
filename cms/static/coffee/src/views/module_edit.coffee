@@ -4,10 +4,10 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   events:
     'click .cancel': 'cancel'
+    # 'click .module-edit', 'edit'
 
   initialize: ->
-    CMS.trigger 'module.edit'
     @$el.append($("""<div id="#{@model.get('id')}">""").load(@model.editUrl()))
 
   cancel: ->
-    CMS.trigger 'hideContent'
+    CMS.popView()
