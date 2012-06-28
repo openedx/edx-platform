@@ -2,6 +2,12 @@ class CMS.Views.ModuleEdit extends Backbone.View
   tagName: 'section'
   className: 'edit-pane'
 
+  events:
+    'click .cancel': 'cancel'
+
   initialize: ->
     CMS.trigger 'module.edit'
-    @$el.append($('<div id="module-html">').load(@model.editUrl()))
+    @$el.append($("""<div id="#{@model.get('id')}">""").load(@model.editUrl()))
+
+  cancel: ->
+    CMS.trigger 'hideContent'
