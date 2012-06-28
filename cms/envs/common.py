@@ -24,6 +24,7 @@ import tempfile
 import os.path
 import os
 import errno
+import glob2
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -183,8 +184,8 @@ for xmodule in XModuleDescriptor.load_classes() + [RawDescriptor]:
 
 PIPELINE_JS = {
     'main': {
-        'source_filenames': ['coffee/main.coffee', 'coffee/unit.coffee'],
-        'output_filename': 'js/main.js',
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
+        'output_filename': 'js/application.js',
     },
     'module-js': {
         'source_filenames': module_js_sources,
