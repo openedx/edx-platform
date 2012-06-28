@@ -15,7 +15,7 @@ URL_RE = re.compile("""
     (/(?P<revision>[^/]+))?
     """, re.VERBOSE)
 
-INVALID_CHARS = re.compile(r"[^\w-]")
+INVALID_CHARS = re.compile(r"[^\w.-]")
 
 
 class Location(object):
@@ -55,7 +55,7 @@ class Location(object):
 
         In both the dict and list forms, the revision is optional, and can be ommitted.
 
-        Components must be composed of alphanumeric characters, or the characters _, and -
+        Components must be composed of alphanumeric characters, or the characters '_', '-', and '.'
 
         Components may be set to None, which may be interpreted by some contexts to mean
         wildcard selection
