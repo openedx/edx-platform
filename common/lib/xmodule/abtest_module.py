@@ -2,11 +2,10 @@ import json
 import random
 from lxml import etree
 
-from x_module import XModule, XModuleDescriptor
-
-
-class ModuleDescriptor(XModuleDescriptor):
-    pass
+from xmodule.x_module import XModule
+from xmodule.raw_module import RawDescriptor
+from xmodule.xml_module import XmlDescriptor
+from xmodule.exceptions import InvalidDefinitionError
 
 
 def group_from_value(groups, v):
@@ -25,7 +24,7 @@ def group_from_value(groups, v):
     return g
 
 
-class Module(XModule):
+class ABTestModule(XModule):
     """
     Implements an A/B test with an aribtrary number of competing groups
 
@@ -37,20 +36,14 @@ class Module(XModule):
     </abtest>
     """
 
-    def __init__(self, system, xml, item_id, instance_state=None, shared_state=None):
-        XModule.__init__(self, system, xml, item_id, instance_state, shared_state)
-        self.xmltree = etree.fromstring(xml)
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
 
-        target_groups = self.xmltree.findall('group')
+        target_groups = self.definition['data'].keys()
         if shared_state is None:
-            target_values = [
-                (elem.get('name'), float(elem.get('portion')))
-                for elem in target_groups
-            ]
-            default_value = 1 - sum(val for (_, val) in target_values)
 
             self.group = group_from_value(
-                target_values + [(None, default_value)],
+                self.definition['data']['group_portions'],
                 random.uniform(0, 1)
             )
         else:
@@ -69,24 +62,57 @@ class Module(XModule):
                 self.group = shared_state['group']
 
     def get_shared_state(self):
+        print self.group
         return json.dumps({'group': self.group})
 
-    def _xml_children(self):
-        group = None
-        if self.group is None:
-            group = self.xmltree.find('default')
-        else:
-            for candidate_group in self.xmltree.find('group'):
-                if self.group == candidate_group.get('name'):
-                    group = candidate_group
-                    break
+    def displayable_items(self):
+        return [self.system.get_module(child)
+                for child
+                in self.definition['data']['group_content'][self.group]]
 
-        if group is None:
-            return []
-        return list(group)
 
-    def get_children(self):
-        return [self.module_from_xml(child) for child in self._xml_children()]
+class ABTestDescriptor(RawDescriptor, XmlDescriptor):
+    module_class = ABTestModule
 
-    def get_html(self):
-        return '\n'.join(child.get_html() for child in self.get_children())
+    def __init__(self, system, definition=None, **kwargs):
+        kwargs['shared_state_key'] = definition['data']['experiment']
+        RawDescriptor.__init__(self, system, definition, **kwargs)
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        experiment = xml_object.get('experiment')
+
+        if experiment is None:
+            raise InvalidDefinitionError("ABTests must specify an experiment. Not found in:\n{xml}".format(xml=etree.tostring(xml_object, pretty_print=True)))
+
+        definition = {
+            'data': {
+                'experiment': experiment,
+                'group_portions': [],
+                'group_content': {None: []},
+            },
+            'children': []}
+        for group in xml_object:
+            if group.tag == 'default':
+                name = None
+            else:
+                name = group.get('name')
+                definition['data']['group_portions'].append(
+                    (name, float(group.get('portion', 0)))
+                )
+
+            child_content_urls = [
+                system.process_xml(etree.tostring(child)).url
+                for child in group
+            ]
+
+            definition['data']['group_content'][name] = child_content_urls
+            definition['children'].extend(child_content_urls)
+
+        default_portion = 1 - sum(portion for (name, portion) in definition['data']['group_portions'])
+        if default_portion < 0:
+            raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
+
+        definition['data']['group_portions'].append((None, default_portion))
+
+        return definition
