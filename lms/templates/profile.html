@@ -2,7 +2,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
-<%block name="title"><title>Profile - MITx 6.002x</title></%block>
+<%block name="title"><title>Profile - edX 6.002x</title></%block>
 
 <%!
     from django.core.urlresolvers import reverse
@@ -234,10 +234,10 @@ $(function() {
   <form id="change_name_form">
     <div id="change_name_error"> </div>
     <fieldset>
-      <p>To uphold the credibility of MITx certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p> 
+      <p>To uphold the credibility of edX certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p> 
       <ul>
         <li>
-          <label>Enter your desired full name, as it will appear on the MITx Certificate: </label>
+          <label>Enter your desired full name, as it will appear on the edX Certificate: </label>
           <input id="new_name_field" value="" type="text" />
         </li>
         <li>
@@ -278,7 +278,7 @@ $(function() {
 </div>
 
 <div id="deactivate-account" class="leanModal_box">
-  <h1>Deactivate MITx Account</h1>
+  <h1>Deactivate edX Account</h1>
   <p>Once you deactivate you&rsquo;re MIT<em>x</em> account you will no longer recieve updates and new class announcements from MIT<em>x</em>.</p>
   <p>If you&rsquo;d like to still get updates and new class announcements you can just <a href="#unenroll" rel="leanModal">unenroll</a> and keep your account active.</p>
 
@@ -287,7 +287,7 @@ $(function() {
     <fieldset>
       <ul>
         <li>
-          <input type="submit" id="" value="Yes, I don't want an MITx account or hear about any new classes or updates to MITx" />
+          <input type="submit" id="" value="Yes, I don't want an edX account or hear about any new classes or updates to edX" />
         </li>
       </ul>
     </fieldset>
@@ -296,14 +296,14 @@ $(function() {
 
 <div id="unenroll" class="leanModal_box">
   <h1>Unenroll from 6.002x</h1>
-  <p>Please note: you will still receive updates and new class announcements from MIT<em>x</em>. If you don&rsquo;t wish to receive any more updates or announcements <a href="#deactivate-account" rel="leanModal">deactivate your account</a>.</p>
+  <p>Please note: you will still receive updates and new class announcements from ed<em>X</em>. If you don&rsquo;t wish to receive any more updates or announcements <a href="#deactivate-account" rel="leanModal">deactivate your account</a>.</p>
 
   <form id="unenroll_form">
     <div id="unenroll_error"> </div>
     <fieldset>
       <ul>
         <li>
-          <input type="submit" id="" value="Yes, I want to unenroll from 6.002x but still hear about any new classes or updates to MITx" />
+          <input type="submit" id="" value="Yes, I want to unenroll from 6.002x but still hear about any new classes or updates to edX" />
         </li>
       </ul>
     </fieldset>
