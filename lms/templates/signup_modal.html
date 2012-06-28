@@ -69,3 +69,42 @@
     </div>
   </div>
 </section>
+
+<script type="text/javascript">
+  (function() {
+   function getCookie(name) {
+   return $.cookie(name);
+  }
+  function postJSON(url, data, callback) {
+    $.ajax({type:'POST',
+      url: url,
+      dataType: 'json',
+      data: data,
+      success: callback,
+      headers : {'X-CSRFToken':getCookie('csrftoken')}
+    });
+  }
+
+  $('form#enroll_form').submit(function(e) {
+      e.preventDefault();
+      var submit_data={};
+      $.each($("[id^=ca_]"), function(index,value){
+        submit_data[value.name]=value.value;
+      });
+      $.each($("[id^=cb_]"), function(index,value){
+        submit_data[value.name]=value.checked;
+      });
+
+        postJSON('/create_account',
+           submit_data,
+           function(json) {
+               if(json.success) {
+                  $('#enroll').html(json.value);
+               } else {
+                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+               }
+             }
+        );
+        });
+  })(this)
+</script>

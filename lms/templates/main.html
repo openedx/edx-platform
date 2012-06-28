@@ -5,7 +5,7 @@
   <%block name="title"><title>edX</title></%block>
 
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:800italic,400,800' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="${static.url('js/jquery.treeview.css')}" type="text/css" media="all" />
+  <link rel="stylesheet" href="${static.url('css/vendor/jquery.treeview.css')}" type="text/css" media="all" />
 
 % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
  <%static:css group='application'/>
@@ -32,15 +32,15 @@
 
 ## codemirror
   <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
-  <script type="text/javascript" src="${ settings.LIB_URL }codemirror-compressed.js"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
 
 ## alternate codemirror
-##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/lib/codemirror.js"></script>
-##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/xml/xml.js"></script>
-##  <script type="text/javascript" src="/static/js/CodeMirror-2.25/mode/python/python.js"></script>
+##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/lib/codemirror.js')}"></script>
+##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/xml/xml.js')}"></script>
+##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/python/python.js')}"></script>
 
 ## image input: for clicking on images (see imageinput.html)
-  <script type="text/javascript" src="/static/js/imageinput.js"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/imageinput.js')}"></script>
 
 ##  <script type="text/javascript">
 ##    var codemirror_set = {};		// track all codemirror textareas, so they can be refreshed on page changes
