@@ -7,7 +7,6 @@ import types
 
 from django.conf import settings
 
-from courseware import global_course_settings
 from courseware.course_settings import course_settings
 from xmodule import graders
 from xmodule.graders import Score
