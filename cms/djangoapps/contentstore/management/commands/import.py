@@ -4,13 +4,9 @@
 
 from django.core.management.base import BaseCommand, CommandError
 from keystore.django import keystore
-from lxml import etree
 from keystore.xml import XMLModuleStore
 
 unnamed_modules = 0
-
-etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                         remove_comments=True))
 
 
 class Command(BaseCommand):
