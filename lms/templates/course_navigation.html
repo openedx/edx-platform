@@ -17,7 +17,7 @@ def url_class(url):
       <li class="book"><a href="${reverse('book', args=[course.id])}" class="${url_class('book')}">Textbook</a></li>
       <li class="discussion"><a href="${reverse('questions')}">Discussion</a></li>
 % endif
-      <li class="wiki"><a href="${reverse('wiki_root')}" class="${url_class('wiki')}">Wiki</a></li>
+      <li class="wiki"><a href="${reverse('wiki_root', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
 % if user.is_authenticated():
       <li class="profile"><a href="${reverse('profile', args=[course.id])}" class="${url_class('profile')}">Profile</a></li>
 % endif
