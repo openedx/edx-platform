@@ -52,9 +52,9 @@ class SequenceModule(XModule):
             contents.append({
                 'content': child.get_html(),
                 'title': "\n".join(
-                    grand_child.display_name.strip()
+                    grand_child.metadata['display_name'].strip()
                     for grand_child in child.get_children()
-                    if grand_child.display_name is not None
+                    if 'metadata'  in grand_child.metadata
                 ),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),

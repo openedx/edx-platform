@@ -137,17 +137,17 @@ def toc_for_course(user, request, course_location, active_chapter, active_sectio
         sections = list()
         for section in chapter.get_display_items():
 
-            active = (chapter.display_name == active_chapter and
-                      section.display_name == active_section)
+            active = (chapter.metadata.get('display_name') == active_chapter and
+                      section.metadata.get('display_name') == active_section)
 
-            sections.append({'name': section.display_name,
-                             'format': getattr(section, 'format', ''),
-                             'due': getattr(section, 'due', ''),
+            sections.append({'name': section.metadata.get('display_name'),
+                             'format': section.metadata.get('format', ''),
+                             'due': section.metadata.get('due', ''),
                              'active': active})
 
-        chapters.append({'name': chapter.display_name,
+        chapters.append({'name': chapter.metadata.get('display_name'),
                          'sections': sections,
-                         'active': chapter.display_name == active_chapter})
+                         'active': chapter.metadata.get('display_name') == active_chapter})
     return chapters
 
 
@@ -171,7 +171,7 @@ def get_section(course, chapter, section):
 
     chapter_module = None
     for _chapter in course_module.get_children():
-        if _chapter.display_name == chapter:
+        if _chapter.metadata.get('display_name') == chapter:
             chapter_module = _chapter
             break
 
@@ -180,7 +180,7 @@ def get_section(course, chapter, section):
 
     section_module = None
     for _section in chapter_module.get_children():
-        if _section.display_name == section:
+        if _section.metadata.get('display_name') == section:
             section_module = _section
             break
 
@@ -271,9 +271,9 @@ def add_histogram(module):
     def get_html():
         module_id = module.id
         histogram = grade_histogram(module_id)
-        print histogram
         render_histogram = len(histogram) > 0
         staff_context = {'definition': json.dumps(module.definition, indent=4),
+                         'metadata': json.dumps(module.metadata, indent=4),
                          'element_id': module.location.html_id(),
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,

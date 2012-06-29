@@ -82,11 +82,9 @@ class XModule(object):
         self.shared_state = shared_state
         self.id = self.location.url()
         self.name = self.location.name
-        self.display_name = kwargs.get('display_name', '')
         self.type = self.location.category
+        self.metadata = kwargs.get('metadata', {})
         self._loaded_children = None
-        self.graded = kwargs.get('graded', False)
-        self.format = kwargs.get('format')
 
     def get_name(self):
         name = self.__xmltree.get('name')
@@ -188,6 +186,9 @@ class XModuleDescriptor(Plugin):
     js = {}
     js_module = None
 
+    # A list of metadata that this module can inherit from its parent module
+    inheritable_metadata = ('graded', 'due', 'graceperiod', 'showanswer', 'rerandomize')
+
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
         """
@@ -215,7 +216,11 @@ class XModuleDescriptor(Plugin):
         return cls(system=system, **json_data)
 
     @staticmethod
-    def load_from_xml(xml_data, system, org=None, course=None, default_class=None):
+    def load_from_xml(xml_data,
+            system,
+            org=None,
+            course=None,
+            default_class=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of xml_data.
@@ -282,32 +287,48 @@ class XModuleDescriptor(Plugin):
 
         Current arguments passed in kwargs:
             location: A keystore.Location object indicating the name and ownership of this problem
-            goals: A list of strings of learning goals associated with this module
-            display_name: The name to use for displaying this module to the user
-            format: The format of this module ('Homework', 'Lab', etc)
-            graded (bool): Whether this module is should be graded or not
+            shared_state_key: The key to use for sharing StudentModules with other
+                modules of this type
+            metadata: A dictionary containing the following optional keys:
+                goals: A list of strings of learning goals associated with this module
+                display_name: The name to use for displaying this module to the user
+                format: The format of this module ('Homework', 'Lab', etc)
+                graded (bool): Whether this module is should be graded or not
+                due (string): The due date for this module
+                graceperiod (string): The amount of grace period to allow when enforcing the due date
+                showanswer (string): When to show answers for this module
+                rerandomize (string): When to generate a newly randomized instance of the module data
         """
         self.system = system
         self.definition = definition if definition is not None else {}
         self.name = Location(kwargs.get('location')).name
         self.type = Location(kwargs.get('location')).category
         self.url = Location(kwargs.get('location')).url()
-        self.display_name = kwargs.get('display_name')
-        self.format = kwargs.get('format')
-        self.graded = kwargs.get('graded', False)
+        self.metadata = kwargs.get('metadata', {})
         self.shared_state_key = kwargs.get('shared_state_key')
 
-        # For now, we represent goals as a list of strings, but this
-        # is one of the things that we are going to be iterating on heavily
-        # to find the best teaching method
-        self.goals = kwargs.get('goals', [])
-
         self._child_instances = None
+
+    def inherit_metadata(self, metadata):
+        """
+        Updates this module with metadata inherited from a containing module.
+        Only metadata specified in self.inheritable_metadata will
+        be inherited
+        """
+        # Set all inheritable metadata from kwargs that are
+        # in self.inheritable_metadata and aren't already set in metadata
+        for attr in self.inheritable_metadata:
+            if attr not in self.metadata and attr in metadata:
+                self.metadata[attr] = metadata[attr]
 
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of this module"""
         if self._child_instances is None:
-            self._child_instances = [self.system.load_item(child) for child in self.definition.get('children', [])]
+            self._child_instances = []
+            for child_loc in self.definition.get('children', []):
+                child = self.system.load_item(child_loc)
+                child.inherit_metadata(self.metadata)
+                self._child_instances.append(child)
 
         return self._child_instances
 
@@ -322,10 +343,14 @@ class XModuleDescriptor(Plugin):
         Returns a constructor for an XModule. This constructor takes two arguments:
         instance_state and shared_state, and returns a fully nstantiated XModule
         """
-        return partial(self.module_class, system, self.url, self.definition,
-            display_name=self.display_name,
-            format=self.format,
-            graded=self.graded)
+        return partial(
+            self.module_class,
+            system,
+            self.url,
+            self.definition,
+            metadata=self.metadata
+        )
+
 
 class DescriptorSystem(object):
     def __init__(self, load_item, resources_fs):

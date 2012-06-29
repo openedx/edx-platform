@@ -125,7 +125,7 @@ class CapaModule(XModule):
 
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions.
-        if self.lcp.done and self.rerandomize == "always":
+        if self.lcp.done and self.metadata['rerandomize'] == "always":
             check_button = False
             save_button = False
 
@@ -184,15 +184,15 @@ class CapaModule(XModule):
         # TODO: Should be converted to: self.explanation=only_one(dom2.xpath('/problem/@explain'), default="closed")
         self.explain_available = only_one(dom2.xpath('/problem/@explain_available'))
 
-        display_due_date_string = only_one(dom2.xpath('/problem/@due'))
-        if len(display_due_date_string) > 0:
+        display_due_date_string = self.metadata.get('due', None)
+        if display_due_date_string is not None:
             self.display_due_date = dateutil.parser.parse(display_due_date_string)
             #log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
         else:
             self.display_due_date = None
 
-        grace_period_string = only_one(dom2.xpath('/problem/@graceperiod'))
-        if len(grace_period_string) > 0 and self.display_due_date:
+        grace_period_string = self.metadata.get('graceperiod', None)
+        if grace_period_string is not None and self.display_due_date:
             self.grace_period = parse_timedelta(grace_period_string)
             self.close_date = self.display_due_date + self.grace_period
             #log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
@@ -206,12 +206,12 @@ class CapaModule(XModule):
         else:
             self.max_attempts = None
 
-        self.show_answer = only_one(dom2.xpath('/problem/@showanswer'))
+        self.show_answer = self.metadata.get('showanwser', 'closed')
 
         if self.show_answer == "":
             self.show_answer = "closed"
 
-        self.rerandomize = only_one(dom2.xpath('/problem/@rerandomize'))
+        self.rerandomize = self.metadata.get('rerandomize', 'always')
         if self.rerandomize == "" or self.rerandomize == "always" or self.rerandomize == "true":
             self.rerandomize = "always"
         elif self.rerandomize == "false" or self.rerandomize == "per_student":
