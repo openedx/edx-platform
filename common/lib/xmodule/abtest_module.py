@@ -7,6 +7,8 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.exceptions import InvalidDefinitionError
 
+DEFAULT = "_DEFAULT_GROUP"
+
 
 def group_from_value(groups, v):
     ''' Given group: (('a',0.3),('b',0.4),('c',0.3)) And random value
@@ -39,7 +41,6 @@ class ABTestModule(XModule):
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
 
-        target_groups = self.definition['data'].keys()
         if shared_state is None:
 
             self.group = group_from_value(
@@ -48,18 +49,7 @@ class ABTestModule(XModule):
             )
         else:
             shared_state = json.loads(shared_state)
-
-            # TODO (cpennington): Remove this once we aren't passing in
-            # groups from django groups
-            if 'groups' in shared_state:
-                self.group = None
-                target_names = [elem.get('name') for elem in target_groups]
-                for group in shared_state['groups']:
-                    if group in target_names:
-                        self.group = group
-                        break
-            else:
-                self.group = shared_state['group']
+            self.group = shared_state['group']
 
     def get_shared_state(self):
         print self.group
@@ -89,12 +79,12 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
             'data': {
                 'experiment': experiment,
                 'group_portions': [],
-                'group_content': {None: []},
+                'group_content': {DEFAULT: []},
             },
             'children': []}
         for group in xml_object:
             if group.tag == 'default':
-                name = None
+                name = DEFAULT
             else:
                 name = group.get('name')
                 definition['data']['group_portions'].append(
@@ -113,6 +103,6 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
         if default_portion < 0:
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 
-        definition['data']['group_portions'].append((None, default_portion))
+        definition['data']['group_portions'].append((DEFAULT, default_portion))
 
         return definition
