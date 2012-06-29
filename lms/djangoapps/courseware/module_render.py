@@ -25,7 +25,7 @@ class I4xSystem(object):
     Note that these functions can be closures over e.g. a django request
     and user, or other environment-specific info.
     '''
-    def __init__(self, ajax_url, track_function, render_function,
+    def __init__(self, ajax_url, track_function,
                  get_module, render_template, user=None,
                  filestore=None):
         '''
@@ -38,10 +38,6 @@ class I4xSystem(object):
                          files.  Update or remove.
         get_module - function that takes (location) and returns a corresponding
                           module instance object.
-        render_function - function that takes (module_xml) and renders it,
-                          returning a dictionary with a context for rendering the
-                          module to html.  Dictionary will contain keys 'content'
-                          and 'type'.
         render_template - a function that takes (template_file, context), and returns
                           rendered html.
         user - The user to base the seed off of for this request
@@ -52,7 +48,6 @@ class I4xSystem(object):
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module
-        self.render_function = render_function
         self.render_template = render_template
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
@@ -230,8 +225,6 @@ def get_module(user, request, location, student_module_cache, position=None):
         return module
 
     system = I4xSystem(track_function=make_track_function(request),
-                       render_function=lambda xml: render_x_module(
-                           user, xml, student_module_cache, position),
                        render_template=render_to_string,
                        ajax_url=ajax_url,
                        # TODO (cpennington): Figure out how to share info between systems
@@ -288,48 +281,6 @@ def add_histogram(module):
         return render_to_string("staff_problem_info.html", staff_context)
     module.get_html = get_html
     return module
-
-
-def render_x_module(user, module, student_module_cache, position=None):
-    ''' Generic module for extensions. This renders to HTML.
-
-    modules include sequential, vertical, problem, video, html
-
-    Note that modules can recurse.  problems, video, html, can be inside sequential or vertical.
-
-    Arguments:
-
-      - user                  : current django User
-      - module                : lxml etree of xml subtree for the current module
-      - student_module_cache  : list of StudentModule objects, one of which may match this module type and id
-      - position   	          : extra information from URL for user-specified position within module
-
-    Returns:
-
-      - dict which is context for HTML rendering of the specified module.  Will have
-      key 'content', and will have 'type' key if passed a valid module.
-    '''
-    if module_xml is None:
-        return {"content": ""}
-
-    (instance, _, _, module_type) = get_module(
-        user, module_xml, student_module_cache, position)
-
-    content = instance.get_html()
-
-    # special extra information about each problem, only for users who are staff
-    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
-        module_id = module_xml.get('id')
-        histogram = grade_histogram(module_id)
-        render_histogram = len(histogram) > 0
-        staff_context = {'xml': etree.tostring(module_xml),
-                         'module_id': module_id,
-                         'histogram': json.dumps(histogram),
-                         'render_histogram': render_histogram}
-        content += render_to_string("staff_problem_info.html", staff_context)
-
-    context = {'content': content, 'type': module_type}
-    return context
 
 
 def modx_dispatch(request, dispatch=None, id=None):
