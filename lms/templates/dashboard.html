@@ -85,7 +85,11 @@
           </article>
         % endfor
       % else:
-        <p>You are not enrolled in any courses. <a href="${reverse('courses')}">Find some here</a>.</p>
+        <div class="find-courses-wrapper">
+          <section class="find-courses">
+            <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
+          </section>
+        </div>
       % endif
 
       <article class="my-course">
