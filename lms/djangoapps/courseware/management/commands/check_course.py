@@ -15,7 +15,7 @@ middleware.MakoMiddleware()
 
 def check_names(user, course):
     '''
-    Complain if any problems have alphanumeric names.
+    Complain if any problems have non alphanumeric names.
     TODO (vshnayder): there are some in 6.002x that don't.  Is that actually a problem?
     '''
     all_ok = True

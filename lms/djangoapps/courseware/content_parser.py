@@ -223,7 +223,7 @@ def get_module(tree, module, id_tag, module_id, sections_dirname, options):
     result_set = tree.xpath(xpath_search)
     if len(result_set) < 1:
         # Not found in main tree.  Let's look in the section files.
-        section_list = (s[:-4] for s in os.listdir(sections_dirname) if s[-4:]=='.xml')
+        section_list = (s[:-4] for s in os.listdir(sections_dirname) if s.endswith('.xml'))
         for section in section_list:
             try: 
                 s = get_section(section, options, sections_dirname)
