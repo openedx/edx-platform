@@ -232,7 +232,15 @@ def textbox(element, value, status, render_template, msg=''):
                'rows':rows, 'cols':cols,
                }
     html = render_template("textbox.html", context)
-    return etree.XML(html)
+    try:
+        xhtml = etree.XML(html)
+    except Exception,err:
+        newmsg = 'error %s in rendering message' % (str(err).replace('<','&lt;'))
+        newmsg += '<br/>Original message: %s' % msg.replace('<','&lt;')
+        context['msg'] = newmsg
+        html = render_template("textbox.html", context)
+        xhtml = etree.XML(html)
+    return xhtml
 
 #-----------------------------------------------------------------------------
 @register_render_function
