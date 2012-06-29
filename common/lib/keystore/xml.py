@@ -1,3 +1,4 @@
+import logging
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
