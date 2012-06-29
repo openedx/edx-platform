@@ -1,3 +1,4 @@
+<%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='../static_content.html'/>
 <%block name="js_extra">
   <script src="${static.url('js/course_info.js')}"></script>
@@ -14,7 +15,7 @@
       <div class="course-abstract">
         <p>${course.get_about_section("short_description")}</p>
       </div>
-      <a class="button sign-up" href="#">Sign up</a>
+      <a class="button sign-up" href="${reverse('enroll', args=[course.id])}">Sign up</a>
     </header>
 
     <section class="sidebar">
