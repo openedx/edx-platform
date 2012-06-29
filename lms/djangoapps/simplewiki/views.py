@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
@@ -15,6 +15,14 @@ from models import Revision, Article, CreateArticleForm, RevisionFormWithTitle, 
 import wiki_settings
 
 def view(request, course_id, slug, namespace=None):
+    try:
+        course = settings.COURSES_BY_ID[course_id]
+        if not namespace:
+            namespace = course.wiki_namespace
+    except KeyError:
+        raise Http404("Course not found")
+    
+    
     (article, err) = get_article(request, slug, namespace if namespace else course_id )
     if err:
         return err
@@ -27,9 +35,11 @@ def view(request, course_id, slug, namespace=None):
 			'wiki_write': article.can_write_l(request.user),
 			'wiki_attachments_write': article.can_attach(request.user),
             'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
-            'wiki_title' : article.title + " - MITX %s Wiki" % course_number
+            'wiki_title' : article.title + " - edX %s Wiki" % course.title,
+            'course' : course,
 			}
     d.update(csrf(request))
+    print d
     return render_to_response('simplewiki/simplewiki_view.html', d)
     
 def view_revision(request, course_id, slug, revision_number, namespace=None):
@@ -445,8 +455,8 @@ def get_article(request, slug, namespace):
     article = None
     
     try:
-        article = Article.objects.get(slug__exact == slug )#, namespace__name__exact = namespace)
-    except:
+        article = Article.objects.get( slug__exact = slug )#, namespace__name__exact = namespace)
+    except Article.DoesNotExist:
         #TODO: We need to pass a url for creating the article here
         err = not_found(request, slug)
         

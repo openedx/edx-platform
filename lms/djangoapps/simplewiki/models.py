@@ -56,15 +56,7 @@ class Article(models.Model):
         try:
             return Article.objects.filter(slug__exact = "")[0]
         except:
-            raise ShouldHaveExactlyOneRootSlug()            
-
-    @models.permalink
-    def get_absolute_url(self):
-        return ('wiki_view', [self.slug])
-        
-    def get_full_slug(self):
-        # TODO: Return namespace : slug
-        return self.slug
+            raise ShouldHaveExactlyOneRootSlug()
 
     # @classmethod
     # def get_url_reverse(cls, path, article, return_list=[]):

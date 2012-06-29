@@ -34,7 +34,7 @@ class ArticleAdminForm(forms.ModelForm):
         model = Article
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('created_by', 'slug', 'modified_on', 'parent')
+    list_display = ('created_by', 'slug', 'modified_on', 'namespace')
     search_fields = ('slug',)
     prepopulated_fields = {'slug': ('title',) }
     inlines = [RevisionInline]
