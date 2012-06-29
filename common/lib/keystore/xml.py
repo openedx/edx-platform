@@ -40,11 +40,12 @@ class XMLModuleStore(ModuleStore):
                         except:
                             log.exception("Unable to parse xml: {xml}".format(xml=xml))
                             raise
-                        if xml_data.get('name'):
-                            xml_data.set('slug', Location.clean(xml_data.get('name')))
-                        else:
-                            self.unnamed_modules += 1
-                            xml_data.set('slug', '{tag}_{count}'.format(tag=xml_data.tag, count=self.unnamed_modules))
+                        if xml_data.get('slug') is None:
+                            if xml_data.get('name'):
+                                xml_data.set('slug', Location.clean(xml_data.get('name')))
+                            else:
+                                self.unnamed_modules += 1
+                                xml_data.set('slug', '{tag}_{count}'.format(tag=xml_data.tag, count=self.unnamed_modules))
 
                         module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
                         modulestore.modules[module.location] = module
