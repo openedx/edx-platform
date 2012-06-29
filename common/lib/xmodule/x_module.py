@@ -23,6 +23,9 @@ class Plugin(object):
 
         entry_point: The name of the entry point to load plugins from
     """
+
+    _plugin_cache = None
+
     @classmethod
     def load_class(cls, identifier, default=None):
         """
@@ -33,20 +36,25 @@ class Plugin(object):
         If default is not None, will return default if no entry_point matching identifier
         is found. Otherwise, will raise a ModuleMissingError
         """
-        identifier = identifier.lower()
-        classes = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
-        if len(classes) > 1:
-            log.warning("Found multiple classes for {entry_point} with identifier {id}: {classes}. Returning the first one.".format(
-                entry_point=cls.entry_point,
-                id=identifier,
-                classes=", ".join(class_.module_name for class_ in classes)))
+        if cls._plugin_cache is None:
+            cls._plugin_cache = {}
 
-        if len(classes) == 0:
-            if default is not None:
-                return default
-            raise ModuleMissingError(identifier)
+        if identifier not in cls._plugin_cache:
+            identifier = identifier.lower()
+            classes = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
+            if len(classes) > 1:
+                log.warning("Found multiple classes for {entry_point} with identifier {id}: {classes}. Returning the first one.".format(
+                    entry_point=cls.entry_point,
+                    id=identifier,
+                    classes=", ".join(class_.module_name for class_ in classes)))
 
-        return classes[0].load()
+            if len(classes) == 0:
+                if default is not None:
+                    return default
+                raise ModuleMissingError(identifier)
+
+            cls._plugin_cache[identifier] = classes[0].load()
+        return cls._plugin_cache[identifier]
 
     @classmethod
     def load_classes(cls):
