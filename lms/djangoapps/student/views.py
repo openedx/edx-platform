@@ -484,6 +484,9 @@ def about(request):
 def jobs(request):
   return render_to_response('jobs.html', None)
 
+def help(request):
+  return render_to_response('help.html', None)
+
 @ensure_csrf_cookie
 def enroll(request, course_id):
   course = settings.COURSES_BY_ID[course_id]
