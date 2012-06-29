@@ -15,7 +15,7 @@ class HtmlModule(XModule):
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
-        self.html = self.definition['data']['text']
+        self.html = self.definition['data']
 
 
 class HtmlDescriptor(RawDescriptor):
