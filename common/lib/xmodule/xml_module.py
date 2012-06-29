@@ -13,7 +13,7 @@ class XmlDescriptor(XModuleDescriptor):
         Return the definition to be passed to the newly created descriptor
         during from_xml
         """
-        raise NotImplementedError("%s does not implement definition_from_xml" % cls.__class__.__name__)
+        raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
