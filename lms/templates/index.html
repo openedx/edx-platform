@@ -1,5 +1,5 @@
+<%! from django.core.urlresolvers import reverse %>
 <%inherit file="main.html" />
-
 <%namespace name='static' file='static_content.html'/>
 
 <section class="container">
@@ -21,7 +21,7 @@
         </div>
         <div class="signup-wrapper">
           <section class="sign-up">
-              <a href="#" class="find-courses">Find Courses</a>
+            <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
           </section>
         </div>
       </section>

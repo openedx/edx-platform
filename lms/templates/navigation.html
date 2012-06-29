@@ -12,14 +12,14 @@
       <ol>
         <li class="primary">
           <div class="divider"></div>
-          <a href="/courses">Find Courses</a>
+          <a href="${reverse('courses')}">Find Courses</a>
           <div class="divider"></div>
         </li>
         %if not user.is_authenticated():
         <li class="secondary">
-          <a href="/about">About</a>
+          <a href="${reverse('about_edx')}">About</a>
           <a href="#">Blog</a>
-          <a href="/jobs">Jobs</a>
+          <a href="${reverse('jobs')}">Jobs</a>
         </li>
         %endif
       </ol>
@@ -30,7 +30,7 @@
       <ol>
         <li class="primary">
           <div class="divider"></div>
-          <a href="/dashboard" class="user-link">
+          <a href="${reverse('dashboard')}" class="user-link">
             <span class="avatar"><img src="${static.url('images/profile.jpg')}" /></span>
             Neil deGrasse Tyson
           </a>
@@ -40,7 +40,7 @@
           <ol class="user-options">
             <li><a href="#">Account Settings</a></li>
             <li><a href="#">Help</a></li>
-            <li><a href="/logout">Log Out</a></li>
+            <li><a href="${reverse('logout')}">Log Out</a></li>
           </ol>
         </li>
       </ol>

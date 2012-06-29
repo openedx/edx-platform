@@ -81,9 +81,9 @@ class PendingEmailChange(models.Model):
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
-class CourseRegistration(models.Model):
+class CourseEnrollment(models.Model):
     user = models.OneToOneField(User, db_index=True)
-    course_id = models.IntegerField()
+    course_id = models.CharField(max_length=255)
 
 #cache_relation(User.profile)
 
