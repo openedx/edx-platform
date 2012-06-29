@@ -193,50 +193,6 @@ def replace_custom_tags(tree):
     replace_custom_tags_dir(tree, settings.DATA_DIR+'/custom_tags')
 
 
-def course_file(user, coursename=None):
-    ''' Given a user, return an xml tree object for the course file.
-
-    Handles getting the right file, and processing it depending on the
-    groups the user is in.  Does caching of the xml strings.
-    '''
-
-    if user.is_authenticated():
-        # use user.profile_cache.courseware?
-        filename = UserProfile.objects.get(user=user).courseware 
-    else:
-        filename = 'guest_course.xml'
-
-    # if a specific course is specified, then use multicourse to get
-    # the right path to the course XML directory
-    if coursename and settings.ENABLE_MULTICOURSE:
-        xp = multicourse_settings.get_course_xmlpath(coursename)
-        filename = xp + filename	# prefix the filename with the path
-
-    groups = user_groups(user)
-    options = get_options(user)
-
-    # Try the cache...
-    cache_key = "{0}_processed?dev_content:{1}&groups:{2}".format(
-        filename,
-        options['dev_content'],
-        sorted(groups))
-    
-    if "dev" in settings.DEFAULT_GROUPS:
-        tree_string = None
-    else: 
-        tree_string = cache.get(cache_key)
-
-    if tree_string:
-        tree = etree.XML(tree_string)
-    else:
-        tree = parse_course_file(filename, options, namespace='course')
-        # Cache it
-        tree_string = etree.tostring(tree)
-        cache.set(cache_key, tree_string, 60)
-
-    return tree
-
-
 def sections_dir(coursename=None):
     ''' Get directory where sections information is stored.
     '''
