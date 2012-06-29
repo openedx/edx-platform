@@ -1,8 +1,6 @@
 import logging
 import urllib
 
-from fs.osfs import OSFS
-
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
@@ -22,7 +20,9 @@ from student.models import UserProfile
 from multicourse import multicourse_settings
 from keystore.django import keystore
 
-from courseware import grades, content_parser
+from util.cache import cache
+from student.models import UserTestGroup
+from courseware import grades
 
 log = logging.getLogger("mitx.courseware")
 
@@ -31,16 +31,39 @@ etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
 
 template_imports = {'urllib': urllib}
 
+
+def user_groups(user):
+    if not user.is_authenticated():
+        return []
+
+    # TODO: Rewrite in Django
+    key = 'user_group_names_{user.id}'.format(user=user)
+    cache_expiration = 60 * 60  # one hour
+
+    # Kill caching on dev machines -- we switch groups a lot
+    group_names = cache.get(key)
+
+    if group_names is None:
+        group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
+        cache.set(key, group_names, cache_expiration)
+
+    return group_names
+
+
+def format_url_params(params):
+    return [urllib.quote(string.replace(' ', '_')) for string in params]
+
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request):
-    if 'course_admin' not in content_parser.user_groups(request.user):
+    if 'course_admin' not in user_groups(request.user):
         raise Http404
 
     coursename = multicourse_settings.get_coursename_from_request(request)
 
     student_objects = User.objects.all()[:100]
     student_info = []
-    
+
     coursename = multicourse_settings.get_coursename_from_request(request)
     course_location = multicourse_settings.get_course_location(coursename)
 
@@ -52,7 +75,7 @@ def gradebook(request):
             'id': student.id,
             'email': student.email,
             'grade_info': grades.grade_sheet(student, course, student_module_cache),
-            'realname': UserProfile.objects.get(user = student).name
+            'realname': UserProfile.objects.get(user=student).name
         })
 
     return render_to_response('gradebook.html', {'students': student_info})
@@ -67,7 +90,7 @@ def profile(request, student_id=None):
     if student_id is None:
         student = request.user
     else:
-        if 'course_admin' not in content_parser.user_groups(request.user):
+        if 'course_admin' not in user_groups(request.user):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
@@ -83,7 +106,7 @@ def profile(request, student_id=None):
                'location': user_info.location,
                'language': user_info.language,
                'email': student.email,
-               'format_url_params': content_parser.format_url_params,
+               'format_url_params': format_url_params,
                'csrf': csrf(request)['csrf_token']
                }
     context.update(grades.grade_sheet(student, course, student_module_cache))
@@ -110,7 +133,7 @@ def render_accordion(request, course, chapter, section):
     context = dict([('active_chapter', active_chapter),
                     ('toc', toc),
                     ('course_name', course),
-                    ('format_url_params', content_parser.format_url_params),
+                    ('format_url_params', format_url_params),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
     return render_to_string('accordion.html', context)
 
@@ -215,7 +238,8 @@ def jump_to(request, probname=None):
 
     # look for problem of given name
     pxml = xml.xpath('//problem[@filename="%s"]' % probname)
-    if pxml: pxml = pxml[0]
+    if pxml:
+        pxml = pxml[0]
 
     # get the parent element
     parent = pxml.getparent()
@@ -224,7 +248,7 @@ def jump_to(request, probname=None):
     chapter = None
     section = None
     branch = parent
-    for k in range(4):	# max depth of recursion
+    for k in range(4):  # max depth of recursion
         if branch.tag == 'section':
             section = branch.get('name')
         if branch.tag == 'chapter':
@@ -233,7 +257,7 @@ def jump_to(request, probname=None):
 
     position = None
     if parent.tag == 'sequential':
-        position = parent.index(pxml) + 1	# position in sequence
+        position = parent.index(pxml) + 1  # position in sequence
 
     return index(request,
                  course=coursename, chapter=chapter,
