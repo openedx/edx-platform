@@ -29,7 +29,7 @@ class Plugin(object):
     @classmethod
     def load_class(cls, identifier, default=None):
         """
-        Loads a single class intance specified by identifier. If identifier
+        Loads a single class instance specified by identifier. If identifier
         specifies more than a single class, then logs a warning and returns the first
         class identified.
 
