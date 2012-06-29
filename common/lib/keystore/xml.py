@@ -9,7 +9,7 @@ from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError
 
 etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                         remove_comments=True))
+                                         remove_comments=True, remove_blank_text=True))
 
 log = logging.getLogger(__name__)
 
