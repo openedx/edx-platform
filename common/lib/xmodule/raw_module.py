@@ -21,3 +21,6 @@ class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         return {'data': etree.tostring(xml_object)}
+
+    def definition_to_xml(self, resource_fs):
+        return etree.fromstring(self.definition['data'])

@@ -51,3 +51,36 @@ class XmlDescriptor(XModuleDescriptor):
                       xml_object.get('slug')],
             metadata=metadata,
         )
+
+    def export_to_xml(self, resource_fs):
+        """
+        Returns an xml string representing this module, and all modules underneath it.
+        May also write required resources out to resource_fs
+
+        Assumes that modules have single parantage (that no module appears twice in the same course),
+        and that it is thus safe to nest modules as xml children as appropriate.
+
+        The returned XML should be able to be parsed back into an identical XModuleDescriptor
+        using the from_xml method with the same system, org, and course
+        """
+        xml_object = self.definition_to_xml(resource_fs)
+        xml_object.set('slug', self.name)
+        xml_object.tag = self.type
+
+        for attr in ('format', 'graceperiod', 'showanswer', 'rerandomize', 'due'):
+            if attr in self.metadata:
+                xml_object.set(attr, self.metadata[attr])
+
+        if 'graded' in self.metadata:
+            xml_object.set('graded', str(self.metadata['graded']).lower())
+
+        if 'display_name' in self.metadata:
+            xml_object.set('name', self.metadata['display_name'])
+
+        return etree.tostring(xml_object, pretty_print=True)
+
+    def definition_to_xml(self, resource_fs):
+        """
+        Return a new etree Element object created from this modules definition.
+        """
+        raise NotImplementedError("%s does not implement definition_to_xml" % self.__class__.__name__)
