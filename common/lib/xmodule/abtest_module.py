@@ -103,3 +103,21 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
         definition['data']['group_portions'][DEFAULT] = default_portion
 
         return definition
+
+    def definition_to_xml(self, resource_fs):
+        xml_object = etree.Element('abtest')
+        xml_object.set('experiment', self.definition['data']['experiment'])
+        for name, group in self.definition['data']['group_content'].items():
+            if name == DEFAULT:
+                group_elem = etree.SubElement(xml_object, 'default')
+            else:
+                group_elem = etree.SubElement(xml_object, 'group', attrib={
+                    'portion': str(self.definition['data']['group_portions'][name]),
+                    'name': name,
+                })
+
+            for child_loc in group:
+                child = self.system.load_item(child_loc)
+                group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
+
+        return xml_object
