@@ -171,9 +171,19 @@ class ModuleStore(object):
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
-        data
+        children
 
         location: Something that can be passed to Location
         children: A list of child item identifiers
+        """
+        raise NotImplementedError
+
+    def update_metadata(self, location, metadata):
+        """
+        Set the metadata for the item specified by the location to
+        metadata
+
+        location: Something that can be passed to Location
+        metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError

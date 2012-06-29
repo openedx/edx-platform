@@ -26,3 +26,4 @@ class Command(BaseCommand):
                 keystore().update_item(module.location, module.definition['data'])
             if 'children' in module.definition:
                 keystore().update_children(module.location, module.definition['children'])
+            keystore().update_metadata(module.url, module.metadata)

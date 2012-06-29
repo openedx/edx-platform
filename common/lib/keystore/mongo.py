@@ -85,7 +85,7 @@ class MongoModuleStore(ModuleStore):
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
-        data
+        children
 
         location: Something that can be passed to Location
         children: A list of child item identifiers
@@ -96,4 +96,20 @@ class MongoModuleStore(ModuleStore):
         self.collection.update(
             {'location': Location(location).dict()},
             {'$set': {'definition.children': children}}
+        )
+
+    def update_metadata(self, location, metadata):
+        """
+        Set the children for the item specified by the location to
+        metadata
+
+        location: Something that can be passed to Location
+        metadata: A nested dictionary of module metadata
+        """
+
+        # See http://www.mongodb.org/display/DOCS/Updating for
+        # atomic update syntax
+        self.collection.update(
+            {'location': Location(location).dict()},
+            {'$set': {'metadata': metadata}}
         )
