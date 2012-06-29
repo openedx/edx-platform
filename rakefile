@@ -114,17 +114,15 @@ task :package do
     Dir.chdir(BUILD_DIR) do
         afterremove = Tempfile.new('afterremove')
         afterremove.write <<-AFTERREMOVE.gsub(/^\s*/, '')
-        #! /bin/sh
+        #! /bin/bash
         set -e
         set -x
         
         # to be a little safer this rm is executed
-        # as the makeitso user and is careful
-        # about what it removes
+        # as the makeitso user
 
-        if [ -d #{INSTALL_DIR_PATH} ]; then
-            sudo -u makeitso rm -rf #{INSTALL_DIR_PATH}/{common,cms,lms,*.pyc}
-            sudo -u makeitso rmdir #{INSTALL_DIR_PATH} 
+        if [[ -d "#{INSTALL_DIR_PATH}" ]]; then
+            sudo -u makeitso rm -rf "#{INSTALL_DIR_PATH}"
         fi
 
         AFTERREMOVE
