@@ -19,12 +19,10 @@ from django.conf import settings
 
 from student.models import UserProfile
 from student.models import UserTestGroup
-from courseware.models import StudentModuleCache
 from mitxmako.shortcuts import render_to_string
 from util.cache import cache
 from multicourse import multicourse_settings
 import xmodule
-from keystore.django import keystore
 
 ''' This file will eventually form an abstraction layer between the
 course XML file and the rest of the system. 
@@ -35,21 +33,10 @@ course XML file and the rest of the system.
 # util.memcache.fasthash (which does not depend on memcache at all)
 # 
 
-class ContentException(Exception):
-    pass
-
 log = logging.getLogger("mitx.courseware")
 
 def format_url_params(params):
     return [ urllib.quote(string.replace(' ','_')) for string in params ]
-
-def xpath_remove(tree, path):
-    ''' Remove all items matching path from lxml tree.  Works in
-        place.'''
-    items = tree.xpath(path)
-    for item in items: 
-        item.getparent().remove(item)
-    return tree
 
 def id_tag(course):
     ''' Tag all course elements with unique IDs '''
