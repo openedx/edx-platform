@@ -269,13 +269,13 @@ def index(request, course=None, chapter=None, section=None,
         {'content': module-error message}
         '''
         user = request.user
-        
+
         module_xml = get_module_xml(user, course, chapter, section)
         if module_xml is None:
             log.exception("couldn't get module_xml: course/chapter/section: '%s/%s/%s'",
                           course, chapter, section)
             return {'content' : render_to_string("module-error.html", {})}
-        
+
         student_module_cache = preload_student_modules(module_xml)
 
         try:
@@ -287,7 +287,7 @@ def index(request, course=None, chapter=None, section=None,
 
         return {'init': module_context.get('init_js', ''),
                 'content': module_context['content']}
-    
+
     if not settings.COURSEWARE_ENABLED:
         return redirect('/')
 
@@ -366,7 +366,7 @@ def jump_to(request, probname=None):
     return index(request,
                  course=coursename, chapter=chapter,
                  section=section, position=position)
-                 
+
 
 @ensure_csrf_cookie
 def course_info(request):
@@ -374,15 +374,14 @@ def course_info(request):
   # TODO: Couse should be a model
   return render_to_response('portal/course_info.html', {'csrf': csrf_token })
 
-@ensure_csrf_cookie             
+@ensure_csrf_cookie
 def course_info(request, course_id):
     # This is the advertising page for a student to look at the course before signing up
     csrf_token = csrf(request)['csrf_token']
-    
+
     try:
         course = settings.COURSES_BY_ID[course_id]
     except KeyError:
         raise Http404("Course not found")
-    
-    return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course' : course})
 
+    return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course' : course})

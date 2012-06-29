@@ -1,3 +1,4 @@
+<%! from django.core.urlresolvers import reverse %>
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
@@ -49,65 +50,47 @@
         </ol>
       </nav>
 
-      <article class="my-course">
-        <a href="/info">
-          <div class="cover">
-            <div class="shade"></div>
-            <div class="arrow"></div>
-            <img src="${static.url('images/history.png')}" />
-          </div>
-          <section class="info">
-            <hgroup>
-              <h2>18th Century History</h2>
-              <p>Adam Smith, Harvard University</p>
-            </hgroup>
-            <div class="edit">options</div>
-            <section class="meta">
-              <div class="complete">
-                <p>60% complete</p>
+      % if len(courses) > 0:
+        % for course in courses:
+          <article class="my-course">
+            <a href="${reverse('info', args=[course.id])}">
+              <div class="cover">
+                <div class="shade"></div>
+                <div class="arrow"></div>
+                <img src="${static.url('images/history.png')}" />
               </div>
-              <div class="progress">
-                <div class="meter">
-                  <div class="meter-fill"></div>
-                </div>
-              </div>
-              <div class="end-date">
-                <p>End date: <time>6/10/12</time></p>
-              </div>
-            </section>
+              <section class="info">
+                <hgroup>
+                  <h2>${course.title}</h2>
+                  % for instructor in course.instructors:
+                    <p>${instructor}, ${course.institution}</p>
+                  % endfor
+                </hgroup>
+                <div class="edit">options</div>
+                <section class="meta">
+                  <div class="complete">
+                    <p>60% complete</p>
+                  </div>
+                  <div class="progress">
+                    <div class="meter">
+                      <div class="meter-fill"></div>
+                    </div>
+                  </div>
+                  <div class="end-date">
+                    <p>End date: <time>6/10/12</time></p>
+                  </div>
+                </section>
+              </section>
+            </a>
+          </article>
+        % endfor
+      % else:
+        <div class="find-courses-wrapper">
+          <section class="find-courses">
+            <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
           </section>
-        </a>
-      </article>
-
-      <article class="my-course">
-        <a href="/info">
-          <div class="cover">
-            <div class="shade"></div>
-            <div class="arrow"></div>
-            <img src="${static.url('images/math.png')}" />
-          </div>
-          <section class="info">
-            <hgroup>
-              <h2>Linear Algebra</h2>
-              <p>Adam Smith, Harvard University</p>
-            </hgroup>
-            <div class="edit">options</div>
-            <section class="meta">
-              <div class="complete">
-                <p>60% complete</p>
-              </div>
-              <div class="progress">
-                <div class="meter">
-                  <div class="meter-fill"></div>
-                </div>
-              </div>
-              <div class="end-date">
-                <p>End date: <time>6/10/12</time></p>
-              </div>
-            </section>
-          </section>
-        </a>
-      </article>
+        </div>
+      % endif
 
       <article class="my-course">
         <a href="/info">
