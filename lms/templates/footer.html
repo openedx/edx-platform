@@ -1,25 +1,26 @@
+<%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='static_content.html'/>
 
 <footer>
   <nav>
     <section class="copyright">
-      <a href="${ MITX_ROOT_URL }" class="logo">
+      <a href="${reverse('root')}" class="logo">
         <img src="${static.url('images/logo.png')}" />
       </a>
       <p>Copyright &copy; 2012.edX. <a href="#">Some rights reserved.</a></p>
     </section>
     <ol>
       <li>
-        <a href="/courses">Find Courses</a>
+        <a href="${reverse('courses')}">Find Courses</a>
       </li>
       <li>
-        <a href="#">About</a>
+        <a href="${reverse('about_edx')}">About</a>
       </li>
       <li>
         <a href="#">Blog</a>
       </li>
       <li>
-        <a href="#">Jobs</a>
+        <a href="${reverse('jobs')}">Jobs</a>
       </li>
       <li class="social">
         <a href="#"><img src="${static.url('images/linkedin.png')}" /></a>

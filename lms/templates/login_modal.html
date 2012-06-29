@@ -1,3 +1,4 @@
+<%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='static_content.html'/>
 
 <section class="modal login-modal">
@@ -37,47 +38,36 @@
 </section>
 
 <script type="text/javascript">
-  (function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-      var cookies = document.cookie.split(';');
-      for (var i = 0; i < cookies.length; i++) {
-        var cookie = jQuery.trim(cookies[i]);
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) == (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
+(function() {
+   function getCookie(name) {
+     return $.cookie(name);
+   }
+   function postJSON(url, data, callback) {
+     $.ajax({type:'POST',
+       url: url,
+       dataType: 'json',
+       data: data,
+       success: callback,
+       headers : {'X-CSRFToken':getCookie('csrftoken')}
+     });
+   }
+
+   $('form#login_form').submit(function(e) {
+     e.preventDefault();
+     var submit_data = $('#login_form').serialize();
+
+     postJSON('/login',
+       submit_data,
+       function(json) {
+       if(json.success) {
+        location.href="${reverse('dashboard')}";
+        } else if($('#login_error').length == 0) {
+        $('#login_form').prepend('<div id="login_error">Email or password is incorrect.</div>');
+        } else {
+        $('#login_error').stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
         }
-      }
-    }
-    return cookieValue;
-  }
-
-function postJSON(url, data, callback) {
-  $.ajax({type:'POST',
-      url: url,
-      dataType: 'json',
-      data: data,
-      success: callback,
-      headers : {'X-CSRFToken':getCookie('csrftoken')}
-      });
-}
-  $('form#login_form').submit(function(e) {
-    e.preventDefault();
-    var submit_data = $('#login_form').serialize();
-
-    postJSON('/login',
-      submit_data,
-      function(json) {
-      if(json.success) {
-      location.href="/courses";
-      } else if($('#login_error').length == 0) {
-      $('#login_form').prepend('<div id="login_error">Email or password is incorrect.</div>');
-      } else {
-      $('#login_error').stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
-      }
-      }
-      );
-    });)(this)
-  // new Modal({el: $(".login-modal")}).render()
+        }
+        );
+     });
+})(this)
 </script>
