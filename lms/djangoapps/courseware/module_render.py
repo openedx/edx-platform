@@ -248,7 +248,8 @@ def get_module(user, request, location, student_module_cache, position=None):
                 student=user,
                 module_type=descriptor.type,
                 module_state_key=module.id,
-                state=module.get_instance_state())
+                state=module.get_instance_state(),
+                max_grade=module.max_score())
             instance_module.save()
             # Add to cache. The caller and the system context have references
             # to it, so the change persists past the return
