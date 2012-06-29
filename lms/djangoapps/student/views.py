@@ -18,10 +18,11 @@ from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
+from django.core.urlresolvers import reverse
 
 from django_future.csrf import ensure_csrf_cookie
 
-from models import Registration, UserProfile, PendingNameChange, PendingEmailChange
+from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 
 log = logging.getLogger("mitx.student")
 
@@ -47,8 +48,13 @@ def index(request):
 
 @ensure_csrf_cookie
 def dashboard(request):
-  csrf_token = csrf(request)['csrf_token']
-  return render_to_response('dashboard.html', {'csrf': csrf_token})
+    csrf_token = csrf(request)['csrf_token']
+    user = request.user
+    enrollments = CourseEnrollment.objects.filter(user=user)
+    courses = [settings.COURSES_BY_ID[enrollment.course_id] for enrollment in enrollments]
+
+    context = { 'csrf': csrf_token, 'courses': courses }
+    return render_to_response('dashboard.html', context)
 
 # Need different levels of logging
 @ensure_csrf_cookie
@@ -477,3 +483,15 @@ def about(request):
 
 def jobs(request):
   return render_to_response('jobs.html', None)
+
+def help(request):
+  return render_to_response('help.html', None)
+
+@ensure_csrf_cookie
+def enroll(request, course_id):
+  course = settings.COURSES_BY_ID[course_id]
+  user = request.user
+  enrollment = CourseEnrollment(user=user,
+      course_id=course_id)
+  enrollment.save()
+  return redirect(reverse('dashboard'))
