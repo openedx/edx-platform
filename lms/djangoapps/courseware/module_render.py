@@ -1,17 +1,14 @@
 import json
 import logging
 
-from lxml import etree
-
+from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
-
-from django.conf import settings
-from mitxmako.shortcuts import render_to_string
-
-from models import StudentModule, StudentModuleCache
+from lxml import etree
 
 from keystore.django import keystore
+from mitxmako.shortcuts import render_to_string
+from models import StudentModule, StudentModuleCache
 
 log = logging.getLogger("mitx.courseware")
 
@@ -247,6 +244,9 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
+    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
+        module = add_histogram(module)
+
     # If StudentModule for this instance wasn't already in the database,
     # and this isn't a guest user, create it.
     if user.is_authenticated():
@@ -270,6 +270,24 @@ def get_module(user, request, location, student_module_cache, position=None):
             student_module_cache.append(shared_module)
 
     return (module, instance_module, shared_module, descriptor.type)
+
+
+def add_histogram(module):
+    original_get_html = module.get_html
+    def get_html():
+        module_id = module.id
+        print "Rendering Histogram for ", module_id
+        histogram = grade_histogram(module_id)
+        print histogram
+        render_histogram = len(histogram) > 0
+        staff_context = {'definition': json.dumps(module.definition, indent=4),
+                         'element_id': module.location.html_id(),
+                         'histogram': json.dumps(histogram),
+                         'render_histogram': render_histogram,
+                         'module_content': original_get_html()}
+        return render_to_string("staff_problem_info.html", staff_context)
+    module.get_html = get_html
+    return module
 
 
 def render_x_module(user, module, student_module_cache, position=None):
