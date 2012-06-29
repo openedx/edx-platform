@@ -12,8 +12,6 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
-from lxml import etree
-
 from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
@@ -25,9 +23,6 @@ from student.models import UserTestGroup
 from courseware import grades
 
 log = logging.getLogger("mitx.courseware")
-
-etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                         remove_comments=True))
 
 template_imports = {'urllib': urllib}
 
