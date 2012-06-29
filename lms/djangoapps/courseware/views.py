@@ -16,7 +16,7 @@ from django.views.decorators.cache import cache_control
 
 from lxml import etree
 
-from module_render import render_x_module, toc_for_course, get_module, get_section
+from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
@@ -113,47 +113,6 @@ def render_accordion(request, course, chapter, section):
                     ('format_url_params', content_parser.format_url_params),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
     return render_to_string('accordion.html', context)
-
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def render_section(request, section):
-    ''' TODO: Consolidate with index
-    '''
-    user = request.user
-    if not settings.COURSEWARE_ENABLED:
-        return redirect('/')
-
-    coursename = multicourse_settings.get_coursename_from_request(request)
-
-    try:
-        dom = content_parser.section_file(user, section, coursename)
-    except:
-        log.exception("Unable to parse courseware xml")
-        return render_to_response('courseware-error.html', {})
-
-    context = {
-        'csrf': csrf(request)['csrf_token'],
-        'accordion': render_accordion(request, get_course(request), '', '')
-    }
-
-    student_module_cache = StudentModuleCache(request.user, dom)
-
-    try:
-        module = render_x_module(user, dom, student_module_cache)
-    except:
-        log.exception("Unable to load module")
-        context.update({
-            'init': '',
-            'content': render_to_string("module-error.html", {}),
-        })
-        return render_to_response('courseware.html', context)
-
-    context.update({
-        'content': module['content'],
-    })
-
-    result = render_to_response('courseware.html', context)
-    return result
 
 
 def get_course(request, course):
