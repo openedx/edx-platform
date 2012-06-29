@@ -14,6 +14,7 @@ urlpatterns = ('',
     url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^about$', 'student.views.about', name="about_edx"),
     url(r'^jobs$', 'student.views.jobs', name="jobs"),
+    url(r'^help$', 'student.views.help', name="help_edx"),
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
