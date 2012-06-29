@@ -94,3 +94,13 @@ class XMLModuleStore(ModuleStore):
         children: A list of child item identifiers
         """
         raise NotImplementedError("XMLModuleStores are read-only")
+
+    def update_metadata(self, location, metadata):
+        """
+        Set the metadata for the item specified by the location to
+        metadata
+
+        location: Something that can be passed to Location
+        metadata: A nested dictionary of module metadata
+        """
+        raise NotImplementedError("XMLModuleStores are read-only")
