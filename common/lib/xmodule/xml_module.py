@@ -68,10 +68,10 @@ class XmlDescriptor(XModuleDescriptor):
         xml_object.tag = self.type
 
         for attr in ('format', 'graceperiod', 'showanswer', 'rerandomize', 'due'):
-            if attr in self.metadata:
+            if attr in self.metadata and attr not in self._inherited_metadata:
                 xml_object.set(attr, self.metadata[attr])
 
-        if 'graded' in self.metadata:
+        if 'graded' in self.metadata and 'graded' not in self._inherited_metadata:
             xml_object.set('graded', str(self.metadata['graded']).lower())
 
         if 'display_name' in self.metadata:

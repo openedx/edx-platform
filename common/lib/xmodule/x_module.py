@@ -253,6 +253,7 @@ class XModuleDescriptor(Plugin):
         self.shared_state_key = kwargs.get('shared_state_key')
 
         self._child_instances = None
+        self._inherited_metadata = set()
 
     def inherit_metadata(self, metadata):
         """
@@ -264,6 +265,7 @@ class XModuleDescriptor(Plugin):
         # in self.inheritable_metadata and aren't already set in metadata
         for attr in self.inheritable_metadata:
             if attr not in self.metadata and attr in metadata:
+                self._inherited_metadata.add(attr)
                 self.metadata[attr] = metadata[attr]
 
     def get_children(self):
