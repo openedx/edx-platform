@@ -15,6 +15,7 @@ class MongoModuleStore(ModuleStore):
             host=host,
             port=port
         )[db][collection]
+        self.collection.ensure_index('location')
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
