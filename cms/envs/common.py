@@ -157,8 +157,8 @@ PIPELINE_CSS = {
 
 PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
 
-from x_module import XModuleDescriptor
-from raw_module import RawDescriptor
+from xmodule.x_module import XModuleDescriptor
+from xmodule.raw_module import RawDescriptor
 js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
 try:
     os.makedirs(js_file_dir)

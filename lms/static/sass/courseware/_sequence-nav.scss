@@ -11,13 +11,14 @@ nav.sequence-nav {
     height: 100%;
     padding-right: flex-grid(1, 9);
     width: 100%;
+    padding-left: 0;
 
     a {
       @extend .block-link;
     }
 
     li {
-      border-left: 1px solid darken($cream, 20%);
+      border-left: 1px solid darken($cream, 10%);
       display: table-cell;
       min-width: 20px;
 
@@ -29,18 +30,17 @@ nav.sequence-nav {
         background-repeat: no-repeat;
 
         &:hover {
-          background-color: lighten($cream, 3%);
+          background-color: lighten($cream, 8%);
         }
       }
 
       .visited {
-        background-color: #DCCDA2;
+        background-color: darken($cream, 4%);
         background-repeat: no-repeat;
-        @include box-shadow(inset 0 0 3px darken(#dccda2, 10%));
+        @include box-shadow(0);
 
         &:hover {
           background-color: $cream;
-          background-position: center center;
         }
       }
 
@@ -51,7 +51,6 @@ nav.sequence-nav {
 
         &:hover {
           background-color: #fff;
-          background-position: center;
         }
       }
 
@@ -61,86 +60,87 @@ nav.sequence-nav {
         cursor: pointer;
         display: block;
         height: 17px;
-        padding: 15px 0 14px;
+        padding: 15px 0 17px;
         position: relative;
         @include transition(all, .4s, $ease-in-out-quad);
         width: 100%;
-
-        &.progress {
-          border-bottom-style: solid;
-          border-bottom-width: 4px;
-        }
-
-        &.progress-none {
-          @extend .progress;
-          border-bottom-color: red;
-        }
-
-        &.progress-some {
-          @extend .progress;
-          border-bottom-color: yellow;
-        }
-
-        &.progress-done {
-          @extend .progress;
-          border-bottom-color: green;
-        }
+        background-position: center 8px;
 
         //video
         &.seq_video_inactive {
           @extend .inactive;
-          background-image: url('../images/sequence-nav/video-icon-normal.png');
-          background-position: center;
+          background-image: url('../images/sequence-nav/video-icon-visited.png');
         }
 
         &.seq_video_visited {
           @extend .visited;
-          background-image: url('../images/sequence-nav/video-icon-visited.png');
-          background-position: center;
+          background-image: url('../images/sequence-nav/video-icon-normal.png');
         }
 
         &.seq_video_active {
           @extend .active;
           background-image: url('../images/sequence-nav/video-icon-current.png');
-          background-position: center;
         }
 
         //other
         &.seq_other_inactive {
           @extend .inactive;
-          background-image: url('../images/sequence-nav/document-icon-normal.png');
-          background-position: center;
+          background-image: url('../images/sequence-nav/document-icon-visited.png');
         }
 
         &.seq_other_visited {
           @extend .visited;
-          background-image: url('../images/sequence-nav/document-icon-visited.png');
-          background-position: center;
+          background-image: url('../images/sequence-nav/document-icon-normal.png');
         }
 
         &.seq_other_active {
           @extend .active;
           background-image: url('../images/sequence-nav/document-icon-current.png');
-          background-position: center;
         }
 
         //vertical & problems
         &.seq_vertical_inactive, &.seq_problem_inactive {
           @extend .inactive;
-          background-image: url('../images/sequence-nav/list-icon-normal.png');
-          background-position: center;
+          background-image: url('../images/sequence-nav/list-icon-visited.png');
         }
 
         &.seq_vertical_visited, &.seq_problem_visited {
           @extend .visited;
-          background-image: url('../images/sequence-nav/list-icon-visited.png');
-          background-position: center;
+          background-image: url('../images/sequence-nav/list-icon-normal.png');
         }
 
         &.seq_vertical_active, &.seq_problem_active {
           @extend .active;
           background-image: url('../images/sequence-nav/list-icon-current.png');
-          background-position: center;
+        }
+
+        &:after {
+          content: "  ";
+          display: block;
+          width: 11px;
+          height: 11px;
+          background: url('../images/sequence-nav/status/dash.png') no-repeat center;
+          @include position( absolute, 0 0 6px 50% );
+          margin-left: -5px;
+        }
+
+        //progress
+        &.progress-none {
+          &:after {
+            background: url('../images/sequence-nav/status/not-started.png') no-repeat center;
+          }
+        }
+
+        &.progress-some {
+          &:after {
+            background: url('../images/sequence-nav/status/wrong.png') no-repeat center;
+          }
+        }
+
+        &.progress-done {
+          &:after {
+            background: url('../images/sequence-nav/status/check.png') no-repeat center;
+          }
         }
 
         p {
@@ -180,6 +180,8 @@ nav.sequence-nav {
         }
 
         &:hover {
+          background-position: center 8px;
+
           p {
             display: block;
             margin-top: 4px;
@@ -215,6 +217,7 @@ nav.sequence-nav {
           display: block;
           text-indent: -9999px;
           @include transition(all, .2s, $ease-in-out-quad);
+          line-height: 49px;
 
           &:hover {
             opacity: .5;
@@ -277,6 +280,7 @@ section.course-content {
       @include border-radius(3px);
       @include box-shadow(inset 0 0 0 1px lighten(#f6efd4, 5%));
       @include inline-block();
+      padding-left: 0;
 
       li {
         float: left;

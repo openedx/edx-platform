@@ -176,11 +176,13 @@ def get_score(user, problem, cache, coursename=None):
         ## HACK 2: Backwards-compatibility: This should be written when a grade is saved, and removed from the system
         # TODO: These are no longer correct params for I4xSystem -- figure out what this code
         # does, clean it up.
-        from module_render import I4xSystem
-        system = I4xSystem(None, None, None, coursename=coursename)
-        total=float(xmodule.capa_module.Module(system, etree.tostring(problem), "id").max_score())
-        response.max_grade = total
-        response.save()
+        # from module_render import I4xSystem
+        # system = I4xSystem(None, None, None, coursename=coursename)
+        # total=float(xmodule.capa_module.Module(system, etree.tostring(problem), "id").max_score())
+        # response.max_grade = total
+        # response.save()
+        total = 1
+        # For a temporary fix, we just assume a problem is worth 1 point if we haven't seen it before. This is totally incorrect
         
     #Now we re-weight the problem, if specified
     weight = problem.get("weight", None)
