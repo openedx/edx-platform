@@ -87,7 +87,7 @@ def grade_sheet(student, course, student_module_cache):
                     for module in yield_descendents(child):
                         yield module
 
-            graded = getattr(s, 'graded', False)
+            graded = s.metadata.get('graded', False)
             scores = []
             for module in yield_descendents(s):
                 (correct, total) = get_score(student, module, student_module_cache)
@@ -105,29 +105,27 @@ def grade_sheet(student, course, student_module_cache):
                     #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                     graded = False
 
-                scores.append(Score(correct, total, graded, module.display_name))
+                scores.append(Score(correct, total, graded, module.metadata.get('display_name')))
 
-            section_total, graded_total = graders.aggregate_scores(scores, s.display_name)
+            section_total, graded_total = graders.aggregate_scores(scores, s.metadata.get('display_name'))
             #Add the graded total to totaled_scores
-            format = getattr(s, 'format', "")
-            subtitle = getattr(s, 'subtitle', format)
+            format = s.metadata.get('format', "")
             if format and graded_total.possible > 0:
                 format_scores = totaled_scores.get(format, [])
                 format_scores.append(graded_total)
                 totaled_scores[format] = format_scores
 
             sections.append({
-                'section': s.display_name,
+                'section': s.metadata.get('display_name'),
                 'scores': scores,
                 'section_total': section_total,
                 'format': format,
-                'subtitle': subtitle,
-                'due': getattr(s, "due", ""),
+                'due': s.metadata.get("due", ""),
                 'graded': graded,
             })
 
-        chapters.append({'course': course.display_name,
-                         'chapter': c.display_name,
+        chapters.append({'course': course.metadata.get('display_name'),
+                         'chapter': c.metadata.get('display_name'),
                          'sections': sections})
 
     grader = course_settings.GRADER

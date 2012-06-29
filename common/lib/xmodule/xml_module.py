@@ -29,6 +29,18 @@ class XmlDescriptor(XModuleDescriptor):
         """
         xml_object = etree.fromstring(xml_data)
 
+        metadata = {}
+        for attr in ('format', 'graceperiod', 'showanswer', 'rerandomize', 'due'):
+            from_xml = xml_object.get(attr)
+            if from_xml is not None:
+                metadata[attr] = from_xml
+
+        if xml_object.get('graded') is not None:
+            metadata['graded'] = xml_object.get('graded') == 'true'
+
+        if xml_object.get('name') is not None:
+            metadata['display_name'] = xml_object.get('name')
+
         return cls(
             system,
             cls.definition_from_xml(xml_object, system),
@@ -37,7 +49,5 @@ class XmlDescriptor(XModuleDescriptor):
                       course,
                       xml_object.tag,
                       xml_object.get('slug')],
-            display_name=xml_object.get('name'),
-            format=xml_object.get('format'),
-            graded=xml_object.get('graded') == 'true',
+            metadata=metadata,
         )
