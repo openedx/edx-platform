@@ -213,6 +213,7 @@ class XModuleDescriptor(Plugin):
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = ('graded', 'due', 'graceperiod', 'showanswer', 'rerandomize')
 
+    # ============================= STRUCTURAL MANIPULATION ===========================
     def __init__(self,
                  system,
                  definition=None,
@@ -253,6 +254,43 @@ class XModuleDescriptor(Plugin):
 
         self._child_instances = None
 
+    def inherit_metadata(self, metadata):
+        """
+        Updates this module with metadata inherited from a containing module.
+        Only metadata specified in self.inheritable_metadata will
+        be inherited
+        """
+        # Set all inheritable metadata from kwargs that are
+        # in self.inheritable_metadata and aren't already set in metadata
+        for attr in self.inheritable_metadata:
+            if attr not in self.metadata and attr in metadata:
+                self.metadata[attr] = metadata[attr]
+
+    def get_children(self):
+        """Returns a list of XModuleDescriptor instances for the children of this module"""
+        if self._child_instances is None:
+            self._child_instances = []
+            for child_loc in self.definition.get('children', []):
+                child = self.system.load_item(child_loc)
+                child.inherit_metadata(self.metadata)
+                self._child_instances.append(child)
+
+        return self._child_instances
+
+    def xmodule_constructor(self, system):
+        """
+        Returns a constructor for an XModule. This constructor takes two arguments:
+        instance_state and shared_state, and returns a fully nstantiated XModule
+        """
+        return partial(
+            self.module_class,
+            system,
+            self.location,
+            self.definition,
+            metadata=self.metadata
+        )
+
+    # ================================= JSON PARSING ===================================
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
         """
@@ -280,6 +318,7 @@ class XModuleDescriptor(Plugin):
         """
         return cls(system=system, **json_data)
 
+    # ================================= XML PARSING ====================================
     @staticmethod
     def load_from_xml(xml_data,
             system,
@@ -315,6 +354,20 @@ class XModuleDescriptor(Plugin):
         """
         raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
 
+    def export_to_xml(self, resource_fs):
+        """
+        Returns an xml string representing this module, and all modules underneath it.
+        May also write required resources out to resource_fs
+
+        Assumes that modules have single parantage (that no module appears twice in the same course),
+        and that it is thus safe to nest modules as xml children as appropriate.
+
+        The returned XML should be able to be parsed back into an identical XModuleDescriptor
+        using the from_xml method with the same system, org, and course
+        """
+        raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
+
+    # ================================== HTML INTERFACE DEFINITIONS ======================
     @classmethod
     def get_javascript(cls):
         """
@@ -334,48 +387,11 @@ class XModuleDescriptor(Plugin):
         """
         return self.js_module
 
-
-    def inherit_metadata(self, metadata):
-        """
-        Updates this module with metadata inherited from a containing module.
-        Only metadata specified in self.inheritable_metadata will
-        be inherited
-        """
-        # Set all inheritable metadata from kwargs that are
-        # in self.inheritable_metadata and aren't already set in metadata
-        for attr in self.inheritable_metadata:
-            if attr not in self.metadata and attr in metadata:
-                self.metadata[attr] = metadata[attr]
-
-    def get_children(self):
-        """Returns a list of XModuleDescriptor instances for the children of this module"""
-        if self._child_instances is None:
-            self._child_instances = []
-            for child_loc in self.definition.get('children', []):
-                child = self.system.load_item(child_loc)
-                child.inherit_metadata(self.metadata)
-                self._child_instances.append(child)
-
-        return self._child_instances
-
     def get_html(self):
         """
         Return the html used to edit this module
         """
         raise NotImplementedError("get_html() must be provided by specific modules")
-
-    def xmodule_constructor(self, system):
-        """
-        Returns a constructor for an XModule. This constructor takes two arguments:
-        instance_state and shared_state, and returns a fully nstantiated XModule
-        """
-        return partial(
-            self.module_class,
-            system,
-            self.location,
-            self.definition,
-            metadata=self.metadata
-        )
 
 
 class DescriptorSystem(object):
