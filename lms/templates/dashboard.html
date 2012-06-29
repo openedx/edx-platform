@@ -53,7 +53,7 @@
       % if len(courses) > 0:
         % for course in courses:
           <article class="my-course">
-            <a href="/info">
+            <a href="${reverse('info', args=[course.id])}">
               <div class="cover">
                 <div class="shade"></div>
                 <div class="arrow"></div>
