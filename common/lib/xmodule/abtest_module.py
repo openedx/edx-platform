@@ -44,7 +44,7 @@ class ABTestModule(XModule):
         if shared_state is None:
 
             self.group = group_from_value(
-                self.definition['data']['group_portions'],
+                self.definition['data']['group_portions'].items(),
                 random.uniform(0, 1)
             )
         else:
@@ -52,7 +52,6 @@ class ABTestModule(XModule):
             self.group = shared_state['group']
 
     def get_shared_state(self):
-        print self.group
         return json.dumps({'group': self.group})
 
     def displayable_items(self):
@@ -78,7 +77,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
         definition = {
             'data': {
                 'experiment': experiment,
-                'group_portions': [],
+                'group_portions': {},
                 'group_content': {DEFAULT: []},
             },
             'children': []}
@@ -87,9 +86,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 name = DEFAULT
             else:
                 name = group.get('name')
-                definition['data']['group_portions'].append(
-                    (name, float(group.get('portion', 0)))
-                )
+                definition['data']['group_portions'][name] = float(group.get('portion', 0))
 
             child_content_urls = [
                 system.process_xml(etree.tostring(child)).location.url()
@@ -99,10 +96,10 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
             definition['data']['group_content'][name] = child_content_urls
             definition['children'].extend(child_content_urls)
 
-        default_portion = 1 - sum(portion for (name, portion) in definition['data']['group_portions'])
+        default_portion = 1 - sum(portion for (name, portion) in definition['data']['group_portions'].items())
         if default_portion < 0:
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 
-        definition['data']['group_portions'].append((DEFAULT, default_portion))
+        definition['data']['group_portions'][DEFAULT] = default_portion
 
         return definition
