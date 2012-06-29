@@ -1,22 +1,36 @@
 <section id="textinput_${id}" class="textinput">
+    % if state == 'unsubmitted':
+    <div class="unanswered" id="status_${id}">
+    % elif state == 'correct':
+    <div class="correct" id="status_${id}">
+    % elif state == 'incorrect':
+    <div class="incorrect" id="status_${id}">
+    % elif state == 'incomplete':
+    <div class="incorrect" id="status_${id}">
+    % endif
+
   <input type="text" name="input_${id}" id="input_${id}" value="${value}"
    % if size:
    size="${size}"
    % endif
    />
 
-  <span id="answer_${id}"></span>
+      <p class="status">
+        % if state == 'unsubmitted':
+        unanswered
+        % elif state == 'correct':
+        correct
+        % elif state == 'incorrect':
+        incorrect
+        % elif state == 'incomplete':
+        incomplete
+        % endif
+      </p>
 
-  % if state == 'unsubmitted':
-  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif state == 'correct':
-  <span class="correct" id="status_${id}"></span>
-  % elif state == 'incorrect':
-  <span class="incorrect" id="status_${id}"></span>
-  % elif state == 'incomplete':
-  <span class="incorrect" id="status_${id}"></span>
-  % endif
+  <p id="answer_${id}" class="answer"></p>
+
   % if msg:
       <span class="message">${msg|n}</span>
   % endif
+</div>
 </section>

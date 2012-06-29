@@ -13,6 +13,7 @@ describe 'Problem', ->
     spyOn($.fn, 'load').andCallFake (url, callback) ->
       $(@).html readFixtures('problem_content.html')
       callback()
+    jasmine.stubRequests()
 
   describe 'constructor', ->
     beforeEach ->
@@ -20,12 +21,6 @@ describe 'Problem', ->
 
     it 'set the element', ->
       expect(@problem.element).toBe '#problem_1'
-
-    it 'set the content url', ->
-      expect(@problem.content_url).toEqual '/problem/url/problem_get?id=1'
-
-    it 'render the content', ->
-      expect($.fn.load).toHaveBeenCalledWith @problem.content_url, @problem.bind
 
   describe 'bind', ->
     beforeEach ->
@@ -57,8 +52,11 @@ describe 'Problem', ->
     it 'bind the math input', ->
       expect($('input.math')).toHandleWith 'keyup', @problem.refreshMath
 
-    it 'display the math input', ->
-      expect(@stubbedJax.root.toMathML).toHaveBeenCalled()
+    it 'replace math content on the page', ->
+      expect(MathJax.Hub.Queue.mostRecentCall.args).toEqual [
+        ['Text', @stubbedJax, ''],
+        [@problem.updateMathML, @stubbedJax, $('#input_example_1').get(0)]
+      ]
 
   describe 'render', ->
     beforeEach ->
@@ -77,12 +75,19 @@ describe 'Problem', ->
         expect(@problem.bind).toHaveBeenCalled()
 
     describe 'with no content given', ->
+      beforeEach ->
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+          callback html: "Hello World"
+        @problem.render()
+
       it 'load the content via ajax', ->
-        expect($.fn.load).toHaveBeenCalledWith @problem.content_url, @bind
+        expect(@problem.element.html()).toEqual 'Hello World'
+
+      it 're-bind the content', ->
+        expect(@problem.bind).toHaveBeenCalled()
 
   describe 'check', ->
     beforeEach ->
-      jasmine.stubRequests()
       @problem = new Problem 1, '/problem/url/'
       @problem.answers = 'foo=1&bar=2'
 
@@ -116,7 +121,6 @@ describe 'Problem', ->
 
   describe 'reset', ->
     beforeEach ->
-      jasmine.stubRequests()
       @problem = new Problem 1, '/problem/url/'
 
     it 'log the problem_reset event', ->
@@ -130,13 +134,13 @@ describe 'Problem', ->
       expect($.postWithPrefix).toHaveBeenCalledWith '/modx/problem/1/problem_reset', { id: 1 }, jasmine.any(Function)
 
     it 'render the returned content', ->
-      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback("Reset!")
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        callback html: "Reset!"
       @problem.reset()
       expect(@problem.element.html()).toEqual 'Reset!'
 
   describe 'show', ->
     beforeEach ->
-      jasmine.stubRequests()
       @problem = new Problem 1, '/problem/url/'
       @problem.element.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
 
@@ -154,18 +158,19 @@ describe 'Problem', ->
         expect($.postWithPrefix).toHaveBeenCalledWith '/modx/problem/1/problem_show', jasmine.any(Function)
 
       it 'show the answers', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback('1_1': 'One', '1_2': 'Two')
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+          callback answers: '1_1': 'One', '1_2': 'Two'
         @problem.show()
         expect($('#answer_1_1')).toHaveHtml 'One'
         expect($('#answer_1_2')).toHaveHtml 'Two'
 
       it 'toggle the show answer button', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback({})
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect($('.show')).toHaveValue 'Hide Answer'
 
       it 'add the showed class to element', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback({})
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect(@problem.element).toHaveClass 'showed'
 
@@ -179,7 +184,8 @@ describe 'Problem', ->
           '''
 
         it 'set the correct_answer attribute on the choice', ->
-          spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback('1_1': [2, 3])
+          spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
+            callback answers: '1_1': [2, 3]
           @problem.show()
           expect($('label[for="input_1_1_1"]')).not.toHaveAttr 'correct_answer', 'true'
           expect($('label[for="input_1_1_2"]')).toHaveAttr 'correct_answer', 'true'
@@ -214,7 +220,6 @@ describe 'Problem', ->
 
   describe 'save', ->
     beforeEach ->
-      jasmine.stubRequests()
       @problem = new Problem 1, '/problem/url/'
       @problem.answers = 'foo=1&bar=2'
 
@@ -236,23 +241,29 @@ describe 'Problem', ->
   describe 'refreshMath', ->
     beforeEach ->
       @problem = new Problem 1, '/problem/url/'
-      @stubbedJax.root.toMathML.andReturn '<MathML>'
       $('#input_example_1').val 'E=mc^2'
+      @problem.refreshMath target: $('#input_example_1').get(0)
+
+    it 'should queue the conversion and MathML element update', ->
+      expect(MathJax.Hub.Queue).toHaveBeenCalledWith ['Text', @stubbedJax, 'E=mc^2'],
+        [@problem.updateMathML, @stubbedJax, $('#input_example_1').get(0)]
+
+  describe 'updateMathML', ->
+    beforeEach ->
+      @problem = new Problem 1, '/problem/url/'
+      @stubbedJax.root.toMathML.andReturn '<MathML>'
 
     describe 'when there is no exception', ->
       beforeEach ->
-        @problem.refreshMath target: $('#input_example_1').get(0)
+        @problem.updateMathML @stubbedJax, $('#input_example_1').get(0)
 
-      it 'should convert and display the MathML object', ->
-        expect(MathJax.Hub.Queue).toHaveBeenCalledWith ['Text', @stubbedJax, 'E=mc^2']
-
-      it 'should display debug output in hidden div', ->
+      it 'convert jax to MathML', ->
         expect($('#input_example_1_dynamath')).toHaveValue '<MathML>'
 
     describe 'when there is an exception', ->
       beforeEach ->
         @stubbedJax.root.toMathML.andThrow {restart: true}
-        @problem.refreshMath target: $('#input_example_1').get(0)
+        @problem.updateMathML @stubbedJax, $('#input_example_1').get(0)
 
       it 'should queue up the exception', ->
         expect(MathJax.Callback.After).toHaveBeenCalledWith [@problem.refreshMath, @stubbedJax], true
