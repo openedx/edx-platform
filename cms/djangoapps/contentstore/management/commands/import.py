@@ -1,8 +1,8 @@
-### 
+###
 ### One-off script for importing courseware form XML format
 ###
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from keystore.django import keystore
 from raw_module import RawDescriptor
 from lxml import etree
@@ -17,13 +17,18 @@ unnamed_modules = 0
 etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
                                          remove_comments=True))
 
+
 class Command(BaseCommand):
     help = \
 '''Import the specified data directory into the default keystore'''
 
     def handle(self, *args, **options):
+        if len(args) != 3:
+            raise CommandError("import requires 3 arguments: <org> <course> <data directory>")
+
         org, course, data_dir = args
         data_dir = path(data_dir)
+
         class ImportSystem(XMLParsingSystem):
             def __init__(self):
                 self.load_item = keystore().get_item
@@ -33,8 +38,8 @@ class Command(BaseCommand):
                 try:
                     xml_data = etree.fromstring(xml)
                 except:
-                    print xml
-                    raise
+                    raise CommandError("Unable to parse xml: " + xml)
+
                 if not xml_data.get('name'):
                     global unnamed_modules
                     unnamed_modules += 1
