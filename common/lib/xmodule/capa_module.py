@@ -117,8 +117,6 @@ class CapaModule(XModule):
         if instance_state != None and 'attempts' in instance_state:
             self.attempts = instance_state['attempts']
 
-        # TODO: Should be: self.filename=only_one(dom2.xpath('/problem/@filename'))
-        self.filename = "problems/" + only_one(dom2.xpath('/problem/@filename')) + ".xml"
         self.name = only_one(dom2.xpath('/problem/@name'))
 
         weight_string = only_one(dom2.xpath('/problem/@weight'))
@@ -133,20 +131,11 @@ class CapaModule(XModule):
             seed = system.id
         else:
             seed = None
+
         try:
-            fp = self.system.filestore.open(self.filename)
+            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(), instance_state, seed=seed, system=self.system)
         except Exception:
-            log.exception('cannot open file %s' % self.filename)
-            if self.system.DEBUG:
-                # create a dummy problem instead of failing
-                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
-                fp.name = "StringIO"
-            else:
-                raise
-        try:
-            self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
-        except Exception:
-            msg = 'cannot create LoncapaProblem %s' % self.filename
+            msg = 'cannot create LoncapaProblem %s' % self.url
             log.exception(msg)
             if self.system.DEBUG:
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
