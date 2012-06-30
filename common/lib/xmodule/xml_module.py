@@ -70,16 +70,6 @@ class XmlDescriptor(XModuleDescriptor):
         raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
 
     @classmethod
-    def definition_from_file(cls, file, system):
-        """
-        Return the definition to be passed to the newly created descriptor
-        during from_xml
-
-        file: File pointer
-        """
-        return cls.definition_from_xml(etree.parse(file), system)
-
-    @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Creates an instance of this descriptor from the supplied xml_data.
@@ -113,8 +103,9 @@ class XmlDescriptor(XModuleDescriptor):
             if filename is None:
                 return cls.definition_from_xml(xml_object, system)
             else:
-                filepath = '{type}/{name}.{ext}'.format(type=xml_object.tag, name=filename, ext=cls.filename_extension)
-                return cls.definition_from_file(system.resources_fs.open(filepath), system)
+                filepath = cls._format_filepath(xml_object.tag, filename)
+                with system.resources_fs.open(filepath) as file:
+                    return cls.definition_from_xml(etree.parse(file).getroot(), system)
 
         return cls(
             system,
@@ -126,6 +117,10 @@ class XmlDescriptor(XModuleDescriptor):
                       xml_object.get('slug')],
             metadata=LazyLoadingDict(metadata_loader),
         )
+
+    @classmethod
+    def _format_filepath(cls, type, name):
+        return '{type}/{name}.{ext}'.format(type=type, name=name, ext=cls.filename_extension)
 
     def export_to_xml(self, resource_fs):
         """
@@ -139,6 +134,20 @@ class XmlDescriptor(XModuleDescriptor):
         using the from_xml method with the same system, org, and course
         """
         xml_object = self.definition_to_xml(resource_fs)
+
+        # Put content in a separate file if it's large (has more than 5 descendent tags)
+        if len(list(xml_object.iter())) > 5:
+
+            filepath = self.__class__._format_filepath(self.type, self.name)
+            resource_fs.makedir(self.type, allow_recreate=True)
+            with resource_fs.open(filepath, 'w') as file:
+                file.write(etree.tostring(xml_object, pretty_print=True))
+
+            for child in xml_object:
+                xml_object.remove(child)
+
+            xml_object.set('filename', self.name)
+
         xml_object.set('slug', self.name)
         xml_object.tag = self.type
 

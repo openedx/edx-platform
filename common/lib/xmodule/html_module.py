@@ -1,9 +1,7 @@
-import json
 import logging
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from lxml import etree
 from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.courseware")
@@ -28,7 +26,3 @@ class HtmlDescriptor(RawDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/module/html.coffee')]}
     js_module = 'HTML'
-
-    @classmethod
-    def definition_from_file(cls, file, system):
-        return {'data': file.read()}
