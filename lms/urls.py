@@ -85,17 +85,17 @@ if settings.COURSEWARE_ENABLED:
     )
     
     # Multicourse wiki
-    article_slug = r"(?:/(?P<namespace>[a-zA-Z\d_-]*))?/(?P<slug>[a-zA-Z\d_-]*)"
+    article_slug = r"/(?P<article_path>[a-zA-Z\d_-]+/[a-zA-Z\d_-]*)"
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]*)/wiki/$', 'simplewiki.views.root_redirect', name='wiki_root'),
         url(r'^courses/(?P<course_id>[^/]*)/wiki/view' + article_slug + r'/?$', 'simplewiki.views.view', name='wiki_view'),
-        url(r'^courses/(?P<course_id>[^/]*)/wiki/view_revision/([0-9]*)(/[a-zA-Z\d/_-]*)/?$', 'simplewiki.views.view_revision', name='wiki_view_revision'),
+        url(r'^courses/(?P<course_id>[^/]*)/wiki/view_revision/(?P<revision_number>[0-9]+)' + article_slug + r'/?$', 'simplewiki.views.view_revision', name='wiki_view_revision'),
         url(r'^courses/(?P<course_id>[^/]*)/wiki/edit' + article_slug + r'/?$', 'simplewiki.views.edit', name='wiki_edit'),
         url(r'^courses/(?P<course_id>[^/]*)/wiki/create/?$', 'simplewiki.views.create', name='wiki_create'),
-        url(r'^courses/(?P<course_id>[^/]*)/wiki/history' + article_slug + r'(?:/([0-9]*))?/?$', 'simplewiki.views.history', name='wiki_history'),
+        url(r'^courses/(?P<course_id>[^/]*)/wiki/history' + article_slug + r'(?:/(?P<page>[0-9]+))?/?$', 'simplewiki.views.history', name='wiki_history'),
         url(r'^courses/(?P<course_id>[^/]*)/wiki/search_related' + article_slug + r'/?$', 'simplewiki.views.search_add_related', name='search_related'),
         url(r'^courses/(?P<course_id>[^/]*)/wiki/random/?$', 'simplewiki.views.random_article', name='wiki_random'),
-        url(r'^courses/(?P<course_id>[^/]*)/wiki/revision_feed/([0-9]*)/?$', 'simplewiki.views.revision_feed', name='wiki_revision_feed'),
+        url(r'^courses/(?P<course_id>[^/]*)/wiki/revision_feed/([0-9]+)/?$', 'simplewiki.views.revision_feed', name='wiki_revision_feed'),
         url(r'^courses/(?P<course_id>[^/]*)/wiki/search/?$', 'simplewiki.views.search_articles', name='wiki_search_articles'),    
         url(r'^courses/(?P<course_id>[^/]*)/wiki/list/?$', 'simplewiki.views.search_articles', name='wiki_list_articles'), #Just an alias for the search, but you usually don't submit a search term
     
