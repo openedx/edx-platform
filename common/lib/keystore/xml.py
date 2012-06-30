@@ -33,6 +33,7 @@ class XMLModuleStore(ModuleStore):
                     modulestore: the XMLModuleStore to store the loaded modules in
                     """
                     self.unnamed_modules = 0
+                    self.used_slugs = set()
 
                     def process_xml(xml):
                         try:
@@ -42,10 +43,17 @@ class XMLModuleStore(ModuleStore):
                             raise
                         if xml_data.get('slug') is None:
                             if xml_data.get('name'):
-                                xml_data.set('slug', Location.clean(xml_data.get('name')))
+                                slug = Location.clean(xml_data.get('name'))
                             else:
                                 self.unnamed_modules += 1
-                                xml_data.set('slug', '{tag}_{count}'.format(tag=xml_data.tag, count=self.unnamed_modules))
+                                slug = '{tag}_{count}'.format(tag=xml_data.tag, count=self.unnamed_modules)
+
+                            if slug in self.used_slugs:
+                                self.unnamed_modules += 1
+                                slug = '{slug}_{count}'.format(slug=slug, count=self.unnamed_modules)
+
+                            self.used_slugs.add(slug)
+                            xml_data.set('slug', slug)
 
                         module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
                         modulestore.modules[module.location] = module
