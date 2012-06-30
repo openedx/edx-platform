@@ -234,7 +234,7 @@ def textbox(element, value, status, render_template, msg=''):
     html = render_template("textbox.html", context)
     try:
         xhtml = etree.XML(html)
-    except Exception,err:
+    except Exception as err:
         newmsg = 'error %s in rendering message' % (str(err).replace('<','&lt;'))
         newmsg += '<br/>Original message: %s' % msg.replace('<','&lt;')
         context['msg'] = newmsg
