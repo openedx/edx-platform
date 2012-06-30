@@ -119,7 +119,7 @@ class Location(_LocationBase):
         """
         Return a string with a version of the location that is safe for use in html id attributes
         """
-        return "-".join(str(v) for v in self if v is not None)
+        return "-".join(str(v) for v in self.list() if v is not None).replace('.', '_')
 
     def dict(self):
         return self.__dict__
