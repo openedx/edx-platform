@@ -47,14 +47,29 @@ class Article(models.Model):
 
     def attachments(self):
         return ArticleAttachment.objects.filter(article__exact = self)
+        
+    def get_path(self):
+        return self.namespace.name + "/" + self.slug
+        
+    @classmethod
+    def get_article(cls, article_path):
+        """
+        Given an article_path like namespace/slug, this returns the article. It may raise
+        a Article.DoesNotExist if no matching article is found or ValueError if the
+        article_path is not constructed properly.
+        """
+        #TODO: Verify the path, throw a meaningful error?
+        namespace, slug = article_path.split("/")
+        return Article.objects.get( slug__exact = slug, namespace__name__exact = namespace)
+        
 
     @classmethod
-    def get_root(cls):
+    def get_root(cls, namespace):
         """Return the root article, which should ALWAYS exist..
         except the very first time the wiki is loaded, in which
         case the user is prompted to create this article."""
         try:
-            return Article.objects.filter(slug__exact = "")[0]
+            return Article.objects.filter(slug__exact = "", namespace__name__exact = namespace)[0]
         except:
             raise ShouldHaveExactlyOneRootSlug()
 

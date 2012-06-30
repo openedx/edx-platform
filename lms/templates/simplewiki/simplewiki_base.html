@@ -7,8 +7,8 @@
   from django.core.urlresolvers import reverse
 %>
 ## A convenience function that calls reverse with the kwargs course_id, namespace, and slug
-<%def name="wiki_reverse(wiki_page)">
-    ${reverse(wiki_page, kwargs={'course_id': course.id, 'namespace' : wiki_article.namespace.name, 'slug' : wiki_article.slug})}
+<%def name="wiki_reverse(wiki_page, args=[], kwargs={})">
+    ${reverse(wiki_page, kwargs=dict({'course_id': course.id, 'article_path' : wiki_article.get_path()}, **kwargs), args=args) }
 </%def>
 
 <%block name="headextra">
