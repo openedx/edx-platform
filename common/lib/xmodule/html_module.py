@@ -24,6 +24,11 @@ class HtmlDescriptor(RawDescriptor):
     """
     mako_template = "widgets/html-edit.html"
     module_class = HtmlModule
+    filename_extension = "html"
 
     js = {'coffee': [resource_string(__name__, 'js/module/html.coffee')]}
     js_module = 'HTML'
+
+    @classmethod
+    def definition_from_file(cls, file, system):
+        return {'data': file.read()}
