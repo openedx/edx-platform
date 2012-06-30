@@ -56,13 +56,28 @@ class XmlDescriptor(XModuleDescriptor):
     Mixin class for standardized parsing of from xml
     """
 
+    # Extension to append to filename paths
+    filename_extension = 'xml'
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
         Return the definition to be passed to the newly created descriptor
         during from_xml
+
+        xml_object: An etree Element
         """
         raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
+
+    @classmethod
+    def definition_from_file(cls, file, system):
+        """
+        Return the definition to be passed to the newly created descriptor
+        during from_xml
+
+        file: File pointer
+        """
+        return cls.definition_from_xml(etree.parse(file), system)
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -93,9 +108,17 @@ class XmlDescriptor(XModuleDescriptor):
 
             return metadata
 
+        def definition_loader():
+            filename = xml_object.get('filename')
+            if filename is None:
+                return cls.definition_from_xml(xml_object, system)
+            else:
+                filepath = '{type}/{name}.{ext}'.format(type=xml_object.tag, name=filename, ext=cls.filename_extension)
+                return cls.definition_from_file(system.resources_fs.open(filepath), system)
+
         return cls(
             system,
-            LazyLoadingDict(lambda: cls.definition_from_xml(xml_object, system)),
+            LazyLoadingDict(definition_loader),
             location=['i4x',
                       org,
                       course,
