@@ -1,5 +1,54 @@
+from collections import MutableMapping
 from xmodule.x_module import XModuleDescriptor
 from lxml import etree
+
+
+class LazyLoadingDict(MutableMapping):
+    """
+    A dictionary object that lazily loads it's contents from a provided
+    function on reads (of members that haven't already been set)
+    """
+
+    def __init__(self, loader):
+        self._contents = {}
+        self._loaded = False
+        self._loader = loader
+        self._deleted = set()
+
+    def __getitem__(self, name):
+        if not (self._loaded or name in self._contents or name in self._deleted):
+            self.load()
+
+        return self._contents[name]
+
+    def __setitem__(self, name, value):
+        self._contents[name] = value
+        self._deleted.discard(name)
+
+    def __delitem__(self, name):
+        del self._contents[name]
+        self._deleted.add(name)
+
+    def __contains__(self, name):
+        self.load()
+        return name in self._contents
+
+    def __len__(self):
+        self.load()
+        return len(self._contents)
+
+    def __iter__(self):
+        self.load()
+        return iter(self._contents)
+
+    def load(self):
+        if self._loaded:
+            return
+
+        loaded_contents = self._loader()
+        loaded_contents.update(self._contents)
+        self._contents = loaded_contents
+        self._loaded = True
 
 
 class XmlDescriptor(XModuleDescriptor):
@@ -29,27 +78,30 @@ class XmlDescriptor(XModuleDescriptor):
         """
         xml_object = etree.fromstring(xml_data)
 
-        metadata = {}
-        for attr in ('format', 'graceperiod', 'showanswer', 'rerandomize', 'due'):
-            from_xml = xml_object.get(attr)
-            if from_xml is not None:
-                metadata[attr] = from_xml
+        def metadata_loader():
+            metadata = {}
+            for attr in ('format', 'graceperiod', 'showanswer', 'rerandomize', 'due'):
+                from_xml = xml_object.get(attr)
+                if from_xml is not None:
+                    metadata[attr] = from_xml
 
-        if xml_object.get('graded') is not None:
-            metadata['graded'] = xml_object.get('graded') == 'true'
+            if xml_object.get('graded') is not None:
+                metadata['graded'] = xml_object.get('graded') == 'true'
 
-        if xml_object.get('name') is not None:
-            metadata['display_name'] = xml_object.get('name')
+            if xml_object.get('name') is not None:
+                metadata['display_name'] = xml_object.get('name')
+
+            return metadata
 
         return cls(
             system,
-            cls.definition_from_xml(xml_object, system),
+            LazyLoadingDict(lambda: cls.definition_from_xml(xml_object, system)),
             location=['i4x',
                       org,
                       course,
                       xml_object.tag,
                       xml_object.get('slug')],
-            metadata=metadata,
+            metadata=LazyLoadingDict(metadata_loader),
         )
 
     def export_to_xml(self, resource_fs):
