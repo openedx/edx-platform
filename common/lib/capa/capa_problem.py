@@ -255,7 +255,7 @@ class LoncapaProblem(object):
             if file is not None:
                 try:
                     ifp = self.system.filestore.open(file)	# open using I4xSystem OSFS filestore
-                except Exception,err:
+                except Exception as err:
                     log.error('Error %s in problem xml include: %s' % (err,etree.tostring(inc,pretty_print=True)))
                     log.error('Cannot find file %s in %s' % (file,self.system.filestore))
                     if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
@@ -263,7 +263,7 @@ class LoncapaProblem(object):
                     else: continue
                 try:
                     incxml = etree.XML(ifp.read())		# read in and convert to XML
-                except Exception,err:
+                except Exception as err:
                     log.error('Error %s in problem xml include: %s' % (err,etree.tostring(inc,pretty_print=True)))
                     log.error('Cannot parse XML in %s' % (file))
                     if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
