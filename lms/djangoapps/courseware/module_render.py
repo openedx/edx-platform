@@ -273,8 +273,11 @@ def add_histogram(module):
         module_id = module.id
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
-        staff_context = {'definition': json.dumps(module.definition, indent=4),
-                         'metadata': json.dumps(module.metadata, indent=4),
+
+        # Cast module.definition and module.metadata to dicts so that json can dump them
+        # even though they are lazily loaded
+        staff_context = {'definition': json.dumps(dict(module.definition), indent=4),
+                         'metadata': json.dumps(dict(module.metadata), indent=4),
                          'element_id': module.location.html_id(),
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,

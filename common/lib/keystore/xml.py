@@ -18,7 +18,15 @@ class XMLModuleStore(ModuleStore):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, org, course, data_dir, default_class=None):
+    def __init__(self, org, course, data_dir, default_class=None, eager=False):
+        """
+        Initialize an XMLModuleStore from data_dir
+
+        org, course: Strings to be used in module keys
+        data_dir: path to data directory containing course.xml
+        default_class: dot-separated string defining the default descriptor class to use if non is specified in entry_points
+        eager: If true, load the modules children immediately to force the entire course tree to be parsed
+        """
         self.data_dir = path(data_dir)
         self.modules = {}
 
@@ -57,6 +65,9 @@ class XMLModuleStore(ModuleStore):
 
                         module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
                         modulestore.modules[module.location] = module
+
+                        if eager:
+                            module.get_children()
                         return module
 
                     XMLParsingSystem.__init__(self, modulestore.get_item, OSFS(data_dir), process_xml)
