@@ -121,7 +121,7 @@ def optioninput(element, value, status, render_template, msg=''):
     eid=element.get('id')
     options = element.get('options')
     if not options:
-        raise Exception,"[courseware.capa.inputtypes.optioninput] Missing options specification in " + etree.tostring(element)
+        raise Exception("[courseware.capa.inputtypes.optioninput] Missing options specification in " + etree.tostring(element))
     oset = shlex.shlex(options[1:-1])
     oset.quotes = "'"
     oset.whitespace = ","
@@ -159,7 +159,7 @@ def choicegroup(element, value, status, render_template, msg=''):
     choices={}
     for choice in element:
         if not choice.tag=='choice':
-            raise Exception,"[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag
+            raise Exception("[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag)
         ctext = ""
         ctext += ''.join([etree.tostring(x) for x in choice])	# TODO: what if choice[0] has math tags in it?
         ctext += choice.text		# TODO: fix order?
@@ -195,7 +195,6 @@ def textline_dynamath(element, value, status, render_template, msg=''):
     '''
     # TODO: Make a wrapper for <formulainput>
     # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-    	## TODO: Code should follow PEP8 (4 spaces per indentation level)
     '''
     textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
     uses a <span id=display_eid>`{::}`</span>
@@ -346,14 +345,14 @@ def imageinput(element, value, status, render_template, msg=''):
         (gx,gy) = (0,0)
     
     context = {
-        'id':eid,
-        'value':value,
+        'id': eid,
+        'value': value,
         'height': height,
-        'width' : width,
-        'src':src,
-        'gx':gx,
-        'gy':gy,
-        'state' : status,	# to change
+        'width': width,
+        'src': src,
+        'gx': gx,
+        'gy': gy,
+        'state': status,	# to change
         'msg': msg,			# to change
         }
     html = render_template("imageinput.html", context)
