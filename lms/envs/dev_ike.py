@@ -18,7 +18,8 @@ from .logsettings import get_logger_config
 from .dev import *
 
 if 'eecs1' in socket.gethostname():
-    MITX_ROOT_URL = '/mitx2'
+    # MITX_ROOT_URL = '/mitx2'
+    MITX_ROOT_URL = 'https://mitx2'
 
 #-----------------------------------------------------------------------------
 # edx4edx content server
