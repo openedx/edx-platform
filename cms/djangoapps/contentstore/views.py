@@ -11,7 +11,7 @@ def index(request):
     org = 'mit.edu'
     course = '6002xs12'
     name = '6.002 Spring 2012'
-    course = keystore().get_item(['i4x', org, course, 'Course', name])
+    course = keystore().get_item(['i4x', org, course, 'course', name])
     weeks = course.get_children()
     return render_to_response('index.html', {'weeks': weeks})
 
@@ -21,6 +21,7 @@ def edit_item(request):
     item = keystore().get_item(item_id)
     return render_to_response('unit.html', {
         'contents': item.get_html(),
+        'js_module': item.js_module_name(),
         'type': item.type,
         'name': item.name,
     })

@@ -12,7 +12,11 @@ class MakoModuleDescriptor(XModuleDescriptor):
     the descriptor as the `module` parameter to that template
     """
 
+    def get_context(self):
+        """
+        Return the context to render the mako template with
+        """
+        return {'module': self}
+
     def get_html(self):
-        return render_to_string(self.mako_template, {
-            'module': self
-        })
+        return render_to_string(self.mako_template, self.get_context())
