@@ -18,6 +18,22 @@ class_priority = ['video', 'problem']
 class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
+
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+        self.position = 1
+
+        if instance_state is not None:
+            state = json.loads(instance_state)
+            if 'position' in state:
+                self.position = int(state['position'])
+
+        # if position is specified in system, then use that instead
+        if system.get('position'):
+            self.position = int(system.get('position'))
+
+        self.rendered = False
+
     def get_instance_state(self):
         return json.dumps({'position': self.position})
 
@@ -80,21 +96,6 @@ class SequenceModule(XModule):
             if c in child_classes:
                 new_class = c
         return new_class
-
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
-        self.position = 1
-
-        if instance_state is not None:
-            state = json.loads(instance_state)
-            if 'position' in state:
-                self.position = int(state['position'])
-
-        # if position is specified in system, then use that instead
-        if system.get('position'):
-            self.position = int(system.get('position'))
-
-        self.rendered = False
 
 
 class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
