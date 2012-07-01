@@ -25,6 +25,8 @@ if 'eecs1' in socket.gethostname():
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 MITX_FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'ichuang@mitx.mit.edu'
+EDX4EDX_ROOT = ENV_ROOT / "data/edx4edx"
+
 #EMAIL_BACKEND = 'django_ses.SESBackend'
 
 #-----------------------------------------------------------------------------
@@ -33,6 +35,8 @@ MITX_FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'ichuang@mitx.mit.edu'
 DEBUG = True
 ENABLE_MULTICOURSE = True     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 QUICKEDIT = True
+
+MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT ]
 
 #MITX_FEATURES['USE_DJANGO_PIPELINE'] = False
 MITX_FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF'] = False
