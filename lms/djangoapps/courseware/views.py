@@ -294,10 +294,12 @@ def index(request, course=None, chapter=None, section=None,
         defsection = multicourse_settings.get_course_default_section(course)
         if defchapter and defsection:
             # jump there using redirect, so the user gets the right URL in their browser
-            return redirect('%s/courseware/%s/%s/%s/' % (settings.MITX_ROOT_URL,
-                                                         get_course(request, course),
-                                                         defchapter,
-                                                         defsection))
+            newurl = '%s/courseware/%s/%s/%s/' % (settings.MITX_ROOT_URL,
+                                                  get_course(request, course),
+                                                  defchapter,
+                                                  defsection)
+            log.debug('redirecting to %s' % newurl)
+            return redirect(newurl)
 
     chapter = clean(chapter)
     section = clean(section)
