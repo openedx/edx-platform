@@ -19,7 +19,7 @@ from .dev import *
 
 if 'eecs1' in socket.gethostname():
     # MITX_ROOT_URL = '/mitx2'
-    MITX_ROOT_URL = 'https://mitx2'
+    MITX_ROOT_URL = 'https://eecs1.mit.edu/mitx2'
 
 #-----------------------------------------------------------------------------
 # edx4edx content server
