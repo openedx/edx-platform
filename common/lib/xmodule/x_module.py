@@ -189,6 +189,46 @@ class XModuleDescriptor(Plugin):
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = ('graded', 'due', 'graceperiod', 'showanswer', 'rerandomize')
 
+    def __init__(self,
+                 system,
+                 definition=None,
+                 **kwargs):
+        """
+        Construct a new XModuleDescriptor. The only required arguments are the
+        system, used for interaction with external resources, and the definition,
+        which specifies all the data needed to edit and display the problem (but none
+        of the associated metadata that handles recordkeeping around the problem).
+
+        This allows for maximal flexibility to add to the interface while preserving
+        backwards compatibility.
+
+        system: An XModuleSystem for interacting with external resources
+        definition: A dict containing `data` and `children` representing the problem definition
+
+        Current arguments passed in kwargs:
+            location: A keystore.Location object indicating the name and ownership of this problem
+            shared_state_key: The key to use for sharing StudentModules with other
+                modules of this type
+            metadata: A dictionary containing the following optional keys:
+                goals: A list of strings of learning goals associated with this module
+                display_name: The name to use for displaying this module to the user
+                format: The format of this module ('Homework', 'Lab', etc)
+                graded (bool): Whether this module is should be graded or not
+                due (string): The due date for this module
+                graceperiod (string): The amount of grace period to allow when enforcing the due date
+                showanswer (string): When to show answers for this module
+                rerandomize (string): When to generate a newly randomized instance of the module data
+        """
+        self.system = system
+        self.definition = definition if definition is not None else {}
+        self.name = Location(kwargs.get('location')).name
+        self.type = Location(kwargs.get('location')).category
+        self.url = Location(kwargs.get('location')).url()
+        self.metadata = kwargs.get('metadata', {})
+        self.shared_state_key = kwargs.get('shared_state_key')
+
+        self._child_instances = None
+
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
         """
@@ -269,45 +309,6 @@ class XModuleDescriptor(Plugin):
         """
         return self.js_module
 
-    def __init__(self,
-                 system,
-                 definition=None,
-                 **kwargs):
-        """
-        Construct a new XModuleDescriptor. The only required arguments are the
-        system, used for interaction with external resources, and the definition,
-        which specifies all the data needed to edit and display the problem (but none
-        of the associated metadata that handles recordkeeping around the problem).
-
-        This allows for maximal flexibility to add to the interface while preserving
-        backwards compatibility.
-
-        system: An XModuleSystem for interacting with external resources
-        definition: A dict containing `data` and `children` representing the problem definition
-
-        Current arguments passed in kwargs:
-            location: A keystore.Location object indicating the name and ownership of this problem
-            shared_state_key: The key to use for sharing StudentModules with other
-                modules of this type
-            metadata: A dictionary containing the following optional keys:
-                goals: A list of strings of learning goals associated with this module
-                display_name: The name to use for displaying this module to the user
-                format: The format of this module ('Homework', 'Lab', etc)
-                graded (bool): Whether this module is should be graded or not
-                due (string): The due date for this module
-                graceperiod (string): The amount of grace period to allow when enforcing the due date
-                showanswer (string): When to show answers for this module
-                rerandomize (string): When to generate a newly randomized instance of the module data
-        """
-        self.system = system
-        self.definition = definition if definition is not None else {}
-        self.name = Location(kwargs.get('location')).name
-        self.type = Location(kwargs.get('location')).category
-        self.url = Location(kwargs.get('location')).url()
-        self.metadata = kwargs.get('metadata', {})
-        self.shared_state_key = kwargs.get('shared_state_key')
-
-        self._child_instances = None
 
     def inherit_metadata(self, metadata):
         """

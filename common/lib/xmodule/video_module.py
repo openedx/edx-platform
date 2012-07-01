@@ -13,6 +13,18 @@ class VideoModule(XModule):
     video_time = 0
     icon_class = 'video'
 
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+        xmltree = etree.fromstring(self.definition['data'])
+        self.youtube = xmltree.get('youtube')
+        self.name = xmltree.get('name')
+        self.position = 0
+
+        if instance_state is not None:
+            state = json.loads(instance_state)
+            if 'position' in state:
+                self.position = int(float(state['position']))
+
     def handle_ajax(self, dispatch, get):
         '''
         Handle ajax calls to this video.
@@ -51,18 +63,6 @@ class VideoModule(XModule):
             'position': self.position,
             'name': self.name,
         })
-
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
-        xmltree = etree.fromstring(self.definition['data'])
-        self.youtube = xmltree.get('youtube')
-        self.name = xmltree.get('name')
-        self.position = 0
-
-        if instance_state is not None:
-            state = json.loads(instance_state)
-            if 'position' in state:
-                self.position = int(float(state['position']))
 
 
 class VideoDescriptor(RawDescriptor):

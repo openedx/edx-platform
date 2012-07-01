@@ -26,8 +26,6 @@ class CustomTagModule(XModule):
     Renders to::
         More information given in <a href="/book/234">the text</a>
     """
-    def get_html(self):
-        return self.html
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
@@ -36,6 +34,8 @@ class CustomTagModule(XModule):
         params = dict(xmltree.items())
         self.html = self.system.render_template(filename, params, namespace='custom_tags')
 
+    def get_html(self):
+        return self.html
 
 class CustomTagDescriptor(RawDescriptor):
     module_class = CustomTagModule

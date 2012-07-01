@@ -72,6 +72,102 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+
+        self.attempts = 0
+        self.max_attempts = None
+
+        dom2 = etree.fromstring(definition['data'])
+
+        self.explanation = "problems/" + only_one(dom2.xpath('/problem/@explain'),
+                                                  default="closed")
+        # TODO: Should be converted to: self.explanation=only_one(dom2.xpath('/problem/@explain'), default="closed")
+        self.explain_available = only_one(dom2.xpath('/problem/@explain_available'))
+
+        display_due_date_string = self.metadata.get('due', None)
+        if display_due_date_string is not None:
+            self.display_due_date = dateutil.parser.parse(display_due_date_string)
+            #log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
+        else:
+            self.display_due_date = None
+
+        grace_period_string = self.metadata.get('graceperiod', None)
+        if grace_period_string is not None and self.display_due_date:
+            self.grace_period = parse_timedelta(grace_period_string)
+            self.close_date = self.display_due_date + self.grace_period
+            #log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
+        else:
+            self.grace_period = None
+            self.close_date = self.display_due_date
+
+        self.max_attempts = only_one(dom2.xpath('/problem/@attempts'))
+        if len(self.max_attempts) > 0:
+            self.max_attempts = int(self.max_attempts)
+        else:
+            self.max_attempts = None
+
+        self.show_answer = self.metadata.get('showanwser', 'closed')
+
+        if self.show_answer == "":
+            self.show_answer = "closed"
+
+        self.rerandomize = self.metadata.get('rerandomize', 'always')
+        if self.rerandomize == "" or self.rerandomize == "always" or self.rerandomize == "true":
+            self.rerandomize = "always"
+        elif self.rerandomize == "false" or self.rerandomize == "per_student":
+            self.rerandomize = "per_student"
+        elif self.rerandomize == "never":
+            self.rerandomize = "never"
+        else:
+            raise Exception("Invalid rerandomize attribute " + self.rerandomize)
+
+        if instance_state != None:
+            instance_state = json.loads(instance_state)
+        if instance_state != None and 'attempts' in instance_state:
+            self.attempts = instance_state['attempts']
+
+        # TODO: Should be: self.filename=only_one(dom2.xpath('/problem/@filename'))
+        self.filename = "problems/" + only_one(dom2.xpath('/problem/@filename')) + ".xml"
+        self.name = only_one(dom2.xpath('/problem/@name'))
+
+        weight_string = only_one(dom2.xpath('/problem/@weight'))
+        if weight_string:
+            self.weight = float(weight_string)
+        else:
+            self.weight = 1
+
+        if self.rerandomize == 'never':
+            seed = 1
+        elif self.rerandomize == "per_student" and hasattr(system, 'id'):
+            seed = system.id
+        else:
+            seed = None
+        try:
+            fp = self.system.filestore.open(self.filename)
+        except Exception:
+            log.exception('cannot open file %s' % self.filename)
+            if self.system.DEBUG:
+                # create a dummy problem instead of failing
+                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
+                fp.name = "StringIO"
+            else:
+                raise
+        try:
+            self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
+        except Exception:
+            msg = 'cannot create LoncapaProblem %s' % self.filename
+            log.exception(msg)
+            if self.system.DEBUG:
+                msg = '<p>%s</p>' % msg.replace('<', '&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
+                # create a dummy problem with error message instead of failing
+                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename, msg))
+                fp.name = "StringIO"
+                self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
+            else:
+                raise
+
     def get_instance_state(self):
         state = self.lcp.get_state()
         state['attempts'] = self.attempts
@@ -170,102 +266,6 @@ class CapaModule(XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
         return html
-
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
-
-        self.attempts = 0
-        self.max_attempts = None
-
-        dom2 = etree.fromstring(definition['data'])
-
-        self.explanation = "problems/" + only_one(dom2.xpath('/problem/@explain'),
-                                                  default="closed")
-        # TODO: Should be converted to: self.explanation=only_one(dom2.xpath('/problem/@explain'), default="closed")
-        self.explain_available = only_one(dom2.xpath('/problem/@explain_available'))
-
-        display_due_date_string = self.metadata.get('due', None)
-        if display_due_date_string is not None:
-            self.display_due_date = dateutil.parser.parse(display_due_date_string)
-            #log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
-        else:
-            self.display_due_date = None
-
-        grace_period_string = self.metadata.get('graceperiod', None)
-        if grace_period_string is not None and self.display_due_date:
-            self.grace_period = parse_timedelta(grace_period_string)
-            self.close_date = self.display_due_date + self.grace_period
-            #log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
-        else:
-            self.grace_period = None
-            self.close_date = self.display_due_date
-
-        self.max_attempts = only_one(dom2.xpath('/problem/@attempts'))
-        if len(self.max_attempts) > 0:
-            self.max_attempts = int(self.max_attempts)
-        else:
-            self.max_attempts = None
-
-        self.show_answer = self.metadata.get('showanwser', 'closed')
-
-        if self.show_answer == "":
-            self.show_answer = "closed"
-
-        self.rerandomize = self.metadata.get('rerandomize', 'always')
-        if self.rerandomize == "" or self.rerandomize == "always" or self.rerandomize == "true":
-            self.rerandomize = "always"
-        elif self.rerandomize == "false" or self.rerandomize == "per_student":
-            self.rerandomize = "per_student"
-        elif self.rerandomize == "never":
-            self.rerandomize = "never"
-        else:
-            raise Exception("Invalid rerandomize attribute " + self.rerandomize)
-
-        if instance_state != None:
-            instance_state = json.loads(instance_state)
-        if instance_state != None and 'attempts' in instance_state:
-            self.attempts = instance_state['attempts']
-
-        # TODO: Should be: self.filename=only_one(dom2.xpath('/problem/@filename'))
-        self.filename = "problems/" + only_one(dom2.xpath('/problem/@filename')) + ".xml"
-        self.name = only_one(dom2.xpath('/problem/@name'))
-
-        weight_string = only_one(dom2.xpath('/problem/@weight'))
-        if weight_string:
-            self.weight = float(weight_string)
-        else:
-            self.weight = 1
-
-        if self.rerandomize == 'never':
-            seed = 1
-        elif self.rerandomize == "per_student" and hasattr(system, 'id'):
-            seed = system.id
-        else:
-            seed = None
-        try:
-            fp = self.system.filestore.open(self.filename)
-        except Exception:
-            log.exception('cannot open file %s' % self.filename)
-            if self.system.DEBUG:
-                # create a dummy problem instead of failing
-                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s is missing</font></text></problem>' % self.filename)
-                fp.name = "StringIO"
-            else:
-                raise
-        try:
-            self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
-        except Exception:
-            msg = 'cannot create LoncapaProblem %s' % self.filename
-            log.exception(msg)
-            if self.system.DEBUG:
-                msg = '<p>%s</p>' % msg.replace('<', '&lt;')
-                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
-                # create a dummy problem with error message instead of failing
-                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename, msg))
-                fp.name = "StringIO"
-                self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
-            else:
-                raise
 
     def handle_ajax(self, dispatch, get):
         '''
