@@ -8,6 +8,7 @@ from __future__ import absolute_import
 
 from django.conf import settings
 from .mongo import MongoModuleStore
+from raw_module import RawDescriptor
 
 _KEYSTORES = {}
 
@@ -16,6 +17,9 @@ def keystore(name='default'):
     global _KEYSTORES
 
     if name not in _KEYSTORES:
-        _KEYSTORES[name] = MongoModuleStore(**settings.KEYSTORE[name])
+        # TODO (cpennington): Load the default class from a string
+        _KEYSTORES[name] = MongoModuleStore(
+            default_class=RawDescriptor,
+            **settings.KEYSTORE[name])
 
     return _KEYSTORES[name]
