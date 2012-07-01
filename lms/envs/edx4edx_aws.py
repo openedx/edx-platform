@@ -18,6 +18,8 @@ COURSE_SETTINGS =  {'edx4edx': {'number' : 'edX.01',
                                     'xmlpath': '/edx4edx/',
                                     'github_url': 'https://github.com/MITx/edx4edx',
                                     'active' : True,
+                                    'default_chapter' : 'Introduction',
+                                    'default_section' : 'edx4edx_Course',
                                     },
                     }
 
