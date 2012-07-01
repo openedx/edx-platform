@@ -54,7 +54,7 @@ class SequenceModule(XModule):
                 'title': "\n".join(
                     grand_child.metadata['display_name'].strip()
                     for grand_child in child.get_children()
-                    if 'metadata'  in grand_child.metadata
+                    if 'display_name'  in grand_child.metadata
                 ),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
