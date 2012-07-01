@@ -28,14 +28,17 @@ class XMLModuleStore(ModuleStore):
 
         with open(self.data_dir / "course.xml") as course_file:
             class ImportSystem(XMLParsingSystem):
-                def __init__(self, keystore):
+                def __init__(self, modulestore):
+                    """
+                    modulestore: the XMLModuleStore to store the loaded modules in
+                    """
                     self.unnamed_modules = 0
 
                     def process_xml(xml):
                         try:
                             xml_data = etree.fromstring(xml)
                         except:
-                            log.exception("Unable to parse xml:" + xml)
+                            log.exception("Unable to parse xml: {xml}".format(xml=xml))
                             raise
                         if xml_data.get('name'):
                             xml_data.set('slug', Location.clean(xml_data.get('name')))
@@ -43,11 +46,11 @@ class XMLModuleStore(ModuleStore):
                             self.unnamed_modules += 1
                             xml_data.set('slug', '{tag}_{count}'.format(tag=xml_data.tag, count=self.unnamed_modules))
 
-                        module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, keystore.default_class)
-                        keystore.modules[module.url] = module
+                        module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
+                        modulestore.modules[module.url] = module
                         return module
 
-                    XMLParsingSystem.__init__(self, keystore.get_item, OSFS(data_dir), process_xml)
+                    XMLParsingSystem.__init__(self, modulestore.get_item, OSFS(data_dir), process_xml)
 
             ImportSystem(self).process_xml(course_file.read())
 
