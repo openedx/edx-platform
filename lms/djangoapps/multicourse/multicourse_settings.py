@@ -80,5 +80,11 @@ def get_course_number(coursename):
 
 def get_course_github_url(coursename):
     return get_course_property(coursename,'github_url')
+
+def get_course_default_chapter(coursename):
+    return get_course_property(coursename,'default_chapter')
+
+def get_course_default_section(coursename):
+    return get_course_property(coursename,'default_section')
     
 
