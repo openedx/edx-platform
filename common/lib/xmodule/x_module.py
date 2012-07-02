@@ -75,7 +75,10 @@ class XModule(object):
         system: An I4xSystem allowing access to external resources
         location: Something Location-like that identifies this xmodule
         definition: A dictionary containing 'data' and 'children'. Both are optional
-            'data': is JSON-like (string, dictionary, list, bool, or None, optionally nested)
+            'data': is JSON-like (string, dictionary, list, bool, or None, optionally nested).
+                This defines all of the data necessary for a problem to display that is intrinsic to the problem.
+                It should not include any data that would vary between two courses using the same problem
+                (due dates, grading policy, randomization, etc.)
             'children': is a list of Location-like values for child modules that this module depends on
         instance_state: A string of serialized json that contains the state of this module for
             current student accessing the system, or None if no state has been saved
