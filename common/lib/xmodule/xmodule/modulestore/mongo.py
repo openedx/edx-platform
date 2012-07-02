@@ -1,6 +1,8 @@
 import pymongo
 from importlib import import_module
-from xmodule.x_module import XModuleDescriptor, DescriptorSystem
+from xmodule.x_module import XModuleDescriptor
+from xmodule.mako_module import MakoDescriptorSystem
+from mitxmako.shortcuts import render_to_string
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
@@ -54,7 +56,7 @@ class MongoModuleStore(ModuleStore):
 
         # TODO (cpennington): Pass a proper resources_fs to the system
         return XModuleDescriptor.load_from_json(
-            item, DescriptorSystem(self.get_item, None), self.default_class)
+            item, MakoDescriptorSystem(load_item=self.get_item, resources_fs=None, render_template=render_to_string), self.default_class)
 
     def create_item(self, location):
         """

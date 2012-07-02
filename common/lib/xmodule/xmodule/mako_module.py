@@ -1,5 +1,10 @@
-from x_module import XModuleDescriptor
-from mitxmako.shortcuts import render_to_string
+from x_module import XModuleDescriptor, DescriptorSystem
+
+
+class MakoDescriptorSystem(DescriptorSystem):
+    def __init__(self, render_template, *args, **kwargs):
+        self.render_template = render_template
+        super(MakoDescriptorSystem, self).__init__(*args, **kwargs)
 
 
 class MakoModuleDescriptor(XModuleDescriptor):
@@ -12,6 +17,11 @@ class MakoModuleDescriptor(XModuleDescriptor):
     the descriptor as the `module` parameter to that template
     """
 
+    def __init__(self, system, definition=None, **kwargs):
+        if getattr(system, 'render_template', None) is None:
+            raise TypeError('{system} must have a render_template function in order to use a MakoDescriptor'.format(system=system))
+        super(MakoModuleDescriptor, self).__init__(system, definition, **kwargs)
+
     def get_context(self):
         """
         Return the context to render the mako template with
@@ -19,4 +29,4 @@ class MakoModuleDescriptor(XModuleDescriptor):
         return {'module': self}
 
     def get_html(self):
-        return render_to_string(self.mako_template, self.get_context())
+        return self.system.render_template(self.mako_template, self.get_context())
