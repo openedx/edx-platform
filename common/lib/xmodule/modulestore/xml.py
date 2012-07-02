@@ -75,7 +75,7 @@ class XMLModuleStore(ModuleStore):
 
                     XMLParsingSystem.__init__(self, modulestore.get_item, OSFS(data_dir), process_xml)
 
-            ImportSystem(self).process_xml(course_file.read())
+            self.course = ImportSystem(self).process_xml(course_file.read())
 
     def get_item(self, location):
         """
