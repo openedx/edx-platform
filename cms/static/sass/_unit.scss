@@ -1,7 +1,8 @@
 section#unit-wrapper {
   > header {
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid $dark-blue;
     @include clearfix();
+    @include box-shadow( 0 2px 0 darken($light-blue, 3%));
     padding: 6px 20px;
 
     section {
@@ -12,6 +13,7 @@ section#unit-wrapper {
         text-transform: uppercase;
         letter-spacing: 1px;
         @include inline-block();
+        color: $bright-blue;
       }
 
       p {
@@ -28,10 +30,25 @@ section#unit-wrapper {
       color: #666;
 
       a {
+        display: block;
+        @include inline-block;
+
        &.cancel {
          margin-right: 20px;
          font-style: italic;
          font-size: 12px;
+       }
+
+       &.save-update {
+         background-color: #f96e5b;
+         color: #fff;
+         -webkit-font-smoothing: antialiased;
+         padding: 8px 10px;
+         margin: -6px -25px -6px 0;
+
+         &:hover {
+           background-color: shade(#f96e5b, 10%);
+         }
        }
       }
     }

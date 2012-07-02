@@ -1,9 +1,13 @@
 $fg-column: 70px;
 $fg-gutter: 26px;
 $fg-max-columns: 12;
-$body-font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+$body-font-family: "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
 $body-font-size: 14px;
 $body-line-height: 20px;
+
+$light-blue: #f0f8fa;
+$dark-blue: #50545c;
+$bright-blue: #3c8ebf;
 
 // Base html styles
 html {
@@ -13,6 +17,11 @@ html {
 a {
   text-decoration: none;
   color: #888;
+  @include transition;
+
+  &:hover {
+    color: #ccc;
+  }
 }
 
 input {
@@ -68,16 +77,16 @@ textarea {
   float: right;
 }
 
-.wip {
-  outline: 1px solid #f00 !important;
-  position: relative;
+// .wip {
+//   outline: 1px solid #f00 !important;
+//   position: relative;
 
-  &:after {
-   content: "WIP";
-   font-size: 8px;
-   padding: 2px;
-   background: #f00;
-   color: #fff;
-   @include position(absolute, 0px 0px 0 0);
-  }
-}
+//   &:after {
+//    content: "WIP";
+//    font-size: 8px;
+//    padding: 2px;
+//    background: #f00;
+//    color: #fff;
+//    @include position(absolute, 0px 0px 0 0);
+//   }
+// }
