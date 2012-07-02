@@ -47,7 +47,7 @@ class XMLModuleStore(ModuleStore):
                             xml_data.set('slug', '{tag}_{count}'.format(tag=xml_data.tag, count=self.unnamed_modules))
 
                         module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
-                        modulestore.modules[module.url] = module
+                        modulestore.modules[module.location] = module
                         return module
 
                     XMLParsingSystem.__init__(self, modulestore.get_item, OSFS(data_dir), process_xml)
@@ -68,7 +68,7 @@ class XMLModuleStore(ModuleStore):
         """
         location = Location(location)
         try:
-            return self.modules[location.url()]
+            return self.modules[location]
         except KeyError:
             raise ItemNotFoundError(location)
 

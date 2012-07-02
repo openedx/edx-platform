@@ -105,6 +105,6 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         return {'children': [
-            system.process_xml(etree.tostring(child_module)).url
+            system.process_xml(etree.tostring(child_module)).location.url()
             for child_module in xml_object
         ]}

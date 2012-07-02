@@ -209,7 +209,7 @@ def index(request, course=None, chapter=None, section=None,
         course_location = multicourse_settings.get_course_location(course)
         section = get_section(course_location, chapter, section)
         student_module_cache = StudentModuleCache(request.user, section)
-        module, _, _, _ = get_module(request.user, request, section.url, student_module_cache)
+        module, _, _, _ = get_module(request.user, request, section.location, student_module_cache)
         context['content'] = module.get_html()
 
     result = render_to_response('courseware.html', context)

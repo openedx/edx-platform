@@ -102,7 +102,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 )
 
             child_content_urls = [
-                system.process_xml(etree.tostring(child)).url
+                system.process_xml(etree.tostring(child)).location.url()
                 for child in group
             ]
 
