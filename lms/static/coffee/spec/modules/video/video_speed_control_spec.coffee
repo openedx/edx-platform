@@ -6,7 +6,7 @@ describe 'VideoSpeedControl', ->
   describe 'constructor', ->
     describe 'always', ->
       beforeEach ->
-        @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
+        @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
       it 'add the video speed control to player', ->
         expect($('.secondary-controls').html()).toContain '''
@@ -26,7 +26,7 @@ describe 'VideoSpeedControl', ->
       beforeEach ->
         spyOn(window, 'onTouchBasedDevice').andReturn true
         $('.speeds').removeClass 'open'
-        @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
+        @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
       it 'open the speed toggle on click', ->
         $('.speeds').click()
@@ -38,7 +38,7 @@ describe 'VideoSpeedControl', ->
       beforeEach ->
         spyOn(window, 'onTouchBasedDevice').andReturn false
         $('.speeds').removeClass 'open'
-        @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
+        @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
       it 'open the speed toggle on hover', ->
         $('.speeds').mouseenter()
@@ -56,7 +56,7 @@ describe 'VideoSpeedControl', ->
 
   describe 'changeVideoSpeed', ->
     beforeEach ->
-      @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
+      @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
       @video.setSpeed '1.0'
 
     describe 'when new speed is the same', ->
@@ -80,7 +80,7 @@ describe 'VideoSpeedControl', ->
 
   describe 'onSpeedChange', ->
     beforeEach ->
-      @speedControl = new VideoSpeedControl element: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
+      @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
       $('li[data-speed="1.0"] a').addClass 'active'
       @speedControl.setSpeed '0.75'
 

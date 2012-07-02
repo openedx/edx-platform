@@ -21,19 +21,19 @@ describe 'VideoPlayer', ->
         expect(@player.currentTime).toEqual 0
 
       it 'set the element', ->
-        expect(@player.element).toBe '#video_example'
+        expect(@player.el).toBe '#video_example'
 
       it 'create video control', ->
-        expect(window.VideoControl).toHaveBeenCalledWith element: $('.video-controls', @player.element)
+        expect(window.VideoControl).toHaveBeenCalledWith el: $('.video-controls', @player.el)
 
       it 'create video caption', ->
-        expect(window.VideoCaption).toHaveBeenCalledWith element: @player.element, youtubeId: 'def456', currentSpeed: '1.0'
+        expect(window.VideoCaption).toHaveBeenCalledWith el: @player.el, youtubeId: 'def456', currentSpeed: '1.0'
 
       it 'create video speed control', ->
-        expect(window.VideoSpeedControl).toHaveBeenCalledWith element: $('.secondary-controls', @player.element), speeds: ['0.75', '1.0'], currentSpeed: '1.0'
+        expect(window.VideoSpeedControl).toHaveBeenCalledWith el: $('.secondary-controls', @player.el), speeds: ['0.75', '1.0'], currentSpeed: '1.0'
 
       it 'create video progress slider', ->
-        expect(window.VideoProgressSlider).toHaveBeenCalledWith element: $('.slider', @player.element)
+        expect(window.VideoProgressSlider).toHaveBeenCalledWith el: $('.slider', @player.el)
 
       it 'create Youtube player', ->
         expect(YT.Player).toHaveBeenCalledWith 'example'
@@ -83,7 +83,7 @@ describe 'VideoPlayer', ->
         expect($('.hide-subtitles')).toHaveData 'qtip'
 
       it 'create video volume control', ->
-        expect(window.VideoVolumeControl).toHaveBeenCalledWith element: $('.secondary-controls', @player.element)
+        expect(window.VideoVolumeControl).toHaveBeenCalledWith el: $('.secondary-controls', @player.el)
 
     describe 'when on a touch based device', ->
       beforeEach ->
@@ -339,34 +339,34 @@ describe 'VideoPlayer', ->
 
     describe 'when the video player is not full screen', ->
       beforeEach ->
-        @player.element.removeClass 'fullscreen'
+        @player.el.removeClass 'fullscreen'
         @player.toggleFullScreen(jQuery.Event("click"))
 
       it 'replace the full screen button tooltip', ->
         expect($('.add-fullscreen')).toHaveAttr 'title', 'Exit fill browser'
 
       it 'add a new exit from fullscreen button', ->
-        expect(@player.element).toContain 'a.exit'
+        expect(@player.el).toContain 'a.exit'
 
       it 'add the fullscreen class', ->
-        expect(@player.element).toHaveClass 'fullscreen'
+        expect(@player.el).toHaveClass 'fullscreen'
 
       it 'tell VideoCaption to resize', ->
         expect(@player.caption.resize).toHaveBeenCalled()
 
     describe 'when the video player already full screen', ->
       beforeEach ->
-        @player.element.addClass 'fullscreen'
+        @player.el.addClass 'fullscreen'
         @player.toggleFullScreen(jQuery.Event("click"))
 
       it 'replace the full screen button tooltip', ->
         expect($('.add-fullscreen')).toHaveAttr 'title', 'Fill browser'
 
       it 'remove exit full screen button', ->
-        expect(@player.element).not.toContain 'a.exit'
+        expect(@player.el).not.toContain 'a.exit'
 
       it 'remove the fullscreen class', ->
-        expect(@player.element).not.toHaveClass 'fullscreen'
+        expect(@player.el).not.toHaveClass 'fullscreen'
 
       it 'tell VideoCaption to resize', ->
         expect(@player.caption.resize).toHaveBeenCalled()

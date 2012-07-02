@@ -1,7 +1,7 @@
 class @Video
   constructor: (@id, videos) ->
     window.player = null
-    @element = $("#video_#{@id}")
+    @el = $("#video_#{@id}")
     @parseVideos videos
     @fetchMetadata()
     @parseSpeed()

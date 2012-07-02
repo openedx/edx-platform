@@ -118,16 +118,16 @@ class @VideoCaption extends Subview
 
   toggle: (event) =>
     event.preventDefault()
-    if @element.hasClass('closed')
+    if @el.hasClass('closed')
       @$('.hide-subtitles').attr('title', 'Turn off captions')
-      @element.removeClass('closed')
+      @el.removeClass('closed')
       @scrollCaption()
     else
       @$('.hide-subtitles').attr('title', 'Turn on captions')
-      @element.addClass('closed')
+      @el.addClass('closed')
 
   captionHeight: ->
-    if @element.hasClass('fullscreen')
+    if @el.hasClass('fullscreen')
       $(window).height() - @$('.video-controls').height()
     else
       @$('.video-wrapper').height()

@@ -4,7 +4,7 @@ class @VideoPlayer extends Subview
     YT.PlayerState.UNSTARTED = -1
 
     @currentTime = 0
-    @element = $("#video_#{@video.id}")
+    @el = $("#video_#{@video.id}")
 
   bind: ->
     $(@control).bind('play', @play)
@@ -20,16 +20,16 @@ class @VideoPlayer extends Subview
     @addToolTip() unless onTouchBasedDevice()
 
   bindExitFullScreen: (event) =>
-    if @element.hasClass('fullscreen') && event.keyCode == 27
+    if @el.hasClass('fullscreen') && event.keyCode == 27
       @toggleFullScreen(event)
 
   render: ->
-    @control = new VideoControl element: @$('.video-controls')
-    @caption = new VideoCaption element: @element, youtubeId: @video.youtubeId('1.0'), currentSpeed: @currentSpeed()
+    @control = new VideoControl el: @$('.video-controls')
+    @caption = new VideoCaption el: @el, youtubeId: @video.youtubeId('1.0'), currentSpeed: @currentSpeed()
     unless onTouchBasedDevice()
-      @volumeControl = new VideoVolumeControl element: @$('.secondary-controls')
-    @speedControl = new VideoSpeedControl element: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
-    @progressSlider = new VideoProgressSlider element: @$('.slider')
+      @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
+    @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
+    @progressSlider = new VideoProgressSlider el: @$('.slider')
     @player = new YT.Player @video.id,
       playerVars:
         controls: 0
@@ -125,12 +125,12 @@ class @VideoPlayer extends Subview
 
   toggleFullScreen: (event) =>
     event.preventDefault()
-    if @element.hasClass('fullscreen')
+    if @el.hasClass('fullscreen')
       @$('.exit').remove()
       @$('.add-fullscreen').attr('title', 'Fill browser')
-      @element.removeClass('fullscreen')
+      @el.removeClass('fullscreen')
     else
-      @element.append('<a href="#" class="exit">Exit</a>').addClass('fullscreen')
+      @el.append('<a href="#" class="exit">Exit</a>').addClass('fullscreen')
       @$('.add-fullscreen').attr('title', 'Exit fill browser')
       @$('.exit').click @toggleFullScreen
     @caption.resize()

@@ -7,7 +7,7 @@ class @Subview
     @bind()
 
   $: (selector) ->
-    $(selector, @element)
+    $(selector, @el)
 
   initialize: ->
   render: ->

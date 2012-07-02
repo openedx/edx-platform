@@ -7,7 +7,7 @@ describe 'VideoProgressSlider', ->
       beforeEach ->
         spyOn($.fn, 'slider').andCallThrough()
         spyOn(window, 'onTouchBasedDevice').andReturn false
-        @slider = new VideoProgressSlider element: $('.slider')
+        @slider = new VideoProgressSlider el: $('.slider')
 
       it 'build the slider', ->
         expect(@slider.slider).toBe '.slider'
@@ -35,7 +35,7 @@ describe 'VideoProgressSlider', ->
       beforeEach ->
         spyOn($.fn, 'slider').andCallThrough()
         spyOn(window, 'onTouchBasedDevice').andReturn true
-        @slider = new VideoProgressSlider element: $('.slider')
+        @slider = new VideoProgressSlider el: $('.slider')
 
       it 'does not build the slider', ->
         expect(@slider.slider).toBeUndefined
@@ -43,7 +43,7 @@ describe 'VideoProgressSlider', ->
 
   describe 'play', ->
     beforeEach ->
-      @slider = new VideoProgressSlider element: $('.slider')
+      @slider = new VideoProgressSlider el: $('.slider')
       spyOn($.fn, 'slider').andCallThrough()
 
     describe 'when the slider was already built', ->
@@ -82,7 +82,7 @@ describe 'VideoProgressSlider', ->
 
   describe 'updatePlayTime', ->
     beforeEach ->
-      @slider = new VideoProgressSlider element: $('.slider')
+      @slider = new VideoProgressSlider el: $('.slider')
       spyOn($.fn, 'slider').andCallThrough()
 
     describe 'when frozen', ->
@@ -106,7 +106,7 @@ describe 'VideoProgressSlider', ->
 
   describe 'onSlide', ->
     beforeEach ->
-      @slider = new VideoProgressSlider element: $('.slider')
+      @slider = new VideoProgressSlider el: $('.slider')
       @time = null
       $(@slider).bind 'seek', (event, time) => @time = time
       spyOnEvent @slider, 'seek'
@@ -124,7 +124,7 @@ describe 'VideoProgressSlider', ->
 
   describe 'onChange', ->
     beforeEach ->
-      @slider = new VideoProgressSlider element: $('.slider')
+      @slider = new VideoProgressSlider el: $('.slider')
       @slider.onChange {}, value: 20
 
     it 'update the tooltip', ->
@@ -132,7 +132,7 @@ describe 'VideoProgressSlider', ->
 
   describe 'onStop', ->
     beforeEach ->
-      @slider = new VideoProgressSlider element: $('.slider')
+      @slider = new VideoProgressSlider el: $('.slider')
       @time = null
       $(@slider).bind 'seek', (event, time) => @time = time
       spyOnEvent @slider, 'seek'
@@ -153,7 +153,7 @@ describe 'VideoProgressSlider', ->
 
   describe 'updateTooltip', ->
     beforeEach ->
-      @slider = new VideoProgressSlider element: $('.slider')
+      @slider = new VideoProgressSlider el: $('.slider')
       @slider.updateTooltip 90
 
     it 'set the tooltip value', ->

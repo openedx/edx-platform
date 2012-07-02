@@ -12,7 +12,7 @@ describe 'Sequence', ->
       @sequence = new Sequence '1', @items, 'sequence', 1
 
     it 'set the element', ->
-      expect(@sequence.element).toEqual $('#sequence_1')
+      expect(@sequence.el).toEqual $('#sequence_1')
 
     it 'build the navigation', ->
       classes = $('#sequence-list li>a').map(-> $(this).attr('class')).get()
@@ -74,7 +74,7 @@ describe 'Sequence', ->
     beforeEach ->
       spyOn $, 'postWithPrefix'
       @sequence = new Sequence '1', @items, 'sequence'
-      spyOnEvent @sequence.element, 'contentChanged'
+      spyOnEvent @sequence.el, 'contentChanged'
       spyOn(@sequence, 'toggleArrows').andCallThrough()
 
     describe 'with a different position than the current one', ->
@@ -109,13 +109,13 @@ describe 'Sequence', ->
         expect(@sequence.toggleArrows).toHaveBeenCalled()
 
       it 'trigger contentChanged event', ->
-        expect('contentChanged').toHaveBeenTriggeredOn @sequence.element
+        expect('contentChanged').toHaveBeenTriggeredOn @sequence.el
 
     describe 'with the same position as the current one', ->
       it 'should not trigger contentChanged event', ->
         @sequence.position = 2
         @sequence.render 2
-        expect('contentChanged').not.toHaveBeenTriggeredOn @sequence.element
+        expect('contentChanged').not.toHaveBeenTriggeredOn @sequence.el
 
   describe 'goto', ->
     beforeEach ->

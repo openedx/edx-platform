@@ -5,7 +5,7 @@ describe 'VideoControl', ->
 
   describe 'constructor', ->
     it 'render the video controls', ->
-      new VideoControl(element: $('.video-controls'))
+      new VideoControl(el: $('.video-controls'))
       expect($('.video-controls').html()).toContain '''
         <div class="slider"></div>
         <div>
@@ -22,7 +22,7 @@ describe 'VideoControl', ->
       '''
 
     it 'bind the playback button', ->
-      control = new VideoControl(element: $('.video-controls'))
+      control = new VideoControl(el: $('.video-controls'))
       expect($('.video_control')).toHandleWith 'click', control.togglePlayback
 
     describe 'when on a touch based device', ->
@@ -30,7 +30,7 @@ describe 'VideoControl', ->
         spyOn(window, 'onTouchBasedDevice').andReturn true
 
       it 'does not add the play class to video control', ->
-        new VideoControl(element: $('.video-controls'))
+        new VideoControl(el: $('.video-controls'))
         expect($('.video_control')).not.toHaveClass 'play'
         expect($('.video_control')).not.toHaveHtml 'Play'
 
@@ -40,13 +40,13 @@ describe 'VideoControl', ->
         spyOn(window, 'onTouchBasedDevice').andReturn false
 
       it 'add the play class to video control', ->
-        new VideoControl(element: $('.video-controls'))
+        new VideoControl(el: $('.video-controls'))
         expect($('.video_control')).toHaveClass 'play'
         expect($('.video_control')).toHaveHtml 'Play'
 
   describe 'play', ->
     beforeEach ->
-      @control = new VideoControl(element: $('.video-controls'))
+      @control = new VideoControl(el: $('.video-controls'))
       @control.play()
 
     it 'switch playback button to play state', ->
@@ -56,7 +56,7 @@ describe 'VideoControl', ->
 
   describe 'pause', ->
     beforeEach ->
-      @control = new VideoControl(element: $('.video-controls'))
+      @control = new VideoControl(el: $('.video-controls'))
       @control.pause()
 
     it 'switch playback button to pause state', ->
@@ -66,7 +66,7 @@ describe 'VideoControl', ->
 
   describe 'togglePlayback', ->
     beforeEach ->
-      @control = new VideoControl(element: $('.video-controls'))
+      @control = new VideoControl(el: $('.video-controls'))
 
     describe 'when the control does not have play or pause class', ->
       beforeEach ->
