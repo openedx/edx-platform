@@ -43,12 +43,10 @@ class ModelsTest(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_get_module_class(self):
-        vc = xmodule.get_module_class('video')
-        vc_str = "<class 'xmodule.video_module.Module'>"
+    def test_load_class(self):
+        vc = xmodule.x_module.XModuleDescriptor.load_class('video')
+        vc_str = "<class 'xmodule.video_module.VideoDescriptor'>"
         self.assertEqual(str(vc), vc_str)
-        video_id = xmodule.get_default_ids()['video']
-        self.assertEqual(video_id, 'youtube')
 
     def test_calc(self):
         variables={'R1':2.0, 'R3':4.0}
@@ -98,7 +96,7 @@ class ModelsTest(unittest.TestCase):
 class MultiChoiceTest(unittest.TestCase):
     def test_MC_grade(self):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multichoice.xml"
-        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1', system=i4xs)
+        test_lcp = lcp.LoncapaProblem(open(multichoice_file).read(), '1', system=i4xs)
         correct_answers = {'1_2_1':'choice_foil3'}
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':'choice_foil2'}
@@ -106,7 +104,7 @@ class MultiChoiceTest(unittest.TestCase):
 
     def test_MC_bare_grades(self):
         multichoice_file = os.path.dirname(__file__)+"/test_files/multi_bare.xml"
-        test_lcp = lcp.LoncapaProblem(open(multichoice_file), '1', system=i4xs)
+        test_lcp = lcp.LoncapaProblem(open(multichoice_file).read(), '1', system=i4xs)
         correct_answers = {'1_2_1':'choice_2'}
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':'choice_1'}
@@ -114,7 +112,7 @@ class MultiChoiceTest(unittest.TestCase):
         
     def test_TF_grade(self):
         truefalse_file =  os.path.dirname(__file__)+"/test_files/truefalse.xml"
-        test_lcp = lcp.LoncapaProblem(open(truefalse_file), '1', system=i4xs)
+        test_lcp = lcp.LoncapaProblem(open(truefalse_file).read(), '1', system=i4xs)
         correct_answers = {'1_2_1':['choice_foil2', 'choice_foil1']}
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
         false_answers = {'1_2_1':['choice_foil1']}
@@ -129,7 +127,7 @@ class MultiChoiceTest(unittest.TestCase):
 class ImageResponseTest(unittest.TestCase):
     def test_ir_grade(self):
         imageresponse_file = os.path.dirname(__file__)+"/test_files/imageresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(imageresponse_file), '1', system=i4xs)
+        test_lcp = lcp.LoncapaProblem(open(imageresponse_file).read(), '1', system=i4xs)
         correct_answers = {'1_2_1':'(490,11)-(556,98)',
                            '1_2_2':'(242,202)-(296,276)'}
         test_answers = {'1_2_1':'[500,20]',
@@ -142,7 +140,7 @@ class SymbolicResponseTest(unittest.TestCase):
     def test_sr_grade(self):
         raise SkipTest() # This test fails due to dependencies on a local copy of snuggletex-webapp. Until we have figured that out, we'll just skip this test
         symbolicresponse_file = os.path.dirname(__file__)+"/test_files/symbolicresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(symbolicresponse_file), '1', system=i4xs)
+        test_lcp = lcp.LoncapaProblem(open(symbolicresponse_file).read(), '1', system=i4xs)
         correct_answers = {'1_2_1':'cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]',
                            '1_2_1_dynamath': '''
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -235,7 +233,7 @@ class OptionResponseTest(unittest.TestCase):
     '''
     def test_or_grade(self):
         optionresponse_file = os.path.dirname(__file__)+"/test_files/optionresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(optionresponse_file), '1', system=i4xs)
+        test_lcp = lcp.LoncapaProblem(open(optionresponse_file).read(), '1', system=i4xs)
         correct_answers = {'1_2_1':'True',
                            '1_2_2':'False'}
         test_answers = {'1_2_1':'True',
@@ -251,7 +249,7 @@ class FormulaResponseWithHintTest(unittest.TestCase):
     '''
     def test_or_grade(self):
         problem_file = os.path.dirname(__file__)+"/test_files/formularesponse_with_hint.xml"
-        test_lcp = lcp.LoncapaProblem(open(problem_file), '1', system=i4xs)
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
         correct_answers = {'1_2_1':'2.5*x-5.0'}
         test_answers = {'1_2_1':'0.4*x-5.0'}
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
@@ -265,7 +263,7 @@ class StringResponseWithHintTest(unittest.TestCase):
     '''
     def test_or_grade(self):
         problem_file = os.path.dirname(__file__)+"/test_files/stringresponse_with_hint.xml"
-        test_lcp = lcp.LoncapaProblem(open(problem_file), '1', system=i4xs)
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
         correct_answers = {'1_2_1':'Michigan'}
         test_answers = {'1_2_1':'Minnesota'}
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
@@ -618,7 +616,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(i4xs, "<dummy />", "dummy")
+        xm = x_module.XModule(i4xs, 'a://b/c/d/e', {})
         p = xm.get_progress()
         self.assertEqual(p, None)
-        
