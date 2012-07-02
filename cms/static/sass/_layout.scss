@@ -9,13 +9,14 @@ body {
   }
 
   > header {
-    background: #000;
+    background: $dark-blue;
     color: #fff;
     display: block;
     float: none;
-    padding: 6px 20px;
+    padding: 8px 25px;
     width: 100%;
     @include box-sizing(border-box);
+    -webkit-font-smoothing: antialiased;
 
     nav {
       @include clearfix;
@@ -24,6 +25,23 @@ body {
         font-size: 14px;
         text-transform: uppercase;
         float: left;
+        margin-right: 15px;
+
+        a {
+          color: #fff;
+
+          &:hover {
+            color: rgba(#fff, .6);
+          }
+        }
+      }
+
+      a {
+        color: rgba(#fff, .8);
+
+        &:hover {
+          color: rgba(#fff, .6);
+        }
       }
 
       ul {
@@ -35,7 +53,16 @@ body {
 
         li {
           @include inline-block();
-          margin-left: 15px;
+
+          a {
+            padding: 8px 10px;
+            display: block;
+            margin: -8px 0;
+
+            &:hover {
+              background-color: darken($dark-blue, 15%);
+            }
+          }
         }
       }
     }
@@ -43,11 +70,11 @@ body {
 
   &.content {
     section.main-content {
-      border-left: 2px solid #000;
+      border-left: 2px solid $dark-blue;
       @include box-sizing(border-box);
       width: flex-grid(9);
       float: left;
-      @include box-shadow( -2px 0 3px #ddd );
+      @include box-shadow( -2px 0 0 darken($light-blue, 3%));
     }
   }
 }
