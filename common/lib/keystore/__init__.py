@@ -101,9 +101,6 @@ class Location(object):
             if val is not None and INVALID_CHARS.search(val) is not None:
                 raise InvalidLocationError(location)
 
-    def __str__(self):
-        return self.url()
-
     def url(self):
         """
         Return a string containing the URL for this location
@@ -135,6 +132,19 @@ class Location(object):
                 'category': self.category,
                 'name': self.name,
                 'revision': self.revision}
+
+    def __str__(self):
+        return self.url()
+
+    def __repr__(self):
+        return 'Location(%r)' % str(self)
+
+    def __hash__(self):
+        return self.url()
+
+    def __eq__(self, other):
+        return (isinstance(other, Location) and
+                str(self) == str(other))
 
 
 class ModuleStore(object):
