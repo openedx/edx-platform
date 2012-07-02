@@ -207,7 +207,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     '''
     descriptor = keystore().get_item(location)
 
-    instance_module = student_module_cache.lookup(descriptor.category, descriptor.url)
+    instance_module = student_module_cache.lookup(descriptor.category, descriptor.location.url())
     shared_state_key = getattr(descriptor, 'shared_state_key', None)
     if shared_state_key is not None:
         shared_module = student_module_cache.lookup(descriptor.category, shared_state_key)
@@ -218,7 +218,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     shared_state = shared_module.state if shared_module is not None else None
 
     # Setup system context for module instance
-    ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.url + '/'
+    ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location, student_module_cache, position)

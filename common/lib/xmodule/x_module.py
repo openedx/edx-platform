@@ -239,7 +239,7 @@ class XModuleDescriptor(Plugin):
         self.definition = definition if definition is not None else {}
         self.name = Location(kwargs.get('location')).name
         self.category = Location(kwargs.get('location')).category
-        self.url = Location(kwargs.get('location')).url()
+        self.location = Location(kwargs.get('location'))
         self.metadata = kwargs.get('metadata', {})
         self.shared_state_key = kwargs.get('shared_state_key')
 
@@ -364,7 +364,7 @@ class XModuleDescriptor(Plugin):
         return partial(
             self.module_class,
             system,
-            self.url,
+            self.location,
             self.definition,
             metadata=self.metadata
         )

@@ -85,6 +85,7 @@ class StudentModuleCache(object):
                     student=user,
                     module_state_key__in=id_chunk)
                 )
+
         else:
             self.cache = []
 
@@ -93,7 +94,7 @@ class StudentModuleCache(object):
         Get a list of the state_keys needed for StudentModules
         required for this chunk of module xml
         '''
-        keys = [descriptor.url]
+        keys = [descriptor.location.url()]
 
         shared_state_key = getattr(descriptor, 'shared_state_key', None)
         if shared_state_key is not None:
