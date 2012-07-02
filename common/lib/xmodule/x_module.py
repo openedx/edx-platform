@@ -56,13 +56,16 @@ class Plugin(object):
 
 
 class XModule(object):
-    ''' Implements a generic learning module. 
-        Initialized on access with __init__, first time with instance_state=None, and
-        shared_state=None. In later instantiations, instance_state will not be None,
-        but shared_state may be
+    ''' Implements a generic learning module.
 
-        See the HTML module for a simple example
+        Subclasses must at a minimum provide a definition for get_html in order to be displayed to users.
+
+        See the HTML module for a simple example.
     '''
+
+    # The default implementation of get_icon_class returns the icon_class attribute of the class
+    # This attribute can be overridden by subclasses, and the function can also be overridden
+    # if the icon class depends on the data in the module
     icon_class = 'other'
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
@@ -72,8 +75,18 @@ class XModule(object):
         system: An I4xSystem allowing access to external resources
         location: Something Location-like that identifies this xmodule
         definition: A dictionary containing 'data' and 'children'. Both are optional
-            'data': is a json object specifying the behavior of this xmodule
+            'data': is JSON-like (string, dictionary, list, bool, or None, optionally nested)
             'children': is a list of xmodule urls for child modules that this module depends on
+        instance_state: A string of serialized json that contains the state of this module for
+            current student accessing the system, or None if no state has been saved
+        shared_state: A string of serialized json that contains the state that is shared between
+            this module and any modules of the same type with the same shared_state_key. This
+            state is only shared per-student, not across different students
+        kwargs: Optional arguments. Subclasses should always accept kwargs and pass them
+            to the parent class constructor.
+            Current known uses of kwargs:
+                metadata: A dictionary containing data that specifies information that is particular
+                    to a problem in the context of a course
         '''
         self.system = system
         self.location = Location(location)
@@ -121,7 +134,7 @@ class XModule(object):
 
     def get_icon_class(self):
         '''
-        Return a class identifying this module in the context of an icon
+        Return a css class identifying this module in the context of an icon
         '''
         return self.icon_class
 
@@ -155,7 +168,7 @@ class XModule(object):
     def get_html(self):
         ''' HTML, as shown in the browser. This is the only method that must be implemented
         '''
-        return "Unimplemented"
+        raise NotImplementedError("get_html must be defined for all XModules that appear on the screen. Not defined in %s" % self.__class__.__name__)
 
     def get_progress(self):
         ''' Return a progress.Progress object that represents how far the student has gone
