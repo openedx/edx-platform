@@ -1,6 +1,6 @@
 class @Problem
   constructor: (@id, @element_id, url) ->
-    @el = $("##{element_id}")
+    @el = $("##{@element_id}")
     @render()
 
   $: (selector) ->

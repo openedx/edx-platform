@@ -9,7 +9,7 @@ describe 'Sequence', ->
 
   describe 'constructor', ->
     beforeEach ->
-      @sequence = new Sequence '1', @items, 'sequence', 1
+      @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 1
 
     it 'set the element', ->
       expect(@sequence.el).toEqual $('#sequence_1')
@@ -31,7 +31,7 @@ describe 'Sequence', ->
 
   describe 'toggleArrows', ->
     beforeEach ->
-      @sequence = new Sequence '1', @items, 'sequence', 1
+      @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 1
 
     describe 'when the first tab is active', ->
       beforeEach ->
@@ -73,7 +73,7 @@ describe 'Sequence', ->
   describe 'render', ->
     beforeEach ->
       spyOn $, 'postWithPrefix'
-      @sequence = new Sequence '1', @items, 'sequence'
+      @sequence = new Sequence '1', 'sequence_1', @items, 'sequence'
       spyOnEvent @sequence.el, 'contentChanged'
       spyOn(@sequence, 'toggleArrows').andCallThrough()
 
@@ -94,7 +94,7 @@ describe 'Sequence', ->
           expect($('[data-element="2"]')).toHaveClass 'seq_video_visited'
 
         it 'save the new position', ->
-          expect($.postWithPrefix).toHaveBeenCalledWith '/modx/sequence/1/goto_position', position: 1
+          expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/goto_position', position: 1
 
       it 'mark new tab as active', ->
         expect($('[data-element="1"]')).toHaveClass 'seq_video_active'
@@ -120,7 +120,7 @@ describe 'Sequence', ->
   describe 'goto', ->
     beforeEach ->
       jasmine.stubRequests()
-      @sequence = new Sequence '1', @items, 'sequence', 2
+      @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 2
       $('[data-element="3"]').click()
 
     it 'log the sequence goto event', ->
@@ -132,7 +132,7 @@ describe 'Sequence', ->
   describe 'next', ->
     beforeEach ->
       jasmine.stubRequests()
-      @sequence = new Sequence '1', @items, 'sequence', 2
+      @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 2
       $('.sequence-nav-buttons .next a').click()
 
     it 'log the next sequence event', ->
@@ -144,7 +144,7 @@ describe 'Sequence', ->
   describe 'previous', ->
     beforeEach ->
       jasmine.stubRequests()
-      @sequence = new Sequence '1', @items, 'sequence', 2
+      @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 2
       $('.sequence-nav-buttons .prev a').click()
 
     it 'log the previous sequence event', ->
@@ -155,5 +155,5 @@ describe 'Sequence', ->
 
   describe 'link_for', ->
     it 'return a link for specific position', ->
-      sequence = new Sequence '1', @items, 2
+      sequence = new Sequence '1', 'sequence_1', @items, 2
       expect(sequence.link_for(2)).toBe '[data-element="2"]'
