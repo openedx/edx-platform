@@ -4,6 +4,7 @@ from importlib import import_module
 from lxml import etree
 from path import path
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
+from xmodule.mako_module import MakoDescriptorSystem
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError
@@ -38,7 +39,7 @@ class XMLModuleStore(ModuleStore):
             self.default_class = class_
 
         with open(self.data_dir / "course.xml") as course_file:
-            class ImportSystem(XMLParsingSystem):
+            class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def __init__(self, modulestore):
                     """
                     modulestore: the XMLModuleStore to store the loaded modules in
@@ -73,7 +74,14 @@ class XMLModuleStore(ModuleStore):
                             module.get_children()
                         return module
 
-                    XMLParsingSystem.__init__(self, modulestore.get_item, OSFS(data_dir), process_xml)
+                    system_kwargs = dict(
+                        render_template=lambda: '',
+                        load_item=modulestore.get_item,
+                        resources_fs=OSFS(data_dir),
+                        process_xml=process_xml
+                    )
+                    MakoDescriptorSystem.__init__(self, **system_kwargs)
+                    XMLParsingSystem.__init__(self, **system_kwargs)
 
             self.course = ImportSystem(self).process_xml(course_file.read())
 
