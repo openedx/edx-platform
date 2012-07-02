@@ -20,7 +20,7 @@ class @Courseware
       id = $(this).attr('id').replace(/video_/, '')
       new Video id, $(this).data('streams')
     $('.course-content .problems-wrapper').each ->
-      id = $(this).attr('problem-id')
+      id = $(this).data('problem-id')
       new Problem id, $(this).attr('id'), $(this).data('url')
     $('.course-content .histogram').each ->
       id = $(this).attr('id').replace(/histogram_/, '')
