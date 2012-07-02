@@ -3,7 +3,7 @@ class @VideoControl extends Subview
     @$('.video_control').click @togglePlayback
 
   render: ->
-    @element.append """
+    @el.append """
       <div class="slider"></div>
       <div>
         <ul class="vcr">

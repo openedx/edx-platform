@@ -20,7 +20,7 @@ describe 'Problem', ->
       @problem = new Problem 1, '/problem/url/'
 
     it 'set the element', ->
-      expect(@problem.element).toBe '#problem_1'
+      expect(@problem.el).toBe '#problem_1'
 
   describe 'bind', ->
     beforeEach ->
@@ -69,7 +69,7 @@ describe 'Problem', ->
         @problem.render 'Hello World'
 
       it 'render the content', ->
-        expect(@problem.element.html()).toEqual 'Hello World'
+        expect(@problem.el.html()).toEqual 'Hello World'
 
       it 're-bind the content', ->
         expect(@problem.bind).toHaveBeenCalled()
@@ -81,7 +81,7 @@ describe 'Problem', ->
         @problem.render()
 
       it 'load the content via ajax', ->
-        expect(@problem.element.html()).toEqual 'Hello World'
+        expect(@problem.el.html()).toEqual 'Hello World'
 
       it 're-bind the content', ->
         expect(@problem.bind).toHaveBeenCalled()
@@ -104,13 +104,13 @@ describe 'Problem', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'correct', contents: 'Correct!')
         @problem.check()
-        expect(@problem.element.html()).toEqual 'Correct!'
+        expect(@problem.el.html()).toEqual 'Correct!'
 
     describe 'when the response is incorrect', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'incorrect', contents: 'Correct!')
         @problem.check()
-        expect(@problem.element.html()).toEqual 'Correct!'
+        expect(@problem.el.html()).toEqual 'Correct!'
 
     describe 'when the response is undetermined', ->
       it 'alert the response', ->
@@ -137,16 +137,16 @@ describe 'Problem', ->
       spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
         callback html: "Reset!"
       @problem.reset()
-      expect(@problem.element.html()).toEqual 'Reset!'
+      expect(@problem.el.html()).toEqual 'Reset!'
 
   describe 'show', ->
     beforeEach ->
       @problem = new Problem 1, '/problem/url/'
-      @problem.element.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
+      @problem.el.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
 
     describe 'when the answer has not yet shown', ->
       beforeEach ->
-        @problem.element.removeClass 'showed'
+        @problem.el.removeClass 'showed'
 
       it 'log the problem_show event', ->
         @problem.show()
@@ -172,11 +172,11 @@ describe 'Problem', ->
       it 'add the showed class to element', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
-        expect(@problem.element).toHaveClass 'showed'
+        expect(@problem.el).toHaveClass 'showed'
 
       describe 'multiple choice question', ->
         beforeEach ->
-          @problem.element.prepend '''
+          @problem.el.prepend '''
             <label for="input_1_1_1"><input type="checkbox" name="input_1_1" id="input_1_1_1" value="1"> One</label>
             <label for="input_1_1_2"><input type="checkbox" name="input_1_1" id="input_1_1_2" value="2"> Two</label>
             <label for="input_1_1_3"><input type="checkbox" name="input_1_1" id="input_1_1_3" value="3"> Three</label>
@@ -194,8 +194,8 @@ describe 'Problem', ->
 
     describe 'when the answers are alreay shown', ->
       beforeEach ->
-        @problem.element.addClass 'showed'
-        @problem.element.prepend '''
+        @problem.el.addClass 'showed'
+        @problem.el.prepend '''
           <label for="input_1_1_1" correct_answer="true">
             <input type="checkbox" name="input_1_1" id="input_1_1_1" value="1" />
             One
@@ -216,7 +216,7 @@ describe 'Problem', ->
 
       it 'remove the showed class from element', ->
         @problem.show()
-        expect(@problem.element).not.toHaveClass 'showed'
+        expect(@problem.el).not.toHaveClass 'showed'
 
   describe 'save', ->
     beforeEach ->
@@ -271,7 +271,7 @@ describe 'Problem', ->
   describe 'refreshAnswers', ->
     beforeEach ->
       @problem = new Problem 1, '/problem/url/'
-      @problem.element.html '''
+      @problem.el.html '''
         <textarea class="CodeMirror" />
         <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
         <input id="input_1_2" name="input_1_2" value="two" />

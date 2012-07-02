@@ -10,7 +10,7 @@ class @VideoVolumeControl extends Subview
     @$('.volume>a').click(@toggleMute)
 
   render: ->
-    @element.prepend """
+    @el.prepend """
       <div class="volume">
         <a href="#"></a>
         <div class="volume-slider-container">

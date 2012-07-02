@@ -1,10 +1,10 @@
 class @Problem
   constructor: (@id, @element_id, url) ->
-    @element = $("##{element_id}")
+    @el = $("##{element_id}")
     @render()
 
   $: (selector) ->
-    $(selector, @element)
+    $(selector, @el)
 
   bind: =>
     MathJax.Hub.Queue ["Typeset", MathJax.Hub]
@@ -18,16 +18,16 @@ class @Problem
 
   updateProgress: (response) =>
     if response.progress_changed
-        @element.attr progress: response.progress_status
-        @element.trigger('progressChanged')
+        @el.attr progress: response.progress_status
+        @el.trigger('progressChanged')
 
   render: (content) ->
     if content
-      @element.html(content)
+      @el.html(content)
       @bind()
     else
       $.postWithPrefix "/modx/#{@id}/problem_get", (response) =>
-        @element.html(response.html)
+        @el.html(response.html)
         @bind()
 
   check: =>
@@ -47,7 +47,7 @@ class @Problem
         @updateProgress response
 
   show: =>
-    if !@element.hasClass 'showed'
+    if !@el.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
       $.postWithPrefix "/modx/#{@id}/problem_show", (response) =>
         answers = response.answers
@@ -59,12 +59,12 @@ class @Problem
             @$("#answer_#{key}, #solution_#{key}").html(value)
         MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
-        @element.addClass 'showed'
+        @el.addClass 'showed'
         @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
-      @element.removeClass 'showed'
+      @el.removeClass 'showed'
       @$('.show').val 'Show Answer'
 
   save: =>

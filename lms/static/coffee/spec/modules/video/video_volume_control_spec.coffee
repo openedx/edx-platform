@@ -6,7 +6,7 @@ describe 'VideoVolumeControl', ->
   describe 'constructor', ->
     beforeEach ->
       spyOn($.fn, 'slider')
-      @volumeControl = new VideoVolumeControl element: $('.secondary-controls')
+      @volumeControl = new VideoVolumeControl el: $('.secondary-controls')
 
     it 'initialize currentVolume to 100', ->
       expect(@volumeControl.currentVolume).toEqual 100
@@ -44,7 +44,7 @@ describe 'VideoVolumeControl', ->
     beforeEach ->
       spyOnEvent @volumeControl, 'volumeChange'
       @newVolume = undefined
-      @volumeControl = new VideoVolumeControl element: $('.secondary-controls')
+      @volumeControl = new VideoVolumeControl el: $('.secondary-controls')
       $(@volumeControl).bind 'volumeChange', (event, volume) => @newVolume = volume
 
     describe 'when the new volume is more than 0', ->
@@ -70,7 +70,7 @@ describe 'VideoVolumeControl', ->
   describe 'toggleMute', ->
     beforeEach ->
       @newVolume = undefined
-      @volumeControl = new VideoVolumeControl element: $('.secondary-controls')
+      @volumeControl = new VideoVolumeControl el: $('.secondary-controls')
       $(@volumeControl).bind 'volumeChange', (event, volume) => @newVolume = volume
 
     describe 'when the current volume is more than 0', ->

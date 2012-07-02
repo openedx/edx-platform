@@ -21,7 +21,7 @@ describe 'Video', ->
         expect(window.player).toBeNull()
 
       it 'set the elements', ->
-        expect(@video.element).toBe '#video_example'
+        expect(@video.el).toBe '#video_example'
 
       it 'parse the videos', ->
         expect(@video.videos).toEqual

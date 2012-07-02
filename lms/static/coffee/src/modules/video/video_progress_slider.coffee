@@ -3,7 +3,7 @@ class @VideoProgressSlider extends Subview
     @buildSlider() unless onTouchBasedDevice()
 
   buildSlider: ->
-    @slider = @element.slider
+    @slider = @el.slider
       range: 'min'
       change: @onChange
       slide: @onSlide

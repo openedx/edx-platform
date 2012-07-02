@@ -15,7 +15,7 @@ class @VideoSpeedControl extends Subview
         $(this).removeClass('open')
 
   render: ->
-    @element.prepend """
+    @el.prepend """
       <div class="speeds">
         <a href="#">
           <h3>Speed</h3>
