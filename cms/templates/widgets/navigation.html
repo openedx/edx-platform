@@ -40,8 +40,8 @@
       <header>
         <h1><a href="#" class="module-edit" id="${week.location.url()}">${week.name}</a></h1>
         <ul>
-          % if week.goals:
-            % for goal in week.goals:
+          % if 'goals' in week.metadata:
+            % for goal in week.metadata['goals']:
             <li class="goal editable">${goal}</li>
             % endfor
           % else:
