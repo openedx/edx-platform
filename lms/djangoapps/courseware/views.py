@@ -16,7 +16,7 @@ from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
-from keystore.django import keystore
+from xmodule.modulestore.django import modulestore
 
 from util.cache import cache
 from student.models import UserTestGroup
@@ -63,7 +63,7 @@ def gradebook(request):
     course_location = multicourse_settings.get_course_location(coursename)
 
     for student in student_objects:
-        student_module_cache = StudentModuleCache(student, keystore().get_item(course_location))
+        student_module_cache = StudentModuleCache(student, modulestore().get_item(course_location))
         course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
         student_info.append({
             'username': student.username,
@@ -93,7 +93,7 @@ def profile(request, student_id=None):
 
     coursename = multicourse_settings.get_coursename_from_request(request)
     course_location = multicourse_settings.get_course_location(coursename)
-    student_module_cache = StudentModuleCache(request.user, keystore().get_item(course_location))
+    student_module_cache = StudentModuleCache(request.user, modulestore().get_item(course_location))
     course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
 
     context = {'name': user_info.name,

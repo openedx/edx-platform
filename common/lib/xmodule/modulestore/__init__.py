@@ -145,8 +145,8 @@ class ModuleStore(object):
         recent revision
 
         If any segment of the location is None except revision, raises
-            keystore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
+            xmodule.modulestore.exceptions.InsufficientSpecificationError
+        If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
         default_class: An XModuleDescriptor subclass to use if no plugin matching the

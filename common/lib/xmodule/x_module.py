@@ -2,7 +2,7 @@ from lxml import etree
 import pkg_resources
 import logging
 
-from keystore import Location
+from xmodule.modulestore import Location
 from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
@@ -231,7 +231,7 @@ class XModuleDescriptor(Plugin):
         definition: A dict containing `data` and `children` representing the problem definition
 
         Current arguments passed in kwargs:
-            location: A keystore.Location object indicating the name and ownership of this problem
+            location: A xmodule.modulestore.Location object indicating the name and ownership of this problem
             shared_state_key: The key to use for sharing StudentModules with other
                 modules of this type
             metadata: A dictionary containing the following optional keys:

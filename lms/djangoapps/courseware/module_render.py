@@ -6,7 +6,7 @@ from django.http import Http404
 from django.http import HttpResponse
 from lxml import etree
 
-from keystore.django import keystore
+from xmodule.modulestore.django import modulestore
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 
@@ -129,7 +129,7 @@ def toc_for_course(user, request, course_location, active_chapter, active_sectio
     chapters with name 'hidden' are skipped.
     '''
 
-    student_module_cache = StudentModuleCache(user, keystore().get_item(course_location), depth=2)
+    student_module_cache = StudentModuleCache(user, modulestore().get_item(course_location), depth=2)
     (course, _, _, _) = get_module(user, request, course_location, student_module_cache)
 
     chapters = list()
@@ -161,7 +161,7 @@ def get_section(course, chapter, section):
     section: Section name
     """
     try:
-        course_module = keystore().get_item(course)
+        course_module = modulestore().get_item(course)
     except:
         log.exception("Unable to load course_module")
         return None
@@ -205,7 +205,7 @@ def get_module(user, request, location, student_module_cache, position=None):
         instance_module is a StudentModule specific to this module for this student
         shared_module is a StudentModule specific to all modules with the same 'shared_state_key' attribute, or None if the module doesn't elect to share state
     '''
-    descriptor = keystore().get_item(location)
+    descriptor = modulestore().get_item(location)
 
     instance_module = student_module_cache.lookup(descriptor.category, descriptor.location.url())
     shared_state_key = getattr(descriptor, 'shared_state_key', None)
@@ -304,7 +304,7 @@ def modx_dispatch(request, dispatch=None, id=None):
     # If there are arguments, get rid of them
     dispatch, _, _ = dispatch.partition('?')
 
-    student_module_cache = StudentModuleCache(request.user, keystore().get_item(id))
+    student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
 
     if instance_module is None:

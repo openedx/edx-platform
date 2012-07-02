@@ -1,6 +1,6 @@
 from nose.tools import assert_equals, assert_raises, assert_not_equals
-from keystore import Location
-from keystore.exceptions import InvalidLocationError
+from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import InvalidLocationError
 
 
 def check_string_roundtrip(url):
