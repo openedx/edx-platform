@@ -1,6 +1,7 @@
 from collections import MutableMapping
 from xmodule.x_module import XModuleDescriptor
 from lxml import etree
+import copy
 
 
 class LazyLoadingDict(MutableMapping):
@@ -41,6 +42,10 @@ class LazyLoadingDict(MutableMapping):
         self.load()
         return iter(self._contents)
 
+    def __repr__(self):
+        self.load()
+        return repr(self._contents)
+
     def load(self):
         if self._loaded:
             return
@@ -59,6 +64,11 @@ class XmlDescriptor(XModuleDescriptor):
     # Extension to append to filename paths
     filename_extension = 'xml'
 
+    # The attributes will be removed from the definition xml passed
+    # to definition_from_xml, and from the xml returned by definition_to_xml
+    metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
+        'due', 'graded', 'name', 'slug')
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
@@ -68,6 +78,15 @@ class XmlDescriptor(XModuleDescriptor):
         xml_object: An etree Element
         """
         raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
+
+    @classmethod
+    def clean_metadata_from_xml(cls, xml_object):
+        """
+        Remove any attribute named in self.metadata_attributes from the supplied xml_object
+        """
+        for attr in cls.metadata_attributes:
+            if xml_object.get(attr) is not None:
+                del xml_object.attrib[attr]
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -101,11 +120,14 @@ class XmlDescriptor(XModuleDescriptor):
         def definition_loader():
             filename = xml_object.get('filename')
             if filename is None:
-                return cls.definition_from_xml(xml_object, system)
+                definition_xml = copy.deepcopy(xml_object)
             else:
                 filepath = cls._format_filepath(xml_object.tag, filename)
                 with system.resources_fs.open(filepath) as file:
-                    return cls.definition_from_xml(etree.parse(file).getroot(), system)
+                    definition_xml = etree.parse(file).getroot()
+
+            cls.clean_metadata_from_xml(definition_xml)
+            return cls.definition_from_xml(definition_xml, system)
 
         return cls(
             system,
@@ -134,6 +156,7 @@ class XmlDescriptor(XModuleDescriptor):
         using the from_xml method with the same system, org, and course
         """
         xml_object = self.definition_to_xml(resource_fs)
+        self.__class__.clean_metadata_from_xml(xml_object)
 
         # Put content in a separate file if it's large (has more than 5 descendent tags)
         if len(list(xml_object.iter())) > 5:
