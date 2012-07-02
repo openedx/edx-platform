@@ -1,4 +1,4 @@
-from nose.tools import assert_equals, assert_raises
+from nose.tools import assert_equals, assert_raises, assert_not_equals
 from keystore import Location
 from keystore.exceptions import InvalidLocationError
 
@@ -11,7 +11,6 @@ def check_string_roundtrip(url):
 def test_string_roundtrip():
     check_string_roundtrip("tag://org/course/category/name")
     check_string_roundtrip("tag://org/course/category/name/revision")
-    check_string_roundtrip("tag://org/course/category/name with spaces/revision")
 
 
 def test_dict():
@@ -50,3 +49,15 @@ def test_invalid_locations():
     assert_raises(InvalidLocationError, Location, ["foo", "bar"])
     assert_raises(InvalidLocationError, Location, ["foo", "bar", "baz", "blat", "foo/bar"])
     assert_raises(InvalidLocationError, Location, None)
+    assert_raises(InvalidLocationError, Location, "tag://org/course/category/name with spaces/revision")
+
+def test_equality():
+    assert_equals(
+        Location('tag', 'org', 'course', 'category', 'name'),
+        Location('tag', 'org', 'course', 'category', 'name')
+    )
+
+    assert_not_equals(
+        Location('tag', 'org', 'course', 'category', 'name1'),
+        Location('tag', 'org', 'course', 'category', 'name')
+    )
