@@ -30,9 +30,12 @@ class XMLModuleStore(ModuleStore):
         self.data_dir = path(data_dir)
         self.modules = {}
 
-        module_path, _, class_name = default_class.rpartition('.')
-        class_ = getattr(import_module(module_path), class_name)
-        self.default_class = class_
+        if default_class is None:
+            self.default_class = None
+        else:
+            module_path, _, class_name = default_class.rpartition('.')
+            class_ = getattr(import_module(module_path), class_name)
+            self.default_class = class_
 
         with open(self.data_dir / "course.xml") as course_file:
             class ImportSystem(XMLParsingSystem):
