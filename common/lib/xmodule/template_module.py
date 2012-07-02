@@ -1,14 +1,9 @@
-import json
-
-from x_module import XModule, XModuleDescriptor
+from xmodule.x_module import XModule
+from xmodule.raw_module import RawDescriptor
 from lxml import etree
 
 
-class ModuleDescriptor(XModuleDescriptor):
-    pass
-
-
-class Module(XModule):
+class CustomTagModule(XModule):
     """
     This module supports tags of the form
     <customtag option="val" option2="val2">
@@ -31,19 +26,16 @@ class Module(XModule):
     Renders to::
         More information given in <a href="/book/234">the text</a>
     """
-    def get_state(self):
-        return json.dumps({})
 
-    @classmethod
-    def get_xml_tags(c):
-        return ['customtag']
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+        xmltree = etree.fromstring(self.definition['data'])
+        filename = xmltree.find('impl').text
+        params = dict(xmltree.items())
+        self.html = self.system.render_template(filename, params, namespace='custom_tags')
 
     def get_html(self):
         return self.html
 
-    def __init__(self, system, xml, item_id, state=None):
-        XModule.__init__(self, system, xml, item_id, state)
-        xmltree = etree.fromstring(xml)
-        filename = xmltree.find('impl').text
-        params = dict(xmltree.items())
-        self.html = self.system.render_template(filename, params, namespace='custom_tags')
+class CustomTagDescriptor(RawDescriptor):
+    module_class = CustomTagModule

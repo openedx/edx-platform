@@ -4,6 +4,7 @@ that are stored in a database an accessible using their Location as an identifie
 """
 
 import re
+from collections import namedtuple
 from .exceptions import InvalidLocationError
 
 URL_RE = re.compile("""
@@ -15,8 +16,10 @@ URL_RE = re.compile("""
     (/(?P<revision>[^/]+))?
     """, re.VERBOSE)
 
+INVALID_CHARS = re.compile(r"[^\w.-]")
 
-class Location(object):
+_LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
+class Location(_LocationBase):
     '''
     Encodes a location.
 
@@ -26,7 +29,16 @@ class Location(object):
     However, they can also be represented a dictionaries (specifying each component),
     tuples or list (specified in order), or as strings of the url
     '''
-    def __init__(self, location):
+    __slots__ = ()
+
+    @classmethod
+    def clean(cls, value):
+        """
+        Return value, made into a form legal for locations
+        """
+        return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
+
+    def __new__(_cls, loc_or_tag, org=None, course=None, category=None, name=None, revision=None):
         """
         Create a new location that is a clone of the specifed one.
 
@@ -45,54 +57,54 @@ class Location(object):
 
         In both the dict and list forms, the revision is optional, and can be ommitted.
 
-        None of the components of a location may contain the '/' character
+        Components must be composed of alphanumeric characters, or the characters '_', '-', and '.'
 
         Components may be set to None, which may be interpreted by some contexts to mean
         wildcard selection
         """
-        self.update(location)
 
-    def update(self, location):
-        """
-        Update this instance with data from another Location object.
+        if org is None and course is None and category is None and name is None and revision is None:
+            location = loc_or_tag
+        else:
+            location = (loc_or_tag, org, course, category, name, revision)
 
-        location: can take the same forms as specified by `__init__`
-        """
-        self.tag = self.org = self.course = self.category = self.name = self.revision = None
+        def check_dict(dict_):
+            check_list(dict_.values())
+
+        def check_list(list_):
+            for val in list_:
+                if val is not None and INVALID_CHARS.search(val) is not None:
+                    raise InvalidLocationError(location)
 
         if isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
                 raise InvalidLocationError(location)
             else:
-                self.update(match.groupdict())
-        elif isinstance(location, list):
+                groups = match.groupdict()
+                check_dict(groups)
+                return _LocationBase.__new__(_cls, **groups)
+        elif isinstance(location, (list, tuple)):
             if len(location) not in (5, 6):
                 raise InvalidLocationError(location)
 
-            (self.tag, self.org, self.course, self.category, self.name) = location[0:5]
-            self.revision = location[5] if len(location) == 6 else None
+            if len(location) == 5:
+                args = tuple(location) + (None, )
+            else:
+                args = tuple(location)
+
+            check_list(args)
+            return _LocationBase.__new__(_cls, *args)
         elif isinstance(location, dict):
-            try:
-                self.tag = location['tag']
-                self.org = location['org']
-                self.course = location['course']
-                self.category = location['category']
-                self.name = location['name']
-            except KeyError:
-                raise InvalidLocationError(location)
-            self.revision = location.get('revision')
+            kwargs = dict(location)
+            kwargs.setdefault('revision', None)
+
+            check_dict(kwargs)
+            return _LocationBase.__new__(_cls, **kwargs)
         elif isinstance(location, Location):
-            self.update(location.list())
+            return _LocationBase.__new__(_cls, location)
         else:
             raise InvalidLocationError(location)
-
-        for val in self.list():
-            if val is not None and '/' in val:
-                raise InvalidLocationError(location)
-
-    def __str__(self):
-        return self.url()
 
     def url(self):
         """
@@ -103,22 +115,23 @@ class Location(object):
             url += "/" + self.revision
         return url
 
-    def list(self):
+    def html_id(self):
         """
-        Return a list representing this location
+        Return a string with a version of the location that is safe for use in html id attributes
         """
-        return [self.tag, self.org, self.course, self.category, self.name, self.revision]
+        return "-".join(str(v) for v in self if v is not None)
 
     def dict(self):
-        """
-        Return a dictionary representing this location
-        """
-        return {'tag': self.tag,
-                'org': self.org,
-                'course': self.course,
-                'category': self.category,
-                'name': self.name,
-                'revision': self.revision}
+        return self.__dict__
+
+    def list(self):
+        return list(self)
+
+    def __str__(self):
+        return self.url()
+
+    def __repr__(self):
+        return "Location%s" % repr(tuple(self))
 
 
 class ModuleStore(object):

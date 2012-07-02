@@ -23,7 +23,7 @@ def process_includes(fn):
             file = next_include.get('file')
             if file is not None:
                 try:
-                    ifp = system.fs.open(file)
+                    ifp = system.resources_fs.open(file)
                 except Exception:
                     log.exception('Error in problem xml include: %s' % (etree.tostring(next_include, pretty_print=True)))
                     log.exception('Cannot find file %s in %s' % (file, dir))
@@ -57,11 +57,26 @@ class SemanticSectionDescriptor(XModuleDescriptor):
 
         if len(xml_object) == 1:
             for (key, val) in xml_object.items():
-                if key == 'format':
-                    continue
                 xml_object[0].set(key, val)
 
             return system.process_xml(etree.tostring(xml_object[0]))
         else:
             xml_object.tag = 'sequence'
             return system.process_xml(etree.tostring(xml_object))
+
+
+class TranslateCustomTagDescriptor(XModuleDescriptor):
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        """
+        Transforms the xml_data from <$custom_tag attr="" attr=""/> to
+        <customtag attr="" attr=""><impl>$custom_tag</impl></customtag>
+        """
+
+        xml_object = etree.fromstring(xml_data)
+        tag = xml_object.tag
+        xml_object.tag = 'customtag'
+        impl = etree.SubElement(xml_object, 'impl')
+        impl.text = tag
+
+        return system.process_xml(etree.tostring(xml_object))

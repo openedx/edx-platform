@@ -3,6 +3,7 @@ import pkg_resources
 import logging
 
 from keystore import Location
+from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -55,86 +56,107 @@ class Plugin(object):
 
 
 class XModule(object):
-    ''' Implements a generic learning module. 
-        Initialized on access with __init__, first time with state=None, and
-        then with state
+    ''' Implements a generic learning module.
 
-        See the HTML module for a simple example
+        Subclasses must at a minimum provide a definition for get_html in order to be displayed to users.
+
+        See the HTML module for a simple example.
     '''
-    id_attribute='id' # An attribute guaranteed to be unique
 
-    @classmethod
-    def get_xml_tags(c):
-        ''' Tags in the courseware file guaranteed to correspond to the module '''
-        return []
-        
-    @classmethod
-    def get_usage_tags(c):
-        ''' We should convert to a real module system
-            For now, this tells us whether we use this as an xmodule, a CAPA response type
-            or a CAPA input type '''
-        return ['xmodule']
+    # The default implementation of get_icon_class returns the icon_class attribute of the class
+    # This attribute can be overridden by subclasses, and the function can also be overridden
+    # if the icon class depends on the data in the module
+    icon_class = 'other'
+
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        '''
+        Construct a new xmodule
+
+        system: An I4xSystem allowing access to external resources
+        location: Something Location-like that identifies this xmodule
+        definition: A dictionary containing 'data' and 'children'. Both are optional
+            'data': is JSON-like (string, dictionary, list, bool, or None, optionally nested).
+                This defines all of the data necessary for a problem to display that is intrinsic to the problem.
+                It should not include any data that would vary between two courses using the same problem
+                (due dates, grading policy, randomization, etc.)
+            'children': is a list of Location-like values for child modules that this module depends on
+        instance_state: A string of serialized json that contains the state of this module for
+            current student accessing the system, or None if no state has been saved
+        shared_state: A string of serialized json that contains the state that is shared between
+            this module and any modules of the same type with the same shared_state_key. This
+            state is only shared per-student, not across different students
+        kwargs: Optional arguments. Subclasses should always accept kwargs and pass them
+            to the parent class constructor.
+            Current known uses of kwargs:
+                metadata: A dictionary containing data that specifies information that is particular
+                    to a problem in the context of a course
+        '''
+        self.system = system
+        self.location = Location(location)
+        self.definition = definition
+        self.instance_state = instance_state
+        self.shared_state = shared_state
+        self.id = self.location.url()
+        self.name = self.location.name
+        self.category = self.location.category
+        self.metadata = kwargs.get('metadata', {})
+        self._loaded_children = None
 
     def get_name(self):
         name = self.__xmltree.get('name')
-        if name: 
+        if name:
             return name
-        else: 
+        else:
             raise "We should iterate through children and find a default name"
 
     def get_children(self):
         '''
         Return module instances for all the children of this module.
         '''
-        children = [self.module_from_xml(e) for e in self.__xmltree]
-        return children            
+        if self._loaded_children is None:
+            self._loaded_children = [self.system.get_module(child) for child in self.definition.get('children', [])]
+        return self._loaded_children
 
-    def rendered_children(self):
+    def get_display_items(self):
         '''
-        Render all children. 
-        This really ought to return a list of xmodules, instead of dictionaries
+        Returns a list of descendent module instances that will display immediately
+        inside this module
         '''
-        children = [self.render_function(e) for e in self.__xmltree]
-        return children            
+        items = []
+        for child in self.get_children():
+            items.extend(child.displayable_items())
 
-    def __init__(self, system = None, xml = None, item_id = None, 
-                 json = None, track_url=None, state=None):
-        ''' In most cases, you must pass state or xml'''
-        if not item_id: 
-            raise ValueError("Missing Index")
-        if not xml and not json:
-            raise ValueError("xml or json required")
-        if not system:
-            raise ValueError("System context required")
+        return items
 
-        self.xml = xml
-        self.json = json
-        self.item_id = item_id
-        self.state = state
-        self.DEBUG = False
-        
-        self.__xmltree = etree.fromstring(xml) # PRIVATE
+    def displayable_items(self):
+        '''
+        Returns list of displayable modules contained by this module. If this module
+        is visible, should return [self]
+        '''
+        return [self]
 
-        if system: 
-            ## These are temporary; we really should go 
-            ## through self.system. 
-            self.ajax_url = system.ajax_url
-            self.tracker = system.track_function
-            self.filestore = system.filestore
-            self.render_function = system.render_function
-            self.module_from_xml = system.module_from_xml
-            self.DEBUG = system.DEBUG
-        self.system = system
+    def get_icon_class(self):
+        '''
+        Return a css class identifying this module in the context of an icon
+        '''
+        return self.icon_class
 
     ### Functions used in the LMS
 
-    def get_state(self):
-        ''' State of the object, as stored in the database 
+    def get_instance_state(self):
+        ''' State of the object, as stored in the database
         '''
-        return ""
+        return '{}'
+
+    def get_shared_state(self):
+        '''
+        Get state that should be shared with other instances
+        using the same 'shared_state_key' attribute.
+        '''
+        return '{}'
 
     def get_score(self):
-        ''' Score the student received on the problem. 
+        ''' Score the student received on the problem.
         '''
         return None
 
@@ -149,7 +171,7 @@ class XModule(object):
     def get_html(self):
         ''' HTML, as shown in the browser. This is the only method that must be implemented
         '''
-        return "Unimplemented"
+        raise NotImplementedError("get_html must be defined for all XModules that appear on the screen. Not defined in %s" % self.__class__.__name__)
 
     def get_progress(self):
         ''' Return a progress.Progress object that represents how far the student has gone
@@ -180,6 +202,49 @@ class XModuleDescriptor(Plugin):
     js = {}
     js_module = None
 
+    # A list of metadata that this module can inherit from its parent module
+    inheritable_metadata = ('graded', 'due', 'graceperiod', 'showanswer', 'rerandomize')
+
+    def __init__(self,
+                 system,
+                 definition=None,
+                 **kwargs):
+        """
+        Construct a new XModuleDescriptor. The only required arguments are the
+        system, used for interaction with external resources, and the definition,
+        which specifies all the data needed to edit and display the problem (but none
+        of the associated metadata that handles recordkeeping around the problem).
+
+        This allows for maximal flexibility to add to the interface while preserving
+        backwards compatibility.
+
+        system: An XModuleSystem for interacting with external resources
+        definition: A dict containing `data` and `children` representing the problem definition
+
+        Current arguments passed in kwargs:
+            location: A keystore.Location object indicating the name and ownership of this problem
+            shared_state_key: The key to use for sharing StudentModules with other
+                modules of this type
+            metadata: A dictionary containing the following optional keys:
+                goals: A list of strings of learning goals associated with this module
+                display_name: The name to use for displaying this module to the user
+                format: The format of this module ('Homework', 'Lab', etc)
+                graded (bool): Whether this module is should be graded or not
+                due (string): The due date for this module
+                graceperiod (string): The amount of grace period to allow when enforcing the due date
+                showanswer (string): When to show answers for this module
+                rerandomize (string): When to generate a newly randomized instance of the module data
+        """
+        self.system = system
+        self.definition = definition if definition is not None else {}
+        self.name = Location(kwargs.get('location')).name
+        self.category = Location(kwargs.get('location')).category
+        self.location = Location(kwargs.get('location'))
+        self.metadata = kwargs.get('metadata', {})
+        self.shared_state_key = kwargs.get('shared_state_key')
+
+        self._child_instances = None
+
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
         """
@@ -201,13 +266,18 @@ class XModuleDescriptor(Plugin):
         Creates an instance of this descriptor from the supplied json_data.
         This may be overridden by subclasses
 
-        json_data: Json data specifying the data, children, and metadata for the descriptor
+        json_data: A json object specifying the definition and any optional keyword arguments for
+            the XModuleDescriptor
         system: An XModuleSystem for interacting with external resources
         """
         return cls(system=system, **json_data)
 
     @staticmethod
-    def load_from_xml(xml_data, system, org=None, course=None, default_class=None):
+    def load_from_xml(xml_data,
+            system,
+            org=None,
+            course=None,
+            default_class=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of xml_data.
@@ -256,43 +326,27 @@ class XModuleDescriptor(Plugin):
         """
         return self.js_module
 
-    def __init__(self,
-                 system,
-                 definition=None,
-                 **kwargs):
+
+    def inherit_metadata(self, metadata):
         """
-        Construct a new XModuleDescriptor. The only required arguments are the
-        system, used for interaction with external resources, and the definition,
-        which specifies all the data needed to edit and display the problem (but none
-        of the associated metadata that handles recordkeeping around the problem).
-
-        This allows for maximal flexibility to add to the interface while preserving
-        backwards compatibility.
-
-        system: An XModuleSystem for interacting with external resources
-        definition: A dict containing `data` and `children` representing the problem definition
-
-        Current arguments passed in kwargs:
-            location: A keystore.Location object indicating the name and ownership of this problem
-            goals: A list of strings of learning goals associated with this module
+        Updates this module with metadata inherited from a containing module.
+        Only metadata specified in self.inheritable_metadata will
+        be inherited
         """
-        self.system = system
-        self.definition = definition if definition is not None else {}
-        self.name = Location(kwargs.get('location')).name
-        self.type = Location(kwargs.get('location')).category
-        self.url = Location(kwargs.get('location')).url()
-
-        # For now, we represent goals as a list of strings, but this
-        # is one of the things that we are going to be iterating on heavily
-        # to find the best teaching method
-        self.goals = kwargs.get('goals', [])
-
-        self._child_instances = None
+        # Set all inheritable metadata from kwargs that are
+        # in self.inheritable_metadata and aren't already set in metadata
+        for attr in self.inheritable_metadata:
+            if attr not in self.metadata and attr in metadata:
+                self.metadata[attr] = metadata[attr]
 
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of this module"""
         if self._child_instances is None:
-            self._child_instances = [self.system.load_item(child) for child in self.definition.get('children', [])]
+            self._child_instances = []
+            for child_loc in self.definition.get('children', []):
+                child = self.system.load_item(child_loc)
+                child.inherit_metadata(self.metadata)
+                self._child_instances.append(child)
 
         return self._child_instances
 
@@ -302,49 +356,36 @@ class XModuleDescriptor(Plugin):
         """
         raise NotImplementedError("get_html() must be provided by specific modules")
 
-    def get_xml(self):
-        ''' For conversions between JSON and legacy XML representations.
-        '''
-        if self.xml:
-            return self.xml
-        else:
-            raise NotImplementedError("JSON->XML Translation not implemented")
-
-    def get_json(self):
-        ''' For conversions between JSON and legacy XML representations.
-        '''
-        if self.json:
-            raise NotImplementedError
-            return self.json  # TODO: Return context as well -- files, etc.
-        else:
-            raise NotImplementedError("XML->JSON Translation not implemented")
-
-    #def handle_cms_json(self):
-    #    raise NotImplementedError
-
-    #def render(self, size):
-    #    ''' Size: [thumbnail, small, full] 
-    #    Small ==> what we drag around
-    #    Full ==> what we edit
-    #    '''
-    #    raise NotImplementedError
+    def xmodule_constructor(self, system):
+        """
+        Returns a constructor for an XModule. This constructor takes two arguments:
+        instance_state and shared_state, and returns a fully nstantiated XModule
+        """
+        return partial(
+            self.module_class,
+            system,
+            self.location,
+            self.definition,
+            metadata=self.metadata
+        )
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item):
+    def __init__(self, load_item, resources_fs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
+        resources_fs: A Filesystem object that contains all of the
+            resources needed for the course
         """
 
         self.load_item = load_item
+        self.resources_fs = resources_fs
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, process_xml, fs):
+    def __init__(self, load_item, resources_fs, process_xml):
         """
         process_xml: Takes an xml string, and returns the the XModuleDescriptor created from that xml
-        fs: A Filesystem object that contains all of the xml resources needed to parse
-            the course
         """
+        DescriptorSystem.__init__(self, load_item, resources_fs)
         self.process_xml = process_xml
-        self.fs = fs

@@ -1,4 +1,4 @@
-<div id="sequence_${id}" class="sequence">
+<div id="sequence_${element_id}" class="sequence">
   <nav aria-label="Section Navigation" class="sequence-nav">
     <ol id="sequence-list">
     </ol>
@@ -22,7 +22,7 @@
 <%block name="js_extra">
 <script type="text/javascript">
   $(function(){
-      new Sequence('${id}', ${items}, '${tag}', ${position});
+    new Sequence('${item_id}', '${element_id}', ${items}, '${tag}', ${position});
   });
 </script>
 </%block>

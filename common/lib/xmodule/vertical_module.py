@@ -1,24 +1,23 @@
-import json
-
-from x_module import XModule, XModuleDescriptor
+from xmodule.x_module import XModule
+from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
-from lxml import etree
 
-class ModuleDescriptor(XModuleDescriptor):
-    pass
+# HACK: This shouldn't be hard-coded to two types
+# OBSOLETE: This obsoletes 'type'
+class_priority = ['video', 'problem']
 
-class Module(XModule):
+
+class VerticalModule(XModule):
     ''' Layout module for laying out submodules vertically.'''
-    id_attribute = 'id'
 
-    def get_state(self):
-        return json.dumps({ })
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+        self.contents = None
 
-    @classmethod
-    def get_xml_tags(c):
-        return ["vertical", "problemset"]
-        
     def get_html(self):
+        if self.contents is None:
+            self.contents = [child.get_html() for child in self.get_display_items()]
+
         return self.system.render_template('vert_module.html', {
             'items': self.contents
         })
@@ -30,8 +29,14 @@ class Module(XModule):
         progress = reduce(Progress.add_counts, progresses)
         return progress
 
-    def __init__(self, system, xml, item_id, state=None):
-        XModule.__init__(self, system, xml, item_id, state)
-        xmltree=etree.fromstring(xml)
-        self.contents=[(e.get("name"),self.render_function(e)) \
-                      for e in xmltree]
+    def get_icon_class(self):
+        child_classes = set(child.get_icon_class() for child in self.get_children())
+        new_class = 'other'
+        for c in class_priority:
+            if c in child_classes:
+                new_class = c
+        return new_class
+
+
+class VerticalDescriptor(SequenceDescriptor):
+    module_class = VerticalModule

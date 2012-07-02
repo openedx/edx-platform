@@ -156,7 +156,7 @@ $(function() {
               
               <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">
                 ${ section['section'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
-              ${section['subtitle']}
+              ${section['format']}
               %if 'due' in section and section['due']!="":
                 due ${section['due']}
               %endif

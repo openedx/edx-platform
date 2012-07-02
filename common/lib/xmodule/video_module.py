@@ -3,17 +3,27 @@ import logging
 
 from lxml import etree
 
-from x_module import XModule, XModuleDescriptor
-from progress import Progress
+from xmodule.x_module import XModule
+from xmodule.raw_module import RawDescriptor
 
-log = logging.getLogger("mitx.courseware.modules")
+log = logging.getLogger(__name__)
 
-class ModuleDescriptor(XModuleDescriptor):
-    pass
 
-class Module(XModule):
-    id_attribute = 'youtube'
+class VideoModule(XModule):
     video_time = 0
+    icon_class = 'video'
+
+    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+        xmltree = etree.fromstring(self.definition['data'])
+        self.youtube = xmltree.get('youtube')
+        self.name = xmltree.get('name')
+        self.position = 0
+
+        if instance_state is not None:
+            state = json.loads(instance_state)
+            if 'position' in state:
+                self.position = int(float(state['position']))
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -39,14 +49,9 @@ class Module(XModule):
         '''
         return None
 
-    def get_state(self):
+    def get_instance_state(self):
         log.debug(u"STATE POSITION {0}".format(self.position))
-        return json.dumps({ 'position': self.position })
-
-    @classmethod
-    def get_xml_tags(c):
-        '''Tags in the courseware file guaranteed to correspond to the module'''
-        return ["video"]
+        return json.dumps({'position': self.position})
 
     def video_list(self):
         return self.youtube
@@ -54,27 +59,11 @@ class Module(XModule):
     def get_html(self):
         return self.system.render_template('video.html', {
             'streams': self.video_list(),
-            'id': self.item_id,
+            'id': self.location.html_id(),
             'position': self.position,
             'name': self.name,
-            'annotations': self.annotations,
         })
 
-    def __init__(self, system, xml, item_id, state=None):
-        XModule.__init__(self, system, xml, item_id, state)
-        xmltree = etree.fromstring(xml)
-        self.youtube = xmltree.get('youtube')
-        self.name = xmltree.get('name')
-        self.position = 0
 
-        if state is not None:
-            state = json.loads(state)
-            if 'position' in state:
-                self.position = int(float(state['position']))
-
-        self.annotations=[(e.get("name"),self.render_function(e)) \
-                      for e in xmltree]
-
-
-class VideoSegmentDescriptor(XModuleDescriptor):
-    pass
+class VideoDescriptor(RawDescriptor):
+    module_class = VideoModule
