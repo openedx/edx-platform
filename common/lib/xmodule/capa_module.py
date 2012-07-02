@@ -112,16 +112,6 @@ class CapaModule(XModule):
         if self.show_answer == "":
             self.show_answer = "closed"
 
-        self.rerandomize = self.metadata.get('rerandomize', 'always')
-        if self.rerandomize == "" or self.rerandomize == "always" or self.rerandomize == "true":
-            self.rerandomize = "always"
-        elif self.rerandomize == "false" or self.rerandomize == "per_student":
-            self.rerandomize = "per_student"
-        elif self.rerandomize == "never":
-            self.rerandomize = "never"
-        else:
-            raise Exception("Invalid rerandomize attribute " + self.rerandomize)
-
         if instance_state != None:
             instance_state = json.loads(instance_state)
         if instance_state != None and 'attempts' in instance_state:
@@ -167,6 +157,21 @@ class CapaModule(XModule):
                 self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
             else:
                 raise
+
+    @property
+    def rerandomize(self):
+        """
+        Property accessor that returns self.metadata['rerandomize'] in a canonical form
+        """
+        rerandomize = self.metadata.get('rerandomize', 'always')
+        if rerandomize in ("", "always", "true"):
+            return "always"
+        elif rerandomize in ("false", "per_student"):
+            return "per_student"
+        elif rerandomize == "never":
+            return "never"
+        else:
+            raise Exception("Invalid rerandomize attribute " + rerandomize)
 
     def get_instance_state(self):
         state = self.lcp.get_state()
@@ -221,7 +226,7 @@ class CapaModule(XModule):
 
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions.
-        if self.lcp.done and self.metadata['rerandomize'] == "always":
+        if self.lcp.done and self.rerandomize == "always":
             check_button = False
             save_button = False
 
