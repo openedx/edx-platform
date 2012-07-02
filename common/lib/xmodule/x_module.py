@@ -263,7 +263,8 @@ class XModuleDescriptor(Plugin):
         Creates an instance of this descriptor from the supplied json_data.
         This may be overridden by subclasses
 
-        json_data: Json data specifying the data, children, and metadata for the descriptor
+        json_data: A json object specifying the definition and any optional keyword arguments for
+            the XModuleDescriptor
         system: An XModuleSystem for interacting with external resources
         """
         return cls(system=system, **json_data)
