@@ -114,6 +114,14 @@ COURSE_SETTINGS =  {'6.002_Fall_2012': {'number' : '6.002x',
                                     'default_chapter' : 'Week_0',
                                     'default_section' : 'Problem_Set_0',
                                     },
+                    '7.00x_Fall_2012': {'number' : '7.00x',
+                                    'title'  : 'Introduction to Biology',
+                                    'xmlpath': '/7.00x/',
+                                    'github_url': 'https://github.com/MITx/7.00x',
+                                    'active' : True,
+                                    'default_chapter' : 'Unit 1',
+                                    'default_section' : 'Introduction',
+                                    },
                     }
 
 #-----------------------------------------------------------------------------
