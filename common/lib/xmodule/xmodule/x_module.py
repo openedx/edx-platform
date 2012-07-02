@@ -422,7 +422,7 @@ class XModuleDescriptor(Plugin):
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item, resources_fs):
+    def __init__(self, load_item, resources_fs, **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
         resources_fs: A Filesystem object that contains all of the
@@ -434,7 +434,7 @@ class DescriptorSystem(object):
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, process_xml):
+    def __init__(self, load_item, resources_fs, process_xml, **kwargs):
         """
         process_xml: Takes an xml string, and returns the the XModuleDescriptor created from that xml
         """
