@@ -146,9 +146,9 @@ def get_score(user, problem, cache):
     correct = 0.0
 
     # If the ID is not in the cache, add the item
-    instance_module = cache.lookup(problem.type, problem.id)
+    instance_module = cache.lookup(problem.category, problem.id)
     if instance_module is None:
-        instance_module = StudentModule(module_type=problem.type,
+        instance_module = StudentModule(module_type=problem.category,
                                         module_state_key=problem.id,
                                         student=user,
                                         state=None,

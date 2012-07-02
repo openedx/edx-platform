@@ -22,7 +22,7 @@ def edit_item(request):
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'js_module': item.js_module_name(),
-        'type': item.type,
+        'category': item.category,
         'name': item.name,
     })
 

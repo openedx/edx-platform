@@ -207,10 +207,10 @@ def get_module(user, request, location, student_module_cache, position=None):
     '''
     descriptor = keystore().get_item(location)
 
-    instance_module = student_module_cache.lookup(descriptor.type, descriptor.url)
+    instance_module = student_module_cache.lookup(descriptor.category, descriptor.url)
     shared_state_key = getattr(descriptor, 'shared_state_key', None)
     if shared_state_key is not None:
-        shared_module = student_module_cache.lookup(descriptor.type, shared_state_key)
+        shared_module = student_module_cache.lookup(descriptor.category, shared_state_key)
     else:
         shared_module = None
 
@@ -246,7 +246,7 @@ def get_module(user, request, location, student_module_cache, position=None):
         if not instance_module:
             instance_module = StudentModule(
                 student=user,
-                module_type=descriptor.type,
+                module_type=descriptor.category,
                 module_state_key=module.id,
                 state=module.get_instance_state(),
                 max_grade=module.max_score())
@@ -257,13 +257,13 @@ def get_module(user, request, location, student_module_cache, position=None):
         if not shared_module and shared_state_key is not None:
             shared_module = StudentModule(
                 student=user,
-                module_type=descriptor.type,
+                module_type=descriptor.category,
                 module_state_key=shared_state_key,
                 state=module.get_shared_state())
             shared_module.save()
             student_module_cache.append(shared_module)
 
-    return (module, instance_module, shared_module, descriptor.type)
+    return (module, instance_module, shared_module, descriptor.category)
 
 
 def add_histogram(module):

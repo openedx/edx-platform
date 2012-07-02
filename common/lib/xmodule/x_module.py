@@ -95,7 +95,7 @@ class XModule(object):
         self.shared_state = shared_state
         self.id = self.location.url()
         self.name = self.location.name
-        self.type = self.location.category
+        self.category = self.location.category
         self.metadata = kwargs.get('metadata', {})
         self._loaded_children = None
 
@@ -235,7 +235,7 @@ class XModuleDescriptor(Plugin):
         self.system = system
         self.definition = definition if definition is not None else {}
         self.name = Location(kwargs.get('location')).name
-        self.type = Location(kwargs.get('location')).category
+        self.category = Location(kwargs.get('location')).category
         self.url = Location(kwargs.get('location')).url()
         self.metadata = kwargs.get('metadata', {})
         self.shared_state_key = kwargs.get('shared_state_key')
