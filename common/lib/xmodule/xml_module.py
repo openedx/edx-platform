@@ -138,8 +138,8 @@ class XmlDescriptor(XModuleDescriptor):
         # Put content in a separate file if it's large (has more than 5 descendent tags)
         if len(list(xml_object.iter())) > 5:
 
-            filepath = self.__class__._format_filepath(self.type, self.name)
-            resource_fs.makedir(self.type, allow_recreate=True)
+            filepath = self.__class__._format_filepath(self.category, self.name)
+            resource_fs.makedir(self.category, allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True))
 
@@ -149,7 +149,7 @@ class XmlDescriptor(XModuleDescriptor):
             xml_object.set('filename', self.name)
 
         xml_object.set('slug', self.name)
-        xml_object.tag = self.type
+        xml_object.tag = self.category
 
         for attr in ('format', 'graceperiod', 'showanswer', 'rerandomize', 'due'):
             if attr in self.metadata and attr not in self._inherited_metadata:
