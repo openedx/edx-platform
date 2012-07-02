@@ -3,6 +3,7 @@ from lxml import etree
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
 
+
 class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
     """
     Module that provides a raw editing view of it's data and children

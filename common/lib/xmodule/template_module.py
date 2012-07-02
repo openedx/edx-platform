@@ -37,5 +37,6 @@ class CustomTagModule(XModule):
     def get_html(self):
         return self.html
 
+
 class CustomTagDescriptor(RawDescriptor):
     module_class = CustomTagModule

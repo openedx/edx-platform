@@ -213,6 +213,10 @@ class XModuleDescriptor(Plugin):
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = ('graded', 'due', 'graceperiod', 'showanswer', 'rerandomize')
 
+    # A list of descriptor attributes that must be equal for the discriptors to be
+    # equal
+    equality_attributes = ('definition', 'metadata', 'location', 'shared_state_key', '_inherited_metadata')
+
     # ============================= STRUCTURAL MANIPULATION ===========================
     def __init__(self,
                  system,
@@ -394,6 +398,27 @@ class XModuleDescriptor(Plugin):
         Return the html used to edit this module
         """
         raise NotImplementedError("get_html() must be provided by specific modules")
+
+    # =============================== BUILTIN METHODS ===========================
+    def __eq__(self, other):
+        eq = (self.__class__ == other.__class__ and
+                all(getattr(self, attr, None) == getattr(other, attr, None)
+                    for attr in self.equality_attributes))
+
+        if not eq:
+            for attr in self.equality_attributes:
+                print getattr(self, attr, None), getattr(other, attr, None), getattr(self, attr, None) == getattr(other, attr, None)
+
+        return eq
+
+    def __repr__(self):
+        return "{class_}({system!r}, {definition!r}, location={location!r}, metadata={metadata!r})".format(
+            class_=self.__class__.__name__,
+            system=self.system,
+            definition=self.definition,
+            location=self.location,
+            metadata=self.metadata
+        )
 
 
 class DescriptorSystem(object):
