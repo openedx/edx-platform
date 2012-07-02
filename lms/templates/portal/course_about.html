@@ -1,4 +1,5 @@
-<%namespace name='static' file='static_content.html'/>
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='../static_content.html'/>
 <%block name="js_extra">
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
