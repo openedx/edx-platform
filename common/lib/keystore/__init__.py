@@ -131,7 +131,8 @@ class Location(_LocationBase):
         return self.url()
 
     def __repr__(self):
-        return "Location%r" % tuple(self)
+        return "Location%s" % repr(tuple(self))
+
 
 class ModuleStore(object):
     """
