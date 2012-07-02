@@ -101,6 +101,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 
         definition['data']['group_portions'][DEFAULT] = default_portion
+        definition['children'].sort()
 
         return definition
 
