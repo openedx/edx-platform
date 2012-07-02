@@ -201,7 +201,7 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt',d)
 
     try:
-        if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL',''):
+        if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
             dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
             message = "Activation for %s (%s): %s\n" % (u,u.email,up.name) + '-'*80 + '\n\n' + message
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
