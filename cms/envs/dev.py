@@ -6,9 +6,9 @@ from .common import *
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-KEYSTORE = {
+MODULESTORE = {
     'default': {
-        'ENGINE': 'keystore.mongo.MongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
         'OPTIONS': {
             'default_class': 'xmodule.raw_module.RawDescriptor',
             'host': 'localhost',

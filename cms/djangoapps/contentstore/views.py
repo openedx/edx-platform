@@ -1,5 +1,5 @@
 from mitxmako.shortcuts import render_to_response
-from keystore.django import keystore
+from xmodule.modulestore.django import modulestore
 from django_future.csrf import ensure_csrf_cookie
 from django.http import HttpResponse
 import json
@@ -12,14 +12,14 @@ def index(request):
     org = 'mit.edu'
     course = '6002xs12'
     name = '6.002_Spring_2012'
-    course = keystore().get_item(['i4x', org, course, 'course', name])
+    course = modulestore().get_item(['i4x', org, course, 'course', name])
     weeks = course.get_children()
     return render_to_response('index.html', {'weeks': weeks})
 
 
 def edit_item(request):
     item_id = request.GET['id']
-    item = keystore().get_item(item_id)
+    item = modulestore().get_item(item_id)
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'js_module': item.js_module_name(),
@@ -31,7 +31,7 @@ def edit_item(request):
 def save_item(request):
     item_id = request.POST['id']
     data = json.loads(request.POST['data'])
-    keystore().update_item(item_id, data)
+    modulestore().update_item(item_id, data)
     return HttpResponse(json.dumps({}))
 
 
@@ -39,7 +39,7 @@ def temp_force_export(request):
     org = 'mit.edu'
     course = '6002xs12'
     name = '6.002_Spring_2012'
-    course = keystore().get_item(['i4x', org, course, 'course', name])
+    course = modulestore().get_item(['i4x', org, course, 'course', name])
     fs = OSFS('../data-export-test')
     xml = course.export_to_xml(fs)
     with fs.open('course.xml', 'w') as course_xml:
