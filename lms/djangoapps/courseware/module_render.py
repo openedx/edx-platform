@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 
 from django.conf import settings
 from django.http import Http404
@@ -103,7 +104,7 @@ def grade_histogram(module_id):
     return grades
 
 
-def make_module_from_xml_fn(user, request, student_module_cache, position):
+def make_module_from_xml_fn(user, request, student_module_cache, course, position):
     '''Create the make_from_xml() function'''
     def module_from_xml(xml):
         '''Modules need a way to convert xml to instance objects.

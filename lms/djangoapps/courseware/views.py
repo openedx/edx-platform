@@ -165,7 +165,6 @@ def get_course(request, course):
             course = settings.COURSE_DEFAULT
     return course
 
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course=None, chapter=None, section=None,
