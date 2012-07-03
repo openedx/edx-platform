@@ -6,4 +6,4 @@ class @HTML
             @preview.empty().append(@edit_box.val())
         )
 
-    save: -> {text: @edit_box.val()}
+    save: -> @edit_box.val()
