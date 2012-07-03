@@ -65,10 +65,8 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaModule(XModule):
-    ''' Interface between capa_problem and x_module. Originally a hack
-    meant to be refactored out, but it seems to be serving a useful
-    prupose now. We can e.g .destroy and create the capa_problem on a
-    reset.
+    '''
+    An XModule implementing LonCapa format problems, implemented by way of capa.capa_problem.LoncapaProblem
     '''
     icon_class = 'problem'
 
