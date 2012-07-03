@@ -16,8 +16,8 @@ MODULESTORE = {
         'OPTIONS': {
             'default_class': 'xmodule.raw_module.RawDescriptor',
             'host': 'localhost',
-            'db': 'mongo_base',
-            'collection': 'key_store',
+            'db': 'xmodule',
+            'collection': 'modulestore',
         }
     }
 }
