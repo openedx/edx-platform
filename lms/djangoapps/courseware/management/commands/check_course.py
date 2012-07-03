@@ -10,7 +10,7 @@ import xmodule
 
 import mitxmako.middleware as middleware
 middleware.MakoMiddleware()
-from keystore.django import keystore
+from xmodule.modulestore.django import modulestore
 from courseware.models import StudentModuleCache
 from courseware.module_render import get_module
 
@@ -78,7 +78,7 @@ class Command(BaseCommand):
 
         # TODO (cpennington): Get coursename in a legitimate way
         course_location = 'i4x://edx/6002xs12/course/6.002_Spring_2012'
-        student_module_cache = StudentModuleCache(sample_user, keystore().get_item(course_location))
+        student_module_cache = StudentModuleCache(sample_user, modulestore().get_item(course_location))
         (course, _, _, _) = get_module(sample_user, None, course_location, student_module_cache)
 
         to_run = [
