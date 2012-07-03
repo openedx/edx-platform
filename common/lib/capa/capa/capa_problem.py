@@ -265,7 +265,7 @@ class LoncapaProblem(object):
                 parent = inc.getparent()			# insert  new XML into tree in place of inlcude
                 parent.insert(parent.index(inc),incxml)
                 parent.remove(inc)
-                log.debug('Included %s into %s' % (file, self.id))
+                log.debug('Included %s into %s' % (file, self.problem_id))
 
     def _extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
         '''
