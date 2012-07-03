@@ -1,10 +1,12 @@
-from mitxmako.shortcuts import render_to_response
-from xmodule.modulestore.django import modulestore
-from django_future.csrf import ensure_csrf_cookie
-from django.http import HttpResponse
 import json
 
+from django.http import HttpResponse
+from django_future.csrf import ensure_csrf_cookie
 from fs.osfs import OSFS
+
+from mitxmako.shortcuts import render_to_response
+from xmodule.modulestore.django import modulestore
+
 
 @ensure_csrf_cookie
 def index(request):
