@@ -1,0 +1,157 @@
+.jobs {
+  margin: 60px auto 120px;
+
+  h1 + hr {
+    margin-bottom: 80px;
+  }
+
+  .message {
+    @include clearfix;
+    margin-bottom: 60px;
+    padding-bottom: 60px;
+    position: relative;
+
+    hr {
+      bottom: 0px;
+      margin: 0px;
+      position: absolute;
+      width: 100%;
+    }
+
+    .photo {
+      background: rgb(255,255,255);
+      border: 1px solid rgb(210,210,210);
+      padding: 1px;
+      width: flex-grid(4);
+
+      img {
+        background: rgb(245,245,245);
+        display: block;
+        height: 200px;
+        width: 100%;
+      }
+    }
+
+    &.left {
+      .photo {
+        float: left;
+        margin-right: flex-gutter();
+      }
+    }
+
+    &.right {
+      h2, p {
+        text-align: right;
+      }
+
+      .photo {
+        float: right;
+        margin-left: flex-gutter();
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0px;
+    }
+  }
+
+  .jobs-wrapper {
+    @include clearfix;
+    float: left;
+    width: flex-grid(12);
+
+    > h2 {
+      border-bottom: 1px solid rgb(220,220,220);
+      margin-bottom: 60px;
+      padding-bottom: 20px;
+      //text-align: center;
+    }
+
+    .jobs-sidebar {
+      @include box-sizing(border-box);
+      border-left: 1px solid rgb(220,220,220);
+      float: left;
+      padding-bottom: 20px;
+      padding-left: 20px;
+      width: flex-grid(3);
+
+      nav {
+        margin-bottom: 40px;
+
+        ol {
+          @include clearfix;
+
+          li {
+            float: left;
+            margin-right: flex-gutter();
+            width: flex-grid(12);
+
+            &:nth-child(4n) {
+              margin-right: 0px;
+            }
+
+            a {
+              display: block;
+              margin-left: -20px;
+              padding: 10px 0px 10px 20px;
+              position: relative;
+              text-transform: uppercase;
+
+              &::after {
+                @include background-image(linear-gradient(180deg, rgba(235,235,235, 0) 0%,
+                                                                  rgba(235,235,235, 1)));
+                bottom: 0px;
+                //content: "";
+                display: block;
+                height: 1px;
+                left: 0px;
+                position: absolute;
+                width: 100%;
+              }
+
+              &:hover {
+                background: rgb(245,245,245);
+                //@include background-image(linear-gradient(180deg, rgba(245,245,245, 0) 0%,
+                                                                  //rgba(245,245,245, 1) 80%,
+                                                                  //rgba(245,245,245, 1) 100%));
+              }
+            }
+          }
+        }
+      }
+
+      p + h2 {
+        margin-top: 40px;
+      }
+    }
+
+    .jobs-listing {
+      float: left;
+      margin-right: flex-gutter();
+      width: flex-grid(9);
+
+      .job {
+        border-bottom: 1px solid rgb(220,220,220);
+        padding: 40px 0px;
+
+        &:first-child {
+          padding-top: 0px;
+        }
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0px;
+        }
+
+        .inner-wrapper {
+        }
+
+        h3 {
+          font-family: $sans-serif;
+          font-weight: bold;
+          margin-bottom: 15px;
+        }
+      }
+    }
+  }
+}

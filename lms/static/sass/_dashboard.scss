@@ -3,9 +3,10 @@
   margin: 40px 10px;
 
   .sidebar {
-    background: rgb(240,240,240);
-    margin-right: flex-gutter();
-    position: absolute;
+    background: rgb(250,250,250);
+    border: 1px solid rgb(220,220,220);
+    @include border-radius(4px);
+    float: left;
     width: 250px;
 
     @media screen and (max-width: 768px) {
@@ -108,7 +109,6 @@
   }
 
   .my-courses {
-    @include box-sizing(border-box);
     margin: 0px;
     padding-left: 270px;
 
@@ -121,45 +121,31 @@
       width: flex-grid(12);
     }
 
-    nav.course-toggle {
-      background: rgb(230,230,230);
-      margin-bottom: 30px;
-      position: relative;
+    .empty-dashboard-message {
+      background: rgb(250,250,250);
+      border: 1px solid rgb(210,210,210);
+      @include border-radius(4px);
+      padding: 40px 0px;
+      text-align: center;
 
-      ol.filters {
-        @include clearfix;
+      p {
+        color: $lighter-base-font-color;
+        font-style: italic;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
 
-        li {
-          border-right: 1px solid rgb(200,200,200);
+        a {
+          background: rgb(240,240,240);
+          @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
+          border: 1px solid rgb(220,220,220);
+          @include border-radius(4px);
+          @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
           @include box-sizing(border-box);
-          list-style: none;
-          float: left;
-          padding: 15px 10px;
-          width: 25%;
-          text-align: center;
-
-          &:last-child {
-            border: none;
-          }
-
-          &:hover {
-            background: rgb(220,220,220);
-            cursor: pointer;
-          }
-
-          &.selected {
-            background: rgb(220,220,220);
-          }
-
-          h2 {
-            font: normal 1rem/1.2rem $sans-serif;
-            text-transform: none;
-          }
-
-          span.count {
-            margin: 5px 0 0 0;
-            display: block;
-          }
+          color: $base-font-color;
+          font: 300 1.2rem/1.6rem $sans-serif;
+          @include inline-block;
+          margin-left: 5px;
+          padding: 5px 10px;
+          text-shadow: 0 1px rgba(255,255,255, 0.6);
         }
       }
     }
@@ -273,7 +259,8 @@
           }
 
           h2 {
-            font: bold 1.2rem/1.6rem $sans-serif;
+            color: $base-font-color;
+            font: bold 1.4rem/1.6rem $sans-serif;
             margin-bottom: 2px;
             overflow: hidden;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
@@ -282,9 +269,9 @@
             white-space: nowrap;
           }
 
-          p {
-            color: $base-font-color;
-            font: normal 1rem/1.6rem $sans-serif;
+          h3 {
+            color: $lighter-base-font-color;
+            font: italic bold 1.2rem/1.6rem $sans-serif;
             overflow: hidden;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
             text-overflow: ellipsis;

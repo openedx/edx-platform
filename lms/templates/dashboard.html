@@ -33,22 +33,9 @@
     </section>
 
     <section class="my-courses">
-      <nav class="course-toggle">
-        <ol class="filters">
-          <li class="selected">
-            <h2>All <span class="count">3</span></h2>
-          </li>
-          <li>
-            <h2>Current <span class="count">3</span></h2>
-          </li>
-          <li>
-            <h2>Upcoming <span class="count">0</span></h2>
-          </li>
-          <li>
-            <h2>Completed <span class="count">0</span></h2>
-          </li>
-        </ol>
-      </nav>
+      <header>
+        <h2>My Current Courses</h2>
+      </header>
 
       % if len(courses) > 0:
         % for course in courses:
@@ -57,13 +44,13 @@
               <div class="cover">
                 <div class="shade"></div>
                 <div class="arrow"></div>
-                <img src="${static.url('images/history.png')}" />
+                <img src="${static.url('images/circuits.jpeg')}" />
               </div>
               <section class="info">
                 <hgroup>
                   <h2>${course.title}</h2>
                   % for instructor in course.instructors:
-                    <p>${instructor}, ${course.institution}</p>
+                    <h3>${course.institution}</h3>
                   % endfor
                 </hgroup>
                 <div class="edit">options</div>
@@ -85,11 +72,9 @@
           </article>
         % endfor
       % else:
-        <div class="find-courses-wrapper">
-          <section class="find-courses">
-            <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
-          </section>
-        </div>
+        <section class="empty-dashboard-message">
+          <p>Looks like you aren't registered for any courses. You should take a minute and <a href="${reverse('courses')}" class="find-courses">Find some courses!</a></p>
+        </section>
       % endif
 
       <article class="my-course">
