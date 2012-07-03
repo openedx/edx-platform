@@ -194,7 +194,7 @@ class CapaModule(XModule):
         as necessary based on the problem config and state.'''
 
         html = self.lcp.get_html()
-        content = {'name': self.name,
+        content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
                   }
