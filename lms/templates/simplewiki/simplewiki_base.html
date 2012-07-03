@@ -5,14 +5,11 @@
 
 <%!
   from django.core.urlresolvers import reverse
+  from simplewiki.views import wiki_article_reverse, wiki_namespace_reverse
 %>
-## A convenience function that calls reverse with the kwargs course_id, namespace, and slug
-<%def name="wiki_reverse(wiki_page, args=[], kwargs={})">
-    ${reverse(wiki_page, kwargs=dict({'course_id': course.id, 'article_path' : wiki_article.get_path()}, **kwargs), args=args) }
-</%def>
 
 <%block name="headextra">
-<script type="text/javascript" src="${static.url('js/simplewiki/bsn.AutoSuggest_c_2.0.js')}"></script>
+<script type="text/javascript" src="${static.url('js/simplewiki-AutoSuggest_c_2.0.js')}"></script>
 
   <script type="text/javascript">
     function set_related_article_id(s) {
@@ -23,7 +20,7 @@
     var x = window.onload;
     window.onload = function(){
         var options = {
-        script: "${ wiki_reverse('search_related')}/?self=${wiki_article.pk}&",
+        script: "${ wiki_article_reverse('search_related', wiki_article, course)}/?self=${wiki_article.pk}&",
         json: true,
         varname: "query",
         maxresults: 35,
@@ -83,7 +80,7 @@
       <ul class="action">
         <li>
           <h3>
-            <a href="${reverse("wiki_list_articles", args=[course.id])}">All Articles</a>
+            <a href="${wiki_namespace_reverse("wiki_list_articles", namespace, course)}">All Articles</a>
           </h3>
         </li>
 
@@ -93,32 +90,26 @@
           </h3>
 
           <div id="wiki_create_form">
-            <form method="GET" action="${reverse("wiki_create", args=[course.id])}">
-
+            <%
+              baseURL = reverse("wiki_create", kwargs={"course_id" : course.id, "article_path" : course.wiki_namespace + "/" })
+            %>
+            <form method="GET" onsubmit="this.action='${baseURL}' + this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '');">
               <div>
                 <label for="id_wiki_article_name">Title of article</label>
                 <input type="text" name="wiki_article_name" id="id_wiki_article_name" /><br/>
-                <!-- <label for="id_wiki_article_is_child">Create as a child of current article</label> -->
-                <!-- <input type="checkbox" name="wiki_article_is_child" id="id_wiki_artcile_is_child" disabled="true" ${ 'checked="checked"' if wiki_article is not UNDEFINED else ""}> -->
               </div>
-
               <ul>
-
                 <li>
                   <input type="submit" class="button" value="Create" style="display: inline-block; margin-right: 2px; font-weight: bold;" />
                 </li>
-
               </ul>
             </form>
           </div>
         </li>
 
         <li class="search">
-          <form method="POST" action='${reverse("wiki_search_articles", args=[course.id])}'>
+          <form method="GET" action='${wiki_namespace_reverse("wiki_search_articles", namespace, course)}'>
             <label class="wiki_box_title">Search</label>
-            <div style="display:none">
-              <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-            </div>
             <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 71%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
             <input type="submit" id="wiki_search_input_submit" value="Go!" style="width: 20%" />
           </form>
@@ -141,15 +132,15 @@
           <ul>
 
             <li>
-              <a href="${ wiki_reverse('wiki_view')}" class="view">View</a>
+              <a href="${ wiki_article_reverse('wiki_view', wiki_article, course)}" class="view">View</a>
             </li>
 
             <li>
-              <a href="${ wiki_reverse('wiki_edit')}" class="edit">Edit</a>
+              <a href="${ wiki_article_reverse('wiki_edit', wiki_article, course)}" class="edit">Edit</a>
             </li>
 
             <li>
-              <a href="${ wiki_reverse('wiki_history')}" class="history">History</a>
+              <a href="${ wiki_article_reverse('wiki_history', wiki_article, course)}" class="history">History</a>
             </li>
           </ul>
         </header>

@@ -3,7 +3,7 @@ var schematic_width = 640;
 
 $(function(){
   $(document).ready(function() {
-	  $("a[rel*=leanModal]").leanModal();
+	  //$("a[rel*=leanModal]").leanModal(); //TODO: Make this work with the new modal library. Try and integrate this with the "slices"
     
     $("body").append('<div id="circuit_editor" class="leanModal_box" style="z-index: 11000; left: 50%; margin-left: -250px; position: absolute; top: 100px; opacity: 1; "><div align="center">'+
       '<input class="schematic" height="' + schematic_height + '" width="' + schematic_width + '" id="schematic_editor" name="schematic" type="hidden" value=""/>' + 
@@ -88,15 +88,20 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
        return {width: schematic_width, height:schematic_height};
      },
      callback: function(node, line) {
-       update_schematics();
-       var schmInput = node.firstChild.firstChild;
-       schmInput.codeMirrorLine = line;
-       if (schmInput.schematic) { //This is undefined if there was an error making the schematic
-         schmInput.schematic.canvas.style.display = "block"; //Otherwise, it gets line height and is a weird size
-         schmInput.schematic.always_draw_grid = true;
-         schmInput.schematic.redraw_background();
+       try {
+         update_schematics();
+         var schmInput = node.firstChild.firstChild;
+         schmInput.codeMirrorLine = line;
+         if (schmInput.schematic) { //This is undefined if there was an error making the schematic
+           schmInput.schematic.canvas.style.display = "block"; //Otherwise, it gets line height and is a weird size
+           schmInput.schematic.always_draw_grid = true;
+           schmInput.schematic.redraw_background();
+         }
+         $(node.firstChild).leanModal();
+       } catch (err) {
+         console.log("Error in mitx_markdown callback: " + err);
        }
-       $(node.firstChild).leanModal();
+
      }
    };
    
