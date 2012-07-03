@@ -4179,31 +4179,31 @@ nav.sequence-nav {
         nav.sequence-nav ol li a.progress-done {
           border-bottom-color: green; }
         nav.sequence-nav ol li a.seq_video_inactive {
-          background-image: url("../images/sequence-nav/video-icon-normal.png");
+          background-image: url("/static/images/sequence-nav/video-icon-normal.png");
           background-position: center; }
         nav.sequence-nav ol li a.seq_video_visited {
-          background-image: url("../images/sequence-nav/video-icon-visited.png");
+          background-image: url("/static/images/sequence-nav/video-icon-visited.png");
           background-position: center; }
         nav.sequence-nav ol li a.seq_video_active {
-          background-image: url("../images/sequence-nav/video-icon-current.png");
+          background-image: url("/static/images/sequence-nav/video-icon-current.png");
           background-position: center; }
         nav.sequence-nav ol li a.seq_other_inactive {
-          background-image: url("../images/sequence-nav/document-icon-normal.png");
+          background-image: url("/static/images/sequence-nav/document-icon-normal.png");
           background-position: center; }
         nav.sequence-nav ol li a.seq_other_visited {
-          background-image: url("../images/sequence-nav/document-icon-visited.png");
+          background-image: url("/static/images/sequence-nav/document-icon-visited.png");
           background-position: center; }
         nav.sequence-nav ol li a.seq_other_active {
-          background-image: url("../images/sequence-nav/document-icon-current.png");
+          background-image: url("/static/images/sequence-nav/document-icon-current.png");
           background-position: center; }
         nav.sequence-nav ol li a.seq_vertical_inactive, nav.sequence-nav ol li a.seq_problem_inactive {
-          background-image: url("../images/sequence-nav/list-icon-normal.png");
+          background-image: url("/static/images/sequence-nav/list-icon-normal.png");
           background-position: center; }
         nav.sequence-nav ol li a.seq_vertical_visited, nav.sequence-nav ol li a.seq_problem_visited {
-          background-image: url("../images/sequence-nav/list-icon-visited.png");
+          background-image: url("/static/images/sequence-nav/list-icon-visited.png");
           background-position: center; }
         nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li a.seq_problem_active {
-          background-image: url("../images/sequence-nav/list-icon-current.png");
+          background-image: url("/static/images/sequence-nav/list-icon-current.png");
           background-position: center; }
         nav.sequence-nav ol li a p {
           background: #333;
@@ -4310,11 +4310,11 @@ nav.sequence-nav {
           cursor: normal;
           opacity: .4; }
       nav.sequence-nav ul li.prev a {
-        background-image: url("../images/sequence-nav/previous-icon.png"); }
+        background-image: url("/static/images/sequence-nav/previous-icon.png"); }
         nav.sequence-nav ul li.prev a:hover {
           background-color: #f6efd4; }
       nav.sequence-nav ul li.next a {
-        background-image: url("../images/sequence-nav/next-icon.png"); }
+        background-image: url("/static/images/sequence-nav/next-icon.png"); }
         nav.sequence-nav ul li.next a:hover {
           background-color: #f6efd4; }
   body.touch-based-device nav.sequence-nav ol li a:hover p {
@@ -4392,12 +4392,12 @@ section.course-content {
               background-color: #fffffe;
               opacity: .4; }
         section.course-content nav.sequence-bottom ul li.prev a {
-          background-image: url("../images/sequence-nav/previous-icon.png");
+          background-image: url("/static/images/sequence-nav/previous-icon.png");
           border-right: 1px solid #e4d080; }
           section.course-content nav.sequence-bottom ul li.prev a:hover {
             background-color: none; }
         section.course-content nav.sequence-bottom ul li.next a {
-          background-image: url("../images/sequence-nav/next-icon.png"); }
+          background-image: url("/static/images/sequence-nav/next-icon.png"); }
           section.course-content nav.sequence-bottom ul li.next a:hover {
             background-color: none; }
 

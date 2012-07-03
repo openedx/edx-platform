@@ -197,7 +197,7 @@ def get_module_xml(user, course, chapter, section):
 
     # this is the module's parent's etree
     path = "//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]"
-    dom_module = dom.xpath(path, course=course, chapter=chapter, section=section)
+    dom_module = dom.xpath(path, course=course.name, chapter=chapter, section=section)
 
     module_wrapper = dom_module[0] if len(dom_module) > 0 else None
     if module_wrapper is None:
@@ -280,7 +280,7 @@ def index(request, course=None, chapter=None, section=None,
 
         try:
             module_context = render_x_module(user, request, module_xml,
-                                             student_module_cache, position)
+                                             student_module_cache, course, position)
         except:
             log.exception("Unable to load module")
             return {'content' : render_to_string("module-error.html", {})}
