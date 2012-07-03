@@ -109,7 +109,12 @@ class Module(XModule):
         score = d['score']
         total = d['total']
         if total > 0:
-            return Progress(score, total)
+            try:
+                return Progress(score, total)
+            except Exception as err:
+                if self.DEBUG:
+                    return None
+                raise
         return None
 
 
