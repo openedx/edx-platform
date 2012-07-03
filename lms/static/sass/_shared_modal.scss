@@ -34,6 +34,21 @@
     display: block;
   }
 
+  &.video-modal {
+    //height: 360px;
+    left: 50%;
+    margin-left: -320px;
+    //margin-top: -180px;
+    //top: 50%;
+    width: 642px;
+
+    .inner-wrapper {
+      height: 360px;
+      padding: 0px;
+      width: 640px;
+    }
+  }
+
   .inner-wrapper {
     background: rgb(240,240,240);
     @include border-radius(0px);
