@@ -1,0 +1,12 @@
+<%inherit file="base.html" />
+<%block name="title">Courses</%block>
+
+<%block name="content">
+<section class="main-container">
+  <ol>
+    %for course, url in courses:
+    <li><a href="${url}">${course}</a></li>
+    %endfor
+  </ol>
+</section>
+</%block>

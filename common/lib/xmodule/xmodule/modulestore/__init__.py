@@ -153,6 +153,18 @@ class ModuleStore(object):
             location is found
         """
         raise NotImplementedError
+    
+    def get_items(self, location, default_class=None):
+        """
+        Returns a list of XModuleDescriptor instances for the items
+        that match location. Any element of location that is None is treated
+        as a wildcard that matches any value
+
+        location: Something that can be passed to Location
+        default_class: An XModuleDescriptor subclass to use if no plugin matching the
+            location is found
+        """
+        raise NotImplementedError
 
     # TODO (cpennington): Replace with clone_item
     def create_item(self, location, editor):
