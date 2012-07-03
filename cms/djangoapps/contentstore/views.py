@@ -9,14 +9,11 @@ from xmodule.modulestore.django import modulestore
 
 
 @ensure_csrf_cookie
-def index(request):
+def course_index(request, org, course, name):
     # TODO (cpennington): These need to be read in from the active user
-    org = 'mit.edu'
-    course = '6002xs12'
-    name = '6.002_Spring_2012'
     course = modulestore().get_item(['i4x', org, course, 'course', name])
     weeks = course.get_children()
-    return render_to_response('index.html', {'weeks': weeks})
+    return render_to_response('course_index.html', {'weeks': weeks})
 
 
 def edit_item(request):
