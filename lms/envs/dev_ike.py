@@ -43,7 +43,7 @@ MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT ]
 MITX_FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF'] = False
 MITX_FEATURES['DISPLAY_EDIT_LINK'] = True
 
-COURSE_SETTINGS =  {'6.002_Fall_2012': {'number' : '6.002x',
+COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
                                           'title'  :  'Circuits and Electronics',
                                           'xmlpath': '/6002x-fall-2012/',
                                           'active' : True,
