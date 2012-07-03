@@ -103,16 +103,17 @@ textarea {
     padding: 4px 10px;
   }
 }
-// .wip {
-//   outline: 1px solid #f00 !important;
-//   position: relative;
 
-//   &:after {
-//    content: "WIP";
-//    font-size: 8px;
-//    padding: 2px;
-//    background: #f00;
-//    color: #fff;
-//    @include position(absolute, 0px 0px 0 0);
-//   }
-// }
+.wip {
+  outline: 1px solid #f00 !important;
+  position: relative;
+
+  &:after {
+   content: "WIP";
+   font-size: 8px;
+   padding: 2px;
+   background: #f00;
+   color: #fff;
+   @include position(absolute, 0px 0px 0 0);
+  }
+}
