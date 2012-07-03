@@ -1167,7 +1167,7 @@ p.ie-warning {
   text-align: left; }
 
 form {
-  font-size: 0em; }
+  font-size: 1em; }
   form label {
     color: #3c3c3c;
     font: normal 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
