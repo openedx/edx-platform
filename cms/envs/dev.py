@@ -29,8 +29,19 @@ DATABASES = {
     }
 }
 
+REPO_ROOT = ENV_ROOT / "content"
+
+REPOS = {
+    'edx4edx': {
+        'path': REPO_ROOT / "edx4edx",
+        'org': 'edx',
+        'course': 'edx4edx',
+        'branch': 'for_cms'
+    }
+}
+
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a 
+    # This is the cache used for most things. Askbot will not work without a
     # functioning cache -- it relies on caching to load its settings in places.
     # In staging/prod envs, the sessions also live here.
     'default': {

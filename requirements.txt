@@ -28,3 +28,4 @@ pymongo
 django_nose
 nosexcover
 rednose
+GitPython >= 0.3
