@@ -30,6 +30,7 @@ def lc_choose(index,*args):
     raise Exception,"loncapa_check.lc_choose error, index=%s, args=%s" % (index,args)
 
 deg2rad = math.pi/180.0
-rad2deg = 180.0/math
+rad2deg = 180.0/math.pi
+
 
 
