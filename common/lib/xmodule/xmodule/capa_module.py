@@ -141,9 +141,8 @@ class CapaModule(XModule):
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 # create a dummy problem with error message instead of failing
-                fp = StringIO.StringIO('<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename, msg))
-                fp.name = "StringIO"
-                self.lcp = LoncapaProblem(fp, self.location.html_id(), instance_state, seed=seed, system=self.system)
+                problem_text = '<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename, msg)
+                self.lcp = LoncapaProblem(problem_text, self.location.html_id(), instance_state, seed=seed, system=self.system)
             else:
                 raise
 
@@ -395,13 +394,13 @@ class CapaModule(XModule):
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?
-            self.lcp = LoncapaProblem(self.system.filestore.open(self.filename),
+            self.lcp = LoncapaProblem(self.system.filestore.open(self.filename).read(),
                                       id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             return {'success': inst.message}
         except:
             # TODO: why is this line here?
-            self.lcp = LoncapaProblem(self.system.filestore.open(self.filename),
+            self.lcp = LoncapaProblem(self.system.filestore.open(self.filename).read(),
                                       id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             raise Exception("error in capa_module")
@@ -486,7 +485,7 @@ class CapaModule(XModule):
             # reset random number generator seed (note the self.lcp.get_state() in next line)
             self.lcp.seed = None
 
-        self.lcp = LoncapaProblem(self.system.filestore.open(self.filename),
+        self.lcp = LoncapaProblem(self.system.filestore.open(self.filename).read(),
                                   self.location.html_id(), self.lcp.get_state(), system=self.system)
 
         event_info['new_state'] = self.lcp.get_state()
