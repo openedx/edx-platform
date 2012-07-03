@@ -20,11 +20,11 @@ ${"Edit " + wiki_title + " - " if wiki_title is not UNDEFINED else ""}MITx 6.002
 </%block>
 
 <%block name="wiki_head">
-<script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/codemirror.js"></script>
-<link rel="stylesheet" href="${ settings.LIB_URL }CodeMirror/codemirror.css" />
+<script type="text/javascript" src="${ settings.LIB_URL }vendor/CodeMirror/codemirror.js"></script>
+<link rel="stylesheet" href="${ settings.LIB_URL }vendor/CodeMirror/codemirror.css" />
 
-<script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/xml.js"></script>
-<script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/mitx_markdown.js"></script>
+<script type="text/javascript" src="${ settings.LIB_URL }vendor/CodeMirror/xml.js"></script>
+<script type="text/javascript" src="${ settings.LIB_URL }vendor/CodeMirror/mitx_markdown.js"></script>
 
 <script>
 	$(function(){

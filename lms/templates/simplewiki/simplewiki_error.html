@@ -41,10 +41,13 @@ ${wiki_error}
 	does not exist. Click <a href="${reverse("wiki_create", args=[wiki_url_parent])}">here</a>
 	to create it.
 	</p>
-%else:
-%if wiki_err_keyword is not UNDEFINED and wiki_err_keyword:
+%elif wiki_err_no_namespace is not UNDEFINED and wiki_err_no_namespace:
 	<p>
-	The page you're trying to create <b>${wiki_url}</b> starts with <b>_</b>, which is reserved for internal use.
+	You must specify a namespace to create an article in.
+	</p>
+%elif wiki_err_bad_namespace is not UNDEFINED and wiki_err_bad_namespace:
+	<p>
+	The namespace for this article does not exist. This article cannot be created.
 	</p>
 %elif wiki_err_locked is not UNDEFINED and wiki_err_locked:
 	<p>
@@ -85,7 +88,6 @@ ${wiki_error}
 	<p>
 	An error has occured.
 	</p>
-%endif
 %endif
 %endif
 

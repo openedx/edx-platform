@@ -5,7 +5,7 @@
 <%block name="title"><title>Wiki - Search Results - MITx 6.002x</title></%block>
 
 <%!
-from django.core.urlresolvers import reverse
+    from simplewiki.views import wiki_article_reverse
 %>
 
 <%block name="wiki_page_title">
@@ -23,7 +23,7 @@ Displaying all articles
 <ul class="article-list">
 %for article in wiki_search_results:
 <% article_deleted = not article.current_revision.deleted == 0 %>
-<li><h3><a href="${reverse("wiki_view", args=[article.get_url()])}">${article.title} ${'(Deleted)' if article_deleted else ''}</a></h3></li>
+<li><h3><a href="${wiki_article_reverse("wiki_view", article, course)}">${article.title} ${'(Deleted)' if article_deleted else ''}</a></h3></li>
 %endfor
 
 %if not wiki_search_results: 
