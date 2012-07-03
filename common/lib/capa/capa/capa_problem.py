@@ -74,11 +74,11 @@ class LoncapaProblem(object):
 
         Arguments:
 
-         - problem_text : xml defining the problem
-         - id           : string used as the identifier for this problem; often a filename (no spaces)
-         - state        : student state (represented as a dict)
-         - seed         : random number generator seed (int)
-         - system       : I4xSystem instance which provides OS, rendering, and user context 
+         - problem_text (string): xml defining the problem
+         - id           (string): identifier for this problem; often a filename (no spaces)
+         - state        (dict): student state
+         - seed         (int): random number generator seed (int)
+         - system       (I4xSystme): I4xSystem instance which provides OS, rendering, and user context 
 
         '''
 
