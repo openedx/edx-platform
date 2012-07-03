@@ -33,7 +33,7 @@ class WikiPathExtension(markdown.Extension):
     def __init__(self, configs):
         # set extension defaults
         self.config = {
-                        'base_url' : ['/', 'String to append to beginning or URL.'],
+                        'default_namespace' : ['edX', 'Default namespace for when one isn\'t specified.'],
                         'html_class' : ['wikipath', 'CSS hook. Leave blank for none.']
         }
         
@@ -62,7 +62,10 @@ class WikiPath(markdown.inlinepatterns.Pattern):
         if article_title.startswith("/"):
             article_title = article_title[1:]
         
-        url = self.config['base_url'][0] + article_title
+        if not "/" in article_title:
+            article_title = self.config['default_namespace'][0] + "/" + article_title
+        
+        url = "../" + article_title
         label = m.group('linkTitle')
         a = etree.Element('a')
         a.set('href', url)
