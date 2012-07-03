@@ -30,6 +30,7 @@ from path import path
 
 MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
+    'GITHUB_PUSH': False,
 }
 
 ############################# SET PATH INFORMATION #############################
