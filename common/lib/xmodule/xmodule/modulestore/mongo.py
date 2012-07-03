@@ -58,6 +58,29 @@ class MongoModuleStore(ModuleStore):
         return XModuleDescriptor.load_from_json(
             item, MakoDescriptorSystem(load_item=self.get_item, resources_fs=None, render_template=render_to_string), self.default_class)
 
+    def get_items(self, location, default_class=None):
+        query = {}
+        for key, val in Location(location).dict().iteritems():
+            if val is not None:
+                query['location.{key}'.format(key=key)] = val
+
+        items = self.collection.find(
+            query,
+            sort=[('revision', pymongo.ASCENDING)],
+        )
+
+        # TODO (cpennington): Pass a proper resources_fs to the system
+        system = MakoDescriptorSystem(
+            load_item=self.get_item,
+            resources_fs=None,
+            render_template=render_to_string
+        )
+
+        return [
+            XModuleDescriptor.load_from_json(item, system, self.default_class)
+            for item in items
+        ]
+
     def create_item(self, location):
         """
         Create an empty item at the specified location with the supplied editor

@@ -3,9 +3,24 @@ import json
 from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from fs.osfs import OSFS
+from django.core.urlresolvers import reverse
 
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
+
+
+@ensure_csrf_cookie
+def index(request):
+    courses = modulestore().get_items(['i4x', None, None, 'course', None])
+    print courses
+    return render_to_response('index.html', {
+        'courses': [(course.metadata['display_name'],
+                    reverse('course_index', args=[
+                        course.location.org,
+                        course.location.course,
+                        course.location.name]))
+                    for course in courses]
+    })
 
 
 @ensure_csrf_cookie
