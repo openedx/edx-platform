@@ -119,7 +119,7 @@ class Location(_LocationBase):
         """
         Return a string with a version of the location that is safe for use in html id attributes
         """
-        return "-".join(str(v) for v in self if v is not None)
+        return "-".join(str(v) for v in self.list() if v is not None).replace('.', '_')
 
     def dict(self):
         return self.__dict__
@@ -145,8 +145,8 @@ class ModuleStore(object):
         recent revision
 
         If any segment of the location is None except revision, raises
-            keystore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
+            xmodule.modulestore.exceptions.InsufficientSpecificationError
+        If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
         default_class: An XModuleDescriptor subclass to use if no plugin matching the
@@ -171,9 +171,19 @@ class ModuleStore(object):
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
-        data
+        children
 
         location: Something that can be passed to Location
         children: A list of child item identifiers
+        """
+        raise NotImplementedError
+
+    def update_metadata(self, location, metadata):
+        """
+        Set the metadata for the item specified by the location to
+        metadata
+
+        location: Something that can be passed to Location
+        metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError

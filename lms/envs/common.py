@@ -138,9 +138,9 @@ COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
 
 
 ############################### XModule Store ##################################
-KEYSTORE = {
+MODULESTORE = {
     'default': {
-        'ENGINE': 'keystore.xml.XMLModuleStore',
+        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
         'OPTIONS': {
             'org': 'edx',
             'course': '6002xs12',

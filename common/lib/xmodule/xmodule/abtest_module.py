@@ -7,6 +7,8 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.exceptions import InvalidDefinitionError
 
+DEFAULT = "_DEFAULT_GROUP"
+
 
 def group_from_value(groups, v):
     ''' Given group: (('a',0.3),('b',0.4),('c',0.3)) And random value
@@ -39,30 +41,17 @@ class ABTestModule(XModule):
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
 
-        target_groups = self.definition['data'].keys()
         if shared_state is None:
 
             self.group = group_from_value(
-                self.definition['data']['group_portions'],
+                self.definition['data']['group_portions'].items(),
                 random.uniform(0, 1)
             )
         else:
             shared_state = json.loads(shared_state)
-
-            # TODO (cpennington): Remove this once we aren't passing in
-            # groups from django groups
-            if 'groups' in shared_state:
-                self.group = None
-                target_names = [elem.get('name') for elem in target_groups]
-                for group in shared_state['groups']:
-                    if group in target_names:
-                        self.group = group
-                        break
-            else:
-                self.group = shared_state['group']
+            self.group = shared_state['group']
 
     def get_shared_state(self):
-        print self.group
         return json.dumps({'group': self.group})
 
     def displayable_items(self):
@@ -88,18 +77,16 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
         definition = {
             'data': {
                 'experiment': experiment,
-                'group_portions': [],
-                'group_content': {None: []},
+                'group_portions': {},
+                'group_content': {DEFAULT: []},
             },
             'children': []}
         for group in xml_object:
             if group.tag == 'default':
-                name = None
+                name = DEFAULT
             else:
                 name = group.get('name')
-                definition['data']['group_portions'].append(
-                    (name, float(group.get('portion', 0)))
-                )
+                definition['data']['group_portions'][name] = float(group.get('portion', 0))
 
             child_content_urls = [
                 system.process_xml(etree.tostring(child)).location.url()
@@ -109,10 +96,29 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
             definition['data']['group_content'][name] = child_content_urls
             definition['children'].extend(child_content_urls)
 
-        default_portion = 1 - sum(portion for (name, portion) in definition['data']['group_portions'])
+        default_portion = 1 - sum(portion for (name, portion) in definition['data']['group_portions'].items())
         if default_portion < 0:
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 
-        definition['data']['group_portions'].append((None, default_portion))
+        definition['data']['group_portions'][DEFAULT] = default_portion
+        definition['children'].sort()
 
         return definition
+
+    def definition_to_xml(self, resource_fs):
+        xml_object = etree.Element('abtest')
+        xml_object.set('experiment', self.definition['data']['experiment'])
+        for name, group in self.definition['data']['group_content'].items():
+            if name == DEFAULT:
+                group_elem = etree.SubElement(xml_object, 'default')
+            else:
+                group_elem = etree.SubElement(xml_object, 'group', attrib={
+                    'portion': str(self.definition['data']['group_portions'][name]),
+                    'name': name,
+                })
+
+            for child_loc in group:
+                child = self.system.load_item(child_loc)
+                group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
+
+        return xml_object

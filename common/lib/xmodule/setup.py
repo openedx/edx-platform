@@ -3,10 +3,10 @@ from setuptools import setup, find_packages
 setup(
     name="XModule",
     version="0.1",
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     install_requires=['distribute'],
     package_data={
-        '': ['js/*']
+        'xmodule': ['js/module/*']
     },
 
     # See http://guide.python-distribute.org/creation.html#entry-points

@@ -1,6 +1,8 @@
 import pymongo
 from importlib import import_module
-from xmodule.x_module import XModuleDescriptor, DescriptorSystem
+from xmodule.x_module import XModuleDescriptor
+from xmodule.mako_module import MakoDescriptorSystem
+from mitxmako.shortcuts import render_to_string
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
@@ -15,6 +17,7 @@ class MongoModuleStore(ModuleStore):
             host=host,
             port=port
         )[db][collection]
+        self.collection.ensure_index('location')
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
@@ -30,8 +33,8 @@ class MongoModuleStore(ModuleStore):
         recent revision
 
         If any segment of the location is None except revision, raises
-            keystore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises keystore.exceptions.ItemNotFoundError
+            xmodule.modulestore.exceptions.InsufficientSpecificationError
+        If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
         """
@@ -53,7 +56,7 @@ class MongoModuleStore(ModuleStore):
 
         # TODO (cpennington): Pass a proper resources_fs to the system
         return XModuleDescriptor.load_from_json(
-            item, DescriptorSystem(self.get_item, None), self.default_class)
+            item, MakoDescriptorSystem(load_item=self.get_item, resources_fs=None, render_template=render_to_string), self.default_class)
 
     def create_item(self, location):
         """
@@ -84,7 +87,7 @@ class MongoModuleStore(ModuleStore):
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
-        data
+        children
 
         location: Something that can be passed to Location
         children: A list of child item identifiers
@@ -95,4 +98,20 @@ class MongoModuleStore(ModuleStore):
         self.collection.update(
             {'location': Location(location).dict()},
             {'$set': {'definition.children': children}}
+        )
+
+    def update_metadata(self, location, metadata):
+        """
+        Set the children for the item specified by the location to
+        metadata
+
+        location: Something that can be passed to Location
+        metadata: A nested dictionary of module metadata
+        """
+
+        # See http://www.mongodb.org/display/DOCS/Updating for
+        # atomic update syntax
+        self.collection.update(
+            {'location': Location(location).dict()},
+            {'$set': {'metadata': metadata}}
         )

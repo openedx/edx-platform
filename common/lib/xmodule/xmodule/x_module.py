@@ -2,7 +2,7 @@ from lxml import etree
 import pkg_resources
 import logging
 
-from keystore import Location
+from xmodule.modulestore import Location
 from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
@@ -23,30 +23,38 @@ class Plugin(object):
 
         entry_point: The name of the entry point to load plugins from
     """
+
+    _plugin_cache = None
+
     @classmethod
     def load_class(cls, identifier, default=None):
         """
-        Loads a single class intance specified by identifier. If identifier
+        Loads a single class instance specified by identifier. If identifier
         specifies more than a single class, then logs a warning and returns the first
         class identified.
 
         If default is not None, will return default if no entry_point matching identifier
         is found. Otherwise, will raise a ModuleMissingError
         """
-        identifier = identifier.lower()
-        classes = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
-        if len(classes) > 1:
-            log.warning("Found multiple classes for {entry_point} with identifier {id}: {classes}. Returning the first one.".format(
-                entry_point=cls.entry_point,
-                id=identifier,
-                classes=", ".join(class_.module_name for class_ in classes)))
+        if cls._plugin_cache is None:
+            cls._plugin_cache = {}
 
-        if len(classes) == 0:
-            if default is not None:
-                return default
-            raise ModuleMissingError(identifier)
+        if identifier not in cls._plugin_cache:
+            identifier = identifier.lower()
+            classes = list(pkg_resources.iter_entry_points(cls.entry_point, name=identifier))
+            if len(classes) > 1:
+                log.warning("Found multiple classes for {entry_point} with identifier {id}: {classes}. Returning the first one.".format(
+                    entry_point=cls.entry_point,
+                    id=identifier,
+                    classes=", ".join(class_.module_name for class_ in classes)))
 
-        return classes[0].load()
+            if len(classes) == 0:
+                if default is not None:
+                    return default
+                raise ModuleMissingError(identifier)
+
+            cls._plugin_cache[identifier] = classes[0].load()
+        return cls._plugin_cache[identifier]
 
     @classmethod
     def load_classes(cls):
@@ -205,6 +213,11 @@ class XModuleDescriptor(Plugin):
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = ('graded', 'due', 'graceperiod', 'showanswer', 'rerandomize')
 
+    # A list of descriptor attributes that must be equal for the discriptors to be
+    # equal
+    equality_attributes = ('definition', 'metadata', 'location', 'shared_state_key', '_inherited_metadata')
+
+    # ============================= STRUCTURAL MANIPULATION ===========================
     def __init__(self,
                  system,
                  definition=None,
@@ -222,7 +235,7 @@ class XModuleDescriptor(Plugin):
         definition: A dict containing `data` and `children` representing the problem definition
 
         Current arguments passed in kwargs:
-            location: A keystore.Location object indicating the name and ownership of this problem
+            location: A xmodule.modulestore.Location object indicating the name and ownership of this problem
             shared_state_key: The key to use for sharing StudentModules with other
                 modules of this type
             metadata: A dictionary containing the following optional keys:
@@ -244,7 +257,46 @@ class XModuleDescriptor(Plugin):
         self.shared_state_key = kwargs.get('shared_state_key')
 
         self._child_instances = None
+        self._inherited_metadata = set()
 
+    def inherit_metadata(self, metadata):
+        """
+        Updates this module with metadata inherited from a containing module.
+        Only metadata specified in self.inheritable_metadata will
+        be inherited
+        """
+        # Set all inheritable metadata from kwargs that are
+        # in self.inheritable_metadata and aren't already set in metadata
+        for attr in self.inheritable_metadata:
+            if attr not in self.metadata and attr in metadata:
+                self._inherited_metadata.add(attr)
+                self.metadata[attr] = metadata[attr]
+
+    def get_children(self):
+        """Returns a list of XModuleDescriptor instances for the children of this module"""
+        if self._child_instances is None:
+            self._child_instances = []
+            for child_loc in self.definition.get('children', []):
+                child = self.system.load_item(child_loc)
+                child.inherit_metadata(self.metadata)
+                self._child_instances.append(child)
+
+        return self._child_instances
+
+    def xmodule_constructor(self, system):
+        """
+        Returns a constructor for an XModule. This constructor takes two arguments:
+        instance_state and shared_state, and returns a fully nstantiated XModule
+        """
+        return partial(
+            self.module_class,
+            system,
+            self.location,
+            self.definition,
+            metadata=self.metadata
+        )
+
+    # ================================= JSON PARSING ===================================
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
         """
@@ -272,6 +324,7 @@ class XModuleDescriptor(Plugin):
         """
         return cls(system=system, **json_data)
 
+    # ================================= XML PARSING ====================================
     @staticmethod
     def load_from_xml(xml_data,
             system,
@@ -307,6 +360,20 @@ class XModuleDescriptor(Plugin):
         """
         raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
 
+    def export_to_xml(self, resource_fs):
+        """
+        Returns an xml string representing this module, and all modules underneath it.
+        May also write required resources out to resource_fs
+
+        Assumes that modules have single parantage (that no module appears twice in the same course),
+        and that it is thus safe to nest modules as xml children as appropriate.
+
+        The returned XML should be able to be parsed back into an identical XModuleDescriptor
+        using the from_xml method with the same system, org, and course
+        """
+        raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
+
+    # ================================== HTML INTERFACE DEFINITIONS ======================
     @classmethod
     def get_javascript(cls):
         """
@@ -326,52 +393,36 @@ class XModuleDescriptor(Plugin):
         """
         return self.js_module
 
-
-    def inherit_metadata(self, metadata):
-        """
-        Updates this module with metadata inherited from a containing module.
-        Only metadata specified in self.inheritable_metadata will
-        be inherited
-        """
-        # Set all inheritable metadata from kwargs that are
-        # in self.inheritable_metadata and aren't already set in metadata
-        for attr in self.inheritable_metadata:
-            if attr not in self.metadata and attr in metadata:
-                self.metadata[attr] = metadata[attr]
-
-    def get_children(self):
-        """Returns a list of XModuleDescriptor instances for the children of this module"""
-        if self._child_instances is None:
-            self._child_instances = []
-            for child_loc in self.definition.get('children', []):
-                child = self.system.load_item(child_loc)
-                child.inherit_metadata(self.metadata)
-                self._child_instances.append(child)
-
-        return self._child_instances
-
     def get_html(self):
         """
         Return the html used to edit this module
         """
         raise NotImplementedError("get_html() must be provided by specific modules")
 
-    def xmodule_constructor(self, system):
-        """
-        Returns a constructor for an XModule. This constructor takes two arguments:
-        instance_state and shared_state, and returns a fully nstantiated XModule
-        """
-        return partial(
-            self.module_class,
-            system,
-            self.location,
-            self.definition,
+    # =============================== BUILTIN METHODS ===========================
+    def __eq__(self, other):
+        eq = (self.__class__ == other.__class__ and
+                all(getattr(self, attr, None) == getattr(other, attr, None)
+                    for attr in self.equality_attributes))
+
+        if not eq:
+            for attr in self.equality_attributes:
+                print getattr(self, attr, None), getattr(other, attr, None), getattr(self, attr, None) == getattr(other, attr, None)
+
+        return eq
+
+    def __repr__(self):
+        return "{class_}({system!r}, {definition!r}, location={location!r}, metadata={metadata!r})".format(
+            class_=self.__class__.__name__,
+            system=self.system,
+            definition=self.definition,
+            location=self.location,
             metadata=self.metadata
         )
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item, resources_fs):
+    def __init__(self, load_item, resources_fs, **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
         resources_fs: A Filesystem object that contains all of the
@@ -383,7 +434,7 @@ class DescriptorSystem(object):
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, process_xml):
+    def __init__(self, load_item, resources_fs, process_xml, **kwargs):
         """
         process_xml: Takes an xml string, and returns the the XModuleDescriptor created from that xml
         """

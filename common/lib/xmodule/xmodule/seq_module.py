@@ -108,3 +108,9 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
             system.process_xml(etree.tostring(child_module)).location.url()
             for child_module in xml_object
         ]}
+
+    def definition_to_xml(self, resource_fs):
+        xml_object = etree.Element('sequential')
+        for child in self.get_children():
+            xml_object.append(etree.fromstring(child.export_to_xml(resource_fs)))
+        return xml_object

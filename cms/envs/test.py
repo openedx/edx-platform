@@ -17,7 +17,7 @@ for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
     NOSE_ARGS += ['--cover-package', app]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-KEYSTORE = {
+MODULESTORE = {
     'host': 'localhost',
     'db': 'mongo_base',
     'collection': 'key_store',
