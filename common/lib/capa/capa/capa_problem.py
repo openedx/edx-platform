@@ -126,7 +126,7 @@ class LoncapaProblem(object):
         self.done = False
 
     def __unicode__(self):
-        return u"LoncapaProblem ({0})".format(self.problem_text)
+        return u"LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
         ''' Stored per-user session data neeeded to:
