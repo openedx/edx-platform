@@ -177,6 +177,8 @@ class XmlDescriptor(XModuleDescriptor):
 
         The returned XML should be able to be parsed back into an identical XModuleDescriptor
         using the from_xml method with the same system, org, and course
+
+        resource_fs is a pyfilesystem office (from the fs package)
         """
         xml_object = self.definition_to_xml(resource_fs)
         self.__class__.clean_metadata_from_xml(xml_object)
