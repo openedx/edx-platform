@@ -2,7 +2,9 @@ from collections import MutableMapping
 from xmodule.x_module import XModuleDescriptor
 from lxml import etree
 import copy
+import logging
 
+log = logging.getLogger(__name__)
 
 class LazyLoadingDict(MutableMapping):
     """
@@ -124,7 +126,11 @@ class XmlDescriptor(XModuleDescriptor):
             else:
                 filepath = cls._format_filepath(xml_object.tag, filename)
                 with system.resources_fs.open(filepath) as file:
-                    definition_xml = etree.parse(file).getroot()
+                    try:
+                        definition_xml = etree.parse(file).getroot()
+                    except:
+                        log.exception("Failed to parse xml in file %s" % filepath)
+                        raise
 
             cls.clean_metadata_from_xml(definition_xml)
             return cls.definition_from_xml(definition_xml, system)
