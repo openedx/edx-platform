@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from fs.osfs import OSFS
 from django.core.urlresolvers import reverse
+from xmodule.modulestore import Location
+from github_sync import repo_path_from_location, export_to_github
 
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
@@ -12,7 +14,6 @@ from xmodule.modulestore.django import modulestore
 @ensure_csrf_cookie
 def index(request):
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
-    print courses
     return render_to_response('index.html', {
         'courses': [(course.metadata['display_name'],
                     reverse('course_index', args=[
@@ -46,6 +47,14 @@ def save_item(request):
     item_id = request.POST['id']
     data = json.loads(request.POST['data'])
     modulestore().update_item(item_id, data)
+
+    # Export the course back to github
+    course_location = Location(item_id)._replace(category='course', name=None)
+    courses = modulestore().get_items(course_location)
+    for course in courses:
+        repo_path = repo_path_from_location(course.location)
+        export_to_github(course, repo_path, "CMS Edit")
+
     return HttpResponse(json.dumps({}))
 
 
