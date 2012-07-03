@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 
 from lxml import etree
 
@@ -133,18 +134,18 @@ def grade_histogram(module_id):
     return grades
 
 
-def make_module_from_xml_fn(user, request, student_module_cache, position):
+def make_module_from_xml_fn(user, request, student_module_cache, course, position):
     '''Create the make_from_xml() function'''
     def module_from_xml(xml):
         '''Modules need a way to convert xml to instance objects.
         Pass the rest of the context through.'''
         (instance, sm, module_type) = get_module(
-            user, request, xml, student_module_cache, position)
+            user, request, xml, student_module_cache, course, position)
         return instance
     return module_from_xml
 
 
-def get_module(user, request, module_xml, student_module_cache, position=None):
+def get_module(user, request, module_xml, student_module_cache, course, position=None):
     ''' Get an instance of the xmodule class corresponding to module_xml,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
@@ -177,17 +178,18 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
     #     xp = multicourse_settings.get_course_xmlpath(coursename)
     #     data_root = settings.DATA_DIR + xp
     # else:
-    data_root = settings.DATA_DIR+"/"+os.path.basename(course.path)
+
+    data_root = course.path
 
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + module_type + '/' + module_id + '/'
 
     module_from_xml = make_module_from_xml_fn(
-        user, request, student_module_cache, position)
+        user, request, student_module_cache, course, position)
     
     system = I4xSystem(track_function = make_track_function(request), 
                        render_function = lambda xml: render_x_module(
-                           user, request, xml, student_module_cache, position),
+                           user, request, xml, student_module_cache, course, position),
                        render_template = render_to_string,
                        ajax_url = ajax_url,
                        request = request,
@@ -213,7 +215,7 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
 
     return (instance, smod, module_type)
 
-def render_x_module(user, request, module_xml, student_module_cache, position=None):
+def render_x_module(user, request, module_xml, student_module_cache, course, position=None):
     ''' Generic module for extensions. This renders to HTML.
 
     modules include sequential, vertical, problem, video, html
@@ -237,7 +239,7 @@ def render_x_module(user, request, module_xml, student_module_cache, position=No
         return {"content": ""}
 
     (instance, smod, module_type) = get_module(
-        user, request, module_xml, student_module_cache, position)
+        user, request, module_xml, student_module_cache, course, position)
 
     content = instance.get_html()
 
