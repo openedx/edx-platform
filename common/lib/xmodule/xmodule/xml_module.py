@@ -71,6 +71,13 @@ class XmlDescriptor(XModuleDescriptor):
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'due', 'graded', 'name', 'slug')
 
+    # A dictionary mapping xml attribute names to function of the value
+    # that return the metadata key and value
+    xml_attribute_map = {
+        'graded': lambda val: ('graded', val == 'true'),
+        'name': lambda val: ('display_name', val),
+    }
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
@@ -116,16 +123,15 @@ class XmlDescriptor(XModuleDescriptor):
 
         def metadata_loader():
             metadata = {}
-            for attr in ('format', 'graceperiod', 'showanswer', 'rerandomize', 'due'):
-                from_xml = xml_object.get(attr)
-                if from_xml is not None:
-                    metadata[attr] = from_xml
-
-            if xml_object.get('graded') is not None:
-                metadata['graded'] = xml_object.get('graded') == 'true'
-
-            if xml_object.get('name') is not None:
-                metadata['display_name'] = xml_object.get('name')
+            for attr in cls.metadata_attributes:
+                val = xml_object.get(attr)
+                if val is not None:
+                    map_fn = cls.xml_attribute_map.get(attr)
+                    if map_fn is None:
+                        metadata[attr] = val
+                    else:
+                        key, val = map_fn(val)
+                        metadata[key] = val
 
             return metadata
 
