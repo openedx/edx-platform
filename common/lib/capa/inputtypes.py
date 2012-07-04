@@ -182,7 +182,8 @@ def textline(element, value, status, render_template, msg=""):
         raise Exception(msg)
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
-    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg': msg}
+    hidden = element.get('hidden','')	# if specified, then textline is hidden and id is stored in div of name given by hidden
+    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg': msg, 'hidden': hidden}
     html = render_template("textinput.html", context)
     return etree.XML(html)
 
@@ -203,8 +204,9 @@ def textline_dynamath(element, value, status, render_template, msg=''):
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
+    hidden = element.get('hidden','')	# if specified, then textline is hidden and id is stored in div of name given by hidden
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
-               'msg':msg,
+               'msg':msg, 'hidden' : hidden,
                }
     html = render_template("textinput_dynamath.html", context)
     return etree.XML(html)
@@ -224,11 +226,13 @@ def textbox(element, value, status, render_template, msg=''):
     rows = element.get('rows') or '30'
     cols = element.get('cols') or '80'
     mode = element.get('mode')	or 'python' 	# mode for CodeMirror, eg "python" or "xml"
+    hidden = element.get('hidden','')	# if specified, then textline is hidden and id is stored in div of name given by hidden
     linenumbers = element.get('linenumbers')	# for CodeMirror
     if not value: value = element.text	# if no student input yet, then use the default input given by the problem
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg,
                'mode':mode, 'linenumbers':linenumbers,
                'rows':rows, 'cols':cols,
+               'hidden' : hidden,
                }
     html = render_template("textbox.html", context)
     try:
