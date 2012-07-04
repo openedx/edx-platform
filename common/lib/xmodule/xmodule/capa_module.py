@@ -141,7 +141,7 @@ class CapaModule(XModule):
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 # create a dummy problem with error message instead of failing
-                problem_text = '<problem><text><font color="red" size="+2">Problem file %s has an error:</font>%s</text></problem>' % (self.filename, msg)
+                problem_text = '<problem><text><font color="red" size="+2">Problem %s has an error:</font>%s</text></problem>' % (self.location.url(), msg)
                 self.lcp = LoncapaProblem(problem_text, self.location.html_id(), instance_state, seed=seed, system=self.system)
             else:
                 raise
@@ -194,7 +194,7 @@ class CapaModule(XModule):
         as necessary based on the problem config and state.'''
 
         html = self.lcp.get_html()
-        content = {'name': self.name,
+        content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
                   }
@@ -368,7 +368,7 @@ class CapaModule(XModule):
             '''
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
-        event_info['filename'] = self.filename
+        event_info['problem_id'] = self.location.url()
 
         answers = self.make_dict_of_responses(get)
 
@@ -394,13 +394,13 @@ class CapaModule(XModule):
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?
-            self.lcp = LoncapaProblem(self.system.filestore.open(self.filename).read(),
+            self.lcp = LoncapaProblem(self.definition['data'],
                                       id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             return {'success': inst.message}
         except:
             # TODO: why is this line here?
-            self.lcp = LoncapaProblem(self.system.filestore.open(self.filename).read(),
+            self.lcp = LoncapaProblem(self.definition['data'],
                                       id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             raise Exception("error in capa_module")
@@ -434,7 +434,7 @@ class CapaModule(XModule):
         '''
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
-        event_info['filename'] = self.filename
+        event_info['problem_id'] = self.location.url()
 
         answers = self.make_dict_of_responses(get)
         event_info['answers'] = answers
@@ -468,7 +468,7 @@ class CapaModule(XModule):
         '''
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
-        event_info['filename'] = self.filename
+        event_info['problem_id'] = self.location.url()
 
         if self.closed():
             event_info['failure'] = 'closed'
@@ -485,7 +485,7 @@ class CapaModule(XModule):
             # reset random number generator seed (note the self.lcp.get_state() in next line)
             self.lcp.seed = None
 
-        self.lcp = LoncapaProblem(self.system.filestore.open(self.filename).read(),
+        self.lcp = LoncapaProblem(self.definition['data'],
                                   self.location.html_id(), self.lcp.get_state(), system=self.system)
 
         event_info['new_state'] = self.lcp.get_state()
