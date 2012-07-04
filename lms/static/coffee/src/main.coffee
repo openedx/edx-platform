@@ -24,8 +24,8 @@ $ ->
 
   # Preserved for backward compatibility
   window.submit_circuit = (circuit_id) ->
-    $("input.schematic").each (index, element) ->
-      element.schematic.update_value()
+    $("input.schematic").each (index, el) ->
+      el.schematic.update_value()
 
     schematic_value $("#schematic_#{circuit_id}").attr("value")
     $.postWithPrefix "/save_circuit/#{circuit_id}", schematic: schematic_value, (data) ->

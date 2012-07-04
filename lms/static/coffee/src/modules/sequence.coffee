@@ -1,13 +1,13 @@
 class @Sequence
   constructor: (@id, @element_id, @elements, @tag, position) ->
-    @element = $("#sequence_#{@element_id}")
+    @el = $("##{@element_id}")
     @buildNavigation()
     @initProgress()
     @bind()
     @render position
 
   $: (selector) ->
-    $(selector, @element)
+    $(selector, @el)
 
   bind: ->
     @$('#sequence-list a').click @goto
@@ -57,7 +57,7 @@ class @Sequence
         when 'none' then element.addClass('progress-none')
         when 'in_progress' then element.addClass('progress-some')
         when 'done' then element.addClass('progress-done')
-  
+
   buildNavigation: ->
     $.each @elements, (index, item) =>
       link = $('<a>').attr class: "seq_#{item.type}_inactive", 'data-element': index + 1
@@ -65,10 +65,10 @@ class @Sequence
       # TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
       # Make sure it gets updated after ajax calls.
       # implementation note: will need to figure out how to handle combining detail
-      # statuses of multiple modules in js. 
+      # statuses of multiple modules in js.
       list_item = $('<li>').append(link.append(title))
       @setProgress item.progress_status, link
-        
+
       @$('#sequence-list').append list_item
 
   toggleArrows: =>
@@ -89,7 +89,7 @@ class @Sequence
       if @position != undefined
         @mark_visited @position
         $.postWithPrefix "/modx/#{@id}/goto_position", position: new_position
-        
+
       @mark_active new_position
       @$('#seq_content').html @elements[new_position - 1].content
 
@@ -97,7 +97,7 @@ class @Sequence
       @position = new_position
       @toggleArrows()
       @hookUpProgressEvent()
-      @element.trigger 'contentChanged'
+      @el.trigger 'contentChanged'
 
   goto: (event) =>
     event.preventDefault()

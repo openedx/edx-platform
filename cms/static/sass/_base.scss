@@ -1,9 +1,15 @@
 $fg-column: 70px;
 $fg-gutter: 26px;
 $fg-max-columns: 12;
-$body-font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+$body-font-family: "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
 $body-font-size: 14px;
 $body-line-height: 20px;
+
+$light-blue: #f0f8fa;
+$dark-blue: #50545c;
+$bright-blue: #3c8ebf;
+$orange: #f96e5b;
+$yellow: #fff8af;
 
 // Base html styles
 html {
@@ -13,23 +19,44 @@ html {
 a {
   text-decoration: none;
   color: #888;
+  @include transition;
+
+  &:hover {
+    color: #ccc;
+  }
 }
 
 input {
   font-family: $body-font-family;
 }
 
-input[type="submit"], .button {
-  border: 1px solid #ccc;
-  background: #efefef;
-  @include border-radius(3px);
-  padding: 6px;
+button, input[type="submit"], .button {
+  background-color: $orange;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  padding: 8px 10px;
+  border: 0;
+  font-weight: bold;
+
+  &:hover {
+    background-color: shade($orange, 10%);
+  }
+}
+
+#{$all-text-inputs}, textarea {
+  border: 1px solid $dark-blue;
+  font: $body-font-size $body-font-family;
+  padding: 4px 6px;
+  @include box-shadow(inset 0 3px 6px $light-blue);
 }
 
 textarea {
   @include box-sizing(border-box);
   display: block;
+  line-height: lh();
+  padding: 15px;
   width: 100%;
+
 }
 
 // Extends
@@ -66,6 +93,15 @@ textarea {
   text-indent: -9999px;
   display: block;
   float: right;
+}
+
+.editable {
+  &:hover {
+    background: lighten($yellow, 10%);
+  }
+  button {
+    padding: 4px 10px;
+  }
 }
 
 .wip {

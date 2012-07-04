@@ -17,16 +17,16 @@ describe 'Problem', ->
 
   describe 'constructor', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
 
     it 'set the element', ->
-      expect(@problem.element).toBe '#problem_1'
+      expect(@problem.el).toBe '#problem_1'
 
   describe 'bind', ->
     beforeEach ->
       spyOn window, 'update_schematics'
       MathJax.Hub.getAllJax.andReturn [@stubbedJax]
-      @problem = new Problem 1, '/problem/url/'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
 
     it 'set mathjax typeset', ->
       expect(MathJax.Hub.Queue).toHaveBeenCalled()
@@ -60,7 +60,7 @@ describe 'Problem', ->
 
   describe 'render', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
       @bind = @problem.bind
       spyOn @problem, 'bind'
 
@@ -69,7 +69,7 @@ describe 'Problem', ->
         @problem.render 'Hello World'
 
       it 'render the content', ->
-        expect(@problem.element.html()).toEqual 'Hello World'
+        expect(@problem.el.html()).toEqual 'Hello World'
 
       it 're-bind the content', ->
         expect(@problem.bind).toHaveBeenCalled()
@@ -81,14 +81,14 @@ describe 'Problem', ->
         @problem.render()
 
       it 'load the content via ajax', ->
-        expect(@problem.element.html()).toEqual 'Hello World'
+        expect(@problem.el.html()).toEqual 'Hello World'
 
       it 're-bind the content', ->
         expect(@problem.bind).toHaveBeenCalled()
 
   describe 'check', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_check event', ->
@@ -98,19 +98,19 @@ describe 'Problem', ->
     it 'submit the answer for check', ->
       spyOn $, 'postWithPrefix'
       @problem.check()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/problem/1/problem_check', 'foo=1&bar=2', jasmine.any(Function)
+      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/problem_check', 'foo=1&bar=2', jasmine.any(Function)
 
     describe 'when the response is correct', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'correct', contents: 'Correct!')
         @problem.check()
-        expect(@problem.element.html()).toEqual 'Correct!'
+        expect(@problem.el.html()).toEqual 'Correct!'
 
     describe 'when the response is incorrect', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'incorrect', contents: 'Correct!')
         @problem.check()
-        expect(@problem.element.html()).toEqual 'Correct!'
+        expect(@problem.el.html()).toEqual 'Correct!'
 
     describe 'when the response is undetermined', ->
       it 'alert the response', ->
@@ -121,7 +121,7 @@ describe 'Problem', ->
 
   describe 'reset', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
 
     it 'log the problem_reset event', ->
       @problem.answers = 'foo=1&bar=2'
@@ -131,22 +131,22 @@ describe 'Problem', ->
     it 'POST to the problem reset page', ->
       spyOn $, 'postWithPrefix'
       @problem.reset()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/problem/1/problem_reset', { id: 1 }, jasmine.any(Function)
+      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/problem_reset', { id: 1 }, jasmine.any(Function)
 
     it 'render the returned content', ->
       spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
         callback html: "Reset!"
       @problem.reset()
-      expect(@problem.element.html()).toEqual 'Reset!'
+      expect(@problem.el.html()).toEqual 'Reset!'
 
   describe 'show', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
-      @problem.element.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem.el.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
 
     describe 'when the answer has not yet shown', ->
       beforeEach ->
-        @problem.element.removeClass 'showed'
+        @problem.el.removeClass 'showed'
 
       it 'log the problem_show event', ->
         @problem.show()
@@ -155,7 +155,7 @@ describe 'Problem', ->
       it 'fetch the answers', ->
         spyOn $, 'postWithPrefix'
         @problem.show()
-        expect($.postWithPrefix).toHaveBeenCalledWith '/modx/problem/1/problem_show', jasmine.any(Function)
+        expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/problem_show', jasmine.any(Function)
 
       it 'show the answers', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
@@ -172,11 +172,11 @@ describe 'Problem', ->
       it 'add the showed class to element', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
-        expect(@problem.element).toHaveClass 'showed'
+        expect(@problem.el).toHaveClass 'showed'
 
       describe 'multiple choice question', ->
         beforeEach ->
-          @problem.element.prepend '''
+          @problem.el.prepend '''
             <label for="input_1_1_1"><input type="checkbox" name="input_1_1" id="input_1_1_1" value="1"> One</label>
             <label for="input_1_1_2"><input type="checkbox" name="input_1_1" id="input_1_1_2" value="2"> Two</label>
             <label for="input_1_1_3"><input type="checkbox" name="input_1_1" id="input_1_1_3" value="3"> Three</label>
@@ -194,8 +194,8 @@ describe 'Problem', ->
 
     describe 'when the answers are alreay shown', ->
       beforeEach ->
-        @problem.element.addClass 'showed'
-        @problem.element.prepend '''
+        @problem.el.addClass 'showed'
+        @problem.el.prepend '''
           <label for="input_1_1_1" correct_answer="true">
             <input type="checkbox" name="input_1_1" id="input_1_1_1" value="1" />
             One
@@ -216,11 +216,11 @@ describe 'Problem', ->
 
       it 'remove the showed class from element', ->
         @problem.show()
-        expect(@problem.element).not.toHaveClass 'showed'
+        expect(@problem.el).not.toHaveClass 'showed'
 
   describe 'save', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_save event', ->
@@ -230,7 +230,7 @@ describe 'Problem', ->
     it 'POST to save problem', ->
       spyOn $, 'postWithPrefix'
       @problem.save()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/problem/1/problem_save', 'foo=1&bar=2', jasmine.any(Function)
+      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/problem_save', 'foo=1&bar=2', jasmine.any(Function)
 
     it 'alert to the user', ->
       spyOn window, 'alert'
@@ -240,7 +240,7 @@ describe 'Problem', ->
 
   describe 'refreshMath', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
       $('#input_example_1').val 'E=mc^2'
       @problem.refreshMath target: $('#input_example_1').get(0)
 
@@ -250,7 +250,7 @@ describe 'Problem', ->
 
   describe 'updateMathML', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
+      @problem = new Problem 1, "problem_1", "/problem/url/"
       @stubbedJax.root.toMathML.andReturn '<MathML>'
 
     describe 'when there is no exception', ->
@@ -270,8 +270,8 @@ describe 'Problem', ->
 
   describe 'refreshAnswers', ->
     beforeEach ->
-      @problem = new Problem 1, '/problem/url/'
-      @problem.element.html '''
+      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem.el.html '''
         <textarea class="CodeMirror" />
         <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
         <input id="input_1_2" name="input_1_2" value="two" />

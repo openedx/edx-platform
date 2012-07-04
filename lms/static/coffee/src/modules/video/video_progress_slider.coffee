@@ -1,15 +1,9 @@
-class @VideoProgressSlider
-  constructor: (@player) ->
+class @VideoProgressSlider extends Subview
+  initialize: ->
     @buildSlider() unless onTouchBasedDevice()
-    $(@player).bind('updatePlayTime', @onUpdatePlayTime)
-    $(@player).bind('ready', @onReady)
-    $(@player).bind('play', @onPlay)
-
-  $: (selector) ->
-    @player.$(selector)
 
   buildSlider: ->
-    @slider = @$('.slider').slider
+    @slider = @el.slider
       range: 'min'
       change: @onChange
       slide: @onSlide
@@ -17,7 +11,7 @@ class @VideoProgressSlider
     @buildHandle()
 
   buildHandle: ->
-    @handle = @$('.slider .ui-slider-handle')
+    @handle = @$('.ui-slider-handle')
     @handle.qtip
       content: "#{Time.format(@slider.slider('value'))}"
       position:
@@ -30,28 +24,25 @@ class @VideoProgressSlider
         classes: 'ui-tooltip-slider'
         widget: true
 
-  onReady: =>
-    @slider.slider('option', 'max', @player.duration()) if @slider
-
-  onPlay: =>
+  play: =>
     @buildSlider() unless @slider
 
-  onUpdatePlayTime: (event, currentTime) =>
+  updatePlayTime: (currentTime, duration) ->
     if @slider && !@frozen
-      @slider.slider('option', 'max', @player.duration())
+      @slider.slider('option', 'max', duration)
       @slider.slider('value', currentTime)
 
   onSlide: (event, ui) =>
     @frozen = true
     @updateTooltip(ui.value)
-    $(@player).trigger('seek', ui.value)
+    $(@).trigger('seek', ui.value)
 
   onChange: (event, ui) =>
     @updateTooltip(ui.value)
 
   onStop: (event, ui) =>
     @frozen = true
-    $(@player).trigger('seek', ui.value)
+    $(@).trigger('seek', ui.value)
     setTimeout (=> @frozen = false), 200
 
   updateTooltip: (value)->
