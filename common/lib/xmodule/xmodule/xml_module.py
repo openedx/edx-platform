@@ -158,7 +158,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     @classmethod
     def _format_filepath(cls, type, name):
-        return '{type}/{name}.{ext}'.format(type=type, name=name, ext=cls.filename_extension)
+        return u'{type}/{name}.{ext}'.format(type=type, name=name, ext=cls.filename_extension)
 
     def export_to_xml(self, resource_fs):
         """
