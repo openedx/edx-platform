@@ -122,7 +122,7 @@ class Location(_LocationBase):
         return "-".join(str(v) for v in self.list() if v is not None).replace('.', '_')
 
     def dict(self):
-        return self.__dict__
+        return self._asdict()
 
     def list(self):
         return list(self)
