@@ -22,10 +22,14 @@ Each input type takes the xml tree as 'element', the previous answer as 'value',
 # status is currently the answer for the problem ID for the input element,
 # but it will turn into a dict containing both the answer and any associated message for the problem ID for the input element.
 
+import logging
 import re
 import shlex # for splitting quoted strings
 
 from lxml import etree
+import xml.sax.saxutils as saxutils
+
+log = logging.getLogger('mitx.' + __name__)
 
 def get_input_xml_tags():
     ''' Eventually, this will be for all registered input types '''
@@ -299,8 +303,18 @@ def math(element, value, status, render_template, msg=''):
     #    isinline = True
     # html = render_template("mathstring.html",{'mathstr':mathstr,'isinline':isinline,'tail':element.tail})
 
-    html = '<html><html>%s</html><html>%s</html></html>' % (mathstr,element.tail)
-    xhtml = etree.XML(html)
+    html = '<html><html>%s</html><html>%s</html></html>' % (mathstr,saxutils.escape(element.tail))
+    try:
+        xhtml = etree.XML(html)
+    except Exception as err:
+        if False: # TODO needs to be self.system.DEBUG - but can't access system 
+            msg = "<html><font color='red'><p>Error %s</p>" % str(err).replace('<','&lt;')
+            msg += '<p>Failed to construct math expression from <pre>%s</pre></p>' % html.replace('<','&lt;')
+            msg += "</font></html>"
+            log.error(msg)
+            return etree.XML(msg)
+        else:
+            raise
     # xhtml.tail = element.tail	# don't forget to include the tail!
     return xhtml
 
