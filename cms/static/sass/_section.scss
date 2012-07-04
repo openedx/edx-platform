@@ -2,8 +2,12 @@ section#unit-wrapper {
   section.filters {
     @include clearfix;
     margin-bottom: 10px;
-    background: #efefef;
-    border: 1px solid #ddd;
+    opacity: .4;
+    @include transition;
+
+    &:hover {
+      opacity: 1;
+    }
 
     ul {
       @include clearfix();
@@ -22,14 +26,16 @@ section#unit-wrapper {
 
   div.content {
     display: table;
-    border: 1px solid;
+    border: 1px solid lighten($dark-blue, 40%);
     width: 100%;
 
     section {
       header {
-        background: #eee;
+        background: #fff;
         padding: 6px;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid lighten($dark-blue, 60%);
+        border-top: 1px solid lighten($dark-blue, 60%);
+        margin-top: -1px;
         @include clearfix;
 
         h2 {
@@ -37,6 +43,7 @@ section#unit-wrapper {
           letter-spacing: 1px;
           font-size: 12px;
           float: left;
+          color: $bright-blue;
         }
       }
 
@@ -44,7 +51,7 @@ section#unit-wrapper {
         @include box-sizing(border-box);
         display: table-cell;
         width: flex-grid(6, 9);
-        border-right: 1px solid #333;
+        border-right: 1px solid lighten($dark-blue, 40%);
 
         &.empty {
           text-align: center;
@@ -59,14 +66,9 @@ section#unit-wrapper {
 
         ol {
           list-style: none;
-          border-bottom: 1px solid #333;
 
           li {
-            border-bottom: 1px solid #333;
-
-            &:last-child{
-              border-bottom: 0;
-            }
+            border-bottom: 1px solid lighten($dark-blue, 60%);
 
             a {
               color: #000;
@@ -77,6 +79,10 @@ section#unit-wrapper {
 
               li {
                 padding: 6px;
+
+                &:last-child {
+                  border-bottom: 0;
+                }
 
                 &:hover {
                   a.draggable {
@@ -127,11 +133,10 @@ section#unit-wrapper {
 
         ol {
           list-style: none;
-          border-bottom: 1px solid #999;
 
           li {
-            border-bottom: 1px solid #999;
-            background: #f9f9f9;
+            border-bottom: 1px solid darken($light-blue, 8%);
+            background: lighten($light-blue, 2%);
 
             &:last-child {
               border-bottom: 0;

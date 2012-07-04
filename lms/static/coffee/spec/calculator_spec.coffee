@@ -12,8 +12,8 @@ describe 'Calculator', ->
 
     it 'bind the help button', ->
       # These events are bind by $.hover()
-      expect($('div.help-wrapper a')).toHandleWith 'mouseenter', @calculator.helpToggle
-      expect($('div.help-wrapper a')).toHandleWith 'mouseleave', @calculator.helpToggle
+      expect($('div.help-wrapper a')).toHandleWith 'mouseover', @calculator.helpToggle
+      expect($('div.help-wrapper a')).toHandleWith 'mouseout', @calculator.helpToggle
 
     it 'prevent default behavior on help button', ->
       $('div.help-wrapper a').click (e) ->

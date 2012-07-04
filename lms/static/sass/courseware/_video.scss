@@ -137,7 +137,6 @@ section.course-content {
             float: left;
             margin-bottom: 0;
 
-
             a {
               border-bottom: none;
               border-right: 1px solid #000;
@@ -199,6 +198,8 @@ section.course-content {
               ol.video_speeds {
                 display: block;
                 opacity: 1;
+                list-style: none;
+                padding-left: 0;
               }
             }
 
@@ -476,6 +477,7 @@ section.course-content {
 
       ol.subtitles {
         width: 0px;
+        display: none;
       }
     }
 
@@ -498,6 +500,7 @@ section.course-content {
         ol.subtitles {
           right: -(flex-grid(4));
           width: auto;
+          display: block;
         }
       }
 

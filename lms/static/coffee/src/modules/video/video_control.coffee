@@ -1,19 +1,9 @@
-class @VideoControl
-  constructor: (@player) ->
-    @render()
-    @bind()
-
-  $: (selector) ->
-    @player.$(selector)
-
+class @VideoControl extends Subview
   bind: ->
-    $(@player).bind('play', @onPlay)
-      .bind('pause', @onPause)
-      .bind('ended', @onPause)
     @$('.video_control').click @togglePlayback
 
   render: ->
-    @$('.video-controls').append """
+    @el.append """
       <div class="slider"></div>
       <div>
         <ul class="vcr">
@@ -31,16 +21,15 @@ class @VideoControl
     unless onTouchBasedDevice()
       @$('.video_control').addClass('play').html('Play')
 
-  onPlay: =>
+  play: ->
     @$('.video_control').removeClass('play').addClass('pause').html('Pause')
 
-  onPause: =>
+  pause: ->
     @$('.video_control').removeClass('pause').addClass('play').html('Play')
 
   togglePlayback: (event) =>
     event.preventDefault()
-    if $('.video_control').hasClass('play') || $('.video_control').hasClass('pause')
-      if @player.isPlaying()
-        $(@player).trigger('pause')
-      else
-        $(@player).trigger('play')
+    if @$('.video_control').hasClass('play')
+      $(@).trigger('play')
+    else if @$('.video_control').hasClass('pause')
+      $(@).trigger('pause')
