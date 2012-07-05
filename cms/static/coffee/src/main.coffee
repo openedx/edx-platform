@@ -5,7 +5,7 @@
   viewStack: []
 
   start: ->
-    new CMS.Views.Course el: $('section.main-container')
+    new CMS.Views.Course(el: $('section.main-container')).render()
 
   replaceView: (view) ->
     @viewStack = [view]

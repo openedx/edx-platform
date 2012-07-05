@@ -1,14 +1,16 @@
 class CMS.Views.Course extends Backbone.View
   initialize: ->
-    @$('#weeks > li').each (index, week) =>
-      new CMS.Views.Week el: week, height: @maxWeekHeight()
-
     CMS.on('content.show', @showContent)
     CMS.on('content.hide', @hideContent)
 
+  render: ->
+    @$('#weeks > li').each (index, week) =>
+      new CMS.Views.Week(el: week, height: @maxWeekHeight()).render()
+    return @
+
   showContent: (subview) =>
     $('body').addClass('content')
-    @$('.main-content').html(subview.el)
+    @$('.main-content').html(subview.render().el)
     @$('.cal').css height: @contentHeight()
     @$('>section').css minHeight: @contentHeight()
 
