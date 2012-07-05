@@ -1,10 +1,16 @@
-from git import Repo
-from contentstore import import_from_xml
-from fs.osfs import OSFS
+import logging
 import os
-from xmodule.modulestore import Location
-from django.conf import settings
 
+from django.conf import settings
+from fs.osfs import OSFS
+from git import Repo, PushInfo
+
+from contentstore import import_from_xml
+from xmodule.modulestore import Location
+
+from .exceptions import GithubSyncError
+
+log = logging.getLogger(__name__)
 
 def import_from_github(repo_settings):
     """
@@ -53,4 +59,17 @@ def export_to_github(course, repo_path, commit_message):
 
         origin = git_repo.remotes.origin
         if settings.MITX_FEATURES['GITHUB_PUSH']:
-            origin.push()
+            push_infos = origin.push()
+            if len(push_infos) > 1:
+                log.error('Unexpectedly pushed multiple heads: {infos}'.format(
+                    infos="\n".join(str(info.summary) for info in push_infos)
+                ))
+
+            if push_infos[0].flags & PushInfo.ERROR:
+                log.error('Failed push: flags={p.flags}, local_ref={p.local_ref}, '
+                          'remote_ref_string={p.remote_ref_string}, '
+                          'remote_ref={p.remote_ref}, old_commit={p.old_commit}, '
+                          'summary={p.summary})'.format(p=push_infos[0]))
+                raise GithubSyncError('Failed to push: {info}'.format(
+                    info=str(push_infos[0].summary)
+                ))
