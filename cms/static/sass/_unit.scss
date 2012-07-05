@@ -51,41 +51,61 @@ section#unit-wrapper {
     padding: 20px;
 
     section.meta {
+      background: $light-blue;
+      border-bottom: 1px solid lighten($dark-blue, 40%);
+      padding: 10px 20px;
+      margin: -20px -20px 10px;
+      opacity: .7;
+      @include transition;
+
+      &:hover {
+        opacity: 1;
+        padding: 20px;
+        margin: -20px -20px 10px;
+      }
+
       section {
         &.status-settings {
           float: left;
           margin-bottom: 10px;
           color: $dark-blue;
+          @include clearfix;
 
           ul {
             list-style: none;
-            border: 1px solid lighten($dark-blue, 40%);
-            @include inline-block();
+            border: 1px solid darken($light-blue, 15%);
+            @include clearfix();
+            float: left;
 
             li {
-              @include inline-block();
-              border-right: 1px solid lighten($dark-blue, 40%);
-              padding: 6px;
+              border-right: 1px solid darken($light-blue, 15%);
+              float: left;
 
               &:last-child {
                 border-right: 0;
               }
 
-              &.current {
-                background: #eee;
-              }
-
               a {
                 color: $dark-blue;
+                padding: 6px;
+                display: block;
+
+                &.current {
+                  background: darken($light-blue, 5%);
+                }
+
+                &:hover {
+                  background-color: lighten($yellow, 13%);
+                }
               }
             }
           }
 
           a.settings {
-            @include inline-block();
+            float: left;
             margin: 0 20px;
             padding: 6px;
-            border: 1px solid lighten($dark-blue, 40%);
+            border: 1px solid darken($light-blue, 15%);
             color: $dark-blue;
           }
 
@@ -110,10 +130,7 @@ section#unit-wrapper {
         }
 
         &.tags {
-          background: $light-blue;
           color: lighten($dark-blue, 6%);
-          padding: 10px;
-          margin: 0 0 20px;
           @include clearfix();
           clear: both;
 
