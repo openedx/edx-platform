@@ -3,7 +3,8 @@
 <%inherit file="simplewiki_base.html"/>
 
 <%!
-    from django.core.urlresolvers import reverse
+  from django.core.urlresolvers import reverse
+  from simplewiki.views import wiki_namespace_reverse
 %>
 
 <%block name="title"><title>Wiki Error – MITx 6.002x</title></%block>
@@ -21,10 +22,10 @@ ${wiki_error}
 %endif
 
 %if wiki_err_notfound is not UNDEFINED:
-	%if wiki_url is not UNDEFINED:
+	%if article_path is not UNDEFINED:
 		<p>
 		The page you requested could not be found.
-		Click <a href="${reverse("wiki_create", args=[wiki_url])}">here</a> to create it.
+		Click <a href="${wiki_namespace_reverse("wiki_create", course=course, kwargs={'article_path' : article_path})}">here</a> to create it.
 		</p>
 	%else:
 		<p>
@@ -35,13 +36,7 @@ ${wiki_error}
 		</p>
 	%endif
 %else:
-%if wiki_err_noparent is not UNDEFINED:
-	<p>
-	You cannot create this page, because its parent
-	does not exist. Click <a href="${reverse("wiki_create", args=[wiki_url_parent])}">here</a>
-	to create it.
-	</p>
-%elif wiki_err_no_namespace is not UNDEFINED and wiki_err_no_namespace:
+%if wiki_err_no_namespace is not UNDEFINED and wiki_err_no_namespace:
 	<p>
 	You must specify a namespace to create an article in.
 	</p>
