@@ -1171,7 +1171,6 @@ h1.top-header, div.course-wrapper section.course-content ol.vert-mod > li header
   border-bottom: 1px solid #eddfaa;
   border-top: 1px solid #fff;
   font-size: 12px;
-  height: 46px;
   line-height: 46px;
   margin: -22.652px -22.652px 22.652px;
   text-shadow: 0 1px 0 #fff; }
@@ -1185,7 +1184,6 @@ h1.top-header, div.course-wrapper section.course-content ol.vert-mod > li header
       color: #7e691a;
       text-decoration: none; }
     .topbar a.block-link, nav.sequence-nav a.block-link, .topbar nav.sequence-nav ol a, nav.sequence-nav ol .topbar a, nav.sequence-nav ol a {
-      background: #f2e7bf;
       border-left: 1px solid #e4d080;
       -webkit-box-shadow: inset 1px 0 0 #faf7e9;
       -moz-box-shadow: inset 1px 0 0 #faf7e9;
@@ -4622,17 +4620,17 @@ section.course-index div#accordion ul.ui-accordion-content {
   margin: 0;
   padding: 1em 1.5em; }
   section.course-index div#accordion ul.ui-accordion-content li {
-    background: transparent;
-    border: 1px solid transparent;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -ms-border-radius: 4px;
-    -o-border-radius: 4px;
-    border-radius: 4px;
-    margin-bottom: 11.326px;
-    position: relative;
-    padding: 5px 36px 5px 10px; }
+    margin-bottom: 11.326px; }
     section.course-index div#accordion ul.ui-accordion-content li a {
+      border: 1px solid transparent;
+      background: transparent;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -ms-border-radius: 4px;
+      -o-border-radius: 4px;
+      border-radius: 4px;
+      position: relative;
+      padding: 5px 36px 5px 10px;
       text-decoration: none;
       display: block;
       color: #666; }
@@ -4643,80 +4641,80 @@ section.course-index div#accordion ul.ui-accordion-content {
           color: #666;
           font-weight: normal;
           display: block; }
-    section.course-index div#accordion ul.ui-accordion-content li:after {
-      background: transparent;
-      border-top: 1px solid #b4b4b4;
-      border-right: 1px solid #b4b4b4;
-      content: "";
-      display: block;
-      height: 12px;
-      margin-top: -6px;
-      opacity: 0;
-      position: absolute;
-      top: 50%;
-      right: 30px;
-      -webkit-transform: rotate(45deg);
-      -moz-transform: rotate(45deg);
-      -ms-transform: rotate(45deg);
-      -o-transform: rotate(45deg);
-      transform: rotate(45deg);
-      width: 12px; }
-    section.course-index div#accordion ul.ui-accordion-content li:hover {
-      background-image: -webkit-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
-      background-image: -moz-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
-      background-image: -ms-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
-      background-image: -o-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
-      background-image: linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
-      border-color: #c8c8c8; }
-      section.course-index div#accordion ul.ui-accordion-content li:hover:after {
-        opacity: 1;
-        right: 15px;
-        -webkit-transition-property: all;
-        -moz-transition-property: all;
-        -ms-transition-property: all;
-        -o-transition-property: all;
-        transition-property: all;
-        -webkit-transition-duration: 0.2s;
-        -moz-transition-duration: 0.2s;
-        -ms-transition-duration: 0.2s;
-        -o-transition-duration: 0.2s;
-        transition-duration: 0.2s;
-        -webkit-transition-timing-function: linear;
-        -moz-transition-timing-function: linear;
-        -ms-transition-timing-function: linear;
-        -o-transition-timing-function: linear;
-        transition-timing-function: linear;
-        -webkit-transition-delay: 0;
-        -moz-transition-delay: 0;
-        -ms-transition-delay: 0;
-        -o-transition-delay: 0;
-        transition-delay: 0; }
-      section.course-index div#accordion ul.ui-accordion-content li:hover > a p {
-        color: #333; }
-    section.course-index div#accordion ul.ui-accordion-content li:active {
-      -webkit-box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1);
-      -moz-box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1);
-      box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1);
-      top: 1px; }
-      section.course-index div#accordion ul.ui-accordion-content li:active:after {
-        opacity: 1;
-        right: 15px; }
+      section.course-index div#accordion ul.ui-accordion-content li a:after {
+        background: transparent;
+        border-top: 1px solid #b4b4b4;
+        border-right: 1px solid #b4b4b4;
+        content: "";
+        display: block;
+        height: 12px;
+        margin-top: -6px;
+        opacity: 0;
+        position: absolute;
+        top: 50%;
+        right: 30px;
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        transform: rotate(45deg);
+        width: 12px; }
+      section.course-index div#accordion ul.ui-accordion-content li a:hover {
+        background-image: -webkit-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+        background-image: -moz-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+        background-image: -ms-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+        background-image: -o-linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+        background-image: linear-gradient(-90deg, rgba(245, 245, 245, 0.4), rgba(230, 230, 230, 0.4));
+        border-color: #c8c8c8; }
+        section.course-index div#accordion ul.ui-accordion-content li a:hover:after {
+          opacity: 1;
+          right: 15px;
+          -webkit-transition-property: all;
+          -moz-transition-property: all;
+          -ms-transition-property: all;
+          -o-transition-property: all;
+          transition-property: all;
+          -webkit-transition-duration: 0.2s;
+          -moz-transition-duration: 0.2s;
+          -ms-transition-duration: 0.2s;
+          -o-transition-duration: 0.2s;
+          transition-duration: 0.2s;
+          -webkit-transition-timing-function: linear;
+          -moz-transition-timing-function: linear;
+          -ms-transition-timing-function: linear;
+          -o-transition-timing-function: linear;
+          transition-timing-function: linear;
+          -webkit-transition-delay: 0;
+          -moz-transition-delay: 0;
+          -ms-transition-delay: 0;
+          -o-transition-delay: 0;
+          transition-delay: 0; }
+        section.course-index div#accordion ul.ui-accordion-content li a:hover > a p {
+          color: #333; }
+      section.course-index div#accordion ul.ui-accordion-content li a:active {
+        -webkit-box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1);
+        -moz-box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: inset 0 1px 14px 0 rgba(0, 0, 0, 0.1); }
+        section.course-index div#accordion ul.ui-accordion-content li a:active:after {
+          opacity: 1;
+          right: 15px; }
     section.course-index div#accordion ul.ui-accordion-content li.active {
-      background: #f0f0f0;
-      background-image: -webkit-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
-      background-image: -moz-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
-      background-image: -ms-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
-      background-image: -o-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
-      background-image: linear-gradient(-90deg, #f5f5f5, #e6e6e6);
-      border-color: #c8c8c8;
       font-weight: bold; }
-      section.course-index div#accordion ul.ui-accordion-content li.active > a p {
-        color: #333; }
+      section.course-index div#accordion ul.ui-accordion-content li.active > a {
+        background: #f0f0f0;
+        background-image: -webkit-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+        background-image: -moz-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+        background-image: -ms-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+        background-image: -o-linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+        background-image: linear-gradient(-90deg, #f5f5f5, #e6e6e6);
+        border-color: #c8c8c8; }
+        section.course-index div#accordion ul.ui-accordion-content li.active > a:after {
+          opacity: 1;
+          right: 15px; }
+        section.course-index div#accordion ul.ui-accordion-content li.active > a p {
+          color: #333; }
       section.course-index div#accordion ul.ui-accordion-content li.active span.subtitle {
         font-weight: normal; }
-      section.course-index div#accordion ul.ui-accordion-content li.active:after {
-        opacity: 1;
-        right: 15px; }
 
 @-moz-document url-prefix() {
   a.add-fullscreen {

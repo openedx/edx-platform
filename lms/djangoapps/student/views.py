@@ -474,9 +474,11 @@ def accept_name_change(request):
 
 @ensure_csrf_cookie
 def course_info(request):
+    # This is the advertising page for a student to look at the course before signing up
   csrf_token = csrf(request)['csrf_token']
+  course = settings.COURSES_BY_ID[course_id]
   # TODO: Couse should be a model
-  return render_to_response('course_info.html', {'csrf': csrf_token })
+  return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course': course })
 
 def about(request):
   return render_to_response('about.html', None)
