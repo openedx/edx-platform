@@ -58,6 +58,10 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates'
 ]
 
+TEMPLATE_DIRS = (
+    PROJECT_ROOT / "templates",
+)
+
 MITX_ROOT_URL = ''
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -67,6 +71,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.auth',  # this is required for admin
     'django.core.context_processors.csrf',  # necessary for csrf protection
 )
+
+################################# Jasmine ###################################
+JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
@@ -190,6 +197,10 @@ PIPELINE_JS = {
     'module-js': {
         'source_filenames': module_js_sources,
         'output_filename': 'js/modules.js',
+    },
+    'spec': {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
+        'output_filename': 'js/spec.js'
     }
 }
 
@@ -233,4 +244,7 @@ INSTALLED_APPS = (
     # For asset pipelining
     'pipeline',
     'staticfiles',
+
+    # For testing
+    'django_jasmine',
 )
