@@ -269,12 +269,32 @@ section.cal {
   opacity: .4;
   @include transition();
 
-  > header ul {
-    display: none;
-  }
-
   &:hover {
     opacity: 1;
+  }
+
+  > header {
+    @include transition;
+    overflow: hidden;
+    height: 55px;
+
+    ul {
+      display: block;
+
+      li {
+        border-left: 0;
+        margin-left: 0;
+        margin-bottom: 4px;
+
+        ul {
+          display: inline;
+        }
+      }
+    }
+
+    &:hover {
+      height: 167px;
+    }
   }
 
   ol {
