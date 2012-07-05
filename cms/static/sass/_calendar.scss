@@ -118,23 +118,24 @@ section.cal {
             position: relative;
 
             > div {
+              background: $dark-blue;
+              @include box-shadow(0 0 5px darken($light-blue, 60%));
+              @include box-sizing(border-box);
               display: none;
+              margin-left: 3%;
+              padding: 10px;
               @include position(absolute, 30px 0 0 0);
               width: 90%;
-              background: rgba(#000, .9);
-              padding: 10px;
-              @include box-sizing(border-box);
-              @include border-radius(3px);
               z-index: 99;
 
               &:before {
+                background: $dark-blue;
                 content: "  ";
                 display: block;
-                background: rgba(#000, .8);
-                width: 10px;
                 height: 10px;
                 @include position(absolute, -5px 0 0 50%);
                 @include transform(rotate(45deg));
+                width: 10px;
               }
 
               ul {
@@ -143,26 +144,33 @@ section.cal {
                   background: none;
 
                   input {
-                    width: 100%;
                     @include box-sizing(border-box);
-                    border-color: #000;
-                    padding: 6px;
+                    width: 100%;
                   }
 
                   select {
-                    width: 100%;
                     @include box-sizing(border-box);
+                    width: 100%;
 
                     option {
                       font-size: 14px;
                     }
                   }
 
+                  div {
+                    margin-top: 10px;
+                  }
+
                   a {
+                    color: $light-blue;
                     float: right;
 
                     &:first-child {
                       float: left;
+                    }
+
+                    &:hover {
+                      color: #fff;
                     }
                   }
                 }
