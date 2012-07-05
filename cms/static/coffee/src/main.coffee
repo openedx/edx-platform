@@ -30,6 +30,6 @@ $ ->
   Backbone.emulateHTTP = true
 
   $.ajaxSetup
-      headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
+    headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
 
   CMS.start()
