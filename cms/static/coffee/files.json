@@ -1,0 +1,8 @@
+{
+  "js_files": [
+    "/static/js/jquery.min.js",
+    "/static/js/json2.js",
+    "/static/js/underscore-min.js",
+    "/static/js/backbone-min.js"
+  ]
+}
