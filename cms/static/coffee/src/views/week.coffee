@@ -1,6 +1,6 @@
 class CMS.Views.Week extends Backbone.View
   events:
-    'click .module-edit': 'edit'
+    'click .week-edit': 'edit'
 
   initialize: ->
     @model = new CMS.Models.Week(id: @$el.data('id'))
