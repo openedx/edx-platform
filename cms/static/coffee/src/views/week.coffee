@@ -3,7 +3,6 @@ class CMS.Views.Week extends Backbone.View
     'click .week-edit': 'edit'
 
   initialize: ->
-    @model = new CMS.Models.Week(id: @$el.data('id'))
     @setHeight()
     @$('.editable').inlineEdit()
     @$('.editable-textarea').inlineEdit(control: 'textarea')
@@ -15,7 +14,7 @@ class CMS.Views.Week extends Backbone.View
     CMS.on('content.hide', @setHeight)
 
   edit: =>
-    CMS.replaceView(new CMS.Views.WeekEdit(model: @model))
+    CMS.replaceView(new CMS.Views.WeekEdit(model: new CMS.Models.Week(id: @$el.data('id'))))
 
   setHeight: =>
     @$el.height(@options.height)

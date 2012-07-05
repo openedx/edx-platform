@@ -19,7 +19,6 @@ class CMS.Views.ModuleEdit extends Backbone.View
   cancel: ->
     CMS.popView()
 
-  editSubmodule: (event) =>
-    $el = $(event.target)
-    model = new CMS.Models.Module(id: $el.data('id'), type: $el.data('type'))
-    CMS.pushView(new CMS.Views.ModuleEdit(model: model))
+  editSubmodule: (event) ->
+    event.preventDefault()
+    CMS.pushView(new CMS.Views.ModuleEdit(model: new CMS.Models.Module(id: $(event.target).data('id'), type: $(event.target).data('type'))))
