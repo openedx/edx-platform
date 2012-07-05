@@ -85,6 +85,8 @@ section#unit-wrapper {
                 }
 
                 &:hover {
+                  background-color: lighten($yellow, 10%);
+
                   a.draggable {
                     opacity: 1;
                   }
@@ -136,10 +138,14 @@ section#unit-wrapper {
 
           li {
             border-bottom: 1px solid darken($light-blue, 8%);
-            background: lighten($light-blue, 2%);
+            background: $light-blue;
 
             &:last-child {
               border-bottom: 0;
+            }
+
+            a {
+              color: $dark-blue;
             }
 
             ul {
@@ -153,6 +159,8 @@ section#unit-wrapper {
                 }
 
                 &:hover {
+                  background-color: lighten($yellow, 10%);
+
                   a.draggable {
                     opacity: 1;
                   }
@@ -172,13 +180,8 @@ section#unit-wrapper {
                   float: right;
                   opacity: .3;
                 }
-
-                a {
-                  color: #000;
-                }
               }
             }
-
           }
         }
       }
