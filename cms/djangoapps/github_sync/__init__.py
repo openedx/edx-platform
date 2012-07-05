@@ -13,7 +13,8 @@ def import_from_github(repo_settings):
     repo_settings is a dictionary with the following keys:
         path: file system path to the local git repo
         branch: name of the branch to track on github
-        org: name of the 
+        org: name of the organization to use in the imported course
+        course: name of the coures to use in the imported course
     """
     repo_path = repo_settings['path']
 
