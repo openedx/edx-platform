@@ -1,12 +1,17 @@
 section#unit-wrapper {
   section.filters {
     @include clearfix;
-    margin-bottom: 10px;
-    opacity: .4;
+    background: $light-blue;
+    border-bottom: 1px solid lighten($dark-blue, 40%);
+    padding: 5px 20px;
+    margin: -20px -20px 10px;
+    opacity: .7;
     @include transition;
 
     &:hover {
       opacity: 1;
+      padding: 10px 20px;
+      margin: -20px -20px 10px;
     }
 
     ul {
