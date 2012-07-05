@@ -30,3 +30,4 @@ nosexcover
 rednose
 GitPython >= 0.3
 django-override-settings
+mock>=0.8, <0.9
