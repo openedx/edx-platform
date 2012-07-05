@@ -88,7 +88,6 @@ def root_redirect(request, course_id):
     try:
         root = Article.get_root(course.wiki_namespace)
     except:
-        #TODO: If we don't find a root article, we should create it
         err = not_found(request, '/')
         return err
 
@@ -465,10 +464,10 @@ def encode_err(request, url, course):
     d.update(csrf(request))
     return render_to_response('simplewiki/simplewiki_error.html', d)
     
-def not_found(request, wiki_url, course):
+def not_found(request, article_path, course):
     """Generate a NOT FOUND message for some URL"""
     d = {'wiki_err_notfound': True,
-         'wiki_url': wiki_url,
+         'article_path': article_path,
          'course' : course,
          'namespace' : course.wiki_namespace}
     d.update(csrf(request))
@@ -481,7 +480,6 @@ def get_article(request, article_path, course):
     try:
         article = Article.get_article(article_path)
     except Article.DoesNotExist, ValueError:
-        #TODO: We need to pass a url for creating the article here
         err = not_found(request, article_path, course)
         
     return (article, err)
