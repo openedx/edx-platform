@@ -24,6 +24,8 @@ sympy
 newrelic
 glob2
 pymongo
+-e common/lib/capa
+-e common/lib/mitxmako
 -e common/lib/xmodule
 django_nose
 nosexcover
