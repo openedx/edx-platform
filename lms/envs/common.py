@@ -138,8 +138,23 @@ COURSE_DEFAULT = '6.002_Spring_2012'
 COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
                                           'title'  :  'Circuits and Electronics',
                                           'xmlpath': '6002x/',
+                                          'location': 'i4x://edx/6002xs12/course/6.002_Spring_2012',
                                           }
                     }
+
+
+############################### XModule Store ##################################
+MODULESTORE = {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+        'OPTIONS': {
+            'org': 'edx',
+            'course': '6002xs12',
+            'data_dir': DATA_DIR,
+            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        }
+    }
+}
 
 
 ############################### DJANGO BUILT-INS ###############################

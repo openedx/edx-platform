@@ -23,3 +23,7 @@ The dev server will automatically compile sass files that have changed. Simply s
 the server using:
     
     $ rake runserver
+
+To run it along side of development:
+
+    $ sass --watch lms/static/sass:lms/static/sass -r ./lms/static/sass/bourbon/lib/bourbon.rb

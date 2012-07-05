@@ -1,38 +1,35 @@
-class @VideoPlayer
-  constructor: (@video) ->
+class @VideoPlayer extends Subview
+  initialize: ->
     # Define a missing constant of Youtube API
     YT.PlayerState.UNSTARTED = -1
 
     @currentTime = 0
-    @element = $("#video_#{@video.id}")
-    @render()
-    @bind()
-
-  $: (selector) ->
-    $(selector, @element)
+    @el = $("#video_#{@video.id}")
 
   bind: ->
-    $(@).bind('seek', @onSeek)
-      .bind('updatePlayTime', @onUpdatePlayTime)
-      .bind('speedChange', @onSpeedChange)
-      .bind('play', @onPlay)
-      .bind('pause', @onPause)
-      .bind('ended', @onPause)
+    $(@control).bind('play', @play)
+      .bind('pause', @pause)
+    $(@caption).bind('seek', @onSeek)
+    $(@speedControl).bind('speedChange', @onSpeedChange)
+    $(@progressSlider).bind('seek', @onSeek)
+    if @volumeControl
+      $(@volumeControl).bind('volumeChange', @onVolumeChange)
     $(document).keyup @bindExitFullScreen
 
     @$('.add-fullscreen').click @toggleFullScreen
     @addToolTip() unless onTouchBasedDevice()
 
   bindExitFullScreen: (event) =>
-    if @element.hasClass('fullscreen') && event.keyCode == 27
+    if @el.hasClass('fullscreen') && event.keyCode == 27
       @toggleFullScreen(event)
 
   render: ->
-    new VideoControl @
-    new VideoCaption @, @video.youtubeId('1.0')
-    new VideoVolumeControl @ unless onTouchBasedDevice()
-    new VideoSpeedControl @, @video.speeds
-    new VideoProgressSlider @
+    @control = new VideoControl el: @$('.video-controls')
+    @caption = new VideoCaption el: @el, youtubeId: @video.youtubeId('1.0'), currentSpeed: @currentSpeed()
+    unless onTouchBasedDevice()
+      @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
+    @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
+    @progressSlider = new VideoProgressSlider el: @$('.slider')
     @player = new YT.Player @video.id,
       playerVars:
         controls: 0
@@ -52,81 +49,101 @@ class @VideoPlayer
         at: 'top center'
 
   onReady: =>
-    $(@).trigger('ready')
-    $(@).trigger('updatePlayTime', 0)
     unless onTouchBasedDevice()
       $('.course-content .video:first').data('video').player.play()
 
   onStateChange: (event) =>
     switch event.data
+      when YT.PlayerState.UNSTARTED
+        @onUnstarted()
       when YT.PlayerState.PLAYING
-        $(@).trigger('play')
-      when YT.PlayerState.PAUSED, YT.PlayerState.UNSTARTED
-        $(@).trigger('pause')
+        @onPlay()
+      when YT.PlayerState.PAUSED
+        @onPause()
       when YT.PlayerState.ENDED
-        $(@).trigger('ended')
+        @onEnded()
+
+  onUnstarted: =>
+    @control.pause()
+    @caption.pause()
 
   onPlay: =>
-    Logger.log 'play_video', id: @currentTime, code: @player.getVideoEmbedCode()
+    @video.log 'play_video'
     window.player.pauseVideo() if window.player && window.player != @player
     window.player = @player
     unless @player.interval
       @player.interval = setInterval(@update, 200)
+    @caption.play()
+    @control.play()
+    @progressSlider.play()
 
   onPause: =>
-    Logger.log 'pause_video', id: @currentTime, code: @player.getVideoEmbedCode()
+    @video.log 'pause_video'
     window.player = null if window.player == @player
     clearInterval(@player.interval)
     @player.interval = null
+    @caption.pause()
+    @control.pause()
 
-  onSeek: (event, time) ->
+  onEnded: =>
+    @control.pause()
+    @caption.pause()
+
+  onSeek: (event, time) =>
     @player.seekTo(time, true)
     if @isPlaying()
       clearInterval(@player.interval)
       @player.interval = setInterval(@update, 200)
     else
       @currentTime = time
-      $(@).trigger('updatePlayTime', time)
+    @updatePlayTime time
 
   onSpeedChange: (event, newSpeed) =>
     @currentTime = Time.convert(@currentTime, parseFloat(@currentSpeed()), newSpeed)
-    @video.setSpeed(parseFloat(newSpeed).toFixed(2).replace /\.00$/, '.0')
+    newSpeed = parseFloat(newSpeed).toFixed(2).replace /\.00$/, '.0'
+    @video.setSpeed(newSpeed)
+    @caption.currentSpeed = newSpeed
 
     if @isPlaying()
       @player.loadVideoById(@video.youtubeId(), @currentTime)
     else
       @player.cueVideoById(@video.youtubeId(), @currentTime)
-    $(@).trigger('updatePlayTime', @currentTime)
+    @updatePlayTime @currentTime
+
+  onVolumeChange: (event, volume) =>
+    @player.setVolume volume
 
   update: =>
     if @currentTime = @player.getCurrentTime()
-      $(@).trigger('updatePlayTime', @currentTime)
+      @updatePlayTime @currentTime
 
-  onUpdatePlayTime: (event, time) =>
+  updatePlayTime: (time) ->
     progress = Time.format(time) + ' / ' + Time.format(@duration())
     @$(".vidtime").html(progress)
+    @caption.updatePlayTime(time)
+    @progressSlider.updatePlayTime(time, @duration())
 
   toggleFullScreen: (event) =>
     event.preventDefault()
-    if @element.hasClass('fullscreen')
+    if @el.hasClass('fullscreen')
       @$('.exit').remove()
       @$('.add-fullscreen').attr('title', 'Fill browser')
-      @element.removeClass('fullscreen')
+      @el.removeClass('fullscreen')
     else
-      @element.append('<a href="#" class="exit">Exit</a>').addClass('fullscreen')
+      @el.append('<a href="#" class="exit">Exit</a>').addClass('fullscreen')
       @$('.add-fullscreen').attr('title', 'Exit fill browser')
       @$('.exit').click @toggleFullScreen
-    $(@).trigger('resize')
+    @caption.resize()
 
   # Delegates
-  play: ->
+  play: =>
     @player.playVideo() if @player.playVideo
 
   isPlaying: ->
     @player.getPlayerState() == YT.PlayerState.PLAYING
 
-  pause: ->
-    @player.pauseVideo()
+  pause: =>
+    @player.pauseVideo() if @player.pauseVideo
 
   duration: ->
     @video.getDuration()

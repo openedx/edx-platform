@@ -39,7 +39,7 @@ def django_admin(system, env, command, *args)
     return "#{django_admin} #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
 end
 
-task :default => [:pep8, :pylint, :test]
+task :default => [:test, :pep8, :pylint]
 
 directory REPORT_DIR
 directory LMS_REPORT_DIR
@@ -57,6 +57,11 @@ task :pylint => REPORT_DIR do
         sh("pylint --rcfile=.pylintrc -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
     end
 end
+
+default_options = {
+    :lms => '8000',
+    :cms => '8001',
+}
 
 [:lms, :cms].each do |system|
     task_name = "test_#{system}"
@@ -76,8 +81,16 @@ end
         Other useful environments are devplus (for dev testing with a real local database)
         desc
     task system, [:env, :options] => [] do |t, args|
-        args.with_defaults(:env => 'dev', :options => '')
+        args.with_defaults(:env => 'dev', :options => default_options[system])
         sh(django_admin(system, args.env, 'runserver', args.options))
+    end
+    
+    Dir["#{system}/envs/*.py"].each do |env_file|
+        env = File.basename(env_file).gsub(/\.py/, '')
+        desc "Attempt to import the settings file #{system}.envs.#{env} and report any errors"
+        task "#{system}:check_settings:#{env}" do
+            sh("echo 'import #{system}.envs.#{env}' | #{django_admin(system, env, 'shell')}")
+        end
     end
 end
 
@@ -153,4 +166,16 @@ end
 
 task :publish => :package do
     sh("scp #{BUILD_DIR}/#{NORMALIZED_DEPLOY_NAME}_#{PKG_VERSION}*.deb #{PACKAGE_REPO}")
+end
+
+namespace :cms do
+  desc "Import course data within the given DATA_DIR variable"
+  task :import do
+    if ENV['DATA_DIR']
+      sh(django_admin(:cms, :dev, :import, ENV['DATA_DIR']))
+    else
+      raise "Please specify a DATA_DIR variable that point to your data directory.\n" +
+        "Example: \`rake cms:import DATA_DIR=../data\`"
+    end
+  end
 end

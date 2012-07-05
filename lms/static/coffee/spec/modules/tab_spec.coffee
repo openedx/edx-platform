@@ -9,7 +9,7 @@ describe 'Tab', ->
       @tab = new Tab 1, @items
 
     it 'set the element', ->
-      expect(@tab.element).toEqual $('#tab_1')
+      expect(@tab.el).toEqual $('#tab_1')
 
     it 'build the tabs', ->
       links = $('.navigation li>a').map(-> $(this).attr('href')).get()
@@ -34,6 +34,6 @@ describe 'Tab', ->
       expect($('#tab-1-2').html()).toEqual ''
 
     it 'trigger contentChanged event on the element', ->
-      spyOnEvent @tab.element, 'contentChanged'
+      spyOnEvent @tab.el, 'contentChanged'
       $('[href="#tab-1-1"]').click()
-      expect('contentChanged').toHaveBeenTriggeredOn @tab.element
+      expect('contentChanged').toHaveBeenTriggeredOn @tab.el

@@ -1,11 +1,10 @@
 class @Problem
-  constructor: (@id, url) ->
-    @element = $("#problem_#{id}")
-    @content_url = "#{url}problem_get?id=#{@id}"
+  constructor: (@id, @element_id, url) ->
+    @el = $("##{@element_id}")
     @render()
 
   $: (selector) ->
-    $(selector, @element)
+    $(selector, @el)
 
   bind: =>
     MathJax.Hub.Queue ["Typeset", MathJax.Hub]
@@ -17,41 +16,40 @@ class @Problem
     @$('section.action input.save').click @save
     @$('input.math').keyup(@refreshMath).each(@refreshMath)
 
-  update_progress: (response) =>
+  updateProgress: (response) =>
     if response.progress_changed
-        @element.attr progress: response.progress_status
-        @element.trigger('progressChanged')
+        @el.attr progress: response.progress_status
+        @el.trigger('progressChanged')
 
   render: (content) ->
     if content
-      @element.html(content)
+      @el.html(content)
       @bind()
     else
-      $.postWithPrefix "/modx/problem/#{@id}/problem_get", '', (response) =>
-        @element.html(response.html)
+      $.postWithPrefix "/modx/#{@id}/problem_get", (response) =>
+        @el.html(response.html)
         @bind()
-      
 
   check: =>
     Logger.log 'problem_check', @answers
-    $.postWithPrefix "/modx/problem/#{@id}/problem_check", @answers, (response) =>
+    $.postWithPrefix "/modx/#{@id}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
           @render(response.contents)
-          @update_progress response
+          @updateProgress response
         else
           alert(response.success)
 
   reset: =>
     Logger.log 'problem_reset', @answers
-    $.postWithPrefix "/modx/problem/#{@id}/problem_reset", id: @id, (response) =>
+    $.postWithPrefix "/modx/#{@id}/problem_reset", id: @id, (response) =>
         @render(response.html)
-        @update_progress response
+        @updateProgress response
 
   show: =>
-    if !@element.hasClass 'showed'
+    if !@el.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
-      $.postWithPrefix "/modx/problem/#{@id}/problem_show", (response) =>
+      $.postWithPrefix "/modx/#{@id}/problem_show", (response) =>
         answers = response.answers
         $.each answers, (key, value) =>
           if $.isArray(value)
@@ -61,38 +59,39 @@ class @Problem
             @$("#answer_#{key}, #solution_#{key}").html(value)
         MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
-        @element.addClass 'showed'
-        @update_progress response
+        @el.addClass 'showed'
+        @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
-      @element.removeClass 'showed'
+      @el.removeClass 'showed'
       @$('.show').val 'Show Answer'
 
   save: =>
     Logger.log 'problem_save', @answers
-    $.postWithPrefix "/modx/problem/#{@id}/problem_save", @answers, (response) =>
+    $.postWithPrefix "/modx/#{@id}/problem_save", @answers, (response) =>
       if response.success
         alert 'Saved'
-      @update_progress response
+      @updateProgress response
 
   refreshMath: (event, element) =>
     element = event.target unless element
     target = "display_#{element.id.replace(/^input_/, '')}"
 
     if jax = MathJax.Hub.getAllJax(target)[0]
-      MathJax.Hub.Queue ['Text', jax, $(element).val()]
+      MathJax.Hub.Queue ['Text', jax, $(element).val()],
+        [@updateMathML, jax, element]
 
-      try
-        output = jax.root.toMathML ''
-        $("##{element.id}_dynamath").val(output)
-      catch exception
-        throw exception unless exception.restart
-        MathJax.Callback.After [@refreshMath, jax], exception.restart
+  updateMathML: (jax, element) =>
+    try
+      $("##{element.id}_dynamath").val(jax.root.toMathML '')
+    catch exception
+      throw exception unless exception.restart
+      MathJax.Callback.After [@refreshMath, jax], exception.restart
 
   refreshAnswers: =>
     @$('input.schematic').each (index, element) ->
       element.schematic.update_value()
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
-    @answers = @$("[id^=input_#{@id}_]").serialize()
+    @answers = @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]").serialize()

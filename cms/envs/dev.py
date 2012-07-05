@@ -3,14 +3,22 @@ This config file runs the simplest dev environment"""
 
 from .common import *
 
+import logging
+import sys
+logging.basicConfig(stream=sys.stdout, )
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-KEYSTORE = {
+MODULESTORE = {
     'default': {
-        'host': 'localhost',
-        'db': 'mongo_base',
-        'collection': 'key_store',
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': {
+            'default_class': 'xmodule.raw_module.RawDescriptor',
+            'host': 'localhost',
+            'db': 'mongo_base',
+            'collection': 'key_store',
+        }
     }
 }
 
