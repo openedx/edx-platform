@@ -37,7 +37,7 @@
           <ol>
             % for child in module.get_children():
             <li>
-              <a href="#" class="module-edit" data-id="${child.location.url()}" data-type="${child.type}">${child.name}</a>
+              <a href="#" class="module-edit" data-id="${child.location.url()}" data-type="${child.js_module_name()}">${child.name}</a>
               <a href="#" class="draggable">handle</a>
             </li>
             %endfor

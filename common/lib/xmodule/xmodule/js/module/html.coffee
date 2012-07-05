@@ -1,7 +1,7 @@
 class @HTML
-    constructor: (@id) ->
-        @edit_box = $("##{@id} .edit-box")
-        @preview = $("##{@id} .preview")
+    constructor: (@element) ->
+        @edit_box = $(".edit-box", @element)
+        @preview = $(".preview", @element)
         @edit_box.on('input', =>
             @preview.empty().append(@edit_box.val())
         )
