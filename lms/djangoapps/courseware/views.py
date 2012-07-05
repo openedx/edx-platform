@@ -275,7 +275,6 @@ def jump_to(request, probname=None):
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
-    # This is the advertising page for a student to look at the course before signing up
     csrf_token = csrf(request)['csrf_token']
 
     try:
@@ -283,4 +282,4 @@ def course_info(request, course_id):
     except KeyError:
         raise Http404("Course not found")
 
-    return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course' : course})
+    return render_to_response('info.html', {'csrf': csrf_token, 'course' : course})
