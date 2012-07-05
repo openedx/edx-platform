@@ -88,7 +88,11 @@ def root_redirect(request, course_id):
     try:
         root = Article.get_root(course.wiki_namespace)
     except:
-        err = not_found(request, '/')
+        # If the root is not found, we probably are loading this class for the first time
+        # We should make sure the namespace exists so the root article can be created.
+        Namespace.ensure_namespace(course.wiki_namespace)
+        
+        err = not_found(request, course.wiki_namespace + '/', course)
         return err
 
     return HttpResponseRedirect(reverse('wiki_view', kwargs={'course_id' : course_id, 'article_path' : root.get_path()} ))
