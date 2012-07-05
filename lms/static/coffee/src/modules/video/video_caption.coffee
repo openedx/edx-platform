@@ -1,16 +1,6 @@
-class @VideoCaption
-  constructor: (@player, @youtubeId) ->
-    @render()
-    @bind()
-
-  $: (selector) ->
-    @player.$(selector)
-
+class @VideoCaption extends Subview
   bind: ->
-    $(window).bind('resize', @onWindowResize)
-    $(@player).bind('resize', @onWindowResize)
-    $(@player).bind('updatePlayTime', @onUpdatePlayTime)
-    $(@player).bind('play', @onPlay)
+    $(window).bind('resize', @resize)
     @$('.hide-subtitles').click @toggle
     @$('.subtitles').mouseenter(@onMouseEnter).mouseleave(@onMouseLeave)
       .mousemove(@onMovement).bind('mousewheel', @onMovement)
@@ -69,12 +59,16 @@ class @VideoCaption
 
     return min
 
-  onPlay: =>
+  play: ->
     @renderCaption() unless @rendered
+    @playing = true
 
-  onUpdatePlayTime: (event, time) =>
+  pause: ->
+    @playing = false
+
+  updatePlayTime: (time) ->
     # This 250ms offset is required to match the video speed
-    time = Math.round(Time.convert(time, @player.currentSpeed(), '1.0') * 1000 + 250)
+    time = Math.round(Time.convert(time, @currentSpeed, '1.0') * 1000 + 250)
     newIndex = @search time
 
     if newIndex != undefined && @currentIndex != newIndex
@@ -85,7 +79,7 @@ class @VideoCaption
       @currentIndex = newIndex
       @scrollCaption()
 
-  onWindowResize: =>
+  resize: =>
     @$('.subtitles').css maxHeight: @captionHeight()
     @$('.subtitles .spacing:first').height(@topSpacingHeight())
     @$('.subtitles .spacing:last').height(@bottomSpacingHeight())
@@ -101,7 +95,7 @@ class @VideoCaption
   onMouseLeave: =>
     clearTimeout @frozen if @frozen
     @frozen = null
-    @scrollCaption() if @player.isPlaying()
+    @scrollCaption() if @playing
 
   scrollCaption: ->
     if !@frozen && @$('.subtitles .current:first').length
@@ -110,8 +104,8 @@ class @VideoCaption
 
   seekPlayer: (event) =>
     event.preventDefault()
-    time = Math.round(Time.convert($(event.target).data('start'), '1.0', @player.currentSpeed()) / 1000)
-    $(@player).trigger('seek', time)
+    time = Math.round(Time.convert($(event.target).data('start'), '1.0', @currentSpeed) / 1000)
+    $(@).trigger('seek', time)
 
   calculateOffset: (element) ->
     @captionHeight() / 2 - element.height() / 2
@@ -124,16 +118,16 @@ class @VideoCaption
 
   toggle: (event) =>
     event.preventDefault()
-    if @player.element.hasClass('closed')
+    if @el.hasClass('closed')
       @$('.hide-subtitles').attr('title', 'Turn off captions')
-      @player.element.removeClass('closed')
+      @el.removeClass('closed')
       @scrollCaption()
     else
       @$('.hide-subtitles').attr('title', 'Turn on captions')
-      @player.element.addClass('closed')
+      @el.addClass('closed')
 
   captionHeight: ->
-    if @player.element.hasClass('fullscreen')
+    if @el.hasClass('fullscreen')
       $(window).height() - @$('.video-controls').height()
     else
       @$('.video-wrapper').height()

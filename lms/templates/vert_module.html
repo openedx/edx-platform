@@ -1,7 +1,7 @@
 <ol class="vert-mod">
-% for t in items:
-  <li id="vert-${items.index(t)}">
-    ${t[1]['content']}
+% for idx, item in enumerate(items):
+  <li id="vert-${idx}">
+    ${item}
   </li>
 % endfor
 </ol>
