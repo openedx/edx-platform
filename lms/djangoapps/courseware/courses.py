@@ -15,6 +15,7 @@ _FIELDS = ['number', # 6.002x
            'instructors', # ['Anant Agarwal']
            'institution', # "MIT"
            'grader', # a courseware.graders.CourseGrader object
+           'location',
 
            #'start', # These should be datetime fields
            #'end'
@@ -27,6 +28,7 @@ class Course(namedtuple('Course', _FIELDS)):
     """Course objects encapsulate general information about a given run of a
     course. This includes things like name, grading policy, etc.
     """
+
     @property
     def id(self):
         return "{0.institution},{0.number},{0.run_id}".format(self).replace(" ", "_")

@@ -57,6 +57,13 @@ class XModule(object):
         else: 
             raise "We should iterate through children and find a default name"
 
+    def get_children(self):
+        '''
+        Return module instances for all the children of this module.
+        '''
+        children = [self.module_from_xml(e) for e in self.__xmltree]
+        return children            
+
     def rendered_children(self):
         '''
         Render all children. 
@@ -90,6 +97,7 @@ class XModule(object):
             self.tracker = system.track_function
             self.filestore = system.filestore
             self.render_function = system.render_function
+            self.module_from_xml = system.module_from_xml
             self.DEBUG = system.DEBUG
         self.system = system
 
@@ -117,6 +125,15 @@ class XModule(object):
         ''' HTML, as shown in the browser. This is the only method that must be implemented
         '''
         return "Unimplemented"
+
+    def get_progress(self):
+        ''' Return a progress.Progress object that represents how far the student has gone
+        in this module.  Must be implemented to get correct progress tracking behavior in
+        nesting modules like sequence and vertical.
+
+        If this module has no notion of progress, return None.
+        '''
+        return None
 
     def handle_ajax(self, dispatch, get):
         ''' dispatch is last part of the URL. 
@@ -187,3 +204,12 @@ class XModuleDescriptor(Plugin):
     #    Full ==> what we edit
     #    '''
     #    raise NotImplementedError
+
+
+class DescriptorSystem(object):
+    def __init__(self, load_item):
+        """
+        load_item: Takes a Location and returns and XModuleDescriptor
+        """
+
+        self.load_item = load_item

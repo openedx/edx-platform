@@ -1,0 +1,256 @@
+section.week-edit,
+section.week-new,
+section.sequence-edit {
+
+  > header {
+    border-bottom: 2px solid #333;
+    @include clearfix();
+
+    div {
+      @include clearfix();
+      padding: 6px 20px;
+
+      h1 {
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        float: left;
+      }
+
+      p {
+        float: right;
+      }
+
+      &.week {
+        background: #eee;
+        font-size: 12px;
+        border-bottom: 1px solid #ccc;
+
+        h2 {
+          font-size: 12px;
+          @include inline-block();
+          margin-right: 20px;
+        }
+
+        ul {
+          list-style: none;
+          @include inline-block();
+
+          li {
+            @include inline-block();
+            margin-right: 10px;
+
+            p {
+              float: none;
+            }
+          }
+        }
+      }
+    }
+
+    section.goals {
+      background: #eee;
+      padding: 6px 20px;
+      border-top: 1px solid #ccc;
+
+      ul {
+        list-style: none;
+        color: #999;
+
+        li {
+          margin-bottom: 6px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+
+  > section.content {
+    @include box-sizing(border-box);
+    padding: 20px;
+
+    section.filters {
+      @include clearfix;
+      margin-bottom: 10px;
+      background: #efefef;
+      border: 1px solid #ddd;
+
+      ul {
+        @include clearfix();
+        list-style: none;
+        padding: 6px;
+
+        li {
+          @include inline-block();
+
+          &.advanced {
+            float: right;
+          }
+        }
+      }
+    }
+
+    > div {
+      display: table;
+      border: 1px solid;
+      width: 100%;
+
+      section {
+        header {
+          background: #eee;
+          padding: 6px;
+          border-bottom: 1px solid #ccc;
+          @include clearfix;
+
+          h2 {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            float: left;
+          }
+        }
+
+        &.modules {
+          @include box-sizing(border-box);
+          display: table-cell;
+          width: flex-grid(6, 9);
+          border-right: 1px solid #333;
+
+          &.empty {
+            text-align: center;
+            vertical-align: middle;
+
+            a {
+              @extend .button;
+              @include inline-block();
+              margin-top: 10px;
+            }
+          }
+
+          ol {
+            list-style: none;
+            border-bottom: 1px solid #333;
+
+            li {
+              border-bottom: 1px solid #333;
+
+              &:last-child{
+                border-bottom: 0;
+              }
+
+              a {
+                color: #000;
+              }
+
+              ol {
+                list-style: none;
+
+                li {
+                  padding: 6px;
+
+                  &:hover {
+                    a.draggable {
+                      opacity: 1;
+                    }
+                  }
+
+                  a.draggable {
+                    float: right;
+                    opacity: .5;
+                  }
+
+                  &.group {
+                    padding: 0;
+
+                    header {
+                      padding: 6px;
+                      background: none;
+
+                      h3 {
+                        font-size: 14px;
+                      }
+                    }
+
+
+                    ol {
+                    border-left: 4px solid #999;
+                    border-bottom: 0;
+
+                      li {
+                        &:last-child {
+                          border-bottom: 0;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        &.scratch-pad {
+          @include box-sizing(border-box);
+          display: table-cell;
+          width: flex-grid(3, 9) + flex-gutter(9);
+          vertical-align: top;
+
+          ol {
+            list-style: none;
+            border-bottom: 1px solid #999;
+
+            li {
+              border-bottom: 1px solid #999;
+              background: #f9f9f9;
+
+              &:last-child {
+                border-bottom: 0;
+              }
+
+              ul {
+                list-style: none;
+
+                li {
+                  padding: 6px;
+
+                  &:last-child {
+                    border-bottom: 0;
+                  }
+
+                  &:hover {
+                    a.draggable {
+                      opacity: 1;
+                    }
+                  }
+
+                  &.empty {
+                    padding: 12px;
+
+                    a {
+                      @extend .button;
+                      display: block;
+                      text-align: center;
+                    }
+                  }
+
+                  a.draggable {
+                    float: right;
+                    opacity: .3;
+                  }
+
+                  a {
+                    color: #000;
+                  }
+                }
+              }
+
+            }
+          }
+        }
+      }
+    }
+  }
+}

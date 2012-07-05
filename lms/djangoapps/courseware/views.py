@@ -65,6 +65,14 @@ def courses(request):
              'csrf' : csrf_token}
   return render_to_response("courses.html", context)
 
+@ensure_csrf_cookie
+def courses(request):
+  csrf_token = csrf(request)['csrf_token']
+  # TODO: Clean up how 'error' is done.
+  context = {'courses' : settings.COURSES,
+             'csrf' : csrf_token}
+  return render_to_response("courses.html", context)
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request):
     if 'course_admin' not in user_groups(request.user):
@@ -75,8 +83,8 @@ def gradebook(request):
     student_objects = User.objects.all()[:100]
     student_info = []
 
-    coursename = multicourse_settings.get_coursename_from_request(request)
-    course_location = multicourse_settings.get_course_location(coursename)
+    coursename = course.name
+    course_location = course.path
 
     for student in student_objects:
         student_module_cache = StudentModuleCache(student, modulestore().get_item(course_location))
@@ -133,8 +141,7 @@ def render_accordion(request, course, chapter, section):
 
         Returns (initialization_javascript, content)'''
 
-    course_location = multicourse_settings.get_course_location(course)
-    toc = toc_for_course(request.user, request, course_location, chapter, section)
+    toc = toc_for_course(request.user, request, course, chapter, section)
 
     active_chapter = 1
     for i in range(len(toc)):
@@ -221,7 +228,7 @@ def index(request, course=None, chapter=None, section=None,
 
     look_for_module = chapter is not None and section is not None
     if look_for_module:
-        course_location = multicourse_settings.get_course_location(course)
+        course_location = course.path #multicourse_settings.get_course_location(course)
         section = get_section(course_location, chapter, section)
         student_module_cache = StudentModuleCache(request.user, section)
         module, _, _, _ = get_module(request.user, request, section.location, student_module_cache)

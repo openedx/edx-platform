@@ -115,7 +115,7 @@ def make_module_from_xml_fn(user, request, student_module_cache, course, positio
     return module_from_xml
 
 
-def toc_for_course(user, request, course_location, active_chapter, active_section):
+def toc_for_course(user, request, course, active_chapter, active_section):
     '''
     Create a table of contents from the module store
 
@@ -131,8 +131,8 @@ def toc_for_course(user, request, course_location, active_chapter, active_sectio
     chapters with name 'hidden' are skipped.
     '''
 
-    student_module_cache = StudentModuleCache(user, modulestore().get_item(course_location), depth=2)
-    (course, _, _, _) = get_module(user, request, course_location, student_module_cache)
+    # student_module_cache = StudentModuleCache(user, modulestore().get_item(course_location), depth=2)
+    # (course, _, _, _) = get_module(user, request, course_location, student_module_cache)
 
     chapters = list()
     for chapter in course.get_display_items():
