@@ -183,9 +183,9 @@
 
       a {
         border-bottom: 3px solid transparent;
-        color: $lighter-base-font-color;
         @include inline-block;
         font: normal 1.2rem/1.6rem $sans-serif;
+        letter-spacing: 1px;
         margin: 0 15px;
         padding: 0px 5px 15px;
         text-align: center;
@@ -196,8 +196,7 @@
         }
 
         &:hover, &.active {
-          border-color: $pink;
-          //background: rgb(240,240,240);
+          border-color: rgb(200,200,200);
           color: $base-font-color;
         }
       }

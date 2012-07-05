@@ -120,13 +120,12 @@
     .partners {
       font-size: 0em;
       margin: 0 auto;
-      padding: 15px 0px;
+      padding: 20px 0px;
       text-align: center;
 
       li.partner {
         @include inline-block;
-        margin-right: 20px;
-        padding-right: 20px;
+        padding: 0px 30px;
         position: relative;
         vertical-align: middle;
 
@@ -134,10 +133,10 @@
           @extend .faded-vertical-divider;
           content: "";
           display: block;
-          height: 100px;
+          height: 80px;
           right: 0px;
           position: absolute;
-          top: 0px;
+          top: -5px;
           width: 1px;
         }
 
@@ -145,21 +144,14 @@
           @extend .faded-vertical-divider-light;
           content: "";
           display: block;
-          height: 100px;
+          height: 80px;
           right: 1px;
           position: absolute;
-          top: 0px;
+          top: -5px;
           width: 1px;
         }
 
-        &.mit {
-          padding: 0 35px 0 20px;
-        }
-
         &:last-child {
-          margin-right: 0px;
-          padding-right: 0px;
-
           &::before {
             display: none;
           }
@@ -171,7 +163,6 @@
       }
 
       a {
-        opacity: 0.7;
         @include transition(all, 0.25s, ease-in-out);
 
         &::before {
@@ -191,21 +182,28 @@
         }
 
         .name {
-          color: $base-font-color;
-          font: 800 italic 2rem/2.2rem $sans-serif;
           left: 0px;
           position: absolute;
           text-align: center;
-          text-shadow: 0 1px rgba(255,255,255, 0.6);
           bottom: -60px;
           @include transition(all, 0.25s, ease-in-out);
-          vertical-align: middle;
           width: 100%;
           z-index: 2;
+
+          span {
+            color: $base-font-color;
+            font: 800 italic 2rem/2.2rem $sans-serif;
+            text-shadow: 0 1px rgba(255,255,255, 0.6);
+            @include transition(all, 0.15s, ease-in-out);
+
+            &:hover {
+              color: $lighter-base-font-color;
+            }
+          }
         }
 
         img {
-          max-width: 140px;
+          max-width: 160px;
           position: relative;
           @include transition(all, 0.25s, ease-in-out);
           vertical-align: middle;
@@ -213,18 +211,16 @@
         }
 
         &:hover {
-          opacity: 0.9;
-
           &::before {
             opacity: 1;
           }
 
           .name {
-            bottom: 30px;
+            bottom: 20px;
           }
 
           img {
-            top: -120px;
+            top: -100px;
           }
         }
       }

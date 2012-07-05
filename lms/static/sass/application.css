@@ -404,7 +404,7 @@ a:link, a:visited {
   .container:after {
     clear: both; }
 
-.faded-hr-divider, .horizontal-divider, .modal .inner-wrapper header hr::after, .modal .inner-wrapper form .honor-code-summary hr::after, .course-info .container nav::after, .course-info .details .inner-wrapper > section::after, .course-info .details .course-staff .teacher::after {
+.faded-hr-divider, .horizontal-divider, .modal .inner-wrapper header hr::after, .modal .inner-wrapper form .honor-code-summary hr::after, .course-info .container nav::after, .course-info .details .inner-wrapper > section::after, .course-info .details .course-staff .teacher::after, .about > nav::after {
   background-image: -webkit-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -moz-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -ms-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
@@ -1767,7 +1767,7 @@ header.app {
     clear: both; }
   .highlighted-courses .courses .course, .find-courses .courses .course {
     background: #fafafa;
-    border: 1px solid #dcdcdc;
+    border: 1px solid #b4b4b4;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     -ms-border-radius: 2px;
@@ -1776,13 +1776,14 @@ header.app {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-    -moz-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
-    box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    -webkit-box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    -moz-box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
     float: left;
     font-size: 0em;
     margin-right: 2.024%;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
+    position: relative;
     width: 31.984%;
     -webkit-transition-property: all;
     -moz-transition-property: all;
@@ -1819,11 +1820,11 @@ header.app {
       width: 100%;
       z-index: 3; }
       .highlighted-courses .courses .course header.course-preview > a, .find-courses .courses .course header.course-preview > a {
-        background-image: -webkit-linear-gradient(-90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.75));
-        background-image: -moz-linear-gradient(-90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.75));
-        background-image: -ms-linear-gradient(-90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.75));
-        background-image: -o-linear-gradient(-90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.75));
-        background-image: linear-gradient(-90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.75));
+        background-image: -webkit-linear-gradient(-90deg, white, rgba(255, 255, 255, 0.85));
+        background-image: -moz-linear-gradient(-90deg, white, rgba(255, 255, 255, 0.85));
+        background-image: -ms-linear-gradient(-90deg, white, rgba(255, 255, 255, 0.85));
+        background-image: -o-linear-gradient(-90deg, white, rgba(255, 255, 255, 0.85));
+        background-image: linear-gradient(-90deg, white, rgba(255, 255, 255, 0.85));
         -webkit-box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
         -moz-box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
         box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
@@ -1869,6 +1870,8 @@ header.app {
           .highlighted-courses .courses .course header.course-preview > a:hover h2, .highlighted-courses .courses .course header.course-preview > a:hover p, .highlighted-courses .courses .course header.course-preview > a:hover .info-link, .find-courses .courses .course header.course-preview > a:hover h2, .find-courses .courses .course header.course-preview > a:hover p, .find-courses .courses .course header.course-preview > a:hover .info-link {
             color: #1d9dd9;
             opacity: 1; }
+          .highlighted-courses .courses .course header.course-preview > a:hover h2, .find-courses .courses .course header.course-preview > a:hover h2 {
+            text-decoration: underline; }
     .highlighted-courses .courses .course .info, .find-courses .courses .course .info {
       height: 310px;
       left: 0px;
@@ -1942,7 +1945,8 @@ header.app {
         width: 100%; }
         .highlighted-courses .courses .course .info .cover-image img, .find-courses .courses .course .info .cover-image img {
           display: block;
-          min-width: 100%; }
+          min-height: 100%;
+          width: 100%; }
       .highlighted-courses .courses .course .info .desc, .find-courses .courses .course .info .desc {
         background: white;
         -webkit-box-sizing: border-box;
@@ -1954,10 +1958,10 @@ header.app {
         width: 100%; }
     .highlighted-courses .courses .course:hover, .find-courses .courses .course:hover {
       background: #f5f5f5;
-      border-color: #bebebe;
-      -webkit-box-shadow: 0 1px 16px 0 rgba(29, 157, 217, 0.35);
-      -moz-box-shadow: 0 1px 16px 0 rgba(29, 157, 217, 0.35);
-      box-shadow: 0 1px 16px 0 rgba(29, 157, 217, 0.35); }
+      border-color: #aaaaaa;
+      -webkit-box-shadow: 0 1px 16px 0 rgba(29, 157, 217, 0.4);
+      -moz-box-shadow: 0 1px 16px 0 rgba(29, 157, 217, 0.4);
+      box-shadow: 0 1px 16px 0 rgba(29, 157, 217, 0.4); }
       .highlighted-courses .courses .course:hover .info, .find-courses .courses .course:hover .info {
         top: -130px; }
         .highlighted-courses .courses .course:hover .info .meta-info, .find-courses .courses .course:hover .info .meta-info {
@@ -2545,7 +2549,7 @@ header.app {
     .home .university-partners .partners {
       font-size: 0em;
       margin: 0 auto;
-      padding: 15px 0px;
+      padding: 20px 0px;
       text-align: center; }
       .home .university-partners .partners li.partner {
         display: -moz-inline-box;
@@ -2555,37 +2559,30 @@ header.app {
         zoom: 1;
         *display: inline;
         *vertical-align: auto;
-        margin-right: 20px;
-        padding-right: 20px;
+        padding: 0px 30px;
         position: relative;
         vertical-align: middle; }
         .home .university-partners .partners li.partner::before {
           content: "";
           display: block;
-          height: 100px;
+          height: 80px;
           right: 0px;
           position: absolute;
-          top: 0px;
+          top: -5px;
           width: 1px; }
         .home .university-partners .partners li.partner::after {
           content: "";
           display: block;
-          height: 100px;
+          height: 80px;
           right: 1px;
           position: absolute;
-          top: 0px;
+          top: -5px;
           width: 1px; }
-        .home .university-partners .partners li.partner.mit {
-          padding: 0 35px 0 20px; }
-        .home .university-partners .partners li.partner:last-child {
-          margin-right: 0px;
-          padding-right: 0px; }
-          .home .university-partners .partners li.partner:last-child::before {
-            display: none; }
-          .home .university-partners .partners li.partner:last-child::after {
-            display: none; }
+        .home .university-partners .partners li.partner:last-child::before {
+          display: none; }
+        .home .university-partners .partners li.partner:last-child::after {
+          display: none; }
       .home .university-partners .partners a {
-        opacity: 0.7;
         -webkit-transition-property: all;
         -moz-transition-property: all;
         -ms-transition-property: all;
@@ -2644,12 +2641,9 @@ header.app {
           top: 50%;
           z-index: 1; }
         .home .university-partners .partners a .name {
-          color: #3c3c3c;
-          font: 800 italic 2rem/2.2rem "Open Sans", Verdana, Geneva, sans-serif;
           left: 0px;
           position: absolute;
           text-align: center;
-          text-shadow: 0 1px rgba(255, 255, 255, 0.6);
           bottom: -60px;
           -webkit-transition-property: all;
           -moz-transition-property: all;
@@ -2671,11 +2665,36 @@ header.app {
           -ms-transition-delay: 0;
           -o-transition-delay: 0;
           transition-delay: 0;
-          vertical-align: middle;
           width: 100%;
           z-index: 2; }
+          .home .university-partners .partners a .name span {
+            color: #3c3c3c;
+            font: 800 italic 2rem/2.2rem "Open Sans", Verdana, Geneva, sans-serif;
+            text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: ease-in-out;
+            -moz-transition-timing-function: ease-in-out;
+            -ms-transition-timing-function: ease-in-out;
+            -o-transition-timing-function: ease-in-out;
+            transition-timing-function: ease-in-out;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0; }
+            .home .university-partners .partners a .name span:hover {
+              color: #a0a0a0; }
         .home .university-partners .partners a img {
-          max-width: 140px;
+          max-width: 160px;
           position: relative;
           -webkit-transition-property: all;
           -moz-transition-property: all;
@@ -2699,14 +2718,12 @@ header.app {
           transition-delay: 0;
           vertical-align: middle;
           z-index: 2; }
-        .home .university-partners .partners a:hover {
-          opacity: 0.9; }
-          .home .university-partners .partners a:hover::before {
-            opacity: 1; }
-          .home .university-partners .partners a:hover .name {
-            bottom: 30px; }
-          .home .university-partners .partners a:hover img {
-            top: -120px; }
+        .home .university-partners .partners a:hover::before {
+          opacity: 1; }
+        .home .university-partners .partners a:hover .name {
+          bottom: 20px; }
+        .home .university-partners .partners a:hover img {
+          top: -100px; }
   .home .highlighted-courses {
     border-bottom: 1px solid #d2d2d2;
     -webkit-box-sizing: border-box;
@@ -3737,7 +3754,6 @@ nav.course-material {
       display: none; }
     .course-info .container nav a {
       border-bottom: 3px solid transparent;
-      color: #a0a0a0;
       display: -moz-inline-box;
       -moz-box-orient: vertical;
       display: inline-block;
@@ -3746,6 +3762,7 @@ nav.course-material {
       *display: inline;
       *vertical-align: auto;
       font: normal 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
+      letter-spacing: 1px;
       margin: 0 15px;
       padding: 0px 5px 15px;
       text-align: center;
@@ -3753,7 +3770,7 @@ nav.course-material {
       .course-info .container nav a:first-child {
         margin-left: 0px; }
       .course-info .container nav a:hover, .course-info .container nav a.active, .course-info .container nav.sequence-nav ol li a.seq_video_active, .course-info .container nav.sequence-nav ol li a.seq_other_active, .course-info .container nav.sequence-nav ol li a.seq_vertical_active, .course-info .container nav.sequence-nav ol li a.seq_problem_active {
-        border-color: #b62568;
+        border-color: #c8c8c8;
         color: #3c3c3c; }
   .course-info .container h2 {
     color: #a0a0a0;
@@ -3907,7 +3924,7 @@ nav.course-material {
     .jobs .message.left .photo {
       float: left;
       margin-right: 2.024%; }
-    .jobs .message.right h2, .jobs .message.right p {
+    .jobs .message.right h2 {
       text-align: right; }
     .jobs .message.right .photo {
       float: right;
@@ -3954,7 +3971,7 @@ nav.course-material {
             .jobs .jobs-wrapper .jobs-sidebar nav ol li a {
               display: block;
               margin-left: -20px;
-              padding: 10px 0px 10px 20px;
+              padding: 10px 0 10px 20px;
               position: relative;
               text-transform: uppercase; }
               .jobs .jobs-wrapper .jobs-sidebar nav ol li a::after {
@@ -3989,6 +4006,191 @@ nav.course-material {
           font-family: "Open Sans", Verdana, Geneva, sans-serif;
           font-weight: bold;
           margin-bottom: 15px; }
+
+.about {
+  margin: 40px auto 120px; }
+  .about > nav {
+    margin-bottom: 80px;
+    text-align: center;
+    width: 100%; }
+    .about > nav::after {
+      content: "";
+      display: block; }
+    .about > nav a {
+      border-bottom: 3px solid transparent;
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      letter-spacing: 1px;
+      margin: 0px 5px;
+      padding: 20px 10px;
+      -webkit-transition-property: all;
+      -moz-transition-property: all;
+      -ms-transition-property: all;
+      -o-transition-property: all;
+      transition-property: all;
+      -webkit-transition-duration: 0.15s;
+      -moz-transition-duration: 0.15s;
+      -ms-transition-duration: 0.15s;
+      -o-transition-duration: 0.15s;
+      transition-duration: 0.15s;
+      -webkit-transition-timing-function: linear;
+      -moz-transition-timing-function: linear;
+      -ms-transition-timing-function: linear;
+      -o-transition-timing-function: linear;
+      transition-timing-function: linear;
+      -webkit-transition-delay: 0;
+      -moz-transition-delay: 0;
+      -ms-transition-delay: 0;
+      -o-transition-delay: 0;
+      transition-delay: 0;
+      text-transform: uppercase; }
+      .about > nav a:hover, .about > nav a.active, .about > nav nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li .about > nav a.seq_video_active, .about > nav nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li .about > nav a.seq_other_active, .about > nav nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li .about > nav a.seq_vertical_active, .about > nav nav.sequence-nav ol li a.seq_problem_active, nav.sequence-nav ol li .about > nav a.seq_problem_active {
+        border-color: #c8c8c8;
+        color: #3c3c3c; }
+  .about .vision {
+    display: none; }
+    .about .vision h1 + hr {
+      margin-bottom: 80px; }
+    .about .vision .message {
+      zoom: 1;
+      margin-bottom: 60px;
+      padding-bottom: 60px;
+      position: relative; }
+      .about .vision .message:before, .about .vision .message:after {
+        content: "";
+        display: table; }
+      .about .vision .message:after {
+        clear: both; }
+      .about .vision .message hr {
+        bottom: 0px;
+        margin: 0px;
+        position: absolute;
+        width: 100%; }
+      .about .vision .message .photo {
+        background: white;
+        border: 1px solid #d2d2d2;
+        padding: 1px;
+        width: 31.984%; }
+        .about .vision .message .photo img {
+          background: #f5f5f5;
+          display: block;
+          height: 200px;
+          width: 100%; }
+      .about .vision .message.left .photo {
+        float: left;
+        margin-right: 2.024%; }
+      .about .vision .message.right h2 {
+        text-align: right; }
+      .about .vision .message.right .photo {
+        float: right;
+        margin-left: 2.024%; }
+      .about .vision .message:last-child {
+        margin-bottom: 0px; }
+  .about .faq {
+    zoom: 1; }
+    .about .faq:before, .about .faq:after {
+      content: "";
+      display: table; }
+    .about .faq:after {
+      clear: both; }
+    .about .faq nav.categories {
+      border-right: 1px solid #dcdcdc;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      float: left;
+      margin-right: 2.024%;
+      padding-right: 20px;
+      width: 23.482%; }
+      .about .faq nav.categories a {
+        display: block;
+        letter-spacing: 1px;
+        margin-right: -20px;
+        padding: 10px 20px 10px 0;
+        text-align: right;
+        text-transform: uppercase; }
+        .about .faq nav.categories a:hover {
+          background: #f5f5f5; }
+    .about .faq .responses {
+      float: left;
+      width: 74.494%; }
+      .about .faq .responses .category {
+        padding-top: 40px; }
+        .about .faq .responses .category:first-child {
+          padding-top: 0px; }
+        .about .faq .responses .category > h2 {
+          border-bottom: 1px solid #dcdcdc;
+          margin-bottom: 40px;
+          padding-bottom: 20px; }
+      .about .faq .responses .response {
+        margin-bottom: 40px; }
+        .about .faq .responses .response h3 {
+          font-family: "Open Sans", Verdana, Geneva, sans-serif;
+          font-weight: bold;
+          margin-bottom: 15px; }
+  .about .press {
+    display: none; }
+    .about .press .press-story {
+      border-bottom: 1px solid #dcdcdc;
+      zoom: 1;
+      margin-bottom: 40px;
+      padding-bottom: 40px; }
+      .about .press .press-story:before, .about .press .press-story:after {
+        content: "";
+        display: table; }
+      .about .press .press-story:after {
+        clear: both; }
+      .about .press .press-story:last-child {
+        border: none;
+        margin: 0px;
+        padding: 0px; }
+      .about .press .press-story .article-cover {
+        background: white;
+        border: 1px solid #787878;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        float: left;
+        height: 120px;
+        margin-right: 2.024%;
+        overflow: hidden;
+        width: 14.98%; }
+        .about .press .press-story .article-cover img {
+          display: block;
+          min-height: 100%;
+          width: 100%; }
+      .about .press .press-story .press-info {
+        float: left;
+        width: 82.996%; }
+        .about .press .press-story .press-info header {
+          margin-bottom: 15px; }
+          .about .press .press-story .press-info header h3 {
+            font-family: "Open Sans", Verdana, Geneva, sans-serif;
+            font-weight: bold; }
+  .about .contact {
+    display: none;
+    zoom: 1;
+    margin: 0 auto;
+    width: 82.996%; }
+    .about .contact:before, .about .contact:after {
+      content: "";
+      display: table; }
+    .about .contact:after {
+      clear: both; }
+    .about .contact .map {
+      background: #f5f5f5;
+      float: left;
+      height: 180px;
+      margin-right: 2.024%;
+      width: 48.988%; }
+    .about .contact .address {
+      float: left;
+      width: 48.988%; }
 
 html {
   height: 100%;

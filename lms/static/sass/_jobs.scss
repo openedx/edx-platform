@@ -40,7 +40,7 @@
     }
 
     &.right {
-      h2, p {
+      h2 {
         text-align: right;
       }
 
@@ -64,7 +64,6 @@
       border-bottom: 1px solid rgb(220,220,220);
       margin-bottom: 60px;
       padding-bottom: 20px;
-      //text-align: center;
     }
 
     .jobs-sidebar {
@@ -93,7 +92,7 @@
             a {
               display: block;
               margin-left: -20px;
-              padding: 10px 0px 10px 20px;
+              padding: 10px 0 10px 20px;
               position: relative;
               text-transform: uppercase;
 
@@ -111,9 +110,6 @@
 
               &:hover {
                 background: rgb(245,245,245);
-                //@include background-image(linear-gradient(180deg, rgba(245,245,245, 0) 0%,
-                                                                  //rgba(245,245,245, 1) 80%,
-                                                                  //rgba(245,245,245, 1) 100%));
               }
             }
           }
