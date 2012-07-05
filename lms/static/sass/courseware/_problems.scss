@@ -205,17 +205,17 @@ section.problem-set {
     table {
       margin-bottom: lh();
       width: 100%;
-      border: 1px solid #ddd;
+      // border: 1px solid #ddd;
       border-collapse: collapse;
 
       th {
-        border-bottom: 2px solid #ccc;
+        // border-bottom: 2px solid #ccc;
         font-weight: bold;
         text-align: left;
       }
 
       td {
-        border: 1px solid #ddd;
+        // border: 1px solid #ddd;
       }
 
       caption, th, td {
@@ -253,11 +253,12 @@ section.problem-set {
       visibility: hidden;
     }
 
-    input[type="text"] {
-      display: inline-block;
-      width: 50%;
+    #{$all-text-inputs} {
+      display: inline;
+      width: auto;
     }
 
+    // this supports a deprecated element and should be removed once the center tag is removed
     center {
       display: block;
       margin: lh() 0;
