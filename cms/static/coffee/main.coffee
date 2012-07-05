@@ -1,7 +1,13 @@
 class @CMS
     @setHeight = =>
-        windowHeight = $(this).height()
-        @contentHeight = windowHeight - 29
+        windowHeight = $(window).height()
+        headerHeight = $('body > header').outerHeight()
+        contentHeight = $('.main-content').height()
+        @sidebarHeight = if windowHeight > contentHeight then windowHeight - headerHeight else contentHeight - headerHeight
+        @minContentHeight = windowHeight - headerHeight
+
+        $('.cal').css('height', @sidebarHeight)
+        $('.main-content').css('min-height', @minContentHeight)
 
     @bind = =>
         $('a.module-edit').click ->
@@ -13,8 +19,9 @@ class @CMS
         $.get('/edit_item', {id: id}, (data) =>
             $('#module-html').empty().append(data)
             CMS.bind()
-            $('body.content .cal').css('height', @contentHeight)
+            CMS.setHeight()
             $('body').addClass('content')
+            $('body.content .cal ol > li').css('height','auto')
             $('section.edit-pane').show()
             new Unit('unit-wrapper', id)
         )
@@ -31,6 +38,7 @@ $ ->
         heighest = if $(this).height() > heighest then $(this).height() else heighest
 
     $('.cal ol > li').css('height',heighest + 'px')
+    $('body.content .cal ol > li').css('height','auto')
 
     $('.add-new-section').click -> return false
 
@@ -43,40 +51,6 @@ $ ->
         $(this).parent().parent().hide()
         return false
 
-    # $('html').keypress ->
-    #   $('.wip').css('visibility', 'visible')
-
-    setHeight = ->
-        windowHeight = $(this).height()
-        contentHeight = windowHeight - 29
-
-        $('section.main-content > section').css('min-height', contentHeight)
-        $('body.content .cal').css('height', contentHeight)
-
-        $('.edit-week').click ->
-            $('body').addClass('content')
-            $('body.content .cal').css('height', contentHeight)
-            $('section.edit-pane').show()
-            return false
-
-        $('a.week-edit').click ->
-            $('body').addClass('content')
-            $('body.content .cal').css('height', contentHeight)
-            $('section.edit-pane').show()
-            return false
-
-        $('a.sequence-edit').click ->
-            $('body').addClass('content')
-            $('body.content .cal').css('height', contentHeight)
-            $('section.edit-pane').show()
-            return false
-
-        $('a.module-edit').click ->
-          $('body.content .cal').css('height', contentHeight)
-
-    $(document).ready(setHeight)
-    $(window).bind('resize', setHeight)
-
     $('.video-new a').click ->
         $('section.edit-pane').show()
         return false
@@ -84,7 +58,7 @@ $ ->
     $('.problem-new a').click ->
         $('section.edit-pane').show()
         return false
-    
+
     CMS.setHeight()
     CMS.bind()
 

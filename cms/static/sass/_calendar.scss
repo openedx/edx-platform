@@ -1,7 +1,7 @@
 section.cal {
   @include box-sizing(border-box);
-  padding: 25px;
   @include clearfix;
+  padding: 25px;
 
   > header {
     @include clearfix;
@@ -62,8 +62,8 @@ section.cal {
       @include box-sizing(border-box);
       float: left;
       width: flex-grid(3) + ((flex-gutter() * 3) / 4);
-      background-color: lighten($light-blue, 2%);
-
+      background-color: $light-blue;
+      overflow-y: hidden;
 
       header {
         border-bottom: 1px solid lighten($dark-blue, 40%);
@@ -90,10 +90,6 @@ section.cal {
             color: #888;
             border-bottom: 0;
             font-size: 12px;
-
-            &:hover {
-              background: #fff;
-            }
           }
         }
       }
