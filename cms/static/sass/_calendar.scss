@@ -77,10 +77,18 @@ section.cal {
           text-transform: uppercase;
           border-bottom: 1px solid lighten($dark-blue, 60%);
           padding: 6px;
+          color: $bright-blue;
 
           a {
             color: $bright-blue;
             display: block;
+            padding: 6px;
+            margin: -6px;
+
+            &:hover {
+              color: darken($bright-blue, 10%);
+              background: lighten($yellow, 10%);
+            }
           }
         }
 
