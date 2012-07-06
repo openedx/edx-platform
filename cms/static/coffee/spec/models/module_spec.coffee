@@ -3,7 +3,7 @@ describe "CMS.Models.Module", ->
     expect(new CMS.Models.Module().url).toEqual("/save_item")
 
   it "set the correct default", ->
-    expect(new CMS.Models.Module().defaults).toEqual({data: ''})
+    expect(new CMS.Models.Module().defaults).toEqual({data: ""})
 
   describe "loadModule", ->
     describe "when the module exists", ->
@@ -11,7 +11,7 @@ describe "CMS.Models.Module", ->
         @fakeModule = jasmine.createSpy("fakeModuleObject")
         window.FakeModule = jasmine.createSpy("FakeModule").andReturn(@fakeModule)
         @module = new CMS.Models.Module(type: "FakeModule")
-        @stubElement = $('<div>')
+        @stubElement = $("<div>")
         @module.loadModule(@stubElement)
 
       afterEach ->
@@ -26,7 +26,7 @@ describe "CMS.Models.Module", ->
         @previousConsole = window.console
         window.console = jasmine.createSpyObj("fakeConsole", ["error"])
         @module = new CMS.Models.Module(type: "HTML")
-        @module.loadModule($('<div>'))
+        @module.loadModule($("<div>"))
 
       afterEach ->
         window.console = @previousConsole
