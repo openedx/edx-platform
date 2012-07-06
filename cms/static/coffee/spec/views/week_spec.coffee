@@ -38,19 +38,15 @@ describe "CMS.Views.Week", ->
 
   describe "edit", ->
     beforeEach ->
-      @view = new CMS.Views.Week(el: $("#week"), height: 100).render()
+      new CMS.Views.Week(el: $("#week"), height: 100).render()
       spyOn(CMS, "replaceView")
       spyOn(CMS.Views, "WeekEdit")
         .andReturn(@view = jasmine.createSpy("Views.WeekEdit"))
-      spyOn(CMS.Models, "Week")
-        .andReturn(@model = jasmine.createSpy("Models.Week"))
       $(".week-edit").click()
 
     it "replace the content with edit week view", ->
       expect(CMS.replaceView).toHaveBeenCalledWith @view
-      expect(CMS.Views.WeekEdit).toHaveBeenCalledWith model: @model
-      expect(CMS.Models.Week).toHaveBeenCalledWith
-        id: "i4x://mitx.edu/course/week"
+      expect(CMS.Views.WeekEdit).toHaveBeenCalled()
 
   describe "on content.show", ->
     beforeEach ->

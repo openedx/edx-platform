@@ -16,7 +16,7 @@ class CMS.Views.Week extends Backbone.View
 
   edit: (event) =>
     event.preventDefault()
-    CMS.replaceView(new CMS.Views.WeekEdit(model: new CMS.Models.Week(id: @$el.data('id'))))
+    CMS.replaceView(new CMS.Views.WeekEdit())
 
   setHeight: =>
     @$el.height(@options.height)
