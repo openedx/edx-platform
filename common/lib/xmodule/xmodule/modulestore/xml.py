@@ -45,7 +45,7 @@ class XMLModuleStore(ModuleStore):
             if not os.path.exists(self.data_dir + "/" + course_dir + "/course.xml"):
                 continue
 
-            self.load_course(course_dir)
+            self.courses.append(self.load_course(course_dir))
 
     def load_course(self, course_dir):
         """
