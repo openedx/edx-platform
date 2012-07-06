@@ -87,7 +87,7 @@
   }
 
   .faq {
-    //display: none;
+    display: none;
     @include clearfix;
 
     nav.categories {
@@ -99,6 +99,7 @@
       width: flex-grid(3);
 
       a {
+        color: $lighter-base-font-color;
         display: block;
         letter-spacing: 1px;
         margin-right: -20px;
@@ -107,6 +108,7 @@
         text-transform: uppercase;
 
         &:hover {
+          color: $blue;
           background: rgb(245,245,245);
         }
       }
