@@ -296,9 +296,13 @@ def history(request, article_path, page=1, course_id=None):
     return render_to_response('simplewiki/simplewiki_history.html', d)
     
     
-def revision_feed(request, page=1):
+def revision_feed(request, page=1, namespace=None, course_id=None):
+    course = get_course(course_id)
+    
     page_size = 10
     
+    if page == None:
+        page = 1
     try:
         p = int(page)
     except ValueError:
@@ -318,9 +322,10 @@ def revision_feed(request, page=1):
 	        'wiki_next_page': next_page,
 	        'wiki_prev_page': prev_page,
 	        'wiki_history': history[beginItem:beginItem+page_size],
-            'show_delete_revision' : request.user.is_superuser,}
-    d.update(csrf(request))
-
+            'show_delete_revision' : request.user.is_superuser,
+            'namespace' : namespace}
+    update_template_dictionary(d, request, course)
+    
     return render_to_response('simplewiki/simplewiki_revision_feed.html', d)
 
 def search_articles(request, namespace=None, course_id = None):
