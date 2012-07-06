@@ -16,6 +16,7 @@ class Migration(DataMigration):
                 while new_name in unique_slugs:
                     i += 1
                     new_name = article.slug + str(i)
+                print "Changing" , article.slug , "to" , new_name
                 article.slug = new_name
                 article.save()
             
@@ -87,14 +88,14 @@ class Migration(DataMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'simplewiki.article': {
-            'Meta': {'unique_together': "(('slug', 'namespace'),)", 'object_name': 'Article'},
+            'Meta': {'unique_together': "(('slug', 'parent'),)", 'object_name': 'Article'},
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
             'created_on': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': '1', 'blank': 'True'}),
             'current_revision': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'current_rev'", 'unique': 'True', 'null': 'True', 'to': "orm['simplewiki.Revision']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'locked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified_on': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': '1', 'blank': 'True'}),
-            'namespace': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['simplewiki.Namespace']"}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['simplewiki.Article']", 'null': 'True', 'blank': 'True'}),
             'permissions': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['simplewiki.Permission']", 'null': 'True', 'blank': 'True'}),
             'related': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'related_rel_+'", 'null': 'True', 'to': "orm['simplewiki.Article']"}),
             'slug': ('django.db.models.fields.SlugField', [], {'max_length': '100', 'blank': 'True'}),
@@ -107,11 +108,6 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'uploaded_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
             'uploaded_on': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
-        },
-        'simplewiki.namespace': {
-            'Meta': {'object_name': 'Namespace'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30', 'db_index': 'True'})
         },
         'simplewiki.permission': {
             'Meta': {'object_name': 'Permission'},
