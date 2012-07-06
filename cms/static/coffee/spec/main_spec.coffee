@@ -10,11 +10,12 @@ describe "CMS", ->
 
   describe "start", ->
     beforeEach ->
+      @element = $("<div>")
       spyOn(CMS.Views, "Course").andReturn(jasmine.createSpyObj("Course", ["render"]))
-      CMS.start()
+      CMS.start(@element)
 
     it "create the Course", ->
-      expect(CMS.Views.Course).toHaveBeenCalled()
+      expect(CMS.Views.Course).toHaveBeenCalledWith(el: @element)
       expect(CMS.Views.Course().render).toHaveBeenCalled()
 
   describe "view stack", ->
