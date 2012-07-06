@@ -1,6 +1,6 @@
 @import 'bourbon/bourbon';
-@import 'reset';
+@import 'normalize';
 
-@import 'base', 'layout';
+@import 'base', 'layout', 'content-types';
 @import 'calendar';
 @import 'section', 'unit';
