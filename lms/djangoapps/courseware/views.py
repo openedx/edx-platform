@@ -17,6 +17,7 @@ from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
 from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 from util.cache import cache
 from student.models import UserTestGroup
@@ -51,24 +52,24 @@ def format_url_params(params):
 
 @ensure_csrf_cookie
 def courses(request):
-  csrf_token = csrf(request)['csrf_token']
-  # TODO: Clean up how 'error' is done.
-  context = {'courses' : settings.COURSES,
-             'csrf' : csrf_token}
-  return render_to_response("courses.html", context)
+    csrf_token = csrf(request)['csrf_token']
+    # TODO: Clean up how 'error' is done.
+    context = {'courses': modulestore().get_courses(),
+               'csrf': csrf_token}
+    return render_to_response("courses.html", context)
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request):
+def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
 
-    course = settings.COURSES_BY_ID[course_id]
+    course_location = CourseDescriptor.id_to_location(course_id)
 
     student_objects = User.objects.all()[:100]
     student_info = []
 
     for student in student_objects:
-        # TODO (cpennington): do the right thing with courses
         student_module_cache = StudentModuleCache(student, modulestore().get_item(course_location))
         course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
         student_info.append({
@@ -84,10 +85,11 @@ def gradebook(request):
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, student_id=None):
+def profile(request, course_id, student_id=None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
-    course = settings.COURSES_BY_ID[course_id]
+
+    course_location = CourseDescriptor.id_to_location(course_id)
     if student_id is None:
         student = request.user
     else:
@@ -97,7 +99,6 @@ def profile(request, student_id=None):
 
     user_info = UserProfile.objects.get(user=student)
 
-    # TODO (cpennington): do the right thing with courses
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(course_location))
     course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
 
@@ -107,7 +108,7 @@ def profile(request, student_id=None):
                'language': user_info.language,
                'email': student.email,
                'course': course,
-               'format_url_params': content_parser.format_url_params,
+               'format_url_params': format_url_params,
                'csrf': csrf(request)['csrf_token']
                }
     context.update(grades.grade_sheet(student, course, student_module_cache))
@@ -124,7 +125,7 @@ def render_accordion(request, course, chapter, section):
         Returns (initialization_javascript, content)'''
 
     # TODO (cpennington): do the right thing with courses
-    toc = toc_for_course(request.user, request, course_location, chapter, section)
+    toc = toc_for_course(request.user, request, course.location, chapter, section)
 
     active_chapter = 1
     for i in range(len(toc)):
@@ -140,40 +141,10 @@ def render_accordion(request, course, chapter, section):
     return render_to_string('accordion.html', context)
 
 
-def get_module_xml(user, course, chapter, section):
-    ''' Look up the module xml for the given course/chapter/section path.
-
-    Takes the user to look up the course file.
-
-    Returns None if there was a problem, or the lxml etree for the module.
-    '''
-    try:
-        # this is the course.xml etree
-        dom = content_parser.course_file(user, course)
-    except:
-        log.exception("Unable to parse courseware xml")
-        return None
-
-    # this is the module's parent's etree
-    path = "//course[@name=$course]/chapter[@name=$chapter]//section[@name=$section]"
-    dom_module = dom.xpath(path, course=course.name, chapter=chapter, section=section)
-
-    module_wrapper = dom_module[0] if len(dom_module) > 0 else None
-    if module_wrapper is None:
-        module = None
-    elif module_wrapper.get("src"):
-        module = content_parser.section_file(
-            user=user, section=module_wrapper.get("src"), coursename=course)
-    else:
-        # Copy the element out of the module's etree
-        module = etree.XML(etree.tostring(module_wrapper[0]))
-    return module
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def index(request, course=None, chapter=None, section=None,
-          position=None, course_id=None):
+def index(request, course_id=None, chapter=None, section=None,
+          position=None):
     ''' Displays courseware accordion, and any associated content.
     If course, chapter, and section aren't all specified, just returns
     the accordion.  If they are specified, returns an error if they don't
@@ -197,6 +168,9 @@ def index(request, course=None, chapter=None, section=None,
         that transformation.
         '''
         return s.replace('_', ' ') if s is not None else None
+
+    course_location = CourseDescriptor.id_to_location(course_id)
+    course = modulestore().get_item(course_location)
 
     if not settings.COURSEWARE_ENABLED:
         return redirect('/')
@@ -278,8 +252,9 @@ def course_info(request, course_id):
     csrf_token = csrf(request)['csrf_token']
 
     try:
-        course = settings.COURSES_BY_ID[course_id]
+        course_location = CourseDescriptor.id_to_location(course_id)
+        course = modulestore().get_item(course_location)
     except KeyError:
         raise Http404("Course not found")
 
-    return render_to_response('info.html', {'csrf': csrf_token, 'course' : course})
+    return render_to_response('info.html', {'csrf': csrf_token, 'course': course})

@@ -5,6 +5,7 @@ from lxml import etree
 from path import path
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 from xmodule.mako_module import MakoDescriptorSystem
+import os
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError
@@ -19,17 +20,19 @@ class XMLModuleStore(ModuleStore):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, org, course, data_dir, default_class=None, eager=False):
+    def __init__(self, data_dir, default_class=None, eager=False):
         """
         Initialize an XMLModuleStore from data_dir
 
-        org, course: Strings to be used in module keys
-        data_dir: path to data directory containing course.xml
+        data_dir: path to data directory containing the course directories
         default_class: dot-separated string defining the default descriptor class to use if non is specified in entry_points
         eager: If true, load the modules children immediately to force the entire course tree to be parsed
         """
+
+        self.eager = eager
         self.data_dir = path(data_dir)
         self.modules = {}
+        self.courses = []
 
         if default_class is None:
             self.default_class = None
@@ -38,7 +41,25 @@ class XMLModuleStore(ModuleStore):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        with open(self.data_dir / "course.xml") as course_file:
+        for course_dir in os.listdir(self.data_dir):
+            if not os.path.isdir(course_dir):
+                continue
+
+            self.load_course(course_dir)
+
+    def load_course(self, course_dir):
+        """
+        Load a course into this module store
+
+        course_path: Course directory name
+        """
+
+        with open(self.data_dir / course_dir / "course.xml") as course_file:
+
+            course_data = etree.parse(course_file).getroot()
+            org = course_data.get('org')
+            course = course_data.get('course')
+
             class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def __init__(self, modulestore):
                     """
@@ -70,20 +91,20 @@ class XMLModuleStore(ModuleStore):
                         module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
                         modulestore.modules[module.location] = module
 
-                        if eager:
+                        if self.eager:
                             module.get_children()
                         return module
 
                     system_kwargs = dict(
                         render_template=lambda: '',
                         load_item=modulestore.get_item,
-                        resources_fs=OSFS(data_dir),
+                        resources_fs=OSFS(self.data_dir / course_dir),
                         process_xml=process_xml
                     )
                     MakoDescriptorSystem.__init__(self, **system_kwargs)
                     XMLParsingSystem.__init__(self, **system_kwargs)
 
-            self.course = ImportSystem(self).process_xml(course_file.read())
+            return ImportSystem(self).process_xml(etree.tostring(course_data))
 
     def get_item(self, location):
         """
@@ -102,6 +123,12 @@ class XMLModuleStore(ModuleStore):
             return self.modules[location]
         except KeyError:
             raise ItemNotFoundError(location)
+
+    def get_courses(self):
+        """
+        Returns a list of course descriptors
+        """
+        return self.courses
 
     def create_item(self, location):
         raise NotImplementedError("XMLModuleStores are read-only")

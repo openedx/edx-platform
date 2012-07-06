@@ -53,10 +53,6 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         url(r'^wiki/', include('simplewiki.urls')),
         url(r'^masquerade/', include('masquerade.urls')),
-        url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)$', 'courseware.views.index'),
-        # url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
-        url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index', name="courseware_chapter"),
-        url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index', name="courseware_course"),
         url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
         url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
         url(r'^change_setting$', 'student.views.change_setting'),
@@ -73,15 +69,15 @@ if settings.COURSEWARE_ENABLED:
 
         # Multicourse related:
         url(r'^courses/?$', 'courseware.views.courses', name="courses"),
-        url(r'^courses/(?P<course_id>[^/]*)/info$', 'courseware.views.course_info', name="info"),
-        url(r'^courses/(?P<course_id>[^/]*)/book$', 'staticbook.views.index', name="book"),
-        url(r'^courses/(?P<course_id>[^/]*)/enroll$', 'student.views.enroll', name="enroll"),
-        url(r'^courses/(?P<course_id>[^/]*)/courseware/?$', 'courseware.views.index', name="courseware"),
-        url(r'^courses/(?P<course_id>[^/]*)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
-        url(r'^courses/(?P<course_id>[^/]*)/profile$', 'courseware.views.profile', name="profile"),
-        url(r'^courses/(?P<course_id>[^/]*)/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/info$', 'courseware.views.course_info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/book$', 'staticbook.views.index', name="book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/enroll$', 'student.views.enroll', name="enroll"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/courseware/?$', 'courseware.views.index', name="courseware"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/profile$', 'courseware.views.profile', name="profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
 
-        url(r'^courses/(?P<course_id>[^/]*)/about$', 'courseware.views.course_info', name="about_course"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/about$', 'courseware.views.course_info', name="about_course"),
     )
 
 if settings.ENABLE_MULTICOURSE:
