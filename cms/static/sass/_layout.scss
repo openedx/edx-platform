@@ -73,9 +73,10 @@ body {
     section.main-content {
       border-left: 2px solid $dark-blue;
       @include box-sizing(border-box);
-      width: flex-grid(9);
+      width: flex-grid(9) + flex-gutter();
       float: left;
       @include box-shadow( -2px 0 0 darken($light-blue, 3%));
+      @include transition();
     }
   }
 }
