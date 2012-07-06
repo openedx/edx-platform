@@ -1,0 +1,1 @@
+describe "CMS.Models.Week", ->
