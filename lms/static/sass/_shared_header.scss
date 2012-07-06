@@ -1,44 +1,62 @@
-header.app {
+header.global {
+  background: rgb(255,255,255);
   border-bottom: 1px solid rgb(200,200,200);
-  @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(230,230,230)));
-  height: 55px;
+  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
+  //@include background-image(linear-gradient(-90deg, rgb(255,255,255), rgba(245,245,245, 1)));
+  height: 75px;
+  position: relative;
   width: 100%;
+  z-index: 10;
 
-  .wrapper {
+  nav {
     @include clearfix;
     @include box-sizing(border-box);
-    max-width: 1200px;
+    height: 40px;
     margin: 0 auto;
-    padding: 0px 10px;
+    max-width: 1200px;
+    padding-top: 20px;
     width: flex-grid(12);
   }
 
-  a.logo {
-    @include box-sizing(border-box);
-    display: block;
+  h1.logo {
     float: left;
-    height: 100%;
-    margin: 16px 15px 0px 0px;
+    margin: 7px 15px 0px 0px;
+    padding-right: 20px;
     position: relative;
 
-    img {
-      position: relative;
-      z-index: 2;
+    &::before {
+      @extend .faded-vertical-divider;
+      content: "";
+      display: block;
+      height: 45px;
+      position: absolute;
+      right: 1px;
+      top: -12px;
+      width: 1px;
+    }
+
+    &::after {
+      @extend .faded-vertical-divider-light;
+      content: "";
+      display: block;
+      height: 36px;
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      width: 1px;
+    }
+
+    a {
+      @include background-image(url('/static/images/logo.png'));
+      background-position: 0 0;
+      background-repeat: no-repeat;
+      display: block;
+      height: 23px;
+      width: 47px;
     }
   }
 
-  .divider {
-    @extend .vertical-divider;
-    @include inline-block;
-    height: 40px;
-    vertical-align: middle;
-  }
-
-
-  nav {
-    height: 40px;
-    margin-top: 8px;
-
+  ol {
     &.find-courses {
       float: left;
     }
@@ -47,67 +65,70 @@ header.app {
       float: right;
     }
 
-    ol {
-      font-size: 0em;
+    > li {
+      @include inline-block;
+      margin-right: 20px;
+      position: relative;
+      vertical-align: middle;
 
-      li {
-        @include inline-block;
-        vertical-align: top;
+      &:last-child {
+        margin-right: 0px;
       }
 
-      li.secondary {
-        margin: 0px 15px;
+      a {
+        letter-spacing: 1px;
+        vertical-align: middle;
+      }
+    }
 
-        a {
-          @include border-radius(3px);
-          border: 1px solid transparent;
-          @include box-sizing(border-box);
-          color: $lighter-base-font-color;
-          display: block;
-          font: italic 1.2rem/1.4rem $serif;
-          height: 30px;
-          @include inline-block;
-          margin: 5px 15px 5px 0px;
-          padding: 7px 2px;
-          text-decoration: none;
-          text-transform: lowercase;
-          text-shadow: 0 1px rgba(255,255,255, 0.6);
-          vertical-align: middle;
+    li.secondary {
+      > a {
+        color: $lighter-base-font-color;
+        color: $blue;
+        display: block;
+        //font: italic 1.2rem/1.4rem $serif;
+        font: normal 1.2rem/1.4rem $sans-serif;
+        @include inline-block;
+        margin: 0px 20px 0px 0px;
+        text-decoration: none;
+        //text-transform: lowercase;
+        text-transform: uppercase;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
 
-          &:last-child {
-            margin-right: 0px;
-          }
+        &:last-child {
+          margin-right: 0px;
+        }
 
-          &:hover {
-            color: $base-font-color;
-          }
+        &:hover {
+          color: $base-font-color;
         }
       }
+    }
 
-      li.primary {
-        position: relative;
+    li.primary {
+      > a {
+        @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
+        border: 1px solid transparent;
+        border-color: rgb(200,200,200);
+        @include border-radius(3px);
+        @include box-sizing(border-box);
+        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+        color: $base-font-color;
+        display: inline-block;
+        font: normal 1.2rem/1.4rem $sans-serif;
+        @include inline-block;
+        margin: 1px 5px;
+        padding: 8px 12px;
+        text-decoration: none;
+        text-transform: uppercase;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+        vertical-align: middle;
 
-        a {
-          border: 1px solid transparent;
-          @include border-radius(3px);
-          @include box-sizing(border-box);
-          color: $base-font-color;
-          display: block;
-          font: normal 1.2rem/1.4rem $sans-serif;
-          height: 38px;
-          @include inline-block;
-          margin: 1px 5px;
-          padding: 10px 8px;
-          text-decoration: none;
-          text-transform: uppercase;
-          text-shadow: 0 1px rgba(255,255,255, 0.6);
-          vertical-align: middle;
+        &:last-child {
+          margin-right: 0px;
+        }
 
-          &:hover, &.active {
-            @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
-            border-color: rgb(200,200,200);
-            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-          }
+        &:hover, &.active {
         }
       }
     }
@@ -116,7 +137,7 @@ header.app {
       float: right;
 
       a.user-link {
-        padding: 9px 8px 11px 40px;
+        padding: 8px 12px 8px 40px;
         position: relative;
         text-transform: none;
 
@@ -129,15 +150,15 @@ header.app {
         .avatar {
           background: rgb(220,220,220);
           @include border-radius(3px);
-          border: 1px solid rgb(180,180,180);
+          border: 1px solid rgb(80,80,80);
           @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-          height: 22px;
+          height: 21px;
           @include inline-block;
-          left: 8px;
+          left: 6px;
           overflow: hidden;
           position: absolute;
-          top: 6px;
-          width: 22px;
+          top: 5px;
+          width: 21px;
 
           &::after {
             @include background-image(linear-gradient((-60deg), rgba(0,0,0, 0) 0%, rgba(0,0,0, 0.1) 50%, rgba(0,0,0, 0.2) 50%, rgba(0,0,0, 0.3) 100%));
@@ -160,17 +181,17 @@ header.app {
         }
       }
 
-      ol.user-options {
+      ul.dropdown-menu {
         @include border-radius(4px);
         @include box-shadow(0 1px 6px 0 rgba(0,0,0, 0.3));
         border: 1px solid rgb(0,0,0);
         @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
                                                           rgba(0,0,0, 0.7) 100%));
         display: none;
-        right: 0px;
         padding: 5px 10px;
         position: absolute;
-        top: 52px;
+        right: 4px;
+        top: 50px;
         width: 150px;
         z-index: 3;
 
@@ -209,6 +230,7 @@ header.app {
 
           > a {
             @include box-sizing(border-box);
+            @include border-radius(3px);
             color: rgba(255,255,255, 0.9);
             display: block;
             font: italic 1.2rem/1.4rem $serif;

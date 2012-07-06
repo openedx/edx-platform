@@ -1,12 +1,20 @@
 .home {
-  margin: 50px 10px 100px;
+  margin: 0px 0px 100px;
 
   > header {
+    background: rgb(250,250,250);
+    border-bottom: 1px solid rgb(200,200,200);
+    @include box-shadow(inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
     @include clearfix;
     min-height: 335px;
-    margin-bottom: 40px;
-    position: relative;
+    padding: 60px 0px 50px;
     width: flex-grid(12);
+
+    .inner-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
 
     .video-wrapper {
       right: 0px;
@@ -98,7 +106,6 @@
     @include background-image(linear-gradient(180deg, rgba(245,245,245, 0) 0%,
                                                       rgba(245,245,245, 1) 50%,
                                                       rgba(245,245,245, 0) 100%));
-    border-top: 1px solid rgb(210,210,210);
     border-bottom: 1px solid rgb(210,210,210);
     margin-bottom: 0px;
     overflow: hidden;
@@ -234,25 +241,23 @@
     width: flex-grid(12);
 
     > h2 {
-      background: rgb(245,245,245);
-      border: 1px solid rgb(220,220,220);
+      @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
+      @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4));
+      border: 1px solid rgb(210,210,210);
       border-top: none;
       @include border-bottom-radius(4px);
       @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
       color: $lighter-base-font-color;
       letter-spacing: 1px;
+      margin-bottom: 0px;
       padding: 15px 10px;
       text-align: center;
       text-transform: uppercase;
-    }
+      text-shadow: 0 1px rgba(255,255,255, 0.6);
 
-    .courses {
-      //background: rgb(245,245,245);
-      //@include background-image(linear-gradient(180deg, rgba(255,255,255, 1) 0%,
-                                                        //rgba(255,255,255, 0.5) 20%,
-                                                        //rgba(255,255,255, 0) 50%,
-                                                        //rgba(255,255,255, 0.5) 80%,
-                                                        //rgba(255,255,255, 1) 100%));
+      .lowercase {
+        text-transform: none;
+      }
     }
   }
 

@@ -77,6 +77,11 @@ a:link, a:visited {
   }
 }
 
+.content-wrapper {
+  margin: 0 auto 0;
+  width: flex-grid(12);
+}
+
 .container {
   @include clearfix;
   margin: 0 auto 0;
