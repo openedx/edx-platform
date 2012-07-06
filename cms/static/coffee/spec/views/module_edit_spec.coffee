@@ -56,7 +56,7 @@ describe "CMS.Views.ModuleEdit", ->
 
   describe "cancel", ->
     beforeEach ->
-      spyOn(CMS, 'popView')
+      spyOn(CMS, "popView")
       @view = new CMS.Views.ModuleEdit(el: $("#module-edit"), model: @stubModule)
       $(".cancel").click()
 

@@ -10,7 +10,7 @@ describe "CMS", ->
 
   describe "start", ->
     beforeEach ->
-      spyOn(CMS.Views, 'Course').andReturn(jasmine.createSpyObj("Course", ["render"]))
+      spyOn(CMS.Views, "Course").andReturn(jasmine.createSpyObj("Course", ["render"]))
       CMS.start()
 
     it "create the Course", ->
@@ -86,4 +86,4 @@ describe "main helper", ->
     expect(Backbone.emulateHTTP).toBeTruthy()
 
   it "setup AJAX CSRF token", ->
-    expect($.ajaxSettings.headers['X-CSRFToken']).toEqual("stubCSRFToken")
+    expect($.ajaxSettings.headers["X-CSRFToken"]).toEqual("stubCSRFToken")

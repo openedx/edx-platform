@@ -1,6 +1,6 @@
 # Stub jQuery.cookie
 @stubCookies =
-  csrftoken: 'stubCSRFToken'
+  csrftoken: "stubCSRFToken"
 
 jQuery.cookie = (key, value) =>
   if value?
