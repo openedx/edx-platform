@@ -7,7 +7,7 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        namespace6002x, created = orm.Namespace.objects.get_or_create(name="6002xS12")
+        namespace6002x, created = orm.Namespace.objects.get_or_create(name="6.002xS12")
         if created:
             namespace6002x.save()
         
