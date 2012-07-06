@@ -25,7 +25,7 @@ describe "CMS", ->
     describe "replaceView", ->
       beforeEach ->
         @newView = jasmine.createSpy("newView")
-        CMS.on "content.show", (@expectedView) =>
+        CMS.on("content.show", (@expectedView) =>)
         CMS.replaceView(@newView)
 
       it "replace the views on the viewStack", ->
@@ -37,7 +37,7 @@ describe "CMS", ->
     describe "pushView", ->
       beforeEach ->
         @newView = jasmine.createSpy("newView")
-        CMS.on "content.show", (@expectedView) =>
+        CMS.on("content.show", (@expectedView) =>)
         CMS.pushView(@newView)
 
       it "push new view onto viewStack", ->
@@ -54,7 +54,7 @@ describe "CMS", ->
       describe "when there's no view on the viewStack", ->
         beforeEach ->
           CMS.viewStack = [@currentView]
-          CMS.on "content.hide", => @eventTriggered = true
+          CMS.on("content.hide", => @eventTriggered = true)
           CMS.popView()
 
         it "trigger content.hide on CMS", ->
@@ -64,7 +64,7 @@ describe "CMS", ->
         beforeEach ->
           @parentView = jasmine.createSpyObj("parentView", ["delegateEvents"])
           CMS.viewStack = [@parentView, @currentView]
-          CMS.on "content.show", (@expectedView) =>
+          CMS.on("content.show", (@expectedView) =>)
           CMS.popView()
 
         it "trigger content.show with the previous view on CMS", ->
