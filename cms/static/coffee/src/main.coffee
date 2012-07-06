@@ -4,8 +4,8 @@
 
   viewStack: []
 
-  start: ->
-    new CMS.Views.Course(el: $('section.main-container')).render()
+  start: (el) ->
+    new CMS.Views.Course(el: el).render()
 
   replaceView: (view) ->
     @viewStack = [view]
@@ -32,4 +32,4 @@ $ ->
   $.ajaxSetup
     headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
 
-  CMS.start()
+  CMS.start($('section.main-container'))
