@@ -15,44 +15,63 @@ from models import Revision, Article, Namespace, CreateArticleForm, RevisionForm
 import wiki_settings
 
 def get_course(course_id):
+    if course_id == None:
+        return None
+        
     try:
         course = settings.COURSES_BY_ID[course_id]
     except KeyError:
         raise Http404("Course not found")
     return course
     
-def wiki_article_reverse(wiki_page, article, course, args=[], kwargs={}):
-    return reverse(wiki_page, kwargs=dict({'course_id': course.id, 'article_path' : article.get_path()}, **kwargs), args=args)
-    
-def wiki_namespace_reverse(wiki_page, namespace = None, course=None, args=[], kwargs={}):
-    kwargs=dict({'course_id' : course.id}, **kwargs)
-    if namespace:
+def wiki_reverse(wiki_page, article = None, course = None, namespace=None, args=[], kwargs={}):
+    kwargs = dict(kwargs) # TODO: Figure out why if I don't do this kwargs sometimes contains {'article_path'}
+    if not 'course_id' in kwargs and course:
+        kwargs['course_id'] = course.id
+    if not 'article_path' in kwargs and article:
+        kwargs['article_path'] = article.get_path()
+    if not 'namespace' in kwargs and namespace:
         kwargs['namespace'] = namespace
     return reverse(wiki_page, kwargs=kwargs, args=args)
     
+def update_template_dictionary(dictionary, request = None, course = None, article = None, revision = None):
+    if article:
+        dictionary['wiki_article'] = article
+        dictionary['wiki_title'] = article.title #TODO: What is the title when viewing the article in a course?
+        if not course and 'namespace' not in dictionary:
+            dictionary['namespace'] = article.namespace.name
+    
+    if course:
+        dictionary['course'] = course
+        if 'namespace' not in dictionary:
+            dictionary['namespace'] = course.wiki_namespace
+    else:
+        dictionary['course'] = None
+    
+    if revision:
+        dictionary['wiki_article_revision'] = revision
+        dictionary['wiki_current_revision_deleted'] = not (revision.deleted == 0)
+    
+    if request:
+        dictionary.update(csrf(request))
+        
 
-def view(request, course_id, article_path):
+def view(request, article_path, course_id=None):
     course = get_course(course_id)
+        
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
     
-    perm_err = check_permissions(request, article, check_read=True, check_deleted=True)
+    perm_err = check_permissions(request, article, course, check_read=True, check_deleted=True)
     if perm_err:
         return perm_err
-    d = {'wiki_article': article,
-            'wiki_article_revision':article.current_revision,
-			'wiki_write': article.can_write_l(request.user),
-			'wiki_attachments_write': article.can_attach(request.user),
-            'wiki_current_revision_deleted' : not (article.current_revision.deleted == 0),
-            'wiki_title' : article.title + " - edX %s Wiki" % course.title,
-            'course' : course,
-            'namespace' : article.namespace.name,
-			}
-    d.update(csrf(request))
+    
+    d = {}
+    update_template_dictionary(d, request, course, article, article.current_revision)
     return render_to_response('simplewiki/simplewiki_view.html', d)
     
-def view_revision(request, course_id, revision_number, article_path):
+def view_revision(request, revision_number, article_path, course_id=None):
     course = get_course(course_id)
     (article, err) = get_article(request, article_path, course )
     if err:
@@ -61,29 +80,21 @@ def view_revision(request, course_id, revision_number, article_path):
     try:
         revision = Revision.objects.get(counter=int(revision_number), article=article)
     except:
-        d = {'wiki_article': article,
-	            'wiki_err_norevision': revision_number,}
-        d.update(csrf(request))
+        d = {'wiki_err_norevision': revision_number}
+        update_template_dictionary(d, request, course, article)
         return render_to_response('simplewiki/simplewiki_error.html', d)
-        
     
-    perm_err = check_permissions(request, article, check_read=True, check_deleted=True, revision=revision)
+    perm_err = check_permissions(request, article, course, check_read=True, check_deleted=True, revision=revision)
     if perm_err:
         return perm_err
-        
-    d = {'wiki_article': article,
-            'wiki_article_revision':revision,
-			'wiki_write': article.can_write_l(request.user),
-			'wiki_attachments_write': article.can_attach(request.user),
-            'wiki_current_revision_deleted' : not (revision.deleted == 0),
-            'course' : course,
-            'namespace' : article.namespace.name,
-			}
-    d.update(csrf(request))
+    
+    d = {}
+    update_template_dictionary(d, request, course, article, revision)
+    
     return render_to_response('simplewiki/simplewiki_view.html', d)
 
 
-def root_redirect(request, course_id):
+def root_redirect(request, course_id=None):
     course = get_course(course_id)
     try:
         root = Article.get_root(course.wiki_namespace)
@@ -94,28 +105,26 @@ def root_redirect(request, course_id):
         
         err = not_found(request, course.wiki_namespace + '/', course)
         return err
-
+    
     return HttpResponseRedirect(reverse('wiki_view', kwargs={'course_id' : course_id, 'article_path' : root.get_path()} ))
 
-def create(request, course_id, article_path):
+def create(request, article_path, course_id=None):
     course = get_course(course_id)
     
     article_path_components = article_path.split('/')
 
     # Ensure the namespace exists
     if not len(article_path_components) >= 1 or len(article_path_components[0]) == 0:
-        d = {'wiki_err_no_namespace': True,
-            'course' : course}
-        d.update(csrf(request))
+        d = {'wiki_err_no_namespace': True}
+        update_template_dictionary(d, request, course)
         return render_to_response('simplewiki/simplewiki_error.html', d)
         
     namespace = None
     try:
         namespace = Namespace.objects.get(name__exact = article_path_components[0])
     except Namespace.DoesNotExist, ValueError:
-        d = {'wiki_err_bad_namespace': True,
-            'course' : course}
-        d.update(csrf(request))
+        d = {'wiki_err_bad_namespace': True}
+        update_template_dictionary(d, request, course)
         return render_to_response('simplewiki/simplewiki_error.html', d)
         
     # See if the article already exists
@@ -125,7 +134,7 @@ def create(request, course_id, article_path):
     try:
         existing_article = Article.objects.get(namespace = namespace, slug__exact = article_slug)
         #It already exists, so we just redirect to view the article
-        return HttpResponseRedirect(wiki_article_reverse("wiki_view", existing_article, course))
+        return HttpResponseRedirect(wiki_reverse("wiki_view", existing_article, course))
     except Article.DoesNotExist:
         #This is good. The article doesn't exist
         pass
@@ -149,28 +158,24 @@ def create(request, course_id, article_path):
             new_revision.article = article
             new_revision.save()
             
-            return HttpResponseRedirect(wiki_article_reverse("wiki_view", article, course))
+            return HttpResponseRedirect(wiki_reverse("wiki_view", article, course))
     else:
         f = CreateArticleForm(initial={'title':request.GET.get('wiki_article_name', article_slug),
                                        'contents':_('Headline\n===\n\n')})
         
-    d = {'wiki_form': f,
-        'wiki_write': True,
-        'create_article' : True,
-        'course' : course,
-        }
-    d.update(csrf(request))
+    d = {'wiki_form': f, 'create_article' : True, 'namespace' : namespace.name}
+    update_template_dictionary(d, request, course)
 
     return render_to_response('simplewiki/simplewiki_edit.html', d)
 
-def edit(request, course_id, article_path):
+def edit(request, article_path, course_id=None):
     course = get_course(course_id)
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
 
     # Check write permissions
-    perm_err = check_permissions(request, article, check_write=True, check_locked=True, check_deleted=False)
+    perm_err = check_permissions(request, article, course, check_write=True, check_locked=True, check_deleted=False)
     if perm_err:
         return perm_err
 
@@ -187,11 +192,11 @@ def edit(request, course_id, article_path):
             
             if request.POST.__contains__('delete'):
                 if (article.current_revision.deleted == 1): #This article has already been deleted. Redirect
-                    return HttpResponseRedirect(wiki_article_reverse('wiki_view', article, course))
+                    return HttpResponseRedirect(wiki_reverse('wiki_view', article, course))
                 new_revision.contents = ""
                 new_revision.deleted = 1
             elif not new_revision.get_diff():
-                return HttpResponseRedirect(wiki_article_reverse('wiki_view', article, course))
+                return HttpResponseRedirect(wiki_reverse('wiki_view', article, course))
             
             if not request.user.is_anonymous():
                 new_revision.revision_user = request.user
@@ -199,31 +204,23 @@ def edit(request, course_id, article_path):
             if wiki_settings.WIKI_ALLOW_TITLE_EDIT:
                 new_revision.article.title = f.cleaned_data['title']
                 new_revision.article.save()
-            return HttpResponseRedirect(wiki_article_reverse('wiki_view', article, course))
+            return HttpResponseRedirect(wiki_reverse('wiki_view', article, course))
     else:
         startContents = article.current_revision.contents if (article.current_revision.deleted == 0) else 'Headline\n===\n\n'
         
         f = EditForm({'contents': startContents, 'title': article.title})
-    d = {'wiki_form': f,
-        	'wiki_write': True,
-        	'wiki_article': article,
-            'wiki_title' : article.title,
-        	'wiki_attachments_write': article.can_attach(request.user),
-            'create_article' : False,
-            'course' : course,
-            'namespace' : article.namespace.name,
-        	}
-    d.update(csrf(request))
-
+        
+    d = {'wiki_form': f}
+    update_template_dictionary(d, request, course, article)
     return render_to_response('simplewiki/simplewiki_edit.html', d)
 
-def history(request, course_id, article_path, page=1):
+def history(request, article_path, page=1, course_id=None):
     course = get_course(course_id)
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
 
-    perm_err = check_permissions(request, article, check_read=True, check_deleted=False)
+    perm_err = check_permissions(request, article, course, check_read=True, check_deleted=False)
     if perm_err:
         return perm_err
 
@@ -240,11 +237,11 @@ def history(request, course_id, article_path, page=1):
     
     if request.method == 'POST':
         if request.POST.__contains__('revision'): #They selected a version, but they can be either deleting or changing the version
-            perm_err = check_permissions(request, article, check_write=True, check_locked=True)
+            perm_err = check_permissions(request, article, course, check_write=True, check_locked=True)
             if perm_err:
                 return perm_err
                 
-            redirectURL = reverse('wiki_view', kwargs={'course_id' : course.id, 'article_path' : article.get_path()})
+            redirectURL = wiki_reverse('wiki_view', article, course)
             try:
                 r = int(request.POST['revision'])
                 revision = Revision.objects.get(id=r)
@@ -252,9 +249,8 @@ def history(request, course_id, article_path, page=1):
                     article.current_revision = revision
                     article.save()
                 elif request.POST.__contains__('view'):
-                    redirectURL = reverse('wiki_view_revision', kwargs={'course_id' : course.id, 
-                                                                        'revision_number' : revision.counter, 
-                                                                        'article_path' : article.get_path()})
+                    redirectURL = wiki_reverse('wiki_view_revision', course=course,
+                                    kwargs={'revision_number' : revision.counter, 'article_path' : article.get_path()})
                 #The rese of these are admin functions
                 elif request.POST.__contains__('delete') and request.user.is_superuser:
                     if (revision.deleted == 0):
@@ -289,19 +285,14 @@ def history(request, course_id, article_path, page=1):
     next_page = p + 1 if page_count > p else None
     prev_page = p - 1 if p > 1 else None
     
+    
     d = {'wiki_page': p,
 	        'wiki_next_page': next_page,
 	        'wiki_prev_page': prev_page,
-	        'wiki_write': article.can_write_l(request.user),
-	        'wiki_attachments_write': article.can_attach(request.user),
-	        'wiki_article': article,
-            'wiki_title': article.title,
 	        'wiki_history': history[beginItem:beginItem+page_size],
-            'show_delete_revision' : request.user.is_superuser,
-            'course' : course,
-            'namespace' : article.namespace.name}
-    d.update(csrf(request))
-
+            'show_delete_revision' : request.user.is_superuser}
+    update_template_dictionary(d, request, course, article)
+    
     return render_to_response('simplewiki/simplewiki_history.html', d)
     
     
@@ -332,7 +323,7 @@ def revision_feed(request, page=1):
 
     return render_to_response('simplewiki/simplewiki_revision_feed.html', d)
 
-def search_articles(request, course_id, namespace=None):
+def search_articles(request, namespace=None, course_id = None):
     # blampe: We should check for the presence of other popular django search
     # apps and use those if possible. Only fall back on this as a last resort.
     # Adding some context to results (eg where matches were) would also be nice.
@@ -373,13 +364,12 @@ def search_articles(request, course_id, namespace=None):
     results = sorted(results, key=lambda article: (article.current_revision.deleted, article.get_path().lower()) )
 
     if len(results) == 1 and querystring:
-        return HttpResponseRedirect(wiki_article_reverse('wiki_view', article=results[0], course=course ))
+        return HttpResponseRedirect(wiki_reverse('wiki_view', article=results[0], course=course ))
     else:
         d = {'wiki_search_results': results,
             	'wiki_search_query': querystring,
-                'course' : course,
                 'namespace' : namespace}
-        d.update(csrf(request))
+        update_template_dictionary(d, request, course)
         return render_to_response('simplewiki/simplewiki_searchresults.html', d)
         
 
@@ -388,7 +378,7 @@ def search_add_related(request, course_id, slug, namespace):
     if err:
         return err
 
-    perm_err = check_permissions(request, article, check_read=True)
+    perm_err = check_permissions(request, article, course, check_read=True)
     if perm_err:
         return perm_err
 
@@ -418,7 +408,7 @@ def add_related(request, course_id, slug, namespace):
     if err:
         return err
     
-    perm_err = check_permissions(request, article, check_write=True, check_locked=True)
+    perm_err = check_permissions(request, article, course, check_write=True, check_locked=True)
     if perm_err:
         return perm_err
     
@@ -440,7 +430,7 @@ def remove_related(request, course_id, namespace, slug, related_id):
     if err:
         return err
 
-    perm_err = check_permissions(request, article, check_write=True, check_locked=True)
+    perm_err = check_permissions(request, article, course, check_write=True, check_locked=True)
     if perm_err:
         return perm_err
 
@@ -459,22 +449,14 @@ def random_article(request, course_id):
     from random import randint
     num_arts = Article.objects.count()
     article = Article.objects.all()[randint(0, num_arts-1)]
-    return HttpResponseRedirect( wiki_article_reverse('wiki_view', article, course))
-
-def encode_err(request, url, course):
-    d = {'wiki_err_encode': True,
-        'course' : course,
-        'namespace' : course.wiki_namespace}
-    d.update(csrf(request))
-    return render_to_response('simplewiki/simplewiki_error.html', d)
+    return HttpResponseRedirect( wiki_reverse('wiki_view', article, course))
     
 def not_found(request, article_path, course):
     """Generate a NOT FOUND message for some URL"""
     d = {'wiki_err_notfound': True,
          'article_path': article_path,
-         'course' : course,
          'namespace' : course.wiki_namespace}
-    d.update(csrf(request))
+    update_template_dictionary(request, course)
     return render_to_response('simplewiki/simplewiki_error.html', d)
     
 def get_article(request, article_path, course):
@@ -488,7 +470,7 @@ def get_article(request, article_path, course):
         
     return (article, err)
 
-def check_permissions(request, article, check_read=False, check_write=False, check_locked=False, check_deleted=False, revision = None):    
+def check_permissions(request, article, course, check_read=False, check_write=False, check_locked=False, check_deleted=False, revision = None):    
     read_err = check_read and not article.can_read(request.user)
     
     write_err = check_write and not article.can_write(request.user)
@@ -508,7 +490,7 @@ def check_permissions(request, article, check_read=False, check_write=False, che
 	            'wiki_err_nowrite': write_err,
 	            'wiki_err_locked': locked_err,
                 'wiki_err_deleted': deleted_err,}
-        d.update(csrf(request))
+        update_template_dictionary(request, course)
         # TODO: Make this a little less jarring by just displaying an error
         #       on the current page? (no such redirect happens for an anon upload yet)
         # benjaoming: I think this is the nicest way of displaying an error, but
