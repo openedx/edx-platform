@@ -9,26 +9,26 @@
     % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
     <%static:css group='base-style'/>
     % else:
-    <link rel="stylesheet" href="${ STATIC_URL }/css/base-style.css">
+    <link rel="stylesheet" href="${static.url('css/base-style.css')}">
     % endif
-    <link rel="stylesheet" type="text/css" href="${ STATIC_URL }/js/vendor/markitup/skins/simple/style.css" />
-    <link rel="stylesheet" type="text/css" href="${ STATIC_URL }/js/vendor/markitup/sets/wiki/style.css" />
+    <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
+    <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
     <title><%block name="title"></%block></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   </head>
 
   <body>
 
-      <%include file="widgets/header.html"/>
+    <%include file="widgets/header.html"/>
 
-      <%block name="content"></%block>
+    <%block name="content"></%block>
 
-    <script type="text/javascript" src="${ STATIC_URL}/js/vendor/jquery.min.js"></script>
-    <script type="text/javascript" src="${ STATIC_URL}/js/vendor/json2.js"></script>
-    <script type="text/javascript" src="${ STATIC_URL}/js/vendor/underscore-min.js"></script>
-    <script type="text/javascript" src="${ STATIC_URL}/js/vendor/backbone-min.js"></script>
-    <script type="text/javascript" src="${ STATIC_URL }/js/vendor/markitup/jquery.markitup.js"></script>
-    <script type="text/javascript" src="${ STATIC_URL }/js/vendor/markitup/sets/wiki/set.js"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/markitup/jquery.markitup.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/markitup/sets/wiki/set.js"')}></script>
     % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
     <%static:js group='main'/>
     % else:
@@ -36,10 +36,10 @@
     % endif
 
     <%static:js group='module-js'/>
-    <script src="${ STATIC_URL }/js/vendor/jquery.inlineedit.js"></script>
-    <script src="${ STATIC_URL }/js/vendor/jquery.cookie.js"></script>
-    <script src="${ STATIC_URL }/js/vendor/jquery.leanModal.min.js"></script>
-    <script src="${ STATIC_URL }/js/vendor/jquery.tablednd.js"></script>
+    <script src="${static.url('js/vendor/jquery.inlineedit.js')}"></script>
+    <script src="${static.url('js/vendor/jquery.cookie.js')}"></script>
+    <script src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>
+    <script src="${static.url('js/vendor/jquery.tablednd.js')}"></script>
   </body>
 </html>
 
