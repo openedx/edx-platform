@@ -42,7 +42,7 @@ class XMLModuleStore(ModuleStore):
             self.default_class = class_
 
         for course_dir in os.listdir(self.data_dir):
-            if not os.path.isdir(course_dir):
+            if not os.path.exists(self.data_dir + "/" + course_dir + "/course.xml"):
                 continue
 
             self.load_course(course_dir)
@@ -50,7 +50,6 @@ class XMLModuleStore(ModuleStore):
     def load_course(self, course_dir):
         """
         Load a course into this module store
-
         course_path: Course directory name
         """
 
@@ -91,14 +90,14 @@ class XMLModuleStore(ModuleStore):
                         module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
                         modulestore.modules[module.location] = module
 
-                        if self.eager:
+                        if modulestore.eager:
                             module.get_children()
                         return module
 
                     system_kwargs = dict(
                         render_template=lambda: '',
                         load_item=modulestore.get_item,
-                        resources_fs=OSFS(self.data_dir / course_dir),
+                        resources_fs=OSFS(modulestore.data_dir / course_dir),
                         process_xml=process_xml
                     )
                     MakoDescriptorSystem.__init__(self, **system_kwargs)

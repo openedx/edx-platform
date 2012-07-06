@@ -249,11 +249,11 @@ class XModuleDescriptor(Plugin):
                 rerandomize (string): When to generate a newly randomized instance of the module data
         """
         self.system = system
-        self.definition = definition if definition is not None else {}
-        self.name = Location(kwargs.get('location')).name
-        self.category = Location(kwargs.get('location')).category
-        self.location = Location(kwargs.get('location'))
         self.metadata = kwargs.get('metadata', {})
+        self.definition = definition if definition is not None else {}
+        self.location = Location(kwargs.get('location'))
+        self.name = self.location.name
+        self.category = self.location.category
         self.shared_state_key = kwargs.get('shared_state_key')
 
         self._child_instances = None
