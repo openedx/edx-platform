@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import patterns, url
 
-namespace_regex = r"[a-zA-Z\d_-]+"
+namespace_regex = r"[a-zA-Z\d._-]+"
 article_slug = r'/(?P<article_path>' + namespace_regex + r'/[a-zA-Z\d_-]*)'
 namespace = r'/(?P<namespace>' + namespace_regex + r')'
 
