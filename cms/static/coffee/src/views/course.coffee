@@ -21,8 +21,8 @@ class CMS.Views.Course extends Backbone.View
     @$('>section').css minHeight: ''
 
   maxWeekHeight: ->
-    _.max($('#weeks > li').map -> $(this).height()) + 1
+    weekElementBorderSize = 1
+    _.max($('#weeks > li').map -> $(this).height()) + weekElementBorderSize
 
   contentHeight: ->
-    padding = 29
-    $(window).height() - padding
+    $(window).height() - $('body>header').outerHeight()
