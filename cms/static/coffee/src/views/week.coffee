@@ -14,7 +14,7 @@ class CMS.Views.Week extends Backbone.View
       new CMS.Views.Module(el: this).render()
     return @
 
-  edit: (event) =>
+  edit: (event) ->
     event.preventDefault()
     CMS.replaceView(new CMS.Views.WeekEdit())
 
