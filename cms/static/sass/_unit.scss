@@ -107,6 +107,10 @@ section#unit-wrapper {
             padding: 6px;
             border: 1px solid darken($light-blue, 15%);
             color: $dark-blue;
+
+            &:hover {
+              background-color: lighten($yellow, 13%);
+            }
           }
 
           select {
