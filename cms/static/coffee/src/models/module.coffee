@@ -1,7 +1,7 @@
 class CMS.Models.Module extends Backbone.Model
   url: '/save_item'
   defaults:
-    data: '{}'
+    data: ''
 
   loadModule: (element) ->
     try
