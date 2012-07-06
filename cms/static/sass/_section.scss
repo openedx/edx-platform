@@ -1,29 +1,45 @@
 section#unit-wrapper {
   section.filters {
     @include clearfix;
-    background: $light-blue;
-    border-bottom: 1px solid lighten($dark-blue, 40%);
-    padding: 5px 20px;
-    margin: -20px -20px 10px;
-    opacity: .7;
+    opacity: .4;
+    margin-bottom: 10px;
     @include transition;
 
     &:hover {
       opacity: 1;
-      padding: 10px 20px;
-      margin: -20px -20px 10px;
+    }
+
+    h2 {
+      @include inline-block();
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 14px;
+      padding: 6px 6px 6px 0;
+      font-size: 12px;
     }
 
     ul {
       @include clearfix();
       list-style: none;
-      padding: 6px;
 
       li {
-        @include inline-block();
+        @include inline-block;
+        margin-right: 6px;
+        border-right: 1px solid #ddd;
+        padding-right: 6px;
 
-        &.advanced {
+        &.search {
           float: right;
+          border: 0;
+        }
+
+        a {
+          &.more {
+            font-size: 12px;
+            @include inline-block;
+            margin: 0 6px;
+            font-style: italic;
+          }
         }
       }
     }
@@ -44,11 +60,12 @@ section#unit-wrapper {
         @include clearfix;
 
         h2 {
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          font-size: 12px;
-          float: left;
           color: $bright-blue;
+          float: left;
+          font-size: 12px;
+          letter-spacing: 1px;
+          line-height: 19px;
+          text-transform: uppercase;
         }
       }
 
@@ -149,6 +166,14 @@ section#unit-wrapper {
               border-bottom: 0;
             }
 
+            &.new-module a {
+              background-color: darken($light-blue, 2%);
+
+              &:hover {
+                background-color: lighten($yellow, 10%);
+              }
+            }
+
             a {
               color: $dark-blue;
             }
@@ -158,9 +183,10 @@ section#unit-wrapper {
 
               li {
                 padding: 6px;
+                border-collapse: collapse;
 
                 &:last-child {
-                  border-bottom: 0;
+                  border-bottom: 1px solid darken($light-blue, 8%);
                 }
 
                 &:hover {
@@ -170,6 +196,7 @@ section#unit-wrapper {
                     opacity: 1;
                   }
                 }
+
 
                 &.empty {
                   padding: 12px;
@@ -182,7 +209,6 @@ section#unit-wrapper {
                 }
 
                 a.draggable {
-                  float: right;
                   opacity: .3;
                 }
               }
