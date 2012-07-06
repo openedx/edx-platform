@@ -59,7 +59,9 @@
     <section class="highlighted-courses">
       <h2>Explore courses from edX universities</h2>
       <section class="courses">
-        <%include file="course.html" />
+        %for course in courses:
+          <%include file="course.html" args="course=course" />
+        %endfor
       </section>
     </section>
 
