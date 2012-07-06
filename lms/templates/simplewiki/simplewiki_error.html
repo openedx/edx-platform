@@ -3,8 +3,7 @@
 <%inherit file="simplewiki_base.html"/>
 
 <%!
-  from django.core.urlresolvers import reverse
-  from simplewiki.views import wiki_namespace_reverse
+  from simplewiki.views import wiki_reverse
 %>
 
 <%block name="title"><title>Wiki Error – MITx 6.002x</title></%block>
@@ -22,21 +21,11 @@ ${wiki_error}
 %endif
 
 %if wiki_err_notfound is not UNDEFINED:
-	%if article_path is not UNDEFINED:
-		<p>
-		The page you requested could not be found.
-		Click <a href="${wiki_namespace_reverse("wiki_create", course=course, kwargs={'article_path' : article_path})}">here</a> to create it.
-		</p>
-	%else:
-		<p>
-		Or maybe rather: Congratulations! It seems that there's no root
-		article, which is probably because you just installed simple-wiki
-		and your installation is working. Now you can create the root article.
-		Click <a href="{% url wiki_create "" %}">here</a> to create it.
-		</p>
-	%endif
-%else:
-%if wiki_err_no_namespace is not UNDEFINED and wiki_err_no_namespace:
+	<p>
+	The page you requested could not be found.
+	Click <a href="${wiki_reverse("wiki_create", course=course, kwargs={'article_path' : article_path})}">here</a> to create it.
+	</p>
+%elif wiki_err_no_namespace is not UNDEFINED and wiki_err_no_namespace:
 	<p>
 	You must specify a namespace to create an article in.
 	</p>
@@ -73,7 +62,7 @@ ${wiki_error}
 	</p>
 %elif wiki_err_deleted is not UNDEFINED and wiki_err_deleted:
 	<p>
-	The article you tried to access has been deleted. You may be able to restore it to an earlier version in its <a href="${reverse("wiki_history", args=[wiki_article.get_url(),1])}">history</a>, or <a href="${reverse("wiki_edit", args=[wiki_article.get_url()])}">create a new version</a>.
+	The article you tried to access has been deleted. You may be able to restore it to an earlier version in its <a href="${wiki_reverse("wiki_history", wiki_article, course)}">history</a>, or <a href="${wiki_reverse("wiki_edit", wiki_article, course)}">create a new version</a>.
 	</p>
 %elif wiki_err_norevision is not UNDEFINED:
 	<p>
@@ -83,7 +72,6 @@ ${wiki_error}
 	<p>
 	An error has occured.
 	</p>
-%endif
 %endif
 
 </div>

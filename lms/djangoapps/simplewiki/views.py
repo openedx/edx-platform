@@ -461,7 +461,7 @@ def not_found(request, article_path, course):
     d = {'wiki_err_notfound': True,
          'article_path': article_path,
          'namespace' : course.wiki_namespace}
-    update_template_dictionary(request, course)
+    update_template_dictionary(d, request, course)
     return render_to_response('simplewiki/simplewiki_error.html', d)
     
 def get_article(request, article_path, course):
@@ -495,7 +495,7 @@ def check_permissions(request, article, course, check_read=False, check_write=Fa
 	            'wiki_err_nowrite': write_err,
 	            'wiki_err_locked': locked_err,
                 'wiki_err_deleted': deleted_err,}
-        update_template_dictionary(request, course)
+        update_template_dictionary(d, request, course)
         # TODO: Make this a little less jarring by just displaying an error
         #       on the current page? (no such redirect happens for an anon upload yet)
         # benjaoming: I think this is the nicest way of displaying an error, but
