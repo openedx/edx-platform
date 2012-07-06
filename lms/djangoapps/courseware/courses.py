@@ -27,6 +27,31 @@ class Course(namedtuple('Course', _FIELDS)):
     """Course objects encapsulate general information about a given run of a
     course. This includes things like name, grading policy, etc.
     """
+    @property
+    def id(self):
+        return "{0.institution},{0.number},{0.run_id}".format(self).replace(" ", "_")
+
+    def get_about_section(self, section):
+        if section == "university":
+            section = "institution"
+        if section in _FIELDS:
+            getattr(self, section)
+        else:
+            return section
+
+    @classmethod
+    def load_from_path(cls, course_path):
+        course_path = path(course_path) # convert it from string if necessary
+        try:
+            with open(course_path / "course_info.yaml") as course_info_file:
+                course_info = yaml.load(course_info_file)
+            summary = course_info['course']
+            summary.update(path=course_path, grader=None)
+            return cls(**summary)
+        except Exception as ex:
+            log.exception(ex)
+            raise CourseInfoLoadError("Could not read course info: {0}:{1}"
+                                      .format(type(ex).__name__, ex))
 
 def load_courses(courses_path):
     """Given a directory of courses, returns a list of Course objects. For the

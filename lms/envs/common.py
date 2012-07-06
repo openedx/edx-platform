@@ -64,6 +64,12 @@ sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
+######### EDX dormsbee/portal changes #################
+from courseware.courses import create_lookup_table, load_courses
+COURSES = load_courses(ENV_ROOT / "data")
+COURSES_BY_ID = create_lookup_table(COURSES)
+#######################################################
+
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
