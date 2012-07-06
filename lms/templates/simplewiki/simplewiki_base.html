@@ -5,7 +5,7 @@
 
 <%!
   from django.core.urlresolvers import reverse
-  from simplewiki.views import wiki_article_reverse, wiki_namespace_reverse
+  from simplewiki.views import wiki_reverse
 %>
 
 <%block name="headextra">
@@ -20,7 +20,7 @@
     var x = window.onload;
     window.onload = function(){
         var options = {
-        script: "${ wiki_article_reverse('search_related', wiki_article, course)}/?self=${wiki_article.pk}&",
+        script: "${ wiki_reverse('search_related', wiki_article, course)}/?self=${wiki_article.pk}&",
         json: true,
         varname: "query",
         maxresults: 35,
@@ -70,7 +70,9 @@
 
 <%block name="bodyextra">
 
+%if course:
 <%include file="../course_navigation.html" args="active_page='wiki'" />
+%endif
 
 <section class="main-content">
   <div class="wiki-wrapper">
@@ -80,7 +82,7 @@
       <ul class="action">
         <li>
           <h3>
-            <a href="${wiki_namespace_reverse("wiki_list_articles", namespace, course)}">All Articles</a>
+            <a href="${wiki_reverse("wiki_list_articles", course=course, namespace=namespace)}">All Articles</a>
           </h3>
         </li>
 
@@ -91,7 +93,7 @@
 
           <div id="wiki_create_form">
             <%
-              baseURL = reverse("wiki_create", kwargs={"course_id" : course.id, "article_path" : course.wiki_namespace + "/" })
+              baseURL = wiki_reverse("wiki_create", course=course, kwargs={"article_path" : namespace + "/" })
             %>
             <form method="GET" onsubmit="this.action='${baseURL}' + this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '');">
               <div>
@@ -108,7 +110,7 @@
         </li>
 
         <li class="search">
-          <form method="GET" action='${wiki_namespace_reverse("wiki_search_articles", namespace, course)}'>
+          <form method="GET" action='${wiki_reverse("wiki_search_articles", course=course, namespace=namespace)}'>
             <label class="wiki_box_title">Search</label>
             <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 71%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
             <input type="submit" id="wiki_search_input_submit" value="Go!" style="width: 20%" />
@@ -132,15 +134,15 @@
           <ul>
 
             <li>
-              <a href="${ wiki_article_reverse('wiki_view', wiki_article, course)}" class="view">View</a>
+              <a href="${ wiki_reverse('wiki_view', wiki_article, course)}" class="view">View</a>
             </li>
 
             <li>
-              <a href="${ wiki_article_reverse('wiki_edit', wiki_article, course)}" class="edit">Edit</a>
+              <a href="${ wiki_reverse('wiki_edit', wiki_article, course)}" class="edit">Edit</a>
             </li>
 
             <li>
-              <a href="${ wiki_article_reverse('wiki_history', wiki_article, course)}" class="history">History</a>
+              <a href="${ wiki_reverse('wiki_history', wiki_article, course)}" class="history">History</a>
             </li>
           </ul>
         </header>
