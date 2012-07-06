@@ -1,5 +1,4 @@
 import logging
-from django.conf import settings
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
@@ -129,8 +128,7 @@ class XMLModuleStore(ModuleStore):
         """
         Returns a list of course descriptors
         """
-        # return self.courses
-        return settings.COURSES
+        return self.courses
 
     def create_item(self, location):
         raise NotImplementedError("XMLModuleStores are read-only")

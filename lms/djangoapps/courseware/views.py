@@ -54,9 +54,7 @@ def format_url_params(params):
 def courses(request):
     csrf_token = csrf(request)['csrf_token']
     # TODO: Clean up how 'error' is done.
-    # context = {'courses': modulestore().get_courses(),
-    #            'csrf': csrf_token}
-    context = {'courses': settings.COURSES,
+    context = {'courses': modulestore().get_courses(),
                'csrf': csrf_token}
     return render_to_response("courses.html", context)
 
@@ -254,9 +252,8 @@ def course_info(request, course_id):
     csrf_token = csrf(request)['csrf_token']
 
     try:
-        # course_location = CourseDescriptor.id_to_location(course_id)
-        # course = modulestore().get_item(course_location)
-        course = settings.COURSES_BY_ID[course_id]
+        course_location = CourseDescriptor.id_to_location(course_id)
+        course = modulestore().get_item(course_location)
     except KeyError:
         raise Http404("Course not found")
 

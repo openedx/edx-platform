@@ -491,9 +491,8 @@ def accept_name_change(request):
 def course_info(request, course_id):
     # This is the advertising page for a student to look at the course before signing up
     csrf_token = csrf(request)['csrf_token']
-    # course_loc = CourseDescriptor.id_to_location(course_id)
-    # course = modulestore().get_item(course_loc)
-    course = settings.COURSES_BY_ID[course_id]
+    course_loc = CourseDescriptor.id_to_location(course_id)
+    course = modulestore().get_item(course_loc)
     # TODO: Couse should be a model
     return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course': course})
 
