@@ -13,10 +13,14 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   save: (event) ->
     event.preventDefault()
-    @model.save().success ->
-      console.log "Saved"
+    @model.save().success(->
+      alert("Your changes have been saved.")
+    ).error(->
+      alert("There was an error saving your changes. Please try again.")
+    )
 
-  cancel: ->
+  cancel: (event) ->
+    event.preventDefault()
     CMS.popView()
 
   editSubmodule: (event) ->
