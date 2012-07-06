@@ -18,21 +18,32 @@ section.cal {
       text-transform: uppercase;
       letter-spacing: 1px;
       font-size: 14px;
-      padding: 6px;
+      padding: 6px 6px 6px 0;
       font-size: 12px;
     }
 
     ul {
       @include inline-block;
+      float: right;
 
       li  {
         @include inline-block;
-        margin-left: 6px;
-        border-left: 1px solid #ddd;
+        margin-right: 6px;
+        border-right: 1px solid #ddd;
         padding: 0 6px;
+
+        &:last-child {
+          border-right: 0;
+          margin-right: 0;
+          padding-right: 0;
+        }
 
         a {
           @include inline-block();
+          font-size: 12px;
+          @include inline-block;
+          margin: 0 6px;
+          font-style: italic;
         }
 
         ul {
@@ -63,7 +74,6 @@ section.cal {
       float: left;
       width: flex-grid(3) + ((flex-gutter() * 3) / 4);
       background-color: $light-blue;
-      overflow-y: hidden;
 
       &:hover {
         li.create-module {
@@ -116,6 +126,7 @@ section.cal {
         li {
           border-bottom: 1px solid darken($light-blue, 8%);
           position: relative;
+          overflow-y: hidden;
 
           &:hover {
             background-color: lighten($yellow, 14%);
@@ -232,7 +243,7 @@ section.cal {
   }
 
   section.new-section {
-    margin-top: 10px;
+    margin: 10px 0 40px;
     @include inline-block();
     position: relative;
 
@@ -319,11 +330,11 @@ section.cal {
 
   &:hover {
     opacity: 1;
-    width: flex-grid(4) + flex-gutter();
+    width: flex-grid(5) + flex-gutter();
     background-color: transparent;
 
     + section.main-content {
-      width: flex-grid(8);
+      width: flex-grid(7);
       opacity: .6;
     }
   }
@@ -331,24 +342,20 @@ section.cal {
   > header {
     @include transition;
     overflow: hidden;
-    height: 30px;
+
+    > a {
+      display: none;
+    }
 
     ul {
+      float: none;
       display: block;
 
       li {
-        border-left: 0;
-        margin-left: 0;
-        margin-bottom: 4px;
-
         ul {
           display: inline;
         }
       }
-    }
-
-    &:hover {
-      height: 10%;
     }
   }
 

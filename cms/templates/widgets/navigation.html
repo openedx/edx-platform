@@ -1,35 +1,34 @@
 <section class="cal">
   <header class="wip">
-    <h2>Filter content:</h2>
+    <a href="#">Timeline view</a>
     <ul>
       <li>
-        <a href="#">Sequences</a>
-
-        <ul>
-          <li>Hide all</li>
-          <li>Lectures</li>
-          <li>Labs</li>
-          <li>Homeworks</li>
-          <li>Exams</li>
-        </ul>
+        <h2>Sort:</h2>
+        <select>
+          <option value="">Linear Order</option>
+          <option value="">Recently Modified</option>
+          <option value="">Type</option>
+          <option value="">Alphabetically</option>
+        </select>
       </li>
 
       <li>
-        <a href="#">Deadlines</a>
-
-        <ul>
-          <li>Today</li>
-          <li>Tomorrow</li>
-          <li>This week</li>
-          <li>In 2 weeks</li>
-          <li>This month</li>
-        </ul>
+        <h2>Filter:</h2>
+        <select>
+          <option value="">All content</option>
+          <option value="">Videos</option>
+          <option value="">Problems</option>
+          <option value="">Labs</option>
+          <option value="">Tutorials</option>
+          <option value="">HTML</option>
+        </select>
+        <a href="#" class="more">More</a>
       </li>
       <li>
-        <a href="#">Goals</a>
-        <ul>
-          <li>Hide</li>
-        </ul>
+        <a href="#">Hide goals</a>
+      </li>
+      <li class="search">
+        <input type="search" name="" id="" value="" placeholder="Search" />
       </li>
     </ul>
   </header>
@@ -83,6 +82,7 @@
           <a href="" class="video-edit">Video 3</a>
           <a href="#" class="draggable">handle</a>
         </li>
+        <%include file="module-dropdown.html"/>
       </ul>
     </li>
   </ol>
@@ -90,30 +90,30 @@
   <section class="new-section">
     <a href="#" >+ Add New Section</a>
 
-    <section>
-      <form>
-        <ul>
-          <li>
-            <input type="text" name="" id="" placeholder="Section title" />
-          </li>
-          <li>
-            <select>
-              <option>Blank</option>
-              <option>6.002x</option>
-              <option>6.00x</option>
-            </select>
-          </li>
-          <li>
-            <input type="submit" value="Save and edit week" class="edit-week" />
+    <!-- <section> -->
+    <!--   <form> -->
+    <!--     <ul> -->
+    <!--       <li> -->
+    <!--         <input type="text" name="" id="" placeholder="Section title" /> -->
+    <!--       </li> -->
+    <!--       <li> -->
+    <!--         <select> -->
+    <!--           <option>Blank</option> -->
+    <!--           <option>6.002x</option> -->
+    <!--           <option>6.00x</option> -->
+    <!--         </select> -->
+    <!--       </li> -->
+    <!--       <li> -->
+    <!--         <input type="submit" value="Save and edit week" class="edit-week" /> -->
 
-            <div>
-              <a href="#" class="close">Save without edit</a>
-              <a href="#" class="close">cancel</a>
-            </div>
-          </li>
-        </ul>
-      </form>
-    </section>
+    <!--         <div> -->
+    <!--           <a href="#" class="close">Save without edit</a> -->
+    <!--           <a href="#" class="close">cancel</a> -->
+    <!--         </div> -->
+    <!--       </li> -->
+    <!--     </ul> -->
+    <!--   </form> -->
+    <!-- </section> -->
   </section>
 </section>
 
