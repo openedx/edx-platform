@@ -166,7 +166,8 @@ def choicegroup(element, value, status, render_template, msg=''):
             raise Exception("[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag)
         ctext = ""
         ctext += ''.join([etree.tostring(x) for x in choice])	# TODO: what if choice[0] has math tags in it?
-        ctext += choice.text		# TODO: fix order?
+        if choice.text is not None:
+            ctext += choice.text		# TODO: fix order?
         choices[choice.get("name")] = ctext
     context={'id':eid, 'value':value, 'state':status, 'type':type, 'choices':choices}
     html = render_template("choicegroup.html", context)
@@ -187,9 +188,17 @@ def textline(element, value, status, render_template, msg=""):
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
     hidden = element.get('hidden','')	# if specified, then textline is hidden and id is stored in div of name given by hidden
+    escapedict = {'"': '&quot;'}
+    value = saxutils.escape(value,escapedict)	# otherwise, answers with quotes in them crashes the system!
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg': msg, 'hidden': hidden}
     html = render_template("textinput.html", context)
-    return etree.XML(html)
+    try:
+        xhtml = etree.XML(html)
+    except Exception as err:
+        if True: # TODO needs to be self.system.DEBUG - but can't access system 
+            log.debug('[inputtypes.textline] failed to parse XML for:\n%s' % html)
+            raise
+    return xhtml
 
 #-----------------------------------------------------------------------------
 
