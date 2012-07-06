@@ -14,13 +14,19 @@ section#unit-wrapper {
         letter-spacing: 1px;
         @include inline-block();
         color: $bright-blue;
+        margin: 0;
       }
 
       p {
         @include inline-block();
-        margin-left: 10px;
-        color: #999;
-        font-size: 12px;
+        margin: 0;
+
+        a {
+          text-indent: -9999px;
+          @include inline-block();
+          width: 1px;
+          height: 100%;
+       }
       }
     }
 
@@ -71,10 +77,12 @@ section#unit-wrapper {
           @include clearfix;
 
           ul {
-            list-style: none;
             border: 1px solid darken($light-blue, 15%);
             @include clearfix();
             float: left;
+            list-style: none;
+            margin: 0;
+            padding: 0;
 
             li {
               border-right: 1px solid darken($light-blue, 15%);
@@ -144,10 +152,12 @@ section#unit-wrapper {
             h2 {
               font-size: 14px;
               @include inline-block();
+              margin: 0;
             }
 
             p {
               @include inline-block();
+              margin: 0;
             }
           }
         }
@@ -212,6 +222,8 @@ section#unit-wrapper {
 
       ul {
         list-style: none;
+        margin: 0;
+        padding: 0;
 
         li {
           margin-bottom: 20px;
