@@ -13,6 +13,7 @@ if settings.DEBUG:
 urlpatterns = ('',
     url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^about$', 'student.views.about', name="about_edx"),
+    url(r'^university_profile$', 'student.views.university_profile', name="university_profile"),
     url(r'^jobs$', 'student.views.jobs', name="jobs"),
     url(r'^help$', 'student.views.help', name="help_edx"),
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
