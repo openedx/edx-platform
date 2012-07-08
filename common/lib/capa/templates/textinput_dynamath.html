@@ -11,8 +11,15 @@
     % elif state == 'incomplete':
     <div class="incorrect" id="status_${id}">
     % endif
+    % if hidden:
+      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+    % endif
 
-      <input type="text" name="input_${id}" id="input_${id}" value="${value}" class="math" size="${size if size else ''}" />
+      <input type="text" name="input_${id}" id="input_${id}" value="${value}" class="math" size="${size if size else ''}" 
+       % if hidden:
+      	    style="display:none;"
+       % endif
+      />
 
       <p class="status">
         % if state == 'unsubmitted':
