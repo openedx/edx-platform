@@ -16,7 +16,7 @@ class CourseDescriptor(SequenceDescriptor):
         return "/".join([self.location.org, self.location.course, self.location.name])
 
     @property
-    def name(self):
+    def display_name(self):
         self.metadata['display_name']
 
     def get_about_section(self, section_key):

@@ -87,7 +87,8 @@ class XMLModuleStore(ModuleStore):
                             self.used_slugs.add(slug)
                             xml_data.set('slug', slug)
 
-                        module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
+                        from xmodule.course_module import CourseDescriptor
+                        module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, CourseDescriptor)
                         modulestore.modules[module.location] = module
 
                         if modulestore.eager:
