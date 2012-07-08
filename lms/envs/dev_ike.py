@@ -35,20 +35,22 @@ EDX4EDX_ROOT = ENV_ROOT / "data/edx4edx"
 
 DEBUG = True
 ENABLE_MULTICOURSE = True     # set to False to disable multicourse display (see lib.util.views.mitxhome)
-QUICKEDIT = True
+QUICKEDIT = False		
 
 MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT ]
 
 #MITX_FEATURES['USE_DJANGO_PIPELINE'] = False
 MITX_FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF'] = False
 MITX_FEATURES['DISPLAY_EDIT_LINK'] = True
+MITX_FEATURES['DEBUG_LEVEL'] = 10				# 0 = lowest level, least verbose, 255 = max level, most verbose
 
-COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
+COURSE_SETTINGS =  {'6002x_Fall_2012': {'number' : '6.002x',
                                           'title'  :  'Circuits and Electronics',
                                           'xmlpath': '/6002x-fall-2012/',
                                           'active' : True,
                                           'default_chapter' : 'Week_1',
                                           'default_section' : 'Administrivia_and_Circuit_Elements',
+                                          'location': 'i4x://edx/6002xs12/course/6002x Fall 2012',
                                           },
                     '8.02_Spring_2013': {'number' : '8.02x',
                                          'title'  : 'Electricity &amp; Magnetism',
@@ -81,6 +83,7 @@ COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
                                     'active' : True,
                                     'default_chapter' : 'Introduction',
                                     'default_section' : 'edx4edx_Course',
+                                    'location': 'i4x://edx/6002xs12/course/edx4edx',
                                     },
                     '7.03x_Fall_2012': {'number' : '7.03x',
                                     'title'  : 'Genetics',

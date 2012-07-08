@@ -135,7 +135,7 @@ class CapaModule(XModule):
         try:
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(), instance_state, seed=seed, system=self.system)
         except Exception:
-            msg = 'cannot create LoncapaProblem %s' % self.url
+            msg = 'cannot create LoncapaProblem %s' % self.location.url
             log.exception(msg)
             if self.system.DEBUG:
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
