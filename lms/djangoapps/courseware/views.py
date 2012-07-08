@@ -117,6 +117,9 @@ def render_accordion(request, course, chapter, section):
 
         Returns (initialization_javascript, content)'''
 
+    if not course:
+        course = settings.COURSE_DEFAULT.replace('_',' ')
+
     course_location = multicourse_settings.get_course_location(course)
     toc = toc_for_course(request.user, request, course_location, chapter, section)
 
@@ -142,9 +145,10 @@ def get_course(request, course):
 
     if course == None:
         if not settings.ENABLE_MULTICOURSE:
-            course = "6.002 Spring 2012"
+            course = "edx4edx"
         elif 'coursename' in request.session:
-            course = request.session['coursename']
+            # use multicourse_settings, so that settings.COURSE_TITLE is set properly
+            course = multicourse_settings.get_coursename_from_request(request)
         else:
             course = settings.COURSE_DEFAULT
     return course
@@ -187,6 +191,19 @@ def index(request, course=None, chapter=None, section=None,
 
     # keep track of current course being viewed in django's request.session
     request.session['coursename'] = course
+
+    # get default chapter & section from multicourse settings, if not provided
+    if chapter is None:
+        defchapter = multicourse_settings.get_course_default_chapter(course)
+        defsection = multicourse_settings.get_course_default_section(course)
+        if defchapter and defsection:
+            # jump there using redirect, so the user gets the right URL in their browser
+            newurl = '%s/courseware/%s/%s/%s/' % (settings.MITX_ROOT_URL,
+                                                  get_course(request, course),
+                                                  defchapter,
+                                                  defsection)
+            log.debug('redirecting to %s' % newurl)
+            return redirect(newurl)
 
     chapter = clean(chapter)
     section = clean(section)

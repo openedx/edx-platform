@@ -120,6 +120,22 @@ task :package do
     FileUtils.mkdir_p(BUILD_DIR)
     
     Dir.chdir(BUILD_DIR) do
+        afterremove = Tempfile.new('afterremove')
+        afterremove.write <<-AFTERREMOVE.gsub(/^\s*/, '')
+        #! /bin/bash
+        set -e
+        set -x
+        
+        # to be a little safer this rm is executed
+        # as the makeitso user
+
+        if [[ -d "#{INSTALL_DIR_PATH}" ]]; then
+            sudo -u makeitso rm -rf "#{INSTALL_DIR_PATH}"
+        fi
+
+        AFTERREMOVE
+        afterremove.close()
+        FileUtils.chmod(0755, afterremove.path)
 
         postinstall = Tempfile.new('postinstall')
         postinstall.write <<-POSTINSTALL.gsub(/^\s*/, '')
@@ -128,14 +144,11 @@ task :package do
         set -x
 
         chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
-        chmod +x #{INSTALL_DIR_PATH}/collect_static_resources
 
         service gunicorn stop || echo "Unable to stop gunicorn. Continuing"
         rm -f #{LINK_PATH}
         ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
         chown makeitso:makeitso #{LINK_PATH}
-
-        /opt/wwc/mitx/collect_static_resources
 
         # Delete mako temp files
         rm -rf /tmp/tmp*mako
@@ -148,6 +161,7 @@ task :package do
         args = ["fakeroot", "fpm", "-s", "dir", "-t", "deb",
             "--verbose",
             "--after-install=#{postinstall.path}",
+            "--after-remove=#{afterremove.path}",
             "--prefix=#{INSTALL_DIR_PATH}",
             "--exclude=**/build/**",
             "--exclude=**/rakefile",

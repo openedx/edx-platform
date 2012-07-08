@@ -1,5 +1,9 @@
 <section id="textbox_${id}" class="textbox">
-  <textarea rows="${rows}" cols="${cols}" name="input_${id}" id="input_${id}">${value|h}</textarea>
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}" id="input_${id}"
+       % if hidden:
+      	    style="display:none;"
+       % endif
+  >${value|h}</textarea>
 
   <span id="answer_${id}"></span>
 
@@ -11,6 +15,9 @@
   <span class="incorrect" id="status_${id}"></span>
   % elif state == 'incomplete':
   <span class="incorrect" id="status_${id}"></span>
+  % endif
+  % if hidden:
+      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
   % endif
   <br/>
   <span class="debug">(${state})</span>
