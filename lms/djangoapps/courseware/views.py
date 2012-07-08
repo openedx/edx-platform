@@ -145,7 +145,7 @@ def get_course(request, course):
 
     if course == None:
         if not settings.ENABLE_MULTICOURSE:
-            course = "edx4edx"
+            course = settings.COURSE_DEFAULT
         elif 'coursename' in request.session:
             # use multicourse_settings, so that settings.COURSE_TITLE is set properly
             course = multicourse_settings.get_coursename_from_request(request)
@@ -187,6 +187,7 @@ def index(request, course=None, chapter=None, section=None,
 
     course = clean(get_course(request, course))
     if not multicourse_settings.is_valid_course(course):
+        log.debug('Course %s is not valid' % course)
         return redirect('/')
 
     # keep track of current course being viewed in django's request.session
