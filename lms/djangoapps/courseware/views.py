@@ -209,9 +209,12 @@ def index(request, course=None, chapter=None, section=None,
     chapter = clean(chapter)
     section = clean(section)
 
+    if settings.ENABLE_MULTICOURSE:
+        settings.MODULESTORE['default']['OPTIONS']['data_dir'] = settings.DATA_DIR + multicourse_settings.get_course_xmlpath(course)
+
     context = {
         'csrf': csrf(request)['csrf_token'],
-        'accordion': render_accordion(request, course, chapter, section),
+        'accordion': render_accordion(request, course, chapter, section),	# triggers course load!
         'COURSE_TITLE': multicourse_settings.get_course_title(course),
         'init': '',
         'content': ''

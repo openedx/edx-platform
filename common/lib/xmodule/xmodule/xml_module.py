@@ -125,6 +125,7 @@ class XmlDescriptor(XModuleDescriptor):
                 definition_xml = copy.deepcopy(xml_object)
             else:
                 filepath = cls._format_filepath(xml_object.tag, filename)
+                log.debug('filepath=%s, resources_fs=%s' % (filepath,system.resources_fs))
                 with system.resources_fs.open(filepath) as file:
                     try:
                         definition_xml = etree.parse(file).getroot()
