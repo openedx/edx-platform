@@ -77,7 +77,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$', 'courseware.views.profile', name="profile"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 'courseware.views.course_info', name="about_course"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 'student.views.course_info', name="about_course"),
     )
 
 if settings.ENABLE_MULTICOURSE:

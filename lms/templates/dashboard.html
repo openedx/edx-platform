@@ -48,9 +48,9 @@
               </div>
               <section class="info">
                 <hgroup>
-                  <h2>${course.title}</h2>
+                  <h2>${course.get_about_section("title")}</h2>
                   % for instructor in course.instructors:
-                    <h3>${course.institution}</h3>
+                    <h3>${course.get_about_section('university')}</h3>
                   % endfor
                 </hgroup>
                 <div class="edit">options</div>
