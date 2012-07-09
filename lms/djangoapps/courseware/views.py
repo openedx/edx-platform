@@ -295,7 +295,7 @@ def index(request, course=None, chapter=None, section=None,
         if defchapter and defsection:
             # jump there using redirect, so the user gets the right URL in their browser
             newurl = '%s/courseware/%s/%s/%s/' % (settings.MITX_ROOT_URL,
-                                                  get_course(request, course),
+                                                  get_course(request, course).replace(' ','_'),
                                                   defchapter,
                                                   defsection)
             log.debug('redirecting to %s' % newurl)
