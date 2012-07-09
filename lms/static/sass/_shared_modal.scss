@@ -30,22 +30,30 @@
   width: grid-width(6);
   z-index: 10;
 
+  &::before {
+    @include background-image(radial-gradient(50% 30%, circle cover, rgba(0,0,0, 0.3), rgba(0,0,0, 0.8)));
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1;
+  }
+
   &.visible {
     display: block;
   }
 
   &.video-modal {
-    //height: 360px;
     left: 50%;
-    margin-left: -320px;
-    //margin-top: -180px;
-    //top: 50%;
-    width: 642px;
+    margin-left: -281px;
+    width: 562px;
 
     .inner-wrapper {
-      height: 360px;
+      height: 315px;
       padding: 0px;
-      width: 640px;
+      width: 560px;
     }
   }
 
@@ -57,6 +65,7 @@
     overflow: hidden;
     padding-bottom: 30px;
     position: relative;
+    z-index: 2;
 
     header {
       margin-bottom: 30px;

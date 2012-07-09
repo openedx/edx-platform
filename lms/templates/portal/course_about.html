@@ -12,7 +12,6 @@
       <section class="intro">
         <hgroup>
           <h1>${course.get_about_section("title")} <h2><a href="#">${course.get_about_section("university")}</a></h2></h1>
-          <hr>
         </hgroup>
         <div class="course-dates">
           <p>Class Starts: <span class="start-date">7/12/12</span></p>
@@ -22,7 +21,7 @@
       </section>
       <section class="actions">
         <div class="register-wrapper">
-          <a href="#" class="register">Register</a>
+          <a href="${reverse('enroll', args=[course.id])}" class="register">Register</a>
         </div>
         <section class="social-sharing">
           <p><span class="num-people-registered">1,435</span> students already registed!</p>
@@ -53,13 +52,13 @@
           <h2>Syllabus</h2>
           <p>${course.get_about_section("syllabus")}</p>
 
-          <h3>Textbook</h3>
+          <h2>Textbook</h2>
           ${course.get_about_section("textbook")}
 
-          <h3>Frequently Asked Questions</h3>
-          ${course.get_about_section("faq")}
+          <h2>Frequently Asked Questions</h2>
+          <p>${course.get_about_section("faq")}</p>
 
-          ${course.get_about_section("more_info")}
+          <p>${course.get_about_section("more_info")}</p>
         </section>
 
         <section class="course-staff">
@@ -94,11 +93,10 @@
     <section class="course-sidebar">
       <div class="media">
         <div class="hero">
-          <img src="${static.url('images/history.png')}" />
+          <img src="${static.url('images/courses/circuits.jpeg')}" />
           <div class="play-intro"></div>
         </div>
         <%include file="../video_modal.html" />
-        ${course.get_about_section("video")}
       </div>
 
       <section class="course-summary">

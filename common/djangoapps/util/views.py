@@ -57,23 +57,9 @@ def send_feedback(request):
               )
     return HttpResponse(json.dumps({'success':True}))
 
-def info(request, course_id=None):
+def info(request):
     ''' Info page (link from main header) '''
-    try:
-        course = settings.COURSES_BY_ID[course_id]
-    except KeyError:
-        raise Http404("Course not found")
-
-    # We're bypassing the templating system for this part. We should cache
-    # this.
-    sections = ["updates", "handouts", "guest_updates", "guest_handouts"]
-    sections_to_content = { 'course': course }
-    for section in sections:
-        filename = section + ".html"
-        with open(course.path / "info" / filename) as f:
-            sections_to_content[section] = f.read()
-
-    return render_to_response("info.html", sections_to_content)
+    return render_to_response("info.html", {})
 
 # From http://djangosnippets.org/snippets/1042/
 def parse_accept_header(accept):

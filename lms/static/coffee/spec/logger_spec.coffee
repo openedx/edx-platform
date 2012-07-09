@@ -25,7 +25,7 @@ describe 'Logger', ->
 
     it 'send a request to log event', ->
       spyOn($, 'ajax')
-      $(window).trigger('onunload')
+      window.onunload()
       expect($.ajax).toHaveBeenCalledWith
         url: "#{Courseware.prefix}/event",
         data:

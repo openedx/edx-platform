@@ -1,0 +1,80 @@
+body {
+  @include clearfix();
+  height: 100%;
+  font: 14px $body-font-family;
+
+  > section {
+    display: table;
+    width: 100%;
+  }
+
+  > header {
+    background: $dark-blue;
+    color: #fff;
+    display: block;
+    float: none;
+    padding: 8px 25px;
+    width: 100%;
+    @include box-sizing(border-box);
+    -webkit-font-smoothing: antialiased;
+
+    nav {
+      @include clearfix;
+
+      h2 {
+        font-size: 14px;
+        text-transform: uppercase;
+        float: left;
+        margin-right: 15px;
+
+        a {
+          color: #fff;
+
+          &:hover {
+            color: rgba(#fff, .6);
+          }
+        }
+      }
+
+      a {
+        color: rgba(#fff, .8);
+
+        &:hover {
+          color: rgba(#fff, .6);
+        }
+      }
+
+      ul {
+        float: left;
+
+        &.user-nav {
+          float: right;
+        }
+
+        li {
+          @include inline-block();
+
+          a {
+            padding: 8px 10px;
+            display: block;
+            margin: -8px 0;
+
+            &:hover {
+              background-color: darken($dark-blue, 15%);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.content {
+    section.main-content {
+      border-left: 2px solid $dark-blue;
+      @include box-sizing(border-box);
+      width: flex-grid(9);
+      float: left;
+      @include box-shadow( -2px 0 0 darken($light-blue, 3%));
+    }
+  }
+}

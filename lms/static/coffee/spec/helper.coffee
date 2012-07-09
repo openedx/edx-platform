@@ -1,14 +1,14 @@
 jasmine.getFixtures().fixturesPath = "/_jasmine/fixtures/"
 
 jasmine.stubbedMetadata =
-  abc123:
-    id: 'abc123'
-    duration: 100
-  def456:
-    id: 'def456'
+  slowerSpeedYoutubeId:
+    id: 'slowerSpeedYoutubeId'
+    duration: 300
+  normalSpeedYoutubeId:
+    id: 'normalSpeedYoutubeId'
     duration: 200
   bogus:
-    duration: 300
+    duration: 100
 
 jasmine.stubbedCaption =
   start: [0, 10000, 20000, 30000]
@@ -20,10 +20,12 @@ jasmine.stubRequests = ->
       settings.success data: jasmine.stubbedMetadata[match[1]]
     else if match = settings.url.match /static\/subs\/(.+)\.srt\.sjson/
       settings.success jasmine.stubbedCaption
+    else if settings.url.match /modx\/.+\/problem_get$/
+      settings.success html: readFixtures('problem_content.html')
     else if settings.url == '/calculate' ||
-      settings.url == '/6002x/modx/sequence/1/goto_position' ||
+      settings.url.match(/modx\/.+\/goto_position$/) ||
       settings.url.match(/event$/) ||
-      settings.url.match(/6002x\/modx\/problem\/.+\/problem_(check|reset|show|save)$/)
+      settings.url.match(/modx\/.+\/problem_(check|reset|show|save)$/)
       # do nothing
     else
       throw "External request attempted for #{settings.url}, which is not defined."
@@ -47,10 +49,10 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   loadFixtures 'video.html'
   jasmine.stubRequests()
   YT.Player = undefined
-  context.video = new Video 'example', '.75:abc123,1.0:def456'
+  context.video = new Video 'example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
   jasmine.stubYoutubePlayer()
   if createPlayer
-    return new VideoPlayer context.video
+    return new VideoPlayer(video: context.video)
 
 spyOn(window, 'onunload')
 

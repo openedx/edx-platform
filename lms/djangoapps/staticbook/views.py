@@ -1,10 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from mitxmako.shortcuts import render_to_response
-from django.conf import settings
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 @login_required
 def index(request, course_id=None, page=0): 
-    course = settings.COURSES_BY_ID[course_id]
+    course_location = CourseDescriptor.id_to_location(course_id)
+    course = modulestore().get_item(course_location)
     return render_to_response('staticbook.html',{'page':int(page), 'course': course})
 
 def index_shifted(request, page):

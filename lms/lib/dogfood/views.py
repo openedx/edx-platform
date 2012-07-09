@@ -174,7 +174,7 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
         module = 'problem'
         xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
     
-        ajax_url = settings.MITX_ROOT_URL + '/modx/'+module+'/'+id+'/'
+        ajax_url = settings.MITX_ROOT_URL + '/modx/'+id+'/'
     
         # Create the module (instance of capa_module.Module)
         system = I4xSystem(track_function = make_track_function(request), 
@@ -184,29 +184,29 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
                            filestore = OSFS(settings.DATA_DIR + xp),
                            #role = 'staff' if request.user.is_staff else 'student',		# TODO: generalize this
                            )
-        instance=xmodule.get_module_class(module)(system, 
-                                                             xml, 
+        instance = xmodule.get_module_class(module)(system,
+                                                             xml,
                                                              id,
                                                              state=None)
         log.info('ajax_url = ' + instance.ajax_url)
 
         # create empty student state for this problem, if not previously existing
-        s = StudentModule.objects.filter(student=request.user, 
-                                         module_id=id)
+        s = StudentModule.objects.filter(student=request.user,
+                                         module_state_key=id)
         if len(s) == 0 or s is None:
-            smod=StudentModule(student=request.user, 
-                               module_type = 'problem',
-                               module_id=id, 
-                               state=instance.get_state())
+            smod = StudentModule(student=request.user,
+                                 module_type='problem',
+                                 module_state_key=id,
+                                 state=instance.get_instance_state())
             smod.save()
 
         lcp = instance.lcp
         pxml = lcp.tree
-        pxmls = etree.tostring(pxml,pretty_print=True)
+        pxmls = etree.tostring(pxml, pretty_print=True)
 
         return instance, pxmls
 
-    instance, pxmls = get_lcp(coursename,id)
+    instance, pxmls = get_lcp(coursename, id)
 
     # if there was a POST, then process it
     msg = ''
@@ -246,8 +246,6 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
     # get the rendered problem HTML
     phtml = instance.get_html()
     # phtml = instance.get_problem_html()
-    # init_js = instance.get_init_js()
-    # destory_js = instance.get_destroy_js()
 
     context = {'id':id,
                'msg' : msg,

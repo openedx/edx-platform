@@ -6,8 +6,12 @@ section.cal {
   > header {
     @include clearfix;
     margin-bottom: 10px;
-    background: #efefef;
-    border: 1px solid #ddd;
+    opacity: .4;
+    @include transition;
+
+    &:hover {
+      opacity: 1;
+    }
 
     h2 {
       @include inline-block();
@@ -15,7 +19,6 @@ section.cal {
       letter-spacing: 1px;
       font-size: 14px;
       padding: 6px;
-      margin-left: 6px;
       font-size: 12px;
     }
 
@@ -25,9 +28,8 @@ section.cal {
       li  {
         @include inline-block;
         margin-left: 6px;
-        padding-left: 6px;
         border-left: 1px solid #ddd;
-        padding: 6px;
+        padding: 0 6px;
 
         a {
           @include inline-block();
@@ -49,32 +51,35 @@ section.cal {
   ol {
     list-style: none;
     @include clearfix;
-    @include box-sizing(border-box);
-    border-left: 1px solid #333;
-    border-top: 1px solid #333;
+    border-left: 1px solid lighten($dark-blue, 40%);
+    border-top: 1px solid lighten($dark-blue, 40%);
     width: 100%;
+    @include box-sizing(border-box);
 
     > li {
-      border-right: 1px solid #333;
-      border-bottom: 1px solid;
+      border-right: 1px solid lighten($dark-blue, 40%);
+      border-bottom: 1px solid lighten($dark-blue, 40%);
       @include box-sizing(border-box);
       float: left;
       width: flex-grid(3) + ((flex-gutter() * 3) / 4);
+      background-color: lighten($light-blue, 2%);
+
 
       header {
-        border-bottom: 1px solid #000;
-        @include box-shadow(0 1px 2px #aaa);
+        border-bottom: 1px solid lighten($dark-blue, 40%);
+        @include box-shadow(0 2px 2px $light-blue);
         display: block;
         margin-bottom: 2px;
+        background: #FFF;
 
         h1 {
           font-size: 14px;
           text-transform: uppercase;
-          border-bottom: 1px solid #ccc;
+          border-bottom: 1px solid lighten($dark-blue, 60%);
           padding: 6px;
 
           a {
-            color: #000;
+            color: $bright-blue;
             display: block;
           }
         }
@@ -85,6 +90,10 @@ section.cal {
             color: #888;
             border-bottom: 0;
             font-size: 12px;
+
+            &:hover {
+              background: #fff;
+            }
           }
         }
       }
@@ -94,9 +103,16 @@ section.cal {
         margin-bottom: 1px;
 
         li {
-          background: #efefef;
-          border-bottom: 1px solid #666;
+          border-bottom: 1px solid darken($light-blue, 8%);
           padding: 6px;
+
+          &:hover {
+            background: lighten($yellow, 10%);
+          }
+
+          a {
+            color: lighten($dark-blue, 10%);
+          }
 
           &.create-module {
             position: relative;

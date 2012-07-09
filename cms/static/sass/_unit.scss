@@ -1,0 +1,225 @@
+section#unit-wrapper {
+  > header {
+    border-bottom: 2px solid $dark-blue;
+    @include clearfix();
+    @include box-shadow( 0 2px 0 darken($light-blue, 3%));
+    padding: 6px 20px;
+
+    section {
+      float: left;
+
+      h1 {
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        @include inline-block();
+        color: $bright-blue;
+      }
+
+      p {
+        @include inline-block();
+        margin-left: 10px;
+        color: #999;
+        font-size: 12px;
+        font-style: italic;
+      }
+    }
+
+    div {
+      float: right;
+      color: #666;
+
+      a {
+        display: block;
+        @include inline-block;
+
+       &.cancel {
+         margin-right: 20px;
+         font-style: italic;
+         font-size: 12px;
+       }
+
+       &.save-update {
+         @extend .button;
+         margin: -6px -25px -6px 0;
+       }
+      }
+    }
+  }
+
+  > section {
+    padding: 20px;
+
+    section.meta {
+      section {
+        &.status-settings {
+          float: left;
+          margin-bottom: 10px;
+          color: $dark-blue;
+
+          ul {
+            list-style: none;
+            border: 1px solid lighten($dark-blue, 40%);
+            @include inline-block();
+
+            li {
+              @include inline-block();
+              border-right: 1px solid lighten($dark-blue, 40%);
+              padding: 6px;
+
+              &:last-child {
+                border-right: 0;
+              }
+
+              &.current {
+                background: #eee;
+              }
+
+              a {
+                color: $dark-blue;
+              }
+            }
+          }
+
+          a.settings {
+            @include inline-block();
+            margin: 0 20px;
+            padding: 6px;
+            border: 1px solid lighten($dark-blue, 40%);
+            color: $dark-blue;
+          }
+
+          select {
+            float: right;
+          }
+        }
+
+        &.author {
+          float: right;
+          color: lighten($dark-blue, 6%);
+
+          dl {
+            dt {
+              font-weight: bold;
+            }
+
+            dd, dt {
+              @include inline-block();
+            }
+          }
+        }
+
+        &.tags {
+          background: $light-blue;
+          color: lighten($dark-blue, 6%);
+          padding: 10px;
+          margin: 0 0 20px;
+          @include clearfix();
+          clear: both;
+
+          div {
+            float: left;
+            margin-right: 20px;
+
+            h2 {
+              font-size: 14px;
+              @include inline-block();
+            }
+
+            p {
+              @include inline-block();
+            }
+          }
+        }
+      }
+    }
+
+    //general styles for main content
+    .preview {
+      @include box-sizing(border-box);
+      border: 1px solid  lighten($dark-blue, 40%);
+      min-height: 40px;
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 1em;
+      }
+
+      h2 {
+        font-size: 20px;
+        margin-bottom: 1em;
+      }
+
+      h3 {
+        font-size: 18;
+        margin-bottom: 1em;
+      }
+
+      ul {
+        padding-left: 20px;
+        margin-bottom: 1em;
+      }
+
+      p {
+        margin-bottom: 1em;
+      }
+    }
+
+    //notes
+    section.notes {
+      margin-top: 40px;
+      padding: 40px 0 0;
+      border-top: 2px solid lighten( $dark-blue, 60% );
+
+      h2 {
+        margin-bottom: 6px;
+        font-size: $body-font-size;
+        text-transform: uppercase;
+        color: $bright-blue;
+        letter-spacing: 1px;
+      }
+
+      form {
+        margin-bottom: 20px;
+
+        input[type="submit"]{
+          margin-top: 10px;
+        }
+      }
+
+      ul {
+        list-style: none;
+
+        li {
+          margin-bottom: 20px;
+
+          p {
+            margin-bottom: 10px;
+
+            &.author {
+              font-style: italic;
+              color: #999;
+            }
+          }
+        }
+      }
+    }
+
+    div.actions {
+      a.save-update {
+        @extend .button;
+        @include inline-block();
+        margin-top: 20px;
+      }
+
+      a.cancel {
+        float: right;
+        font-style: italic;
+        margin-top: 20px;
+      }
+    }
+  }
+}

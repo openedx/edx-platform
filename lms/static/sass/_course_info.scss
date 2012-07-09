@@ -42,33 +42,14 @@
 
         > hgroup {
           position: relative;
-
-          hr {
-            @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
-                                                              rgba(200,200,200, 1) 50%,
-                                                              rgba(200,200,200, 1)));
-            border: none;
-            height: 1px;
-            margin: 10px 0;
-            position: relative;
-
-            &::after {
-              @include background-image(linear-gradient(180deg, rgba(255,255,255, 0) 0%,
-                                                                rgba(255,255,255, 0.6) 50%,
-                                                                rgba(255,255,255, 0.6)));
-              bottom: -1px;
-              content: "";
-              display: block;
-              height: 1px;
-              position: absolute;
-              width: 100%;
-            }
-          }
+          margin-bottom: 12px;
 
           h1 {
+            color: $base-font-color;
             font: bold 2.8rem/3.2rem $sans-serif;
             @include inline-block;
-            margin-right: 5px;
+            margin: 0 5px 0 0;
+            letter-spacing: 0px;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
 
             span {
@@ -80,6 +61,7 @@
 
           h2 {
             @include inline-block;
+            margin: 0;
 
             a {
               color: $lighter-base-font-color;
@@ -97,19 +79,22 @@
           p {
             color: $lighter-base-font-color;
             @include inline-block;
-            font: 300 1.2rem/1.6rem $sans-serif;
+            font: italic 1.2rem/1.6rem $serif;
             margin-top: 0px;
             margin-right: 20px;
-            text-transform: uppercase;
 
             &:last-child {
               margin: 0;
             }
 
             > span {
+              background: rgb(255,255,255);
+              border: 1px solid rgb(220,220,220);
+              @include border-radius(4px);
               color: $base-font-color;
               font: 300 1.2rem/1.6rem $sans-serif;
               margin-left: 5px;
+              padding: 2px 10px;
             }
           }
         }
@@ -117,6 +102,7 @@
 
       .actions {
         float: left;
+        margin-top: 5px;
         position: relative;
         width: flex-grid(4);
         z-index: 2;
@@ -124,18 +110,14 @@
         &:hover {
           .register-wrapper {
             @include box-shadow(0 1px 16px 0 rgba($blue, 0.35));
-            border-color: rgb(180,180,180);
           }
         }
 
         .register-wrapper {
           @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
-          @include box-sizing(border-box);
           @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1), inset 0 0 0 1px rgba(255,255,255, 0.9));
-          border: 1px solid rgb(210,210,210);
           @include border-radius(4px);
           @include transition(all, 0.15s, linear);
-          padding: 10px;
 
           a.register {
             @include button(shiny, $blue);
@@ -156,14 +138,14 @@
           padding: 0px 20px;
 
           p {
-            background: rgb(245,245,245);
+            background: rgb(255,255,255);
             @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.075), inset 0 0 0 1px rgba(255,255,255, 0.9));
             border: 1px solid rgb(210,210,210);
             border-top: 0;
             @include border-bottom-radius(4px);
-            padding: 5px 10px;
+            padding: 3px 10px;
             margin: 0 auto;
-            color: $lighter-base-font-color;
+            color: $base-font-color;
             font: italic 300 1.2rem/1.6rem $serif;
             margin: 0 0 5px 0;
             text-align: center;
@@ -201,9 +183,9 @@
 
       a {
         border-bottom: 3px solid transparent;
-        color: $lighter-base-font-color;
         @include inline-block;
         font: normal 1.2rem/1.6rem $sans-serif;
+        letter-spacing: 1px;
         margin: 0 15px;
         padding: 0px 5px 15px;
         text-align: center;
@@ -214,8 +196,7 @@
         }
 
         &:hover, &.active {
-          border-color: $pink;
-          //background: rgb(240,240,240);
+          border-color: rgb(200,200,200);
           color: $base-font-color;
         }
       }

@@ -14,7 +14,9 @@
     ## I'm removing this for now since we aren't using it for the fall.
     ## <%include file="course_filter.html" />
     <section class="courses">
-      <%include file="course.html" />
+      %for course in courses:
+        <%include file="course.html" args="course=course" />
+      %endfor
     </section>
   </section>
 </section>
