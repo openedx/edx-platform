@@ -141,7 +141,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     return chapters
 
 
-def get_section(course, chapter, section):
+def get_section(course_module, chapter, section):
     """
     Returns the xmodule descriptor for the name course > chapter > section,
     or None if this doesn't specify a valid section
@@ -150,11 +150,6 @@ def get_section(course, chapter, section):
     chapter: Chapter name
     section: Section name
     """
-    try:
-        course_module = modulestore().get_item(course)
-    except:
-        log.exception("Unable to load course_module")
-        return None
 
     if course_module is None:
         return

@@ -190,7 +190,8 @@ def index(request, course_id=None, chapter=None, section=None,
     look_for_module = chapter is not None and section is not None
     if look_for_module:
         # TODO (cpennington): Pass the right course in here
-        section = get_section(course_location, chapter, section)
+
+        section = get_section(course, chapter, section)
         student_module_cache = StudentModuleCache(request.user, section)
         module, _, _, _ = get_module(request.user, request, section.location, student_module_cache)
         context['content'] = module.get_html()
