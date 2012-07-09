@@ -140,7 +140,7 @@ section.cal {
         li {
           border-bottom: 1px solid darken($light-blue, 8%);
           position: relative;
-          overflow-y: hidden;
+          overflow: hidden;
 
           &:hover {
             background-color: lighten($yellow, 14%);
@@ -192,16 +192,6 @@ section.cal {
               width: 90%;
               z-index: 99;
 
-              &:before {
-                background: $dark-blue;
-                content: "  ";
-                display: block;
-                height: 10px;
-                @include position(absolute, -5px 0 0 50%);
-                @include transform(rotate(45deg));
-                width: 10px;
-              }
-
               ul {
                 li {
                   border-bottom: 0;
@@ -238,12 +228,6 @@ section.cal {
                     }
                   }
                 }
-              }
-            }
-
-            &:hover {
-              div {
-                display: block;
               }
             }
           }
@@ -317,12 +301,6 @@ section.cal {
             }
           }
         }
-      }
-    }
-
-    &:hover {
-      section {
-        display: block;
       }
     }
   }
