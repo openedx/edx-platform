@@ -18,6 +18,10 @@ class CourseDescriptor(SequenceDescriptor):
     def title(self):
         self.metadata['display_name']
 
+    @property
+    def instructors(self):
+        return self.get_about_section("instructors").split("\n")
+
     def get_about_section(self, section_key):
         """
         This returns the snippet of html to be rendered on the course about page, given the key for the section.
@@ -41,8 +45,9 @@ class CourseDescriptor(SequenceDescriptor):
         # Many of these are stored as html files instead of some semantic markup. This can change without effecting
         # this interface when we find a good format for defining so many snippets of text/html.
 
+        # TODO: Remove number, instructors from this list
         if section_key in ['short_description', 'description', 'key_dates', 'video', 'course_staff_short', 'course_staff_extended',
-                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number']:
+                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number', 'instructors']:
             try:
                 with self.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
                     return htmlFile.read()
