@@ -89,57 +89,57 @@ nav.sequence-nav {
         //video
         &.seq_video_inactive {
           @extend .inactive;
-          background-image: url('../images/sequence-nav/video-icon-normal.png');
+          background-image: url('/static/images/sequence-nav/video-icon-normal.png');
           background-position: center;
         }
 
         &.seq_video_visited {
           @extend .visited;
-          background-image: url('../images/sequence-nav/video-icon-visited.png');
+          background-image: url('/static/images/sequence-nav/video-icon-visited.png');
           background-position: center;
         }
 
         &.seq_video_active {
           @extend .active;
-          background-image: url('../images/sequence-nav/video-icon-current.png');
+          background-image: url('/static/images/sequence-nav/video-icon-current.png');
           background-position: center;
         }
 
         //other
         &.seq_other_inactive {
           @extend .inactive;
-          background-image: url('../images/sequence-nav/document-icon-normal.png');
+          background-image: url('/static/images/sequence-nav/document-icon-normal.png');
           background-position: center;
         }
 
         &.seq_other_visited {
           @extend .visited;
-          background-image: url('../images/sequence-nav/document-icon-visited.png');
+          background-image: url('/static/images/sequence-nav/document-icon-visited.png');
           background-position: center;
         }
 
         &.seq_other_active {
           @extend .active;
-          background-image: url('../images/sequence-nav/document-icon-current.png');
+          background-image: url('/static/images/sequence-nav/document-icon-current.png');
           background-position: center;
         }
 
         //vertical & problems
         &.seq_vertical_inactive, &.seq_problem_inactive {
           @extend .inactive;
-          background-image: url('../images/sequence-nav/list-icon-normal.png');
+          background-image: url('/static/images/sequence-nav/list-icon-normal.png');
           background-position: center;
         }
 
         &.seq_vertical_visited, &.seq_problem_visited {
           @extend .visited;
-          background-image: url('../images/sequence-nav/list-icon-visited.png');
+          background-image: url('/static/images/sequence-nav/list-icon-visited.png');
           background-position: center;
         }
 
         &.seq_vertical_active, &.seq_problem_active {
           @extend .active;
-          background-image: url('../images/sequence-nav/list-icon-current.png');
+          background-image: url('/static/images/sequence-nav/list-icon-current.png');
           background-position: center;
         }
 
@@ -229,7 +229,7 @@ nav.sequence-nav {
 
       &.prev {
         a {
-          background-image: url('../images/sequence-nav/previous-icon.png');
+          background-image: url('/static/images/sequence-nav/previous-icon.png');
 
           &:hover {
             background-color: $cream;
@@ -239,7 +239,7 @@ nav.sequence-nav {
 
       &.next {
         a {
-          background-image: url('../images/sequence-nav/next-icon.png');
+          background-image: url('/static/images/sequence-nav/next-icon.png');
 
           &:hover {
             background-color: $cream;
@@ -310,7 +310,7 @@ section.course-content {
 
         &.prev {
           a {
-            background-image: url('../images/sequence-nav/previous-icon.png');
+            background-image: url('/static/images/sequence-nav/previous-icon.png');
             border-right: 1px solid darken(#f6efd4, 20%);
 
             &:hover {
@@ -321,7 +321,7 @@ section.course-content {
 
         &.next {
           a {
-            background-image: url('../images/sequence-nav/next-icon.png');
+            background-image: url('/static/images/sequence-nav/next-icon.png');
 
             &:hover {
               background-color: none;

@@ -26,6 +26,22 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-font-smoothing: antialiased;
 }
 
+h1 {
+  color: $lighter-base-font-color;
+  font: 300 2.4rem/3rem $sans-serif;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+h2 {
+  color: $lighter-base-font-color;
+  font: normal 1.4rem/2rem $serif;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
 p {
   color: $base-font-color;
   font: normal 1.3rem/2rem $serif;
@@ -36,9 +52,23 @@ p + p {
   margin-top: 20px;
 }
 
+p {
+  a:link, a:visited {
+    color: $blue;
+    font: normal 1.3rem/2rem $serif;
+    text-decoration: none;
+    @include transition(all, 0.1s, linear);
+
+    &:hover {
+      color: $blue;
+      text-decoration: underline;
+    }
+  }
+}
+
 a:link, a:visited {
   color: $blue;
-  font: normal 1rem/1.8rem $sans-serif;
+  font: normal 1.2rem/2rem $sans-serif;
   text-decoration: none;
   @include transition(all, 0.1s, linear);
 

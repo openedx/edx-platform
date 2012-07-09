@@ -20,11 +20,14 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.core.urlresolvers import reverse
 
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.django import modulestore
 from django_future.csrf import ensure_csrf_cookie
 
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 
 log = logging.getLogger("mitx.student")
+
 
 def csrf_token(context):
     ''' A csrf token that can be included in a form.
@@ -33,6 +36,7 @@ def csrf_token(context):
     if csrf_token == 'NOTPROVIDED':
         return ''
     return u'<div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token)
+
 
 @ensure_csrf_cookie
 def index(request):
@@ -43,26 +47,33 @@ def index(request):
     else:
         csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done.
-        return render_to_response('index.html', {'courses' : settings.COURSES,
-                                                 'csrf': csrf_token })
+        return render_to_response('index.html', {'courses': modulestore().get_courses(),
+                                                 'csrf': csrf_token})
+
 
 @ensure_csrf_cookie
 def dashboard(request):
     csrf_token = csrf(request)['csrf_token']
     user = request.user
     enrollments = CourseEnrollment.objects.filter(user=user)
-    courses = [settings.COURSES_BY_ID[enrollment.course_id] for enrollment in enrollments]
 
-    context = { 'csrf': csrf_token, 'courses': courses }
+    def course_from_id(id):
+        course_loc = CourseDescriptor.id_to_location(id)
+        return modulestore().get_item(course_loc)
+
+    courses = [course_from_id(enrollment.course_id) for enrollment in enrollments]
+
+    context = {'csrf': csrf_token, 'courses': courses}
     return render_to_response('dashboard.html', context)
+
 
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):
     ''' AJAX request to log in the user. '''
     if 'email' not in request.POST or 'password' not in request.POST:
-        return HttpResponse(json.dumps({'success':False,
-                                        'error': 'Invalid login'})) # TODO: User error message
+        return HttpResponse(json.dumps({'success': False,
+                                        'error': 'Invalid login'}))  # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
@@ -70,14 +81,14 @@ def login_user(request, error=""):
         user = User.objects.get(email=email)
     except User.DoesNotExist:
         log.warning("Login failed - Unknown user email: {0}".format(email))
-        return HttpResponse(json.dumps({'success':False,
-                                        'error': 'Invalid login'})) # TODO: User error message
+        return HttpResponse(json.dumps({'success': False,
+                                        'error': 'Invalid login'}))  # TODO: User error message
 
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
         log.warning("Login failed - password for {0} is invalid".format(email))
-        return HttpResponse(json.dumps({'success':False,
+        return HttpResponse(json.dumps({'success': False,
                                         'error': 'Invalid login'}))
 
     if user is not None and user.is_active:
@@ -416,6 +427,7 @@ def change_name_request(request):
     pnc.save()
     return HttpResponse(json.dumps({'success':True}))
 
+
 @ensure_csrf_cookie
 def pending_name_changes(request):
     ''' Web page which allows staff to approve or reject name changes. '''
@@ -423,13 +435,14 @@ def pending_name_changes(request):
         raise Http404
 
     changes = list(PendingNameChange.objects.all())
-    js = {'students' : [{'new_name': c.new_name,
-                         'rationale':c.rationale,
-                         'old_name':UserProfile.objects.get(user=c.user).name,
-                         'email':c.user.email,
-                         'uid':c.user.id,
-                         'cid':c.id} for c in changes]}
+    js = {'students': [{'new_name': c.new_name,
+                        'rationale':c.rationale,
+                        'old_name':UserProfile.objects.get(user=c.user).name,
+                        'email':c.user.email,
+                        'uid':c.user.id,
+                        'cid':c.id} for c in changes]}
     return render_to_response('name_changes.html', js)
+
 
 @ensure_csrf_cookie
 def reject_name_change(request):
@@ -438,12 +451,13 @@ def reject_name_change(request):
         raise Http404
 
     try:
-        pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
+        pnc = PendingNameChange.objects.get(id=int(request.POST['id']))
     except PendingNameChange.DoesNotExist:
-        return HttpResponse(json.dumps({'success':False, 'error':'Invalid ID'}))
+        return HttpResponse(json.dumps({'success': False, 'error': 'Invalid ID'}))
 
     pnc.delete()
-    return HttpResponse(json.dumps({'success':True}))
+    return HttpResponse(json.dumps({'success': True}))
+
 
 @ensure_csrf_cookie
 def accept_name_change(request):
@@ -452,9 +466,9 @@ def accept_name_change(request):
         raise Http404
 
     try:
-        pnc = PendingNameChange.objects.get(id = int(request.POST['id']))
+        pnc = PendingNameChange.objects.get(id=int(request.POST['id']))
     except PendingNameChange.DoesNotExist:
-        return HttpResponse(json.dumps({'success':False, 'error':'Invalid ID'}))
+        return HttpResponse(json.dumps({'success': False, 'error': 'Invalid ID'}))
 
     u = pnc.user
     up = UserProfile.objects.get(user=u)
@@ -470,28 +484,35 @@ def accept_name_change(request):
     up.save()
     pnc.delete()
 
-    return HttpResponse(json.dumps({'success':True}))
+    return HttpResponse(json.dumps({'success': True}))
+
 
 @ensure_csrf_cookie
-def course_info(request):
-  csrf_token = csrf(request)['csrf_token']
-  # TODO: Couse should be a model
-  return render_to_response('course_info.html', {'csrf': csrf_token })
+def course_info(request, course_id):
+    # This is the advertising page for a student to look at the course before signing up
+    csrf_token = csrf(request)['csrf_token']
+    course_loc = CourseDescriptor.id_to_location(course_id)
+    course = modulestore().get_item(course_loc)
+    # TODO: Couse should be a model
+    return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course': course})
+
 
 def about(request):
-  return render_to_response('about.html', None)
+    return render_to_response('about.html', None)
+
 
 def jobs(request):
-  return render_to_response('jobs.html', None)
+    return render_to_response('jobs.html', None)
+
 
 def help(request):
-  return render_to_response('help.html', None)
+    return render_to_response('help.html', None)
+
 
 @ensure_csrf_cookie
 def enroll(request, course_id):
-  course = settings.COURSES_BY_ID[course_id]
-  user = request.user
-  enrollment = CourseEnrollment(user=user,
-      course_id=course_id)
-  enrollment.save()
-  return redirect(reverse('dashboard'))
+    user = request.user
+    enrollment = CourseEnrollment(user=user,
+        course_id=course_id)
+    enrollment.save()
+    return redirect(reverse('dashboard'))

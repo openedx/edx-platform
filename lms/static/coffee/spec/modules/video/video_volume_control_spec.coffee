@@ -1,15 +1,15 @@
 describe 'VideoVolumeControl', ->
   beforeEach ->
-    @player = jasmine.stubVideoPlayer @
+    jasmine.stubVideoPlayer @
     $('.volume').remove()
 
   describe 'constructor', ->
     beforeEach ->
       spyOn($.fn, 'slider')
-      @volumeControl = new VideoVolumeControl @player
+      @volumeControl = new VideoVolumeControl el: $('.secondary-controls')
 
-    it 'initialize previousVolume to 100', ->
-      expect(@volumeControl.previousVolume).toEqual 100
+    it 'initialize currentVolume to 100', ->
+      expect(@volumeControl.currentVolume).toEqual 100
 
     it 'render the volume control', ->
       expect($('.secondary-controls').html()).toContain """
@@ -32,7 +32,6 @@ describe 'VideoVolumeControl', ->
         slide: @volumeControl.onChange
 
     it 'bind the volume control', ->
-      expect($(@player)).toHandleWith 'ready', @volumeControl.onReady
       expect($('.volume>a')).toHandleWith 'click', @volumeControl.toggleMute
 
       expect($('.volume')).not.toHaveClass 'open'
@@ -41,27 +40,19 @@ describe 'VideoVolumeControl', ->
       $('.volume').mouseleave()
       expect($('.volume')).not.toHaveClass 'open'
 
-  describe 'onReady', ->
-    beforeEach ->
-      @volumeControl = new VideoVolumeControl @player
-      spyOn $.fn, 'slider'
-      spyOn(@player, 'volume').andReturn 60
-      @volumeControl.onReady()
-
-    it 'set the max value of the slider', ->
-      expect($.fn.slider).toHaveBeenCalledWith 'option', 'max', 60
-
   describe 'onChange', ->
     beforeEach ->
-      spyOn @player, 'volume'
-      @volumeControl = new VideoVolumeControl @player
+      spyOnEvent @volumeControl, 'volumeChange'
+      @newVolume = undefined
+      @volumeControl = new VideoVolumeControl el: $('.secondary-controls')
+      $(@volumeControl).bind 'volumeChange', (event, volume) => @newVolume = volume
 
     describe 'when the new volume is more than 0', ->
       beforeEach ->
         @volumeControl.onChange undefined, value: 60
 
       it 'set the player volume', ->
-        expect(@player.volume).toHaveBeenCalledWith 60
+        expect(@newVolume).toEqual 60
 
       it 'remote muted class', ->
         expect($('.volume')).not.toHaveClass 'muted'
@@ -71,32 +62,33 @@ describe 'VideoVolumeControl', ->
         @volumeControl.onChange undefined, value: 0
 
       it 'set the player volume', ->
-        expect(@player.volume).toHaveBeenCalledWith 0
+        expect(@newVolume).toEqual 0
 
       it 'add muted class', ->
         expect($('.volume')).toHaveClass 'muted'
 
   describe 'toggleMute', ->
     beforeEach ->
-      spyOn @player, 'volume'
-      @volumeControl = new VideoVolumeControl @player
+      @newVolume = undefined
+      @volumeControl = new VideoVolumeControl el: $('.secondary-controls')
+      $(@volumeControl).bind 'volumeChange', (event, volume) => @newVolume = volume
 
     describe 'when the current volume is more than 0', ->
       beforeEach ->
-        @player.volume.andReturn 60
+        @volumeControl.currentVolume = 60
         @volumeControl.toggleMute()
 
       it 'save the previous volume', ->
         expect(@volumeControl.previousVolume).toEqual 60
 
       it 'set the player volume', ->
-        expect(@player.volume).toHaveBeenCalledWith 0
+        expect(@newVolume).toEqual 0
 
     describe 'when the current volume is 0', ->
       beforeEach ->
-        @player.volume.andReturn 0
+        @volumeControl.currentVolume = 0
         @volumeControl.previousVolume = 60
         @volumeControl.toggleMute()
 
       it 'set the player volume to previous volume', ->
-        expect(@player.volume).toHaveBeenCalledWith 60
+        expect(@newVolume).toEqual 60

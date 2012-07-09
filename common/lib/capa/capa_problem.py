@@ -68,14 +68,13 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     '''
 
-    def __init__(self, fileobject, id, state=None, seed=None, system=None):
+    def __init__(self, problem_text, id, state=None, seed=None, system=None):
         '''
-        Initializes capa Problem.  The problem itself is defined by the XML file
-        pointed to by fileobject.
+        Initializes capa Problem.
 
         Arguments:
 
-         - filesobject  : an OSFS instance: see fs.osfs
+         - problem_text : xml defining the problem
          - id           : string used as the identifier for this problem; often a filename (no spaces)
          - state        : student state (represented as a dict)
          - seed         : random number generator seed (int)
@@ -103,14 +102,11 @@ class LoncapaProblem(object):
         if not self.seed:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
-        self.fileobject = fileobject    	# save problem file object, so we can use for debugging information later
-        if getattr(system, 'DEBUG', False):	# get the problem XML string from the problem file
-            log.info("[courseware.capa.capa_problem.lcp.init]  fileobject = %s" % fileobject)
-        file_text = fileobject.read()
-        file_text = re.sub("startouttext\s*/", "text", file_text)   # Convert startouttext and endouttext to proper <text></text>
-        file_text = re.sub("endouttext\s*/", "/text", file_text)
+        problem_text = re.sub("startouttext\s*/", "text", problem_text)   # Convert startouttext and endouttext to proper <text></text>
+        problem_text = re.sub("endouttext\s*/", "/text", problem_text)
+        self.problem_text = problem_text
 
-        self.tree = etree.XML(file_text)	# parse problem XML file into an element tree
+        self.tree = etree.XML(problem_text)  # parse problem XML file into an element tree
         self._process_includes()		# handle any <include file="foo"> tags
 
         # construct script processor context (eg for customresponse problems)
@@ -130,7 +126,7 @@ class LoncapaProblem(object):
         self.done = False
 
     def __unicode__(self):
-        return u"LoncapaProblem ({0})".format(self.fileobject)
+        return u"LoncapaProblem ({0})".format(self.problem_text)
 
     def get_state(self):
         ''' Stored per-user session data neeeded to:
@@ -272,7 +268,7 @@ class LoncapaProblem(object):
                 parent = inc.getparent()			# insert  new XML into tree in place of inlcude
                 parent.insert(parent.index(inc),incxml)
                 parent.remove(inc)
-                log.debug('Included %s into %s' % (file,self.fileobject))
+                log.debug('Included %s into %s' % (file, self.id))
 
     def _extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
         '''

@@ -1,7 +1,7 @@
 class @Video
   constructor: (@id, videos) ->
     window.player = null
-    @element = $("#video_#{@id}")
+    @el = $("#video_#{@id}")
     @parseVideos videos
     @fetchMetadata()
     @parseSpeed()
@@ -36,7 +36,7 @@ class @Video
       @speed = '1.0'
 
   embed: ->
-    @player = new VideoPlayer(this)
+    @player = new VideoPlayer video: this
 
   fetchMetadata: (url) ->
     @metadata = {}
@@ -45,3 +45,10 @@ class @Video
 
   getDuration: ->
     @metadata[@youtubeId()].duration
+
+  log: (eventName) ->
+    Logger.log eventName,
+      id: @id
+      code: @youtubeId()
+      currentTime: @player.currentTime
+      speed: @speed

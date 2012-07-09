@@ -1,11 +1,11 @@
 describe 'VideoControl', ->
   beforeEach ->
-    @player = jasmine.stubVideoPlayer @
+    jasmine.stubVideoPlayer @
     $('.video-controls').html ''
 
   describe 'constructor', ->
     it 'render the video controls', ->
-      new VideoControl @player
+      new VideoControl(el: $('.video-controls'))
       expect($('.video-controls').html()).toContain '''
         <div class="slider"></div>
         <div>
@@ -21,14 +21,8 @@ describe 'VideoControl', ->
         </div>
       '''
 
-    it 'bind player events', ->
-      control = new VideoControl @player
-      expect($(@player)).toHandleWith 'play', control.onPlay
-      expect($(@player)).toHandleWith 'pause', control.onPause
-      expect($(@player)).toHandleWith 'ended', control.onPause
-
     it 'bind the playback button', ->
-      control = new VideoControl @player
+      control = new VideoControl(el: $('.video-controls'))
       expect($('.video_control')).toHandleWith 'click', control.togglePlayback
 
     describe 'when on a touch based device', ->
@@ -36,7 +30,7 @@ describe 'VideoControl', ->
         spyOn(window, 'onTouchBasedDevice').andReturn true
 
       it 'does not add the play class to video control', ->
-        new VideoControl @player
+        new VideoControl(el: $('.video-controls'))
         expect($('.video_control')).not.toHaveClass 'play'
         expect($('.video_control')).not.toHaveHtml 'Play'
 
@@ -46,24 +40,24 @@ describe 'VideoControl', ->
         spyOn(window, 'onTouchBasedDevice').andReturn false
 
       it 'add the play class to video control', ->
-        new VideoControl @player
+        new VideoControl(el: $('.video-controls'))
         expect($('.video_control')).toHaveClass 'play'
         expect($('.video_control')).toHaveHtml 'Play'
 
-  describe 'onPlay', ->
+  describe 'play', ->
     beforeEach ->
-      @control = new VideoControl @player
-      @control.onPlay()
+      @control = new VideoControl(el: $('.video-controls'))
+      @control.play()
 
     it 'switch playback button to play state', ->
       expect($('.video_control')).not.toHaveClass 'play'
       expect($('.video_control')).toHaveClass 'pause'
       expect($('.video_control')).toHaveHtml 'Pause'
 
-  describe 'onPause', ->
+  describe 'pause', ->
     beforeEach ->
-      @control = new VideoControl @player
-      @control.onPause()
+      @control = new VideoControl(el: $('.video-controls'))
+      @control.pause()
 
     it 'switch playback button to pause state', ->
       expect($('.video_control')).not.toHaveClass 'pause'
@@ -72,7 +66,7 @@ describe 'VideoControl', ->
 
   describe 'togglePlayback', ->
     beforeEach ->
-      @control = new VideoControl @player
+      @control = new VideoControl(el: $('.video-controls'))
 
     describe 'when the control does not have play or pause class', ->
       beforeEach ->
@@ -80,41 +74,36 @@ describe 'VideoControl', ->
 
       describe 'when the video is playing', ->
         beforeEach ->
-          spyOn(@player, 'isPlaying').andReturn true
-          spyOnEvent @player, 'pause'
+          $('.video_control').addClass('play')
+          spyOnEvent @control, 'pause'
           @control.togglePlayback jQuery.Event('click')
 
         it 'does not trigger the pause event', ->
-          expect('pause').not.toHaveBeenTriggeredOn @player
+          expect('pause').not.toHaveBeenTriggeredOn @control
 
       describe 'when the video is paused', ->
         beforeEach ->
-          spyOn(@player, 'isPlaying').andReturn false
-          spyOnEvent @player, 'play'
+          $('.video_control').addClass('pause')
+          spyOnEvent @control, 'play'
           @control.togglePlayback jQuery.Event('click')
 
         it 'does not trigger the play event', ->
-          expect('play').not.toHaveBeenTriggeredOn @player
+          expect('play').not.toHaveBeenTriggeredOn @control
 
-    for className in ['play', 'pause']
-      describe "when the control has #{className} class", ->
+      describe 'when the video is playing', ->
         beforeEach ->
-          $('.video_control').addClass className
+          spyOnEvent @control, 'pause'
+          $('.video_control').addClass 'pause'
+          @control.togglePlayback jQuery.Event('click')
 
-        describe 'when the video is playing', ->
-          beforeEach ->
-            spyOn(@player, 'isPlaying').andReturn true
-            spyOnEvent @player, 'pause'
-            @control.togglePlayback jQuery.Event('click')
+        it 'trigger the pause event', ->
+          expect('pause').toHaveBeenTriggeredOn @control
 
-          it 'trigger the pause event', ->
-            expect('pause').toHaveBeenTriggeredOn @player
+      describe 'when the video is paused', ->
+        beforeEach ->
+          spyOnEvent @control, 'play'
+          $('.video_control').addClass 'play'
+          @control.togglePlayback jQuery.Event('click')
 
-        describe 'when the video is paused', ->
-          beforeEach ->
-            spyOn(@player, 'isPlaying').andReturn false
-            spyOnEvent @player, 'play'
-            @control.togglePlayback jQuery.Event('click')
-
-          it 'trigger the play event', ->
-            expect('play').toHaveBeenTriggeredOn @player
+        it 'trigger the play event', ->
+          expect('play').toHaveBeenTriggeredOn @control

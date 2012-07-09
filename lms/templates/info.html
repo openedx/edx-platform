@@ -7,17 +7,17 @@
       <div class="info-wrapper">
         % if user.is_authenticated():
         <section class="updates">
-          ${updates}
+          ${course.get_info_section('updates')}
         </section>
         <section aria-label="Handout Navigation" class="handouts">
-          ${handouts}
+          ${course.get_info_section('handouts')}
         </section>
         % else:
         <section class="updates">
-          ${guest_updates}
+          ${course.get_info_section('guest_updates')}
         </section>
         <section aria-label="Handout Navigation" class="handouts">
-          ${guest_handouts}
+          ${course.get_info_section('guest_handouts')}
         </section>
         % endif
       </div>

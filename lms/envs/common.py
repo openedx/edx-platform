@@ -64,12 +64,6 @@ sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
-######### EDX dormsbee/portal changes #################
-from courseware.courses import create_lookup_table, load_courses
-COURSES = load_courses(ENV_ROOT / "data")
-COURSES_BY_ID = create_lookup_table(COURSES)
-#######################################################
-
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
@@ -138,8 +132,21 @@ COURSE_DEFAULT = '6.002_Spring_2012'
 COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
                                           'title'  :  'Circuits and Electronics',
                                           'xmlpath': '6002x/',
+                                          'location': 'i4x://edx/6002xs12/course/6.002_Spring_2012',
                                           }
                     }
+
+
+############################### XModule Store ##################################
+MODULESTORE = {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+        'OPTIONS': {
+            'data_dir': DATA_DIR,
+            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        }
+    }
+}
 
 
 ############################### DJANGO BUILT-INS ###############################

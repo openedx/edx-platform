@@ -1,30 +1,23 @@
 import json
 import logging
-
-from lxml import etree
-
-from django.http import Http404
-from django.http import HttpResponse
-from django.shortcuts import redirect
-
-from fs.osfs import OSFS
+import os
 
 from django.conf import settings
-from mitxmako.shortcuts import render_to_string, render_to_response
+from django.http import Http404
+from django.http import HttpResponse
+from lxml import etree
 
-from models import StudentModule
-from multicourse import multicourse_settings
-from util.views import accepts
-
-import courseware.content_parser as content_parser
-import xmodule
+from xmodule.modulestore.django import modulestore
+from mitxmako.shortcuts import render_to_string
+from models import StudentModule, StudentModuleCache
 
 log = logging.getLogger("mitx.courseware")
 
+
 class I4xSystem(object):
     '''
-    This is an abstraction such that x_modules can function independent 
-    of the courseware (e.g. import into other types of courseware, LMS, 
+    This is an abstraction such that x_modules can function independent
+    of the courseware (e.g. import into other types of courseware, LMS,
     or if we want to have a sandbox server for user-contributed content)
 
     I4xSystem objects are passed to x_modules to provide access to system
@@ -33,9 +26,9 @@ class I4xSystem(object):
     Note that these functions can be closures over e.g. a django request
     and user, or other environment-specific info.
     '''
-    def __init__(self, ajax_url, track_function, render_function,
-                 module_from_xml, render_template, request=None,
-                 filestore=None, course=None):
+    def __init__(self, ajax_url, track_function,
+                 get_module, render_template, user=None,
+                 filestore=None):
         '''
         Create a closure around the system environment.
 
@@ -44,40 +37,28 @@ class I4xSystem(object):
                          or otherwise tracking the event.
                          TODO: Not used, and has inconsistent args in different
                          files.  Update or remove.
-        module_from_xml - function that takes (module_xml) and returns a corresponding
+        get_module - function that takes (location) and returns a corresponding
                           module instance object.
-        render_function - function that takes (module_xml) and renders it,
-                          returning a dictionary with a context for rendering the
-                          module to html.  Dictionary will contain keys 'content'
-                          and 'type'.
         render_template - a function that takes (template_file, context), and returns
                           rendered html.
-        request - the request in progress
+        user - The user to base the seed off of for this request
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
         '''
-        self.course = course
         self.ajax_url = ajax_url
         self.track_function = track_function
-        if not filestore: 
-            self.filestore = OSFS(settings.DATA_DIR)
-        else:
-            self.filestore = filestore
-            if settings.DEBUG:
-                log.info("[courseware.module_render.I4xSystem] filestore path = %s",
-                         filestore)
-        self.module_from_xml = module_from_xml
-        self.render_function = render_function
+        self.filestore = filestore
+        self.get_module = get_module
         self.render_template = render_template
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
-        self.id = request.user.id if request is not None else 0
+        self.seed = user.id if user is not None else 0
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
         return self.__dict__.get(attr)
-    
-    def set(self,attr,val):
+
+    def set(self, attr, val):
         '''provide uniform access to attributes (like etree)'''
         self.__dict__[attr] = val
 
@@ -87,21 +68,9 @@ class I4xSystem(object):
     def __str__(self):
         return str(self.__dict__)
 
-def smod_cache_lookup(cache, module_type, module_id):
-    '''
-    Look for a student module with the given type and id in the cache.
-
-    cache -- list of student modules
-
-    returns first found object, or None
-    '''
-    for o in cache: 
-        if o.module_type == module_type and o.module_id == module_id:
-            return o
-    return None
 
 def make_track_function(request):
-    ''' 
+    '''
     Make a tracking function that logs what happened.
     For use in I4xSystem.
     '''
@@ -111,8 +80,9 @@ def make_track_function(request):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
 
+
 def grade_histogram(module_id):
-    ''' Print out a histogram of grades on a given problem. 
+    ''' Print out a histogram of grades on a given problem.
         Part of staff member debug info.
     '''
     from django.db import connection
@@ -133,18 +103,81 @@ def grade_histogram(module_id):
     return grades
 
 
-def make_module_from_xml_fn(user, request, student_module_cache, position):
-    '''Create the make_from_xml() function'''
-    def module_from_xml(xml):
-        '''Modules need a way to convert xml to instance objects.
-        Pass the rest of the context through.'''
-        (instance, sm, module_type) = get_module(
-            user, request, xml, student_module_cache, position)
-        return instance
-    return module_from_xml
+def toc_for_course(user, request, course, active_chapter, active_section):
+    '''
+    Create a table of contents from the module store
+
+    Return format:
+    [ {'name': name, 'sections': SECTIONS, 'active': bool}, ... ]
+
+    where SECTIONS is a list
+    [ {'name': name, 'format': format, 'due': due, 'active' : bool}, ...]
+
+    active is set for the section and chapter corresponding to the passed
+    parameters.  Everything else comes from the xml, or defaults to "".
+
+    chapters with name 'hidden' are skipped.
+    '''
+
+    student_module_cache = StudentModuleCache(user, course, depth=2)
+    (course, _, _, _) = get_module(user, request, course.location, student_module_cache)
+
+    chapters = list()
+    for chapter in course.get_display_items():
+        sections = list()
+        for section in chapter.get_display_items():
+
+            active = (chapter.metadata.get('display_name') == active_chapter and
+                      section.metadata.get('display_name') == active_section)
+
+            sections.append({'name': section.metadata.get('display_name'),
+                             'format': section.metadata.get('format', ''),
+                             'due': section.metadata.get('due', ''),
+                             'active': active})
+
+        chapters.append({'name': chapter.metadata.get('display_name'),
+                         'sections': sections,
+                         'active': chapter.metadata.get('display_name') == active_chapter})
+    return chapters
 
 
-def get_module(user, request, module_xml, student_module_cache, position=None):
+def get_section(course, chapter, section):
+    """
+    Returns the xmodule descriptor for the name course > chapter > section,
+    or None if this doesn't specify a valid section
+
+    course: Course url
+    chapter: Chapter name
+    section: Section name
+    """
+    try:
+        course_module = modulestore().get_item(course)
+    except:
+        log.exception("Unable to load course_module")
+        return None
+
+    if course_module is None:
+        return
+
+    chapter_module = None
+    for _chapter in course_module.get_children():
+        if _chapter.metadata.get('display_name') == chapter:
+            chapter_module = _chapter
+            break
+
+    if chapter_module is None:
+        return
+
+    section_module = None
+    for _section in chapter_module.get_children():
+        if _section.metadata.get('display_name') == section:
+            section_module = _section
+            break
+
+    return section_module
+
+
+def get_module(user, request, location, student_module_cache, position=None):
     ''' Get an instance of the xmodule class corresponding to module_xml,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
@@ -153,196 +186,125 @@ def get_module(user, request, module_xml, student_module_cache, position=None):
       - user                  : current django User
       - request               : current django HTTPrequest
       - module_xml            : lxml etree of xml subtree for the requested module
-      - student_module_cache  : list of StudentModule objects, one of which may
-                                match this module type and id
-      - position   	          : extra information from URL for user-specified
+      - student_module_cache  : a StudentModuleCache
+      - position              : extra information from URL for user-specified
                                 position within module
 
     Returns:
-      - a tuple (xmodule instance, student module, module type).
+      - a tuple (xmodule instance, instance_module, shared_module, module type).
+        instance_module is a StudentModule specific to this module for this student
+        shared_module is a StudentModule specific to all modules with the same 'shared_state_key' attribute, or None if the module doesn't elect to share state
     '''
-    module_type = module_xml.tag
-    module_class = xmodule.get_module_class(module_type)
-    module_id = module_xml.get('id')
+    descriptor = modulestore().get_item(location)
 
-    # Grab xmodule state from StudentModule cache
-    smod = smod_cache_lookup(student_module_cache, module_type, module_id)
-    state = smod.state if smod else None
+    instance_module = student_module_cache.lookup(descriptor.category, descriptor.location.url())
+    shared_state_key = getattr(descriptor, 'shared_state_key', None)
+    if shared_state_key is not None:
+        shared_module = student_module_cache.lookup(descriptor.category, shared_state_key)
+    else:
+        shared_module = None
 
-    # get coursename if present in request
-    # coursename = multicourse_settings.get_coursename_from_request(request)
-
-    # if coursename and settings.ENABLE_MULTICOURSE:
-    #     # path to XML for the course
-    #     xp = multicourse_settings.get_course_xmlpath(coursename)
-    #     data_root = settings.DATA_DIR + xp
-    # else:
-    data_root = settings.DATA_DIR+"/"+os.path.basename(course.path)
+    instance_state = instance_module.state if instance_module is not None else None
+    shared_state = shared_module.state if shared_module is not None else None
 
     # Setup system context for module instance
-    ajax_url = settings.MITX_ROOT_URL + '/modx/' + module_type + '/' + module_id + '/'
+    ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
-    module_from_xml = make_module_from_xml_fn(
-        user, request, student_module_cache, position)
-    
-    system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = lambda xml: render_x_module(
-                           user, request, xml, student_module_cache, position),
-                       render_template = render_to_string,
-                       ajax_url = ajax_url,
-                       request = request,
-                       filestore = OSFS(data_root),
-                       module_from_xml = module_from_xml,
+    def _get_module(location):
+        (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
+        return module
+
+    system = I4xSystem(track_function=make_track_function(request),
+                       render_template=render_to_string,
+                       ajax_url=ajax_url,
+                       # TODO (cpennington): Figure out how to share info between systems
+                       filestore=descriptor.system.resources_fs,
+                       get_module=_get_module,
+                       user=user,
                        )
     # pass position specified in URL to module through I4xSystem
-    system.set('position', position) 
-    instance = module_class(system, 
-                            etree.tostring(module_xml), 
-                            module_id, 
-                            state=state)
+    system.set('position', position)
+
+    module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+
+    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
+        module = add_histogram(module)
 
     # If StudentModule for this instance wasn't already in the database,
     # and this isn't a guest user, create it.
-    if not smod and user.is_authenticated():
-        smod = StudentModule(student=user, module_type = module_type,
-                           module_id=module_id, state=instance.get_state())
-        smod.save()
-        # Add to cache. The caller and the system context have references
-        # to it, so the change persists past the return
-        student_module_cache.append(smod)
+    if user.is_authenticated():
+        if not instance_module:
+            instance_module = StudentModule(
+                student=user,
+                module_type=descriptor.category,
+                module_state_key=module.id,
+                state=module.get_instance_state(),
+                max_grade=module.max_score())
+            instance_module.save()
+            # Add to cache. The caller and the system context have references
+            # to it, so the change persists past the return
+            student_module_cache.append(instance_module)
+        if not shared_module and shared_state_key is not None:
+            shared_module = StudentModule(
+                student=user,
+                module_type=descriptor.category,
+                module_state_key=shared_state_key,
+                state=module.get_shared_state())
+            shared_module.save()
+            student_module_cache.append(shared_module)
 
-    return (instance, smod, module_type)
+    return (module, instance_module, shared_module, descriptor.category)
 
-def render_x_module(user, request, module_xml, student_module_cache, position=None):
-    ''' Generic module for extensions. This renders to HTML.
 
-    modules include sequential, vertical, problem, video, html
+def add_histogram(module):
+    original_get_html = module.get_html
 
-    Note that modules can recurse.  problems, video, html, can be inside sequential or vertical.
-
-    Arguments:
-
-      - user                  : current django User
-      - request               : current django HTTPrequest
-      - module_xml            : lxml etree of xml subtree for the current module
-      - student_module_cache : list of StudentModule objects, one of which may match this module type and id
-      - position   	      : extra information from URL for user-specified position within module
-
-    Returns:
-
-      - dict which is context for HTML rendering of the specified module.  Will have
-      key 'content', and will have 'type' key if passed a valid module.
-    '''
-    if module_xml is None :
-        return {"content": ""}
-
-    (instance, smod, module_type) = get_module(
-        user, request, module_xml, student_module_cache, position)
-
-    content = instance.get_html()
-
-    # special extra information about each problem, only for users who are staff 
-    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
-        module_id = module_xml.get('id')
+    def get_html():
+        module_id = module.id
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
-        staff_context = {'xml': etree.tostring(module_xml), 
-                         'module_id': module_id,
+
+        # Cast module.definition and module.metadata to dicts so that json can dump them
+        # even though they are lazily loaded
+        staff_context = {'definition': json.dumps(dict(module.definition), indent=4),
+                         'metadata': json.dumps(dict(module.metadata), indent=4),
+                         'element_id': module.location.html_id(),
                          'histogram': json.dumps(histogram),
-                         'render_histogram': render_histogram}
-        content += render_to_string("staff_problem_info.html", staff_context)
+                         'render_histogram': render_histogram,
+                         'module_content': original_get_html()}
+        return render_to_string("staff_problem_info.html", staff_context)
 
-    context = {'content': content, 'type': module_type}
-    return context
+    module.get_html = get_html
+    return module
 
-def modx_dispatch(request, module=None, dispatch=None, id=None):
+
+def modx_dispatch(request, dispatch=None, id=None):
     ''' Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
 
       - request -- the django request.
-      - module -- the type of the module, as used in the course configuration xml.
-                  e.g. 'problem', 'video', etc
       - dispatch -- the command string to pass through to the module's handle_ajax call
            (e.g. 'problem_reset').  If this string contains '?', only pass
            through the part before the first '?'.
-      - id -- the module id.  Used to look up the student module.
-            e.g. filenamexformularesponse
+      - id -- the module id. Used to look up the XModule instance
     '''
     # ''' (fix emacs broken parsing)
-    if not request.user.is_authenticated():
-        return redirect('/')
-
-    # python concats adjacent strings
-    error_msg = ("We're sorry, this module is temporarily unavailable. "
-                 "Our staff is working to fix it as soon as possible")
-
-
-    # Grab the student information for the module from the database
-    s = StudentModule.objects.filter(student=request.user, 
-                                     module_id=id)
-
-    if s is None or len(s) == 0:
-        log.debug("Couldn't find module '%s' for user '%s' and id '%s'",
-                  module, request.user, id)
-        raise Http404
-    s = s[0]
-
-    oldgrade = s.grade
-    oldstate = s.state
 
     # If there are arguments, get rid of them
     dispatch, _, _ = dispatch.partition('?')
 
-    ajax_url = '{root}/modx/{module}/{id}'.format(root = settings.MITX_ROOT_URL,
-                                                  module=module, id=id)
-    coursename = multicourse_settings.get_coursename_from_request(request)
-    if coursename and settings.ENABLE_MULTICOURSE:
-        xp = multicourse_settings.get_course_xmlpath(coursename)
-        data_root = settings.DATA_DIR + xp
-    else:
-        data_root = settings.DATA_DIR
+    student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
+    instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
 
-    # Grab the XML corresponding to the request from course.xml
-    try:
-        xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
-    except:
-        log.exception(
-            "Unable to load module during ajax call. module=%s, dispatch=%s, id=%s",
-            module, dispatch, id)
-        if accepts(request, 'text/html'):
-            return render_to_response("module-error.html", {})
-        else:
-            response = HttpResponse(json.dumps({'success': error_msg}))
-        return response
+    if instance_module is None:
+        log.debug("Couldn't find module '%s' for user '%s'",
+                  id, request.user)
+        raise Http404
 
-    # TODO: This doesn't have a cache of child student modules.  Just
-    # passing the current one.  If ajax calls end up needing children,
-    # this won't work (but fixing it may cause performance issues...)
-    # Figure out :)
-    module_from_xml = make_module_from_xml_fn(
-        request.user, request, [s], None)
-
-    # Create the module
-    system = I4xSystem(track_function = make_track_function(request), 
-                       render_function = None,
-                       module_from_xml = module_from_xml,
-                       render_template = render_to_string,
-                       ajax_url = ajax_url,
-                       request = request,
-                       filestore = OSFS(data_root),
-                       )
-
-    try:
-        module_class = xmodule.get_module_class(module)
-        instance = module_class(system, xml, id, state=oldstate)
-    except:
-        log.exception("Unable to load module instance during ajax call")
-        if accepts(request, 'text/html'):
-            return render_to_response("module-error.html", {})
-        else:
-            response = HttpResponse(json.dumps({'success': error_msg}))
-        return response
+    oldgrade = instance_module.grade
+    old_instance_state = instance_module.state
+    old_shared_state = shared_module.state if shared_module is not None else None
 
     # Let the module handle the AJAX
     try:
@@ -352,10 +314,16 @@ def modx_dispatch(request, module=None, dispatch=None, id=None):
         raise
 
     # Save the state back to the database
-    s.state = instance.get_state()
-    if instance.get_score(): 
-        s.grade = instance.get_score()['score']
-    if s.grade != oldgrade or s.state != oldstate:
-        s.save()
+    instance_module.state = instance.get_instance_state()
+    if instance.get_score():
+        instance_module.grade = instance.get_score()['score']
+    if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
+        instance_module.save()
+
+    if shared_module is not None:
+        shared_module.state = instance.get_shared_state()
+        if shared_module.state != old_shared_state:
+            shared_module.save()
+
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)

@@ -1,6 +1,8 @@
+${module_content}
 <div class="staff_info">
-${xml | h}
+definition = ${definition | h}
+metadata = ${metadata | h}
 </div>
 %if render_histogram:
-<div id="histogram_${module_id}" class="histogram" data-histogram="${histogram}"></div>
+<div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
 %endif
