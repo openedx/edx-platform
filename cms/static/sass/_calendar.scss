@@ -27,12 +27,17 @@ section.cal {
       @include inline-block;
       float: right;
       margin: 0;
+      padding: 0;
+
+      &.actions {
+        float: left;
+      }
 
       li  {
         @include inline-block;
         margin-right: 6px;
         border-right: 1px solid #ddd;
-        padding: 0 6px;
+        padding: 0 6px 0 0;
 
         &:last-child {
           border-right: 0;
@@ -161,16 +166,10 @@ section.cal {
 
             &.draggable {
               background-color: $light-blue;
-              float: none;
-              height: 100%;
-              padding: 0;
-              @include position(absolute,  0px 0px 0 0);
-              width: 30px;
-              z-index: 99;
               opacity: .3;
+              padding: 0;
 
               &:hover {
-                cursor: move;
                 background-color: lighten($yellow, 10%);
               }
             }
