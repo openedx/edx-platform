@@ -1,7 +1,9 @@
 from path import path
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
+import logging
 
+log = logging.getLogger("mitx.courseware")
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
@@ -16,7 +18,7 @@ class CourseDescriptor(SequenceDescriptor):
         return "/".join([self.location.org, self.location.course, self.location.name])
 
     @property
-    def display_name(self):
+    def title(self):
         self.metadata['display_name']
 
     def get_about_section(self, section_key):
@@ -52,7 +54,7 @@ class CourseDescriptor(SequenceDescriptor):
         elif section_key == "title":
             return self.name
         elif section_key == "university":
-            return self.org
+            return self.location.org
         elif section_key == "number":
             return self.number
 

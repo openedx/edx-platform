@@ -69,15 +69,15 @@ if settings.COURSEWARE_ENABLED:
 
         # Multicourse related:
         url(r'^courses/?$', 'courseware.views.courses', name="courses"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/info$', 'courseware.views.course_info', name="info"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/book$', 'staticbook.views.index', name="book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/enroll$', 'student.views.enroll', name="enroll"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/courseware/?$', 'courseware.views.index', name="courseware"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/profile$', 'courseware.views.profile', name="profile"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 'courseware.views.course_info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book$', 'staticbook.views.index', name="book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 'student.views.enroll', name="enroll"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$', 'courseware.views.index', name="courseware"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$', 'courseware.views.profile', name="profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/])/about$', 'courseware.views.course_info', name="about_course"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 'courseware.views.course_info', name="about_course"),
     )
 
 if settings.ENABLE_MULTICOURSE:
