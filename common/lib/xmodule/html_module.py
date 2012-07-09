@@ -36,6 +36,11 @@ class Module(XModule):
             textlist=[xmltree.text]+[etree.tostring(i) for i in xmltree]+[xmltree.tail]
             textlist=[i for i in textlist if type(i)==str]
             return "".join(textlist)
+        try:
+            if not self.filename.endswith('.html'):
+                self.filename += '.html'
+        except:
+            log.exception('failed to add .html to HTML filename %s' % self.filename)
         try: 
             filename="html/"+self.filename
             return self.filestore.open(filename).read()
