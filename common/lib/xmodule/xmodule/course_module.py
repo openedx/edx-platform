@@ -61,3 +61,25 @@ class CourseDescriptor(SequenceDescriptor):
             return self.number
 
         raise KeyError("Invalid about key " + str(section_key))
+
+    def get_info_section(self, section_key):
+        """
+        This returns the snippet of html to be rendered on the course info page, given the key for the section.
+        Valid keys:
+        - handouts
+        - guest_handouts
+        - updates
+        - guest_updates
+        """
+
+        # Many of these are stored as html files instead of some semantic markup. This can change without effecting
+        # this interface when we find a good format for defining so many snippets of text/html.
+
+        if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
+            try:
+                with self.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
+                    return htmlFile.read()
+            except IOError:
+                return "! About section missing !"
+
+        raise KeyError("Invalid about key " + str(section_key))
