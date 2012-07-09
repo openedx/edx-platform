@@ -99,8 +99,6 @@ textarea {
 }
 
 .draggable {
-  width: 7px;
-  min-height: 14px;
   background: url('../img/drag-handle.png') no-repeat center;
   text-indent: -9999px;
   display: block;
@@ -122,16 +120,16 @@ textarea {
   }
 }
 
-// .wip {
-//   outline: 1px solid #f00 !important;
-//   position: relative;
+.wip {
+  outline: 1px solid #f00 !important;
+  position: relative;
 
-//   &:after {
-//    content: "WIP";
-//    font-size: 8px;
-//    padding: 2px;
-//    background: #f00;
-//    color: #fff;
-//    @include position(absolute, 0px 0px 0 0);
-//   }
-// }
+  &:after {
+   content: "WIP";
+   font-size: 8px;
+   padding: 2px;
+   background: #f00;
+   color: #fff;
+   @include position(absolute, 0px 0px 0 0);
+  }
+}
