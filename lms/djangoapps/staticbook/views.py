@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from mitxmako.shortcuts import render_to_response
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 @login_required
 def index(request, course_id=None, page=0): 
