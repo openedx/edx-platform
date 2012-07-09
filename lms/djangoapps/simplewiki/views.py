@@ -9,7 +9,8 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
 
-from multicourse import multicourse_settings
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.django import modulestore
 
 from models import Revision, Article, Namespace, CreateArticleForm, RevisionFormWithTitle, RevisionForm
 import wiki_settings
@@ -17,11 +18,10 @@ import wiki_settings
 def get_course(course_id):
     if course_id == None:
         return None
-        
-    try:
-        course = settings.COURSES_BY_ID[course_id]
-    except KeyError:
-        raise Http404("Course not found")
+    
+    course_loc = CourseDescriptor.id_to_location(course_id)
+    course = modulestore().get_item(course_loc)
+    # raise Http404("Course not found")
     return course
     
 def wiki_reverse(wiki_page, article = None, course = None, namespace=None, args=[], kwargs={}):
