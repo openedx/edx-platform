@@ -2,176 +2,24 @@
 <%!
     from django.core.urlresolvers import reverse
 %>
-
-%for course in courses:
+<%page args="course" />
 <article id="${course.id}"class="course">
   <div class="inner-wrapper">
     <header class="course-preview">
-      <a href="${reverse('about_course', args=[course.id])}">
+        <a href="${reverse('about_course', kwargs={'course_id': course.id})}">
         <hgroup>
-          <h2>${course.title}</h2>
+          <h2>${course.get_about_section('title')}</h2>
         </hgroup>
         <div class="info-link">&#x2794;</div>
       </a>
     </header>
     <section class="info">
       <div class="meta-info">
-        <p class="university">${course.institution}</p>
+        <p class="university">${course.get_about_section('university')}</p>
         <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
       </div>
       <div class="cover-image">
         <img src="${static.url('images/courses/history.png')}">
-      </div>
-      <div class="desc">
-        <p>An advanced introduction to analog circuits.</p>
-      </div>
-    </section>
-  </div>
-</article>
-%endfor
-
-<article id="${course.id}"class="course">
-  <div class="inner-wrapper">
-    <header class="course-preview">
-      <a href="${reverse('about_course', args=[course.id])}">
-        <hgroup>
-          <h2>${course.title}</h2>
-        </hgroup>
-        <div class="info-link">&#x2794;</div>
-      </a>
-    </header>
-    <section class="info">
-      <div class="meta-info">
-        <p class="university">${course.institution}</p>
-        <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
-      </div>
-      <div class="cover-image">
-        <img src="${static.url('images/courses/math.png')}">
-      </div>
-      <div class="desc">
-        <p>An advanced introduction to analog circuits.</p>
-      </div>
-    </section>
-  </div>
-</article>
-
-<article id="${course.id}"class="course">
-  <div class="inner-wrapper">
-    <header class="course-preview">
-      <a href="${reverse('about_course', args=[course.id])}">
-        <hgroup>
-          <h2>${course.title}</h2>
-        </hgroup>
-        <div class="info-link">&#x2794;</div>
-      </a>
-    </header>
-    <section class="info">
-      <div class="meta-info">
-        <p class="university">${course.institution}</p>
-        <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
-      </div>
-      <div class="cover-image">
-        <img src="${static.url('images/courses/python.png')}">
-      </div>
-      <div class="desc">
-        <p>An advanced introduction to analog circuits.</p>
-      </div>
-    </section>
-  </div>
-</article>
-
-<article id="${course.id}"class="course">
-  <div class="inner-wrapper">
-    <header class="course-preview">
-      <a href="${reverse('about_course', args=[course.id])}">
-        <hgroup>
-          <h2>${course.title}</h2>
-        </hgroup>
-        <div class="info-link">&#x2794;</div>
-      </a>
-    </header>
-    <section class="info">
-      <div class="meta-info">
-        <p class="university">${course.institution}</p>
-        <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
-      </div>
-      <div class="cover-image">
-        <img src="${static.url('images/courses/space1.jpg')}">
-      </div>
-      <div class="desc">
-        <p>An advanced introduction to analog circuits.</p>
-      </div>
-    </section>
-  </div>
-</article>
-
-<article id="${course.id}"class="course">
-  <div class="inner-wrapper">
-    <header class="course-preview">
-      <a href="${reverse('about_course', args=[course.id])}">
-        <hgroup>
-          <h2>${course.title}</h2>
-        </hgroup>
-        <div class="info-link">&#x2794;</div>
-      </a>
-    </header>
-    <section class="info">
-      <div class="meta-info">
-        <p class="university">${course.institution}</p>
-        <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
-      </div>
-      <div class="cover-image">
-        <img src="${static.url('images/courses/space2.jpg')}">
-      </div>
-      <div class="desc">
-        <p>An advanced introduction to analog circuits.</p>
-      </div>
-    </section>
-  </div>
-</article>
-
-<article id="${course.id}"class="course">
-  <div class="inner-wrapper">
-    <header class="course-preview">
-      <a href="${reverse('about_course', args=[course.id])}">
-        <hgroup>
-          <h2>${course.title}</h2>
-        </hgroup>
-        <div class="info-link">&#x2794;</div>
-      </a>
-    </header>
-    <section class="info">
-      <div class="meta-info">
-        <p class="university">${course.institution}</p>
-        <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
-      </div>
-      <div class="cover-image">
-        <img src="${static.url('images/courses/space4.jpg')}">
-      </div>
-      <div class="desc">
-        <p>An advanced introduction to analog circuits.</p>
-      </div>
-    </section>
-  </div>
-</article>
-
-<article id="${course.id}"class="course">
-  <div class="inner-wrapper">
-    <header class="course-preview">
-      <a href="${reverse('about_course', args=[course.id])}">
-        <hgroup>
-          <h2>${course.title}</h2>
-        </hgroup>
-        <div class="info-link">&#x2794;</div>
-      </a>
-    </header>
-    <section class="info">
-      <div class="meta-info">
-        <p class="university">${course.institution}</p>
-        <p class="dates"><span class="start">7/23/12</span> &rarr; <span class="end">12/15/12</span></p>
-      </div>
-      <div class="cover-image">
-        <img src="${static.url('images/courses/space3.jpg')}">
       </div>
       <div class="desc">
         <p>An advanced introduction to analog circuits.</p>
