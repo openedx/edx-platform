@@ -6,7 +6,7 @@
 <article id="${course.id}"class="course">
   <div class="inner-wrapper">
     <header class="course-preview">
-        <a href="${reverse('about_course', kwargs={'course_id': course.id})}">
+        <a href="${reverse('about_course', args=[course.id])}">
         <hgroup>
           <h2>${course.get_about_section('title')}</h2>
         </hgroup>
