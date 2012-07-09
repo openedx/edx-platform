@@ -104,7 +104,12 @@ textarea {
   background: url('../img/drag-handle.png') no-repeat center;
   text-indent: -9999px;
   display: block;
-  float: right;
+  cursor: move;
+  height: 100%;
+  padding: 0;
+  @include position(absolute,  0px 0px 0 0);
+  width: 30px;
+  z-index: 99;
 }
 
 .editable {
