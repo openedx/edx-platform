@@ -257,4 +257,4 @@ def course_info(request, course_id):
     except KeyError:
         raise Http404("Course not found")
 
-    return render_to_response('info.html', {'csrf': csrf_token, 'course': course})
+    return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course': course})
