@@ -130,11 +130,11 @@ QUICKEDIT = False
 
 ###
 
-COURSE_DEFAULT = '6.002_Spring_2012'
-COURSE_SETTINGS =  {'6.002_Spring_2012': {'number' : '6.002x',
+COURSE_DEFAULT = '6.002x_Fall_2012'
+COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
                                           'title'  :  'Circuits and Electronics',
                                           'xmlpath': '6002x/',
-                                          'location': 'i4x://edx/6002xs12/course/6.002_Spring_2012',
+                                          'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
                                           }
                     }
 
