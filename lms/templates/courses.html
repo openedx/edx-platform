@@ -3,16 +3,20 @@
 <%namespace name='static' file='static_content.html'/>
 
 <section class="find-courses">
-  <header class="search-intro">
-    <div class="inner-wrapper">
-      <img src="${static.url('images/edx_bw.png')}" />
-      <h1>Explore courses from universities around the world.</h1>
+  <header class="search">
+    <div class="inner-wrapper main-search">
+      <hgroup>
+        <div class="logo">
+          <img src="${static.url('images/edx_bw.png')}" />
+        </div>
+        <h2>Explore courses from universities around the world.</h2>
+      </hgroup>
     </div>
   </header>
 
   <section class="container">
     ## I'm removing this for now since we aren't using it for the fall.
-    ## <%include file="course_filter.html" />
+    <%include file="course_filter.html" />
     <section class="courses">
       %for course in courses:
         <%include file="course.html" args="course=course" />

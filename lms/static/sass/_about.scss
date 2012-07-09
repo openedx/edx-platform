@@ -1,5 +1,5 @@
 .about {
-  margin: 40px auto 120px;
+  margin: 20px auto 120px;
 
   > nav {
     margin-bottom: 80px;
@@ -14,12 +14,14 @@
 
     a {
       border-bottom: 3px solid transparent;
+      color: $lighter-base-font-color;
+      font: italic 1.2rem/1.4rem $serif;
       @include inline-block;
       letter-spacing: 1px;
-      margin: 0px 5px;
+      margin: 0px 15px;
       padding: 20px 10px;
       @include transition(all, 0.15s, linear);
-      text-transform: uppercase;
+      text-transform: lowercase;
 
       &:hover, &.active {
         border-color: rgb(200,200,200);
@@ -29,7 +31,7 @@
   }
 
   .vision {
-    display: none;
+    //display: none;
 
     h1 + hr {
       margin-bottom: 80px;
@@ -99,7 +101,6 @@
       width: flex-grid(3);
 
       a {
-        color: $lighter-base-font-color;
         display: block;
         letter-spacing: 1px;
         margin-right: -20px;
@@ -108,7 +109,6 @@
         text-transform: uppercase;
 
         &:hover {
-          color: $blue;
           background: rgb(245,245,245);
         }
       }
