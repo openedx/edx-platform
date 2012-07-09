@@ -327,6 +327,7 @@ h1 {
 h2 {
   color: #a0a0a0;
   font: normal 1.4rem/2rem Georgia, Cambria, "Times New Roman", Times, serif;
+  letter-spacing: 1px;
   margin-bottom: 15px;
   text-transform: uppercase; }
 
@@ -435,7 +436,7 @@ a:link, a:visited {
   height: 1px;
   width: 100%; }
 
-.faded-vertical-divider, .vertical-divider, footer nav .copyright a.logo::after, footer nav ol li::after, header.global h1.logo::before, .home .university-partners .partners li.partner::before {
+.faded-vertical-divider, .vertical-divider, footer nav .copyright a.logo::after, footer nav ol li::after, header.global h1.logo::before, .home .university-partners .partners li.partner::before, .find-courses header.search .inner-wrapper.main-search .logo::after, .find-courses header.search .inner-wrapper.university-search .logo::after, .university-profile header.search .inner-wrapper.main-search .logo::after, .university-profile header.search .inner-wrapper.university-search .logo::after {
   background-image: -webkit-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -moz-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -ms-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
@@ -1470,12 +1471,21 @@ footer {
               opacity: 0.7; }
 
 header.global {
-  background: white;
-  border-bottom: 1px solid #c8c8c8;
+  border-bottom: 1px solid #bebebe;
   -webkit-box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
   box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
-  height: 75px;
+  background-image: -webkit-linear-gradient(-90deg, white, #ebebeb);
+  background-image: -moz-linear-gradient(-90deg, white, #ebebeb);
+  background-image: -ms-linear-gradient(-90deg, white, #ebebeb);
+  background-image: -o-linear-gradient(-90deg, white, #ebebeb);
+  background-image: linear-gradient(-90deg, white, #ebebeb);
+  background-image: -webkit-linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
+  background-image: -moz-linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
+  background-image: -ms-linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
+  background-image: -o-linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
+  background-image: linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
+  height: 68px;
   position: relative;
   width: 100%;
   z-index: 10; }
@@ -1487,7 +1497,7 @@ header.global {
     height: 40px;
     margin: 0 auto;
     max-width: 1200px;
-    padding-top: 20px;
+    padding-top: 14px;
     width: 100%; }
     header.global nav:before, header.global nav:after {
       content: "";
@@ -1496,13 +1506,13 @@ header.global {
       clear: both; }
   header.global h1.logo {
     float: left;
-    margin: 7px 15px 0px 0px;
+    margin: 9px 15px 0px 0px;
     padding-right: 20px;
     position: relative; }
     header.global h1.logo::before {
       content: "";
       display: block;
-      height: 45px;
+      height: 50px;
       position: absolute;
       right: 1px;
       top: -12px;
@@ -1510,10 +1520,10 @@ header.global {
     header.global h1.logo::after {
       content: "";
       display: block;
-      height: 36px;
+      height: 50px;
       position: absolute;
       right: 0px;
-      top: 0px;
+      top: -12px;
       width: 1px; }
     header.global h1.logo a {
       background-image: url("/static/images/logo.png");
@@ -1526,7 +1536,7 @@ header.global {
       display: block;
       height: 23px;
       width: 47px; }
-  header.global ol.find-courses {
+  header.global ol.left {
     float: left; }
   header.global ol.guest {
     float: right; }
@@ -1558,7 +1568,7 @@ header.global {
     zoom: 1;
     *display: inline;
     *vertical-align: auto;
-    margin: 0px 20px 0px 0px;
+    margin: 0px 30px 0px 0px;
     text-decoration: none;
     text-transform: uppercase;
     text-shadow: 0 1px rgba(255, 255, 255, 0.6); }
@@ -1566,47 +1576,49 @@ header.global {
       margin-right: 0px; }
     header.global ol li.secondary > a:hover {
       color: #3c3c3c; }
-  header.global ol li.primary > a {
-    background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    background-image: -moz-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    background-image: -ms-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    background-image: -o-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    background-image: linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-    border: 1px solid transparent;
-    border-color: #c8c8c8;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    -ms-border-radius: 3px;
-    -o-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-    -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-    color: #3c3c3c;
-    display: inline-block;
-    font: normal 1.2rem/1.4rem "Open Sans", Verdana, Geneva, sans-serif;
-    display: -moz-inline-box;
-    -moz-box-orient: vertical;
-    display: inline-block;
-    vertical-align: baseline;
-    zoom: 1;
-    *display: inline;
-    *vertical-align: auto;
-    margin: 1px 5px;
-    padding: 8px 12px;
-    text-decoration: none;
-    text-transform: uppercase;
-    text-shadow: 0 1px rgba(255, 255, 255, 0.6);
-    vertical-align: middle; }
-    header.global ol li.primary > a:last-child {
-      margin-right: 0px; }
+  header.global ol li.primary {
+    margin-right: 5px; }
+    header.global ol li.primary > a {
+      background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
+      background-image: -moz-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
+      background-image: -ms-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
+      background-image: -o-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
+      background-image: linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
+      border: 1px solid transparent;
+      border-color: #c8c8c8;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+      -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+      color: #3c3c3c;
+      display: inline-block;
+      font: normal 1.2rem/1.4rem "Open Sans", Verdana, Geneva, sans-serif;
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      margin: 1px 5px;
+      padding: 10px 12px;
+      text-decoration: none;
+      text-transform: uppercase;
+      text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+      vertical-align: middle; }
+      header.global ol li.primary > a:last-child {
+        margin-right: 0px; }
   header.global ol.user {
     float: right; }
     header.global ol.user a.user-link {
-      padding: 8px 12px 8px 40px;
+      padding: 10px 12px 10px 42px;
       position: relative;
       text-transform: none; }
       @media screen and (max-width: 768px) {
@@ -1633,10 +1645,10 @@ header.global {
         zoom: 1;
         *display: inline;
         *vertical-align: auto;
-        left: 6px;
+        left: 8px;
         overflow: hidden;
         position: absolute;
-        top: 5px;
+        top: 7px;
         width: 21px; }
         header.global ol.user a.user-link .avatar::after {
           background-image: -webkit-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
@@ -2035,13 +2047,14 @@ header.global {
     background-image: -ms-linear-gradient(-90deg, #fafafa, #e6e6e6);
     background-image: -o-linear-gradient(-90deg, #fafafa, #e6e6e6);
     background-image: linear-gradient(-90deg, #fafafa, #e6e6e6);
-    -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    -moz-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), inset 0 0 0 -1px rgba(255, 255, 255, 0.4);
+    -moz-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), inset 0 0 0 -1px rgba(255, 255, 255, 0.4);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), inset 0 0 0 -1px rgba(255, 255, 255, 0.4);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    border: 1px solid #c8c8c8;
+    border: 1px solid #bebebe;
+    border-bottom-color: #c8c8c8;
     border-top: none;
     -webkit-border-bottom-left-radius: 4px;
     -moz-border-bottom-left-radius: 4px;
@@ -2423,11 +2436,6 @@ header.global {
 .home {
   margin: 0px 0px 100px; }
   .home > header {
-    background: #fafafa;
-    border-bottom: 1px solid #c8c8c8;
-    -webkit-box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
-    box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
     zoom: 1;
     min-height: 335px;
     padding: 60px 0px 50px;
@@ -2441,161 +2449,67 @@ header.global {
       max-width: 1200px;
       margin: 0 auto;
       position: relative; }
-    .home > header .video-wrapper {
-      right: 0px;
-      position: absolute;
-      top: 0px; }
-      .home > header .video-wrapper .video-player {
-        background: #2d2d2d;
-        border: 1px solid black;
-        -webkit-border-radius: 4px;
-        -moz-border-radius: 4px;
-        -ms-border-radius: 4px;
-        -o-border-radius: 4px;
-        border-radius: 4px;
-        height: 315px;
-        padding: 5px;
-        width: 560px; }
-        .home > header .video-wrapper .video-player:hover {
-          -webkit-box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.3);
-          -moz-box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.3);
-          box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.3); }
-        .home > header .video-wrapper .video-player .video-inner {
-          background: transparent;
-          height: 315px;
-          margin: 0 auto;
-          width: 560px; }
-    .home > header .welcome {
+    .home > header h1 {
+      text-align: left; }
+    .home > header a {
+      border: 1px solid #002e88;
+      border-bottom: 1px solid #001e5f;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      -ms-border-radius: 5px;
+      -o-border-radius: 5px;
+      border-radius: 5px;
+      -webkit-box-shadow: inset 0 1px 0 0 #42bae5;
+      -moz-box-shadow: inset 0 1px 0 0 #42bae5;
+      box-shadow: inset 0 1px 0 0 #42bae5;
+      color: white;
+      display: inline;
+      font-size: 14px;
+      font-weight: bold;
+      background-color: #1d9dd9;
+      background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1d9dd9), color-stop(50%, #006bb8), color-stop(50%, #0052a9), color-stop(100%, #0057ab));
+      background-image: -webkit-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+      background-image: -moz-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+      background-image: -ms-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+      background-image: -o-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+      background-image: linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
+      padding: 7px 20px 8px;
+      text-align: center;
+      text-decoration: none;
+      text-shadow: 0 -1px 1px #001067;
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
-      float: left;
-      font-size: 0em;
-      width: 100%;
-      padding-right: 600px;
-      padding-top: 20px; }
-      .home > header .welcome h1 {
-        text-align: left; }
-      .home > header .welcome .intro {
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        margin-bottom: 40px;
-        width: 100%; }
-        .home > header .welcome .intro p {
-          color: #3c3c3c;
-          margin: 0px;
-          width: 100%; }
-      .home > header .welcome .signup-wrapper {
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        width: 91.498%; }
-        .home > header .welcome .signup-wrapper .sign-up {
-          background: #f0f0f0;
-          background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-          background-image: -moz-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-          background-image: -ms-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-          background-image: -o-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-          background-image: linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
-          border: 1px solid #dcdcdc;
-          -webkit-border-radius: 4px;
-          -moz-border-radius: 4px;
-          -ms-border-radius: 4px;
-          -o-border-radius: 4px;
-          border-radius: 4px;
-          -webkit-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-          -moz-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-          box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-          -webkit-box-sizing: border-box;
-          -moz-box-sizing: border-box;
-          box-sizing: border-box;
-          font-size: 0em;
-          padding: 12px;
-          -webkit-transition-property: all;
-          -moz-transition-property: all;
-          -ms-transition-property: all;
-          -o-transition-property: all;
-          transition-property: all;
-          -webkit-transition-duration: 0.15s;
-          -moz-transition-duration: 0.15s;
-          -ms-transition-duration: 0.15s;
-          -o-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-          -webkit-transition-timing-function: linear;
-          -moz-transition-timing-function: linear;
-          -ms-transition-timing-function: linear;
-          -o-transition-timing-function: linear;
-          transition-timing-function: linear;
-          -webkit-transition-delay: 0;
-          -moz-transition-delay: 0;
-          -ms-transition-delay: 0;
-          -o-transition-delay: 0;
-          transition-delay: 0;
-          width: 100%; }
-          .home > header .welcome .signup-wrapper .sign-up:hover {
-            -webkit-box-shadow: 0 0 16px 0 rgba(29, 157, 217, 0.35);
-            -moz-box-shadow: 0 0 16px 0 rgba(29, 157, 217, 0.35);
-            box-shadow: 0 0 16px 0 rgba(29, 157, 217, 0.35); }
-          .home > header .welcome .signup-wrapper .sign-up a {
-            border: 1px solid #002e88;
-            border-bottom: 1px solid #001e5f;
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
-            -ms-border-radius: 5px;
-            -o-border-radius: 5px;
-            border-radius: 5px;
-            -webkit-box-shadow: inset 0 1px 0 0 #42bae5;
-            -moz-box-shadow: inset 0 1px 0 0 #42bae5;
-            box-shadow: inset 0 1px 0 0 #42bae5;
-            color: white;
-            display: inline;
-            font-size: 14px;
-            font-weight: bold;
-            background-color: #1d9dd9;
-            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1d9dd9), color-stop(50%, #006bb8), color-stop(50%, #0052a9), color-stop(100%, #0057ab));
-            background-image: -webkit-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-            background-image: -moz-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-            background-image: -ms-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-            background-image: -o-linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-            background-image: linear-gradient(top, #1d9dd9 0%, #006bb8 50%, #0052a9 50%, #0057ab 100%);
-            padding: 7px 20px 8px;
-            text-align: center;
-            text-decoration: none;
-            text-shadow: 0 -1px 1px #001067;
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            box-sizing: border-box;
-            -webkit-border-radius: 3px;
-            -moz-border-radius: 3px;
-            -ms-border-radius: 3px;
-            -o-border-radius: 3px;
-            border-radius: 3px;
-            display: -moz-inline-box;
-            -moz-box-orient: vertical;
-            display: inline-block;
-            vertical-align: baseline;
-            zoom: 1;
-            *display: inline;
-            *vertical-align: auto;
-            font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
-            padding: 15px 0px;
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%; }
-            .home > header .welcome .signup-wrapper .sign-up a:hover {
-              cursor: pointer;
-              background-color: #108ec7;
-              background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #108ec7), color-stop(50%, #005fa6), color-stop(50%, #004897), color-stop(100%, #004d9a));
-              background-image: -webkit-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
-              background-image: -moz-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
-              background-image: -ms-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
-              background-image: -o-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
-              background-image: linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%); }
-            .home > header .welcome .signup-wrapper .sign-up a:active {
-              -webkit-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
-              -moz-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
-              box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+      padding: 15px 0px;
+      text-transform: uppercase;
+      text-align: center;
+      width: 23.482%; }
+      .home > header a:hover {
+        cursor: pointer;
+        background-color: #108ec7;
+        background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #108ec7), color-stop(50%, #005fa6), color-stop(50%, #004897), color-stop(100%, #004d9a));
+        background-image: -webkit-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+        background-image: -moz-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+        background-image: -ms-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+        background-image: -o-linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%);
+        background-image: linear-gradient(top, #108ec7 0%, #005fa6 50%, #004897 50%, #004d9a 100%); }
+      .home > header a:active {
+        -webkit-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
+        -moz-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
+        box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
   .home .university-partners {
     background-image: -webkit-linear-gradient(180deg, rgba(245, 245, 245, 0) 0%, #f5f5f5 50%, rgba(245, 245, 245, 0) 100%);
     background-image: -moz-linear-gradient(180deg, rgba(245, 245, 245, 0) 0%, #f5f5f5 50%, rgba(245, 245, 245, 0) 100%);
@@ -2804,9 +2718,6 @@ header.global {
       background-image: -ms-linear-gradient(-90deg, #fafafa, #e6e6e6);
       background-image: -o-linear-gradient(-90deg, #fafafa, #e6e6e6);
       background-image: linear-gradient(-90deg, #fafafa, #e6e6e6);
-      -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-      -moz-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
       border: 1px solid #d2d2d2;
       border-top: none;
       -webkit-border-bottom-left-radius: 4px;
@@ -2821,9 +2732,9 @@ header.global {
       -ms-border-bottom-right-radius: 4px;
       -o-border-bottom-right-radius: 4px;
       border-bottom-right-radius: 4px;
-      -webkit-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-      -moz-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-      box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+      -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+      -moz-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 1px 8px 0 rgba(0, 0, 0, 0.1);
       color: #a0a0a0;
       letter-spacing: 1px;
       margin-bottom: 0px;
@@ -3519,51 +3430,103 @@ nav.course-material {
     background: #f0f0f0;
     height: 600px; }
 
-.find-courses .container {
-  margin-bottom: 60px; }
-.find-courses header.search-intro {
-  background: #f0f0f0;
-  border-bottom: 1px solid #c8c8c8;
-  -webkit-box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
-  box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
-  width: 100%; }
-  .find-courses header.search-intro .inner-wrapper {
-    height: 120px;
-    margin: 0 auto;
-    max-width: 1200px;
-    overflow: hidden;
-    padding: 40px 0px 30px;
-    position: relative;
+.find-courses, .university-profile {
+  background: #fcfcfc;
+  padding-bottom: 60px; }
+  .find-courses header.search, .university-profile header.search {
+    background: #f0f0f0;
+    background-image: url("/static/images/shot-2-large.jpg");
+    background-image: url("/static/images/shot-2-large.jpg");
+    background-image: url("/static/images/shot-2-large.jpg");
+    background-image: url("/static/images/shot-2-large.jpg");
+    background-image: url("/static/images/shot-2-large.jpg");
+    background-size: cover;
+    border-bottom: 1px solid #646464;
+    -webkit-box-shadow: inset 0 -1px 8px 0 rgba(0, 0, 0, 0.2), inset 0 1px 12px 0 rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: inset 0 -1px 8px 0 rgba(0, 0, 0, 0.2), inset 0 1px 12px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 -1px 8px 0 rgba(0, 0, 0, 0.2), inset 0 1px 12px 0 rgba(0, 0, 0, 0.3);
+    margin-top: -69px;
     width: 100%; }
-    .find-courses header.search-intro .inner-wrapper::before {
-      background-image: -webkit-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-      background-image: -moz-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-      background-image: -ms-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-      background-image: -o-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-      background-image: radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
-      bottom: -300px;
-      content: "";
-      display: block;
-      height: 600px;
+    .find-courses header.search .inner-wrapper, .university-profile header.search .inner-wrapper {
+      height: 120px;
       margin: 0 auto;
-      position: absolute;
-      width: 100%;
-      z-index: 1; }
-    .find-courses header.search-intro .inner-wrapper img {
-      display: block;
-      margin: 0 auto;
+      max-width: 1200px;
+      overflow: hidden;
+      padding: 154px 0px 80px;
       position: relative;
-      width: 100px;
-      z-index: 2; }
-    .find-courses header.search-intro .inner-wrapper h1 {
-      color: #a0a0a0;
-      font: normal 1.2rem/1.8rem Georgia, Cambria, "Times New Roman", Times, serif;
-      letter-spacing: 1px;
-      position: relative;
-      text-transform: uppercase;
       text-align: center;
-      z-index: 2; }
+      width: 100%; }
+      .find-courses header.search .inner-wrapper::before, .university-profile header.search .inner-wrapper::before {
+        background-image: -webkit-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+        background-image: -moz-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+        background-image: -ms-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+        background-image: -o-radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+        background-image: radial-gradient(50% 50%, circle closest-side, white 0%, rgba(255, 255, 255, 0) 100%);
+        bottom: -300px;
+        content: "";
+        display: none;
+        height: 600px;
+        margin: 0 auto;
+        position: absolute;
+        width: 100%;
+        z-index: 1; }
+      .find-courses header.search .inner-wrapper > hgroup, .university-profile header.search .inner-wrapper > hgroup {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #646464;
+        -webkit-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+        -moz-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+        box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+        padding: 20px 30px;
+        position: relative;
+        z-index: 2; }
+      .find-courses header.search .inner-wrapper.main-search, .find-courses header.search .inner-wrapper.university-search, .university-profile header.search .inner-wrapper.main-search, .university-profile header.search .inner-wrapper.university-search {
+        text-align: center; }
+        .find-courses header.search .inner-wrapper.main-search hgroup, .find-courses header.search .inner-wrapper.university-search hgroup, .university-profile header.search .inner-wrapper.main-search hgroup, .university-profile header.search .inner-wrapper.university-search hgroup {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto; }
+        .find-courses header.search .inner-wrapper.main-search .logo, .find-courses header.search .inner-wrapper.university-search .logo, .university-profile header.search .inner-wrapper.main-search .logo, .university-profile header.search .inner-wrapper.university-search .logo {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          height: 80px;
+          margin-right: 30px;
+          padding-right: 30px;
+          position: relative;
+          vertical-align: middle; }
+          .find-courses header.search .inner-wrapper.main-search .logo::after, .find-courses header.search .inner-wrapper.university-search .logo::after, .university-profile header.search .inner-wrapper.main-search .logo::after, .university-profile header.search .inner-wrapper.university-search .logo::after {
+            content: "";
+            display: block;
+            height: 80px;
+            position: absolute;
+            right: 0px;
+            top: 0px; }
+          .find-courses header.search .inner-wrapper.main-search .logo img, .find-courses header.search .inner-wrapper.university-search .logo img, .university-profile header.search .inner-wrapper.main-search .logo img, .university-profile header.search .inner-wrapper.university-search .logo img {
+            height: 100%; }
+        .find-courses header.search .inner-wrapper.main-search h1, .find-courses header.search .inner-wrapper.university-search h1, .university-profile header.search .inner-wrapper.main-search h1, .university-profile header.search .inner-wrapper.university-search h1 {
+          color: #3c3c3c;
+          font: italic bold 2.4rem/3rem "Open Sans", Verdana, Geneva, sans-serif;
+          text-transform: none; }
+        .find-courses header.search .inner-wrapper.main-search h1, .find-courses header.search .inner-wrapper.main-search h2, .find-courses header.search .inner-wrapper.university-search h1, .find-courses header.search .inner-wrapper.university-search h2, .university-profile header.search .inner-wrapper.main-search h1, .university-profile header.search .inner-wrapper.main-search h2, .university-profile header.search .inner-wrapper.university-search h1, .university-profile header.search .inner-wrapper.university-search h2 {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          letter-spacing: 1px;
+          margin-bottom: 0px;
+          text-shadow: 0 1px rgba(255, 255, 255, 0.8);
+          vertical-align: middle; }
 
 .course-info .container {
   margin-bottom: 60px; }
@@ -4088,7 +4051,7 @@ nav.course-material {
           margin-bottom: 15px; }
 
 .about {
-  margin: 40px auto 120px; }
+  margin: 20px auto 120px; }
   .about > nav {
     margin-bottom: 80px;
     text-align: center;
@@ -4098,6 +4061,8 @@ nav.course-material {
       display: block; }
     .about > nav a {
       border-bottom: 3px solid transparent;
+      color: #a0a0a0;
+      font: italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
       display: -moz-inline-box;
       -moz-box-orient: vertical;
       display: inline-block;
@@ -4106,7 +4071,7 @@ nav.course-material {
       *display: inline;
       *vertical-align: auto;
       letter-spacing: 1px;
-      margin: 0px 5px;
+      margin: 0px 15px;
       padding: 20px 10px;
       -webkit-transition-property: all;
       -moz-transition-property: all;
@@ -4128,49 +4093,47 @@ nav.course-material {
       -ms-transition-delay: 0;
       -o-transition-delay: 0;
       transition-delay: 0;
-      text-transform: uppercase; }
+      text-transform: lowercase; }
       .about > nav a:hover, .about > nav a.active, .about > nav nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li .about > nav a.seq_video_active, .about > nav nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li .about > nav a.seq_other_active, .about > nav nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li .about > nav a.seq_vertical_active, .about > nav nav.sequence-nav ol li a.seq_problem_active, nav.sequence-nav ol li .about > nav a.seq_problem_active {
         border-color: #c8c8c8;
         color: #3c3c3c; }
-  .about .vision {
-    display: none; }
-    .about .vision h1 + hr {
-      margin-bottom: 80px; }
-    .about .vision .message {
-      zoom: 1;
-      margin-bottom: 60px;
-      padding-bottom: 60px;
-      position: relative; }
-      .about .vision .message:before, .about .vision .message:after {
-        content: "";
-        display: table; }
-      .about .vision .message:after {
-        clear: both; }
-      .about .vision .message hr {
-        bottom: 0px;
-        margin: 0px;
-        position: absolute;
+  .about .vision h1 + hr {
+    margin-bottom: 80px; }
+  .about .vision .message {
+    zoom: 1;
+    margin-bottom: 60px;
+    padding-bottom: 60px;
+    position: relative; }
+    .about .vision .message:before, .about .vision .message:after {
+      content: "";
+      display: table; }
+    .about .vision .message:after {
+      clear: both; }
+    .about .vision .message hr {
+      bottom: 0px;
+      margin: 0px;
+      position: absolute;
+      width: 100%; }
+    .about .vision .message .photo {
+      background: white;
+      border: 1px solid #d2d2d2;
+      padding: 1px;
+      width: 31.984%; }
+      .about .vision .message .photo img {
+        background: #f5f5f5;
+        display: block;
+        height: 200px;
         width: 100%; }
-      .about .vision .message .photo {
-        background: white;
-        border: 1px solid #d2d2d2;
-        padding: 1px;
-        width: 31.984%; }
-        .about .vision .message .photo img {
-          background: #f5f5f5;
-          display: block;
-          height: 200px;
-          width: 100%; }
-      .about .vision .message.left .photo {
-        float: left;
-        margin-right: 2.024%; }
-      .about .vision .message.right h2 {
-        text-align: right; }
-      .about .vision .message.right .photo {
-        float: right;
-        margin-left: 2.024%; }
-      .about .vision .message:last-child {
-        margin-bottom: 0px; }
+    .about .vision .message.left .photo {
+      float: left;
+      margin-right: 2.024%; }
+    .about .vision .message.right h2 {
+      text-align: right; }
+    .about .vision .message.right .photo {
+      float: right;
+      margin-left: 2.024%; }
+    .about .vision .message:last-child {
+      margin-bottom: 0px; }
   .about .faq {
     display: none;
     zoom: 1; }
@@ -4189,7 +4152,6 @@ nav.course-material {
       padding-right: 20px;
       width: 23.482%; }
       .about .faq nav.categories a {
-        color: #a0a0a0;
         display: block;
         letter-spacing: 1px;
         margin-right: -20px;
@@ -4197,7 +4159,6 @@ nav.course-material {
         text-align: right;
         text-transform: uppercase; }
         .about .faq nav.categories a:hover {
-          color: #1d9dd9;
           background: #f5f5f5; }
     .about .faq .responses {
       float: left;

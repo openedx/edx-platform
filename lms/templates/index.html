@@ -5,26 +5,8 @@
 <section class="content-wrapper home">
   <header>
     <div class="inner-wrapper">
-      <section class="video-wrapper">
-        <div class="video-player">
-          <div class="video-inner">
-            <iframe width="560" height="315" src="http://www.youtube.com/embed/SA6ELdIRkRU" frameborder="0" allowfullscreen></iframe>
-          </div>
-        </div>
-      </section>
-      <section class="welcome">
-        <div class="intro">
-          <h1>The Future of Online Education</h1>
-          <p>
-            edX is a joint partnership between The Massachusetts Institute of Technology (MIT) and Harvard University to offer online learning to millions of people around the world. edX will offer Harvard and MIT classes online for free. Through this partnership, the institutions aim to extend their collective reach to build a global community of online learners and to improve education.
-          </p>
-        </div>
-        <div class="signup-wrapper">
-          <section class="sign-up">
-            <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
-          </section>
-        </div>
-      </section>
+      <h1>The Future of Online Education</h1>
+      <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
     </div>
   </header>
 
@@ -35,7 +17,7 @@
       <section class="university-partners">
         <ol class="partners">
           <li class="partner mit">
-            <a href="/university_profile.html">
+            <a href="/university_profile">
               <img src="${static.url('images/mit.png')}" />
               <div class="name">
                 <span>MITx</span>
@@ -43,7 +25,7 @@
             </a>
           </li>
           <li class="partner">
-            <a href="/university_profile.html">
+            <a href="/university_profile">
               <img src="${static.url('images/harvard.png')}" />
               <div class="name">
                 <span>HarvardX</span>
@@ -51,7 +33,7 @@
             </a>
           </li>
           <li class="partner">
-            <a href="/university_profile.html">
+            <a href="/university_profile">
               <img src="${static.url('images/berkeley.png')}" />
               <div class="name">
                 <span>BerkeleyX</span>
