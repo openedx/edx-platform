@@ -125,7 +125,7 @@ def render_accordion(request, course, chapter, section):
         Returns (initialization_javascript, content)'''
 
     # TODO (cpennington): do the right thing with courses
-    toc = toc_for_course(request.user, request, course.location, chapter, section)
+    toc = toc_for_course(request.user, request, course, chapter, section)
 
     active_chapter = 1
     for i in range(len(toc)):
