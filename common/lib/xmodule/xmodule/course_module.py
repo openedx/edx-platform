@@ -1,9 +1,6 @@
 from path import path
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-import logging
-
-log = logging.getLogger("mitx.courseware")
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
@@ -45,7 +42,7 @@ class CourseDescriptor(SequenceDescriptor):
         # this interface when we find a good format for defining so many snippets of text/html.
 
         if section_key in ['short_description', 'description', 'key_dates', 'video', 'course_staff_short', 'course_staff_extended',
-                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info']:
+                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number']:
             try:
                 with self.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
                     return htmlFile.read()
