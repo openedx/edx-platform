@@ -1,31 +1,30 @@
 <section class="sequence-edit">
-  <section class="filters">
+  <section class="filters wip">
     <ul>
       <li>
-        <label for="">Sort by</label>
+        <h2>Sort:</h2>
         <select>
+          <option value="">Linear Order</option>
           <option value="">Recently Modified</option>
+          <option value="">Type</option>
+          <option value="">Alphabetically</option>
         </select>
       </li>
 
       <li>
-        <label for="">Display</label>
+        <h2>Filter:</h2>
         <select>
           <option value="">All content</option>
+          <option value="">Videos</option>
+          <option value="">Problems</option>
+          <option value="">Labs</option>
+          <option value="">Tutorials</option>
+          <option value="">HTML</option>
         </select>
+        <a href="#" class="more">More</a>
       </li>
-      <li>
-        <select>
-          <option value="">Internal Only</option>
-        </select>
-      </li>
-
-      <li class="advanced">
-        <a href="#">Advanced filters</a>
-      </li>
-
-      <li>
-        <input type="search" name="" id="" value="" />
+      <li class="search">
+        <input type="search" name="" id="" value="" placeholder="Search" />
       </li>
     </ul>
   </section>
@@ -36,7 +35,7 @@
         <li>
           <ol>
             % for child in module.get_children():
-            <li>
+            <li class="${module.category}">
               <a href="#" class="module-edit" id="${child.location.url()}">${child.name}</a>
               <a href="#" class="draggable">handle</a>
             </li>
@@ -47,7 +46,7 @@
       </ol>
     </section>
 
-    <section class="scratch-pad">
+    <section class="scratch-pad wip">
       <ol>
         <li class="new-module">
           <%include file="new-module.html"/>
