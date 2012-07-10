@@ -37,3 +37,4 @@ mock>=0.8, <0.9
 PyYAML
 South
 django-countries
+djkombu
