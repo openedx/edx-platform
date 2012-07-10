@@ -40,3 +40,7 @@ django-countries
 django-kombu
 django-followit
 django-keyedcache
+django-robots
+django-ses
+django-storages
+django-threaded-multihost
