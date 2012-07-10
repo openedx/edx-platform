@@ -1,3 +1,0 @@
-#! /bin/bash
-
-cd $(dirname $0) && django-admin.py collectstatic --noinput --settings=envs.aws --pythonpath=.

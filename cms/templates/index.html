@@ -1,13 +1,12 @@
 <%inherit file="base.html" />
-<%block name="title">Course Manager</%block>
+<%block name="title">Courses</%block>
 
 <%block name="content">
 <section class="main-container">
-
-  <%include file="widgets/navigation.html"/>
-
-  <section class="main-content">
-  </section>
-
+  <ol>
+    %for course, url in courses:
+    <li><a href="${url}">${course}</a></li>
+    %endfor
+  </ol>
 </section>
 </%block>

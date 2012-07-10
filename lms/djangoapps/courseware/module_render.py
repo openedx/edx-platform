@@ -274,11 +274,24 @@ def add_histogram(module):
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
 
+        # TODO: fixme - no filename in module.xml in general (this code block for edx4edx)
+        # the following if block is for summer 2012 edX course development; it will change when the CMS comes online
+        if settings.MITX_FEATURES.get('DISPLAY_EDIT_LINK') and settings.DEBUG and module_xml.get('filename') is not None:
+            coursename = multicourse_settings.get_coursename_from_request(request)
+            github_url = multicourse_settings.get_course_github_url(coursename)
+            fn = module_xml.get('filename')
+            if module_xml.tag=='problem': fn = 'problems/' + fn	# grrr
+            edit_link = (github_url + '/tree/master/' + fn) if github_url is not None else None
+            if module_xml.tag=='problem': edit_link += '.xml'	# grrr
+        else:
+            edit_link = False
+
         # Cast module.definition and module.metadata to dicts so that json can dump them
         # even though they are lazily loaded
         staff_context = {'definition': json.dumps(dict(module.definition), indent=4),
                          'metadata': json.dumps(dict(module.metadata), indent=4),
                          'element_id': module.location.html_id(),
+                         'edit_link': edit_link,
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
                          'module_content': original_get_html()}
@@ -286,7 +299,6 @@ def add_histogram(module):
 
     module.get_html = get_html
     return module
-
 
 def modx_dispatch(request, dispatch=None, id=None):
     ''' Generic view for extensions. This is where AJAX calls go.
