@@ -27,7 +27,7 @@ NORMALIZED_DEPLOY_NAME = DEPLOY_NAME.downcase().gsub(/[_\/]/, '-')
 INSTALL_DIR_PATH = File.join(DEPLOY_DIR, NORMALIZED_DEPLOY_NAME)
 
 # Set up the clean and clobber tasks
-CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage')
+CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage', 'test_root/*_repo')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
 def select_executable(*cmds)
