@@ -1,15 +1,15 @@
 import json
 import logging
-import os
 
 from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
-from lxml import etree
+from functools import wraps
 
 from xmodule.modulestore.django import modulestore
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
+from static_replace import replace_urls
 
 log = logging.getLogger("mitx.courseware")
 
@@ -222,6 +222,12 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
+    # TODO (cpennington): When modules are shared between courses, the static
+    # prefix is going to have to be specific to the module, not the directory
+    # that the xml was loaded from
+    prefix = module.metadata['data_dir']
+    module = replace_static_urls(module, prefix)
+
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
         module = add_histogram(module)
 
@@ -251,9 +257,32 @@ def get_module(user, request, location, student_module_cache, position=None):
     return (module, instance_module, shared_module, descriptor.category)
 
 
+def replace_static_urls(module, prefix):
+    """
+    Updates the supplied module with a new get_html function that wraps
+    the old get_html function and substitutes urls of the form /static/...
+    with urls that are /static/<prefix>/...
+    """
+    original_get_html = module.get_html
+    
+    @wraps(original_get_html)
+    def get_html():
+        return replace_urls(original_get_html(), staticfiles_prefix=prefix)
+
+    module.get_html = get_html
+    return module
+
+
 def add_histogram(module):
+    """
+    Updates the supplied module with a new get_html function that wraps
+    the output of the old get_html function with additional information
+    for admin users only, including a histogram of student answers and the
+    definition of the xmodule
+    """
     original_get_html = module.get_html
 
+    @wraps(original_get_html)
     def get_html():
         module_id = module.id
         histogram = grade_histogram(module_id)

@@ -21,6 +21,10 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery.cookie.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.qtip.min.js')}"></script>
 
+  ## TODO (cpennington): Remove this when we have a good way for modules to specify js to load on the page
+  ## and in the wiki
+  <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
+
 % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
  <%static:js group='application'/>
 % endif

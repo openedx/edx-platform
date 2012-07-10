@@ -211,7 +211,13 @@ class XModuleDescriptor(Plugin):
     js_module = None
 
     # A list of metadata that this module can inherit from its parent module
-    inheritable_metadata = ('graded', 'due', 'graceperiod', 'showanswer', 'rerandomize')
+    inheritable_metadata = (
+        'graded', 'due', 'graceperiod', 'showanswer', 'rerandomize',
+
+        # This is used by the XMLModuleStore to provide for locations for static files,
+        # and will need to be removed when that code is removed
+        'data_dir'
+    )
 
     # A list of descriptor attributes that must be equal for the discriptors to be
     # equal
