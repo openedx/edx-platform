@@ -54,7 +54,7 @@ class CourseDescriptor(SequenceDescriptor):
             except IOError:
                 return "! About section missing !"
         elif section_key == "title":
-            return self.name
+            return self.metadata.get('display_name', self.name)
         elif section_key == "university":
             return self.location.org
         elif section_key == "number":
