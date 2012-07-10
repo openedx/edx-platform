@@ -15,7 +15,7 @@ $blue: rgb(29,157,217);
 $pink: rgb(182,37,104);
 
 html, body {
-  background: rgb(255,255,255);
+  background: rgb(253,253,253);
   font-size: 75%;
 }
 
@@ -47,6 +47,7 @@ p {
   color: $base-font-color;
   font: normal 1.3rem/2rem $serif;
   margin: 0px;
+  //-webkit-font-smoothing: antialiased;
 }
 
 p + p {
@@ -72,6 +73,7 @@ a:link, a:visited {
   font: normal 1.2rem/2rem $sans-serif;
   text-decoration: none;
   @include transition(all, 0.1s, linear);
+  //-webkit-font-smoothing: antialiased;
 
   &:hover {
     color: $base-font-color;
