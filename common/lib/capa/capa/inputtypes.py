@@ -22,10 +22,14 @@ Each input type takes the xml tree as 'element', the previous answer as 'value',
 # status is currently the answer for the problem ID for the input element,
 # but it will turn into a dict containing both the answer and any associated message for the problem ID for the input element.
 
+import logging
 import re
 import shlex # for splitting quoted strings
 
 from lxml import etree
+import xml.sax.saxutils as saxutils
+
+log = logging.getLogger('mitx.' + __name__)
 
 def get_input_xml_tags():
     ''' Eventually, this will be for all registered input types '''
@@ -121,7 +125,7 @@ def optioninput(element, value, status, render_template, msg=''):
     eid=element.get('id')
     options = element.get('options')
     if not options:
-        raise Exception,"[courseware.capa.inputtypes.optioninput] Missing options specification in " + etree.tostring(element)
+        raise Exception("[courseware.capa.inputtypes.optioninput] Missing options specification in " + etree.tostring(element))
     oset = shlex.shlex(options[1:-1])
     oset.quotes = "'"
     oset.whitespace = ","
@@ -159,10 +163,11 @@ def choicegroup(element, value, status, render_template, msg=''):
     choices={}
     for choice in element:
         if not choice.tag=='choice':
-            raise Exception,"[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag
+            raise Exception("[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag)
         ctext = ""
         ctext += ''.join([etree.tostring(x) for x in choice])	# TODO: what if choice[0] has math tags in it?
-        ctext += choice.text		# TODO: fix order?
+        if choice.text is not None:
+            ctext += choice.text		# TODO: fix order?
         choices[choice.get("name")] = ctext
     context={'id':eid, 'value':value, 'state':status, 'type':type, 'choices':choices}
     html = render_template("choicegroup.html", context)
@@ -182,9 +187,18 @@ def textline(element, value, status, render_template, msg=""):
         raise Exception(msg)
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
-    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg': msg}
+    hidden = element.get('hidden','')	# if specified, then textline is hidden and id is stored in div of name given by hidden
+    escapedict = {'"': '&quot;'}
+    value = saxutils.escape(value,escapedict)	# otherwise, answers with quotes in them crashes the system!
+    context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg': msg, 'hidden': hidden}
     html = render_template("textinput.html", context)
-    return etree.XML(html)
+    try:
+        xhtml = etree.XML(html)
+    except Exception as err:
+        if True: # TODO needs to be self.system.DEBUG - but can't access system 
+            log.debug('[inputtypes.textline] failed to parse XML for:\n%s' % html)
+            raise
+    return xhtml
 
 #-----------------------------------------------------------------------------
 
@@ -195,7 +209,6 @@ def textline_dynamath(element, value, status, render_template, msg=''):
     '''
     # TODO: Make a wrapper for <formulainput>
     # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-    	## TODO: Code should follow PEP8 (4 spaces per indentation level)
     '''
     textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
     uses a <span id=display_eid>`{::}`</span>
@@ -204,8 +217,9 @@ def textline_dynamath(element, value, status, render_template, msg=''):
     eid=element.get('id')
     count = int(eid.split('_')[-2])-1 # HACK
     size = element.get('size')
+    hidden = element.get('hidden','')	# if specified, then textline is hidden and id is stored in div of name given by hidden
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size,
-               'msg':msg,
+               'msg':msg, 'hidden' : hidden,
                }
     html = render_template("textinput_dynamath.html", context)
     return etree.XML(html)
@@ -225,14 +239,24 @@ def textbox(element, value, status, render_template, msg=''):
     rows = element.get('rows') or '30'
     cols = element.get('cols') or '80'
     mode = element.get('mode')	or 'python' 	# mode for CodeMirror, eg "python" or "xml"
+    hidden = element.get('hidden','')	# if specified, then textline is hidden and id is stored in div of name given by hidden
     linenumbers = element.get('linenumbers')	# for CodeMirror
     if not value: value = element.text	# if no student input yet, then use the default input given by the problem
     context = {'id':eid, 'value':value, 'state':status, 'count':count, 'size': size, 'msg':msg,
                'mode':mode, 'linenumbers':linenumbers,
                'rows':rows, 'cols':cols,
+               'hidden' : hidden,
                }
     html = render_template("textbox.html", context)
-    return etree.XML(html)
+    try:
+        xhtml = etree.XML(html)
+    except Exception as err:
+        newmsg = 'error %s in rendering message' % (str(err).replace('<','&lt;'))
+        newmsg += '<br/>Original message: %s' % msg.replace('<','&lt;')
+        context['msg'] = newmsg
+        html = render_template("textbox.html", context)
+        xhtml = etree.XML(html)
+    return xhtml
 
 #-----------------------------------------------------------------------------
 @register_render_function
@@ -288,8 +312,18 @@ def math(element, value, status, render_template, msg=''):
     #    isinline = True
     # html = render_template("mathstring.html",{'mathstr':mathstr,'isinline':isinline,'tail':element.tail})
 
-    html = '<html><html>%s</html><html>%s</html></html>' % (mathstr,element.tail)
-    xhtml = etree.XML(html)
+    html = '<html><html>%s</html><html>%s</html></html>' % (mathstr,saxutils.escape(element.tail))
+    try:
+        xhtml = etree.XML(html)
+    except Exception as err:
+        if False: # TODO needs to be self.system.DEBUG - but can't access system 
+            msg = "<html><font color='red'><p>Error %s</p>" % str(err).replace('<','&lt;')
+            msg += '<p>Failed to construct math expression from <pre>%s</pre></p>' % html.replace('<','&lt;')
+            msg += "</font></html>"
+            log.error(msg)
+            return etree.XML(msg)
+        else:
+            raise
     # xhtml.tail = element.tail	# don't forget to include the tail!
     return xhtml
 
@@ -338,14 +372,14 @@ def imageinput(element, value, status, render_template, msg=''):
         (gx,gy) = (0,0)
     
     context = {
-        'id':eid,
-        'value':value,
+        'id': eid,
+        'value': value,
         'height': height,
-        'width' : width,
-        'src':src,
-        'gx':gx,
-        'gy':gy,
-        'state' : status,	# to change
+        'width': width,
+        'src': src,
+        'gx': gx,
+        'gy': gy,
+        'state': status,	# to change
         'msg': msg,			# to change
         }
     html = render_template("imageinput.html", context)

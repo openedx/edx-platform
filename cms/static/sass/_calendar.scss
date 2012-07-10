@@ -1,7 +1,7 @@
 section.cal {
   @include box-sizing(border-box);
-  padding: 25px;
   @include clearfix;
+  padding: 25px;
 
   > header {
     @include clearfix;
@@ -18,25 +18,44 @@ section.cal {
       text-transform: uppercase;
       letter-spacing: 1px;
       font-size: 14px;
-      padding: 6px;
+      padding: 6px 6px 6px 0;
       font-size: 12px;
+      margin: 0;
     }
 
     ul {
       @include inline-block;
+      float: right;
+      margin: 0;
+      padding: 0;
+
+      &.actions {
+        float: left;
+      }
 
       li  {
         @include inline-block;
-        margin-left: 6px;
-        border-left: 1px solid #ddd;
-        padding: 0 6px;
+        margin-right: 6px;
+        border-right: 1px solid #ddd;
+        padding: 0 6px 0 0;
+
+        &:last-child {
+          border-right: 0;
+          margin-right: 0;
+          padding-right: 0;
+        }
 
         a {
           @include inline-block();
+          font-size: 12px;
+          @include inline-block;
+          margin: 0 6px;
+          font-style: italic;
         }
 
         ul {
           @include inline-block();
+          margin: 0;
 
           li {
             @include inline-block();
@@ -55,6 +74,8 @@ section.cal {
     border-top: 1px solid lighten($dark-blue, 40%);
     width: 100%;
     @include box-sizing(border-box);
+    margin: 0;
+    padding: 0;
 
     > li {
       border-right: 1px solid lighten($dark-blue, 40%);
@@ -62,8 +83,13 @@ section.cal {
       @include box-sizing(border-box);
       float: left;
       width: flex-grid(3) + ((flex-gutter() * 3) / 4);
-      background-color: lighten($light-blue, 2%);
+      background-color: $light-blue;
 
+      &:hover {
+        li.create-module {
+          opacity: 1;
+        }
+      }
 
       header {
         border-bottom: 1px solid lighten($dark-blue, 40%);
@@ -77,65 +103,94 @@ section.cal {
           text-transform: uppercase;
           border-bottom: 1px solid lighten($dark-blue, 60%);
           padding: 6px;
+          color: $bright-blue;
+          margin: 0;
 
           a {
             color: $bright-blue;
             display: block;
+            padding: 6px;
+            margin: -6px;
+
+            &:hover {
+              color: darken($bright-blue, 10%);
+              background: lighten($yellow, 10%);
+            }
           }
         }
 
         ul {
+          margin: 0;
+          padding: 0;
+
           li {
             background: #fff;
             color: #888;
             border-bottom: 0;
             font-size: 12px;
-
-            &:hover {
-              background: #fff;
-            }
           }
         }
       }
 
       ul {
         list-style: none;
-        margin-bottom: 1px;
+        margin: 0 0 1px 0;
+        padding: 0;
 
         li {
           border-bottom: 1px solid darken($light-blue, 8%);
-          padding: 6px;
+          position: relative;
+          overflow: hidden;
 
           &:hover {
-            background: lighten($yellow, 10%);
+            background-color: lighten($yellow, 14%);
+
+            a.draggable {
+              background-color: lighten($yellow, 14%);
+              opacity: 1;
+            }
+          }
+
+          &.editable {
+            padding: 3px 6px;
           }
 
           a {
             color: lighten($dark-blue, 10%);
+            display: block;
+            padding: 6px 35px 6px 6px;
+
+            &:hover {
+              background-color: lighten($yellow, 10%);
+            }
+
+            &.draggable {
+              background-color: $light-blue;
+              opacity: .3;
+              padding: 0;
+
+              &:hover {
+                background-color: lighten($yellow, 10%);
+              }
+            }
           }
 
           &.create-module {
             position: relative;
+            opacity: 0;
+            @include transition(all 3s ease-in-out);
+            background: darken($light-blue, 2%);
 
             > div {
+              background: $dark-blue;
+              @include box-shadow(0 0 5px darken($light-blue, 60%));
+              @include box-sizing(border-box);
               display: none;
+              margin-left: 3%;
+              padding: 10px;
               @include position(absolute, 30px 0 0 0);
               width: 90%;
-              background: rgba(#000, .9);
-              padding: 10px;
-              @include box-sizing(border-box);
-              @include border-radius(3px);
               z-index: 99;
-
-              &:before {
-                content: "  ";
-                display: block;
-                background: rgba(#000, .8);
-                width: 10px;
-                height: 10px;
-                @include position(absolute, -5px 0 0 50%);
-                @include transform(rotate(45deg));
-              }
 
               ul {
                 li {
@@ -143,35 +198,36 @@ section.cal {
                   background: none;
 
                   input {
-                    width: 100%;
                     @include box-sizing(border-box);
-                    border-color: #000;
-                    padding: 6px;
+                    width: 100%;
                   }
 
                   select {
-                    width: 100%;
                     @include box-sizing(border-box);
+                    width: 100%;
 
                     option {
                       font-size: 14px;
                     }
                   }
 
+                  div {
+                    margin-top: 10px;
+                  }
+
                   a {
+                    color: $light-blue;
                     float: right;
 
                     &:first-child {
                       float: left;
                     }
+
+                    &:hover {
+                      color: #fff;
+                    }
                   }
                 }
-              }
-            }
-
-            &:hover {
-              div {
-                display: block;
               }
             }
           }
@@ -181,7 +237,7 @@ section.cal {
   }
 
   section.new-section {
-    margin-top: 10px;
+    margin: 10px 0 40px;
     @include inline-block();
     position: relative;
 
@@ -247,30 +303,48 @@ section.cal {
         }
       }
     }
-
-    &:hover {
-      section {
-        display: block;
-      }
-    }
   }
 }
 
 body.content
 section.cal {
-  width: flex-grid(3) + flex-gutter();
+  width: flex-grid(3);
   float: left;
   overflow: scroll;
   @include box-sizing(border-box);
   opacity: .4;
   @include transition();
-
-  > header ul {
-    display: none;
-  }
+  background: darken($light-blue, 2%);
 
   &:hover {
     opacity: 1;
+    width: flex-grid(5) + flex-gutter();
+    background-color: transparent;
+
+    + section.main-content {
+      width: flex-grid(7);
+      opacity: .6;
+    }
+  }
+
+  > header {
+    @include transition;
+    overflow: hidden;
+
+    > a {
+      display: none;
+    }
+
+    ul {
+      float: none;
+      display: block;
+
+      li {
+        ul {
+          display: inline;
+        }
+      }
+    }
   }
 
   ol {

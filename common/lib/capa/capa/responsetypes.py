@@ -193,7 +193,7 @@ class LoncapaResponse(object):
 
             try:
                 self.context[hintfn](self.answer_ids, student_answers, new_cmap, old_cmap)
-            except Exception, err:
+            except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err,hintfn)
                 msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
                 raise ResponseError(msg)
@@ -556,7 +556,7 @@ def sympy_check2():
         idset = sorted(self.answer_ids)				# ordered list of answer id's
         try:
             submission = [student_answers[k] for k in idset]	# ordered list of answers
-        except Exception, err:
+        except Exception as err:
             msg = '[courseware.capa.responsetypes.customresponse] error getting student answer from %s' % student_answers
             msg += '\n idset = %s, error = %s' % (idset,err)
             log.error(msg)
@@ -567,7 +567,7 @@ def sympy_check2():
 
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset)==1 and not submission[0]:
-            return {idset[0]:'no_answer_entered'}
+            return CorrectMap(idset[0],'incorrect',msg='<font color="red">No answer entered!</font>')
 
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
@@ -594,7 +594,7 @@ def sympy_check2():
         if type(self.code)==str:
             try:
                 exec self.code in self.context['global_context'], self.context
-            except Exception,err:
+            except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ",self.context
                 print traceback.format_exc()
@@ -619,7 +619,7 @@ def sympy_check2():
                 log.debug('nargs=%d, args=%s, kwargs=%s' % (nargs,args,kwargs))
 
                 ret = fn(*args[:nargs],**kwargs)
-            except Exception,err:
+            except Exception as err:
                 log.error("oops in customresponse (cfn) error %s" % err)
                 # print "context = ",self.context
                 log.error(traceback.format_exc())
@@ -746,12 +746,20 @@ main()
         xml = self.xml
         self.url = xml.get('url') or "http://eecs1.mit.edu:8889/pyloncapa"	# FIXME - hardcoded URL
 
-        answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]	# FIXME - catch errors
-        answer_src = answer.get('src')
-        if answer_src is not None:
-            self.code = self.system.filesystem.open('src/'+answer_src).read()
-        else:
-            self.code = answer.text
+        # answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]	# FIXME - catch errors
+        answer = xml.find('answer')
+        if answer is not None:
+            answer_src = answer.get('src')
+            if answer_src is not None:
+                self.code = self.system.filesystem.open('src/'+answer_src).read()
+            else:
+                self.code = answer.text
+        else:					# no <answer> stanza; get code from <script>
+            self.code = self.context['script_code']
+            if not self.code:
+                msg = '%s: Missing answer script code for externalresponse' % unicode(self)
+                msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
+                raise LoncapaProblemError(msg)
 
         self.tests = xml.get('tests')
 
@@ -774,7 +782,7 @@ main()
 
         try:
             r = requests.post(self.url,data=payload)          # call external server
-        except Exception,err:
+        except Exception as err:
             msg = 'Error %s - cannot connect to external server url=%s' % (err,self.url)
             log.error(msg)
             raise Exception(msg)
@@ -786,7 +794,7 @@ main()
 
         try:
             rxml = etree.fromstring(r.text)         # response is XML; prase it
-        except Exception,err:
+        except Exception as err:
             msg = 'Error %s - cannot parse response from external server r.text=%s' % (err,r.text)
             log.error(msg)
             raise Exception(msg)
@@ -798,7 +806,7 @@ main()
         cmap = CorrectMap()
         try:
             submission = [student_answers[k] for k in idset]
-        except Exception,err:
+        except Exception as err:
             log.error('Error %s: cannot get student answer for %s; student_answers=%s' % (err,self.answer_ids,student_answers))
             raise Exception(err)
 
@@ -808,7 +816,7 @@ main()
 
         try:
             rxml = self.do_external_request('get_score',extra_payload)
-        except Exception, err:
+        except Exception as err:
             log.error('Error %s' % err)
             if self.system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(self.answer_ids), ['incorrect'] * len(idset) )))
@@ -838,7 +846,7 @@ main()
         try:
             rxml = self.do_external_request('get_answers',{})
             exans = json.loads(rxml.find('expected').text)
-        except Exception,err:
+        except Exception as err:
             log.error('Error %s' % err)
             if self.system.DEBUG:
                 msg = '<font color=red size=+2>%s</font>' % str(err).replace('<','&lt;')
@@ -935,7 +943,7 @@ class FormulaResponse(LoncapaResponse):
             except UndefinedVariable as uv:
                 log.debug('formularesponse: undefined variable in given=%s' % given)
                 raise StudentInputError(uv.message+" not permitted in answer")
-            except Exception, err:
+            except Exception as err:
                 #traceback.print_exc()
                 log.debug('formularesponse: error %s in formula' % err)
                 raise StudentInputError("Error in formula")

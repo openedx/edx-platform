@@ -15,6 +15,7 @@ from xmodule.raw_module import RawDescriptor
 from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
+from static_replace import replace_urls
 
 log = logging.getLogger("mitx.courseware")
 
@@ -135,7 +136,7 @@ class CapaModule(XModule):
         try:
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(), instance_state, seed=seed, system=self.system)
         except Exception:
-            msg = 'cannot create LoncapaProblem %s' % self.url
+            msg = 'cannot create LoncapaProblem %s' % self.location.url()
             log.exception(msg)
             if self.system.DEBUG:
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
@@ -179,7 +180,12 @@ class CapaModule(XModule):
         score = d['score']
         total = d['total']
         if total > 0:
-            return Progress(score, total)
+            try:
+                return Progress(score, total)
+            except Exception as err:
+                if self.system.DEBUG:
+                    return None
+                raise
         return None
 
     def get_html(self):
@@ -193,7 +199,18 @@ class CapaModule(XModule):
         '''Return html for the problem.  Adds check, reset, save buttons
         as necessary based on the problem config and state.'''
 
-        html = self.lcp.get_html()
+        try:
+            html = self.lcp.get_html()
+        except Exception, err:
+            if self.system.DEBUG:
+                log.exception(err)
+                msg = '[courseware.capa.capa_module] <font size="+1" color="red">Failed to generate HTML for problem %s</font>' % (self.location.url())
+                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<','&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
+                html = msg
+            else:
+                raise
+                
         content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
@@ -258,7 +275,7 @@ class CapaModule(XModule):
             html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
-        return html
+        return replace_urls(html, self.metadata['data_dir'])
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -394,14 +411,18 @@ class CapaModule(XModule):
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?
-            self.lcp = LoncapaProblem(self.definition['data'],
-                                      id=lcp_id, state=old_state, system=self.system)
+            #self.lcp = LoncapaProblem(self.definition['data'],
+            #                          id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             return {'success': inst.message}
-        except:
+        except Exception, err:
             # TODO: why is this line here?
-            self.lcp = LoncapaProblem(self.definition['data'],
-                                      id=lcp_id, state=old_state, system=self.system)
+            #self.lcp = LoncapaProblem(self.definition['data'],
+            #                          id=lcp_id, state=old_state, system=self.system)
+            if self.system.DEBUG:
+                msg = "Error checking problem: " + str(err)
+                msg += '\nTraceback:\n' + traceback.format_exc()
+                return {'success':msg}
             traceback.print_exc()
             raise Exception("error in capa_module")
 

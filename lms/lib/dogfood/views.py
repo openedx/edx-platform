@@ -25,7 +25,7 @@ import track.views
 from lxml import etree
 
 
-from courseware.module_render import make_track_function, I4xSystem
+from courseware.module_render import make_track_function, I4xSystem, get_module
 from courseware.models import StudentModule
 from multicourse import multicourse_settings
 from student.models import UserProfile
@@ -55,6 +55,7 @@ def update_problem(pfn,pxml,coursename=None,overwrite=True,filestore=None):
     else:
         pfn2 = 'problems/%s.xml' % pfn
         fp = filestore.open(pfn2,'w')
+    log.debug('[dogfood.update_problem] pfn2=%s' % pfn2)
 
     if os.path.exists(pfn2) and not overwrite: return		# don't overwrite if already exists and overwrite=False
     pxmls = pxml if type(pxml) in [str,unicode] else etree.tostring(pxml,pretty_print=True)
@@ -71,7 +72,7 @@ def df_capa_problem(request, id=None):
     # "WARNING: UNDEPLOYABLE CODE. FOR DEV USE ONLY."
     
     if settings.DEBUG:
-        print '[lib.dogfood.df_capa_problem] id=%s' % id
+        log.debug('[lib.dogfood.df_capa_problem] id=%s' % id)
 
     if not 'coursename' in request.session:
         coursename = DOGFOOD_COURSENAME
@@ -86,7 +87,7 @@ def df_capa_problem(request, id=None):
     try:
         xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
     except Exception,err:
-        print "[lib.dogfood.df_capa_problem] error in calling content_parser: %s" % err
+        log.error("[lib.dogfood.df_capa_problem] error in calling content_parser: %s" % err)
         xml = None
 
     # if problem of given ID does not exist, then create it
@@ -96,7 +97,7 @@ def df_capa_problem(request, id=None):
         if not m:
             raise Exception,'[lib.dogfood.df_capa_problem] Illegal problem id %s' % id
         pfn = m.group(1)
-        print '[lib.dogfood.df_capa_problem] creating new problem pfn=%s' % pfn
+        log.debug('[lib.dogfood.df_capa_problem] creating new problem pfn=%s' % pfn)
 
         # add problem to course.xml
         fn = settings.DATA_DIR + xp + 'course.xml'
@@ -126,7 +127,7 @@ def df_capa_problem(request, id=None):
                    'groups' : groups}
         filename = xp + 'course.xml'
         cache_key = filename + "_processed?dev_content:" + str(options['dev_content']) + "&groups:" + str(sorted(groups))
-        print '[lib.dogfood.df_capa_problem] cache_key = %s' % cache_key
+        log.debug('[lib.dogfood.df_capa_problem] cache_key = %s' % cache_key)
         #cache.delete(cache_key)
         tree = content_parser.course_xml_process(xml)	# add ID tags
         cache.set(cache_key,etree.tostring(tree),60)
@@ -134,7 +135,7 @@ def df_capa_problem(request, id=None):
 
     xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
     if not xml:
-        print "[lib.dogfood.df_capa_problem] problem xml not found!"
+        log.debug("[lib.dogfood.df_capa_problem] problem xml not found!")
 
     # add problem ID to list so that is_staff check can be bypassed
     request.session['dogfood_id'] = id
@@ -170,6 +171,31 @@ def quickedit(request, id=None, qetemplate='quickedit.html',coursename=None):
     xp = multicourse_settings.get_course_xmlpath(coursename)	# path to XML for the course
 
     def get_lcp(coursename,id):
+        # Grab the XML corresponding to the request from course.xml
+        # create empty student state for this problem, if not previously existing
+        s = StudentModule.objects.filter(student=request.user, 
+                                         module_id=id)
+        student_module_cache = list(s) if s is not None else []
+        #if len(s) == 0 or s is None:
+        #    smod=StudentModule(student=request.user, 
+        #                       module_type = 'problem',
+        #                       module_id=id, 
+        #                       state=instance.get_state())
+        #    smod.save()
+        #    student_module_cache = [smod]
+        module = 'problem'
+        module_xml = etree.XML(content_parser.module_xml(request.user, module, 'id', id, coursename))
+        module_id = module_xml.get('id')
+        log.debug("module_id = %s" % module_id)
+        (instance,smod,module_type) = get_module(request.user, request, module_xml, student_module_cache, position=None)
+        log.debug('[dogfood.views] instance=%s' % instance)
+        lcp = instance.lcp
+        log.debug('[dogfood.views] lcp=%s' % lcp)
+        pxml = lcp.tree
+        pxmls = etree.tostring(pxml,pretty_print=True)
+        return instance, pxmls
+
+    def old_get_lcp(coursename,id):
         # Grab the XML corresponding to the request from course.xml
         module = 'problem'
         xml = content_parser.module_xml(request.user, module, 'id', id, coursename)
@@ -280,7 +306,8 @@ def quickedit_git_reload(request):
         
     if 'gitupdate' in request.POST:
         import os			# FIXME - put at top?
-        cmd = "cd ../data%s; git reset --hard HEAD; git pull origin %s" % (xp,xp.replace('/',''))
+        #cmd = "cd ../data%s; git reset --hard HEAD; git pull origin %s" % (xp,xp.replace('/',''))
+        cmd = "cd ../data%s; ./GITRELOAD '%s'" % (xp,xp.replace('/',''))
         msg += '<p>cmd: %s</p>' % cmd
         ret = os.popen(cmd).read()
         msg += '<p><pre>%s</pre></p>' % ret.replace('<','&lt;')
