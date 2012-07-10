@@ -153,7 +153,7 @@ task :package do
         # Delete mako temp files
         rm -rf /tmp/tmp*mako
 
-        service gunicorn start
+        service gunicorn start || echo "Unable to start gunicorn. Continuing"
         POSTINSTALL
         postinstall.close()
         FileUtils.chmod(0755, postinstall.path)
