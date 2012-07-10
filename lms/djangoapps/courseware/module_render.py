@@ -1,15 +1,15 @@
 import json
 import logging
-import os
 
 from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
-from lxml import etree
+from functools import wraps
 
 from xmodule.modulestore.django import modulestore
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
+from static_replace import replace_urls
 
 log = logging.getLogger("mitx.courseware")
 
@@ -141,7 +141,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     return chapters
 
 
-def get_section(course, chapter, section):
+def get_section(course_module, chapter, section):
     """
     Returns the xmodule descriptor for the name course > chapter > section,
     or None if this doesn't specify a valid section
@@ -150,11 +150,6 @@ def get_section(course, chapter, section):
     chapter: Chapter name
     section: Section name
     """
-    try:
-        course_module = modulestore().get_item(course)
-    except:
-        log.exception("Unable to load course_module")
-        return None
 
     if course_module is None:
         return
@@ -227,6 +222,12 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
+    # TODO (cpennington): When modules are shared between courses, the static
+    # prefix is going to have to be specific to the module, not the directory
+    # that the xml was loaded from
+    prefix = module.metadata['data_dir']
+    module = replace_static_urls(module, prefix)
+
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
         module = add_histogram(module)
 
@@ -256,19 +257,55 @@ def get_module(user, request, location, student_module_cache, position=None):
     return (module, instance_module, shared_module, descriptor.category)
 
 
+def replace_static_urls(module, prefix):
+    """
+    Updates the supplied module with a new get_html function that wraps
+    the old get_html function and substitutes urls of the form /static/...
+    with urls that are /static/<prefix>/...
+    """
+    original_get_html = module.get_html
+    
+    @wraps(original_get_html)
+    def get_html():
+        return replace_urls(original_get_html(), staticfiles_prefix=prefix)
+
+    module.get_html = get_html
+    return module
+
+
 def add_histogram(module):
+    """
+    Updates the supplied module with a new get_html function that wraps
+    the output of the old get_html function with additional information
+    for admin users only, including a histogram of student answers and the
+    definition of the xmodule
+    """
     original_get_html = module.get_html
 
+    @wraps(original_get_html)
     def get_html():
         module_id = module.id
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
+
+        # TODO: fixme - no filename in module.xml in general (this code block for edx4edx)
+        # the following if block is for summer 2012 edX course development; it will change when the CMS comes online
+        if settings.MITX_FEATURES.get('DISPLAY_EDIT_LINK') and settings.DEBUG and module_xml.get('filename') is not None:
+            coursename = multicourse_settings.get_coursename_from_request(request)
+            github_url = multicourse_settings.get_course_github_url(coursename)
+            fn = module_xml.get('filename')
+            if module_xml.tag=='problem': fn = 'problems/' + fn	# grrr
+            edit_link = (github_url + '/tree/master/' + fn) if github_url is not None else None
+            if module_xml.tag=='problem': edit_link += '.xml'	# grrr
+        else:
+            edit_link = False
 
         # Cast module.definition and module.metadata to dicts so that json can dump them
         # even though they are lazily loaded
         staff_context = {'definition': json.dumps(dict(module.definition), indent=4),
                          'metadata': json.dumps(dict(module.metadata), indent=4),
                          'element_id': module.location.html_id(),
+                         'edit_link': edit_link,
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
                          'module_content': original_get_html()}
@@ -276,7 +313,6 @@ def add_histogram(module):
 
     module.get_html = get_html
     return module
-
 
 def modx_dispatch(request, dispatch=None, id=None):
     ''' Generic view for extensions. This is where AJAX calls go.

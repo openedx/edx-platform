@@ -1,4 +1,5 @@
 import logging
+from lxml import etree
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
@@ -26,3 +27,8 @@ class HtmlDescriptor(RawDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/module/html.coffee')]}
     js_module = 'HTML'
+
+    @classmethod
+    def file_to_xml(cls, file_object):
+        parser = etree.HTMLParser()
+        return etree.parse(file_object, parser).getroot()
