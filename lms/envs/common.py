@@ -155,7 +155,7 @@ TEMPLATE_DEBUG = False
 SITE_ID = 1
 SITE_NAME = "localhost:8000"
 HTTPS = 'on'
-ROOT_URLCONF = 'mitx.lms.urls'
+ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
