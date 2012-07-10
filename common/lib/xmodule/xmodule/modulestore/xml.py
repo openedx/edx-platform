@@ -57,7 +57,19 @@ class XMLModuleStore(ModuleStore):
 
             course_data = etree.parse(course_file).getroot()
             org = course_data.get('org')
+
+            if org is None:
+                log.error("No 'org' attribute set for course in {dir}. Using default 'edx'".format(dir=course_dir))
+                org = 'edx'
+
             course = course_data.get('course')
+
+            if course is None:
+                log.error("No 'course' attribute set for course in {dir}. Using default '{default}'".format(
+                    dir=course_dir,
+                    default=course_dir
+                ))
+                course = course_dir
 
             class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def __init__(self, modulestore):
