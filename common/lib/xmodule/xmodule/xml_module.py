@@ -135,6 +135,7 @@ class XmlDescriptor(XModuleDescriptor):
                 definition_xml = copy.deepcopy(xml_object)
             else:
                 filepath = cls._format_filepath(xml_object.tag, filename)
+                log.debug('filepath=%s, resources_fs=%s' % (filepath,system.resources_fs))
                 with system.resources_fs.open(filepath) as file:
                     try:
                         definition_xml = cls.file_to_xml(file)
@@ -157,8 +158,8 @@ class XmlDescriptor(XModuleDescriptor):
         )
 
     @classmethod
-    def _format_filepath(cls, type, name):
-        return u'{type}/{name}.{ext}'.format(type=type, name=name, ext=cls.filename_extension)
+    def _format_filepath(cls, category, name):
+        return u'{category}/{name}.{ext}'.format(category=category, name=name, ext=cls.filename_extension)
 
     def export_to_xml(self, resource_fs):
         """
