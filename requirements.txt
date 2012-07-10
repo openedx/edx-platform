@@ -39,3 +39,4 @@ South
 django-countries
 django-kombu
 django-followit
+django-keyedcache
