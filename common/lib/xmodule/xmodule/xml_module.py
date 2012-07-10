@@ -91,6 +91,16 @@ class XmlDescriptor(XModuleDescriptor):
                 del xml_object.attrib[attr]
 
     @classmethod
+    def file_to_xml(cls, file_object):
+        """
+        Used when this module wants to parse a file object to xml
+        that will be converted to the definition.
+
+        Returns an lxml Element
+        """
+        return etree.parse(file_object).getroot()
+
+    @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Creates an instance of this descriptor from the supplied xml_data.
@@ -128,7 +138,7 @@ class XmlDescriptor(XModuleDescriptor):
                 log.debug('filepath=%s, resources_fs=%s' % (filepath,system.resources_fs))
                 with system.resources_fs.open(filepath) as file:
                     try:
-                        definition_xml = etree.parse(file).getroot()
+                        definition_xml = cls.file_to_xml(file)
                     except:
                         log.exception("Failed to parse xml in file %s" % filepath)
                         raise
@@ -149,7 +159,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     @classmethod
     def _format_filepath(cls, category, name):
-        return '{category}/{name}.{ext}'.format(category=category, name=name, ext=cls.filename_extension)
+        return u'{category}/{name}.{ext}'.format(category=category, name=name, ext=cls.filename_extension)
 
     def export_to_xml(self, resource_fs):
         """
