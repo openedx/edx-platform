@@ -38,3 +38,4 @@ PyYAML
 South
 django-countries
 django-kombu
+django-followit
