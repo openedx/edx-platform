@@ -27,8 +27,8 @@ class I4xSystem(object):
     and user, or other environment-specific info.
     '''
     def __init__(self, ajax_url, track_function,
-                 get_module, render_template, user=None,
-                 filestore=None):
+                 get_module, render_template, replace_urls,
+                 user=None, filestore=None):
         '''
         Create a closure around the system environment.
 
@@ -44,6 +44,8 @@ class I4xSystem(object):
         user - The user to base the seed off of for this request
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
+        replace_urls - TEMPORARY - A function like static_replace.replace_urls
+            that capa_module can use to fix up the static urls in ajax results.
         '''
         self.ajax_url = ajax_url
         self.track_function = track_function
@@ -53,6 +55,7 @@ class I4xSystem(object):
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
         self.seed = user.id if user is not None else 0
+        self.replace_urls = replace_urls
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
@@ -209,6 +212,9 @@ def get_module(user, request, location, student_module_cache, position=None):
         (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
         return module
 
+    # TODO (cpennington): When modules are shared between courses, the static
+    # prefix is going to have to be specific to the module, not the directory
+    # that the xml was loaded from
     system = I4xSystem(track_function=make_track_function(request),
                        render_template=render_to_string,
                        ajax_url=ajax_url,
@@ -216,17 +222,18 @@ def get_module(user, request, location, student_module_cache, position=None):
                        filestore=descriptor.system.resources_fs,
                        get_module=_get_module,
                        user=user,
+                       # TODO (cpennington): This should be removed when all html from
+                       # a module is coming through get_html and is therefore covered
+                       # by the replace_static_urls code below
+                       replace_urls=replace_urls,
                        )
     # pass position specified in URL to module through I4xSystem
     system.set('position', position)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
-    # TODO (cpennington): When modules are shared between courses, the static
-    # prefix is going to have to be specific to the module, not the directory
-    # that the xml was loaded from
-    prefix = module.metadata['data_dir']
-    module = replace_static_urls(module, prefix)
+    replace_prefix = module.metadata['data_dir']
+    module = replace_static_urls(module, replace_prefix)
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
         module = add_histogram(module)

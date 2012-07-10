@@ -20,19 +20,21 @@ class XMLModuleStore(ModuleStore):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, eager=False):
+    def __init__(self, data_dir, default_class=None, eager=False, course_dirs=None):
         """
         Initialize an XMLModuleStore from data_dir
 
         data_dir: path to data directory containing the course directories
         default_class: dot-separated string defining the default descriptor class to use if non is specified in entry_points
         eager: If true, load the modules children immediately to force the entire course tree to be parsed
+        course_dirs: If specified, the list of course_dirs to load. Otherwise, load
+            all course dirs
         """
 
         self.eager = eager
         self.data_dir = path(data_dir)
         self.modules = {}
-        self.courses = []
+        self.courses = {}
 
         if default_class is None:
             self.default_class = None
@@ -46,10 +48,14 @@ class XMLModuleStore(ModuleStore):
         log.debug('default_class = %s' % self.default_class)
 
         for course_dir in os.listdir(self.data_dir):
-            if not os.path.exists(self.data_dir + "/" + course_dir + "/course.xml"):
+            if course_dirs is not None and course_dir not in course_dirs:
                 continue
 
-            self.courses.append(self.load_course(course_dir))
+            if not os.path.exists(self.data_dir / course_dir / "course.xml"):
+                continue
+
+            course_descriptor = self.load_course(course_dir)
+            self.courses[course_dir] = course_descriptor
 
     def load_course(self, course_dir):
         """
@@ -148,7 +154,7 @@ class XMLModuleStore(ModuleStore):
         """
         Returns a list of course descriptors
         """
-        return self.courses
+        return self.courses.values()
 
     def create_item(self, location):
         raise NotImplementedError("XMLModuleStores are read-only")

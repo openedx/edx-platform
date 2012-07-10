@@ -1,7 +1,7 @@
 from django.test import TestCase
 from path import path
 import shutil
-from github_sync import import_from_github, export_to_github, repo_path_from_location
+from github_sync import import_from_github, export_to_github
 from git import Repo
 from django.conf import settings
 from xmodule.modulestore.django import modulestore
@@ -10,6 +10,7 @@ from override_settings import override_settings
 from github_sync.exceptions import GithubSyncError
 
 
+@override_settings(DATA_DIR=path('test_root'))
 class GithubSyncTestCase(TestCase):
 
     def setUp(self):
@@ -29,8 +30,6 @@ class GithubSyncTestCase(TestCase):
             'path': self.repo_dir,
             'origin': self.remote_dir,
             'branch': 'master',
-            'org': 'org',
-            'course': 'course'
         })
 
     def tearDown(self):
@@ -49,7 +48,7 @@ class GithubSyncTestCase(TestCase):
         """
         self.assertEquals('Toy Course', self.import_course.metadata['display_name'])
         self.assertIn(
-            Location('i4x://org/course/chapter/Overview'),
+            Location('i4x://edx/local_repo/chapter/Overview'),
             [child.location for child in self.import_course.get_children()])
         self.assertEquals(1, len(self.import_course.get_children()))
 
@@ -58,7 +57,7 @@ class GithubSyncTestCase(TestCase):
         """
         Test that with the GITHUB_PUSH feature disabled, no content is pushed to the remote
         """
-        export_to_github(self.import_course, self.repo_dir, 'Test no-push')
+        export_to_github(self.import_course, 'Test no-push')
         self.assertEquals(1, Repo(self.remote_dir).head.commit.count())
 
     @override_settings(MITX_FEATURES={'GITHUB_PUSH': True})
@@ -67,7 +66,7 @@ class GithubSyncTestCase(TestCase):
         Test that with GITHUB_PUSH enabled, content is pushed to the remote
         """
         self.import_course.metadata['display_name'] = 'Changed display name'
-        export_to_github(self.import_course, self.repo_dir, 'Test push')
+        export_to_github(self.import_course, 'Test push')
         self.assertEquals(2, Repo(self.remote_dir).head.commit.count())
 
     @override_settings(MITX_FEATURES={'GITHUB_PUSH': True})
@@ -80,17 +79,6 @@ class GithubSyncTestCase(TestCase):
         remote = Repo(self.remote_dir)
         remote.git.commit(allow_empty=True, m="Testing conflict commit")
 
-        self.assertRaises(GithubSyncError, export_to_github, self.import_course, self.repo_dir, 'Test push')
+        self.assertRaises(GithubSyncError, export_to_github, self.import_course, 'Test push')
         self.assertEquals(2, remote.head.reference.commit.count())
         self.assertEquals("Testing conflict commit\n", remote.head.reference.commit.message)
-
-
-@override_settings(REPOS={'namea': {'path': 'patha', 'org': 'orga', 'course': 'coursea'},
-                          'nameb': {'path': 'pathb', 'org': 'orgb', 'course': 'courseb'}})
-class RepoPathLookupTestCase(TestCase):
-    def test_successful_lookup(self):
-        self.assertEquals('patha', repo_path_from_location('i4x://orga/coursea/course/foo'))
-        self.assertEquals('pathb', repo_path_from_location('i4x://orgb/courseb/course/foo'))
-
-    def test_failed_lookup(self):
-        self.assertEquals(None, repo_path_from_location('i4x://c/c/course/foo'))
