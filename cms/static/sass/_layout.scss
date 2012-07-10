@@ -5,6 +5,7 @@ body {
 
   > section {
     display: table;
+    table-layout: fixed;
     width: 100%;
   }
 
@@ -25,7 +26,7 @@ body {
         font-size: 14px;
         text-transform: uppercase;
         float: left;
-        margin-right: 15px;
+        margin: 0 15px 0 0;
 
         a {
           color: #fff;
@@ -46,6 +47,7 @@ body {
 
       ul {
         float: left;
+        margin: 0;
 
         &.user-nav {
           float: right;
@@ -72,9 +74,10 @@ body {
     section.main-content {
       border-left: 2px solid $dark-blue;
       @include box-sizing(border-box);
-      width: flex-grid(9);
+      width: flex-grid(9) + flex-gutter();
       float: left;
       @include box-shadow( -2px 0 0 darken($light-blue, 3%));
+      @include transition();
     }
   }
 }
