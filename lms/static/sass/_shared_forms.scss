@@ -13,11 +13,11 @@ form {
   input[type="email"],
   input[type="password"] {
     background: rgb(250,250,250);
-    border: 1px solid rgb(210,210,210);
+    border: 1px solid rgb(200,200,200);
     @include border-radius(3px);
     @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1));
     @include box-sizing(border-box);
-    font: italic 300 1.2rem/1.6rem $sans-serif;
+    font: italic 300 1.2rem/1.6rem $serif;
     height: 35px;
     @include inline-block;
     padding: 5px 12px;
@@ -44,6 +44,5 @@ form {
     letter-spacing: 1px;
     text-transform: uppercase;
     vertical-align: top;
-    -webkit-font-smoothing: antialiased;
   }
 }
