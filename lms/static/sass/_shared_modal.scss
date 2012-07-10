@@ -107,15 +107,16 @@
       h3 {
         color: $lighter-base-font-color;
         font: normal 1.4rem/1.8rem $serif;
+        letter-spacing: 1px;
         padding-bottom: 20px;
+        position: relative;
         text-align: center;
         text-shadow: 0 1px rgba(255,255,255, 0.4);
         text-transform: uppercase;
         vertical-align: middle;
-        position: relative;
+        -webkit-font-smoothing: antialiased;
         z-index: 2;
       }
-
     }
 
     form {
