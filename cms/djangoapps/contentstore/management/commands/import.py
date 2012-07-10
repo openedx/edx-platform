@@ -13,8 +13,12 @@ class Command(BaseCommand):
 '''Import the specified data directory into the default ModuleStore'''
 
     def handle(self, *args, **options):
-        if len(args) != 3:
-            raise CommandError("import requires 3 arguments: <org> <course> <data directory>")
+        if len(args) == 0:
+            raise CommandError("import requires at least one argument: <data directory> [<course dir>...]")
 
-        org, course, data_dir = args
-        import_from_xml(org, course, data_dir)
+        data_dir = args[0]
+        if len(args) > 1:
+            course_dirs = args[1:]
+        else:
+            course_dirs = None
+        import_from_xml(data_dir, course_dirs)
