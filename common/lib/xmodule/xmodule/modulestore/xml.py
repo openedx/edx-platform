@@ -13,7 +13,7 @@ from .exceptions import ItemNotFoundError
 etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
                                          remove_comments=True, remove_blank_text=True))
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('mitx.' + __name__)
 
 
 class XMLModuleStore(ModuleStore):
@@ -38,8 +38,12 @@ class XMLModuleStore(ModuleStore):
             self.default_class = None
         else:
             module_path, _, class_name = default_class.rpartition('.')
+            log.debug('module_path = %s' % module_path)
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
+
+        log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager,self.data_dir))
+        log.debug('default_class = %s' % self.default_class)
 
         for course_dir in os.listdir(self.data_dir):
             if not os.path.exists(self.data_dir + "/" + course_dir + "/course.xml"):
@@ -97,9 +101,11 @@ class XMLModuleStore(ModuleStore):
                                 slug = '{slug}_{count}'.format(slug=slug, count=self.unnamed_modules)
 
                             self.used_slugs.add(slug)
+                            # log.debug('-> slug=%s' % slug)
                             xml_data.set('slug', slug)
 
                         module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
+                        log.debug('==> importing module location %s' % repr(module.location))
                         modulestore.modules[module.location] = module
 
                         if modulestore.eager:
@@ -117,6 +123,7 @@ class XMLModuleStore(ModuleStore):
 
             course_descriptor = ImportSystem(self).process_xml(etree.tostring(course_data))
             course_descriptor.metadata['data_dir'] = course_dir
+            log.debug('========> Done with course import')
             return course_descriptor
 
     def get_item(self, location):

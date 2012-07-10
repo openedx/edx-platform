@@ -172,11 +172,11 @@ def index(request, course_id=None, chapter=None, section=None,
     course_location = CourseDescriptor.id_to_location(course_id)
     course = modulestore().get_item(course_location)
 
-    if not settings.COURSEWARE_ENABLED:
-        return redirect('/')
-
     chapter = clean(chapter)
     section = clean(section)
+
+    if settings.ENABLE_MULTICOURSE:
+        settings.MODULESTORE['default']['OPTIONS']['data_dir'] = settings.DATA_DIR + multicourse_settings.get_course_xmlpath(course)
 
     context = {
         'csrf': csrf(request)['csrf_token'],
