@@ -364,14 +364,13 @@ td {
   font-style: italic; }
 
 html, body {
-  background: #fdfdfd;
+  background: #fafafa;
   font-size: 75%; }
 
 h1, h2, h3, h4, h5, h6 {
   color: #3c3c3c;
   font: normal 1.4rem/2rem Georgia, Cambria, "Times New Roman", Times, serif;
-  margin: 0px;
-  -webkit-font-smoothing: antialiased; }
+  margin: 0px; }
 
 h1 {
   color: #a0a0a0;
@@ -386,7 +385,8 @@ h2 {
   font: normal 1.4rem/2rem Georgia, Cambria, "Times New Roman", Times, serif;
   letter-spacing: 1px;
   margin-bottom: 15px;
-  text-transform: uppercase; }
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased; }
 
 p {
   color: #3c3c3c;
@@ -452,6 +452,7 @@ a:link, a:visited {
     color: #3c3c3c; }
 
 .content-wrapper {
+  background: white;
   margin: 0 auto 0;
   width: 100%; }
 
@@ -1391,7 +1392,7 @@ form {
       box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
 
 footer {
-  background: #fafafa;
+  background: transparent;
   border-top: 1px solid #c8c8c8;
   -webkit-box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   -moz-box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.1);

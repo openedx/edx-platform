@@ -15,7 +15,7 @@ $blue: rgb(29,157,217);
 $pink: rgb(182,37,104);
 
 html, body {
-  background: rgb(253,253,253);
+  background: rgb(250,250,250);
   font-size: 75%;
 }
 
@@ -23,7 +23,6 @@ h1, h2, h3, h4, h5, h6 {
   color: $base-font-color;
   font: normal 1.4rem/2rem $serif;
   margin: 0px;
-  -webkit-font-smoothing: antialiased;
 }
 
 h1 {
@@ -41,13 +40,13 @@ h2 {
   letter-spacing: 1px;
   margin-bottom: 15px;
   text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
 }
 
 p {
   color: $base-font-color;
   font: normal 1.3rem/2rem $serif;
   margin: 0px;
-  //-webkit-font-smoothing: antialiased;
 }
 
 p + p {
@@ -73,7 +72,6 @@ a:link, a:visited {
   font: normal 1.2rem/2rem $sans-serif;
   text-decoration: none;
   @include transition(all, 0.1s, linear);
-  //-webkit-font-smoothing: antialiased;
 
   &:hover {
     color: $base-font-color;
@@ -81,6 +79,7 @@ a:link, a:visited {
 }
 
 .content-wrapper {
+  background: rgb(255,255,255);
   margin: 0 auto 0;
   width: flex-grid(12);
 }

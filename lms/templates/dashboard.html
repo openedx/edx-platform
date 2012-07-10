@@ -3,110 +3,108 @@
 
 <%namespace name='static' file='static_content.html'/>
 
-<section class="container">
-  <section class="dashboard">
+<section class="container dashboard">
 
-    <section class="sidebar">
-      <header class="profile">
-        <section class="user-info">
-          <div class="avatar">
-            <img src="${static.url('images/profile.jpg')}" />
-          </div>
-          <section class="info">
-            <h2>${ user.username }</h2>
-            <ul>
-              <li>
-                <h3>Email: <span>${ user.email }</span></h3>
-              </li>
-              <li>
-                <h3>Location: <span>${ user.profile.location }</span></h3>
-              </li>
-              <li>
-                <h3>Language: <span>${ user.profile.language }</span></h3>
-              </li>
-            </ul>
-          </section>
+  <section class="sidebar">
+    <header class="profile">
+      <section class="user-info">
+        <div class="avatar">
+          <img src="${static.url('images/profile.jpg')}" />
+        </div>
+        <section class="info">
+          <h2>${ user.username }</h2>
+          <ul>
+            <li>
+              <h3>Email: <span>${ user.email }</span></h3>
+            </li>
+            <li>
+              <h3>Location: <span>${ user.profile.location }</span></h3>
+            </li>
+            <li>
+              <h3>Language: <span>${ user.profile.language }</span></h3>
+            </li>
+          </ul>
         </section>
-        <section class="meta-info">
-        </section>
-      </header>
-    </section>
-
-    <section class="my-courses">
-      <header>
-        <h2>My Current Courses</h2>
-      </header>
-
-      % if len(courses) > 0:
-        % for course in courses:
-          <article class="my-course">
-            <a href="${reverse('info', args=[course.id])}">
-              <div class="cover">
-                <div class="shade"></div>
-                <div class="arrow"></div>
-                <img src="${static.url('images/circuits.jpeg')}" />
-              </div>
-              <section class="info">
-                <hgroup>
-                  <h2>${course.get_about_section("title")}</h2>
-                  % for instructor in course.instructors:
-                    <h3>${course.get_about_section('university')}</h3>
-                  % endfor
-                </hgroup>
-                <div class="edit">options</div>
-                <section class="meta">
-                  <div class="complete">
-                    <p>60% complete</p>
-                  </div>
-                  <div class="progress">
-                    <div class="meter">
-                      <div class="meter-fill"></div>
-                    </div>
-                  </div>
-                  <div class="end-date">
-                    <p>End date: <time>6/10/12</time></p>
-                  </div>
-                </section>
-              </section>
-            </a>
-          </article>
-        % endfor
-      % else:
-        <section class="empty-dashboard-message">
-          <p>Looks like you aren't registered for any courses. You should take a minute and <a href="${reverse('courses')}" class="find-courses">Find some courses!</a></p>
-        </section>
-      % endif
-
-      <article class="my-course">
-        <a href="/info">
-          <div class="cover">
-            <div class="shade"></div>
-            <div class="arrow"></div>
-            <img src="${static.url('images/python.png')}" />
-          </div>
-          <section class="info">
-            <hgroup>
-              <h2>CS 102 Python</h2>
-              <p>Adam Smith, Harvard University</p>
-            </hgroup>
-            <div class="edit">options</div>
-            <section class="meta">
-              <div class="complete">
-                <p>60% complete</p>
-              </div>
-              <div class="progress">
-                <div class="meter">
-                  <div class="meter-fill"></div>
-                </div>
-              </div>
-              <div class="end-date">
-                <p>End date: <time>6/10/12</time></p>
-              </div>
-            </section>
-          </section>
-        </a>
-      </article>
-    </section>
-
+      </section>
+      <section class="meta-info">
+      </section>
+    </header>
   </section>
+
+  <section class="my-courses">
+    <header>
+      <h2>My Current Courses</h2>
+    </header>
+
+    % if len(courses) > 0:
+      % for course in courses:
+        <article class="my-course">
+          <a href="${reverse('info', args=[course.id])}">
+            <div class="cover">
+              <div class="shade"></div>
+              <div class="arrow"></div>
+              <img src="${static.url('images/circuits.jpeg')}" />
+            </div>
+            <section class="info">
+              <hgroup>
+                <h2>${course.get_about_section("title")}</h2>
+                % for instructor in course.instructors:
+                  <h3>${course.get_about_section('university')}</h3>
+                % endfor
+              </hgroup>
+              <div class="edit">options</div>
+              <section class="meta">
+                <div class="complete">
+                  <p>60% complete</p>
+                </div>
+                <div class="progress">
+                  <div class="meter">
+                    <div class="meter-fill"></div>
+                  </div>
+                </div>
+                <div class="end-date">
+                  <p>End date: <time>6/10/12</time></p>
+                </div>
+              </section>
+            </section>
+          </a>
+        </article>
+      % endfor
+    % else:
+      <section class="empty-dashboard-message">
+        <p>Looks like you aren't registered for any courses. You should take a minute and <a href="${reverse('courses')}" class="find-courses">Find some courses!</a></p>
+      </section>
+    % endif
+
+    <article class="my-course">
+      <a href="/info">
+        <div class="cover">
+          <div class="shade"></div>
+          <div class="arrow"></div>
+          <img src="${static.url('images/python.png')}" />
+        </div>
+        <section class="info">
+          <hgroup>
+            <h2>CS 102 Python</h2>
+            <p>Adam Smith, Harvard University</p>
+          </hgroup>
+          <div class="edit">options</div>
+          <section class="meta">
+            <div class="complete">
+              <p>60% complete</p>
+            </div>
+            <div class="progress">
+              <div class="meter">
+                <div class="meter-fill"></div>
+              </div>
+            </div>
+            <div class="end-date">
+              <p>End date: <time>6/10/12</time></p>
+            </div>
+          </section>
+        </section>
+      </a>
+    </article>
+  </section>
+
 </section>
