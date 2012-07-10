@@ -158,11 +158,8 @@
         }
 
         a {
-          font: normal 1.2rem/1.6rem $serif;
+          font: italic normal 1.2rem/1.6rem $serif;
           text-decoration: underline;
-
-          &:hover {
-          }
         }
       }
 
@@ -231,6 +228,7 @@
         color: $lighter-base-font-color;
         font: italic 1.2rem/1.6rem $serif;
         text-align: center;
+        -webkit-font-smoothing: antialiased;
 
         a {
           color: $lighter-base-font-color;
