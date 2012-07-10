@@ -176,12 +176,14 @@ STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
-] + [
-    # TODO (cpennington): When courses are stored in a database, this
-    # should no longer be added to STATICFILES
-    (course_dir, DATA_DIR / course_dir)
-    for course_dir in os.listdir(DATA_DIR)
 ]
+if os.path.isdir(DATA_DIR):
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir)
+        for course_dir in os.listdir(DATA_DIR)
+    ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York' # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
