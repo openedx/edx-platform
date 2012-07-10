@@ -1,5 +1,5 @@
-.about {
-  margin: 20px auto 120px;
+.container.about {
+  padding: 20px 0 120px;
 
   > nav {
     margin-bottom: 80px;
@@ -31,8 +31,6 @@
   }
 
   .vision {
-    //display: none;
-
     h1 + hr {
       margin-bottom: 80px;
     }
