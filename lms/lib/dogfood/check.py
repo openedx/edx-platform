@@ -24,7 +24,7 @@ def check_problem_code(ans,the_lcp,correct_answers,false_answers):
     pfn += the_lcp.problem_id.replace('filename','')    # add problem ID to dogfood problem name
     update_problem(pfn,ans,filestore=the_lcp.system.filestore)
     msg = '<hr width="100%"/>'
-    msg += '<iframe src="%s/dogfood/filename%s" width="95%%" frameborder="1">No iframe support!</iframe>' % (settings.MITX_ROOT_URL,pfn)
+    msg += '<iframe src="%s/dogfood/filename%s" width="95%%" height="400" frameborder="1">No iframe support!</iframe>' % (settings.MITX_ROOT_URL,pfn)
     msg += '<hr width="100%"/>'
 
     endmsg = """<p><font size="-1" color="purple">Note: if the code text box disappears after clicking on "Check",

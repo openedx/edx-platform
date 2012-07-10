@@ -350,6 +350,8 @@ class XModuleDescriptor(Plugin):
             etree.fromstring(xml_data).tag,
             default_class
         )
+        # leave next line in code, commented out - useful for low-level debugging
+        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (etree.fromstring(xml_data).tag,class_))
         return class_.from_xml(xml_data, system, org, course)
 
     @classmethod

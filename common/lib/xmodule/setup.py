@@ -8,6 +8,10 @@ setup(
     package_data={
         'xmodule': ['js/module/*']
     },
+    requires=[
+        'capa',
+        'mitxmako'
+    ],
 
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points

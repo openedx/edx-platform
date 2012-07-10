@@ -94,6 +94,14 @@ def get_course_title(coursename):
 def get_course_number(coursename):
     return get_course_property(coursename, 'number')
 
+def get_course_github_url(coursename):
+    return get_course_property(coursename,'github_url')
 
+def get_course_default_chapter(coursename):
+    return get_course_property(coursename,'default_chapter')
+
+def get_course_default_section(coursename):
+    return get_course_property(coursename,'default_section')
+    
 def get_course_location(coursename):
     return get_course_property(coursename, 'location')

@@ -180,7 +180,12 @@ class CapaModule(XModule):
         score = d['score']
         total = d['total']
         if total > 0:
-            return Progress(score, total)
+            try:
+                return Progress(score, total)
+            except Exception as err:
+                if self.system.DEBUG:
+                    return None
+                raise
         return None
 
     def get_html(self):
@@ -194,7 +199,18 @@ class CapaModule(XModule):
         '''Return html for the problem.  Adds check, reset, save buttons
         as necessary based on the problem config and state.'''
 
-        html = self.lcp.get_html()
+        try:
+            html = self.lcp.get_html()
+        except Exception, err:
+            if self.system.DEBUG:
+                log.exception(err)
+                msg = '[courseware.capa.capa_module] <font size="+1" color="red">Failed to generate HTML for problem %s</font>' % (self.location.url())
+                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<','&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
+                html = msg
+            else:
+                raise
+                
         content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
@@ -395,14 +411,18 @@ class CapaModule(XModule):
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?
-            self.lcp = LoncapaProblem(self.definition['data'],
-                                      id=lcp_id, state=old_state, system=self.system)
+            #self.lcp = LoncapaProblem(self.definition['data'],
+            #                          id=lcp_id, state=old_state, system=self.system)
             traceback.print_exc()
             return {'success': inst.message}
-        except:
+        except Exception, err:
             # TODO: why is this line here?
-            self.lcp = LoncapaProblem(self.definition['data'],
-                                      id=lcp_id, state=old_state, system=self.system)
+            #self.lcp = LoncapaProblem(self.definition['data'],
+            #                          id=lcp_id, state=old_state, system=self.system)
+            if self.system.DEBUG:
+                msg = "Error checking problem: " + str(err)
+                msg += '\nTraceback:\n' + traceback.format_exc()
+                return {'success':msg}
             traceback.print_exc()
             raise Exception("error in capa_module")
 

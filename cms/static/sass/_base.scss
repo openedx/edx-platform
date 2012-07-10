@@ -32,11 +32,11 @@ input {
 
 button, input[type="submit"], .button {
   background-color: $orange;
-  color: #fff;
-  -webkit-font-smoothing: antialiased;
-  padding: 8px 10px;
   border: 0;
+  color: #fff;
   font-weight: bold;
+  padding: 8px 10px;
+  -webkit-font-smoothing: antialiased;
 
   &:hover {
     background-color: shade($orange, 10%);
@@ -45,9 +45,22 @@ button, input[type="submit"], .button {
 
 #{$all-text-inputs}, textarea {
   border: 1px solid $dark-blue;
-  font: $body-font-size $body-font-family;
-  padding: 4px 6px;
   @include box-shadow(inset 0 3px 6px $light-blue);
+  color: lighten($dark-blue, 30%);
+  font: $body-font-size $body-font-family;
+  outline: none;
+  padding: 4px 6px;
+
+  &:hover {
+    background: lighten($yellow, 13%);
+    color: $dark-blue;
+  }
+
+  &:focus {
+    @include box-shadow(inset 0 3px 6px $light-blue, 0 0 3px lighten($bright-blue, 10%));
+    color: $dark-blue;
+    background: lighten($yellow, 13%);
+  }
 }
 
 textarea {
@@ -56,7 +69,6 @@ textarea {
   line-height: lh();
   padding: 15px;
   width: 100%;
-
 }
 
 // Extends
@@ -87,18 +99,22 @@ textarea {
 }
 
 .draggable {
-  width: 7px;
-  min-height: 14px;
   background: url('../img/drag-handle.png') no-repeat center;
   text-indent: -9999px;
   display: block;
-  float: right;
+  cursor: move;
+  height: 100%;
+  padding: 0;
+  @include position(absolute,  0px 0px 0 0);
+  width: 30px;
+  z-index: 99;
 }
 
 .editable {
   &:hover {
     background: lighten($yellow, 10%);
   }
+
   button {
     padding: 4px 10px;
   }
@@ -107,13 +123,8 @@ textarea {
 .wip {
   outline: 1px solid #f00 !important;
   position: relative;
+}
 
-  &:after {
-   content: "WIP";
-   font-size: 8px;
-   padding: 2px;
-   background: #f00;
-   color: #fff;
-   @include position(absolute, 0px 0px 0 0);
-  }
+.hidden {
+  display: none;
 }

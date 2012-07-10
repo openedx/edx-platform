@@ -1,24 +1,48 @@
 section#unit-wrapper {
   section.filters {
     @include clearfix;
-    margin-bottom: 10px;
     opacity: .4;
+    margin-bottom: 10px;
     @include transition;
 
     &:hover {
       opacity: 1;
     }
 
+    h2 {
+      @include inline-block();
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 14px;
+      padding: 6px 6px 6px 0;
+      font-size: 12px;
+      margin: 0;
+    }
+
     ul {
       @include clearfix();
       list-style: none;
-      padding: 6px;
+      margin: 0;
+      padding: 0;
 
       li {
-        @include inline-block();
+        @include inline-block;
+        margin-right: 6px;
+        border-right: 1px solid #ddd;
+        padding-right: 6px;
 
-        &.advanced {
+        &.search {
           float: right;
+          border: 0;
+        }
+
+        a {
+          &.more {
+            font-size: 12px;
+            @include inline-block;
+            margin: 0 6px;
+            font-style: italic;
+          }
         }
       }
     }
@@ -39,11 +63,13 @@ section#unit-wrapper {
         @include clearfix;
 
         h2 {
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          font-size: 12px;
-          float: left;
           color: $bright-blue;
+          float: left;
+          font-size: 12px;
+          letter-spacing: 1px;
+          line-height: 19px;
+          text-transform: uppercase;
+          margin: 0;
         }
       }
 
@@ -66,6 +92,8 @@ section#unit-wrapper {
 
         ol {
           list-style: none;
+          margin: 0;
+          padding: 0;
 
           li {
             border-bottom: 1px solid lighten($dark-blue, 60%);
@@ -76,15 +104,20 @@ section#unit-wrapper {
 
             ol {
               list-style: none;
+              margin: 0;
+              padding: 0;
 
               li {
                 padding: 6px;
+                position: relative;
 
                 &:last-child {
                   border-bottom: 0;
                 }
 
                 &:hover {
+                  background-color: lighten($yellow, 10%);
+
                   a.draggable {
                     opacity: 1;
                   }
@@ -92,7 +125,7 @@ section#unit-wrapper {
 
                 a.draggable {
                   float: right;
-                  opacity: .5;
+                  opacity: .4;
                 }
 
                 &.group {
@@ -104,13 +137,15 @@ section#unit-wrapper {
 
                     h3 {
                       font-size: 14px;
+                      margin: 0;
                     }
                   }
-
 
                   ol {
                     border-left: 4px solid #999;
                     border-bottom: 0;
+                    margin: 0;
+                    padding: 0;
 
                     li {
                       &:last-child {
@@ -133,30 +168,51 @@ section#unit-wrapper {
 
         ol {
           list-style: none;
+          margin: 0;
+          padding: 0;
 
           li {
             border-bottom: 1px solid darken($light-blue, 8%);
-            background: lighten($light-blue, 2%);
+            background: $light-blue;
 
             &:last-child {
               border-bottom: 0;
             }
 
+            &.new-module a {
+              background-color: darken($light-blue, 2%);
+
+              &:hover {
+                background-color: lighten($yellow, 10%);
+              }
+            }
+
+            a {
+              color: $dark-blue;
+            }
+
             ul {
               list-style: none;
+              margin: 0;
+              padding: 0;
 
               li {
                 padding: 6px;
+                border-collapse: collapse;
+                position: relative;
 
                 &:last-child {
-                  border-bottom: 0;
+                  border-bottom: 1px solid darken($light-blue, 8%);
                 }
 
                 &:hover {
+                  background-color: lighten($yellow, 10%);
+
                   a.draggable {
                     opacity: 1;
                   }
                 }
+
 
                 &.empty {
                   padding: 12px;
@@ -169,16 +225,10 @@ section#unit-wrapper {
                 }
 
                 a.draggable {
-                  float: right;
                   opacity: .3;
-                }
-
-                a {
-                  color: #000;
                 }
               }
             }
-
           }
         }
       }
