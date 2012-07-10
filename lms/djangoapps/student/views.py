@@ -191,7 +191,9 @@ def create_account(request, post_override=None):
     up.save()
 
     d={'name':post_vars['name'],
-       'key':r.activation_key}
+       'key':r.activation_key,
+       'course_title' : settings.COURSE_TITLE,
+       }
 
     subject = render_to_string('emails/activation_email_subject.txt',d)
         # Email subject *must not* contain newlines
@@ -199,7 +201,11 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt',d)
 
     try:
-        if not settings.GENERATE_RANDOM_USER_CREDENTIALS:
+        if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+            dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
+            message = "Activation for %s (%s): %s\n" % (u,u.email,up.name) + '-'*80 + '\n\n' + message
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
+        elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
             res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         log.exception(sys.exc_info())

@@ -251,7 +251,7 @@ class LoncapaProblem(object):
             if file is not None:
                 try:
                     ifp = self.system.filestore.open(file)	# open using I4xSystem OSFS filestore
-                except Exception,err:
+                except Exception as err:
                     log.error('Error %s in problem xml include: %s' % (err,etree.tostring(inc,pretty_print=True)))
                     log.error('Cannot find file %s in %s' % (file,self.system.filestore))
                     if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
@@ -259,7 +259,7 @@ class LoncapaProblem(object):
                     else: continue
                 try:
                     incxml = etree.XML(ifp.read())		# read in and convert to XML
-                except Exception,err:
+                except Exception as err:
                     log.error('Error %s in problem xml include: %s' % (err,etree.tostring(inc,pretty_print=True)))
                     log.error('Cannot parse XML in %s' % (file))
                     if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
@@ -283,6 +283,7 @@ class LoncapaProblem(object):
         context.update(global_context)            		# initialize context to have stuff in global_context
         context['__builtins__'] = globals()['__builtins__']    	# put globals there also
         context['the_lcp'] = self                		# pass instance of LoncapaProblem in
+        context['script_code'] = ''
 
         for script in tree.findall('.//script'):
             stype = script.get('type')
@@ -295,10 +296,12 @@ class LoncapaProblem(object):
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code, XMLESC)
+            context['script_code'] += code		# store code source in context
             try:
-                exec code in context, context        # use "context" for global context; thus defs in code are global within code
+                exec code in context, context        	# use "context" for global context; thus defs in code are global within code
             except Exception:
-                log.exception("Error while execing code: " + code)
+                log.exception("Error while execing script code: " + code)
+                raise responsetypes.LoncapaProblemError("Error while executing script code")
         return context
 
     def _extract_html(self, problemtree):  # private
@@ -311,6 +314,10 @@ class LoncapaProblem(object):
 
         Used by get_html.
         '''
+        if problemtree.tag=='script' and problemtree.get('type') and 'javascript' in problemtree.get('type'):
+            # leave javascript intact.
+            return problemtree
+
         if problemtree.tag in html_problem_semantics:
             return
 

@@ -17,10 +17,18 @@ for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
     NOSE_ARGS += ['--cover-package', app]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+TEST_ROOT = 'test_root'
+
 MODULESTORE = {
-    'host': 'localhost',
-    'db': 'mongo_base',
-    'collection': 'key_store',
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': {
+            'default_class': 'xmodule.raw_module.RawDescriptor',
+            'host': 'localhost',
+            'db': 'test_xmodule',
+            'collection': 'modulestore',
+        }
+    }
 }
 
 DATABASES = {

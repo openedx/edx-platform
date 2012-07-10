@@ -71,6 +71,7 @@ class Settings(object):
         # Load the course settings as a dictionary
         course_settings = {}
         try:
+            # TODO: this doesn't work with multicourse
             with open( settings.DATA_DIR + "/course_settings.json") as course_settings_file:
                 course_settings_string = course_settings_file.read()
             course_settings = json.loads(course_settings_string)

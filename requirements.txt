@@ -1,5 +1,6 @@
 django<1.4
 pip
+numpy
 scipy
 matplotlib
 markdown
@@ -24,7 +25,12 @@ sympy
 newrelic
 glob2
 pymongo
+-e common/lib/capa
+-e common/lib/mitxmako
 -e common/lib/xmodule
 django_nose
 nosexcover
 rednose
+GitPython >= 0.3
+django-override-settings
+mock>=0.8, <0.9

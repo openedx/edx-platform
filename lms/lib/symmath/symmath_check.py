@@ -231,6 +231,9 @@ def symmath_check(expect,ans,dynamath=None,options=None,debug=None):
             dm = my_evalf(sympy.Matrix(fexpect)-sympy.Matrix(xgiven),chop=True)
             if abs(dm.vec().norm().evalf())<threshold:
                 return {'ok': True,'msg': msg}
+        except sympy.ShapeError:
+            msg += "<p>Error - your input vector or matrix has the wrong dimensions"
+            return {'ok':False,'msg':msg}
         except Exception,err:
             msg += "<p>Error %s in comparing expected (a list) and your answer</p>" % str(err).replace('<','&lt;')
             if DEBUG: msg += "<p/><pre>%s</pre>" % traceback.format_exc()
