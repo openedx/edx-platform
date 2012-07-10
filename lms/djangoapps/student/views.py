@@ -509,6 +509,7 @@ def help(request):
     return render_to_response('help.html', None)
 
 
+@login_required
 @ensure_csrf_cookie
 def enroll(request, course_id):
     user = request.user
