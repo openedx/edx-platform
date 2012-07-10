@@ -15,7 +15,6 @@ from xmodule.raw_module import RawDescriptor
 from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
-from static_replace import replace_urls
 
 log = logging.getLogger("mitx.courseware")
 
@@ -275,7 +274,7 @@ class CapaModule(XModule):
             html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
-        return replace_urls(html, self.metadata['data_dir'])
+        return self.system.replace_urls(html, self.metadata['data_dir'])
 
     def handle_ajax(self, dispatch, get):
         '''
