@@ -2336,12 +2336,14 @@ header.global {
       .modal .inner-wrapper header h3 {
         color: #a0a0a0;
         font: normal 1.4rem/1.8rem Georgia, Cambria, "Times New Roman", Times, serif;
+        letter-spacing: 1px;
         padding-bottom: 20px;
+        position: relative;
         text-align: center;
         text-shadow: 0 1px rgba(255, 255, 255, 0.4);
         text-transform: uppercase;
         vertical-align: middle;
-        position: relative;
+        -webkit-font-smoothing: antialiased;
         z-index: 2; }
     .modal .inner-wrapper form {
       margin-bottom: 12px;
@@ -3993,59 +3995,45 @@ nav.course-material {
         .course-info .course-sidebar .media:hover .play-intro::after {
           color: #b62568; }
 
-.jobs {
-  margin: 60px auto 120px; }
-  .jobs h1 + hr {
+.container.jobs {
+  padding: 60px 0 120px; }
+  .container.jobs h1 + hr {
     margin-bottom: 80px; }
-  .jobs .message {
+  .container.jobs .message {
     zoom: 1;
-    margin-bottom: 60px;
-    padding-bottom: 60px;
+    margin-bottom: 100px;
     position: relative; }
-    .jobs .message:before, .jobs .message:after {
+    .container.jobs .message:before, .container.jobs .message:after {
       content: "";
       display: table; }
-    .jobs .message:after {
+    .container.jobs .message:after {
       clear: both; }
-    .jobs .message hr {
-      bottom: 0px;
-      margin: 0px;
-      position: absolute;
-      width: 100%; }
-    .jobs .message .photo {
+    .container.jobs .message .photo {
       background: white;
       border: 1px solid #d2d2d2;
+      float: left;
+      margin-right: 2.024%;
       padding: 1px;
       width: 31.984%; }
-      .jobs .message .photo img {
+      .container.jobs .message .photo img {
         background: #f5f5f5;
         display: block;
         height: 200px;
         width: 100%; }
-    .jobs .message.left .photo {
-      float: left;
-      margin-right: 2.024%; }
-    .jobs .message.right h2 {
-      text-align: right; }
-    .jobs .message.right .photo {
-      float: right;
-      margin-left: 2.024%; }
-    .jobs .message:last-child {
-      margin-bottom: 0px; }
-  .jobs .jobs-wrapper {
+  .container.jobs .jobs-wrapper {
     zoom: 1;
     float: left;
     width: 100%; }
-    .jobs .jobs-wrapper:before, .jobs .jobs-wrapper:after {
+    .container.jobs .jobs-wrapper:before, .container.jobs .jobs-wrapper:after {
       content: "";
       display: table; }
-    .jobs .jobs-wrapper:after {
+    .container.jobs .jobs-wrapper:after {
       clear: both; }
-    .jobs .jobs-wrapper > h2 {
+    .container.jobs .jobs-wrapper > h2 {
       border-bottom: 1px solid #dcdcdc;
       margin-bottom: 60px;
       padding-bottom: 20px; }
-    .jobs .jobs-wrapper .jobs-sidebar {
+    .container.jobs .jobs-wrapper .jobs-sidebar {
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
@@ -4054,56 +4042,45 @@ nav.course-material {
       padding-bottom: 20px;
       padding-left: 20px;
       width: 23.482%; }
-      .jobs .jobs-wrapper .jobs-sidebar nav {
+      .container.jobs .jobs-wrapper .jobs-sidebar nav {
         margin-bottom: 40px; }
-        .jobs .jobs-wrapper .jobs-sidebar nav ol {
+        .container.jobs .jobs-wrapper .jobs-sidebar nav ol {
           zoom: 1; }
-          .jobs .jobs-wrapper .jobs-sidebar nav ol:before, .jobs .jobs-wrapper .jobs-sidebar nav ol:after {
+          .container.jobs .jobs-wrapper .jobs-sidebar nav ol:before, .container.jobs .jobs-wrapper .jobs-sidebar nav ol:after {
             content: "";
             display: table; }
-          .jobs .jobs-wrapper .jobs-sidebar nav ol:after {
+          .container.jobs .jobs-wrapper .jobs-sidebar nav ol:after {
             clear: both; }
-          .jobs .jobs-wrapper .jobs-sidebar nav ol li {
+          .container.jobs .jobs-wrapper .jobs-sidebar nav ol li {
             float: left;
             margin-right: 2.024%;
             width: 100%; }
-            .jobs .jobs-wrapper .jobs-sidebar nav ol li:nth-child(4n) {
+            .container.jobs .jobs-wrapper .jobs-sidebar nav ol li:nth-child(4n) {
               margin-right: 0px; }
-            .jobs .jobs-wrapper .jobs-sidebar nav ol li a {
+            .container.jobs .jobs-wrapper .jobs-sidebar nav ol li a {
               display: block;
+              letter-spacing: 1px;
               margin-left: -20px;
               padding: 10px 0 10px 20px;
               position: relative;
               text-transform: uppercase; }
-              .jobs .jobs-wrapper .jobs-sidebar nav ol li a::after {
-                background-image: -webkit-linear-gradient(180deg, rgba(235, 235, 235, 0) 0%, #ebebeb);
-                background-image: -moz-linear-gradient(180deg, rgba(235, 235, 235, 0) 0%, #ebebeb);
-                background-image: -ms-linear-gradient(180deg, rgba(235, 235, 235, 0) 0%, #ebebeb);
-                background-image: -o-linear-gradient(180deg, rgba(235, 235, 235, 0) 0%, #ebebeb);
-                background-image: linear-gradient(180deg, rgba(235, 235, 235, 0) 0%, #ebebeb);
-                bottom: 0px;
-                display: block;
-                height: 1px;
-                left: 0px;
-                position: absolute;
-                width: 100%; }
-              .jobs .jobs-wrapper .jobs-sidebar nav ol li a:hover {
+              .container.jobs .jobs-wrapper .jobs-sidebar nav ol li a:hover {
                 background: #f5f5f5; }
-      .jobs .jobs-wrapper .jobs-sidebar p + h2 {
+      .container.jobs .jobs-wrapper .jobs-sidebar p + h2 {
         margin-top: 40px; }
-    .jobs .jobs-wrapper .jobs-listing {
+    .container.jobs .jobs-wrapper .jobs-listing {
       float: left;
       margin-right: 2.024%;
       width: 74.494%; }
-      .jobs .jobs-wrapper .jobs-listing .job {
+      .container.jobs .jobs-wrapper .jobs-listing .job {
         border-bottom: 1px solid #dcdcdc;
         padding: 40px 0px; }
-        .jobs .jobs-wrapper .jobs-listing .job:first-child {
+        .container.jobs .jobs-wrapper .jobs-listing .job:first-child {
           padding-top: 0px; }
-        .jobs .jobs-wrapper .jobs-listing .job:last-child {
+        .container.jobs .jobs-wrapper .jobs-listing .job:last-child {
           border: none;
           padding-bottom: 0px; }
-        .jobs .jobs-wrapper .jobs-listing .job h3 {
+        .container.jobs .jobs-wrapper .jobs-listing .job h3 {
           font-family: "Open Sans", Verdana, Geneva, sans-serif;
           font-weight: bold;
           margin-bottom: 15px; }
