@@ -307,7 +307,7 @@ td {
   h2, h3 {
     page-break-after: avoid; } }
 html, body {
-  background: white;
+  background: #fdfdfd;
   font-size: 75%; }
 
 h1, h2, h3, h4, h5, h6 {
@@ -1232,9 +1232,10 @@ form {
   font-size: 0em; }
   form label {
     color: #3c3c3c;
-    font: normal 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+    font: italic 300 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
     margin-bottom: 5px;
-    text-shadow: 0 1px rgba(255, 255, 255, 0.4); }
+    text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+    -webkit-font-smoothing: antialiased; }
   form input[type="text"],
   form input[type="email"],
   form input[type="password"] {
@@ -1251,7 +1252,7 @@ form {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+    font: italic 300 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
     height: 35px;
     display: -moz-inline-box;
     -moz-box-orient: vertical;
@@ -1261,7 +1262,8 @@ form {
     *display: inline;
     *vertical-align: auto;
     padding: 5px 12px;
-    vertical-align: top; }
+    vertical-align: top;
+    -webkit-font-smoothing: antialiased; }
     form input[type="text"]:last-child,
     form input[type="email"]:last-child,
     form input[type="password"]:last-child {
@@ -1305,7 +1307,7 @@ form {
     -ms-border-radius: 3px;
     -o-border-radius: 3px;
     border-radius: 3px;
-    font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+    font: 300 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
     height: 35px;
     display: -moz-inline-box;
     -moz-box-orient: vertical;
@@ -1314,8 +1316,10 @@ form {
     zoom: 1;
     *display: inline;
     *vertical-align: auto;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    vertical-align: top; }
+    vertical-align: top;
+    -webkit-font-smoothing: antialiased; }
     form input[type="submit"]:hover {
       cursor: pointer;
       background-color: #108ec7;
@@ -1471,20 +1475,11 @@ footer {
               opacity: 0.7; }
 
 header.global {
+  background: rgba(245, 245, 245, 0.9);
   border-bottom: 1px solid #bebebe;
   -webkit-box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
   box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
-  background-image: -webkit-linear-gradient(-90deg, white, #ebebeb);
-  background-image: -moz-linear-gradient(-90deg, white, #ebebeb);
-  background-image: -ms-linear-gradient(-90deg, white, #ebebeb);
-  background-image: -o-linear-gradient(-90deg, white, #ebebeb);
-  background-image: linear-gradient(-90deg, white, #ebebeb);
-  background-image: -webkit-linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
-  background-image: -moz-linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
-  background-image: -ms-linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
-  background-image: -o-linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
-  background-image: linear-gradient(-90deg, white, rgba(235, 235, 235, 0.9));
   height: 68px;
   position: relative;
   width: 100%;
@@ -2235,7 +2230,7 @@ header.global {
       padding: 0px;
       width: 560px; }
   .modal .inner-wrapper {
-    background: #f0f0f0;
+    background: #f5f5f5;
     -webkit-border-radius: 0px;
     -moz-border-radius: 0px;
     -ms-border-radius: 0px;
@@ -2436,9 +2431,20 @@ header.global {
 .home {
   margin: 0px 0px 100px; }
   .home > header {
+    background-image: url("/static/images/shot-5-large.jpg");
+    background-image: url("/static/images/shot-5-large.jpg");
+    background-image: url("/static/images/shot-5-large.jpg");
+    background-image: url("/static/images/shot-5-large.jpg");
+    background-image: url("/static/images/shot-5-large.jpg");
+    background-size: cover;
+    border-bottom: 1px solid #505050;
+    -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 5px 0 rgba(0, 0, 0, 0.1);
     zoom: 1;
-    min-height: 335px;
-    padding: 60px 0px 50px;
+    margin-top: -69px;
+    min-height: 300px;
+    padding: 129px 0px 50px;
     width: 100%; }
     .home > header:before, .home > header:after {
       content: "";
@@ -2450,7 +2456,8 @@ header.global {
       margin: 0 auto;
       position: relative; }
     .home > header h1 {
-      text-align: left; }
+      color: white;
+      text-align: center; }
     .home > header a {
       border: 1px solid #002e88;
       border-bottom: 1px solid #001e5f;
@@ -2485,17 +2492,14 @@ header.global {
       -ms-border-radius: 3px;
       -o-border-radius: 3px;
       border-radius: 3px;
-      display: -moz-inline-box;
-      -moz-box-orient: vertical;
-      display: inline-block;
-      vertical-align: baseline;
-      zoom: 1;
-      *display: inline;
-      *vertical-align: auto;
-      font: italic 1.2rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+      display: block;
+      font: italic 1.4rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
+      letter-spacing: 1px;
+      margin: 0 auto;
       padding: 15px 0px;
       text-transform: uppercase;
       text-align: center;
+      -webkit-font-smoothing: antialiased;
       width: 23.482%; }
       .home > header a:hover {
         cursor: pointer;
@@ -2510,6 +2514,8 @@ header.global {
         -webkit-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
         -moz-box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white;
         box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
+      .home > header a:hover {
+        color: white; }
   .home .university-partners {
     background-image: -webkit-linear-gradient(180deg, rgba(245, 245, 245, 0) 0%, #f5f5f5 50%, rgba(245, 245, 245, 0) 100%);
     background-image: -moz-linear-gradient(180deg, rgba(245, 245, 245, 0) 0%, #f5f5f5 50%, rgba(245, 245, 245, 0) 100%);
@@ -2718,26 +2724,20 @@ header.global {
       background-image: -ms-linear-gradient(-90deg, #fafafa, #e6e6e6);
       background-image: -o-linear-gradient(-90deg, #fafafa, #e6e6e6);
       background-image: linear-gradient(-90deg, #fafafa, #e6e6e6);
-      border: 1px solid #d2d2d2;
-      border-top: none;
-      -webkit-border-bottom-left-radius: 4px;
-      -moz-border-bottom-left-radius: 4px;
-      -moz-border-radius-bottomleft: 4px;
-      -ms-border-bottom-left-radius: 4px;
-      -o-border-bottom-left-radius: 4px;
-      border-bottom-left-radius: 4px;
-      -webkit-border-bottom-right-radius: 4px;
-      -moz-border-bottom-right-radius: 4px;
-      -moz-border-radius-bottomright: 4px;
-      -ms-border-bottom-right-radius: 4px;
-      -o-border-bottom-right-radius: 4px;
-      border-bottom-right-radius: 4px;
-      -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-      -moz-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+      border: 1px solid #c8c8c8;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -ms-border-radius: 4px;
+      -o-border-radius: 4px;
+      border-radius: 4px;
+      border-top-color: #bebebe;
+      -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 0px 12px 0 rgba(0, 0, 0, 0.2);
+      -moz-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 0px 12px 0 rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4), 0 0px 12px 0 rgba(0, 0, 0, 0.2);
       color: #a0a0a0;
       letter-spacing: 1px;
       margin-bottom: 0px;
+      margin-top: -15px;
       padding: 15px 10px;
       text-align: center;
       text-transform: uppercase;
