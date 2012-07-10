@@ -19,6 +19,7 @@ Longer TODO:
    multiple sites, but we do need a way to map their data assets.
 """
 import sys
+import os
 import tempfile
 import glob2
 
@@ -167,19 +168,17 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles" 
+STATIC_ROOT = ENV_ROOT / "staticfiles"
 
-# FIXME: We should iterate through the courses we have, adding the static 
-#        contents for each of them. (Right now we just use symlinks.)
 STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
-    ("circuits", DATA_DIR / "images"),
-    ("handouts", DATA_DIR / "handouts"),
-    ("subs", DATA_DIR / "subs"),
 
-# This is how you would use the textbook images locally
-#    ("book", ENV_ROOT / "book_images")
+] + [
+    # TODO (cpennington): When courses are stored in a database, this
+    # should no longer be added to STATICFILES
+    (course_dir, DATA_DIR / course_dir)
+    for course_dir in os.listdir(DATA_DIR)
 ]
 
 # Locale/Internationalization

@@ -115,7 +115,9 @@ class XMLModuleStore(ModuleStore):
                     MakoDescriptorSystem.__init__(self, **system_kwargs)
                     XMLParsingSystem.__init__(self, **system_kwargs)
 
-            return ImportSystem(self).process_xml(etree.tostring(course_data))
+            course_descriptor = ImportSystem(self).process_xml(etree.tostring(course_data))
+            course_descriptor.metadata['data_dir'] = course_dir
+            return course_descriptor
 
     def get_item(self, location):
         """
