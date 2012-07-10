@@ -1,3 +1,4 @@
+from util.json_request import expect_json
 import json
 
 from django.http import HttpResponse
@@ -43,6 +44,7 @@ def edit_item(request):
     })
 
 
+@expect_json
 def save_item(request):
     item_id = request.POST['id']
     data = json.loads(request.POST['data'])
