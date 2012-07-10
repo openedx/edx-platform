@@ -1,6 +1,7 @@
 from path import path
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from fs.errors import ResourceNotFoundError
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
@@ -51,7 +52,7 @@ class CourseDescriptor(SequenceDescriptor):
             try:
                 with self.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
                     return htmlFile.read()
-            except IOError:
+            except ResourceNotFoundError:
                 return "! About section missing !"
         elif section_key == "title":
             return self.metadata.get('display_name', self.name)
@@ -79,7 +80,7 @@ class CourseDescriptor(SequenceDescriptor):
             try:
                 with self.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
                     return htmlFile.read()
-            except IOError:
+            except ResourceNotFoundError:
                 return "! About section missing !"
 
         raise KeyError("Invalid about key " + str(section_key))
