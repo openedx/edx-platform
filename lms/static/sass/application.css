@@ -467,7 +467,7 @@ a:link, a:visited {
   .container:after {
     clear: both; }
 
-.faded-hr-divider, .horizontal-divider, .modal .inner-wrapper header hr::after, .modal .inner-wrapper form .honor-code-summary hr::after, .course-info .container nav::after, .course-info .details .inner-wrapper > section::after, .course-info .details .course-staff .teacher::after, .about > nav::after {
+.faded-hr-divider, .horizontal-divider, .modal .inner-wrapper header hr::after, .modal .inner-wrapper form .honor-code-summary hr::after, .course-info .container nav::after, .course-info .details .inner-wrapper > section::after, .course-info .details .course-staff .teacher::after, .container.about > nav::after {
   background-image: -webkit-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -moz-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -ms-linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
@@ -1971,7 +1971,7 @@ header.global {
           top: 0px; }
           .highlighted-courses .courses .course header.course-preview > a hgroup h2, .find-courses .courses .course header.course-preview > a hgroup h2 {
             color: #3c3c3c;
-            font: bold 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
+            font: 800 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
             padding-top: 10px;
             text-shadow: 0 1px rgba(255, 255, 255, 0.6);
             text-overflow: ellipsis;
@@ -2850,140 +2850,95 @@ header.global {
 
 .dashboard {
   zoom: 1;
-  margin: 40px 10px; }
+  padding: 60px 0px 120px; }
   .dashboard:before, .dashboard:after {
     content: "";
     display: table; }
   .dashboard:after {
     clear: both; }
-  .dashboard .sidebar, .dashboard section.course-index {
-    background: #fafafa;
-    border: 1px solid #dcdcdc;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -ms-border-radius: 4px;
-    -o-border-radius: 4px;
-    border-radius: 4px;
+  .dashboard .profile-sidebar {
+    background: transparent;
     float: left;
-    width: 250px; }
-    @media screen and (max-width: 768px) {
-      .dashboard .sidebar, .dashboard section.course-index {
-        float: none;
-        margin: 0 0 30px 0;
-        position: static;
-        width: 100%; } }
-    .dashboard .sidebar header.profile .user-info, .dashboard section.course-index header.profile .user-info {
-      zoom: 1;
-      padding: 10px; }
-      .dashboard .sidebar header.profile .user-info:before, .dashboard section.course-index header.profile .user-info:before, .dashboard .sidebar header.profile .user-info:after, .dashboard section.course-index header.profile .user-info:after {
-        content: "";
-        display: table; }
-      .dashboard .sidebar header.profile .user-info:after, .dashboard section.course-index header.profile .user-info:after {
-        clear: both; }
-      .dashboard .sidebar header.profile .user-info .avatar, .dashboard section.course-index header.profile .user-info .avatar {
-        background: #dcdcdc;
-        border: 1px solid #b4b4b4;
-        -webkit-border-radius: 4px;
-        -moz-border-radius: 4px;
-        -ms-border-radius: 4px;
-        -o-border-radius: 4px;
-        border-radius: 4px;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        margin: 0 0 15px 0;
-        max-width: 100%;
-        overflow: hidden; }
-        @media screen and (max-width: 768px) {
-          .dashboard .sidebar header.profile .user-info .avatar, .dashboard section.course-index header.profile .user-info .avatar {
-            margin: 0px;
-            margin-right: 2.024%;
-            position: absolute;
-            width: 100px; } }
-        .dashboard .sidebar header.profile .user-info .avatar img, .dashboard section.course-index header.profile .user-info .avatar img {
-          -webkit-border-radius: 4px;
-          -moz-border-radius: 4px;
-          -ms-border-radius: 4px;
-          -o-border-radius: 4px;
-          border-radius: 4px;
-          display: block;
-          max-width: 100%; }
-      @media screen and (max-width: 768px) {
-        .dashboard .sidebar header.profile .user-info .info, .dashboard section.course-index header.profile .user-info .info {
-          -webkit-box-sizing: border-box;
-          -moz-box-sizing: border-box;
-          box-sizing: border-box;
-          float: left;
-          min-height: 100px;
-          padding-left: 110px;
-          width: 100%; } }
-      .dashboard .sidebar header.profile .user-info .info h2, .dashboard section.course-index header.profile .user-info .info h2 {
-        border-bottom: 1px solid #c8c8c8;
-        -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.4);
-        -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.4);
-        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.4);
-        font: bold 1.2rem/1.4rem "Open Sans", Verdana, Geneva, sans-serif;
-        margin-bottom: 15px;
-        overflow: hidden;
-        padding-bottom: 15px;
-        text-align: center;
-        text-wrap: nowrap;
-        text-overflow: ellipsis; }
-        @media screen and (max-width: 768px) {
-          .dashboard .sidebar header.profile .user-info .info h2, .dashboard section.course-index header.profile .user-info .info h2 {
-            text-align: left; } }
-      .dashboard .sidebar header.profile .user-info .info > ul, .dashboard section.course-index header.profile .user-info .info > ul {
-        zoom: 1;
-        margin: 0px;
-        padding: 0 0 10px 0; }
-        .dashboard .sidebar header.profile .user-info .info > ul:before, .dashboard section.course-index header.profile .user-info .info > ul:before, .dashboard .sidebar header.profile .user-info .info > ul:after, .dashboard section.course-index header.profile .user-info .info > ul:after {
-          content: "";
-          display: table; }
-        .dashboard .sidebar header.profile .user-info .info > ul:after, .dashboard section.course-index header.profile .user-info .info > ul:after {
-          clear: both; }
-        @media screen and (max-width: 768px) {
-          .dashboard .sidebar header.profile .user-info .info > ul, .dashboard section.course-index header.profile .user-info .info > ul {
-            padding: 0px; } }
-        .dashboard .sidebar header.profile .user-info .info > ul li, .dashboard section.course-index header.profile .user-info .info > ul li {
-          list-style: none;
-          margin-bottom: 10px; }
-          @media screen and (max-width: 768px) {
-            .dashboard .sidebar header.profile .user-info .info > ul li, .dashboard section.course-index header.profile .user-info .info > ul li {
-              float: left;
-              margin-right: 10px; } }
-          .dashboard .sidebar header.profile .user-info .info > ul li:last-child, .dashboard section.course-index header.profile .user-info .info > ul li:last-child {
-            margin-bottom: 0px; }
-          .dashboard .sidebar header.profile .user-info .info > ul li h3, .dashboard section.course-index header.profile .user-info .info > ul li h3 {
-            color: #a0a0a0;
-            font: bold 1rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif;
-            text-shadow: 0 1px rgba(255, 255, 255, 0.8); }
-            .dashboard .sidebar header.profile .user-info .info > ul li h3 span, .dashboard section.course-index header.profile .user-info .info > ul li h3 span {
-              font-weight: normal;
-              text-transform: none; }
-  .dashboard .my-courses {
-    margin: 0px;
-    padding-left: 270px; }
-    @media screen and (max-width: 768px) {
-      .dashboard .my-courses {
-        padding: 0px; } }
-    @media only screen and (max-width: 768px) {
-      .dashboard .my-courses {
-        float: none;
-        width: 100%; } }
-    .dashboard .my-courses .empty-dashboard-message {
-      background: #fafafa;
-      border: 1px solid #d2d2d2;
+    margin-right: 2.024%;
+    width: 23.482%; }
+    .dashboard .profile-sidebar header.profile h1.user-name {
+      border: 1px solid #c8c8c8;
       -webkit-border-radius: 4px;
       -moz-border-radius: 4px;
       -ms-border-radius: 4px;
       -o-border-radius: 4px;
       border-radius: 4px;
-      padding: 40px 0px;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      color: #3c3c3c;
+      font: bold 1.4rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
+      margin: 0px;
+      overflow: hidden;
+      padding: 15px 10px 17px;
+      text-wrap: nowrap;
+      text-overflow: ellipsis;
+      text-transform: none;
+      width: 100%; }
+    .dashboard .profile-sidebar header.profile .user-info {
+      zoom: 1;
+      padding: 0px 10px; }
+      .dashboard .profile-sidebar header.profile .user-info:before, .dashboard .profile-sidebar header.profile .user-info:after {
+        content: "";
+        display: table; }
+      .dashboard .profile-sidebar header.profile .user-info:after {
+        clear: both; }
+      .dashboard .profile-sidebar header.profile .user-info > ul {
+        background: #fafafa;
+        border: 1px solid #dcdcdc;
+        border-top: none;
+        -webkit-border-bottom-left-radius: 4px;
+        -moz-border-bottom-left-radius: 4px;
+        -moz-border-radius-bottomleft: 4px;
+        -ms-border-bottom-left-radius: 4px;
+        -o-border-bottom-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        -webkit-border-bottom-right-radius: 4px;
+        -moz-border-bottom-right-radius: 4px;
+        -moz-border-radius-bottomright: 4px;
+        -ms-border-bottom-right-radius: 4px;
+        -o-border-bottom-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        zoom: 1;
+        margin: 0px;
+        padding: 0px 10px 20px;
+        width: 100%; }
+        .dashboard .profile-sidebar header.profile .user-info > ul:before, .dashboard .profile-sidebar header.profile .user-info > ul:after {
+          content: "";
+          display: table; }
+        .dashboard .profile-sidebar header.profile .user-info > ul:after {
+          clear: both; }
+        .dashboard .profile-sidebar header.profile .user-info > ul li {
+          list-style: none; }
+          .dashboard .profile-sidebar header.profile .user-info > ul li p {
+            color: #a0a0a0;
+            font: 300 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
+            text-shadow: 0 1px rgba(255, 255, 255, 0.8); }
+            .dashboard .profile-sidebar header.profile .user-info > ul li p span {
+              font-weight: 700;
+              margin-left: 5px;
+              text-transform: none; }
+  .dashboard .my-courses {
+    float: left;
+    margin: 0px;
+    width: 74.494%; }
+    .dashboard .my-courses .empty-dashboard-message {
+      border-top: 1px solid #d2d2d2;
+      padding: 80px 0px;
       text-align: center; }
       .dashboard .my-courses .empty-dashboard-message p {
         color: #a0a0a0;
         font-style: italic;
-        text-shadow: 0 1px rgba(255, 255, 255, 0.6); }
+        text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+        -webkit-font-smoothing: antialiased; }
         .dashboard .my-courses .empty-dashboard-message p a {
           background: #f0f0f0;
           background-image: -webkit-linear-gradient(-90deg, #f5f5f5 0%, #f3f3f3 50%, #ededed 50%, #ebebeb 100%);
@@ -3017,19 +2972,26 @@ header.global {
           text-shadow: 0 1px rgba(255, 255, 255, 0.6); }
     .dashboard .my-courses .my-course {
       background: #fafafa;
-      border: 1px solid #dcdcdc;
+      background-image: -webkit-linear-gradient(-90deg, #fdfdfd, #f3f3f3);
+      background-image: -moz-linear-gradient(-90deg, #fdfdfd, #f3f3f3);
+      background-image: -ms-linear-gradient(-90deg, #fdfdfd, #f3f3f3);
+      background-image: -o-linear-gradient(-90deg, #fdfdfd, #f3f3f3);
+      background-image: linear-gradient(-90deg, #fdfdfd, #f3f3f3);
+      border: 1px solid #bebebe;
       -webkit-border-radius: 3px;
       -moz-border-radius: 3px;
       -ms-border-radius: 3px;
       -o-border-radius: 3px;
       border-radius: 3px;
+      -webkit-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1), inset 0 -1px 0 0 rgba(255, 255, 255, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+      -moz-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1), inset 0 -1px 0 0 rgba(255, 255, 255, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+      box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1), inset 0 -1px 0 0 rgba(255, 255, 255, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
-      float: left;
+      zoom: 1;
       font-size: 0em;
       margin-right: 2.024%;
-      min-height: 120px;
       margin-bottom: 25px;
       overflow: hidden;
       position: relative;
@@ -3054,39 +3016,36 @@ header.global {
       -ms-transition-delay: 0;
       -o-transition-delay: 0;
       transition-delay: 0; }
-      @media only screen and (max-width: 768px) {
-        .dashboard .my-courses .my-course {
-          float: none;
-          margin-right: 0px;
-          width: 100%; } }
+      .dashboard .my-courses .my-course:before, .dashboard .my-courses .my-course:after {
+        content: "";
+        display: table; }
+      .dashboard .my-courses .my-course:after {
+        clear: both; }
       .dashboard .my-courses .my-course:last-child {
         margin-bottom: none; }
-      .dashboard .my-courses .my-course > a {
-        zoom: 1;
-        display: block;
-        padding: 10px;
-        position: relative; }
-        .dashboard .my-courses .my-course > a:before, .dashboard .my-courses .my-course > a:after {
-          content: "";
-          display: table; }
-        .dashboard .my-courses .my-course > a:after {
-          clear: both; }
       .dashboard .my-courses .my-course .cover {
         background: #e1e1e1;
-        border: 1px solid #969696;
-        -webkit-border-radius: 4px;
-        -moz-border-radius: 4px;
-        -ms-border-radius: 4px;
-        -o-border-radius: 4px;
-        border-radius: 4px;
-        -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-        -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+        background-size: cover;
+        background-position: center center;
+        border-right: 1px solid #969696;
+        -webkit-border-top-left-radius: 3px;
+        -moz-border-top-left-radius: 3px;
+        -moz-border-radius-topleft: 3px;
+        -ms-border-top-left-radius: 3px;
+        -o-border-top-left-radius: 3px;
+        border-top-left-radius: 3px;
+        -webkit-border-bottom-left-radius: 3px;
+        -moz-border-bottom-left-radius: 3px;
+        -moz-border-radius-bottomleft: 3px;
+        -ms-border-bottom-left-radius: 3px;
+        -o-border-bottom-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+        -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 1px 0 0 0 rgba(255, 255, 255, 0.8);
+        -moz-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 1px 0 0 0 rgba(255, 255, 255, 0.8);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 1px 0 0 0 rgba(255, 255, 255, 0.8);
         float: left;
-        height: 100px;
+        height: 120px;
         margin: 0px;
-        opacity: 0.8;
-        overflow: hidden;
         position: relative;
         -webkit-transition-property: all;
         -moz-transition-property: all;
@@ -3108,12 +3067,13 @@ header.global {
         -ms-transition-delay: 0;
         -o-transition-delay: 0;
         transition-delay: 0;
-        width: 100px; }
-        @media only screen and (max-width: 320px) {
-          .dashboard .my-courses .my-course .cover {
-            display: none; } }
+        width: 200px; }
         .dashboard .my-courses .my-course .cover .shade {
-          background: rgba(0, 0, 0, 0.3);
+          background-image: -webkit-linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
+          background-image: -moz-linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
+          background-image: -ms-linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
+          background-image: -o-linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
+          background-image: linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
           -webkit-border-radius: 4px;
           -moz-border-radius: 4px;
           -ms-border-radius: 4px;
@@ -3123,7 +3083,6 @@ header.global {
           content: "";
           display: block;
           left: 0px;
-          opacity: 0;
           position: absolute;
           top: 0px;
           -webkit-transition-property: all;
@@ -3148,19 +3107,21 @@ header.global {
           transition-delay: 0;
           right: 0px; }
         .dashboard .my-courses .my-course .cover .arrow {
-          border-top: 1px solid;
-          border-left: 1px solid;
-          border-color: white;
-          -webkit-box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.6);
-          -moz-box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.6);
-          box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.6);
+          border-top: 8px solid;
+          border-left: 8px solid;
+          border-color: rgba(0, 0, 0, 0.7);
+          -webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.8), -1px 0 1px 0 rgba(255, 255, 255, 0.8);
+          -moz-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.8), -1px 0 1px 0 rgba(255, 255, 255, 0.8);
+          box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.8), -1px 0 1px 0 rgba(255, 255, 255, 0.8);
           content: "";
           display: block;
           height: 55px;
-          left: 40px;
+          left: 50%;
+          margin-left: -10px;
+          margin-top: -30px;
           opacity: 0;
           position: absolute;
-          top: 23px;
+          top: 50%;
           -webkit-transform: rotate(-45deg);
           -moz-transform: rotate(-45deg);
           -ms-transform: rotate(-45deg);
@@ -3187,110 +3148,76 @@ header.global {
           -o-transition-delay: 0;
           transition-delay: 0;
           width: 55px; }
-        .dashboard .my-courses .my-course .cover img {
-          -webkit-border-radius: 4px;
-          -moz-border-radius: 4px;
-          -ms-border-radius: 4px;
-          -o-border-radius: 4px;
-          border-radius: 4px;
-          display: block;
-          min-height: 100%;
-          min-width: 100%;
-          width: 100%; }
+        .dashboard .my-courses .my-course .cover:hover .shade {
+          background: rgba(255, 255, 255, 0.1);
+          background-image: -webkit-linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
+          background-image: -moz-linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
+          background-image: -ms-linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
+          background-image: -o-linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%);
+          background-image: linear-gradient(-90deg, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.3) 100%); }
       .dashboard .my-courses .my-course .info {
-        left: 130px;
+        left: 201px;
+        padding: 0px 10px;
         position: absolute;
-        right: 10px;
-        top: 10px;
+        right: 0px;
+        top: 0px;
         z-index: 2; }
-        @media only screen and (max-width: 320px) {
-          .dashboard .my-courses .my-course .info {
-            margin: 0px; } }
         .dashboard .my-courses .my-course .info > hgroup {
+          border-bottom: 1px solid #d2d2d2;
+          -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+          -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+          box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+          margin-bottom: 20px;
+          padding: 15px 0px;
           width: 100%; }
-          @media only screen and (max-width: 320px) {
-            .dashboard .my-courses .my-course .info > hgroup {
-              margin: 0px; } }
           .dashboard .my-courses .my-course .info > hgroup h2 {
-            color: #3c3c3c;
-            font: bold 1.4rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
-            margin-bottom: 2px;
-            overflow: hidden;
-            text-shadow: 0 1px rgba(255, 255, 255, 0.6);
-            -webkit-transition-property: color;
-            -moz-transition-property: color;
-            -ms-transition-property: color;
-            -o-transition-property: color;
-            transition-property: color;
-            -webkit-transition-duration: 0.15s;
-            -moz-transition-duration: 0.15s;
-            -ms-transition-duration: 0.15s;
-            -o-transition-duration: 0.15s;
-            transition-duration: 0.15s;
-            -webkit-transition-timing-function: linear;
-            -moz-transition-timing-function: linear;
-            -ms-transition-timing-function: linear;
-            -o-transition-timing-function: linear;
-            transition-timing-function: linear;
-            -webkit-transition-delay: 0;
-            -moz-transition-delay: 0;
-            -ms-transition-delay: 0;
-            -o-transition-delay: 0;
-            transition-delay: 0;
-            text-overflow: ellipsis;
-            white-space: nowrap; }
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto;
+            margin-bottom: 0px;
+            vertical-align: middle; }
+            .dashboard .my-courses .my-course .info > hgroup h2 a {
+              color: #3c3c3c;
+              font: 800 1.6rem/2rem "Open Sans", Verdana, Geneva, sans-serif;
+              text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+              text-overflow: ellipsis;
+              white-space: nowrap; }
+              .dashboard .my-courses .my-course .info > hgroup h2 a:hover {
+                color: #1d9dd9;
+                text-decoration: underline; }
           .dashboard .my-courses .my-course .info > hgroup h3 {
-            color: #a0a0a0;
-            font: italic bold 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
-            overflow: hidden;
-            text-shadow: 0 1px rgba(255, 255, 255, 0.6);
-            text-overflow: ellipsis;
-            white-space: nowrap; }
-        .dashboard .my-courses .my-course .info .edit, .dashboard .my-courses .my-course .info .register {
-          border: 1px solid #dcdcdc;
-          background: #e6e6e6;
-          color: #a0a0a0;
-          display: block;
-          font: normal 12px/14px "Open Sans", Verdana, Geneva, sans-serif;
-          padding: 6px 10px;
-          position: absolute;
-          right: 0px;
-          top: 0px;
-          -webkit-transition-property: all;
-          -moz-transition-property: all;
-          -ms-transition-property: all;
-          -o-transition-property: all;
-          transition-property: all;
-          -webkit-transition-duration: 0.15s;
-          -moz-transition-duration: 0.15s;
-          -ms-transition-duration: 0.15s;
-          -o-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-          -webkit-transition-timing-function: linear;
-          -moz-transition-timing-function: linear;
-          -ms-transition-timing-function: linear;
-          -o-transition-timing-function: linear;
-          transition-timing-function: linear;
-          -webkit-transition-delay: 0;
-          -moz-transition-delay: 0;
-          -ms-transition-delay: 0;
-          -o-transition-delay: 0;
-          transition-delay: 0; }
-          @media only screen and (max-width: 320px) {
-            .dashboard .my-courses .my-course .info .edit, .dashboard .my-courses .my-course .info .register {
-              display: none; } }
-          .dashboard .my-courses .my-course .info .edit:hover, .dashboard .my-courses .my-course .info .register:hover {
-            background: white;
-            color: #1d9dd9; }
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto;
+            margin-right: 10px;
+            vertical-align: middle; }
+            .dashboard .my-courses .my-course .info > hgroup h3 a {
+              background: white;
+              border: 1px solid #b4b4b4;
+              -webkit-border-radius: 3px;
+              -moz-border-radius: 3px;
+              -ms-border-radius: 3px;
+              -o-border-radius: 3px;
+              border-radius: 3px;
+              -webkit-box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.2), 0 1px 0 0 rgba(255, 255, 255, 0.6);
+              -moz-box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.2), 0 1px 0 0 rgba(255, 255, 255, 0.6);
+              box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.2), 0 1px 0 0 rgba(255, 255, 255, 0.6);
+              color: #a0a0a0;
+              display: block;
+              font: italic 800 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
+              padding: 5px 10px; }
+              .dashboard .my-courses .my-course .info > hgroup h3 a:hover {
+                color: #1d9dd9; }
         .dashboard .my-courses .my-course .info .meta {
-          border-top: 1px solid #c8c8c8;
-          -webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
-          -moz-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
-          box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
-          font-size: 1rem;
-          height: 34px;
-          margin-top: 10px;
-          opacity: 0.9;
+          zoom: 1;
           position: relative;
           -webkit-transition-property: opacity;
           -moz-transition-property: opacity;
@@ -3313,101 +3240,93 @@ header.global {
           -o-transition-delay: 0;
           transition-delay: 0;
           width: 100%; }
-          .dashboard .my-courses .my-course .info .meta:hover {
-            opacity: 0.9; }
-          .dashboard .my-courses .my-course .info .meta > * {
-            height: 18px;
-            position: absolute;
-            top: 15px; }
-          .dashboard .my-courses .my-course .info .meta p + p {
-            margin-top: 0px; }
+          .dashboard .my-courses .my-course .info .meta:before, .dashboard .my-courses .my-course .info .meta:after {
+            content: "";
+            display: table; }
+          .dashboard .my-courses .my-course .info .meta:after {
+            clear: both; }
+          .dashboard .my-courses .my-course .info .meta .course-work-icon {
+            background: #c8c8c8;
+            float: left;
+            font: 300 1.2rem/1.6rem "Open Sans", Verdana, Geneva, sans-serif;
+            height: 22px;
+            width: 22px; }
           .dashboard .my-courses .my-course .info .meta .complete {
-            left: 0px; }
+            float: right;
+            padding-top: 2px; }
             .dashboard .my-courses .my-course .info .meta .complete p {
-              font: normal 1rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif; }
-              .dashboard .my-courses .my-course .info .meta .complete p span {
-                color: #3c3c3c;
-                font-family: "Open Sans", Verdana, Geneva, sans-serif;
-                margin-left: 3px; }
-          .dashboard .my-courses .my-course .info .meta .dates p {
-            color: #a0a0a0;
-            font: normal 1rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
-            display: -moz-inline-box;
-            -moz-box-orient: vertical;
-            display: inline-block;
-            vertical-align: baseline;
-            zoom: 1;
-            *display: inline;
-            *vertical-align: auto;
-            text-align: right; }
-            .dashboard .my-courses .my-course .info .meta .dates p:first-child {
-              border-right: 1px solid #c8c8c8;
-              margin-right: 10px;
-              padding-right: 10px; }
-            .dashboard .my-courses .my-course .info .meta .dates p time {
-              color: #3c3c3c;
-              font-family: "Open Sans", Verdana, Geneva, sans-serif;
-              margin-left: 3px; }
-          .dashboard .my-courses .my-course .info .meta .end-date {
-            border-left: 1px solid #c8c8c8;
-            right: 0px;
-            padding-left: 15px; }
-            @media only screen and (max-width: 320px) {
-              .dashboard .my-courses .my-course .info .meta .end-date {
-                display: none; } }
-            .dashboard .my-courses .my-course .info .meta .end-date p {
               color: #a0a0a0;
-              font: normal 1rem/1.6rem Georgia, Cambria, "Times New Roman", Times, serif;
-              text-align: right; }
-              .dashboard .my-courses .my-course .info .meta .end-date p time {
+              font: italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
+              display: -moz-inline-box;
+              -moz-box-orient: vertical;
+              display: inline-block;
+              vertical-align: baseline;
+              zoom: 1;
+              *display: inline;
+              *vertical-align: auto;
+              text-align: right;
+              text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+              -webkit-font-smoothing: antialiased; }
+              .dashboard .my-courses .my-course .info .meta .complete p .completeness {
                 color: #3c3c3c;
-                font-family: "Open Sans", Verdana, Geneva, sans-serif;
-                margin-left: 3px; }
+                font: 700 1.2rem/1.4rem "Open Sans", Verdana, Geneva, sans-serif;
+                margin-right: 5px; }
           .dashboard .my-courses .my-course .info .meta .progress, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done {
             -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-            left: 90px;
-            right: 140px; }
-            @media only screen and (max-width: 320px) {
-              .dashboard .my-courses .my-course .info .meta .progress, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done {
-                right: 0px; } }
+            left: 40px;
+            position: absolute;
+            right: 110px; }
             .dashboard .my-courses .my-course .info .meta .progress .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done .meter {
-              background: #e6e6e6;
-              border: 1px solid #c8c8c8;
-              -webkit-border-radius: 3px;
-              -moz-border-radius: 3px;
-              -ms-border-radius: 3px;
-              -o-border-radius: 3px;
-              border-radius: 3px;
+              background: #f5f5f5;
+              border: 1px solid #a0a0a0;
+              -webkit-box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.15);
+              -moz-box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.15);
+              box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.15);
               -webkit-box-sizing: border-box;
               -moz-box-sizing: border-box;
               box-sizing: border-box;
-              height: 100%;
-              padding: 2px; }
+              -webkit-border-radius: 4px;
+              -moz-border-radius: 4px;
+              -ms-border-radius: 4px;
+              -o-border-radius: 4px;
+              border-radius: 4px;
+              height: 22px;
+              margin: 0 auto;
+              padding: 2px;
+              width: 100%; }
               .dashboard .my-courses .my-course .info .meta .progress .meter .meter-fill, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none .meter .meter-fill, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none .meter .meter-fill, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some .meter .meter-fill, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some .meter .meter-fill, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done .meter .meter-fill, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done .meter .meter-fill {
-                -webkit-border-radius: 3px;
-                -moz-border-radius: 3px;
-                -ms-border-radius: 3px;
-                -o-border-radius: 3px;
-                border-radius: 3px;
-                background: #d2d2d2;
+                background: #787878;
+                background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%);
+                background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%);
+                background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%);
+                background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%);
+                background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%);
+                background-size: 40px 40px;
+                background-repeat: repeat-x;
+                border: 1px solid #737373;
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                -ms-border-radius: 4px;
+                -o-border-radius: 4px;
+                border-radius: 4px;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                content: "";
+                display: block;
                 height: 100%;
                 width: 60%; }
-      .dashboard .my-courses .my-course:hover {
-        background: #f5f5f5;
-        -webkit-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.2);
-        -moz-box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.2);
-        box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.2); }
-        .dashboard .my-courses .my-course:hover .edit {
-          background: #dcdcdc;
-          border-color: #bebebe; }
-        .dashboard .my-courses .my-course:hover .cover {
+      .dashboard .my-courses .my-course:hover .edit {
+        background: #dcdcdc;
+        border-color: #bebebe; }
+      .dashboard .my-courses .my-course:hover .cover {
+        opacity: 1; }
+        .dashboard .my-courses .my-course:hover .cover .shade, .dashboard .my-courses .my-course:hover .cover .arrow {
           opacity: 1; }
-          .dashboard .my-courses .my-course:hover .cover .shade, .dashboard .my-courses .my-course:hover .cover .arrow {
-            opacity: 1; }
-        .dashboard .my-courses .my-course:hover .meta {
-          opacity: 0.9; }
+      .dashboard .my-courses .my-course:hover .meta {
+        opacity: 0.9; }
 
 nav.course-material {
   background: #d2d2d2;
@@ -4085,16 +4004,16 @@ nav.course-material {
           font-weight: bold;
           margin-bottom: 15px; }
 
-.about {
-  margin: 20px auto 120px; }
-  .about > nav {
+.container.about {
+  padding: 20px 0 120px; }
+  .container.about > nav {
     margin-bottom: 80px;
     text-align: center;
     width: 100%; }
-    .about > nav::after {
+    .container.about > nav::after {
       content: "";
       display: block; }
-    .about > nav a {
+    .container.about > nav a {
       border-bottom: 3px solid transparent;
       color: #a0a0a0;
       font: italic 1.2rem/1.4rem Georgia, Cambria, "Times New Roman", Times, serif;
@@ -4129,55 +4048,55 @@ nav.course-material {
       -o-transition-delay: 0;
       transition-delay: 0;
       text-transform: lowercase; }
-      .about > nav a:hover, .about > nav a.active, .about > nav nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li .about > nav a.seq_video_active, .about > nav nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li .about > nav a.seq_other_active, .about > nav nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li .about > nav a.seq_vertical_active, .about > nav nav.sequence-nav ol li a.seq_problem_active, nav.sequence-nav ol li .about > nav a.seq_problem_active {
+      .container.about > nav a:hover, .container.about > nav a.active, .container.about > nav nav.sequence-nav ol li a.seq_video_active, nav.sequence-nav ol li .container.about > nav a.seq_video_active, .container.about > nav nav.sequence-nav ol li a.seq_other_active, nav.sequence-nav ol li .container.about > nav a.seq_other_active, .container.about > nav nav.sequence-nav ol li a.seq_vertical_active, nav.sequence-nav ol li .container.about > nav a.seq_vertical_active, .container.about > nav nav.sequence-nav ol li a.seq_problem_active, nav.sequence-nav ol li .container.about > nav a.seq_problem_active {
         border-color: #c8c8c8;
         color: #3c3c3c; }
-  .about .vision h1 + hr {
+  .container.about .vision h1 + hr {
     margin-bottom: 80px; }
-  .about .vision .message {
+  .container.about .vision .message {
     zoom: 1;
     margin-bottom: 60px;
     padding-bottom: 60px;
     position: relative; }
-    .about .vision .message:before, .about .vision .message:after {
+    .container.about .vision .message:before, .container.about .vision .message:after {
       content: "";
       display: table; }
-    .about .vision .message:after {
+    .container.about .vision .message:after {
       clear: both; }
-    .about .vision .message hr {
+    .container.about .vision .message hr {
       bottom: 0px;
       margin: 0px;
       position: absolute;
       width: 100%; }
-    .about .vision .message .photo {
+    .container.about .vision .message .photo {
       background: white;
       border: 1px solid #d2d2d2;
       padding: 1px;
       width: 31.984%; }
-      .about .vision .message .photo img {
+      .container.about .vision .message .photo img {
         background: #f5f5f5;
         display: block;
         height: 200px;
         width: 100%; }
-    .about .vision .message.left .photo {
+    .container.about .vision .message.left .photo {
       float: left;
       margin-right: 2.024%; }
-    .about .vision .message.right h2 {
+    .container.about .vision .message.right h2 {
       text-align: right; }
-    .about .vision .message.right .photo {
+    .container.about .vision .message.right .photo {
       float: right;
       margin-left: 2.024%; }
-    .about .vision .message:last-child {
+    .container.about .vision .message:last-child {
       margin-bottom: 0px; }
-  .about .faq {
+  .container.about .faq {
     display: none;
     zoom: 1; }
-    .about .faq:before, .about .faq:after {
+    .container.about .faq:before, .container.about .faq:after {
       content: "";
       display: table; }
-    .about .faq:after {
+    .container.about .faq:after {
       clear: both; }
-    .about .faq nav.categories {
+    .container.about .faq nav.categories {
       border-right: 1px solid #dcdcdc;
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
@@ -4186,49 +4105,49 @@ nav.course-material {
       margin-right: 2.024%;
       padding-right: 20px;
       width: 23.482%; }
-      .about .faq nav.categories a {
+      .container.about .faq nav.categories a {
         display: block;
         letter-spacing: 1px;
         margin-right: -20px;
         padding: 10px 20px 10px 0;
         text-align: right;
         text-transform: uppercase; }
-        .about .faq nav.categories a:hover {
+        .container.about .faq nav.categories a:hover {
           background: #f5f5f5; }
-    .about .faq .responses {
+    .container.about .faq .responses {
       float: left;
       width: 74.494%; }
-      .about .faq .responses .category {
+      .container.about .faq .responses .category {
         padding-top: 40px; }
-        .about .faq .responses .category:first-child {
+        .container.about .faq .responses .category:first-child {
           padding-top: 0px; }
-        .about .faq .responses .category > h2 {
+        .container.about .faq .responses .category > h2 {
           border-bottom: 1px solid #dcdcdc;
           margin-bottom: 40px;
           padding-bottom: 20px; }
-      .about .faq .responses .response {
+      .container.about .faq .responses .response {
         margin-bottom: 40px; }
-        .about .faq .responses .response h3 {
+        .container.about .faq .responses .response h3 {
           font-family: "Open Sans", Verdana, Geneva, sans-serif;
           font-weight: bold;
           margin-bottom: 15px; }
-  .about .press {
+  .container.about .press {
     display: none; }
-    .about .press .press-story {
+    .container.about .press .press-story {
       border-bottom: 1px solid #dcdcdc;
       zoom: 1;
       margin-bottom: 40px;
       padding-bottom: 40px; }
-      .about .press .press-story:before, .about .press .press-story:after {
+      .container.about .press .press-story:before, .container.about .press .press-story:after {
         content: "";
         display: table; }
-      .about .press .press-story:after {
+      .container.about .press .press-story:after {
         clear: both; }
-      .about .press .press-story:last-child {
+      .container.about .press .press-story:last-child {
         border: none;
         margin: 0px;
         padding: 0px; }
-      .about .press .press-story .article-cover {
+      .container.about .press .press-story .article-cover {
         background: white;
         border: 1px solid #787878;
         -webkit-box-sizing: border-box;
@@ -4239,35 +4158,35 @@ nav.course-material {
         margin-right: 2.024%;
         overflow: hidden;
         width: 14.98%; }
-        .about .press .press-story .article-cover img {
+        .container.about .press .press-story .article-cover img {
           display: block;
           min-height: 100%;
           width: 100%; }
-      .about .press .press-story .press-info {
+      .container.about .press .press-story .press-info {
         float: left;
         width: 82.996%; }
-        .about .press .press-story .press-info header {
+        .container.about .press .press-story .press-info header {
           margin-bottom: 15px; }
-          .about .press .press-story .press-info header h3 {
+          .container.about .press .press-story .press-info header h3 {
             font-family: "Open Sans", Verdana, Geneva, sans-serif;
             font-weight: bold; }
-  .about .contact {
+  .container.about .contact {
     display: none;
     zoom: 1;
     margin: 0 auto;
     width: 82.996%; }
-    .about .contact:before, .about .contact:after {
+    .container.about .contact:before, .container.about .contact:after {
       content: "";
       display: table; }
-    .about .contact:after {
+    .container.about .contact:after {
       clear: both; }
-    .about .contact .map {
+    .container.about .contact .map {
       background: #f5f5f5;
       float: left;
       height: 180px;
       margin-right: 2.024%;
       width: 48.988%; }
-    .about .contact .address {
+    .container.about .contact .address {
       float: left;
       width: 48.988%; }
 

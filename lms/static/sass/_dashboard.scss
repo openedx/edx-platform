@@ -1,105 +1,56 @@
 .dashboard {
   @include clearfix;
-  margin: 40px 10px;
+  padding: 60px 0px 120px;
 
-  .sidebar {
-    background: rgb(250,250,250);
-    border: 1px solid rgb(220,220,220);
-    @include border-radius(4px);
+  .profile-sidebar {
+    background: transparent;
     float: left;
-    width: 250px;
-
-    @media screen and (max-width: 768px) {
-      float: none;
-      margin: 0 0 30px 0;
-      position: static;
-      width: flex-grid(12);
-    }
+    margin-right: flex-gutter();
+    width: flex-grid(3);
 
     header.profile {
+      h1.user-name {
+        border: 1px solid rgb(200,200,200);
+        @include border-radius(4px);
+        @include box-sizing(border-box);
+        color: $base-font-color;
+        font: bold 1.4rem/1.6rem $sans-serif;
+        margin: 0px;
+        overflow: hidden;
+        padding: 15px 10px 17px;
+        text-wrap: nowrap;
+        text-overflow: ellipsis;
+        text-transform: none;
+        width: flex-grid(12);
+      }
+
       .user-info {
         @include clearfix;
-        padding: 10px;
+        padding: 0px 10px;
 
-        .avatar {
-          background: rgb(220,220,220);
-          border: 1px solid rgb(180,180,180);
-          @include border-radius(4px);
+        > ul {
+          background: rgb(250,250,250);
+          border: 1px solid rgb(220,220,220);
+          border-top: none;
+          @include border-bottom-radius(4px);
           @include box-sizing(border-box);
-          margin: 0 0 15px 0;
-          max-width: 100%;
-          overflow: hidden;
+          @include clearfix;
+          margin: 0px;
+          padding: 0px 10px 20px;
+          width: flex-grid(12);
 
-          @media screen and (max-width: 768px) {
-            margin: 0px;
-            margin-right: flex-gutter();
-            position: absolute;
-            width: 100px;
-          }
+          li {
+            list-style: none;
 
-          img {
-            @include border-radius(4px);
-            display: block;
-            max-width: 100%;
-          }
-        }
+            p {
+              color: $lighter-base-font-color;
+              font: 300 1.2rem/1.6rem $sans-serif;
+              text-shadow: 0 1px rgba(255,255,255, 0.8);
 
-        .info {
-          @media screen and (max-width: 768px) {
-            @include box-sizing(border-box);
-            float: left;
-            min-height: 100px;
-            padding-left: 110px;
-            width: 100%;
-          }
-
-          h2 {
-            border-bottom: 1px solid rgb(200,200,200);
-            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.4));
-            font: bold 1.2rem/1.4rem $sans-serif;
-            margin-bottom: 15px;
-            overflow: hidden;
-            padding-bottom: 15px;
-            text-align: center;
-            text-wrap: nowrap;
-            text-overflow: ellipsis;
-
-            @media screen and (max-width: 768px) {
-              text-align: left;
-            }
-          }
-
-          > ul {
-            @include clearfix;
-            margin: 0px;
-            padding: 0 0 10px 0;
-
-            @media screen and (max-width: 768px) {
-              padding: 0px;
-            }
-
-            li {
-              list-style: none;
-              margin-bottom: 10px;
-
-              @media screen and (max-width: 768px) {
-                float: left;
-                margin-right: 10px;
-              }
-
-              &:last-child {
-                margin-bottom: 0px;
-              }
-
-              h3 {
-                color: $lighter-base-font-color;
-                font: bold 1rem/1.2rem $sans-serif;
-                text-shadow: 0 1px rgba(255,255,255, 0.8);
-
-                span {
-                  font-weight: normal;
-                  text-transform: none;
-                }
+              span {
+                font-weight: 700;
+                margin-left: 5px;
+                text-transform: none;
               }
             }
           }
@@ -109,29 +60,20 @@
   }
 
   .my-courses {
+    float: left;
     margin: 0px;
-    padding-left: 270px;
-
-    @media screen and (max-width: 768px) {
-      padding: 0px;
-    }
-
-    @media only screen and (max-width: 768px) {
-      float: none;
-      width: flex-grid(12);
-    }
+    width: flex-grid(9);
 
     .empty-dashboard-message {
-      background: rgb(250,250,250);
-      border: 1px solid rgb(210,210,210);
-      @include border-radius(4px);
-      padding: 40px 0px;
+      border-top: 1px solid rgb(210,210,210);
+      padding: 80px 0px;
       text-align: center;
 
       p {
         color: $lighter-base-font-color;
         font-style: italic;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
+        -webkit-font-smoothing: antialiased;
 
         a {
           background: rgb(240,240,240);
@@ -152,62 +94,46 @@
 
     .my-course {
       background: rgb(250,250,250);
-      border: 1px solid rgb(220,220,220);
+      @include background-image(linear-gradient(-90deg, rgb(253,253,253), rgb(243,243,243)));
+      border: 1px solid rgb(190,190,190);
       @include border-radius(3px);
+      @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1), inset 0 -1px 0 0 rgba(255,255,255, 0.8), inset 0 1px 0 0 rgba(255,255,255, 0.8));
       @include box-sizing(border-box);
-      float: left;
+      @include clearfix;
       font-size: 0em;
       margin-right: flex-gutter();
-      min-height: 120px;
       margin-bottom: 25px;
       overflow: hidden;
       position: relative;
       width: flex-grid(12);
       @include transition(all, 0.15s, linear);
 
-      @media only screen and (max-width: 768px) {
-        float: none;
-        margin-right: 0px;
-        width: flex-grid(12);
-      }
-
       &:last-child {
         margin-bottom: none;
       }
 
-      > a {
-        @include clearfix;
-        display: block;
-        padding: 10px;
-        position: relative;
-      }
-
       .cover {
         background: rgb(225,225,225);
-        border: 1px solid rgb(150,150,150);
-        @include border-radius(4px);
-        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+        background-size: cover;
+        background-position: center center;
+        border-right: 1px solid rgb(150,150,150);
+        @include border-left-radius(3px);
+        @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.6), 1px 0 0 0 rgba(255,255,255, 0.8));
         float: left;
-        height: 100px;
+        height: 120px;
         margin: 0px;
-        opacity: 0.8;
-        overflow: hidden;
         position: relative;
         @include transition(all, 0.15s, linear);
-        width: 100px;
-
-        @media only screen and (max-width: 320px) {
-          display: none;
-        }
+        width: 200px;
 
         .shade {
-          background: rgba(0,0,0, 0.3);
+          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.3) 0%,
+                                                            rgba(0,0,0, 0.3) 100%));
           @include border-radius(4px);
           bottom: 0px;
           content: "";
           display: block;
           left: 0px;
-          opacity: 0;
           position: absolute;
           top: 0px;
           @include transition(all, 0.15s, linear);
@@ -215,194 +141,155 @@
         }
 
         .arrow {
-          border-top: 1px solid;
-          border-left: 1px solid;
-          border-color: rgb(255,255,255);
-          @include box-shadow(inset 1px 1px 0 0 rgba(255,255,255, 0.6));
+          border-top: 8px solid;
+          border-left: 8px solid;
+          border-color: rgba(0,0,0, 0.7);
+          @include box-shadow(inset 0 1px 0 0 rgba(255,255,255, 0.8), -1px 0 1px 0 rgba(255,255,255, 0.8));
           content: "";
           display: block;
           height: 55px;
-          left: 40px;
+          left: 50%;
+          margin-left: -10px;
+          margin-top: -30px;
           opacity: 0;
           position: absolute;
-          top: 23px;
+          top: 50%;
           @include transform(rotate(-45deg));
           @include transition(all, 0.15s, linear);
           width: 55px;
         }
 
-        img {
-          @include border-radius(4px);
-          display: block;
-          min-height: 100%;
-          min-width: 100%;
-          width: 100%;
+        &:hover {
+          .shade {
+            background: rgba(255,255,255, 0.1);
+            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.3) 0%,
+                                                              rgba(0,0,0, 0.3) 100%));
+          }
         }
       }
 
       .info {
-        left: 130px;
+        left: 201px;
+        padding: 0px 10px;
         position: absolute;
-        right: 10px;
-        top: 10px;
+        right: 0px;
+        top: 0px;
         z-index: 2;
 
-        @media only screen and (max-width: 320px) {
-          margin: 0px;
-        }
-
         > hgroup {
+          border-bottom: 1px solid rgb(210,210,210);
+          @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+          margin-bottom: 20px;
+          padding: 15px 0px;
           width: 100%;
 
-          @media only screen and (max-width: 320px) {
-            margin: 0px;
-          }
-
           h2 {
-            color: $base-font-color;
-            font: bold 1.4rem/1.6rem $sans-serif;
-            margin-bottom: 2px;
-            overflow: hidden;
-            text-shadow: 0 1px rgba(255,255,255, 0.6);
-            @include transition(color, 0.15s, linear);
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            @include inline-block;
+            margin-bottom: 0px;
+            vertical-align: middle;
+
+            a {
+              color: $base-font-color;
+              font: 800 1.6rem/2rem $sans-serif;
+              text-shadow: 0 1px rgba(255,255,255, 0.6);
+              text-overflow: ellipsis;
+              white-space: nowrap;
+
+              &:hover {
+                color: $blue;
+                text-decoration: underline;
+              }
+            }
           }
 
           h3 {
-            color: $lighter-base-font-color;
-            font: italic bold 1.2rem/1.6rem $sans-serif;
-            overflow: hidden;
-            text-shadow: 0 1px rgba(255,255,255, 0.6);
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-        }
+            @include inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
 
-        .edit, .register {
-          border: 1px solid rgb(220,220,220);
-          background: rgb(230,230,230);
-          color: $lighter-base-font-color;
-          display: block;
-          font: normal 12px/14px $sans-serif;
-          padding: 6px 10px;
-          position: absolute;
-          right: 0px;
-          top: 0px;
-          @include transition(all, 0.15s, linear);
+            a {
+              background: rgba(255,255,255, 1);
+              border: 1px solid rgb(180,180,180);
+              @include border-radius(3px);
+              @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.2), 0 1px 0 0 rgba(255,255,255, 0.6));
+              color: $lighter-base-font-color;
+              display: block;
+              font: italic 800 1.2rem/1.6rem $sans-serif;
+              padding: 5px 10px;
 
-          @media only screen and (max-width: 320px) {
-            display: none;
-          }
-
-          &:hover {
-            background: rgb(255,255,255);
-            color: $blue;
+              &:hover {
+                color: $blue;
+              }
+            }
           }
         }
 
         .meta {
-          border-top: 1px solid rgb(200,200,200);
-          @include box-shadow(inset 0 1px 0 0 rgba(255,255,255, 0.6));
-          font-size: 1rem;
-          height: 34px;
-          margin-top: 10px;
-          opacity: 0.9;
+          @include clearfix;
           position: relative;
           @include transition(opacity, 0.15s, linear);
           width: 100%;
 
-          &:hover {
-            opacity: 0.9;
-          }
-
-          > * {
-            height: 18px;
-            position: absolute;
-            top: 15px;
-          }
-
-          p + p {
-            margin-top: 0px;
+          .course-work-icon {
+            background: rgb(200,200,200);
+            float: left;
+            font: 300 1.2rem/1.6rem $sans-serif;
+            height: 22px;
+            width: 22px;
           }
 
           .complete {
-            left: 0px;
+            float: right;
+            padding-top: 2px;
 
-            p {
-              font: normal 1rem/1.6rem $serif;
-
-              span {
-                color: $base-font-color;
-                font-family: $sans-serif;
-                margin-left: 3px;
-              }
-            }
-          }
-
-          .dates {
             p {
               color: $lighter-base-font-color;
-              font: normal 1rem/1.6rem $serif;
+              font: italic 1.2rem/1.4rem $serif;
               @include inline-block;
               text-align: right;
+              text-shadow: 0 1px rgba(255,255,255, 0.6);
+              -webkit-font-smoothing: antialiased;
 
-              &:first-child {
-                border-right: 1px solid rgb(200,200,200);
-                margin-right: 10px;
-                padding-right: 10px;
-              }
-
-              time {
+              .completeness {
                 color: $base-font-color;
-                font-family: $sans-serif;
-                margin-left: 3px;
-              }
-            }
-          }
-
-          .end-date {
-            border-left: 1px solid rgb(200,200,200);
-            right: 0px;
-            padding-left: 15px;
-
-            @media only screen and (max-width: 320px) {
-              display: none;
-            }
-
-            p {
-              color: $lighter-base-font-color;
-              font: normal 1rem/1.6rem $serif;
-              text-align: right;
-
-              time {
-                color: $base-font-color;
-                font-family: $sans-serif;
-                margin-left: 3px;
+                font: 700 1.2rem/1.4rem $sans-serif;
+                margin-right: 5px;
               }
             }
           }
 
           .progress {
             @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-            left: 90px;
-            right: 140px;
-
-            @media only screen and (max-width: 320px) {
-              right: 0px;
-            }
+            left: 40px;
+            position: absolute;
+            right: 110px;
 
             .meter {
-              background: rgb(230,230,230);
-              border: 1px solid rgb(200,200,200);
-              @include border-radius(3px);
+              background: rgb(245,245,245);
+              border: 1px solid rgb(160,160,160);
+              @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
               @include box-sizing(border-box);
-              height: 100%;
+              @include border-radius(4px);
+              height: 22px;
+              margin: 0 auto;
               padding: 2px;
+              width: 100%;
 
               .meter-fill {
-                @include border-radius(3px);
-                background: rgb(210,210,210);
+                background: rgb(120,120,120);
+                @include background-image(linear-gradient(-45deg, rgba(255,255,255, 0.15) 25%,
+                                                                  transparent 25%,
+                                                                  transparent 50%,
+                                                                  rgba(255,255,255, 0.15) 50%,
+                                                                  rgba(255,255,255, 0.15) 75%,
+                                                                  transparent 75%));
+                background-size: 40px 40px;
+                background-repeat: repeat-x;
+                border: 1px solid rgb(115,115,115);
+                @include border-radius(4px);
+                @include box-sizing(border-box);
+                content: "";
+                display: block;
                 height: 100%;
                 width: 60%;
               }
@@ -412,8 +299,6 @@
       }
 
       &:hover {
-        background: rgb(245,245,245);
-        @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.2));
 
         .edit {
           background: rgb(220,220,220);
