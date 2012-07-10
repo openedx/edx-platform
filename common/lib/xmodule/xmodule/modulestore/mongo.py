@@ -1,4 +1,5 @@
 import pymongo
+from bson.objectid import ObjectId
 from importlib import import_module
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
@@ -7,6 +8,19 @@ from mitxmako.shortcuts import render_to_string
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
 
+
+# TODO (cpennington): This code currently operates under the assumption that
+# there is only one revision for each item. Once we start versioning inside the CMS,
+# that assumption will have to change
+
+
+def location_to_query(loc):
+    query = {}
+    for key, val in Location(loc).dict().iteritems():
+        if val is not None:
+            query['_id.{key}'.format(key=key)] = val
+
+    return query
 
 class MongoModuleStore(ModuleStore):
     """
@@ -17,7 +31,6 @@ class MongoModuleStore(ModuleStore):
             host=host,
             port=port
         )[db][collection]
-        self.collection.ensure_index('location')
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
@@ -25,6 +38,18 @@ class MongoModuleStore(ModuleStore):
         module_path, _, class_name = default_class.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
         self.default_class = class_
+
+        # TODO (cpennington): Pass a proper resources_fs to the system
+        self.system = MakoDescriptorSystem(
+            load_item=self.get_item,
+            resources_fs=None,
+            render_template=render_to_string
+        )
+
+    def _load_item(self, item):
+        item['location'] = item['_id']
+        del item['_id']
+        return XModuleDescriptor.load_from_json(item, self.system, self.default_class)
 
     def get_item(self, location):
         """
@@ -39,24 +64,26 @@ class MongoModuleStore(ModuleStore):
         location: Something that can be passed to Location
         """
 
-        query = {}
         for key, val in Location(location).dict().iteritems():
             if key != 'revision' and val is None:
                 raise InsufficientSpecificationError(location)
 
-            if val is not None:
-                query['location.{key}'.format(key=key)] = val
-
         item = self.collection.find_one(
-            query,
+            location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],
         )
         if item is None:
             raise ItemNotFoundError(location)
+        return self._load_item(item)
 
-        # TODO (cpennington): Pass a proper resources_fs to the system
-        return XModuleDescriptor.load_from_json(
-            item, MakoDescriptorSystem(load_item=self.get_item, resources_fs=None, render_template=render_to_string), self.default_class)
+    def get_items(self, location, default_class=None):
+        print location_to_query(location)
+        items = self.collection.find(
+            location_to_query(location),
+            sort=[('revision', pymongo.ASCENDING)],
+        )
+
+        return [self._load_item(item) for item in items]
 
     def create_item(self, location):
         """
@@ -65,7 +92,7 @@ class MongoModuleStore(ModuleStore):
         location: Something that can be passed to Location
         """
         self.collection.insert({
-            'location': Location(location).dict(),
+            '_id': Location(location).dict(),
         })
 
     def update_item(self, location, data):
@@ -80,8 +107,9 @@ class MongoModuleStore(ModuleStore):
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
         self.collection.update(
-            {'location': Location(location).dict()},
-            {'$set': {'definition.data': data}}
+            {'_id': Location(location).dict()},
+            {'$set': {'definition.data': data}},
+
         )
 
     def update_children(self, location, children):
@@ -96,7 +124,7 @@ class MongoModuleStore(ModuleStore):
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
         self.collection.update(
-            {'location': Location(location).dict()},
+            {'_id': Location(location).dict()},
             {'$set': {'definition.children': children}}
         )
 
@@ -112,6 +140,6 @@ class MongoModuleStore(ModuleStore):
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
         self.collection.update(
-            {'location': Location(location).dict()},
+            {'_id': Location(location).dict()},
             {'$set': {'metadata': metadata}}
         )
