@@ -128,6 +128,10 @@ class Location(_LocationBase):
         return "-".join(str(v) for v in self.list() if v is not None).replace('.', '_')
 
     def dict(self):
+        """
+        Return an OrderedDict of this locations keys and values. The order is
+        tag, org, course, category, name, revision
+        """
         return self._asdict()
 
     def list(self):
