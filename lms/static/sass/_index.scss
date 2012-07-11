@@ -1,5 +1,5 @@
 .home {
-  margin: 0px 0px 100px;
+  padding: 0px 0px 100px;
 
   > header {
     //background: rgb(250,250,250);
@@ -198,6 +198,7 @@
       text-shadow: 0 1px rgba(255,255,255, 0.6);
 
       .lowercase {
+        color: $lighter-base-font-color;
         text-transform: none;
       }
     }

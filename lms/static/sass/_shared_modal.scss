@@ -231,6 +231,11 @@
         text-align: center;
         -webkit-font-smoothing: antialiased;
 
+        span {
+          color: $lighter-base-font-color;
+          font: italic 1.2rem/1.6rem $serif;
+        }
+
         a {
           color: $lighter-base-font-color;
           font: italic 1.2rem/1.6rem $serif;

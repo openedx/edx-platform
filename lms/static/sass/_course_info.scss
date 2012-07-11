@@ -1,54 +1,70 @@
 .course-info {
   .container {
-    margin-bottom: 60px;
+    padding-bottom: 120px;
   }
 
   header.course-profile {
     background: rgb(245,245,245);
+    @include background-image(url('/static/images/shot-2-large.jpg'));
+    background-size: cover;
     //@include background-image(linear-gradient(-90deg, rgb(230,230,230), rgb(245,245,245)));
     @include box-shadow(0 1px 80px 0 rgba(0,0,0, 0.5));
-    border-bottom: 1px solid rgb(200,200,200);
+    border-bottom: 1px solid rgb(100,100,100);
     @include box-shadow(inset 0 1px 5px 0 rgba(0,0,0, 0.1));
+    margin-top: -69px;
     overflow: hidden;
+    padding: 134px 0px 60px;
+    position: relative;
     width: 100%;
 
+    &::before {
+      @include background-image(radial-gradient(50% 50%, ellipse closest-side, rgba(#fff, 1), rgba(#fff, 0)));
+      //content: "";
+      display: block;
+      height: 200%;
+      left: 50%;
+      margin-left: -(flex-grid(5));
+      margin-top: -100%;
+      position: absolute;
+      top: 50%;
+      width: flex-grid(10);
+      z-index: 1;
+    }
+
     .intro-inner-wrapper {
+      background: rgba(255,255,255, 0.9);
+      border: 1px solid rgb(100,100,100);
+      @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+      @include box-sizing(border-box);
       @include clearfix;
       margin: 0 auto;
       max-width: 1200px;
-      padding: 50px 0px 40px;
       position: relative;
       width: flex-grid(12);
+      z-index: 2;
 
-      &::before {
-        @include background-image(radial-gradient(50% 50%, ellipse closest-side, rgba(#fff, 1), rgba(#fff, 0)));
-        content: "";
-        display: block;
-        height: 200%;
-        left: 0px;
-        position: absolute;
-        top: 80px;
-        width: flex-grid(8);
-        z-index: 1;
-      }
 
       .intro {
+        @include box-sizing(border-box);
         @include clearfix;
         float: left;
-        margin-right: flex-gutter();
+        padding: 20px 20px;
         position: relative;
-        width: flex-grid(8);
+        width: flex-grid(8) + flex-gutter();
         z-index: 2;
 
         > hgroup {
-          position: relative;
-          margin-bottom: 12px;
+          border-bottom: 1px solid rgb(210,210,210);
+          @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+          margin-bottom: 30px;
+          padding-bottom: 20px;
+          width: 100%;
 
           h1 {
             color: $base-font-color;
-            font: bold 2.8rem/3.2rem $sans-serif;
+            font: 600 2.8rem/3.2rem $sans-serif;
             @include inline-block;
-            margin: 0 5px 0 0;
+            margin: 0 10px 0 0;
             letter-spacing: 0px;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
 
@@ -65,8 +81,10 @@
 
             a {
               color: $lighter-base-font-color;
-              font: italic bold 1.4rem/1.6rem $sans-serif;
+              font: italic 800 1.4rem/1.6rem $sans-serif;
+              letter-spacing: 0px;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
+              text-transform: none;
 
               &:hover {
                 color: $blue;
@@ -76,6 +94,9 @@
         }
 
         .course-dates {
+          display: none;
+          margin-bottom: 20px;
+
           p {
             color: $lighter-base-font-color;
             @include inline-block;
@@ -100,11 +121,71 @@
         }
       }
 
-      .actions {
-        float: left;
-        margin-top: 5px;
+      .media {
+        border-left: 1px solid rgb(100,100,100);
+        @include box-sizing(border-box);
+        float: right;
+        padding: 1px;
         position: relative;
         width: flex-grid(4);
+        z-index: 2;
+
+        .hero {
+          height: 180px;
+          overflow: hidden;
+          position: relative;
+
+          .play-intro {
+            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.6), rgba(255,255,255, 0.4)));
+            @include border-radius(4px);
+            @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.2));
+            border: 1px solid rgba(0,0,0, 0.3);
+            height: 80px;
+            left: 50%;
+            margin-top: -40px;
+            margin-left: -40px;
+            position: absolute;
+            top: 50%;
+            width: 80px;
+
+            &::after {
+              color: $base-font-color;
+              content: "\25B6";
+              display: block;
+              font: normal 3.2rem/3.2rem $sans-serif;
+              left: 50%;
+              margin-left: -12px;
+              margin-top: -17px;
+              position: absolute;
+              text-shadow: 0 1px rgba(255,255,255, 0.8);
+              top: 50%;
+            }
+          }
+
+          img {
+            min-width: 100%;
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+
+          .play-intro {
+            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.7), rgba(255,255,255, 0.5)));
+            @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.2));
+            border: 1px solid rgba(0,0,0, 0.4);
+
+            &::after {
+              color: $pink;
+            }
+          }
+        }
+      }
+
+      .actions {
+        @include clearfix;
+        position: relative;
+        width: flex-grid(12);
         z-index: 2;
 
         &:hover {
@@ -117,7 +198,10 @@
           @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
           @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1), inset 0 0 0 1px rgba(255,255,255, 0.9));
           @include border-radius(4px);
+          float: left;
+          margin-right: flex-gutter();
           @include transition(all, 0.15s, linear);
+          width: flex-grid(6);
 
           a.register {
             @include button(shiny, $blue);
@@ -135,16 +219,15 @@
         }
 
         .social-sharing {
-          padding: 0px 20px;
+          float: left;
+          width: flex-grid(6);
 
           p {
             background: rgb(255,255,255);
-            @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.075), inset 0 0 0 1px rgba(255,255,255, 0.9));
+            @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
             border: 1px solid rgb(210,210,210);
-            border-top: 0;
-            @include border-bottom-radius(4px);
-            padding: 3px 10px;
-            margin: 0 auto;
+            @include border-radius(4px);
+            padding: 9px 10px;
             color: $base-font-color;
             font: italic 300 1.2rem/1.6rem $serif;
             margin: 0 0 5px 0;
@@ -183,13 +266,14 @@
 
       a {
         border-bottom: 3px solid transparent;
+        color: $lighter-base-font-color;
         @include inline-block;
-        font: normal 1.2rem/1.6rem $sans-serif;
+        font: italic 1.2rem/1.6rem $serif;
         letter-spacing: 1px;
         margin: 0 15px;
         padding: 0px 5px 15px;
         text-align: center;
-        text-transform: uppercase;
+        text-transform: lowercase;
 
         &:first-child {
           margin-left: 0px;
@@ -223,6 +307,7 @@
 
     .inner-wrapper {
       > section {
+        margin-bottom: 40px;
 
         &::after {
           @extend .faded-hr-divider;
@@ -230,18 +315,127 @@
           display: none;
           margin-top: 60px;
         }
-        margin-bottom: 60px;
 
 
         p + h2 {
           margin-top: 40px;
         }
       }
+
+      .course-staff {
+        .teacher {
+          margin-bottom: 40px;
+
+          h3 {
+            color: $base-font-color;
+            font-family: $sans-serif;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+          }
+
+          .teacher-image {
+            background: rgb(255,255,255);
+            border: 1px solid rgb(200,200,200);
+            float: left;
+            margin: 0 15px 15px 0;
+            padding: 1px;
+          }
+        }
+      }
+    }
+  }
+
+  .course-sidebar {
+    @include box-sizing(border-box);
+    @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
+    border: 1px solid rgb(200,200,200);
+    border-top: none;
+    float: left;
+    padding: 30px 20px;
+    width: flex-grid(4);
+
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 26px;
+      position: relative;
+      text-align: center;
+
+      &::after {
+        @extend .faded-hr-divider;
+        content: "";
+        display: block;
+        height: 1px;
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+      }
+
+      a.university-name {
+        border-right: 1px solid rgb(200,200,200);
+        color: $base-font-color;
+        font: italic 800 1.4rem/1.6rem $sans-serif;
+        @include inline-block;
+        letter-spacing: 0px;
+        margin-right: 15px;
+        padding-right: 15px;
+
+        &:hover {
+          color: $lighter-base-font-color;
+        }
+      }
+
+      span {
+        font: 300 1.2rem/1.6rem $sans-serif;
+      }
+    }
+
+    .important-dates {
+      list-style: none;
+      margin: 0px;
+      padding: 0px 10px;
+
+      li {
+        @include clearfix;
+        border-bottom: 1px dotted rgb(220,220,220);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+
+        p {
+          float: left;
+          font: 300 1.2rem/1.6rem $sans-serif;
+        }
+
+        img {
+          background: rgb(230,230,230);
+          float: left;
+          height: 19px;
+          margin-right: 10px;
+          width: 19px;
+        }
+
+        span {
+          font: 700 1.2rem/1.6rem $sans-serif;
+          float: right;
+        }
+      }
     }
 
     .course-staff {
+      display: none;
+
       .teacher {
         margin-bottom: 30px;
+
+        h3 {
+          color: $base-font-color;
+          font-family: $sans-serif;
+          font-weight: 700;
+          margin-bottom: 15px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
 
         &::after {
           @extend .faded-hr-divider;
@@ -262,88 +456,6 @@
           float: left;
           margin: 0 15px 15px 0;
           padding: 1px;
-        }
-      }
-    }
-  }
-
-  .course-sidebar {
-    @include box-sizing(border-box);
-    float: left;
-    padding-top: 40px;
-    width: flex-grid(4);
-
-    h3 {
-      color: $lighter-base-font-color;
-      font-family: $serif;
-      font-weight: 300;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-    }
-
-    > section {
-      border: 1px solid rgb(220,220,220);
-      @include border-radius(4px);
-      background: rgb(245,245,245);
-      margin-bottom: 20px;
-      padding: 15px;
-    }
-
-    .media {
-      border: 1px solid rgb(200,200,200);
-      @include box-sizing(border-box);
-      margin-bottom: 20px;
-      padding: 1px;
-      width: flex-grid(12);
-
-      .hero {
-        height: 180px;
-        overflow: hidden;
-        position: relative;
-
-        .play-intro {
-          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.6), rgba(255,255,255, 0.4)));
-          @include border-radius(4px);
-          @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.2));
-          border: 1px solid rgba(0,0,0, 0.3);
-          height: 80px;
-          left: 50%;
-          margin-top: -40px;
-          margin-left: -40px;
-          position: absolute;
-          top: 50%;
-          width: 80px;
-
-          &::after {
-            color: $base-font-color;
-            content: "\25B6";
-            display: block;
-            font: normal 3.2rem/3.2rem $sans-serif;
-            left: 50%;
-            margin-left: -12px;
-            margin-top: -17px;
-            position: absolute;
-            text-shadow: 0 1px rgba(255,255,255, 0.8);
-            top: 50%;
-          }
-        }
-
-        img {
-          min-width: 100%;
-        }
-      }
-
-      &:hover {
-        cursor: pointer;
-
-        .play-intro {
-          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.7), rgba(255,255,255, 0.5)));
-          @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.2));
-          border: 1px solid rgba(0,0,0, 0.4);
-
-          &::after {
-            color: $pink;
-          }
         }
       }
     }

@@ -49,6 +49,12 @@ p {
   margin: 0px;
 }
 
+span {
+  color: $lighter-base-font-color;
+  font: normal 1.3rem/2rem $sans-serif;
+  margin: 0px;
+}
+
 p + p {
   margin-top: 20px;
 }
