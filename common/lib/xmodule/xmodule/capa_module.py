@@ -107,7 +107,7 @@ class CapaModule(XModule):
         else:
             self.max_attempts = None
 
-        self.show_answer = self.metadata.get('showanwser', 'closed')
+        self.show_answer = self.metadata.get('showanswer', 'closed')
 
         if self.show_answer == "":
             self.show_answer = "closed"
