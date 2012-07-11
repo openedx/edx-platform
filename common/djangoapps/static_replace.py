@@ -18,8 +18,9 @@ def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/'):
         return replace(static_url, staticfiles_prefix)
 
     return re.sub(r"""
+        (?x)		# flags=re.VERBOSE
         (?P<quote>\\?['"])  # the opening quotes
         {prefix}         # the prefix
         (?P<rest>.*?)    # everything else in the url
         (?P=quote)       # the first matching closing quote
-        """.format(prefix=replace_prefix), replace_url, text, flags=re.VERBOSE)
+        """.format(prefix=replace_prefix), replace_url, text)
