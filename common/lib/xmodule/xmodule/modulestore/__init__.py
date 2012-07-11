@@ -19,6 +19,8 @@ URL_RE = re.compile("""
     (/(?P<revision>[^/]+))?
     """, re.VERBOSE)
 
+# TODO (cpennington): We should decide whether we want to expand the
+# list of valid characters in a location
 INVALID_CHARS = re.compile(r"[^\w.-]")
 
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
