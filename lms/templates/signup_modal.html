@@ -1,5 +1,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django_countries import countries %>
+<%! from student.models import UserProfile %>
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
@@ -21,12 +23,24 @@
         <input name="username" type="text" placeholder="Public Username">
         <label>Full Name</label>
         <input name="name" type="text" placeholder="Full Name">
-        <label>Mailing address</label>
-        <textarea name="mailing_address" placeholder="Mailing address"></textarea>
-        <label>Country</label>
-        <input name="country" type="text" placeholder="Country of citizenship">
+        <p>
+            <label>Mailing address</label>
+            <textarea name="mailing_address" placeholder="Mailing address"></textarea>
+        </p>
+        <label>Country of citizenship</label>
+        <select name="country">
+            %for code, country in countries.COUNTRIES:
+                <option value="${code}">${country}</option>
+            %endfor
+        </select>
         <label>Preferred Language</label>
         <input name="language" type="text" placeholder="Preferred Language">
+        <label>Gender</label>
+        <select name="gender">
+            %for code, gender in UserProfile.GENDER_CHOICES:
+                <option value="${code}">${gender}</option>
+            %endfor
+        </select>
         <label class="terms-of-service">
           <input name="terms_of_service" type="checkbox" value="true">
           I agree to the
