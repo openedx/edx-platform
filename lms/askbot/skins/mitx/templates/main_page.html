@@ -1,0 +1,28 @@
+{% extends "two_column_body.html" %}
+{# 
+    this template is split into several
+    blocks that are included here
+    the blocks are within directory templates/main_page
+    relative to the skin directory
+
+    there is no html markup in this file
+#}
+<!-- questions.html -->
+{% block title %}{% spaceless %}{% trans %}Questions{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+    {% include "main_page/tab_bar.html" %}
+    {# include "main_page/headline.html" #}
+    {# ==== BEGIN: main_page/content.html === #}
+    <ul class="question-list" id="question-list">
+        {% include "main_page/questions_loop.html" %}
+    </ul>
+    {# ==== END: main_page/content.html === #}
+    {% include "main_page/paginator.html" %}
+{% endblock %}
+{% block sidebar %}
+    {% include "main_page/sidebar.html" %}
+{% endblock %}
+{% block endjs %}
+    {% include "main_page/javascript.html" %}
+{% endblock %}
+<!-- end questions.html -->

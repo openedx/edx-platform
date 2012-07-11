@@ -1,0 +1,200 @@
+.highlighted-courses, .find-courses {
+  .courses {
+    @include clearfix;
+    padding: 40px 15px 15px;
+
+    .course {
+      background: rgb(250,250,250);
+      border: 1px solid rgb(180,180,180);
+      @include border-radius(2px);
+      @include box-sizing(border-box);
+      @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9));
+      float: left;
+      font-size: 0em;
+      margin-right: flex-gutter();
+      margin-bottom: 30px;
+      position: relative;
+      width: flex-grid(4);
+      @include transition(all, 0.15s, linear);
+
+      &:nth-child(3n+3) {
+        margin-right: 0;
+      }
+
+      .meta-info {
+        background: rgba(0,0,0, 0.6);
+        bottom: 6px;
+        border: 1px solid rgba(0,0,0, 0.5);
+        @include border-right-radius(2px);
+        @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.15));
+        @include clearfix;
+        position: absolute;
+        right: -3px;
+        @include transition(all, 0.15s, linear);
+
+        p {
+          color: rgb(255,255,255);
+          font: 300 1.2rem/1.4rem $sans-serif;
+          padding: 5px 12px;
+
+          &.university {
+            float: left;
+          }
+        }
+      }
+
+      .inner-wrapper {
+        border: 1px solid rgba(255,255,255, 1);
+        height: 100%;
+        height: 180px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      header.course-preview {
+        left: 0px;
+        position: absolute;
+        top: 0px;
+        width: 100%;
+        z-index: 3;
+
+        > a {
+          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.85)));
+          @include box-shadow(inset 0 -1px 0 0 rgba(255,255,255, 0.2));
+          border-bottom: 1px solid rgba(150,150,150, 0.7);
+          display: block;
+          height: 50px;
+
+          hgroup {
+            left: 0px;
+            padding: 5px 10px;
+            position: absolute;
+            right: 60px;
+            top: 0px;
+
+            h2 {
+              color: $base-font-color;
+              font: 800 1.2rem/1.6rem $sans-serif;
+              padding-top: 10px;
+              text-shadow: 0 1px rgba(255,255,255, 0.6);
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+
+          .info-link {
+            border-left: 1px solid rgba(150,150,150, 0.5);
+            @include box-sizing(border-box);
+            color: $base-font-color;
+            display: block;
+            font: bold 2rem/2.2rem $sans-serif;
+            height: 100%;
+            opacity: 0.6;
+            padding-top: 10px;
+            position: absolute;
+            right: 0px;
+            text-align: center;
+            text-shadow: 0 1px rgba(255,255,255, 0.6);
+            top: 0px;
+            width: 60px;
+          }
+
+          &:hover {
+            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
+
+            h2, p, .info-link {
+              color: $blue;
+              opacity: 1;
+            }
+
+            h2 {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+
+      .info {
+        background: rgb(255,255,255);
+        height: 180px + 130px;
+        left: 0px;
+        position: absolute;
+        top: 0px;
+        @include transition(all, 0.15s, linear);
+        width: 100%;
+
+        .cover-image {
+          height: 180px;
+          overflow: hidden;
+          width: 100%;
+
+          img {
+            display: block;
+            min-height: 100%;
+            width: 100%;
+          }
+        }
+
+        .desc {
+          @include box-sizing(border-box);
+          height: 100px;
+          overflow: hidden;
+          padding: 10px 10px 15px 10px;
+          position: relative;
+          width: 100%;
+
+          p {
+            height: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .bottom {
+          @include box-sizing(border-box);
+          @include clearfix;
+          padding: 6px 10px;
+          width: 100%;
+
+          > p, a {
+            color: $lighter-base-font-color;
+            font: 300 1.2rem/1.4rem $sans-serif;
+            letter-spacing: 1px;
+            padding: 0;
+
+            &.university {
+              border-right: 1px solid $lighter-base-font-color;
+              display: block;
+              float: left;
+              margin-right: 10px;
+              padding-right: 10px;
+
+              &:hover {
+                color: $blue;
+              }
+            }
+
+            &.dates {
+              float: left;
+              margin-top: 0px;
+            }
+          }
+        }
+      }
+
+      &:hover {
+        background: rgb(245,245,245);
+        border-color: rgb(170,170,170);
+        @include box-shadow(0 1px 16px 0 rgba($blue, 0.4));
+
+        .info {
+          top: -130px;
+        }
+
+        .meta-info {
+          opacity: 0;
+        }
+      }
+    }
+  }
+}

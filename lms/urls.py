@@ -11,7 +11,12 @@ if settings.DEBUG:
     admin.autodiscover()
 
 urlpatterns = ('',
-    url(r'^$', 'student.views.index'), # Main marketing page, or redirect to courseware
+    url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
+    url(r'^about$', 'student.views.about', name="about_edx"),
+    url(r'^university_profile$', 'student.views.university_profile', name="university_profile"),
+    url(r'^jobs$', 'student.views.jobs', name="jobs"),
+    url(r'^help$', 'student.views.help', name="help_edx"),
+    url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
@@ -23,7 +28,7 @@ urlpatterns = ('',
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),
     url(r'^login$', 'student.views.login_user'),
     url(r'^login/(?P<error>[^/]*)$', 'student.views.login_user'),
-    url(r'^logout$', 'student.views.logout_user'),
+    url(r'^logout$', 'student.views.logout_user', name='logout'),
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account'),
 #    url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
@@ -47,29 +52,33 @@ if settings.PERFSTATS:
 
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
-        url(r'^courseware/$', 'courseware.views.index', name="courseware"),
-        url(r'^info$', 'util.views.info'),
         url(r'^wiki/', include('simplewiki.urls')),
         url(r'^masquerade/', include('masquerade.urls')),
-        url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)$', 'courseware.views.index'),
-        url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
-        url(r'^courseware/(?P<course>[^/]*)/(?P<chapter>[^/]*)/$', 'courseware.views.index', name="courseware_chapter"),
-        url(r'^courseware/(?P<course>[^/]*)/$', 'courseware.views.index', name="courseware_course"),
         url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
         url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
-        url(r'^profile$', 'courseware.views.profile'),
-        url(r'^profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
         url(r'^change_setting$', 'student.views.change_setting'),
         url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
-        url(r'^book/(?P<page>[^/]*)$', 'staticbook.views.index'), 
-        url(r'^book-shifted/(?P<page>[^/]*)$', 'staticbook.views.index_shifted'), 
-        url(r'^book*$', 'staticbook.views.index'), 
+        url(r'^book/(?P<page>[^/]*)$', 'staticbook.views.index'),
+        url(r'^book-shifted/(?P<page>[^/]*)$', 'staticbook.views.index_shifted'),
+        url(r'^book*$', 'staticbook.views.index'),
         #    url(r'^course_info/$', 'student.views.courseinfo'),
         #    url(r'^show_circuit/(?P<circuit>[^/]*)$', 'circuit.views.show_circuit'),
         url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
         url(r'^calculate$', 'util.views.calculate'),
         url(r'^heartbeat$', include('heartbeat.urls')),
+
+        # Multicourse related:
+        url(r'^courses/?$', 'courseware.views.courses', name="courses"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 'courseware.views.course_info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book$', 'staticbook.views.index', name="book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 'student.views.enroll', name="enroll"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$', 'courseware.views.index', name="courseware"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$', 'courseware.views.profile', name="profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 'student.views.course_info', name="about_course"),
     )
 
 if settings.ENABLE_MULTICOURSE:

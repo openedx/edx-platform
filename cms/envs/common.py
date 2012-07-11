@@ -36,14 +36,15 @@ MITX_FEATURES = {
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
-COMMON_ROOT = PROJECT_ROOT.dirname() / "common"
-ENV_ROOT = PROJECT_ROOT.dirname().dirname()  # virtualenv dir /mitx is in
+REPO_ROOT = PROJECT_ROOT.dirname()
+COMMON_ROOT = REPO_ROOT / "common"
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 # FIXME: To support multiple courses, we should walk the courses dir at startup
 DATA_DIR = COURSES_ROOT
 
-sys.path.append(ENV_ROOT)
+sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
@@ -118,7 +119,7 @@ TEMPLATE_DEBUG = False
 SITE_ID = 1
 SITE_NAME = "localhost:8000"
 HTTPS = 'on'
-ROOT_URLCONF = 'mitx.cms.urls'
+ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email

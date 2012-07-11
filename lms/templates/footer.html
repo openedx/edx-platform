@@ -1,0 +1,30 @@
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='static_content.html'/>
+
+<footer>
+  <nav>
+    <section class="copyright">
+      <a href="${reverse('root')}" class="logo"></a>
+      <p>&copy; 2012 edX, <a href="#">some rights reserved.</a></p>
+    </section>
+    <ol>
+      <li>
+        <a href="${reverse('courses')}">Find Courses</a>
+      </li>
+      <li>
+        <a href="${reverse('about_edx')}">About</a>
+      </li>
+      <li>
+        <a href="#">Blog</a>
+      </li>
+      <li>
+        <a href="${reverse('jobs')}">Jobs</a>
+      </li>
+      <li class="social">
+        <a href="#"><img src="${static.url('images/linkedin.png')}" /></a>
+        <a href="#"><img src="${static.url('images/facebook.png')}" /></a>
+        <a href="#"><img src="${static.url('images/twitter.png')}" /></a>
+      </li>
+    </ol>
+  </nav>
+</footer>

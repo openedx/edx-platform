@@ -1,9 +1,10 @@
 <%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
 <%block name="bodyclass">courseware</%block>
 <%block name="title"><title>Courseware – MITx 6.002x</title></%block>
 
 <%block name="headextra">
-<script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
 </%block>
 
 <%block name="js_extra">
@@ -14,9 +15,9 @@
 </script>
 </%block>
 
-<%include file="navigation.html" args="active_page='courseware'" />
+<%include file="course_navigation.html" args="active_page='courseware'" />
 
-<section class="main-content">
+<section class="container">
   <div class="course-wrapper">
     <section aria-label="Course Navigation" class="course-index">
       <header id="open_close_accordion">

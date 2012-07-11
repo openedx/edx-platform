@@ -19,6 +19,7 @@ Longer TODO:
    multiple sites, but we do need a way to map their data assets.
 """
 import sys
+import os
 import tempfile
 import glob2
 
@@ -49,16 +50,17 @@ DEFAULT_GROUPS = []
 GENERATE_PROFILE_SCORES = False
 
 ############################# SET PATH INFORMATION #############################
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname() # /mitx/lms
-COMMON_ROOT = PROJECT_ROOT.dirname() / "common"
-ENV_ROOT = PROJECT_ROOT.dirname().dirname() # virtualenv dir /mitx is in
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
+REPO_ROOT = PROJECT_ROOT.dirname()
+COMMON_ROOT = REPO_ROOT / "common"
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
 COURSES_ROOT = ENV_ROOT / "data"
 
 # FIXME: To support multiple courses, we should walk the courses dir at startup
 DATA_DIR = COURSES_ROOT
 
-sys.path.append(ENV_ROOT)
+sys.path.append(REPO_ROOT)
 sys.path.append(ASKBOT_ROOT)
 sys.path.append(ASKBOT_ROOT / "askbot" / "deps")
 sys.path.append(PROJECT_ROOT / 'djangoapps')
@@ -71,21 +73,15 @@ sys.path.append(COMMON_ROOT / 'lib')
 # templates
 MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 MAKO_TEMPLATES = {}
-MAKO_TEMPLATES['course'] = [DATA_DIR]
-MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
-MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'templates',
-                          COMMON_ROOT / 'lib' / 'capa' / 'templates',
-                          COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
-                          DATA_DIR / 'info',
-                          DATA_DIR / 'problems']
+                          COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
+                          COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
 
 # This is where Django Template lookup is defined. There are a few of these 
 # still left lying around.
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
-    DATA_DIR / "problems",
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -144,8 +140,6 @@ MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
         'OPTIONS': {
-            'org': 'edx',
-            'course': '6002xs12',
             'data_dir': DATA_DIR,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         }
@@ -162,7 +156,7 @@ TEMPLATE_DEBUG = False
 SITE_ID = 1
 SITE_NAME = "localhost:8000"
 HTTPS = 'on'
-ROOT_URLCONF = 'mitx.lms.urls'
+ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
@@ -177,20 +171,20 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles" 
+STATIC_ROOT = ENV_ROOT / "staticfiles"
 
-# FIXME: We should iterate through the courses we have, adding the static 
-#        contents for each of them. (Right now we just use symlinks.)
 STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
-    ("circuits", DATA_DIR / "images"),
-    ("handouts", DATA_DIR / "handouts"),
-    ("subs", DATA_DIR / "subs"),
 
-# This is how you would use the textbook images locally
-#    ("book", ENV_ROOT / "book_images")
 ]
+if os.path.isdir(DATA_DIR):
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir)
+        for course_dir in os.listdir(DATA_DIR)
+    ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York' # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -218,7 +212,8 @@ skin_settings['LOCAL_LOGIN_ICON'] = unicode(MITX_ROOT_URL) + skin_settings['LOCA
 LIVESETTINGS_OPTIONS[1]['SETTINGS']['LOGIN_PROVIDERS']['WORDPRESS_SITE_ICON'] = unicode(MITX_ROOT_URL) + LIVESETTINGS_OPTIONS[1]['SETTINGS']['LOGIN_PROVIDERS']['WORDPRESS_SITE_ICON']
 LIVESETTINGS_OPTIONS[1]['SETTINGS']['LICENSE_SETTINGS']['LICENSE_LOGO_URL'] = unicode(MITX_ROOT_URL) + LIVESETTINGS_OPTIONS[1]['SETTINGS']['LICENSE_SETTINGS']['LICENSE_LOGO_URL']
 
-ASKBOT_EXTRA_SKINS_DIR = ASKBOT_ROOT / "askbot" / "skins"
+# ASKBOT_EXTRA_SKINS_DIR = ASKBOT_ROOT / "askbot" / "skins"
+ASKBOT_EXTRA_SKINS_DIR =  PROJECT_ROOT / "askbot" / "skins"
 ASKBOT_ALLOWED_UPLOAD_FILE_TYPES = ('.jpg', '.jpeg', '.gif', '.bmp', '.png', '.tiff')
 ASKBOT_MAX_UPLOAD_FILE_SIZE = 1024 * 1024 # result in bytes
 
@@ -383,5 +378,5 @@ INSTALLED_APPS = (
     'askbot.deps.livesettings',
     'followit',
     'keyedcache',
-    'robots',
+    'robots'
 )

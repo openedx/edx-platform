@@ -1,0 +1,110 @@
+<%namespace name='static' file='static_content.html'/>
+
+<section class="modal signup-modal">
+  <div class="inner-wrapper">
+    <header>
+      <h3>Sign Up for edX</h3>
+      <hr>
+    </header>
+
+    <div id="enroll">
+
+      <form id="enroll_form" method="post">
+        <div id="enroll_error" name="enroll_error"></div>
+        <label>E-mail</label>
+        <input name="email" type="email" placeholder="E-mail">
+        <label>Password</label>
+        <input name="password" type="password" placeholder="Password">
+        <label>Public Username</label>
+        <input name="username" type="text" placeholder="Public Username">
+        <label>Full Name</label>
+        <input name="name" type="text" placeholder="Full Name">
+        <label>Your Location</label>
+        <input name="location" type="text" placeholder="Your Location">
+        <label>Preferred Language</label>
+        <input name="language" type="text" placeholder="Preferred Language">
+        <label class="terms-of-service">
+          <input name="terms_of_service" type="checkbox" value="true">
+          I agree to the
+          <a href="#">Terms of Service</a>
+        </label>
+        <label class="honor-code">
+          <input name="honor_code" type="checkbox" value="true">
+          I agree to the
+          <a href="#">Honor Code</a>
+          , sumarized below as:
+        </label>
+
+          <div class="honor-code-summary">
+            <ul>
+              <li>
+                <p>Complete all mid-terms and final exams with only my own work.</p>
+              </li>
+              <li>
+                <p>Maintain only one account, and not share the username or password.</p>
+              </li>
+              <li>
+                <p>Not engage in any activity that would dishonestly improve my results, or improve or hurt those of others.</p>
+              </li>
+              <li>
+                <p>Not post answers to problems that are being used to assess student performance.</p>
+              </li>
+            </ul>
+            <hr>
+          </div>
+
+
+        <div class="submit">
+          <input name="submit" type="submit" value="Create My Account">
+        </div>
+      </form>
+
+      <section class="login-extra">
+        <p>
+          <span>Already have an account? <a href="#">Login.</a></span>
+        </p>
+      </section>
+
+    </div>
+
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="text/javascript">
+  (function() {
+    function getCookie(name) {
+      return $.cookie(name);
+    }
+
+    function postJSON(url, data, callback) {
+      $.ajax({type:'POST',
+        url: url,
+        dataType: 'json',
+        data: data,
+        success: callback,
+        headers : {'X-CSRFToken':getCookie('csrftoken')}
+      });
+    }
+
+    $('form#enroll_form').submit(function(e) {
+      e.preventDefault();
+      var submit_data = $('#enroll_form').serialize();
+
+      postJSON('/create_account',
+        submit_data,
+        function(json) {
+          if(json.success) {
+            $('#enroll').html(json.value);
+          } else {
+            $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+          }
+        }
+      );
+    });
+  })(this)
+</script>

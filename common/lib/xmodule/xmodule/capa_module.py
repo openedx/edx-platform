@@ -107,7 +107,7 @@ class CapaModule(XModule):
         else:
             self.max_attempts = None
 
-        self.show_answer = self.metadata.get('showanwser', 'closed')
+        self.show_answer = self.metadata.get('showanswer', 'closed')
 
         if self.show_answer == "":
             self.show_answer = "closed"
@@ -135,7 +135,7 @@ class CapaModule(XModule):
         try:
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(), instance_state, seed=seed, system=self.system)
         except Exception:
-            msg = 'cannot create LoncapaProblem %s' % self.location.url
+            msg = 'cannot create LoncapaProblem %s' % self.location.url()
             log.exception(msg)
             if self.system.DEBUG:
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
@@ -182,7 +182,7 @@ class CapaModule(XModule):
             try:
                 return Progress(score, total)
             except Exception as err:
-                if self.DEBUG:
+                if self.system.DEBUG:
                     return None
                 raise
         return None
@@ -201,9 +201,9 @@ class CapaModule(XModule):
         try:
             html = self.lcp.get_html()
         except Exception, err:
-            if self.DEBUG:
+            if self.system.DEBUG:
                 log.exception(err)
-                msg = '[courseware.capa.capa_module] <font size="+1" color="red">Failed to generate HTML for problem %s</font>' % (self.filename)
+                msg = '[courseware.capa.capa_module] <font size="+1" color="red">Failed to generate HTML for problem %s</font>' % (self.location.url())
                 msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<','&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
                 html = msg
@@ -274,7 +274,7 @@ class CapaModule(XModule):
             html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
-        return html
+        return self.system.replace_urls(html, self.metadata['data_dir'])
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -418,7 +418,7 @@ class CapaModule(XModule):
             # TODO: why is this line here?
             #self.lcp = LoncapaProblem(self.definition['data'],
             #                          id=lcp_id, state=old_state, system=self.system)
-            if self.DEBUG:
+            if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
                 return {'success':msg}

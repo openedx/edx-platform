@@ -1,0 +1,13 @@
+{% set question_url=settings.APP_URL+question.get_absolute_url()|urlencode %}
+<div class="share-question">
+  <p>{% trans %}Know someone who can answer? <strong> Share a <a href="{{ question_url }}">link</a> to this question via{% endtrans %}
+    {% if settings.ENABLE_SHARING_TWITTER %}{{ macros.share(site = 'twitter', site_label = 'Twitter') }},{% endif %}
+    {% if settings.ENABLE_SHARING_FACEBOOK %}{{ macros.share(site = 'facebook', site_label = 'Facebook') }},{% endif %}
+    {% if settings.ENABLE_SHARING_LINKEDIN %}{{ macros.share(site = 'linkedin', site_label = 'LinkedIn') }},{% endif %}
+    {% if settings.ENABLE_SHARING_IDENTICA %}{{ macros.share(site = 'identica', site_label = 'Identi.ca') }},{% endif %}
+    {%- if settings.ENABLE_SHARING_TWITTER or settings.ENABLE_SHARING_FACEBOOK or settings.ENABLE_SHARING_LINKEDIN or settings.ENABLE_SHARING_IDENTICA -%}
+        {% trans %} or{% endtrans %}
+    {% endif %}
+    <a href="mailto:?subject={{ settings.APP_SHORT_NAME|urlencode }}&amp;body={{ question_url }}">{% trans %}email{% endtrans %}</a>.</strong>
+</p>
+</div>

@@ -1,6 +1,7 @@
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from lxml import etree
+from mako.template import Template
 
 
 class CustomTagModule(XModule):
@@ -30,9 +31,10 @@ class CustomTagModule(XModule):
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
         xmltree = etree.fromstring(self.definition['data'])
-        filename = xmltree.find('impl').text
+        template_name = xmltree.find('impl').text
         params = dict(xmltree.items())
-        self.html = self.system.render_template(filename, params, namespace='custom_tags')
+        with self.system.filestore.open('custom_tags/{name}'.format(name=template_name)) as template:
+            self.html = Template(template.read()).render(**params)
 
     def get_html(self):
         return self.html

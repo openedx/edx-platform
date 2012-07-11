@@ -4,11 +4,12 @@ import logging
 from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
-from lxml import etree
+from functools import wraps
 
 from xmodule.modulestore.django import modulestore
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
+from static_replace import replace_urls
 
 log = logging.getLogger("mitx.courseware")
 
@@ -26,8 +27,8 @@ class I4xSystem(object):
     and user, or other environment-specific info.
     '''
     def __init__(self, ajax_url, track_function,
-                 get_module, render_template, user=None,
-                 filestore=None):
+                 get_module, render_template, replace_urls,
+                 user=None, filestore=None):
         '''
         Create a closure around the system environment.
 
@@ -43,6 +44,8 @@ class I4xSystem(object):
         user - The user to base the seed off of for this request
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
+        replace_urls - TEMPORARY - A function like static_replace.replace_urls
+            that capa_module can use to fix up the static urls in ajax results.
         '''
         self.ajax_url = ajax_url
         self.track_function = track_function
@@ -52,6 +55,7 @@ class I4xSystem(object):
         self.exception404 = Http404
         self.DEBUG = settings.DEBUG
         self.seed = user.id if user is not None else 0
+        self.replace_urls = replace_urls
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
@@ -102,18 +106,7 @@ def grade_histogram(module_id):
     return grades
 
 
-def make_module_from_xml_fn(user, request, student_module_cache, position):
-    '''Create the make_from_xml() function'''
-    def module_from_xml(xml):
-        '''Modules need a way to convert xml to instance objects.
-        Pass the rest of the context through.'''
-        (instance, _, _, _) = get_module(
-            user, request, xml, student_module_cache, position)
-        return instance
-    return module_from_xml
-
-
-def toc_for_course(user, request, course_location, active_chapter, active_section):
+def toc_for_course(user, request, course, active_chapter, active_section):
     '''
     Create a table of contents from the module store
 
@@ -129,8 +122,8 @@ def toc_for_course(user, request, course_location, active_chapter, active_sectio
     chapters with name 'hidden' are skipped.
     '''
 
-    student_module_cache = StudentModuleCache(user, modulestore().get_item(course_location), depth=2)
-    (course, _, _, _) = get_module(user, request, course_location, student_module_cache)
+    student_module_cache = StudentModuleCache(user, course, depth=2)
+    (course, _, _, _) = get_module(user, request, course.location, student_module_cache)
 
     chapters = list()
     for chapter in course.get_display_items():
@@ -151,7 +144,7 @@ def toc_for_course(user, request, course_location, active_chapter, active_sectio
     return chapters
 
 
-def get_section(course, chapter, section):
+def get_section(course_module, chapter, section):
     """
     Returns the xmodule descriptor for the name course > chapter > section,
     or None if this doesn't specify a valid section
@@ -160,11 +153,6 @@ def get_section(course, chapter, section):
     chapter: Chapter name
     section: Section name
     """
-    try:
-        course_module = modulestore().get_item(course)
-    except:
-        log.exception("Unable to load course_module")
-        return None
 
     if course_module is None:
         return
@@ -224,6 +212,9 @@ def get_module(user, request, location, student_module_cache, position=None):
         (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
         return module
 
+    # TODO (cpennington): When modules are shared between courses, the static
+    # prefix is going to have to be specific to the module, not the directory
+    # that the xml was loaded from
     system = I4xSystem(track_function=make_track_function(request),
                        render_template=render_to_string,
                        ajax_url=ajax_url,
@@ -231,11 +222,18 @@ def get_module(user, request, location, student_module_cache, position=None):
                        filestore=descriptor.system.resources_fs,
                        get_module=_get_module,
                        user=user,
+                       # TODO (cpennington): This should be removed when all html from
+                       # a module is coming through get_html and is therefore covered
+                       # by the replace_static_urls code below
+                       replace_urls=replace_urls,
                        )
     # pass position specified in URL to module through I4xSystem
     system.set('position', position)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+
+    replace_prefix = module.metadata['data_dir']
+    module = replace_static_urls(module, replace_prefix)
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
         module = add_histogram(module)
@@ -266,9 +264,32 @@ def get_module(user, request, location, student_module_cache, position=None):
     return (module, instance_module, shared_module, descriptor.category)
 
 
+def replace_static_urls(module, prefix):
+    """
+    Updates the supplied module with a new get_html function that wraps
+    the old get_html function and substitutes urls of the form /static/...
+    with urls that are /static/<prefix>/...
+    """
+    original_get_html = module.get_html
+    
+    @wraps(original_get_html)
+    def get_html():
+        return replace_urls(original_get_html(), staticfiles_prefix=prefix)
+
+    module.get_html = get_html
+    return module
+
+
 def add_histogram(module):
+    """
+    Updates the supplied module with a new get_html function that wraps
+    the output of the old get_html function with additional information
+    for admin users only, including a histogram of student answers and the
+    definition of the xmodule
+    """
     original_get_html = module.get_html
 
+    @wraps(original_get_html)
     def get_html():
         module_id = module.id
         histogram = grade_histogram(module_id)

@@ -1,0 +1,119 @@
+{% import "macros.html" as macros %}
+{% load extra_filters_jinja %}
+{% cache 0 "scope_sort_tabs" search_tags request.user scope sort query context.page language_code %}
+
+<div class="question-list-header">
+  <section class="question-list-meta">
+
+    <div class="question-list-title">
+
+      {% if questions_count > 0 %}
+          <h1>
+          {% trans cnt=questions_count, q_num=questions_count|intcomma %}{{q_num}} question{% pluralize %}{{q_num}} questions{% endtrans %}
+
+          {% if author_name %}
+            {% trans %}with {{author_name}}'s contributions{% endtrans %}
+          {% endif %}
+          </h1>
+
+
+
+      {% else %}
+
+        <h1>No questions found</h1>
+
+      {% endif %}
+    </div>
+
+
+    {% if questions_count > 0 %}
+          <div class="question-sort">
+            <nav>
+              <div id="sort_tabs">
+                <span class="label">{% trans %}Sort by {% endtrans %}</span>
+                {% if show_sort_by_relevance %}
+                {% set asc_relevance_tooltip = gettext('most relevant questions') %}
+                {% set desc_relevance_tooltip = gettext('click to see most relevant questions') %}
+                {% set relevance_label = gettext('relevance') %}
+                {% if query %}
+                <a id="by_relevance"
+                  {% if sort == "relevance-desc" %}
+                  href="{{ search_state.change_sort('relevance-desc').full_url() }}"
+                  class="on"
+                  title="{{asc_relevance_tooltip}}"><span>{{relevance_label}} &#9660;</span>
+                  {% else %}
+                  href="{{ search_state.change_sort('relevance-desc').full_url() }}"
+                  class="off"
+                  title="{{desc_relevance_tooltip}}"><span>{{relevance_label}}</span>
+                  {% endif %}
+                </a>
+                {% endif %}
+                <script type="text/javascript">
+                  var sortButtonData = sortButtonData || {}; sortButtonData['relevance'] = { asc_tooltip: "{{asc_relevance_tooltip}}", desc_tooltip: "{{desc_relevance_tooltip}}", label: "{{relevance_label}}" };
+                </script>
+
+                {% endif %}
+
+                {{macros.reversible_sort_button(
+                        button_sort_criterium = 'age',
+                        label = gettext('by date'),
+                        asc_tooltip = gettext('click to see the oldest questions'),
+                        desc_tooltip = gettext('click to see the newest questions'),
+                        current_sort_method = sort,
+                        search_state = search_state,
+                    )
+                }}
+                {{macros.reversible_sort_button(
+                button_sort_criterium = 'activity',
+                label = gettext('by activity'),
+                asc_tooltip = gettext('click to see the least recently updated questions'),
+                desc_tooltip = gettext('click to see the most recently updated questions'),
+                current_sort_method = sort,
+                search_state = search_state,
+                )
+                }}
+                {{macros.reversible_sort_button(
+                button_sort_criterium = 'answers',
+                label = gettext('by answers'),
+                asc_tooltip = gettext('click to see the least answered questions'),
+                desc_tooltip = gettext('click to see the most answered questions'),
+                current_sort_method = sort,
+                search_state = search_state,
+                )
+                }}
+                {{macros.reversible_sort_button(
+                        button_sort_criterium = 'votes',
+                        label = gettext('by votes'),
+                        asc_tooltip = gettext('click to see least voted questions'),
+                        desc_tooltip = gettext('click to see most voted questions'),
+                        current_sort_method = sort,
+                        search_state = search_state,
+                    )
+                }}
+                </div>
+              </nav>
+            </div>
+    {% endif %}
+
+  </section>
+
+    {% if search_tags %}
+    <section class="question-tags-list">
+
+    <div class="back">
+      <a class="light-button" href="{% url questions %}">Reset filter</a>
+    </div>
+
+    <div id="listSearchTags"class="tags-list">
+      <!-- <span>{% trans %}Tagged{% endtrans %}</span> -->
+      {{ macros.tag_list_widget( search_tags, id = 'searchTags', deletable = True, make_links = False, search_state = search_state) }}
+    </div>
+
+
+
+      </section>
+    {% endif %}
+
+</div>
+
+{% endcache %}

@@ -1,0 +1,93 @@
+{% extends "two_column_body.html" %}
+<!-- template faq.html -->
+{% block title %}{% spaceless %}{% trans %}FAQ{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1>{% trans %}Frequently Asked Questions {% endtrans %}({% trans %}FAQ{% endtrans %})</h1>
+<h2 class="first">{% trans %}What kinds of questions can I ask here?{% endtrans %}</h2>
+<p>{% trans %}Most importanly - questions should be <strong>relevant</strong> to this community.{% endtrans %}
+{% trans %}Before asking the question - please make sure to use search to see whether your question has alredy been answered.{% endtrans %}
+</p>
+<h2>{% trans %}What questions should I avoid asking?{% endtrans %}</h2>
+<p>{% trans %}Please avoid asking questions that are not relevant to this community, too subjective and argumentative.{% endtrans %}
+</p>
+<h2>{% trans %}What should I avoid in my answers?{% endtrans %}</h2>
+<p>{{ settings.APP_TITLE }} {% trans %}is a Q&A site, not a discussion group. Therefore - please avoid having discussions in your answers, comment facility allows some space for brief discussions.{% endtrans %}</p>
+<h2>{% trans %}Who moderates this community?{% endtrans %}</h2>
+<p>{% trans %}The short answer is: <strong>you</strong>.{% endtrans %}
+{% trans %}This website is moderated by the users.{% endtrans %}
+{% trans %}The reputation system allows users earn the authorization to perform a variety of moderation tasks.{% endtrans %} 
+</p>
+<h2>{% trans %}How does reputation system work?{% endtrans %}</h2>
+<p>{% trans %}Rep system summary{% endtrans %}</p>
+<p>{% trans MAX_REP_GAIN_PER_USER_PER_DAY=settings.MAX_REP_GAIN_PER_USER_PER_DAY, REP_GAIN_FOR_RECEIVING_UPVOTE=settings.REP_GAIN_FOR_RECEIVING_UPVOTE, REP_LOSS_FOR_RECEIVING_DOWNVOTE=settings.REP_LOSS_FOR_RECEIVING_DOWNVOTE|absolute_value %}For example, if you ask an interesting question or give a helpful answer, your input will be upvoted. On the other hand if the answer is misleading - it will be downvoted. Each vote in favor will generate <strong>{{REP_GAIN_FOR_RECEIVING_UPVOTE}}</strong> points, each vote against will subtract <strong>{{REP_LOSS_FOR_RECEIVING_DOWNVOTE}}</strong> points. There is a limit of <strong>{{MAX_REP_GAIN_PER_USER_PER_DAY}}</strong> points that can be accumulated for a question or answer per day. The table below explains reputation point requirements for each type of moderation task.{% endtrans %}
+</p>
+
+<table cellspacing="3" cellpadding="3">
+    <tr>
+        <th width="40px" style="text-align:right"></th>
+        <th width="300px"></th>
+    </tr>
+    <tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_VOTE_UP}}</strong></td>
+        <td>{% trans %}upvote{% endtrans %}</td>
+    </tr>
+    <tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_LEAVE_COMMENTS}}</strong></td>
+        <td>{% trans %}add comments{% endtrans %}</td>
+    </tr>
+    <tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_VOTE_DOWN}}</strong></td>
+        <td>{% trans %}downvote{% endtrans %}</td>
+    </tr><tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_ACCEPT_OWN_ANSWER}}</strong></td>
+        <td>{% trans %} accept own answer to own questions{% endtrans %}</td>
+    </tr>
+    </tr><tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_CLOSE_OWN_QUESTIONS}}</strong></td>
+        <td>{% trans %}open and close own questions{% endtrans %}</td>
+    </tr>
+    <tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_RETAG_OTHERS_QUESTIONS}}</strong></td>
+        <td>{% trans %}retag other's questions{% endtrans %}</td>
+    </tr>
+    {% if settings.WIKI_ON %}
+    <tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_EDIT_WIKI}}</strong></td>
+        <td>{% trans %}edit community wiki questions{% endtrans %}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_EDIT_OTHERS_POSTS}}</strong></td>
+        <td>{% trans %}edit any answer{% endtrans %}</td>
+    </tr>
+    <tr>
+        <td class="faq-rep-item"><strong>{{settings.MIN_REP_TO_DELETE_OTHERS_COMMENTS}}</strong></td>
+        <td>{% trans %}delete any comment{% endtrans %}</td>
+    </tr>
+</table>
+<a id='gravatar'></a><h2>{% trans %}what is gravatar{% endtrans %}</h2>
+{% trans %}gravatar faq info{% endtrans %}
+<h2>{% trans %}To register, do I need to create new password?{% endtrans %}</h2>
+<p>{% trans %}No, you don't have to. You can login through any service that supports OpenID, e.g. Google, Yahoo, AOL, etc."{% endtrans %}
+<strong><a href="{{ settings.LOGIN_URL }}">{% trans %}"Login now!"{% endtrans %}</a> »</strong> 
+</p>
+<h2>{% trans %}Why other people can edit my questions/answers?{% endtrans %}</h2>
+<p> {% trans %}Goal of this site is...{% endtrans %} {% trans %}So questions and answers can be edited like wiki pages by experienced users of this site and this improves the overall quality of the knowledge base content.{% endtrans %}
+{% trans %}If this approach is not for you, we respect your choice.{% endtrans %}
+</p>
+<h2>{% trans %}Still have questions?{% endtrans %}</h2>
+<p>{% trans %}Please ask your question at {{ask_question_url}}, help make our community better!{% endtrans %} 
+</p>
+</div>
+<script type="text/javascript">
+    //highlihts section if url has matching #anchor_name
+    $(document).ready(function (){
+        var hash = window.location.hash;
+        if (hash.length > 1){
+            $(hash).parent().addClass('highlight');
+            window.location.hash = hash;
+        }
+    })
+</script>
+{% endblock %}
+<!-- end template faq.html -->

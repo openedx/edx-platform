@@ -1,0 +1,45 @@
+{% set pipe=joiner('<span class="sep">|</span>') %}
+{% if request.user|can_edit_post(question) %}{{ pipe() }}
+  <a class="question-edit" href="{% url edit_question question.id %}">{% trans %}edit{% endtrans %}</a>
+{% endif %}
+
+{% if thread.closed %}
+
+  {% if request.user|can_reopen_question(question) %}{{ pipe() }}
+    <a  class="question-close" href="{% url reopen question.id %}">{% trans %}reopen{% endtrans %}</a>
+  {% endif %}
+
+{% else %}
+
+    {% if request.user|can_close_question(question) %}{{ pipe() }}
+      <a class="question-close" href="{% url close question.id %}">{% trans %}close{% endtrans %}</a>
+    {% endif %}
+
+{% endif %}
+
+{% if question.offensive_flag_count == 0 %}{{ pipe() }}
+
+<span id="question-offensive-flag-{{ question.id }}" class="offensive-flag" title="{% trans %}report as offensive (i.e containing spam, advertising, malicious text, etc.){% endtrans %}">
+  <a class="question-flag" href="#">{% trans %}flag offensive{% endtrans %}</a>
+
+  {% if request.user|can_see_offensive_flags(question) %}
+  <span class="darkred">{% if question.offensive_flag_count > 0 %}({{ question.offensive_flag_count }}){% endif %}</span>
+  {% endif %}
+</span>
+
+{% elif question.offensive_flag_count > 0 %}{{ pipe() }}
+
+<span id="question-offensive-flag-remove-{{ question.id }}" class="offensive-flag"
+  title="{% trans %}report as offensive (i.e containing spam, advertising, malicious text, etc.){% endtrans %}">
+  <a class="question-flag" href="#">{% trans %}remove flag{% endtrans %}</a>
+
+  {% if request.user|can_see_offensive_flags(question) %}
+  <span class="darkred">{% if question.offensive_flag_count > 0 %}({{ question.offensive_flag_count }}){% endif %}</span>
+  {% endif %}
+</span>
+{% endif %}
+
+{% if request.user|can_delete_post(question) %}{{ pipe() }}
+  <a class="question-delete" id="question-delete-link-{{question.id}}">{% if question.deleted %}{% trans %}undelete{% endtrans %}{% else %}&#10006;{% endif %}</a>
+
+{% endif %}

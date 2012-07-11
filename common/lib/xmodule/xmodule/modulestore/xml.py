@@ -5,6 +5,7 @@ from lxml import etree
 from path import path
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 from xmodule.mako_module import MakoDescriptorSystem
+import os
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError
@@ -19,17 +20,21 @@ class XMLModuleStore(ModuleStore):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, org, course, data_dir, default_class=None, eager=False):
+    def __init__(self, data_dir, default_class=None, eager=False, course_dirs=None):
         """
         Initialize an XMLModuleStore from data_dir
 
-        org, course: Strings to be used in module keys
-        data_dir: path to data directory containing course.xml
+        data_dir: path to data directory containing the course directories
         default_class: dot-separated string defining the default descriptor class to use if non is specified in entry_points
         eager: If true, load the modules children immediately to force the entire course tree to be parsed
+        course_dirs: If specified, the list of course_dirs to load. Otherwise, load
+            all course dirs
         """
+
+        self.eager = eager
         self.data_dir = path(data_dir)
         self.modules = {}
+        self.courses = {}
 
         if default_class is None:
             self.default_class = None
@@ -42,7 +47,40 @@ class XMLModuleStore(ModuleStore):
         log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager,self.data_dir))
         log.debug('default_class = %s' % self.default_class)
 
-        with open(self.data_dir / "course.xml") as course_file:
+        for course_dir in os.listdir(self.data_dir):
+            if course_dirs is not None and course_dir not in course_dirs:
+                continue
+
+            if not os.path.exists(self.data_dir / course_dir / "course.xml"):
+                continue
+
+            course_descriptor = self.load_course(course_dir)
+            self.courses[course_dir] = course_descriptor
+
+    def load_course(self, course_dir):
+        """
+        Load a course into this module store
+        course_path: Course directory name
+        """
+
+        with open(self.data_dir / course_dir / "course.xml") as course_file:
+
+            course_data = etree.parse(course_file).getroot()
+            org = course_data.get('org')
+
+            if org is None:
+                log.error("No 'org' attribute set for course in {dir}. Using default 'edx'".format(dir=course_dir))
+                org = 'edx'
+
+            course = course_data.get('course')
+
+            if course is None:
+                log.error("No 'course' attribute set for course in {dir}. Using default '{default}'".format(
+                    dir=course_dir,
+                    default=course_dir
+                ))
+                course = course_dir
+
             class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def __init__(self, modulestore):
                     """
@@ -76,21 +114,23 @@ class XMLModuleStore(ModuleStore):
                         log.debug('==> importing module location %s' % repr(module.location))
                         modulestore.modules[module.location] = module
 
-                        if eager:
+                        if modulestore.eager:
                             module.get_children()
                         return module
 
                     system_kwargs = dict(
                         render_template=lambda: '',
                         load_item=modulestore.get_item,
-                        resources_fs=OSFS(data_dir),
+                        resources_fs=OSFS(modulestore.data_dir / course_dir),
                         process_xml=process_xml
                     )
                     MakoDescriptorSystem.__init__(self, **system_kwargs)
                     XMLParsingSystem.__init__(self, **system_kwargs)
 
-            self.course = ImportSystem(self).process_xml(course_file.read())
+            course_descriptor = ImportSystem(self).process_xml(etree.tostring(course_data))
+            course_descriptor.metadata['data_dir'] = course_dir
             log.debug('========> Done with course import')
+            return course_descriptor
 
     def get_item(self, location):
         """
@@ -109,6 +149,12 @@ class XMLModuleStore(ModuleStore):
             return self.modules[location]
         except KeyError:
             raise ItemNotFoundError(location)
+
+    def get_courses(self):
+        """
+        Returns a list of course descriptors
+        """
+        return self.courses.values()
 
     def create_item(self, location):
         raise NotImplementedError("XMLModuleStores are read-only")

@@ -18,7 +18,7 @@ describe 'VideoProgressSlider', ->
           stop: @slider.onStop
 
       it 'build the seek handle', ->
-        expect(@slider.handle).toBe '.ui-slider-handle'
+        expect(@slider.handle).toBe '.slider .ui-slider-handle'
         expect($.fn.qtip).toHaveBeenCalledWith
           content: "0:00"
           position:

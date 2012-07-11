@@ -1,0 +1,60 @@
+{% extends "two_column_body.html" %}
+{% import "macros.html" as macros %}
+<!-- users.html -->
+{% block title %}{% spaceless %}{% trans %}Users{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1 class="section-title">{% trans %}Users{% endtrans %}</h1>
+<div class="tabBar tabBar-user">
+    <div class="tabsA">
+    <span class="label">{% trans %}Sort by &raquo;{% endtrans %}</span>
+        <a 
+            id="sort_reputation"
+            href="{% url users %}?sort=reputation"
+            {% if tab_id == 'reputation' %}class="on"{% endif %}
+            title="{% trans %}see people with the highest reputation{% endtrans %}"
+        ><span>{% trans %}reputation{% endtrans %}</span></a>
+        <a 
+            id="sort_newest"
+            href="{% url users %}?sort=newest"
+            {% if tab_id == 'newest' %}class="on"{% endif %}
+            class="off" title="{% trans %}see people who joined most recently{% endtrans %}"
+        ><span>{% trans %}recent{% endtrans %}</span></a>
+        <a 
+            id="sort_last"
+            href="{% url users %}?sort=last"
+            {% if tab_id == 'last' %}class="on"{% endif %}
+            class="off" title="{% trans %}see people who joined the site first{% endtrans %}"
+        ><span>{% trans %}oldest{% endtrans %}<span></a>
+        <a 
+            id="sort_user"
+            href="{% url users %}?sort=user"
+            {% if tab_id == 'user' %}class="on"{% endif %}
+            title="{% trans %}see people sorted by name{% endtrans %}"
+        ><span>{% trans %}by username{% endtrans %}</span></a>
+    </div>
+</div>
+<div class="clean"></div>
+<p>
+    {% if suser %}
+        {% trans %}users matching query {{suser}}:{% endtrans %}
+    {% endif %}
+    {% if not users.object_list %}
+        <span>{% trans %}Nothing found.{% endtrans %}</span>
+    {% endif %}
+</p>
+{{ macros.user_list(users.object_list) }}
+<div class="pager">
+    {{ macros.paginator(paginator_context) }}
+</div>              
+{% endblock %}
+{% block endjs %}
+    <script type="text/javascript">
+        //todo move javascript out
+        $().ready(function(){
+            Hilite.exact = false;
+            Hilite.elementid = "main-body";
+            Hilite.debug_referrer = location.href;
+        });
+    </script>
+{% endblock %}
+<!-- end users.html -->

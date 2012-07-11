@@ -1,0 +1,66 @@
+{% extends "two_column_body.html" %}
+<!-- template badges.html -->
+{% block title %}{% spaceless %}{% trans %}Badges summary{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<div class="question-list-header">
+  <h1>{% trans %}Badges{% endtrans %}</h1>
+</div>
+<div class="badges-intro">
+  <p>
+  {% trans %}Community gives you awards for your questions, answers and votes.{% endtrans %}<br/>
+  {% trans %}Below is the list of available badges and number 
+  of times each type of badge has been awarded. Give us feedback at {{feedback_faq_url}}.
+  {% endtrans %}
+  </p>
+</div>
+<ul id="medalList" class="badge-list">
+    {% for badge in badges %}
+    <li class="badge">
+        <div class="check">
+        {% for a in mybadges %}
+            {% if a.badge_id == badge.id %}
+             <span>&#10003;</span>
+            {% endif %}
+        {% endfor %}
+        </div>
+        <div class="badge-name">
+            <a href="{{badge.get_absolute_url()}}"
+                title="{{badge.get_type_display()}} : {{badge.description}}"
+                class="medal"><span class="{{ badge.css_class }}">&#9679;</span>&nbsp;{{badge.name}}</a><strong>
+                &#215; {{ badge.awarded_count|intcomma }}</strong>
+        </div>
+        <p style="">{{badge.description}}</p>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+{% block sidebar %}
+
+<h1>{% trans %}Community badges{% endtrans %}</h1>
+<div class="box badge-desc">
+
+  <div>
+    <span class="gold">&#9679;</span>&nbsp;<strong>{% trans %}gold{% endtrans %}</strong>
+    <p>
+    {% trans %}gold badge description{% endtrans %}
+    </p>
+  </div>
+
+  <div>
+   <span class="silver">&#9679;</span>&nbsp;<strong>{% trans %}silver{% endtrans %}</strong>
+    <p>
+    {% trans %}silver badge description{% endtrans %}
+    </p>
+  </div>
+
+
+  <div>
+    <span class="bronze">&#9679;</span>&nbsp;<strong>{% trans %}bronze{% endtrans %}</strong>
+    <p>
+    {% trans %}bronze badge description{% endtrans %}
+    </p>
+  </div>
+
+</div>
+{% endblock %}
+<!-- end template badges.html -->
