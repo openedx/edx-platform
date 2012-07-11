@@ -1,95 +1,45 @@
 .home {
-  margin: 50px 10px 100px;
+  margin: 0px 0px 100px;
 
   > header {
+    //background: rgb(250,250,250);
+    @include background-image(url('/static/images/shot-5-large.jpg'));
+    background-size: cover;
+    border-bottom: 1px solid rgb(80,80,80);
+    @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.9), inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
     @include clearfix;
-    min-height: 335px;
-    margin-bottom: 40px;
-    position: relative;
+    margin-top: -69px;
+    min-height: 300px;
+    padding: 129px 0px 50px;
     width: flex-grid(12);
 
-    .video-wrapper {
-      right: 0px;
-      position: absolute;
-      top: 0px;
-
-      .video-player {
-        background: rgb(45,45,45);
-        border: 1px solid rgb(0,0,0);
-        @include border-radius(4px);
-        height: 315px;
-        padding: 5px;
-        width: 560px;
-
-        &:hover {
-          @include box-shadow(0 0 12px 0 rgba(0,0,0, 0.3));
-        }
-
-        .video-inner {
-          background: transparent;
-          height: 315px;
-          margin: 0 auto;
-          width: 560px;
-        }
-      }
+    .inner-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
     }
 
-    .welcome {
+    h1 {
+      color: rgb(255,255,255);
+      text-align: center;
+    }
+
+    a {
+      @include button(shiny, $blue);
       @include box-sizing(border-box);
-      float: left;
-      font-size: 0em;
-      width: flex-grid(12);
-      padding-right: 600px;
-      padding-top: 20px;
+      @include border-radius(3px);
+      display: block;
+      font: italic 1.4rem/1.6rem $serif;
+      letter-spacing: 1px;
+      margin: 0 auto;
+      padding: 15px 0px;
+      text-transform: uppercase;
+      text-align: center;
+      -webkit-font-smoothing: antialiased;
+      width: flex-grid(3);
 
-      h1 {
-        text-align: left;
-      }
-
-      .intro {
-        @include box-sizing(border-box);
-        margin-bottom: 40px;
-        width: flex-grid(12);
-
-        p {
-          color: $base-font-color;
-          margin: 0px;
-          width: flex-grid(12);
-        }
-      }
-
-      .signup-wrapper {
-        @include box-sizing(border-box);
-        width: flex-grid(11);
-
-        .sign-up {
-          background: rgb(240,240,240);
-          @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
-          border: 1px solid rgb(220,220,220);
-          @include border-radius(4px);
-          @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
-          @include box-sizing(border-box);
-          font-size: 0em;
-          padding: 12px;
-          @include transition(all, 0.15s, linear);
-          width: flex-grid(12);
-
-          &:hover {
-            @include box-shadow(0 0 16px 0 rgba($blue, 0.35));
-          }
-
-          a {
-            @include button(shiny, $blue);
-            @include box-sizing(border-box);
-            @include border-radius(3px);
-            @include inline-block;
-            font: italic 1.2rem/1.6rem $serif;
-            padding: 15px 0px;
-            text-transform: uppercase;
-            text-align: center;
-            width: flex-grid(12);
-          }
-        }
+      &:hover {
+        color: rgb(255,255,255);
       }
     }
   }
@@ -98,7 +48,6 @@
     @include background-image(linear-gradient(180deg, rgba(245,245,245, 0) 0%,
                                                       rgba(245,245,245, 1) 50%,
                                                       rgba(245,245,245, 0) 100%));
-    border-top: 1px solid rgb(210,210,210);
     border-bottom: 1px solid rgb(210,210,210);
     margin-bottom: 0px;
     overflow: hidden;
@@ -234,25 +183,23 @@
     width: flex-grid(12);
 
     > h2 {
-      background: rgb(245,245,245);
-      border: 1px solid rgb(220,220,220);
-      border-top: none;
-      @include border-bottom-radius(4px);
-      @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
+      @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
+      border: 1px solid rgb(200,200,200);
+      @include border-radius(4px);
+      border-top-color: rgb(190,190,190);
+      @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2));
       color: $lighter-base-font-color;
       letter-spacing: 1px;
+      margin-bottom: 0px;
+      margin-top: -15px;
       padding: 15px 10px;
       text-align: center;
       text-transform: uppercase;
-    }
+      text-shadow: 0 1px rgba(255,255,255, 0.6);
 
-    .courses {
-      //background: rgb(245,245,245);
-      //@include background-image(linear-gradient(180deg, rgba(255,255,255, 1) 0%,
-                                                        //rgba(255,255,255, 0.5) 20%,
-                                                        //rgba(255,255,255, 0) 50%,
-                                                        //rgba(255,255,255, 0.5) 80%,
-                                                        //rgba(255,255,255, 1) 100%));
+      .lowercase {
+        text-transform: none;
+      }
     }
   }
 

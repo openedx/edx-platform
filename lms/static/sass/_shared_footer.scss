@@ -1,5 +1,7 @@
 footer {
-  max-width: 1200px;
+  background: transparent;
+  border-top: 1px solid rgb(200,200,200);
+  @include box-shadow(inset 0 1px 3px 0 rgba(0,0,0, 0.1));
   margin: 0 auto;
   padding: 0 0 40px;
   width: flex-grid(12);
@@ -11,7 +13,6 @@ footer {
   }
 
   nav {
-    border-top: 1px solid rgb(200,200,200);
     @include box-sizing(border-box);
     @include clearfix;
     max-width: 1200px;
@@ -24,15 +25,22 @@ footer {
       padding-top: 2px;
 
       a.logo {
-        @include box-sizing(border-box);
+        @include background-image(url('/static/images/logo.png'));
+        background-position: 0 -24px;
+        background-repeat: no-repeat;
         @include inline-block;
         float: left;
-        height: 100%;
-        margin-right: 14px;
-        margin-top: 1px;
+        height: 23px;
+        margin-right: 15px;
+        margin-top: 2px;
         padding-right: 15px;
         position: relative;
+        width: 47px;
         vertical-align: middle;
+
+        &:hover {
+          background-position: 0 0;
+        }
 
         &::after {
           @extend .faded-vertical-divider;
@@ -44,16 +52,11 @@ footer {
           top: -2px;
           width: 1px;
         }
-
-        img {
-          position: relative;
-          z-index: 2;
-        }
       }
 
       p {
         color: $lighter-base-font-color;
-        font: normal 1.2rem/1.6rem $serif;
+        font: italic 1.2rem/1.6rem $serif;
         @include inline-block;
         margin: 0 auto;
         padding-top: 4px;
@@ -62,9 +65,8 @@ footer {
 
         a {
           color: $lighter-base-font-color;
-          font: normal 1.2rem/1.6rem $serif;
+          font: italic 1.2rem/1.6rem $serif;
           margin-left: 5px;
-          text-decoration: underline;
         }
       }
     }
@@ -74,7 +76,6 @@ footer {
       font-size: 0em;
 
       li {
-        //border-right: 1px solid rgb(200,200,200);
         @include inline-block;
         list-style: none;
         padding: 0px 15px;
@@ -94,7 +95,8 @@ footer {
 
         a:link, a:visited {
           color: $lighter-base-font-color;
-          font: normal 1.2rem/1.6rem $serif;
+          font: 300 1.2rem/1.6rem $sans-serif;
+          letter-spacing: 1px;
           padding: 6px 0px;
         }
 

@@ -1,5 +1,5 @@
-.about {
-  margin: 40px auto 120px;
+.container.about {
+  padding: 20px 0 120px;
 
   > nav {
     margin-bottom: 80px;
@@ -14,12 +14,14 @@
 
     a {
       border-bottom: 3px solid transparent;
+      color: $lighter-base-font-color;
+      font: italic 1.2rem/1.4rem $serif;
       @include inline-block;
       letter-spacing: 1px;
-      margin: 0px 5px;
+      margin: 0px 15px;
       padding: 20px 10px;
       @include transition(all, 0.15s, linear);
-      text-transform: uppercase;
+      text-transform: lowercase;
 
       &:hover, &.active {
         border-color: rgb(200,200,200);
@@ -29,8 +31,6 @@
   }
 
   .vision {
-    display: none;
-
     h1 + hr {
       margin-bottom: 80px;
     }
@@ -87,7 +87,7 @@
   }
 
   .faq {
-    //display: none;
+    display: none;
     @include clearfix;
 
     nav.categories {

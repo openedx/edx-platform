@@ -15,7 +15,7 @@ $blue: rgb(29,157,217);
 $pink: rgb(182,37,104);
 
 html, body {
-  background: rgb(255,255,255);
+  background: rgb(250,250,250);
   font-size: 75%;
 }
 
@@ -23,7 +23,6 @@ h1, h2, h3, h4, h5, h6 {
   color: $base-font-color;
   font: normal 1.4rem/2rem $serif;
   margin: 0px;
-  -webkit-font-smoothing: antialiased;
 }
 
 h1 {
@@ -38,8 +37,10 @@ h1 {
 h2 {
   color: $lighter-base-font-color;
   font: normal 1.4rem/2rem $serif;
+  letter-spacing: 1px;
   margin-bottom: 15px;
   text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
 }
 
 p {
@@ -75,6 +76,12 @@ a:link, a:visited {
   &:hover {
     color: $base-font-color;
   }
+}
+
+.content-wrapper {
+  background: rgb(255,255,255);
+  margin: 0 auto 0;
+  width: flex-grid(12);
 }
 
 .container {

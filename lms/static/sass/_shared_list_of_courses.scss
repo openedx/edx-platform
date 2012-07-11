@@ -21,26 +21,27 @@
         margin-right: 0;
       }
 
-      //.meta-info {
-        //background: rgba(0,0,0, 0.6);
-        //bottom: 8px;
-        //border: 1px solid rgba(0,0,0, 0.5);
-        //@include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.15));
-        //@include clearfix;
-        //left: -4px;
-        //position: absolute;
-        //@include transition(all, 0.15s, linear);
+      .meta-info {
+        background: rgba(0,0,0, 0.6);
+        bottom: 6px;
+        border: 1px solid rgba(0,0,0, 0.5);
+        @include border-right-radius(2px);
+        @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.15));
+        @include clearfix;
+        position: absolute;
+        right: -3px;
+        @include transition(all, 0.15s, linear);
 
-        //p {
-          //color: rgb(255,255,255);
-          //font: 300 1.2rem/1.4rem $sans-serif;
-          //padding: 5px 12px;
+        p {
+          color: rgb(255,255,255);
+          font: 300 1.2rem/1.4rem $sans-serif;
+          padding: 5px 12px;
 
-          //&.university {
-            //float: left;
-          //}
-        //}
-      //}
+          &.university {
+            float: left;
+          }
+        }
+      }
 
       .inner-wrapper {
         border: 1px solid rgba(255,255,255, 1);
@@ -73,7 +74,7 @@
 
             h2 {
               color: $base-font-color;
-              font: bold 1.2rem/1.6rem $sans-serif;
+              font: 800 1.2rem/1.6rem $sans-serif;
               padding-top: 10px;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-overflow: ellipsis;
@@ -114,37 +115,13 @@
       }
 
       .info {
+        background: rgb(255,255,255);
         height: 180px + 130px;
         left: 0px;
         position: absolute;
         top: 0px;
         @include transition(all, 0.15s, linear);
         width: 100%;
-
-        .meta-info {
-          background: rgba(0,0,0, 0.6);
-          bottom: 130px;
-          border-top: 1px solid rgba(0,0,0, 0.5);
-          @include clearfix;
-          position: absolute;
-          @include transition(all, 0.15s, linear);
-          width: 100%;
-
-          p {
-            color: rgb(255,255,255);
-            font: 300 1.2rem/1.4rem $sans-serif;
-            padding: 5px 10px;
-
-            &.university {
-              float: left;
-            }
-
-            &.dates {
-              float: right;
-              margin-top: 0px;
-            }
-          }
-        }
 
         .cover-image {
           height: 180px;
@@ -159,13 +136,49 @@
         }
 
         .desc {
-          background: rgb(255,255,255);
           @include box-sizing(border-box);
-          height: 130px;
+          height: 100px;
           overflow: hidden;
-          padding: 10px;
+          padding: 10px 10px 15px 10px;
+          position: relative;
           width: 100%;
 
+          p {
+            height: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .bottom {
+          @include box-sizing(border-box);
+          @include clearfix;
+          padding: 6px 10px;
+          width: 100%;
+
+          > p, a {
+            color: $lighter-base-font-color;
+            font: 300 1.2rem/1.4rem $sans-serif;
+            letter-spacing: 1px;
+            padding: 0;
+
+            &.university {
+              border-right: 1px solid $lighter-base-font-color;
+              display: block;
+              float: left;
+              margin-right: 10px;
+              padding-right: 10px;
+
+              &:hover {
+                color: $blue;
+              }
+            }
+
+            &.dates {
+              float: left;
+              margin-top: 0px;
+            }
+          }
         }
       }
 
@@ -176,10 +189,10 @@
 
         .info {
           top: -130px;
+        }
 
-          .meta-info {
-            opacity: 0;
-          }
+        .meta-info {
+          opacity: 0;
         }
       }
     }

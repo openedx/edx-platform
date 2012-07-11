@@ -1,44 +1,47 @@
 <section class="cal">
   <header class="wip">
-    <h2>Filter content:</h2>
+    <ul class="actions">
+      <li><a href="#">Timeline view</a></li>
+      <li><a href="#">Multi-Module edit</a></li>
+    </ul>
+
     <ul>
       <li>
-        <a href="#">Sequences</a>
-
-        <ul>
-          <li>Hide all</li>
-          <li>Lectures</li>
-          <li>Labs</li>
-          <li>Homeworks</li>
-          <li>Exams</li>
-        </ul>
+        <h2>Sort:</h2>
+        <select>
+          <option value="">Linear Order</option>
+          <option value="">Recently Modified</option>
+          <option value="">Type</option>
+          <option value="">Alphabetically</option>
+        </select>
       </li>
 
       <li>
-        <a href="#">Deadlines</a>
-
-        <ul>
-          <li>Today</li>
-          <li>Tomorrow</li>
-          <li>This week</li>
-          <li>In 2 weeks</li>
-          <li>This month</li>
-        </ul>
+        <h2>Filter:</h2>
+        <select>
+          <option value="">All content</option>
+          <option value="">Videos</option>
+          <option value="">Problems</option>
+          <option value="">Labs</option>
+          <option value="">Tutorials</option>
+          <option value="">HTML</option>
+        </select>
+        <a href="#" class="more">More</a>
       </li>
       <li>
-        <a href="#">Goals</a>
-        <ul>
-          <li>Hide</li>
-        </ul>
+        <a href="#">Hide goals</a>
+      </li>
+      <li class="search">
+        <input type="search" name="" id="" value="" placeholder="Search" />
       </li>
     </ul>
   </header>
 
-  <ol>
+  <ol id="weeks">
     % for week in weeks:
-    <li>
+    <li class="week" data-id="${week.location.url()}">
       <header>
-        <h1><a href="#" class="module-edit" id="${week.location.url()}">${week.name}</a></h1>
+        <h1><a href="#" class="week-edit">${week.name}</a></h1>
         <ul>
           % if 'goals' in week.metadata:
             % for goal in week.metadata['goals']:
@@ -50,10 +53,10 @@
         </ul>
       </header>
 
-      <ul>
+      <ul class="modules">
         % for module in week.get_children():
-        <li class="${module.category}">
-            <a href="#" class="module-edit" id="${module.location.url()}">${module.name}</a>
+        <li class="module" data-id="${module.location.url()}" data-type="${module.js_module_name()}">
+            <a href="#" class="module-edit">${module.name}</a>
             <a href="#" class="draggable">handle</a>
         </li>
         % endfor
@@ -61,7 +64,7 @@
       </ul>
     </li>
     %endfor
-    <li>
+    <li class="wip">
       <header>
         <h1>Course Scratch Pad</h1>
       </header>
@@ -83,14 +86,15 @@
           <a href="" class="video-edit">Video 3</a>
           <a href="#" class="draggable">handle</a>
         </li>
+        <%include file="module-dropdown.html"/>
       </ul>
     </li>
   </ol>
 
   <section class="new-section">
-    <a href="#" >+ Add New Section</a>
+    <a href="#" class="wip" >+ Add New Section</a>
 
-    <section>
+    <section class="hidden">
       <form>
         <ul>
           <li>

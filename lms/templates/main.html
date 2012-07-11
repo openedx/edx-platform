@@ -21,6 +21,10 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery.cookie.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.qtip.min.js')}"></script>
 
+  ## TODO (cpennington): Remove this when we have a good way for modules to specify js to load on the page
+  ## and in the wiki
+  <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
+
 % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
  <%static:js group='application'/>
 % endif
@@ -60,17 +64,17 @@
 <body class="<%block name='bodyclass'/>">
   <%include file="navigation.html" />
   <!--[if lte IE 9]>
-  <p class="ie-warning">You are using a browser that is not supported by <em>MITx</em>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p>
+  <p class="ie-warning">You are using a browser that is not supported by <em>edX</em>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p>
   <![endif]-->
 
-  ${self.body()}
+  <section class="content-wrapper">
+    ${self.body()}
+  </section>
+
   <%block name="bodyextra"/>
   <%include file="footer.html" />
   <%block name="js_extra"/>
   <script src="${static.url('js/my_courses_dropdown.js')}"></script>
-  <!--
-     -<script src="${static.url('js/sticky_footer.js')}"></script>
-     -->
   <script src="${static.url('js/toggle_login_modal.js')}"></script>
   <script src="${static.url('js/sticky_filter.js')}"></script>
 
