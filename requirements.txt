@@ -40,4 +40,4 @@ django-robots
 django-ses
 django-storages
 django-threaded-multihost
--f repo-requirements.txt
+-r repo-requirements.txt
