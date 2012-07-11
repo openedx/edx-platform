@@ -94,7 +94,7 @@ def login_user(request, error=""):
     if user is not None and user.is_active:
         try:
             login(request, user)
-            if request.POST['remember'] == 'true':
+            if request.POST.get('remember') == 'true':
                 request.session.set_expiry(None) # or change to 604800 for 7 days
                 log.debug("Setting user session to never expire")
             else:
