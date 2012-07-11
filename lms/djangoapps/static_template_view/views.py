@@ -9,13 +9,19 @@ from django.core.context_processors import csrf
 from django.conf import settings
 
 #valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
-valid_templates=['index.html', 
-                 'tos.html', 
-                 'privacy.html', 
-                 'honor.html', 
-                 'copyright.html', 
+valid_templates=['index.html',
+                 'tos.html',
+                 'privacy.html',
+                 'honor.html',
+                 'copyright.html',
                  '404.html',
-                 'mitx_help.html']
+                 'mitx_help.html',
+                 'pressrelease.html',
+                 'about.html',
+                 'faq.html',
+                 'press.html',
+                 'contact.html',
+                 'terms_and_conditions.html']
 
 if settings.STATIC_GRAB: 
     valid_templates = valid_templates+['server-down.html',
