@@ -411,13 +411,13 @@ class GraderTest(unittest.TestCase):
         self.assertAlmostEqual( graded['percent'], 0.7688095238095238 )
         self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
         self.assertEqual( len(graded['grade_breakdown']), 3 )
-        
+    
         graded = zeroWeightsGrader.grade(self.test_gradesheet)
         self.assertAlmostEqual( graded['percent'], 0.2525 )
         self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
         self.assertEqual( len(graded['grade_breakdown']), 3 )
-        
-        
+    
+    
         graded = allZeroWeightsGrader.grade(self.test_gradesheet)
         self.assertAlmostEqual( graded['percent'], 0.0 )
         self.assertEqual( len(graded['section_breakdown']), (12 + 1) + (7+1) + 1 )
@@ -436,8 +436,6 @@ class GraderTest(unittest.TestCase):
         self.assertAlmostEqual( graded['percent'], 0.0 )
         self.assertEqual( len(graded['section_breakdown']), 0 )
         self.assertEqual( len(graded['grade_breakdown']), 0 )
-        
-    
 
     def test_graderFromConf(self):
         
@@ -486,12 +484,12 @@ class GraderTest(unittest.TestCase):
         graded = homeworkGrader2.grade(self.test_gradesheet)
         self.assertAlmostEqual( graded['percent'], 0.11 )
         self.assertEqual( len(graded['section_breakdown']), 12 + 1 )
-        
+    
         #TODO: How do we test failure cases? The parser only logs an error when it can't parse something. Maybe it should throw exceptions?
 
 # --------------------------------------------------------------------------
 # Module progress tests
-        
+    
 class ProgressTest(unittest.TestCase):
     ''' Test that basic Progress objects work.  A Progress represents a
     fraction between 0 and 1.
@@ -501,7 +499,7 @@ class ProgressTest(unittest.TestCase):
     half_done = Progress(3, 6)
     also_half_done = Progress(1, 2)
     done = Progress(7, 7)
-    
+
     def test_create_object(self):
         # These should work:
         p = Progress(0, 2)

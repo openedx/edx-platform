@@ -1,0 +1,49 @@
+<!--
+
+   @desc Word checker
+    Tests the JavaScript-side i18n translation arrays for completeness
+    and generates an empty template containing all the keys 
+    for new translations.
+    
+   Needs output-words.js and other JavaScript files shipped with Askbot.
+   
+   @author      Pekka Gaiser <post@pekkagaiser.com>
+   @package     Part of the ASKBOT project <www.askbot.org>
+   @license     Published with NO WARRANTY WHATSOEVER
+                under the same license as the Askbot project.
+   @version     First release, May 7th 2010
+
+
+--><html>
+<head>
+
+<title>Translation check</title>
+
+<style type="text/css">
+  
+   body { margin: 16px; color: navy}
+  
+   table.languages td.language { width: 40px; padding-top: 4px; padding-bottom: 4px; text-align: center }  
+   table.languages td.okay     { background-color: lightgreen }
+   table.languages td.missing  { background-color: orange }
+   
+   div.column { width: 49%; float: left; padding-bottom: 64px }
+ 
+</style>
+
+<script type="text/javascript">i18nLang = "De";</script>           
+<script type="text/javascript" src="jquery-1.2.6.js"></script>           
+<script type="text/javascript" src="i18n.js"></script>
+<script type="text/javascript" src="output-words.js"></script>
+
+
+</head>
+<body>
+
+  <script type="text/javascript">
+       output();
+ </script>
+
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% from "macros.html" import user_country_flag, tag_list_widget %}
+<li class="single-question short-summary {% if extra_class %} {{extra_class}}{% endif %}" id="question-{{question.id}}">
+
+    <div class="question-body">
+
+       <h2><a title="{{question.summary|escape}}" href="{{ question.get_absolute_url(title=thread.title) }}">{{thread.get_title(question)|escape}}</a></h2>
+       <p class="excerpt">{{question.summary}}&hellip;</p>
+
+       <div class="user-info">
+          <span class="relative-time" title="{{thread.last_activity_at}}">{{ thread.last_activity_at|diff_date }}</span>
+          {% if question.is_anonymous %}
+          <span class="anonymous">{{ thread.last_activity_by.get_anonymous_name() }}</span>
+          {% else %}
+          by <a href="{% url user_profile thread.last_activity_by.id, thread.last_activity_by.username|slugify %}">{{thread.last_activity_by.username}}</a>{{ user_country_flag(thread.last_activity_by) }}
+          {#{user_score_and_badge_summary(thread.last_activity_by)}#}
+          {% endif %}
+        </div>
+
+       &nbsp;{{ tag_list_widget(thread.get_tag_names(), search_state=search_state) }}
+
+    </div>
+
+    <div class="question-meta">
+      <ul class="counts">
+        <li class="views {% if thread.view_count == 0 -%} no-views {% else -%} some-views {%- endif -%}">
+          <span class="item-count">{{thread.view_count}}</span>
+          <div>
+            {% trans cnt=thread.view_count %}view{% pluralize %}views{% endtrans %}
+          </div>
+        </li>
+
+        <li class="answers
+          {% if thread.answer_count == 0 -%}
+          no-answers
+          {% else -%}
+          {%- if thread.accepted_answer_id -%}  {# INFO: Use _id to not fetch the whole answer post #}
+          accepted
+          {%- else -%}
+          some-answers
+          {%- endif -%}
+          {%- endif -%}"> 
+          <span class="item-count" >{{thread.answer_count}}{% if thread.accepted_answer_id %}{% endif %}</span>
+          <div>
+            {% trans cnt=thread.answer_count %}answer{% pluralize %}answers{% endtrans %}
+          </div>
+        </li>
+
+        <li class="votes 
+          {% if question.score == 0 -%}
+          no-votes
+          {% else -%}
+          some-votes
+          {%- endif -%}">
+          <span class="item-count">{{question.score}}</span>
+          <div>
+            {% trans cnt=question.score %}vote{% pluralize %}votes{% endtrans %}
+          </div>
+        </li>
+
+      </ul>
+    </div>
+</li>
+

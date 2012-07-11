@@ -1,0 +1,131 @@
+{% extends "user_profile/user.html" %}
+{% import "macros.html" as macros %}
+<!-- user_responses.html -->
+{#
+This template accepts a list of response list
+they are a generalized form of any response and 
+
+The following properties of response object are used:
+timestamp - when it happened
+user - user who gave response (database object)
+response_type - type of response
+response_url - link to the question
+response_title - title of the question
+response_snippet - abbreviated content of the response
+inbox_section - forum|flags
+#}
+{% block profilesection %}
+    {% trans %}inbox{% endtrans %}
+{% endblock %}
+{% block usercontent %}
+    <div style="padding-top:5px;font-size:13px;">
+    {% set re_count = request.user.new_response_count +
+            request.user.seen_response_count
+    %}
+    {% if moderation_items %}
+        {% set flag_count = moderation_items['new_count'] +
+                            moderation_items['seen_count']
+        %}
+    {% else %}
+        {% set flag_count = 0 %}
+    {% endif %}
+    {% if re_count > 0 and flag_count > 0 %}
+    <div id="re_sections">
+        {% trans %}Sections:{% endtrans %}
+        <a href="{{request.user.get_absolute_url()}}?sort=inbox&section=forum"
+            {% if inbox_section == 'forum' %}class="on"{% endif %}
+        >
+            {% trans %}forum responses ({{re_count}}){% endtrans -%}
+        </a> |
+        <a href="{{request.user.get_absolute_url()}}?sort=inbox&section=flags"
+            {% if inbox_section == 'flags' %}class="on"{% endif %}
+        >
+            {% trans %}flagged items ({{flag_count}}){% endtrans %}
+        </a>
+    </div>
+    {% endif %}
+    {% if inbox_section == 'forum' %}
+    <div id="re_tools">
+        <strong>{% trans %}select:{% endtrans %}</strong>
+        <a id="sel_all">{% trans %}all{% endtrans %}</a> |
+        <a id="sel_seen">{% trans %}seen{% endtrans %}</a> |
+        <a id="sel_new">{% trans %}new{% endtrans %}</a> |
+        <a id="sel_none">{% trans %}none{% endtrans %}</a><br />
+        <button id="re_mark_seen">{% trans %}mark as seen{% endtrans %}</button>
+        <button id="re_mark_new">{% trans %}mark as new{% endtrans %}</button>
+        <button id="re_dismiss">{% trans %}dismiss{% endtrans %}</button>
+    </div>
+    {% endif %}
+    {% if inbox_section == 'flags' %}
+    <div id="re_tools">
+        <strong>{% trans %}select:{% endtrans %}</strong>
+        <a id="sel_all">{% trans %}all{% endtrans %}</a> |
+        <a id="sel_seen">{% trans %}seen{% endtrans %}</a> |
+        <a id="sel_new">{% trans %}new{% endtrans %}</a> |
+        <a id="sel_none">{% trans %}none{% endtrans %}</a><br />
+        <button id="re_remove_flag">{% trans %}remove flags{% endtrans %}</button>
+        <button id="re_close">{% trans %}close{% endtrans %}</button>
+        <button id="re_delete_post">{% trans %}delete post{% endtrans %}</button>
+    </div>
+    {% endif %}
+    <div id="responses">
+    {% for response in responses %}
+              <div class="response-parent">
+                <p class="headline">
+                <strong>"{{ response.response_title.strip()|escape}}"</strong>
+                </p>
+                <div id="re_{{response.id}}" class="re{% if response.is_new %} new highlight{% else %} seen{% endif %}">
+                <input type="checkbox" />
+                <div class="face">
+                {{ macros.gravatar(response.user, 48) }}
+                </div>
+                <a style="font-size:12px" href="{{ response.user.get_absolute_url() }}">{{ response.user.username }}</a>
+                <a style="text-decoration:none;" href="{{ response.response_url }}">
+                    {{ response.response_type }}
+                    ({{ response.timestamp|diff_date(True) }}):<br/>
+                    {% if inbox_section != 'flags' %}
+                        {{ response.response_snippet }}
+                    {% endif %}
+                </a>
+                {% if inbox_section == 'flags' %}
+                <a class="re_expand" href="{{ response.response_url }}">
+                    <div class="re_snippet">{{ response.response_snippet }}</div>
+                    <div class="re_content">{{ response.response_content }}</div></a>
+                {% endif %}
+                </div>
+                {% if response.nested_responses %}
+                {%for nested_response in response.nested_responses %}
+                <div id="re_{{nested_response.id}}" class="re{% if nested_response.is_new %} new highlight{% else %} seen{% endif %}">
+                <input type="checkbox" />
+                <div class="face">
+                {{ macros.gravatar(nested_response.user, 48) }}
+                </div>
+                <a style="font-size:12px" href="{{ nested_response.user.get_absolute_url() }}">{{ nested_response.user.username }}</a>
+                <a style="text-decoration:none;" href="{{ nested_response.response_url }}">
+                    {{ nested_response.response_type }}
+                    ({{ nested_response.timestamp|diff_date(True) }}):<br/>
+                    {% if inbox_section != 'flags' %}
+                    {{ nested_response.response_snippet }}
+                    {% endif %}
+                </a>
+                {% if inbox_section == 'flags' %}
+                <a class="re_expand" href="{{ nested_response.response_url }}">
+                    <div class="re_snippet">{{ nested_response.response_snippet }}</div>
+                    <div class="re_content">{{ nested_response.response_content }}</div></a>
+                {% endif %}
+                </div>
+                {%endfor%}
+                {%endif%}
+              </div>
+    {% endfor %}
+    </div>
+    </div>
+{% endblock %}
+{% block userjs %}
+    <script type="text/javascript">
+        var askbot = askbot || {};
+        askbot['urls'] = askbot['urls'] || {};
+        askbot['urls']['manageInbox'] = '{% url manage_inbox %}';
+    </script>
+<!-- end user_responses.html -->
+{% endblock %}

@@ -133,7 +133,7 @@ LIVESETTINGS_OPTIONS = {
                 'SHOW_LOGO' : False,
                 'LOCAL_LOGIN_ICON' : u'/images/pw-login.gif',
                 'ALWAYS_SHOW_ALL_UI_FUNCTIONS' : False,
-                'ASKBOT_DEFAULT_SKIN' : u'default',
+                'ASKBOT_DEFAULT_SKIN' : u'mitx',
                 'USE_CUSTOM_HTML_HEAD' : False,
                 'FOOTER_MODE' : u'default',
                 'USE_CUSTOM_CSS' : False,
@@ -179,7 +179,7 @@ LIVESETTINGS_OPTIONS = {
             'MARKUP' : {
                 'MARKUP_CODE_FRIENDLY' : False,
                 'ENABLE_MATHJAX' : True,
-                'MATHJAX_BASE_URL' : u'/static/js/mathjax-MathJax-c9db6ac/',
+                'MATHJAX_BASE_URL' : u'/static/js/vendor/mathjax-MathJax-c9db6ac/',
                 'ENABLE_AUTO_LINKING' : False,
                 'AUTO_LINK_PATTERNS' : u'',
                 'AUTO_LINK_URLS' : u'',

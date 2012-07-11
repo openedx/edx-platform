@@ -6,7 +6,7 @@ from django_future.csrf import ensure_csrf_cookie
 from fs.osfs import OSFS
 from django.core.urlresolvers import reverse
 from xmodule.modulestore import Location
-from github_sync import repo_path_from_location, export_to_github
+from github_sync import export_to_github
 
 from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
@@ -51,11 +51,12 @@ def save_item(request):
     modulestore().update_item(item_id, data)
 
     # Export the course back to github
+    # This uses wildcarding to find the course, which requires handling
+    # multiple courses returned, but there should only ever be one
     course_location = Location(item_id)._replace(category='course', name=None)
     courses = modulestore().get_items(course_location)
     for course in courses:
-        repo_path = repo_path_from_location(course.location)
-        export_to_github(course, repo_path, "CMS Edit")
+        export_to_github(course, "CMS Edit")
 
     return HttpResponse(json.dumps({}))
 

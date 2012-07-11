@@ -1,0 +1,30 @@
+{% extends "user_profile/user.html" %}
+<!-- user_votes.html -->
+{% block profilesection %}
+{% trans %}votes{% endtrans %}
+{% endblock %}
+{% block usercontent %}
+<div style="padding-top:5px;font-size:13px;">
+  {% for vote in votes %}
+  <div style="clear:both;line-height:20px" >
+    <div style="width:150px;float:left">{{vote.voted_at|diff_date(True)}}</div>
+    <div style="width:30px;float:left">
+      {% if vote.vote==1 %}
+      <img src="{{"/images/vote-arrow-up-on-new.png"|media}}" title="{% trans %}upvote{% endtrans %}">
+      {% else %}
+      <img src="{{"/images/vote-arrow-down-on-new.png"|media}}" title="{% trans %}downvote{% endtrans %}">
+      {% endif %}
+    </div>
+    <div style="float:left;overflow:hidden;width:750px">
+      {% if vote.answer_id==0 %}
+      <span class="question-title-link"><a href="{% url question vote.question_id %}{{ vote.title|slugify }}">{{ vote.title|escape }}</a></span>
+      {% else %}
+      <span class="answer-title-link" ><a href="{% url question vote.question_id %}{{ vote.title|slugify }}#{{ vote.answer_id }}">{{ vote.title|escape}}</a></span>
+      {% endif %}
+      <div style="height:5px"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+<!-- end user_votes.html -->

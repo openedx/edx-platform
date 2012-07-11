@@ -1,0 +1,42 @@
+{% import "macros.html" as macros %}
+
+{# ==== BEGIN: question/question_card.html ==== #}
+{% include "question/question_card.html" %}
+{# ==== END: question/question_card.html ==== #}
+{% if thread.closed %}
+    {# ==== START: question/closed_question_info.html ==== #}
+    {% include "question/closed_question_info.html" %}
+    {# ==== END: question/closed_question_info.html ==== #}
+{% endif %}
+
+{% if answers %}
+
+    {# ==== START: question/answer_tab_bar.html ==== #}
+    {% include "question/answer_tab_bar.html" %}
+    {# ==== END: question/answer_tab_bar.html ==== #}
+
+    <!-- {{ macros.paginator(paginator_context, anchor='#sort-top') }} -->
+
+    {% for answer in answers %}
+        {# ==== START: question/answer_card.html ==== #}
+        {% include "question/answer_card.html" %}
+        {# ==== END: question/answer_card.html ==== #}
+    {% endfor %}
+
+    {{ macros.paginator(paginator_context, anchor='#sort-top') }}
+
+{% else %}
+    {# ==== START: question/sharing_prompt_phrase.html ==== #}
+    {% include "question/sharing_prompt_phrase.html" %}
+    {# ==== END: question/sharing_prompt_phrase.html ==== #}
+{% endif %}
+
+{# ==== START: question/new_answer_form.html ==== #}
+{% include "question/new_answer_form.html" %}
+{# ==== END: question/new_answer_form.html ==== #}
+
+{% if request.user == question.author %}{# this is outside the form on purpose #}
+  <div class="answer-own">
+    <input type="button" class="after-editor" id="fmanswer_button"  value="{% trans %}Answer Your Own Question{% endtrans %}"/>
+  </div>
+{%endif%}

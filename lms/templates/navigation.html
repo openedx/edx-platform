@@ -1,30 +1,53 @@
-<%page args="active_page" />
-<div class="header-wrapper">
-  <header aria-label="Global Navigation">
-    <hgroup>
-      <h1><em>
-        % if settings.ENABLE_MULTICOURSE:
-            <a href="${ MITX_ROOT_URL }/mitxhome" style="color:black;">edX</a>
-        % else:
-            edX
-        % endif
-       </em></h1>
-      <h2><a href="${ MITX_ROOT_URL }/courseware/">${ settings.COURSE_TITLE }</a></h2>
-    </hgroup>
+## TODO: Split this into two files, one for people who are authenticated, and
+## one for people who aren't. Assume a Course object is passed to the former,
+## instead of using settings.COURSE_TITLE
+<%namespace name='static' file='static_content.html'/>
+<%! from django.core.urlresolvers import reverse %>
 
-    <nav class="${active_page}">
-      <ul class="coursenav">
-        <li class="courseware"><a href="${ MITX_ROOT_URL }/courseware/">Courseware</a></li>
-        <li class="info"><a href="${ MITX_ROOT_URL }/info">Course Info</a></li>
-% if user.is_authenticated():
-        <li class="book"><a href="${ MITX_ROOT_URL }/book">Textbook</a></li>
-        <li class="discussion"><a href="${ MITX_ROOT_URL }/discussion/questions/">Discussion</a></li>
-% endif
-        <li class="wiki"><a href="${ MITX_ROOT_URL }/wiki/view/">Wiki</a></li>
-% if user.is_authenticated():
-        <li class="profile"><a href="${ MITX_ROOT_URL }/profile">Profile</a></li>
-% endif
-      </ul>
-    </nav>
-  </header>
-</div>
+<header class="global" aria-label="Global Navigation">
+  <nav>
+    <h1 class="logo"><a href="${reverse('root')}"></a></h1>
+    <ol class="left">
+      <li class="primary">
+        <a href="${reverse('courses')}">Find Courses</a>
+      </li>
+    </ol>
+
+  %if user.is_authenticated():
+    <ol class="user">
+      <li class="primary">
+        <a href="${reverse('dashboard')}" class="user-link">
+          <span class="avatar"><img src="${static.url('images/profile.jpg')}" /></span>
+          ${user.username}
+        </a>
+      </li>
+      <li class="primary">
+        <a href="#" class="dropdown">&#9662</a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Account Settings</a></li>
+            <li><a href="${reverse('help')}">Help</a></li>
+            <li><a href="${reverse('logout')}">Log Out</a></li>
+          </ul>
+      </li>
+    </ol>
+
+  %else:
+    <ol class="guest">
+      <li class="secondary">
+        <a href="${reverse('about_edx')}">About</a>
+        <a href="#">Blog</a>
+        <a href="${reverse('jobs')}">Jobs</a>
+        <a href="#" id="login">Log In</a>
+      </li>
+      <li class="primary">
+        <a href="#" id="signup">Sign Up</a>
+      </li>
+    </ol>
+  </nav>
+  %endif
+</header>
+
+%if not user.is_authenticated():
+  <%include file="login_modal.html" />
+  <%include file="signup_modal.html" />
+%endif

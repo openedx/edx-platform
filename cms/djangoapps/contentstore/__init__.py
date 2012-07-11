@@ -5,12 +5,17 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def import_from_xml(org, course, data_dir):
+def import_from_xml(data_dir, course_dirs=None):
     """
     Import the specified xml data_dir into the django defined modulestore,
     using org and course as the location org and course.
     """
-    module_store = XMLModuleStore(org, course, data_dir, 'xmodule.raw_module.RawDescriptor', eager=True)
+    module_store = XMLModuleStore(
+        data_dir,
+        default_class='xmodule.raw_module.RawDescriptor',
+        eager=True,
+        course_dirs=course_dirs
+    )
     for module in module_store.modules.itervalues():
 
         # TODO (cpennington): This forces import to overrite the same items.
@@ -26,4 +31,4 @@ def import_from_xml(org, course, data_dir):
             modulestore().update_children(module.location, module.definition['children'])
         modulestore().update_metadata(module.location, dict(module.metadata))
 
-    return module_store.course
+    return module_store

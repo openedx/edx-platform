@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block body_class %}two-col{% endblock %}
+{% block body %}
+<div class="discussion-wrapper">
+  <div class="discussion-content" id="ContentLeft">
+    {% block content%}
+    {% endblock%}
+  </div>
+  <aside id="ContentRight" class="main-sidebar">
+  {% block sidebar%}
+  {% endblock%}
+  </aside>
+</div>
+{% endblock %}

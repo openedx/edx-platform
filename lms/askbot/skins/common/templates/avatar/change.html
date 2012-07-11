@@ -1,0 +1,24 @@
+{% extends "user_profile/user.html" %}
+{% import "macros.html" as macros %}
+{% block profilesection %}
+    {% trans %}change avatar{% endtrans %}
+{% endblock %}
+{% block usercontent %}
+    <p>{% trans %}Your current avatar: {% endtrans %}<br/>
+    {{ macros.gravatar(user, 128) }}
+    </p>
+    {% if not avatars %}
+        <p>{% trans %}You haven't uploaded an avatar yet. Please upload one now.{% endtrans %}</p>
+    {% else %}
+        <form method="POST" action="{% url avatar_change %}">{% csrf_token %}
+            <ul>
+                {{ primary_avatar_form.as_ul() }}
+            </ul>
+            <p><input type="submit" value="{% trans %}Choose new Default{% endtrans %}" /></p>
+        </form>
+    {% endif %}
+    <form enctype="multipart/form-data" method="POST" action="{% url avatar_add %}">{% csrf_token %}
+        {{ upload_avatar_form.as_p() }}
+        <p><input type="submit" value="{% trans %}Upload{% endtrans %}" /></p>
+    </form>
+{% endblock %}

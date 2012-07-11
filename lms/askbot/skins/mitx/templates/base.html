@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- template base.html -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+    {% spaceless %}
+    <head>
+        <title>{% block title %}{% endblock %} - MITX 6.002</title>
+          {% include "meta/html_head_meta.html" %}
+        <link rel="shortcut icon" href="{{ settings.SITE_FAVICON|media }}" />
+          {% include "meta/html_head_stylesheets.html" %}
+        {% block forestyle %}{% endblock %}
+        {% include "meta/html_head_javascript.html" %}
+        {% if settings.USE_CUSTOM_HTML_HEAD %}
+            {{ settings.CUSTOM_HTML_HEAD }}
+        {% endif %}
+    </head>
+    {% endspaceless %}
+    <body class="askbot {% block body_class %}{% endblock %}{% if user_messages %} user-messages{% endif %}{% if page_class %} {{page_class}}{% endif %}{% if request.user.is_anonymous() %} anon{% endif %} lang-{{settings.LANGUAGE_CODE}}">
+        {% include "widgets/system_messages.html" %}
+        {% include "debug_header.html" %}
+        {% include "widgets/header.html" %} {# Logo, user tool navigation and meta navitation #}
+        {# include "widgets/secondary_header.html" #} {# Scope selector, search input and ask button #}
+
+        <section class="main-content">
+            {% block body %}
+            {% endblock %}
+        </section>
+
+        {% if settings.FOOTER_MODE == 'default' %}
+            {% include "widgets/footer.html" %}
+        {% elif settings.FOOTER_MODE == 'customize' %}
+            {{ settings.CUSTOM_FOOTER }}
+        {% endif %}
+        {% include "custom_footer.html" ignore missing %}
+        {% include "meta/bottom_scripts.html" %}
+        {% block endjs %}
+        {% endblock %}
+        <script type="text/javascript">
+            for (url_name in askbot['urls']){
+                askbot['urls'][url_name] = cleanUrl(askbot['urls'][url_name]);
+            }
+        </script>
+    </body>
+</html>
+<!-- end template base.html -->

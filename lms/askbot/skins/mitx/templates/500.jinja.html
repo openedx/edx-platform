@@ -1,0 +1,25 @@
+{% extends "two_column_body.html" %}
+<!-- template 500.html -->
+{% block title %}{% spaceless %}{% trans %}Internal server error{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1>{% trans %}Internal server error{% endtrans %}</h1>
+<div id="main-body">
+    <div style="padding:5px 0px 10px 0;line-height:25px">
+        {% trans %}system error log is recorded, error will be fixed as soon as possible{% endtrans %}<br/>
+        {% trans %}please report the error to the site administrators if you wish{% endtrans %}
+        <ul>
+            <li><a href="#" id="linkPrevious">{% trans %}back to previous page{% endtrans %}</li>
+            <li><a href="{% url questions %}">{% trans %}see latest questions{% endtrans %}</a></li>
+            <li><a href="{% url tags %}">{% trans %}see tags{% endtrans %}</a></li>
+        </u>
+    </div>
+</div>
+{% endblock %}
+{% block endjs %}
+    <script type="text/javascript">
+    $().ready(function(){
+        $("#linkPrevious").bind("click", back=function(){history.go(-1);})            
+        });
+    </script>
+{% endblock %}
+<!-- end template 500.html -->

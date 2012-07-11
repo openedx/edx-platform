@@ -5,20 +5,15 @@ scipy
 matplotlib
 markdown
 pygments
-django-mako
-django-ses
 lxml
 boto
 mako
 python-memcached
-django-celery
 path.py
 django_debug_toolbar
 -e git+git://github.com/MITx/django-pipeline.git#egg=django-pipeline
 django-staticfiles>=1.2.1
-django-masquerade
 fs
-django-jasmine
 beautifulsoup
 requests
 sympy
@@ -34,3 +29,17 @@ rednose
 GitPython >= 0.3
 django-override-settings
 mock>=0.8, <0.9
+PyYAML
+South
+django-celery
+django-countries
+django-kombu
+django-followit
+django-jasmine
+django-keyedcache
+django-mako
+django-masquerade
+django-robots
+django-ses
+django-storages
+django-threaded-multihost

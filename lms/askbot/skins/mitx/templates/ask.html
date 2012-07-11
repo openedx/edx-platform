@@ -1,0 +1,67 @@
+{% extends "two_column_body.html" %}
+{% import "macros.html" as macros %}
+<!-- template ask.html -->
+{% block title %}{% spaceless %}{% trans %}Ask a question{% endtrans %}{% endspaceless %}{% endblock %}
+{% block forestyle %}
+    <link rel="stylesheet" type="text/css" href="{{"/js/wmd/wmd.css"|media}}" />
+{% endblock %}
+{# main contents of ask form is in the template input_bar #}
+{% block sidebar %}
+{% include "widgets/question_edit_tips.html" %}
+{% endblock %}
+{% block content %}
+        {% include "widgets/ask_form.html" %}
+{% endblock %}
+{% block endjs %}
+    <script type='text/javascript' src='{{"/js/editor.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/jquery.validate.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/post.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/wmd/showdown.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/wmd/wmd.js"|media}}'></script>
+    <script type='text/javascript'>
+        var sortMethod = undefined;//need for live_search
+        var minSearchWordLength = {{settings.MIN_SEARCH_WORD_LENGTH}};
+    </script>
+    <script type='text/javascript' src='{{"/js/live_search_new_thread.js"|media}}'></script>
+    {% include "meta/editor_data.html" %}
+    {% if mandatory_tags %}
+        {% include "meta/mandatory_tags_js.html" %}
+    {% endif %}
+    <script type='text/javascript'>
+        askbot['urls']['api_get_questions'] = '{% url api_get_questions %}';
+        {% if settings.ENABLE_MATHJAX or settings.MARKUP_CODE_FRIENDLY %}
+            var codeFriendlyMarkdown = true;
+        {% else %}
+            var codeFriendlyMarkdown = false;
+        {% endif %}
+        $().ready(function(){
+            liveSearchNewThreadInit();
+            //set current module button style
+            $('#editor').TextAreaResizer();
+
+            //highlight code synctax when editor has new text
+            $("#editor").typeWatch({highlight: false, wait: 3000,
+                             captureLength: 5, callback: lanai.highlightSyntax});
+
+            //toggle preview of editor
+            //todo remove copy-paste
+            var display = true;
+            var txt = "{% trans %}hide preview{% endtrans %}";
+            $('#pre-collapse').text(txt);
+            $('#pre-collapse').bind('click', function(){
+                txt = display ? "{% trans %}show preview{% endtrans %}" : "{% trans %}hide preview{% endtrans %}";
+                display = !display;
+                $('#previewer').toggle();
+                $('#pre-collapse').text(txt);
+            });
+            //Tags autocomplete
+
+            {{ macros.tag_autocomplete_js(id = '#id_tags') }}
+
+            setupFormValidation($("#fmask"), CPValidator.getQuestionFormRules(), CPValidator.getQuestionFormMessages());
+            lanai.highlightSyntax();
+        });
+    </script>
+{% endblock %}
+
+<!-- end template ask.html -->

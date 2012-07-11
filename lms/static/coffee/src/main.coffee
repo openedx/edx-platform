@@ -14,7 +14,7 @@ $ ->
 
   $('body').addClass 'touch-based-device' if onTouchBasedDevice()
 
-  $("a[rel*=leanModal]").leanModal()
+  # $("a[rel*=leanModal]").leanModal()
   $('#csrfmiddlewaretoken').attr 'value', $.cookie('csrftoken')
 
   new Calculator

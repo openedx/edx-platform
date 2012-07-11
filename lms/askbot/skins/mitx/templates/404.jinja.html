@@ -1,0 +1,44 @@
+{% extends "one_column_body.html" %}
+<!-- template 404.jinja.html -->
+{% block title %}{% spaceless %}{% trans %}Page not found{% endtrans %}{% endspaceless %}{% endblock %}
+{% block forestyle%}
+<style type="text/css">
+    form input { margin-right: 5px; }
+</style>
+{% endblock %}
+{% block content %}
+<h1>{% trans %}Page not found{% endtrans %}</h1>
+<div id="main-body">
+    <div style="padding:5px 0px 10px 0;line-height:25px;">
+        <h2>{% trans %}Sorry, could not find the page you requested.{% endtrans %}</h2>
+        <div style="margin-top:5px">
+        {% trans %}This might have happened for the following reasons:{% endtrans %}<br/>
+        <ul>
+            <li>{% trans %}this question or answer has been deleted;{% endtrans %}</li>
+            <li>{% trans %}url has error - please check it;{% endtrans %}</li>
+            <li>{% trans %}the page you tried to visit is protected or you don't have sufficient points, see{% endtrans %} <a href="{% url faq %}">{% trans %}faq{% endtrans %}</a>;</li>
+            <li>{% trans %}if you believe this error 404 should not have occured, please{% endtrans %} 
+                <a href="{{feedback_site_url}}" target="_blank">{% trans %}report this problem{% endtrans %}</a></li>
+            </u>
+        </div>
+        <script type="text/javascript">
+            var GOOG_FIXURL_LANG = '{{settings.LANGUAGE_CODE}}';
+            var GOOG_FIXURL_SITE = '{{site_url}}';
+        </script>
+        <script type="text/javascript" src="http://linkhelp.clients.google.com/tbproxy/lh/wm/fixurl.js"></script>
+        <ul>
+            <li><a href="#" id="linkPrevious">{% trans %}back to previous page{% endtrans %} »</li>
+            <li><a href="{% url questions %}">{% trans %}see all questions{% endtrans %} »</a></li>
+            <li><a href="{% url tags %}">{% trans %}see all tags{% endtrans %} »</a></li>
+        </u>
+    </div>
+</div>
+{% endblock %}
+{% block endjs %}
+   <script type="text/javascript">
+        $().ready(function(){
+            $("#linkPrevious").bind("click", back=function(){history.go(-1);})            
+        });
+    </script>
+{% endblock %}
+<!-- end template 404.jinja.html -->

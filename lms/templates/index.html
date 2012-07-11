@@ -1,70 +1,63 @@
-<%inherit file="marketing.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 
-<%block name="title">edx4edx author course</%block>
-<%block name="description">edx4edx</%block>
-<%block name="keywords">MITx, edx4edx</%block>
+<section class="home">
+  <header>
+    <div class="inner-wrapper">
+      <h1>The Future of Online Education</h1>
+      <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
+    </div>
+  </header>
 
-<%block name="header_text">
-    <section class="course">
-      <section>
-        <h1>edx4edx</h1>
-        <h2>edX Author Course</h2>
-        <a class="enroll" rel="leanModal" href="#enroll"><noscript>In
-order to</noscript> Enroll in edx4edx  <noscript>you need to have javascript enabled</noscript></a>
+  <section class="container">
+    <section class="highlighted-courses">
+    <h2>Explore courses from <span class="lowercase">edX</span> universities</h2>
+
+      <section class="university-partners">
+        <ol class="partners">
+          <li class="partner mit">
+            <a href="/university_profile">
+              <img src="${static.url('images/mit.png')}" />
+              <div class="name">
+                <span>MITx</span>
+              </div>
+            </a>
+          </li>
+          <li class="partner">
+            <a href="/university_profile">
+              <img src="${static.url('images/harvard.png')}" />
+              <div class="name">
+                <span>HarvardX</span>
+              </div>
+            </a>
+          </li>
+          <li class="partner">
+            <a href="/university_profile">
+              <img src="${static.url('images/berkeley.png')}" />
+              <div class="name">
+                <span>BerkeleyX</span>
+              </div>
+            </a>
+          </li>
+        </ol>
       </section>
-      <p>edx4edx is a course for prospective edX course authors</p>
+
+      <section class="courses">
+        %for course in courses:
+          <%include file="course.html" args="course=course" />
+        %endfor
+      </section>
     </section>
-</%block>
 
-<%block name="header_class">course</%block>
-
-<section class="index-content">
+    <section class="more-info">
+      <h2>edX News & Announcements</h2>
+      <section class="news">
+        <article></article>
+        <article></article>
+        <article></article>
+        <article></article>
+      </section>
+    </section>
+  </section>
 </section>
-
-  <div id="enroll" class="leanModal_box" name="enroll"><%include file="create_account.html" /></div>
-
-<script>
-$(function() {
-
-    // TODO: Clean up as per http://stackoverflow.com/questions/169506/obtain-form-input-fields-using-jquery
-
-    /* Handles when the user hits 'enroll'. Grabs form data. Does AJAX.
-            Either shows error, or shows success. */
-
-    $('form#enroll_form').submit(function(e) {
-      e.preventDefault();
-      var submit_data={};
-      $.each($("[id^=ca_]"), function(index,value){
-        submit_data[value.name]=value.value;
-      });
-      $.each($("[id^=cb_]"), function(index,value){
-        submit_data[value.name]=value.checked;
-      });
-
-        postJSON('/create_account',
-           submit_data,
-           function(json) {
-               if(json.success) {
-                  $('#enroll').html(json.value);
-               } else {
-                  $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
-               }
-             }
-        );
-    });
-
-    /* Activate stupid spinner drop-downs in enrollment form */
-    var spinner_array=$("[id^=spinner_]");
-       spinner_array.each(function(i) {
-          var s=spinner_array[i];
-          $("#"+s.id).click(function(){
-             $("#sregion"+s.id.substring(7)).toggle();
-          });
-        })
-
-
-   /*$("sregion"+$("[id^=spinner_]")[1].id.substring(7)) */
-});
-
-</script>

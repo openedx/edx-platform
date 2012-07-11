@@ -17,6 +17,7 @@ from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
 from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 from util.cache import cache
 from student.models import UserTestGroup
@@ -49,18 +50,24 @@ def format_url_params(params):
     return [urllib.quote(string.replace(' ', '_')) for string in params]
 
 
+@ensure_csrf_cookie
+def courses(request):
+    csrf_token = csrf(request)['csrf_token']
+    # TODO: Clean up how 'error' is done.
+    context = {'courses': modulestore().get_courses(),
+               'csrf': csrf_token}
+    return render_to_response("courses.html", context)
+
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request):
+def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
 
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    course_location = CourseDescriptor.id_to_location(course_id)
 
     student_objects = User.objects.all()[:100]
     student_info = []
-
-    coursename = multicourse_settings.get_coursename_from_request(request)
-    course_location = multicourse_settings.get_course_location(coursename)
 
     for student in student_objects:
         student_module_cache = StudentModuleCache(student, modulestore().get_item(course_location))
@@ -73,15 +80,16 @@ def gradebook(request):
             'realname': UserProfile.objects.get(user=student).name
         })
 
-    return render_to_response('gradebook.html', {'students': student_info})
+    return render_to_response('gradebook.html', {'students': student_info, 'course': course})
 
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, student_id=None):
+def profile(request, course_id, student_id=None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
 
+    course_location = CourseDescriptor.id_to_location(course_id)
     if student_id is None:
         student = request.user
     else:
@@ -91,8 +99,6 @@ def profile(request, student_id=None):
 
     user_info = UserProfile.objects.get(user=student)
 
-    coursename = multicourse_settings.get_coursename_from_request(request)
-    course_location = multicourse_settings.get_course_location(coursename)
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(course_location))
     course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
 
@@ -101,6 +107,7 @@ def profile(request, student_id=None):
                'location': user_info.location,
                'language': user_info.language,
                'email': student.email,
+               'course': course,
                'format_url_params': format_url_params,
                'csrf': csrf(request)['csrf_token']
                }
@@ -117,11 +124,8 @@ def render_accordion(request, course, chapter, section):
 
         Returns (initialization_javascript, content)'''
 
-    if not course:
-        course = settings.COURSE_DEFAULT.replace('_',' ')
-
-    course_location = multicourse_settings.get_course_location(course)
-    toc = toc_for_course(request.user, request, course_location, chapter, section)
+    # TODO (cpennington): do the right thing with courses
+    toc = toc_for_course(request.user, request, course, chapter, section)
 
     active_chapter = 1
     for i in range(len(toc)):
@@ -130,33 +134,16 @@ def render_accordion(request, course, chapter, section):
 
     context = dict([('active_chapter', active_chapter),
                     ('toc', toc),
-                    ('course_name', course),
+                    ('course_name', course.title),
+                    ('course_id', course.id),
                     ('format_url_params', format_url_params),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
     return render_to_string('accordion.html', context)
 
 
-def get_course(request, course):
-    ''' Figure out what the correct course is.
-
-    Needed to preserve backwards compatibility with non-multi-course version.
-    TODO: Can this go away once multicourse becomes standard?
-    '''
-
-    if course == None:
-        if not settings.ENABLE_MULTICOURSE:
-            course = settings.COURSE_DEFAULT
-        elif 'coursename' in request.session:
-            # use multicourse_settings, so that settings.COURSE_TITLE is set properly
-            course = multicourse_settings.get_coursename_from_request(request)
-        else:
-            course = settings.COURSE_DEFAULT
-    return course
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def index(request, course=None, chapter=None, section=None,
+def index(request, course_id=None, chapter=None, section=None,
           position=None):
     ''' Displays courseware accordion, and any associated content.
     If course, chapter, and section aren't all specified, just returns
@@ -182,29 +169,8 @@ def index(request, course=None, chapter=None, section=None,
         '''
         return s.replace('_', ' ') if s is not None else None
 
-    if not settings.COURSEWARE_ENABLED:
-        return redirect('/')
-
-    course = clean(get_course(request, course))
-    if not multicourse_settings.is_valid_course(course):
-        log.debug('Course %s is not valid' % course)
-        return redirect('/')
-
-    # keep track of current course being viewed in django's request.session
-    request.session['coursename'] = course
-
-    # get default chapter & section from multicourse settings, if not provided
-    if chapter is None:
-        defchapter = multicourse_settings.get_course_default_chapter(course)
-        defsection = multicourse_settings.get_course_default_section(course)
-        if defchapter and defsection:
-            # jump there using redirect, so the user gets the right URL in their browser
-            newurl = '%s/courseware/%s/%s/%s/' % (settings.MITX_ROOT_URL,
-                                                  get_course(request, course).replace(' ','_'),
-                                                  defchapter,
-                                                  defsection)
-            log.debug('redirecting to %s' % newurl)
-            return redirect(newurl)
+    course_location = CourseDescriptor.id_to_location(course_id)
+    course = modulestore().get_item(course_location)
 
     chapter = clean(chapter)
     section = clean(section)
@@ -214,16 +180,18 @@ def index(request, course=None, chapter=None, section=None,
 
     context = {
         'csrf': csrf(request)['csrf_token'],
-        'accordion': render_accordion(request, course, chapter, section),	# triggers course load!
-        'COURSE_TITLE': multicourse_settings.get_course_title(course),
+        'accordion': render_accordion(request, course, chapter, section),
+        'COURSE_TITLE': course.title,
+        'course': course,
         'init': '',
         'content': ''
     }
 
     look_for_module = chapter is not None and section is not None
     if look_for_module:
-        course_location = multicourse_settings.get_course_location(course)
-        section = get_section(course_location, chapter, section)
+        # TODO (cpennington): Pass the right course in here
+
+        section = get_section(course, chapter, section)
         student_module_cache = StudentModuleCache(request.user, section)
         module, _, _, _ = get_module(request.user, request, section.location, student_module_cache)
         context['content'] = module.get_html()
@@ -278,3 +246,16 @@ def jump_to(request, probname=None):
     return index(request,
                  course=coursename, chapter=chapter,
                  section=section, position=position)
+
+
+@ensure_csrf_cookie
+def course_info(request, course_id):
+    csrf_token = csrf(request)['csrf_token']
+
+    try:
+        course_location = CourseDescriptor.id_to_location(course_id)
+        course = modulestore().get_item(course_location)
+    except KeyError:
+        raise Http404("Course not found")
+
+    return render_to_response('info.html', {'csrf': csrf_token, 'course': course})

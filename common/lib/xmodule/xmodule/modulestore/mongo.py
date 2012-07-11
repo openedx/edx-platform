@@ -4,10 +4,11 @@ from importlib import import_module
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from mitxmako.shortcuts import render_to_string
+from bson.son import SON
+from itertools import repeat
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
-
 
 # TODO (cpennington): This code currently operates under the assumption that
 # there is only one revision for each item. Once we start versioning inside the CMS,
@@ -15,7 +16,9 @@ from .exceptions import ItemNotFoundError, InsufficientSpecificationError
 
 
 def location_to_query(loc):
-    query = {}
+    query = SON()
+    # Location dict is ordered by specificity, and SON
+    # will preserve that order for queries
     for key, val in Location(loc).dict().iteritems():
         if val is not None:
             query['_id.{key}'.format(key=key)] = val
@@ -34,6 +37,10 @@ class MongoModuleStore(ModuleStore):
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
+
+        # Force mongo to maintain an index over _id.* that is in the same order
+        # that is used when querying by a location
+        self.collection.ensure_index(zip(('_id.' + field for field in Location._fields), repeat(1)))
 
         module_path, _, class_name = default_class.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
@@ -77,7 +84,6 @@ class MongoModuleStore(ModuleStore):
         return self._load_item(item)
 
     def get_items(self, location, default_class=None):
-        print location_to_query(location)
         items = self.collection.find(
             location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],

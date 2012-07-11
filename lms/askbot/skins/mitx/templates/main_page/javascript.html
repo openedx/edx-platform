@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    var sortMethod = '{{sort}}';
+    var showSortByRelevance = {% if show_sort_by_relevance %}true{% else %}false{% endif %};
+    var minSearchWordLength = {{settings.MIN_SEARCH_WORD_LENGTH}};
+    $(document).ready(function(){
+        /*var on_tab = '#nav_questions';
+        $(on_tab).attr('className','on');*/
+        liveSearch('{{ search_state.query_string()|escapejs }}');
+        Hilite.exact = false;
+        Hilite.elementid = "question-list";
+        Hilite.debug_referrer = location.href;
+
+        {% if update_avatar_data == True %}
+            var today = new Date();{#add timestamp to prevent browser caching #}
+            $.getJSON('{% url user_update_has_custom_avatar %}?t=' + today.getTime());
+        {% endif %}
+
+    });
+
+    askbot['urls']['mark_interesting_tag'] = '{% url mark_interesting_tag %}';
+    askbot['urls']['mark_ignored_tag'] = '{% url mark_ignored_tag %}';
+    askbot['urls']['unmark_tag'] = '{% url unmark_tag %}';
+    askbot['urls']['set_tag_filter_strategy'] = '{% url "set_tag_filter_strategy" %}';
+    askbot['urls']['questions'] = '{% url "questions" %}';
+    askbot['urls']['question_url_template'] = scriptUrl + '{{'question/'|transurl}}{{ "{{QuestionID}}/" }}';
+</script>
+<script type='text/javascript' src='{{"/js/editor.js"|media}}'></script>
+{% if request.user.is_authenticated() %}
+<script type='text/javascript' src='{{"/js/tag_selector.js"|media}}'></script>
+{% endif %}
+<script type="text/javascript" src="{{"/js/live_search.js"|media}}"></script>
+

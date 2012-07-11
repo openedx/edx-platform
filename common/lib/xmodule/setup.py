@@ -20,7 +20,7 @@ setup(
             "abtest = xmodule.abtest_module:ABTestDescriptor",
             "book = xmodule.translation_module:TranslateCustomTagDescriptor",
             "chapter = xmodule.seq_module:SequenceDescriptor",
-            "course = xmodule.seq_module:SequenceDescriptor",
+            "course = xmodule.course_module:CourseDescriptor",
             "customtag = xmodule.template_module:CustomTagDescriptor",
             "discuss = xmodule.translation_module:TranslateCustomTagDescriptor",
             "html = xmodule.html_module:HtmlDescriptor",

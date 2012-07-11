@@ -1,0 +1,7 @@
+{% import "macros.html" as macros %}
+{% if questions_count > page_size %}
+    <div id="pager" class="pager">
+        {{ macros.paginator_main_page(context|setup_paginator, position='left', search_state=search_state) }}
+        <div class="clean"></div>
+    </div>
+{% endif %}

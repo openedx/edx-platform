@@ -11,7 +11,7 @@ from .common import *
 from .logsettings import get_logger_config
 
 DEBUG = True
-TEMPLATE_DEBUG = False
+TEMPLATE_DEBUG = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log", 
                             logging_env="dev",

@@ -1,0 +1,69 @@
+<!-- question_edit_tips.html -->
+<div id="tips" class="box question-tips">
+    <h2>{% trans %}question tips{% endtrans %}</h2>
+    <ul>
+        <li>{% trans %}please ask a relevant question{% endtrans %}
+        </li>
+        <li>
+          {% trans %}please try provide enough details{% endtrans %}
+        </li>
+        <li>
+           {% trans %}be clear and concise{% endtrans %}
+        </li>
+    </ul>
+    <p class='info-box-follow-up-links'>
+<!-- will be change to a popup windows
+        <a href="{% url faq %}" target="_blank" title="{% trans %}see frequently asked questions{% endtrans %}">{% trans %}FAQ{% endtrans %} »</a>
+-->
+    </p>
+</div>
+
+<div id="markdownHelp" class="box markdown">
+    <h2>{% trans %}Markdown tips{% endtrans %}</h2>
+    <ul>
+        {% if settings.MARKDUP_CODE_FRIENDLY or settings.ENABLE_MATHJAX %}
+        <li>
+            {% trans %}*italic*{% endtrans %}
+        </li>
+        <li>
+            {% trans %}**bold**{% endtrans %}
+        </li>
+        {% else %}
+        <li>
+            {% trans %}*italic* or _italic_{% endtrans %}
+        </li>
+        <li>
+            {% trans %}**bold** or __bold__{% endtrans %}
+        </li>
+        {% endif %}
+        <li>
+            <b>{% trans %}link{% endtrans %}</b>:[{% trans %}text{% endtrans %}](http://url.com/ "{% trans %}title{% endtrans %}")
+
+        </li>
+
+        <li>
+            <b>{% trans %}image{% endtrans %}</b>:![alt {% trans %}text{% endtrans %}](/path/img.jpg "{% trans %}title{% endtrans %}")
+
+        </li>
+        <li>
+            {% trans %}numbered list:{% endtrans %}
+            <ol>
+              <li>
+             Foo
+              </li>
+              <li>
+             Bar
+              </li>
+            </ol>
+        </li>
+        <li>
+            {% trans %}basic HTML tags are also supported{% endtrans %}
+        </li>
+    </ul>
+    <p class='info-box-follow-up-links'>
+<!-- will be change to a popup windows
+        <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">{% trans %}learn more about Markdown{% endtrans %} »</a>
+-->
+    </p>
+</div>
+<!-- end question_edit_tips.html -->

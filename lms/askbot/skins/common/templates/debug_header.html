@@ -1,0 +1,27 @@
+{% if settings.USING_RUNSERVER %}
+    {% if settings.DEBUG == False %}
+    <div>
+        <p>
+            You are seeing this message because you are using Django runserver
+            and DEBUG_MODE is False. Runserver should not be used in production.
+        </p>
+        <p>
+            To serve static media in production - please run:
+            <pre>python manage.py collectstatic</pre>
+        </p>
+        <p>
+            If you do not see page styling - set DEBUG_MODE = True.
+        </p>
+    </div>
+    {% endif %}
+{% else %}
+    {% if settings.DEBUG == True %}
+        <div>
+            <p> 
+                Debug mode is on, do not use it in production.
+                To turn it off, use DEBUG = False in your 
+                settings.py file.
+            </p>
+        </div>
+    {% endif %}
+{% endif %}

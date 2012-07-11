@@ -1,0 +1,28 @@
+{% extends "one_column_body.html" %}
+<!-- template close.html -->
+{% block title %}{% spaceless %}{% trans %}Close question{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+
+<h1>{% trans %}Close question{% endtrans %}</h1>
+    <p>{% trans %}Close the question{% endtrans %}: <a href="{{ question.get_absolute_url() }}">
+    <strong>{{ question.get_question_title()|escape }}</strong></a>
+    </p>
+    <form id="fmclose" action="{% url close question.id %}" method="post" >{% csrf_token %}
+        <p>
+            <strong>{% trans %}Reasons{% endtrans %}:</strong>
+            {{ form.reason }}
+        </p>
+        <p>
+        <input type="submit" value="{% trans %}OK to close{% endtrans %}" class="submit" />&nbsp;
+        <input id="btBack" type="button" class="submit" value="{% trans %}Cancel{% endtrans %}"  />
+        </p>
+    </form>
+{% endblock %}
+{% block endjs %}
+    <script type="text/javascript">
+        $().ready(function(){
+            $('#btBack').bind('click', function(){ history.back(); });
+        });
+    </script>
+{% endblock %}
+<!-- end template close.html -->
