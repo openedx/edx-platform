@@ -2,9 +2,11 @@ from util.json_request import expect_json
 import json
 
 from django.http import HttpResponse
+from django.core.context_processors import csrf
 from django_future.csrf import ensure_csrf_cookie
-from fs.osfs import OSFS
 from django.core.urlresolvers import reverse
+from fs.osfs import OSFS
+
 from xmodule.modulestore import Location
 from github_sync import export_to_github
 
@@ -24,6 +26,14 @@ def index(request):
                     for course in courses]
     })
 
+
+@ensure_csrf_cookie
+def signup(request):
+    """
+    Display the signup form.
+    """
+    csrf_token = csrf(request)['csrf_token']
+    return render_to_response('signup.html', {'csrf': csrf_token }) 
 
 @ensure_csrf_cookie
 def course_index(request, org, course, name):
