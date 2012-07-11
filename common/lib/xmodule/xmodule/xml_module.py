@@ -6,6 +6,10 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
+# TODO (cpennington): This was implemented in an attempt to improve performance,
+# but the actual improvement wasn't measured (and it was implemented late at night).
+# We should check if it hurts, and whether there's a better way of doing lazy loading
 class LazyLoadingDict(MutableMapping):
     """
     A dictionary object that lazily loads it's contents from a provided
