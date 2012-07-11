@@ -176,14 +176,14 @@ def get_section(course_module, chapter, section):
 
 
 def get_module(user, request, location, student_module_cache, position=None):
-    ''' Get an instance of the xmodule class corresponding to module_xml,
+    ''' Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
 
     Arguments:
       - user                  : current django User
       - request               : current django HTTPrequest
-      - module_xml            : lxml etree of xml subtree for the requested module
+      - location              : A Location-like object identifying the module to load
       - student_module_cache  : a StudentModuleCache
       - position              : extra information from URL for user-specified
                                 position within module
