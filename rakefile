@@ -63,13 +63,18 @@ default_options = {
     :cms => '8001',
 }
 
+task :predjango do
+    sh("find . -type f -name *.pyc -delete")
+    sh('pip install -e common/lib/xmodule')
+end
+
 [:lms, :cms].each do |system|
     task_name = "test_#{system}"
     report_dir = File.join(REPORT_DIR, task_name)
     directory report_dir
 
     desc "Run all django tests on our djangoapps for the #{system}"
-    task task_name => report_dir do
+    task task_name => [report_dir, :predjango] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
         sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
@@ -80,7 +85,7 @@ default_options = {
         Start the #{system} locally with the specified environment (defaults to dev).
         Other useful environments are devplus (for dev testing with a real local database)
         desc
-    task system, [:env, :options] => [] do |t, args|
+    task system, [:env, :options] => [:predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
@@ -88,8 +93,13 @@ default_options = {
     Dir["#{system}/envs/*.py"].each do |env_file|
         env = File.basename(env_file).gsub(/\.py/, '')
         desc "Attempt to import the settings file #{system}.envs.#{env} and report any errors"
-        task "#{system}:check_settings:#{env}" do
+        task "#{system}:check_settings:#{env}" => :predjango do
             sh("echo 'import #{system}.envs.#{env}' | #{django_admin(system, env, 'shell')}")
+        end
+
+        desc "Run collectstatic in the specified environment"
+        task "#{system}:collectstatic:#{env}" => :predjango do
+            sh("#{django_admin(system, env, 'collectstatic')}")
         end
     end
 end
