@@ -1,26 +1,21 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        if db.backend_name == 'mysql':
-            db.execute_many("""
-            ALTER DATABASE CHARACTER SET utf8 COLLATE utf8_general_ci;
-            ALTER TABLE student_pendingemailchange CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-            ALTER TABLE student_pendingnamechange CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-            ALTER TABLE student_usertestgroup CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-            ALTER TABLE student_usertestgroup_users CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-            """)
-
+        # Adding field 'GeneratedCertificate.download_url'
+        db.add_column('certificates_generatedcertificate', 'download_url',
+                      self.gf('django.db.models.fields.CharField')(max_length=128, null=True),
+                      keep_default=False)
 
     def backwards(self, orm):
-        # Although this migration can't be undone, it is okay for it to be run backwards because it doesn't add/remove any fields
-        pass
-
+        # Deleting field 'GeneratedCertificate.download_url'
+        db.delete_column('certificates_generatedcertificate', 'download_url')
 
     models = {
         'auth.group': {
@@ -77,50 +72,20 @@ class Migration(SchemaMigration):
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
             'website': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'})
         },
+        'certificates.generatedcertificate': {
+            'Meta': {'object_name': 'GeneratedCertificate'},
+            'certificate_id': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'download_url': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'student.pendingemailchange': {
-            'Meta': {'object_name': 'PendingEmailChange'},
-            'activation_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'new_email': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
-        },
-        'student.pendingnamechange': {
-            'Meta': {'object_name': 'PendingNameChange'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'new_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'rationale': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
-        },
-        'student.registration': {
-            'Meta': {'object_name': 'Registration', 'db_table': "'auth_registration'"},
-            'activation_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
-        },
-        'student.userprofile': {
-            'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
-            'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'language': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
-            'location': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
-            'meta': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.User']"})
-        },
-        'student.usertestgroup': {
-            'Meta': {'object_name': 'UserTestGroup'},
-            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '32', 'db_index': 'True'}),
-            'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'db_index': 'True', 'symmetrical': 'False'})
         }
     }
 
-    complete_apps = ['student']
+    complete_apps = ['certificates']
