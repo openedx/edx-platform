@@ -25,7 +25,7 @@ PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
 
 NORMALIZED_DEPLOY_NAME = DEPLOY_NAME.downcase().gsub(/[_\/]/, '-')
 INSTALL_DIR_PATH = File.join(DEPLOY_DIR, NORMALIZED_DEPLOY_NAME)
-
+PIP_REPO_REQUIREMENTS = "#{INSTALL_DIR_PATH}/repo-requirements.txt"
 # Set up the clean and clobber tasks
 CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage', 'test_root/*_repo')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
@@ -149,6 +149,13 @@ task :package do
         rm -f #{LINK_PATH}
         ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
         chown makeitso:makeitso #{LINK_PATH}
+
+        # install python modules that are in the package
+        if [ -r #{PIP_REPO_REQUIREMENTS} ]; then
+            cd #{INSTALL_DIR_PATH}
+            pip install -r #{PIP_REPO_REQUIREMENTS}
+        fi
+
 
         # Delete mako temp files
         rm -rf /tmp/tmp*mako

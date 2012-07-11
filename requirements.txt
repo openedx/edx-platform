@@ -20,9 +20,6 @@ sympy
 newrelic
 glob2
 pymongo
--e common/lib/capa
--e common/lib/mitxmako
--e common/lib/xmodule
 django_nose
 nosexcover
 rednose
@@ -43,3 +40,4 @@ django-robots
 django-ses
 django-storages
 django-threaded-multihost
+-f repo-requirements.txt
