@@ -24,6 +24,8 @@ URL_RE = re.compile("""
 INVALID_CHARS = re.compile(r"[^\w.-]")
 
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
+
+
 class Location(_LocationBase):
     '''
     Encodes a location.
