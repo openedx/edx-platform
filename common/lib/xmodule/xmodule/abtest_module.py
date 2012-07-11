@@ -53,6 +53,8 @@ class ABTestModule(XModule):
                 in self.definition['data']['group_content'][self.group]]
 
 
+# TODO (cpennington): Use Groups should be a first class object, rather than being
+# managed by ABTests
 class ABTestDescriptor(RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
 
