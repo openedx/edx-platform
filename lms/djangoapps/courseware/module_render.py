@@ -41,7 +41,7 @@ class I4xSystem(object):
                           module instance object.
         render_template - a function that takes (template_file, context), and returns
                           rendered html.
-        user - The user to base the seed off of for this request
+        user - The user to base the random number generator seed off of for this request
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
