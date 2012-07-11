@@ -143,15 +143,15 @@ def create_account(request, post_override=None):
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'location', 'language', 'name']:
         if a not in post_vars:
-            js['value']="Error (401 {field}). E-mail us.".format(field=a)
+            js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
             return HttpResponse(json.dumps(js))
 
-    if post_vars['honor_code']!=u'true':
+    if 'honor_code' not in post_vars or post_vars['honor_code'] != u'true':
         js['value']="To enroll, you must follow the honor code.".format(field=a)
         return HttpResponse(json.dumps(js))
 
 
-    if post_vars['terms_of_service']!=u'true':
+    if 'terms_of_service' not in post_vars or post_vars['terms_of_service'] != u'true':
         js['value']="You must accept the terms of service.".format(field=a)
         return HttpResponse(json.dumps(js))
 
@@ -161,7 +161,7 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
     for a in ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']:
-        if len(post_vars[a])<2:
+        if len(post_vars[a]) < 2:
             error_str = {'username' : 'Username of length 2 or greater',
                          'email' : 'Properly formatted e-mail',
                          'name' : 'Your legal name ',
@@ -183,25 +183,23 @@ def create_account(request, post_override=None):
         js['value']="Username should only consist of A-Z and 0-9.".format(field=a)
         return HttpResponse(json.dumps(js))
 
-
-
-    u=User(username=post_vars['username'],
-           email=post_vars['email'],
-           is_active=False)
+    u = User(username=post_vars['username'],
+             email=post_vars['email'],
+             is_active=False)
     u.set_password(post_vars['password'])
-    r=Registration()
+    r = Registration()
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     try:
         u.save()
     except IntegrityError:
         # Figure out the cause of the integrity error
-        if len(User.objects.filter(username=post_vars['username']))>0:
-            js['value']="An account with this username already exists."
+        if len(User.objects.filter(username=post_vars['username'])) > 0:
+            js['value'] = "An account with this username already exists."
             return HttpResponse(json.dumps(js))
 
-        if len(User.objects.filter(email=post_vars['email']))>0:
-            js['value']="An account with this e-mail already exists."
+        if len(User.objects.filter(email=post_vars['email'])) > 0:
+            js['value'] = "An account with this e-mail already exists."
             return HttpResponse(json.dumps(js))
 
         raise
@@ -209,36 +207,37 @@ def create_account(request, post_override=None):
     r.register(u)
 
     up = UserProfile(user=u)
-    up.name=post_vars['name']
-    up.language=post_vars['language']
-    up.location=post_vars['location']
+    up.name = post_vars['name']
+    up.language = post_vars['language']
+    up.location = post_vars['location']
     up.save()
 
-    d={'name':post_vars['name'],
-       'key':r.activation_key,
-       'course_title' : settings.COURSE_TITLE,
-       }
+    # TODO (vshnayder): the LMS should probably allow signups without a particular course too
+    d = {'name': post_vars['name'],
+         'key': r.activation_key,
+         'course_title': getattr(settings, 'COURSE_TITLE', ''),
+         }
 
-    subject = render_to_string('emails/activation_email_subject.txt',d)
+    subject = render_to_string('emails/activation_email_subject.txt', d)
         # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt',d)
+    message = render_to_string('emails/activation_email.txt', d)
 
     try:
         if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
             dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
-            message = "Activation for %s (%s): %s\n" % (u,u.email,up.name) + '-'*80 + '\n\n' + message
+            message = "Activation for %s (%s): %s\n" % (u,u.email,up.name) + '-' * 80 + '\n\n' + message
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
         elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
-            res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            res = u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         log.exception(sys.exc_info())
-        js['value']='Could not send activation e-mail.'
+        js['value'] = 'Could not send activation e-mail.'
         return HttpResponse(json.dumps(js))
 
-    js={'success':True,
-        'value':render_to_string('registration/reg_complete.html', {'email':post_vars['email'],
-                                                                    'csrf':csrf(request)['csrf_token']})}
+    js={'success': True,
+        'value': render_to_string('registration/reg_complete.html', {'email': post_vars['email'],
+                                                                     'csrf': csrf(request)['csrf_token']})}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
 def create_random_account(create_account_function):

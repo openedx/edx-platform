@@ -21,8 +21,6 @@
 
     <%include file="widgets/header.html"/>
 
-    <%block name="content"></%block>
-
     <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
@@ -40,6 +38,9 @@
     <script src="${static.url('js/vendor/jquery.cookie.js')}"></script>
     <script src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>
     <script src="${static.url('js/vendor/jquery.tablednd.js')}"></script>
+
+    <%block name="content"></%block>
+
   </body>
 </html>
 
