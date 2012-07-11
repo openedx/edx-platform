@@ -151,7 +151,7 @@ class LoncapaProblem(object):
         used to give complex problems (eg programming questions) multiple points.
         '''
         maxscore = 0
-        for responder in self.responders.values():
+        for response, responder in self.responders.iteritems():
             if hasattr(responder,'get_max_score'):
                 try:
                     maxscore += responder.get_max_score()
@@ -159,11 +159,7 @@ class LoncapaProblem(object):
                     log.debug('responder %s failed to properly return from get_max_score()' % responder) # FIXME
                     raise
             else:
-                try:
-                    maxscore += len(responder.get_answers())
-                except:
-                    log.debug('responder %s failed to properly return get_answers()' % responder) # FIXME
-                    raise
+                maxscore += len(self.responder_answers[response])
         return maxscore
 
     def get_score(self):
@@ -215,8 +211,8 @@ class LoncapaProblem(object):
         (see capa_module)
         """
         answer_map = dict()
-        for responder in self.responders.values():
-            results = responder.get_answers()
+        for response in self.responders.keys():
+            results = self.responder_answers[response]
             answer_map.update(results)                # dict of (id,correct_answer)
 
         # include solutions from <solution>...</solution> stanzas
@@ -232,8 +228,9 @@ class LoncapaProblem(object):
         the dicts returned by grade_answers and get_question_answers. (Though
         get_question_answers may only return a subset of these."""
         answer_ids = []
-        for responder in self.responders.values():
-            answer_ids.append(responder.get_answers().keys())
+        for response in self.responders.keys():
+            results = self.responder_answers[response]
+            answer_ids.append(results.keys())
         return answer_ids
 
     def get_html(self):
@@ -386,6 +383,8 @@ class LoncapaProblem(object):
         In-place transformation
 
         Also create capa Response instances for each responsetype and save as self.responders
+
+        Obtain all responder answers and save as self.responder_answers dict (key = response)
         '''
         response_id = 1
         self.responders = {}
@@ -405,6 +404,15 @@ class LoncapaProblem(object):
 
             responder = response_tag_dict[response.tag](response, inputfields, self.context, self.system) # instantiate capa Response
             self.responders[response] = responder                               # save in list in self
+
+        # get responder answers (do this only once, since there may be a performance cost, eg with externalresponse)
+        self.responder_answers = {}
+        for response in self.responders.keys():
+            try:
+                self.responder_answers[response] = responder.get_answers()
+            except:
+                log.debug('responder %s failed to properly return get_answers()' % self.responders[response]) # FIXME
+                raise
 
         # <solution>...</solution> may not be associated with any specific response; give IDs for those separately
         # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
