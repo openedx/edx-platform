@@ -11,22 +11,31 @@
     <div class="intro-inner-wrapper">
       <section class="intro">
         <hgroup>
-          <h1>${course.get_about_section("title")} <h2><a href="#">${course.get_about_section("university")}</a></h2></h1>
+        <h1>${course.get_about_section("title")}</h1><h2><a href="#">${course.get_about_section("university")}</a></h2>
         </hgroup>
         <div class="course-dates">
-          <p>Class Starts: <span class="start-date">7/12/12</span></p>
+          <p><span class="university"><a href="#">${course.get_about_section("university")}</a></span></p>
+          <p><span class="course-number">${course.get_about_section("number")}</span></p>
+          <p><span class="course-length">15 weeks</span></p>
+          <p>Start: <span class="start-date">7/12/12</span></p>
           <p>Final Exam: <span class="start-date">12/09/12</span></p>
-          <p>Total Length: <span class="course-length">15 weeks</span></p>
         </div>
-      </section>
-      <section class="actions">
-        <div class="register-wrapper">
-          <a href="${reverse('enroll', args=[course.id])}" class="register">Register</a>
-        </div>
-        <section class="social-sharing">
-          <p><span class="num-people-registered">1,435</span> students already registed!</p>
+        <section class="actions">
+          <div class="register-wrapper">
+            <a href="${reverse('enroll', args=[course.id])}" class="register">Register</a>
+          </div>
+          <section class="social-sharing">
+            <p><span class="num-people-registered">1,435</span> students already registed!</p>
+          </section>
         </section>
       </section>
+      <div class="media">
+        <div class="hero">
+          <img src="${static.url('images/courses/circuits.jpeg')}" />
+          <div class="play-intro"></div>
+        </div>
+        <%include file="../video_modal.html" />
+      </div>
     </div>
   </header>
 
@@ -45,20 +54,6 @@
         <section class="about">
           <h2>About this course</h2>
           <p>${course.get_about_section("description")}</p>
-
-          <h2>Requirements</h2>
-          <p>${course.get_about_section("requirements")}</p>
-
-          <h2>Syllabus</h2>
-          <p>${course.get_about_section("syllabus")}</p>
-
-          <h2>Textbook</h2>
-          ${course.get_about_section("textbook")}
-
-          <h2>Frequently Asked Questions</h2>
-          <p>${course.get_about_section("faq")}</p>
-
-          <p>${course.get_about_section("more_info")}</p>
         </section>
 
         <section class="course-staff">
@@ -87,26 +82,70 @@
             <p>Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Dr. Mitros has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p>
           </article>
         </section>
+
+        <section class="requirements">
+          <h2>Requirements</h2>
+          <p>${course.get_about_section("requirements")}</p>
+        </section>
+
+        <section class="syllabus">
+          <h2>Syllabus</h2>
+          <p>${course.get_about_section("syllabus")}</p>
+        </section>
+
+        <section class="text-book">
+          <h2>Textbook</h2>
+          ${course.get_about_section("textbook")}
+        </section>
+
+        <section class="course-faq">
+          <h2>Frequently Asked Questions</h2>
+          <p>${course.get_about_section("faq")}</p>
+        </section>
+
       </section>
     </div>
 
     <section class="course-sidebar">
-      <div class="media">
-        <div class="hero">
-          <img src="${static.url('images/courses/circuits.jpeg')}" />
-          <div class="play-intro"></div>
-        </div>
-        <%include file="../video_modal.html" />
-      </div>
-
       <section class="course-summary">
-        <h3>Course Sumamry</h3>
-        <p>${course.get_about_section("short_description")}</p>
+        <header>
+          <a href="#" class="university-name">${course.get_about_section("university")}</a><span>${course.get_about_section("title")}</span>
+        </header>
+        <ol class="important-dates">
+          <li><img src=""><p>Classes Start</p><span class="start-date">7/12/12</span></li>
+          <li><img src=""><p>Final Exam</p><span class="start-date">12/09/12</span></li>
+          <li><img src=""><p>Course Length</p><span class="course-length">15 weeks</span></li>
+          <li><img src=""><p>Course Number</p><span class="course-number">${course.get_about_section("number")}</span></li>
+        </ol>
+
+        <section class="course-staff">
+          <h2>Course staff</h3>
+          <article class="teacher">
+            <div class="teacher-image">
+              <img src="${static.url('images/anant.jpg')}" />
+            </div>
+            <h3>Anant Agarwal</h3>
+            <p>Director of MIT’s Computer Science and Artificial Intelligence Laboratory (CSAIL) and a professor of the Electrical Engineering and Computer Science department at MIT. His research focus is in parallel computer architectures and cloud software systems, and he is a founder of several successful startups, including Tilera, a company that produces scalable multicore processors. Prof. Agarwal won MIT’s Smullin and Jamieson prizes for teaching and co-authored the course textbook “Foundations of Analog and Digital Electronic Circuits.”</p>
+          </article>
+
+          <article class="teacher">
+            <div class="teacher-image">
+              <img src="${static.url('images/gerald.jpg')}" />
+            </div>
+            <h3>Gerald Sussman</h3>
+            <p>Professor of Electrical Engineering at MIT. He is a well known educator in the computer science community, perhaps best known as the author of Structure and Interpretation of Computer Programs, which is universally acknowledged as one of the top ten textbooks in computer science, and as the creator of Scheme, a popular teaching language. His research spans a range of topics, from artificial intelligence, to physics and chaotic systems, to supercomputer design.</p>
+          </article>
+
+          <article class="teacher">
+            <div class="teacher-image">
+              <img src="${static.url('images/piotr.jpg')}" />
+            </div>
+            <h3>Piotr Mitros</h3>
+            <p>Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Dr. Mitros has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p>
+          </article>
+        </section>
       </section>
 
-      <section class="dates">
-        <p>Course Number <span class="start-date">(${course.get_about_section("number")})</span></p>
-      </section>
     </section>
   </section>
 </section>
