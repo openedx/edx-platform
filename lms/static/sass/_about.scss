@@ -70,10 +70,6 @@
       }
 
       &.right {
-        h2 {
-          text-align: right;
-        }
-
         .photo {
           float: right;
           margin-left: flex-gutter();
@@ -87,23 +83,22 @@
   }
 
   .faq {
-    display: none;
     @include clearfix;
 
     nav.categories {
-      border-right: 1px solid rgb(220,220,220);
+      border: 1px solid rgb(220,220,220);
       @include box-sizing(border-box);
       float: left;
-      margin-right: flex-gutter();
-      padding-right: 20px;
+      margin-left: flex-gutter();
+      padding: 20px;
       width: flex-grid(3);
 
       a {
         display: block;
         letter-spacing: 1px;
-        margin-right: -20px;
-        padding: 10px 20px 10px 0;
-        text-align: right;
+        margin: 0px -20px;
+        padding: 10px 0px 10px 20px;
+        text-align: left;
         text-transform: uppercase;
 
         &:hover {
@@ -143,8 +138,6 @@
   }
 
   .press {
-    display: none;
-
     .press-story {
       border-bottom: 1px solid rgb(220,220,220);
       @include clearfix;
@@ -194,7 +187,6 @@
   }
 
   .contact {
-    display: none;
     @include clearfix;
     margin: 0 auto;
     width: flex-grid(10);

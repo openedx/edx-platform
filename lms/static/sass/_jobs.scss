@@ -7,7 +7,7 @@
 
   .message {
     @include clearfix;
-    margin-bottom: 100px;
+    margin-bottom: 80px;
     position: relative;
 
     .photo {
@@ -30,20 +30,21 @@
   .jobs-wrapper {
     @include clearfix;
     float: left;
+    padding-top: 80px;
     width: flex-grid(12);
 
     > h2 {
-      border-bottom: 1px solid rgb(220,220,220);
+      //border-bottom: 1px solid rgb(220,220,220);
+      display: none;
       margin-bottom: 60px;
       padding-bottom: 20px;
     }
 
     .jobs-sidebar {
       @include box-sizing(border-box);
-      border-left: 1px solid rgb(220,220,220);
+      border: 1px solid rgb(220,220,220);
       float: left;
-      padding-bottom: 20px;
-      padding-left: 20px;
+      padding: 20px;
       width: flex-grid(3);
 
       nav {
@@ -64,7 +65,7 @@
             a {
               display: block;
               letter-spacing: 1px;
-              margin-left: -20px;
+              margin: 0px -20px;
               padding: 10px 0 10px 20px;
               position: relative;
               text-transform: uppercase;
