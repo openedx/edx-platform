@@ -20,7 +20,7 @@ class UserProfile(models.Model):
     class Meta:
         db_table = "auth_userprofile"
 
-    GENDER_CHOICES = (('male', 'Male'), ('female', 'Female'), ('other', 'Other'))
+    GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
 
     ## CRITICAL TODO/SECURITY
     # Sanitize all fields.
