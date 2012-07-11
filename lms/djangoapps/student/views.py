@@ -51,6 +51,7 @@ def index(request):
                                                  'csrf': csrf_token})
 
 
+@login_required
 @ensure_csrf_cookie
 def dashboard(request):
     csrf_token = csrf(request)['csrf_token']
