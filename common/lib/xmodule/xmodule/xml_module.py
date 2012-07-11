@@ -3,6 +3,7 @@ from xmodule.x_module import XModuleDescriptor
 from lxml import etree
 import copy
 import logging
+from collections import namedtuple
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +63,18 @@ class LazyLoadingDict(MutableMapping):
         self._loaded = True
 
 
+_AttrMapBase = namedtuple('_AttrMap', 'metadata_key to_metadata from_metadata')
+
+
+class AttrMap(_AttrMapBase):
+    """
+    A class that specifies a metadata_key, a function to transform an xml attribute to be placed in that key,
+    and to transform that key value
+    """
+    def __new__(_cls, metadata_key, to_metadata=lambda x: x, from_metadata=lambda x: x):
+        return _AttrMapBase.__new__(_cls, metadata_key, to_metadata, from_metadata)
+
+
 class XmlDescriptor(XModuleDescriptor):
     """
     Mixin class for standardized parsing of from xml
@@ -75,11 +88,11 @@ class XmlDescriptor(XModuleDescriptor):
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'due', 'graded', 'name', 'slug')
 
-    # A dictionary mapping xml attribute names to function of the value
+    # A dictionary mapping xml attribute names to functions of the value
     # that return the metadata key and value
     xml_attribute_map = {
-        'graded': lambda val: ('graded', val == 'true'),
-        'name': lambda val: ('display_name', val),
+        'graded': AttrMap('graded', lambda val: val == 'true', lambda val: str(val).lower()),
+        'name': AttrMap('display_name'),
     }
 
     @classmethod
@@ -130,12 +143,8 @@ class XmlDescriptor(XModuleDescriptor):
             for attr in cls.metadata_attributes:
                 val = xml_object.get(attr)
                 if val is not None:
-                    map_fn = cls.xml_attribute_map.get(attr)
-                    if map_fn is None:
-                        metadata[attr] = val
-                    else:
-                        key, val = map_fn(val)
-                        metadata[key] = val
+                    attr_map = cls.xml_attribute_map.get(attr, AttrMap(attr))
+                    metadata[attr_map.metadata_key] = attr_map.to_metadata(val)
 
             return metadata
 
@@ -203,15 +212,15 @@ class XmlDescriptor(XModuleDescriptor):
         xml_object.set('slug', self.name)
         xml_object.tag = self.category
 
-        for attr in ('format', 'graceperiod', 'showanswer', 'rerandomize', 'due'):
-            if attr in self.metadata and attr not in self._inherited_metadata:
-                xml_object.set(attr, self.metadata[attr])
+        for attr in self.metadata_attributes:
+            attr_map = self.xml_attribute_map.get(attr, AttrMap(attr))
+            metadata_key = attr_map.metadata_key
 
-        if 'graded' in self.metadata and 'graded' not in self._inherited_metadata:
-            xml_object.set('graded', str(self.metadata['graded']).lower())
+            if metadata_key not in self.metadata or metadata_key in self._inherited_metadata:
+                continue
 
-        if 'display_name' in self.metadata:
-            xml_object.set('name', self.metadata['display_name'])
+            val = attr_map.from_metadata(self.metadata[metadata_key])
+            xml_object.set(attr, val)
 
         return etree.tostring(xml_object, pretty_print=True)
 
