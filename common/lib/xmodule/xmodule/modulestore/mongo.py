@@ -15,7 +15,38 @@ from .exceptions import ItemNotFoundError, InsufficientSpecificationError
 # that assumption will have to change
 
 
+class CachingDescriptorSystem(MakoDescriptorSystem):
+    """
+    A system that has a cache of module json that it will use to load modules
+    from, with a backup of calling to the underlying modulestore for more data
+    """
+    def __init__(self, modulestore, module_data, default_class, resources_fs, render_template):
+        """
+        modulestore: the module store that can be used to retrieve additional modules
+        module_data: a mapping of Location -> json that was cached from the underlying modulestore
+        default_class: The default_class to use when loading an XModuleDescriptor from the module_data
+        resources_fs: a filesystem, as per MakoDescriptorSystem
+        render_template: a function for rendering templates, as per MakoDescriptorSystem
+        """
+        super(CachingDescriptorSystem, self).__init__(render_template, self.load_item, resources_fs)
+        self.modulestore = modulestore
+        self.module_data = module_data
+        self.default_class = default_class
+
+    def load_item(self, location):
+        location = Location(location)
+        json_data = self.module_data.get(location)
+        if json_data is None:
+            return self.modulestore.get_item(location)
+        else:
+            return XModuleDescriptor.load_from_json(json_data, self, self.default_class)
+
+
 def location_to_query(loc):
+    """
+    Takes a Location and returns a SON object that will query for that location.
+    Fields in loc that are None are ignored in the query
+    """
     query = SON()
     # Location dict is ordered by specificity, and SON
     # will preserve that order for queries
@@ -46,19 +77,49 @@ class MongoModuleStore(ModuleStore):
         class_ = getattr(import_module(module_path), class_name)
         self.default_class = class_
 
-        # TODO (cpennington): Pass a proper resources_fs to the system
-        self.system = MakoDescriptorSystem(
-            load_item=self.get_item,
-            resources_fs=None,
-            render_template=render_to_string
-        )
-
-    def _load_item(self, item):
+    def _clean_item_data(self, item):
+        """
+        Renames the '_id' field in item to 'location'
+        """
         item['location'] = item['_id']
         del item['_id']
-        return XModuleDescriptor.load_from_json(item, self.system, self.default_class)
 
-    def get_item(self, location):
+    def _cache_children(self, items, depth=0):
+        """
+        Returns a dictionary mapping Location -> item data, populated with json data
+        for all descendents of items up to the specified depth.
+        This will make a number of queries that is linear in the depth
+        """
+        data = {}
+        to_process = list(items)
+        while to_process and depth is None or depth >= 0:
+            children = []
+            for item in to_process:
+                self._clean_item_data(item)
+                children.extend(item.get('definition', {}).get('children', []))
+                data[Location(item['location'])] = item
+
+            # Load all children by id. See
+            # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
+            # for or-query syntax
+            if children:
+                to_process = list(self.collection.find({'_id': {'$in': [Location(child).dict() for child in children]}}))
+            else:
+                to_process = []
+            if depth is not None:
+                depth -= 1
+
+        return data
+
+    def _load_items(self, items, depth=0):
+        """
+        Load a list of xmodules from the data in items, with children cached up to specified depth
+        """
+        data_cache = self._cache_children(items, depth)
+        system = CachingDescriptorSystem(self, data_cache, self.default_class, None, render_to_string)
+        return [system.load_item(item['location']) for item in items]
+
+    def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
         If location.revision is None, returns the most item with the most
@@ -68,7 +129,11 @@ class MongoModuleStore(ModuleStore):
             xmodule.modulestore.exceptions.InsufficientSpecificationError
         If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
 
-        location: Something that can be passed to Location
+        location: a Location object
+        depth (int): An argument that some module stores may use to prefetch descendents of the queried modules
+            for more efficient results later in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents
+
         """
 
         for key, val in Location(location).dict().iteritems():
@@ -81,15 +146,15 @@ class MongoModuleStore(ModuleStore):
         )
         if item is None:
             raise ItemNotFoundError(location)
-        return self._load_item(item)
+        return self._load_items([item], depth)[0]
 
-    def get_items(self, location, default_class=None):
+    def get_items(self, location, depth=0):
         items = self.collection.find(
             location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],
         )
 
-        return [self._load_item(item) for item in items]
+        return self._load_items(list(items), depth)
 
     def create_item(self, location):
         """

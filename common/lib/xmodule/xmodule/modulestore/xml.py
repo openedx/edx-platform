@@ -132,7 +132,7 @@ class XMLModuleStore(ModuleStore):
             log.debug('========> Done with course import')
             return course_descriptor
 
-    def get_item(self, location):
+    def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
         If location.revision is None, returns the most item with the most
@@ -150,7 +150,7 @@ class XMLModuleStore(ModuleStore):
         except KeyError:
             raise ItemNotFoundError(location)
 
-    def get_courses(self):
+    def get_courses(self, depth=0):
         """
         Returns a list of course descriptors
         """

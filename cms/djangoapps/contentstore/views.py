@@ -54,7 +54,7 @@ def save_item(request):
     # This uses wildcarding to find the course, which requires handling
     # multiple courses returned, but there should only ever be one
     course_location = Location(item_id)._replace(category='course', name=None)
-    courses = modulestore().get_items(course_location)
+    courses = modulestore().get_items(course_location, depth=None)
     for course in courses:
         export_to_github(course, "CMS Edit")
 
