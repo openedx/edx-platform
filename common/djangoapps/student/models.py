@@ -13,6 +13,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 import json
+from django_countries import CountryField
 
 #from cache_toolbox import cache_model, cache_relation
 
@@ -34,7 +35,7 @@ class UserProfile(models.Model):
     gender = models.CharField(blank=True, null=True, max_length=6, choices=GENDER_CHOICES)
     date_of_birth = models.DateField(blank=True, null=True)
     mailing_address = models.TextField(blank=True, null=True)
-    country = models.CharField(blank=True, null=True, max_length=255)
+    country = CountryField(blank=True, null=True)
     telephone_number = models.CharField(blank=True, null=True, max_length=25)
     occupation = models.CharField(blank=True, null=True, max_length=255)
 
