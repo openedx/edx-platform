@@ -96,7 +96,9 @@ class XModule(object):
         kwargs: Optional arguments. Subclasses should always accept kwargs and pass them
             to the parent class constructor.
             Current known uses of kwargs:
-                metadata: A dictionary containing data that specifies information that is particular
+                metadata: SCAFFOLDING - This dictionary will be split into several different types of metadata
+                    in the future (course policy, modification history, etc).
+                    A dictionary containing data that specifies information that is particular
                     to a problem in the context of a course
         '''
         self.system = system
