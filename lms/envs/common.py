@@ -50,16 +50,17 @@ DEFAULT_GROUPS = []
 GENERATE_PROFILE_SCORES = False
 
 ############################# SET PATH INFORMATION #############################
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname() # /mitx/lms
-COMMON_ROOT = PROJECT_ROOT.dirname() / "common"
-ENV_ROOT = PROJECT_ROOT.dirname().dirname() # virtualenv dir /mitx is in
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
+REPO_ROOT = PROJECT_ROOT.dirname()
+COMMON_ROOT = REPO_ROOT / "common"
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
 COURSES_ROOT = ENV_ROOT / "data"
 
 # FIXME: To support multiple courses, we should walk the courses dir at startup
 DATA_DIR = COURSES_ROOT
 
-sys.path.append(ENV_ROOT)
+sys.path.append(REPO_ROOT)
 sys.path.append(ASKBOT_ROOT)
 sys.path.append(ASKBOT_ROOT / "askbot" / "deps")
 sys.path.append(PROJECT_ROOT / 'djangoapps')
