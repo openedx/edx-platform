@@ -3,63 +3,48 @@
 ## instead of using settings.COURSE_TITLE
 <%namespace name='static' file='static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
-<header class="app" aria-label="Global Navigation">
-  <section class="wrapper">
-    <a href="${reverse('root')}" class="logo">
-      <img src="${static.url('images/logo.png')}" />
-    </a>
-    <nav class="find-courses">
-      <ol>
-        <li class="primary">
-          <div class="divider"></div>
-          <a href="${reverse('courses')}">Find Courses</a>
-          <div class="divider"></div>
-        </li>
-        %if not user.is_authenticated():
-        <li class="secondary">
-          <a href="${reverse('about_edx')}">About</a>
-          <a href="#">Blog</a>
-          <a href="${reverse('jobs')}">Jobs</a>
-        </li>
-        %endif
-      </ol>
-    </nav>
 
-    %if user.is_authenticated():
-    <nav class="user">
-      <ol>
-        <li class="primary">
-          <div class="divider"></div>
-          <a href="${reverse('dashboard')}" class="user-link">
-            <span class="avatar"><img src="${static.url('images/profile.jpg')}" /></span>
-            ${user.username}
-          </a>
-          <div class="divider"></div>
-          <a href="#" class="options">&#9662</a>
-          <div class="divider"></div>
-          <ol class="user-options">
+<header class="global" aria-label="Global Navigation">
+  <nav>
+    <h1 class="logo"><a href="${reverse('root')}"></a></h1>
+    <ol class="left">
+      <li class="primary">
+        <a href="${reverse('courses')}">Find Courses</a>
+      </li>
+    </ol>
+
+  %if user.is_authenticated():
+    <ol class="user">
+      <li class="primary">
+        <a href="${reverse('dashboard')}" class="user-link">
+          <span class="avatar"><img src="${static.url('images/profile.jpg')}" /></span>
+          ${user.username}
+        </a>
+      </li>
+      <li class="primary">
+        <a href="#" class="dropdown">&#9662</a>
+          <ul class="dropdown-menu">
             <li><a href="#">Account Settings</a></li>
             <li><a href="${reverse('help')}">Help</a></li>
             <li><a href="${reverse('logout')}">Log Out</a></li>
-          </ol>
-        </li>
-      </ol>
-    </nav>
+          </ul>
+      </li>
+    </ol>
 
-    %else:
-    <nav class="guest">
-      <ol>
-        <li class="primary">
-          <div class="divider"></div>
-          <a href="#" id="login">Log In</a>
-          <div class="divider"></div>
-          <a href="#" id="signup">Sign Up</a>
-          <div class="divider"></div>
-        </li>
-      </ol>
-    </nav>
-    %endif
-  </section>
+  %else:
+    <ol class="guest">
+      <li class="secondary">
+        <a href="${reverse('about_edx')}">About</a>
+        <a href="#">Blog</a>
+        <a href="${reverse('jobs')}">Jobs</a>
+        <a href="#" id="login">Log In</a>
+      </li>
+      <li class="primary">
+        <a href="#" id="signup">Sign Up</a>
+      </li>
+    </ol>
+  </nav>
+  %endif
 </header>
 
 %if not user.is_authenticated():

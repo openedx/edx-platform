@@ -6,6 +6,9 @@ that are stored in a database an accessible using their Location as an identifie
 import re
 from collections import namedtuple
 from .exceptions import InvalidLocationError
+import logging
+
+log = logging.getLogger('mitx.' + 'modulestore')
 
 URL_RE = re.compile("""
     (?P<tag>[^:]+)://
@@ -74,11 +77,13 @@ class Location(_LocationBase):
         def check_list(list_):
             for val in list_:
                 if val is not None and INVALID_CHARS.search(val) is not None:
+                    log.debug('invalid characters val="%s", list_="%s"' % (val,list_))
                     raise InvalidLocationError(location)
 
         if isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
+                log.debug('location is instance of %s but no URL match' % basestring)
                 raise InvalidLocationError(location)
             else:
                 groups = match.groupdict()
@@ -86,6 +91,7 @@ class Location(_LocationBase):
                 return _LocationBase.__new__(_cls, **groups)
         elif isinstance(location, (list, tuple)):
             if len(location) not in (5, 6):
+                log.debug('location has wrong length')
                 raise InvalidLocationError(location)
 
             if len(location) == 5:
@@ -122,6 +128,10 @@ class Location(_LocationBase):
         return "-".join(str(v) for v in self.list() if v is not None).replace('.', '_')
 
     def dict(self):
+        """
+        Return an OrderedDict of this locations keys and values. The order is
+        tag, org, course, category, name, revision
+        """
         return self._asdict()
 
     def list(self):
@@ -147,6 +157,18 @@ class ModuleStore(object):
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
         If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
+
+        location: Something that can be passed to Location
+        default_class: An XModuleDescriptor subclass to use if no plugin matching the
+            location is found
+        """
+        raise NotImplementedError
+    
+    def get_items(self, location, default_class=None):
+        """
+        Returns a list of XModuleDescriptor instances for the items
+        that match location. Any element of location that is None is treated
+        as a wildcard that matches any value
 
         location: Something that can be passed to Location
         default_class: An XModuleDescriptor subclass to use if no plugin matching the

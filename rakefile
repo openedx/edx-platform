@@ -25,9 +25,9 @@ PACKAGE_REPO = "packages@gp.mitx.mit.edu:/opt/pkgrepo.incoming"
 
 NORMALIZED_DEPLOY_NAME = DEPLOY_NAME.downcase().gsub(/[_\/]/, '-')
 INSTALL_DIR_PATH = File.join(DEPLOY_DIR, NORMALIZED_DEPLOY_NAME)
-
+PIP_REPO_REQUIREMENTS = "#{INSTALL_DIR_PATH}/repo-requirements.txt"
 # Set up the clean and clobber tasks
-CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage')
+CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage', 'test_root/*_repo')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
 def select_executable(*cmds)
@@ -63,13 +63,18 @@ default_options = {
     :cms => '8001',
 }
 
+task :predjango do
+    sh("find . -type f -name *.pyc -delete")
+    sh('pip install -e common/lib/xmodule')
+end
+
 [:lms, :cms].each do |system|
     task_name = "test_#{system}"
     report_dir = File.join(REPORT_DIR, task_name)
     directory report_dir
 
     desc "Run all django tests on our djangoapps for the #{system}"
-    task task_name => report_dir do
+    task task_name => [report_dir, :predjango] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
         sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
@@ -80,7 +85,7 @@ default_options = {
         Start the #{system} locally with the specified environment (defaults to dev).
         Other useful environments are devplus (for dev testing with a real local database)
         desc
-    task system, [:env, :options] => [] do |t, args|
+    task system, [:env, :options] => [:predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
@@ -88,8 +93,13 @@ default_options = {
     Dir["#{system}/envs/*.py"].each do |env_file|
         env = File.basename(env_file).gsub(/\.py/, '')
         desc "Attempt to import the settings file #{system}.envs.#{env} and report any errors"
-        task "#{system}:check_settings:#{env}" do
+        task "#{system}:check_settings:#{env}" => :predjango do
             sh("echo 'import #{system}.envs.#{env}' | #{django_admin(system, env, 'shell')}")
+        end
+
+        desc "Run collectstatic in the specified environment"
+        task "#{system}:collectstatic:#{env}" => :predjango do
+            sh("#{django_admin(system, env, 'collectstatic')}")
         end
     end
 end
@@ -120,6 +130,22 @@ task :package do
     FileUtils.mkdir_p(BUILD_DIR)
     
     Dir.chdir(BUILD_DIR) do
+        afterremove = Tempfile.new('afterremove')
+        afterremove.write <<-AFTERREMOVE.gsub(/^\s*/, '')
+        #! /bin/bash
+        set -e
+        set -x
+        
+        # to be a little safer this rm is executed
+        # as the makeitso user
+
+        if [[ -d "#{INSTALL_DIR_PATH}" ]]; then
+            sudo -u makeitso rm -rf "#{INSTALL_DIR_PATH}"
+        fi
+
+        AFTERREMOVE
+        afterremove.close()
+        FileUtils.chmod(0755, afterremove.path)
 
         postinstall = Tempfile.new('postinstall')
         postinstall.write <<-POSTINSTALL.gsub(/^\s*/, '')
@@ -128,26 +154,30 @@ task :package do
         set -x
 
         chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
-        chmod +x #{INSTALL_DIR_PATH}/collect_static_resources
 
         service gunicorn stop || echo "Unable to stop gunicorn. Continuing"
         rm -f #{LINK_PATH}
         ln -s #{INSTALL_DIR_PATH} #{LINK_PATH}
         chown makeitso:makeitso #{LINK_PATH}
 
-        /opt/wwc/mitx/collect_static_resources
+        # install python modules that are in the package
+        if [ -r #{PIP_REPO_REQUIREMENTS} ]; then
+            cd #{INSTALL_DIR_PATH}
+            pip install -r #{PIP_REPO_REQUIREMENTS}
+        fi
+
 
         # Delete mako temp files
         rm -rf /tmp/tmp*mako
 
-        service gunicorn start
+        service gunicorn start || echo "Unable to start gunicorn. Continuing"
         POSTINSTALL
         postinstall.close()
         FileUtils.chmod(0755, postinstall.path)
 
         args = ["fakeroot", "fpm", "-s", "dir", "-t", "deb",
-            "--verbose",
             "--after-install=#{postinstall.path}",
+            "--after-remove=#{afterremove.path}",
             "--prefix=#{INSTALL_DIR_PATH}",
             "--exclude=**/build/**",
             "--exclude=**/rakefile",

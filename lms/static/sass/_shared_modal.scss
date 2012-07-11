@@ -58,7 +58,7 @@
   }
 
   .inner-wrapper {
-    background: rgb(240,240,240);
+    background: rgb(245,245,245);
     @include border-radius(0px);
     border: 1px solid rgba(0, 0, 0, 0.9);
     @include box-shadow(inset 0 1px 0 0 rgba(255, 255, 255, 0.7));
@@ -107,15 +107,16 @@
       h3 {
         color: $lighter-base-font-color;
         font: normal 1.4rem/1.8rem $serif;
+        letter-spacing: 1px;
         padding-bottom: 20px;
+        position: relative;
         text-align: center;
         text-shadow: 0 1px rgba(255,255,255, 0.4);
         text-transform: uppercase;
         vertical-align: middle;
-        position: relative;
+        -webkit-font-smoothing: antialiased;
         z-index: 2;
       }
-
     }
 
     form {
@@ -158,11 +159,8 @@
         }
 
         a {
-          font: normal 1.2rem/1.6rem $serif;
+          font: italic normal 1.2rem/1.6rem $serif;
           text-decoration: underline;
-
-          &:hover {
-          }
         }
       }
 
@@ -231,6 +229,7 @@
         color: $lighter-base-font-color;
         font: italic 1.2rem/1.6rem $serif;
         text-align: center;
+        -webkit-font-smoothing: antialiased;
 
         a {
           color: $lighter-base-font-color;

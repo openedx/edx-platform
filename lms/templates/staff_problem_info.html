@@ -3,6 +3,9 @@ ${module_content}
 definition = ${definition | h}
 metadata = ${metadata | h}
 </div>
+%if edit_link:
+<div><a href="${edit_link}">Edit</a></div>
+% endif
 %if render_histogram:
 <div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
 %endif

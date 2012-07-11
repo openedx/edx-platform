@@ -3,9 +3,10 @@
 
   nav {
     @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
-    @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4));
+    @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4), inset 0 0 0 -1px rgba(255,255,255, 0.4));
     @include box-sizing(border-box);
-    border: 1px solid rgb(200,200,200);
+    border: 1px solid rgb(190,190,190);
+    border-bottom-color: rgb(200,200,200);
     border-top: none;
     @include border-bottom-radius(4px);
     @include clearfix;

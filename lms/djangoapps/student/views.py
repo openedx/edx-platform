@@ -51,6 +51,7 @@ def index(request):
                                                  'csrf': csrf_token})
 
 
+@login_required
 @ensure_csrf_cookie
 def dashboard(request):
     csrf_token = csrf(request)['csrf_token']
@@ -94,7 +95,7 @@ def login_user(request, error=""):
     if user is not None and user.is_active:
         try:
             login(request, user)
-            if request.POST['remember'] == 'true':
+            if request.POST.get('remember') == 'true':
                 request.session.set_expiry(None) # or change to 604800 for 7 days
                 log.debug("Setting user session to never expire")
             else:
@@ -214,7 +215,9 @@ def create_account(request, post_override=None):
     up.save()
 
     d={'name':post_vars['name'],
-       'key':r.activation_key}
+       'key':r.activation_key,
+       'course_title' : settings.COURSE_TITLE,
+       }
 
     subject = render_to_string('emails/activation_email_subject.txt',d)
         # Email subject *must not* contain newlines
@@ -222,7 +225,11 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt',d)
 
     try:
-        if not settings.GENERATE_RANDOM_USER_CREDENTIALS:
+        if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+            dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
+            message = "Activation for %s (%s): %s\n" % (u,u.email,up.name) + '-'*80 + '\n\n' + message
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
+        elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
             res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         log.exception(sys.exc_info())
@@ -501,6 +508,9 @@ def about(request):
     return render_to_response('about.html', None)
 
 
+def university_profile(request):
+  return render_to_response('university_profile.html', None)
+
 def jobs(request):
     return render_to_response('jobs.html', None)
 
@@ -509,6 +519,7 @@ def help(request):
     return render_to_response('help.html', None)
 
 
+@login_required
 @ensure_csrf_cookie
 def enroll(request, course_id):
     user = request.user

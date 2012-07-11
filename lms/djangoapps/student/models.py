@@ -20,19 +20,27 @@ class UserProfile(models.Model):
     class Meta:
         db_table = "auth_userprofile"
 
+    GENDER_CHOICES = (('male', 'Male'), ('female', 'Female'), ('other', 'Other'))
+
     ## CRITICAL TODO/SECURITY
-    # Sanitize all fields. 
+    # Sanitize all fields.
     # This is not visible to other users, but could introduce holes later
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
     language = models.CharField(blank=True, max_length=255, db_index=True)
-    location = models.CharField(blank=True, max_length=255, db_index=True)
+    location = models.CharField(blank=True, max_length=255, db_index=True) # TODO: What are we doing with this?
     meta = models.CharField(blank=True, max_length=255) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
+    gender = models.CharField(blank=True, null=True, max_length=6, choices=GENDER_CHOICES)
+    date_of_birth = models.DateField(blank=True, null=True)
+    mailing_address = models.TextField(blank=True, null=True)
+    country = models.CharField(blank=True, null=True, max_length=255)
+    telephone_number = models.CharField(blank=True, null=True, max_length=25)
+    occupation = models.CharField(blank=True, null=True, max_length=255)
 
     def get_meta(self):
         js_str = self.meta
-        if not js_str: 
+        if not js_str:
             js_str = dict()
         else:
             js_str = json.loads(self.meta)
@@ -51,7 +59,7 @@ class UserTestGroup(models.Model):
 
 class Registration(models.Model):
     ''' Allows us to wait for e-mail before user is registered. A
-        registration profile is created when the user creates an 
+        registration profile is created when the user creates an
         account, but that account is inactive. Once the user clicks
         on the activation key, it becomes active. '''
     class Meta:
@@ -82,12 +90,12 @@ class PendingEmailChange(models.Model):
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
 class CourseEnrollment(models.Model):
-    user = models.OneToOneField(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True)
     course_id = models.CharField(max_length=255)
 
 #cache_relation(User.profile)
 
-#### Helper methods for use from python manage.py shell. 
+#### Helper methods for use from python manage.py shell.
 
 def get_user(email):
     u = User.objects.get(email = email)
@@ -146,7 +154,7 @@ default_groups = {'email_future_courses' : 'Receive e-mails about future MITx co
 def add_user_to_default_group(user, group):
     try:
         utg = UserTestGroup.objects.get(name = group)
-    except UserTestGroup.DoesNotExist: 
+    except UserTestGroup.DoesNotExist:
         utg = UserTestGroup()
         utg.name = group
         utg.description = default_groups[group]

@@ -24,24 +24,27 @@ import tempfile
 import os.path
 import os
 import errno
+import glob2
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
 
 MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
+    'GITHUB_PUSH': False,
 }
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
-COMMON_ROOT = PROJECT_ROOT.dirname() / "common"
-ENV_ROOT = PROJECT_ROOT.dirname().dirname()  # virtualenv dir /mitx is in
+REPO_ROOT = PROJECT_ROOT.dirname()
+COMMON_ROOT = REPO_ROOT / "common"
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 # FIXME: To support multiple courses, we should walk the courses dir at startup
 DATA_DIR = COURSES_ROOT
 
-sys.path.append(ENV_ROOT)
+sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
@@ -57,6 +60,10 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates'
 ]
 
+TEMPLATE_DIRS = (
+    PROJECT_ROOT / "templates",
+)
+
 MITX_ROOT_URL = ''
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -66,6 +73,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.auth',  # this is required for admin
     'django.core.context_processors.csrf',  # necessary for csrf protection
 )
+
+################################# Jasmine ###################################
+JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
@@ -109,7 +119,7 @@ TEMPLATE_DEBUG = False
 SITE_ID = 1
 SITE_NAME = "localhost:8000"
 HTTPS = 'on'
-ROOT_URLCONF = 'mitx.cms.urls'
+ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
@@ -183,12 +193,16 @@ for xmodule in XModuleDescriptor.load_classes() + [RawDescriptor]:
 
 PIPELINE_JS = {
     'main': {
-        'source_filenames': ['coffee/main.coffee', 'coffee/unit.coffee'],
-        'output_filename': 'js/main.js',
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
+        'output_filename': 'js/application.js',
     },
     'module-js': {
         'source_filenames': module_js_sources,
         'output_filename': 'js/modules.js',
+    },
+    'spec': {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
+        'output_filename': 'js/spec.js'
     }
 }
 
@@ -232,4 +246,7 @@ INSTALLED_APPS = (
     # For asset pipelining
     'pipeline',
     'staticfiles',
+
+    # For testing
+    'django_jasmine',
 )
