@@ -289,21 +289,9 @@ PIPELINE_CSS = {
         'source_filenames': ['sass/application.scss'],
         'output_filename': 'css/application.css',
     },
-    'marketing': {
-        'source_filenames': ['sass/marketing.scss'],
-        'output_filename': 'css/marketing.css',
-    },
-    'marketing-ie': {
-        'source_filenames': ['sass/marketing-ie.scss'],
-        'output_filename': 'css/marketing-ie.css',
-    },
-    'print': {
-        'source_filenames': ['sass/print.scss'],
-        'output_filename': 'css/print.css',
-    }
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/marketing.scss', 'sass/marketing-ie.scss', 'sass/print.scss']
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss']
 
 PIPELINE_JS = {
     'application': {
