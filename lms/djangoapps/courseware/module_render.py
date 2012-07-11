@@ -189,7 +189,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                                 position within module
 
     Returns:
-      - a tuple (xmodule instance, instance_module, shared_module, module type).
+      - a tuple (xmodule instance, instance_module, shared_module, module category).
         instance_module is a StudentModule specific to this module for this student
         shared_module is a StudentModule specific to all modules with the same 'shared_state_key' attribute, or None if the module doesn't elect to share state
     '''
