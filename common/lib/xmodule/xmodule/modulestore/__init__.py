@@ -72,7 +72,7 @@ class Location(_LocationBase):
             location = (loc_or_tag, org, course, category, name, revision)
 
         def check_dict(dict_):
-            check_list(dict_.values())
+            check_list(dict_.itervalues())
 
         def check_list(list_):
             for val in list_:
