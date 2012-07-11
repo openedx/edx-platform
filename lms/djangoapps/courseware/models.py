@@ -72,6 +72,10 @@ class StudentModuleCache(object):
         '''
         Find any StudentModule objects that are needed by any child modules of the
         supplied descriptor. Avoids making multiple queries to the database
+
+        descriptor: An XModuleDescriptor
+        depth is the number of levels of descendent modules to load StudentModules for, in addition to
+            the supplied descriptor. If depth is None, load all descendent StudentModules
         '''
         if user.is_authenticated():
             module_ids = self._get_module_state_keys(descriptor, depth)
@@ -92,7 +96,11 @@ class StudentModuleCache(object):
     def _get_module_state_keys(self, descriptor, depth):
         '''
         Get a list of the state_keys needed for StudentModules
-        required for this chunk of module xml
+        required for this module descriptor
+
+        descriptor: An XModuleDescriptor
+        depth is the number of levels of descendent modules to load StudentModules for, in addition to
+            the supplied descriptor. If depth is None, load all descendent StudentModules
         '''
         keys = [descriptor.location.url()]
 
