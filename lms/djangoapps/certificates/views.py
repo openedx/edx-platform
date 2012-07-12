@@ -1,6 +1,5 @@
 import json
 import logging
-import settings
 import uuid
 
 from django.conf import settings
