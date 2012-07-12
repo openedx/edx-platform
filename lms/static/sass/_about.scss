@@ -138,6 +138,27 @@
   }
 
   .press {
+
+    .press-resources {
+      @include clearfix;
+      margin-bottom: 60px;
+
+      .pressreleases, .identity-assets {
+        background: rgb(245,245,245);
+        border: 1px solid rgb(200,200,200);
+        @include box-sizing(border-box);
+        @include border-radius(4px);
+        float: left;
+        padding: 20px 30px;
+        text-align: center;
+        width: flex-grid(6);
+      }
+
+      .pressreleases {
+        margin-right: flex-gutter();
+      }
+    }
+
     .press-story {
       border-bottom: 1px solid rgb(220,220,220);
       @include clearfix;
@@ -179,7 +200,10 @@
             font-weight: bold;
           }
 
-          a {
+          span.post-date {
+            color: $lighter-base-font-color;
+            font: 300 italic 1.2rem/1.6rem $sans-serif;
+            margin-right: 10px;
           }
         }
       }
