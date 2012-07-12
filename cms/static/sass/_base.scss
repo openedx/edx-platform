@@ -8,7 +8,7 @@ $body-line-height: 20px;
 $light-blue: #f0f7fd;
 $dark-blue: #50545c;
 $bright-blue: #3c8ebf;
-$orange: #ea5155;
+$orange: #f96e5b;
 $yellow: #fff8af;
 $cream: #F6EFD4;
 $mit-red: #933;
@@ -41,29 +41,19 @@ input {
 }
 
 button, input[type="submit"], .button {
-<<<<<<< HEAD
   background-color: $orange;
-  @include linear-gradient(adjust-hue($orange, 8%), $orange);
   border: 1px solid darken($orange, 15%);
+  @include border-radius(4px);
   @include box-shadow(inset 0 0 0 1px adjust-hue($orange, 20%), 0 1px 0 #fff);
-  text-shadow: 0 1px 0 darken($orange, 10%);
-=======
-  @include box-shadow(inset 0 0 0 1px lighten($bright-blue, 15%));
-  @include linear-gradient(lighten($bright-blue, 10%), $bright-blue);
-  border-left: 1px solid lighten($dark-blue, 10%);
-  text-shadow: 0 -1px 0 darken($bright-blue, 10%);
->>>>>>> Added more styles includeing the index page more color changes and header styles
   color: #fff;
   font-weight: bold;
+  @include linear-gradient(adjust-hue($orange, 8%), $orange);
   padding: 6px 20px;
+  text-shadow: 0 1px 0 darken($orange, 10%);
   -webkit-font-smoothing: antialiased;
-  @include border-radius(4px);
 
   &:hover, &:focus {
-<<<<<<< HEAD
     @include box-shadow(inset 0 0 6px 1px adjust-hue($orange, 30%));
-=======
->>>>>>> Added more styles includeing the index page more color changes and header styles
   }
 }
 
