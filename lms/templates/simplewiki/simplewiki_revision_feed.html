@@ -5,7 +5,7 @@
 <%block name="title"><title>Wiki - Revision feed - MITx 6.002x</title></%block>
 
 <%!
-    from django.core.urlresolvers import reverse
+    from simplewiki.views import wiki_reverse
 %>
 
 <%block name="wiki_page_title">
@@ -29,7 +29,7 @@
       <% loopCount += 1 %>
       <tr style="border-top: 1px" class="${'dark ' if (loopCount % 2) == 0 else ''}${'deleted ' if (revision.deleted==2) else ''}" >
         <td width="15px">
-        <a href="${reverse('wiki_view_revision',args=[revision.counter, revision.article.get_url()])}"> ${revision.article.title} - ${revision}</a>
+        <a href="${wiki_reverse('wiki_view_revision', revision.article, course, kwargs={'revision_number' : revision.counter})}"> ${revision.article.title} - ${revision}</a>
         </td>
         <td>
           ${ revision.revision_text if revision.revision_text else "<i>None</i>" }</td>
@@ -50,10 +50,10 @@
             <tr>
                 <td colspan="4">
                     %if wiki_prev_page:
-                        <a href="${reverse("wiki_revision_feed", args=[wiki_prev_page])}">Previous page</a>
+                        <a href="${wiki_reverse("wiki_revision_feed", course=course, namespace=namespace, kwargs={'page': wiki_prev_page})}">Previous page</a>
                     %endif
                     %if wiki_next_page:
-                        <a href="${reverse("wiki_revision_feed", args=[wiki_next_page])}">Next page</a>
+                        <a href="${wiki_reverse("wiki_revision_feed", course=course, namespace=namespace, kwargs={'page': wiki_next_page})}">Next page</a>
                     %endif
                 </td>
             </tr>

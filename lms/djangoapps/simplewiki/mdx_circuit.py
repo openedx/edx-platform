@@ -17,8 +17,6 @@ circuit-schematic:[["r",[128,48,0],{"r":"1","_json_":0},["2","1"]],["view",0,0,2
 import markdown
 import re
 
-import simplewiki.settings as settings
-
 from django.utils.html import escape
 
 try:
@@ -68,5 +66,7 @@ class CircuitLink(markdown.inlinepatterns.Pattern):
         return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='640' height='480'/></div>")
         
     
-def makeExtension(configs=None) :
-    return CircuitExtension(configs=configs)
+def makeExtension(configs=None):
+    to_return = CircuitExtension(configs=configs)
+    print "circuit returning " , to_return
+    return to_return

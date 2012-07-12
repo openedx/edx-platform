@@ -52,7 +52,6 @@ if settings.PERFSTATS:
 
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
-        url(r'^wiki/', include('simplewiki.urls')),
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
         url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
@@ -79,6 +78,12 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 'student.views.course_info', name="about_course"),
+    )
+    
+    # Multicourse wiki
+    urlpatterns += (
+        url(r'^wiki/', include('simplewiki.urls')),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
     )
 
 if settings.ENABLE_MULTICOURSE:

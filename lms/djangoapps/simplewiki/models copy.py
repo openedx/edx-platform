@@ -16,23 +16,9 @@ from util.cache import cache
 class ShouldHaveExactlyOneRootSlug(Exception):
     pass
 
-class Namespace(models.Model):
-    name = models.CharField(max_length=30, db_index=True, unique=True, verbose_name=_('namespace'))
-    # TODO: We may want to add permissions, etc later
-    
-    @classmethod
-    def ensure_namespace(cls, name):
-        try:
-            namespace = Namespace.objects.get(name__exact = name)
-        except Namespace.DoesNotExist:
-            new_namespace = Namespace(name=name)
-            new_namespace.save()
-            
-        
-
 class Article(models.Model):
     """Wiki article referring to Revision model for actual content.
-       'slug' and 'title' field should be maintained centrally, since users
+       'slug' and 'parent' field should be maintained centrally, since users
        aren't allowed to change them, anyways.
     """
     
@@ -41,10 +27,12 @@ class Article(models.Model):
     slug = models.SlugField(max_length=100, verbose_name=_('slug'),
                             help_text=_('Letters, numbers, underscore and hyphen.'),
                             blank=True)
-    namespace = models.ForeignKey(Namespace, verbose_name=_('Namespace'))
     created_by = models.ForeignKey(User, verbose_name=_('Created by'), blank=True, null=True)
     created_on = models.DateTimeField(auto_now_add = 1)
     modified_on = models.DateTimeField(auto_now_add = 1)
+    parent = models.ForeignKey('self', verbose_name=_('Parent article slug'), 
+                               help_text=_('Affects URL structure and possibly inherits permissions'),
+                               null=True, blank=True)
     locked = models.BooleanField(default=False, verbose_name=_('Locked for editing'))
     permissions = models.ForeignKey('Permission', verbose_name=_('Permissions'),
                                     blank=True, null=True,
@@ -57,44 +45,53 @@ class Article(models.Model):
 
     def attachments(self):
         return ArticleAttachment.objects.filter(article__exact = self)
-        
-    def get_path(self):
-        return self.namespace.name + "/" + self.slug
-        
-    @classmethod
-    def get_article(cls, article_path):
-        """
-        Given an article_path like namespace/slug, this returns the article. It may raise
-        a Article.DoesNotExist if no matching article is found or ValueError if the
-        article_path is not constructed properly.
-        """
-        #TODO: Verify the path, throw a meaningful error?
-        namespace, slug = article_path.split("/")
-        return Article.objects.get( slug__exact = slug, namespace__name__exact = namespace)
-        
 
     @classmethod
-    def get_root(cls, namespace):
+    def get_root(cls):
         """Return the root article, which should ALWAYS exist..
         except the very first time the wiki is loaded, in which
         case the user is prompted to create this article."""
         try:
-            return Article.objects.filter(slug__exact = "", namespace__name__exact = namespace)[0]
+            return Article.objects.filter(slug__exact = "")[0]
         except:
             raise ShouldHaveExactlyOneRootSlug()
 
-    # @classmethod
-    # def get_url_reverse(cls, path, article, return_list=[]):
-    #     """Lookup a URL and return the corresponding set of articles
-    #     in the path."""
-    #     if path == []:
-    #         return return_list + [article]
-    #     # Lookup next child in path
-    #     try:
-    #         a = Article.objects.get(parent__exact = article, slug__exact=str(path[0]))
-    #         return cls.get_url_reverse(path[1:], a, return_list+[article])
-    #     except Exception, e:
-    #         return None
+    def get_url(self):
+        """Return the Wiki URL for an article"""    
+        url = self.slug + "/"
+        if self.parent_id:
+            parent_url = cache.get("wiki_url-" + str(self.parent_id))
+            if parent_url is None:
+                parent_url = self.parent.get_url()
+            
+            url = parent_url + url
+        
+        cache.set("wiki_url-" + str(self.id), url, 60*60)
+            
+        return url
+
+    def get_abs_url(self):
+        """Return the absolute path for an article. This is necessary in cases
+        where the template system isn't used for generating URLs..."""
+        # TODO: Remove and create a reverse() lookup.
+        return WIKI_BASE + self.get_url()
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('wiki_view', [self.get_url()])
+
+    @classmethod
+    def get_url_reverse(cls, path, article, return_list=[]):
+        """Lookup a URL and return the corresponding set of articles
+        in the path."""
+        if path == []:
+            return return_list + [article]
+        # Lookup next child in path
+        try:
+            a = Article.objects.get(parent__exact = article, slug__exact=str(path[0]))
+            return cls.get_url_reverse(path[1:], a, return_list+[article])
+        except Exception, e:
+            return None
     
     def can_read(self, user):
         """ Check read permissions and return True/False."""
@@ -104,8 +101,7 @@ class Article(models.Model):
             perms = self.permissions.can_read.all()
             return perms.count() == 0 or (user in perms)
         else:
-            # TODO: We can inherit namespace permissions here
-            return True
+            return self.parent.can_read(user) if self.parent else True
 
     def can_write(self, user):
         """ Check write permissions and return True/False."""
@@ -115,8 +111,7 @@ class Article(models.Model):
             perms = self.permissions.can_write.all()
             return perms.count() == 0 or (user in perms)
         else:
-            # TODO: We can inherit namespace permissions here
-            return True
+            return self.parent.can_write(user) if self.parent else True
 
     def can_write_l(self, user):
         """Check write permissions and locked status"""
@@ -128,13 +123,13 @@ class Article(models.Model):
         return self.can_write_l(user) and (WIKI_ALLOW_ANON_ATTACHMENTS or not user.is_anonymous())
 
     def __unicode__(self):
-        if self.slug == '':
+        if self.slug == '' and not self.parent:
             return unicode(_('Root article'))
         else:
-            return self.slug
+            return self.get_url()
     
     class Meta:
-        unique_together = (('slug', 'namespace'),)
+        unique_together = (('slug', 'parent'),)
         verbose_name = _('Article')
         verbose_name_plural = _('Articles')
 
@@ -280,7 +275,7 @@ class Revision(models.Model):
 
         # Create pre-parsed contents - no need to parse on-the-fly
         ext = WIKI_MARKDOWN_EXTENSIONS
-        ext += ["wikipath(default_namespace=%s)" % self.article.namespace.name ]
+        ext += ["wikipath(base_url=%s)" % reverse('wiki_view', args=('/',))]
         self.contents_parsed = markdown(self.contents,
                                         extensions=ext,
                                         safe_mode='escape',)

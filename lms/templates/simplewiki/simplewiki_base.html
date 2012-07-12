@@ -1,14 +1,15 @@
 ##This file is based on the template from the SimpleWiki source which carries the GPL license
 
-<%inherit file="main.html"/>
-<%namespace name='static' file='static_content.html'/>
+<%inherit file="../main.html"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+  from django.core.urlresolvers import reverse
+  from simplewiki.views import wiki_reverse
+%>
 
 <%block name="headextra">
-<script type="text/javascript" src="${static.url('js/simplewiki/bsn.AutoSuggest_c_2.0.js')}"></script>
-
-  <%!
-      from django.core.urlresolvers import reverse
-  %>
+<script type="text/javascript" src="${static.url('js/simplewiki-AutoSuggest_c_2.0.js')}"></script>
 
   <script type="text/javascript">
     function set_related_article_id(s) {
@@ -19,7 +20,7 @@
     var x = window.onload;
     window.onload = function(){
         var options = {
-        script: "${reverse("search_related", args=[wiki_article.get_url()] )}/?self=${wiki_article.pk}&",
+        script: "${ wiki_reverse('search_related', wiki_article, course)}/?self=${wiki_article.pk}&",
         json: true,
         varname: "query",
         maxresults: 35,
@@ -69,23 +70,19 @@
 
 <%block name="bodyextra">
 
-<%include file="course_navigation.html" args="active_page='wiki'" />
+%if course:
+<%include file="../course_navigation.html" args="active_page='wiki'" />
+%endif
 
 <section class="main-content">
   <div class="wiki-wrapper">
     <%block name="wiki_panel">
     <div aria-label="Wiki Navigation" id="wiki_panel">
     <h2>Course Wiki</h2>
-      <%
-          if (wiki_article is not UNDEFINED):
-          	baseURL = reverse("wiki_view", args=[wiki_article.get_url()])
-          else:
-          	baseURL = reverse("wiki_view", args=["/"])
-      %>
       <ul class="action">
         <li>
           <h3>
-            <a href="${reverse("wiki_list_articles", args=[])}">All Articles</a>
+            <a href="${wiki_reverse("wiki_list_articles", course=course, namespace=namespace)}">All Articles</a>
           </h3>
         </li>
 
@@ -96,36 +93,25 @@
 
           <div id="wiki_create_form">
             <%
-              theaction = "this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '')"
-              baseURL = reverse("wiki_create", args=["/"])
+              baseURL = wiki_reverse("wiki_create", course=course, kwargs={"article_path" : namespace + "/" })
             %>
-
-            <form method="GET" onsubmit="this.action='${baseURL + "' + " + theaction};">
-
+            <form method="GET" onsubmit="this.action='${baseURL}' + this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '');">
               <div>
                 <label for="id_wiki_article_name">Title of article</label>
                 <input type="text" name="wiki_article_name" id="id_wiki_article_name" /><br/>
-                <!-- <label for="id_wiki_article_is_child">Create as a child of current article</label> -->
-                <!-- <input type="checkbox" name="wiki_article_is_child" id="id_wiki_artcile_is_child" disabled="true" ${ 'checked="checked"' if wiki_article is not UNDEFINED else ""}> -->
               </div>
-
               <ul>
-
                 <li>
                   <input type="submit" class="button" value="Create" style="display: inline-block; margin-right: 2px; font-weight: bold;" />
                 </li>
-
               </ul>
             </form>
           </div>
         </li>
 
         <li class="search">
-          <form method="POST" action='${reverse("wiki_search_articles", args=[])}'>
+          <form method="GET" action='${wiki_reverse("wiki_search_articles", course=course, namespace=namespace)}'>
             <label class="wiki_box_title">Search</label>
-            <div style="display:none">
-              <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-            </div>
             <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 71%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
             <input type="submit" id="wiki_search_input_submit" value="Go!" style="width: 20%" />
           </form>
@@ -148,15 +134,15 @@
           <ul>
 
             <li>
-              <input type="button" onclick="javascript:location.href='${reverse("wiki_view", args=[wiki_article.get_url()])}'" value="View" class="view" />
+              <a href="${ wiki_reverse('wiki_view', wiki_article, course)}" class="view">View</a>
             </li>
 
             <li>
-              <input type="button" onclick="javascript:location.href='${reverse("wiki_edit", args=[wiki_article.get_url()])}'" value="Edit" ${'disabled="true"' if not wiki_write else ""} class="edit"/>
+              <a href="${ wiki_reverse('wiki_edit', wiki_article, course)}" class="edit">Edit</a>
             </li>
 
             <li>
-              <input type="button" onclick="javascript:location.href='${reverse("wiki_history", args=[wiki_article.get_url(),1])}'" value="History" class="button history" />
+              <a href="${ wiki_reverse('wiki_history', wiki_article, course)}" class="history">History</a>
             </li>
           </ul>
         </header>

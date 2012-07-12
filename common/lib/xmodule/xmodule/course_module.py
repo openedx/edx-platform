@@ -29,6 +29,10 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def instructors(self):
         return self.get_about_section("instructors").split("\n")
+        
+    @property
+    def wiki_namespace(self):
+        return self.location.course
 
     def get_about_section(self, section_key):
         """
