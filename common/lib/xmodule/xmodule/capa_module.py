@@ -503,3 +503,10 @@ class CapaDescriptor(RawDescriptor):
     """
 
     module_class = CapaModule
+
+    # TODO (cpennington): Delete this method once all fall 2012 course are being
+    # edited in the cms
+    @classmethod
+    def backcompat_path(cls, path):
+        if path.startswith('problem'):
+            return 'problems/' + path[7:]
