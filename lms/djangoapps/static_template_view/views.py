@@ -13,6 +13,7 @@ valid_templates=['index.html',
                  'tos.html',
                  'privacy.html',
                  'honor.html',
+                 'help.html',
                  'copyright.html',
                  '404.html',
                  'mitx_help.html',
@@ -20,10 +21,9 @@ valid_templates=['index.html',
                  'about.html',
                  'faq.html',
                  'press.html',
-                 'contact.html',
-                 'terms_and_conditions.html']
+                 'contact.html']
 
-if settings.STATIC_GRAB: 
+if settings.STATIC_GRAB:
     valid_templates = valid_templates+['server-down.html',
                                        'server-error.html'
                                        'server-overloaded.html', 
@@ -33,7 +33,7 @@ if settings.STATIC_GRAB:
                                        '6002x-press-release.html'
                                        ]
 
-def index(request, template): 
+def index(request, template):
     csrf_token = csrf(request)['csrf_token']
     if template in valid_templates:
         return render_to_response(template, {'error' : '',
@@ -43,7 +43,7 @@ def index(request, template):
 
 valid_auth_templates=['help.html']
 
-def auth_index(request, template): 
+def auth_index(request, template):
     if not request.user.is_authenticated():
         return redirect('/')
 

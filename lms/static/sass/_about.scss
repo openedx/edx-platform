@@ -194,14 +194,32 @@
     .map {
       background: rgb(245,245,245);
       float: left;
-      height: 180px;
+      height: 280px;
       margin-right: flex-gutter();
+      overflow: hidden;
       width: flex-grid(6);
+
+      img {
+        min-height: 100%;
+        max-width: 100%;
+      }
     }
 
-    .address {
+    .contacts {
+      @include box-sizing(border-box);
       float: left;
+      padding-left: 40px;
       width: flex-grid(6);
+
+      ul {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+
+        li {
+          margin-bottom: 10px;
+        }
+      }
     }
   }
 }

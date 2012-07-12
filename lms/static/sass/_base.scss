@@ -43,19 +43,17 @@ h2 {
   -webkit-font-smoothing: antialiased;
 }
 
+p + h2, ul + h2, ol + h2 {
+  margin-top: 40px;
+}
+
 p {
   color: $base-font-color;
   font: normal 1.3rem/2rem $serif;
   margin: 0px;
 }
 
-span {
-  color: $lighter-base-font-color;
-  font: normal 1.3rem/2rem $sans-serif;
-  margin: 0px;
-}
-
-p + p {
+p + p, ul + p, ol + p {
   margin-top: 20px;
 }
 
@@ -95,4 +93,43 @@ a:link, a:visited {
   margin: 0 auto 0;
   max-width: 1200px;
   width: flex-grid(12);
+}
+
+.static-container {
+  @include clearfix;
+  margin: 0 auto 0;
+  max-width: 1200px;
+  padding: 60px 0px 120px;
+  width: flex-grid(12);
+
+  .inner-wrapper {
+    margin: 0 auto 0;
+    width: flex-grid(10);
+  }
+
+  ol, ul {
+    list-style: disc;
+
+    li {
+      color: $base-font-color;
+      font: normal 1.3rem/2rem $serif;
+      margin: 0px;
+    }
+  }
+
+  h1 {
+    margin-bottom: 30px;
+  }
+
+  h1 + hr {
+    margin-bottom: 60px;
+  }
+
+  p + h2, ul + h2, ol + h2 {
+    margin-top: 40px;
+  }
+
+  ul + p, ol + p {
+    margin-top: 20px;
+  }
 }
