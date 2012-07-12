@@ -12,8 +12,9 @@ import courseware.grades as grades
 from certificates.models import GeneratedCertificate, certificate_state_for_student, revoke_certificate
 from mitxmako.shortcuts import render_to_response, render_to_string
 from student.models import UserProfile
-from student.survey_questions import exit_survey_list_for_student
-from student.views import student_took_survey, record_exit_survey
+#TODO: Finish migrating these changes from stable
+# from student.survey_questions import exit_survey_list_for_student
+# from student.views import student_took_survey, record_exit_survey
 
 log = logging.getLogger("mitx.certificates")
 
