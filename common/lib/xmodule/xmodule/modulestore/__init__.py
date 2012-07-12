@@ -72,7 +72,7 @@ class Location(_LocationBase):
             location = (loc_or_tag, org, course, category, name, revision)
 
         def check_dict(dict_):
-            check_list(dict_.values())
+            check_list(dict_.itervalues())
 
         def check_list(list_):
             for val in list_:
@@ -148,7 +148,7 @@ class ModuleStore(object):
     """
     An abstract interface for a database backend that stores XModuleDescriptor instances
     """
-    def get_item(self, location, default_class=None):
+    def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
         If location.revision is None, returns the item with the most
@@ -159,20 +159,24 @@ class ModuleStore(object):
         If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
-        default_class: An XModuleDescriptor subclass to use if no plugin matching the
-            location is found
+
+        depth (int): An argument that some module stores may use to prefetch descendents of the queried modules
+            for more efficient results later in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents
         """
         raise NotImplementedError
     
-    def get_items(self, location, default_class=None):
+    def get_items(self, location, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
         as a wildcard that matches any value
 
         location: Something that can be passed to Location
-        default_class: An XModuleDescriptor subclass to use if no plugin matching the
-            location is found
+
+        depth: An argument that some module stores may use to prefetch descendents of the queried modules
+            for more efficient results later in the request. The depth is counted in the number of calls
+            to get_children() to cache. None indicates to cache all descendents
         """
         raise NotImplementedError
 
