@@ -48,32 +48,52 @@ class Module(XModule):
         '''Tags in the courseware file guaranteed to correspond to the module'''
         return ["video"]
 
-    def video_list(self):
-        return self.youtube
-
     def get_html(self):
         return self.system.render_template('video.html', {
-            'streams': self.video_list(),
             'id': self.item_id,
-            'position': self.position,
             'name': self.name,
+            'position': self.position,
+            'sources': self.sources,
             'annotations': self.annotations,
         })
 
     def __init__(self, system, xml, item_id, state=None):
         XModule.__init__(self, system, xml, item_id, state)
+
         xmltree = etree.fromstring(xml)
-        self.youtube = xmltree.get('youtube')
+
         self.name = xmltree.get('name')
-        self.position = 0
+        self.position = self._init_position(state)
+        self.sources = self._init_sources(xmltree)
+        self.annotations = self._init_annotations(xmltree)
 
-        if state is not None:
-            state = json.loads(state)
-            if 'position' in state:
-                self.position = int(float(state['position']))
+    def _init_position(self, state):
+        position = 0 if state is None else json.loads(state).get('position', 0)
+        return position
 
-        self.annotations=[(e.get("name"),self.render_function(e)) \
-                      for e in xmltree]
+    def _init_sources(self, xmltree):
+        valid_attrs = ['src', 'type' ,'codecs']
+
+        def get_attrib(el):
+            return {k:v for k,v in el.attrib.iteritems() if k in valid_attrs}
+
+        sources = []
+        elements = [xmltree]
+        elements.extend(xmltree.findall('source'))
+
+        for el in elements:
+            attrb = get_attrib(el)
+            if attrb:
+                sources.append(attrb)
+
+        return sources
+
+    def _init_annotations(self, xmltree):
+        #  TODO: [rocha] make anotations similar to html5 media
+        #  tracks, which can be used for subtitles, alternative
+        #  languages, and alternative streams (sign language for
+        #  example)
+        return []
 
 
 class VideoSegmentDescriptor(XModuleDescriptor):

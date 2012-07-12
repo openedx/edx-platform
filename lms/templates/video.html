@@ -2,11 +2,17 @@
   <h1> ${name} </h1>
 % endif
 
-<div id="video_${id}" class="video" data-streams="${streams}">
+<div id="video_${id}" class="video">
   <div class="tc-wrapper">
     <article class="video-wrapper">
       <section class="video-player">
-        <div id="${id}"></div>
+        <div  id="${id}">
+          <video>
+          % for s in sources:
+            <source ${" ".join("{0}=\"{1}\"".format(*i) for i in s.items())}/>
+          % endfor
+          </video>
+        </div>
       </section>
 
       <section class="video-controls"></section>
