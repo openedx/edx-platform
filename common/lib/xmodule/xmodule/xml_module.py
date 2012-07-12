@@ -4,6 +4,8 @@ from lxml import etree
 import copy
 import logging
 from collections import namedtuple
+from fs.errors import ResourceNotFoundError
+import os
 
 log = logging.getLogger(__name__)
 
@@ -154,13 +156,30 @@ class XmlDescriptor(XModuleDescriptor):
                 definition_xml = copy.deepcopy(xml_object)
             else:
                 filepath = cls._format_filepath(xml_object.tag, filename)
-                log.debug('filepath=%s, resources_fs=%s' % (filepath,system.resources_fs))
-                with system.resources_fs.open(filepath) as file:
-                    try:
-                        definition_xml = cls.file_to_xml(file)
-                    except:
-                        log.exception("Failed to parse xml in file %s" % filepath)
-                        raise
+
+                # TODO (cpennington): If the file doesn't exist at the right path,
+                # give the class a chance to fix it up. The file will be written out again
+                # in the correct format.
+                # This should go away once the CMS is online and has imported all current (fall 2012)
+                # courses from xml
+                if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
+                    candidates = cls.backcompat_paths(filepath)
+                    for candidate in candidates:
+                        if system.resources_fs.exists(candidate):
+                            filepath = candidate
+                            break
+
+                log.debug('filepath=%s, resources_fs=%s' % (filepath, system.resources_fs))
+                try:
+                    with system.resources_fs.open(filepath) as file:
+                        try:
+                            definition_xml = cls.file_to_xml(file)
+                        except:
+                            log.exception("Failed to parse xml in file %s" % filepath)
+                            raise
+                except ResourceNotFoundError:
+                    log.exception('Unable to load file contents at path %s' % filepath)
+                    return {'data': 'Error loading file contents at path %s' % filepath}
 
             cls.clean_metadata_from_xml(definition_xml)
             return cls.definition_from_xml(definition_xml, system)
@@ -200,7 +219,7 @@ class XmlDescriptor(XModuleDescriptor):
         if len(list(xml_object.iter())) > 5:
 
             filepath = self.__class__._format_filepath(self.category, self.name)
-            resource_fs.makedir(self.category, allow_recreate=True)
+            resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True))
 

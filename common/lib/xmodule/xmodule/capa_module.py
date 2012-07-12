@@ -6,6 +6,7 @@ import logging
 import traceback
 import re
 import StringIO
+import os
 
 from datetime import timedelta
 from lxml import etree
@@ -503,3 +504,12 @@ class CapaDescriptor(RawDescriptor):
     """
 
     module_class = CapaModule
+
+    # TODO (cpennington): Delete this method once all fall 2012 course are being
+    # edited in the cms
+    @classmethod
+    def backcompat_paths(cls, path):
+        return [
+            'problems/' + path[8:],
+            path[8:],
+        ]
