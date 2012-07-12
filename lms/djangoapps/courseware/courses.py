@@ -14,6 +14,7 @@ _FIELDS = ['number', # 6.002x
            'path', # /some/absolute/filepath/6.002x --> course.xml is in here.
            'instructors', # ['Anant Agarwal']
            'institution', # "MIT"
+           'wiki_namespace',
            'grader', # a courseware.graders.CourseGrader object
 
            #'start', # These should be datetime fields
