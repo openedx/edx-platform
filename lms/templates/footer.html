@@ -3,28 +3,36 @@
 
 <footer>
   <nav>
-    <section class="copyright">
-      <a href="${reverse('root')}" class="logo"></a>
-      <p>&copy; 2012 edX, <a href="#">some rights reserved.</a></p>
+    <section class="primary-links">
+      <section class="copyright">
+        <a href="${reverse('root')}" class="logo"></a>
+        <p>&copy; 2012 edX, <a href="/t/copyright.html">some rights reserved.</a></p>
+      </section>
+      <ol>
+        <li>
+          <a href="${reverse('courses')}">Find Courses</a>
+        </li>
+        <li>
+          <a href="/t/about.html">About</a>
+        </li>
+        <li>
+          <a href="#">Blog</a>
+        </li>
+        <li>
+          <a href="/t/jobs.html">Jobs</a>
+        </li>
+        <li class="social">
+          <a href="#"><img src="${static.url('images/linkedin.png')}" /></a>
+          <a href="#"><img src="${static.url('images/facebook.png')}" /></a>
+          <a href="#"><img src="${static.url('images/twitter.png')}" /></a>
+        </li>
+      </ol>
     </section>
-    <ol>
-      <li>
-        <a href="${reverse('courses')}">Find Courses</a>
-      </li>
-      <li>
-        <a href="${reverse('about_edx')}">About</a>
-      </li>
-      <li>
-        <a href="#">Blog</a>
-      </li>
-      <li>
-        <a href="${reverse('jobs')}">Jobs</a>
-      </li>
-      <li class="social">
-        <a href="#"><img src="${static.url('images/linkedin.png')}" /></a>
-        <a href="#"><img src="${static.url('images/facebook.png')}" /></a>
-        <a href="#"><img src="${static.url('images/twitter.png')}" /></a>
-      </li>
-    </ol>
+    <section class="secondary-links">
+      <a href="/t/tos.html">Terms of Service</a>
+      <a href="/t/privacy.html">Privacy Policy</a>
+      <a href="/t/honor.html">Honor Code</a>
+      <a href="/t/help.html">Help</a>
+    </section>
   </nav>
 </footer>

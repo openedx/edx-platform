@@ -2,44 +2,274 @@
   padding: 0px 0px 100px;
 
   > header {
-    //background: rgb(250,250,250);
-    @include background-image(url('/static/images/shot-5-large.jpg'));
+    background: rgb(255,255,255);
+    @include background-image(url('/static/images/shot-2-large.jpg'));
     background-size: cover;
     border-bottom: 1px solid rgb(80,80,80);
     @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.9), inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
     @include clearfix;
     margin-top: -69px;
-    min-height: 300px;
-    padding: 129px 0px 50px;
+    overflow: hidden;
+    padding: 149px 0px 90px;
     width: flex-grid(12);
 
-    .inner-wrapper {
+    .outer-wrapper {
+      @extend .animation-home-header-pop-up;
       max-width: 1200px;
       margin: 0 auto;
       position: relative;
-    }
-
-    h1 {
-      color: rgb(255,255,255);
       text-align: center;
-    }
-
-    a {
-      @include button(shiny, $blue);
-      @include box-sizing(border-box);
-      @include border-radius(3px);
-      display: block;
-      font: italic 1.4rem/1.6rem $serif;
-      letter-spacing: 1px;
-      margin: 0 auto;
-      padding: 15px 0px;
-      text-transform: uppercase;
-      text-align: center;
-      -webkit-font-smoothing: antialiased;
-      width: flex-grid(3);
 
       &:hover {
-        color: rgb(255,255,255);
+        .main-cta {
+          @include box-shadow(0 1px 16px 0 rgba($blue, 0.35));
+        }
+      }
+    }
+
+    .inner-wrapper {
+      background: rgba(255,255,255, 0.9);
+      border: 1px solid rgb(100,100,100);
+      @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+      @include inline-block;
+      padding: 30px 50px 30px;
+      position: relative;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .title {
+      @include inline-block;
+      margin-right: 50px;
+      padding-right: 50px;
+      position: relative;
+      text-align: left;
+      vertical-align: middle;
+
+      &::after {
+        @extend .faded-vertical-divider;
+        content: "";
+        display: block;
+        height: 170px;
+        position: absolute;
+        right: 0px;
+        top: -20px;
+      }
+
+      h1 {
+        border-bottom: 1px solid rgb(200,200,200);
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        text-align: left;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+      }
+
+      p {
+        color: $lighter-base-font-color;
+        display: none;
+        font-style: italic;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+        text-transform: lowercase;
+      }
+
+      .main-cta {
+        @include clearfix;
+        float: left;
+        margin-right: flex-gutter();
+        @include transition(all, 0.15s, linear);
+        width: flex-grid(6);
+
+        > a.find-courses {
+          @include button(shiny, $blue);
+          @include box-sizing(border-box);
+          @include border-radius(3px);
+          display: block;
+          font: italic 1.4rem/1.6rem $serif;
+          letter-spacing: 1px;
+          padding: 12px 0px;
+          text-transform: uppercase;
+          text-align: center;
+          -webkit-font-smoothing: antialiased;
+          width: flex-grid(12);
+
+          &:hover {
+            color: rgb(255,255,255);
+          }
+        }
+      }
+
+      .social-sharing {
+        @include box-sizing(border-box);
+        float: left;
+        height: 44px;
+        position: relative;
+        text-align: center;
+        width: flex-grid(6);
+
+        &:hover {
+          .sharing-message {
+            opacity: 1;
+            top: 63px;
+          }
+        }
+
+        .sharing-message {
+          @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
+                                                            rgba(0,0,0, 0.7) 100%));
+          border: 1px solid rgba(0,0,0, 0.5);
+          @include border-radius(4px);
+          @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+          @include box-sizing(border-box);
+          color: rgb(255,255,255);
+          float: right;
+          font: italic 1.2rem/1.6rem $serif;
+          left: 50%;
+          margin-left: -110px;
+          opacity: 0;
+          padding: 5px 10px;
+          position: absolute;
+          text-align: center;
+          @include transition(all, 0.15s, ease-out);
+          top: 73px;
+          width: 220px;
+
+          &::before {
+            background: transparent;
+            border: {
+              top: 6px solid rgba(0,0,0, 1);
+              right: 6px solid rgba(0,0,0, 1);
+              bottom: 6px solid transparent;
+              left: 6px solid transparent;
+            }
+            @include box-shadow(1px 0 0 0 rgb(0,0,0), 0 -1px 0 0 rgb(0,0,0));
+            content: "";
+            display: block;
+            height: 0px;
+            left: 50%;
+            margin-left: -7px;
+            position: absolute;
+            @include transform(rotate(-45deg));
+            top: -6px;
+            width: 0px;
+          }
+        }
+
+        .share {
+          height: 44px;
+          @include inline-block;
+          margin-right: 10px;
+          opacity: 0.5;
+          @include transition(all, 0.15s, linear);
+          width: 44px;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          img {
+            width: 100%;
+          }
+
+          &:last-child {
+            margin-right: 0px;
+          }
+        }
+      }
+    }
+
+    .media {
+      background: #fff;
+      border: 1px solid rgb(200,200,200);
+      @include box-sizing(border-box);
+      @include inline-block;
+      padding: 1px;
+      position: relative;
+      vertical-align: middle;
+      width: 210px;
+      z-index: 2;
+
+      .hero {
+        height: 125px;
+        overflow: hidden;
+        position: relative;
+
+        .play-intro {
+          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.6), rgba(255,255,255, 0.4)));
+          @include border-radius(4px);
+          @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.2));
+          border: 1px solid rgba(0,0,0, 0.3);
+          height: 80px;
+          left: 50%;
+          margin-top: -40px;
+          margin-left: -40px;
+          position: absolute;
+          top: 50%;
+          width: 80px;
+
+          &::after {
+            color: $base-font-color;
+            content: "\25B6";
+            display: block;
+            font: normal 3.2rem/3.2rem $sans-serif;
+            left: 50%;
+            margin-left: -12px;
+            margin-top: -17px;
+            position: absolute;
+            text-shadow: 0 1px rgba(255,255,255, 0.8);
+            top: 50%;
+          }
+        }
+
+        img {
+          display: block;
+          width: 100%;
+        }
+      }
+
+      &:hover {
+        cursor: pointer;
+
+        .play-intro {
+          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.7), rgba(255,255,255, 0.5)));
+          @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.2));
+          border: 1px solid rgba(0,0,0, 0.4);
+
+          &::after {
+            color: $pink;
+          }
+        }
+      }
+    }
+  }
+
+  .highlighted-courses {
+    border-bottom: 1px solid rgb(210,210,210);
+    @include box-sizing(border-box);
+    margin-bottom: 60px;
+    position: relative;
+    width: flex-grid(12);
+    z-index: 1;
+
+    > h2 {
+      @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
+      border: 1px solid rgb(200,200,200);
+      @include border-radius(4px);
+      border-top-color: rgb(190,190,190);
+      @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2));
+      color: $lighter-base-font-color;
+      letter-spacing: 1px;
+      margin-bottom: 0px;
+      margin-top: -15px;
+      padding: 15px 10px;
+      text-align: center;
+      text-transform: uppercase;
+      text-shadow: 0 1px rgba(255,255,255, 0.6);
+
+      .lowercase {
+        color: $lighter-base-font-color;
+        text-transform: none;
       }
     }
   }
@@ -172,34 +402,6 @@
             top: -100px;
           }
         }
-      }
-    }
-  }
-
-  .highlighted-courses {
-    border-bottom: 1px solid rgb(210,210,210);
-    @include box-sizing(border-box);
-    margin-bottom: 60px;
-    width: flex-grid(12);
-
-    > h2 {
-      @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
-      border: 1px solid rgb(200,200,200);
-      @include border-radius(4px);
-      border-top-color: rgb(190,190,190);
-      @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2));
-      color: $lighter-base-font-color;
-      letter-spacing: 1px;
-      margin-bottom: 0px;
-      margin-top: -15px;
-      padding: 15px 10px;
-      text-align: center;
-      text-transform: uppercase;
-      text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-      .lowercase {
-        color: $lighter-base-font-color;
-        text-transform: none;
       }
     }
   }
