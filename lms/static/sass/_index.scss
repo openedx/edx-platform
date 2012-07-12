@@ -419,24 +419,30 @@
 
   .more-info {
     //background: rgb(245,245,245);
-    //border-top: 1px solid rgb(200,200,200);
-    padding: 40px 0px 80px;
+    border: 1px solid rgb(200,200,200);
+    margin-bottom: 80px;
+    //padding: 0px 0px 80px;
     width: flex-grid(12);
 
     header {
-      border-bottom: 1px solid rgb(220,220,220);
+      @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
+      border-bottom: 1px solid rgb(200,200,200);
       @include clearfix;
-      margin-bottom: 30px;
+      //margin-bottom: 30px;
+      padding: 10px 20px 8px;
 
       h2 {
         float: left;
+        margin: 0px;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
       }
 
       a {
         color: $lighter-base-font-color;
         float: right;
         font: italic 1.2rem/1.6rem $serif;
-        padding-top: 5px;
+        padding-top: 3px;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
 
         &:hover {
           color: $base-font-color;
@@ -447,7 +453,7 @@
     .news {
       //border: 1px solid rgb(200,200,200);
       @include box-sizing(border-box);
-      //padding: 20px;
+      padding: 20px;
       width: flex-grid(12);
 
       .blog-posts {
@@ -458,14 +464,22 @@
 
         > article {
           //background: rgb(250,250,250);
-          border-left: 1px dotted rgb(220,220,220);
+          border: 1px dotted transparent;
+          border-color: rgb(220,220,220);
           @include box-sizing(border-box);
           //@include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.1));
           @include clearfix;
           float: left;
           margin-right: flex-gutter();
-          padding: 10px 0px 10px 20px;
+          padding: 10px;
+          @include transition(all, 0.15s, linear);
           width: flex-grid(4);
+
+          &:hover {
+            background: rgb(253,253,253);
+            border: 1px solid rgb(220,220,220);
+            @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.1));
+          }
 
           &:last-child {
             margin-right: 0px;
@@ -515,22 +529,6 @@
           }
         }
       }
-    }
-  }
-
-  .social-media {
-    background: rgb(245,245,245);
-    border: 1px solid rgb(220,220,220);
-    @include border-radius(4px);
-    @include box-shadow(inset 0 1px 2px 0 rgba(0,0,0, 0.1));
-    height: 200px;
-    width: flex-grid(12);
-
-    h2 {
-      color: $lighter-base-font-color;
-      font: normal 1.6rem/2rem $sans-serif;
-      padding-top: 80px;
-      text-align: center;
     }
   }
 }
