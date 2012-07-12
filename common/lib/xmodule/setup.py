@@ -18,21 +18,21 @@ setup(
     entry_points={
         'xmodule.v1': [
             "abtest = xmodule.abtest_module:ABTestDescriptor",
-            "book = xmodule.translation_module:TranslateCustomTagDescriptor",
+            "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "chapter = xmodule.seq_module:SequenceDescriptor",
             "course = xmodule.course_module:CourseDescriptor",
             "customtag = xmodule.template_module:CustomTagDescriptor",
-            "discuss = xmodule.translation_module:TranslateCustomTagDescriptor",
+            "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "html = xmodule.html_module:HtmlDescriptor",
-            "image = xmodule.translation_module:TranslateCustomTagDescriptor",
+            "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.vertical_module:VerticalDescriptor",
-            "section = xmodule.translation_module:SemanticSectionDescriptor",
+            "section = xmodule.backcompat_module:SemanticSectionDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
-            "slides = xmodule.translation_module:TranslateCustomTagDescriptor",
+            "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",
             "video = xmodule.video_module:VideoDescriptor",
-            "videodev = xmodule.translation_module:TranslateCustomTagDescriptor",
+            "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
         ]
     }

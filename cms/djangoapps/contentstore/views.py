@@ -59,16 +59,3 @@ def save_item(request):
         export_to_github(course, "CMS Edit")
 
     return HttpResponse(json.dumps({}))
-
-
-def temp_force_export(request):
-    org = 'mit.edu'
-    course = '6002xs12'
-    name = '6.002_Spring_2012'
-    course = modulestore().get_item(['i4x', org, course, 'course', name])
-    fs = OSFS('../data-export-test')
-    xml = course.export_to_xml(fs)
-    with fs.open('course.xml', 'w') as course_xml:
-        course_xml.write(xml)
-
-    return HttpResponse('Done')

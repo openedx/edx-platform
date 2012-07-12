@@ -65,10 +65,8 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaModule(XModule):
-    ''' Interface between capa_problem and x_module. Originally a hack
-    meant to be refactored out, but it seems to be serving a useful
-    prupose now. We can e.g .destroy and create the capa_problem on a
-    reset.
+    '''
+    An XModule implementing LonCapa format problems, implemented by way of capa.capa_problem.LoncapaProblem
     '''
     icon_class = 'problem'
 
@@ -79,11 +77,6 @@ class CapaModule(XModule):
         self.max_attempts = None
 
         dom2 = etree.fromstring(definition['data'])
-
-        self.explanation = "problems/" + only_one(dom2.xpath('/problem/@explain'),
-                                                  default="closed")
-        # TODO: Should be converted to: self.explanation=only_one(dom2.xpath('/problem/@explain'), default="closed")
-        self.explain_available = only_one(dom2.xpath('/problem/@explain_available'))
 
         display_due_date_string = self.metadata.get('due', None)
         if display_due_date_string is not None:
@@ -246,16 +239,6 @@ class CapaModule(XModule):
         if self.max_attempts is None and self.rerandomize != "always":
             save_button = False
 
-        # Check if explanation is available, and if so, give a link
-        explain = ""
-        if self.lcp.done and self.explain_available == 'attempted':
-            explain = self.explanation
-        if self.closed() and self.explain_available == 'closed':
-            explain = self.explanation
-
-        if len(explain) == 0:
-            explain = False
-
         context = {'problem': content,
                    'id': self.id,
                    'check_button': check_button,
@@ -265,7 +248,6 @@ class CapaModule(XModule):
                    'ajax_url': self.system.ajax_url,
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
-                   'explain': explain,
                    'progress': self.get_progress(),
                    }
 

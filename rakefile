@@ -42,21 +42,6 @@ end
 task :default => [:test, :pep8, :pylint]
 
 directory REPORT_DIR
-directory LMS_REPORT_DIR
-
-desc "Run pep8 on all libraries"
-task :pep8 => REPORT_DIR do
-    sh("pep8 --ignore=E501 lms/djangoapps common/lib/* | tee #{REPORT_DIR}/pep8.report")
-end
-
-desc "Run pylint on all libraries"
-task :pylint => REPORT_DIR do
-    Dir["lms/djangoapps/*", "common/lib/*"].each do |app|
-        ENV['PYTHONPATH'] = File.dirname(app)
-        app = File.basename(app)
-        sh("pylint --rcfile=.pylintrc -f parseable #{app} | tee #{REPORT_DIR}/#{app}.pylint.report")
-    end
-end
 
 default_options = {
     :lms => '8000',
@@ -68,18 +53,39 @@ task :predjango do
     sh('pip install -e common/lib/xmodule')
 end
 
-[:lms, :cms].each do |system|
-    task_name = "test_#{system}"
-    report_dir = File.join(REPORT_DIR, task_name)
+[:lms, :cms, :common].each do |system|
+    report_dir = File.join(REPORT_DIR, system.to_s)
     directory report_dir
 
+    desc "Run pep8 on all #{system} code"
+    task "pep8_#{system}" => report_dir do
+        sh("pep8 --ignore=E501 #{system}/djangoapps #{system}/lib | tee #{report_dir}/pep8.report")
+    end
+    task :pep8 => "pep8_#{system}"
+
+    desc "Run pylint on all #{system} code"
+    task "pylint_#{system}" => report_dir do
+        Dir["#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
+            ENV['PYTHONPATH'] = File.dirname(app)
+            app = File.basename(app)
+            sh("pylint --rcfile=.pylintrc -f parseable #{app} | tee #{report_dir}/#{app}.pylint.report")
+        end
+    end
+    task :pylint => "pylint_#{system}"
+end
+
+[:lms, :cms].each do |system|
+    report_dir = File.join(REPORT_DIR, system.to_s)
+    directory report_dir
+
+    # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task task_name => [report_dir, :predjango] do
+    task "test_#{system}" => [report_dir, :predjango] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
         sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
     end
-    task :test => task_name
+    task :test => "test_#{system}"
 
     desc <<-desc
         Start the #{system} locally with the specified environment (defaults to dev).
@@ -89,7 +95,8 @@ end
         args.with_defaults(:env => 'dev', :options => default_options[system])
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
-    
+
+    # Per environment tasks
     Dir["#{system}/envs/*.py"].each do |env_file|
         env = File.basename(env_file).gsub(/\.py/, '')
         desc "Attempt to import the settings file #{system}.envs.#{env} and report any errors"

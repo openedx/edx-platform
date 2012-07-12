@@ -29,13 +29,6 @@ def group_from_value(groups, v):
 class ABTestModule(XModule):
     """
     Implements an A/B test with an aribtrary number of competing groups
-
-    Format:
-    <abtest>
-        <group name="a" portion=".1"><contenta/></group>
-        <group name="b" portion=".2"><contentb/></group>
-        <default><contentdefault/></default>
-    </abtest>
     """
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
@@ -60,15 +53,53 @@ class ABTestModule(XModule):
                 in self.definition['data']['group_content'][self.group]]
 
 
+# TODO (cpennington): Use Groups should be a first class object, rather than being
+# managed by ABTests
 class ABTestDescriptor(RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
 
     def __init__(self, system, definition=None, **kwargs):
+        """
+        definition is a dictionary with the following layout:
+            {'data': {
+                'experiment': 'the name of the experiment',
+                'group_portions': {
+                    'group_a': 0.1,
+                    'group_b': 0.2
+                },
+                'group_contents': {
+                    'group_a': [
+                        'url://for/content/module/1',
+                        'url://for/content/module/2',
+                    ],
+                    'group_b': [
+                        'url://for/content/module/3',
+                    ],
+                    DEFAULT: [
+                        'url://for/default/content/1'
+                    ]
+                }
+            },
+            'children': [
+                'url://for/content/module/1',
+                'url://for/content/module/2',
+                'url://for/content/module/3',
+                'url://for/default/content/1',
+            ]}
+        """
         kwargs['shared_state_key'] = definition['data']['experiment']
         RawDescriptor.__init__(self, system, definition, **kwargs)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
+        """
+        XML Format:
+        <abtest experiment="experiment_name">
+            <group name="a" portion=".1"><contenta/></group>
+            <group name="b" portion=".2"><contentb/></group>
+            <default><contentdefault/></default>
+        </abtest>
+        """
         experiment = xml_object.get('experiment')
 
         if experiment is None:

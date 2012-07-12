@@ -74,11 +74,11 @@ class LoncapaProblem(object):
 
         Arguments:
 
-         - problem_text : xml defining the problem
-         - id           : string used as the identifier for this problem; often a filename (no spaces)
-         - state        : student state (represented as a dict)
-         - seed         : random number generator seed (int)
-         - system       : I4xSystem instance which provides OS, rendering, and user context 
+         - problem_text (string): xml defining the problem
+         - id           (string): identifier for this problem; often a filename (no spaces)
+         - state        (dict): student state
+         - seed         (int): random number generator seed (int)
+         - system       (I4xSystme): I4xSystem instance which provides OS, rendering, and user context 
 
         '''
 
@@ -126,7 +126,7 @@ class LoncapaProblem(object):
         self.done = False
 
     def __unicode__(self):
-        return u"LoncapaProblem ({0})".format(self.problem_text)
+        return u"LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
         ''' Stored per-user session data neeeded to:
@@ -265,7 +265,7 @@ class LoncapaProblem(object):
                 parent = inc.getparent()			# insert  new XML into tree in place of inlcude
                 parent.insert(parent.index(inc),incxml)
                 parent.remove(inc)
-                log.debug('Included %s into %s' % (file, self.id))
+                log.debug('Included %s into %s' % (file, self.problem_id))
 
     def _extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
         '''
