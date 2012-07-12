@@ -41,7 +41,7 @@ class I4xSystem(object):
                           module instance object.
         render_template - a function that takes (template_file, context), and returns
                           rendered html.
-        user - The user to base the seed off of for this request
+        user - The user to base the random number generator seed off of for this request
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
                     settings.DATA_DIR.
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
@@ -176,20 +176,20 @@ def get_section(course_module, chapter, section):
 
 
 def get_module(user, request, location, student_module_cache, position=None):
-    ''' Get an instance of the xmodule class corresponding to module_xml,
+    ''' Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
 
     Arguments:
       - user                  : current django User
       - request               : current django HTTPrequest
-      - module_xml            : lxml etree of xml subtree for the requested module
+      - location              : A Location-like object identifying the module to load
       - student_module_cache  : a StudentModuleCache
       - position              : extra information from URL for user-specified
                                 position within module
 
     Returns:
-      - a tuple (xmodule instance, instance_module, shared_module, module type).
+      - a tuple (xmodule instance, instance_module, shared_module, module category).
         instance_module is a StudentModule specific to this module for this student
         shared_module is a StudentModule specific to all modules with the same 'shared_state_key' attribute, or None if the module doesn't elect to share state
     '''

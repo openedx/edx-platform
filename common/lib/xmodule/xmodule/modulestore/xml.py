@@ -82,9 +82,9 @@ class XMLModuleStore(ModuleStore):
                 course = course_dir
 
             class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
-                def __init__(self, modulestore):
+                def __init__(self, xmlstore):
                     """
-                    modulestore: the XMLModuleStore to store the loaded modules in
+                    xmlstore: the XMLModuleStore to store the loaded modules in
                     """
                     self.unnamed_modules = 0
                     self.used_slugs = set()
@@ -110,18 +110,18 @@ class XMLModuleStore(ModuleStore):
                             # log.debug('-> slug=%s' % slug)
                             xml_data.set('slug', slug)
 
-                        module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, modulestore.default_class)
+                        module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, xmlstore.default_class)
                         log.debug('==> importing module location %s' % repr(module.location))
-                        modulestore.modules[module.location] = module
+                        xmlstore.modules[module.location] = module
 
-                        if modulestore.eager:
+                        if xmlstore.eager:
                             module.get_children()
                         return module
 
                     system_kwargs = dict(
                         render_template=lambda: '',
-                        load_item=modulestore.get_item,
-                        resources_fs=OSFS(modulestore.data_dir / course_dir),
+                        load_item=xmlstore.get_item,
+                        resources_fs=OSFS(xmlstore.data_dir / course_dir),
                         process_xml=process_xml
                     )
                     MakoDescriptorSystem.__init__(self, **system_kwargs)
