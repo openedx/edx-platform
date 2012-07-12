@@ -27,6 +27,25 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
+def check_course(function, course_must_be_open=True):
+    def inner_function(*args, **kwargs):
+        course_id = kwargs['course_id']
+
+        try:
+            course_loc = CourseDescriptor.id_to_location(course_id)
+            course = modulestore().get_item(course_loc)
+        except KeyError:
+            raise Http404("Course not found.")
+        
+        if course_must_be_open and not course.has_started():
+            raise Http404
+        
+        del kwargs['course_id']
+        kwargs['course'] = course
+        
+        return function(*args, **kwargs)
+    return inner_function
+    
 
 def user_groups(user):
     if not user.is_authenticated():
@@ -84,12 +103,12 @@ def gradebook(request, course_id):
 
 
 @login_required
+@check_course
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, course_id, student_id=None):
+def profile(request, course, student_id=None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
 
-    course_location = CourseDescriptor.id_to_location(course_id)
     if student_id is None:
         student = request.user
     else:
@@ -99,8 +118,8 @@ def profile(request, course_id, student_id=None):
 
     user_info = UserProfile.objects.get(user=student)
 
-    student_module_cache = StudentModuleCache(request.user, modulestore().get_item(course_location))
-    course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
+    student_module_cache = StudentModuleCache(request.user, course)
+    course, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
 
     context = {'name': user_info.name,
                'username': student.username,
@@ -142,8 +161,9 @@ def render_accordion(request, course, chapter, section):
 
 
 @ensure_csrf_cookie
+@check_course
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def index(request, course_id=None, chapter=None, section=None,
+def index(request, course, chapter=None, section=None,
           position=None):
     ''' Displays courseware accordion, and any associated content.
     If course, chapter, and section aren't all specified, just returns
@@ -168,9 +188,6 @@ def index(request, course_id=None, chapter=None, section=None,
         that transformation.
         '''
         return s.replace('_', ' ') if s is not None else None
-
-    course_location = CourseDescriptor.id_to_location(course_id)
-    course = modulestore().get_item(course_location)
 
     chapter = clean(chapter)
     section = clean(section)
@@ -249,13 +266,8 @@ def jump_to(request, probname=None):
 
 
 @ensure_csrf_cookie
-def course_info(request, course_id):
+@check_course
+def course_info(request, course):
     csrf_token = csrf(request)['csrf_token']
-
-    try:
-        course_location = CourseDescriptor.id_to_location(course_id)
-        course = modulestore().get_item(course_location)
-    except KeyError:
-        raise Http404("Course not found")
 
     return render_to_response('info.html', {'csrf': csrf_token, 'course': course})

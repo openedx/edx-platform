@@ -1,3 +1,5 @@
+from datetime import datetime
+import dateutil.parser
 from fs.errors import ResourceNotFoundError
 import logging
 from path import path
@@ -13,6 +15,14 @@ log = logging.getLogger(__name__)
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
 
+    def __init__(self, system, definition=None, **kwargs):
+        super(CourseDescriptor, self).__init__(system, definition, **kwargs)
+        
+        self.start = dateutil.parser.parse(self.metadata["start"])
+    
+    def has_started(self):
+        return datetime.now() > self.start
+    
     @classmethod
     def id_to_location(cls, course_id):
         org, course, name = course_id.split('/')
@@ -24,7 +34,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def title(self):
-        self.metadata['display_name']
+        return self.metadata['display_name']
 
     @property
     def instructors(self):
@@ -69,6 +79,7 @@ class CourseDescriptor(SequenceDescriptor):
         elif section_key == "title":
             return self.metadata.get('display_name', self.name)
         elif section_key == "university":
+            return self.metadata.get('start')
             return self.location.org
         elif section_key == "number":
             return self.number

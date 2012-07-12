@@ -214,7 +214,7 @@ class XModuleDescriptor(Plugin):
 
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (
-        'graded', 'due', 'graceperiod', 'showanswer', 'rerandomize',
+        'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
 
         # This is used by the XMLModuleStore to provide for locations for static files,
         # and will need to be removed when that code is removed
@@ -251,6 +251,7 @@ class XModuleDescriptor(Plugin):
                 display_name: The name to use for displaying this module to the user
                 format: The format of this module ('Homework', 'Lab', etc)
                 graded (bool): Whether this module is should be graded or not
+                start (string): The date for which this module will be available
                 due (string): The due date for this module
                 graceperiod (string): The amount of grace period to allow when enforcing the due date
                 showanswer (string): When to show answers for this module
