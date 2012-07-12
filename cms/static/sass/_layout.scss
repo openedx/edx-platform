@@ -20,7 +20,7 @@ body {
     color: #fff;
     display: block;
     float: none;
-    padding: 0 25px;
+    padding: 0 20px;
     text-shadow: 0 -1px 0 darken($dark-blue, 15%);
     width: 100%;
 
@@ -117,7 +117,7 @@ body {
       @include box-sizing(border-box);
       width: flex-grid(9) + flex-gutter();
       float: left;
-      @include box-shadow( -2px 0 0 darken($light-blue, 3%));
+      @include box-shadow( -2px 0 0 lighten($dark-blue, 55%));
       @include transition();
       background: #FFF;
     }
