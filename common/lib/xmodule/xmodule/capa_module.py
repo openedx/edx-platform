@@ -6,6 +6,7 @@ import logging
 import traceback
 import re
 import StringIO
+import os
 
 from datetime import timedelta
 from lxml import etree
@@ -507,6 +508,8 @@ class CapaDescriptor(RawDescriptor):
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
     @classmethod
-    def backcompat_path(cls, path):
-        if path.startswith('problem'):
-            return 'problems/' + path[7:]
+    def backcompat_paths(cls, path):
+        return [
+            'problems/' + path[8:],
+            path[8:],
+        ]

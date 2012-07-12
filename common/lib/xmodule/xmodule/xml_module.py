@@ -162,10 +162,12 @@ class XmlDescriptor(XModuleDescriptor):
                 # in the correct format.
                 # This should go away once the CMS is online and has imported all current (fall 2012)
                 # courses from xml
-                if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_path'):
-                    new_filepath = cls.backcompat_path(filepath)
-                    if new_filepath is not None and system.resources_fs.exists(new_filepath):
-                        filepath = new_filepath
+                if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
+                    candidates = cls.backcompat_paths(filepath)
+                    for candidate in candidates:
+                        if system.resources_fs.exists(candidate):
+                            filepath = candidate
+                            break
 
                 log.debug('filepath=%s, resources_fs=%s' % (filepath, system.resources_fs))
                 try:

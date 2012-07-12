@@ -1,4 +1,5 @@
 import logging
+import os
 from lxml import etree
 
 from xmodule.x_module import XModule
@@ -31,12 +32,15 @@ class HtmlDescriptor(RawDescriptor):
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
     @classmethod
-    def backcompat_path(cls, path):
-        if path.startswith('html/html'):
-            path = path[5:]
+    def backcompat_paths(cls, path):
         if path.endswith('.html.html'):
             path = path[:-5]
-        return path
+        candidates = []
+        while os.sep in path:
+            candidates.append(path)
+            _, _, path = path.partition(os.sep)
+
+        return candidates
 
     @classmethod
     def file_to_xml(cls, file_object):
