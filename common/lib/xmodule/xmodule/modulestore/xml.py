@@ -5,7 +5,9 @@ from lxml import etree
 from path import path
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 from xmodule.mako_module import MakoDescriptorSystem
+from cStringIO import StringIO
 import os
+import re
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError
@@ -14,6 +16,13 @@ etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
                                          remove_comments=True, remove_blank_text=True))
 
 log = logging.getLogger('mitx.' + __name__)
+
+
+# TODO (cpennington): Remove this once all fall 2012 courses have been imported into the cms from xml
+def clean_out_mako_templating(xml_string):
+    xml_string = xml_string.replace('%include', 'include')
+    xml_string = re.sub("(?m)^\s*%.*$", '', xml_string)
+    return xml_string
 
 
 class XMLModuleStore(ModuleStore):
@@ -54,8 +63,11 @@ class XMLModuleStore(ModuleStore):
             if not os.path.exists(self.data_dir / course_dir / "course.xml"):
                 continue
 
-            course_descriptor = self.load_course(course_dir)
-            self.courses[course_dir] = course_descriptor
+            try:
+                course_descriptor = self.load_course(course_dir)
+                self.courses[course_dir] = course_descriptor
+            except:
+                log.exception("Failed to load course %s" % course_dir)
 
     def load_course(self, course_dir):
         """
@@ -64,6 +76,9 @@ class XMLModuleStore(ModuleStore):
         """
 
         with open(self.data_dir / course_dir / "course.xml") as course_file:
+
+            # TODO (cpennington): Remove this once all fall 2012 courses have been imported into the cms from xml
+            course_file = StringIO(clean_out_mako_templating(course_file.read()))
 
             course_data = etree.parse(course_file).getroot()
             org = course_data.get('org')
@@ -91,6 +106,8 @@ class XMLModuleStore(ModuleStore):
 
                     def process_xml(xml):
                         try:
+                            # TODO (cpennington): Remove this once all fall 2012 courses have been imported into the cms from xml
+                            xml = clean_out_mako_templating(xml)
                             xml_data = etree.fromstring(xml)
                         except:
                             log.exception("Unable to parse xml: {xml}".format(xml=xml))
