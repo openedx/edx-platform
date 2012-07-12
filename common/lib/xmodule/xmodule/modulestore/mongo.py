@@ -23,7 +23,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     def __init__(self, modulestore, module_data, default_class, resources_fs, render_template):
         """
         modulestore: the module store that can be used to retrieve additional modules
-        module_data: a mapping of Location -> json that was cached from the underlying modulestore
+        module_data: a dict mapping Location -> json that was cached from the underlying modulestore
         default_class: The default_class to use when loading an XModuleDescriptor from the module_data
         resources_fs: a filesystem, as per MakoDescriptorSystem
         render_template: a function for rendering templates, as per MakoDescriptorSystem
@@ -42,15 +42,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             return XModuleDescriptor.load_from_json(json_data, self, self.default_class)
 
 
-def location_to_query(loc):
+def location_to_query(location):
     """
     Takes a Location and returns a SON object that will query for that location.
-    Fields in loc that are None are ignored in the query
+    Fields in location that are None are ignored in the query
     """
     query = SON()
     # Location dict is ordered by specificity, and SON
     # will preserve that order for queries
-    for key, val in Location(loc).dict().iteritems():
+    for key, val in Location(location).dict().iteritems():
         if val is not None:
             query['_id.{key}'.format(key=key)] = val
 
@@ -106,6 +106,7 @@ class MongoModuleStore(ModuleStore):
                 to_process = list(self.collection.find({'_id': {'$in': [Location(child).dict() for child in children]}}))
             else:
                 to_process = []
+            # If depth is None, then we just recurse until we hit all the descendents
             if depth is not None:
                 depth -= 1
 
