@@ -235,11 +235,11 @@ def create_account(request, post_override=None):
     r.register(u)
 
     up = UserProfile(user=u)
-    up.name=post_vars['name']
-    up.language=post_vars['language']
-    up.country=post_vars['country']
-    up.gender=post_vars['gender']
-    up.mailing_address=post_vars['mailing_address']
+    up.name = post_vars['name']
+    up.language = post_vars['language']
+    up.country = post_vars['country']
+    up.gender = post_vars['gender']
+    up.mailing_address = post_vars['mailing_address']
     up.save()
 
     # TODO (vshnayder): the LMS should probably allow signups without a particular course too

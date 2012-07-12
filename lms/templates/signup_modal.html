@@ -1,6 +1,6 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
-<%! from django_countries import countries %>
+<%! from django_countries.countries import COUNTRIES %>
 <%! from student.models import UserProfile %>
 
 <section id="signup-modal" class="modal signup-modal">
@@ -29,8 +29,8 @@
         </p>
         <label>Country of citizenship</label>
         <select name="country">
-            %for code, country in countries.COUNTRIES:
-                <option value="${code}">${country}</option>
+            %for country_code, country_name in COUNTRIES:
+                <option value="${country_code}">${country_name}</option>
             %endfor
         </select>
         <label>Preferred Language</label>
