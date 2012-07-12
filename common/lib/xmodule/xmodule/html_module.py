@@ -28,6 +28,16 @@ class HtmlDescriptor(RawDescriptor):
     js = {'coffee': [resource_string(__name__, 'js/module/html.coffee')]}
     js_module = 'HTML'
 
+    # TODO (cpennington): Delete this method once all fall 2012 course are being
+    # edited in the cms
+    @classmethod
+    def backcompat_path(cls, path):
+        if path.startswith('html/html'):
+            path = path[5:]
+        if path.endswith('.html.html'):
+            path = path[:-5]
+        return path
+
     @classmethod
     def file_to_xml(cls, file_object):
         parser = etree.HTMLParser()
