@@ -353,6 +353,7 @@ INSTALLED_APPS = (
     'simplewiki',
     'track',
     'util',
+    'certificates',
 
     # For testing
     'django_jasmine',
