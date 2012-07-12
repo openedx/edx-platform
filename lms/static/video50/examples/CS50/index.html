@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+    <head>
+        <link href="css/lib/mediaelementplayer.min.css" rel="stylesheet" type="text/css" />
+        <link href="css/lib/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="css/cs50.video.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="js/lib/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="js/lib/underscore-min.js"></script>
+        <script type="text/javascript" src="js/lib/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/lib/mediaelement-and-player.min.js"></script>
+        <script type="text/javascript" src="js/lib/jquery.scroll.js"></script>
+        <script type="text/javascript" src="js/cs50.video.js"></script>
+        <script type="text/javascript" src="js/cs50.video.render.js"></script>
+
+        <script>
+            var questions = [
+                {
+                    timecode: 3,
+                    mode: CS50.Video.QuestionMode.PANEL,
+                    question: {
+                        id: 0,
+                        render: CS50.Video.Render.TrueFalse,
+                        answer: true,
+                        question: 'Is David wearing a v-neck?',
+                        tags: ['Linked Lists', 'Pointers']
+                    }
+                },
+                {
+                    timecode: 6,
+                    mode: CS50.Video.QuestionMode.FLIP,
+                    question: {
+                        id: 1,
+                        render: CS50.Video.Render.MultipleChoice,
+                        answer: 2,
+                        choices: [100, 70, 50, 30],
+                        question: 'How many TFs are there?',
+                        tags: ['PHP', 'MySQL']
+                    }
+                },
+                {
+                    timecode: 9,
+                    mode: CS50.Video.QuestionMode.FLIP,
+                    question: {
+                        id: 2,
+                        render: CS50.Video.Render.FreeResponse,
+                        answer: /^very$/i,
+                        question: 'How awesome is Tommy?',
+                        tags: ['JavaScript', 'DOM']
+                    }
+                },
+                {
+                    timecode: 12,
+                    mode: CS50.Video.QuestionMode.FLIP,
+                    question: {
+                        id: 3,
+                        render: CS50.Video.Render.Numeric,
+                        answer: 35,
+                        question: 'How old is David?',
+                        tags: ['Algorithms', 'Insertion Sort'],
+                        tolerance: 0.1
+                    }
+                }
+            ];
+
+            $(function() {
+                var player = new CS50.Video({
+                    autostart: true,
+                    notificationsContainer: '#questions',
+                    playerContainer: '#video',
+                    questions: questions,
+                    questionContainer: '#question',
+                    srt: {
+                        'en': '../../week0w-en.srt',
+                        'pt': '../../week0w-pt.srt'
+                    },
+                    swf: 'js/lib/flashmediaelement.swf',
+                    title: 'Lecture 0: Wednesday',
+                    transcriptContainer: '#transcript',
+                    video: 'http://cdn.cs50.net/2011/fall/lectures/0/week0w.mp4?download'
+                });
+            });
+        </script>
+        <style type="text/css">
+            #navbar-border {
+              min-width: 1535px;
+              width: 100%;
+              vertical-align: top; }
+
+            #navbar-border-wrapper {
+              position: absolute;
+              height: 4px;
+              top: 55px;
+              z-index: 500;
+              width: 100%;
+              overflow: hidden; }
+
+            .navbar-inner {
+              border-radius: 0px;
+              background-color: #FEFEFE;
+              height: 55px;
+              background-image: none;
+              -moz-box-shadow: none;
+              -webkit-box-shadow: none;
+              box-shadow: none; }
+
+            .navbar {
+              margin-bottom: 0px;
+              left: 0px;
+              right: 0px;
+
+              z-index: 501;
+              border-bottom: 0px solid #DDD; }
+              .navbar .brand {
+                color: #333;
+                font-size: 28px;
+                letter-spacing: -1px;
+                line-height: 55px;
+                padding: 0px 0px 0px 15px;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", "Helvetica", sans-serif;
+                font-weight: 200;
+                -webkit-font-smoothing: antialiased;
+                text-shadow: 1px 1px 0px white; }
+              .navbar .account-menu {
+                height: 35px;
+                margin: 0px; }
+              .navbar .suite.account-menu, .navbar .user.account-menu {
+                padding: 10px 10px 10px 15px; }
+              .navbar .product.account-menu {
+                padding: 10px 0px 10px 0px; }
+              .navbar .suite.account-menu {
+                border-right: 1px solid #EEE; }
+              .navbar .product.dropdown-menu {
+                left: -100px; }
+              .navbar .suite.dropdown-menu {
+                right: -9px; }
+                .navbar .suite.dropdown-menu a {
+                  text-align: right; }
+              .navbar .user.dropdown-menu {
+                right: -14px; }
+              .navbar .product.dropdown-menu, .navbar .suite.dropdown-menu, .navbar .user.dropdown-menu {
+                background-color: #FEFEFE;
+                border: none;
+                min-width: 100px;
+                top: 45px;
+                border-radius: 0px;
+                -moz-border-radius: 0px;
+                -webkit-border-radius: 0px; }
+                .navbar .product.dropdown-menu::before, .navbar .suite.dropdown-menu::before, .navbar .user.dropdown-menu::before {
+                  display: none; }
+                .navbar .product.dropdown-menu::after, .navbar .suite.dropdown-menu::after, .navbar .user.dropdown-menu::after {
+                  display: none; }
+                .navbar .product.dropdown-menu li a, .navbar .suite.dropdown-menu li a, .navbar .user.dropdown-menu li a {
+                  padding: 0px 18px 3px 22px; }
+                .navbar .product.dropdown-menu li:hover > a, .navbar .suite.dropdown-menu li:hover > a, .navbar .user.dropdown-menu li:hover > a {
+                  background-color: #F1F1F1;
+                  color: #333; }
+              .navbar .dropdown-brand {
+                color: #333;
+                font-size: 20px;
+                letter-spacing: -1px;
+                line-height: 30px;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", "Helvetica", sans-serif;
+                font-weight: 200;
+                -webkit-font-smoothing: antialiased;
+                vertical-align: middle; }
+                .navbar .dropdown-brand img {
+                  height: 14px;
+                  margin-top: 9px;
+                  margin-right: 6px;
+                  vertical-align: top; }
+              .navbar .nav .dropdown-toggle .caret {
+                border-top-color: black !important;
+                border-bottom-color: black !important; }
+
+            .navbar-inner .container-fluid .account-menu .dropdown .dropdown-toggle .login-text {
+              color: #333;
+              font-size: 16px;
+              -webkit-font-smoothing: antialiased;
+              text-shadow: none; }
+
+            .brand {
+                margin-left: -35px !important;
+            }
+        </style>
+        <style type='text/css'>
+            html, body {
+                background-color: #FCFCFC;
+                min-width: 1495px;
+            }
+
+            #navbar-border-wrapper {
+                min-width: 1495px;
+            }
+
+            #content-wrapper-outer {
+                margin: 30px;
+                min-width: 1455px;
+            }
+
+            #content-wrapper-inner {
+                margin: 0px auto;
+                min-width: 1395px;
+                max-width: 1395px;    
+            }
+
+            .panel {
+                background-color: #FFFFFF;
+                border-top: 1px solid #DDD;
+                border-radius: 4px;
+                -moz-border-radius: 4px;
+                -webkit-border-radius: 4px;
+                -moz-box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px;
+                -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px;
+                box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px; 
+            }
+
+            .panel-inset {
+                background-color: #FFFFFF;
+                border-top: 1px solid #DDD;
+                border-radius: 4px;
+                -moz-border-radius: 4px;
+                -webkit-border-radius: 4px;
+                -moz-box-shadow: inset rgba(0, 0, 0, 0.3) 0 0px 5px;
+                -webkit-box-shadow: inset rgba(0, 0, 0, 0.3) 0 0px 5px;
+                box-shadow: inset rgba(0, 0, 0, 0.3) 0 0px 5px;  
+            }
+
+            .video50-transcript {
+                border: 0px;
+                line-height: 20px;
+            }
+                 
+            .video50-transcript-container {
+                height: 335px;
+            }
+
+            .video50-notifications table {
+                border-width: 0px 0px 1px 0px;
+                border-radius: 0px;
+                margin-bottom: 0px;
+            }
+
+            .video50-notifications table tr td {
+                border-left: 0px;
+            }
+
+            #video-wrapper, #transcript, #questions, #question {
+                display: inline-block;
+                vertical-align: top;
+            }
+            
+            #video-wrapper {
+                margin-right: 20px;
+                margin-bottom: 20px;
+            }
+         
+            #questions, #question {
+                height: 400px;
+            }
+ 
+            #questions {
+                margin-right: 20px;
+            }
+            
+            #question {
+                width: 700px;
+            }
+ 
+            .video50-question{
+                border: 0px;
+            }        
+     
+            .video50-player .player-navbar {
+                border: 0px;
+                border-bottom: 1px solid #ccc;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="brand" href="/">This is CS50 Video.</a>
+                </div>    
+            </div>
+        </div>
+        <div id="navbar-border-wrapper">
+            <img id="navbar-border" src="/img/bottom-border.png">
+        </div>
+        <div id="content-wrapper-outer">
+            <div id="content-wrapper-inner">
+                <div id="video-wrapper" class="panel">
+                    <div id="video"></div>
+                </div>
+                <div id="transcript" class="panel-inset"></div>
+                <div id="questions" class="panel"></div>
+                <div id="question" class="panel"></div>
+            </div>
+        </div>
+    </body>
+</html>

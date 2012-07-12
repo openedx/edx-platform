@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<!-- saved from url=(0073)https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript">var NREUMQ=NREUMQ||[];NREUMQ.push(["mark","firstbyte",new Date().getTime()])</script> <title>Courseware – MITx 6.002x</title> <link rel="stylesheet" href="./Courseware – MITx 6.002x_files/jquery.treeview.css" type="text/css" media="all"> <link rel="stylesheet" href="./Courseware – MITx 6.002x_files/application.css" type="text/css" media="all"> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/jquery-1.6.2.min.js"></script> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/jquery-ui-1.8.16.custom.min.js"></script> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/swfobject.js"></script> <!--[if lt IE 9]> <script src="/static/js/html5shiv.js"></script> <![endif]--> <script type="text/x-mathjax-config;executed=true">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [["\\(","\\)"]],
+      displayMath: [["\\[","\\]"]]}
+    });
+  </script> <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates --> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/MathJax.js"></script> <style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 1px 2em; background: transparent}
+.MathJax_MenuTitle {background-color: #CCCCCC; margin: -5px 0 0 0; text-align: center; font-style: italic; font-size: 80%; color: #444444; padding: 2px 0; overflow: hidden}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuRadioCheck {position: absolute; left: .7em}
+.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: #606872; color: white}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css" media="screen">#ytapiplayer {visibility:hidden}</style><style type="text/css">.MathJax_Display {text-align: center; margin: 1em 0em; position: relative; display: block; width: 100%}
+.MathJax .merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+#MathJax_Tooltip {background-color: InfoBackground; color: InfoText; border: 1px solid black; box-shadow: 2px 2px 5px #AAAAAA; -webkit-box-shadow: 2px 2px 5px #AAAAAA; -moz-box-shadow: 2px 2px 5px #AAAAAA; -khtml-box-shadow: 2px 2px 5px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true'); padding: 3px 4px; position: absolute; left: 0; top: 0; width: auto; height: auto; display: none}
+.MathJax {display: inline; font-style: normal; font-weight: normal; line-height: normal; font-size: 100%; font-size-adjust: none; text-indent: 0; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; border: 0; padding: 0; margin: 0}
+.MathJax img, .MathJax nobr, .MathJax a {border: 0; padding: 0; margin: 0; max-width: none; max-height: none; vertical-align: 0; line-height: normal; text-decoration: none}
+img.MathJax_strut {border: 0 !important; padding: 0 !important; margin: 0 !important; vertical-align: 0 !important}
+.MathJax span {display: inline; position: static; border: 0; padding: 0; margin: 0; vertical-align: 0; line-height: normal; text-decoration: none}
+.MathJax nobr {white-space: nowrap ! important}
+.MathJax img {display: inline ! important; float: none ! important}
+.MathJax_Processing {visibility: hidden; position: fixed; width: 0; height: 0; overflow: hidden}
+.MathJax_Processed {display: none!important}
+.MathJax_ExBox {display: block; overflow: hidden; width: 1px; height: 60ex}
+.MathJax .MathJax_EmBox {display: block; overflow: hidden; width: 1px; height: 60em}
+.MathJax .MathJax_HitBox {cursor: text; background: white; opacity: 0; filter: alpha(opacity=0)}
+.MathJax .MathJax_HitBox * {filter: none; opacity: 1; background: transparent}
+#MathJax_Tooltip * {filter: none; opacity: 1; background: transparent}
+@font-face {font-family: MathJax_Blank; src: url('about:blank')}
+.MathJax .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head> <body class="courseware"><div style="visibility: hidden; overflow: hidden; position: absolute; top: 0px; height: 1px; width: auto; padding: 0px; border: 0px; margin: 0px; text-align: left; text-indent: 0px; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; "><div id="MathJax_Hidden"></div></div><div id="MathJax_Message" style="display: none; "></div> <!--[if lte IE 9]> <p class="ie-warning">You are using a browser that is not supported by <em>MITx</em>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p> <![endif]--> <div class="header-wrapper"> <header> <hgroup> <h1><em>MITx</em></h1> <h2><a href="https://6002x.mitx.mit.edu/courseware">Circuits and Electronics</a></h2> </hgroup> <nav class="courseware"> <ul class="coursenav"> <li class="courseware"><a href="https://6002x.mitx.mit.edu/courseware">Courseware</a></li> <li class="info"><a href="https://6002x.mitx.mit.edu/info">Course Info</a></li> <li class="wiki"><a href="https://6002x.mitx.mit.edu/wiki/view">Wiki</a></li> </ul> </nav> </header> </div> <section class="main-content"> <div class="course-wrapper"> <section class="course-index"> <header id="open_close_accordion"> <h2>Courseware Index</h2> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">close</a> </header> <div id="accordion" class="ui-accordion ui-widget ui-helper-reset ui-accordion-icons" role="tablist"> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-state-active ui-corner-top" role="tab" aria-expanded="true" aria-selected="true" tabindex="0"><span class="ui-icon ui-icon-triangle-1-s"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Overview</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active" role="tabpanel"> <li class="active"> <a href="./Courseware – MITx 6.002x_files/Courseware – MITx 6.002x.html"> <p>Welcome</p> <p class="subtitle">
+              Video 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/System_Usage_Sequence/"> <p>System Usage Sequence</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Lab0%3A_Using_the_tools/"> <p>Lab0: Using the tools</p> <p class="subtitle">
+              Lab 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Circuit_Sandbox/"> <p>Circuit Sandbox</p> <p class="subtitle">
+              Lab 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 1</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_1/Administrivia_and_Circuit_Elements/"> <p>Administrivia and Circuit Elements</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_1/Circuit_Analysis_Toolchest/"> <p>Circuit Analysis Toolchest</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_1/Resistor_Divider/"> <p>Resistor Divider</p> <p class="subtitle">
+              Lab due March 18
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_1/Week_1_Tutorials/"> <p>Week 1 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 2</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_2/Linearity_and_Superposition/"> <p>Linearity and Superposition</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_2/Static_Discipline_and_Boolean_Logic/"> <p>Static Discipline and Boolean Logic</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_2/Superposition_experiment/"> <p>Superposition experiment</p> <p class="subtitle">
+              Lab due March 25
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_2/Lab2b%3A_Mixing_Two_Signals/"> <p>Lab2b: Mixing Two Signals</p> <p class="subtitle">
+              Lab due March 25
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_2/Week_2_Tutorials/"> <p>Week 2 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 3</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_3/Inside_the_Gate/"> <p>Inside the Gate</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_3/Circuits_with_Nonlinear_Elements/"> <p>Circuits with Nonlinear Elements</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_3/Logic_Gate_Implementation/"> <p>Logic Gate Implementation</p> <p class="subtitle">
+              Lab due April 1
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_3/Week_3_Tutorials/"> <p>Week 3 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 4</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_4/Incremental_Analysis/"> <p>Incremental Analysis</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_4/Dependent_Sources_and_Amplifiers/"> <p>Dependent Sources and Amplifiers</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_4/Curve_Tracer/"> <p>Curve Tracer</p> <p class="subtitle">
+              Lab due April 8
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_4/Week_4_Tutorials/"> <p>Week 4 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 5</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_5/MOSFETs%3A_Large_Signals/"> <p>MOSFETs: Large Signals</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_5/MOSFET_Amplifiers%3A_Small_signal_model/"> <p>MOSFET Amplifiers: Small signal model</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_5/Mosfet_Amplifier/"> <p>Mosfet Amplifier</p> <p class="subtitle">
+              Lab due April 15
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_5/Mosfet_Amplifier_Experiment/"> <p>Mosfet Amplifier Experiment</p> <p class="subtitle">
+              Lab due April 15
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_5/Week_5_Tutorials/"> <p>Week 5 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 6</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_6/Small-Signal_Circuit_Models/"> <p>Small-Signal Circuit Models</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_6/Capacitors_and_First-Order_Circuits/"> <p>Capacitors and First-Order Circuits</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_6/Propagation_Delay/"> <p>Propagation Delay</p> <p class="subtitle">
+              Lab due April 24
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_6/Week_6_Tutorials/"> <p>Week 6 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 7</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_7/Inductors_and_First-Order_Circuits/"> <p>Inductors and First-Order Circuits</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_7/Speed_of_Digital_Circuits/"> <p>Speed of Digital Circuits</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_7/Capacitors_and_Energy_Storage/"> <p>Capacitors and Energy Storage</p> <p class="subtitle">
+              Lab due April 29
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_7/Week_7_Tutorials/"> <p>Week 7 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 8</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_8/Ramps%2C_Steps%2C_and_Impulses/"> <p>Ramps, Steps, and Impulses</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_8/State_and_Memory/"> <p>State and Memory</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_8/First-order_Transients/"> <p>First-order Transients</p> <p class="subtitle">
+              Lab due May 6
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_8/Week_8_Tutorials/"> <p>Week 8 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 9</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_9/Undamped_Second-Order_Systems/"> <p>Undamped Second-Order Systems</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_9/Damped_Second-Order_Systems/"> <p>Damped Second-Order Systems</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_9/Second-order_Circuits/"> <p>Second-order Circuits</p> <p class="subtitle">
+              Lab due May 13
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_9/Week_9_Tutorials/"> <p>Week 9 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 10</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_10/Sinusoidal_Steady_State/"> <p>Sinusoidal Steady State</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_10/The_Impedance_Model/"> <p>The Impedance Model</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_10/Impedance_%26_Frequency_Response/"> <p>Impedance &amp; Frequency Response</p> <p class="subtitle">
+              Lab due May 20
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_10/RC_Filters_Experiment/"> <p>RC Filters Experiment</p> <p class="subtitle">
+              Lab due May 20
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_10/Week_10_Tutorials/"> <p>Week 10 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 11</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_11/Filters/"> <p>Filters</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_11/Time_Domain_Versus_Frequency_Domain_Analysis/"> <p>Time Domain Versus Frequency Domain Analysis</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_11/Resonance/"> <p>Resonance</p> <p class="subtitle">
+              Lab due May 27
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_11/Week_11_Tutorials/"> <p>Week 11 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 12</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_12/The_Operational_Amplifier_Abstraction/"> <p>The Operational Amplifier Abstraction</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_12/Operational_Amplifier_Circuits/"> <p>Operational Amplifier Circuits</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_12/Op_Amps/"> <p>Op Amps</p> <p class="subtitle">
+              Lab due June 3
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_12/Week_12_Tutorials/"> <p>Week 12 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 13</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_13/Op_Amps_Positive_Feedback/"> <p>Op Amps Positive Feedback</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_13/Energy_and_Power/"> <p>Energy and Power</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_13/Week_13_Tutorials/"> <p>Week 13 Tutorials</p> <p class="subtitle">
+              Tutorial Index 
+            </p> </a> </li></ul> <h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Week 14</a></h3> <ul class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" role="tabpanel" style="display: none; "> <li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_14/Energy_and_CMOS_Design/"> <p>Energy and CMOS Design</p> <p class="subtitle">
+              Lecture Sequence 
+            </p> </a> </li><li> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Week_14/Breaking_the_Abstraction_Barrier/"> <p>Breaking the Abstraction Barrier</p> <p class="subtitle">
+              Lecture Sequence 
+              </p> </a> </li></ul> </div> </section> <section class="course-content"> <div class="video-subtitles"> <div class="tc-wrapper"> 
+
+        <link href="css/lib/mediaelementplayer.min.css" rel="stylesheet" type="text/css" />
+        <link href="css/lib/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="css/cs50.video.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="js/lib/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="js/lib/underscore-min.js"></script>
+        <script type="text/javascript" src="js/lib/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/lib/mediaelement-and-player.min.js"></script>
+        <script type="text/javascript" src="js/lib/jquery.scroll.js"></script>
+        <script type="text/javascript" src="js/cs50.video.js"></script>
+        <script type="text/javascript" src="js/cs50.video.render.js"></script>
+
+
+        <style type='text/css'>
+            .panel {
+                background-color: #FFFFFF;
+                border-top: 1px solid #DDD;
+                border-radius: 4px;
+                -moz-border-radius: 4px;
+                -webkit-border-radius: 4px;
+                -moz-box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px;
+                -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px;
+                box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px; 
+            }
+
+            .panel-inset {
+                background-color: #FFFFFF;
+                border-top: 1px solid #DDD;
+                border-radius: 4px;
+                -moz-border-radius: 4px;
+                -webkit-border-radius: 4px;
+                -moz-box-shadow: inset rgba(0, 0, 0, 0.3) 0 0px 5px;
+                -webkit-box-shadow: inset rgba(0, 0, 0, 0.3) 0 0px 5px;
+                box-shadow: inset rgba(0, 0, 0, 0.3) 0 0px 5px;  
+            }
+
+            .video50-transcript {
+                border: 0px;
+                font-size: 12px;
+                line-height: 15px;
+            }
+
+            .video50-playback-controls {
+                text-align: right;
+            }
+                
+            .video50-playback-controls li {
+                margin: 0px !important;
+                float: none;
+                display: inline-block;
+            }
+            
+            .video50-playback-controls li a {
+                border-left: 1px solid #ddd;
+                border-top: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+            }
+            
+            .video50-playback-controls li a:hover {
+                color: #933;
+            }
+            
+            .video50-playback-controls li.active a {
+                border: 0px;
+            }
+                 
+            .video50-transcript-container {
+                height: 335px; 
+                width: 310px;
+            }
+
+            .video50-notifications table {
+                border-width: 0px 0px 1px 0px;
+                border-radius: 0px;
+                margin-bottom: 0px;
+            }
+
+            .video50-notifications table tr td {
+                border-left: 0px;
+            }
+
+            #video-wrapper, #transcript, #questions, #question {
+                margin-top: 10px;
+                display: inline-block;
+                vertical-align: top;
+            }
+            
+            #video-wrapper {
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+         
+            #questions, #question {
+                height: 400px;
+                width: 505px;
+                margin-bottom: 10px;
+            }
+
+            .question-content {
+                font-family: Helvetica Neue;
+            }
+
+            .question-content h2 {
+                text-transform: none !important;
+            }
+
+            #questions {
+                margin-right: 10px;
+            }
+
+            .video50-question .question-content .btn.btn-submit {
+                display: inline-block;
+                padding: 4px 10px 4px;
+                margin-bottom: 0;
+                font-size: 13px;
+                line-height: 18px;
+                color: #333;
+                text-align: center;
+                text-shadow: 0 1px 1px 
+                rgba(255, 255, 255, 0.75);
+                vertical-align: middle;
+                cursor: pointer;
+                background-color: whiteSmoke;
+                background-image: -webkit-linear-gradient(top,white,#E6E6E6);
+                background-repeat: repeat-x;
+                border: 1px solid #CCC;
+                border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+                border-bottom-color: #B3B3B3;
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                border-radius: 4px;
+                -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),0 1px 2px rgba(0, 0, 0, 0.05);
+            } 
+
+            .video50-question .question-content .btn.btn-submit:hover {
+                color: #333;
+                text-decoration: none;
+                background-color: #E6E6E6;
+                background-position: 0 -15px;
+                -webkit-transition: background-position .1s linear;
+                -moz-transition: background-position .1s linear;
+                -ms-transition: background-position .1s linear;
+                -o-transition: background-position .1s linear;
+                transition: background-position .1s linear;
+            }
+
+            .video50-question{
+                border: 0px;
+            }        
+
+            .nav-pills > .active > a, .nav-pills > .active > a:hover {
+                background-color: #732626;
+            }
+
+            .video50-player .player-navbar {
+                border: 0px;
+                border-bottom: 1px solid #ccc;
+            }
+
+            #transcript .highlight {
+                background-color: transparent;
+                color: #933;
+            }
+        </style>
+
+        <script>
+            var questions = [
+                {
+                    timecode: 3,
+                    mode: CS50.Video.QuestionMode.PANEL,
+                    question: {
+                        id: 0,
+                        render: CS50.Video.Render.TrueFalse,
+                        answer: true,
+                        question: 'Is David wearing a v-neck?',
+                        tags: ['Linked Lists', 'Pointers']
+                    }
+                },
+                {
+                    timecode: 6,
+                    mode: CS50.Video.QuestionMode.FLIP,
+                    question: {
+                        id: 1,
+                        render: CS50.Video.Render.MultipleChoice,
+                        answer: 2,
+                        choices: [100, 70, 50, 30],
+                        question: 'How many TFs are there?',
+                        tags: ['PHP', 'MySQL']
+                    }
+                },
+                {
+                    timecode: 9,
+                    mode: CS50.Video.QuestionMode.FLIP,
+                    question: {
+                        id: 2,
+                        render: CS50.Video.Render.FreeResponse,
+                        answer: /^very$/i,
+                        question: 'How awesome is Tommy?',
+                        tags: ['JavaScript', 'DOM']
+                    }
+                },
+                {
+                    timecode: 12,
+                    mode: CS50.Video.QuestionMode.FLIP,
+                    question: {
+                        id: 3,
+                        render: CS50.Video.Render.Numeric,
+                        answer: 35,
+                        question: 'How old is David?',
+                        tags: ['Algorithms', 'Insertion Sort'],
+                        tolerance: 0.1
+                    }
+                }
+            ];
+
+            $(function() {
+                alert("ready")
+                var player = new CS50.Video({
+                    autostart: true,
+                    notificationsContainer: '#questions',
+                    playerContainer: '#video',
+                    questions: questions,
+                    questionContainer: '#question',
+                    srt: {
+                        'en': '../../week0w-en.srt',
+                        'pt': '../../week0w-pt.srt'
+                    },
+                    swf: 'js/lib/flashmediaelement.swf',
+                    title: 'Lecture 0: Wednesday',
+                    transcriptContainer: '#transcript',
+                    video: 'http://cdn.cs50.net/2011/fall/lectures/0/week0w.mp4?download'
+                });
+            });
+        </script>
+
+        <div id="video-wrapper" class="panel">
+            <div id="video"></div>
+        </div>
+        <div id="transcript" class="panel-inset"></div>
+        <div id="questions" class="panel"></div>
+        <div id="question" class="panel"></div>
+                
+
+</section> </div> </section> <footer> <!-- Template based on a design from http://www.dotemplate.com/ - Donated $10 (pmitros) so we don't need to include credit. --> <p> Copyright © 2012. MIT. <a href="https://6002x.mitx.mit.edu/t/copyright.html">Some rights reserved.</a> </p> <nav> <ul class="social"> <li class="linkedin"> <a href="http://www.linkedin.com/groups/Friends-Alumni-MITx-4316538">Linked In</a> </li> <li class="twitter"> <a href="https://twitter.com/#!/MyMITx">Twitter</a> </li> <li class="facebook"> <a href="http://www.facebook.com/pages/MITx/378592442151504">Facebook</a> </li> </ul> <ul> <li><a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#feedback_div" rel="leanModal">Feedback</a></li> <li class="calc-main"> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#" class="calc">Calculator</a> <div id="calculator_wrapper"> <form id="calculator"> <div class="input-wrapper"> <input type="text" id="calculator_input"> <div class="help-wrapper"> <a href="https://6002x.mitx.mit.edu/courseware/6.002_Spring_2012/Overview/Welcome/#">Hints</a> <dl class="help"> <dt>Suffixes:</dt> <dd> %kMGTcmunp</dd> <dt>Operations:</dt> <dd>^ * / + - ()</dd> <dt>Functions:</dt> <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd> <dt>Constants</dt> <dd>e, pi</dd> <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.
+
+                  <dt>Unsupported:</dt> <dd>||, j </dd>  --> </dl> </div> </div> <input id="calculator_button" type="submit" value="="> <input type="text" id="calculator_output" readonly=""> </form> </div> </li> <li><a href="https://6002x.mitx.mit.edu/s/help.html">Help</a></li> </ul> </nav> </footer> <div id="feedback_div" class="leanModal_box"> <h1>Feedback for MITx</h1> <p>Found a bug? Got an idea for improving our system? Let us know.</p> <form> <ol> <li><label>Subject:</label> <input type="text" id="feedback_subject"></li> <li><label>Feedback: </label><textarea id="feedback_message"></textarea></li> <li><input id="feedback_button" type="button" value="Submit"></li> </ol> </form> </div> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/jquery.treeview.js"></script> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/jquery.leanModal.min.js"></script> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/jquery.qtip.min.js"></script> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/jquery.cookie.js"></script> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/video_player.js"></script> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/schematic.js"></script> <script type="text/javascript" src="./Courseware – MITx 6.002x_files/cktsim.js"></script> <script>
+  // Feedback form
+$(function() {
+    $("#feedback_button").click(function(){
+      postJSON("/send_feedback", {"subject":$("#feedback_subject").attr("value"),
+        "url":document.URL,
+        "message":$("#feedback_message").attr("value")},
+        function(data){
+        $("#feedback_subject").attr("value","");
+        $("#feedback_message").attr("value","");
+        $("#feedback_div").html("Feedback submitted. Thank you");
+        });
+      });
+
+// Calculator
+
+    $(".calc").click(function(){
+      $("li.calc-main").toggleClass('open');
+      $("#calculator_wrapper #calculator_input").focus();
+      $(this).toggleClass("closed");
+      return false;
+      });
+
+    $("div.help-wrapper a").hover(function(){
+      $(".help").toggleClass("shown");
+
+      });
+
+    $("div.help-wrapper a").click(function(){
+      return false;
+      });
+    $("form#calculator").submit(function(e){
+      e.preventDefault();
+      $.getJSON("/calculate", {"equation":$("#calculator_input").attr("value")},
+        function(data){
+        $("#calculator_output").attr("value",data.result);
+        });
+      });
+
+    $("a[rel*=leanModal]").leanModal();
+
+    });
+</script> <!-- TODO: http://docs.jquery.com/Plugins/Validation --> <script type="text/javascript">
+  $(function() {
+    $("#accordion").accordion({
+  active: 0,
+  header: 'h3',
+  autoHeight: false,
+});
+
+$("#open_close_accordion a").click(function(){
+  if ($(".course-wrapper").hasClass("closed")){
+    $(".course-wrapper").removeClass("closed");
+  } else {
+    $(".course-wrapper").addClass("closed");
+  }
+});
+
+$('.ui-accordion').bind('accordionchange', function(event, ui) {
+   var event_data = {'newheader':ui.newHeader.text(),
+         'oldheader':ui.oldHeader.text()};
+   log_event('accordion', event_data);
+});
+var streams={"1.50": "rABDYkeK0x8", "1.0": "p2Q6BrNhdh8", "1.25": "1EeWXzPdhSA", "0.75": "izygArpw-Qo"}
+var params = { allowScriptAccess: "always", bgcolor: "#cccccc", wmode: "transparent", allowFullScreen: "true" };
+var atts = { id: "myytplayer" };
+
+// If the user doesn't have flash, use the HTML5 Video instead. YouTube's
+// iFrame API which supports HTML5 is still developmental so it is not default
+if (swfobject.hasFlashPlayerVersion("10.1")){
+  swfobject.embedSWF(document.location.protocol +  "//www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer?wmode=transparent",
+        "ytapiplayer", "640", "385", "8", null, null, params, atts);
+} else {
+
+  //end of this URL may need &origin=http://..... once pushed to production to prevent XSS
+  $("#html5_player").attr("src", document.location.protocol +  "//www.youtube.com/embed/" + streams["1.0"] + "?enablejsapi=1&controls=0");
+  $("#html5_player").show();
+
+  var tag = document.createElement('script');
+  tag.src = document.location.protocol +  "//www.youtube.com/player_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  // Make sure the callback is called once API ready, YT seems to be buggy
+  loadHTML5Video();
+}
+
+var captions=0;
+
+/* Cache a reference to our slider element */
+var slider = $('#slider')
+
+.slider({
+  range: "min",
+  slide: function(event,ui) {
+    var slider_time = format_time(ui.value)
+
+    seek_slide('slide',event.originalEvent,ui.value);
+    handle.qtip('option', 'content.text', '' + slider_time);
+  }, 
+  stop:function(event,ui){seek_slide('stop',event.originalEvent,ui.value);}
+}),
+
+/* Grab and cache the newly created slider handle */
+handle = $('.ui-slider-handle', slider);
+
+/* 
+	 * Selector needs changing here to match your elements.
+	 * 
+	 * Notice the second argument to the $() constructor, which tells
+	 * jQuery to use that as the top-level element to seareh down from.
+	 */
+	handle.qtip({
+		content: '' + slider.slider('option', 'value'), // Use the current value of the slider
+		position: {
+			my: 'bottom center',
+			at: 'top center',
+			container: handle // Stick it inside the handle element so it keeps the position synched up
+		},
+		hide: {
+			delay: 700 // Give it a longer delay so it doesn't hide frequently as we move the handle
+		},
+		style: {
+			classes: 'ui-tooltip-slider',
+			widget: true // Make it Themeroller compatible
+		}
+	});
+
+function good() {
+    window['console'].log(ytplayer.getCurrentTime());
+}
+
+ajax_video=good;
+
+// load the same video speed your last video was at in a sequence
+// if the last speed played on video doesn't exist on another video just use 1.0 as default
+
+function add_speed(key, stream) {
+  var id = 'speed_' + stream;
+
+  if (key == video_speed) {
+    $("#video_speeds").append(' <li class="active" id="'+id+'">'+key+'x</li>');
+    $("p.active").text(key + 'x');
+  } else {
+    $("#video_speeds").append(' <li id="'+id+'">'+key+'x</li>');
+  }
+
+  $("#"+id).click(function(){
+    change_video_speed(key, stream);
+    $(this).siblings().removeClass("active");
+    $(this).addClass("active");
+    var active = $(this).text();
+    $("p.active").text(active);
+  });
+
+}
+
+var l=[]
+for (var key in streams) {
+    l.push(key);
+}
+
+function sort_by_value(a,b) {
+    var x=parseFloat(a);
+    var y=parseFloat(b);
+    var r=((x < y) ? -1 : ((x > y) ? 1 : 0));
+    return r;
+}
+
+l.sort(sort_by_value);
+
+$(document).ready(function() {
+    video_speed = $.cookie("video_speed");
+
+    //ugly hack to account for different formats in vid speed in the XML (.75 vs 0.75, 1.5 vs 1.50);
+    if (( !video_speed ) || ( !streams[video_speed] && !streams[video_speed + "0"]) && !streams[video_speed.slice(0,-1)] && !streams[video_speed.slice(1)] && !streams["0" + video_speed]) {
+      video_speed = "1.0";
+    }
+
+    if (streams[video_speed + "0"]){
+      video_speed = video_speed + "0";
+    } else if (streams[video_speed.slice(0, -1)]){
+      video_speed = video_speed.slice(0, -1);
+    } else if (streams[video_speed.slice(1)]) {
+      video_speed = video_speed.slice(1);
+    } else if (streams["0" + video_speed]) {
+      video_speed = "0" + video_speed;
+    }
+
+    loadNewVideo(streams["1.0"], streams[video_speed], 0);
+
+    for(var i=0; i<l.length; i++) {
+      add_speed(l[i], streams[l[i]])
+    }
+
+    var dropUpHeight = $('ol#video_speeds').height();
+    console.log(dropUpHeight);
+    $('ol#video_speeds').css('top', -(dropUpHeight + 2));
+});
+
+function toggleVideo(){
+  if ($("#video_control").hasClass("play")){
+    play();
+    $("#video_control").removeClass().addClass("pause");
+  } else {
+    pause();
+    $("#video_control").removeClass().addClass("play");
+  }
+}
+
+$("#video_control").click(toggleVideo);
+
+// space bar to pause video
+$(".video-wrapper").keyup(function(e){
+  active = document.activeElement;
+  if (e.which == 32) {
+    e.preventDefault();
+    $("#video_control").click();
+  }
+});
+
+
+    $(".sequence-nav li a").hover(function(){
+      $(this).siblings().toggleClass("shown");
+
+      $(".Strain-Logic-Circuit-Switched-Capacitor-BJT-OpAmpRL-OpAmpFET-Trapping-Noise-Increasing-Q-Scope-Probe-Triode-Amplifier > p").remove();     });
+    });
+
+
+</script> <script type="text/javascript">if(!NREUMQ.f){NREUMQ.f=function(){NREUMQ.push(["load",new Date().getTime()]);var e=document.createElement("script");e.type="text/javascript";e.async=true;e.src="https://d1ros97qkrwjf5.cloudfront.net/39/eum/rum.js";document.body.appendChild(e);if(NREUMQ.a)NREUMQ.a();};NREUMQ.a=window.onload;window.onload=NREUMQ.f;};NREUMQ.push(["nrf2","beacon-1.newrelic.com","1beac94c95",404692,"NQQGYUZWDUNSVUMPWQxOIkBaVBdZXFgYBVkXExdQQ1YRVR1AXgNBEVsNW1BSGw==",0,71,new Date().getTime()])</script> 
+<div id="lean_overlay"></div><div id="MathJax_Font_Test" style="position: absolute; visibility: hidden; top: 0px; left: 0px; width: auto; padding: 0px; border: 0px; margin: 0px; white-space: nowrap; text-align: left; text-indent: 0px; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; font-size: 40px; font-weight: normal; font-style: normal; font-family: STIXSizeOneSym, sans-serif; ">ˆ</div><script type="text/javascript" async="" src="./Courseware – MITx 6.002x_files/rum.js"></script></body></html>
