@@ -15,5 +15,6 @@ class @Video
     new MediaSliderControl @
     new MediaPlayControl @
     new MediaTimeDisplay @
+    new MediaSpeedControl @, [0.75, 1.0, 1.25, 1.50]
     new MediaVolumeControl @ unless onTouchBasedDevice()
     new MediaFullscreenControl @

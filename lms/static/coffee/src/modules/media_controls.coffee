@@ -225,3 +225,59 @@ class @MediaVolumeControl extends @MediaControl
       @slider.slider('option', 'value', 0)
     else
       @slider.slider('option', 'value', @previousVolume)
+
+
+class @MediaSpeedControl extends @MediaControl
+  initialize: (@speeds) ->
+
+  render: ->
+    @element = $("""
+      <div class="speeds">
+        <a href="#">
+          <h3>Speed</h3>
+          <p class="active"></p>
+        </a>
+      </div>
+      """) #"
+
+    @selector = $('<ol class="video_speeds">')
+    @element.append(@selector)
+
+    $.each @speeds, (index, speed) =>
+      link = $('<a>').attr(href: "#").html("#{speed}x")
+      @selector.prepend($('<li>').attr('data-speed', speed).append(link))
+
+    @get_secondary_controls().append(@element)
+
+    @setSpeed(@media[0].defaultPlaybackRate)
+
+  bind: ->
+    @media.bind('ratechange', @onSpeedChange)
+    @selector.find('a').click(@changeVideoSpeed)
+    if onTouchBasedDevice()
+      @element.click (event) ->
+        event.preventDefault()
+        $(this).toggleClass('open')
+    else
+      @element.mouseenter ->
+        $(this).addClass('open')
+      @element.mouseleave ->
+        $(this).removeClass('open')
+      @element.click (event) ->
+        event.preventDefault()
+        $(this).removeClass('open')
+
+  setSpeed: (speed) ->
+    @selector.find('li').removeClass('active')
+    @selector.find("li[data-speed='#{speed}']").addClass('active')
+    @selector.find('p.active').html("#{speed}x")
+
+  changeVideoSpeed: (event) =>
+    event.preventDefault()
+    unless $(event.target).parent().hasClass('active')
+      @media[0].playbackRate = $(event.target).parent().data('speed')
+
+  onSpeedChange: (event) =>
+    speed = @media[0].playbackRate
+    value  = parseFloat(speed).toFixed(2).replace(/\.00$/, '.0')
+    @setSpeed(value)
