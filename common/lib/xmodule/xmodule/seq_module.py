@@ -7,6 +7,7 @@ from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
+from xmodule.exceptions import NotFoundError
 
 log = logging.getLogger("mitx.common.lib.seq_module")
 
@@ -56,7 +57,7 @@ class SequenceModule(XModule):
         if dispatch == 'goto_position':
             self.position = int(get['position'])
             return json.dumps({'success': True})
-        raise self.system.exception404
+        raise NotFoundError('Unexpected dispatch type')
 
     def render(self):
         if self.rendered:

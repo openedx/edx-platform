@@ -16,33 +16,23 @@ import capa.calc as calc
 import capa.capa_problem as lcp
 from capa.correctmap import CorrectMap
 from xmodule import graders, x_module
+from xmodule.x_module import ModuleSystem
 from xmodule.graders import Score, aggregate_scores
 from xmodule.progress import Progress
 from nose.plugins.skip import SkipTest
+from mock import Mock
 
-
-class I4xSystem(object):
-    '''
-    This is an abstraction such that x_modules can function independent
-    of the courseware (e.g. import into other types of courseware, LMS,
-    or if we want to have a sandbox server for user-contributed content)
-    '''
-    def __init__(self):
-        self.ajax_url = '/'
-        self.track_function = lambda x: None
-        self.filestore = fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__)))
-        self.render_function = lambda x: {}  # Probably incorrect
-        self.module_from_xml = lambda x: None  # May need a real impl...
-        self.exception404 = Exception
-        self.DEBUG = True
-
-    def __repr__(self):
-        return repr(self.__dict__)
-
-    def __str__(self):
-        return str(self.__dict__)
-
-i4xs = I4xSystem()
+i4xs = ModuleSystem(
+    ajax_url='/',
+    track_function=Mock(),
+    get_module=Mock(),
+    render_template=Mock(),
+    replace_urls=Mock(),
+    user=Mock(),
+    filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))),
+    debug=True,
+    xqueue_callback_url='/'
+)
 
 
 class ModelsTest(unittest.TestCase):

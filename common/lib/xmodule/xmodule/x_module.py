@@ -81,7 +81,7 @@ class XModule(object):
         '''
         Construct a new xmodule
 
-        system: An I4xSystem allowing access to external resources
+        system: A ModuleSystem allowing access to external resources
         location: Something Location-like that identifies this xmodule
         definition: A dictionary containing 'data' and 'children'. Both are optional
             'data': is JSON-like (string, dictionary, list, bool, or None, optionally nested).
@@ -452,3 +452,62 @@ class XMLParsingSystem(DescriptorSystem):
         """
         DescriptorSystem.__init__(self, load_item, resources_fs)
         self.process_xml = process_xml
+
+
+class ModuleSystem(object):
+    '''
+    This is an abstraction such that x_modules can function independent
+    of the courseware (e.g. import into other types of courseware, LMS,
+    or if we want to have a sandbox server for user-contributed content)
+
+    ModuleSystem objects are passed to x_modules to provide access to system
+    functionality.
+
+    Note that these functions can be closures over e.g. a django request
+    and user, or other environment-specific info.
+    '''
+    def __init__(self, ajax_url, track_function,
+                 get_module, render_template, replace_urls,
+                 user=None, filestore=None, debug=False, xqueue_callback_url=None):
+        '''
+        Create a closure around the system environment.
+
+        ajax_url - the url where ajax calls to the encapsulating module go.
+        track_function - function of (event_type, event), intended for logging
+                         or otherwise tracking the event.
+                         TODO: Not used, and has inconsistent args in different
+                         files.  Update or remove.
+        get_module - function that takes (location) and returns a corresponding
+                          module instance object.
+        render_template - a function that takes (template_file, context), and returns
+                          rendered html.
+        user - The user to base the random number generator seed off of for this request
+        filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
+                    settings.DATA_DIR.
+        replace_urls - TEMPORARY - A function like static_replace.replace_urls
+            that capa_module can use to fix up the static urls in ajax results.
+        '''
+        self.ajax_url = ajax_url
+        self.xqueue_callback_url = xqueue_callback_url
+        self.track_function = track_function
+        self.filestore = filestore
+        self.get_module = get_module
+        self.render_template = render_template
+        self.DEBUG = self.debug = debug
+        self.seed = user.id if user is not None else 0
+        self.replace_urls = replace_urls
+
+    def get(self, attr):
+        '''	provide uniform access to attributes (like etree).'''
+        return self.__dict__.get(attr)
+
+    def set(self, attr, val):
+        '''provide uniform access to attributes (like etree)'''
+        self.__dict__[attr] = val
+
+    def __repr__(self):
+        return repr(self.__dict__)
+
+    def __str__(self):
+        return str(self.__dict__)
+

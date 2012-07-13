@@ -101,7 +101,7 @@ class LoncapaResponse(object):
           - xml         : ElementTree of this Response
           - inputfields : ordered list of ElementTrees for each input entry field in this Response
           - context     : script processor context
-          - system      : I4xSystem instance which provides OS, rendering, and user context
+          - system      : ModuleSystem instance which provides OS, rendering, and user context
 
         '''
         self.xml = xml
