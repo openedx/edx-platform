@@ -231,9 +231,6 @@ class CapaModule(XModule):
         # Only show the reset button if pressing it will show different values
         if self.rerandomize != 'always':
             reset_button = False
-        
-        # THK: for debugging
-        reset_button = True
 
         # User hasn't submitted an answer yet -- we don't want resets
         if not self.lcp.done:
