@@ -231,6 +231,9 @@ class CapaModule(XModule):
         # Only show the reset button if pressing it will show different values
         if self.rerandomize != 'always':
             reset_button = False
+        
+        # THK: for debugging
+        reset_button = True
 
         # User hasn't submitted an answer yet -- we don't want resets
         if not self.lcp.done:
@@ -275,6 +278,7 @@ class CapaModule(XModule):
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
+            'score_update': self.update_score,
             }
 
         if dispatch not in handlers:
@@ -320,6 +324,12 @@ class CapaModule(XModule):
             return True
         #TODO: Not 404
         raise self.system.exception404
+
+    def update_score(self, get):
+        score_msg = get['response']
+        self.lcp.update_score(score_msg)
+
+        return dict() # No AJAX return is needed
 
     def get_answer(self, get):
         '''
