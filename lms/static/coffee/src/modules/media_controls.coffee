@@ -125,7 +125,7 @@ class @MediaSliderControl extends @MediaControl
       slide: @onSlide
       stop: @onStop
 
-    @handle = @slider.find('.slider .ui-slider-handle')
+    @handle = @slider.find('.ui-slider-handle')
     @handle.qtip
       content: "#{Time.format(@slider.slider('value'))}"
       position:
@@ -148,6 +148,7 @@ class @MediaSliderControl extends @MediaControl
     @media[0].currentTime = time
 
   updateTooltip: (value)->
+    value = value / @_ssf
     @handle.qtip('option', 'content.text', "#{Time.format(value)}")
 
   onLoadedMetadata: =>
