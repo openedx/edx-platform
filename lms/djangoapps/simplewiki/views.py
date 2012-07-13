@@ -9,20 +9,12 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
 
+from courseware.decorators import check_course
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
 from models import Revision, Article, Namespace, CreateArticleForm, RevisionFormWithTitle, RevisionForm
 import wiki_settings
-
-def get_course(course_id):
-    if course_id == None:
-        return None
-    
-    course_loc = CourseDescriptor.id_to_location(course_id)
-    course = modulestore().get_item(course_loc)
-    # raise Http404("Course not found")
-    return course
     
 def wiki_reverse(wiki_page, article = None, course = None, namespace=None, args=[], kwargs={}):
     kwargs = dict(kwargs) # TODO: Figure out why if I don't do this kwargs sometimes contains {'article_path'}
@@ -55,10 +47,9 @@ def update_template_dictionary(dictionary, request = None, course = None, articl
     if request:
         dictionary.update(csrf(request))
         
-
-def view(request, article_path, course_id=None):
-    course = get_course(course_id)
-        
+@check_course(course_required=False)
+def view(request, article_path, course=None):
+            
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
@@ -71,8 +62,9 @@ def view(request, article_path, course_id=None):
     update_template_dictionary(d, request, course, article, article.current_revision)
     return render_to_response('simplewiki/simplewiki_view.html', d)
     
-def view_revision(request, revision_number, article_path, course_id=None):
-    course = get_course(course_id)
+@check_course(course_required=False)
+def view_revision(request, revision_number, article_path, course=None):
+
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
@@ -93,24 +85,24 @@ def view_revision(request, revision_number, article_path, course_id=None):
     
     return render_to_response('simplewiki/simplewiki_view.html', d)
 
-
-def root_redirect(request, course_id=None):
-    course = get_course(course_id)
+@check_course(course_required=False)
+def root_redirect(request, course=None):
+    #TODO: Add a default namespace to settings.
+    namespace = course.wiki_namespace if course else "edX"
+    
     try:
-        root = Article.get_root(course.wiki_namespace)
+        root = Article.get_root(namespace)
+        return HttpResponseRedirect(reverse('wiki_view', kwargs={'course_id' : course_id, 'article_path' : root.get_path()} ))
     except:
         # If the root is not found, we probably are loading this class for the first time
         # We should make sure the namespace exists so the root article can be created.
-        Namespace.ensure_namespace(course.wiki_namespace)
+        Namespace.ensure_namespace(namespace)
         
-        err = not_found(request, course.wiki_namespace + '/', course)
+        err = not_found(request, namespace + '/', course)
         return err
-    
-    return HttpResponseRedirect(reverse('wiki_view', kwargs={'course_id' : course_id, 'article_path' : root.get_path()} ))
 
-def create(request, article_path, course_id=None):
-    course = get_course(course_id)
-    
+@check_course(course_required=False)
+def create(request, article_path, course=None):    
     article_path_components = article_path.split('/')
 
     # Ensure the namespace exists
@@ -168,8 +160,8 @@ def create(request, article_path, course_id=None):
 
     return render_to_response('simplewiki/simplewiki_edit.html', d)
 
-def edit(request, article_path, course_id=None):
-    course = get_course(course_id)
+@check_course(course_required=False)
+def edit(request, article_path, course=None):
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
@@ -214,8 +206,8 @@ def edit(request, article_path, course_id=None):
     update_template_dictionary(d, request, course, article)
     return render_to_response('simplewiki/simplewiki_edit.html', d)
 
-def history(request, article_path, page=1, course_id=None):
-    course = get_course(course_id)
+@check_course(course_required=False)
+def history(request, article_path, page=1, course=None):
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
@@ -295,10 +287,8 @@ def history(request, article_path, page=1, course_id=None):
     
     return render_to_response('simplewiki/simplewiki_history.html', d)
     
-    
-def revision_feed(request, page=1, namespace=None, course_id=None):
-    course = get_course(course_id)
-    
+@check_course(course_required=False)   
+def revision_feed(request, page=1, namespace=None, course=None):
     page_size = 10
     
     if page == None:
@@ -328,7 +318,8 @@ def revision_feed(request, page=1, namespace=None, course_id=None):
     
     return render_to_response('simplewiki/simplewiki_revision_feed.html', d)
 
-def search_articles(request, namespace=None, course_id = None):
+@check_course(course_required=False)
+def search_articles(request, namespace=None, course = None):
     # blampe: We should check for the presence of other popular django search
     # apps and use those if possible. Only fall back on this as a last resort.
     # Adding some context to results (eg where matches were) would also be nice.
@@ -339,9 +330,7 @@ def search_articles(request, namespace=None, course_id = None):
         querystring = request.GET.get('value', '').strip()
     else:
         querystring = ""
-        
-    course = get_course(course_id)
-    
+            
     results = Article.objects.all()
     if namespace:
         results = results.filter(namespace__name__exact = namespace)
@@ -377,8 +366,8 @@ def search_articles(request, namespace=None, course_id = None):
         update_template_dictionary(d, request, course)
         return render_to_response('simplewiki/simplewiki_searchresults.html', d)
         
-
-def search_add_related(request, course_id, slug, namespace):
+@check_course(course_required=False)
+def search_add_related(request, course, slug, namespace):
     (article, err) = get_article(request, slug, namespace if namespace else course_id )
     if err:
         return err
@@ -408,7 +397,8 @@ def search_add_related(request, course_id, slug, namespace):
     json = simplejson.dumps({'results': results})
     return HttpResponse(json, mimetype='application/json')
 
-def add_related(request, course_id, slug, namespace):
+@check_course(course_required=False)
+def add_related(request, course, slug, namespace):
     (article, err) = get_article(request, slug, namespace if namespace else course_id )
     if err:
         return err
@@ -429,7 +419,8 @@ def add_related(request, course_id, slug, namespace):
     finally:
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
-def remove_related(request, course_id, namespace, slug, related_id):
+@check_course(course_required=False)
+def remove_related(request, course, namespace, slug, related_id):
     (article, err) = get_article(request, slug, namespace if namespace else course_id )
     
     if err:
@@ -449,8 +440,8 @@ def remove_related(request, course_id, namespace, slug, related_id):
     finally:
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
-def random_article(request, course_id):
-    course = get_course(course_id)
+@check_course(course_required=False)
+def random_article(request, course=None):
     from random import randint
     num_arts = Article.objects.count()
     article = Article.objects.all()[randint(0, num_arts-1)]
