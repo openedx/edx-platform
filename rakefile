@@ -80,7 +80,7 @@ end
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}" => [report_dir, :predjango] do
+    task "test_#{system}" => [report_dir, :predjango, "#{system}:collectstatic:test"] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
         sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
@@ -106,7 +106,7 @@ end
 
         desc "Run collectstatic in the specified environment"
         task "#{system}:collectstatic:#{env}" => :predjango do
-            sh("#{django_admin(system, env, 'collectstatic')}")
+            sh("#{django_admin(system, env, 'collectstatic', '--noinput')}")
         end
     end
 end
