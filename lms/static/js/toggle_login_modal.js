@@ -34,6 +34,7 @@
           $('#lean_overlay').css({ 'display' : 'block', opacity : 0 });
           $('#lean_overlay').fadeTo(200,o.overlay);
 
+          $('iframe', modal_id).attr('src', $('iframe', modal_id).data('src'));
           $(modal_id).css({
             'display' : 'block',
             'position' : o.position,
@@ -52,10 +53,18 @@
 
       function close_modal(modal_id){
         $("#lean_overlay").fadeOut(200);
+        $('iframe', modal_id).attr('src', '');
         $(modal_id).css({ 'display' : 'none' });
       }
     }
   });
-})(jQuery);
 
-$("a[rel*=leanModal]").leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
+  $("a[rel*=leanModal]").each(function(){
+    $(this).leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
+    embed = $($(this).attr('href')).find('iframe')
+    if(embed.length > 0) {
+      embed.data('src', embed.attr('src') + '?autoplay=1');
+      embed.attr('src', '');
+    }
+  });
+})(jQuery);
