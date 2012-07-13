@@ -18,33 +18,36 @@
   color: #fff;
   display: none;
   left: 50%;
-  margin-left: -(grid-width(6)) / 2;
+  //margin-left: -(grid-width(6)) / 2;
   padding: 8px;
   position: absolute;
-  //top: 170px;
   width: grid-width(6);
   z-index: 12;
 
   &.video-modal {
     left: 50%;
-    margin-left: -281px;
-    width: 562px;
+    padding: 10px;
+    width: 582px;
 
     .inner-wrapper {
+      background: #000;
+      @include box-shadow(none);
       height: 315px;
-      padding: 0px;
+      padding: 10px;
       width: 560px;
     }
   }
 
   &.home-page-video-modal {
     left: 50%;
-    margin-left: -321px;
-    width: 642px;
+    padding: 10px;
+    width: 662px;
 
     .inner-wrapper {
+      background: #000;
+      @include box-shadow(none);
       height: 360px;
-      padding: 0px;
+      padding: 10px;
       width: 640px;
     }
   }
