@@ -266,7 +266,7 @@ class @MediaSpeedControl extends @MediaControl
         $(this).removeClass('open')
       @element.click (event) ->
         event.preventDefault()
-        $(this).removeClass('open')
+        $(this).toggleClass('open')
 
   setSpeed: (speed) ->
     @selector.find('li').removeClass('active')
