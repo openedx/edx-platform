@@ -503,21 +503,6 @@ def course_info(request, course_id):
     return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course': course})
 
 
-def about(request):
-    return render_to_response('about.html', None)
-
-
-def university_profile(request):
-  return render_to_response('university_profile.html', None)
-
-def jobs(request):
-    return render_to_response('jobs.html', None)
-
-
-def help(request):
-    return render_to_response('help.html', None)
-
-
 @login_required
 @ensure_csrf_cookie
 def enroll(request, course_id):

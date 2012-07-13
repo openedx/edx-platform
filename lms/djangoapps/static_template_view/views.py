@@ -8,14 +8,7 @@ from django.shortcuts import redirect
 from django.core.context_processors import csrf
 from django.conf import settings
 
-#valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
-valid_templates=['index.html', 
-                 'tos.html', 
-                 'privacy.html', 
-                 'honor.html', 
-                 'copyright.html', 
-                 '404.html',
-                 'mitx_help.html']
+valid_templates = []
 
 if settings.STATIC_GRAB: 
     valid_templates = valid_templates+['server-down.html',
@@ -30,10 +23,22 @@ if settings.STATIC_GRAB:
 def index(request, template): 
     csrf_token = csrf(request)['csrf_token']
     if template in valid_templates:
-        return render_to_response(template, {'error' : '',
-                                             'csrf': csrf_token }) 
+        return render_to_response('static_templates/' + template, {}) 
     else:
         return redirect('/')
+
+
+def render(request, template):
+    """
+    This view function renders the template sent without checking that it
+    exists. Do not expose template as a regex part of the url. The user should
+    not be able to ender any arbitray template name. The correct usage would be:
+    
+    url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs'}, name="jobs")
+    """
+    template = template + '.html'
+    return render_to_response('static_templates/' + template, {}) 
+    
 
 valid_auth_templates=['help.html']
 
