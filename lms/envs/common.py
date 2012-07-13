@@ -186,7 +186,7 @@ if os.path.isdir(DATA_DIR):
         # should no longer be added to STATICFILES
         (course_dir, DATA_DIR / course_dir)
         for course_dir in os.listdir(DATA_DIR)
-        if os.path.isdir(course_dir)
+        if os.path.isdir(DATA_DIR / course_dir)
     ]
 
 # Locale/Internationalization

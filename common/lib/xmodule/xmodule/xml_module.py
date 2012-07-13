@@ -172,12 +172,8 @@ class XmlDescriptor(XModuleDescriptor):
                 log.debug('filepath=%s, resources_fs=%s' % (filepath, system.resources_fs))
                 try:
                     with system.resources_fs.open(filepath) as file:
-                        try:
-                            definition_xml = cls.file_to_xml(file)
-                        except:
-                            log.exception("Failed to parse xml in file %s" % filepath)
-                            raise
-                except ResourceNotFoundError:
+                        definition_xml = cls.file_to_xml(file)
+                except (ResourceNotFoundError, etree.XMLSyntaxError):
                     log.exception('Unable to load file contents at path %s' % filepath)
                     return {'data': 'Error loading file contents at path %s' % filepath}
 
