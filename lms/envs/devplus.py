@@ -15,6 +15,8 @@ Dir structure:
 """
 from .dev import *
 
+WIKI_ENABLED = True
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

@@ -84,6 +84,7 @@ if settings.COURSEWARE_ENABLED:
     )
     
     # Multicourse wiki
+if settings.WIKI_ENABLED:
     urlpatterns += (
         url(r'^wiki/', include('simplewiki.urls')),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
