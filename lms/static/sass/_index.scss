@@ -256,7 +256,7 @@
 
   .highlighted-courses {
     @include box-sizing(border-box);
-    margin-bottom: 0px;
+    margin-bottom: 40px;
     position: relative;
     width: flex-grid(12);
     z-index: 1;
@@ -421,7 +421,6 @@
     //background: rgb(245,245,245);
     border: 1px solid rgb(200,200,200);
     margin-bottom: 80px;
-    //padding: 0px 0px 80px;
     width: flex-grid(12);
 
     header {
@@ -476,7 +475,7 @@
           width: flex-grid(4);
 
           &:hover {
-            background: rgb(253,253,253);
+            background: rgb(248,248,248);
             border: 1px solid rgb(220,220,220);
             @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.1));
           }

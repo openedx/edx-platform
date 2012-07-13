@@ -124,6 +124,7 @@
         background: #fff;
         border-left: 1px solid rgb(100,100,100);
         @include box-sizing(border-box);
+        display: block;
         float: right;
         padding: 1px;
         position: relative;
