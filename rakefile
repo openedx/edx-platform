@@ -74,6 +74,14 @@ end
     task :pylint => "pylint_#{system}"
 end
 
+
+def run_tests(system, report_dir)
+    ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
+    ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
+    sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
+end
+
+
 [:lms, :cms].each do |system|
     report_dir = File.join(REPORT_DIR, system.to_s)
     directory report_dir
@@ -81,10 +89,14 @@ end
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
     task "test_#{system}" => [report_dir, :predjango, "#{system}:collectstatic:test"] do
-        ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-        ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
-        sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
+        run_tests(system, report_dir)
     end
+    # Have a way to run the tests without running collectstatic -- useful when debugging without
+    # messing with static files.
+    task "fasttest_#{system}" => [report_dir, :predjango] do
+        run_tests(system, report_dir)
+    end
+
     task :test => "test_#{system}"
 
     desc <<-desc
