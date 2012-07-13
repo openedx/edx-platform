@@ -5,14 +5,13 @@ import json
 import logging
 import traceback
 import re
-import StringIO
-import os
 
 from datetime import timedelta
 from lxml import etree
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.exceptions import NotFoundError
 from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
@@ -319,8 +318,8 @@ class CapaModule(XModule):
 
         if self.show_answer == 'always':
             return True
-        #TODO: Not 404
-        raise self.system.exception404
+
+        return False
 
     def update_score(self, get):
         """
@@ -347,7 +346,7 @@ class CapaModule(XModule):
         Returns the answers: {'answers' : answers}
         '''
         if not self.answer_available():
-            raise self.system.exception404
+            raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
             return {'answers': answers}
@@ -403,15 +402,14 @@ class CapaModule(XModule):
         if self.closed():
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_check_fail', event_info)
-            # TODO (vshnayder): probably not 404?
-            raise self.system.exception404
+            raise NotFoundError('Problem is closed')
 
         # Problem submitted. Student should reset before checking
         # again.
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
             self.system.track_function('save_problem_check_fail', event_info)
-            raise self.system.exception404
+            raise NotFoundError('Problem must be reset before it can be checked again')
 
         try:
             old_state = self.lcp.get_state()

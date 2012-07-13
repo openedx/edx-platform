@@ -12,75 +12,16 @@ from xmodule.modulestore.django import modulestore
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
+from xmodule.exceptions import NotFoundError
+from xmodule.x_module import ModuleSystem
 
 log = logging.getLogger("mitx.courseware")
-
-
-class I4xSystem(object):
-    '''
-    This is an abstraction such that x_modules can function independent
-    of the courseware (e.g. import into other types of courseware, LMS,
-    or if we want to have a sandbox server for user-contributed content)
-
-    I4xSystem objects are passed to x_modules to provide access to system
-    functionality.
-
-    Note that these functions can be closures over e.g. a django request
-    and user, or other environment-specific info.
-    '''
-    def __init__(self, ajax_url, track_function,
-                 get_module, render_template, replace_urls,
-                 user=None, filestore=None, xqueue_callback_url=None):
-        '''
-        Create a closure around the system environment.
-
-        ajax_url - the url where ajax calls to the encapsulating module go.
-        xqueue_callback_url - the url where external queueing system (e.g. for grading)
-                              returns its response
-        track_function - function of (event_type, event), intended for logging
-                         or otherwise tracking the event.
-                         TODO: Not used, and has inconsistent args in different
-                         files.  Update or remove.
-        get_module - function that takes (location) and returns a corresponding
-                          module instance object.
-        render_template - a function that takes (template_file, context), and returns
-                          rendered html.
-        user - The user to base the random number generator seed off of for this request
-        filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
-                    settings.DATA_DIR.
-        replace_urls - TEMPORARY - A function like static_replace.replace_urls
-            that capa_module can use to fix up the static urls in ajax results.
-        '''
-        self.ajax_url = ajax_url
-        self.xqueue_callback_url = xqueue_callback_url
-        self.track_function = track_function
-        self.filestore = filestore
-        self.get_module = get_module
-        self.render_template = render_template
-        self.exception404 = Http404
-        self.DEBUG = settings.DEBUG
-        self.seed = user.id if user is not None else 0
-        self.replace_urls = replace_urls
-
-    def get(self, attr):
-        '''	provide uniform access to attributes (like etree).'''
-        return self.__dict__.get(attr)
-
-    def set(self, attr, val):
-        '''provide uniform access to attributes (like etree)'''
-        self.__dict__[attr] = val
-
-    def __repr__(self):
-        return repr(self.__dict__)
-
-    def __str__(self):
-        return str(self.__dict__)
 
 
 def make_track_function(request):
     '''
     Make a tracking function that logs what happened.
-    For use in I4xSystem.
+    For use in ModuleSystem.
     '''
     import track.views
 
@@ -221,20 +162,20 @@ def get_module(user, request, location, student_module_cache, position=None):
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
-    system = I4xSystem(track_function=make_track_function(request),
-                       render_template=render_to_string,
-                       ajax_url=ajax_url,
-                       xqueue_callback_url=xqueue_callback_url,
-                       # TODO (cpennington): Figure out how to share info between systems
-                       filestore=descriptor.system.resources_fs,
-                       get_module=_get_module,
-                       user=user,
-                       # TODO (cpennington): This should be removed when all html from
-                       # a module is coming through get_html and is therefore covered
-                       # by the replace_static_urls code below
-                       replace_urls=replace_urls,
-                       )
-    # pass position specified in URL to module through I4xSystem
+    system = ModuleSystem(track_function=make_track_function(request),
+                          render_template=render_to_string,
+                          ajax_url=ajax_url,
+                          xqueue_callback_url=xqueue_callback_url,
+                          # TODO (cpennington): Figure out how to share info between systems
+                          filestore=descriptor.system.resources_fs,
+                          get_module=_get_module,
+                          user=user,
+                          # TODO (cpennington): This should be removed when all html from
+                          # a module is coming through get_html and is therefore covered
+                          # by the replace_static_urls code below
+                          replace_urls=replace_urls,
+                          )
+    # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
@@ -407,6 +348,9 @@ def modx_dispatch(request, dispatch=None, id=None):
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, request.POST)
+    except NotFoundError:
+        log.exception("Module indicating to user that request doesn't exist")
+        raise Http404
     except:
         log.exception("error processing ajax call")
         raise

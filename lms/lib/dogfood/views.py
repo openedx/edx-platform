@@ -25,7 +25,7 @@ import track.views
 from lxml import etree
 
 
-from courseware.module_render import make_track_function, I4xSystem, get_module
+from courseware.module_render import make_track_function, ModuleSystem, get_module
 from courseware.models import StudentModule
 from multicourse import multicourse_settings
 from student.models import UserProfile
@@ -206,13 +206,12 @@ def quickedit(request, id=None, qetemplate='quickedit.html', coursename=None):
         ajax_url = settings.MITX_ROOT_URL + '/modx/' + id + '/'
 
         # Create the module (instance of capa_module.Module)
-        system = I4xSystem(track_function=make_track_function(request),
-                           render_function=None,
-                           render_template=render_to_string,
-                           ajax_url=ajax_url,
-                           filestore=OSFS(settings.DATA_DIR + xp),
-                           #role = 'staff' if request.user.is_staff else 'student',		# TODO: generalize this
-                           )
+        system = ModuleSystem(track_function=make_track_function(request),
+                              render_function=None,
+                              render_template=render_to_string,
+                              ajax_url=ajax_url,
+                              filestore=OSFS(settings.DATA_DIR + xp),
+                              )
         instance = xmodule.get_module_class(module)(system,
                                                              xml,
                                                              id,

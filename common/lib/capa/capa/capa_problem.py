@@ -80,7 +80,7 @@ class LoncapaProblem(object):
          - id           (string): identifier for this problem; often a filename (no spaces)
          - state        (dict): student state
          - seed         (int): random number generator seed (int)
-         - system       (I4xSystem): I4xSystem instance which provides OS, rendering, and user context
+         - system       (ModuleSystem): ModuleSystem instance which provides OS, rendering, and user context
 
         '''
 
@@ -286,7 +286,7 @@ class LoncapaProblem(object):
             file = inc.get('file')
             if file is not None:
                 try:
-                    ifp = self.system.filestore.open(file)	 # open using I4xSystem OSFS filestore
+                    ifp = self.system.filestore.open(file)  # open using ModuleSystem OSFS filestore
                 except Exception as err:
                     log.error('Error %s in problem xml include: %s' % (err, etree.tostring(inc, pretty_print=True)))
                     log.error('Cannot find file %s in %s' % (file, self.system.filestore))
