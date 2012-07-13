@@ -16,36 +16,16 @@ from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
 
-from util.cache import cache
+#from util.cache import cache #TODO: Where did this go? lib/util/cache no longer exists
 from student.models import UserTestGroup
 from courseware import grades
+from courseware.decorators import check_course
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
-
-def check_course(function, course_must_be_open=True):
-    def inner_function(*args, **kwargs):
-        course_id = kwargs['course_id']
-
-        try:
-            course_loc = CourseDescriptor.id_to_location(course_id)
-            course = modulestore().get_item(course_loc)
-        except KeyError:
-            raise Http404("Course not found.")
-        
-        if course_must_be_open and not course.has_started():
-            raise Http404
-        
-        del kwargs['course_id']
-        kwargs['course'] = course
-        
-        return function(*args, **kwargs)
-    return inner_function
-    
 
 def user_groups(user):
     if not user.is_authenticated():
@@ -77,20 +57,18 @@ def courses(request):
                'csrf': csrf_token}
     return render_to_response("courses.html", context)
 
-
+@check_course
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request, course_id):
+def gradebook(request, course):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
-
-    course_location = CourseDescriptor.id_to_location(course_id)
-
+    
     student_objects = User.objects.all()[:100]
     student_info = []
 
     for student in student_objects:
-        student_module_cache = StudentModuleCache(student, modulestore().get_item(course_location))
-        course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
+        student_module_cache = StudentModuleCache(student, course)
+        course, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
         student_info.append({
             'username': student.username,
             'id': student.id,
