@@ -179,6 +179,15 @@ class LoncapaProblem(object):
             return {'score': correct,
                     'total': self.get_max_score()}
 
+    def update_score(self, score_msg):
+        newcmap = CorrectMap()
+        for responder in self.responders.values():
+            if hasattr(responder,'update_score'): # Is this the best way to implement 'update_score' for CodeResponse?
+                results = responder.update_score(score_msg)         
+                newcmap.update(results)
+        self.correct_map = newcmap
+        return newcmap
+
     def grade_answers(self, answers):
         '''
         Grade student responses.  Called by capa_module.check_problem.
