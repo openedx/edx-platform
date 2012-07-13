@@ -4,10 +4,8 @@ from path import path
 
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from fs.errors import ResourceNotFoundError
 
 log = logging.getLogger(__name__)
-
 
 
 class CourseDescriptor(SequenceDescriptor):
@@ -29,7 +27,7 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def instructors(self):
         return self.get_about_section("instructors").split("\n")
-        
+
     @property
     def wiki_namespace(self):
         return self.location.course
@@ -95,5 +93,5 @@ class CourseDescriptor(SequenceDescriptor):
             except ResourceNotFoundError:
                 log.exception("Missing info section {key} in course {url}".format(key=section_key, url=self.location.url()))
                 return "! Info section missing !"
-        
+
         raise KeyError("Invalid about key " + str(section_key))

@@ -14,30 +14,23 @@ import xmodule
 import capa.calc as calc
 import capa.capa_problem as lcp
 from xmodule import graders, x_module
+from xmodule.x_module import ModuleSystem
 from xmodule.graders import Score, aggregate_scores
 from xmodule.progress import Progress
 from nose.plugins.skip import SkipTest
+from mock import Mock
 
-class I4xSystem(object):
-    '''
-    This is an abstraction such that x_modules can function independent 
-    of the courseware (e.g. import into other types of courseware, LMS, 
-    or if we want to have a sandbox server for user-contributed content)
-    '''
-    def __init__(self):
-        self.ajax_url = '/'
-        self.track_function = lambda x: None
-        self.filestore = None
-        self.render_function = lambda x: {} # Probably incorrect
-        self.module_from_xml = lambda x: None  # May need a real impl...
-        self.exception404 = Exception
-        self.DEBUG = True
-    def __repr__(self):
-        return repr(self.__dict__)
-    def __str__(self):
-        return str(self.__dict__)
+i4xs = ModuleSystem(
+    '/',
+    Mock(),
+    Mock(),
+    Mock(),
+    Mock(),
+    Mock(),
+    Mock(),
+    True
+)
 
-i4xs = I4xSystem()
 
 class ModelsTest(unittest.TestCase):
     def setUp(self):
