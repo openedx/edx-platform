@@ -12,10 +12,6 @@ if settings.DEBUG:
 
 urlpatterns = ('',
     url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
-    url(r'^about$', 'student.views.about', name="about_edx"),
-    url(r'^university_profile$', 'student.views.university_profile', name="university_profile"),
-    url(r'^jobs$', 'student.views.jobs', name="jobs"),
-    url(r'^help$', 'student.views.help', name="help_edx"),
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
@@ -48,6 +44,21 @@ urlpatterns = ('',
         name='auth_password_reset_done'),
     ## Feedback
     url(r'^send_feedback$', 'util.views.send_feedback'),
+    
+    
+    
+    #Semi-static views (these need to be rendered and have the login bar, but don't change)
+    url(r'^404$', 'static_template_view.views.render', {'template': '404'}, name="404"),
+    url(r'^about$', 'static_template_view.views.render', {'template': 'about'}, name="about_edx"),
+    url(r'^university_profile$', 'static_template_view.views.render', {'template': 'university_profile'}, name="university_profile"),
+    url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs'}, name="jobs"),
+    url(r'^help$', 'static_template_view.views.render', {'template': 'help'}, name="help_edx"),
+    
+    #TODO: Convert these pages to the new edX layout
+    # 'tos.html', 
+    # 'privacy.html', 
+    # 'honor.html', 
+    # 'copyright.html', 
 )
 
 if settings.PERFSTATS:
