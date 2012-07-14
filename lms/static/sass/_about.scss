@@ -15,7 +15,8 @@
     a {
       border-bottom: 3px solid transparent;
       color: $lighter-base-font-color;
-      font: italic 1.2rem/1.4rem $serif;
+      font-family: $serif;
+      font-style: italic;
       @include inline-block;
       letter-spacing: 1px;
       margin: 0px 15px;
@@ -26,6 +27,7 @@
       &:hover, &.active {
         border-color: rgb(200,200,200);
         color: $base-font-color;
+        text-decoration: none;
       }
     }
   }
@@ -97,12 +99,12 @@
         display: block;
         letter-spacing: 1px;
         margin: 0px -20px;
-        padding: 10px 0px 10px 20px;
+        padding: 12px 0px 12px 20px;
         text-align: left;
-        text-transform: uppercase;
 
         &:hover {
           background: rgb(245,245,245);
+          text-decoration: none;
         }
       }
     }
@@ -130,7 +132,7 @@
 
         h3 {
           font-family: $sans-serif;
-          font-weight: bold;
+          font-weight: 700;
           margin-bottom: 15px;
         }
       }
@@ -193,16 +195,16 @@
         width: flex-grid(10);
 
         header {
-          margin-bottom: 15px;
+          margin-bottom: 10px;
 
           h3 {
             font-family: $sans-serif;
-            font-weight: bold;
+            font-weight: 700;
+            margin-bottom: 5px;
           }
 
           span.post-date {
             color: $lighter-base-font-color;
-            font: 300 italic 1.2rem/1.6rem $sans-serif;
             margin-right: 10px;
           }
         }

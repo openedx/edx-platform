@@ -34,7 +34,6 @@
     width: flex-grid(12);
 
     > h2 {
-      //border-bottom: 1px solid rgb(220,220,220);
       display: none;
       margin-bottom: 60px;
       padding-bottom: 20px;
@@ -50,30 +49,16 @@
       nav {
         margin-bottom: 40px;
 
-        ol {
-          @include clearfix;
+        a {
+          display: block;
+          letter-spacing: 1px;
+          margin: 0px -20px;
+          padding: 12px 0px 12px 20px;
+          text-align: left;
 
-          li {
-            float: left;
-            margin-right: flex-gutter();
-            width: flex-grid(12);
-
-            &:nth-child(4n) {
-              margin-right: 0px;
-            }
-
-            a {
-              display: block;
-              letter-spacing: 1px;
-              margin: 0px -20px;
-              padding: 10px 0 10px 20px;
-              position: relative;
-              text-transform: uppercase;
-
-              &:hover {
-                background: rgb(245,245,245);
-              }
-            }
+          &:hover {
+            background: rgb(245,245,245);
+            text-decoration: none;
           }
         }
       }
@@ -106,7 +91,7 @@
 
         h3 {
           font-family: $sans-serif;
-          font-weight: bold;
+          font-weight: 700;
           margin-bottom: 15px;
         }
       }

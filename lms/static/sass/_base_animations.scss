@@ -2,19 +2,21 @@
 //************************************************************************//
 
 .animation-home-header-pop-up {
-  @include animation(home-header-pop-up 1.25s ease-in-out);
+  @include animation(home-header-pop-up 1.15s ease-in-out);
   @include animation-fill-mode(both);
   @include animation-delay(1s);
 }
 
 @mixin home-header-pop-up-keyframes {
   0% {
-    //opacity: 0;
+    opacity: 0;
     top: 300px;
     //@include transform(scale(0.9));
   }
+  45% {
+    opacity: 1;
+  }
   65% {
-    //opacity: 1;
     top: -40px;
     //@include transform(scale(1));
   }
