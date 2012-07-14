@@ -16,20 +16,6 @@
     position: relative;
     width: 100%;
 
-    &::before {
-      @include background-image(radial-gradient(50% 50%, ellipse closest-side, rgba(#fff, 1), rgba(#fff, 0)));
-      //content: "";
-      display: block;
-      height: 200%;
-      left: 50%;
-      margin-left: -(flex-grid(5));
-      margin-top: -100%;
-      position: absolute;
-      top: 50%;
-      width: flex-grid(10);
-      z-index: 1;
-    }
-
     .intro-inner-wrapper {
       background: rgba(255,255,255, 0.9);
       border: 1px solid rgb(100,100,100);
@@ -56,22 +42,16 @@
           border-bottom: 1px solid rgb(210,210,210);
           @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
           margin-bottom: 30px;
-          padding-bottom: 20px;
+          padding-bottom: 15px;
           width: 100%;
 
           h1 {
             color: $base-font-color;
-            font: 600 2.8rem/3.2rem $sans-serif;
+            font-weight: 700;
             @include inline-block;
             margin: 0 10px 0 0;
             letter-spacing: 0px;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-            span {
-              color: $lighter-base-font-color;
-              display: none;
-              font: 300 1.2rem/3rem $sans-serif;
-            }
           }
 
           h2 {
@@ -80,7 +60,7 @@
 
             a {
               color: $lighter-base-font-color;
-              font: italic 800 1.4rem/1.6rem $sans-serif;
+              font: italic 800 1em/1em $sans-serif;
               letter-spacing: 0px;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-transform: none;
@@ -92,29 +72,91 @@
           }
         }
 
-        .course-dates {
-          display: none;
-          margin-bottom: 20px;
+        .main-cta {
+          @include clearfix;
+          float: left;
+          margin-right: flex-gutter();
+          @include transition(all, 0.15s, linear);
+          width: flex-grid(6);
 
-          p {
-            color: $lighter-base-font-color;
+          > a.find-courses, a.register {
+            @include button(shiny, $blue);
+            @include box-sizing(border-box);
+            @include border-radius(3px);
+            display: block;
+            font: normal 1.2rem/1.6rem $sans-serif;
+            letter-spacing: 1px;
+            padding: 10px 0px;
+            text-transform: uppercase;
+            text-align: center;
+            width: flex-grid(12);
+
+            &:hover {
+              color: rgb(255,255,255);
+            }
+          }
+        }
+
+        .social-sharing {
+          @include box-sizing(border-box);
+          float: left;
+          height: 44px;
+          position: relative;
+          text-align: center;
+          width: flex-grid(6);
+
+          &:hover {
+            .sharing-message {
+              opacity: 1;
+              top: 56px;
+            }
+          }
+
+          .sharing-message {
+            @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
+                                                              rgba(0,0,0, 0.7) 100%));
+            border: 1px solid rgba(0,0,0, 0.5);
+            @include border-radius(4px);
+            @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+            @include box-sizing(border-box);
+            color: rgb(255,255,255);
+            float: right;
+            font-family: $serif;
+            font-size: 0.9em;
+            font-style: italic;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            padding: 6px 10px;
+            position: absolute;
+            text-align: center;
+            @include transition(all, 0.15s, ease-out);
+            top: 65px;
+            width: 220px;
+
+            &:hover {
+              opacity: 0;
+            }
+          }
+
+          .share {
+            height: 44px;
             @include inline-block;
-            font: italic 1.2rem/1.6rem $serif;
-            margin-top: 0px;
-            margin-right: 20px;
+            margin-right: 10px;
+            opacity: 0.5;
+            @include transition(all, 0.15s, linear);
+            width: 44px;
 
-            &:last-child {
-              margin: 0;
+            &:hover {
+              opacity: 1;
             }
 
-            > span {
-              background: rgb(255,255,255);
-              border: 1px solid rgb(220,220,220);
-              @include border-radius(4px);
-              color: $base-font-color;
-              font: 300 1.2rem/1.6rem $sans-serif;
-              margin-left: 5px;
-              padding: 2px 10px;
+            img {
+              width: 100%;
+            }
+
+            &:last-child {
+              margin-right: 0px;
             }
           }
         }
@@ -137,10 +179,10 @@
           position: relative;
 
           .play-intro {
-            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.6), rgba(255,255,255, 0.4)));
+            @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
             @include border-radius(4px);
-            @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.2));
-            border: 1px solid rgba(0,0,0, 0.3);
+            @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.4));
+            border: 2px solid rgba(255,255,255, 0.8);
             height: 80px;
             left: 50%;
             margin-top: -40px;
@@ -150,15 +192,15 @@
             width: 80px;
 
             &::after {
-              color: $base-font-color;
+              color: rgba(255,255,255, 0.8);
               content: "\25B6";
               display: block;
-              font: normal 3.2rem/3.2rem $sans-serif;
+              font: normal 2em/1em $sans-serif;
               left: 50%;
-              margin-left: -12px;
-              margin-top: -17px;
+              margin-left: -11px;
+              margin-top: -16px;
               position: absolute;
-              text-shadow: 0 1px rgba(255,255,255, 0.8);
+              text-shadow: 0 -1px rgba(0,0,0, 0.8);
               top: 50%;
             }
           }
@@ -173,76 +215,12 @@
           cursor: pointer;
 
           .play-intro {
-            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.7), rgba(255,255,255, 0.5)));
-            @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.2));
-            border: 1px solid rgba(0,0,0, 0.4);
+            @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
+            @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.5));
+            border-color: rgba(255,255,255, 0.9);
 
             &::after {
-              color: $pink;
-            }
-          }
-        }
-      }
-
-      .actions {
-        @include clearfix;
-        position: relative;
-        width: flex-grid(12);
-        z-index: 2;
-
-        &:hover {
-          .register-wrapper {
-            @include box-shadow(0 1px 16px 0 rgba($blue, 0.35));
-          }
-        }
-
-        .register-wrapper {
-          @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
-          @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1), inset 0 0 0 1px rgba(255,255,255, 0.9));
-          @include border-radius(4px);
-          float: left;
-          margin-right: flex-gutter();
-          @include transition(all, 0.15s, linear);
-          width: flex-grid(6);
-
-          a.register {
-            @include button(shiny, $blue);
-            @include box-sizing(border-box);
-            @include border-radius(3px);
-            display: block;
-            font: italic 1.2rem/1.6rem $serif;
-            padding: 10px 0px;
-            position: relative;
-            text-transform: uppercase;
-            text-align: center;
-            width: flex-grid(12);
-            z-index: 1;
-          }
-        }
-
-        .social-sharing {
-          float: left;
-          width: flex-grid(6);
-
-          p {
-            background: rgb(255,255,255);
-            @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
-            border: 1px solid rgb(210,210,210);
-            @include border-radius(4px);
-            padding: 9px 10px;
-            color: $base-font-color;
-            font: italic 300 1.2rem/1.6rem $serif;
-            margin: 0 0 5px 0;
-            text-align: center;
-            text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-            &:last-child {
-              margin: 0;
-            }
-
-            > span {
-              font: normal 1.2rem/1.6rem $sans-serif;
-              margin-right: 5px;
+              color: rgba(255,255,255, 1);
             }
           }
         }
@@ -270,7 +248,6 @@
         border-bottom: 3px solid transparent;
         color: $lighter-base-font-color;
         @include inline-block;
-        font: italic 1.2rem/1.6rem $serif;
         letter-spacing: 1px;
         margin: 0 15px;
         padding: 0px 5px 15px;
@@ -284,21 +261,9 @@
         &:hover, &.active {
           border-color: rgb(200,200,200);
           color: $base-font-color;
+          text-decoration: none;
         }
       }
-    }
-
-    h2 {
-      color: $lighter-base-font-color;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-    }
-
-    h3 {
-      color: $base-font-color;
-      font-weight: 300;
-      font-family: $sans-serif;
-      margin-bottom: 10px;
     }
   }
 
@@ -310,18 +275,6 @@
     .inner-wrapper {
       > section {
         margin-bottom: 40px;
-
-        &::after {
-          @extend .faded-hr-divider;
-          content: "";
-          display: none;
-          margin-top: 60px;
-        }
-
-
-        p + h2 {
-          margin-top: 40px;
-        }
       }
 
       .course-staff {
@@ -333,8 +286,7 @@
             font-family: $sans-serif;
             font-weight: 700;
             margin-bottom: 15px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            text-transform: none;
           }
 
           .teacher-image {
@@ -377,7 +329,9 @@
       a.university-name {
         border-right: 1px solid rgb(200,200,200);
         color: $base-font-color;
-        font: italic 800 1.4rem/1.6rem $sans-serif;
+        font-family: $sans-serif;
+        font-style: italic;
+        font-weight: 800;
         @include inline-block;
         letter-spacing: 0px;
         margin-right: 15px;
@@ -386,10 +340,6 @@
         &:hover {
           color: $lighter-base-font-color;
         }
-      }
-
-      span {
-        font: 300 1.2rem/1.6rem $sans-serif;
       }
     }
 
@@ -405,59 +355,22 @@
         padding-bottom: 10px;
 
         p {
+          color: $lighter-base-font-color;
           float: left;
-          font: 300 1.2rem/1.6rem $sans-serif;
+          font-family: $sans-serif;
         }
 
         img {
           background: rgb(230,230,230);
           float: left;
           height: 19px;
-          margin-right: 10px;
+          margin: 3px 10px 0 0;
           width: 19px;
         }
 
         span {
-          font: 700 1.2rem/1.6rem $sans-serif;
           float: right;
-        }
-      }
-    }
-
-    .course-staff {
-      display: none;
-
-      .teacher {
-        margin-bottom: 30px;
-
-        h3 {
-          color: $base-font-color;
-          font-family: $sans-serif;
           font-weight: 700;
-          margin-bottom: 15px;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-        }
-
-        &::after {
-          @extend .faded-hr-divider;
-          content: "";
-          display: block;
-          margin-top: 30px;
-        }
-
-        &:last-child {
-          &::after {
-            display: none;
-          }
-        }
-
-        .teacher-image {
-          background: rgb(255,255,255);
-          border: 1px solid rgb(200,200,200);
-          float: left;
-          margin: 0 15px 15px 0;
-          padding: 1px;
         }
       }
     }

@@ -28,8 +28,6 @@ footer {
       text-align: left;
 
       a {
-        color: $lighter-base-font-color;
-        font: 300 1.2rem/1.6rem $sans-serif;
         letter-spacing: 1px;
         margin-right: 20px;
       }
@@ -71,16 +69,16 @@ footer {
 
       p {
         color: $lighter-base-font-color;
-        font: italic 1.2rem/1.6rem $serif;
+        font-style: italic;
         @include inline-block;
         margin: 0 auto;
-        padding-top: 4px;
+        padding-top: 1px;
         text-align: center;
         vertical-align: middle;
 
         a {
           color: $lighter-base-font-color;
-          font: italic 1.2rem/1.6rem $serif;
+          font-style: italic;
           margin-left: 5px;
         }
       }
@@ -88,7 +86,6 @@ footer {
 
     ol {
       float: right;
-      font-size: 0em;
 
       li {
         @include inline-block;
@@ -110,7 +107,6 @@ footer {
 
         a:link, a:visited {
           color: $lighter-base-font-color;
-          font: 300 1.2rem/1.6rem $sans-serif;
           letter-spacing: 1px;
           padding: 6px 0px;
         }
@@ -120,15 +116,13 @@ footer {
           margin: 0 0 0 5px;
           padding: 0;
 
-          &::after {
-            display: none;
-          }
-
           a {
+            opacity: 0.7;
             padding: 0 0 0 10px;
             @include transition(all, 0.1s, linear);
+
             &:hover {
-              opacity: 0.7;
+              opacity: 1;
             }
           }
         }

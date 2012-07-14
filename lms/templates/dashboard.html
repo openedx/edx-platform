@@ -39,11 +39,11 @@
           </a>
           <section class="info">
             <hgroup>
-              <h3><a href="#">${course.get_about_section('university')}</a></h3>
-              <h2><a href="${reverse('info', args=[course.id])}">${course.get_about_section("title")}</a></h2>
+              <a href="#" class="university">${course.get_about_section('university')}</a>
+              <h3><a href="${reverse('info', args=[course.id])}">${course.get_about_section("title")}</a></h3>
             </hgroup>
             <section class="course-status">
-              <p>Class starts - <span>9/2/2012</span></div>
+              <p>Class Starts - <span>9/2/2012</span></div>
             </section>
             <section class="meta">
               <div src="" class="course-work-icon"></div>

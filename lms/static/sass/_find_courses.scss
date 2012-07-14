@@ -75,7 +75,9 @@
 
         h1 {
           color: $base-font-color;
-          font: italic 800 2.4rem/3rem $sans-serif;
+          font-family: $sans-serif;
+          font-style: italic;
+          font-weight: 800;
           letter-spacing: 0px;
           text-transform: none;
         }

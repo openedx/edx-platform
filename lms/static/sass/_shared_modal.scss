@@ -18,7 +18,6 @@
   color: #fff;
   display: none;
   left: 50%;
-  //margin-left: -(grid-width(6)) / 2;
   padding: 8px;
   position: absolute;
   width: grid-width(6);
@@ -99,17 +98,10 @@
         }
       }
 
-      h3 {
-        color: $lighter-base-font-color;
-        font: normal 1.4rem/1.8rem $serif;
-        letter-spacing: 1px;
-        padding-bottom: 20px;
+      h2 {
         position: relative;
         text-align: center;
         text-shadow: 0 1px rgba(255,255,255, 0.4);
-        text-transform: uppercase;
-        vertical-align: middle;
-        -webkit-font-smoothing: antialiased;
         z-index: 2;
       }
     }
@@ -154,8 +146,8 @@
         }
 
         a {
-          font: italic normal 1.2rem/1.6rem $serif;
-          text-decoration: underline;
+          font-family: $serif;
+          font-style: italic;
         }
       }
 
@@ -166,7 +158,7 @@
 
         p {
           color: $lighter-base-font-color;
-          font: 300 1.2rem/1.6rem $sans-serif;
+          font-family: $sans-serif;
         }
 
         hr {
@@ -222,18 +214,19 @@
 
       p {
         color: $lighter-base-font-color;
-        font: italic 1.2rem/1.6rem $serif;
+        font-style: italic;
         text-align: center;
-        -webkit-font-smoothing: antialiased;
 
         span {
           color: $lighter-base-font-color;
-          font: italic 1.2rem/1.6rem $serif;
+          font-family: $serif;
+          font-style: italic;
         }
 
         a {
           color: $lighter-base-font-color;
-          font: italic 1.2rem/1.6rem $serif;
+          font-family: $serif;
+          font-style: italic;
           text-decoration: underline;
 
           &:hover {
