@@ -44,7 +44,7 @@ def export_to_github(course, commit_message, author_str=None):
     and push to github (if MITX_FEATURES['GITHUB_PUSH'] is True).
     If author_str is specified, uses it in the commit.
     '''
-    repo_path = settings.DATA_DIR / course.metadata.get('course_dir', course.location.course)
+    repo_path = settings.DATA_DIR / course.metadata.get('data_dir', course.location.course)
     fs = OSFS(repo_path)
     xml = course.export_to_xml(fs)
 
