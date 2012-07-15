@@ -25,6 +25,7 @@ import os.path
 import os
 import errno
 import glob2
+import lms.envs.common
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -63,6 +64,9 @@ MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates'
 ]
+
+for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
+    MAKO_TEMPLATES['lms.' + namespace] = template_dirs
 
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
