@@ -411,6 +411,13 @@ class XModuleDescriptor(Plugin):
         """
         raise NotImplementedError("get_html() must be provided by specific modules")
 
+    # =============================== Testing ===================================
+    def get_sample_state(self):
+        """
+        Return a list of tuples of instance_state, shared_state. Each tuple defines a test/sample case for this module
+        """
+        return [('{}', '{}')]
+
     # =============================== BUILTIN METHODS ===========================
     def __eq__(self, other):
         eq = (self.__class__ == other.__class__ and

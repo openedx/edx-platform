@@ -8,9 +8,11 @@ from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 
 from xmodule.modulestore import Location
+from xmodule.x_module import ModuleSystem
 from github_sync import export_to_github
+from static_replace import replace_urls
 
-from mitxmako.shortcuts import render_to_response
+from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 
 
@@ -39,6 +41,9 @@ def login_page(request):
 @login_required
 @ensure_csrf_cookie
 def index(request):
+    """
+    List all courses available to the logged in user
+    """
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
     return render_to_response('index.html', {
         'courses': [(course.metadata['display_name'],
@@ -61,6 +66,11 @@ def has_access(user, location):
 @login_required
 @ensure_csrf_cookie
 def course_index(request, org, course, name):
+    """
+    Display an editable course overview.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
     location = ['i4x', org, course, 'course', name]
     if not has_access(request.user, location):
         raise Http404  # TODO (vshnayder): better error
@@ -73,6 +83,13 @@ def course_index(request, org, course, name):
 
 @login_required
 def edit_item(request):
+    """
+    Display an editing page for the specified module.
+
+    Expects a GET request with the parameter 'id'.
+
+    id: A Location URL
+    """
     # TODO (vshnayder): change name from id to location in coffee+html as well.
     item_location = request.GET['id']
     print item_location, request.GET
@@ -85,6 +102,7 @@ def edit_item(request):
         'js_module': item.js_module_name(),
         'category': item.category,
         'name': item.name,
+        'previews': get_module_previews(item),
     })
 
 
@@ -105,6 +123,71 @@ def user_author_string(user):
 
 
 @login_required
+def preview_dispatch(request, module_id, dispatch):
+    """
+    Dispatch an AJAX action to a preview XModule
+
+    Expects a POST request, and passes the arguments to the module
+
+    module_id: The Location of the module to dispatch to
+    dispatch: The action to execute
+    """
+    pass
+
+
+def render_from_lms(template_name, dictionary, context=None, namespace='main'):
+    """
+    Render a template using the LMS MAKO_TEMPLATES
+    """
+    return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
+
+
+def sample_module_system(descriptor):
+    """
+    Returns a ModuleSystem for the specified descriptor that is specialized for
+    rendering module previews.
+    """
+    return ModuleSystem(
+        ajax_url=reverse('preview_dispatch', args=[descriptor.location.url(), '']),
+        # TODO (cpennington): Do we want to track how instructors are using the preview problems?
+        track_function=lambda x: None,
+        filestore=descriptor.system.resources_fs,
+        get_module=get_sample_module,
+        render_template=render_from_lms,
+        debug=True,
+        replace_urls=replace_urls
+    )
+
+
+def get_sample_module(location):
+    """
+    Returns a sample XModule at the specified location. The sample_data is chosen arbitrarily
+    from the set of sample data for the descriptor specified by Location
+
+    location: A Location
+    """
+    descriptor = modulestore().get_item(location)
+    instance_state, shared_state = descriptor.get_sample_state()[0]
+    system = sample_module_system(descriptor)
+    module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+    return module
+
+
+def get_module_previews(descriptor):
+    """
+    Returns a list of preview XModule html contents. One preview is returned for each
+    pair of states returned by get_sample_state() for the supplied descriptor.
+
+    descriptor: An XModuleDescriptor
+    """
+    preview_html = []
+    system = sample_module_system(descriptor)
+    for instance_state, shared_state in descriptor.get_sample_state():
+        module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+        preview_html.append(module.get_html())
+    return preview_html
+
+
 @expect_json
 def save_item(request):
     item_location = request.POST['id']
@@ -124,4 +207,7 @@ def save_item(request):
         author_string = user_author_string(request.user)
         export_to_github(course, "CMS Edit", author_string)
 
-    return HttpResponse(json.dumps({}))
+    descriptor = modulestore().get_item(item_id)
+    preview_html = get_module_previews(descriptor)
+
+    return HttpResponse(json.dumps(preview_html))
