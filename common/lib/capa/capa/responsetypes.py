@@ -696,7 +696,9 @@ class SymbolicResponse(CustomResponse):
 
 class CodeResponse(LoncapaResponse):
     ''' 
-    Grade student code using an external server
+    Grade student code using an external server. Unlike ExternalResponse, CodeResponse:
+        1) Goes through a queueing system (xqueue)
+        2) Does not do external request for 'get_answers'
     '''
 
     response_tag = 'coderesponse'
@@ -704,9 +706,10 @@ class CodeResponse(LoncapaResponse):
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url') or "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/" # FIXME -- hardcoded url
+        self.url = xml.get('url', "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/") # FIXME -- hardcoded url
 
         answer = xml.find('answer')
+
         if answer is not None:
             answer_src = answer.get('src')
             if answer_src is not None:
@@ -791,7 +794,9 @@ class CodeResponse(LoncapaResponse):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = { 'return_url': self.system.xqueue_callback_url }
-        header.update({'timestamp': time.time()})
+#        header.update({'timestamp': time.time()})
+        random.seed()
+        header.update({'key': random.randint(0,2**32-1)})
         payload = {'xqueue_header': json.dumps(header), # 'xqueue_header' should eventually be derived from xqueue.queue_common.HEADER_TAG or something similar
                    'xml': xmlstr,
                    'edX_cmd': 'get_score',

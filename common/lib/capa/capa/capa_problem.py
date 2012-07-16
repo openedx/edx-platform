@@ -180,9 +180,15 @@ class LoncapaProblem(object):
                     'total': self.get_max_score()}
 
     def update_score(self, score_msg):
+        '''
+        Deliver grading response (e.g. from async code checking) to 
+            the specific ResponseType
+         
+        Returns an updated CorrectMap
+        '''
         newcmap = CorrectMap()
         for responder in self.responders.values():
-            if hasattr(responder,'update_score'): # Is this the best way to implement 'update_score' for CodeResponse?
+            if hasattr(responder,'update_score'): # TODO: Is this the best way to target 'update_score' of CodeResponse?
                 results = responder.update_score(score_msg)         
                 newcmap.update(results)
         self.correct_map = newcmap

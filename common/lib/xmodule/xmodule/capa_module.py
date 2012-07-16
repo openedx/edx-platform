@@ -323,6 +323,15 @@ class CapaModule(XModule):
         raise self.system.exception404
 
     def update_score(self, get):
+        """
+        Delivers grading response (e.g. from asynchronous code checking) to
+            the capa problem, so its score can be updated
+
+        'get' must have a field 'response' which is a string that contains the
+            grader's response
+
+        No ajax return is needed. Return empty dict.
+        """
         score_msg = get['response']
         self.lcp.update_score(score_msg)
 
