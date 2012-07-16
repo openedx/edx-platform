@@ -22,6 +22,7 @@ import random
 import re
 import scipy
 import struct
+import sys
 
 from lxml import etree
 from xml.sax.saxutils import unescape
@@ -281,8 +282,21 @@ class LoncapaProblem(object):
         context['__builtins__'] = globals()['__builtins__']    	# put globals there also
         context['the_lcp'] = self                		# pass instance of LoncapaProblem in
         context['script_code'] = ''
+        old_path = sys.path
 
         for script in tree.findall('.//script'):
+            # find additional comma-seperated modules search path
+            path_csv = script.get('path', '')
+            search_path = path_csv.split(",")  # a search path directory should not contain space or comma
+            path = []
+            for directory in search_path:
+                if directory:
+                    # a search path must be an absolute path or a path relative to settings.DATA_DIR
+                    abs_dir = os.path.normpath(os.path.join(
+                        os.path.dirname(self.system.filestore.root_path), directory))
+                    log.info("appending search path: %s" % abs_dir)
+                    path.append(abs_dir)
+
             stype = script.get('type')
             if stype:
                 if 'javascript' in stype:
@@ -290,6 +304,7 @@ class LoncapaProblem(object):
                 if 'perl' in stype:
                     continue        # skip perl
             # TODO: evaluate only python
+            sys.path = sys.path + path
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code, XMLESC)
@@ -299,6 +314,8 @@ class LoncapaProblem(object):
             except Exception:
                 log.exception("Error while execing script code: " + code)
                 raise responsetypes.LoncapaProblemError("Error while executing script code")
+            finally:
+                sys.path = old_path
         return context
 
     def _extract_html(self, problemtree):  # private
