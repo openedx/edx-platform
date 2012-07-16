@@ -95,7 +95,7 @@ for static_dir in STATICFILES_DIRS:
     except ValueError:
         data_dir = static_dir
 
-    if not data_dir.startswith(REPO_ROOT):
+    if data_dir.startswith(REPO_ROOT):
         new_staticfiles_dirs.append(static_dir)
 STATICFILES_DIRS = new_staticfiles_dirs
 
