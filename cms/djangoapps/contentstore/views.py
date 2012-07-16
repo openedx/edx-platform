@@ -82,6 +82,21 @@ def edit_item(request):
     })
 
 
+def user_author_string(user):
+    '''Get an author string for commits by this user.  Format:
+    first last <email@email.com>.
+
+    If the first and last names are blank, uses the username instead.
+    Assumes that the email is not blank.
+    '''
+    f = user.first_name
+    l = user.last_name
+    if f == '' and l == '':
+        f = user.username
+    return '{first} {last} <{email}>'.format(first=f,
+                                             last=l,
+                                             email=user.email)
+
 @login_required
 @expect_json
 def save_item(request):
@@ -98,6 +113,7 @@ def save_item(request):
     course_location = Location(item_id)._replace(category='course', name=None)
     courses = modulestore().get_items(course_location, depth=None)
     for course in courses:
-        export_to_github(course, "CMS Edit")
+        author_string = user_author_string(request.user)
+        export_to_github(course, "CMS Edit", author_string)
 
     return HttpResponse(json.dumps({}))
