@@ -179,20 +179,31 @@ class LoncapaProblem(object):
             return {'score': correct,
                     'total': self.get_max_score()}
 
-    def update_score(self, score_msg):
+    def update_score(self, score_msg, queuekey):
         '''
         Deliver grading response (e.g. from async code checking) to 
-            the specific ResponseType
+            the specific ResponseType that requested grading 
          
         Returns an updated CorrectMap
         '''
+        oldcmap = self.correct_map
         newcmap = CorrectMap()
         for responder in self.responders.values():
             if hasattr(responder,'update_score'): # TODO: Is this the best way to target 'update_score' of CodeResponse?
-                results = responder.update_score(score_msg)         
+                results = responder.update_score(score_msg, oldcmap, queuekey)
                 newcmap.update(results)
         self.correct_map = newcmap
         return newcmap
+
+    def is_queued(self):
+        '''
+        Returns True if any part of the problem has been submitted to an external queue
+        '''
+        queued = False
+        for answer_id in self.correct_map:
+            if self.correct_map.is_queued(answer_id):
+                queued = True
+        return queued
 
     def grade_answers(self, answers):
         '''

@@ -33,6 +33,8 @@ class I4xSystem(object):
         Create a closure around the system environment.
 
         ajax_url - the url where ajax calls to the encapsulating module go.
+        xqueue_callback_url - the url where external queueing system (e.g. for grading)
+                              returns its response 
         track_function - function of (event_type, event), intended for logging
                          or otherwise tracking the event.
                          TODO: Not used, and has inconsistent args in different
@@ -324,7 +326,7 @@ def add_histogram(module):
     module.get_html = get_html
     return module
 
-# THK: TEMPORARY BYPASS OF AUTH!
+# TODO: TEMPORARY BYPASS OF AUTH!
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 @csrf_exempt
@@ -336,9 +338,6 @@ def xqueue_callback(request, username, id, dispatch):
     except Exception as err:
         msg = "Error in xqueue_callback %s: Invalid return format" % err
         raise Exception(msg)
-    
-    # Should proceed only when the request timestamp is more recent than problem timestamp
-    timestamp = header['timestamp']
 
     # Retrieve target StudentModule
     user = User.objects.get(username=username)
@@ -353,6 +352,10 @@ def xqueue_callback(request, username, id, dispatch):
     
     oldgrade = instance_module.grade
     old_instance_state = instance_module.state
+
+    # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
+    #   use the interface defined by 'handle_ajax'
+    get.update({'queuekey': header['queuekey']})
 
     # We go through the "AJAX" path
     #   So far, the only dispatch from xqueue will be 'score_update'

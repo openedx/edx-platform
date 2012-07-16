@@ -18,7 +18,6 @@ import re
 import requests
 import traceback
 import abc
-import time
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -709,7 +708,6 @@ class CodeResponse(LoncapaResponse):
         self.url = xml.get('url', "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/") # FIXME -- hardcoded url
 
         answer = xml.find('answer')
-
         if answer is not None:
             answer_src = answer.get('src')
             if answer_src is not None:
@@ -727,7 +725,7 @@ class CodeResponse(LoncapaResponse):
 
     def get_score(self, student_answers):
         idset = sorted(self.answer_ids)
-        
+
         try:
             submission = [student_answers[k] for k in idset]
         except Exception as err:
@@ -737,12 +735,16 @@ class CodeResponse(LoncapaResponse):
         self.context.update({'submission': submission})
         extra_payload = {'edX_student_response': json.dumps(submission)}
 
-        # Should do something -- like update the problem state -- based on the queue response
-        r = self._send_to_queue(extra_payload)
-        
-        return CorrectMap() 
+        r, queuekey = self._send_to_queue(extra_payload) # TODO: Perform checks on the xqueue response
 
-    def update_score(self, score_msg):
+        # Non-null CorrectMap['queuekey'] indicates that the problem has been submitted
+        cmap = CorrectMap()
+        for answer_id in idset:
+            cmap.set(answer_id, queuekey=queuekey)
+
+        return cmap
+
+    def update_score(self, score_msg, oldcmap, queuekey):
         # Parse 'score_msg' as XML
         try:
             rxml = etree.fromstring(score_msg)
@@ -752,7 +754,6 @@ class CodeResponse(LoncapaResponse):
 
         # The following process is lifted directly from ExternalResponse
         idset = sorted(self.answer_ids)
-        cmap = CorrectMap()
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
                  'WRONG_FORMAT': 'incorrect',
@@ -761,13 +762,17 @@ class CodeResponse(LoncapaResponse):
         if ad in admap:
             self.context['correct'][0] = admap[ad]
 
-        # create CorrectMap
-        for key in idset:
-            idx = idset.index(key)
-            msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
-            cmap.set(key, self.context['correct'][idx], msg=msg)
+        # Replace 'oldcmap' with new grading results if queuekey matches
+        #   If queuekey does not match, we keep waiting for the score_msg that will match
+        for answer_id in idset:
+            if oldcmap.is_right_queuekey(answer_id, queuekey):
+                idx = idset.index(answer_id)
+                msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
+                oldcmap.set(answer_id, self.context['correct'][idx], msg=msg)
+            else: # Queuekey does not match
+                log.debug('CodeResponse: queuekey %d does not match for answer_id=%s.' % (queuekey, answer_id)) 
         
-        return cmap
+        return oldcmap 
 
     # CodeResponse differentiates from ExternalResponse in the behavior of 'get_answers'. CodeResponse.get_answers
     #   does NOT require a queue submission, and the answer is computed (extracted from problem XML) locally.
@@ -794,10 +799,12 @@ class CodeResponse(LoncapaResponse):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = { 'return_url': self.system.xqueue_callback_url }
-#        header.update({'timestamp': time.time()})
+
         random.seed()
-        header.update({'key': random.randint(0,2**32-1)})
-        payload = {'xqueue_header': json.dumps(header), # 'xqueue_header' should eventually be derived from xqueue.queue_common.HEADER_TAG or something similar
+        queuekey = random.randint(0,2**32-1)
+        header.update({'queuekey': queuekey})
+
+        payload = {'xqueue_header': json.dumps(header), # TODO: 'xqueue_header' should eventually be derived from config file
                    'xml': xmlstr,
                    'edX_cmd': 'get_score',
                    'edX_tests': self.tests,
@@ -813,7 +820,7 @@ class CodeResponse(LoncapaResponse):
             log.error(msg)
             raise Exception(msg)
 
-        return r
+        return r, queuekey
 
 #-----------------------------------------------------------------------------
 
