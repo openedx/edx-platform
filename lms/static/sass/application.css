@@ -2108,6 +2108,7 @@ header.global {
         clear: both; }
       .highlighted-courses .courses .course .meta-info p, .find-courses .courses .course .meta-info p {
         color: white;
+        font-style: italic;
         line-height: 1.2em;
         padding: 4px 12px 5px; }
     .highlighted-courses .courses .course .inner-wrapper, .find-courses .courses .course .inner-wrapper {
@@ -2142,7 +2143,11 @@ header.global {
           top: 0px; }
           .highlighted-courses .courses .course header.course-preview > a hgroup h2, .find-courses .courses .course header.course-preview > a hgroup h2 {
             color: #3c3c3c;
+            font-family: "Open Sans", Verdana, Geneva, sans-serif;
+            font-size: 1em;
+            font-weight: 700;
             margin-bottom: 0px;
+            overflow: hidden;
             padding-top: 9px;
             text-shadow: 0 1px rgba(255, 255, 255, 0.6);
             text-overflow: ellipsis;
@@ -4173,11 +4178,6 @@ nav.course-material {
   padding-bottom: 60px; }
   .find-courses header.search, .university-profile header.search {
     background: #f0f0f0;
-    background-image: url("/static/images/shot-2-large.jpg");
-    background-image: url("/static/images/shot-2-large.jpg");
-    background-image: url("/static/images/shot-2-large.jpg");
-    background-image: url("/static/images/shot-2-large.jpg");
-    background-image: url("/static/images/shot-2-large.jpg");
     background-size: cover;
     border-bottom: 1px solid #646464;
     -webkit-box-shadow: inset 0 -1px 8px 0 rgba(0, 0, 0, 0.2), inset 0 1px 12px 0 rgba(0, 0, 0, 0.3);
@@ -4590,11 +4590,11 @@ nav.course-material {
   border: 1px solid #c8c8c8;
   border-top: none;
   float: left;
-  padding: 20px 20px 30px;
+  padding: 16px 20px 30px;
   width: 31.984%; }
   .course-info .course-sidebar header {
     margin-bottom: 30px;
-    padding-bottom: 20px;
+    padding-bottom: 16px;
     position: relative;
     text-align: center; }
     .course-info .course-sidebar header::after {
