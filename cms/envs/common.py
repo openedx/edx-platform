@@ -44,10 +44,8 @@ PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
-COURSES_ROOT = ENV_ROOT / "data"
 
-# FIXME: To support multiple courses, we should walk the courses dir at startup
-DATA_DIR = COURSES_ROOT
+GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
