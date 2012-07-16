@@ -24,6 +24,7 @@ TEST_ROOT = path('test_root')
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles" 
 
+GITHUB_REPO_ROOT = TEST_ROOT / "data"
 
 MODULESTORE = {
     'default': {
@@ -33,6 +34,7 @@ MODULESTORE = {
             'host': 'localhost',
             'db': 'test_xmodule',
             'collection': 'modulestore',
+            'fs_root': GITHUB_REPO_ROOT,
         }
     }
 }

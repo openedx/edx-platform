@@ -92,7 +92,6 @@ def edit_item(request):
     """
     # TODO (vshnayder): change name from id to location in coffee+html as well.
     item_location = request.GET['id']
-    print item_location, request.GET
     if not has_access(request.user, item_location):
         raise Http404  # TODO (vshnayder): better error
 
