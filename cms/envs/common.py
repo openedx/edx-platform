@@ -34,6 +34,10 @@ MITX_FEATURES = {
     'GITHUB_PUSH': False,
 }
 
+# needed to use lms student app
+GENERATE_RANDOM_USER_CREDENTIALS = False
+
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -97,7 +101,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
-    # Instead of AuthenticationMiddleware, we use a cached backed version
+    # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -214,7 +218,7 @@ PIPELINE_COMPILERS = [
 PIPELINE_SASS_ARGUMENTS = '-t compressed -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
+PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
@@ -239,9 +243,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
+    'south',
 
     # For CMS
     'contentstore',
+    'student',  # misleading name due to sharing with lms
 
     # For asset pipelining
     'pipeline',

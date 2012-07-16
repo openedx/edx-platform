@@ -6,50 +6,50 @@
 
 .videosequence a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/videosequence.png');
+  background-image: url('../img/content-types/videosequence.png');
 }
 
 .video a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/video.png');
+  background-image: url('../img/content-types/video.png');
 }
 
 .problemset a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/problemset.png');
+  background-image: url('../img/content-types/problemset.png');
 }
 
 .problem a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/problem.png');
+  background-image: url('../img/content-types/problem.png');
 }
 
 .lab a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/lab.png');
+  background-image: url('../img/content-types/lab.png');
 }
 
 .tab a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/lab.png');
+  background-image: url('../img/content-types/lab.png');
 }
 
 .html a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/html.png');
+  background-image: url('../img/content-types/html.png');
 }
 
 .vertical a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/vertical.png');
+  background-image: url('../img/content-types/vertical.png');
 }
 
 .sequential a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/sequential.png');
+  background-image: url('../img/content-types/sequential.png');
 }
 
 .chapter a:first-child {
   @extend .content-type;
-  background-image: url('/static/img/content-types/chapter.png');
+  background-image: url('../img/content-types/chapter.png');
 }
