@@ -102,9 +102,24 @@ environments, defined in `cms/envs`.
 
 - Core rendering path: Still TBD
 
+### Static file processing
+
+- CSS -- we use a superset of CSS called SASS.  It supports nice things like includes and variables, and compiles to CSS.  The compiler is called `sass`.
+
+- javascript -- we use coffeescript, which compiles to js, and is much nicer to work with.  Look for `*.coffee` files.  We use _jasmine_ for testing js.
+
+- _mako_  -- we use this for templates, and have wrapper called mitxmako that makes mako look like the django templating calls.
+
+We use a fork of django-pipeline to make sure that the js and css always reflect the latest `*.coffee` and `*.sass` files (We're hoping to get our changes merged in the official version soon).  This works differently in development and production.  Test uses the production settings.  
+
+In production, the django `collectstatic` command recompiles everything and puts all the generated static files in a static/ dir.  A starting point in the code is `django-pipeline/pipeline/packager.py:pack`.
+
+In development, we don't use collectstatic, instead accessing the files in place.  The auto-compilation is run via `common/djangoapps/pipeline_mako/templates/static_content.html`.  Details: templates include `<%namespace name='static' file='static_content.html'/>`, then something like `<%static:css group='application'/>` to call the functions in `common/djangoapps/pipeline_mako/__init__.py`, which call the `django-pipeline` compilers.
+
 ### Other modules
 
 - Wiki -- in `lms/djangoapps/simplewiki`.  Has some markdown extentions for embedding circuits, videos, etc.
+
 
 ## Testing
 

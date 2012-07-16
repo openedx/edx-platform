@@ -38,7 +38,12 @@ def import_from_github(repo_settings):
     return git_repo.head.commit.hexsha, module_store.courses[course_dir]
 
 
-def export_to_github(course, commit_message):
+def export_to_github(course, commit_message, author_str=None):
+    '''
+    Commit any changes to the specified course with given commit message,
+    and push to github (if MITX_FEATURES['GITHUB_PUSH'] is True).
+    If author_str is specified, uses it in the commit.
+    '''
     repo_path = settings.DATA_DIR / course.metadata.get('course_dir', course.location.course)
     fs = OSFS(repo_path)
     xml = course.export_to_xml(fs)
@@ -49,8 +54,11 @@ def export_to_github(course, commit_message):
     git_repo = Repo(repo_path)
     if git_repo.is_dirty():
         git_repo.git.add(A=True)
-        git_repo.git.commit(m=commit_message)
-
+        if author_str is not None:
+            git_repo.git.commit(m=commit_message, author=author_str)
+        else:
+            git_repo.git.commit(m=commit_message)
+        
         origin = git_repo.remotes.origin
         if settings.MITX_FEATURES['GITHUB_PUSH']:
             push_infos = origin.push()

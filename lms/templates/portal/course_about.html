@@ -18,19 +18,6 @@
           <a href="${reverse('enroll', args=[course.id])}" class="register">Register</a>
         </div>
 
-        <div class="social-sharing">
-          <div class="sharing-message">Share with friends and family!</div>
-          <a href="#" class="share">
-            <img src="${static.url('images/twitter-sharing.png')}">
-          </a>
-          <a href="#" class="share">
-            <img src="${static.url('images/facebook-sharing.png')}">
-          </a>
-          <a href="#" class="share">
-            <img src="${static.url('images/email-sharing.png')}">
-          </a>
-        </div>
-
       </section>
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
@@ -111,7 +98,21 @@
     <section class="course-sidebar">
       <section class="course-summary">
         <header>
-          <a href="#" class="university-name">${course.get_about_section("university")}</a><span>${course.get_about_section("title")}</span>
+          <!--
+             -<a href="#" class="university-name">${course.get_about_section("university")}</a><span>${course.get_about_section("title")}</span>
+             -->
+          <div class="social-sharing">
+            <div class="sharing-message">Share with friends and family!</div>
+            <a href="#" class="share">
+              <img src="${static.url('images/twitter-sharing.png')}">
+            </a>
+            <a href="#" class="share">
+              <img src="${static.url('images/facebook-sharing.png')}">
+            </a>
+            <a href="#" class="share">
+              <img src="${static.url('images/email-sharing.png')}">
+            </a>
+          </div>
         </header>
 
         <ol class="important-dates">

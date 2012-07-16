@@ -207,7 +207,6 @@ h1.top-header {
   font-size: 12px;
   // height:46px;
   line-height: 46px;
-  margin: (-$body-line-height) (-$body-line-height) $body-line-height;
   text-shadow: 0 1px 0 #fff;
 
   @media print {
@@ -215,6 +214,7 @@ h1.top-header {
   }
 
   a {
+    line-height: 46px;
     border-bottom: 0;
     color: darken($cream, 80%);
 

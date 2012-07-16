@@ -18,6 +18,7 @@ import re
 import requests
 import traceback
 import abc
+import time
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -693,6 +694,124 @@ class SymbolicResponse(CustomResponse):
 
 #-----------------------------------------------------------------------------
 
+class CodeResponse(LoncapaResponse):
+    ''' 
+    Grade student code using an external server
+    '''
+
+    response_tag = 'coderesponse'
+    allowed_inputfields = ['textline', 'textbox']
+
+    def setup_response(self):
+        xml = self.xml
+        self.url = xml.get('url') or "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/" # FIXME -- hardcoded url
+
+        answer = xml.find('answer')
+        if answer is not None:
+            answer_src = answer.get('src')
+            if answer_src is not None:
+                self.code = self.system.filesystem.open('src/'+answer_src).read()
+            else:
+                self.code = answer.text
+        else:					# no <answer> stanza; get code from <script>
+            self.code = self.context['script_code']
+            if not self.code:
+                msg = '%s: Missing answer script code for externalresponse' % unicode(self)
+                msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
+                raise LoncapaProblemError(msg)
+
+        self.tests = xml.get('tests')
+
+    def get_score(self, student_answers):
+        idset = sorted(self.answer_ids)
+        
+        try:
+            submission = [student_answers[k] for k in idset]
+        except Exception as err:
+            log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_ids, student_answers))
+            raise Exception(err)
+
+        self.context.update({'submission': submission})
+        extra_payload = {'edX_student_response': json.dumps(submission)}
+
+        # Should do something -- like update the problem state -- based on the queue response
+        r = self._send_to_queue(extra_payload)
+        
+        return CorrectMap() 
+
+    def update_score(self, score_msg):
+        # Parse 'score_msg' as XML
+        try:
+            rxml = etree.fromstring(score_msg)
+        except Exception as err:
+            msg = 'Error in CodeResponse %s: cannot parse response from xworker r.text=%s' % (err, score_msg)
+            raise Exception(err)
+
+        # The following process is lifted directly from ExternalResponse
+        idset = sorted(self.answer_ids)
+        cmap = CorrectMap()
+        ad = rxml.find('awarddetail').text
+        admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
+                 'WRONG_FORMAT': 'incorrect',
+                 }
+        self.context['correct'] = ['correct']
+        if ad in admap:
+            self.context['correct'][0] = admap[ad]
+
+        # create CorrectMap
+        for key in idset:
+            idx = idset.index(key)
+            msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
+            cmap.set(key, self.context['correct'][idx], msg=msg)
+        
+        return cmap
+
+    # CodeResponse differentiates from ExternalResponse in the behavior of 'get_answers'. CodeResponse.get_answers
+    #   does NOT require a queue submission, and the answer is computed (extracted from problem XML) locally.
+    def get_answers(self):
+        # Extract the CodeResponse answer from XML
+        penv = {}
+        penv['__builtins__'] = globals()['__builtins__']
+        try:
+            exec(self.code,penv,penv)
+        except Exception as err:
+            log.error('Error in CodeResponse %s: Error in problem reference code' % err)
+            raise Exception(err)
+        try:
+            ans = penv['answer']
+        except Exception as err:
+            log.error('Error in CodeResponse %s: Problem reference code does not define answer in <answer>...</answer>' % err)
+            raise Exception(err)
+
+        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % ans
+        return dict(zip(self.answer_ids,[anshtml]))
+
+    # CodeResponse._send_to_queue implements the same interface as defined for ExternalResponse's 'get_score'
+    def _send_to_queue(self, extra_payload):
+        # Prepare payload
+        xmlstr = etree.tostring(self.xml, pretty_print=True)
+        header = { 'return_url': self.system.xqueue_callback_url }
+        header.update({'timestamp': time.time()})
+        payload = {'xqueue_header': json.dumps(header), # 'xqueue_header' should eventually be derived from xqueue.queue_common.HEADER_TAG or something similar
+                   'xml': xmlstr,
+                   'edX_cmd': 'get_score',
+                   'edX_tests': self.tests,
+                   'processor': self.code,
+                  }
+        payload.update(extra_payload)
+
+        # Contact queue server
+        try:
+            r = requests.post(self.url, data=payload)
+        except Exception as err:
+            msg = "Error in CodeResponse %s: cannot connect to queue server url=%s" % (err, self.url)
+            log.error(msg)
+            raise Exception(msg)
+
+        return r
+
+#-----------------------------------------------------------------------------
+
 class ExternalResponse(LoncapaResponse):
     '''
     Grade the students input using an external server.
@@ -1072,5 +1191,5 @@ class ImageResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-__all__ = [ NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse ]
+__all__ = [ CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse ]
 

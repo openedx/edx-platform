@@ -253,14 +253,14 @@ td {
 .invisible {
   visibility: hidden; }
 
-.clearfix:before, .topbar:before, nav.sequence-nav:before, div.course-wrapper section.course-content .problem-set:before, div.course-wrapper section.course-content section.problems-wrapper:before, div.course-wrapper section.course-content div#seq_content:before, div.course-wrapper section.course-content ol.vert-mod > li:before, section.course-content nav.sequence-bottom ul:before, section.course-content div.video article.video-wrapper section.video-controls:before, section.course-content div.video article.video-wrapper section.video-controls div.slider:before, section.tool-wrapper:before, section.tool-wrapper div#controlls-container:before, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:before, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:before, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:before, .clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after {
+.clearfix:before, .topbar:before, nav.sequence-nav:before, div.course-wrapper section.course-content .problem-set:before, div.course-wrapper section.course-content section.problems-wrapper:before, div.course-wrapper section.course-content div#seq_content:before, div.course-wrapper section.course-content ol.vert-mod > li:before, section.course-content nav.sequence-bottom ul:before, section.course-content div.video article.video-wrapper section.video-controls:before, section.course-content div.video article.video-wrapper section.video-controls div.slider:before, section.tool-wrapper:before, section.tool-wrapper div#controlls-container:before, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:before, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:before, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:before, section.problem-set:before, section.problems-wrapper:before, .clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after, section.problem-set:after, section.problems-wrapper:after {
   content: "";
   display: table; }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after, section.problem-set:after, section.problems-wrapper:after {
   clear: both; }
 
-.clearfix, .topbar, nav.sequence-nav, div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li, section.course-content nav.sequence-bottom ul, section.course-content div.video article.video-wrapper section.video-controls, section.course-content div.video article.video-wrapper section.video-controls div.slider, section.tool-wrapper, section.tool-wrapper div#controlls-container, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders {
+.clearfix, .topbar, nav.sequence-nav, div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li, section.course-content nav.sequence-bottom ul, section.course-content div.video article.video-wrapper section.video-controls, section.course-content div.video article.video-wrapper section.video-controls div.slider, section.tool-wrapper, section.tool-wrapper div#controlls-container, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders, section.problem-set, section.problems-wrapper {
   *zoom: 1; }
 
 @media print {
@@ -367,7 +367,8 @@ html, body {
   background: #fafafa;
   font-family: "Open Sans", Verdana, Geneva, sans-serif;
   font-size: 1em;
-  line-height: 1em; }
+  line-height: 1em;
+  -webkit-font-smoothing: antialiased; }
 
 h1, h2, h3, h4, h5, h6 {
   color: #3c3c3c;
@@ -531,7 +532,7 @@ a:link, a:visited {
   height: 1px;
   width: 100%; }
 
-.faded-vertical-divider, .vertical-divider, footer nav .copyright a.logo::after, footer nav ol li::after, header.global h1.logo::before, .home > header .title::before, .home .university-partners .partners li.partner::before, .find-courses header.search .inner-wrapper.main-search .logo::after, .find-courses header.search .inner-wrapper.university-search .logo::after, .university-profile header.search .inner-wrapper.main-search .logo::after, .university-profile header.search .inner-wrapper.university-search .logo::after {
+.faded-vertical-divider, .vertical-divider, footer nav .top ol li::after, footer nav .top .primary a.logo::after, header.global h1.logo::before, .home > header .title::before, .home .university-partners .partners li.partner::before, .find-courses header.search .inner-wrapper.main-search .logo::after, .find-courses header.search .inner-wrapper.university-search .logo::after, .university-profile header.search .inner-wrapper.main-search .logo::after, .university-profile header.search .inner-wrapper.university-search .logo::after {
   background-image: -webkit-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -moz-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -ms-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
@@ -1086,7 +1087,7 @@ a:link, a:visited {
   100% {
     bottom: 0px; } }
 
-.clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after {
+.clearfix:after, .topbar:after, nav.sequence-nav:after, div.course-wrapper section.course-content .problem-set:after, div.course-wrapper section.course-content section.problems-wrapper:after, div.course-wrapper section.course-content div#seq_content:after, div.course-wrapper section.course-content ol.vert-mod > li:after, section.course-content nav.sequence-bottom ul:after, section.course-content div.video article.video-wrapper section.video-controls:after, section.course-content div.video article.video-wrapper section.video-controls div.slider:after, section.tool-wrapper:after, section.tool-wrapper div#controlls-container:after, section.tool-wrapper div#controlls-container div.graph-controls div.music-wrapper:after, section.tool-wrapper div#controlls-container div.graph-controls div.inputs-wrapper:after, section.tool-wrapper div#controlls-container div.schematic-sliders div.top-sliders:after, section.problem-set:after, section.problems-wrapper:after {
   clear: both;
   content: ".";
   display: block;
@@ -1334,12 +1335,12 @@ h1.top-header, div.course-wrapper section.course-content ol.vert-mod > li header
   border-top: 1px solid #fff;
   font-size: 12px;
   line-height: 46px;
-  margin: -22.652px -22.652px 22.652px;
   text-shadow: 0 1px 0 #fff; }
   @media print {
     .topbar, nav.sequence-nav {
       display: none; } }
   .topbar a, nav.sequence-nav a {
+    line-height: 46px;
     border-bottom: 0;
     color: #292309; }
     .topbar a:hover, nav.sequence-nav a:hover {
@@ -1461,7 +1462,8 @@ form {
     height: 35px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    vertical-align: top; }
+    vertical-align: top;
+    -webkit-font-smoothing: antialiased; }
     form input[type="submit"]:hover {
       cursor: pointer;
       background-color: #108ec7;
@@ -1494,107 +1496,108 @@ footer {
     box-sizing: border-box;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px 10px 0;
+    padding: 30px 10px 0;
     width: 100%; }
-    footer nav .primary-links {
+    footer nav .top {
+      border-bottom: 1px solid #c8c8c8;
       zoom: 1;
-      margin-bottom: 30px; }
-      footer nav .primary-links:before, footer nav .primary-links:after {
+      padding-bottom: 30px;
+      width: 100%;
+      text-align: center; }
+      footer nav .top:before, footer nav .top:after {
         content: "";
         display: table; }
-      footer nav .primary-links:after {
+      footer nav .top:after {
         clear: both; }
-    footer nav .secondary-links {
-      padding-bottom: 10px;
-      text-align: left; }
-      footer nav .secondary-links a {
-        letter-spacing: 1px;
-        margin-right: 20px; }
-    footer nav .copyright {
-      float: left;
-      padding-top: 2px; }
-      footer nav .copyright a.logo {
-        background-image: url("/static/images/logo.png");
-        background-image: url("/static/images/logo.png");
-        background-image: url("/static/images/logo.png");
-        background-image: url("/static/images/logo.png");
-        background-image: url("/static/images/logo.png");
-        background-position: 0 -24px;
-        background-repeat: no-repeat;
-        display: -moz-inline-box;
-        -moz-box-orient: vertical;
-        display: inline-block;
-        vertical-align: baseline;
+      footer nav .top ol {
+        float: right; }
+        footer nav .top ol li {
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          list-style: none;
+          padding: 0px 15px;
+          position: relative;
+          vertical-align: middle; }
+          footer nav .top ol li::after {
+            content: "";
+            display: block;
+            height: 30px;
+            right: 0px;
+            position: absolute;
+            top: -5px;
+            width: 1px; }
+          footer nav .top ol li a:link, footer nav .top ol li a:visited {
+            color: #a0a0a0;
+            letter-spacing: 1px;
+            padding: 6px 0px; }
+      footer nav .top .primary {
         zoom: 1;
-        *display: inline;
-        *vertical-align: auto;
-        float: left;
-        height: 23px;
-        margin-right: 15px;
-        margin-top: 2px;
-        padding-right: 15px;
-        position: relative;
-        width: 47px;
-        vertical-align: middle; }
-        footer nav .copyright a.logo:hover {
-          background-position: 0 0; }
-        footer nav .copyright a.logo::after {
+        float: left; }
+        footer nav .top .primary:before, footer nav .top .primary:after {
           content: "";
-          display: block;
-          height: 30px;
-          right: 0px;
-          position: absolute;
-          top: -2px;
-          width: 1px; }
-      footer nav .copyright p {
-        color: #a0a0a0;
-        font-style: italic;
-        display: -moz-inline-box;
-        -moz-box-orient: vertical;
-        display: inline-block;
-        vertical-align: baseline;
-        zoom: 1;
-        *display: inline;
-        *vertical-align: auto;
-        margin: 0 auto;
-        padding-top: 1px;
-        text-align: center;
-        vertical-align: middle; }
-        footer nav .copyright p a {
+          display: table; }
+        footer nav .top .primary:after {
+          clear: both; }
+        footer nav .top .primary a.logo {
+          background-image: url("/static/images/logo.png");
+          background-image: url("/static/images/logo.png");
+          background-image: url("/static/images/logo.png");
+          background-image: url("/static/images/logo.png");
+          background-image: url("/static/images/logo.png");
+          background-position: 0 -24px;
+          background-repeat: no-repeat;
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          height: 22px;
+          margin-right: 15px;
+          margin-top: 2px;
+          padding-right: 15px;
+          position: relative;
+          width: 47px;
+          vertical-align: middle; }
+          footer nav .top .primary a.logo:hover {
+            background-position: 0 0; }
+          footer nav .top .primary a.logo::after {
+            content: "";
+            display: block;
+            height: 30px;
+            right: 0px;
+            position: absolute;
+            top: -3px;
+            width: 1px; }
+        footer nav .top .primary a {
           color: #a0a0a0;
-          font-style: italic;
-          margin-left: 5px; }
-    footer nav ol {
-      float: right; }
-      footer nav ol li {
-        display: -moz-inline-box;
-        -moz-box-orient: vertical;
-        display: inline-block;
-        vertical-align: baseline;
-        zoom: 1;
-        *display: inline;
-        *vertical-align: auto;
-        list-style: none;
-        padding: 0px 15px;
-        position: relative;
-        vertical-align: middle; }
-        footer nav ol li::after {
-          content: "";
-          display: block;
-          height: 30px;
-          right: 0px;
-          position: absolute;
-          top: -5px;
-          width: 1px; }
-        footer nav ol li a:link, footer nav ol li a:visited {
-          color: #a0a0a0;
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
           letter-spacing: 1px;
-          padding: 6px 0px; }
-        footer nav ol li.social {
+          margin-right: 20px;
+          padding-top: 2px;
+          vertical-align: middle; }
+          footer nav .top .primary a:hover {
+            color: #3c3c3c;
+            text-decoration: none; }
+      footer nav .top .social {
+        float: right; }
+        footer nav .top .social.social {
           border: none;
           margin: 0 0 0 5px;
           padding: 0; }
-          footer nav ol li.social a {
+          footer nav .top .social.social a {
             opacity: 0.7;
             padding: 0 0 0 10px;
             -webkit-transition-property: all;
@@ -1617,8 +1620,75 @@ footer {
             -ms-transition-delay: 0;
             -o-transition-delay: 0;
             transition-delay: 0; }
-            footer nav ol li.social a:hover {
+            footer nav .top .social.social a:hover {
               opacity: 1; }
+    footer nav .bottom {
+      zoom: 1;
+      opacity: 0.8;
+      padding: 10px 0px 30px;
+      -webkit-transition-property: all;
+      -moz-transition-property: all;
+      -ms-transition-property: all;
+      -o-transition-property: all;
+      transition-property: all;
+      -webkit-transition-duration: 0.15s;
+      -moz-transition-duration: 0.15s;
+      -ms-transition-duration: 0.15s;
+      -o-transition-duration: 0.15s;
+      transition-duration: 0.15s;
+      -webkit-transition-timing-function: linear;
+      -moz-transition-timing-function: linear;
+      -ms-transition-timing-function: linear;
+      -o-transition-timing-function: linear;
+      transition-timing-function: linear;
+      -webkit-transition-delay: 0;
+      -moz-transition-delay: 0;
+      -ms-transition-delay: 0;
+      -o-transition-delay: 0;
+      transition-delay: 0;
+      width: 100%; }
+      footer nav .bottom:before, footer nav .bottom:after {
+        content: "";
+        display: table; }
+      footer nav .bottom:after {
+        clear: both; }
+      footer nav .bottom:hover {
+        opacity: 1; }
+      footer nav .bottom .copyright {
+        float: left; }
+        footer nav .bottom .copyright p {
+          color: #a0a0a0;
+          font-style: italic;
+          display: -moz-inline-box;
+          -moz-box-orient: vertical;
+          display: inline-block;
+          vertical-align: baseline;
+          zoom: 1;
+          *display: inline;
+          *vertical-align: auto;
+          margin: 0 auto;
+          padding-top: 1px;
+          text-align: center;
+          vertical-align: middle; }
+          footer nav .bottom .copyright p a {
+            color: #a0a0a0;
+            font-style: italic;
+            margin-left: 5px; }
+            footer nav .bottom .copyright p a:hover {
+              color: #1d9dd9; }
+      footer nav .bottom .secondary {
+        float: right;
+        text-align: left; }
+        footer nav .bottom .secondary a {
+          color: #a0a0a0;
+          font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+          font-style: italic;
+          letter-spacing: 1px;
+          line-height: 1.6em;
+          margin-left: 20px;
+          text-transform: lowercase; }
+          footer nav .bottom .secondary a:hover {
+            color: #1d9dd9; }
 
 header.global {
   border-bottom: 1px solid #bebebe;
@@ -1651,7 +1721,7 @@ header.global {
       clear: both; }
   header.global h1.logo {
     float: left;
-    margin: 9px 15px 0px 0px;
+    margin: 6px 15px 0px 0px;
     padding-right: 20px;
     position: relative; }
     header.global h1.logo::before {
@@ -1660,7 +1730,7 @@ header.global {
       height: 50px;
       position: absolute;
       right: 1px;
-      top: -12px;
+      top: -8px;
       width: 1px; }
     header.global h1.logo::after {
       content: "";
@@ -1671,16 +1741,16 @@ header.global {
       top: -12px;
       width: 1px; }
     header.global h1.logo a {
-      background-image: url("/static/images/logo.png");
-      background-image: url("/static/images/logo.png");
-      background-image: url("/static/images/logo.png");
-      background-image: url("/static/images/logo.png");
-      background-image: url("/static/images/logo.png");
+      background-image: url("/static/images/header-logo.png");
+      background-image: url("/static/images/header-logo.png");
+      background-image: url("/static/images/header-logo.png");
+      background-image: url("/static/images/header-logo.png");
+      background-image: url("/static/images/header-logo.png");
       background-position: 0 0;
       background-repeat: no-repeat;
       display: block;
-      height: 23px;
-      width: 47px; }
+      height: 31px;
+      width: 64px; }
   header.global ol.left {
     float: left; }
   header.global ol.guest {
@@ -2414,6 +2484,15 @@ header.global {
         text-align: center;
         text-shadow: 0 1px rgba(255, 255, 255, 0.4);
         z-index: 2; }
+    .modal .inner-wrapper #enroll_error, .modal .inner-wrapper #login_error {
+      background: #fd5757;
+      border: 1px solid #ca1111;
+      color: #8f0e0e;
+      display: none;
+      margin-bottom: 20px;
+      padding: 12px; }
+    .modal .inner-wrapper .activation-message {
+      padding: 0 40px 10px; }
     .modal .inner-wrapper form {
       margin-bottom: 12px;
       padding: 0px 40px;
@@ -2619,13 +2698,10 @@ header.global {
       zoom: 1;
       *display: inline;
       *vertical-align: auto;
-      margin-right: 50px;
-      padding-right: 50px;
       position: relative;
       text-align: left;
       vertical-align: middle; }
       .home > header .title::before {
-        content: "";
         display: block;
         height: 170px;
         position: absolute;
@@ -2730,115 +2806,252 @@ header.global {
             box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
           .home > header .title .main-cta > a.find-courses:hover {
             color: white; }
-      .home > header .title .social-sharing {
+      .home > header .title .secondary-actions {
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
+        zoom: 1;
         float: left;
-        height: 44px;
-        position: relative;
-        text-align: center;
+        height: 47px;
         width: 48.988%; }
-        .home > header .title .social-sharing:hover .sharing-message {
-          opacity: 1;
-          top: 56px; }
-        .home > header .title .social-sharing .sharing-message {
-          background-image: -webkit-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          background-image: -moz-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          background-image: -ms-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          background-image: -o-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          background-image: linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          border: 1px solid rgba(0, 0, 0, 0.5);
-          -webkit-border-radius: 4px;
-          -moz-border-radius: 4px;
-          -ms-border-radius: 4px;
-          -o-border-radius: 4px;
-          border-radius: 4px;
-          -webkit-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
-          -moz-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
-          box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+        .home > header .title .secondary-actions:before, .home > header .title .secondary-actions:after {
+          content: "";
+          display: table; }
+        .home > header .title .secondary-actions:after {
+          clear: both; }
+        .home > header .title .secondary-actions a.intro-video {
+          background: #f5f5f5;
+          background-image: -webkit-linear-gradient(-90deg, #fafafa, #ebebeb);
+          background-image: -moz-linear-gradient(-90deg, #fafafa, #ebebeb);
+          background-image: -ms-linear-gradient(-90deg, #fafafa, #ebebeb);
+          background-image: -o-linear-gradient(-90deg, #fafafa, #ebebeb);
+          background-image: linear-gradient(-90deg, #fafafa, #ebebeb);
+          border: 1px solid #c8c8c8;
+          -webkit-border-radius: 30px;
+          -moz-border-radius: 30px;
+          -ms-border-radius: 30px;
+          -o-border-radius: 30px;
+          border-radius: 30px;
           -webkit-box-sizing: border-box;
           -moz-box-sizing: border-box;
           box-sizing: border-box;
-          color: white;
-          float: right;
-          font-family: Georgia, Cambria, "Times New Roman", Times, serif;
-          font-size: 0.9em;
-          font-style: italic;
-          left: 50%;
-          margin-left: -110px;
-          opacity: 0;
-          padding: 6px 10px;
-          position: absolute;
-          text-align: center;
-          -webkit-transition-property: all;
-          -moz-transition-property: all;
-          -ms-transition-property: all;
-          -o-transition-property: all;
-          transition-property: all;
-          -webkit-transition-duration: 0.15s;
-          -moz-transition-duration: 0.15s;
-          -ms-transition-duration: 0.15s;
-          -o-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-          -webkit-transition-timing-function: ease-out;
-          -moz-transition-timing-function: ease-out;
-          -ms-transition-timing-function: ease-out;
-          -o-transition-timing-function: ease-out;
-          transition-timing-function: ease-out;
-          -webkit-transition-delay: 0;
-          -moz-transition-delay: 0;
-          -ms-transition-delay: 0;
-          -o-transition-delay: 0;
-          transition-delay: 0;
-          top: 65px;
-          width: 220px; }
-          .home > header .title .social-sharing .sharing-message:hover {
-            opacity: 0; }
-        .home > header .title .social-sharing .share {
-          height: 44px;
-          display: -moz-inline-box;
-          -moz-box-orient: vertical;
-          display: inline-block;
-          vertical-align: baseline;
+          -webkit-box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+          -moz-box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+          box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
           zoom: 1;
-          *display: inline;
-          *vertical-align: auto;
-          margin-right: 10px;
-          opacity: 0.5;
-          -webkit-transition-property: all;
-          -moz-transition-property: all;
-          -ms-transition-property: all;
-          -o-transition-property: all;
-          transition-property: all;
-          -webkit-transition-duration: 0.15s;
-          -moz-transition-duration: 0.15s;
-          -ms-transition-duration: 0.15s;
-          -o-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-          -webkit-transition-timing-function: linear;
-          -moz-transition-timing-function: linear;
-          -ms-transition-timing-function: linear;
-          -o-transition-timing-function: linear;
-          transition-timing-function: linear;
-          -webkit-transition-delay: 0;
-          -moz-transition-delay: 0;
-          -ms-transition-delay: 0;
-          -o-transition-delay: 0;
-          transition-delay: 0;
-          width: 44px; }
-          .home > header .title .social-sharing .share:hover {
-            opacity: 1; }
-          .home > header .title .social-sharing .share img {
-            width: 100%; }
-          .home > header .title .social-sharing .share:last-child {
-            margin-right: 0px; }
+          display: block;
+          float: left;
+          height: 100%;
+          overflow: hidden;
+          text-align: middle;
+          width: 48.988%; }
+          .home > header .title .secondary-actions a.intro-video:before, .home > header .title .secondary-actions a.intro-video:after {
+            content: "";
+            display: table; }
+          .home > header .title .secondary-actions a.intro-video:after {
+            clear: both; }
+          .home > header .title .secondary-actions a.intro-video:hover {
+            text-decoration: none; }
+            .home > header .title .secondary-actions a.intro-video:hover p {
+              color: #3c3c3c; }
+            .home > header .title .secondary-actions a.intro-video:hover .video {
+              opacity: 1; }
+          .home > header .title .secondary-actions a.intro-video .video {
+            background-image: url("/static/images/shot-2-large.jpg");
+            background-image: url("/static/images/shot-2-large.jpg");
+            background-image: url("/static/images/shot-2-large.jpg");
+            background-image: url("/static/images/shot-2-large.jpg");
+            background-image: url("/static/images/shot-2-large.jpg");
+            background-size: cover;
+            border-right: 1px solid #c8c8c8;
+            -webkit-border-top-left-radius: 30px;
+            -moz-border-top-left-radius: 30px;
+            -moz-border-radius-topleft: 30px;
+            -ms-border-top-left-radius: 30px;
+            -o-border-top-left-radius: 30px;
+            border-top-left-radius: 30px;
+            -webkit-border-bottom-left-radius: 30px;
+            -moz-border-bottom-left-radius: 30px;
+            -moz-border-radius-bottomleft: 30px;
+            -ms-border-bottom-left-radius: 30px;
+            -o-border-bottom-left-radius: 30px;
+            border-bottom-left-radius: 30px;
+            -webkit-box-shadow: 1px 0 0 0 rgba(255, 255, 255, 0.6), inset 1px 0 0 0 rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+            -moz-box-shadow: 1px 0 0 0 rgba(255, 255, 255, 0.6), inset 1px 0 0 0 rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+            box-shadow: 1px 0 0 0 rgba(255, 255, 255, 0.6), inset 1px 0 0 0 rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+            float: left;
+            height: 100%;
+            opacity: 0.8;
+            position: relative;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: linear;
+            -moz-transition-timing-function: linear;
+            -ms-transition-timing-function: linear;
+            -o-transition-timing-function: linear;
+            transition-timing-function: linear;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            width: 60px;
+            vertical-align: middle; }
+            .home > header .title .secondary-actions a.intro-video .video .play {
+              background: rgba(255, 255, 255, 0.6);
+              height: 31px;
+              margin-left: -13px;
+              margin-top: -15px;
+              left: 50%;
+              position: absolute;
+              top: 50%;
+              width: 31px; }
+          .home > header .title .secondary-actions a.intro-video p {
+            color: #a0a0a0;
+            font-style: italic;
+            padding-top: 10px;
+            text-align: center;
+            text-shadow: 0 1px rgba(255, 255, 255, 0.6);
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: linear;
+            -moz-transition-timing-function: linear;
+            -ms-transition-timing-function: linear;
+            -o-transition-timing-function: linear;
+            transition-timing-function: linear;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            vertical-align: middle; }
+        .home > header .title .secondary-actions .social-sharing {
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box;
+          float: left;
+          height: 44px;
+          margin-right: 2.024%;
+          position: relative;
+          text-align: center;
+          width: 48.988%; }
+          .home > header .title .secondary-actions .social-sharing:hover .sharing-message {
+            opacity: 1;
+            top: 56px; }
+          .home > header .title .secondary-actions .social-sharing .sharing-message {
+            background-image: -webkit-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+            background-image: -moz-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+            background-image: -ms-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+            background-image: -o-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+            background-image: linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            -ms-border-radius: 4px;
+            -o-border-radius: 4px;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+            -moz-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            color: white;
+            float: right;
+            font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+            font-size: 0.9em;
+            font-style: italic;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            padding: 6px 10px;
+            position: absolute;
+            text-align: center;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: ease-out;
+            -moz-transition-timing-function: ease-out;
+            -ms-transition-timing-function: ease-out;
+            -o-transition-timing-function: ease-out;
+            transition-timing-function: ease-out;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            top: 65px;
+            width: 220px; }
+            .home > header .title .secondary-actions .social-sharing .sharing-message:hover {
+              opacity: 0; }
+          .home > header .title .secondary-actions .social-sharing .share {
+            height: 44px;
+            display: -moz-inline-box;
+            -moz-box-orient: vertical;
+            display: inline-block;
+            vertical-align: baseline;
+            zoom: 1;
+            *display: inline;
+            *vertical-align: auto;
+            margin-right: 10px;
+            opacity: 0.5;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: linear;
+            -moz-transition-timing-function: linear;
+            -ms-transition-timing-function: linear;
+            -o-transition-timing-function: linear;
+            transition-timing-function: linear;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            width: 44px; }
+            .home > header .title .secondary-actions .social-sharing .share:hover {
+              opacity: 1; }
+            .home > header .title .secondary-actions .social-sharing .share img {
+              width: 100%; }
+            .home > header .title .secondary-actions .social-sharing .share:last-child {
+              margin-right: 0px; }
     .home > header .media {
       background: #fff;
       border: 1px solid #c8c8c8;
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
+      float: left;
       display: -moz-inline-box;
       -moz-box-orient: vertical;
       display: inline-block;
@@ -2849,10 +3062,10 @@ header.global {
       padding: 1px;
       position: relative;
       vertical-align: middle;
-      width: 210px;
+      width: 23.482%;
       z-index: 2; }
       .home > header .media .hero {
-        height: 125px;
+        height: 100%;
         overflow: hidden;
         position: relative; }
         .home > header .media .hero .play-intro {
@@ -4132,109 +4345,6 @@ nav.course-material {
             box-shadow: inset 0 0 20px 0 #00295f, 0 1px 0 white; }
           .course-info header.course-profile .intro-inner-wrapper .intro .main-cta > a.find-courses:hover, .course-info header.course-profile .intro-inner-wrapper .intro .main-cta a.register:hover {
             color: white; }
-      .course-info header.course-profile .intro-inner-wrapper .intro .social-sharing {
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        float: left;
-        height: 44px;
-        position: relative;
-        text-align: center;
-        width: 48.988%; }
-        .course-info header.course-profile .intro-inner-wrapper .intro .social-sharing:hover .sharing-message {
-          opacity: 1;
-          top: 56px; }
-        .course-info header.course-profile .intro-inner-wrapper .intro .social-sharing .sharing-message {
-          background-image: -webkit-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          background-image: -moz-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          background-image: -ms-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          background-image: -o-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          background-image: linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-          border: 1px solid rgba(0, 0, 0, 0.5);
-          -webkit-border-radius: 4px;
-          -moz-border-radius: 4px;
-          -ms-border-radius: 4px;
-          -o-border-radius: 4px;
-          border-radius: 4px;
-          -webkit-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
-          -moz-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
-          box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
-          -webkit-box-sizing: border-box;
-          -moz-box-sizing: border-box;
-          box-sizing: border-box;
-          color: white;
-          float: right;
-          font-family: Georgia, Cambria, "Times New Roman", Times, serif;
-          font-size: 0.9em;
-          font-style: italic;
-          left: 50%;
-          margin-left: -110px;
-          opacity: 0;
-          padding: 6px 10px;
-          position: absolute;
-          text-align: center;
-          -webkit-transition-property: all;
-          -moz-transition-property: all;
-          -ms-transition-property: all;
-          -o-transition-property: all;
-          transition-property: all;
-          -webkit-transition-duration: 0.15s;
-          -moz-transition-duration: 0.15s;
-          -ms-transition-duration: 0.15s;
-          -o-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-          -webkit-transition-timing-function: ease-out;
-          -moz-transition-timing-function: ease-out;
-          -ms-transition-timing-function: ease-out;
-          -o-transition-timing-function: ease-out;
-          transition-timing-function: ease-out;
-          -webkit-transition-delay: 0;
-          -moz-transition-delay: 0;
-          -ms-transition-delay: 0;
-          -o-transition-delay: 0;
-          transition-delay: 0;
-          top: 65px;
-          width: 220px; }
-          .course-info header.course-profile .intro-inner-wrapper .intro .social-sharing .sharing-message:hover {
-            opacity: 0; }
-        .course-info header.course-profile .intro-inner-wrapper .intro .social-sharing .share {
-          height: 44px;
-          display: -moz-inline-box;
-          -moz-box-orient: vertical;
-          display: inline-block;
-          vertical-align: baseline;
-          zoom: 1;
-          *display: inline;
-          *vertical-align: auto;
-          margin-right: 10px;
-          opacity: 0.5;
-          -webkit-transition-property: all;
-          -moz-transition-property: all;
-          -ms-transition-property: all;
-          -o-transition-property: all;
-          transition-property: all;
-          -webkit-transition-duration: 0.15s;
-          -moz-transition-duration: 0.15s;
-          -ms-transition-duration: 0.15s;
-          -o-transition-duration: 0.15s;
-          transition-duration: 0.15s;
-          -webkit-transition-timing-function: linear;
-          -moz-transition-timing-function: linear;
-          -ms-transition-timing-function: linear;
-          -o-transition-timing-function: linear;
-          transition-timing-function: linear;
-          -webkit-transition-delay: 0;
-          -moz-transition-delay: 0;
-          -ms-transition-delay: 0;
-          -o-transition-delay: 0;
-          transition-delay: 0;
-          width: 44px; }
-          .course-info header.course-profile .intro-inner-wrapper .intro .social-sharing .share:hover {
-            opacity: 1; }
-          .course-info header.course-profile .intro-inner-wrapper .intro .social-sharing .share img {
-            width: 100%; }
-          .course-info header.course-profile .intro-inner-wrapper .intro .social-sharing .share:last-child {
-            margin-right: 0px; }
     .course-info header.course-profile .intro-inner-wrapper .media {
       background: #fff;
       border-left: 1px solid #646464;
@@ -4375,11 +4485,11 @@ nav.course-material {
   border: 1px solid #c8c8c8;
   border-top: none;
   float: left;
-  padding: 30px 20px;
+  padding: 20px 20px 30px;
   width: 31.984%; }
   .course-info .course-sidebar header {
     margin-bottom: 30px;
-    padding-bottom: 26px;
+    padding-bottom: 20px;
     position: relative;
     text-align: center; }
     .course-info .course-sidebar header::after {
@@ -4388,7 +4498,8 @@ nav.course-material {
       height: 1px;
       position: absolute;
       bottom: 0px;
-      width: 100%; }
+      width: 100%;
+      z-index: 1; }
     .course-info .course-sidebar header a.university-name {
       border-right: 1px solid #c8c8c8;
       color: #3c3c3c;
@@ -4407,6 +4518,111 @@ nav.course-material {
       padding-right: 15px; }
       .course-info .course-sidebar header a.university-name:hover {
         color: #a0a0a0; }
+    .course-info .course-sidebar header .social-sharing {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      float: left;
+      height: 44px;
+      position: relative;
+      text-align: center;
+      width: 100%;
+      z-index: 2;
+      float: none; }
+      .course-info .course-sidebar header .social-sharing:hover .sharing-message {
+        opacity: 1;
+        top: 56px; }
+      .course-info .course-sidebar header .social-sharing .sharing-message {
+        background-image: -webkit-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        background-image: -moz-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        background-image: -ms-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        background-image: -o-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        background-image: linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        -ms-border-radius: 4px;
+        -o-border-radius: 4px;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+        -moz-box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+        box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        color: white;
+        float: right;
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+        font-size: 0.9em;
+        font-style: italic;
+        left: 50%;
+        margin-left: -110px;
+        opacity: 0;
+        padding: 6px 10px;
+        position: absolute;
+        text-align: center;
+        -webkit-transition-property: all;
+        -moz-transition-property: all;
+        -ms-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-duration: 0.15s;
+        -moz-transition-duration: 0.15s;
+        -ms-transition-duration: 0.15s;
+        -o-transition-duration: 0.15s;
+        transition-duration: 0.15s;
+        -webkit-transition-timing-function: ease-out;
+        -moz-transition-timing-function: ease-out;
+        -ms-transition-timing-function: ease-out;
+        -o-transition-timing-function: ease-out;
+        transition-timing-function: ease-out;
+        -webkit-transition-delay: 0;
+        -moz-transition-delay: 0;
+        -ms-transition-delay: 0;
+        -o-transition-delay: 0;
+        transition-delay: 0;
+        top: 65px;
+        width: 220px; }
+        .course-info .course-sidebar header .social-sharing .sharing-message:hover {
+          opacity: 0; }
+      .course-info .course-sidebar header .social-sharing .share {
+        height: 44px;
+        display: -moz-inline-box;
+        -moz-box-orient: vertical;
+        display: inline-block;
+        vertical-align: baseline;
+        zoom: 1;
+        *display: inline;
+        *vertical-align: auto;
+        margin-right: 10px;
+        opacity: 0.5;
+        -webkit-transition-property: all;
+        -moz-transition-property: all;
+        -ms-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-duration: 0.15s;
+        -moz-transition-duration: 0.15s;
+        -ms-transition-duration: 0.15s;
+        -o-transition-duration: 0.15s;
+        transition-duration: 0.15s;
+        -webkit-transition-timing-function: linear;
+        -moz-transition-timing-function: linear;
+        -ms-transition-timing-function: linear;
+        -o-transition-timing-function: linear;
+        transition-timing-function: linear;
+        -webkit-transition-delay: 0;
+        -moz-transition-delay: 0;
+        -ms-transition-delay: 0;
+        -o-transition-delay: 0;
+        transition-delay: 0;
+        width: 44px; }
+        .course-info .course-sidebar header .social-sharing .share:hover {
+          opacity: 1; }
+        .course-info .course-sidebar header .social-sharing .share img {
+          width: 100%; }
+        .course-info .course-sidebar header .social-sharing .share:last-child {
+          margin-right: 0px; }
   .course-info .course-sidebar .important-dates {
     list-style: none;
     margin: 0px;
@@ -4579,6 +4795,9 @@ nav.course-material {
       position: absolute;
       width: 100%; }
     .container.about .vision .message .photo {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
       background: white;
       border: 1px solid #d2d2d2;
       padding: 1px;
@@ -4588,6 +4807,9 @@ nav.course-material {
         display: block;
         height: 200px;
         width: 100%; }
+    .container.about .vision .message > article {
+      float: left;
+      width: 65.992%; }
     .container.about .vision .message.left .photo {
       float: left;
       margin-right: 2.024%; }
@@ -4803,9 +5025,9 @@ div.course-wrapper section.course-content {
       margin-bottom: 0; }
   div.course-wrapper section.course-content ul li {
     margin-bottom: 11.326px; }
-  div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li {
+  div.course-wrapper section.course-content .problem-set, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content, div.course-wrapper section.course-content ol.vert-mod > li, div.course-wrapper section.course-content section.problems-wrapper, div.course-wrapper section.course-content div#seq_content {
     position: relative; }
-    div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+    div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2 {
       margin-top: 0;
       margin-bottom: 15px;
       width: 20.109%;
@@ -4816,36 +5038,36 @@ div.course-wrapper section.course-content {
       box-sizing: border-box;
       display: table-cell;
       vertical-align: top; }
-      div.course-wrapper section.course-content .problem-set h2.problem-header section.staff, div.course-wrapper section.course-content section.problems-wrapper h2.problem-header section.staff, div.course-wrapper section.course-content div#seq_content h2.problem-header section.staff, div.course-wrapper section.course-content ol.vert-mod > li h2.problem-header section.staff {
+      div.course-wrapper section.course-content .problem-set h2.problem-header section.staff, div.course-wrapper section.course-content section.problems-wrapper h2.problem-header section.staff, div.course-wrapper section.course-content div#seq_content h2.problem-header section.staff, div.course-wrapper section.course-content ol.vert-mod > li h2.problem-header section.staff, div.course-wrapper section.course-content section.problems-wrapper h2.problem-header section.staff, div.course-wrapper section.course-content div#seq_content h2.problem-header section.staff {
         margin-top: 30px;
         font-size: 80%; }
       @media screen and (max-width:1120px) {
-        div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+        div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2 {
           display: block;
           width: auto;
           border-right: 0; } }
       @media print {
-        div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2 {
+        div.course-wrapper section.course-content .problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2, div.course-wrapper section.course-content ol.vert-mod > li h2, div.course-wrapper section.course-content section.problems-wrapper h2, div.course-wrapper section.course-content div#seq_content h2 {
           display: block;
           width: auto;
           border-right: 0; } }
-    div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+    div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem {
       display: table-cell;
       width: 77.174%;
       padding-left: 2.717%; }
       @media screen and (max-width:1120px) {
-        div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+        div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem {
           display: block;
           width: auto;
           padding: 0; } }
       @media print {
-        div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem {
+        div.course-wrapper section.course-content .problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem, div.course-wrapper section.course-content ol.vert-mod > li section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, div.course-wrapper section.course-content div#seq_content section.problem {
           display: block;
           width: auto;
           padding: 0; }
-          div.course-wrapper section.course-content .problem-set section.problem canvas, div.course-wrapper section.course-content section.problems-wrapper section.problem canvas, div.course-wrapper section.course-content div#seq_content section.problem canvas, div.course-wrapper section.course-content ol.vert-mod > li section.problem canvas, div.course-wrapper section.course-content .problem-set section.problem img, div.course-wrapper section.course-content section.problems-wrapper section.problem img, div.course-wrapper section.course-content div#seq_content section.problem img, div.course-wrapper section.course-content ol.vert-mod > li section.problem img {
+          div.course-wrapper section.course-content .problem-set section.problem canvas, div.course-wrapper section.course-content section.problems-wrapper section.problem canvas, div.course-wrapper section.course-content div#seq_content section.problem canvas, div.course-wrapper section.course-content ol.vert-mod > li section.problem canvas, div.course-wrapper section.course-content section.problems-wrapper section.problem canvas, div.course-wrapper section.course-content div#seq_content section.problem canvas, div.course-wrapper section.course-content .problem-set section.problem img, div.course-wrapper section.course-content section.problems-wrapper section.problem img, div.course-wrapper section.course-content div#seq_content section.problem img, div.course-wrapper section.course-content ol.vert-mod > li section.problem img, div.course-wrapper section.course-content section.problems-wrapper section.problem img, div.course-wrapper section.course-content div#seq_content section.problem img {
             page-break-inside: avoid; } }
-      div.course-wrapper section.course-content .problem-set section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.unanswered, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-bullet, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-bullet, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-bullet, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-bullet {
+      div.course-wrapper section.course-content .problem-set section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem span.unanswered, div.course-wrapper section.course-content div#seq_content section.problem span.unanswered, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-bullet, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-bullet, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-bullet, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-bullet, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-bullet, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-bullet {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
         display: inline-block;
@@ -4858,7 +5080,7 @@ div.course-wrapper section.course-content {
         position: relative;
         top: 4px;
         width: 14px; }
-      div.course-wrapper section.course-content .problem-set section.problem span.correct, div.course-wrapper section.course-content section.problems-wrapper section.problem span.correct, div.course-wrapper section.course-content div#seq_content section.problem span.correct, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.correct, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-check, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-check, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-check, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-check {
+      div.course-wrapper section.course-content .problem-set section.problem span.correct, div.course-wrapper section.course-content section.problems-wrapper section.problem span.correct, div.course-wrapper section.course-content div#seq_content section.problem span.correct, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.correct, div.course-wrapper section.course-content section.problems-wrapper section.problem span.correct, div.course-wrapper section.course-content div#seq_content section.problem span.correct, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-check, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-check, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-check, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-check, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-check, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-check {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
         display: inline-block;
@@ -4871,7 +5093,7 @@ div.course-wrapper section.course-content {
         position: relative;
         top: 6px;
         width: 25px; }
-      div.course-wrapper section.course-content .problem-set section.problem span.incorrect, div.course-wrapper section.course-content section.problems-wrapper section.problem span.incorrect, div.course-wrapper section.course-content div#seq_content section.problem span.incorrect, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.incorrect, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-close, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-close, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-close, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-close {
+      div.course-wrapper section.course-content .problem-set section.problem span.incorrect, div.course-wrapper section.course-content section.problems-wrapper section.problem span.incorrect, div.course-wrapper section.course-content div#seq_content section.problem span.incorrect, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.incorrect, div.course-wrapper section.course-content section.problems-wrapper section.problem span.incorrect, div.course-wrapper section.course-content div#seq_content section.problem span.incorrect, div.course-wrapper section.course-content .problem-set section.problem span.ui-icon-close, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-close, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-close, div.course-wrapper section.course-content ol.vert-mod > li section.problem span.ui-icon-close, div.course-wrapper section.course-content section.problems-wrapper section.problem span.ui-icon-close, div.course-wrapper section.course-content div#seq_content section.problem span.ui-icon-close {
         display: -moz-inline-box;
         -moz-box-orient: vertical;
         display: inline-block;
@@ -4884,26 +5106,26 @@ div.course-wrapper section.course-content {
         width: 20px;
         position: relative;
         top: 6px; }
-    div.course-wrapper section.course-content .problem-set div > span, div.course-wrapper section.course-content section.problems-wrapper div > span, div.course-wrapper section.course-content div#seq_content div > span, div.course-wrapper section.course-content ol.vert-mod > li div > span {
+    div.course-wrapper section.course-content .problem-set div > span, div.course-wrapper section.course-content section.problems-wrapper div > span, div.course-wrapper section.course-content div#seq_content div > span, div.course-wrapper section.course-content ol.vert-mod > li div > span, div.course-wrapper section.course-content section.problems-wrapper div > span, div.course-wrapper section.course-content div#seq_content div > span {
       display: block;
       margin-bottom: 11.326px; }
-      div.course-wrapper section.course-content .problem-set div > span[answer], div.course-wrapper section.course-content section.problems-wrapper div > span[answer], div.course-wrapper section.course-content div#seq_content div > span[answer], div.course-wrapper section.course-content ol.vert-mod > li div > span[answer] {
+      div.course-wrapper section.course-content .problem-set div > span[answer], div.course-wrapper section.course-content section.problems-wrapper div > span[answer], div.course-wrapper section.course-content div#seq_content div > span[answer], div.course-wrapper section.course-content ol.vert-mod > li div > span[answer], div.course-wrapper section.course-content section.problems-wrapper div > span[answer], div.course-wrapper section.course-content div#seq_content div > span[answer] {
         border-top: 1px solid #ededed;
         border-bottom: 1px solid #ededed;
         background: #f3f3f3;
         margin: 0 -22.652px;
         padding: 11.326px 22.652px; }
-    div.course-wrapper section.course-content .problem-set input[type="text"], div.course-wrapper section.course-content section.problems-wrapper input[type="text"], div.course-wrapper section.course-content div#seq_content input[type="text"], div.course-wrapper section.course-content ol.vert-mod > li input[type="text"] {
+    div.course-wrapper section.course-content .problem-set input[type="text"], div.course-wrapper section.course-content section.problems-wrapper input[type="text"], div.course-wrapper section.course-content div#seq_content input[type="text"], div.course-wrapper section.course-content ol.vert-mod > li input[type="text"], div.course-wrapper section.course-content section.problems-wrapper input[type="text"], div.course-wrapper section.course-content div#seq_content input[type="text"] {
       display: inline-block;
       width: 50%; }
-    div.course-wrapper section.course-content .problem-set center, div.course-wrapper section.course-content section.problems-wrapper center, div.course-wrapper section.course-content div#seq_content center, div.course-wrapper section.course-content ol.vert-mod > li center {
+    div.course-wrapper section.course-content .problem-set center, div.course-wrapper section.course-content section.problems-wrapper center, div.course-wrapper section.course-content div#seq_content center, div.course-wrapper section.course-content ol.vert-mod > li center, div.course-wrapper section.course-content section.problems-wrapper center, div.course-wrapper section.course-content div#seq_content center {
       display: block;
       margin: 22.652px 0;
       border: 1px solid #ccc;
       padding: 22.652px; }
-    div.course-wrapper section.course-content .problem-set section.action, div.course-wrapper section.course-content section.problems-wrapper section.action, div.course-wrapper section.course-content div#seq_content section.action, div.course-wrapper section.course-content ol.vert-mod > li section.action {
+    div.course-wrapper section.course-content .problem-set section.action, div.course-wrapper section.course-content section.problems-wrapper section.action, div.course-wrapper section.course-content div#seq_content section.action, div.course-wrapper section.course-content ol.vert-mod > li section.action, div.course-wrapper section.course-content section.problems-wrapper section.action, div.course-wrapper section.course-content div#seq_content section.action {
       margin-top: 22.652px; }
-      div.course-wrapper section.course-content .problem-set section.action input[type="button"], div.course-wrapper section.course-content section.problems-wrapper section.action input[type="button"], div.course-wrapper section.course-content div#seq_content section.action input[type="button"], div.course-wrapper section.course-content ol.vert-mod > li section.action input[type="button"] {
+      div.course-wrapper section.course-content .problem-set section.action input[type="button"], div.course-wrapper section.course-content section.problems-wrapper section.action input[type="button"], div.course-wrapper section.course-content div#seq_content section.action input[type="button"], div.course-wrapper section.course-content ol.vert-mod > li section.action input[type="button"], div.course-wrapper section.course-content section.problems-wrapper section.action input[type="button"], div.course-wrapper section.course-content div#seq_content section.action input[type="button"] {
         padding: 9.061px 22.652px;
         text-shadow: 0 -1px 0 #666666; }
   div.course-wrapper section.course-content section.problems-wrapper {
@@ -6516,3 +6738,228 @@ section.tool-wrapper {
         margin-top: -0.3em; }
         section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:hover, section.tool-wrapper div#controlls-container div.schematic-sliders div.slider .ui-slider-handle:active {
           background-color: #6e8992; }
+
+section.problem-set, div.course-wrapper section.course-content section.problems-wrapper, section.problems-wrapper {
+  position: relative; }
+  section.problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, section.problems-wrapper h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    width: 20.109%;
+    padding-right: 2.717%;
+    border-right: 1px dashed #ddd;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table-cell;
+    vertical-align: top; }
+    section.problem-set h2.problem-header section.staff, div.course-wrapper section.course-content section.problems-wrapper h2.problem-header section.staff, section.problems-wrapper h2.problem-header section.staff {
+      margin-top: 30px;
+      font-size: 80%; }
+    @media screen and (max-width:1120px) {
+      section.problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, section.problems-wrapper h2 {
+        display: block;
+        width: auto;
+        border-right: 0; } }
+    @media print {
+      section.problem-set h2, div.course-wrapper section.course-content section.problems-wrapper h2, section.problems-wrapper h2 {
+        display: block;
+        width: auto;
+        border-right: 0; } }
+  section.problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, section.problems-wrapper section.problem {
+    display: table-cell;
+    width: 77.174%;
+    padding-left: 2.717%; }
+    @media screen and (max-width:1120px) {
+      section.problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, section.problems-wrapper section.problem {
+        display: block;
+        width: auto;
+        padding: 0; } }
+    @media print {
+      section.problem-set section.problem, div.course-wrapper section.course-content section.problems-wrapper section.problem, section.problems-wrapper section.problem {
+        display: block;
+        width: auto;
+        padding: 0; }
+        section.problem-set section.problem canvas, div.course-wrapper section.course-content section.problems-wrapper section.problem canvas, section.problems-wrapper section.problem canvas, section.problem-set section.problem img, div.course-wrapper section.course-content section.problems-wrapper section.problem img, section.problems-wrapper section.problem img {
+          page-break-inside: avoid; } }
+    section.problem-set section.problem div p.status, div.course-wrapper section.course-content section.problems-wrapper section.problem div p.status, section.problems-wrapper section.problem div p.status {
+      text-indent: -9999px;
+      margin: -1px 0 0 10px; }
+    section.problem-set section.problem div.unanswered p.status, div.course-wrapper section.course-content section.problems-wrapper section.problem div.unanswered p.status, section.problems-wrapper section.problem div.unanswered p.status {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("../images/unanswered-icon.png") center center no-repeat;
+      height: 14px;
+      width: 14px; }
+    section.problem-set section.problem div.correct p.status, div.course-wrapper section.course-content section.problems-wrapper section.problem div.correct p.status, section.problems-wrapper section.problem div.correct p.status, section.problem-set section.problem div.ui-icon-check p.status, div.course-wrapper section.course-content section.problems-wrapper section.problem div.ui-icon-check p.status, section.problems-wrapper section.problem div.ui-icon-check p.status {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("../images/correct-icon.png") center center no-repeat;
+      height: 20px;
+      width: 25px; }
+    section.problem-set section.problem div.correct input, div.course-wrapper section.course-content section.problems-wrapper section.problem div.correct input, section.problems-wrapper section.problem div.correct input, section.problem-set section.problem div.ui-icon-check input, div.course-wrapper section.course-content section.problems-wrapper section.problem div.ui-icon-check input, section.problems-wrapper section.problem div.ui-icon-check input {
+      border-color: green; }
+    section.problem-set section.problem div.incorrect p.status, div.course-wrapper section.course-content section.problems-wrapper section.problem div.incorrect p.status, section.problems-wrapper section.problem div.incorrect p.status, section.problem-set section.problem div.ui-icon-close p.status, div.course-wrapper section.course-content section.problems-wrapper section.problem div.ui-icon-close p.status, section.problems-wrapper section.problem div.ui-icon-close p.status {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("../images/incorrect-icon.png") center center no-repeat;
+      height: 20px;
+      width: 20px;
+      text-indent: -9999px; }
+    section.problem-set section.problem div.incorrect input, div.course-wrapper section.course-content section.problems-wrapper section.problem div.incorrect input, section.problems-wrapper section.problem div.incorrect input, section.problem-set section.problem div.ui-icon-close input, div.course-wrapper section.course-content section.problems-wrapper section.problem div.ui-icon-close input, section.problems-wrapper section.problem div.ui-icon-close input {
+      border-color: red; }
+    section.problem-set section.problem div > span, div.course-wrapper section.course-content section.problems-wrapper section.problem div > span, section.problems-wrapper section.problem div > span {
+      display: block;
+      margin-bottom: 11.326px; }
+    section.problem-set section.problem div p.answer, div.course-wrapper section.course-content section.problems-wrapper section.problem div p.answer, section.problems-wrapper section.problem div p.answer {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      margin-bottom: 0;
+      margin-left: 10px; }
+      section.problem-set section.problem div p.answer:before, div.course-wrapper section.course-content section.problems-wrapper section.problem div p.answer:before, section.problems-wrapper section.problem div p.answer:before {
+        content: "Answer: ";
+        font-weight: bold;
+        display: inline; }
+      section.problem-set section.problem div p.answer:empty:before, div.course-wrapper section.course-content section.problems-wrapper section.problem div p.answer:empty:before, section.problems-wrapper section.problem div p.answer:empty:before {
+        display: none; }
+    section.problem-set section.problem div div.equation, div.course-wrapper section.course-content section.problems-wrapper section.problem div div.equation, section.problems-wrapper section.problem div div.equation {
+      clear: both;
+      padding: 6px;
+      background: #eee; }
+      section.problem-set section.problem div div.equation span, div.course-wrapper section.course-content section.problems-wrapper section.problem div div.equation span, section.problems-wrapper section.problem div div.equation span {
+        margin-bottom: 0; }
+    section.problem-set section.problem div span.unanswered, div.course-wrapper section.course-content section.problems-wrapper section.problem div span.unanswered, section.problems-wrapper section.problem div span.unanswered, section.problem-set section.problem div span.ui-icon-bullet, div.course-wrapper section.course-content section.problems-wrapper section.problem div span.ui-icon-bullet, section.problems-wrapper section.problem div span.ui-icon-bullet {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("../images/unanswered-icon.png") center center no-repeat;
+      height: 14px;
+      position: relative;
+      top: 4px;
+      width: 14px; }
+    section.problem-set section.problem div span.correct, div.course-wrapper section.course-content section.problems-wrapper section.problem div span.correct, section.problems-wrapper section.problem div span.correct, section.problem-set section.problem div span.ui-icon-check, div.course-wrapper section.course-content section.problems-wrapper section.problem div span.ui-icon-check, section.problems-wrapper section.problem div span.ui-icon-check {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("../images/correct-icon.png") center center no-repeat;
+      height: 20px;
+      position: relative;
+      top: 6px;
+      width: 25px; }
+    section.problem-set section.problem div span.incorrect, div.course-wrapper section.course-content section.problems-wrapper section.problem div span.incorrect, section.problems-wrapper section.problem div span.incorrect, section.problem-set section.problem div span.ui-icon-close, div.course-wrapper section.course-content section.problems-wrapper section.problem div span.ui-icon-close, section.problems-wrapper section.problem div span.ui-icon-close {
+      display: -moz-inline-box;
+      -moz-box-orient: vertical;
+      display: inline-block;
+      vertical-align: baseline;
+      zoom: 1;
+      *display: inline;
+      *vertical-align: auto;
+      background: url("../images/incorrect-icon.png") center center no-repeat;
+      height: 20px;
+      width: 20px;
+      position: relative;
+      top: 6px; }
+    section.problem-set section.problem ul, div.course-wrapper section.course-content section.problems-wrapper section.problem ul, section.problems-wrapper section.problem ul {
+      list-style: disc outside none;
+      margin-bottom: 22.652px;
+      margin-left: .75em;
+      margin-left: .75rem; }
+    section.problem-set section.problem ol, div.course-wrapper section.course-content section.problems-wrapper section.problem ol, section.problems-wrapper section.problem ol {
+      list-style: decimal outside none;
+      margin-bottom: 22.652px;
+      margin-left: .75em;
+      margin-left: .75rem; }
+    section.problem-set section.problem dl, div.course-wrapper section.course-content section.problems-wrapper section.problem dl, section.problems-wrapper section.problem dl {
+      line-height: 1.4em; }
+    section.problem-set section.problem dl dt, div.course-wrapper section.course-content section.problems-wrapper section.problem dl dt, section.problems-wrapper section.problem dl dt {
+      font-weight: bold; }
+    section.problem-set section.problem dl dd, div.course-wrapper section.course-content section.problems-wrapper section.problem dl dd, section.problems-wrapper section.problem dl dd {
+      margin-bottom: 0; }
+    section.problem-set section.problem dd, div.course-wrapper section.course-content section.problems-wrapper section.problem dd, section.problems-wrapper section.problem dd {
+      margin-left: .5em;
+      margin-left: .5rem; }
+    section.problem-set section.problem li, div.course-wrapper section.course-content section.problems-wrapper section.problem li, section.problems-wrapper section.problem li {
+      line-height: 1.4em;
+      margin-bottom: 11.326px; }
+      section.problem-set section.problem li:last-child, div.course-wrapper section.course-content section.problems-wrapper section.problem li:last-child, section.problems-wrapper section.problem li:last-child {
+        margin-bottom: 0; }
+    section.problem-set section.problem p, div.course-wrapper section.course-content section.problems-wrapper section.problem p, section.problems-wrapper section.problem p {
+      margin-bottom: 22.652px; }
+    section.problem-set section.problem table, div.course-wrapper section.course-content section.problems-wrapper section.problem table, section.problems-wrapper section.problem table {
+      margin-bottom: 22.652px;
+      width: 100%;
+      border-collapse: collapse; }
+      section.problem-set section.problem table th, div.course-wrapper section.course-content section.problems-wrapper section.problem table th, section.problems-wrapper section.problem table th {
+        font-weight: bold;
+        text-align: left; }
+      section.problem-set section.problem table caption, div.course-wrapper section.course-content section.problems-wrapper section.problem table caption, section.problems-wrapper section.problem table caption, section.problem-set section.problem table th, div.course-wrapper section.course-content section.problems-wrapper section.problem table th, section.problems-wrapper section.problem table th, section.problem-set section.problem table td, div.course-wrapper section.course-content section.problems-wrapper section.problem table td, section.problems-wrapper section.problem table td {
+        padding: .25em .75em .25em 0;
+        padding: .25rem .75rem .25rem 0; }
+      section.problem-set section.problem table caption, div.course-wrapper section.course-content section.problems-wrapper section.problem table caption, section.problems-wrapper section.problem table caption {
+        background: #f1f1f1;
+        margin-bottom: .75em;
+        margin-bottom: .75rem;
+        padding: .75em 0;
+        padding: .75rem 0; }
+      section.problem-set section.problem table tr, div.course-wrapper section.course-content section.problems-wrapper section.problem table tr, section.problems-wrapper section.problem table tr, section.problem-set section.problem table td, div.course-wrapper section.course-content section.problems-wrapper section.problem table td, section.problems-wrapper section.problem table td, section.problem-set section.problem table th, div.course-wrapper section.course-content section.problems-wrapper section.problem table th, section.problems-wrapper section.problem table th {
+        vertical-align: middle; }
+    section.problem-set section.problem hr, div.course-wrapper section.course-content section.problems-wrapper section.problem hr, section.problems-wrapper section.problem hr {
+      background: #ddd;
+      border: none;
+      clear: both;
+      color: #ddd;
+      float: none;
+      height: 1px;
+      margin: 0 0 .75rem;
+      width: 100%; }
+    section.problem-set section.problem .hidden, div.course-wrapper section.course-content section.problems-wrapper section.problem .hidden, section.problems-wrapper section.problem .hidden {
+      display: none;
+      visibility: hidden; }
+    section.problem-set section.problem input[type="email"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="email"], section.problems-wrapper section.problem input[type="email"], section.problem-set section.problem input[type="number"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="number"], section.problems-wrapper section.problem input[type="number"], section.problem-set section.problem input[type="password"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="password"], section.problems-wrapper section.problem input[type="password"], section.problem-set section.problem input[type="search"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="search"], section.problems-wrapper section.problem input[type="search"], section.problem-set section.problem input[type="tel"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="tel"], section.problems-wrapper section.problem input[type="tel"], section.problem-set section.problem input[type="text"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="text"], section.problems-wrapper section.problem input[type="text"], section.problem-set section.problem input[type="url"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="url"], section.problems-wrapper section.problem input[type="url"], section.problem-set section.problem input[type="color"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="color"], section.problems-wrapper section.problem input[type="color"], section.problem-set section.problem input[type="date"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="date"], section.problems-wrapper section.problem input[type="date"], section.problem-set section.problem input[type="datetime"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="datetime"], section.problems-wrapper section.problem input[type="datetime"], section.problem-set section.problem input[type="datetime-local"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="datetime-local"], section.problems-wrapper section.problem input[type="datetime-local"], section.problem-set section.problem input[type="month"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="month"], section.problems-wrapper section.problem input[type="month"], section.problem-set section.problem input[type="time"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="time"], section.problems-wrapper section.problem input[type="time"], section.problem-set section.problem input[type="week"], div.course-wrapper section.course-content section.problems-wrapper section.problem input[type="week"], section.problems-wrapper section.problem input[type="week"] {
+      display: inline;
+      width: auto; }
+    section.problem-set section.problem center, div.course-wrapper section.course-content section.problems-wrapper section.problem center, section.problems-wrapper section.problem center {
+      display: block;
+      margin: 22.652px 0;
+      border: 1px solid #ccc;
+      padding: 22.652px; }
+  section.problem-set section.action, div.course-wrapper section.course-content section.problems-wrapper section.action, section.problems-wrapper section.action {
+    margin-top: 11.326px; }
+    section.problem-set section.action input[type="button"], div.course-wrapper section.course-content section.problems-wrapper section.action input[type="button"], section.problems-wrapper section.action input[type="button"] {
+      padding: 9.061px 22.652px;
+      text-shadow: 0 -1px 0 #666666; }
+
+section.problems-wrapper {
+  display: table;
+  width: 100%; }
+  @media screen and (max-width:1120px) {
+    section.problems-wrapper {
+      display: block;
+      width: auto; } }
