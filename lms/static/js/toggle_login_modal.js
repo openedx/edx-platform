@@ -18,6 +18,8 @@
 
         $(this).click(function(e) {
 
+          $(".modal").hide();
+
           var modal_id = $(this).attr("href");
 
           $("#lean_overlay").click(function() {

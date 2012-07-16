@@ -2482,6 +2482,13 @@ header.global {
         text-align: center;
         text-shadow: 0 1px rgba(255, 255, 255, 0.4);
         z-index: 2; }
+    .modal .inner-wrapper #enroll_error, .modal .inner-wrapper #login_error {
+      background: #fd5757;
+      border: 1px solid #ca1111;
+      color: #8f0e0e;
+      display: none;
+      margin-bottom: 20px;
+      padding: 12px; }
     .modal .inner-wrapper form {
       margin-bottom: 12px;
       padding: 0px 40px;
