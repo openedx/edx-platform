@@ -48,11 +48,37 @@ urlpatterns = ('',
     
     
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
-    url(r'^404$', 'static_template_view.views.render', {'template': '404.html'}, name="404"),
-    url(r'^about$', 'static_template_view.views.render', {'template': 'about.html'}, name="about_edx"),
-    url(r'^university_profile$', 'static_template_view.views.render', {'template': 'university_profile.html'}, name="university_profile"),
-    url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs"),
-    url(r'^help$', 'static_template_view.views.render', {'template': 'help.html'}, name="help_edx"),
+    url(r'^404$', 'static_template_view.views.render', 
+        {'template': '404.html'}, name="404"),
+    url(r'^about$', 'static_template_view.views.render', 
+        {'template': 'about.html'}, name="about_edx"),
+    url(r'^jobs$', 'static_template_view.views.render', 
+        {'template': 'jobs.html'}, name="jobs"),
+    url(r'^contact$', 'static_template_view.views.render', 
+        {'template': 'contact.html'}, name="contact"),
+    url(r'^press$', 'static_template_view.views.render', 
+        {'template': 'press.html'}, name="press"),
+    url(r'^faq$', 'static_template_view.views.render', 
+        {'template': 'faq.html'}, name="faq_edx"),
+    url(r'^help$', 'static_template_view.views.render', 
+        {'template': 'help.html'}, name="help_edx"),
+    url(r'^pressrelease$', 'static_template_view.views.render', 
+        {'template': 'pressrelease.html'}, name="pressrelease"),
+    url(r'^tos$', 'static_template_view.views.render', 
+        {'template': 'tos.html'}, name="tos"),
+    url(r'^privacy$', 'static_template_view.views.render', 
+        {'template': 'privacy.html'}, name="privacy_edx"),
+    url(r'^copyright$', 'static_template_view.views.render', 
+        {'template': 'copyright.html'}, name="copyright"),
+    url(r'^honor$', 'static_template_view.views.render', 
+        {'template': 'honor.html'}, name="honor"),
+    
+    
+    
+    #Temporarily static, for testing
+    url(r'^university_profile$', 'static_template_view.views.render', 
+        {'template': 'university_profile.html'}, name="university_profile"),
+    
     
     #TODO: Convert these pages to the new edX layout
     # 'tos.html', 
@@ -69,6 +95,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
         url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
+        url(r'^xqueue/(?P<username>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting'),
         url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
         url(r'^book/(?P<page>[^/]*)$', 'staticbook.views.index'),

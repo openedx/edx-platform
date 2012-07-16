@@ -1,3 +1,4 @@
+<%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='static_content.html'/>
 <!DOCTYPE html>
 <html>
@@ -84,13 +85,13 @@ function postJSON(url, data, callback) {
 
   <footer>
   <div class="footer-wrapper">
-    <p> Copyright &copy; 2012. MIT. <a href="/t/copyright.html">Some rights reserved.</a></p>
+    <p> Copyright &copy; 2012. MIT. <a href="${reverse('copyright')}">Some rights reserved.</a></p>
 
     <ul>
-      <li><a href="/t/tos.html">Terms of Service</a></li>
-      <li><a href="/t/privacy.html">Privacy Policy</a></li>
-      <li><a href="/t/honor.html">Honor Code</a></li>
-      <li><a href="/t/mitx_help.html">Help</a></li>
+      <li><a href="${reverse('tos')}">Terms of Service</a></li>
+      <li><a href="${reverse('privacy')}">Privacy Policy</a></li>
+      <li><a href="${reverse('honor')}">Honor Code</a></li>
+      <li><a href="${reverse('help_edx')}">Help</a></li>
     </ul>
 
     <ul aria-label="Social Links" class="social">

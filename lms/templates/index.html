@@ -4,15 +4,41 @@
 
 <section class="home">
   <header>
-    <div class="inner-wrapper">
-      <h1>The Future of Online Education</h1>
-      <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
+    <div class="outer-wrapper">
+      <div class="inner-wrapper">
+        <div class="title">
+          <h1>The Future of Online Education</h1>
+          <div class="main-cta">
+            <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
+          </div>
+
+          <div class="social-sharing">
+            <div class="sharing-message">Share with friends and family!</div>
+            <a href="#" class="share">
+              <img src="${static.url('images/twitter-sharing.png')}">
+            </a>
+            <a href="#" class="share">
+              <img src="${static.url('images/facebook-sharing.png')}">
+            </a>
+            <a href="#" class="share">
+              <img src="${static.url('images/email-sharing.png')}">
+            </a>
+          </div>
+        </div>
+
+        <a href="#video-modal" class="media" rel="leanModal">
+          <div class="hero">
+            <img src="${static.url('images/courses/space1.jpg')}" />
+            <div class="play-intro"></div>
+          </div>
+        </a>
+      </div>
     </div>
   </header>
 
   <section class="container">
     <section class="highlighted-courses">
-    <h2>Explore courses from <span class="lowercase">edX</span> universities</h2>
+      <h2>Explore courses from <span class="lowercase">edX</span> universities</h2>
 
       <section class="university-partners">
         <ol class="partners">
@@ -49,15 +75,54 @@
         %endfor
       </section>
     </section>
+  </section>
 
+  <section class="container">
     <section class="more-info">
-      <h2>edX News & Announcements</h2>
+      <header>
+        <h2>edX News & Announcements</h2>
+        <a href="${reverse('press')}">Read More &rarr;</a>
+      </header>
       <section class="news">
-        <article></article>
-        <article></article>
-        <article></article>
-        <article></article>
+        <section class="blog-posts">
+          <article>
+            <a href="#" class="post-graphics">
+              <img src="${static.url('images/courses/space1.jpg')}" />
+            </a>
+            <div class="post-name">
+              <a href="">Online Classes Cut Costs, But Do They Dilute Brands?</a>
+              <p class="post-date">7/12/2012</p>
+            </div>
+          </article>
+
+          <article>
+            <a href="#" class="post-graphics">
+              <img src="${static.url('images/courses/space1.jpg')}" />
+            </a>
+            <div class="post-name">
+              <a href="">Online Classes Cut Costs, But Do They Dilute Brands?</a>
+              <p class="post-date">7/12/2012</p>
+            </div>
+          </article>
+
+          <article>
+            <a href="#" class="post-graphics">
+              <img src="${static.url('images/courses/space1.jpg')}" />
+            </a>
+            <div class="post-name">
+              <a href="">Online Classes Cut Costs, But Do They Dilute Brands?</a>
+              <p class="post-date">7/12/2012</p>
+            </div>
+          </article>
+        </section>
       </section>
     </section>
   </section>
+
+</section>
+
+<section id="video-modal" class="modal home-page-video-modal">
+  <div class="inner-wrapper">
+    <iframe width="640" height="360" src="http://www.youtube.com/embed/SA6ELdIRkRU" frameborder="0" allowfullscreen></iframe>
+  </div>
 </section>

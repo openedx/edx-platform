@@ -1,3 +1,37 @@
+// home-header-pop-up animation
+//************************************************************************//
+
+.animation-home-header-pop-up {
+  @include animation(home-header-pop-up 1.15s ease-in-out);
+  @include animation-fill-mode(both);
+  @include animation-delay(1s);
+}
+
+@mixin home-header-pop-up-keyframes {
+  0% {
+    opacity: 0;
+    top: 300px;
+    //@include transform(scale(0.9));
+  }
+  45% {
+    opacity: 1;
+  }
+  65% {
+    top: -40px;
+    //@include transform(scale(1));
+  }
+  85% {
+    top: 10px;
+  }
+  100% {
+    top: 0px;
+  }
+}
+
+@-webkit-keyframes home-header-pop-up { @include home-header-pop-up-keyframes; }
+   @-moz-keyframes home-header-pop-up { @include home-header-pop-up-keyframes; }
+        @keyframes home-header-pop-up { @include home-header-pop-up-keyframes; }
+
 // title appear animation
 //************************************************************************//
 
