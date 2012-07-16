@@ -20,11 +20,12 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.core.urlresolvers import reverse
 
+from django_future.csrf import ensure_csrf_cookie
+from student.models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
+from util.cache import cache_if_anonymous 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
-from django_future.csrf import ensure_csrf_cookie
 
-from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 
 log = logging.getLogger("mitx.student")
 
@@ -39,6 +40,7 @@ def csrf_token(context):
 
 
 @ensure_csrf_cookie
+@cache_if_anonymous
 def index(request):
     ''' Redirects to main page -- info page if user authenticated, or marketing if not
     '''
@@ -492,13 +494,14 @@ def accept_name_change(request):
 
 
 @ensure_csrf_cookie
+@cache_if_anonymous
 def course_info(request, course_id):
     # This is the advertising page for a student to look at the course before signing up
     csrf_token = csrf(request)['csrf_token']
     course_loc = CourseDescriptor.id_to_location(course_id)
     course = modulestore().get_item(course_loc)
     # TODO: Couse should be a model
-    return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course': course})
+    return render_to_response('portal/course_about.html', {'course': course})
 
 
 @login_required

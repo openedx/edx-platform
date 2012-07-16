@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 
-from util.cache import cache
+from util.cache import cache_if_anonymous 
 
 valid_templates = []
 
@@ -29,6 +29,7 @@ def index(request, template):
         return redirect('/')
 
 @ensure_csrf_cookie
+@cache_if_anonymous
 def render(request, template):
     """
     This view function renders the template sent without checking that it
@@ -36,17 +37,8 @@ def render(request, template):
     not be able to ender any arbitray template name. The correct usage would be:
     
     url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs")
-    """
-    cache_key = "static_template_view_render." + template
-    use_cache = not request.user.is_authenticated()
-    
-    response = cache.get(cache_key) if use_cache else None
-    if not response:
-        response = render_to_response('static_templates/' + template, {})
-        if use_cache:
-            cache.set(cache_key, response, 60 * 3)
-    
-    return response
+    """    
+    return render_to_response('static_templates/' + template, {})
     
 
 valid_auth_templates=['help.html']
