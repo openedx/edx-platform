@@ -68,12 +68,13 @@ def course_index(request, org, course, name):
 
 @login_required
 def edit_item(request):
-    # TODO (vshnayder): Why are we using "id" instead of "location"?
-    item_id = request.GET['id']
-    if not has_access(request.user, item_id):
+    # TODO (vshnayder): change name from id to location in coffee+html as well.
+    item_location = request.GET['id']
+    print item_location, request.GET
+    if not has_access(request.user, item_location):
         raise Http404  # TODO (vshnayder): better error
         
-    item = modulestore().get_item(item_id)
+    item = modulestore().get_item(item_location)
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'js_module': item.js_module_name(),
@@ -100,17 +101,18 @@ def user_author_string(user):
 @login_required
 @expect_json
 def save_item(request):
-    item_id = request.POST['id']
-    if not has_access(request.user, item_id):
+    item_location = request.POST['id']
+    if not has_access(request.user, item_location):
         raise Http404  # TODO (vshnayder): better error
 
     data = json.loads(request.POST['data'])
-    modulestore().update_item(item_id, data)
+    modulestore().update_item(item_location, data)
 
     # Export the course back to github
     # This uses wildcarding to find the course, which requires handling
     # multiple courses returned, but there should only ever be one
-    course_location = Location(item_id)._replace(category='course', name=None)
+    course_location = Location(item_location)._replace(
+        category='course', name=None)
     courses = modulestore().get_items(course_location, depth=None)
     for course in courses:
         author_string = user_author_string(request.user)

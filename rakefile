@@ -88,7 +88,7 @@ end
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-  task "test_#{system}" => ["#{system}:collectstatic:test", "fasttest_#{system}"]
+    task "test_#{system}" => ["#{system}:collectstatic:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
