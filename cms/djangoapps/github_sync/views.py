@@ -49,4 +49,4 @@ def github_post_receive(request):
     revision, course = import_from_github(repo)
     export_to_github(course, repo['path'], "Changes from cms import of revision %s" % revision)
 
-    return HttpResponse('Push recieved')
+    return HttpResponse('Push received')
