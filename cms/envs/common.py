@@ -70,6 +70,10 @@ TEMPLATE_DIRS = (
 
 MITX_ROOT_URL = ''
 
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/login'
+LOGIN_URL = MITX_ROOT_URL + '/login'
+
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
