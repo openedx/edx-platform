@@ -6,6 +6,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from mitxmako.shortcuts import render_to_string
 from bson.son import SON
 from itertools import repeat
+from fs.osfs import OSFS
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
@@ -61,7 +62,9 @@ class MongoModuleStore(ModuleStore):
     """
     A Mongodb backed ModuleStore
     """
-    def __init__(self, host, db, collection, port=27017, default_class=None):
+
+    # TODO (cpennington): Enable non-filesystem filestores
+    def __init__(self, host, db, collection, fs_root, port=27017, default_class=None):
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port
@@ -77,6 +80,7 @@ class MongoModuleStore(ModuleStore):
         module_path, _, class_name = default_class.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
         self.default_class = class_
+        self.fs_root = fs_root
 
     def _clean_item_data(self, item):
         """
@@ -113,13 +117,27 @@ class MongoModuleStore(ModuleStore):
 
         return data
 
+    def _load_item(self, item, data_cache):
+        """
+        Load an XModuleDescriptor from item, using the children stored in data_cache
+        """
+        resource_fs = OSFS(self.fs_root / item.get('data_dir', item['location']['course']))
+        system = CachingDescriptorSystem(
+            self,
+            data_cache,
+            self.default_class,
+            resource_fs,
+            render_to_string
+        )
+        return system.load_item(item['location'])
+
     def _load_items(self, items, depth=0):
         """
         Load a list of xmodules from the data in items, with children cached up to specified depth
         """
         data_cache = self._cache_children(items, depth)
-        system = CachingDescriptorSystem(self, data_cache, self.default_class, None, render_to_string)
-        return [system.load_item(item['location']) for item in items]
+
+        return [self._load_item(item, data_cache) for item in items]
 
     def get_item(self, location, depth=0):
         """
