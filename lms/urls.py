@@ -48,11 +48,11 @@ urlpatterns = ('',
     
     
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
-    url(r'^404$', 'static_template_view.views.render', {'template': '404'}, name="404"),
-    url(r'^about$', 'static_template_view.views.render', {'template': 'about'}, name="about_edx"),
-    url(r'^university_profile$', 'static_template_view.views.render', {'template': 'university_profile'}, name="university_profile"),
-    url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs'}, name="jobs"),
-    url(r'^help$', 'static_template_view.views.render', {'template': 'help'}, name="help_edx"),
+    url(r'^404$', 'static_template_view.views.render', {'template': '404.html'}, name="404"),
+    url(r'^about$', 'static_template_view.views.render', {'template': 'about.html'}, name="about_edx"),
+    url(r'^university_profile$', 'static_template_view.views.render', {'template': 'university_profile.html'}, name="university_profile"),
+    url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs"),
+    url(r'^help$', 'static_template_view.views.render', {'template': 'help.html'}, name="help_edx"),
     
     #TODO: Convert these pages to the new edX layout
     # 'tos.html', 

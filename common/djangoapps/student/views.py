@@ -45,10 +45,8 @@ def index(request):
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect(reverse('dashboard'))
     else:
-        csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done.
-        return render_to_response('index.html', {'courses': modulestore().get_courses(),
-                                                 'csrf': csrf_token})
+        return render_to_response('index.html', {'courses': modulestore().get_courses()})
 
 
 @login_required
