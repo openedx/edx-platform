@@ -10,7 +10,6 @@
       @include box-sizing(border-box);
       @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9));
       float: left;
-      font-size: 0em;
       margin-right: flex-gutter();
       margin-bottom: 30px;
       position: relative;
@@ -34,12 +33,8 @@
 
         p {
           color: rgb(255,255,255);
-          font: 300 1.2rem/1.4rem $sans-serif;
-          padding: 5px 12px;
-
-          &.university {
-            float: left;
-          }
+          line-height: 1.2em;
+          padding: 4px 12px 5px;
         }
       }
 
@@ -74,8 +69,8 @@
 
             h2 {
               color: $base-font-color;
-              font: 800 1.2rem/1.6rem $sans-serif;
-              padding-top: 10px;
+              margin-bottom: 0px;
+              padding-top: 9px;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-overflow: ellipsis;
               white-space: nowrap;
@@ -87,7 +82,7 @@
             @include box-sizing(border-box);
             color: $base-font-color;
             display: block;
-            font: bold 2rem/2.2rem $sans-serif;
+            font: bold 1.6em/1.2em $sans-serif;
             height: 100%;
             opacity: 0.6;
             padding-top: 10px;
@@ -102,7 +97,7 @@
           &:hover {
             @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
 
-            h2, p, .info-link {
+            h2, .info-link {
               color: $blue;
               opacity: 1;
             }
@@ -139,7 +134,7 @@
           @include box-sizing(border-box);
           height: 100px;
           overflow: hidden;
-          padding: 10px 10px 15px 10px;
+          padding: 10px 10px 12px 10px;
           position: relative;
           width: 100%;
 
@@ -152,32 +147,25 @@
 
         .bottom {
           @include box-sizing(border-box);
-          @include clearfix;
-          padding: 6px 10px;
+          padding: 0px 10px 10px 10px;
           width: 100%;
 
-          > p, a {
+
+          .university {
+            border-right: 1px solid rgb(200,200,200);
             color: $lighter-base-font-color;
-            font: 300 1.2rem/1.4rem $sans-serif;
             letter-spacing: 1px;
-            padding: 0;
+            margin-right: 10px;
+            padding-right: 10px;
 
-            &.university {
-              border-right: 1px solid $lighter-base-font-color;
-              display: block;
-              float: left;
-              margin-right: 10px;
-              padding-right: 10px;
-
-              &:hover {
-                color: $blue;
-              }
+            &:hover {
+              color: $blue;
             }
+          }
 
-            &.dates {
-              float: left;
-              margin-top: 0px;
-            }
+          .start-date  {
+            color: $lighter-base-font-color;
+            letter-spacing: 1px;
           }
         }
       }

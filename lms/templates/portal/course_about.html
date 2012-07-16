@@ -11,22 +11,20 @@
     <div class="intro-inner-wrapper">
       <section class="intro">
         <hgroup>
-          <h1>${course.get_about_section("title")} <h2><a href="#">${course.get_about_section("university")}</a></h2></h1>
+        <h1>${course.get_about_section("title")}</h1><h2><a href="#">${course.get_about_section("university")}</a></h2>
         </hgroup>
-        <div class="course-dates">
-          <p>Class Starts: <span class="start-date">7/12/12</span></p>
-          <p>Final Exam: <span class="start-date">12/09/12</span></p>
-          <p>Total Length: <span class="course-length">15 weeks</span></p>
-        </div>
-      </section>
-      <section class="actions">
-        <div class="register-wrapper">
+
+        <div class="main-cta">
           <a href="${reverse('enroll', args=[course.id])}" class="register">Register</a>
         </div>
-        <section class="social-sharing">
-          <p><span class="num-people-registered">1,435</span> students already registed!</p>
-        </section>
+
       </section>
+      <a href="#video-modal" class="media" rel="leanModal">
+        <div class="hero">
+          <img src="${static.url('images/courses/circuits.jpeg')}" />
+          <div class="play-intro"></div>
+        </div>
+      </a>
     </div>
   </header>
 
@@ -45,20 +43,6 @@
         <section class="about">
           <h2>About this course</h2>
           <p>${course.get_about_section("description")}</p>
-
-          <h2>Requirements</h2>
-          <p>${course.get_about_section("requirements")}</p>
-
-          <h2>Syllabus</h2>
-          <p>${course.get_about_section("syllabus")}</p>
-
-          <h2>Textbook</h2>
-          ${course.get_about_section("textbook")}
-
-          <h2>Frequently Asked Questions</h2>
-          <p>${course.get_about_section("faq")}</p>
-
-          <p>${course.get_about_section("more_info")}</p>
         </section>
 
         <section class="course-staff">
@@ -87,26 +71,60 @@
             <p>Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Dr. Mitros has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p>
           </article>
         </section>
-      </section>
-    </div>
+
+        <section class="requirements">
+          <h2>Requirements</h2>
+          <p>${course.get_about_section("requirements")}</p>
+        </section>
+
+        <section class="syllabus">
+          <h2>Syllabus</h2>
+          <p>${course.get_about_section("syllabus")}</p>
+        </section>
+
+        <section class="text-book">
+          <h2>Textbook</h2>
+          ${course.get_about_section("textbook")}
+        </section>
+
+        <section class="course-faq">
+          <h2>Frequently Asked Questions</h2>
+          <p>${course.get_about_section("faq")}</p>
+        </section>
+
+      </div>
+    </section>
 
     <section class="course-sidebar">
-      <div class="media">
-        <div class="hero">
-          <img src="${static.url('images/courses/circuits.jpeg')}" />
-          <div class="play-intro"></div>
-        </div>
-        <%include file="../video_modal.html" />
-      </div>
-
       <section class="course-summary">
-        <h3>Course Sumamry</h3>
-        <p>${course.get_about_section("short_description")}</p>
-      </section>
+        <header>
+          <!--
+             -<a href="#" class="university-name">${course.get_about_section("university")}</a><span>${course.get_about_section("title")}</span>
+             -->
+          <div class="social-sharing">
+            <div class="sharing-message">Share with friends and family!</div>
+            <a href="#" class="share">
+              <img src="${static.url('images/twitter-sharing.png')}">
+            </a>
+            <a href="#" class="share">
+              <img src="${static.url('images/facebook-sharing.png')}">
+            </a>
+            <a href="#" class="share">
+              <img src="${static.url('images/email-sharing.png')}">
+            </a>
+          </div>
+        </header>
 
-      <section class="dates">
-        <p>Course Number <span class="start-date">(${course.get_about_section("number")})</span></p>
+        <ol class="important-dates">
+          <li><img src=""><p>Classes Start</p><span class="start-date">7/12/12</span></li>
+          <li><img src=""><p>Final Exam</p><span class="final-date">12/09/12</span></li>
+          <li><img src=""><p>Course Length</p><span class="course-length">15 weeks</span></li>
+          <li><img src=""><p>Course Number</p><span class="course-number">${course.get_about_section("number")}</span></li>
+        </ol>
       </section>
     </section>
+
   </section>
 </section>
+
+<%include file="../video_modal.html" />

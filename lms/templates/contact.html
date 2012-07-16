@@ -1,0 +1,34 @@
+<%namespace name='static' file='static_content.html'/>
+
+<%inherit file="main.html" />
+
+<section class="container about">
+  <nav>
+    <a href="/t/about.html">Vision</a>
+    <a href="/t/faq.html">Faq</a>
+    <a href="/t/press.html">Press</a>
+    <a href="/t/contact.html" class="active">Contact</a>
+  </nav>
+
+  <section class="contact">
+    <div class="map">
+      <img src="${static.url('images/edx-location.png')}">
+    </div>
+    <div class="contacts">
+      <h2>Email Contacts</h2>
+      <ul>
+        <li><p>System-related questions: <a href="mailto:technical@mitx.mit.edu">technical@mitx.mit.edu</a></p></li>
+        <li><p>Content-related questions: <a href="mailto:content@mitx.mit.edu">content@mitx.mit.edu</a></p></li>
+        <li><p>Bug reports: <a href="mailto:bugs@mitx.mit.edu">bugs@mitx.mit.edu</a></p></li>
+        <li><p>Suggestions: <a href="mailto:suggestions@mitx.mit.edu">suggestions@mitx.mit.edu</a></p></li>
+      </ul>
+
+      <h2>Physical Address</h2>
+      <ul>
+        <li><p>11 Cambridge Center</p></li>
+        <li><p>Cambridge, MA 02142</p></li>
+      </ul>
+    </div>
+  </section>
+</section>
+

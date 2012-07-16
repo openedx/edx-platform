@@ -35,13 +35,16 @@ urlpatterns = ('',
     url(r'^password_reset/$', 'student.views.password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
-    url(r'^password_change/$',django.contrib.auth.views.password_change,name='auth_password_change'),
-    url(r'^password_change_done/$',django.contrib.auth.views.password_change_done,name='auth_password_change_done'),
-    url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',django.contrib.auth.views.password_reset_confirm,
+    url(r'^password_change/$', django.contrib.auth.views.password_change,
+        name='auth_password_change'),
+    url(r'^password_change_done/$', django.contrib.auth.views.password_change_done,
+        name='auth_password_change_done'),
+    url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        django.contrib.auth.views.password_reset_confirm,
         name='auth_password_reset_confirm'),
-    url(r'^password_reset_complete/$',django.contrib.auth.views.password_reset_complete,
+    url(r'^password_reset_complete/$', django.contrib.auth.views.password_reset_complete,
         name='auth_password_reset_complete'),
-    url(r'^password_reset_done/$',django.contrib.auth.views.password_reset_done,
+    url(r'^password_reset_done/$', django.contrib.auth.views.password_reset_done,
         name='auth_password_reset_done'),
     ## Feedback
     url(r'^send_feedback$', 'util.views.send_feedback'),
@@ -55,6 +58,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
         url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
+        url(r'^xqueue/(?P<username>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting'),
         url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
         #    url(r'^course_info/$', 'student.views.courseinfo'),
@@ -65,22 +69,30 @@ if settings.COURSEWARE_ENABLED:
         url(r'^heartbeat$', include('heartbeat.urls')),
 
         # Multicourse related:
-        url(r'^courses/?$', 'courseware.views.courses', name="courses"),
-        
+        url(r'^courses/?$', 'courseware.views.courses', name="courses"),        
         #About the course
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 'student.views.course_info', name="about_course"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 'student.views.enroll', name="enroll"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 
+            'student.views.course_info', name="about_course"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 
+            'student.views.enroll', name="enroll"),
         
         #Inside the course
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 'courseware.views.course_info', name="info"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book$', 'staticbook.views.index', name="book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<page>[^/]*)$', 'staticbook.views.index'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book-shifted/(?P<page>[^/]*)$', 'staticbook.views.index_shifted'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$', 'courseware.views.index', name="courseware"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 'courseware.views.index', name="courseware_section"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$', 'courseware.views.profile', name="profile"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 'courseware.views.profile'),
-
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 
+            'courseware.views.course_info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book$', 
+            'staticbook.views.index', name="book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<page>[^/]*)$', 
+            'staticbook.views.index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book-shifted/(?P<page>[^/]*)$', 
+            'staticbook.views.index_shifted'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$', 
+            'courseware.views.index', name="courseware"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 
+            'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$', 
+            'courseware.views.profile', name="profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 
+            'courseware.views.profile'),
     )
     
     # Multicourse wiki
