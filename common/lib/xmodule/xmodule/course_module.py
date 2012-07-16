@@ -1,4 +1,4 @@
-from datetime import datetime, date
+import time
 import dateutil.parser
 from fs.errors import ResourceNotFoundError
 import logging
@@ -19,16 +19,16 @@ class CourseDescriptor(SequenceDescriptor):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
         
         try:
-            self.start = dateutil.parser.parse(self.metadata["start"])
+            self.start = time.strptime(self.metadata["start"], "%Y-%m-%dT%H:%M")
         except KeyError:
-            self.start = date.fromtimestamp(0) #The epoch
+            self.start = time.gmtime(0) #The epoch
             log.critical("Course loaded without a start date. " + str(self.id))
         except ValueError, e:
-            self.start = date.fromtimestamp(0) #The epoch
+            self.start = time.gmtime(0) #The epoch
             log.critical("Course loaded with a bad start date. " + str(self.id) + " '" + str(e) + "'")
     
     def has_started(self):
-        return datetime.now() > self.start
+        return time.gmtime() > self.start
     
     @classmethod
     def id_to_location(cls, course_id):
@@ -86,7 +86,6 @@ class CourseDescriptor(SequenceDescriptor):
         elif section_key == "title":
             return self.metadata.get('display_name', self.name)
         elif section_key == "university":
-            return self.metadata.get('start')
             return self.location.org
         elif section_key == "number":
             return self.number
