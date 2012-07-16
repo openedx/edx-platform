@@ -106,13 +106,14 @@
       }
     }
 
-    //#enroll_error {
-      //background: rgb(253, 87, 87);
-      //border: 1px solid rgb(202, 17, 17);
-      //color: rgb(143, 14, 14);
-      //margin-bottom: 20px;
-      //padding: 12px;
-    //}
+    #enroll_error, #login_error {
+      background: rgb(253, 87, 87);
+      border: 1px solid rgb(202, 17, 17);
+      color: rgb(143, 14, 14);
+      display: none;
+      margin-bottom: 20px;
+      padding: 12px;
+    }
 
     //#enroll {
       //padding: 0 40px;
