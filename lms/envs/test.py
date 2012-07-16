@@ -84,6 +84,21 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
 STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
+
+new_staticfiles_dirs = []
+# Strip out any static files that aren't in the repository root
+# so that the tests can run with only the mitx directory checked out
+for static_dir in STATICFILES_DIRS:
+    # Handle both tuples and non-tuple directory definitions
+    try:
+        _, data_dir = static_dir
+    except ValueError:
+        data_dir = static_dir
+
+    if not data_dir.startswith(REPO_ROOT):
+        new_staticfiles_dirs.append(static_dir)
+STATICFILES_DIRS = new_staticfiles_dirs
+
 FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
