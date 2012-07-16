@@ -17,7 +17,7 @@ from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
 
-#from util.cache import cache #TODO: Where did this go? lib/util/cache no longer exists
+from util.cache import cache
 from student.models import UserTestGroup
 from courseware import grades
 from courseware.decorators import check_course
