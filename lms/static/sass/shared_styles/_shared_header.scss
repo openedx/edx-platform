@@ -19,7 +19,7 @@ header.global {
 
   h1.logo {
     float: left;
-    margin: 9px 15px 0px 0px;
+    margin: 6px 15px 0px 0px;
     padding-right: 20px;
     position: relative;
 
@@ -30,7 +30,7 @@ header.global {
       height: 50px;
       position: absolute;
       right: 1px;
-      top: -12px;
+      top: -8px;
       width: 1px;
     }
 
@@ -46,12 +46,12 @@ header.global {
     }
 
     a {
-      @include background-image(url('/static/images/logo.png'));
+      @include background-image(url('/static/images/header-logo.png'));
       background-position: 0 0;
       background-repeat: no-repeat;
       display: block;
-      height: 23px;
-      width: 47px;
+      height: 31px;
+      width: 64px;
     }
   }
 
