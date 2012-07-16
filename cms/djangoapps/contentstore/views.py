@@ -1,7 +1,7 @@
 from util.json_request import expect_json
 import json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django_future.csrf import ensure_csrf_cookie
