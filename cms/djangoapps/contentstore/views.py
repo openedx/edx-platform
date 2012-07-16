@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
-from fs.osfs import OSFS
 
 from xmodule.modulestore import Location
 from xmodule.x_module import ModuleSystem
@@ -16,6 +15,7 @@ from static_replace import replace_urls
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 
+
 # ==== Public views ==================================================
 
 @ensure_csrf_cookie
@@ -24,7 +24,8 @@ def signup(request):
     Display the signup form.
     """
     csrf_token = csrf(request)['csrf_token']
-    return render_to_response('signup.html', {'csrf': csrf_token }) 
+    return render_to_response('signup.html', {'csrf': csrf_token})
+
 
 @ensure_csrf_cookie
 def login_page(request):
@@ -32,8 +33,9 @@ def login_page(request):
     Display the login form.
     """
     csrf_token = csrf(request)['csrf_token']
-    return render_to_response('login.html', {'csrf': csrf_token }) 
-    
+    return render_to_response('login.html', {'csrf': csrf_token})
+
+
 # ==== Views for any logged-in user ==================================
 
 @login_required
@@ -52,12 +54,14 @@ def index(request):
                     for course in courses]
     })
 
+
 # ==== Views with per-item permissions================================
 
 def has_access(user, location):
     '''Return True if user allowed to access this piece of data'''
     # TODO (vshnayder): actually check perms
     return user.is_active and user.is_authenticated
+
 
 @login_required
 @ensure_csrf_cookie
@@ -70,11 +74,12 @@ def course_index(request, org, course, name):
     location = ['i4x', org, course, 'course', name]
     if not has_access(request.user, location):
         raise Http404  # TODO (vshnayder): better error
-    
+
     # TODO (cpennington): These need to be read in from the active user
     course = modulestore().get_item(location)
     weeks = course.get_children()
     return render_to_response('course_index.html', {'weeks': weeks})
+
 
 @login_required
 def edit_item(request):
@@ -90,7 +95,7 @@ def edit_item(request):
     print item_location, request.GET
     if not has_access(request.user, item_location):
         raise Http404  # TODO (vshnayder): better error
-        
+
     item = modulestore().get_item(item_location)
     return render_to_response('unit.html', {
         'contents': item.get_html(),
@@ -115,6 +120,7 @@ def user_author_string(user):
     return '{first} {last} <{email}>'.format(first=f,
                                              last=l,
                                              email=user.email)
+
 
 @login_required
 def preview_dispatch(request, module_id, dispatch):
