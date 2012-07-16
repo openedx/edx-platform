@@ -62,7 +62,7 @@ class CourseDescriptor(SequenceDescriptor):
                             'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number', 'instructors']:
             try:
                 with self.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
-                    return htmlFile.read()
+                    return htmlFile.read().decode('utf-8')
             except ResourceNotFoundError:
                 log.exception("Missing about section {key} in course {url}".format(key=section_key, url=self.location.url()))
                 return "! About section missing !"
@@ -91,7 +91,7 @@ class CourseDescriptor(SequenceDescriptor):
         if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
             try:
                 with self.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
-                    return htmlFile.read()
+                    return htmlFile.read().decode('utf-8')
             except ResourceNotFoundError:
                 log.exception("Missing info section {key} in course {url}".format(key=section_key, url=self.location.url()))
                 return "! Info section missing !"
