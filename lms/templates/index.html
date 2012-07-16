@@ -1,4 +1,5 @@
 <%! from django.core.urlresolvers import reverse %>
+<%! from time import strftime %>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 
@@ -91,35 +92,19 @@
       </header>
       <section class="news">
         <section class="blog-posts">
-          <article>
-            <a href="#" class="post-graphics">
-              <img src="${static.url('images/mongolia_post.jpeg')}" />
-            </a>
-            <div class="post-name">
-              <a href="">Opening Doors For Exceptional Students: 6.002x in Mongolia.</a>
-              <p class="post-date">7/12/2012</p>
-            </div>
-          </article>
-
-          <article>
-            <a href="#" class="post-graphics">
-              <img src="${static.url('images/courses/space1.jpg')}" />
-            </a>
-            <div class="post-name">
-              <a href="">Online Classes Cut Costs, But Do They Dilute Brands?</a>
-              <p class="post-date">7/12/2012</p>
-            </div>
-          </article>
-
-          <article>
-            <a href="#" class="post-graphics">
-              <img src="${static.url('images/courses/space1.jpg')}" />
-            </a>
-            <div class="post-name">
-              <a href="">Online Classes Cut Costs, But Do They Dilute Brands?</a>
-              <p class="post-date">7/12/2012</p>
-            </div>
-          </article>
+            %for entry in entries:
+            <article>
+                %if hasattr(entry, 'image'):
+                    <a href="${entry.link}" class="post-graphics">
+                        <img src="${entry.image}" />
+                    </a>
+                %endif
+                <div class="post-name">
+                    <a href="${entry.link}">${entry.title}</a>
+                    <p class="post-date">${strftime("%m/%d/%y", entry.published_parsed)}</p>
+                </div>
+            </article>
+            %endfor
         </section>
       </section>
     </section>

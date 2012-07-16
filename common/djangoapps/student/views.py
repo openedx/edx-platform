@@ -5,6 +5,7 @@ import random
 import string
 import sys
 import uuid
+import feedparser
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -19,6 +20,8 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.core.urlresolvers import reverse
+from BeautifulSoup import BeautifulSoup
+from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie
 from student.models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
@@ -44,11 +47,23 @@ def csrf_token(context):
 def index(request):
     ''' Redirects to main page -- info page if user authenticated, or marketing if not
     '''
+    entries = None
+    if settings.RSS_URL:
+        feed = cache.get("students_index_rss_feed")
+        if feed == None:
+            feed = feedparser.parse(settings.RSS_URL)
+            cache.set("students_index_rss_feed", feed, settings.RSS_TIMEOUT)
+        entries = feed['entries'][0:3]
+        for entry in entries:
+            soup = BeautifulSoup(entry.description)
+            if soup.img:
+                entry.image = soup.img['src']
+
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect(reverse('dashboard'))
     else:
         # TODO: Clean up how 'error' is done.
-        return render_to_response('index.html', {'courses': modulestore().get_courses()})
+        return render_to_response('index.html', {'courses': modulestore().get_courses(), 'entries': entries})
 
 
 @login_required
