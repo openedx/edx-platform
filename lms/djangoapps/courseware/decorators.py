@@ -30,9 +30,9 @@ def check_course(course_must_be_open=True, course_required=True):
                         course = modulestore().get_item(course_loc)
                     except KeyError:
                         raise Http404("Course not found.")
-        
+                    
                     if course_must_be_open and not course.has_started():
-                        raise Http404
+                        raise Http404("This course has not yet started.")
         
                 del kwargs['course_id']
                 kwargs['course'] = course
