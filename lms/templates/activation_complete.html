@@ -1,9 +1,14 @@
-<%inherit file="marketing.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="main.html" />
 
-<section class="tos">
-<div>
-  <h1>Activation Complete!</h1>
-  <!-- <p>Now go <a href="/">log in</a> and try the course!</a></p> -->
-  <p>Thanks for activating your account. You can log in at the <a href="/">6.002x course page</a>.</p>
-</div>
+<%namespace name='static' file='static_content.html'/>
+
+<section class="container activation">
+
+  <section class="message">
+    <h1 class="valid">Activation Complete!</h1>
+    <hr class="horizontal-divider">
+
+    <p>Thanks for activating your account. You can now <a href="#login-modal" rel="leanModal">login</a>.</p>
+  </section>
 </section>

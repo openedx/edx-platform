@@ -107,7 +107,7 @@
     }
 
     #enroll_error, #login_error {
-      background: rgb(253, 87, 87);
+      background: $error-red;
       border: 1px solid rgb(202, 17, 17);
       color: rgb(143, 14, 14);
       display: none;
