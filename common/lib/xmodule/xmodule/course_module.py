@@ -24,7 +24,11 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def title(self):
-        self.metadata['display_name']
+        return self.metadata['display_name']
+
+    @property
+    def course_number(self):
+        return self.location.course
 
     @property
     def instructors(self):
