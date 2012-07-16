@@ -29,39 +29,37 @@ DATABASES = {
     }
 }
 
-REPO_ROOT = ENV_ROOT / "content"
-
 REPOS = {
     'edx4edx': {
-        'path': REPO_ROOT / "edx4edx",
+        'path': DATA_DIR / "edx4edx",
         'org': 'edx',
         'course': 'edx4edx',
         'branch': 'for_cms',
         'origin': 'git@github.com:MITx/edx4edx.git',
     },
     '6002x-fall-2012': {
-        'path': REPO_ROOT / '6002x-fall-2012',
+        'path': DATA_DIR / '6002x-fall-2012',
         'org': 'mit.edu',
         'course': '6.002x',
         'branch': 'for_cms',
         'origin': 'git@github.com:MITx/6002x-fall-2012.git',
     },
     '6.00x': {
-        'path': REPO_ROOT / '6.00x',
+        'path': DATA_DIR / '6.00x',
         'org': 'mit.edu',
         'course': '6.00x',
         'branch': 'for_cms',
         'origin': 'git@github.com:MITx/6.00x.git',
     },
     '7.00x': {
-        'path': REPO_ROOT / '7.00x',
+        'path': DATA_DIR / '7.00x',
         'org': 'mit.edu',
         'course': '7.00x',
         'branch': 'for_cms',
         'origin': 'git@github.com:MITx/7.00x.git',
     },
     '3.091x': {
-        'path': REPO_ROOT / '3.091x',
+        'path': DATA_DIR / '3.091x',
         'org': 'mit.edu',
         'course': '3.091x',
         'branch': 'for_cms',
