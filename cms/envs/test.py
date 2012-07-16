@@ -9,6 +9,8 @@ sessions. Assumes structure:
 """
 from .common import *
 import os
+from path import path
+
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
@@ -17,7 +19,11 @@ for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
     NOSE_ARGS += ['--cover-package', app]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-TEST_ROOT = 'test_root'
+TEST_ROOT = path('test_root')
+
+# Want static files in the same dir for running on jenkins.
+STATIC_ROOT = TEST_ROOT / "staticfiles" 
+
 
 MODULESTORE = {
     'default': {
@@ -34,7 +40,7 @@ MODULESTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "mitx.db",
+        'NAME': ENV_ROOT / "db" / "cms.db",
     }
 }
 
