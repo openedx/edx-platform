@@ -3,28 +3,34 @@
 
 <footer>
   <nav>
-    <section class="copyright">
-      <a href="${reverse('root')}" class="logo"></a>
-      <p>&copy; 2012 edX, <a href="#">some rights reserved.</a></p>
-    </section>
-    <ol>
-      <li>
+    <section class="top">
+      <section class="primary">
+        <a href="${reverse('root')}" class="logo"></a>
         <a href="${reverse('courses')}">Find Courses</a>
-      </li>
-      <li>
         <a href="${reverse('about_edx')}">About</a>
-      </li>
-      <li>
         <a href="#">Blog</a>
-      </li>
-      <li>
         <a href="${reverse('jobs')}">Jobs</a>
-      </li>
-      <li class="social">
+      </section>
+
+      <section class="social">
         <a href="#"><img src="${static.url('images/linkedin.png')}" /></a>
         <a href="#"><img src="${static.url('images/facebook.png')}" /></a>
         <a href="#"><img src="${static.url('images/twitter.png')}" /></a>
-      </li>
-    </ol>
+      </section>
+    </section>
+
+    <section class="bottom">
+      <section class="copyright">
+        <p>&copy; 2012 edX, <a href="${reverse('copyright')}">some rights reserved.</a></p>
+      </section>
+
+      <section class="secondary">
+        <a href="${reverse('tos')}">Terms of Service</a>
+        <a href="${reverse('privacy_edx')}">Privacy Policy</a>
+        <a href="${reverse('honor')}">Honor Code</a>
+        <a href="${reverse('help_edx')}">Help</a>
+      </section>
+    </section>
+
   </nav>
 </footer>

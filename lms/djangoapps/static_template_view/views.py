@@ -12,7 +12,7 @@ from util.cache import cache_if_anonymous
 
 valid_templates = []
 
-if settings.STATIC_GRAB: 
+if settings.STATIC_GRAB:
     valid_templates = valid_templates+['server-down.html',
                                        'server-error.html'
                                        'server-overloaded.html', 
@@ -28,6 +28,7 @@ def index(request, template):
     else:
         return redirect('/')
 
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def render(request, template):
@@ -41,9 +42,9 @@ def render(request, template):
     return render_to_response('static_templates/' + template, {})
     
 
-valid_auth_templates=['help.html']
+valid_auth_templates=[]
 
-def auth_index(request, template): 
+def auth_index(request, template):
     if not request.user.is_authenticated():
         return redirect('/')
 
