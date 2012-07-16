@@ -96,70 +96,6 @@
             }
           }
         }
-
-        .social-sharing {
-          @include box-sizing(border-box);
-          float: left;
-          height: 44px;
-          position: relative;
-          text-align: center;
-          width: flex-grid(6);
-
-          &:hover {
-            .sharing-message {
-              opacity: 1;
-              top: 56px;
-            }
-          }
-
-          .sharing-message {
-            @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
-                                                              rgba(0,0,0, 0.7) 100%));
-            border: 1px solid rgba(0,0,0, 0.5);
-            @include border-radius(4px);
-            @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
-            @include box-sizing(border-box);
-            color: rgb(255,255,255);
-            float: right;
-            font-family: $serif;
-            font-size: 0.9em;
-            font-style: italic;
-            left: 50%;
-            margin-left: -110px;
-            opacity: 0;
-            padding: 6px 10px;
-            position: absolute;
-            text-align: center;
-            @include transition(all, 0.15s, ease-out);
-            top: 65px;
-            width: 220px;
-
-            &:hover {
-              opacity: 0;
-            }
-          }
-
-          .share {
-            height: 44px;
-            @include inline-block;
-            margin-right: 10px;
-            opacity: 0.5;
-            @include transition(all, 0.15s, linear);
-            width: 44px;
-
-            &:hover {
-              opacity: 1;
-            }
-
-            img {
-              width: 100%;
-            }
-
-            &:last-child {
-              margin-right: 0px;
-            }
-          }
-        }
       }
 
       .media {
@@ -307,12 +243,12 @@
     border: 1px solid rgb(200,200,200);
     border-top: none;
     float: left;
-    padding: 30px 20px;
+    padding: 20px 20px 30px;
     width: flex-grid(4);
 
     header {
       margin-bottom: 30px;
-      padding-bottom: 26px;
+      padding-bottom: 20px;
       position: relative;
       text-align: center;
 
@@ -324,6 +260,7 @@
         position: absolute;
         bottom: 0px;
         width: 100%;
+        z-index: 1;
       }
 
       a.university-name {
@@ -339,6 +276,73 @@
 
         &:hover {
           color: $lighter-base-font-color;
+        }
+      }
+
+      .social-sharing {
+        @include box-sizing(border-box);
+        float: left;
+        height: 44px;
+        position: relative;
+        text-align: center;
+        width: flex-grid(12);
+        z-index: 2;
+
+        float: none;
+
+        &:hover {
+          .sharing-message {
+            opacity: 1;
+            top: 56px;
+          }
+        }
+
+        .sharing-message {
+          @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
+                                                            rgba(0,0,0, 0.7) 100%));
+          border: 1px solid rgba(0,0,0, 0.5);
+          @include border-radius(4px);
+          @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+          @include box-sizing(border-box);
+          color: rgb(255,255,255);
+          float: right;
+          font-family: $serif;
+          font-size: 0.9em;
+          font-style: italic;
+          left: 50%;
+          margin-left: -110px;
+          opacity: 0;
+          padding: 6px 10px;
+          position: absolute;
+          text-align: center;
+          @include transition(all, 0.15s, ease-out);
+          top: 65px;
+          width: 220px;
+
+          &:hover {
+            opacity: 0;
+          }
+        }
+
+        .share {
+          height: 44px;
+          @include inline-block;
+          margin-right: 10px;
+          opacity: 0.5;
+          @include transition(all, 0.15s, linear);
+          width: 44px;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          img {
+            width: 100%;
+          }
+
+          &:last-child {
+            margin-right: 0px;
+          }
         }
       }
     }

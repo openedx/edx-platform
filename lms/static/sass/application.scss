@@ -1,32 +1,29 @@
 @import 'bourbon/bourbon';
-@import 'reset';
-@import 'font_face';
-@import 'base';
-@import 'base_mixins';
-@import 'base_extends';
-@import 'base_animations';
+@import 'base_styles/reset';
+@import 'base_styles/font_face';
+@import 'base_styles/base';
+@import 'base_styles/base_mixins';
+@import 'base_styles/base_extends';
+@import 'base_styles/base_animations';
 
 @import 'sass_old/base/variables';
-//@import 'sass_old/base/base';
 @import 'sass_old/base/extends';
-//@import 'sass_old/base/font-face';
 @import 'sass_old/base/functions';
-//@import 'sass_old/base/reset';
 
-@import 'shared_forms';
-@import 'shared_footer';
-@import 'shared_header';
-@import 'shared_list_of_courses';
-@import 'shared_course_filter';
-@import 'shared_modal';
+@import 'shared_styles/shared_forms';
+@import 'shared_styles/shared_footer';
+@import 'shared_styles/shared_header';
+@import 'shared_styles/shared_list_of_courses';
+@import 'shared_styles/shared_course_filter';
+@import 'shared_styles/shared_modal';
 
-@import 'index';
+@import 'home';
 @import 'dashboard';
-@import 'course';
-@import 'find_courses';
-@import 'course_info';
+@import 'course_object';
+@import 'courses';
+@import 'course_about';
 @import 'jobs';
-@import 'about';
+@import 'about_pages';
 @import 'press_release';
 
 @import 'sass_old/courseware/courseware';
