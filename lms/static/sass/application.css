@@ -2491,6 +2491,8 @@ header.global {
       display: none;
       margin-bottom: 20px;
       padding: 12px; }
+    .modal .inner-wrapper .activation-message {
+      padding: 0 40px 10px; }
     .modal .inner-wrapper form {
       margin-bottom: 12px;
       padding: 0px 40px;
