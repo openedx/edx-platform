@@ -6,7 +6,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
 
-def check_course(course_must_be_open=True, course_required=True):
+def check_course(function=None, course_must_be_open=True, course_required=True):
     """
     This is a decorator for views that are within a course.
     It converts the string passed to the view as 'course_id'
@@ -58,11 +58,7 @@ def check_course(course_must_be_open=True, course_required=True):
             return function(*args, **kwargs)
         return wrapped_function
         
-    # If no arguments were passed to the decorator, the function itself
-    # will be in course_must_be_open
-    if callable(course_must_be_open):
-        function = course_must_be_open
-        course_must_be_open = True
-        return inner_check_course(function)
-    else:
+    if function is None:
         return inner_check_course
+    else:
+        return inner_check_course(function)
