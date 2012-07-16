@@ -3,36 +3,35 @@
 
 <footer>
   <nav>
-    <section class="primary-links">
-      <section class="copyright">
+    <section class="top">
+      <section class="primary">
         <a href="${reverse('root')}" class="logo"></a>
+        <a href="${reverse('courses')}">Find Courses</a>
+        <a href="/t/about.html">About</a>
+        <a href="#">Blog</a>
+        <a href="/t/jobs.html">Jobs</a>
+        <a href="/t/contact.html">Contact</a>
+      </section>
+
+      <section class="social">
+        <a href="#"><img src="${static.url('images/linkedin.png')}" /></a>
+        <a href="#"><img src="${static.url('images/facebook.png')}" /></a>
+        <a href="#"><img src="${static.url('images/twitter.png')}" /></a>
+      </section>
+    </section>
+
+    <section class="bottom">
+      <section class="copyright">
         <p>&copy; 2012 edX, <a href="/t/copyright.html">some rights reserved.</a></p>
       </section>
-      <ol>
-        <li>
-          <a href="${reverse('courses')}">Find Courses</a>
-        </li>
-        <li>
-          <a href="/t/about.html">About</a>
-        </li>
-        <li>
-          <a href="#">Blog</a>
-        </li>
-        <li>
-          <a href="/t/jobs.html">Jobs</a>
-        </li>
-        <li class="social">
-          <a href="#"><img src="${static.url('images/linkedin.png')}" /></a>
-          <a href="#"><img src="${static.url('images/facebook.png')}" /></a>
-          <a href="#"><img src="${static.url('images/twitter.png')}" /></a>
-        </li>
-      </ol>
+
+      <section class="secondary">
+        <a href="/t/tos.html">Terms of Service</a>
+        <a href="/t/privacy.html">Privacy Policy</a>
+        <a href="/t/honor.html">Honor Code</a>
+        <a href="/t/help.html">Help</a>
+      </section>
     </section>
-    <section class="secondary-links">
-      <a href="/t/tos.html">Terms of Service</a>
-      <a href="/t/privacy.html">Privacy Policy</a>
-      <a href="/t/honor.html">Honor Code</a>
-      <a href="/t/help.html">Help</a>
-    </section>
+
   </nav>
 </footer>

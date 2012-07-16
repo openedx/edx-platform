@@ -20,6 +20,7 @@ html, body {
   font-family: $sans-serif;
   font-size: 1em;
   line-height: 1em;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -88,7 +89,6 @@ a:link, a:visited {
     text-decoration: underline;
   }
 }
-
 
 .content-wrapper {
   background: rgb(255,255,255);

@@ -1,6 +1,7 @@
+<%! from django.core.urlresolvers import reverse %>
 <header>
   <nav>
-    <h2><a href="/">6.002x circuits and electronics</a></h2>
+    <h2><a href="/">edX CMS: TODO:-course-name-here</a></h2>
     <ul>
       <li>
         <a href="#" class="new-module wip">New Module</a>
@@ -13,6 +14,12 @@
     <ul class="user-nav">
       <li><a href="#" class="wip">Tasks</a></li>
       <li><a href="#" class="wip">Settings</a></li>
+      % if user.is_authenticated():
+         <li><a href="${reverse('logout')}">Log out</a></li>
+      % else:
+         <li><a href="${reverse('login')}">Log in</a></li>
+      % endif
+
     </ul>
   </nav>
 </header>

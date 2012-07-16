@@ -1,12 +1,16 @@
-<%namespace name='static' file='static_content.html'/>
+<%inherit file="base.html" />
+<%block name="title">Sign up</%block>
 
-<section id="signup-modal" class="modal signup-modal">
-  <div class="inner-wrapper">
+<%block name="content">
+<section class="main-container">
+
+  <section class="main-content">
+    <header>
+      <h3>Sign Up for edX</h3>
+      <hr>
+    </header>
+
     <div id="enroll">
-      <header>
-        <h2>Sign Up for edX</h2>
-        <hr>
-      </header>
 
       <form id="enroll_form" method="post">
         <div id="enroll_error" name="enroll_error"></div>
@@ -27,52 +31,22 @@
           I agree to the
           <a href="#">Terms of Service</a>
         </label>
-        <label class="honor-code">
-          <input name="honor_code" type="checkbox" value="true">
-          I agree to the
-          <a href="/t/honor.html" target="blank">Honor Code</a>
-        </label>
-
-          <!--
-             -<div class="honor-code-summary">
-             -  <ul>
-             -    <li>
-             -      <p>Complete all mid-terms and final exams with only my own work.</p>
-             -    </li>
-             -    <li>
-             -      <p>Maintain only one account, and not share the username or password.</p>
-             -    </li>
-             -    <li>
-             -      <p>Not engage in any activity that would dishonestly improve my results, or improve or hurt those of others.</p>
-             -    </li>
-             -    <li>
-             -      <p>Not post answers to problems that are being used to assess student performance.</p>
-             -    </li>
-             -  </ul>
-             -  <hr>
-             -</div>
-             -->
+        
+        <!-- no honor code for CMS, but need it because we're using the lms student object -->
+          <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
 
         <div class="submit">
           <input name="submit" type="submit" value="Create My Account">
         </div>
-      </form>
-
-      <section class="login-extra">
+        </form>
+        
+        <section class="login-extra">
         <p>
-          <span>Already have an account? <a href="#login-modal" class="close-signup" rel="leanModal">Login.</a></span>
+        <span>Already have an account? <a href="#">Login.</a></span>
         </p>
-      </section>
+        </section>
 
     </div>
-
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <script type="text/javascript">
   (function() {
@@ -100,10 +74,15 @@
           if(json.success) {
             $('#enroll').html(json.value);
           } else {
-            $('#enroll_error').html(json.value).stop().css("display", "block");
+            $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
           }
         }
       );
     });
   })(this)
 </script>
+
+  </section>
+
+</section>
+</%block>

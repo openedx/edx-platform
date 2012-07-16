@@ -10,6 +10,7 @@ sessions. Assumes structure:
 from .common import *
 from .logsettings import get_logger_config
 import os
+from path import path
 
 INSTALLED_APPS = [
     app
@@ -28,6 +29,9 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Local Directories
 TEST_ROOT = path("test_root")
+# Want static files in the same dir for running on jenkins.
+STATIC_ROOT = TEST_ROOT / "staticfiles" 
+
 COURSES_ROOT = TEST_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 MAKO_TEMPLATES['course'] = [DATA_DIR]
@@ -77,9 +81,24 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ############################ FILE UPLOADS (ASKBOT) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-MEDIA_ROOT = PROJECT_ROOT / "uploads"
+MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
 STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
+
+new_staticfiles_dirs = []
+# Strip out any static files that aren't in the repository root
+# so that the tests can run with only the mitx directory checked out
+for static_dir in STATICFILES_DIRS:
+    # Handle both tuples and non-tuple directory definitions
+    try:
+        _, data_dir = static_dir
+    except ValueError:
+        data_dir = static_dir
+
+    if data_dir.startswith(REPO_ROOT):
+        new_staticfiles_dirs.append(static_dir)
+STATICFILES_DIRS = new_staticfiles_dirs
+
 FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',

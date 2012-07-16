@@ -1,6 +1,7 @@
 from django.test import TestCase
 from path import path
 import shutil
+import os
 from github_sync import import_from_github, export_to_github
 from git import Repo
 from django.conf import settings
@@ -13,10 +14,18 @@ from github_sync.exceptions import GithubSyncError
 @override_settings(DATA_DIR=path('test_root'))
 class GithubSyncTestCase(TestCase):
 
+    def cleanup(self):
+        shutil.rmtree(self.repo_dir, ignore_errors=True)
+        shutil.rmtree(self.remote_dir, ignore_errors=True)
+
     def setUp(self):
         self.working_dir = path(settings.TEST_ROOT)
         self.repo_dir = self.working_dir / 'local_repo'
         self.remote_dir = self.working_dir / 'remote_repo'
+
+        # make sure there's no stale data lying around
+        self.cleanup()
+
         shutil.copytree('common/test/data/toy', self.remote_dir)
 
         remote = Repo.init(self.remote_dir)
@@ -33,8 +42,7 @@ class GithubSyncTestCase(TestCase):
         })
 
     def tearDown(self):
-        shutil.rmtree(self.repo_dir)
-        shutil.rmtree(self.remote_dir)
+        self.cleanup()
 
     def test_initialize_repo(self):
         """
