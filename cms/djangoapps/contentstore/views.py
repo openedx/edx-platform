@@ -207,7 +207,7 @@ def save_item(request):
         author_string = user_author_string(request.user)
         export_to_github(course, "CMS Edit", author_string)
 
-    descriptor = modulestore().get_item(item_id)
+    descriptor = modulestore().get_item(item_location)
     preview_html = get_module_previews(descriptor)
 
     return HttpResponse(json.dumps(preview_html))
