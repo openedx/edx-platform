@@ -93,7 +93,9 @@ class MongoModuleStore(ModuleStore):
         """
         Returns a dictionary mapping Location -> item data, populated with json data
         for all descendents of items up to the specified depth.
-        This will make a number of queries that is linear in the depth
+        (0 = no descendents, 1 = children, 2 = grandchildren, etc)
+        If depth is None, will load all the children.
+        This will make a number of queries that is linear in the depth.
         """
         data = {}
         to_process = list(items)
@@ -108,7 +110,8 @@ class MongoModuleStore(ModuleStore):
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
             if children:
-                to_process = list(self.collection.find({'_id': {'$in': [Location(child).dict() for child in children]}}))
+                to_process = list(self.collection.find(
+                    {'_id': {'$in': [Location(child).dict() for child in children]}}))
             else:
                 to_process = []
             # If depth is None, then we just recurse until we hit all the descendents
@@ -142,17 +145,19 @@ class MongoModuleStore(ModuleStore):
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the most item with the most
-        recent revision
+        If location.revision is None, returns the item with the most
+        recent revision.
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
+        If no object is found at that location, raises
+            xmodule.modulestore.exceptions.ItemNotFoundError
 
         location: a Location object
-        depth (int): An argument that some module stores may use to prefetch descendents of the queried modules
-            for more efficient results later in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all descendents
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents.
 
         """
 
