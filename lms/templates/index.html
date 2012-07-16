@@ -7,31 +7,37 @@
     <div class="outer-wrapper">
       <div class="inner-wrapper">
         <div class="title">
-          <h1>The Future of Online Education</h1>
+          <h1>Online education for anyone, anywhere, at anytime</h1>
+
           <div class="main-cta">
-            <a href="${reverse('courses')}" class="find-courses">Find Courses</a>
+            <a href="#signup-modal" class="find-courses" rel="leanModal">Sign Up</a>
           </div>
 
-          <div class="social-sharing">
-            <div class="sharing-message">Share with friends and family!</div>
-            <a href="#" class="share">
-              <img src="${static.url('images/twitter-sharing.png')}">
-            </a>
-            <a href="#" class="share">
-              <img src="${static.url('images/facebook-sharing.png')}">
-            </a>
-            <a href="#" class="share">
-              <img src="${static.url('images/email-sharing.png')}">
+          <div class="secondary-actions">
+            <div class="social-sharing">
+              <div class="sharing-message">Share with friends and family!</div>
+              <a href="#" class="share">
+                <img src="${static.url('images/twitter-sharing.png')}">
+              </a>
+              <a href="#" class="share">
+                <img src="${static.url('images/facebook-sharing.png')}">
+              </a>
+              <a href="#" class="share">
+                <img src="${static.url('images/email-sharing.png')}">
+              </a>
+            </div>
+
+            <a href="#video-modal" class="intro-video" rel="leanModal">
+              <!--
+                 -<img src="${static.url('images/courses/space1.jpg')}" />
+                 -->
+              <div class="video">
+                <div class="play"></div>
+              </div>
+              <p>Play intro video</p>
             </a>
           </div>
         </div>
-
-        <a href="#video-modal" class="media" rel="leanModal">
-          <div class="hero">
-            <img src="${static.url('images/courses/space1.jpg')}" />
-            <div class="play-intro"></div>
-          </div>
-        </a>
       </div>
     </div>
   </header>
@@ -87,10 +93,10 @@
         <section class="blog-posts">
           <article>
             <a href="#" class="post-graphics">
-              <img src="${static.url('images/courses/space1.jpg')}" />
+              <img src="${static.url('images/mongolia_post.jpeg')}" />
             </a>
             <div class="post-name">
-              <a href="">Online Classes Cut Costs, But Do They Dilute Brands?</a>
+              <a href="">Opening Doors For Exceptional Students: 6.002x in Mongolia.</a>
               <p class="post-date">7/12/2012</p>
             </div>
           </article>
