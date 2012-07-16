@@ -15,6 +15,7 @@ django_debug_toolbar
 django-staticfiles>=1.2.1
 fs
 beautifulsoup
+feedparser
 requests
 sympy
 newrelic
