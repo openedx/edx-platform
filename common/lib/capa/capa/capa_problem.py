@@ -79,7 +79,7 @@ class LoncapaProblem(object):
          - id           (string): identifier for this problem; often a filename (no spaces)
          - state        (dict): student state
          - seed         (int): random number generator seed (int)
-         - system       (I4xSystme): I4xSystem instance which provides OS, rendering, and user context 
+         - system       (I4xSystem): I4xSystem instance which provides OS, rendering, and user context 
 
         '''
 
@@ -188,7 +188,7 @@ class LoncapaProblem(object):
 
         Thus, for example, input_ID123 -> ID123, and input_fromjs_ID123 -> fromjs_ID123
 
-        Calles the Response for each question in this problem, to do the actual grading.
+        Calls the Response for each question in this problem, to do the actual grading.
         '''
         self.student_answers = answers
         oldcmap = self.correct_map				# old CorrectMap
@@ -268,6 +268,34 @@ class LoncapaProblem(object):
                 parent.remove(inc)
                 log.debug('Included %s into %s' % (file, self.problem_id))
 
+    def _extract_system_path(self, script):
+        '''
+        Extracts and normalizes additional paths for code execution.
+        For now, there's a default path of data/course/code; this may be removed
+        at some point.
+        '''
+
+        DEFAULT_PATH = ['code']
+
+        # Separate paths by :, like the system path.
+        raw_path = script.get('system_path', '').split(":") + DEFAULT_PATH
+
+        # find additional comma-separated modules search path
+        path = []
+
+        for dir in raw_path:
+
+            if not dir:
+                continue
+
+            # path is an absolute path or a path relative to the data dir
+            dir = os.path.join(self.system.filestore.root_path, dir)
+            abs_dir = os.path.normpath(dir)
+            log.debug("appending to path: %s" % abs_dir)
+            path.append(abs_dir)
+        
+        return path
+    
     def _extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
         '''
         Extract content of <script>...</script> from the problem.xml file, and exec it in the
@@ -282,20 +310,20 @@ class LoncapaProblem(object):
         context['__builtins__'] = globals()['__builtins__']    	# put globals there also
         context['the_lcp'] = self                		# pass instance of LoncapaProblem in
         context['script_code'] = ''
-        old_path = sys.path
 
-        for script in tree.findall('.//script'):
-            # find additional comma-seperated modules search path
-            path_csv = script.get('path', '')
-            search_path = path_csv.split(",")  # a search path directory should not contain space or comma
-            path = []
-            for directory in search_path:
-                if directory:
-                    # a search path must be an absolute path or a path relative to settings.DATA_DIR
-                    abs_dir = os.path.normpath(os.path.join(
-                        os.path.dirname(self.system.filestore.root_path), directory))
-                    log.info("appending search path: %s" % abs_dir)
-                    path.append(abs_dir)
+        self._execute_scripts(tree.findall('.//script'), context)
+
+        return context
+
+    def _execute_scripts(self, scripts, context):
+        ''' 
+        Executes scripts in the given context.
+        '''
+        original_path = sys.path
+
+        for script in scripts:
+
+            sys.path = original_path + self._extract_system_path(script)
 
             stype = script.get('type')
             if stype:
@@ -304,7 +332,6 @@ class LoncapaProblem(object):
                 if 'perl' in stype:
                     continue        # skip perl
             # TODO: evaluate only python
-            sys.path = sys.path + path
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code, XMLESC)
@@ -315,8 +342,7 @@ class LoncapaProblem(object):
                 log.exception("Error while execing script code: " + code)
                 raise responsetypes.LoncapaProblemError("Error while executing script code")
             finally:
-                sys.path = old_path
-        return context
+                sys.path = original_path
 
     def _extract_html(self, problemtree):  # private
         '''
