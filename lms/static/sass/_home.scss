@@ -148,7 +148,8 @@
             vertical-align: middle;
 
             .play {
-              background: rgba(255,255,255, 0.6);
+              @include background-image(url('/static/images/portal-icons/video-play-icon.png'));
+              background-size: cover;
               height: 31px;
               margin-left: -13px;
               margin-top: -15px;

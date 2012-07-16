@@ -583,6 +583,16 @@ a:link, a:visited {
   background-image: linear-gradient(180deg, #c8c8c8 0%, rgba(200, 200, 200, 0));
   border: none; }
 
+.error-message-colors, .container.activation h1.invalid {
+  background: #fd5757;
+  border: 1px solid #ca1111;
+  color: #8f0e0e; }
+
+.success-message-colors, .container.activation h1.valid {
+  background: #63ec89;
+  border: 1px solid #11ca36;
+  color: #238f0e; }
+
 .animation-home-header-pop-up, .home > header .outer-wrapper {
   -webkit-animation: home-header-pop-up 1.15s ease-in-out;
   -moz-animation: home-header-pop-up 1.15s ease-in-out;
@@ -1833,22 +1843,43 @@ header.global {
         margin-right: 0px; }
   header.global ol.user {
     float: right; }
+    header.global ol.user > li.primary {
+      display: block;
+      float: left;
+      margin: 0px; }
+      header.global ol.user > li.primary > a {
+        margin: 0px;
+        -webkit-border-top-right-radius: 0px;
+        -moz-border-top-right-radius: 0px;
+        -moz-border-radius-topright: 0px;
+        -ms-border-top-right-radius: 0px;
+        -o-border-top-right-radius: 0px;
+        border-top-right-radius: 0px;
+        -webkit-border-bottom-right-radius: 0px;
+        -moz-border-bottom-right-radius: 0px;
+        -moz-border-radius-bottomright: 0px;
+        -ms-border-bottom-right-radius: 0px;
+        -o-border-bottom-right-radius: 0px;
+        border-bottom-right-radius: 0px; }
+      header.global ol.user > li.primary:last-child > a {
+        -webkit-border-radius: 0 4px 4px 0;
+        -moz-border-radius: 0 4px 4px 0;
+        -ms-border-radius: 0 4px 4px 0;
+        -o-border-radius: 0 4px 4px 0;
+        border-radius: 0 4px 4px 0;
+        border-left: none; }
     header.global ol.user a.user-link {
       padding: 10px 12px 10px 42px;
       position: relative;
       text-transform: none; }
       header.global ol.user a.user-link .avatar {
-        background: #dcdcdc;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        -ms-border-radius: 3px;
-        -o-border-radius: 3px;
-        border-radius: 3px;
-        border: 1px solid #505050;
-        -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-        -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-        height: 21px;
+        background-image: url("/static/images/portal-icons/home-icon.png");
+        background-image: url("/static/images/portal-icons/home-icon.png");
+        background-image: url("/static/images/portal-icons/home-icon.png");
+        background-image: url("/static/images/portal-icons/home-icon.png");
+        background-image: url("/static/images/portal-icons/home-icon.png");
+        background-size: cover;
+        height: 26px;
         display: -moz-inline-box;
         -moz-box-orient: vertical;
         display: inline-block;
@@ -1857,61 +1888,57 @@ header.global {
         *display: inline;
         *vertical-align: auto;
         left: 8px;
+        opacity: 0.5;
         overflow: hidden;
         position: absolute;
-        top: 7px;
-        width: 21px; }
-        header.global ol.user a.user-link .avatar::after {
-          background-image: -webkit-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-          background-image: -moz-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-          background-image: -ms-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-          background-image: -o-linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-          background-image: linear-gradient(-60deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.3) 100%);
-          content: "";
-          display: block;
-          height: 100%;
-          position: absolute;
-          right: 0px;
-          top: 0px;
-          width: 100%; }
-        header.global ol.user a.user-link .avatar img {
-          -webkit-border-radius: 4px;
-          -moz-border-radius: 4px;
-          -ms-border-radius: 4px;
-          -o-border-radius: 4px;
-          border-radius: 4px;
-          display: block;
-          min-height: 100%;
-          min-width: 100%;
-          height: 100%; }
+        top: 4px;
+        -webkit-transition-property: all;
+        -moz-transition-property: all;
+        -ms-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-duration: 0.15s;
+        -moz-transition-duration: 0.15s;
+        -ms-transition-duration: 0.15s;
+        -o-transition-duration: 0.15s;
+        transition-duration: 0.15s;
+        -webkit-transition-timing-function: linear;
+        -moz-transition-timing-function: linear;
+        -ms-transition-timing-function: linear;
+        -o-transition-timing-function: linear;
+        transition-timing-function: linear;
+        -webkit-transition-delay: 0;
+        -moz-transition-delay: 0;
+        -ms-transition-delay: 0;
+        -o-transition-delay: 0;
+        transition-delay: 0;
+        width: 26px; }
+      header.global ol.user a.user-link:hover .avatar {
+        opacity: 0.8; }
     header.global ol.user ul.dropdown-menu {
+      background: #fcfcfc;
       -webkit-border-radius: 4px;
       -moz-border-radius: 4px;
       -ms-border-radius: 4px;
       -o-border-radius: 4px;
       border-radius: 4px;
-      -webkit-box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
-      -moz-box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
-      box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.3);
-      border: 1px solid black;
-      background-image: -webkit-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-      background-image: -moz-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-      background-image: -ms-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-      background-image: -o-linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-      background-image: linear-gradient(-90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+      -webkit-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.4);
+      -moz-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.4);
+      box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.4);
+      border: 1px solid #646464;
       display: none;
       padding: 5px 10px;
       position: absolute;
-      right: 4px;
+      right: 0px;
       top: 50px;
-      width: 150px;
+      width: 170px;
       z-index: 3; }
       header.global ol.user ul.dropdown-menu.expanded {
         display: block; }
       header.global ol.user ul.dropdown-menu::before {
         background: transparent;
-        border-top: 6px solid black;
-        border-right: 6px solid black;
+        border-top: 6px solid #fcfcfc;
+        border-right: 6px solid #fcfcfc;
         border-bottom: 6px solid transparent;
         border-left: 6px solid transparent;
         -webkit-box-shadow: 1px 0 0 0 black, 0 -1px 0 0 black;
@@ -1931,7 +1958,7 @@ header.global {
         width: 0px; }
       header.global ol.user ul.dropdown-menu li {
         display: block;
-        border-top: 1px solid rgba(0, 0, 0, 0.4);
+        border-top: 1px dotted #c8c8c8;
         -webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
         -moz-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
         box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05); }
@@ -1941,35 +1968,32 @@ header.global {
           -moz-box-shadow: none;
           box-shadow: none; }
         header.global ol.user ul.dropdown-menu li > a {
-          -webkit-box-sizing: border-box;
-          -moz-box-sizing: border-box;
-          box-sizing: border-box;
+          border: 1px solid transparent;
           -webkit-border-radius: 3px;
           -moz-border-radius: 3px;
           -ms-border-radius: 3px;
           -o-border-radius: 3px;
           border-radius: 3px;
-          color: rgba(255, 255, 255, 0.9);
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box;
+          color: #1d9dd9;
+          cursor: pointer;
           display: block;
-          font-family: Georgia, Cambria, "Times New Roman", Times, serif;
-          height: auto;
-          line-height: 1em;
           margin: 5px 0px;
           overflow: hidden;
           padding: 3px 5px 4px;
-          text-shadow: none;
           text-overflow: ellipsis;
-          text-transform: none;
           -webkit-transition-property: padding;
           -moz-transition-property: padding;
           -ms-transition-property: padding;
           -o-transition-property: padding;
           transition-property: padding;
-          -webkit-transition-duration: 0.1s;
-          -moz-transition-duration: 0.1s;
-          -ms-transition-duration: 0.1s;
-          -o-transition-duration: 0.1s;
-          transition-duration: 0.1s;
+          -webkit-transition-duration: 0.15s;
+          -moz-transition-duration: 0.15s;
+          -ms-transition-duration: 0.15s;
+          -o-transition-duration: 0.15s;
+          transition-duration: 0.15s;
           -webkit-transition-timing-function: linear;
           -moz-transition-timing-function: linear;
           -ms-transition-timing-function: linear;
@@ -1983,18 +2007,8 @@ header.global {
           white-space: nowrap;
           width: 100%; }
           header.global ol.user ul.dropdown-menu li > a:hover {
-            background: #1d9dd9;
-            background-image: -webkit-linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
-            background-image: -moz-linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
-            background-image: -ms-linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
-            background-image: -o-linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
-            background-image: linear-gradient(-90deg, #5abbe9 0%, #1d9dd9 100%);
-            border-color: black;
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
-            box-shadow: none;
-            padding-left: 8px;
-            text-shadow: 0 -1px rgba(0, 0, 0, 0.2); }
+            color: #3c3c3c;
+            text-decoration: none; }
 
 .highlighted-courses .courses, .find-courses .courses {
   zoom: 1;
@@ -2640,6 +2654,28 @@ header.global {
       .modal .inner-wrapper .close-modal:hover p {
         color: #3c3c3c; }
 
+.container.activation {
+  padding: 60px 0px 120px; }
+  .container.activation h1 {
+    margin-bottom: 20px;
+    padding: 10px; }
+  .container.activation h1 + hr {
+    margin-bottom: 30px; }
+  .container.activation .message {
+    background: #fcfcfc;
+    border: 1px solid #c8c8c8;
+    -webkit-box-shadow: 0 3px 20px 0 rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 3px 20px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 20px 0 rgba(0, 0, 0, 0.2);
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    border-radius: 4px;
+    margin: 0 auto;
+    padding: 40px;
+    width: 48.988%; }
+
 .home {
   padding: 0px; }
   .home > header {
@@ -2906,7 +2942,12 @@ header.global {
             width: 60px;
             vertical-align: middle; }
             .home > header .title .secondary-actions a.intro-video .video .play {
-              background: rgba(255, 255, 255, 0.6);
+              background-image: url("/static/images/portal-icons/video-play-icon.png");
+              background-image: url("/static/images/portal-icons/video-play-icon.png");
+              background-image: url("/static/images/portal-icons/video-play-icon.png");
+              background-image: url("/static/images/portal-icons/video-play-icon.png");
+              background-image: url("/static/images/portal-icons/video-play-icon.png");
+              background-size: cover;
               height: 31px;
               margin-left: -13px;
               margin-top: -15px;
@@ -3529,7 +3570,7 @@ header.global {
         clear: both; }
       .dashboard .profile-sidebar header.profile .user-info > ul {
         background: #fafafa;
-        border: 1px solid #dcdcdc;
+        border: 1px solid #c8c8c8;
         border-top: none;
         -webkit-border-bottom-left-radius: 4px;
         -moz-border-bottom-left-radius: 4px;
@@ -3546,9 +3587,12 @@ header.global {
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
+        -webkit-box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.15);
+        -moz-box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.15);
+        box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.15);
         zoom: 1;
         margin: 0px;
-        padding: 0px 10px 20px;
+        padding: 20px 10px 10px;
         width: 100%; }
         .dashboard .profile-sidebar header.profile .user-info > ul:before, .dashboard .profile-sidebar header.profile .user-info > ul:after {
           content: "";
@@ -3556,15 +3600,70 @@ header.global {
         .dashboard .profile-sidebar header.profile .user-info > ul:after {
           clear: both; }
         .dashboard .profile-sidebar header.profile .user-info > ul li {
-          list-style: none; }
+          zoom: 1;
+          border-bottom: 1px dotted #dcdcdc;
+          list-style: none;
+          margin-bottom: 20px;
+          padding-bottom: 10px; }
+          .dashboard .profile-sidebar header.profile .user-info > ul li:before, .dashboard .profile-sidebar header.profile .user-info > ul li:after {
+            content: "";
+            display: table; }
+          .dashboard .profile-sidebar header.profile .user-info > ul li:after {
+            clear: both; }
+          .dashboard .profile-sidebar header.profile .user-info > ul li:hover .icon {
+            opacity: 1; }
           .dashboard .profile-sidebar header.profile .user-info > ul li p {
             color: #a0a0a0;
-            font-family: "Open Sans", Verdana, Geneva, sans-serif;
-            text-shadow: 0 1px rgba(255, 255, 255, 0.8); }
+            float: left;
+            font-family: "Open Sans", Verdana, Geneva, sans-serif; }
             .dashboard .profile-sidebar header.profile .user-info > ul li p span {
               font-weight: 700;
-              margin-left: 10px;
-              text-transform: none; }
+              margin-left: 12px; }
+          .dashboard .profile-sidebar header.profile .user-info > ul li .icon {
+            background-size: cover;
+            float: left;
+            height: 19px;
+            margin: 2px 8px 0 0;
+            opacity: 0.6;
+            -webkit-transition-property: all;
+            -moz-transition-property: all;
+            -ms-transition-property: all;
+            -o-transition-property: all;
+            transition-property: all;
+            -webkit-transition-duration: 0.15s;
+            -moz-transition-duration: 0.15s;
+            -ms-transition-duration: 0.15s;
+            -o-transition-duration: 0.15s;
+            transition-duration: 0.15s;
+            -webkit-transition-timing-function: linear;
+            -moz-transition-timing-function: linear;
+            -ms-transition-timing-function: linear;
+            -o-transition-timing-function: linear;
+            transition-timing-function: linear;
+            -webkit-transition-delay: 0;
+            -moz-transition-delay: 0;
+            -ms-transition-delay: 0;
+            -o-transition-delay: 0;
+            transition-delay: 0;
+            width: 19px; }
+            .dashboard .profile-sidebar header.profile .user-info > ul li .icon.email-icon {
+              background-image: url("/static/images/portal-icons/email-icon.png");
+              background-image: url("/static/images/portal-icons/email-icon.png");
+              background-image: url("/static/images/portal-icons/email-icon.png");
+              background-image: url("/static/images/portal-icons/email-icon.png");
+              background-image: url("/static/images/portal-icons/email-icon.png"); }
+            .dashboard .profile-sidebar header.profile .user-info > ul li .icon.location-icon {
+              background-image: url("/static/images/portal-icons/home-icon.png");
+              background-image: url("/static/images/portal-icons/home-icon.png");
+              background-image: url("/static/images/portal-icons/home-icon.png");
+              background-image: url("/static/images/portal-icons/home-icon.png");
+              background-image: url("/static/images/portal-icons/home-icon.png"); }
+            .dashboard .profile-sidebar header.profile .user-info > ul li .icon.language-icon {
+              background-image: url("/static/images/portal-icons/language-icon.png");
+              background-image: url("/static/images/portal-icons/language-icon.png");
+              background-image: url("/static/images/portal-icons/language-icon.png");
+              background-image: url("/static/images/portal-icons/language-icon.png");
+              background-image: url("/static/images/portal-icons/language-icon.png"); }
   .dashboard .my-courses {
     float: left;
     margin: 0px;
@@ -3903,9 +4002,15 @@ header.global {
           .dashboard .my-courses .my-course .info .meta:after {
             clear: both; }
           .dashboard .my-courses .my-course .info .meta .course-work-icon {
-            background: #c8c8c8;
+            background-image: url("/static/images/portal-icons/pencil-icon.png");
+            background-image: url("/static/images/portal-icons/pencil-icon.png");
+            background-image: url("/static/images/portal-icons/pencil-icon.png");
+            background-image: url("/static/images/portal-icons/pencil-icon.png");
+            background-image: url("/static/images/portal-icons/pencil-icon.png");
+            background-size: cover;
             float: left;
             height: 22px;
+            opacity: 0.7;
             width: 22px; }
           .dashboard .my-courses .my-course .info .meta .complete {
             float: right; }
@@ -3929,7 +4034,7 @@ header.global {
             -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
             box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
-            left: 40px;
+            left: 35px;
             position: absolute;
             right: 130px; }
             .dashboard .my-courses .my-course .info .meta .progress .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-none .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-none .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-some .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-some .meter, .dashboard .my-courses .my-course .info .meta nav.sequence-nav ol li a.progress-done .meter, nav.sequence-nav ol li .dashboard .my-courses .my-course .info .meta a.progress-done .meter {
@@ -4637,16 +4742,63 @@ nav.course-material {
         display: table; }
       .course-info .course-sidebar .important-dates li:after {
         clear: both; }
+      .course-info .course-sidebar .important-dates li:hover .icon {
+        opacity: 1; }
       .course-info .course-sidebar .important-dates li p {
         color: #a0a0a0;
         float: left;
         font-family: "Open Sans", Verdana, Geneva, sans-serif; }
-      .course-info .course-sidebar .important-dates li img {
-        background: #e6e6e6;
+      .course-info .course-sidebar .important-dates li .icon {
+        background-size: cover;
         float: left;
         height: 19px;
-        margin: 3px 10px 0 0;
+        margin: 2px 10px 0 0;
+        opacity: 0.6;
+        -webkit-transition-property: all;
+        -moz-transition-property: all;
+        -ms-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-duration: 0.15s;
+        -moz-transition-duration: 0.15s;
+        -ms-transition-duration: 0.15s;
+        -o-transition-duration: 0.15s;
+        transition-duration: 0.15s;
+        -webkit-transition-timing-function: linear;
+        -moz-transition-timing-function: linear;
+        -ms-transition-timing-function: linear;
+        -o-transition-timing-function: linear;
+        transition-timing-function: linear;
+        -webkit-transition-delay: 0;
+        -moz-transition-delay: 0;
+        -ms-transition-delay: 0;
+        -o-transition-delay: 0;
+        transition-delay: 0;
         width: 19px; }
+        .course-info .course-sidebar .important-dates li .icon.start-icon {
+          background-image: url("/static/images/portal-icons/calendar-icon.png");
+          background-image: url("/static/images/portal-icons/calendar-icon.png");
+          background-image: url("/static/images/portal-icons/calendar-icon.png");
+          background-image: url("/static/images/portal-icons/calendar-icon.png");
+          background-image: url("/static/images/portal-icons/calendar-icon.png"); }
+        .course-info .course-sidebar .important-dates li .icon.final-icon {
+          background-image: url("/static/images/portal-icons/pencil-icon.png");
+          background-image: url("/static/images/portal-icons/pencil-icon.png");
+          background-image: url("/static/images/portal-icons/pencil-icon.png");
+          background-image: url("/static/images/portal-icons/pencil-icon.png");
+          background-image: url("/static/images/portal-icons/pencil-icon.png"); }
+        .course-info .course-sidebar .important-dates li .icon.length-icon {
+          background-image: url("/static/images/portal-icons/chart-icon.png");
+          background-image: url("/static/images/portal-icons/chart-icon.png");
+          background-image: url("/static/images/portal-icons/chart-icon.png");
+          background-image: url("/static/images/portal-icons/chart-icon.png");
+          background-image: url("/static/images/portal-icons/chart-icon.png"); }
+        .course-info .course-sidebar .important-dates li .icon.number-icon {
+          background-image: url("/static/images/portal-icons/course-info-icon.png");
+          background-image: url("/static/images/portal-icons/course-info-icon.png");
+          background-image: url("/static/images/portal-icons/course-info-icon.png");
+          background-image: url("/static/images/portal-icons/course-info-icon.png");
+          background-image: url("/static/images/portal-icons/course-info-icon.png"); }
       .course-info .course-sidebar .important-dates li span {
         float: right;
         font-weight: 700; }
