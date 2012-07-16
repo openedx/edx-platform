@@ -90,7 +90,7 @@ if settings.COURSEWARE_ENABLED:
 
         # TODO (vshnayder): there is no student.views.course_info.
         # Where should this point instead? same as the info view?
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
             'student.views.course_info', name="about_course"),
     )
     
