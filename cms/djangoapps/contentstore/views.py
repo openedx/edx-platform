@@ -188,6 +188,7 @@ def get_module_previews(descriptor):
     return preview_html
 
 
+@login_required
 @expect_json
 def save_item(request):
     item_location = request.POST['id']
