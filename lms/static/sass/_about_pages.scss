@@ -15,7 +15,8 @@
     a {
       border-bottom: 3px solid transparent;
       color: $lighter-base-font-color;
-      font: italic 1.2rem/1.4rem $serif;
+      font-family: $serif;
+      font-style: italic;
       @include inline-block;
       letter-spacing: 1px;
       margin: 0px 15px;
@@ -26,6 +27,7 @@
       &:hover, &.active {
         border-color: rgb(200,200,200);
         color: $base-font-color;
+        text-decoration: none;
       }
     }
   }
@@ -70,10 +72,6 @@
       }
 
       &.right {
-        h2 {
-          text-align: right;
-        }
-
         .photo {
           float: right;
           margin-left: flex-gutter();
@@ -87,27 +85,26 @@
   }
 
   .faq {
-    display: none;
     @include clearfix;
 
     nav.categories {
-      border-right: 1px solid rgb(220,220,220);
+      border: 1px solid rgb(220,220,220);
       @include box-sizing(border-box);
       float: left;
-      margin-right: flex-gutter();
-      padding-right: 20px;
+      margin-left: flex-gutter();
+      padding: 20px;
       width: flex-grid(3);
 
       a {
         display: block;
         letter-spacing: 1px;
-        margin-right: -20px;
-        padding: 10px 20px 10px 0;
-        text-align: right;
-        text-transform: uppercase;
+        margin: 0px -20px;
+        padding: 12px 0px 12px 20px;
+        text-align: left;
 
         &:hover {
           background: rgb(245,245,245);
+          text-decoration: none;
         }
       }
     }
@@ -135,7 +132,7 @@
 
         h3 {
           font-family: $sans-serif;
-          font-weight: bold;
+          font-weight: 700;
           margin-bottom: 15px;
         }
       }
@@ -143,7 +140,26 @@
   }
 
   .press {
-    display: none;
+
+    .press-resources {
+      @include clearfix;
+      margin-bottom: 60px;
+
+      .pressreleases, .identity-assets {
+        background: rgb(245,245,245);
+        border: 1px solid rgb(200,200,200);
+        @include box-sizing(border-box);
+        @include border-radius(4px);
+        float: left;
+        padding: 20px 30px;
+        text-align: center;
+        width: flex-grid(6);
+      }
+
+      .pressreleases {
+        margin-right: flex-gutter();
+      }
+    }
 
     .press-story {
       border-bottom: 1px solid rgb(220,220,220);
@@ -179,14 +195,17 @@
         width: flex-grid(10);
 
         header {
-          margin-bottom: 15px;
+          margin-bottom: 10px;
 
           h3 {
             font-family: $sans-serif;
-            font-weight: bold;
+            font-weight: 700;
+            margin-bottom: 5px;
           }
 
-          a {
+          span.post-date {
+            color: $lighter-base-font-color;
+            margin-right: 10px;
           }
         }
       }
@@ -194,7 +213,6 @@
   }
 
   .contact {
-    display: none;
     @include clearfix;
     margin: 0 auto;
     width: flex-grid(10);
@@ -202,14 +220,32 @@
     .map {
       background: rgb(245,245,245);
       float: left;
-      height: 180px;
+      height: 280px;
       margin-right: flex-gutter();
+      overflow: hidden;
       width: flex-grid(6);
+
+      img {
+        min-height: 100%;
+        max-width: 100%;
+      }
     }
 
-    .address {
+    .contacts {
+      @include box-sizing(border-box);
       float: left;
+      padding-left: 40px;
       width: flex-grid(6);
+
+      ul {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+
+        li {
+          margin-bottom: 10px;
+        }
+      }
     }
   }
 }

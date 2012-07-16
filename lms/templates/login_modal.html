@@ -1,10 +1,10 @@
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='static_content.html'/>
 
-<section class="modal login-modal">
+<section id="login-modal" class="modal login-modal">
   <div class="inner-wrapper">
     <header>
-      <h3>Log In</h3>
+      <h2>Log In</h2>
       <hr>
     </header>
 
@@ -18,13 +18,13 @@
         Remember me
       </label>
       <div class="submit">
-        <input name="submit" type="submit" value="Submit">
+        <input name="submit" type="submit" value="Access My Courses">
       </div>
     </form>
 
     <section class="login-extra">
       <p>
-        <span>Not enrolled? <a href="#">Sign up.</a></span>
+        <span>Not enrolled? <a href="#signup-modal" class="close-login" rel="leanModal">Sign up.</a></span>
         <a href="#" class="pwd-reset">Forgot password?</a>
       </p>
     </section>
@@ -64,7 +64,7 @@
         } else if($('#login_error').length == 0) {
         $('#login_form').prepend('<div id="login_error">Email or password is incorrect.</div>');
         } else {
-        $('#login_error').stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+        $('#login_error').stop().css("display", "block");
         }
         }
         );

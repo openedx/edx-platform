@@ -14,7 +14,7 @@
         @include border-radius(4px);
         @include box-sizing(border-box);
         color: $base-font-color;
-        font: bold 1.4rem/1.6rem $sans-serif;
+        font: 700 1.2em/1.2em $sans-serif;
         margin: 0px;
         overflow: hidden;
         padding: 15px 10px 17px;
@@ -44,12 +44,12 @@
 
             p {
               color: $lighter-base-font-color;
-              font: 300 1.2rem/1.6rem $sans-serif;
+              font-family: $sans-serif;
               text-shadow: 0 1px rgba(255,255,255, 0.8);
 
               span {
                 font-weight: 700;
-                margin-left: 5px;
+                margin-left: 10px;
                 text-transform: none;
               }
             }
@@ -64,43 +64,52 @@
     margin: 0px;
     width: flex-grid(9);
 
+    > header {
+      border-bottom: 1px solid rgb(210,210,210);
+      margin-bottom: 30px;
+    }
+
     .empty-dashboard-message {
-      border-top: 1px solid rgb(210,210,210);
       padding: 80px 0px;
       text-align: center;
 
       p {
         color: $lighter-base-font-color;
         font-style: italic;
+        margin-bottom: 20px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
-        -webkit-font-smoothing: antialiased;
+      }
 
-        a {
-          background: rgb(240,240,240);
-          @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
-          border: 1px solid rgb(220,220,220);
-          @include border-radius(4px);
-          @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
-          @include box-sizing(border-box);
-          color: $base-font-color;
-          font: 300 1.2rem/1.6rem $sans-serif;
-          @include inline-block;
-          margin-left: 5px;
-          padding: 5px 10px;
-          text-shadow: 0 1px rgba(255,255,255, 0.6);
+      a {
+        background: rgb(240,240,240);
+        @include background-image(linear-gradient(-90deg, rgb(245,245,245) 0%, rgb(243,243,243) 50%, rgb(237,237,237) 50%, rgb(235,235,235) 100%));
+        border: 1px solid rgb(220,220,220);
+        @include border-radius(4px);
+        @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
+        @include box-sizing(border-box);
+        color: $base-font-color;
+        font-family: $sans-serif;
+        @include inline-block;
+        letter-spacing: 1px;
+        margin-left: 5px;
+        padding: 5px 10px;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+
+        &:hover {
+          color: $blue;
+          text-decoration: none;
         }
       }
     }
 
     .my-course {
       background: rgb(250,250,250);
-      @include background-image(linear-gradient(-90deg, rgb(253,253,253), rgb(243,243,243)));
+      @include background-image(linear-gradient(-90deg, rgb(253,253,253), rgb(240,240,240)));
       border: 1px solid rgb(190,190,190);
       @include border-radius(3px);
       @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1), inset 0 -1px 0 0 rgba(255,255,255, 0.8), inset 0 1px 0 0 rgba(255,255,255, 0.8));
       @include box-sizing(border-box);
       @include clearfix;
-      font-size: 0em;
       margin-right: flex-gutter();
       margin-bottom: 25px;
       overflow: hidden;
@@ -161,7 +170,7 @@
 
         &:hover {
           .shade {
-            background: rgba(255,255,255, 0.1);
+            background: rgba(255,255,255, 0.3);
             @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.3) 0%,
                                                               rgba(0,0,0, 0.3) 100%));
           }
@@ -179,80 +188,91 @@
         > hgroup {
           border-bottom: 1px solid rgb(210,210,210);
           @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-          margin-bottom: 20px;
-          padding: 15px 0px;
+          padding: 12px 0px;
           width: 100%;
 
-          h2 {
+          a.university {
+            background: rgba(255,255,255, 1);
+            border: 1px solid rgb(180,180,180);
+            @include border-radius(3px);
+            @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.2), 0 1px 0 0 rgba(255,255,255, 0.6));
+            color: $lighter-base-font-color;
+            display: block;
+            font-style: italic;
+            font-weight: 800;
+            @include inline-block;
+            margin-right: 10px;
+            padding: 5px 10px;
+            vertical-align: middle;
+
+            &:hover {
+              color: $blue;
+              text-decoration: none;
+            }
+          }
+
+          h3 {
             @include inline-block;
             margin-bottom: 0px;
             vertical-align: middle;
 
             a {
               color: $base-font-color;
-              font: 800 1.6rem/2rem $sans-serif;
+              font-weight: 700;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-overflow: ellipsis;
               white-space: nowrap;
 
               &:hover {
-                color: $blue;
                 text-decoration: underline;
-              }
-            }
-          }
-
-          h3 {
-            @include inline-block;
-            margin-right: 10px;
-            vertical-align: middle;
-
-            a {
-              background: rgba(255,255,255, 1);
-              border: 1px solid rgb(180,180,180);
-              @include border-radius(3px);
-              @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.2), 0 1px 0 0 rgba(255,255,255, 0.6));
-              color: $lighter-base-font-color;
-              display: block;
-              font: italic 800 1.2rem/1.6rem $sans-serif;
-              padding: 5px 10px;
-
-              &:hover {
-                color: $blue;
               }
             }
           }
         }
 
+        .course-status {
+          background: $yellow;
+          border: 1px solid rgb(200,200,200);
+          @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+          margin-top: 16px;
+          padding: 5px;
+
+          p {
+            color: $lighter-base-font-color;
+            font-style: italic;
+            letter-spacing: 1px;
+            text-align: center;
+          }
+        }
+
         .meta {
           @include clearfix;
+          margin-top: 22px;
           position: relative;
           @include transition(opacity, 0.15s, linear);
           width: 100%;
 
+
           .course-work-icon {
             background: rgb(200,200,200);
             float: left;
-            font: 300 1.2rem/1.6rem $sans-serif;
             height: 22px;
             width: 22px;
           }
 
           .complete {
             float: right;
-            padding-top: 2px;
 
             p {
               color: $lighter-base-font-color;
-              font: italic 1.2rem/1.4rem $serif;
+              font-style: italic;
               @include inline-block;
               text-align: right;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
-              -webkit-font-smoothing: antialiased;
 
               .completeness {
                 color: $base-font-color;
-                font: 700 1.2rem/1.4rem $sans-serif;
+                font-weight: 700;
                 margin-right: 5px;
               }
             }
@@ -262,7 +282,7 @@
             @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
             left: 40px;
             position: absolute;
-            right: 110px;
+            right: 130px;
 
             .meter {
               background: rgb(245,245,245);
@@ -276,7 +296,7 @@
               width: 100%;
 
               .meter-fill {
-                background: rgb(120,120,120);
+                background: $blue;
                 @include background-image(linear-gradient(-45deg, rgba(255,255,255, 0.15) 25%,
                                                                   transparent 25%,
                                                                   transparent 50%,
@@ -299,22 +319,16 @@
       }
 
       &:hover {
-
-        .edit {
-          background: rgb(220,220,220);
-          border-color: rgb(190,190,190);
-        }
-
         .cover {
-          opacity: 1;
+          .shade {
+            background: rgba(255,255,255, 0.1);
+            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.3) 0%,
+                                                              rgba(0,0,0, 0.3) 100%));
+          }
 
-          .shade, .arrow {
+          .arrow {
             opacity: 1;
           }
-        }
-
-        .meta {
-          opacity: 0.9;
         }
       }
     }

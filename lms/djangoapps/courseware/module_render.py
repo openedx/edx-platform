@@ -28,7 +28,7 @@ class I4xSystem(object):
     '''
     def __init__(self, ajax_url, track_function,
                  get_module, render_template, replace_urls,
-                 user=None, filestore=None):
+                 user=None, filestore=None, xqueue_callback_url=None):
         '''
         Create a closure around the system environment.
 
@@ -48,6 +48,7 @@ class I4xSystem(object):
             that capa_module can use to fix up the static urls in ajax results.
         '''
         self.ajax_url = ajax_url
+        self.xqueue_callback_url = xqueue_callback_url
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module
@@ -207,6 +208,7 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
+    xqueue_callback_url = settings.MITX_ROOT_URL + '/xqueue/' + user.username + '/' + descriptor.location.url() + '/'
 
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
@@ -218,6 +220,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     system = I4xSystem(track_function=make_track_function(request),
                        render_template=render_to_string,
                        ajax_url=ajax_url,
+                       xqueue_callback_url=xqueue_callback_url,
                        # TODO (cpennington): Figure out how to share info between systems
                        filestore=descriptor.system.resources_fs,
                        get_module=_get_module,
@@ -321,6 +324,53 @@ def add_histogram(module):
     module.get_html = get_html
     return module
 
+# THK: TEMPORARY BYPASS OF AUTH!
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+@csrf_exempt
+def xqueue_callback(request, username, id, dispatch):
+    # Parse xqueue response
+    get = request.POST.copy()
+    try:
+        header = json.loads(get.pop('xqueue_header')[0]) # 'dict'
+    except Exception as err:
+        msg = "Error in xqueue_callback %s: Invalid return format" % err
+        raise Exception(msg)
+    
+    # Should proceed only when the request timestamp is more recent than problem timestamp
+    timestamp = header['timestamp']
+
+    # Retrieve target StudentModule
+    user = User.objects.get(username=username)
+
+    student_module_cache = StudentModuleCache(user, modulestore().get_item(id))
+    instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
+    
+    if instance_module is None:
+        log.debug("Couldn't find module '%s' for user '%s'",
+                  id, request.user)
+        raise Http404
+    
+    oldgrade = instance_module.grade
+    old_instance_state = instance_module.state
+
+    # We go through the "AJAX" path
+    #   So far, the only dispatch from xqueue will be 'score_update'
+    try:
+        ajax_return = instance.handle_ajax(dispatch, get) # Can ignore the "ajax" return in 'xqueue_callback'
+    except:
+        log.exception("error processing ajax call")
+        raise
+
+    # Save state back to database
+    instance_module.state = instance.get_instance_state()
+    if instance.get_score():
+        instance_module.grade = instance.get_score()['score']
+    if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
+        instance_module.save()
+
+    return HttpResponse("")
+
 def modx_dispatch(request, dispatch=None, id=None):
     ''' Generic view for extensions. This is where AJAX calls go.
 
@@ -339,7 +389,7 @@ def modx_dispatch(request, dispatch=None, id=None):
 
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
-
+    
     if instance_module is None:
         log.debug("Couldn't find module '%s' for user '%s'",
                   id, request.user)

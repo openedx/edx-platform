@@ -34,11 +34,10 @@
         @include box-sizing(border-box);
         @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.4), inset 0 1px 0 0 rgba(255,255,255, 0.6));
         border: 1px solid rgb(200,200,200);
-        color: $lighter-base-font-color;
+        color: $base-font-color;
         cursor: pointer;
-        font: normal 1.2rem/1.8rem $sans-serif;
         height: 36px;
-        padding: 6px;
+        padding: 9px;
         position: relative;
         text-align: center;
         text-shadow: 0 1px rgba(255,255,255, 0.8);
@@ -51,7 +50,7 @@
         @include border-radius(0px 4px 4px 4px);
         border: 1px solid rgb(200,200,200);
         @include box-shadow(0 2px 15px 0 rgba(0,0,0, 0.2));
-        padding: 10px;
+        padding: 20px 0px 5px 20px;
         position: absolute;
         visibility: hidden;
         width: 200px;
@@ -59,9 +58,7 @@
 
         li {
           list-style: none;
-
-          a {
-          }
+          margin-bottom: 15px;
         }
       }
 
@@ -70,7 +67,7 @@
           background: rgb(255,255,255);
           @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(255,255,255)));
           @include border-radius(4px 4px 0px 0px);
-          border-bottom: none;
+          border-bottom: 1px dotted rgb(200,200,200);
           @include box-shadow(0 2px 0 -1px rgb(255,255,255));
           color: $base-font-color;
           height: 40px;
@@ -87,13 +84,16 @@
 
       input[type="text"] {
         @include border-radius(3px 0px 0px 3px);
+        float: left;
         height: 36px;
         width: 200px;
       }
 
       input[type="submit"] {
         @include border-radius(0px 3px 3px 0px);
+        float: left;
         height: 36px;
+        padding: 2px 20px;
       }
     }
   }

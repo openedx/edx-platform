@@ -1,9 +1,9 @@
 <%namespace name='static' file='static_content.html'/>
 
-<section class="modal signup-modal">
+<section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
     <header>
-      <h3>Sign Up for edX</h3>
+      <h2>Sign Up for edX</h2>
       <hr>
     </header>
 
@@ -31,7 +31,7 @@
         <label class="honor-code">
           <input name="honor_code" type="checkbox" value="true">
           I agree to the
-          <a href="#">Honor Code</a>
+          <a href="/t/honor.html" target="blank">Honor Code</a>
           , sumarized below as:
         </label>
 
@@ -53,7 +53,6 @@
             <hr>
           </div>
 
-
         <div class="submit">
           <input name="submit" type="submit" value="Create My Account">
         </div>
@@ -61,7 +60,7 @@
 
       <section class="login-extra">
         <p>
-          <span>Already have an account? <a href="#">Login.</a></span>
+          <span>Already have an account? <a href="#login-modal" class="close-signup" rel="leanModal">Login.</a></span>
         </p>
       </section>
 
@@ -101,7 +100,7 @@
           if(json.success) {
             $('#enroll').html(json.value);
           } else {
-            $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+            $('#enroll_error').html(json.value).stop().css("display", "block");
           }
         }
       );
