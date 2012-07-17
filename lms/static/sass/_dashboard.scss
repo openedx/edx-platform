@@ -68,15 +68,15 @@
                 width: 19px;
 
                 &.email-icon {
-                  @include background-image(url('/static/images/portal-icons/email-icon.png'));
+                  @include background-image(url('../images/portal-icons/email-icon.png'));
                 }
 
                 &.location-icon {
-                  @include background-image(url('/static/images/portal-icons/home-icon.png'));
+                  @include background-image(url('../images/portal-icons/home-icon.png'));
                 }
 
                 &.language-icon {
-                  @include background-image(url('/static/images/portal-icons/language-icon.png'));
+                  @include background-image(url('../images/portal-icons/language-icon.png'));
                 }
               }
             }
@@ -287,7 +287,7 @@
 
 
           .course-work-icon {
-            @include background-image(url('/static/images/portal-icons/pencil-icon.png'));
+            @include background-image(url('../images/portal-icons/pencil-icon.png'));
             background-size: cover;
             float: left;
             height: 22px;
