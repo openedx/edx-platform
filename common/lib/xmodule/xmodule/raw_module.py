@@ -12,8 +12,7 @@ class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
     """
     mako_template = "widgets/raw-edit.html"
 
-    js = {'coffee': [resource_string(__name__, 'js/module/raw.coffee')]}
-    js_module = 'Raw'
+    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit.coffee')]}
 
     def get_context(self):
         return {

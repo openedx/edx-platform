@@ -22,6 +22,7 @@ import sys
 import os
 import tempfile
 import glob2
+import errno
 
 import djcelery
 from path import path
@@ -327,6 +328,37 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
 ]
 
+# Load javascript from all of the available xmodules, and
+# prep it for use in pipeline js
+from xmodule.x_module import XModuleDescriptor
+from xmodule.hidden_module import HiddenDescriptor
+js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
+try:
+    os.makedirs(js_file_dir)
+except OSError as exc:
+    if exc.errno == errno.EEXIST:
+        pass
+    else:
+        raise
+
+module_js_sources = []
+for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
+    module = getattr(descriptor, 'module_class', None)
+    if module is None:
+        continue
+
+    js = module.get_javascript()
+    for filetype in ('coffee', 'js'):
+        for idx, fragment in enumerate(js.get(filetype, [])):
+            path = os.path.join(js_file_dir, "{name}.{idx}.{type}".format(
+                name=module.__name__,
+                idx=idx,
+                type=filetype))
+            with open(path, 'w') as js_file:
+                js_file.write(fragment)
+            module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+
+
 PIPELINE_JS = {
     'application': {
         # Application will contain all paths not in courseware_only_js
@@ -349,6 +381,10 @@ PIPELINE_JS = {
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/main_vendor.js',
+    },
+    'module-js': {
+        'source_filenames': module_js_sources,
+        'output_filename': 'js/modules.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
