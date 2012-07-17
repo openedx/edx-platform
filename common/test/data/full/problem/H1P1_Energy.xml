@@ -1,0 +1,32 @@
+<problem><script type="loncapa/python">
+i = random.randrange(3)
+M = ["Big Mac", "Angus Bacon and Cheese", "Quarter Pounder with Cheese"][i]
+C = [540, 790, 510][i]
+
+BM = C*1000*4.2
+CB = 50*12*3600
+</script><startouttext/>
+According to McDonald's
+<a href="http://nutrition.mcdonalds.com/getnutrition/nutritionfacts.pdf">nutrition
+facts</a> a \($M\) provides \($C\) kiloCalories of energy.  (1 dietitian's
+calorie is 1000 physicist's calories.)  A typical automobile lead-acid
+battery can supply 50 Ampere-hours at 12 Volts.  We can compare these by
+converting the energy specifications to common units.  The SI unit of
+energy is the Joule=1 Watt-second.  One physicist's calorie is 4.2 Joules.
+<endouttext/>
+<startouttext/> 
+<br/>
+How many Joules are there in a \($M\)?
+<endouttext/>
+<numericalresponse answer="$BM"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/> 
+<br/>
+How many Joules are there in a car battery?
+<endouttext/>
+<numericalresponse answer="$CB"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/> 
+<br/>
+Which tastes better? :-)
+<endouttext/>
+
+</problem>
