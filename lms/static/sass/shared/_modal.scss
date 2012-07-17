@@ -115,7 +115,20 @@
       padding: 12px;
     }
 
+<<<<<<< HEAD
     .activation-message, .message {
+=======
+    .notice {
+      background: $yellow;
+      border: 1px solid darken($yellow, 60%);
+      color: darken($yellow, 60%);
+      display: none;
+      margin-bottom: 20px;
+      padding: 12px;
+    }
+
+    .activation-message {
+>>>>>>> cb49d9c... Style notice.
       padding: 0 40px 10px;
 
       p {
