@@ -8,6 +8,7 @@ import re
 
 from datetime import timedelta
 from lxml import etree
+from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
@@ -69,6 +70,8 @@ class CapaModule(XModule):
     An XModule implementing LonCapa format problems, implemented by way of capa.capa_problem.LoncapaProblem
     '''
     icon_class = 'problem'
+
+    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')]}
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)

@@ -2,6 +2,7 @@ import json
 import logging
 
 from lxml import etree
+from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
@@ -12,6 +13,13 @@ log = logging.getLogger(__name__)
 class VideoModule(XModule):
     video_time = 0
     icon_class = 'video'
+
+    js = {'coffee':
+        [resource_string(__name__, 'js/src/video/display.coffee')] +
+        [resource_string(__name__, 'js/src/video/display/' + filename)
+         for filename
+         in resource_listdir(__name__, 'js/src/video/display')
+        ]}
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)

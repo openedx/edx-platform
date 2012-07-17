@@ -18,7 +18,7 @@ class @Courseware
   render: ->
     $('.course-content .video').each ->
       id = $(this).attr('id').replace(/video_/, '')
-      new Video id, $(this).data('streams')
+      new Video id, $(this).data('streams'), $(this).data('caption-url-base')
     $('.course-content .problems-wrapper').each ->
       id = $(this).data('problem-id')
       new Problem id, $(this).attr('id'), $(this).data('url')

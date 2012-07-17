@@ -177,6 +177,8 @@ PIPELINE_CSS = {
 
 PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
 
+# Load javascript from all of the available descriptors, and
+# prep it for use in pipeline js
 from xmodule.x_module import XModuleDescriptor
 from xmodule.raw_module import RawDescriptor
 js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"

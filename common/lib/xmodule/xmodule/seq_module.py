@@ -8,6 +8,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
+from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.common.lib.seq_module")
 
@@ -19,6 +20,7 @@ class_priority = ['video', 'problem']
 class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
+    js = {'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')]}
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
