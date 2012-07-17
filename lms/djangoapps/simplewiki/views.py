@@ -9,7 +9,7 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
 
-from courseware.decorators import check_course
+from courseware.courses import check_course
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -47,8 +47,8 @@ def update_template_dictionary(dictionary, request = None, course = None, articl
     if request:
         dictionary.update(csrf(request))
         
-@check_course(course_required=False)
-def view(request, article_path, course=None):
+def view(request, article_path, course_id=None):
+    course = check_course(course_id, course_required=False)
             
     (article, err) = get_article(request, article_path, course )
     if err:
@@ -62,9 +62,9 @@ def view(request, article_path, course=None):
     update_template_dictionary(d, request, course, article, article.current_revision)
     return render_to_response('simplewiki/simplewiki_view.html', d)
     
-@check_course(course_required=False)
-def view_revision(request, revision_number, article_path, course=None):
-
+def view_revision(request, revision_number, article_path, course_id=None):
+    course = check_course(course_id, course_required=False)
+    
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
@@ -85,8 +85,9 @@ def view_revision(request, revision_number, article_path, course=None):
     
     return render_to_response('simplewiki/simplewiki_view.html', d)
 
-@check_course(course_required=False)
-def root_redirect(request, course=None):
+def root_redirect(request, course_id=None):
+    course = check_course(course_id, course_required=False)
+    
     #TODO: Add a default namespace to settings.
     namespace = course.wiki_namespace if course else "edX"
     
@@ -101,8 +102,9 @@ def root_redirect(request, course=None):
         err = not_found(request, namespace + '/', course)
         return err
 
-@check_course(course_required=False)
-def create(request, article_path, course=None):    
+def create(request, article_path, course_id=None):   
+    course = check_course(course_id, course_required=False)
+     
     article_path_components = article_path.split('/')
 
     # Ensure the namespace exists
@@ -160,8 +162,9 @@ def create(request, article_path, course=None):
 
     return render_to_response('simplewiki/simplewiki_edit.html', d)
 
-@check_course(course_required=False)
-def edit(request, article_path, course=None):
+def edit(request, article_path, course_id=None):
+    course = check_course(course_id, course_required=False)
+    
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
@@ -206,8 +209,9 @@ def edit(request, article_path, course=None):
     update_template_dictionary(d, request, course, article)
     return render_to_response('simplewiki/simplewiki_edit.html', d)
 
-@check_course(course_required=False)
-def history(request, article_path, page=1, course=None):
+def history(request, article_path, page=1, course_id=None):
+    course = check_course(course_id, course_required=False)
+    
     (article, err) = get_article(request, article_path, course )
     if err:
         return err
@@ -287,8 +291,9 @@ def history(request, article_path, page=1, course=None):
     
     return render_to_response('simplewiki/simplewiki_history.html', d)
     
-@check_course(course_required=False)   
-def revision_feed(request, page=1, namespace=None, course=None):
+def revision_feed(request, page=1, namespace=None, course_id=None):
+    course = check_course(course_id, course_required=False)
+    
     page_size = 10
     
     if page == None:
@@ -318,8 +323,9 @@ def revision_feed(request, page=1, namespace=None, course=None):
     
     return render_to_response('simplewiki/simplewiki_revision_feed.html', d)
 
-@check_course(course_required=False)
-def search_articles(request, namespace=None, course = None):
+def search_articles(request, namespace=None, course_id = None):
+    course = check_course(course_id, course_required=False)
+    
     # blampe: We should check for the presence of other popular django search
     # apps and use those if possible. Only fall back on this as a last resort.
     # Adding some context to results (eg where matches were) would also be nice.
@@ -366,8 +372,9 @@ def search_articles(request, namespace=None, course = None):
         update_template_dictionary(d, request, course)
         return render_to_response('simplewiki/simplewiki_searchresults.html', d)
         
-@check_course(course_required=False)
-def search_add_related(request, course, slug, namespace):
+def search_add_related(request, course_id, slug, namespace):
+    course = check_course(course_id, course_required=False)
+    
     (article, err) = get_article(request, slug, namespace if namespace else course_id )
     if err:
         return err
@@ -397,8 +404,9 @@ def search_add_related(request, course, slug, namespace):
     json = simplejson.dumps({'results': results})
     return HttpResponse(json, mimetype='application/json')
 
-@check_course(course_required=False)
-def add_related(request, course, slug, namespace):
+def add_related(request, course_id, slug, namespace):
+    course = check_course(course_id, course_required=False)
+    
     (article, err) = get_article(request, slug, namespace if namespace else course_id )
     if err:
         return err
@@ -419,8 +427,9 @@ def add_related(request, course, slug, namespace):
     finally:
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
-@check_course(course_required=False)
-def remove_related(request, course, namespace, slug, related_id):
+def remove_related(request, course_id, namespace, slug, related_id):
+    course = check_course(course_id, course_required=False)
+    
     (article, err) = get_article(request, slug, namespace if namespace else course_id )
     
     if err:
@@ -440,8 +449,9 @@ def remove_related(request, course, namespace, slug, related_id):
     finally:
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
-@check_course(course_required=False)
-def random_article(request, course=None):
+def random_article(request, course_id=None):
+    course = check_course(course_id, course_required=False)
+    
     from random import randint
     num_arts = Article.objects.count()
     article = Article.objects.all()[randint(0, num_arts-1)]
