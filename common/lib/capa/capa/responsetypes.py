@@ -769,7 +769,7 @@ class CodeResponse(LoncapaResponse):
             if oldcmap.is_right_queuekey(answer_id, queuekey): # If answer_id is not queued, will return False
                 idx = idset.index(answer_id)
                 msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
-                oldcmap.set(answer_id, self.context['correct'][idx], msg=msg)
+                oldcmap.set(answer_id, self.context['correct'][idx], msg=msg, queuekey=None) # Queuekey is consumed 
             else: # Queuekey does not match
                 log.debug('CodeResponse: queuekey %d does not match for answer_id=%s.' % (queuekey, answer_id)) 
         
