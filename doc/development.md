@@ -15,7 +15,7 @@ Please see http://www.mongodb.org/downloads for more detailed instructions.
 
 ### OSX
 
-    Use the MacPorts package `mongodb` or the Homebrew formula `mongodb`
+Use the MacPorts package `mongodb` or the Homebrew formula `mongodb`
 
 ## Initializing Mongodb
 
