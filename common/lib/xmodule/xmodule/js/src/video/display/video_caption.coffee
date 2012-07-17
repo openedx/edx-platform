@@ -7,7 +7,7 @@ class @VideoCaption extends Subview
       .bind('DOMMouseScroll', @onMovement)
 
   captionURL: ->
-    "/static/subs/#{@youtubeId}.srt.sjson"
+    "#{@captionURLBase}/#{@youtubeId}.srt.sjson"
 
   render: ->
     @$('.video-wrapper').after """

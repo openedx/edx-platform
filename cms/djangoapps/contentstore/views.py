@@ -98,7 +98,7 @@ def edit_item(request):
     item = modulestore().get_item(item_location)
     return render_to_response('unit.html', {
         'contents': item.get_html(),
-        'js_module': item.js_module_name(),
+        'js_module': item.__class__.__name__,
         'category': item.category,
         'name': item.name,
         'previews': get_module_previews(item),

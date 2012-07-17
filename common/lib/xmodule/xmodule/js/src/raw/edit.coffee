@@ -1,4 +1,4 @@
-class @HTML
+class @RawDescriptor
     constructor: (@element) ->
         @edit_box = $(".edit-box", @element)
 

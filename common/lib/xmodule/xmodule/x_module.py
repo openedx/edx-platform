@@ -77,6 +77,8 @@ class XModule(object):
     # if the icon class depends on the data in the module
     icon_class = 'other'
 
+    js = {}
+
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         '''
         Construct a new xmodule
@@ -179,11 +181,6 @@ class XModule(object):
         '''
         return None
 
-    def get_html(self):
-        ''' HTML, as shown in the browser. This is the only method that must be implemented
-        '''
-        raise NotImplementedError("get_html must be defined for all XModules that appear on the screen. Not defined in %s" % self.__class__.__name__)
-
     def get_progress(self):
         ''' Return a progress.Progress object that represents how far the student has gone
         in this module.  Must be implemented to get correct progress tracking behavior in
@@ -198,6 +195,25 @@ class XModule(object):
             get is a dictionary-like object '''
         return ""
 
+    # ================================== HTML INTERFACE DEFINITIONS ======================
+    @classmethod
+    def get_javascript(cls):
+        """
+        Return a dictionary containing some of the following keys:
+            coffee: A list of coffeescript fragments that should be compiled and
+                    placed on the page
+            js: A list of javascript fragments that should be included on the page
+
+        All of these will be loaded onto the page in the LMS
+        """
+        return cls.js
+
+    def get_html(self):
+        ''' HTML, as shown in the browser. This is the only method that must be implemented
+        '''
+        raise NotImplementedError("get_html must be defined for all XModules that appear on the screen. Not defined in %s" % self.__class__.__name__)
+
+
 
 class XModuleDescriptor(Plugin):
     """
@@ -211,7 +227,6 @@ class XModuleDescriptor(Plugin):
     """
     entry_point = "xmodule.v1"
     js = {}
-    js_module = None
 
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (
@@ -397,13 +412,6 @@ class XModuleDescriptor(Plugin):
         All of these will be loaded onto the page in the CMS
         """
         return cls.js
-
-    def js_module_name(self):
-        """
-        Return the name of the javascript class to instantiate when
-        this module descriptor is loaded for editing
-        """
-        return self.js_module
 
     def get_html(self):
         """

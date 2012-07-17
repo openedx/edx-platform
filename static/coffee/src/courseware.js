@@ -27,7 +27,7 @@
       $('.course-content .video').each(function() {
         var id;
         id = $(this).attr('id').replace(/video_/, '');
-        return new Video(id, $(this).data('streams'));
+        return new Video(id, $(this).data('streams'), $(this).data('caption-url'));
       });
       $('.course-content .problems-wrapper').each(function() {
         var id;

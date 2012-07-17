@@ -1,5 +1,5 @@
 class @Video
-  constructor: (@id, videos) ->
+  constructor: (@id, videos, @caption_url_base) ->
     window.player = null
     @el = $("#video_#{@id}")
     @parseVideos videos
