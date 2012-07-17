@@ -1,62 +1,33 @@
-from collections import namedtuple
-import logging
-import os
+from functools import wraps
 
-from path import path
-import yaml
+from django.http import Http404
 
-log = logging.getLogger('mitx.courseware.courses')
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.django import modulestore
 
-_FIELDS = ['number', # 6.002x
-           'title', # Circuits and Electronics
-           'short_title', # Circuits
-           'run_id', # Spring 2012
-           'path', # /some/absolute/filepath/6.002x --> course.xml is in here.
-           'instructors', # ['Anant Agarwal']
-           'institution', # "MIT"
-           'wiki_namespace',
-           'grader', # a courseware.graders.CourseGrader object
 
-           #'start', # These should be datetime fields
-           #'end'
-           ]
-
-class CourseInfoLoadError(Exception):
-    pass
-
-class Course(namedtuple('Course', _FIELDS)):
-    """Course objects encapsulate general information about a given run of a
-    course. This includes things like name, grading policy, etc.
+def check_course(course_id, course_must_be_open=True, course_required=True):
     """
-
-def load_courses(courses_path):
-    """Given a directory of courses, returns a list of Course objects. For the
-    sake of backwards compatibility, if you point it at the top level of a
-    specific course, it will return a list with one Course object in it.
+    Given a course_id, this returns the course object. By default,
+    if the course is not found or the course is not open yet, this
+    method will raise a 404.
+    
+    If course_must_be_open is False, the course will be returned
+    without a 404 even if it is not open.
+    
+    If course_required is False, a course_id of None is acceptable. The
+    course returned will be None. Even if the course is not required,
+    if a course_id is given that does not exist a 404 will be raised.
     """
-    courses_path = path(courses_path)
-    def _is_course_path(p):
-        return os.path.exists(p / "course_info.yaml")
-
-    log.info("Loading courses from {0}".format(courses_path))
-
-    # Compatibility: courses_path is the path for a single course
-    if _is_course_path(courses_path):
-        log.warning("course_info.yaml found in top-level ({0})"
-                    .format(courses_path) +
-                    " -- assuming there is only a single course.")
-        return [Course.load_from_path(courses_path)]
-
-    # Default: Each dir in courses_path is a separate course
-    courses = []
-    log.info("Reading courses from {0}".format(courses_path))
-    for course_dir_name in os.listdir(courses_path):
-        course_path = courses_path / course_dir_name
-        if _is_course_path(course_path):
-            log.info("Initializing course {0}".format(course_path))
-            courses.append(Course.load_from_path(course_path))
-
-    return courses
-
-def create_lookup_table(courses):
-    return dict((c.id, c) for c in courses)
+    course = None
+    if course_required or course_id:
+        try:
+            course_loc = CourseDescriptor.id_to_location(course_id)
+            course = modulestore().get_item(course_loc)
+        except KeyError:
+            raise Http404("Course not found.")
+        
+        if course_must_be_open and not course.has_started():
+            raise Http404("This course has not yet started.")
+    
+    return course

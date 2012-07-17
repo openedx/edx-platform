@@ -126,6 +126,8 @@ COURSE_TITLE = "Circuits and Electronics"
 ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 QUICKEDIT = False
 
+WIKI_ENABLED = False
+
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'

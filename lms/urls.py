@@ -98,9 +98,6 @@ if settings.COURSEWARE_ENABLED:
         url(r'^xqueue/(?P<username>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting'),
         url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
-        url(r'^book/(?P<page>[^/]*)$', 'staticbook.views.index'),
-        url(r'^book-shifted/(?P<page>[^/]*)$', 'staticbook.views.index_shifted'),
-        url(r'^book*$', 'staticbook.views.index'),
         #    url(r'^course_info/$', 'student.views.courseinfo'),
         #    url(r'^show_circuit/(?P<circuit>[^/]*)$', 'circuit.views.show_circuit'),
         url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
@@ -109,29 +106,34 @@ if settings.COURSEWARE_ENABLED:
         url(r'^heartbeat$', include('heartbeat.urls')),
 
         # Multicourse related:
-        url(r'^courses/?$', 'courseware.views.courses', name="courses"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
-            'courseware.views.course_info', name="info"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book$',
-            'staticbook.views.index', name="book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$',
-            'student.views.enroll', name="enroll"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
-            'courseware.views.index', name="courseware"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
-            'courseware.views.index', name="courseware_section"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$',
-            'courseware.views.profile', name="profile"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$',
-            'courseware.views.profile'),
-
-        # TODO (vshnayder): there is no student.views.course_info.
-        # Where should this point instead? same as the info view?
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
+        url(r'^courses/?$', 'courseware.views.courses', name="courses"),        
+        #About the course
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 
             'student.views.course_info', name="about_course"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 
+            'student.views.enroll', name="enroll"),
+        
+        #Inside the course
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 
+            'courseware.views.course_info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book$', 
+            'staticbook.views.index', name="book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<page>[^/]*)$', 
+            'staticbook.views.index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book-shifted/(?P<page>[^/]*)$', 
+            'staticbook.views.index_shifted'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$', 
+            'courseware.views.index', name="courseware"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$', 
+            'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$', 
+            'courseware.views.profile', name="profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 
+            'courseware.views.profile'),
     )
     
     # Multicourse wiki
+if settings.WIKI_ENABLED:
     urlpatterns += (
         url(r'^wiki/', include('simplewiki.urls')),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
