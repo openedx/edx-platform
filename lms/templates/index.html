@@ -94,7 +94,7 @@
         <section class="blog-posts">
             %for entry in entries:
             <article>
-                %if hasattr(entry, 'image'):
+                %if entry.image:
                     <a href="${entry.link}" class="post-graphics">
                         <img src="${entry.image}" />
                     </a>
