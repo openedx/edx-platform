@@ -523,9 +523,8 @@ def course_info(request, course_id):
 @ensure_csrf_cookie
 def enroll(request, course_id):
     course = check_course(course_id, course_must_be_open=False)
-    
     user = request.user
-    enrollment = CourseEnrollment(user=user,
-        course_id=course.id)
-    enrollment.save()
+    
+    enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+    
     return redirect(reverse('dashboard'))
