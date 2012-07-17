@@ -1,22 +1,23 @@
-<%namespace name='static' file='static_content.html'/>
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='../static_content.html'/>
 
-<%inherit file="main.html" />
+<%inherit file="../main.html" />
 
 <section class="container about">
   <nav>
-    <a href="/t/about.html">Vision</a>
-    <a href="/t/faq.html">Faq</a>
-    <a href="/t/press.html" class="active">Press</a>
-    <a href="/t/contact.html">Contact</a>
+    <a href="${reverse('about_edx')}">Vision</a>
+    <a href="${reverse('faq_edx')}">Faq</a>
+    <a href="${reverse('press')}" class="active">Press</a>
+    <a href="${reverse('contact')}">Contact</a>
   </nav>
 
   <section class="press">
     <section class="press-resources">
       <section class="pressreleases">
-        <p>View our <a href="/t/pressrelease.html">Press Release</a></p>
+        <p>View our <a href="${reverse('pressrelease')}">Press Release</a></p>
       </section>
       <section class="identity-assets">
-        <p>Download our <a href="/t/pressrelease.html">Logos</a></p>
+        <p>Download our <a href="${reverse('pressrelease')}">Logos</a></p>
       </section>
     </section>
     <article class="press-story">

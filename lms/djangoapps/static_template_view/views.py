@@ -5,23 +5,12 @@
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.shortcuts import redirect
-from django.core.context_processors import csrf
 from django.conf import settings
+from django_future.csrf import ensure_csrf_cookie
 
-#valid_templates=['index.html', 'staff.html', 'info.html', 'credits.html']
-valid_templates=['index.html',
-                 'tos.html',
-                 'privacy.html',
-                 'honor.html',
-                 'help.html',
-                 'copyright.html',
-                 '404.html',
-                 'mitx_help.html',
-                 'pressrelease.html',
-                 'about.html',
-                 'faq.html',
-                 'press.html',
-                 'contact.html']
+from util.cache import cache_if_anonymous 
+
+valid_templates = []
 
 if settings.STATIC_GRAB:
     valid_templates = valid_templates+['server-down.html',
@@ -33,15 +22,27 @@ if settings.STATIC_GRAB:
                                        '6002x-press-release.html'
                                        ]
 
-def index(request, template):
-    csrf_token = csrf(request)['csrf_token']
+def index(request, template): 
     if template in valid_templates:
-        return render_to_response(template, {'error' : '',
-                                             'csrf': csrf_token }) 
+        return render_to_response('static_templates/' + template, {}) 
     else:
         return redirect('/')
 
-valid_auth_templates=['help.html']
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def render(request, template):
+    """
+    This view function renders the template sent without checking that it
+    exists. Do not expose template as a regex part of the url. The user should
+    not be able to ender any arbitray template name. The correct usage would be:
+    
+    url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs")
+    """    
+    return render_to_response('static_templates/' + template, {})
+    
+
+valid_auth_templates=[]
 
 def auth_index(request, template):
     if not request.user.is_authenticated():

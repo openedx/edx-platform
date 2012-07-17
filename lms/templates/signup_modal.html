@@ -1,4 +1,5 @@
 <%namespace name='static' file='static_content.html'/>
+<%! from django.core.urlresolvers import reverse %>
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
@@ -25,12 +26,12 @@
         <label class="terms-of-service">
           <input name="terms_of_service" type="checkbox" value="true">
           I agree to the
-          <a href="#">Terms of Service</a>
+          <a href="${reverse('tos')}">Terms of Service</a>
         </label>
         <label class="honor-code">
           <input name="honor_code" type="checkbox" value="true">
           I agree to the
-          <a href="/t/honor.html" target="blank">Honor Code</a>
+          <a href="${reverse('honor')}" target="blank">Honor Code</a>
         </label>
 
           <!--
