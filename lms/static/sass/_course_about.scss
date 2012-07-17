@@ -24,8 +24,9 @@
       @include clearfix;
       margin: 0 auto;
       max-width: 1200px;
+      padding: 0px 10px;
       position: relative;
-      width: flex-grid(12);
+      width: grid-width(12);
       z-index: 2;
 
 
@@ -243,12 +244,12 @@
     border: 1px solid rgb(200,200,200);
     border-top: none;
     float: left;
-    padding: 20px 20px 30px;
+    padding: 16px 20px 30px;
     width: flex-grid(4);
 
     header {
       margin-bottom: 30px;
-      padding-bottom: 20px;
+      padding-bottom: 16px;
       position: relative;
       text-align: center;
 

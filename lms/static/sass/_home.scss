@@ -17,6 +17,7 @@
       @extend .animation-home-header-pop-up;
       max-width: 1200px;
       margin: 0 auto;
+      padding: 0 10px;
       position: relative;
       text-align: center;
 
@@ -32,7 +33,7 @@
       border: 1px solid rgb(100,100,100);
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       @include inline-block;
-      padding: 30px 50px 30px;
+      padding: 20px 30px 30px;
       position: relative;
       text-align: center;
       z-index: 1;
@@ -40,21 +41,9 @@
 
     .title {
       @include inline-block;
-      //margin-right: 50px;
-      //padding-right: 50px;
       position: relative;
       text-align: left;
       vertical-align: middle;
-
-      &::before {
-        @extend .faded-vertical-divider;
-        //content: "";
-        display: block;
-        height: 170px;
-        position: absolute;
-        right: 0px;
-        top: -20px;
-      }
 
       &::after {
         @extend .faded-vertical-divider-light;
