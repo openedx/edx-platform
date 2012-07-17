@@ -88,7 +88,7 @@ class XmlDescriptor(XModuleDescriptor):
     # The attributes will be removed from the definition xml passed
     # to definition_from_xml, and from the xml returned by definition_to_xml
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
-        'due', 'graded', 'name', 'slug')
+        'start', 'due', 'graded', 'name', 'slug')
 
     # A dictionary mapping xml attribute names to functions of the value
     # that return the metadata key and value
