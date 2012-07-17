@@ -1,0 +1,100 @@
+<problem><script type="loncapa/python">
+#VS = 4.0
+#RL1 = 2.0
+#RL2 = 1.0
+#RW1 = 1.0
+#RW2 = 1.0
+
+VS  = float(random.choice([4, 5, 6, 9, 15]))
+RL1 = float(random.choice([10, 11, 12, 13, 14, 15]))
+RL2 = float(random.choice([16, 17, 18, 19, 20, 21]))
+RW1 = float(random.choice([1, 2, 3]))
+RW2 = float(random.choice([1, 2, 3]))
+
+delta = RL1*RL2 + RL1*RW1 + RL1*RW2 + RL2*RW1 + RW1*RW2
+
+EL1 = (RL1*RL2 + RL1*RW2)*VS/delta
+EL2 = RL1*RL2*VS/delta
+
+PRW1 = ((VS - EL1)**2)/RW1
+PRL1 = (EL1**2)/RL1
+
+PRW2 = ((EL2 - EL1)**2)/RW2
+PRL2 = (EL2**2)/RL2
+
+PVS = VS*(EL1 - VS)/RW1
+
+#print(PVS+PRL2+PRW2+PRL1+PRW1)
+
+</script><startouttext/>
+The power distribution network in a particular apparatus can be
+modeled by the circuit below.
+<center><img src="/static/circuits/x0.gif"/></center>
+The power comes from a voltage source and is delivered to two loads.
+The loads are modeled by the resistors \(R_{L1}\) and \(R_{L2}\).  The
+resistances of the interconnects are modeled by the resistors
+\(R_{W1}\) and \(R_{W2}\).  The values of the element parameters are
+\(V_S=$VS\)V, \(R_{L1}=$RL1\Omega\), \(R_{L2}=$RL2\Omega\), 
+\(R_{W1}=$RW1\Omega\), \(R_{W2}=$RW2\Omega\).
+<endouttext/>
+
+<startouttext/>
+<br/><br/>
+Determine the node potentials \(e_{L1}\) and \(e_{L2}\), assuming a
+ground node as indicated in the figure.  Write your answers in the
+spaces provided below.  Express your answers in Volts.
+<br/>
+\(e_{L1} =\)
+<endouttext/>
+<numericalresponse answer="$EL1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+\(e_{L2} =\)
+<endouttext/>
+<numericalresponse answer="$EL2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/><br/>
+Determine the power dissipated in each of the resistors and the power
+entering the source.  Express your powers in Watts.  Remember that the
+power entering a two-terminal device is the product of the voltage
+across the device and the current through it in the associated
+reference directions.  Write your answers in the spaces
+provided below.
+<br/>
+\(P_{R_{W1}} =\)
+<endouttext/>
+<numericalresponse answer="$PRW1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+\(P_{R_{L1}} =\)
+<endouttext/>
+<numericalresponse answer="$PRL1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+\(P_{R_{W2}} =\)
+<endouttext/>
+<numericalresponse answer="$PRW2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+\(P_{R_{L2}} =\)
+<endouttext/>
+<numericalresponse answer="$PRL2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+\(P_{V_{S}} =\)
+<endouttext/>
+<numericalresponse answer="$PVS"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/><br/>
+Note: If you did everything correctly the sum of the powers should be zero!
+<endouttext/>
+
+</problem>

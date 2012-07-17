@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:oLWqOmhysqg,1.0:QSiRNiG_7EQ,1.25:PllCCsyzWEM,1.50:T6SDxkpo9bI" slug="S25V2_Negative_vs._positive_feedback" rerandomize="per_student" name="S25V2: Negative vs. positive feedback"/>
+  <customtag tag="S25" slug="discuss_1777" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="869" slug="book_1778" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1779" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

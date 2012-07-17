@@ -1,0 +1,17 @@
+<problem>
+
+<script type="loncapa/python">
+u = math.sin
+I = "IS*(1-u(t-t0))"
+</script>
+
+<startouttext/>
+Can we test that a student enters "IS*(1-u(t-t0))"?
+<endouttext/>
+<formularesponse type="cs" samples="I0,R,L,t,t0@1,1,1,1,1:3,3,3,3,3#10" answer="$I">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

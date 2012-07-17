@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:Qs1BVtqD4nE,1.0:ma9XMQ5I2Xo,1.25:8-mwv64qONA,1.50:YFxgjqW7m_U" slug="S9V6_MOSFET_SCS_model" name="S9V6: MOSFET SCS model"/>
+  <customtag tag="S9" slug="discuss_577">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="340" slug="book_578">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="9" slug="slides_579">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

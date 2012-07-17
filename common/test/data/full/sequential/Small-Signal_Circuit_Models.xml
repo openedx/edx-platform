@@ -1,0 +1,22 @@
+<sequential>
+  <vertical filename="vertical_711" slug="vertical_711" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_715" slug="vertical_715" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_719" slug="vertical_719" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_723" slug="vertical_723" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_727" slug="vertical_727" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_731" slug="vertical_731" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_735" slug="vertical_735" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_738" slug="vertical_738" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_742" slug="vertical_742" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_745" slug="vertical_745" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_749" slug="vertical_749" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_753" slug="vertical_753" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_757" slug="vertical_757" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_761" slug="vertical_761" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_764" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <video youtube="0.75:o8zhUzlDWEE,1.0:VRwQMn58klI,1.25:FkDeFgWDcGk,1.50:rVHG7vV5XWU" slug="Coming_up_Differential_Equations" rerandomize="per_student" name="Coming up: Differential Equations"/>
+    <customtag tag="S11" slug="discuss_765" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+</sequential>

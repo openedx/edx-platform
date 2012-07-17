@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:227NDapJIz0,1.0:Duh1RHZGMQ0,1.25:IzULGSWdcGk,1.50:gJSD6jYc8jI" slug="S3V10_Norton_Method" name="S3V10: Norton Method"/>
+  <customtag tag="S3" slug="discuss_197">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="167" slug="book_198">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="3" slug="slides_199">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,92 @@
+<problem><script type="loncapa/python">
+V1 = float(random.randrange(1,10,1))
+V2 = float(random.randrange(1,10,1))
+
+R1 = float(random.randrange(1,10,1))
+R2 = float(random.randrange(1,10,1))
+R3 = float(random.randrange(1,10,1))
+
+R1R3P = (R1*R3)/(R1+R3)
+R2R3P = (R2*R3)/(R2+R3)
+
+a31 = R2R3P/(R1+R2R3P)
+a32 = R1R3P/(R2+R1R3P)
+
+v31 = a31*V1
+v32 = a32*V2
+
+x1 = v31
+x2 = v32
+
+v3 = x1 + x2
+
+i3 = v3/R3
+
+b1 = (a31-1)/R1
+b2 = a32/R1
+
+y1 = b1*V1
+y2 = b2*V2
+
+i1 = y1+y2
+
+c1 = a31/R2
+c2 = (a32-1)/R2
+
+z1 = c1*V1
+z2 = c2*V2
+
+i2 = z1 + z2
+
+</script><startouttext/>
+Consider the familiar network containing two voltage sources and
+three resistors.
+You are given that \(R_1=$R1\Omega\),
+\(R_2=$R2\Omega\). \(R_3=$R3\Omega\),
+\(V_1=$V1\)V, and \(V_2=$V2\)V.
+<center><img src="/static/circuits/superposition-v.gif"/></center>
+The voltage \(v_3\) across resistor \(R_3\) can be expressed as the sum
+of the voltage \(x_1\) due to \(V_1\) acting alone and the voltage \(x_2\) due to
+\(V_2\) acting alone.
+<endouttext/>
+
+<startouttext/>
+<br/>
+The value (in Volts) of \(x_1\) is: 
+<endouttext/>
+<numericalresponse answer="$v31"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/> 
+The value (in Volts) of \(x_2\) is: 
+<endouttext/>
+<numericalresponse answer="$v32"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/><br/>
+Similarly, the current \(i_1\) into the resistor \(R_1\) can be
+expressed as the sum of the current \(y_1\) due to \(V_1\) acting
+alone and the current \(y_2\) due to \(V_2\) acting alone.
+<br/> <br/>
+The value (in Amperes) of \(y_1\) is: 
+<endouttext/>
+<numericalresponse answer="$y1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/> 
+The value (in Amperes) of \(y_2\) is: 
+<endouttext/>
+<numericalresponse answer="$y2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/><br/>
+Surely this is true of every other circuit voltage and current, such as
+\(i_2\) (but NOT device parameters).
+<br/>
+We will not plague you with working them all out. :-)
+<endouttext/>
+
+</problem>

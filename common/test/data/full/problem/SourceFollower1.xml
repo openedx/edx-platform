@@ -1,0 +1,171 @@
+<!-- Week 5 Homework: Large-Signal analysis of Source Follower -->
+
+<problem>
+
+<script type="loncapa/python">
+
+iDS   = "(K/2)*(vIN - vOUT - VT)^2"
+vOUTs = "iDS*RS"
+iDSs  = "(1+K*RS*(vIN-VT)-sqrt(1+2*K*RS*(vIN-VT)))/(K*RS^2)"
+
+</script>
+
+<startouttext/>
+One of the most valuable of the amplifier configurations is the source
+follower, shown in the figure below:
+<center>
+<img src="/static/circuits/source-follower.gif" />
+</center>
+Here the source labeled \(V_{DD}\) is the power supply.
+<br/>
+Although the source follower has no voltage gain (actually a small
+loss) it has power gain: it presents a very high resistance to the
+signal source so it takes no power from the source, but it can drive a
+low resistance load.  Also, because of feedback, which we will learn
+about later, the source follower is close to linear.  In this problem
+we will investigate the large-signal characteristics of a source
+follower.
+<br/>
+As usual, the MOSFET is set up to operate in the saturated region.
+<endouttext/>
+
+<startouttext/>
+<br/>
+Write an algebraic expression for \(i_{DS}\) in terms of \(K\),
+\(v_{IN}\), \(v_{OUT}\), and \(V_T\).  Remember, algebraic expressions
+are case sensitive.
+<endouttext/>
+<formularesponse type="cs" samples="VT,K,vIN,vOUT@1,1,1,1:3,3,3,3#10" answer="$iDS">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Write an algebraic expression for \(v_{OUT}\) in terms of \(i_{DS}\) and \(R_S\).
+<endouttext/>
+<formularesponse type="cs" samples="iDS,RS@1,1:3,3#10" answer="$vOUTs">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Solve the previous two results for \(i_{DS}\).  You will get a quadratic, and you will have to
+choose the correct root: make sure that \(i_{DS}=0\) when \(v_{IN}=V_T\).
+<br/>
+What is your solution for \(i_{DS}\)?
+<endouttext/>
+<formularesponse type="cs" samples="VT,K,vIN,RS@1,1,4,1:3,3,6,3#10" answer="$iDSs">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+So, now you have an expression for \(v_{OUT}\).  We won't ask you for it :-).
+<endouttext/>
+
+<script type="loncapa/python">
+# Numerical stuff must not share names with symbolic stuff!  
+#   I added "n" to every name.
+
+global Kn, VTn, RSn
+
+Kn  = 2.0   #A/V**2
+VTn = 2.0   #V
+RSn = 16    #Ohms
+
+# The following aliases are defined because of a bug.
+# If I put \($RSn\) in an XML text, I will not get its
+# value, just its name.  Ugh!
+
+Knd  = Kn
+VTnd = VTn
+RSnd = RSn
+
+def iDn(vI):
+   vA = vI-VTn
+   delta = math.sqrt(1+2*Kn*RSn*vA)
+   return((1 + Kn*RSn*vA - delta)/(Kn*RSn**2))
+
+
+#vINn = 6.0
+#vINn = 6.5
+vINn = random.choice([6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9])
+
+iDSn = iDn(vINn)  #0.25A
+
+vOUTn = RSn*iDSn   #4.0V
+
+def dvodvi(VI):
+   vA = VI-VTn
+   delta = math.sqrt(1+2*Kn*RSn*vA)
+   return(1-1/delta)
+
+ddn = dvodvi(vINn) #0.94 V/V
+
+#print(iDSn)
+#print(vOUTn)
+#print(ddn)
+
+#DVIN = 1.0
+DVIN = random.choice([0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+
+UvIN = vINn + DVIN      #max vIN
+UvOUT = RSn*iDn(UvIN)
+LvIN = vINn - DVIN      #min vIN
+LvOUT = RSn*iDn(LvIN)
+
+VDDmin = UvIN-VTn
+</script>
+
+<startouttext/>
+<br/>
+Let's crunch some numbers.  Assume our power MOSFET has
+\(K=$Knd\)A/V\(^2\) and \(V_T=$VTnd\).  Also, assume we are driving a
+\(R_S=$RSnd\Omega\) earphone load.
+<br/> <br/> 
+If we bias the input so that \(V_{IN}=$vINn\)V, what is the bias voltage 
+\(V_{OUT}\) (in Volts) across the earphone?
+<endouttext/>
+<numericalresponse answer="$vOUTn">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+We expect our signal to drive the input up and down by \($DVIN\)V.  
+<br/> 
+So, if the input goes up to  \(V_{IN}=$UvIN\) what will the output
+voltage \(v_{OUT}\) (in Volts) be?
+<endouttext/>
+<numericalresponse answer="$UvOUT">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+And, if the input goes down to  \(V_{IN}=$LvIN\) what will the output
+voltage \(v_{OUT}\) (in Volts) be?
+<endouttext/>
+<numericalresponse answer="$LvOUT">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+In order to allow this much swing on the output voltage, we must
+supply a sufficiently high supply voltage.  What is the minimum value
+of \(V_{DD}\) (in Volts) that we must supply to keep the transistor in the region of
+saturated operation?
+<endouttext/>
+<numericalresponse answer="$VDDmin">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

@@ -1,0 +1,68 @@
+<problem><script type="loncapa/python">
+Lu = random.choice([2.2, 3.3, 3.9, 4.7])
+L = Lu*1e-6
+
+I = random.choice([0.5, 0.62, 0.68, 0.75, 0.82, 1.0])
+
+E = 0.5*L*I*I
+
+dt = 0.25e-6 #s
+
+Pmax = E/dt
+</script><startouttext/>
+We have just learned the v-i characteristic for a linear inductor:
+<br/><br/>
+<center>
+\(v = L \frac{d i}{d t}\)
+</center>
+<br/><br/>
+So the power entering the inductor (as in any two-terminal device) is:
+<br/><br/>
+<center>
+\(P = v i = L i \frac{d i}{d t} \)
+</center>
+<br/><br/>
+If we integrate this between two times we get the energy change in the
+inductor over the interval:
+<br/><br/>
+<center>
+\( \Delta E = \int_{t_0}^{t_1} P(t) dt 
+            = \int_{t_0}^{t_1} L i(t) \frac{d i(t)}{d t}  dt 
+            = \frac{1}{2} L (i({t_1}))^2 - \frac{1}{2} L (i({t_0}))^2 
+\)
+</center>
+<br/><br/>
+So the energy stored in an inductor, as a function of the current
+through it, is:
+<br/><br/>
+<center>
+\( E = \frac{1}{2} L i^2 \)
+</center>
+<br/><br/>
+
+<endouttext/>
+
+<startouttext/>
+<br/>
+Inductors are used in buck-boost converters as part of the power
+supply of a mobile device such as a cell phone.  For example,  
+<a href="http://www.ti.com/lit/ds/slvs520b/slvs520b.pdf"> see.</a>
+In a typical application the inductor might have an inductance of
+\($Lu\mu\)H and the peak current might be \($I\)A.
+<br/>
+How much energy, in Joules, is stored in the inductor at the time of the peak
+current? 
+<endouttext/>
+<numericalresponse answer="$E"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/>
+This energy, stored in the inductor, is dumped into a capacitor on a timescale
+of perhaps 0.25\(\mu\)s.
+<br/>
+What is the peak power (in Watts) of this transaction?
+<endouttext/>
+<numericalresponse answer="$Pmax"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

@@ -1,0 +1,100 @@
+<!--  
+This is a KVL and KCL exercise, to be used after L2-12-13.
+Method 2
+-->
+
+<problem>
+
+<script type="loncapa/python">
+V = 2.0
+
+R=float(random.randrange(1,10,1))
+R1 = 2*R
+R2 = 2*R
+R3 = R
+R4 = R
+
+R3R4S = R3+R4
+R2R3R4SP = (R2*R3R4S)/(R2+R3R4S)
+R1R2R3R4SPS = R1+R2R3R4SP
+
+i1 = V/R1R2R3R4SPS
+i2 = R3R4S/(R2 + R3R4S)*i1
+i3 = i1 - i2
+i4 = i3
+
+v1 = R1*i1
+v2 = R2*i2
+v3 = R3*i3
+v4 = R4*i4
+</script>
+
+
+<startouttext />
+In the network shown you are given that \(V=$V\)V and that the
+resistors have the resistances \(R_1 = $R1 \Omega\),
+ \(R_2 = $R2 \Omega\), \(R_3 = $R3 \Omega\), and \(R_4 = $R4 \Omega\).
+<center>
+<img src="/static/circuits/ladder.gif" />
+</center>
+<endouttext />
+
+<startouttext />
+<br /> What is the equivalent resistance (in Ohms) of the series combination of \(R_3\) and \(R_4\)?
+<endouttext />
+<numericalresponse answer="$R3R4S">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> What is the equivalent resistance (in Ohms) of the parallel combination of
+\(R_2\) and the series combination of \(R_3\) and \(R_4\)?
+<endouttext />
+<numericalresponse answer="$R2R3R4SP">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext />
+<br /> What is the equivalent resistance (in Ohms) of the series combination of \(R_1\)
+and the parallel combination of \(R_2\) and the series combination of \(R_3\) and \(R_4\)?
+<endouttext />
+<numericalresponse answer="$R1R2R3R4SPS">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> What is the current (in Amperes) \(i_1\)?
+<endouttext />
+<numericalresponse answer="$i1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> What is the voltage (in Volts) across the resistor \(R_2\)?
+<endouttext />
+<numericalresponse answer="$v2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> What is the voltage (in Volts) across the resistor \(R_4\)?
+<endouttext />
+<numericalresponse answer="$v4">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> This is an important circuit structure called a ladder.  Many filters
+are built with ladders of capacitors and inductors.  We will see this
+kind of circuit later.
+<endouttext />
+
+
+</problem>

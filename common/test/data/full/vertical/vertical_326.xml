@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:z2e7XtoCwFo,1.0:DJafcK9z2uc,1.25:rtB4gvqt76A,1.50:h7FG14w3Wew" slug="S5V12_MOSFET_Inverter" rerandomize="per_student" name="S5V12: MOSFET Inverter"/>
+  <customtag tag="S5" slug="discuss_327" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="291" slug="book_328" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="5" slug="slides_329" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

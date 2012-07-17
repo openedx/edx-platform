@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:lA6QBtuahv8,1.0:ucYvm4YhSxg,1.25:4m0ZvHw2qVQ,1.50:7jU6fVfSGX0" slug="S20V1_Review_--_Sinusoidal_steady_state_SSS" name="S20V1: Review -- Sinusoidal steady state SSS"/>
+  <customtag tag="S20" slug="discuss_1348">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="703" slug="book_1349">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="20" slug="slides_1350">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,16 @@
+<problem><script type="loncapa/python">
+ids = "K*(VGS-VT)*vgs"
+</script><startouttext/>
+When operating in the saturated region we have 
+\(i_{DS} = \frac{K}{2}(v_{GS}-V_T)^2\).
+<br/>
+In the space provided below write an algebraic expression for
+the small-signal current \(i_{ds}\) for the MOSFET.  Your expression 
+should be in terms of device parameters \(K\) and \(V_T\), the bias
+voltage \(V_{GS}\), and the incremental voltage \(v_{gs}\).  Remember
+that algebraic expressions are case sensitive.
+<endouttext/>
+<formularesponse type="cs" samples="VT,K,VGS,vgs@1,1,1,1:3,3,3,3#10" answer="$ids"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+
+</problem>

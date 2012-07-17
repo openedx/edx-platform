@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:TyFaZOWd0Mo,1.0:ZU2ALNL9tUg,1.25:5tVsh3_RFkg,1.50:kgH1-1VeNmQ" slug="S12V16_DEMO_RC_Transients" showanswer="attempted" rerandomize="per_student" name="S12V16: DEMO RC Transients"/>
+  <customtag tag="S12" slug="discuss_836" showanswer="attempted" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="512" slug="book_837" showanswer="attempted" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="12" slug="slides_838" showanswer="attempted" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

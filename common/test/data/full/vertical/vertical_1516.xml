@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:y04aDzN_amA,1.0:rAOKcmHvM9M,1.25:5tnZxm2EDVE,1.50:hRi421068F4" slug="S22V3_Q_indicates_peakiness" name="S22V3: Q indicates peakiness"/>
+  <customtag tag="S22" slug="discuss_1517">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="792" slug="book_1518">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="22" slug="slides_1519">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:m4KCFAvLxZA,1.0:3nOKqJOJP_U,1.25:xqA85joAD-o,1.50:6fEA-6kvNZA" slug="S26V3_Static_power_for_logic_gate" rerandomize="per_student" name="S26V3: Static power for logic gate"/>
+  <customtag tag="S26" slug="discuss_1869" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="604" slug="book_1870" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1871" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

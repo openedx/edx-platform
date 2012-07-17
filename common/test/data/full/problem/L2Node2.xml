@@ -1,0 +1,13 @@
+<problem><script type="loncapa/perl">
+V0 = "V0"
+I1 = "I1"
+IR1 = "(e1-V0)/R1"
+KCLe2 = "(e2-e1)/R3 + (e2-V0)/R4 + e2/R5 - I1"
+</script><startouttext/><center><img src="/static/circuits/bridge-with-is-2.gif"/></center>
+Write the the expression that represents the sum of the currents
+leaving the node with potential \(e_2\) in the circuit given.  Express
+your answer in terms of the resistances, not the conductances.
+<endouttext/>
+<formularesponse type="cs" samples="e1,e2,I1,V0,R3,R4,R5@10,10,10,10,10,10,10:20,20,20,20,20,20,20#10" answer="$KCLe2"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="25"/></formularesponse>
+
+</problem>

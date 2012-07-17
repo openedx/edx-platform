@@ -1,0 +1,120 @@
+<problem>
+
+<script type="loncapa/python">
+# VT = 1.0 #V
+# K = 0.01 #A/V^2
+
+VT = float(random.randrange(9,15,1))/10.0
+K = float(random.randrange(9,20,1))/1000.0
+
+RL = random.choice([100.0, 120.0, 180.0, 220.0])  #Ohms
+
+vINmax = +1.0 #V
+vINmin = -2.0 #V
+
+#vGS = VG - vIN
+
+VGmin = vINmax + VT
+
+VG = math.ceil(VGmin + 1.0) #1Vsafety over cutoff
+
+vGSmax = VG - vINmin
+iDmax = (K/2)*(vGSmax - VT)**2
+
+vDSmin = vGSmax - VT #To keep out of triode
+
+# VDDmin = vDSmin + iDmax*RL + vINmin
+VDDmin = iDmax*RL + VG - VT
+
+print "iDmax = ", iDmax, "  vDSmin =", vDSmin, "  VDDmin =", VDDmin
+
+#VDD = math.ceil(VDDmin + 1.0) #1V safety over triode
+
+gm = K*(VG - VT)
+
+vovi = gm*RL
+
+rin = 1/gm
+</script>
+
+<startouttext/>
+The circuit shown below is called a "common gate amplifier": the
+input is applied to the source rather than the gate of the MOSFET. 
+As usual, however, the MOSFET is biased so that it is operated in 
+saturation.
+<center>
+<img src="/static/circuits/common-gate.gif" />
+</center>
+The MOSFET's parameters are: \(V_T = $VT\)V and \(K = $K\)A/V\(^2\).
+The resistance of the load resistor \(R_L = $RL\Omega\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+If in the application of this circuit the input voltage \(v_{IN}\) may
+swing between \($vINmax\)V and \($vINmin\)V, what is the minimum value of
+the bias voltage \(V_G\), in Volts, needed to keep the MOSFET out of cutoff?
+<endouttext/>
+<numericalresponse answer="$VGmin">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Assume \(V_G = $VG\)V, and the input swing is as specified. 
+<br/>
+What is the
+minimum value of the power-supply voltage \(V_{DD}\), in Volts, needed to keep
+the MOSFET in saturation? 
+<endouttext/>
+<numericalresponse answer="$VDDmin">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Choose the operating point where the input bias voltage \(V_{IN}=0\).
+<br/>
+Now we go to a small-signal model:
+what is the transconductance \(g_m\), in Amperes/Volt, of the MOSFET
+at the chosen operating point? 
+<endouttext/>
+<numericalresponse answer="$gm">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the incremental gain \(\frac{v_{out}}{v_{in}}\) of this
+circuit at the chosen operating point?  
+<br/>
+Be careful with signs here.
+<endouttext/>
+<numericalresponse answer="$vovi">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the equivalent incremental input resistance, in Ohms, of this
+small-signal model?
+<br/>
+Note that the incremental input resistance is \(\frac{v_{in}}{i_{in}}\), where 
+\(i_{in}\) is the current taken from the input voltage source for the
+voltage \(v_{in}\).
+<endouttext/>
+<numericalresponse answer="$rin">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+</problem>

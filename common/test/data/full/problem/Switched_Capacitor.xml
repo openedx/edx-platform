@@ -1,0 +1,71 @@
+<problem><script type="loncapa/python">
+
+VSd = random.randrange(300,500,5)
+VS  = float(VSd)
+
+RSd = random.choice([820,1000,1200])
+RS  = float(RSd)
+
+Cu = random.choice([270,330,390,470])
+C = float(Cu)*1e-6
+
+RLd = 10
+RL  = float(RLd)
+
+tau1 = RS*C
+t1   = random.choice([0.4,0.5,0.6,0.7,0.8,0.9,1.0])
+vct1  = VS*(1-math.exp(-t1/tau1))
+erst1  = -(tau1/2)*(VS**2/RS)*(math.exp(-2*t1/tau1) - 1)
+ect1   = (C/2)*vct1**2
+
+irlt1  = vct1/RL
+
+dt = random.choice([.01,.02,.03])
+
+tau2 = RL*C
+t2   = t1+dt
+vlt2 =  vct1*math.exp(-(t2-t1)/tau2)
+
+</script><startouttext/>
+
+In this circuit, \(V_S = $VSd\)V, \(R_S = $RSd\Omega\), \(C = $Cu\mu\)F,
+and \(R_L = $RLd\Omega\).
+The switch has been in the position shown for a
+very long time. 
+<center><img src="/static/circuits/SwitchedC.gif"/></center>
+At \(t=0\) the switch is flipped to the left.
+<br/>
+What is the voltage on the capacitor at \(t=$t1\), in Volts?
+<endouttext/>
+<numericalresponse answer="$vct1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the energy stored in the capacitor at \(t=$t1\) seconds, in Joules?
+<endouttext/>
+<numericalresponse answer="$ect1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+How much energy was dissipated in the resistor \(R_S\) between \(t=0\)
+and \(t=$t1\), in Joules? 
+<endouttext/>
+<numericalresponse answer="$erst1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+At \(t=$t1\) the switch is flipped to the right.
+<br/>
+Just after the flip, what is the current through the resistor \(R_L\),
+in Amperes? 
+<endouttext/>
+<numericalresponse answer="$irlt1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the voltage \(v_L\), in Volts, at time \(t=$t2\) seconds?
+<endouttext/>
+<numericalresponse answer="$vlt2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

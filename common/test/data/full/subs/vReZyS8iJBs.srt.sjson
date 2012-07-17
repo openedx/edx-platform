@@ -1,0 +1,23 @@
+{
+  "start": [
+    1120, 
+    4530, 
+    8290, 
+    12660, 
+    20810
+  ], 
+  "end": [
+    4530, 
+    8290, 
+    12660, 
+    20810, 
+    22080
+  ], 
+  "text": [
+    "SPEAKER: So notice here that I'm showing you the input on", 
+    "the x-axis, vi, and v0 on the y-axis.", 
+    "So notice how the output switches at plus six volts and", 
+    "then switches at a minus six volts to plus 12 or minus 12.", 
+    "OK, that's a hysteresis property."
+  ]
+}

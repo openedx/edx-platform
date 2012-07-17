@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S18E2_Homogenous_Equation_Solution" slug="S18E2_Homogenous_Equation_Solution" showanswer="attempted" rerandomize="false" name="S18E2: Homogenous Equation Solution"/>
+  <customtag tag="S18" slug="discuss_1215">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="656" slug="book_1216">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1217">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:JMZjY3qMCK8,1.0:5uKqMpQqNtk,1.25:__k5Aj1v0mE,1.50:ZgxM5-amKQ8" slug="S5V15_DEMO_SR_Model_Curve" rerandomize="per_student" name="S5V15: DEMO SR Model Curve"/>
+  <customtag tag="S5" slug="discuss_341" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="300" slug="book_342" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="5" slug="slides_343" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

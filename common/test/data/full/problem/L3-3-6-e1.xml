@@ -1,0 +1,119 @@
+<!--  
+This is a linearity exercise, to be used after L3 slides 3 through 6.
+-->
+
+<problem>
+
+<script type="loncapa/python">
+V1 = float(random.randrange(1,10,1))
+V2 = float(random.randrange(1,10,1))
+
+R1 = float(random.randrange(1,10,1))
+R2 = float(random.randrange(1,10,1))
+R3 = float(random.randrange(1,10,1))
+
+R1R3P = (R1*R3)/(R1+R3)
+R2R3P = (R2*R3)/(R2+R3)
+
+a31 = R2R3P/(R1+R2R3P)
+a32 = R1R3P/(R2+R1R3P)
+
+v31 = a31*V1
+v32 = a32*V2
+
+v3 = v31+v32
+
+i3 = v3/R3
+
+
+b1 = (a31-1)/R1
+b2 = a32/R1
+
+i1 = b1*V1 + b2*V2
+
+c1 = a31/R2
+c2 = (a32-1)/R2
+
+i2 = c1*V1 + c2*V2
+
+# print(str(i1+i2+i3)) had to be zero
+</script>
+
+<startouttext />
+Consider the following network containing two voltage sources and
+three resistors.
+You are given that \(R_1=$R1\Omega\),
+\(R_2=$R2\Omega\). \(R_3=$R3\Omega\),
+\(V_1=$V1\)V, and \(V_2=$V2\)V.
+<center>
+<img src="/static/circuits/superposition-v.gif" />
+</center>
+The voltage \(v\) across resistor \(R_3\) and the currents \(i_1\) and \(i_2\)
+can be expressed as a linear combinations of \(V_1\) and \(V_2\):
+<br /><br />
+\[v_3 = a_1*v_1 + a_2*v_2\]
+<br />
+\[i_1 = b_1*v_1 + b_2*v_2\]
+<br />
+\[i_2 = c_1*v_1 + c_2*v_2\]
+<br />
+<endouttext />
+
+<startouttext />
+<br />
+The value of \(a_1\) is: 
+<endouttext />
+<numericalresponse answer="$a31">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext />
+<br /> 
+The value of \(a_2\) is: 
+<endouttext />
+<numericalresponse answer="$a32">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+The value of \(b_1\) is: 
+<endouttext />
+<numericalresponse answer="$b1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> 
+The value of \(b_2\) is: 
+<endouttext />
+<numericalresponse answer="$b2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+The value of \(c_1\) is: 
+<endouttext />
+<numericalresponse answer="$c1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> 
+The value of \(c_2\) is: 
+<endouttext />
+<numericalresponse answer="$c2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>
+
+

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:b-ROnTVQTmk,1.0:jlX8hpZvnUQ,1.25:SERkCFri2wk,1.50:aRXzV6duFv8" slug="S5V9_MOSFET_Device_S_Model_Demo_Setup" rerandomize="per_student" name="S5V9: MOSFET Device, S Model, Demo Setup"/>
+  <customtag tag="S5" slug="discuss_310" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="288" slug="book_311" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="5" slug="slides_312" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

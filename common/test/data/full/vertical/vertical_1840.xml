@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:9zdSBbZxCTM,1.0:rnBrgT_wOuA,1.25:q7m3lAnBvAs,1.50:RS1HrQPJGVw" slug="S25V17_Op_Amp_oscillator_rise_time" rerandomize="per_student" name="S25V17: Op Amp oscillator rise time"/>
+  <customtag tag="S25" slug="discuss_1841" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="871" slug="book_1842" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1843" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

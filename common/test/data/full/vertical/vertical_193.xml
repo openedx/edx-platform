@@ -1,0 +1,10 @@
+<sequential>
+  <problem filename="S3E4_Simple_Thevenin" slug="S3E4_Simple_Thevenin" name="S3E4: Simple Thevenin"/>
+  <customtag tag="S3E4" slug="discuss_194">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S3E5_Thevenin_Model" slug="S3E5_Thevenin_Model" name="S3E5: Thevenin Model"/>
+  <customtag tag="S3E5" slug="discuss_195">
+    <impl>discuss</impl>
+  </customtag>
+</sequential>

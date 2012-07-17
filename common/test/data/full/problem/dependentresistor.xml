@@ -1,0 +1,39 @@
+<!--
+This is a week 4 or 5 problem about dependent elements
+-->
+
+<problem>
+
+<script type="loncapa/python">
+VS=float(random.randrange(5, 10, 1))
+RA=float(random.randrange(100, 1000, 50))
+RB=float(random.randrange(100, 1000, 50))
+K=float(random.randrange(50, 100, 5))
+
+VB=((VS*RB)-K)/(RA+RB)
+</script>
+
+   <startouttext/>
+   Voltage and current sources are not the only elements that can be
+   dependent on voltage or current.  The following circuit shows a
+   voltage-dependent resistor.  The resistor R is dependent on the
+   voltage across the resistor \(R_B\).
+   <center>
+   <img src="/static/circuits/dependent_resistor.gif"/>
+   </center>
+   <br/>
+   Determine \(v_B\), given that \(R=\frac{K}{v_B}\).  Assume also
+   that \(V_S=$VS\)V, \(R_A=$R A\Omega\), \(R_B=$RB\Omega\), and
+   \(K=$K\).
+   <endouttext/>
+
+   <startouttext/>
+   <br/>
+   \(v_B\):
+   <endouttext/>
+   <numericalresponse answer="$VB">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+</problem>
+   

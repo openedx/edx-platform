@@ -1,0 +1,64 @@
+<!--  
+This is a modeling exercise, to be used in L3
+-->
+
+<problem>
+
+<script type="loncapa/python">
+g = 12
+r = 1.588
+Pl = 1000.0
+Vl = 240.0
+Il = Pl/Vl
+Rl = Vl/Il
+
+l = float(random.randrange(100,200,1))
+
+Rt = 2*r*l/1000
+
+Vd = Il*Rt
+</script>
+
+
+<startouttext />
+Joe has a barn that is \($l\) feet from his house.  He needs to supply 
+1000 Watts at 240V to a resistive load at his barn from the 60Hz power line at his house.
+Note that the circuit from the house to the barn requires two
+lengths of the interconnecting wire.
+He proposes to use number \($g\) AWG wire to connect his house to his
+barn. (AWG is American Wire Gauge: a specification of the size of
+the wire.  For more information 
+<a href="http://en.wikipedia.org/wiki/American_wire_gauge">see</a>.)  
+Number \($g\) AWG copper wire has a resistance of \($r\Omega\) per 1000
+feet.  
+<center>
+<img src="/static/circuits/house-barn.gif" />
+</center>
+<endouttext />
+
+<startouttext />
+<br />  What is the total resistance (in Ohms) of the transmission line?
+<endouttext />
+<numericalresponse answer="$Rt">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> What is the resistance (in Ohms) of Joe's load at his barn?
+<endouttext />
+<numericalresponse answer="$Rl">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> What is the voltage drop (in Volts) from the house to the load at the barn
+  due to the resistance in Joe's transmission line?
+<endouttext />
+<numericalresponse answer="$Vd">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

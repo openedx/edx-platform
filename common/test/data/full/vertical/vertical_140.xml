@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:pEnx2wWI5pI,1.0:3g8ZeZlpv8E,1.25:f-fdq90ktF0,1.50:hqMARaVvRv0" slug="S2V10_Method_3_-_Node_Analysis" rerandomize="per_student" name="S2V10: Method 3 - Node Analysis"/>
+  <customtag tag="S2" slug="discuss_141" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="119" slug="book_142" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="2" slug="slides_143" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

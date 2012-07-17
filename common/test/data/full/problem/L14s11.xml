@@ -1,0 +1,44 @@
+<problem>
+<script type="loncapa/python">
+
+# Static Discipline
+VLOW = 0.0
+VOL  = 1.0
+VIL  = 2.0
+VIH  = 3.0
+VOH  = 4.0
+VS   = 5.0
+
+RLk = 1
+RL  = 1e3*RLk
+RON = 10
+
+CGSp  = 0.1
+CGS   = 1e-12*CGSp
+
+RTH = RON*RL/(RON+RL)
+VTH = RON*VS/(RON+RL)
+
+tau = RTH*CGS
+
+tf = -tau*math.log((VOL-VTH)/(VS-VTH))
+
+tfp = tf*1e12
+</script>
+
+<startouttext/> 
+Given that \(R_{ON} = $RON\Omega\), \(R_L = $RLk\)k\(\Omega\), and
+\(C_{GS}=$CGSp\)pF.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the time, in picoseconds, that it takes for the signal at node B to fall
+to the value of \(V_{OL} = $VOL\)V
+<endouttext/>
+<numericalresponse answer="$tfp">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> <textline />
+</numericalresponse>
+
+</problem>

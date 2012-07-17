@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:Fm2clHIrSI0,1.0:qehrY5JUkbQ,1.25:azkzEcaRssE,1.50:7zvjULwH3OU" slug="S8V4_Various_Types_of_Dependent_Sources" name="S8V4: Various Types of Dependent Sources"/>
+  <customtag tag="S8" slug="discuss_500">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="101" slug="book_501">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="8" slug="slides_502">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,41 @@
+<problem><startouttext/>
+    An inverter has the input/output transfer characteristic shown in the following figure:
+    <center><img src="/static/circuits/inverter_graph.gif"/></center>
+    <br/>
+    The inverter obeys the static discipline for suitable choices of
+    the voltages \(V_{IL}\), \(V_{OL}\), \(V_{IH}\), and \(V_{OH}\),
+    and those are such that \(NM_H\)=\(NM_L\).  
+    <br/>
+    Give  the value of \(V_{IL}\) (in Volts) that will actually achieve the
+    static discipline with the maximum positive noise margin.
+   <endouttext/>
+   <numericalresponse answer="1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+    <startouttext/>
+    <br/>
+    Give the value of \(V_{OL}\) (in Volts) that will actually achieve the static
+    discipline with the maximum positive noise margin. 
+    <endouttext/>
+    <numericalresponse answer="0.5"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+    <startouttext/>
+    <br/>
+    Give the value of \(V_{IH}\) (in Volts) that will actually achieve the static
+    discipline with the maximum positive noise margin. 
+    <endouttext/>
+    <numericalresponse answer="4"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+    <startouttext/>
+    <br/>
+    Give the value of \(V_{OH}\) (in Volts) that will actually achieve the static
+    discipline with the maximum positive noise margin. 
+    <endouttext/>
+    <numericalresponse answer="4.5"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+    <startouttext/>
+    <br/>
+    What is the noise margin (in Volts) that you obtained?
+    <endouttext/>
+    <numericalresponse answer="0.5"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse> 
+
+ </problem>

@@ -1,0 +1,97 @@
+<!-- Photodiode Buffer -->
+
+<problem>
+
+<script type="loncapa/python">
+iat100lx = 4.5e-6
+R1V_100lx = 1/iat100lx #1V/100lx
+inputbias = 5e-9
+percenterror = (5e-9/4.5e-6)*100
+
+vo = "(A/(1+A))*((R-RX)*IB+R*i)"
+RX = "R"
+</script>
+
+<startouttext/>
+It is sometimes necessary make precision measurements of light.  Such
+measurements are often done with a silicon photodiode.
+A silicon photodiode produces a very small reverse current
+proportional to the amount of light that hits it.
+If the <a href="http://en.wikipedia.org/wiki/Illuminance">
+illuminance</a> is 100lx a  
+<a href="http://sales.hamamatsu.com/en/products/solid-state-division/si-photodiode-series/si-photodiode.php">S1336-5BQ</a>
+photodiode will put out about 4.5uA, but it does this
+only over a small range of voltages.  So we need to sense this current
+and amplify it to some easily measured value.  We also need to
+maintain an approximately constant voltage across the diode.  A
+first-cut attack on this problem is as follows:
+<center>
+<img src="/static/circuits/PhotodiodeBuffer.gif" />
+</center>
+Assuming an ideal op amp, what resistance \(R\) should we use to
+obtain a sensitivity of \(1\)V/\(100\)lx?
+<endouttext/>
+<numericalresponse answer="$R1V_100lx">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Unfortunately, a real op amp is not ideal.  For this application we
+need to know that the inputs of a real op amp actually take some
+current, called the "input bias current," to operate correctly.  We
+can model this aspect of non-ideal behavior by augmenting our model of
+the opamp with a pair of current sources:
+<center>
+<img src="/static/circuits/PhotodiodeBufferBias.gif" />
+</center>
+We can see that the input bias current confuses our measurement by
+subtracting the bias current from our sensor.
+The input bias current of an 
+<a href="http://www.ti.com/lit/ds/symlink/opa827.pdf">
+OPA27 </a> op amp is less than 10pA typically, but it can be up to 
+5nA if we need to use it over a temperature range of \(-40^o\)C to \(+125^o\)C.
+<br/>
+Using the resistance you deduced in the previous question, and
+assuming that the gain \(A = \infty\), if we were operating in these
+extreme temperature conditions what percentage error would we incur in
+the voltage on the output when measuring light of 100lx?
+<endouttext/>
+<numericalresponse answer="$percenterror">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Although this is a small error, it may matter in precision
+applications.  However the error can be mitigated with the
+introduction of a single resistor:
+<center>
+<img src="/static/circuits/PhotodiodeBufferBiasFix.gif" />
+</center>
+<br/>
+In the space provided below write an algebraic expression for the
+output voltage, \(v\), in terms of \(A\), \(R\), \(R_X\), \(I_B\), and
+\(i\). 
+<endouttext/>
+<formularesponse type="cs" samples="A,R,RX,IB,i@1,1,1,1,1:3,3,3,3,3#10" answer="$vo">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+So, for what value of the resistor \(R_x\) is the effect of the bias
+current cancelled?  Write an algebraic expression for that value.
+<endouttext/>
+<formularesponse type="cs" samples="A,R,IB,i@1,1,1,1:3,3,3,3#10" answer="$RX">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

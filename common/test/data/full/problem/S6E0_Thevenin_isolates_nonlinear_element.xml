@@ -1,0 +1,32 @@
+<problem><startouttext/>
+If we want to study the behavior of a circuit with linear resistors,
+independent sources, and an unfamiliar, perhaps nonlinear, element, it
+is to our advantage to package up everything but the unfamiliar
+element into a Thevenin or Norton model, so we can concentrate on the
+interaction of this simply-characterized circuit with the unfamiliar
+element.  For example, the circuit on the left of the diagram can be
+summarized, from the point of view of the unfamiliar element, by the
+circuit on the right.
+<center><img src="/static/circuits/Thev-but-one.gif"/></center>
+<endouttext/>
+
+<script type="loncapa/perl">
+VTH = "RP*VS/(RS+RP)";
+RTH = "RS*RP/(RS+RP)";
+</script>
+
+<startouttext/>
+In the space provided, write the algebraic expressions for the
+Thevenin voltage and resistance.
+<br/>
+\(V_{TH}\) =
+<endouttext/>
+<formularesponse type="cs" samples="VS,RS,RP@1,1,1:3,3,3#10" answer="$VTH"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+\(R_{TH}\) =
+<endouttext/>
+<formularesponse type="cs" samples="VS,RS,RP@1,1,1:3,3,3#10" answer="$RTH"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+</problem>

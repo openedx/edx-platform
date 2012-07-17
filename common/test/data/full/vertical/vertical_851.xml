@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:YIJ6i3aDBWQ,1.0:giWrmvBUB4Y,1.25:-5iE0LbZ7eo,1.50:TUrBJf5GqJg" slug="S13V2_Ideal_Linear_Inductors" rerandomize="per_student" name="S13V2: Ideal Linear Inductors"/>
+  <customtag tag="S13" slug="discuss_852" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="466" slug="book_853" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="13" slug="slides_854" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

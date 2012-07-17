@@ -1,0 +1,15 @@
+<sequential>
+  <video youtube="0.75:bUsnXUwkPmM,1.0:4_V_8uAVdmg,1.25:o38WbVFcN5M,1.50:ApE7rSIuoTY" slug="S13V4_Inductor_and_a_Voltage_Source" rerandomize="per_student" name="S13V4: Inductor and a Voltage Source"/>
+  <html slug="html_866" rerandomize="per_student">
+	Correction: An <strong>inductor</strong> looks like an instantaneous open to an external change in current. (not a capacitor)
+	</html>
+  <customtag tag="S13" slug="discuss_867" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="480" slug="book_868" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="13" slug="slides_869" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

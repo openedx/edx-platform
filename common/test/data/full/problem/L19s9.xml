@@ -1,0 +1,34 @@
+<!-- Sinusoidal Steady State: Exponential Subproblem -->
+
+<problem>
+
+<script type="loncapa/python">
+Vp = "(1/(1+R*C*s))*Vi"
+</script>
+
+<startouttext/>
+We are working on finding the particular solution for the first-order
+linear constant-coefficient ordinary differential equation:
+<br/><br/>
+\( R C \frac{d v_P(t)}{d t} + v_P(t) = V_i\cos(\omega t) \)
+<br/><br/>
+The new idea is to find the particular solution for the related
+equation
+<br/><br/>
+\( R C \frac{d v_{PS}(t)}{d t} + v_{PS}(t) = V_i e^{st} \)
+<br/><br/>
+because we expect that this solution is easy to get and it will help
+to find the particular solution for the original equation.
+<br/><br/>
+If you try \( v_{PS}(t) =  V_p e^{st} \) you will find that it will
+work; you can solve for \(V_p\).  In the space provided
+below write an algebraic expression for \(V_p\) in terms of \(V_i\),
+\(s\), \(R\) and \(C\).
+<endouttext/>
+<formularesponse type="cs" samples="R,C,s,Vi@1,1,1,1:3,3,3,3#10" answer="$Vp">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

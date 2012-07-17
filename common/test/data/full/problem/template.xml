@@ -1,0 +1,26 @@
+<!-- Photodiode Buffer -->
+
+<problem>
+
+<script type="loncapa/python">
+</script>
+
+<startouttext/>
+It is sometimes necessary make precision measurements of light.  Such
+measurements are often done with a 
+<a href="http://sales.hamamatsu.com/en/products/solid-state-division/si-photodiode-series/si-photodiode.php"> silicon photodiode</a>.
+A silicon photodiode produces a very small current proportional to the amount of
+light that hits it, but it does this only over a small range of
+voltages.  So we need to sense this current and amplify it to some
+easily measured value.  We also need to maintain an approximately
+constant voltage across the diode.  A first-cut attack on this problem is
+as follows:
+<center>
+<img src="/static/circuits/PhotodiodeBuffer.gif" />
+</center>
+<endouttext/>
+
+
+
+
+</problem>

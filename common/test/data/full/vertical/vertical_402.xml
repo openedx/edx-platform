@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:7yhllRkHZKU,1.0:HSqbzBmd3Lw,1.25:Sp0e4nwPz6Q,1.50:6CS87cRcL_8" slug="S6V9_Method_3_-_Piecewise_Linear_Method" rerandomize="per_student" name="S6V9: Method 3 - Piecewise Linear Method"/>
+  <customtag tag="S6" slug="discuss_403" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="206" slug="book_404" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="6" slug="slides_405" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

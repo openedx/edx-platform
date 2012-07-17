@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:3NRB50tthvA,1.0:odVt2Dyogjs,1.25:mj0PNYH4jqk,1.50:kDItSi4A1O8" slug="S26V6_Energy_from_source_during_T2_S1_open_S2_closed" rerandomize="per_student" name="S26V6: Energy from source during T2: S1 open, S2 closed"/>
+  <customtag tag="S26" slug="discuss_1885" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="601" slug="book_1886" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1887" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

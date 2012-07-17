@@ -1,0 +1,90 @@
+<problem>
+
+<script type="loncapa/python">
+def FOS(tau, start, goal, deltat):
+   return(goal+(start-goal)*math.exp(-(deltat/tau)))
+
+#R  = 100.0 #Ohm
+#L  = 0.1 #H
+#V0 = 4.0 #V
+#Lambda = 1.0e-2 #Weber=Volt*second
+
+R = random.choice([68.0, 82.0, 100.0, 120.0, 180.0, 220.0])
+L = random.choice([0.047, 0.056, 0.068, 0.082, 0.1, 0.12, 0.18, 0.22])
+V0 = random.choice([2.0, 3.0, 4.0, 5.0])
+Lambda = random.choice([0.007, 0.008, 0.009, 0.01, 0.011, 0.012, 0.013])
+
+Igoal = V0/R
+
+
+
+tm1m = -1.0 #ms
+tm1  = tm1m*1e-3
+im1m = -10  #mA
+im1  = im1m*1e-3
+
+t0  = 0
+im  = FOS(L/R, im1, Igoal, t0-tm1)
+ip  = im + Lambda/L
+
+print "im=", im, " ", "ip=", ip
+
+tp1m = +1.0 #ms
+tp1  = tp1m*1e-3
+ip1  = FOS(L/R, ip, Igoal, tp1-t0)
+
+print "ip1=", ip1
+</script>
+
+<startouttext/>
+Consider the following circuit:
+<center>
+<img src="/static/circuits/thevenin-inductor.gif" />
+</center>
+Let \(R = $R\Omega\) and \(L= $L\)H.
+Suppose time is measured in milliseconds.
+Starting at time \(t = -5\)ms and continuing, we know that
+\(V(t) = V_0 + \Lambda \delta(t)\)V, where \(V_0 = $V0\)V and \(\Lambda = $Lambda\)Webers.
+<br/>
+Also, assume that we measured \(i_L(-1) = $im1\)A.
+<br/><br/>
+What is the current, in Amperes, through the inductor at \(t=0_-\), a time
+infinitesimally before the impulse is delivered?  Hint: The system has
+not yet reached steady state.
+<endouttext/>
+<numericalresponse answer="$im">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+What is the current, in Amperes, through the inductor at \(t=0_+\), a time
+infinitesimally after the impulse is delivered?
+<endouttext/>
+<numericalresponse answer="$ip">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+What is the current, in Amperes, through the inductor at \(t=1\)ms,
+after the impulse is delivered?
+<endouttext/>
+<numericalresponse answer="$ip1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>
+
+
+<!--
+<br/><br/>
+<img src="/static/circuits/thevenin-inductor.gif" />
+, and  
+and \(V(t) = 1 + B\delta(t)\)V. 
+ and \(i_L(-1) = 3\)A. 
+-->

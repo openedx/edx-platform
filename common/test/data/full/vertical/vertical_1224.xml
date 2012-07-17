@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:TcOhcbVPCwA,1.0:0hc7okPX0Ec,1.25:g46rnpdr8Qk,1.50:DCjva-HhQ1A" slug="S18V2_Driven_Series_RLC_Circuit" rerandomize="per_student" name="S18V2: Driven, Series RLC Circuit"/>
+  <customtag tag="S18" slug="discuss_1225" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="654" slug="book_1226" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1227" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

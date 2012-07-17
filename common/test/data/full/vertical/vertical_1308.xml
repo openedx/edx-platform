@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:8mMsK4ObxtY,1.0:WP9XIVvpijY,1.25:SnArvWqclCQ,1.50:3MD9ydBBff0" slug="S18V20_Other_Variables_in_RLC_Circuits" rerandomize="per_student" name="S18V20: Other Variables in RLC Circuits"/>
+  <customtag tag="S18" slug="discuss_1309" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="658" slug="book_1310" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1311" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

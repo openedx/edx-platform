@@ -1,0 +1,123 @@
+<problem><script type="loncapa/python">
+ddi = "(I - iL)/(L*C)"
+I0 = float(random.choice([2, 3, 4, 5, 6, 7, 8, 9, 10]))
+
+Iinitial = 0.0
+Vinitial = 0.0
+
+CharPoly = "L*C*s^2 + 1"
+
+fM = random.choice([5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0])
+f = fM*1e6
+pi = 4.0*math.atan(1.0)
+omega0 = 2*pi*f
+
+Cp = 100.0
+C  = Cp*1e-12
+
+L = 1.0/(omega0**2 * C)
+Lu = L*1e6
+
+phi = math.atan2((Iinitial - I0), Vinitial/(L*omega0))
+A   = (Iinitial - I0)/math.sin(phi)
+</script><startouttext/>
+Consider the circuit:
+<center><img src="/static/circuits/ILC.gif"/></center>
+In the space provided below write an algebraic expression for the
+second derivative of the inductor current in terms of the source
+current \(I\), the inductor current \(i_L\), the inductance \(L\), and
+the capacitance \(C\).
+<br/><br/>
+\(\frac{d^2i_L}{dt^2}=\)
+<endouttext/>
+<formularesponse type="cs" samples="I,L,C,iL@1,1,1,1:3,3,3,3#10" answer="$ddi"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+Let \(I(t) = I_0 u(t)\), a step of height \(I_0=$I0\)A starting at
+\(t=0\).
+Suppose also that just after the step \(I(0_+) = $Iinitial\)A and \(v_C(0_+) = $Vinitial\)V.
+<br/>
+For \(t &gt; 0\) what would \(i_L(t)\) have to be, in Amperes, 
+to make \(\frac{d^2i_L(t)}{dt^2}=0\)?
+<endouttext/>
+<numericalresponse answer="$I0"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+Your answer should have been \(I_0 = $I0\).  So \(I_P(t)
+=$I0\) is a particular solution of the differential equation for \(t
+&gt; 0\).
+<endouttext/>
+
+<startouttext/>
+Unfortunately, our particular solution cannot be the solution to our
+problem because it does not match the initial conditions.  So we must
+add in an appropriate amount of solution of the homogeneous equation
+to match the initial conditions.
+<br/>
+In the space provided below write the characteristic polynomial for
+this differential equation in terms of the
+indeterminate \(s\) and the parameters \(L\) and \(C\).
+<endouttext/>
+<customresponse><startouttext/><br/><textline size="40" correct_answer="L*C*s^2 + 1"/><endouttext/><answer type="loncapa/python">
+correct = ['correct']
+L = 3.14159
+C = 2.71828
+s = 1j*math.sqrt(1/(L*C))
+try:
+  input = submission[0]
+  residual = calc.evaluator({'L' : L, 'C' : C, 's' : s},{},input)
+except ValueError:
+  correct[0] = 'incorrect'
+  residual = 1e6
+
+#print residual
+
+
+if (not(('L' in input) or ('C' in input) or ('s' in input))) or (abs(residual) &gt; 1e-6):
+  correct[0] = 'incorrect'
+</answer></customresponse>
+
+
+
+<startouttext/>
+<br/>
+If we want the natural frequency of oscillation of this circuit to be
+\(f=$fM\)MHz and we have a capacitor of \(C=$Cp\)pF what inductance
+\(L\), in microHenrys, should we use?  Note: \(\omega_0 = 2\pi f\).
+<endouttext/>
+<numericalresponse answer="$Lu"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+A general form of the solution to the homogeneous equation
+associated with this circuit is \(i_H(t) = A\sin(\omega_0 t + \phi)\).
+So the solution to our problem for \(t &gt; 0\) can be written
+\(i_L(t) = i_P(t) + i_H(t)\), or
+<br/><br/>
+\(i_L(t) = I_0 + A\sin(\omega_0 t + \phi) \)
+<br/><br/>
+We now know \(\omega_0\) but we need the values of \(A\) and \(\phi\)
+to complete the solution.  But these are determined by the initial
+conditions.  We have two equations:
+<br/><br/>
+\(i_L(0) = I_0 + A\sin(\phi)\)
+<br/><br/>
+\(v_C(0) = L \frac{d i_L(t)}{dt}|_{t=0} = A L \omega_0 \cos(\phi) \)
+<br/><br/>
+Given the numerical values we now know for \(\omega\) and for the initial conditions,
+solve the last two equations for \(A\) and \(\phi\).  Note: There are
+mathematically equivalent solutions with \(A\) positive or \(A\) negative.  Please
+give the solution with positive \(A\).
+<br/>
+\(A = \)
+<endouttext/>
+<numericalresponse answer="$A"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+\(\phi = \) (in radians \(-\pi \lt \phi &lt; \pi\) )
+<endouttext/>
+<numericalresponse answer="$phi"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+</problem>

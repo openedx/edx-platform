@@ -1,0 +1,26 @@
+<!-- Impedance Model: Lecturer asks students to derive complex 
+     amplitude of voltage across resistor in series VLCR circuit. -->
+
+<problem>
+
+<script type="loncapa/python">
+Vr = "((j*w*R*C)/(1+j*w*R*C-w^2*L*C))*Vi"
+</script>
+
+<startouttext/>
+<center>
+<img src="/static/circuits/VLCR1.gif" />
+</center>
+The complex amplitude of \(v_I(t)\) is \(V_i\).
+Derive \(V_r\) as a function of \(R\), \(C\), \(L\), \(\omega\), and
+\(V_i\).  In the space below enter your algebraic expression for
+\(V_r\).  (As usual, use \(w\) for \(\omega\) in your expression.)
+<endouttext/>
+
+<formularesponse type="cs" samples="w,R,L,C,Vi@1,1,1,1,1:3,3,3,3,3#10" answer="$Vr">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

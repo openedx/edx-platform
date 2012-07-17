@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:XNy6Ek51X8Q,1.0:YJR2DBIXNsI,1.25:htfaiQCHQTU,1.50:njg11FgcgY4" slug="S12V8_Capacitor_and_a_Current_Source" showanswer="attempted" rerandomize="per_student" name="S12V8: Capacitor and a Current Source"/>
+  <customtag tag="S12" slug="discuss_801" showanswer="attempted" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="482" slug="book_802" showanswer="attempted" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="12" slug="slides_803" showanswer="attempted" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

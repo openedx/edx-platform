@@ -1,0 +1,83 @@
+<problem><script type="loncapa/python">
+mu0 = 4*math.pi*1e-7
+k = 640
+lcm = 10 #cm
+l = 0.01*lcm
+dcm = 1 #cm
+d = 0.01*dcm
+N = 100
+
+A = math.pi*(d/2)**2
+L = k*mu0*(N**2*A)/l
+</script><startouttext/>
+An inductor is a device that stores energy in the magnetic field.  The
+characteristic parameter \(L\) of an inductor is called "inductance", which
+is measured in units of Henrys, after Joseph Henry, who discovered the
+phenomena of self inductance and of mutual inductance.
+See
+<a href="http://en.wikipedia.org/wiki/Joseph_Henry"> Henry</a>
+for more historical information about this great scientist/engineer.
+<br/><br/>
+For a mechanical analogy, inductance is analogous to inertia.  If
+voltage is analogous to force, and charge is analogous to
+displacement, then current is analogous to velocity and magnetic flux \(\Phi\)
+is analogous to momentum.  So the law for a linear inductor is
+analogous to Newton's law of motion:
+<br/><br/>
+<center>
+\(\Phi = L i\ \Longleftrightarrow\ p = m v\)
+</center>
+<br/><br/>
+and
+<br/><br/>
+<center>
+\(v = L \frac{d i}{d t}\)
+</center>
+<br/><br/>
+The inductance of an inductor is determined by its geometry and the
+magnetic properties of the materials it is made out of.  For example,
+for a solenoidal inductor (with \(N\) turns of wire wrapped around a
+core of area \(A\) and length \(l\) we have:
+<br/><br/>
+<center>
+\(L = \mu \frac{N^2 A}{l}\)
+</center>
+<br/><br/>
+The constant of proportionality \(\mu\) is called the "permeability"
+of the core on which the solenoid is wound.  The permeability is a
+property of the material of the core.
+<endouttext/>
+
+<startouttext/>
+<br/>
+Suppose we double the length, width, and depth of a solenoidal inductor, by what
+multiple does the inductance increase?
+<endouttext/>
+<numericalresponse answer="2"><responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Suppose we double the number of turns of wire on a solenoidal inductor, by what
+multiple does the inductance increase?
+<endouttext/>
+<numericalresponse answer="4"><responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+The permeability of the vacuum is \(\mu_0 = 4\pi\times 10^{-7}\).  
+This is also called the
+<a href="http://physics.nist.gov/cgi-bin/cuu/Value?mu0|search_for=universal_in!">
+ magnetic constant</a>.
+Magnetic materials, such as manganese-zinc ferrite, have a higher
+permeability than the vacuum.  The ratio of the permeability of a
+material to the permeability of the vacuum is called the "relative
+permeability" of the material.  For example, the relative permeability
+of one kind of manganese-zinc ferrite is about \($k\).  For more information 
+<a href="http://en.wikipedia.org/wiki/Permeability_%28electromagnetism%29">see</a>. 
+<br/>
+What is the approximate inductance (in Henrys) of a \($N\)-turn solenoidal inductor wound on
+\($dcm\)cm diameter cylindrical ferrite core \($lcm\)cm long?
+ <endouttext/>
+<numericalresponse answer="$L"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

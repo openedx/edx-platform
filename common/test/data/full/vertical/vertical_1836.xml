@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:26uB0OHPa9s,1.0:OLSkdIY2nNs,1.25:GXOyozzKbtE,1.50:ONSFunZkBvw" slug="S25V16_Op_Amp_oscillator" rerandomize="per_student" name="S25V16: Op Amp oscillator"/>
+  <customtag tag="S25" slug="discuss_1837" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="870" slug="book_1838" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1839" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

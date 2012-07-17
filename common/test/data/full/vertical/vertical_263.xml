@@ -1,0 +1,10 @@
+<sequential>
+  <problem filename="S4E2_Boolean_Functions" slug="S4E2_Boolean_Functions" name="S4E2: Boolean Functions"/>
+  <customtag tag="S4E2" slug="discuss_264">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S4E3_Truth_Table" slug="S4E3_Truth_Table" name="S4E3: Truth Table"/>
+  <customtag tag="S4E3" slug="discuss_265">
+    <impl>discuss</impl>
+  </customtag>
+</sequential>

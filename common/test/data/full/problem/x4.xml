@@ -1,0 +1,148 @@
+<problem>
+
+<script type="loncapa/python">
+Vmin=0
+Vmax=random.choice([5.0, 4.0, 3.3, 2.9])
+
+Vrange = Vmax - Vmin
+
+# Nominal voltages
+Voln = 1*Vrange/5
+Viln = 2*Vrange/5
+Vihn = 3*Vrange/5
+Vohn = 4*Vrange/5
+
+Vcen = (Viln + Vihn)/2.0
+
+# Adding perturbations
+Vol = Voln + float(random.randrange(-2,+3,1))*Vrange/25
+Vil = Viln + float(random.randrange(-2,+3,1))*Vrange/25
+Vih = Vihn + float(random.randrange(-2,+3,1))*Vrange/25
+Voh = Vohn + float(random.randrange(-2,+3,1))*Vrange/25
+
+Vfb = Vih - Vil
+
+Vnml = Vil - Vol
+Vnmh = Voh - Vih
+
+RON = 5000.0
+RONk = RON*1e-3
+RPUmin = RON*(Vmax-Vol)/Vol
+RPUmink = RPUmin*1e-3
+
+RPUk = math.ceil(RPUmin*1e-3 + 1.0)
+RPU  = RPUk*1e3
+
+Pmax = (2*Vmax**2)/(RON+RPU)
+Pmaxm = Pmax*1000.0
+
+CGS = 50e-15
+CGSf = CGS*1e15
+
+tr  = RPU*CGS
+tf  = ((RON*RPU)/(RON+RPU))*CGS
+
+trn = tr*1e9
+tfn = tf*1e9
+
+</script>
+
+<startouttext/> 
+The circuit shown below is intended to implement C as a logic function
+of A and B.
+<center>
+<img src="/static/circuits/x4.gif" />
+</center>
+Three of the four following logic diagrams compute the same logic
+function as the circuit above.
+<center>
+<img src="/static/circuits/x41.gif" />
+</center>
+Which diagram computes something different?
+<br/>
+Write the number of the incorrect diagram in the box below:
+<endouttext/>
+<numericalresponse answer="2">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+The circuit is intended to obey the following static discipline:
+<br/><br/>
+\(V_S=$Vmax\)V, \(V_{OH}=$Voh\)V, \(V_{IH}=$Vih\)V, \(V_{IL}=$Vil\)V,
+\(V_{OL}=$Vol\)V.
+<br/><br/>
+<endouttext/>
+
+<startouttext />
+<br />
+What is the low-level noise margin?  (Express your answer in Volts.)
+<endouttext />
+<numericalresponse answer="$Vnml">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+What is the high-level noise margin?  (Express your answer in Volts.)
+<endouttext />
+<numericalresponse answer="$Vnmh">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br />
+How big (in Volts) is the forbidden region?
+<endouttext />
+<numericalresponse answer="$Vfb">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br />
+Assume that \(R_{ON}=$RONk\)k\(\Omega\) for our MOSFETS.  What is the minimum value that
+\(R_{PU}\) can have, in kilOhms, and still satisfy the static discipline?
+<endouttext />
+<numericalresponse answer="$RPUmink">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br />
+We now have \(R_{ON}=$RONk\)k\(\Omega\).  Let's choose \(R_{PU} =$RPUk\)k\(\Omega\).  What is the maximum
+amount of power, in milliWatts, that is consumed by this circuit for legitimate logic
+levels applied at A and B?
+<endouttext/>
+<numericalresponse answer="$Pmaxm">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br />
+Given our choices of \(R_{ON}\) and \(R_{PU}\), assume that the gate-to-source capacitance \(C_{GS}=$CGSf\)fF.
+What is the rising edge time constant, in nanoseconds, for the signal
+at the node labeled X?
+<endouttext />
+<numericalresponse answer="$trn">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br />
+What is the falling edge time constant, in nanoseconds, for the signal
+at the node labeled X?
+<endouttext />
+<numericalresponse answer="$tfn">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:aodbo4LU-is,1.0:hNMXLMfzkHU,1.25:6zwZgkkOzEs,1.50:ZXLUCJYg5yI" slug="S11V8_Small_Signal_Circuit_Analysis_of_Amplifier" rerandomize="per_student" name="S11V8: Small Signal Circuit Analysis of Amplifier"/>
+  <customtag tag="S11" slug="discuss_746" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="418" slug="book_747" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="11" slug="slides_748" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

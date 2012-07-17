@@ -1,0 +1,10 @@
+<sequential>
+  <problem filename="S8E1_Dependent_Current_Source" slug="S8E1_Dependent_Current_Source" showanswer="attempted" rerandomize="false" name="S8E1: Dependent Current Source"/>
+  <customtag tag="S8E1" slug="discuss_518">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S8E2_Dependent_Voltage_Source" slug="S8E2_Dependent_Voltage_Source" showanswer="attempted" rerandomize="false" name="S8E2: Dependent Voltage Source"/>
+  <customtag tag="S8E2" slug="discuss_519">
+    <impl>discuss</impl>
+  </customtag>
+</sequential>

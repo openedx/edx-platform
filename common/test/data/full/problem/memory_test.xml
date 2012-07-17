@@ -1,0 +1,164 @@
+<problem>
+
+<script type="loncapa/python">
+Lu   = 1.0   # um
+Wu   = 1.0   # um
+toxn = 10.0  # nm
+kox  = 3.9 # SiO2
+mue  = 0.075 # m^2/(V*s)   electron surface mobility in Si
+mup  = 0.025 # m^2/(V*s)   hole surface mobility in Si
+
+e0   = 8.854187817620389e-12 # F/m
+
+L    = Lu*1e-6
+W    = Wu*1e-6
+tox  = toxn*1e-9
+
+# CGS  = kox*e0*L*W/tox
+CGSf = 3.5 #fF
+CGS  = CGSf*1e-15
+
+# K    =  (mue*kox*e0*W)/(L*tox)
+VT   = 1.0 # V
+
+#RPUk = 10.0  # kOhms
+RPUk = 16.0
+#RPUk = float(random.randrange(10,20,2))
+RPU  = RPUk*1e3
+
+#RON  = 2000.0
+RON  = 1800.0
+#RON  = float(random.randrange(1800,2200,50))
+
+#ROFFM = 100.0 # MOhms
+ROFFM = 90.0 # MOhms
+#ROFFM = float(random.randrange(90,120,5))
+ROFF = ROFFM*1e6
+
+VS    = 5.0  #Volts
+VOH   = 3.5
+VIH   = 3.0
+VIL   = 2.0
+VOL   = 1.5
+Vmin  = 0.0
+
+tdm   = 100 #ms
+td    = tdm*1e-3
+
+Rp   =  -td/(CGS*math.log(VIH/VOH))
+RpT  = Rp*1e-12
+
+Vhi = VS*ROFF/(ROFF+RPU)
+Vdrop = Vhi - VT
+
+Rcharge = RON + RPU*ROFF/(RPU+ROFF)
+
+#tcharge = - (RPU+RON)*CGS*math.log((VOH - Vdrop)/(VOL - Vdrop))
+tcharge = - Rcharge*CGS*math.log((VOH - Vdrop)/(VOL - Vdrop))
+tchargep = tcharge*1e12
+
+Vlo = VS*RON/(RON+RPU)
+Rdis = RON + (RON*RPU)/(RON+RPU)
+
+tdis = - Rdis*CGS*math.log((VIL - Vlo)/(VOH - Vlo))
+tdisp = tdis*1e12
+
+</script>
+
+
+<startouttext/>
+One possible implementation of one bit of a digital memory might be
+something like the circuit below.  The memory element here is the
+gate-to-source capacitance of transistor \(Q_2\).  Since the
+capacitance is leaky, this can hold a value only for a time determined
+by the time constant of the capacitance and the leakage resistance.
+Thus, such a memory has to be "refreshed" periodically, by reading out
+its value and rewriting that value.
+<center>
+<img src="/static/circuits/memory.gif" />
+</center>
+We assume an "ancient" \(1\mu\)m technology satisfying the static
+discipline:
+<br/> <br/> 
+\(V_S=$VS\)V, \(V_{OH}=$VOH\)V, \(V_{IH}=$VIH\)V, \(V_{IL}=$VIL\)V, \(V_{OL}=$VOL\)V
+<br/> <br/> 
+The gate-source capacitance \(C_{GS}=$CGSf\)fF and \(V_T = $VT\)V.
+<br/><br/>
+\(R_{ON} = $RON\Omega\), \(R_{OFF}=$ROFFM\)M\(\Omega\) and \(R_{PU} =$RPUk\)k\(\Omega\).
+<br/> <br/> 
+The specifications for this logic family say that we have to refresh
+this memory every 64ms.  So, if we charge the gate capacitance to
+\(V_{OH}\) it will take more than 64ms to decay to \(V_{IH}\).
+If it takes \($td\)s to decay that far, what must be the parasitic
+resistance, in TerraOhms from the gate
+to the source of \(Q_2\)?  Note:  (1 T\(\Omega = 10^{12}\Omega\)).
+<endouttext/>
+<numericalresponse answer="$RpT">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+On a chip a MOSFET is physically symmetrical: the source and the drain
+are interchangeable.  For the purposes of the formulae that describe
+an n-channel MOSFET the source is just the electrode with the lowest
+potential and the drain is the one with the highest potential.  (That
+is, the voltage from the drain to the source \(v_{DS}\) is positive.)
+For \(Q_1\) and \(Q_2\) this is not an issue, but for \(Q_3\)
+sometimes we are charging the gate of \(Q_2\), to store a "0", and
+sometimes we are discharging it, to store a "1".  (Note that there is
+an inversion on input and output.)
+<br/><br/>
+When \(D_{IN}\) is low \(Q_1\) turns off and its drain goes high.  What
+is the maximum value of voltage on the drain of \(Q_1\), in Volts?
+<endouttext/>
+<numericalresponse answer="$Vhi">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Now, suppose the drain of \(Q_1\) is high, as above, and the store line is held
+at the same voltage as the drain of \(Q_1\).  What is the maximum
+voltage, in Volts, that the gate of \(Q_2\) can be charged to?
+Note, this value must be larger than \(V_{OH}\) to satisfy the static
+discipline. 
+<endouttext/>
+<numericalresponse answer="$Vdrop">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+The drain of \(Q_1\) is still high and the gate of \(Q_2\) is
+at \(V_{OL}\).  A STORE pulse comes in and turns on \(Q_3\).  How long
+must the STORE pulse be on, in picoseconds, to charge the gate
+capacitance of \(Q_2\) to \(V_{OH}\)?  
+<endouttext/>
+<numericalresponse answer="$tchargep">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+Now, suppose \(D_{IN}\) is high, the drain of \(Q_1\) is low, and the gate of \(Q_2\) is
+at \(V_{OH}\).  A STORE pulse comes in and turns on \(Q_3\).  How long
+must the STORE pulse be on, in picoseconds, to discharge the gate
+capacitance of \(Q_2\) to \(V_{IL}\)?  
+<endouttext/>
+<numericalresponse answer="$tdisp">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

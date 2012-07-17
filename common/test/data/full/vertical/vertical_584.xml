@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S9E1_MOSFET_model" slug="S9E1_MOSFET_model" showanswer="attempted" rerandomize="false" name="S9E1: MOSFET model"/>
+  <customtag tag="S9E1" slug="discuss_585">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="337" slug="book_586">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="9" slug="slides_587">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,20 @@
+<sequential>
+  <problem filename="S1E1_Various_V-I_characteristics" slug="S1E1_Various_V-I_characteristics" name="S1E1: Various V-I characteristics"/>
+  <customtag tag="S1E1" slug="discuss_53">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S1E1.5_Simple_Power" slug="S1E1.5_Simple_Power" name="S1E1.5: Simple Power"/>
+  <customtag tag="S1E1.5" slug="discuss_54">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S1E2_Power" slug="S1E2_Power" name="S1E2: Power"/>
+  <customtag tag="S1E2" slug="discuss_55">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="39" slug="book_56">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="1" slug="slides_57">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

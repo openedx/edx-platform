@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:1qrT8pVo7LE,1.0:Kq-0sgJ3z_U,1.25:qCnf91q1uK0,1.50:0x4OpmiUwsw" slug="S21V4_Introduction_to_filters" name="S21V4: Introduction to filters"/>
+  <customtag tag="S21" slug="discuss_1437">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="742" slug="book_1438">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="21" slug="slides_1439">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

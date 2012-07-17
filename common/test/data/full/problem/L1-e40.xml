@@ -1,0 +1,44 @@
+<!-- This is a problem about KCL -->
+
+<problem>
+
+<script type="loncapa/python">
+i1 = random.choice([-.7, -.6, -.5, .5, .6, .7])
+i3 = random.choice([2.0, 2.3, 2.5, 2.7, 3.0])
+i4 = random.choice([0.2, 0.3, 0.4, 1.2, 1.3, 1.4])
+i2 = -(i3+i4+i1)
+i5 = i3+i4
+</script>
+
+<startouttext />
+While further poking around in his experiment, Joe found an exposed
+interconnect.  It connected the positive output of the \(5\)V power
+supply, a \(3.3\Omega\) resistor, and two unknown 2-terminal elements,
+as shown:
+<center>
+<img src="/static/circuits/KCL-0.gif" />
+</center>
+He couldn't trace where the other ends of the elements went.  However,
+he had a nifty (very expensive!) Hall-effect clamp-on ammeter that he used
+to measure the three of the four currents entering the elements.  He
+didn't have enough space to measure the current entering the fourth
+element.  He found that \(i_1=$i1\)A, \(i_3=$i3\)A, \(i_4=$i4\)A. 
+<br /><br />
+What was the current (in Amperes) \(i_2\) into the fourth element?
+<endouttext />
+<numericalresponse answer="$i2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+Joe managed to get his ammeter probe around a wire and measured
+\(i_5\).  What current (in Amperes) did he measure?
+<endouttext />
+<numericalresponse answer="$i5">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+</problem>

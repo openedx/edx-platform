@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S9E3_MOSFET_Amplifier_2" slug="S9E3_MOSFET_Amplifier_2" showanswer="attempted" rerandomize="false" name="S9E3: MOSFET Amplifier 2"/>
+  <customtag tag="S9E3" slug="discuss_629">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="356" slug="book_630">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="9" slug="slides_631">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

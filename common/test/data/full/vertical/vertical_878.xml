@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S13E3_Thevenin_Inductor_Circuit" slug="S13E3_Thevenin_Inductor_Circuit" rerandomize="per_student" name="S13E3: Thevenin Inductor Circuit"/>
+  <customtag tag="S13E3" slug="discuss_879" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="517" slug="book_880" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:evhUlvWDvMQ,1.0:54m8gpykwyE,1.25:vuqi1s1H478,1.50:2w0N2eBeyTg" slug="S19V11_Sinusoidal_steady_state_SSS_solution" name="S19V11: Sinusoidal steady state (SSS) solution"/>
+  <customtag tag="S19" slug="discuss_1324">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="710" slug="book_1325">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="19" slug="slides_1326">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,75 @@
+<problem>
+
+<script type="loncapa/python">
+R1M = 1.0
+R1 = 1.0e6*R1M
+
+R2 = 1.0
+
+RK = random.choice([1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2])
+R = 1.0e3*RK
+
+VS = random.choice([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+
+iD = VS/(R+R2)
+vD = R2*iD
+
+VN = -VS
+
+iDN = VN/(R+R1)
+vDN = R1*iDN
+</script>
+
+<startouttext/>
+The characteristic of the nonlinear element shown in the circuit is
+made up of two linear segments.  The resistance of one segment is
+\(R_1=$R1M\)M\(\Omega\) and the resistance of the other segment is
+\(R_2=$R2\Omega\).  (Of course, the graph is not to a uniform scale.
+If it were, we would not see the slope of the segment with slope \(1/R_1\).)
+<center>
+<img src="/static/circuits/piecewise.gif" />
+</center>
+In the circuit, the resistor \(R=$RK\)k\(\Omega\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+If the voltage source has strength \(V=$VS\)V,
+<br/>
+what is the current \(i_D\) (in Amperes)?
+<endouttext/>
+<numericalresponse answer="$iD">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext/>
+<br/>
+And what is the voltage \(v_D\) (in Volts)?
+<endouttext/>
+<numericalresponse answer="$vD">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext/>
+<br/><br/>
+However, suppose the voltage source has strength \(V=$VN\)V,
+<br/>
+ what is now the current \(i_D\) (in Amperes)?
+<endouttext/>
+<numericalresponse answer="$iDN">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext/>
+<br/>
+And, in this case, what is the voltage \(v_D\) (in Volts)?
+<endouttext/>
+<numericalresponse answer="$vDN">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+</problem>

@@ -1,0 +1,48 @@
+<sequential>
+  <customtag file="ex1p1.png" slug="image_1541" graceperiod="1 day 12 hours 59 minutes 59 seconds">
+    <impl>image</impl>
+  </customtag>
+  <customtag slug="exercise_1_1.MTS" graceperiod="1 day 12 hours 59 minutes 59 seconds" name="exercise_1_1.MTS">
+    <impl>videodev</impl>
+  </customtag>
+  <customtag slug="exercise_1_2_part_2.MTS" graceperiod="1 day 12 hours 59 minutes 59 seconds" name="exercise_1_2_part_2.MTS">
+    <impl>videodev</impl>
+  </customtag>
+  <customtag file="ex1p2.png" slug="image_1542" graceperiod="1 day 12 hours 59 minutes 59 seconds">
+    <impl>image</impl>
+  </customtag>
+  <html slug="html_1543" graceperiod="1 day 12 hours 59 minutes 59 seconds">Camtasia video </html>
+  <vertical slug="vertical_1544" graceperiod="1 day 12 hours 59 minutes 59 seconds">
+    <customtag file="ex1p3.png" slug="image_1545">
+      <impl>image</impl>
+    </customtag>
+    <customtag file="ex1p3circ.png" slug="image_1546">
+      <impl>image</impl>
+    </customtag>
+  </vertical>
+  <html slug="html_1547" graceperiod="1 day 12 hours 59 minutes 59 seconds">Camtasia video </html>
+  <customtag file="p1p1.png" slug="image_1548" graceperiod="1 day 12 hours 59 minutes 59 seconds">
+    <impl>image</impl>
+  </customtag>
+  <customtag slug="problem_1-1.MTS" graceperiod="1 day 12 hours 59 minutes 59 seconds" name="problem_1-1.MTS">
+    <impl>videodev</impl>
+  </customtag>
+  <customtag file="p1p2.png" slug="image_1549" graceperiod="1 day 12 hours 59 minutes 59 seconds">
+    <impl>image</impl>
+  </customtag>
+  <customtag slug="problem_1-2_part1.MTS" graceperiod="1 day 12 hours 59 minutes 59 seconds" name="problem_1-2_part1.MTS">
+    <impl>videodev</impl>
+  </customtag>
+  <customtag slug="problem_1-2_part2.MTS" graceperiod="1 day 12 hours 59 minutes 59 seconds" name="problem_1-2_part2.MTS">
+    <impl>videodev</impl>
+  </customtag>
+  <customtag slug="problem_1-2_part3.MTS" graceperiod="1 day 12 hours 59 minutes 59 seconds" name="problem_1-2_part3.MTS">
+    <impl>videodev</impl>
+  </customtag>
+  <customtag file="p1p3.png" slug="image_1550" graceperiod="1 day 12 hours 59 minutes 59 seconds">
+    <impl>image</impl>
+  </customtag>
+  <customtag slug="problem_1_3.MTS" graceperiod="1 day 12 hours 59 minutes 59 seconds" name="problem_1_3.MTS">
+    <impl>videodev</impl>
+  </customtag>
+</sequential>

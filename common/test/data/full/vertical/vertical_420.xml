@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:8XEGPeHWdeg,1.0:9oGx4uGvWZA,1.25:Z5wl63MQTxo,1.50:-3kemWJQbQA" slug="S6V13_Demo_-_Distorted_Music_with_Nonlinear_Element" rerandomize="per_student" name="S6V13: Demo - Distorted Music with Nonlinear Element"/>
+  <customtag tag="S6" slug="discuss_421" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="214" slug="book_422" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="6" slug="slides_423" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

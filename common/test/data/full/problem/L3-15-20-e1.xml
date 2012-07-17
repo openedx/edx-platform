@@ -1,0 +1,106 @@
+<!--  
+This is a Thevenin exercise, to be used in L3
+  The idea is that this is a model of a sensor.  It produces a current
+   proportional to its illumination.  But there is leakage,
+   represented by Rp and there is contact resistance, represented by
+   Rs.
+-->
+
+<problem>
+
+<script type="loncapa/python">
+# Sensor current is 100nA--10uA
+# In Amperes
+I = float(random.randrange(100,10000,1))/1e9
+# In uA
+Iu = I*1e6
+
+# Leakage resistance is 1MOhm--2MOhm
+Rp = float(random.randrange(10,20,1))*1e5
+# In MOhms
+RpM = Rp/1e6
+
+# Series resistance is between 10kOhm and 20kOhm
+# In kOhms
+RsK = float(random.randrange(10,20,1))
+# In Ohms
+Rs = RsK*1e3
+
+# Loaded by 100kOhm indicator circuit
+Rl = 1e5
+RlK = Rl/1e3
+
+
+Vt = I*Rp
+Rt = Rp+2*Rs
+In = Vt/Rt
+
+RtM = Rt/1e6
+
+Vl = (Vt*Rl)/(Rl+Rt)
+</script>
+
+<startouttext />
+A certain light sensor is modeled as a current source that produces a
+current proportional to the intensity of light falling on it.  There
+is leakage through the sensor, modeled by a resistor \(R_p=$RpM\)M\(\Omega\) in
+parallel with the current source.
+There is resistance in the contacts to the sensor, modeled by the
+series resistances \(R_s=$RsK\)k\(\Omega\).  In this experiment the light produces
+a current of \(I=$Iu\mu\)A.
+<center>
+<img src="/static/circuits/sensor-thevenin.gif" />
+</center>
+It is useful to summarize this model
+by constructing a Thevenin equivalent circuit for it.
+<endouttext />
+
+<startouttext />
+<br />  What is the Thevenin voltage (in Volts) \(V_{TH}\) of the sensor?
+<endouttext />
+<numericalresponse answer="$Vt">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />  What is the Thevenin resistance (in M\(\Omega\)) \(R_{TH}\) of the sensor?
+<endouttext />
+<numericalresponse answer="$RtM">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> <br /> The sensor is intended to be used in a light meter.  In
+this application the output of the sensor is connected to a system
+that amplifies the signal and displays it, scaled to appropriate
+units.
+<center>
+<img src="/static/circuits/sensor-loaded.gif" />
+</center>
+The amplifier is designed to present a resistance of 
+\(R_L=$RlK\)k\(\Omega\).  So, from the point of view of the sensor we can
+model it as just a resistor.
+<endouttext />
+
+<startouttext />
+<br />  What is the voltage (in Volts) \(V_L\) presented to the amplifier?
+<endouttext />
+<numericalresponse answer="$Vl">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext />
+<br /> <br /> Note that the circuit connecting the sensor to the
+amplifier and display does not care about the insides of either the
+sensor or of the the amplifier and display.  So we don't have to
+consider those complications to compute the properties of their
+interconnection.  This is the modeling power of the Thevenin idea!
+<endouttext />
+
+
+
+</problem>

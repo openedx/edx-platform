@@ -1,0 +1,98 @@
+<!--  
+This is a linearity exercise, to be used after L3 slides 3 through 6.
+-->
+
+<problem>
+
+<script type="loncapa/perl">
+a1 = "R2*R3/(R1*R2+R1*R3+R2*R3)";
+a2 = "R1*R3/(R1*R2+R1*R3+R2*R3)";
+
+b1 = "-(R2+R3)/(R1*R2+R1*R3+R2*R3)";
+b2 = "R3/(R1*R2+R1*R3+R2*R3)";
+
+c1 = "R3/(R1*R2+R1*R3+R2*R3)";
+c2 = "-(R1+R3)/(R1*R2+R1*R3+R2*R3)";
+</script>
+
+<startouttext />
+Consider the following network containing two voltage sources and
+three resistors. The device parameters are \(V_1\), \(V_2\),
+\(R_1\), \(R_2\), and \(R_3\).
+<center>
+<img src="/static/circuits/superposition-v.gif" />
+</center>
+The voltage \(v\) across resistor \(R_3\) and the currents \(i_1\) and \(i_2\)
+can be expressed as a linear combinations of \(V_1\) and \(V_2\):
+<br /><br />
+\[v_3 = a_1*V_1 + a_2*V_2\]
+<br />
+\[i_1 = b_1*V_1 + b_2*V_2\]
+<br />
+\[i_2 = c_1*V_1 + c_2*V_2\]
+<br />
+In each of the following, write algebraic expressions for the
+coefficients
+<br />
+<endouttext />
+
+<startouttext />
+<br />
+\(a_1\) =
+<endouttext />
+<formularesponse type="cs" samples="R1,R2,R3@1,1,1:3,3,3#10" answer="$a1">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext />
+<br />
+\(a_2\) =
+<endouttext />
+<formularesponse type="cs" samples="R1,R2,R3@1,1,1:3,3,3#10" answer="$a2">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+
+<startouttext />
+<br />
+\(b_1\) =
+<endouttext />
+<formularesponse type="cs" samples="R1,R2,R3@1,1,1:3,3,3#10" answer="$b1">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext />
+<br />
+\(b_2\) =
+<endouttext />
+<formularesponse type="cs" samples="R1,R2,R3@1,1,1:3,3,3#10" answer="$b2">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext />
+<br />
+\(c_1\) =
+<endouttext />
+<formularesponse type="cs" samples="R1,R2,R3@1,1,1:3,3,3#10" answer="$c1">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext />
+<br />
+\(c_2\) =
+<endouttext />
+<formularesponse type="cs" samples="R1,R2,R3@1,1,1:3,3,3#10" answer="$c2">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+</problem>
+
+

@@ -1,0 +1,167 @@
+<problem><script type="loncapa/python">
+import math
+
+global K, mu, RK, RP, RL, CI, CO
+
+Km = random.choice([3.5e-2, 3.6e-2, 3.7e-2, 3.8e-2])
+K  = Km*1.0e-3
+MU = 33.0
+
+RGM = 1
+
+RKk  = random.choice([0.82, 0.91, 1, 1.2, 1.5])
+RK   = RKk*1.0e3
+
+RPk  = random.choice([15, 18, 22, 27])
+RP   = RPk*1.0e3
+
+RLk  = random.choice([47, 56, 68, 82, 100])
+RL   = RLk*1.0e3
+
+CIu   = random.choice([0.1, 0.15, 0.2, 0.27, 0.33])
+CI    = CIu*1e-6
+
+COu   = random.choice([10, 12, 15, 18, 22, 27])
+CO    = COu*1e-6
+
+VBB   = random.choice([100, 105, 110, 115, 120, 125, 130])
+VB    = float(VBB) 
+
+global close_enuf
+
+def close_enuf(x, y, eps):
+    return(abs(x - y) &lt; eps*(abs(x)+abs(y)))
+
+global bisect
+
+def bisect(f, x0, x1, eps):
+    xlo = x0
+    xhi = x1
+    fx0 = f(x0)
+    fx1 = f(x1)
+    while True:
+        if fx0 == 0.0:
+            return(xlo)
+        elif fx1 == 0.0:
+            return(xhi)
+        elif fx0*fx1 &gt; 0.0:
+            raise Exception('Root Not Bounded', x0, x1)
+        else:
+            xm = (xlo + xhi)/2.0
+            if close_enuf(xlo, xhi, eps):
+                return(xm)
+            else:
+                fxm = f(xm)
+                if fx1*fxm &lt; 0.0:
+                    xlo = xm
+                    fx0 = fxm
+                else:
+                    xhi = xm
+                    fx1 = fxm
+
+
+global triode_ip
+
+def triode_ip(k, mu, vgk, vpk):
+  e = vpk + mu*vgk
+  if e &gt; 0:
+     return(k*e**1.5)
+  else:
+     return(0)
+
+
+global triode_amp
+
+def triode_amp(k, mu, rp, rk, vb, vg):
+  ip = bisect(lambda(i): i-triode_ip(k, mu, vg-i*rk, vb-i*(rp+rk)),
+              0.0, 20e-3, 1e-10)
+  return(ip)
+
+# Bias Conditions
+
+IP = triode_amp(K, MU, RP, RK, VB, 0.0)
+#print (IP)
+IPm = IP*1e3
+
+VP = VB-RP*IP
+VK = RK*IP
+VPK = VP-VK
+VGK = -VK
+
+
+# Incremental Model
+
+rp = 1/(1.5*K*(MU*VGK+VPK)**0.5)
+gm = MU/rp
+
+#print rp,gm
+
+gain = -RL*RP*MU/(((MU+1)*RK + rp)*(RL+RP) + RL*RP)
+
+#print gain
+</script><startouttext/>
+Note: Although this problem can be solved using material from
+this class, it is intended to stretch you beyond the material
+that we explicitly taught in this class.  Do not work on it
+until you have finished with the other problems.
+<br/><br/>
+A vacuum triode (shown below, with voltages and currents indicated)
+<center><img src="/static/circuits/VacuumTriode.gif"/></center>
+is a three-terminal device with two parameters \(K\) and \(\mu\).  The
+terminals are called the plate, the grid, and the cathode.
+Its behavior is specified by the following approximate laws that give
+the current into the plate \(i_P\) and the current into the grid
+\(i_G\) as a function of the voltage from plate to the cathode \(v_{PK}\)
+and the voltage from the grid to the cathode \(v_{GK}\).  
+<br/>
+\(   i_P = \left\{ \begin{array}{ll}
+                   K(v_{PK} + \mu \, v_{GK})^{3/2} &amp; \mbox{if $v_{PK} + \mu \, v_{GK} &gt; 0$} \\
+                   0               &amp; \mbox{otherwise} 
+                   \end{array}
+            \right.
+\)
+<br/>
+\(   i_G = 0 \)
+<br/>
+\(   i_K = i_P + i_G \)
+<br/>
+A <a href="http://tdsl.duncanamps.com/show.php?des=6dj8"> 6DJ8 </a>
+is a matched pair of vacuum triodes packaged in a single vacuum tube.
+<br/><br/>
+Amplifiers based on vacuum triodes
+are popular with high-fidelity sound enthusiasts.
+The following schematic diagram shows a common way
+to use such a tube to provide voltage amplification.
+<center><img src="/static/circuits/TriodeAmplifier.gif"/></center>
+In this problem we will consider this design.
+<br/><br/>
+Assume that \(K = $Km\)mA/V\(^{3/2}\) and \(\mu = $MU\).
+The circuit parameters are \(R_G=$RGM\)M\(\Omega\), 
+\(R_K = $RKk\)k\(\Omega\), \(R_P = $RPk\)k\(\Omega\),
+\(R_L = $RLk\)k\(\Omega\), \(C_I = $CIu \mu\)F, and 
+\(C_O = $COu \mu\)F.  The power supply provides 
+\(V_{BB} = $VBB\)V.
+<endouttext/>
+
+<startouttext/>
+<br/>
+In the space provided below give the value of the plate current
+\(I_P\) at the operating point (\(v_i=0\), in milliAmperes.  Note: This requires
+numerically solving a nonlinear equation, but it is easy to iterate to
+an answer. 
+<endouttext/>
+<numericalresponse answer="$IPm"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+We expect to use this amplifier for audio frequencies (\(20{\rm Hz} &lt; f &lt;
+20{\rm kHz}\)), so we have chosen the capacitors to act as short
+circuits for frequencies in that range.  (You can verify that, if you like.)
+As a consequence they do not appear in an incremental (small signal) model.
+<br/><br/>
+Under this assumption what is the incremental gain \(v_o/v_i\) of this
+amplifier? 
+<endouttext/>
+<numericalresponse answer="$gain"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

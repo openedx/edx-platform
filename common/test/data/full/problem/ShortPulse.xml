@@ -1,0 +1,50 @@
+<problem>
+
+<script type="loncapa/python">
+#e = math.exp(1)
+IT = "IS*(1-e^(-(R/L)*T))"
+I2 = "IT*e^(-(R/L)*(t-T))"
+</script>
+
+<startouttext/>
+We can use unit steps to make a unit pulse \(u(t_0) - u(t_1))\).  This
+pulse is one unit high, starting at \(t_0\) and ending at \(t_1\).
+<br/>
+Continuing with our parallel L-R-I circuit.
+<br/>
+Suppose, that our independent current source puts out a pulse of
+height \(I_S\) that starts at time \(t=0\) and ends at time \(t = T\).
+<br/>
+We can notate this using our unit step by  
+\(I(t) = I_S\ (u(t) - u(t-T))\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+Suppose that the inductor current \(i_L(t) = 0\) for \(t &lt; 0\).  
+<br/><br/>
+In the box provided below write an algebraic expression for
+the value of \(i_L(T)\) in terms of \(I_S\), \(R\),
+\(L\), and \(T\).
+<endouttext/>
+<formularesponse type="cs" samples="IS,R,L,T@1,1,1,1:3,3,3,3#10" answer="$IT">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Let's define \(I_T = i_L(T)\) that you just computed.
+<br/><br/>
+In the box provided below write an algebraic expression for
+the value of \(i_L(t)\) for \(T \leq t\) in terms of \(I_T\), \(R\),
+\(L\), \(T\), and \(t\).
+<endouttext/>
+<formularesponse type="cs" samples="IT,R,L,t,T@1,1,1,1,1:3,3,3,3,3#10" answer="$I2">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

@@ -1,0 +1,18 @@
+<sequential>
+  <vertical filename="vertical_847" slug="vertical_847" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_851" slug="vertical_851" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_855" slug="vertical_855" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_858" slug="vertical_858" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_862" slug="vertical_862" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_865" slug="vertical_865" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_870" slug="vertical_870" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_874" slug="vertical_874" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_878" slug="vertical_878" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_881" slug="vertical_881" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_884" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <video youtube="0.75:iHJjJ_-5UV8,1.0:bfRCYJR8rBc,1.25:gjDx22RxROU,1.50:lmAvX6RcZmQ" slug="Coming_up_" rerandomize="per_student" name="Coming up:"/>
+    <customtag tag="S12" slug="discuss_885" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:qV13WD9wUAI,1.0:LcA9-GgawSU,1.25:Fjj0IGW1gyQ,1.50:KFMRFPj70e4" slug="S19V13_Summary_of_SSS_approach" name="S19V13: Summary of SSS approach"/>
+  <customtag tag="S19" slug="discuss_1332">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="711" slug="book_1333">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="19" slug="slides_1334">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

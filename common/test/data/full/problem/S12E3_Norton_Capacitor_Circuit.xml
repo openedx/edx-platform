@@ -1,0 +1,39 @@
+<problem><script type="loncapa/python">
+dvdt = "(I*R - vC)/(R*C)"
+
+Rk = 1.0 #kOhm
+R  = 1000*Rk
+
+Cu = 1.0 #uF
+C  = 1e-6*Cu
+
+Im = 1 #mA
+I =  1e-3*Im
+vC = 0 #V
+
+T   = R*C
+f   = 1/T
+
+vps = (I*R-vC)/(R*C)
+vpsm = vps*1e-3
+</script><startouttext/>
+For the circuit shown below
+<center><img src="/static/circuits/norton-capacitor.gif"/></center>
+write an algebraic expression for the rate of change of the capacitor
+voltage in terms of \(I\), \(R\), \(C\), and \(v_C\).
+Be careful, algebraic expressions are case sensitive.
+<br/><br/>
+\(\frac{d v_C}{d t}\) = 
+<endouttext/>
+<formularesponse type="cs" samples="I,R,C,vC@1,1,1,1:3,3,3,3#10" answer="$dvdt"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+Let \(R = $Rk\)k\(\Omega\) and \(C = $Cu\mu\)F.  
+If at some time \(t\) we have \(I(t) = $Im\)mA and \(v_C(t) = $vC\)V what
+is the rate of change of capacitor voltage?  Express your answer in
+Volts/millisecond.
+<endouttext/>
+<numericalresponse answer="$vpsm"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

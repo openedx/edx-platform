@@ -1,0 +1,56 @@
+<problem><script type="loncapa/python">
+VI = random.choice([1.0, 1.3, 1.5, 1.8, 2.0, 2.2, 2.7])
+Rk = random.choice([0.76, 0.82, 0.91, 1.0, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8])
+R  = Rk*1000.0
+VT = random.choice([0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3])
+Km = random.choice([1, 2, 3, 4, 5])
+K  = Km*1e-3
+
+# Large-signal behavior
+
+def vO(R, K, VT, vI):
+   return( -(math.sqrt((2.0*vI)/(K*R))+VT) )
+
+
+# Output Bias for input bias VI
+
+VO = vO(R, K, VT, VI)
+
+# print R, K, VT, VI, VO
+
+# Small-signal behavior
+
+def dvOdvI(R, K, VT, VI):
+   return( -1.0/math.sqrt(2.0*R*K*VI) )
+
+gain = dvOdvI(R, K, VT, VI)
+
+</script><startouttext/>
+Consider the following circuit.  There is an ideal operational
+amplifier with a FET in the feedback path.  The gate of the FET is
+grounded.  We will be concerned with the operating point and the
+small-signal behavior of this circuit.  So the input voltage \(v_I = V_I + v_i\) and
+the output voltage \(v_O = V_O + v_o\).
+<center><img src="/static/circuits/OpAmpFET.gif"/></center>
+The parameters of the FET are
+\(K = $Km\)mA/V\(^2\) 
+and \(V_T = $VT\)V.
+<br/>
+The resistor's resistance is \(R_S = $R\Omega\).
+<br/>
+If we set the input operating-point voltage to \(V_I = $VI\)V, what is the output
+operating-point voltage \(V_O\), in Volts?
+<endouttext/>
+<numericalresponse answer="$VO"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Now that we have an operating point we can determine the response to
+small signals.  
+<br/>
+What is the small-signal gain \(v_o/v_i\) of this
+circuit at the operating point?
+<endouttext/>
+<numericalresponse answer="$gain"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

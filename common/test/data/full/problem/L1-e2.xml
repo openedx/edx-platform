@@ -1,0 +1,92 @@
+<!--  
+This is an L1 modeling problem
+-->
+
+<problem>
+
+<script type="loncapa/python">
+V = 1.5*float(random.randrange(1,6,1))
+V1 = V
+V2 = V
+
+R1 = float(random.randrange(15,30,5))/100.0
+R2 = R1 + float(random.randrange(1,10,1))/100.0
+
+Isc = (V1/R1)+(V2/R2)
+
+Req = V/Isc
+
+delta = 0.1
+V2d = V2+delta
+
+id = delta/(R1+R2)
+</script>
+
+<startouttext />
+A real battery is not an ideal independent voltage source.  A voltage
+source is an appropriate idealization of the battery if the load on
+the battery is negligible.  A better model for a battery is a voltage
+source in series with an ideal linear resistor whose resistance varies
+with temperature.  Sometimes even better models are required - this  
+<a href="http://data.energizer.com/PDFs/BatteryIR.pdf">Energizer
+  technical bulletin</a> gives more information.  However, let's use the simple model of a
+linear resistor in series with an ideal independent voltage source, as
+in the figure.
+<center>
+<img src="/static/circuits/battery-model.gif" />
+</center>
+<br />
+It is suggested in section 1.5.1 of the textbook that to increase the
+current-capacity of a battery without increasing the voltage at the
+terminals we can connect batteries of the same voltage in parallel.
+Let's examine this using our model.
+<center>
+<img src="/static/circuits/two-batteries.gif" />
+</center>
+Let's assume that both component batteries have the same voltage
+\(V_1=V_2=$V\).  The internal resistances of small batteries
+are about \(0.2\Omega\), but they vary a bit.  Let's assume that 
+\(R_1=$R1\) and \(R_2=$R2\).  What is the open-circuit voltage (in
+Volts) \(V\) of the combination?
+<endouttext />
+<numericalresponse answer="$V">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> Now, suppose we short-circuit the compound battery.  (This is
+very dangerous.  NEVER do this to a large battery, such as a lead-acid
+battery in a car, or to a lithium-ion battery from your laptop.  You
+MAY live to regret it, but you may not.)  What is the current (in Amperes) you
+should expect to go through the short circuit?
+<endouttext />
+<numericalresponse answer="$Isc">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> We can think of this combination as a bigger battery of the
+same voltage as the two component batteries.  What is the
+equivalent resistance (in Ohms) of the compound battery?  (Hint: you have the
+voltage with nothing connected and the current when shorted out.)
+<endouttext />
+<numericalresponse answer="$Req">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> Now, suppose that the voltages of the two component batteries are not
+quite the same.  For example, suppose that \(V_2 = $V2d\).  Then when
+we hook the two batteries together current will flow and the higher
+voltage battery will charge the lower voltage one.  What is the
+current (in Amperes) that will flow?
+<endouttext />
+<numericalresponse answer="$id">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

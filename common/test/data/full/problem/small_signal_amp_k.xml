@@ -1,0 +1,52 @@
+<!--
+This is a problem about small-signal analysis
+-->
+
+
+<problem> 
+<script type="loncapa/python">  
+VT = 0.5
+
+Km = 20.0
+K  = Km/1000.0
+VS = float(random.randrange(20, 40, 1))
+RL = float(random.randrange(100, 150, 5))
+VI = float(random.randrange(20, 30, 1))/10
+
+VO = VS - RL*((K*(VI-VT)**2)/2) 
+gain = -RL*K*(VI-VT) 
+</script>
+   
+   <startouttext/>
+   Consider the amplifier shown below:
+   <center>
+   <img src="/static/circuits/small_signal.gif"/>
+   </center>
+   The MOSFET operates in its saturation region and is characterized
+   by the parameters \(V_T=$VT\)V and \(K=$Km\frac{mA}{V^2}\).  The
+   input voltage \(v_I\) is the sum of a DC bias voltage
+   \(V_I\) and a sinusoid of the form \(v_i=A \sin(\omega t)\), where
+   \(A\) is very small compared to \(V_I\).  The output voltage
+   \(v_O\) is the sum of a DC bias term \(V_O\) and a small-signal response
+   term \(v_o\).
+   <br/>
+   The supply voltage \(V_S=$VS\)V and the resistance of the drain
+   resistor \(R_L=$RL\Omega\).  The input bias voltage is \(V_I=$VI\)V.
+   <br/>
+   What is the output operating-point bias voltage \(V_O\) (in Volts)?
+   <endouttext/>
+   <numericalresponse answer="$VO">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+
+   <startouttext/>
+   <br/>
+   What is the small-signal gain \(v_o/v_i\) of the amplifier?
+   <endouttext/>
+   <numericalresponse answer="$gain">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+
+</problem>

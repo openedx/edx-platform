@@ -199,3 +199,6 @@ class EditTestCase(ContentStoreTestCase):
 
     def test_edit_item_toy(self):
         self.check_edit_item('toy')
+
+    def test_edit_item_full(self):
+        self.check_edit_item('full')

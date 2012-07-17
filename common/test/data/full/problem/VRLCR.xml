@@ -1,0 +1,184 @@
+<problem>
+
+<script type="loncapa/python">
+#f0  = 1.0
+#f0 = 15.0 #Mhz
+f0 = float(random.randrange(1,15,1))
+f  = f0*1e6
+omega00 = 2*math.pi*f
+#Lu  =  8.2
+#Lu  = 15.0  #uH
+Lu = random.choice([8.2, 9.1, 10.0, 12.0, 15.0])
+L   = Lu*1e-6
+
+#print omega00
+
+omega002 = omega00**2
+
+Ct   = 1.0/(L*omega002)
+Cp  = round(Ct*1e12,2)
+C = Cp*1e-12
+
+R1  = 50.0 #Ohms
+R2k = 1.0  #kOhms
+R2  = R2k*1e3
+
+omega0 = math.sqrt((R1/R2 + 1.0)*omega002)
+alpha  = (R1/L + 1/(R2*C))/2.0
+alphaus = alpha*1e-6
+
+#print "omega0=",omega0,"  alpha=",alpha
+
+omegad = math.sqrt(omega0**2-alpha**2)
+fring  = omegad/(2.0*math.pi)
+fringM = fring/1e6
+
+Q = omega0/(2*alpha)
+
+Vdrive = 3.0 #V
+vfinal = (R2/(R1+R2))*Vdrive
+
+R1crit = (2*R2*math.sqrt(L*C) + L)/(C*R2)
+R2crit = (C*L*R1 - 2*L*math.sqrt(L*C))/((C*R1)**2 - 4*C*L)
+
+#print R1crit, R2crit
+</script>
+
+<startouttext/>
+Consider the following circuit
+<center>
+<img src="/static/circuits/VRLCR.gif" />
+</center>
+The device parameters are 
+<br/>
+\(V(t) = $Vdrive u(t)\)V, \(R_1 = $R1\Omega\), \(R_2 = $R2\Omega\),
+\(L = $Lu\mu\)H, and \(C = $Cp\)pF.
+<endouttext/>
+
+<startouttext/>
+<br/>
+After a very long time the voltage \(v\) across \(R_2\) will converge
+to a constant value.  What is that value, in Volts?
+<endouttext/>
+<numericalresponse answer="$vfinal">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+The differential equation for \(v(t)\) the voltage across \(R_2\) is
+<br/><br/>
+\( C L R_2 \frac{d^2 v(t)}{d t^2} + (C R_1 R_2 + L)\frac{d v(t)}{d t}
++ (R_1 + R_2) v(t) = R_2 V(t) \)
+<endouttext/>
+
+<startouttext/>
+<br/>
+After the step happens this circuit will ring.  What is the frequency
+at which it will ring?  Enter the ring frequency in MegaHertz.
+<endouttext/>
+<numericalresponse answer="$fringM">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+The ringing will be damped by the factor \(e^{-\alpha t}\).  What is
+the value of \(\alpha\)?  Enter the value in \(\mu\)s\(^{-1}\).
+<endouttext/>
+<numericalresponse answer="$alphaus">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the "Quality Factor" \(Q\) of this circuit?
+<endouttext/>
+<numericalresponse answer="$Q">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Suppose we need to suppress the ringing.  We could change the value of
+\(R_2\) to make this circuit critically damped.  (Hint: make the
+\(Q=\frac{1}{2}\))  What is the value of \(R_2\), in Ohms,
+that will make this circuit critically damped?
+<endouttext/>
+<numericalresponse answer="$R2crit">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+</problem>
+
+<!-- Derivation of formulas for critical damping
+;;; Omega0^2 -alpha^2 = 0 for critical damping
+(let ((L 'L) (C 'C) (R1 'R_1) (R2 'R_2))
+  (- (* (/ 1 (* L C)) (+ (/ R1 R2) 1))
+     (* 1/4 (square (+ (/ R1 L) (/ 1 (* R2 C)))))))
+#|
+(/
+ (+ (* -1 (expt C 2) (expt R_1 2) (expt R_2 2))
+    (* 2 C L R_1 R_2)
+    (* 4 C L (expt R_2 2))
+    (* -1 (expt L 2)))
+ (* 4 (expt C 2) (expt L 2) (expt R_2 2)))
+|#
+
+(define (quadratic-solution a b c)
+  (list (/ (+ (- b) (sqrt (- (square b) (* 4 a c))))
+	   (* 2 a))
+	(/ (- (- b) (sqrt (- (square b) (* 4 a c))))
+	   (* 2 a))))
+#| quadratic-solution |#
+
+;;; For R2
+(let ((L 'L) (C 'C) (R1 'R_1) (R2 'R_2))
+  (quadratic-solution (- (* 4 C L) (square (* C R1)))
+		      (* 2 C L R1)
+		      (- (square L))))
+#|
+((/ (+ (* C L R_1) (* -2 L (sqrt L) (sqrt C)))
+    (+ (* (expt C 2) (expt R_1 2)) (* -4 C L)))
+ (/ (+ (* C L R_1) (* 2 L (sqrt L) (sqrt C)))
+    (+ (* (expt C 2) (expt R_1 2)) (* -4 C L))))
+|#
+
+(let ((L 10e-6) (C 12.92e-12) (R1 50) (R2 1000))
+  (quadratic-solution (- (* 4 C L) (square (* C R1)))
+		      (* 2 C L R1)
+		      (- (square L))))
+#|
+(427.72998138358406 -452.7501851981643)
+|#
+
+;;; For R1
+
+(let ((L 'L) (C 'C) (R1 'R_1) (R2 'R_2))
+  (quadratic-solution (square (* C R2))
+		      (* -2 C L R2)
+		      (- (square L)
+			 (* 4 C L (square R2)))))
+#|
+((/ (+ (* 2 R_2 (sqrt L) (sqrt C)) L) (* C R_2))
+ (/ (+ (* -2 R_2 (sqrt L) (sqrt C)) L) (* C R_2)))
+|#
+
+(let ((L 10e-6) (C 12.92e-12) (R1 50) (R2 1000))
+  (quadratic-solution (square (* C R2))
+		      (* -2 C L R2)
+		      (- (square L)
+			 (* 4 C L (square R2)))))
+#|
+(2533.5321657440027 -985.5445496449314)
+|#
+-->

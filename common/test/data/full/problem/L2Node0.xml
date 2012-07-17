@@ -1,0 +1,11 @@
+<problem><script type="loncapa/perl">
+V0 = "V0"
+I1 = "I1"
+</script><startouttext/><center><img src="/static/circuits/bridge-with-is-1.gif"/></center>
+In the circuit shown, what is the node potential of the node labeled
+"a" relative to the ground indicated?  Write the expression in the
+box provided.  Note, this is case sensitive.
+<endouttext/>
+<formularesponse type="cs" samples="V0@10:20#4" answer="$V0"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="25"/></formularesponse>
+
+</problem>

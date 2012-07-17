@@ -1,0 +1,29 @@
+<problem><script type="loncapa/python">
+PRI = "V*I"
+PRV = "V^2/R"
+ERT = "V*I*T"
+</script><startouttext/>
+Just a reminder of power and energy...
+<center><img src="/static/circuits/L26s4.gif"/></center>
+<br/>
+In this simple network, 
+what is the power dissipated in the resistor, in terms of \(V\) and \(I\)?
+<endouttext/>
+<formularesponse type="cs" samples="I,V@1,1:3,3#10" answer="$PRI"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+What is the power dissipated in the
+resistor, in terms of \(V\) and \(R\)?
+<endouttext/>
+<formularesponse type="cs" samples="R,V@1,1:3,3#10" answer="$PRV"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+In an interval \(T\) 
+what is the energy dissipated in the resistor, in terms of \(V\), \(I\)
+and \(T\)?
+<endouttext/>
+<formularesponse type="cs" samples="I,V,T@1,1,1:3,3,3#10" answer="$ERT"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+</problem>

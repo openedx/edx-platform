@@ -1,0 +1,59 @@
+<!-- Generalization of Inverting Amplifier -->
+
+<problem>
+
+<script type="loncapa/python">
+A = "-R/L"
+B = "-1/(L*C)"
+vo = "-VT*ln(vI/(R*IS) + 1)"
+</script>
+
+<startouttext/>
+The inverting amplifier is a very flexible concept.  
+<center>
+<img src="/static/circuits/InvertingAmplifierGeneralized.gif" />
+</center>
+We now know that for two resistors, the gain of this
+configuration approaches \( \frac{v_O}{v_I} = - \frac{R_F}{R_S} \)
+as the op amp approaches the ideal.
+<br/>
+
+We have also learned that this idea can be generalized to elements
+that store energy.  For example, if we use a capacitor in the feedback
+path (\(U_F\) is a capacitor of capacitance \(C\) and \(U_S\) is a
+resistor of resistance \(R\)), then 
+<center>
+\( v_O = -\frac{1}{R C}\int_{-\infty}^t v_I(t) dt \)
+</center>
+Suppose that we make \(U_S\) an inductor with inductance \(L\) and
+\(U_F\) a resistor with resistance \(R\).  Using the same reasoning we
+will also get an integrator of the form:
+<center>
+\( v_O = A\int_{-\infty}^t v_I(t) dt \)
+</center>
+In the space provided below give an algebraic expression for \(A\) in
+the formula above:
+<endouttext/>
+<formularesponse type="cs" samples="R,C,L@1,1,1:3,3,3#10" answer="$A">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+For even more fun, we could put a capacitor in for \(U_F\) and an
+inductor in for \(U_S\), yielding
+<center>
+\( v_O = B\int_{-\infty}^t\int_{-\infty}^t v_I(t) dt^2 \)
+</center>
+In the space provided below give an algebraic expression for \(B\) in
+the formula above:
+<endouttext/>
+<formularesponse type="cs" samples="R,C,L@1,1,1:3,3,3#10" answer="$B">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

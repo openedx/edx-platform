@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:59Mae3gx75g,1.0:Eu_e11FcCq4,1.25:0bCuCTTG_mE,1.50:qiJn3f2d2cE" slug="S5V4_How_to_Use_a_Gate" rerandomize="per_student" name="S5V4: How to Use a Gate"/>
+  <customtag tag="S5" slug="discuss_288" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="288" slug="book_289" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="5" slug="slides_290" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

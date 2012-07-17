@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:ln3sDCbQzBY,1.0:4XNg0nsg1Tg,1.25:TVWpN6X_oyI,1.50:KKSwfJbMHzI" slug="S5V11_DEMO_MOSFET_Switch_Device_S_Model_Curve" name="S5V11: DEMO MOSFET Switch Device, S Model Curve"/>
+  <customtag tag="S5" slug="discuss_318">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="288" slug="book_319">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="5" slug="slides_320">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

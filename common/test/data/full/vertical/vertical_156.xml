@@ -1,0 +1,10 @@
+<sequential>
+  <problem filename="S3E1_Node_Equation_Review" slug="S3E1_Node_Equation_Review" name="S3E1: Node Equation Review"/>
+  <customtag tag="S3E1" slug="discuss_157">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S3E2_Circuit_Voltages_and_Currents_are_Linear_Combinations_of_Source_Strengths" slug="S3E2_Circuit_Voltages_and_Currents_are_Linear_Combinations_of_Source_Strengths" name="S3E2: Circuit Voltages and Currents are Linear Combinations of Source Strengths"/>
+  <customtag tag="S3E2" slug="discuss_158">
+    <impl>discuss</impl>
+  </customtag>
+</sequential>

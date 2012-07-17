@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:3kgFVIB1uB8,1.0:hAkcNuyVMqM,1.25:VR7A1yUJo0g,1.50:i9E6JLLy6SY" slug="S17V17_Undriven_LC_Network_Response" name="S17V17: Undriven LC Network Response"/>
+  <customtag tag="S17" slug="discuss_1159">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="633" slug="book_1160">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1161">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

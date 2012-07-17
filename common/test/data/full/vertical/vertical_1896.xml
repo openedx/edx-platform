@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:cOkaFTCUSXo,1.0:O36qYmBF47k,1.25:EsALuB1wwWk,1.50:0c8iSPcn8QA" slug="S26V9_Standby_and_dynamic_power_for_inverter" rerandomize="per_student" name="S26V9: Standby and dynamic power for inverter"/>
+  <customtag tag="S26" slug="discuss_1897" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="608" slug="book_1898" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1899" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

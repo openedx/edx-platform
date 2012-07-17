@@ -1,0 +1,94 @@
+<!-- Sinusoidal Steady State:
+     This is fourth way to get the vP.
+     It works, and is not so bad. -->
+
+<problem>
+
+<script type="loncapa/python">
+A = "(1/(1+(R*C*w)^2))*Vi"
+B = "((R*C*w)/(1+(R*C*w)^2))*Vi"
+</script>
+
+<startouttext/>
+We are presented with a familiar first-order circuit: a capacitor
+driven by a Thevenin source.  Now we have a sinusoidal drive that
+starts at \(t=0\). so the differential equation is
+<br/><br/>
+\( R C \frac{d v(t)}{d t} + v(t) = v_I(t) = V_i\cos(\omega t) u(t) \)
+<br/><br/>
+and we are given the initial state \(v(0_-)=0\).
+<center>
+<img src="/static/circuits/thevenin-capacitor1.gif" />
+</center>
+We know how to solve this problem in the abstract.  
+<br/> <br/>
+<p>
+1. Find a particular solution, \(v_P(t)\).
+</p>
+<p>
+2. Form the general solution to the homogeneous equation \(v_H(t)\).
+</p>
+<p>
+3. Form the total solution \(v(t) = v_P(t) + v_H(t)\).
+</p>
+<p>
+4. Use the initial conditions to solve for the unknown coefficients in
+the total solution.
+</p>
+Today we concentrate on finding the particular solution for
+\(t&gt;0\), where the differential equation is:
+<br/><br/>
+\(R C \frac{d v_P(t)}{d t} + v_P(t) = V_i\cos(\omega t)\)
+<br/><br/>
+(Notice that we are using an upper-case name with a lower-case
+subscript for amplitude of the sinusoid.)
+<br/><br/>
+The lecturer threw up his hands in disgust after three tries with
+trigonometric functions.  He will go on to exponentials, which is
+really a better idea.  But I think we should try one more
+possibility... Let's try
+<br/><br/>
+\( v_P(t) = A \cos(\omega t) + B \sin(\omega t) \)
+<br/><br/>
+If you substitute this into the differential equation you will find
+that you can solve for the amplitudes \(A\) and \(B\) fairly easily.
+(Hint: You will need the fact that \(\sin(\omega t)\) and
+\(\cos(\omega t)\) cannot both be zero at the same time.)
+<br/>
+In the spaces provided below write algebraic expressions for these
+amplitudes.  (Since we have no easy way for you to enter the Greek 
+letter \(\omega\), please use the Roman letter \(w\) for the angular
+frequency.)
+<br/>
+\(A=\)
+<endouttext/>
+<formularesponse type="cs" samples="R,C,w,Vi@1,1,1,1:3,3,3,3#10" answer="$A">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+\(B=\)
+<endouttext/>
+<formularesponse type="cs" samples="R,C,w,Vi@1,1,1,1:3,3,3,3#10" answer="$B">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+This wasn't so bad... The big problem here is that
+<br/><br/>
+\( A \cos(\omega t) + B \sin(\omega t) = C \cos(\omega t + \phi) \)
+<br/><br/>
+and we really want \(C\) and \(\phi\), but the trigonometric
+computation of these from \(A\) and \(B\) is pretty nasty.
+<br/><br/>
+We will find that exponentials are much nicer and easier to work
+with. 
+<endouttext/>
+
+</problem>

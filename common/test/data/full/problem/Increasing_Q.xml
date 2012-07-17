@@ -1,0 +1,103 @@
+<problem><script type="loncapa/python">
+
+ISu = random.randrange(1,5,1)
+IS  = float(ISu)*1e-6
+
+R  = 2000
+
+vsig = R*IS
+vsigm = vsig*1e3
+
+
+Lu  = random.choice([0.13, 0.14, 0.15, 0.16, 0.17])
+L   = float(Lu)*1e-6
+
+floM = random.choice([88.1, 88.9, 89.7, 90.3, 90.9, 95.3, 95.9, 96.9, 97.7, 104.9, 105.7, 106.7, 107.9])
+flo  = floM*1e6
+omegalo = 2*math.pi*flo
+Clo   = 1/(L*omegalo**2)
+Clop  = Clo*1e12
+Qlo   = omegalo*R*Clo
+BWlo  = flo/Qlo
+BWloM = BWlo*1e-6
+
+Rs = "-(R1*R2)/R3"
+
+choice = "b"
+
+
+R1x = random.choice([1000, 1200, 1500, 1800, 2200, 2700, 3300])
+
+Qgoal = 100
+Rdesired = Qgoal*math.sqrt(L/Clo)
+#print Rdesired
+
+RQ = Rdesired*R/(R-Rdesired)
+R2 = -RQ
+</script><startouttext/>
+If we want to select a signal from a mess of interfering signals, and
+if the desired signal is confined to a narrow range of frequencies, we
+can often use a resonant circuit:
+<center><img src="/static/circuits/ParallelTank.gif"/></center>
+For example, if we want to select a station in the FM broadcast band 
+(88.1 MHz to 107.9 MHz in the U.S.) we might choose to have an
+inductance of \(L = $Lu\mu\)H.  Assume that the input resistance of
+the first stage of the receiver is \(R=$R\Omega\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the appropriate capacitance for the variable capacitor to
+select the station at \(f = $floM\)MHz?  Express your answer in
+picoFarads. 
+<endouttext/>
+<numericalresponse answer="$Clop"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the \(Q\) of the system for the capacitance that selects the
+station at \(f =$floM\)MHz?
+<endouttext/>
+<numericalresponse answer="$Qlo"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the bandwidth of the system for the capacitance that selects
+the station at \(f =$floM\)MHz, in MegaHertz?
+<endouttext/>
+<numericalresponse answer="$BWloM"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/><br/>
+A wizardly engineer suggests that we could use an active circuit to
+enhance the \(Q\) of the tuned circuit and thus increase the selectivity, as follows:
+<center><img src="/static/circuits/ParallelTankNIC.gif"/></center>
+The active circuit the engineer suggested was the following:
+<center><img src="/static/circuits/NIC.gif"/></center>
+Assume that the operational amplifier is ideal.
+In the space provided below give an algebraic expression for
+the equivalent resistance \(v/i\) of this circuit as seen from the
+indicated port, in terms of the resistances in the circuit diagram.
+<endouttext/>
+<formularesponse type="cs" samples="R1,R2,R3@1,1,1:3,3,3#10" answer="$Rs"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+Which of the following phrases best describes this circuit?
+<br/>
+(a) resistance multiplier, (b) negative resistance, (c) oscillator,
+(d) amplifier, (e) none of the above.
+<br/>
+In the space provided below enter a letter for the correct answer:
+<endouttext/>
+<formularesponse samples="a,b,c,d,e@1,1,1,1,1:3,3,3,3,3#10" answer="$choice"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="4"/></formularesponse>
+
+<startouttext/>
+<br/><br/>
+If we fix \(R_1 = R_3 = $R1x\Omega\), what should we make \(R_2\), in
+Ohms, to make the \(Q\) of our tuned circuit \($Qgoal\) at our station \(f = $floM\)MHz?
+<endouttext/>
+<numericalresponse answer="$R2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+</problem>

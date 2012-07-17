@@ -1,0 +1,183 @@
+<!-- Resonance: cjt 4/21/12 -->
+
+<problem>
+
+<startouttext />
+
+In this lab we'll look at resonance in second-order circuits.  You'll find it
+helpful to review <A href="/book-shifted/777">Chapter 14</A> in the text.
+We have some specific experiments for you try below, but you may find
+it fun to run your own experiments on various RLC configurations.  Take
+a look at <A href="/book-shifted/816">Figure 14.40</A> for some circuits
+to try.
+
+<br/><br/><b>Task 1.  Designing an RLC circuit for a specific \(Q\) and \(\omega_0\)</b>
+
+<br/><br/>Consider the series RLC circuit shown in Figure 1.  Leaving
+the resistance fixed at \(10\Omega\) your task is choose values of L
+and C such that the undamped resonance frequency, \(\omega_0\), is
+\(10\textrm{kHz}\), with \(Q = 10\).
+
+<endouttext />
+<schematicresponse>
+<center>
+<schematic width="500" type="hidden" height="200" id="schematic1" parts="g,L,r,l,c,v,s,a" analyses="ac,tran" class="schematic" name="RLC"
+initial_value="[[&quot;v&quot;,[40,32,0],{&quot;name&quot;:&quot;src&quot;,&quot;value&quot;:&quot;sin(0,1,10K,0,0)&quot;,&quot;_json_&quot;:0},[&quot;V1&quot;,&quot;0&quot;]],[&quot;l&quot;,[72,32,3],{&quot;name&quot;:&quot;L&quot;,&quot;l&quot;:&quot;100u&quot;,&quot;_json_&quot;:1},[&quot;V1&quot;,&quot;1&quot;]],[&quot;c&quot;,[120,32,3],{&quot;name&quot;:&quot;C&quot;,&quot;c&quot;:&quot;10p&quot;,&quot;_json_&quot;:2},[&quot;1&quot;,&quot;V2&quot;]],[&quot;r&quot;,[168,32,0],{&quot;name&quot;:&quot;R&quot;,&quot;r&quot;:&quot;10&quot;,&quot;_json_&quot;:3},[&quot;V2&quot;,&quot;0&quot;]],[&quot;w&quot;,[40,80,168,80]],[&quot;g&quot;,[40,80,0],{&quot;_json_&quot;:5},[&quot;0&quot;]],[&quot;w&quot;,[40,32,72,32]],[&quot;s&quot;,[168,32,0],{&quot;color&quot;:&quot;blue&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:7},[&quot;V2&quot;]],[&quot;L&quot;,[184,32,3],{&quot;label&quot;:&quot;V2&quot;,&quot;_json_&quot;:8},[&quot;V2&quot;]],[&quot;w&quot;,[184,32,168,32]],[&quot;L&quot;,[40,32,5],{&quot;label&quot;:&quot;V1&quot;,&quot;_json_&quot;:10},[&quot;V1&quot;]],[&quot;view&quot;,0,0,2,&quot;50&quot;,&quot;10&quot;,&quot;100M&quot;,&quot;src&quot;,&quot;100&quot;,&quot;1&quot;,&quot;1000&quot;],[&quot;dc&quot;,{&quot;0&quot;:0,&quot;1&quot;:0,&quot;2&quot;:0,&quot;3&quot;:0,&quot;I(src)&quot;:0}]]"/>
+<br/>Figure 1. Series RLC circuit
+</center>
+<answer type="loncapa/python">
+correct = ['correct']
+</answer>
+</schematicresponse>
+
+<startouttext />
+
+With correctly chosen values for L and C, the results of an AC analysis
+plotting \(|H(s)| = |\frac{V2}{V1}|\) should look like Figure 2.  Note
+that an AC analysis requires that one specify the voltage or current
+source where the test tone is to be injected -- in this case, it's
+the voltage source labeled "src".
+
+<center>
+<img src="/static/circuits/Lab11_1.png" width="500"/>
+<br/>Figure 2. Magnitude of the frequency response
+</center>
+
+Verify your results by entering your values for L and C in Figure 1
+and running an AC analysis.  Please enter the values for L and C that
+give the specified \(\omega_o\) and \(Q\):
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Value for L (in henries)
+<numericalresponse answer="1592e-6">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Value for C (in farads)
+<numericalresponse answer="159.1e-9">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+Here's an analysis of the circuit Figure 1 that may help in finding
+the correct values.  Using the impedance model, we can write the
+system function as
+
+\[
+H(s) = \frac{V2}{V1} = \frac{R}{R + (sL + 1/{sC})}
+\]
+
+which we can rewrite so that the demonimator is in the standard form
+\(s^2 + 2\alpha s + \omega_0^2\) for second-order systems:
+
+\[
+H(s) = \frac{s\frac{R}{L}}{s^2 + \frac{R}{L}s + \frac{1}{LC}}
+\]
+
+Matching terms in the standard form to the denominator in the system
+function, we see that
+
+\[
+\omega_0 = \sqrt{\frac{1}{LC}}\textrm{   and   }\alpha = \frac{R}{2L}
+\]
+
+Noting that \(Q = \omega_0/2\alpha\), we have the machinery in place
+to determine \(L\) and \(C\) given the desired \(Q\), \(\omega_0\) and
+\(R\).
+
+<br/><br/><b>Task 2.  Step response of a resonant RLC circuit</b>
+
+<br/><br/>Observe that the condition for resonance given
+by <A href="/book-shifted/779">Equation 14.9</A>, \(\alpha \lt
+\omega_0\), is the same as that for under-damped dynamics described
+in <A href="/book-shifted/644">Section 12.1.1</A>.  So we'd expect the
+RLC system above to respond to a step input with a ringing response.
+Using your modified values for L and C, change the voltage source in
+Figure 1 to a \(1V\) step and run a \(2\textrm{ ms}\) TRAN simulation.
+Your result should like that shown in Figure 3.
+
+<center>
+<img src="/static/circuits/Lab11_2.png" width="500"/>
+<br/>Figure 3. Resonant RLC response to a step input
+</center>
+
+As expected, the period of the ringing is \(\frac{2\pi}{\omega_d}
+\approx \frac{2\pi}{2\pi\cdot 10000} = 100\mu s\) since the difference
+between \(\omega_0\) and \(\omega_d\) is small.  Measure the amount
+decay over a span of \(Q=10\) oscillations by taking the ratio of the
+maximum value in the 11th oscillation at \(t \approx 1025\mu s\) to
+the maximum value of the 1st oscillation at \(t \approx 25\mu s\).
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Ratio of V2 @ 1025us to V2 @ 25us:
+<numericalresponse answer="0.0356">
+    <responseparam type="tolerance" default="20%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+Looking at <A href="/book-shifted/646">Figure 12.16</A>, we'd expect the
+amplitude of the ringing to decay as \(e^{-\alpha t}\), so the computed
+decay over \(Q\) oscillations is
+
+\[
+e^{-\alpha \cdot Q \cdot \frac{2\pi}{\omega_d}} \approx e^{-\alpha \cdot \frac{\omega_0}{2\alpha} \cdot \frac{2\pi}{\omega_0}} = e^{-\pi} \approx 0.04
+\]
+
+This leads to a nice rule of thumb: the ringing in the step response
+for a resonant RLC circuit with a given \(Q\) lasts for approximately
+\(Q\) cycles.
+
+<br/><br/><b>Task 3.  Response at the resonant frequency</b>
+
+<br/><br/>Switch the positions of the R and C in Figure 1, then run an
+AC analysis.  You should see a plot of the magnitude of the system
+response (now measuring the voltage across the capacitor) like that
+shown in Figure 4.
+
+<center>
+<img src="/static/circuits/Lab11_3.png" width="500"/>
+<br/>Figure 4. Frequency response with R and C interchanged.
+</center>
+
+Change the voltage source in Figure 1 back to generating a sinusoid
+with an amplitude of 1V and a frequency of 10kHz.  Run a 2ms TRAN
+simulation and report the steady-state amplitude of the voltage V2.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Steady-state amplitude of voltage V2 at resonance:
+<numericalresponse answer="10">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+Wow, if we drive the system with a 1V 10kHz sinusoid, we'll see a 10V
+10kHz sinusoid across the capacitor!  This is consistent with what we
+learned from the AC analysis shown in Figure 4.  The response at
+\(\omega_0\ = 10\textrm{kHz}\) is 20dB, i.e., \(20\log(\frac{V2}{V1})
+= 20\) or \(V2 = 10\cdot V1\).
+
+<br/><br/>Where did all this gain come from?  Think of pushing a
+swing.  If you time your push to be at the same point of each
+oscillation, the amplitude of the oscillation will increase slightly
+with each push, until the energy dissipated during each oscillation
+due to air resistance and hinge friction exactly equals the energy
+imparted by the push.  In this RLC circuit, the "push" is provided
+by the sinusoidal voltage source at exactly the frequency of the
+oscillation (the resonance frequency) and is dissipated by the resistor.
+As you see in the plot of the TRAN simulation, the amplitude at the
+output increases until the energy added is balanced by the energy
+dissipated, at which point we reach a steady state.
+
+<endouttext />
+
+</problem>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:IpgRVbvkER8,1.0:30gff5JsupY,1.25:n5HvdEs6S4E,1.50:zMAz8jsferM" slug="S11V10_Perspective_on_the_Small_Signal_Circuit" rerandomize="per_student" name="S11V10: Perspective on the Small Signal Circuit"/>
+  <customtag tag="S11" slug="discuss_754" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="414" slug="book_755" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="11" slug="slides_756" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

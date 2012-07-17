@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:37ShJZGXYww,1.0:yYPT0lBgfeM,1.25:_auNRnGTeCM,1.50:NGuWKkpK45E" slug="S28V1_The_Double_Take" name="S28V1: The Double Take"/>
+  <customtag tag="S28" slug="discuss_1957">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="9" slug="book_1958">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="28" slug="slides_1959">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

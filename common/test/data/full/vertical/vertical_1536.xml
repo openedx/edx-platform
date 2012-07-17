@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S22E2_The_filter_is_ringing" slug="S22E2_The_filter_is_ringing" showanswer="attempted" rerandomize="false" name="S22E2: The filter is ringing"/>
+  <customtag tag="S22" slug="discuss_1537">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="801" slug="book_1538">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="22" slug="slides_1539">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

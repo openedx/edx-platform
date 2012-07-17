@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S21E3_Thevenin_Tank" slug="S21E3_Thevenin_Tank" showanswer="attempted" rerandomize="false" name="S21E3: Thevenin Tank"/>
+  <customtag tag="S21" slug="discuss_1457">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="783" slug="book_1458">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="21" slug="slides_1459">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

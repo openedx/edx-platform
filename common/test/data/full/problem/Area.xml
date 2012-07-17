@@ -1,0 +1,67 @@
+<problem>
+
+<script type="loncapa/python">
+#e = math.exp(1)
+IT = "IS*(1-e^(-(R/L)*T))"
+I2 = "IT*e^(-(R/L)*(t-T))"
+Ilim = "(A*(R/L))*e^(-(R/L)*t)"
+</script>
+
+<startouttext/>
+Now, let's find out what happens when the pulse becomes very short but
+very high.  If we choose \(Is = A/T\) then the area of the pulse is
+kept constant \(A\), independent of the length of the pulse.
+<br/>
+So now, our independent current source puts out a pulse of
+height \(I_S = A/T\) that starts at time \(t=0\) and ends at time \(t = T\).
+<br/>
+Thus \(I(t) = \frac{A}{T} (u(t) - u(t-T))\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+Continuing with the inductor current \(i_L(t) = 0\) for \(t &lt; 0\).  
+<br/><br/>
+In the box provided below write an algebraic expression for
+the value of \(\lim_{T \to 0} i_L(t)\).
+<endouttext/>
+<formularesponse type="cs" samples="A,R,L,T,t@1,1,1,1,1:3,3,3,3,3#10" answer="$Ilim">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+To see this in operation, here is a set of response graphs for a
+circuit with time-constant 1/4 second, to a sequence of narrowing
+pulses of 1/4 second and area 2.
+<center>
+<img src="/static/circuits/limit.gif" />
+</center>
+Because this limit exists we can invent a new function symbol
+representing an infinitely tall and infinitely narrow pulse.  We
+define \(\delta(t)\) as an infinitesimal pulse of area 1 at \(t=0\)
+and zero everywhere else.  This is called an "impulse".
+<br/><br/>
+Mathematically, introducing impulses is a big step, because
+\(\delta\) does not satisfy the usual requirements for a function.  It
+is a
+a <a href="http://en.wikipedia.org/wiki/Distribution_%28mathematics%29">
+  distribution</a>, which generalizes the notion of a function.  But
+we do not expect you to learn that very advanced material for
+use in this class :-).
+<br/><br/>
+Notice what the impulse did: it "instantaneously" changed the current
+through the inductor, thus setting the initial conditions for the
+exponential decay that follows.  In fact, it incremented the current
+in the inductor by the area of the impulse divided by the time
+constant of the circuit, as seen from the inductor.
+<br/><br/>
+Notice also that in this problem the area is the product of current
+and time, hence charge: we put out an impulse whose area can be
+expressed in Coulombs (C).
+<endouttext/>
+
+
+</problem>

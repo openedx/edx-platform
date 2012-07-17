@@ -1,0 +1,121 @@
+<problem>
+
+<script type="loncapa/python">
+VINmin = "VT+Dv"
+VDDmin = "2*VIN-VT"
+
+gm1 = "K*(VIN-VT)"
+gm2 = gm1
+vout = "-vin"
+rout = "1/(K*(VIN-VT))"
+
+</script>
+
+<startouttext/>
+The circuit shown below has two MOSFETs.  The input signal is
+presented to the gate of \(Q_1\).  \(Q_2\) is configured as
+the two-terminal device that you explored in exercise S10E2.  Here,
+\(Q_2\), with its gate connected to its drain, is used as a
+replacement for the load resistor in a common-source amplifier. 
+<center>
+<img src="/static/circuits/phase-inverter.gif" />
+</center>
+Assume that the MOSFETs are identical, with parameters \(K\) and
+\(V_T\).  Note that it is hard to get close to identical transistors
+if they are discrete components, but one can get pretty good matched 
+pairs on an integrated circuit chip.
+<endouttext/>
+
+<startouttext/>
+<br/>
+We want to set the input bias \(V_{IN}\) high enough to keep \(Q_1\)
+out of cutoff.  If we want to be able to swing the input voltage up
+and down by \(Dv\), what is the minimum value for the input bias
+voltage?  Write an algebraic expression involving \(Dv\) and \(V_T\)
+for this minimum value of \(V_{IN}\).
+<endouttext/>
+<formularesponse type="cs" samples="VT,Dv@1,1:3,3#10" answer="$VINmin">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+What is the minimum value that the power
+supply voltage \(V_{DD}\) must be to ensure that both transistors are
+operating in the saturated region?  Write an algebraic expression
+involving \(V_{IN}\) and \(V_T\) for this minimum value of \(V_{DD}\) in
+the space provided below:
+<endouttext/>
+<formularesponse type="cs" samples="VT,VIN@1,1:3,3#10" answer="$VDDmin">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Notice that \(K\) did not appear in this answer... Hmmmmmm, very interesting...
+<endouttext/>
+
+<startouttext/>
+<br/>
+Now, consider the small-signal model of this circuit.  What is the
+transconductance \(g_{m1}\) of transistor \(Q_1\) at the operating
+point?  Write an algebraic expression for \(g_{m1}\) in terms of
+the parameters \(K\) and \(V_T\), and the bias voltage \(V_{IN}\).
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,VIN@1,1,1:3,3,3#10" answer="$gm1">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+What is the
+transconductance \(g_{m2}\) of transistor \(Q_2\) at the operating
+point?  Write an algebraic expression for \(g_{m2}\) in terms of
+the parameters \(K\) and \(V_T\), and the bias voltage \(V_{IN}\).
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,VIN@1,1,1:3,3,3#10" answer="$gm2">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Hmmmmmm...
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the Thevenin equivalent open-circuit voltage of the
+small-signal circuit, as seen from the output port?  Write an
+algebraic expression for this \(v_{out}\) in terms of the parameters
+\(K\) and \(V_T\), the bias voltage \(V_{IN}\), and the incremental
+input voltage \(v_{in}\).
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,VIN,vin@1,1,1,1:3,3,3,3#10" answer="$vout">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+What is the Thevenin equivalent resistance of the small-signal
+circuit, as seen from the output port?    Write an
+algebraic expression for this resistance in terms of the parameters
+\(K\) and \(V_T\), and the bias voltage \(V_{IN}\).
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,VIN,vin@1,1,1,1:3,3,3,3#10" answer="$rout">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/><br/>
+Notice that, for the approximations we use in this class, the behavior
+of this circuit is quite independent of the detailed properties of the
+MOSFETs.  This is very useful.
+<endouttext/>
+
+</problem>

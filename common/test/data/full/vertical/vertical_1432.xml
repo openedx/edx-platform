@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S21E1_Second-order_impedance" slug="S21E1_Second-order_impedance" showanswer="attempted" rerandomize="false" name="S21E1: Second-order impedance"/>
+  <customtag tag="S21" slug="discuss_1433">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="737" slug="book_1434">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="21" slug="slides_1435">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

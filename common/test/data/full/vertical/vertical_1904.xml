@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:mFDMyU2pkYU,1.0:1XSk8A0AlEQ,1.25:zb2rkw47BWY,1.50:ZTd1VA7gR2M" slug="S26V11_Logic_gate_power_and_the_sun" rerandomize="per_student" name="S26V11: Logic gate power and the sun"/>
+  <customtag tag="S26" slug="discuss_1905" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="610" slug="book_1906" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1907" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

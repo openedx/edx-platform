@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:NL2oex4L8EE,1.0:vGgTBs3dNf0,1.25:R1eatOikZ4Y,1.50:Sn67ZSiwtZM" slug="S12V4_Structure_of_a_Capacitor" showanswer="attempted" rerandomize="per_student" name="S12V4: Structure of a Capacitor"/>
+  <customtag tag="S12" slug="discuss_779" showanswer="attempted" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="461" slug="book_780" showanswer="attempted" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="12" slug="slides_781" showanswer="attempted" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:vQTsRyeGtgA,1.0:JrsRKwGUfLU,1.25:C6szGIJ9AN4,1.50:Oibupy3j3Ls" slug="S17V9_Particular_and_Homogeneous_Solutions" rerandomize="per_student" name="S17V9: Particular and Homogeneous Solutions"/>
+  <customtag tag="S17" slug="discuss_1162" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="629" slug="book_1163" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1164" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

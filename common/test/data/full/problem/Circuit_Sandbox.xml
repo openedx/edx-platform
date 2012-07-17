@@ -1,0 +1,6 @@
+<problem><startouttext/><p/>Here's a sandbox where you can experiment with all the components
+we'll discuss in 6.002x.  If you click on CHECK below, your diagram
+will be saved on the server and you can return at some later time.
+<endouttext/><schematicresponse><p/><center><schematic name="work" value="" width="800" height="600"/></center><answer type="loncapa/python">
+correct = ['correct']
+</answer></schematicresponse></problem>

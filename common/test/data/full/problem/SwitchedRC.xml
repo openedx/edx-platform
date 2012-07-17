@@ -1,0 +1,69 @@
+<problem>
+
+<script type="loncapa/python">
+t0 = 0.0
+t1 = 1.0
+t2 = 2.0
+
+R1k = 10.0
+R2k = random.choice([18.0, 20.0, 22.0])
+Cu = random.choice([100.0, 120.0, 180.0, 220.0])
+V  = random.choice([9.0, 12.0, 15.0, 18.0, 24.0])
+
+R1 = 1000*R1k
+R2 = 1000*R2k
+C  = 1e-6*Cu
+
+vt0 = 0
+
+RthClosed = (R1*R2)/(R1+R2)
+VthClosed = (R2*V)/(R1+R2)
+
+RthOpen   = R2
+VthOpen   = 0.0
+
+RCclosed  = RthClosed*C
+RCopen    = RthOpen*C
+
+def FirstOrder(Vgoal, Vstart, RC, time):
+   return(Vgoal + (Vstart - Vgoal)*math.exp(-time/RC))
+
+vt1 = FirstOrder(VthClosed, vt0, RCclosed, t1-t0)
+
+vt2 = FirstOrder(VthOpen, vt1, RCopen, t2-t1)
+</script>
+
+
+<startouttext/>
+In the circuit shown below the switch has been left open for a very
+long time.  It was closed at \(t=$t0\)s.  It was then opened at
+\(t=$t1\)s.  The switch is now shown in the open position.
+<center>
+<img src="/static/circuits/switched-RC.gif" />
+</center>
+The device parameters are: \(R_1=$R1k\)k\(\Omega\), \(R_2=$R2k\)k\(\Omega\),
+\(C=$Cu\mu\)F, and \(V=$V\)V.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the capacitor voltage at \(t=$t1\)s?
+<endouttext/>
+<numericalresponse answer="$vt1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> 
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the capacitor voltage at \(t=$t2\)s?
+<endouttext/>
+<numericalresponse answer="$vt2">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> 
+    <textline />
+</numericalresponse>
+
+
+</problem>

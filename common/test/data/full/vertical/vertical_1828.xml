@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:_BP5TgJQ_SI,1.0:vReZyS8iJBs,1.25:JM6rZQT8Ox4,1.50:tT-IF4IhTIA" slug="S25V14_DEMO_Op_Amp_hysteresis" rerandomize="per_student" name="S25V14: DEMO: Op Amp hysteresis"/>
+  <customtag tag="S25" slug="discuss_1829" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="869" slug="book_1830" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1831" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

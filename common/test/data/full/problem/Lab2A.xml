@@ -1,0 +1,73 @@
+<script type="text/javascript">
+$(document).ready(function() { $("#slider").slider(); });
+</script>
+
+<p/>Using the sliders, please determine values for R1, R2, R3 and R4
+so that the voltage across the terminals on the right-hand side of
+diagram is 8.00 volts.
+
+<table><tr valign="top">
+<td>
+<input width="400" type="hidden" height="150" id="schematic1" parts="" analyses="" class="schematic ctrls" name="test2" value="[[&quot;w&quot;,[160,64,184,64]],[&quot;w&quot;,[160,16,184,16]],[&quot;w&quot;,[64,16,112,16]],[&quot;w&quot;,[112,64,88,64]],[&quot;w&quot;,[64,64,88,64]],[&quot;g&quot;,[88,64,0],{},[&quot;0&quot;]],[&quot;w&quot;,[112,64,160,64]],[&quot;w&quot;,[16,64,64,64]],[&quot;r&quot;,[160,16,0],{&quot;name&quot;:&quot;R4&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[160,16,1],{&quot;name&quot;:&quot;R3&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;2&quot;]],[&quot;i&quot;,[112,64,6],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;6A&quot;},[&quot;0&quot;,&quot;2&quot;]],[&quot;r&quot;,[64,16,0],{&quot;name&quot;:&quot;R2&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;0&quot;]],[&quot;r&quot;,[64,16,1],{&quot;name&quot;:&quot;R1&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;3&quot;]],[&quot;v&quot;,[16,16,0],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;8V&quot;},[&quot;3&quot;,&quot;0&quot;]],[&quot;view&quot;,0,0,2]]"/>
+</td>
+<td>
+  <table cellspacing="5px;">
+    <tr valign="top">
+      <td>R1</td>
+      <td>
+	<div id="r1_slider" style="width:200px; height:10px; margin-bottom:20px; margin-left:10px;"></div>
+	<script type="text/javascript">
+	  $("#r1_slider").slider({
+	  value: 1, min: 1, max: 10, step: 1, slide: schematic.component_slider,
+	  schematic: "ctrls", component: "R1", property: "r", analysis: "dc",
+	  })
+	</script>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>R2</td>
+      <td>
+	<div id="r2_slider" style="width:200px; height:10px; margin-bottom:20px; margin-left:10px;"></div>
+	<script type="text/javascript">
+	  $("#r2_slider").slider({
+	  value: 1, min: 1, max: 10, step: 1, slide: schematic.component_slider,
+	  schematic: "ctrls", component: "R2", property: "r", analysis: "dc",
+	  })
+	</script>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>R3</td>
+      <td>
+	<div id="r3_slider" style="width:200px; height:10px; margin-bottom:20px; margin-left:10px;"></div>
+	<script type="text/javascript">
+	  $("#r3_slider").slider({
+	  value: 1, min: 1, max: 10, step: 1, slide: schematic.component_slider,
+	  schematic: "ctrls", component: "R3", property: "r", analysis: "dc",
+	  })
+	</script>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>R4</td>
+      <td>
+	<div id="r4_slider" style="width:200px; height:10px; margin-bottom:20px; margin-left:10px;"></div>
+	<script type="text/javascript">
+	  $("#r4_slider").slider({
+	  value: 1, min: 1, max: 10, step: 1, slide: schematic.component_slider,
+	  schematic: "ctrls", component: "R4", property: "r", analysis: "dc",
+	  })
+	</script>
+      </td>
+    </tr>
+  </table>
+</td></tr></table>
+
+<p/>The controls also affect the following two schematics, which show
+how the original diagram can be decomposed by superposition to create
+simpler subcases to analyze.  Note that a node voltage in the diagram
+above should be the sum of the voltages for the corresponding node in
+the two diagrams below.
+
+<input width="400" type="hidden" height="150" id="schematic2" parts="" analyses="" class="schematic ctrls" name="test2" value="[[&quot;w&quot;,[160,64,184,64]],[&quot;w&quot;,[160,16,184,16]],[&quot;w&quot;,[64,16,112,16]],[&quot;w&quot;,[112,64,88,64]],[&quot;w&quot;,[64,64,88,64]],[&quot;g&quot;,[88,64,0],{},[&quot;0&quot;]],[&quot;w&quot;,[112,64,160,64]],[&quot;w&quot;,[16,64,64,64]],[&quot;r&quot;,[160,16,0],{&quot;name&quot;:&quot;R4&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[160,16,1],{&quot;name&quot;:&quot;R3&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;2&quot;]],[&quot;r&quot;,[64,16,0],{&quot;name&quot;:&quot;R2&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;0&quot;]],[&quot;r&quot;,[64,16,1],{&quot;name&quot;:&quot;R1&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;3&quot;]],[&quot;v&quot;,[16,16,0],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;8&quot;},[&quot;3&quot;,&quot;0&quot;]],[&quot;view&quot;,0,0,2]]"/>
+<input width="400" type="hidden" height="150" id="schematic3" parts="" analyses="" class="schematic ctrls" name="test2" value="[[&quot;w&quot;,[16,16,16,64]],[&quot;w&quot;,[160,64,184,64]],[&quot;w&quot;,[160,16,184,16]],[&quot;w&quot;,[64,16,112,16]],[&quot;w&quot;,[112,64,88,64]],[&quot;w&quot;,[64,64,88,64]],[&quot;g&quot;,[88,64,0],{},[&quot;0&quot;]],[&quot;w&quot;,[112,64,160,64]],[&quot;w&quot;,[16,64,64,64]],[&quot;r&quot;,[160,16,0],{&quot;name&quot;:&quot;R4&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[160,16,1],{&quot;name&quot;:&quot;R3&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;2&quot;]],[&quot;i&quot;,[112,64,6],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;6&quot;},[&quot;0&quot;,&quot;2&quot;]],[&quot;r&quot;,[64,16,0],{&quot;name&quot;:&quot;R2&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;0&quot;]],[&quot;r&quot;,[64,16,1],{&quot;name&quot;:&quot;R1&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;3&quot;]],[&quot;view&quot;,0,0,2]]"/>

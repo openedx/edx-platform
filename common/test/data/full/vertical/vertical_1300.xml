@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:qpxDcIcTX2Q,1.0:bTXYwsuMSWg,1.25:Pz9FUAdO9qY,1.50:3pF1clozaIs" slug="S18V18_Intuitive_Analysis_of_Second_Order_Circuits_--_Part_1" rerandomize="per_student" name="S18V18: Intuitive Analysis of Second Order Circuits -- Part 1"/>
+  <customtag tag="S18" slug="discuss_1301" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="678" slug="book_1302" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1303" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

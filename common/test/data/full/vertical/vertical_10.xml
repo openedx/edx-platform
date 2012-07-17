@@ -1,0 +1,9 @@
+<sequential>
+  <video youtube="0.75:xUgJlHAOD2Y,1.0:eX6HhcKJUUM,1.25:E-SIlOQEJW0,1.50:Tc50eh7ycMU" slug="S0V4_Time_Management_Skit" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="S0V4: Time Management Skit"/>
+  <customtag page="0" slug="book_11" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="1" slug="slides_12" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S26E2_Energy_Sourced_in_T1" slug="S26E2_Energy_Sourced_in_T1" rerandomize="per_student" name="S26E2: Energy Sourced in T1"/>
+  <customtag tag="S26" slug="discuss_1877" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="596" slug="book_1878" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1879" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

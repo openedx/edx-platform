@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:w-aK-m9-G_0,1.0:zqqSOCUD8A0,1.25:KNKaQKzi3wU,1.50:3XfvTYiX0U0" slug="S21V10_DEMO_AM_Radio_receiver" name="S21V10: DEMO AM Radio receiver"/>
+  <customtag tag="S21" slug="discuss_1469">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="785" slug="book_1470">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="21" slug="slides_1471">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

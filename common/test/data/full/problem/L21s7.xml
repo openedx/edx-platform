@@ -1,0 +1,40 @@
+<!-- It works, and is not so bad. -->
+
+<problem>
+
+<script type="loncapa/python">
+VoVi = " R/(L*j*w + R) "
+LPF  = " LPF "
+HPF  = " HPF "
+Neither = " Neither "
+</script>
+
+<startouttext/>
+The following circuit is one more combination of an inductor and a
+resistor driven by a voltage source in a series circuit.
+<center>
+<img src="/static/circuits/LR.gif" />
+</center>
+In the space provided below write an algebraic expression for
+the complex voltage-transfer ratio \(\frac{V_{out}}{V_{in}}\).
+(Remember, write \(w\) for \(\omega\).)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L@1,1,1:3,3,3#10" answer="$VoVi">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+What kind of response is this?  In the space provided below enter one
+of the strings: \({\rm LPF}\), \({\rm HPF}\), or \({\rm Neither}\).
+<endouttext/>
+<formularesponse type="cs" samples="HPF,LPF,Neither@1,1,1:3,3,3#10" answer="$LPF">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+</problem>

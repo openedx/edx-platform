@@ -1,0 +1,98 @@
+<problem><script type="loncapa/python">
+RX = 1000 # Ohms, for an Omega SG-13/1000-LY11
+GF = 2    # (DeltaR/R)/(DeltaL/L)
+
+#RA = 2000 # Choosable
+RA = random.choice([1500, 1800, 2200, 2700])
+RB = 2*RA
+RC = 1500
+#VS = 30   # Choosable
+VS = random.randrange(20,30,2)
+
+ra = float(RA)
+rb = float(RB)
+rc = float(RC)
+rx = float(RX)
+vs = float(VS)
+
+def vo(ra, rb, rc, rx, vs):
+  return((rb/(ra+rb) - rc/(rc+rx))*vs)
+
+von = vo(ra, rb, rc, rx, vs)
+
+drx = 2.0
+rxp = rx + drx
+vop = vo(ra, rb, rc, rxp, vs)
+
+vopon = vop - von
+voponm = vopon*1e3
+
+#to balance bridge
+rbb = ra*rc/rx
+
+# now get new ra=rx
+rax = 3*rx
+
+</script><startouttext/>
+One way to measure the deformation of an object is with strain
+gauges. A strain gauge is a resistor whose resistance varies with the
+amount it is stretched or compressed.  For example, an 
+<a href="http://www.omega.com/pptst/gen_purpose_strain_SG.html">
+Omega SG-13/1000-LY11 </a> has a nominal undeformed resistance of
+\(R_X = $RX\Omega\).  The change in resistance is very small: if the piece
+of steel the gauge is bonded to stretches by \(\frac{\Delta l}{l} =
+0.001\) the gauge increases resistance by only \($GF\Omega\). 
+<br/>
+To measure the strain we need to get a voltage proportional to the
+change in resistance from the nominal resistance of the gauge.  This
+is arranged with a circuit like this:
+<center><img src="/static/circuits/Strain.gif"/></center>
+<br/>
+Let's start by assuming that \(R_A = $RA\Omega\),
+\(R_B = $RB\Omega\), \(R_C = $RC\Omega\), and \(V_S = $VS\)V.
+<br/><br/>
+Note: In this problem it is necessary to compute your answers to
+within 1% of the correct value.
+<br/><br/>
+What is the output voltage \(v_O\), in Volts, if the gauge is
+not deformed? 
+<endouttext/>
+<numericalresponse answer="$von"><responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Now suppose the gauge stretches so its resistance changes to 
+\(R_X = $rxp\Omega\).  What is the change in the output voltage, in
+milliVolts? 
+<endouttext/>
+<numericalresponse answer="$voponm"><responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+We would really like the output voltage to be zero when the gauge is
+not deformed.  Keeping the other resistors the same, what should we
+make the resistance \(R_B\) to accomplish this?  Express your answer
+in Ohms.
+<endouttext/>
+<numericalresponse answer="$rbb"><responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/><br/>
+Now we want to choose some resistances to get the maximum sensitivity:
+we want the biggest change in output voltage for a change in the gauge
+resistance.  We also want the output voltage to be zero when the gauge is
+not deformed.
+<br/> <br/>
+Assume that we are given \(R_A = $rax\Omega\), and remember that the
+nominal undeformed resistance of the gauge \(R_X = $RX\Omega\).
+What value should we choose for \(R_C\), in Ohms?
+<endouttext/>
+<numericalresponse answer="$RX"><responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What value should we choose for \(R_B\), in Ohms?
+<endouttext/>
+<numericalresponse answer="$rax"><responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

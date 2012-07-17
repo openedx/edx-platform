@@ -1,0 +1,24 @@
+<!-- Impedance Model: Lecturer asks students to derive impedance of an inductor -->
+
+<problem>
+
+<script type="loncapa/python">
+ZL = "j*w*L"
+</script>
+
+<startouttext/>
+You just saw a derivation of the impedance of a resistor and the
+impedance of a capacitor.  You are to derive the impedance of an
+inductor.  In the space provided below write an algebraic expression
+in terms of angular frequency \(\omega\) and inductance \(L\) for the
+ratio of the complex amplitude of the voltage across an inductor to
+the complex amplitude of the current through the inductor.  (As usual,
+use \(w\) for \(\omega\) in your expression.)
+<endouttext/>
+<formularesponse type="cs" samples="w,L@1,1:3,3#10" answer="$ZL">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

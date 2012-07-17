@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S13E4_First-Order_Inductor_Examples" slug="S13E4_First-Order_Inductor_Examples" showanswer="attempted" rerandomize="false" name="S13E4: First-Order Inductor Examples"/>
+  <customtag tag="S13E4" slug="discuss_851">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="517" slug="book_852">
+    <impl>book</impl>
+  </customtag>
+</sequential>

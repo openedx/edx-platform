@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:RAr1Q9kyOec,1.0:SRSYiAuesj8,1.25:z6vgUITkvjo,1.50:mBS6FfGGQ7Q" slug="S5V17_Static_Power_in_Digital_Circuits_Insights" rerandomize="per_student" name="S5V17: Static Power in Digital Circuits, Insights"/>
+  <customtag tag="S5" slug="discuss_351" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="320" slug="book_352" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="5" slug="slides_353" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

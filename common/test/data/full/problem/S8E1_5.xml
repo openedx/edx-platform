@@ -1,0 +1,38 @@
+<problem>
+
+<script type="loncapa/python">
+VO1 = "-RO*K1*VI"
+VO2 = "-(RO/RI)*K2*VI"
+
+</script>
+
+<startouttext/>
+In the following diagram there is a dependent current source driving a
+resistor.  The current in the dependent source may be a function of
+either \(v_B\) or \(i_B\) as indicated in the diagram.
+<center>
+<img src="/static/circuits/dependent-current-source.gif" />
+</center>
+Write the algebraic expression required for each question below.
+<endouttext/>
+
+<startouttext/>
+<br/><br/>
+If \(i_D = K_1 v_B\) what is \(v_O\)?
+<endouttext/>
+<formularesponse type="cs" samples="RO,K1,VI@1,1,1:3,3,3#10" answer="$VO1">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/>
+If \(i_D = K_2 i_B\) what is \(v_O\)?
+<endouttext/>
+<formularesponse type="cs" samples="RO,RI,K2,VI@1,1,1,1:3,3,3,3#10" answer="$VO2">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

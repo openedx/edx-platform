@@ -1,0 +1,126 @@
+<!-- Neon Relaxation Oscillator -->
+
+<problem>
+
+<script type="loncapa/python">
+def P(R1, R2):
+   return(R1*R2/(R1+R2))
+
+def FOS(tau, start, goal, deltat):
+   return(goal+(start-goal)*math.exp(-(deltat/tau)))
+
+def FOSt(tau, start, goal, valatt):
+   return(-tau*math.log((valatt - goal)/(start - goal)))
+
+def FOStau(t, start, goal, valatt):
+   return(-t/math.log((valatt - goal)/(start - goal)))
+
+
+#VSd = 90
+VSd = random.randrange(90, 110, 2)
+VS  = float(VSd)
+
+#VUd = 70
+VUd = random.randrange(65, 80, 2)
+VU  = float(VUd)
+
+RBkd = 10
+RB  = float(RBkd)*1e3
+
+#VDd = 30
+VDd = random.randrange(20, 40, 1)
+VD  = float(VDd)  
+
+RM  = 1.5
+R   = RM*1e6
+
+Cu  = 1.0
+C   = Cu*1e-6
+
+Trise = FOSt(R*C, VD, VS, VU)
+
+Tfall = FOSt(P(R,RB)*C, VU, 0, VD)
+
+dc = Tfall/(Trise + Tfall)
+
+</script>
+
+<startouttext/>
+
+It is fun to make and to understand a neon-lamp relaxation oscillator.
+<br/> <br/>
+A small neon indicator lamp such as an
+<a href="http://www.chml.com/products/pdf/5-4.pdf"> NE-2 </a>
+is a pair of electrodes closely spaced in a 
+low-pressure atmosphere of neon gas.  
+<center>
+<img src="/static/circuits/Neon.gif" />
+</center>
+
+The lamp starts out as an open circuit.  We raise the voltage \(v\)
+across the lamp.  When the voltage across the lamp exceeds a striking
+voltage threshold \(V_{U} \approx $VUd\)V the gas ionizes and becomes
+a conductor with a resistance of about \(R_B \approx $RBkd\)k\(\Omega\).
+However, if the voltage across the lamp decreases to a value below the
+sustaining threshold \(V_{D} \approx $VDd\)V the gas loses its
+ionization and the lamp becomes an open circuit again.
+
+<br/> <br/>
+The following circuit can oscillate.
+<center>
+<img src="/static/circuits/NeonOscillator.gif" />
+</center>
+
+The voltage of the battery \(V_S = $VSd\)V is greater than the striking
+threshold of the lamp.  However, initially the capacitor is at \(0\)V.
+The battery charges up the capcitor through the resistor.  When the
+voltage on the capacitor, which is the voltage across the lamp,
+exceeds the striking threshold of the lamp, the lamp turns on.  The
+current through the lamp is larger than the current through the
+resistor from the battery, so the voltage on the capacitor decreases.
+When the voltage across the lamp goes below the sustaining threshold
+the lamp turns off, and the capacitor starts to charge again.
+<br/>
+So after the initial transient from \(0\)V the voltage across the
+capacitor oscillates between the two thresholds and the lamp flashes.
+
+<br/> <br/>
+Let \(R = $RM\)M\(\Omega\) and \(C = $Cu\mu\)F.  
+
+<br/> <br/>
+How much time, in seconds, does it take for the capacitor to charge
+from the sustaining threshold to the striking threshold?
+<endouttext/>
+<numericalresponse answer="$Trise">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+How much time, in seconds, does it take for the capacitor to discharge
+from the striking threshold to the sustaining threshold?
+<endouttext/>
+<numericalresponse answer="$Tfall">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the duty cycle of the lamp?  (The duty cycle is the ratio of
+the time it is lit to the total time.)
+<endouttext/>
+<numericalresponse answer="$dc">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+
+
+</problem>

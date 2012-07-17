@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S12E4_First-Order_Capacitor_Examples" slug="S12E4_First-Order_Capacitor_Examples" showanswer="attempted" rerandomize="false" name="S12E4: First-Order Capacitor Examples"/>
+  <customtag tag="S12E4" slug="discuss_811">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="512" slug="book_812">
+    <impl>book</impl>
+  </customtag>
+</sequential>

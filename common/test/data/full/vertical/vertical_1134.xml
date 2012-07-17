@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S17E3_Matching_Initial_Conditions" slug="S17E3_Matching_Initial_Conditions" showanswer="attempted" rerandomize="false" name="S17E3: Matching Initial Conditions"/>
+  <customtag tag="S17" slug="discuss_1135">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="563" slug="book_1136">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1137">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

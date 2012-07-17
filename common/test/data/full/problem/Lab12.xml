@@ -1,0 +1,147 @@
+<!-- RC active filters: cjt 4/30/12 -->
+
+<problem>
+
+<startouttext />
+
+For this lab the design task is to build a resonant circuit <i>without
+using inductors</i>, a feat that's made possible by the use of Op Amps
+to create an active filter circuit.  You'll find it useful to review
+<A href="/book-shifted/859">Section 15.6</A> in the text.
+
+<br/><br/>One variant of an Op Amp active filter is shown in Figure 1.
+
+<center>
+<img src="/static/circuits/Lab12_2.png" width="500"/>
+<br/>Figure 1. One variant of an Op Amp active filter
+</center>
+
+The goal is to create a filter with a resonant frequency \(\omega_O\ =
+10\textrm{ kHz} \pm 100\textrm{ Hz}\) and a \(Q \gt 5\), i.e., a
+filter similar to that of the RLC circuit in Task 1 of Lab 11.  With
+the appropriate choice of component values, the magnitude of the
+frequency response should be similar to the plot shown in Figure 2.
+The exact dB values aren't important, just the resonant frequency
+and Q of your circuit.
+
+<center>
+<img src="/static/circuits/Lab12_1.png" width="500"/>
+<br/>Figure 2. Desired frequency response of active filter
+</center>
+
+To start, use the Node Method and impedances to write KCL equations
+for the nodes labeled V2 and V3 in Figure 1.  These can then be solved
+to give a system equation of the form
+
+\[H(s) = \frac{V4}{V1} = \frac{numerator}{s^2 + 2\alpha s + \omega_0^2}\]
+
+where the denominator is in the canonical form for second-order
+systems.  If your math is correct, the expressions for \(\alpha\) and
+\(\omega_0\) should be expressions involving R1, C1, R2 and C2.
+Recalling that \(Q = \omega_0/2\alpha\), you should now be able to
+choose values for the resistors and capacitors.
+
+<br/><br/>If we actually wanted to build the design, the specified
+components would have to be available from parts suppliers, so please
+choose values from the listings
+of <A href="/static/circuits/Lab12_3.png" target="_blank">standard 1% resistance values</A>
+and <A href="/static/circuits/Lab12_4.png"
+target="_blank">standard capacitance values</A>.
+
+<br/><br/>Please use the sandbox below to enter the circuit and try
+out various component values.  Run an AC analysis to verify the
+appropriate resonant frequency and Q.
+
+<br/><br/>Remember to connect the "gnd" pin of the Op Amp to the
+ground node in your circuit.  So why does the Op Amp in the circuit
+sandbox have a "gnd" pin?  The idealOp Amp is modeled as a dependent
+voltage source, as shown in <A href="/book-shifted/841">Figue 15.6</A>,
+which generates the output voltage \(v_o\) relative to a reference
+voltage shown as a ground connection in the figure.  The "gnd" pin on
+the sandbox Op Amp is provided so that you can indicate which node
+in your circuit has been selected as the source of the reference voltage.
+
+<endouttext />
+<schematicresponse>
+<center>
+<schematic width="600" type="hidden" height="400" id="schematic1" parts="g,L,r,c,o,v,s,a" analyses="ac,tran" class="schematic" name="active_filter" initial_value=""/>
+</center>
+<answer type="loncapa/python">
+correct = ['correct']
+</answer>
+</schematicresponse>
+<startouttext />
+
+When you've completed the design, please enter your final values for the components
+below.  The on-line system will perform a calculation using the values to determine
+the resonant frequency and Q of your system.  Note that the answers will either
+all be marked correct (\(\omega_0\) and Q are okay) or all be marked incorrect
+(a negative component value, or out of range values for \(\omega_0\) or Q).
+
+<endouttext />
+
+<customresponse>
+  <startouttext />
+    <br />
+    R1 (in Ohms): <textline size="5" />
+    <br />
+    C1 (in Farads): <textline size="5" />
+    <br />
+    R2 (in Ohms): <textline size="5" />
+    <br />
+    C2 (in Farads): <textline size="5" />
+  <endouttext />
+<answer type="loncapa/python">
+
+okay = True
+
+try:
+  r1 = calc.evaluator({},{},submission[0])
+except ValueError:
+  r1 = 0
+if math.isnan(r1):
+  r1 = 0
+
+try:
+  c1 = calc.evaluator({},{},submission[1])
+except ValueError:
+  c1 = 0
+if math.isnan(c1):
+  c1 = 0
+
+try:
+  r2 = calc.evaluator({},{},submission[2])
+except ValueError:
+  r2 = 0
+if math.isnan(r2):
+  r2 = 0
+
+try:
+  c2 = calc.evaluator({},{},submission[3])
+except ValueError:
+  c2 = 0
+if math.isnan(c2):
+  c2 = 0
+
+if r1 &lt;= 0 or c1 &lt;= 0 or r2 &lt;= 0 or c2 &lt;= 0:
+  okay = False
+
+w0_min = 2 * math.pi * 9900
+w0_max = 2 * math.pi * 10100
+Q_min = 5
+
+if okay:
+  w0 = math.sqrt(1.0/(r1*r2*c1*c2))
+  alpha = (0.5/r2)*(1.0/c1 + 1.0/c2)
+  Q = w0/(2*alpha)
+
+  if w0 &lt; w0_min or w0 &gt; w0_max or Q &lt; Q_min:
+    okay = False
+
+correct = ['correct']*4 if okay else ['incorrect']*4
+
+</answer>
+</customresponse>
+
+
+</problem>

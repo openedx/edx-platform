@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="Strain" slug="Strain" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="Strain"/>
+  <problem filename="Logic_Circuit" slug="Logic_Circuit" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="Logic Circuit"/>
+  <problem filename="Switched_Capacitor" slug="Switched_Capacitor" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="Switched Capacitor"/>
+  <problem filename="BJT" slug="BJT" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="BJT"/>
+  <problem filename="OpAmpRL" slug="OpAmpRL" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="OpAmpRL"/>
+  <problem filename="OpAmpFET" slug="OpAmpFET" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="OpAmpFET"/>
+  <problem filename="Trapping_Noise" slug="Trapping_Noise" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="Trapping Noise"/>
+  <problem filename="Increasing_Q" slug="Increasing_Q" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="Increasing Q"/>
+  <problem filename="Scope_Probe" slug="Scope_Probe" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="Scope Probe"/>
+  <problem filename="Triode_Amplifier" slug="Triode_Amplifier" graceperiod="5 minutes 00 seconds" rerandomize="per_student" due="June 11 12:00" graded="true" name="Triode Amplifier"/>
+</sequential>

@@ -1,0 +1,120 @@
+<problem><script type="loncapa/python">
+
+Lu = 10.0 #uH
+Cp = 10.0 #pF
+Rk = 1.0  #kOhm
+
+L_n = Lu*1e-6
+C_n = Cp*1e-12
+R_n = Rk*1e3
+
+omega0_n = 1.0/math.sqrt(L_n*C_n)
+alpha_n  = R_n/(2.0*L_n)
+
+# Underdamped, so oscillation is at omegad
+omegad_n = math.sqrt(omega0_n**2 - alpha_n**2)
+
+phi = "arctan(-a/wd)"
+A   = "-VI*(w0/wd)"
+
+VI_n = 3.0
+
+phi_n = -math.atan2(alpha_n, omegad_n)
+A_n   = -VI_n*omega0_n/omegad_n
+</script><startouttext/>
+Back to our circuit
+<center><img src="/static/circuits/VRLC1.gif"/></center>
+The input is \(v_I(t) = V_I u(t)\).  The initial conditions are
+\(v(0) = 0\) and \(i(0) = 0\).
+The capacitor voltage in this system is described by a second-order
+linear constant-coefficient ordinary differential equation:
+<br/><br/>
+\(L C \frac{d^2 v(t)}{dt^2} + R C \frac{d v(t)}{dt} + v(t) = V_I u(t) \)
+<br/><br/>
+For \(t &gt; 0\) we now know a particular solution \(v_P(t)=V_I\) and
+the general solution of the associated homogeneous equation.
+<endouttext/>
+
+<startouttext/>
+<br/>
+Suppose \(L = $Lu\mu\)H, \(C = $Cp\)pF, and \(R = $Rk\)k\(\Omega\).
+This gives an underdamped system: The general solution of the
+homogeneous equation is an exponentially-decaying sinusoid of the
+form: 
+<br/><br/>
+\(v_H(t) = A e^{-\alpha t}\cos(\omega_d t + \phi) \)
+<br/><br/>
+where \( \omega_d = \sqrt{\omega_0^2 - \alpha^2} \)
+and \(\omega_0\) and \(\alpha\) are derived from the device
+parameters.
+<br/>
+What is the numerical value of \(\alpha\) in this system?
+<endouttext/>
+<numericalresponse answer="$alpha_n"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the numerical value of \(\omega_0\)?  
+<endouttext/>
+<numericalresponse answer="$omega0_n"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the numerical value of \(\omega_d\), the natural oscillation
+frequency of this damped system?  
+<endouttext/>
+<numericalresponse answer="$omegad_n"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+The remaining parameters, \(A\) and \(\phi\) cannot be determined
+yet.  They are determined by matching the total solution
+(=particular+homogeneous) to the initial conditions.
+The total solution is of the form:
+<br/><br/>
+\( v(t) = V_I + A e^{-\alpha t}\cos(\omega_d t + \phi) \)
+<br/><br/>
+We know two initial conditions: \(v(0) = 0\) and \(i(0) = 0\).
+<br/>
+First, from \(i(0) = 0\) we know that \( \frac{d v(t)}{d t}|_{t=0} = 0 \).
+From this we can deduce the value of \(\phi\).  In the space provided
+below give an algebraic expression for \(\phi\) in terms of \(\alpha\)
+and \(\omega_d\).  (Use \(wd\) for \(\omega_d\) and \(a\) for \(\alpha\)
+in your expression.)
+<endouttext/>
+<formularesponse type="cs" samples="a,wd@1,1:3,3#10" answer="$phi"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+Now, from our knowledge of \(\phi\) and using the other condition, \(v(0) =
+0\), we can deduce the value of A.  In the space provided below write
+an algebraic expression for \(A\) in terms of \(V_I\), \(\omega_0\),
+and \(\omega_d\). (Use \(wd\) for \(\omega_d\) and \(w0\) for \(\omega_0\)
+in your expression.)
+<endouttext/>
+<formularesponse type="cs" samples="VI,w0,wd@1,1,1:3,3,3#10" answer="$A"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+Assume that \(V_I = $VI_n\)V.  
+Now, we can bring it all together numerically.  We have the form of
+the solution:
+<br/><br/>
+\( v(t) = V_I + A e^{-\alpha t}\cos(\omega_d t + \phi) \)
+<br/><br/>
+and the only two coefficients that we don't have numerically are
+\(A\) and \(\phi\).  What is the numerical value of \(A\)?
+<endouttext/>
+<numericalresponse answer="$A_n"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the numerical value of \(\phi\)?
+<endouttext/>
+<numericalresponse answer="$phi_n"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+At this point you should check that \(v(0)=0\) and \(i(0)=0\), as required.
+<endouttext/>
+
+</problem>

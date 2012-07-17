@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:B3ndftmIcoQ,1.0:N3jXyuAz5Dg,1.25:gfoN8eSAsV8,1.50:7BHkP2tSTl8" slug="S4V15_Demo_Setup_-_Chain_Saw" name="S4V15: Demo Setup - Chain Saw"/>
+  <customtag tag="S4" slug="discuss_267">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="258" slug="book_268">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="4" slug="slides_269">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

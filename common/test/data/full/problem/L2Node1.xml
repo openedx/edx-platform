@@ -1,0 +1,12 @@
+<problem><script type="loncapa/perl">
+V0 = "V0"
+I1 = "I1"
+IR1 = "(e1-V0)/R1"
+</script><startouttext/><center><img src="/static/circuits/bridge-with-is-2.gif"/></center>
+In the circuit shown, what is the current going up through the 
+resistor with resistance \(R_1\) in terms of the node potentials?
+Write the expression in the box:
+<endouttext/>
+<formularesponse type="cs" samples="e1,V0,R1@10,10,10:20,20,20#10" answer="$IR1"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="25"/></formularesponse>
+
+</problem>

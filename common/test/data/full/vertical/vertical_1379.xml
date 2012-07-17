@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S20E2_RC_voltage_divider" slug="S20E2_RC_voltage_divider" showanswer="attempted" rerandomize="false" name="S20E2: RC voltage divider"/>
+  <customtag tag="S20" slug="discuss_1380">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="717" slug="book_1381">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="20" slug="slides_1382">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S25E1_Positive_Feedback_Gain" slug="S25E1_Positive_Feedback_Gain" rerandomize="per_student" name="S25E1: Positive Feedback Gain"/>
+  <customtag tag="S25" slug="discuss_1785" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="869" slug="book_1786" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1787" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

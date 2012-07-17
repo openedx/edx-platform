@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:9-zxvWasDUM,1.0:fWjGw7EsemM,1.25:em9KNZDOiB0,1.50:kc49RkfwJDM" slug="S13V3_Energy_Storage_in_an_Inductor" rerandomize="per_student" name="S13V3: Energy Storage in an Inductor"/>
+  <customtag tag="S13" slug="discuss_859" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="470" slug="book_860" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="13" slug="slides_861" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

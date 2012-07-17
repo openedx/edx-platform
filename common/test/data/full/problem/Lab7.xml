@@ -1,0 +1,178 @@
+<!-- Capacitors & Energy Storage : cjt 3/10/12 -->
+
+<problem>
+
+<script type="loncapa/python">
+vcap = "(1/C)*(1/(1000*2*PI))*(-cos(1000*2*PI*t) + 1)"
+</script>
+
+<startouttext />
+
+In this lab we'll be exploring capacitors and their ability to store energy.
+You may find it useful to review <A href="/book-shifted/461">Section 9.1</A>
+and <A href="/book-shifted/480">Section 9.4</A> in the text.
+
+<br/><br/><b>Task 1: Energy storage in capacitors</b>
+
+<br/><br/>The circuit below contains a 1A sinusoidal current source
+driving a 1mF capacitor.  We've added both a voltage probe and a current probe
+so we can see what's going on.
+
+<center>
+<input width="400" type="hidden" height="250" id="schematic1" parts="g,L,i,c,s,a" analyses="tran" class="schematic" name="ckt1"
+initial_value="[[&quot;i&quot;,[40,88,6],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;sin(0,1,1k,0,0)&quot;,&quot;_json_&quot;:0},[&quot;0&quot;,&quot;2&quot;]],[&quot;c&quot;,[128,40,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;1m&quot;,&quot;_json_&quot;:1},[&quot;1&quot;,&quot;0&quot;]],[&quot;g&quot;,[40,88,0],{&quot;_json_&quot;:2},[&quot;0&quot;]],[&quot;a&quot;,[80,40,0],{&quot;color&quot;:&quot;magenta&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:3},[&quot;2&quot;,&quot;1&quot;]],[&quot;w&quot;,[40,40,80,40]],[&quot;w&quot;,[96,40,128,40]],[&quot;w&quot;,[40,88,128,88]],[&quot;s&quot;,[128,40,0],{&quot;color&quot;:&quot;blue&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:7},[&quot;1&quot;]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;2ms&quot;,&quot;1000&quot;]]"/>
+</center>
+
+The current to/from the current source can only flow from/to one plate of the capacitor.
+The voltage across this capacitor at any point in time is
+given by <A href="/book-shifted/464">Equation 9.12</A>, shown below:
+
+\[v_C(t) = \frac{1}{C} \int^{t}_{-\infty} i(t)dt\]
+
+In this example, \(C = .001\) and \(i(t) = \sin(1000 * 2\pi * t)\).
+Please evaluate the integral using the known capacitance, current and
+initial conditions and enter the resulting formula for \(v_C(t)\), the
+voltage across the capacitor.  You can use the variable PI to represent
+\(\pi\) in your formula.  Assume that \(I(t) = 0\) for \(t \le 0\) and
+simplify your equation accordingly.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Formula for v<sub>C</sub>(t):
+<formularesponse type="cs" samples="t,C,PI@0,.001,3.141592653:.001,.001,3.141592653#10" answer="$vcap">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="80" />    
+</formularesponse>
+</div>
+
+Please evaluate your formula for \(t = 0.0005\), i.e., 0.5ms, half-way
+through the first cycle of current's sine wave and enter the result
+below.  You can evaluate the result precisely, so please enter 6
+digits of precision.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Computed value for v(0.0005) in volts:
+<numericalresponse answer=".318310">
+    <responseparam type="tolerance" default=".000001" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+Now let's see what we measure from the simulation:  Run a 2ms
+transient simulation on the circuit above, measure the voltage at
+0.5ms and enter the result below.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Measured value for v(0.0005) in volts:
+<numericalresponse answer=".317585">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+There may be a small discrepency between the measurement and the calculation
+since the simulator is estimating the current at only a discrete number of time
+points and therefore its estimate of the integral will be off a bit from the true
+answer (the measurement will converge to the computed value as we use more
+and more time points in the requested interval).
+
+<br/><br/>
+Finally, using <A href="/book-shifted/465">Equation 9.18</A> and your measurement
+above, estimate the amount of electrical energy stored in the capacitor at time 0.5ms and
+enter the result below.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Estimated value for electrical energy stored at time 0.0005, in joules:
+<numericalresponse answer="50.4e-6">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+The moral of the story: current flowing into a capacitor causes
+charge to accumulate on the capacitor's plates.  The accumulated charge
+represents stored electrical energy that can be drawn upon later (see Task 2 below!).
+
+<br/><br/><b>Task 2: Using energy storage in a circuit</b>
+
+<br/><br/>Let's look at an example circuit where we'll use the energy storage capability
+of the capacitor to our advantage.  The circuit shown below is the first draft of a power supply
+whose job it is convert a 12 VAC power source (such as might come from a transformer plugged
+into an electrical outlet) into a relatively stable DC voltage for driving a load.
+
+<br/><br/>The initial circuit, shown below, is a <i>bridge rectifier</i> built from four
+diodes wired so that the positive and negative transitions of the AC supply voltage are
+converted into a voltage that is always positive: basically the negative excursions in the
+AC waveform are converted into positive excursions.  Run a 30ms transient analysis and
+examine the voltage waveform to see what's happening.
+
+<center>
+<input width="550" type="hidden" height="320" id="schematic3" parts="g,L,v,c,r,d,s,a" analyses="tran" class="schematic" name="ckt3"
+initial_value="[[&quot;w&quot;,[208,56,240,56]],[&quot;w&quot;,[168,56,208,56]],[&quot;w&quot;,[96,136,208,136]],[&quot;w&quot;,[120,8,168,8]],[&quot;w&quot;,[120,104,168,104]],[&quot;w&quot;,[120,56,96,56]],[&quot;w&quot;,[32,104,120,104]],[&quot;w&quot;,[32,8,120,8]],[&quot;w&quot;,[96,56,96,136]],[&quot;s&quot;,[208,56,0],{&quot;color&quot;:&quot;black&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:9},[&quot;Vout&quot;]],[&quot;g&quot;,[208,136,0],{&quot;_json_&quot;:10},[&quot;0&quot;]],[&quot;d&quot;,[168,8,0],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;_json_&quot;:11},[&quot;2&quot;,&quot;Vout&quot;]],[&quot;d&quot;,[120,56,0],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;_json_&quot;:12},[&quot;0&quot;,&quot;1&quot;]],[&quot;v&quot;,[32,32,0],{&quot;name&quot;:&quot;Vac&quot;,&quot;value&quot;:&quot;sin(0,12,60,0,0)&quot;,&quot;_json_&quot;:13},[&quot;2&quot;,&quot;1&quot;]],[&quot;d&quot;,[120,56,2],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;_json_&quot;:14},[&quot;0&quot;,&quot;2&quot;]],[&quot;d&quot;,[168,104,2],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;_json_&quot;:15},[&quot;1&quot;,&quot;Vout&quot;]],[&quot;w&quot;,[32,32,32,8]],[&quot;w&quot;,[32,80,32,104]],[&quot;r&quot;,[208,88,0],{&quot;name&quot;:&quot;Rload&quot;,&quot;r&quot;:&quot;50&quot;,&quot;_json_&quot;:18},[&quot;Vout&quot;,&quot;0&quot;]],[&quot;L&quot;,[240,56,3],{&quot;label&quot;:&quot;Vout&quot;,&quot;_json_&quot;:19},[&quot;Vout&quot;]],[&quot;w&quot;,[208,56,208,88]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;30m&quot;,&quot;1000&quot;]]"/>
+</center>
+
+Sadly, the supply voltage delivered to the load is far from constant!  Let's add a <i>reservoir capacitor</i>
+in parallel with the load along with some current probes to see what happens.  Run a 30ms transient
+analysis on the circuit below and look at the plot.
+
+<center>
+<input width="550" type="hidden" height="320" id="schematic4" parts="g,L,v,c,r,d,s,a" analyses="tran" class="schematic" name="ckt4"
+initial_value="[[&quot;w&quot;,[208,56,192,56]],[&quot;w&quot;,[168,56,176,56]],[&quot;a&quot;,[176,56,0],{&quot;color&quot;:&quot;red&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:2},[&quot;3&quot;,&quot;Vout&quot;]],[&quot;L&quot;,[240,56,3],{&quot;label&quot;:&quot;Vout&quot;,&quot;_json_&quot;:3},[&quot;Vout&quot;]],[&quot;r&quot;,[208,88,0],{&quot;name&quot;:&quot;Rload&quot;,&quot;r&quot;:&quot;50&quot;,&quot;_json_&quot;:4},[&quot;2&quot;,&quot;0&quot;]],[&quot;w&quot;,[32,80,32,104]],[&quot;w&quot;,[32,32,32,8]],[&quot;d&quot;,[168,104,2],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;_json_&quot;:7},[&quot;5&quot;,&quot;3&quot;]],[&quot;d&quot;,[120,56,2],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;_json_&quot;:8},[&quot;0&quot;,&quot;4&quot;]],[&quot;v&quot;,[32,32,0],{&quot;name&quot;:&quot;Vac&quot;,&quot;value&quot;:&quot;sin(0,12,60,0,0)&quot;,&quot;_json_&quot;:9},[&quot;4&quot;,&quot;5&quot;]],[&quot;d&quot;,[120,56,0],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;_json_&quot;:10},[&quot;0&quot;,&quot;5&quot;]],[&quot;d&quot;,[168,8,0],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;_json_&quot;:11},[&quot;4&quot;,&quot;3&quot;]],[&quot;g&quot;,[208,136,0],{&quot;_json_&quot;:12},[&quot;0&quot;]],[&quot;s&quot;,[208,56,0],{&quot;color&quot;:&quot;black&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:13},[&quot;Vout&quot;]],[&quot;w&quot;,[96,56,96,136]],[&quot;w&quot;,[32,8,120,8]],[&quot;w&quot;,[32,104,120,104]],[&quot;w&quot;,[120,56,96,56]],[&quot;w&quot;,[120,104,168,104]],[&quot;w&quot;,[120,8,168,8]],[&quot;w&quot;,[96,136,208,136]],[&quot;w&quot;,[208,56,240,56]],[&quot;c&quot;,[240,88,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;1m&quot;,&quot;_json_&quot;:22},[&quot;1&quot;,&quot;0&quot;]],[&quot;w&quot;,[208,136,240,136]],[&quot;a&quot;,[208,72,1],{&quot;color&quot;:&quot;green&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:24},[&quot;Vout&quot;,&quot;2&quot;]],[&quot;w&quot;,[208,56,208,72]],[&quot;a&quot;,[240,72,1],{&quot;color&quot;:&quot;blue&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:26},[&quot;Vout&quot;,&quot;1&quot;]],[&quot;w&quot;,[240,56,240,72]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;30m&quot;,&quot;1000&quot;]]"/>
+</center>
+
+First look at the black waveform, the voltage across the load.  It's
+now relatively stable at around 10V, with a small 0.6V <i>ripple</i>
+(the positive and negative supply voltage variations about the
+average supply voltage).  Looking the green curve, the current into
+the load resistor, we see that it's also relatively constant at
+about 200mA.  Approximately how much power is being delivered to the load?
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Power delivered to the load in watts:
+<numericalresponse answer="2">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+Now look at the red curve, the supply current flowing from the bridge recitifier into
+the resistor and capacitor.  Notice that <i>the supply current is essentially
+zero</i> for 80% of the time.
+
+<br/><br/>
+But a relatively constant current is supplied to the load all the time, so where is
+it coming from the other 80% of the time?  Compare the green curve
+(the load current) to the blue curve (the capacitor current).  Notice they are
+<i>equal and opposite</i> during the 80% of the time the bridge
+recitifier current is essentially zero: the capacitor is supplying the load
+current when the bridge rectifier is not.
+
+<br/><br/>
+As a sanity check, let's estimate the power supplied by the bridge rectifier.  The
+average supply voltage is about 10V.  What is average current supplied by the
+bridge rectifier? (Hint: I thought the red current waveform looked like a right triangle during
+its non-zero portion, so using some measurements from the plot was able to compute
+the average current.)
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Average current supplied by bridge rectifier, in amps:
+<numericalresponse answer=".2">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+Multiply by 10V and you should get the same answer as the power delivered to the load --
+so, yes, the bridge rectifier is delivering all the power required to drive the load, but
+it's doing it during only 20% of the cycle.  80% of the energy delivered by the bridge rectifier
+is stored in the capacitor and then fed back into the circuit as the load current when
+the bridge rectifier is not supplying current.
+
+<endouttext />
+
+</problem>

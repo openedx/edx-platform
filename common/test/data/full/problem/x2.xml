@@ -1,0 +1,65 @@
+<problem>
+
+<script type="loncapa/python">
+P = random.choice([40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0])
+RL = random.choice([4.0, 8.0])
+RTH = random.choice([0.05, 0.1, 0.15, 0.2])
+
+VatS = math.sqrt(RL * P)
+I    = VatS/RL
+
+VOC  = VatS + I*RTH
+
+l = random.choice([10.0, 15.0, 20.0, 25.0])
+l2 = 2*l
+
+rwk = 20.95 #Ohms/km
+rw  = rwk/1000.0
+
+RW = l2*rw
+
+va = random.choice([0.5, 0.75, 1.0, 1.25, 1.5])
+
+vs = (RL*va)/(RL+RW)
+</script>
+
+<startouttext/> 
+Joe is hooking up his hifi system.  His amplifier is
+claimed to be able to pump \($P\)W RMS into his \($RL\Omega\)
+speaker.  From the point of view of the speaker, the amplifier can be
+modeled as a Thevenin source with an internal resistance of
+\(R_{TH}=$RTH\Omega\).
+<endouttext/>
+
+<startouttext/> 
+<br/><br/>
+What is the maximum open-circuit voltage, in Volts RMS, that the
+amplifier can deliver?
+<endouttext/>
+<numericalresponse answer="$VOC">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+
+<startouttext/> 
+<br/><br/>
+Joe buys a roll of #18AWG speaker wire.  He needs to run \($l\)m of
+wire (a \($l2\)m round trip) to the speaker from his amplifier.  The
+resistance of #18AWG copper wire is about \($rwk\Omega\)/km.
+<br/><br/>
+If Joe uses the wire he bought to connect the amplifier to the speaker
+then when his amplifier is putting out \($va\)V RMS at the amplifier
+terminals, what is the voltage, in Volts RMS, at the speaker terminals?
+<endouttext/>
+<numericalresponse answer="$vs">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+
+
+
+</problem>

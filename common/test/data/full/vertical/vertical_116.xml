@@ -1,0 +1,13 @@
+<sequential>
+  <video youtube="0.75:pPK7M0E9NRY,1.0:XgSOO1sfsa4,1.25:9ltbkZh1oFs,1.50:es7IX5LmHA4" slug="S2V5_Method_2_-_Element_combination_rules" rerandomize="per_student" name="S2V5: Method 2 - Element combination rules"/>
+  <html slug="html_117" rerandomize="per_student">Correction: at 1:30 in 1.0x speed, the lecture shows two voltages in series but the words are "two voltages in parallel". The voltages are, in fact, in series.</html>
+  <customtag tag="S2" slug="discuss_118" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="89" slug="book_119" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="2" slug="slides_120" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

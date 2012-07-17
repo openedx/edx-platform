@@ -1,0 +1,158 @@
+<!--
+This is a week 3 homework problem about digital logic
+-->
+
+
+<problem>
+
+<script type="loncapa/python">
+def vd(R1, R2, VS):
+   return((R2/(R1+R2))*VS)
+
+VCC = 3.0
+
+RL = 2000.0
+
+ROFF = 1.0e7
+RON  = random.choice([50.0, 75.0, 100.0, 125.0, 150.0])
+
+#NOT
+vi = vd(RL, ROFF, VCC)
+vj = vd(RL, RON, VCC)
+
+#NAND
+vk = vd(RL, 2*ROFF, VCC)
+vl = vd(RL, ROFF, VCC)
+vm = vd(RL, ROFF, VCC)
+vn = vd(RL, 2*RON, VCC)
+
+
+#NOR
+vo = vd(RL, 2*ROFF, VCC)
+vp = vd(RL, RON, VCC)
+vq = vd(RL, RON, VCC)
+vr = vd(RL, RON/2, VCC)
+</script>
+
+
+   <startouttext/>
+   For this problem, consider the convention that a logical one
+   corresponds to a high voltage level and a logical zero corresponds
+   to a low voltage level.  Thus when the voltage \(v_A\)
+   associated with the Boolean variable A is high, A is one. When
+   \(v_A\) is low, A is zero.  The same holds for \(v_B\) and B, and
+   \(v_C\) and C.  Assume also the following: 
+   <br/>
+   The high voltage level is much greater than the threshold voltage.
+   <br/>
+   The &quot;on&quot; resistance of the MOSFET is \($RON\Omega\)
+   <br/>
+   The &quot;off&quot; resistance of the MOSFET is 10M\(\Omega\)
+   <br/>
+   For each of the following diagrams we provide a corresponding truth table.
+   You will provide the value of the output voltage \(v_C\) for each
+   row of the table.  We will refer to a row by an index placed next
+   to the logical value of C in the table.
+   <endouttext/>
+
+
+   <startouttext/>
+   <br/>
+   <center>
+   <img src="/static/circuits/inverter_1.gif"/>
+   <img src="/static/circuits/tt_1.gif"/>
+   </center>
+   What is the value of \(v_C\) (in Volts) at entry i?
+   <endouttext/>
+   <numericalresponse answer="$vi">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+   <startouttext/>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry j?
+   <endouttext/>
+   <numericalresponse answer="$vj">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+
+
+   <startouttext/>
+   <br/>
+   <center>
+   <img src="/static/circuits/inverter_2.gif"/>
+   <img src="/static/circuits/tt_2.gif"/>
+   </center>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry k?
+   <endouttext/>
+   <numericalresponse answer="$vk">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+   <startouttext/>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry l?
+   <endouttext/>
+   <numericalresponse answer="$vl">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+   <startouttext/>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry m?
+   <endouttext/>
+   <numericalresponse answer="$vm">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+   <startouttext/>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry n?
+   <endouttext/>
+   <numericalresponse answer="$vn">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+
+   <startouttext/>
+   <br/>
+   <center>
+   <img src="/static/circuits/inverter_3.gif"/>
+   <img src="/static/circuits/tt_3.gif"/>
+   </center>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry o?
+   <endouttext/>
+   <numericalresponse answer="$vo">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+   <startouttext/>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry p?
+   <endouttext/>
+   <numericalresponse answer="$vp">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+   <startouttext/>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry q?
+   <endouttext/>
+   <numericalresponse answer="$vq">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+   <startouttext/>
+   <br/>
+   What is the value of \(v_C\) (in Volts) at entry r?
+   <endouttext/>
+   <numericalresponse answer="$vr">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+    </numericalresponse>
+ </problem>
+   
+      

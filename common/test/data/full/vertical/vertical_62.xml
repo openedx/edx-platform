@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="1.50:3SaQtdKynIM,1.25:3sWKu1arHKE,1.0:AEwvgztBf44,0.75:8iAty3Kla7U" slug="S1V10_Demo_-_Taking_Abstraction_Too_Far" name="S1V10: Demo - Taking Abstraction Too Far"/>
+  <customtag tag="S1" slug="discuss_63">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="39" slug="book_64">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="1" slug="slides_65">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,41 @@
+{
+  "start": [
+    0, 
+    1040, 
+    3890, 
+    6375, 
+    9260, 
+    11540, 
+    15770, 
+    18890, 
+    22230, 
+    25100, 
+    27360
+  ], 
+  "end": [
+    1040, 
+    3890, 
+    6375, 
+    9260, 
+    11540, 
+    15770, 
+    18890, 
+    22230, 
+    25100, 
+    27360, 
+    28610
+  ], 
+  "text": [
+    null, 
+    "PROFESSOR: So notice, for that\ndevice, mathematically, just", 
+    "by that model, it should just\nhave gone through the floor", 
+    "and at a point through to\nthe corridor below.", 
+    "But this is a practical\ndevice.", 
+    "And notice that the model breaks\ndown, and that&#39;s what", 
+    "begins to happen.", 
+    "The device stops behaving like\na dependent current source.", 
+    "Rather, it behaves like some\ncorny, old resistor, or", 
+    "something like that, and\nsaturates sound.", 
+    null
+  ]
+}

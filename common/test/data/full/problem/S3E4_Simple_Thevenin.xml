@@ -1,0 +1,29 @@
+<problem><script type="loncapa/python">
+VS = float(random.choice([5, 10, 15]))
+E12=[10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82]
+mult = float(random.choice([1, 10, 100, 1000]))
+R1 = float(random.choice(E12))*mult
+R2 = float(random.choice(E12))*mult
+
+VTH = VS*(R2/(R1+R2))
+RTH = (R1*R2)/(R1+R2)
+</script><startouttext/>
+Given the circuit below with the indicated terminals, you will construct a
+Thevenin equivalent circuit.
+<br/>
+The device parameters of the circuit to be modeled are \(V_S=$VS\)V,
+\(R_1=$R1\Omega\), and \(R_2=$R2\Omega\).
+<center><img src="/static/circuits/simple-thevenin.gif"/></center>
+<br/>
+<br/>
+What is the Thevenin open-circuit voltage (in Volts) \(V_{TH}\)?
+<endouttext/>
+<numericalresponse answer="$VTH"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/><br/>
+What is the Thevnin equivalent resistance (in Ohms) \(R_{TH}\)?
+<endouttext/>
+<numericalresponse answer="$RTH"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

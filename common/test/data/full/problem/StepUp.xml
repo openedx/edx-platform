@@ -1,0 +1,84 @@
+<problem>
+
+<startouttext/>
+We now have a name \(u\) for the "unit step" function that turns on at zero: 
+<br/><br/>
+\(   u(t) = \left\{ \begin{array}{ll}
+                   0  &amp; \mbox{if $t &lt; 0$} \\
+                   1  &amp; \mbox{if $t \geq 0$} 
+                   \end{array}
+            \right.
+\)
+<br/><br/>
+Now, for a circuit we have seen before
+<center>
+<img src="/static/circuits/norton-inductor.gif" />
+</center>
+we can say that \(I(t) = I_S\  u(t)\) to specify that the current source
+rises at time \(t=0\) from \(0\) to \(I_S\).
+<endouttext/>
+<customresponse>
+<startouttext/>
+<br/>
+Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
+In the space provided below write an algebraic expression for \(I(t)\). 
+Please be very careful to format your answer without spaces and using standard ordering conventions.
+<br/>
+<textline size="40" correct_answer="IS*u(t-t0)" />
+<endouttext/>
+<answer type="loncapa/python">
+correct=['correct']
+try:
+  r = str(submission[0])
+except ValueError:
+  correct[0] ='incorrect'
+  r = '0'
+
+def u(x):
+  if x &lt; 0:
+     return(0.0)
+  elif x==0 :
+     return(0.5)
+  else:
+     return(1.0)
+
+residual = "IS*u(t-t0)"+"-"+r
+
+for y in range(10):
+  i   = float(random.randrange(10,30,1))/10.0
+  t  = (float(random.randrange(1,60,1))-30.0)/10.0
+  t0 = (float(random.randrange(1,60,1))-30.0)/10.0
+
+  #context = {'IS':i,'t':t,'t0':t0}
+  #numerical = abs(calc.evaluator(context,{'u':u}, residual))
+  #print residual, numerical, context, t, t-t0, u(t), u(t-t0)
+  if not(abs(calc.evaluator({'IS':i,'t':t,'t0':t0},{'u':u}, residual, cs=True)) &lt; .0001):
+  #if not(numerical &lt; .0001):
+  #if not(r=="IS*u(t-t0)"):
+    correct[0] ='incorrect'
+
+</answer>
+</customresponse>
+
+
+<script type="loncapa/python">
+#e = math.exp(1)
+I = "IS*(1-e^(-(R/L)*(t-t0)))"
+</script>
+
+<startouttext/>
+<br/>
+Now, back to our circuit.  Suppose that \(I(t) = I_S\ u(t-t_0)\); and
+suppose that the inductor current \(i_L(t) = 0\) for \(t &lt;t_0\).  
+In the box provided below write an algebraic expression for
+the value of \(i_L(t)\) for \(t \geq t_0\).
+<endouttext/>
+<formularesponse type="cs" samples="IS,R,L,t,t0@1,1,1,1,1:3,3,3,3,3#10" answer="$I">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+
+</problem>

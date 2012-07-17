@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:_p2FvOkJtdU,1.0:W0OwY7cAxCk,1.25:3-DchMuZ-qo,1.50:VzSlTmjQloU" slug="S25V10_Op_Amp_comparator" rerandomize="per_student" name="S25V10: Op Amp comparator"/>
+  <customtag tag="S25" slug="discuss_1813" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="869" slug="book_1814" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1815" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

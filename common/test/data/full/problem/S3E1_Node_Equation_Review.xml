@@ -1,0 +1,23 @@
+<problem><script type="loncapa/python">
+#because eia.E12 is not defined in my system.
+E12=[10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82]
+mult = float(random.choice([100, 1000]))
+R1 = float(random.choice(E12))*mult
+R2 = float(random.choice(E12))*mult
+V1 = float(random.choice([5, 10, 15]))
+V2 = -float(random.choice([3.3, 7.2, 9]))
+
+e = (V1*R2-V2*R1)/(R1+R2) 
+</script><startouttext/>
+This is just a quick review of the node equation idea.
+<br/>
+In the following circuit there is one unknown node potential, 
+labeled \(e\).  The device parameters are: \(R_1=$R1\Omega\),
+\(R_2=$R2\Omega\), \(V_1=$V1\)V, \(V_2=$V2\)V.
+<center><img src="/static/circuits/node-review.gif"/></center>
+<br/>
+What is the unknown potential \(e\) (in Volts)?
+<endouttext/>
+<numericalresponse answer="$e"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

@@ -1,0 +1,46 @@
+<!--
+This is a week 4 exercise about dependent voltage sources and Thevenin equivalents
+-->
+
+<problem>
+
+<script type = "loncapa/python">
+IO=float(random.randrange(4, 10, 1))/1000.0
+R1=float(random.randrange(100, 1000, 50))
+R2=float(random.randrange(100, 1000, 50))
+alpha=float(random.randrange(3,10,1))
+
+VT = ((R1+alpha)*R2*IO)/(R1+R2+alpha)
+RT = (R2*(R1+alpha))/(R1+R2+alpha)
+</script>
+
+   <startouttext/>
+   The following circuit contains a current-dependent voltage source.  
+   <center>
+   <img src="/static/circuits/dependent_voltage.gif"/>
+   </center>
+   <br/>  
+   Find the Thevenin equivalent voltage and resistant.  Assume that
+   \(I_O=$IO\)A, \(R_1=$R1\Omega\), \(R_2=$R2\Omega\), and
+   \(\alpha=$alpha\Omega\).
+   <br/>
+   \(V_{TH}\):
+   <endouttext/>
+
+   <numericalresponse answer="$VT">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+
+   <startouttext/>
+   <br/>
+   \(R_{TH}\):
+   <endouttext/>
+
+   <numericalresponse answer="$RT">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+
+</problem>
+   

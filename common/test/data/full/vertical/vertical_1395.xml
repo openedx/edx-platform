@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S20E3_LCR_voltage_divider" slug="S20E3_LCR_voltage_divider" showanswer="attempted" rerandomize="false" name="S20E3: LCR voltage divider"/>
+  <customtag tag="S20" slug="discuss_1396">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="801" slug="book_1397">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="20" slug="slides_1398">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,31 @@
+<problem>
+
+<startouttext />
+Complete the sentence:
+<endouttext />
+
+<customresponse id="11">
+    <notsolved>
+        <startouttext />
+The q<textline readonly="no" size="5" /> brown fox jum<textline readonly="no" size="3" /> over the <textline readonly="no" size="3" />zy d<textline readonly="no" size="3" />.
+        <endouttext />
+    </notsolved>
+    <solved>
+        <startouttext />
+The q<b>uick</b> brown fox jum<b>ps</b> over the <b>la</b>zy d<b>og</b>.
+        <endouttext />
+    </solved>
+    <answer type="loncapa/perl">
+@answer=('uick','ps','la','og');
+$correct=0;
+for ($i=0;$i<=$#$submission;$i++) {
+    $$submission[$i]=~s/\s//gs;
+    if ($$submission[$i] eq $answer[$i]) { $correct++; }
+}
+if ($correct==$#answer+1) { return 'EXACT_ANS'; }
+if ($correct==0) { return 'INCORRECT'; }
+return('ASSIGNED_SCORE',$correct/($#answer+1));
+    </answer>
+</customresponse>
+
+</problem>

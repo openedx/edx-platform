@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:oPJGTv_4HNg,1.0:XAwPE7Ky47E,1.25:wBLrSCYJSrc,1.50:xhy0quM8q90" slug="S17V14_DEMO_Driven_LC_Network_Response" rerandomize="per_student" name="S17V14: DEMO Driven LC Network Response"/>
+  <customtag tag="S17" slug="discuss_1190" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="633" slug="book_1191" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1192" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

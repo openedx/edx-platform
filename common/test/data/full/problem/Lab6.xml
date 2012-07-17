@@ -1,0 +1,196 @@
+<!-- Propagation Delay: cjt 3/5/12 -->
+
+<problem>
+<startouttext />
+
+The goal of this lab is to measure the propagation delay of an inverter.
+You may find it useful to review <A href="/book-shifted/525">Section 10.4</A> in the text.
+
+<br/><br/>The circuit below contains an inverter designed to be used in
+a system where \(V_S = 3V\), \(V_{OL} = 0.25V\) and \(V_{OH} = 2.5V\).
+The input to the inverter is hooked to a voltage source that makes
+a \(0 \rightarrow 1\) transition at \(t = 0\).  The performance of the inverter
+is measured as it drives a 200fF capacitive load, which represents the
+parasitic capacitance of the wiring and the inputs of other logic gates
+hooked to the output of the inverter.
+
+<center>
+<input width="600" type="hidden" height="300" id="schematic1" parts="g,L,v,r,c,n,s,a" analyses="tran" class="schematic" name="ckt1"
+initial_value="[[&quot;c&quot;,[144,80,0],{&quot;name&quot;:&quot;CGS&quot;,&quot;c&quot;:&quot;200f&quot;,&quot;_json_&quot;:0},[&quot;1&quot;,&quot;0&quot;]],[&quot;v&quot;,[264,80,0],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;dc(2.5)&quot;,&quot;_json_&quot;:1},[&quot;VOH&quot;,&quot;0&quot;]],[&quot;g&quot;,[264,128,0],{&quot;_json_&quot;:2},[&quot;0&quot;]],[&quot;L&quot;,[264,80,2],{&quot;label&quot;:&quot;VOH&quot;,&quot;_json_&quot;:3},[&quot;VOH&quot;]],[&quot;s&quot;,[264,80,0],{&quot;color&quot;:&quot;magenta&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:4},[&quot;VOH&quot;]],[&quot;v&quot;,[200,80,0],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;dc(250m)&quot;,&quot;_json_&quot;:5},[&quot;VOL&quot;,&quot;0&quot;]],[&quot;g&quot;,[200,128,0],{&quot;_json_&quot;:6},[&quot;0&quot;]],[&quot;L&quot;,[200,80,2],{&quot;label&quot;:&quot;VOL&quot;,&quot;_json_&quot;:7},[&quot;VOL&quot;]],[&quot;s&quot;,[200,80,0],{&quot;color&quot;:&quot;cyan&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:8},[&quot;VOL&quot;]],[&quot;v&quot;,[64,32,1],{&quot;name&quot;:&quot;VS&quot;,&quot;value&quot;:&quot;dc(3)&quot;,&quot;_json_&quot;:9},[&quot;2&quot;,&quot;0&quot;]],[&quot;v&quot;,[64,104,1],{&quot;name&quot;:&quot;Vin&quot;,&quot;value&quot;:&quot;step(0,3,0,1p)&quot;,&quot;_json_&quot;:10},[&quot;3&quot;,&quot;0&quot;]],[&quot;n&quot;,[104,80,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:11},[&quot;1&quot;,&quot;3&quot;,&quot;0&quot;]],[&quot;g&quot;,[104,128,0],{&quot;_json_&quot;:12},[&quot;0&quot;]],[&quot;s&quot;,[144,80,0],{&quot;color&quot;:&quot;blue&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:13},[&quot;1&quot;]],[&quot;r&quot;,[104,32,0],{&quot;name&quot;:&quot;RL&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:14},[&quot;2&quot;,&quot;1&quot;]],[&quot;w&quot;,[64,104,80,104]],[&quot;w&quot;,[64,32,104,32]],[&quot;w&quot;,[16,32,16,104]],[&quot;w&quot;,[16,128,16,104]],[&quot;g&quot;,[16,128,0],{&quot;_json_&quot;:19},[&quot;0&quot;]],[&quot;w&quot;,[104,80,144,80]],[&quot;g&quot;,[144,128,0],{&quot;_json_&quot;:21},[&quot;0&quot;]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;2n&quot;,&quot;1000&quot;]]"/>
+</center>
+
+Run a 2ns transient analysis on this circuit and use measurements
+from the plot to answer the following questions:
+
+<ul style="list-style-type:decimal; margin-left: 2em;">
+
+<br/><li>
+Measure final output voltage of the inverter when the input is
+high and use that to estimate \(R_{ON}\) for the mosfet switch.
+</li>
+
+<div style="margin-left: 4em;">
+Estimate for R<sub>ON</sub> in ohms:
+<numericalresponse answer="687">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+<br/><li>
+When the input to the inverter is high, the Thevenin equivalent for the circuit is as
+shown in <A href="/book-shifted/531">Figure 10.22</A> in the text.  Using your measurements,
+estimate \(V_{TH}\) and \(R_{TH}\) for the Thevenin equivalent circuit.
+</li>
+
+<div style="margin-left: 4em;">
+Estimate for V<sub>TH</sub> in volts:
+<numericalresponse answer=".193">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Estimate for R<sub>TH</sub> in ohms:
+<numericalresponse answer="643">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+<br/><li>
+Using <A href="/book-shifted/533">Equation 10.66</A> in the text and the parameters
+above, compute an estimate for \(t_{pd,0 \rightarrow 1}\), the time it takes for the inverter
+output to fall from \(V_S\) to \(V_{OL}\) when driving a 200fF capacitive load.
+</li>
+
+<div style="margin-left: 4em;">
+Estimate for t<sub>pd</sub> in nanoseconds:
+<numericalresponse answer=".5011">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+<br/><li>
+Using the plot of the inverter's output voltage from the transient analysis, enter the
+measured value of \(t_{pd,0 \rightarrow 1}\).
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Measurement for t<sub>pd</sub> for a rising input in nanoseconds:
+<numericalresponse answer=".6">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+You'll notice that the measured value is longer than the estimated
+value.  To understand why, remember that the value you used for
+\(R_{ON}\) in the calculation was based on the steady-state output
+voltage of the inverter after the output transition was
+complete, <i>i.e.</i>, when the mosfet switch is in its triode region
+of operation.  However the transition started with the mosfet switch
+in its saturation region, where the effective resistance
+(\(\frac{V_{DS}}{I_{DS}}\)) was higher.  Hence the actual propagation
+delay will be somewhat longer than the calculated propagation delay.
+</li>
+
+<br/><li>
+Finally, change the Vin voltage source so that input is making a \(1 \rightarrow 0\) transition (just
+interchange the initial and plateau voltages) and measure the value of \(t_{pd,1 \rightarrow 0}\),
+the time it takes for the inverter's output to reach \(V_{OH}\).
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Measurement for t<sub>pd</sub> for a falling input in nanoseconds:
+<numericalresponse answer="3.45">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+If you compute an estimate for \(t_{pd,1 \rightarrow 0}\) using <A href="/book-shifted/534">Equation 10.71</A>
+and the appropriate parameters, you'll find it agrees quite well with the measurement.  This time the
+resistance used in the calculation (\(R_L\)) was exactly the resistance in the circuit throughout the
+entire transition.
+</li>
+
+</ul>
+
+These measurements and calculations of the inverter's propagation delay are <i>worst-case</i> values.
+When there are many logic gates in series, the actual measured signal delay is often considerably
+smaller than the sum of the worst-case delays for each gate.  This is because the gates will start
+their transitions long before their inputs have reached their final value, <i>e.g.</i>, the mosfet
+switch in the inverter turns on when its input exceeds \(V_{T}\), long before the input
+reaches \(V_{OH}\).
+
+<br/><br/>To see this effect, let's build a 9-stage <i>ring oscillator</i>, a chain of 9 inverters
+hooked in a loop as shown in the circuit below.  Here's how it works:
+
+<br/><br/><ul style="list-style-type:decimal; margin-left: 2em;">
+Think about 9 inverters hooked in series: if we set the input of the first inverter to a "0" logic value,
+it produces a "1" on its output after a short delay.  This causes the second inverter to produce a "0"
+after another short delay, and so on, until the ninth inverter produces a "1" on its output after a
+delay that reflects how long it takes for the original input to propagate through all nine inverters.
+Since there are an odd number of inverters, the output signal will be the negation of the input signal.
+
+<br/><br/>Now suppose the output of the ninth inverter is hooked to the input of the first.  
+Things proceed as explained above, until the ninth inverter produces
+a "1" on its output.  But this output is hooked to the input of the first inverter and this new value
+propagates through the inverter chain as before, producing a "0" on the output of the ninth inverter.
+This cycle repeats itself over and over: the value of each input/output alternates between "0" and "1"
+as each new value propagates through the chain and then back to the start.
+
+<br/><br/>What happens when the circuit powers on is a bit more
+complicated since, if all the nodes start at 0 volts, each inverter
+has a "0" on its input as starts to drive its output to "1".  But any
+small assymmetry will cause some inverters to do this more slowly than
+the others -- this assymmetry happens naturally in a manufactured
+circuit where, e.g., the long wire that completes the loop has a bit
+more capacitance than the other wires.  It takes a cycle for the
+inverters to get themselves sorted out.  You can see this happening it
+the little hiccup at the beginning of the transient simulation of the
+circuit below.  Add some additional voltage probes if you'd like to
+see in more detail what is happening.
+</ul>
+
+<br/><br/> We have to use two tricks to ensure the oscillator
+will oscillate in the perfect world of the simulator: introduce a small asymmetry in the parasitic
+capacitances and turn "on" the circuit after time 0 by using a step voltage source for the power
+supply.
+
+<center>
+<input width="800" type="hidden" height="425" id="schematic2" parts="g,L,v,r,c,n,s,a" analyses="tran" class="schematic" name="ckt2"
+initial_value="[[&quot;w&quot;,[8,72,8,160]],[&quot;w&quot;,[384,72,384,160]],[&quot;w&quot;,[8,160,384,160]],[&quot;s&quot;,[304,72,0],{&quot;color&quot;:&quot;cyan&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:3},[&quot;8&quot;]],[&quot;w&quot;,[384,72,368,72]],[&quot;w&quot;,[368,144,344,144]],[&quot;c&quot;,[344,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.2p&quot;,&quot;_json_&quot;:6},[&quot;9&quot;,&quot;0&quot;]],[&quot;w&quot;,[368,144,368,120]],[&quot;r&quot;,[368,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:8},[&quot;VDD&quot;,&quot;1&quot;]],[&quot;n&quot;,[368,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:9},[&quot;1&quot;,&quot;9&quot;,&quot;0&quot;]],[&quot;g&quot;,[344,144,0],{&quot;_json_&quot;:10},[&quot;0&quot;]],[&quot;L&quot;,[368,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:11},[&quot;VDD&quot;]],[&quot;w&quot;,[344,96,344,72]],[&quot;w&quot;,[344,72,328,72]],[&quot;w&quot;,[328,144,304,144]],[&quot;c&quot;,[304,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.2p&quot;,&quot;_json_&quot;:15},[&quot;8&quot;,&quot;0&quot;]],[&quot;w&quot;,[328,144,328,120]],[&quot;r&quot;,[328,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:17},[&quot;VDD&quot;,&quot;9&quot;]],[&quot;n&quot;,[328,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:18},[&quot;9&quot;,&quot;8&quot;,&quot;0&quot;]],[&quot;g&quot;,[304,144,0],{&quot;_json_&quot;:19},[&quot;0&quot;]],[&quot;L&quot;,[328,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:20},[&quot;VDD&quot;]],[&quot;w&quot;,[304,96,304,72]],[&quot;w&quot;,[304,72,288,72]],[&quot;w&quot;,[288,144,264,144]],[&quot;c&quot;,[264,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.2p&quot;,&quot;_json_&quot;:24},[&quot;7&quot;,&quot;0&quot;]],[&quot;w&quot;,[288,144,288,120]],[&quot;r&quot;,[288,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:26},[&quot;VDD&quot;,&quot;8&quot;]],[&quot;n&quot;,[288,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:27},[&quot;8&quot;,&quot;7&quot;,&quot;0&quot;]],[&quot;g&quot;,[264,144,0],{&quot;_json_&quot;:28},[&quot;0&quot;]],[&quot;L&quot;,[288,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:29},[&quot;VDD&quot;]],[&quot;w&quot;,[264,96,264,72]],[&quot;w&quot;,[264,72,248,72]],[&quot;w&quot;,[248,144,224,144]],[&quot;c&quot;,[224,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.2p&quot;,&quot;_json_&quot;:33},[&quot;6&quot;,&quot;0&quot;]],[&quot;w&quot;,[248,144,248,120]],[&quot;r&quot;,[248,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:35},[&quot;VDD&quot;,&quot;7&quot;]],[&quot;n&quot;,[248,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:36},[&quot;7&quot;,&quot;6&quot;,&quot;0&quot;]],[&quot;g&quot;,[224,144,0],{&quot;_json_&quot;:37},[&quot;0&quot;]],[&quot;L&quot;,[248,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:38},[&quot;VDD&quot;]],[&quot;w&quot;,[224,96,224,72]],[&quot;w&quot;,[224,72,208,72]],[&quot;w&quot;,[208,144,184,144]],[&quot;c&quot;,[184,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.2p&quot;,&quot;_json_&quot;:42},[&quot;5&quot;,&quot;0&quot;]],[&quot;w&quot;,[208,144,208,120]],[&quot;r&quot;,[208,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:44},[&quot;VDD&quot;,&quot;6&quot;]],[&quot;n&quot;,[208,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:45},[&quot;6&quot;,&quot;5&quot;,&quot;0&quot;]],[&quot;g&quot;,[184,144,0],{&quot;_json_&quot;:46},[&quot;0&quot;]],[&quot;L&quot;,[208,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:47},[&quot;VDD&quot;]],[&quot;w&quot;,[184,96,184,72]],[&quot;w&quot;,[184,72,168,72]],[&quot;w&quot;,[168,144,144,144]],[&quot;c&quot;,[144,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.2p&quot;,&quot;_json_&quot;:51},[&quot;4&quot;,&quot;0&quot;]],[&quot;w&quot;,[168,144,168,120]],[&quot;r&quot;,[168,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:53},[&quot;VDD&quot;,&quot;5&quot;]],[&quot;n&quot;,[168,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:54},[&quot;5&quot;,&quot;4&quot;,&quot;0&quot;]],[&quot;g&quot;,[144,144,0],{&quot;_json_&quot;:55},[&quot;0&quot;]],[&quot;L&quot;,[168,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:56},[&quot;VDD&quot;]],[&quot;w&quot;,[144,96,144,72]],[&quot;w&quot;,[144,72,128,72]],[&quot;w&quot;,[128,144,104,144]],[&quot;c&quot;,[104,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.2p&quot;,&quot;_json_&quot;:60},[&quot;3&quot;,&quot;0&quot;]],[&quot;w&quot;,[128,144,128,120]],[&quot;r&quot;,[128,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:62},[&quot;VDD&quot;,&quot;4&quot;]],[&quot;n&quot;,[128,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:63},[&quot;4&quot;,&quot;3&quot;,&quot;0&quot;]],[&quot;g&quot;,[104,144,0],{&quot;_json_&quot;:64},[&quot;0&quot;]],[&quot;L&quot;,[128,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:65},[&quot;VDD&quot;]],[&quot;w&quot;,[104,96,104,72]],[&quot;w&quot;,[104,72,88,72]],[&quot;w&quot;,[88,144,64,144]],[&quot;c&quot;,[64,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.2p&quot;,&quot;_json_&quot;:69},[&quot;2&quot;,&quot;0&quot;]],[&quot;w&quot;,[88,144,88,120]],[&quot;r&quot;,[88,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:71},[&quot;VDD&quot;,&quot;3&quot;]],[&quot;n&quot;,[88,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:72},[&quot;3&quot;,&quot;2&quot;,&quot;0&quot;]],[&quot;g&quot;,[64,144,0],{&quot;_json_&quot;:73},[&quot;0&quot;]],[&quot;L&quot;,[88,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:74},[&quot;VDD&quot;]],[&quot;w&quot;,[64,96,64,72]],[&quot;w&quot;,[64,72,48,72]],[&quot;w&quot;,[48,144,24,144]],[&quot;c&quot;,[24,96,0],{&quot;name&quot;:&quot;&quot;,&quot;c&quot;:&quot;.21p&quot;,&quot;_json_&quot;:78},[&quot;1&quot;,&quot;0&quot;]],[&quot;v&quot;,[64,184,1],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;step(0,3,0,.1n)&quot;,&quot;_json_&quot;:79},[&quot;VDD&quot;,&quot;0&quot;]],[&quot;r&quot;,[48,24,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:80},[&quot;VDD&quot;,&quot;2&quot;]],[&quot;n&quot;,[48,72,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;30&quot;,&quot;_json_&quot;:81},[&quot;2&quot;,&quot;1&quot;,&quot;0&quot;]],[&quot;g&quot;,[16,184,0],{&quot;_json_&quot;:82},[&quot;0&quot;]],[&quot;L&quot;,[64,184,3],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:83},[&quot;VDD&quot;]],[&quot;g&quot;,[24,144,0],{&quot;_json_&quot;:84},[&quot;0&quot;]],[&quot;L&quot;,[48,24,2],{&quot;label&quot;:&quot;VDD&quot;,&quot;_json_&quot;:85},[&quot;VDD&quot;]],[&quot;w&quot;,[24,72,8,72]],[&quot;w&quot;,[48,144,48,120]],[&quot;w&quot;,[24,96,24,72]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;50n&quot;,&quot;1000&quot;]]"/>
+</center>
+
+Because there are an odd number of inverters in the loop, the node voltages will
+oscillate between high and low, the period of oscillation being determined by the time it
+takes for a signal to propagate <i>twice</i> around the loop (think about why).  If we consider
+the voltage for a particular node, the period of oscillation represents one \(0 \rightarrow 1\)
+transition and one \(1 \rightarrow 0\) transition, separated by the propagation time of 9
+inverters.
+
+<br/><br/>Run a 50ns transient simulation on the ring oscillator and
+measure the period of oscillation.  Be patient! It can take a
+moment for the simulation to complete.  Divide the result by 9 to get
+an estimate for the time it takes one inverter to make a \(0
+\rightarrow 1\) transition followed by a \(1 \rightarrow 0\)
+transition.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Estimate for time for both transitions, in nanoseconds:
+<numericalresponse answer="1.8">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+Compare this time to the sum of your answers for questions (4) and (5) above.
+
+<endouttext />
+
+</problem>

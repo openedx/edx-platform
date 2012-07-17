@@ -1,0 +1,60 @@
+<problem>
+
+<script type="loncapa/python">
+R=float(random.randrange(1,10,1))
+v1 = 2.0
+v2 = 3.0
+v3 = 4.0
+vO1 = (R+1+1)*v1/(R+1+1+1)
+vO2 = (R+1+1)*v2/(R+1+1+1)
+vO3 = (R+1+1)*v3/(R+1+1+1)
+vO  = vO1 + vO2 + vO3
+</script>
+
+<startouttext /> 
+
+Consider the network containing three voltage sources connected as
+shown. You are given that \(R=$R k\Omega\), and \(v_1 = $v1 V\), \(v_2
+= $v2 V\), and \(v_3 = $v3 V\).
+<center>
+<img src="/static/circuits/superposition-ex-e2-fig.gif" />
+</center>
+Determine \(v_{O1}\), the voltage component of \(v_O\) with \(v_1\)
+acting alone.  <endouttext />
+
+<numericalresponse answer="$vO1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+Next, determine \(v_{O2}\), the voltage component of \(v_O\) with \(v_2\) acting alone.
+<endouttext />
+
+<numericalresponse answer="$vO2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+Next, determine \(v_{O3}\), the voltage component of \(v_O\) with \(v_3\) acting alone.
+<endouttext />
+
+<numericalresponse answer="$vO3">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+Finally, determine \(v_O\), the total output voltage.
+<endouttext />
+
+<numericalresponse answer="$vO">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

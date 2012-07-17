@@ -1,0 +1,44 @@
+<problem>
+
+<startouttext/>
+In the circuit just shown:
+<center>
+<img src="/static/circuits/CascadeInvertersCGS.gif" />
+</center>
+When the voltage at node A falls in a step from 5V to 0V, the voltage
+at node B looks like one of the following traces.  
+<center>
+<img src="/static/circuits/fos.gif" />
+</center>
+Which trace is the correct one?  Write the letter corresponding to the
+correct trace in the box provided below:
+<endouttext/>
+<customresponse>
+<startouttext/>
+<br/>
+<textline size="5" correct_answer="C" />
+<endouttext/>
+<answer type="loncapa/python">
+correct = ['correct']
+
+try:
+  r = str(submission[0])
+except ValueError:
+  correct[0] = 'incorrect'
+  r = "0"
+
+if not r=="C":
+  correct[0] = 'incorrect'
+
+</answer>
+</customresponse>
+
+<startouttext/>
+<br/><br/>
+Note: You need a very fast (and thus very expensive) oscilloscope to
+see traces like these.  You need to use a very low capacitance probe
+and you must connect the oscilloscope to the circuit very carefully,
+with a very short ground.
+<endouttext/>
+
+</problem>

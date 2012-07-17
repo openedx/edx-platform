@@ -1,0 +1,99 @@
+<problem>
+<script type="loncapa/python">
+global P
+P  = 0.002 # A/V^(3/2)
+Pm = 1000*P
+
+def iP(vPK):
+  if vPK &gt; 0:
+     return(P*vPK**1.5)
+  else:
+     return(0)
+
+def DiP(VPK):
+  if VPK &gt; 0:
+     return(1.5*P*math.sqrt(VPK))
+  else:
+     return(0)
+
+V1 = 4.0
+V2 = 10.0
+#V1 = random.choice([4.0, 5.0, 6.0, 7.0, 8.0])
+#V2 = random.choice([9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0])
+
+I1 = iP(V1)
+I2 = iP(V2)
+
+R1 = 1.0/DiP(V1)
+R2 = 1.0/DiP(V2)
+
+</script>
+
+<startouttext/>
+Although vacuum tubes are no longer commonly used in 
+computer or consumer electronics, they still have a 
+substantial niche in high-end audio, high-power radio 
+transmitters, particle accelerators, and microwave ovens.
+<br/>
+A vacuum diode, the simplest vacuum tube, is an interesting 
+two-terminal device.  
+<center>
+  <img src="/static/circuits/VacuumDiode.gif"/>
+</center>
+A vacuum diode's voltage-current characteristic is closely approximated 
+by the \(Childs-Langmuir\ Law\), with one parameter \(P\ \) called the
+perveance: 
+<br/><br/>
+\(   i_P = \left\{ \begin{array}{ll}
+                   P\ v_{PK}^{3/2} &amp; \mbox{if $v_{PK} &gt; 0$} \\
+                   0               &amp; \mbox{if $v_{PK} &lt; 0$} 
+                   \end{array}
+            \right.
+\)
+<endouttext/>
+
+<startouttext/>
+<br/>
+A <a href="http://www.r-type.org/pdfs/6AL5.pdf"> 6AL5 twin diode </a>
+has \(P\approx $Pm\)mA/V\(^{3/2}\).
+<endouttext/>
+
+
+<startouttext/>
+<br/>
+What is the current \(I_P\) (in Amperes) for a bias voltage of \(V_{PK}=$V1\)V?
+<endouttext/>
+<numericalresponse answer="$I1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the incremental resistance (in Ohms) for the bias voltage of \(V_{PK}=$V1\)V?
+<endouttext/>
+<numericalresponse answer="$R1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the current \(I_P\) (in Amperes) for a bias voltage of \(V_{PK}=$V2\)V?
+<endouttext/>
+<numericalresponse answer="$I2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the incremental resistance (in Ohms) for the bias voltage of \(V_{PK}=$V2\)V?
+<endouttext/>
+<numericalresponse answer="$R2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

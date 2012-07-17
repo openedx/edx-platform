@@ -1,0 +1,35 @@
+<problem>
+<script type="loncapa/python">
+
+# Static Discipline
+VLOW = 0.0
+VOL  = 1.0
+VIL  = 2.0
+VIH  = 3.0
+VOH  = 4.0
+VS   = 5.0
+
+RLk = 1
+RL  = 1e3*RLk
+
+CGSp  = 0.1
+CGS   = 1e-12*CGSp
+
+tr = -RL*CGS*math.log((VS - VOH)/VS)
+
+trn = tr*1e9
+</script>
+
+<startouttext/> 
+Given that \(R_L = $RLk\)k\(\Omega\), \(C_{GS}=$CGSp\)pF, and \(V_S =
+$VS\)V.  What is the time \(t_r\), in nanoseconds, after the falling
+edge at node A, that it takes for the signal at node B to rise to
+\(V_{OH} = $VOH\)V?
+<endouttext/>
+<numericalresponse answer="$trn">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> <textline />
+</numericalresponse>
+
+
+</problem>

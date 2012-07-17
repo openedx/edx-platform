@@ -1,0 +1,52 @@
+<problem>
+<script type="loncapa/python">
+VS = random.choice([5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0])
+Rk = random.choice([7.6,8.2,9.1,10.0])
+R = Rk*1e3
+VT = 1.0
+Km = 20.0
+K = Km*1e-3
+CGSf = float(random.randrange(30,40,1))
+CGS = CGSf*1e-15
+Ip = 1.0
+I = Ip*1e-9
+
+tsat = CGS*VT/I
+Vst = VT + (-1 + math.sqrt(1 + 2*K*R*VS))/(K*R)
+ttriode = CGS*Vst/I
+
+tsatm = tsat*1e6
+ttriodem = ttriode*1e6
+</script>
+
+<startouttext/>
+In the circuit below we show a common-source amplifier being driven by
+a current source.  The current source turns on at time \(t=0\).
+<center>
+<img src="/static/circuits/CurrentDrivenInverter.gif" />
+</center>
+The power-supply voltage \(V_S=$VS\)V.  The resistor \(R=$Rk\)k\(\Omega\).
+The MOSFET's parameters are: \(V_T=$VT\)V, \(K=$Km\)mA/V\(^2\), \(C_{GS}=$CGSf\)fF.
+The initial value of the voltage from gate to source is \(0\)V.
+When the current source turns on it puts out \(I=$Ip\)pA.
+<br/><br/>
+At what time, in microseconds, does the MOSFET leave cutoff and enter saturation?
+<endouttext/>
+<numericalresponse answer="$tsatm">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/><br/>
+At what time, in microseconds, does the MOSFET leave saturation and enter
+triode operation?
+<endouttext/>
+<numericalresponse answer="$ttriodem">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+</problem>

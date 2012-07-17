@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S21E4_AM_Radio_Tuning" slug="S21E4_AM_Radio_Tuning" showanswer="attempted" rerandomize="false" name="S21E4: AM Radio Tuning"/>
+  <customtag tag="S21" slug="discuss_1497">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="794" slug="book_1498">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="21" slug="slides_1499">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

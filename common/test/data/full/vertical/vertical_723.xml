@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:xCQMb0htvlo,1.0:MuX4d2AjHeg,1.25:vTQ1GwsiZcI,1.50:sbhcQ3q66WQ" slug="S11V4_DEMO_-_How_to_Choose_the_Bias_Point_for_an_Amplifier" rerandomize="per_student" name="S11V4: DEMO - How to Choose the Bias Point for an Amplifier"/>
+  <customtag tag="S11" slug="discuss_724" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="420" slug="book_725" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="11" slug="slides_726" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

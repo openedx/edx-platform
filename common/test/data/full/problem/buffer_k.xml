@@ -1,0 +1,59 @@
+<problem>
+<script type="loncapa/python">
+VTn = random.randrange(6, 12, 1)
+VT  = float(VTn)/10
+K   = float(random.randrange(5, 10, 1))/1000
+R   = float(random.randrange(50, 1000, 50))
+VSn = random.randrange(5, 10, 1)
+VS  = float(VSn)
+
+vIN = float(random.randrange(12,50,1))/10
+
+vOUT= (((((2.0/(R*K))+4.0*(vIN-VT))**(0.5))-(2.0/(R*K))**(0.5))/2.0)**2
+
+UP = VS + VT
+LOW = VT
+</script>
+   <startouttext/>
+   Consider the "source-follower" or "buffer" circuit shown below.
+   Both the typical MOSFET model and the equivalent SCS model are
+   shown.
+   <center>
+   <img src="/static/circuits/mosfet_model.gif"/>
+   <img src="/static/circuits/SCS_model.gif"/>
+   </center>
+   Use the SCS model to perform a large-signal analysis of this
+   circuit. You can assume the parameters \(V_T=$VT\)V,
+   \(K=$K\frac{A}{V^2}\), \(R=$R\Omega\), and \(V_S=$VS\)V.  First,
+   assume that the MOSFET operates in its saturation region and find
+   an equation relating \(v_{IN}\) to \(v_{OUT}\). (Hint: Your equation
+   should be quadratic.) Using that equation, find \(v_{OUT}\) if
+   \(v_{IN}=$vIN\).
+   <br/>
+   \(v_{OUT}\):
+   <endouttext/>
+   <numericalresponse answer="$vOUT">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+   <startouttext/>
+   <br/>
+   Now, determine the range of \(v_{IN}\) over which the assumption of
+   saturated MOSFET operation holds. Find both an upper and a lower
+   bound.
+   <br/>
+   Upper bound:
+   <endouttext/>
+   <numericalresponse answer="$UP">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+   <startouttext/>
+   <br/>
+   Lower bound:
+   <endouttext/>
+   <numericalresponse answer="$LOW">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+</problem>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:cBxQudbDRq0,1.0:jdn9hXyviCE,1.25:PFT6APIIRko,1.50:07v4bFNXdLw" slug="S5V18_Demo_-_Shatter_a_Mouse" name="S5V18: Demo - Shatter a Mouse"/>
+  <customtag tag="S5" slug="discuss_350">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="322" slug="book_351">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="5" slug="slides_352">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

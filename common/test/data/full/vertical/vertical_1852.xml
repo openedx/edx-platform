@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:0sRUdyvCOx8,1.0:vkB1yKv-z6U,1.25:QzAtZNHp7JY,1.50:-0K_E8GLkrY" slug="S25V19_Clocks_in_digital_systems" rerandomize="per_student" name="S25V19: Clocks in digital systems"/>
+  <customtag tag="S25" slug="discuss_1853" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="870" slug="book_1854" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1855" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,173 @@
+<!-- Curve tracer: cjt 2/23/12 -->
+
+<problem>
+<startouttext />
+A <i>curve tracer</i> is a test instrument that plots the v-i
+characteristic of a device.  In this lab you'll build a curve
+tracer and use it to explore the v-i characteristics of a
+mosfet.
+
+<br/><br/>The schematic below shows a simple circuit that will
+plot the v-i characteristic of a resistor when a transient analysis
+is run.  Please observe that
+
+<ul style="list-style-type:decimal; margin-left: 2em;">
+
+<br/><li>
+The Vtest voltage source generates a triangle waveform that ramps
+from 0V to 3V then back again over a period of 1ms.  The stop time
+of the transient analysis is chosen to be 0.5ms so that the voltage
+on node vtest will be just the rising ramp from 0V to 3V.
+</li>
+
+<li>
+The voltage probe on the vtest node has its "Plot color" set to
+"x-axis", which asks the tool to use the values sampled by the
+probe as the x-coordinate when plotting.  So the horizontal axis
+of the plot showing the transient results will be the voltage
+vtest instead of time.
+</li>
+
+<li>
+A current probe -- a short wire segment with a colored chevron
+showing the reference direction -- is used to plot the current
+flowing into the resistor.  As with a voltage probe, one can
+double-click a current probe to select the plot color that
+will be used when plotting the current.
+</li>
+
+<li>
+You can use the label component (looks like a short straight
+line in the parts bin) to add names to circuit nodes.  Nodes
+with the same name are considered to be electrically connected.
+</li>
+
+</ul>
+
+<br/>The combined effect of this circuitry is that running a transient
+analysis will produce a plot of current through the resistor as a
+function of vtest, the voltage across the resistor.  Click on TRAN in
+the diagram below to see the resulting plot.
+
+<center>
+<input width="425" type="hidden" height="250" id="schematic1" parts="" analyses="tran" class="schematic" name="r_vi_curve"
+value="[[&quot;v&quot;,[48,56,0],{&quot;name&quot;:&quot;Vtest&quot;,&quot;value&quot;:&quot;triangle(0,3,1000)&quot;,&quot;_json_&quot;:0},[&quot;vtest&quot;,&quot;0&quot;]],[&quot;g&quot;,[48,104,0],{&quot;_json_&quot;:1},[&quot;0&quot;]],[&quot;w&quot;,[48,56,48,40]],[&quot;w&quot;,[48,40,80,40]],[&quot;L&quot;,[80,40,3],{&quot;label&quot;:&quot;vtest&quot;,&quot;_json_&quot;:4},[&quot;vtest&quot;]],[&quot;s&quot;,[48,40,0],{&quot;color&quot;:&quot;x-axis&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:5},[&quot;vtest&quot;]],[&quot;r&quot;,[168,56,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;3.3k&quot;,&quot;_json_&quot;:6},[&quot;1&quot;,&quot;0&quot;]],[&quot;g&quot;,[168,104,0],{&quot;_json_&quot;:7},[&quot;0&quot;]],[&quot;a&quot;,[168,40,1],{&quot;color&quot;:&quot;magenta&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:8},[&quot;vtest&quot;,&quot;1&quot;]],[&quot;L&quot;,[168,40,2],{&quot;label&quot;:&quot;vtest&quot;,&quot;_json_&quot;:9},[&quot;vtest&quot;]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;.5m&quot;,&quot;1000&quot;]]"/>
+<br/>Figure 1.  Curve Tracer for a resistor
+</center>
+
+Not surprisingly the v-i characteristic is a straight line passing
+through the origin, <i>i.e.</i>, the resistor is <i>linear</i> device.
+As a sanity check, use your mouse to make a measurement on the plot of
+the current I at a particular voltage V.  For example at V = 1.005,
+the measurement for I is 304.545uA.  Now compute R = V/I =
+1.005/.000304505 = 3300.4 ohms.  (The small numerical discrepency
+comes from the rounding that occurs when printing numerical values in
+the plot window.)
+
+<br/><br/>Now it's your turn!  Constructing a similar test setup in
+the schematic diagram below, plot the v-i characteristic of a mosfet.
+You may find it useful to first review <A href="/book-shifted/335">Section 7.3</A>
+in the text.
+
+<br/><br/>The behavior of the mosfet is determined by two voltages:
+\(v_{DS}\), the potential difference between the drain and source
+terminals and \(v_{GS}\), the potential difference between the gate
+and source terminals.  As the test device use a mosfet with a W/L
+parameter of 1.  Use a DC voltage source to supply \(v_{GS}\):
+you'll want to try a range of values -- 0V, 0.5V, 1.0V, 1.5V, 2.0V,
+2.5V and 3V -- varying from ground up to the power supply voltage.
+
+<br/><br/>You can try the various \(v_{GS}\) values one at a
+time, but it's more instructive to see them plotted together to get a
+sense of how varying the \(v_{GS}\) changes the current through the
+mosfet switch.  To get multiple v-i curves at the same time, simply
+replicate the mosfet test setup (<i>i.e.</i>, the current probe, mosfet and
+gate voltage source), chosing different values for gate voltage source
+and changing the plot color for the current probe.  With a little
+effort, after clicking on TRAN you can get a plot like that shown in
+Figure 2 below.  Compare your results to <A href="/book-shifted/338">Figure
+7.11</A> in the text.  It's easy to see the the mosfet is a <i>non-linear</i>
+device!
+
+<center>
+<img src="/static/circuits/Lab4_1.png"/>
+<br/>Figure 2.  Mosfet v-i charactertistic for different \(v_{GS}\) values
+</center>
+
+<endouttext />
+
+<schematicresponse>
+<center>
+<schematic height="500" width="600" parts="g,L,n,d,v,s,a" analyses="tran"/>
+</center>
+<answer type="loncapa/python">
+correct = ['correct']
+</answer>
+</schematicresponse>
+
+<startouttext />
+
+Please answer the following questions using measurements taken from the
+v-i plots you created.
+
+<ul style="list-style-type:decimal; margin-left: 2em;">
+<br/><li> Compute the effective
+\(R_{ON}\) in the triode region of the v-i characteritic when
+\(v_{GS}=3V\), <i>i.e.</i>, measure the current through the mosfet switch
+when, say, \(v_{DS}=1V\) and report \(\frac{v_{DS}}{i_{DS}}\) as your
+answer below.  Remember this should be for a device whose W/L is 1.</li>
+
+<div style="margin-left: 4em;">
+<numericalresponse answer="23834">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+<li>The current through a mosfet switch operating in the saturation region is
+given by <A href="/book-shifted/341">Equation 7.8</A> in the text:
+
+\[i_{DS} = \frac{K(v_{GS} - V_T)^2}{2}\]
+
+We can compute an estimate for the threshold voltage \(V_T\) of the
+mosfet switch from the ratio of two \(i_{DS}\) measurements in the
+saturation region for different \(v_{GS}\) values.
+
+\[\frac{i_{DS_1}}{i_{DS_2}} = \frac{(v_{GS_1} - V_T)^2}{(v_{GS_2} - V_T)^2}\]
+
+At \(v_{DS} \approx 3V\), well into the saturation region, measure
+\(i_{DS}\) twice, once when \(v_{GS}=3V\) and once when \(v_{GS}=2.5\).
+Plug the measurements and the appropriate values for \(v_{GS}\) into
+the equation above, solve for \(V_T\) and report your result below.</li>
+
+<div style="margin-left: 4em;">
+<numericalresponse answer="0.5">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+<li>Finally, using your measurements and calculated value for \(V_T\),
+compute the value for the constant \(K\) in equation 7.8 (see above)
+and report the results.</li>
+
+<div style="margin-left: 4em;"> 
+<numericalresponse answer="23e-6">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+</ul>
+
+Moral: by using a curve tracer, it's possible to make measurements from an
+actual device and derive estimates for the fundamental mosfet
+properties, \(K\) and \(V_T\), that designers need to model how the
+devices will work <i>in situ</i>.
+
+<br/><br/>Food for thought: you might try using your curve tracer to plot
+the v-i characteristics of a diode, another non-linear device.
+
+<endouttext />
+
+</problem>

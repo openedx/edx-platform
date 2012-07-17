@@ -1,0 +1,80 @@
+<problem><script type="loncapa/python">
+ngatesM = 5 #Millions
+ngates = ngatesM*1e6
+
+freqG  = 3 #Ghz
+freq   = freqG*1e9
+
+Cf     = 1 #1fF
+C      = Cf*1e-15
+
+RLk    = 10 #kOhms
+RL     = RLk*1e3
+
+RON    = 100 #Ohms
+
+VS     = 5
+
+PStatic = VS**2/(2*RL)
+PStaticm = PStatic*1e3
+
+PDynamic = C*VS**2*freq
+PDynamicu = PDynamic*1e6
+
+Ptotal = ngates*(PDynamic + PStatic)
+PtotalK = Ptotal*1e-3
+
+luminosity_Sun = 3.86e26 #Watts
+lum = luminosity_Sun*1e-26
+radius_Sun = 695500000. #meters
+radk = radius_Sun*1e-3
+
+surface_Sun = 4*math.pi*radius_Sun**2
+radiation = luminosity_Sun/surface_Sun
+#  W/m^2 -&gt; kW/cm^2 multiply by 10^-7
+radiationKwcm2foo = 1e-7*radiation
+radiationKwcm2 = 1e-2*round(1e2*radiationKwcm2foo)
+</script><startouttext/>
+Suppose we are making an NMOS chip with \($ngatesM\) million gates, to run at a
+frequency of \($freqG\)GHz.  Our process makes MOSFETs with a
+gate-source capacitance of \($Cf\)fF, and our pullups are
+\($RLk\)k\(\Omega\).  The \(R_{ON} = $RON\Omega \ll R_L \), so we can
+ignore it.
+Suppose also that we chose to use a \($VS\)V power supply (a bad idea!).
+<br/>
+What is the average static power, in milliWatts, that a gate in this
+process dissipates? 
+<endouttext/>
+<numericalresponse answer="$PStaticm"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the average dynamic power, in microWatts, that a gate in this
+process dissipates? 
+<endouttext/>
+<numericalresponse answer="$PDynamicu"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Now, we have \($ngatesM\) million gates, so what power does the whole chip
+dissipate? (In kiloWatts.) 
+<endouttext/>
+<numericalresponse answer="$PtotalK"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+To put this into perspective, consider the Sun.
+The <a href="http://www.ips.gov.au/Category/Educational/The%20Sun%20and%20Solar%20Activity/General%20Info/Solar_Constant.pdf">
+luminosity </a> of the Sun (the total power output) is about \($lum
+\times 10^{26}\)W.
+The 
+<a href="http://en.wikipedia.org/wiki/Solar_radius"> radius </a>
+of the Sun is about \($radk\)km.  Thus each square centimeter of the
+surface of the
+Sun is putting out \($radiationKwcm2\)kW/cm\(^2\).
+<br/>
+But our chip is about a square centimeter; a difficult problem
+for cooling!  We cannot make chips this way.
+<endouttext/>
+
+</problem>

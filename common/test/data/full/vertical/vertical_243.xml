@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:lG8fv8haWQI,1.0:-RNnPC6fmjY,1.25:GHgnWEDafyM,1.50:MPg1tJ1elEU" slug="S4V10_Digital_Logic_Circuits" name="S4V10: Digital Logic Circuits"/>
+  <customtag tag="S4" slug="discuss_244">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="256" slug="book_245">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="4" slug="slides_246">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,64 @@
+<problem>
+
+<script type="loncapa/python">
+R=random.randrange(1,10,1)
+a1 = (R+1+1)/(R+1+1+1)
+a2 = (R+1+1)/(R+1+1+1)
+a3 = (R+1+1)/(R+1+1+1)
+v1 = 2
+v2 = 3
+v3 = 4
+vO1 = (R+1+1)* v1/(R+1+1+1)
+vO2 = (R+1+1)* v2/(R+1+1+1)
+vO3 = (R+1+1)* v3/(R+1+1+1)
+vO  = vO1 + vO2 + vO3
+</script>
+
+<startouttext />
+Consider the network containing three voltage sources connected as shown. You are given that \(R=$R k\Omega\).
+
+<center>
+<img src="/static/circuits/superposition-ex-e2-fig.gif" />
+</center>
+
+Use the node method to show that \(v_O\) can be expressed as a linear
+combination of \(v_1\), \(v_2\), and \(v_3\), by determining the
+values of \(a_1\), \(a_2\), and \(a_3\) in the equation:  \[v_O = a_1 v_1 +
+a_2 v_2 + a_3 + v_3\] where \(a_1\), \(a_2\), and \(a_3\) are constants.<br />
+\(a_1\): <endouttext />
+
+<numericalresponse answer="$a1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />\(a_2\): 
+<endouttext />
+
+<numericalresponse answer="$a2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />\(a_3\): 
+<endouttext />
+
+<numericalresponse answer="$a3">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+
+<startouttext />
+<br />What is the value of \(v_O\) given that \(v_1 = $v1 V\), \(v_2 = $v2 V\), and \(v_3 = $v3 V\).
+<endouttext />
+
+<numericalresponse answer="$vO">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

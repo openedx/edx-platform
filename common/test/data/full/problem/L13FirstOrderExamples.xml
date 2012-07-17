@@ -1,0 +1,71 @@
+<problem>
+
+<script type="loncapa/python">
+
+I = random.choice([0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+
+Rk = random.choice([1.0, 1.2, 1.5, 2.2])
+Lm = random.choice([2.7, 3.3, 3.9, 4.7])
+
+R= 1000*Rk
+L= Lm/1000
+
+taus = str(L/R)
+
+Is = str(I)
+
+
+
+i1 = Is + "-" + Is+"*e^(-t*R/L)"
+
+i2 = Is + "*e^(-t*R/L)"
+
+#e = math.exp(1)
+
+</script>
+
+<startouttext/>
+We have a circuit with an inductor and a resistor driven by an
+independent current source with a current that is a function of time \(I(t)\).
+<center>
+<img src="/static/circuits/norton-inductor.gif" />
+</center>
+The resistance of the resistor is \(R\Omega\) and the inductance of
+the inductor is \(L\)H.
+<endouttext/>
+
+<startouttext/>
+<br/>
+Suppose the drive \(I\) rises in a step from \(0\)A to \($I\)A at the initial time
+\(t=0\).  Also suppose that the inductor's initial current 
+\(i_L(0) = 0\)A.
+<br/>
+In the space provided below write an algebraic expression
+for the inductor current as a function of time, \(i_L(t)\) for 
+\(t &gt; 0\).
+<endouttext/>
+<formularesponse type="cs" samples="R,L,t@1,1,1:3,3,3#10" answer="$i1">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/>
+Now, suppose the drive falls in a step from \($I\)A to \(0\)A at the initial time
+\(t=0\).  Also suppose that the inductor's initial current 
+\(i_L(0) = $I\)A.
+<br/>
+In the space provided below write an algebraic expression
+for the inductor current as a function of time, \(i_L(t)\) for 
+\(t &gt; 0\).
+<endouttext/>
+<formularesponse type="cs" samples="R,L,t@1,1,1:3,3,3#10" answer="$i2">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>
+

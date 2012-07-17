@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S25E2_Relaxation_Oscillator_Frequency" slug="S25E2_Relaxation_Oscillator_Frequency" rerandomize="per_student" name="S25E2: Relaxation Oscillator Frequency"/>
+  <customtag tag="S25" slug="discuss_1849" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="872" slug="book_1850" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1851" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

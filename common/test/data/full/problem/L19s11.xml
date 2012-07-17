@@ -1,0 +1,94 @@
+<!-- Sinusoidal Steady State: Complex Exponentials -->
+
+<problem>
+
+<script type="loncapa/python">
+mag = "abs(Vi)/sqrt(1+(w*R*C)^2)"
+ang = "w*t + arctan(-w*R*C)"
+</script>
+
+<startouttext/>
+In working with complex exponentials we need some simple rules and
+short cuts for doing the algebra. 
+<br/><br/>
+Remember that a complex number \(z\) is a vector in the
+2-dimensional plane.  It has a length (also called "magnitude")
+\(|z|\) and an angle \(\angle(z)\) measured counterclockwise from the
+real axis.  You need to know the following facts: 
+<br/><br/>
+<p>
+\( \operatorname{Re}(a + jb) = a \); \(\ \ \ \)
+\( \operatorname{Im}(a + jb) = b \)
+</p>
+
+<p>
+\( |a + jb| = \sqrt{a^2 + b^2} \) ; \(\ \ \ \)
+
+\( \angle(a + jb) = \arctan(b,a) \)
+</p>
+
+<p>
+\( |z_1 z_2| = |z_1| |z_2| \) ; \(\ \ \ \)
+
+\( \left|\frac{z_1}{z_2}\right| = \frac{|z_1|}{|z_2|} \)
+</p>
+
+<p>
+\( \angle(z_1 z_2) = \angle(z_1) + \angle(z_2) \); \(\ \ \ \)
+
+\( \angle(\frac{z_1}{z_2}) = \angle(z_1) - \angle(z_2) \)
+</p>
+
+<p>
+\( |e^{j\theta}| = 1 \); \(\ \ \ \)
+
+\( \angle(e^{j\theta}) = \theta \)
+</p>
+<br/>
+Now let's practice on the problem before us.  We have a complex
+particular solution:
+<br/><br/>
+\( v_{PS}(t) = V_i \frac{1}{1+j\omega R C}e^{j\omega t} \)
+<br/><br/>
+Let's get its magnitude.  The complex number before us is a product of
+factors, so its magnitude is the product of the magnitude of the
+factors. \(V_i\) is a real number, so its magnitude
+is its absolute value.
+The second factor is a quotient, so its
+magnitude is the quotient of the magnitudes of the numerator and the
+denominator. 
+The third factor is a unit vector; so its magnitude is 1.
+<br/>
+What is the magnitude of \(v_{PS}\)?  Express your
+result in terms of \(V_i\), \(\omega\), \(R\) and \(C\).  (Since we
+have no easy way for you to enter the Greek letter \(\omega\), please
+use the Roman letter \(w\) for the angular frequency.)
+<endouttext/>
+<formularesponse type="cs" samples="R,C,w,Vi@1,1,1,1:3,3,3,3#10" answer="$mag">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Now let's get the angle.  The angle of the product is the sum of the
+angles.  The angle of the first factor, the real number \(V_i\) is just either \(0\) if
+it is positive or \(\pi\) if it is negative.  Assume \(V_i\) is
+positive here.  The angle of the second factor is just the difference
+of the angle of the numerator and the angle of the denominator.  The
+angle of the third factor is the imaginary part of the exponent.
+<br/>
+What is the angle of \(v_{PS}\)?  Express your
+result in terms of \(V_i\), \(\omega\), \(t\), \(R\) and \(C\).  (Since we
+have no easy way for you to enter the Greek letter \(\omega\), please
+use the Roman letter \(w\) for the angular frequency.)
+<formularesponse type="cs" samples="R,C,w,t,Vi@1,1,1,1,1:3,3,3,3,3#10" answer="$ang">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<endouttext/>
+
+</problem>

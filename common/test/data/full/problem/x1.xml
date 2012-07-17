@@ -1,0 +1,57 @@
+<problem>
+
+<script type="loncapa/python">
+#v1=5
+#i1=1
+#v2=4
+#i2=2
+# Both VOC=6 and ISC=6
+
+v1 = float(random.randrange(1, 20, 1))
+i2 = float(random.randrange(1, 20, 1))
+
+v2 = v1 + float(random.randrange(1, 20, 1))
+i1 = i2 + float(random.randrange(1, 20, 1))
+
+# i1-i2 positive and v2-v1 positive; thus RTH positive
+RTH = - (v2-v1)/(i2-i1)
+VOC = v1 + RTH*i1
+ISC = VOC/RTH
+</script>
+
+<startouttext/>
+A resistive load is attached to a two-terminal "black box".
+<center>
+<img src="/static/circuits/x1.gif" />
+</center>
+The "black box" contains only linear resistors and independent sources.
+<br/>
+The voltage across the load is measured to be \(v=$v1\)V when the current
+through the load is measured to be \(i=$i1\)A.
+<br/><br/>
+The load is then changed and the voltage across the new load is measured
+to be \(v=$v2\)V when the current through the load is measured to be
+\(i=$i2\)A.
+<br/><br/>
+If the resistive load is replaced by a short circuit, what is the
+current, in Amperes, that flows through the short circuit?
+<endouttext/>
+<numericalresponse answer="$ISC">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/><br/>
+If the resistive load is replaced by an open circuit, what is the
+voltage, in Volts, that appears across the open circuit?
+<endouttext/>
+<numericalresponse answer="$VOC">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+</problem>
+

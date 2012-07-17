@@ -1,0 +1,185 @@
+<problem>
+
+<script type="loncapa/python">
+# "_s" suffix is for variables used for formula responses.
+I_s = "I"
+i2rest_s = "I/2"
+vout_s = "VS - RL*I/2"
+
+i1_s = "(K/2)*(v1 - e - VT)^2"
+i2_s = "(K/2)*(v2 - e - VT)^2"
+e_s = "(v1+v2)/2 - VT - sqrt(I/K - ((v1-v2)/2)^2)"
+i2s_s = "I/2 - vD*sqrt(K*I-(K*vD)^2)"
+vOUT_s = "VS - RL*(I/2 - ((v1-v2)/2)*sqrt(K*I-(K*((v1-v2)/2))^2))"
+
+vDmax_s = "sqrt(I/(2*K))"
+
+gain_s = "(RL/2)*sqrt(K*I)"
+
+</script>
+
+<startouttext/>
+The source-coupled pair is an extremely useful circuit.
+It amplifies small differences between the two voltages \(v_1\) and
+\(v_2\) but it is relatively insensitive to their average value.  So,
+it forms the basis for differential amplifiers, such as the
+operational amplifier.
+<center>
+<img src="/static/circuits/DifferentialPair.gif" />
+</center>
+You may assume that the two transistors are identical, with parameters
+\(K\) and \(V_T\).  The parameter \(I\) specifies the current source.
+We intend the transistors to be operating in the saturation region, so
+we will have to be careful about that. 
+<br/><br/>
+For each of the first three questions the answer is one of the
+following algebraic expressions:
+<br/>
+\(\sqrt{\frac{I}{2 K}}\ \),  \(I\ \), \(V_S - \frac{R_L I}{2}\ \),
+\(\sqrt{\frac{I}{K}}\ \),  \(\frac{I}{2}\ \),
+\(\sqrt{\frac{2 I}{K}}\ \), \(- \frac{R_L I}{2}\ \), \( \left(\frac{R_L I}{2}\right)^2\ \)
+<br/><br/>
+In the space provided below write an algebraic expression for
+\(i_1+i_2\).  
+<endouttext/>
+<formularesponse type="cs" samples="I@1:3#1" answer="$I_s">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="20" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+If the two input voltages are equal: \(v_1 = v_2\), what is the current
+\(i_2\)?  Write the correct algebraic expression here:
+<endouttext/>
+<formularesponse type="cs" samples="I@1:3#1" answer="$i2rest_s">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="20" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Also, if the two input voltages are equal, write an algebraic
+expression for the output voltage \(v_{OUT}\) here:
+<endouttext/>
+<formularesponse type="cs" samples="VS,RL,I@1,1,1:3,3,3#5" answer="$vout_s">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="20" />    
+</formularesponse>
+<startouttext/>
+Let's call this value the bias voltage \(V_{OUT}\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+Assuming that transistor \(Q_1\) is in saturation, write an algebraic
+expression for \(i_1\) in terms of \(v_1\), the node potential
+\(e\), and the parameters of \(Q_1\).  
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,v1,e@1,1,1,1:3,3,3,3#10" answer="$i1_s">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="50" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Assuming that transistor \(Q_2\) is in saturation, write an algebraic
+expression for \(i_2\) in terms of \(v_2\), the node potential
+\(e\), and the parameters of \(Q_2\).  
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,v2,e@1,1,1,1:3,3,3,3#10" answer="$i2_s">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="50" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Notice that the sum of the two currents forms a quadratic equation in
+\(e\).  Solve that for \(e\) (only one root is correct!) and
+then substitute back to get the currents.  Write an algebraic
+expression for \(e\) in terms of \(K\), \(V_T\), \(I\), \(v_1\), and
+\(v_2\). 
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,I,v1,v2@1,1,10,1,1:3,3,15,3,3#10" answer="$e_s">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="50" />    
+</formularesponse>
+
+<startouttext/>
+Assuming that both transistors are in saturation, write an algebraic
+expression for \(v_{OUT}\) in terms of \(v_1\), \(v_2\) and the device
+parameters. 
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,I,VS,RL,v1,v2@1,1,90,1,1,1,1:3,3,100,3,3,3,3#10" answer="$vOUT_s">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="50" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/>
+Now suppose we want to use this circuit to amplify very small
+differences of voltage.  If the two inputs are at the same voltage, we
+know the output voltage \(V_{OUT}\) (from the third question, above).  
+Suppose now that \(v_1-v_2 = v_{in}\) for some small \(v_{in}\).  
+The output will also change: \(v_{out}=v_{OUT}-V_{OUT}\).  What is the
+gain of this amplifier?  
+<br/>
+Write an algebraic expression for \(v_{out}/v_{in}\).  This will be a 
+short expression.
+<endouttext/>
+<formularesponse type="cs" samples="K,I,RL@1,1,1:3,3,3#10" answer="$gain_s">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="50" />    
+</formularesponse>
+
+<script type="loncapa/python">
+V_T = 1.0
+K   = random.choice([0.003, 0.004, 0.005, 0.006])
+
+IDSm = random.choice([0.8, 0.9, 1.0, 1.1, 1.2])
+IDS  = float(IDSm)*1e-3
+
+IS = 2*IDS
+
+VS   = float(random.randrange(15, 30, 1))
+
+gain = random.choice([8.0, 9.0, 10.0, 11.0, 12.0])
+
+RL = 2*gain/math.sqrt(K*IS)
+RLk = RL*1e-3
+
+VOUT = VS - RL*IDS
+
+dvmax = 2*math.sqrt(IS/(2*K))
+</script>
+
+
+<startouttext/> 
+<br/>
+Now that we understand this circuit, let's see how one can meet a
+specification.  Assume we have matched pairs of MOSFETs with \(V_T =
+$V_T\)V and \(K = $K\)A/V\(^2\).  Our MOSFETs like to run at about
+\(I_{DS} = $IDSm\)mA.  We want an incremental gain 
+\(\frac{v_{out}}{v_{in}} = $gain\).
+<br/>
+In the space provided below give the value of \(R_L\), in kOhms that
+meets this specification.
+<endouttext/>
+<numericalresponse answer="$RLk">
+      <responseparam type="tolerance" default="5%" name="tol"
+                     description="Numerical Tolerance"/> 
+      <textline/>
+</numericalresponse>
+
+</problem>
+
+

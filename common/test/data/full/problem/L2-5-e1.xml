@@ -1,0 +1,74 @@
+<!--  
+This is a KVL and KCL exercise, to be used after L2-5.
+
+Piotr: I would like the answers to be integer, but I don't know how to
+   specify that. 
+-->
+
+<problem>
+
+<startouttext />
+In the bridge network shown:
+<center>
+<img src="/static/circuits/bridge.gif" />
+</center>
+how many nodes are there?
+<endouttext />
+<numericalresponse answer="4">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> How many KCL equations are independent?
+<endouttext />
+<numericalresponse answer="3">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext />
+<br />
+How many loops are there?
+<endouttext />
+<numericalresponse answer="7">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+How many KVL equations are independent?
+<endouttext />
+<numericalresponse answer="3">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext /> 
+<br /> Notice that in any circuit there is always one more node than there
+are independent KCL equations.  If two nodes share a branch, the
+current entering one node from that branch is the negative of the
+current entering the other node from that branch.  So the sum of the
+currents entering two nodes does not count current going from one to
+the other.  As a consequence, the sum of all the currents entering all
+but one of the nodes is the same as the current entering the remaining
+node.  So the KCL equation for that node is the sum of the KCL
+equations for all the other nodes.
+
+<br /><br /> Also, in a circuit with more than one loop there are always more loops
+than KVL equations.  The argument is analogous with the argument for
+nodes: if two loops share a branch, and we count the voltages
+counterclockwise in each loop, then the KVL equation for the branches
+containing both subloops is the sum of the KVL equations for each
+subloop.  This bigger equation does not count the current in the
+shared branch, since it is of opposite sign in the two subloops.
+
+<br /><br /> A thought: if you have take a class in multivariate calculus, these
+arguments should remind you of the proofs of the divergence theorem
+and of Stokes's theorem.
+<endouttext />
+
+</problem>

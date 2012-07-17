@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:7MlUx0gapEo,1.0:3c8nYVolWPo,1.25:iBxLafLBdiE,1.50:DePB5ZWtKLo" slug="S17V10_Homogeneous_Solution_and_Characteristic_Equation" rerandomize="per_student" name="S17V10: Homogeneous Solution and Characteristic Equation"/>
+  <customtag tag="S17" slug="discuss_1170" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="629" slug="book_1171" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1172" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

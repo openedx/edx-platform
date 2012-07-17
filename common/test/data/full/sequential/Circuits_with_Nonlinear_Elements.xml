@@ -1,0 +1,46 @@
+<sequential>
+  <vertical filename="vertical_364" slug="vertical_364" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_368" slug="vertical_368" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_372" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S6E0_Thevenin_isolates_nonlinear_element" slug="S6E0_Thevenin_isolates_nonlinear_element" rerandomize="per_student" name="S6E0: Thevenin isolates nonlinear element"/>
+    <customtag tag="S6E0" slug="discuss_373" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_374" slug="vertical_374" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_378" slug="vertical_378" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_382" slug="vertical_382" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_386" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S6E1_A_Nonlinear_Element" slug="S6E1_A_Nonlinear_Element" rerandomize="per_student" name="S6E1: A Nonlinear Element"/>
+    <customtag tag="S6E1" slug="discuss_387" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_388" slug="vertical_388" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_392" slug="vertical_392" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_396" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S6E2_Load_Line" slug="S6E2_Load_Line" rerandomize="per_student" name="S6E2: Load Line"/>
+    <customtag tag="S6E2" slug="discuss_397" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_398" slug="vertical_398" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_402" slug="vertical_402" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_406" slug="vertical_406" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_410" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S6E3_Piecewise_Linear" slug="S6E3_Piecewise_Linear" rerandomize="per_student" name="S6E3: Piecewise Linear"/>
+    <customtag tag="S6E3" slug="discuss_411" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_412" slug="vertical_412" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_416" slug="vertical_416" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_420" slug="vertical_420" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_424" slug="vertical_424" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_428" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <video youtube="0.75:nCNuIopQGHU,1.0:s7xmU4a50p8,1.25:9AxXd51T-J0,1.50:yyzqOIZgXpA" slug="What_s_next_429" rerandomize="per_student" name="What's next"/>
+    <customtag tag="S6" slug="discuss_430" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+</sequential>

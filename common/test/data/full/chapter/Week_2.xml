@@ -1,0 +1,12 @@
+<sequential>
+  <sequential filename="Linearity_and_Superposition" slug="Linearity_and_Superposition" format="Lecture Sequence" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Linearity and Superposition"/>
+  <sequential filename="Static_Discipline_and_Boolean_Logic" slug="Static_Discipline_and_Boolean_Logic" format="Lecture Sequence" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Static Discipline and Boolean Logic"/>
+  <vertical slug="Linearity_Thevenin_and_Norton_Digital" format="Homework" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="per_student" due="March 25" graded="true" name="Linearity, Thevenin and Norton; Digital">
+    <problem filename="H2P1_Voltage-Divider_Design" slug="H2P1_Voltage-Divider_Design" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="false" due="March 25" graded="true" name="H2P1: Voltage-Divider Design"/>
+    <problem filename="H2P2_Solar_Power" slug="H2P2_Solar_Power" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="false" due="March 25" graded="true" name="H2P2: Solar Power"/>
+    <problem filename="H2P3_Logic_Diagrams" slug="H2P3_Logic_Diagrams" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="false" due="March 25" graded="true" name="H2P3: Logic Diagrams"/>
+  </vertical>
+  <html filename="Superposition_experiment" slug="Superposition_experiment" format="Lab" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" due="March 25" name="Superposition experiment"/>
+  <problem filename="Lab2b_Mixing_Two_Signals" slug="Lab2b_Mixing_Two_Signals" format="Lab" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="false" due="March 25" graded="true" name="Lab2b: Mixing Two Signals"/>
+  <html filename="Week_2_Tutorials" slug="Week_2_Tutorials" format="Tutorial Index" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Week 2 Tutorials"/>
+</sequential>

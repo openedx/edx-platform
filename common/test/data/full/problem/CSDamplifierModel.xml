@@ -1,0 +1,145 @@
+<problem>
+
+<script type="loncapa/python">
+
+#VDD = 50.0
+#VDD = 150.0
+VDD = float(random.randrange(50, 150, 5))
+
+#RL = 82.0
+#RL = 120.0
+RL = random.choice([82.0, 100.0, 120.0])
+
+RS = 22.0
+
+VI = 6.5
+
+
+VT=2.0
+K=2.0
+
+DELTA = math.sqrt(1+2*K*RS*(VI-VT))
+ID = (1+K*RS*(VI-VT)-DELTA)/(K*RS*RS)
+VO = VDD - RL*ID
+
+DvI = 1.0
+vI1 = DvI + VI
+DELTA1 = math.sqrt(1+2*K*RS*(vI1-VT))
+iD1 = (1+K*RS*(vI1-VT)-DELTA)/(K*RS*RS)
+vO1 = VDD - RL*iD1
+
+DvO = vO1 - VO
+
+vim = 1.0
+vi = 0.001*vim
+dvodvi = (RL*(1-DELTA))/(RS*DELTA)
+vo = dvodvi * vi
+vom = 1000.0*vo
+
+</script>
+
+<startouttext/>
+The figure shows a model of a real power amplifier.  The dependent source is
+a voltage-controlled current source with characteristic
+<br/>
+\(   i_D = \left\{ \begin{array}{ll}
+                   \frac{K}{2}(v_{GS}-V_T)^2 ) &amp; \mbox{if $v_{GS} &gt; V_T$} \\
+                    0 &amp; \mbox{if $v_{GS} &lt; V_T$} 
+                   \end{array}
+            \right.
+\)
+<br/>
+This device model has two parameters \(K=$K\)A/V\(^2\) and \(V_T=$VT\)V.  
+<center>
+<img src="/static/circuits/source-degeneration-model.gif"/>
+</center>
+Assume that the power supply voltage \(V_{DD} = $VDD\)V, and the
+resistances \(R_S=$RS\Omega\) and \(R_L=$RL\Omega\). 
+<endouttext/>
+
+<startouttext/>
+<br/><br/>
+If the bias input voltage \(V_I &lt; V_T\) what is the output bias voltage
+\(V_O\), in Volts?
+<br/>
+\(V_O\) = 
+<endouttext/>
+<numericalresponse answer="$VDD">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/><br/>
+In the rest of this problem assume the input bias voltage \(V_I = $VI\) 
+<endouttext/>
+<startouttext/>
+<br/>
+What is the bias current \(I_D\), in Amperes?
+<br/>
+\(I_D\) = 
+<endouttext/>
+<numericalresponse answer="$ID">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the output bias voltage \(V_O\), in Volts?
+<br/>
+\(V_O\) = 
+<endouttext/>
+<numericalresponse answer="$VO">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+If we increment the input voltage \(v_I = V_I + \Delta v_I\) the
+output voltage will change \(v_O = V_O + \Delta v_O\).
+<br/>
+If \(\Delta v_I = $DvI\)V what is the \(\Delta v_O\), in Volts?
+<br/>
+\(\Delta v_O\) = 
+<endouttext/>
+<numericalresponse answer="$DvO">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/><br/>
+Now, let's consider the incremental behavior of this amplifier.
+<br/>
+Assume that the incremental input voltage \(v_i=$vim\)mV.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the incremental output voltage \(v_o\), in milliVolts?
+<br/>
+\(v_o\) = 
+<endouttext/>
+<numericalresponse answer="$vom">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the small-signal gain of this amplifier \(\frac{v_o}{v_i}\)?
+<br/>
+ \(\frac{v_o}{v_i}\) = 
+<endouttext/>
+<numericalresponse answer="$dvodvi">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+
+</problem>

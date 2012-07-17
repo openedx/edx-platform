@@ -1,0 +1,37 @@
+<problem>
+
+<script type="loncapa/python">
+vINmin = "VT"
+vOUTmin = "vIN - VT"
+</script>
+
+<startouttext/>
+Consider the simple common-source MOSFET amplifier:
+<center>
+<img src="/static/circuits/mos-amplifier.gif" />
+</center>
+In the spaces provided enter the algebraic expression for your answer.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the minimum value that \(v_{IN}\) can have for the MOSFET to
+operate in saturation?
+<endouttext/>
+<formularesponse type="cs" samples="VT@1:3#10" answer="$vINmin">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/>
+What is the minimum value that \(v_{OUT}\) can have for the MOSFET to
+operate in saturation?  Remember that algebraic expressions are case sensitive.
+<endouttext/>
+<formularesponse type="cs" samples="vIN,VT@1,1:3,3#10" answer="$vOUTmin">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

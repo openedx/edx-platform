@@ -1,0 +1,55 @@
+<!--
+Week 6 problem about MOSFETs
+-->
+
+<problem>
+<script type="loncapa/python">
+
+VT=float(random.randrange(5, 12, 1))/10
+Km=float(random.randrange(50, 100, 10))
+K=Km/1000
+vR=float(random.randrange(20, 30, 1))/10
+irm=float(random.randrange(5, 10, 1))
+ir=irm/1000
+
+iR = (K*(vR-VT)**2)/2
+
+iRm = iR*1000
+
+vr = (1/(K*(vR-VT)))*ir
+vrm = vr*1000
+</script>
+
+   <startouttext/>
+   Consider a two-terminal device formed by a MOSFET with its gate tied to its drain, as illustrated in the figure below.
+   <center>
+   <img src="/static/circuits/gate_to_drain.gif"/>
+   </center>
+   The MOSFET is characterized by parameters \(V_T\) and \(K\), and its drain-to-source voltage and drain current are denoted as \(v_R\) and \(i_R\), respectively.
+   <br/>
+   You can assume the following parameters: \(V_T=$VT\)V and \(K=$Km\frac{mA}{V^2}\).
+   <br/>
+   If \(v_R=$vR\)V, what is \(i_R\) (in mA)?
+   <endouttext/>
+   <numericalresponse answer="$iRm">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+   
+   <startouttext/>
+   <br/>
+   Develop a small-signal model for this device around the operating
+   point \(V_R=$vR\), describing the relationship between \(v_r\)
+   and \(i_r\).  
+   <br/>
+   Using this model, find \(v_r\), if \(i_r=$irm\)mA.
+   <br/>
+   What is \(v_r\) (in mV)?
+   <endouttext/>
+   <numericalresponse answer="$vrm">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+  
+</problem>
+   

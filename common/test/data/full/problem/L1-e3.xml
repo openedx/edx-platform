@@ -1,0 +1,52 @@
+<!--  
+This is an L1 KVL problem
+-->
+
+<problem>
+
+<script type="loncapa/python">
+V =  float(random.randrange(1,10,1))
+v1 = (float(random.randrange(100,300,1))-200)/10
+v2 = (float(random.randrange(100,300,1))-200)/10
+
+v3 = V - v1
+v4 = v2 - V
+v5 = v1 + v2 - V
+</script>
+
+<startouttext />
+In the circuit shown there are four unknown elements and an
+independent voltage source.  
+<center>
+<img src="/static/circuits/kvl.gif" />
+</center>
+The strength of the source \(V=$V\)V is
+given.  Also, there are two branch voltages measured: we know
+\(v_1=$v1\)V and \(v_2=$v2\)V.
+<br />
+what is the voltage \(v_3\)?
+<endouttext />
+<numericalresponse answer="$v3">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+what is the voltage \(v_4\)?
+<endouttext />
+<numericalresponse answer="$v4">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+what is the voltage \(v_5\)?
+<endouttext />
+<numericalresponse answer="$v5">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

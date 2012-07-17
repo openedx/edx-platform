@@ -1,0 +1,144 @@
+<!-- Week 5 Homework: Small-Signal analysis of Source Follower -->
+
+<problem>
+
+<script type="loncapa/python">
+
+# From Large-Signal Analysis
+#iDs   = "(K/2)*(vIN - vOUT - VT)^2"
+#vOUTs = "iDS*RS"
+#iDss  = "(1+K*RS*(vIN-VT)-sqrt(1+2*K*RS*(vIN-VT)))/(K*RS^2)"
+
+vo = "(1 - 1/sqrt(1 + 2*K*RS*(VIN-VT)))*vin"
+
+
+</script>
+
+<startouttext/>
+Continuing with our analysis of the source follower, we now want to
+examine its small-signal behavior.
+<center>
+<img src="/static/circuits/source-follower.gif" />
+</center>
+<br/>
+We have exactly the same situation as we had in H5P1 (but the numbers
+will be different.)
+<endouttext/>
+
+<startouttext/>
+<br/>
+Derive an algebraic expression for the incremental output voltage
+\(v_{out}\) in terms of parameters \(K\), \(V_T\), and \(R_S\), the
+input bias voltage \(V_{IN}\), and the incremental input voltage
+\(v_{in}\).
+<br/>
+Hint: Remember that you computed the total output voltage \(v_{OUT}\)
+in H5P1.  Also remember that
+\(v_{out} = v_{in} \frac{\partial v_{OUT}}{\partial v_{IN}}|_{v_{IN}=V_{IN}} \).
+<br/>
+So in the space provided below (too small!) write your algebraic
+expression for \(v_{out}\):
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,RS,VIN,vin@1,1,1,4,1:3,3,6,3,3#10" answer="$vo">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<script type="loncapa/python">
+# Numerical stuff must not share names with symbolic stuff!  
+#   I added "n" to every name.
+
+global Kn, VTn, RSn
+
+Kn  = 2.0   #A/V**2
+VTn = 2.0   #V
+RSn = 16    #Ohms
+
+# The following aliases are defined because of a bug.
+# If I put \($RSn\) in an XML text, I will not get its
+# value, just its name.  Ugh!
+
+Knd  = Kn
+VTnd = VTn
+RSnd = RSn
+
+def iDn(vI):
+   vA = vI-VTn
+   delta = math.sqrt(1+2*Kn*RSn*vA)
+   return((1 + Kn*RSn*vA - delta)/(Kn*RSn**2))
+
+
+#vINn = 6.0
+#vINn = 6.5
+vINn = random.choice([6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9])
+
+iDSn = iDn(vINn)  #0.25A
+
+vOUTn = RSn*iDSn   #4.0V
+
+def dvodvi(VI):
+   vA = VI-VTn
+   delta = math.sqrt(1+2*Kn*RSn*vA)
+   return(1-1/delta)
+
+ddn = dvodvi(vINn) #0.94 V/V
+
+#dvi = 0.001
+dvi = random.choice([0.0009, 0.002, 0.0025, 0.003, 0.0035])
+dvo = ddn*dvi
+
+#print(iDSn)
+#print(vOUTn)
+#print(ddn)
+
+#DVIN = 1.0
+
+#UvIN = vINn + DVIN
+#UvOUT = RSn*iDn(UvIN)
+#LvIN = vINn - DVIN
+#LvOUT = RSn*iDn(LvIN)
+
+#VDDmin = UvOUT+VTn
+
+</script>
+
+<startouttext/>
+<br/>
+Using the expression you just derived, 
+let's crunch the numbers again.  Remember, our power MOSFET has
+\(K=$Knd\)A/V\(^2\) and \(V_T=$VTnd\).  And we are driving a
+\(R_S=$RSnd\Omega\) earphone load.  Assume here that our input bias
+voltage \(V_{IN} = $vINn\)V.
+<br/> <br/> 
+If we have an incremental input of \(v_i=$dvi\)V what is the
+incremental output \(v_o\) (in Volts)?
+<endouttext/>
+<numericalresponse answer="$dvo">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+So, what is the incremental voltage gain \(v_o/v_i\) of this circuit?
+<endouttext/>
+<numericalresponse answer="$ddn">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/> <br/>
+Notice that although the voltage gain is less than one, we are driving
+a \($RSnd\Omega\) earphone.  The signal source is putting out (almost) no
+power, because the gate of the MOSFET takes (almost) no current.
+(Actually, because the gate has capacitance to the source and drain
+there is a small amount of current pulled, but we will learn about
+that later!)  So this circuit has very large current gain.
+<br/><br/>
+One other problem is that usually we don't want our bias current to go
+through the earphone.  We can use capacitors to solve that problem
+too, but later.
+<endouttext/>
+
+</problem>

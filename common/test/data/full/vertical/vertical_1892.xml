@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:PL1iaL8lwhU,1.0:BnVvqxYMNyU,1.25:vOXoMQ-mOec,1.50:YGVtqZgazuY" slug="S26V8_Inverter_power_dissipation" rerandomize="per_student" name="S26V8: Inverter power dissipation"/>
+  <customtag tag="S26" slug="discuss_1893" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="606" slug="book_1894" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1895" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

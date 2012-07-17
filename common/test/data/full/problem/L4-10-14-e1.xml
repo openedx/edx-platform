@@ -1,0 +1,62 @@
+<!-- Static Discipline Exercise, to be used in L4 -->
+
+<problem>
+
+<script type="loncapa/python">
+Vmin=0
+Vmax=random.choice([5.0, 4.0, 3.3, 2.9])
+
+# Nominal voltages
+Voln =   Vmax/5
+Viln = 2*Vmax/5
+Vihn = 3*Vmax/5
+Vohn = 4*Vmax/5
+
+Vcen = (Viln + Vihn)/2.0
+
+# Adding perturbations
+Vol = Voln + float(random.randrange(-2,+3,1))*Vmax/25
+Vil = Viln + float(random.randrange(-2,+3,1))*Vmax/25
+Vih = Vihn + float(random.randrange(-2,+3,1))*Vmax/25
+Voh = Vohn + float(random.randrange(-2,+3,1))*Vmax/25
+
+Vfb = Vih - Vil
+
+Vnml = Vil - Vol
+Vnmh = Voh - Vih
+</script>
+
+<startouttext />
+A static discipline has the following voltage thresholds:
+<br />
+\(V_{MIN}=$Vmin\)V, 
+\(V_{IL}=$Vil\)V, \(V_{IH}=$Vih\)V, 
+\(V_{OL}=$Vol\)V, \(V_{OH}=$Voh\)V, 
+\(V_{MAX}=$Vmax\)V.
+<br />
+How big (in Volts) is the forbidden region?
+<endouttext />
+<numericalresponse answer="$Vfb">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+What is the low-level noise margin?  (Express your answer in Volts.)
+<endouttext />
+<numericalresponse answer="$Vnml">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+What is the high-level noise margin?  (Express your answer in Volts.)
+<endouttext />
+<numericalresponse answer="$Vnmh">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

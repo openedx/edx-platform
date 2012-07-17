@@ -1,0 +1,67 @@
+<!-- It works, and is not so bad. -->
+
+<problem>
+
+<script type="loncapa/python">
+X = "C"
+Y = "R"
+Z = "L"
+Q = 4.176
+</script>
+
+<startouttext/>
+For the following series RLC network we can take as output the voltage
+across the resistor, the capacitor, or the inductor.
+<center>
+<img src="/static/circuits/VLCR2.gif" />
+</center>
+The following graphs show the magnitudes of the voltage-transfer
+ratios of the amplitudes of these output voltages to the amplitude of
+the input voltage source \(V_i\).  
+<center>
+<img src="/static/circuits/SOFmag.gif" />
+</center>
+The graphs are labeled X, Y, Z.  Which voltage does each one match?
+<endouttext/>
+
+<startouttext/>
+<br/>
+Which voltage is labeled X?  Enter R, L, or C in the space provided.
+<endouttext/>
+<formularesponse type="cs" samples="R,L,C@1,1,1:3,3,3#10" answer="$X">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Which voltage is labeled Y?  Enter R, L, or C in the space provided.
+<endouttext/>
+<formularesponse type="cs" samples="R,L,C@1,1,1:3,3,3#10" answer="$Y">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Which voltage is labeled Z?  Enter R, L, or C in the space provided.
+<endouttext/>
+<formularesponse type="cs" samples="R,L,C@1,1,1:3,3,3#10" answer="$Z">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+What is the \(Q\) of this circuit?
+<endouttext/>
+<numericalresponse answer="$Q">
+    <responseparam type="tolerance" default="10%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+</problem>

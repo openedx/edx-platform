@@ -1,0 +1,7 @@
+<sequential>
+  <problem filename="Q1" slug="Q1" graceperiod="0 day 0 hours 5 minutes 0 seconds" rerandomize="per_student" due="April 30, 12:00" graded="true" name="Q1"/>
+  <problem filename="Q2" slug="Q2" graceperiod="0 day 0 hours 5 minutes 0 seconds" rerandomize="per_student" due="April 30, 12:00" graded="true" name="Q2"/>
+  <problem filename="Q3" slug="Q3" graceperiod="0 day 0 hours 5 minutes 0 seconds" rerandomize="per_student" due="April 30, 12:00" graded="true" name="Q3"/>
+  <problem filename="Q4" slug="Q4" graceperiod="0 day 0 hours 5 minutes 0 seconds" rerandomize="per_student" due="April 30, 12:00" graded="true" name="Q4"/>
+  <problem filename="Q5" slug="Q5" graceperiod="0 day 0 hours 5 minutes 0 seconds" rerandomize="per_student" due="April 30, 12:00" graded="true" name="Q5"/>
+</sequential>

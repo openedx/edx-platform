@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:YGbpZL5lsio,1.0:xneJbj1S34k,1.25:QxpSTM-OE-U,1.50:bil-NyQtJmU" slug="S17V16_Example_--_Undriven_LC_Circuit" rerandomize="per_student" name="S17V16: Example -- Undriven LC Circuit"/>
+  <customtag tag="S17" slug="discuss_1198" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="627" slug="book_1199" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1200" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

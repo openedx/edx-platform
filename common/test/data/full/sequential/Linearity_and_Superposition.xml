@@ -1,0 +1,28 @@
+<sequential>
+  <vertical filename="vertical_152" slug="vertical_152" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_156" slug="vertical_156" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_159" slug="vertical_159" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_163" slug="vertical_163" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_167" slug="vertical_167" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_171" slug="vertical_171" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_175" slug="vertical_175" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical slug="vertical_179" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <problem filename="S3E3_Circuit_Variables_are_Superpositions_of_values_due_to_each_source_separately" slug="S3E3_Circuit_Variables_are_Superpositions_of_values_due_to_each_source_separately" name="S3E3: Circuit Variables are Superpositions of values due to each source separately"/>
+    <customtag tag="S3E3" slug="discuss_180">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_181" slug="vertical_181" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_185" slug="vertical_185" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_189" slug="vertical_189" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_193" slug="vertical_193" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_196" slug="vertical_196" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical slug="vertical_200" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <problem filename="S3E6_Norton_Model" slug="S3E6_Norton_Model" name="S3E6: Norton Model"/>
+    <customtag tag="S3E6" slug="discuss_201">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_202" slug="vertical_202" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <video youtube="0.75:flUctmQeXUQ,1.0:nv8G8lsvuQc,1.25:VbanfV-HpA8,1.50:MB9deM-2-eU" slug="What_s_next_206" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="What's next"/>
+</sequential>

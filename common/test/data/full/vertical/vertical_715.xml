@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:fT3sosoypec,1.0:1Goe8gWwGMo,1.25:78vD58L3xv0,1.50:7P7JD9oADpQ" slug="S11V2_Choosing_an_Operating_Point_for_the_Amplifier" rerandomize="per_student" name="S11V2: Choosing an Operating Point for the Amplifier"/>
+  <customtag tag="S11" slug="discuss_716" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="420" slug="book_717" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="11" slug="slides_718" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

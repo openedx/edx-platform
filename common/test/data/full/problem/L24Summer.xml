@@ -1,0 +1,76 @@
+<!-- Summing Amplifier -->
+
+<problem>
+
+<script type="loncapa/python">
+vaverage = "(v1+v2)/2"
+vo = "((RF+RS)/RS)*((v1+v2)/2)"
+RF = "RS"
+</script>
+
+<startouttext/>
+Consider the following circuit
+<center>
+<img src="/static/circuits/SummingAmplifier.gif" />
+</center>
+Assume that the op amp is ideal, with infinite gain, infinite input
+resistance, and zero output resistance. 
+<endouttext/>
+
+<startouttext/>
+<br/>
+In the box provided below write an algebraic expression in voltages
+\(v_1\) and \(v_2\) for the node potential \(e_1\).
+<endouttext/>
+<formularesponse type="cs" samples="v1,v2,RF,RS,RI@1,1,1,1,1:3,3,3,3,3#10" answer="$vaverage">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+In the box provided below write an algebraic expression in voltages
+\(v_1\) and \(v_2\) for the node potential \(e_2\).
+<endouttext/>
+<formularesponse type="cs" samples="v1,v2,RF,RS,RI@1,1,1,1,1:3,3,3,3,3#10" answer="$vaverage">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+In the box provided below write an algebraic expression in voltages
+\(v_1\) and \(v_2\) for the output voltage \(v_O\).
+<endouttext/>
+<formularesponse type="cs" samples="v1,v2,RF,RS,RI@1,1,1,1,1:3,3,3,3,3#10" answer="$vo">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/>
+If we want the output voltage to be \(v_O = v_1 + v_2\) what should be
+the resistance \(R_F\) in terms of the other resistances?  Write an
+algebraic expression for \(R_F\) in the box provided below.
+<endouttext/>
+<formularesponse type="cs" samples="v1,v2,RF,RS,RI@1,1,1,1,1:3,3,3,3,3#10" answer="$RF">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/>
+This circuit is called a "summing amplifier".  As you see, we can
+control the scale of the output with the resistors \(R_F\) and
+\(R_S\).  We can also make a weighted sum by manipulating the
+resistances of the resistors labeled \(R_I\).  Do you see how to do
+that?
+<endouttext/>
+
+</problem>

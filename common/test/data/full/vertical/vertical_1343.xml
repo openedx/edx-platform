@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S19E4_Magnitudes_and_Angles" slug="S19E4_Magnitudes_and_Angles" showanswer="attempted" rerandomize="false" name="S19E4: Magnitudes and Angles"/>
+  <customtag tag="S19" slug="discuss_1344">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="711" slug="book_1345">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="19" slug="slides_1346">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,37 @@
+<sequential>
+  <vertical filename="vertical_97" slug="vertical_97" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_101" slug="vertical_101" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <problem filename="S2E1_Circuit_Topology" slug="S2E1_Circuit_Topology" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="S2E1: Circuit Topology"/>
+  <vertical filename="vertical_105" slug="vertical_105" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_109" slug="vertical_109" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_113" slug="vertical_113" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_116" slug="vertical_116" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_121" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S2E4_Series_and_Parallel" slug="S2E4_Series_and_Parallel" rerandomize="never" name="S2E4: Series and Parallel"/>
+    <customtag tag="S2E4" slug="discuss_122" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_123" slug="vertical_123" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <problem filename="L2Node0" slug="L2Node0" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="L2Node0"/>
+  <vertical filename="vertical_127" slug="vertical_127" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <problem filename="L2Node1" slug="L2Node1" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="L2Node1"/>
+  <vertical filename="vertical_131" slug="vertical_131" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <problem filename="L2Node2" slug="L2Node2" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="L2Node2"/>
+  <vertical filename="vertical_136" slug="vertical_136" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_140" slug="vertical_140" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_144" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S2E5_Node_Method" slug="S2E5_Node_Method" rerandomize="never" name="S2E5: Node Method"/>
+    <customtag tag="S2" slug="discuss_145" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_146" slug="vertical_146" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_150" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S2E6_Modeling" slug="S2E6_Modeling" rerandomize="per_student" name="S2E6: Modeling"/>
+    <customtag tag="S2E6" slug="discuss_151" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <video youtube="0.75:8G7WMgz_qiE,1.0:aAJQrTmLvVE,1.25:Q1MhUuZnCjk,1.50:KSDx8N-RaO8" slug="Summary_and_what_s_next" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student" name="Summary and what's next"/>
+</sequential>

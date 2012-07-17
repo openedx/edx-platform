@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S26E3_A_Hot_Processor" slug="S26E3_A_Hot_Processor" rerandomize="per_student" name="S26E3: A Hot Processor"/>
+  <customtag tag="S26" slug="discuss_1909" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="610" slug="book_1910" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1911" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

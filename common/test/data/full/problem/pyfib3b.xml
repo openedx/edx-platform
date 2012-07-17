@@ -1,0 +1,87 @@
+<problem>
+
+<!-- 
+
+     File:   pyfib3b.xml
+     Date:   30-Mar-12
+     Author: I. Chuang <ichuang@mit.edu>
+     
+     Python programming exercise test: fibonacci exercise
+
+-->     
+
+<startouttext />
+Fibonacci programming exercise
+
+<br/>
+<endouttext />
+
+
+<externalresponse answerisplay="" answer="1,2,3,4,5">
+  <startouttext />
+    <br />
+
+Paste your code for the Fibonacci program described in the <a href="http://google.com">Design Lab 1 handout</a>.
+
+    <textbox size="5" /> 
+<p/>You should not attempt to debug your code here; debug it using <a href="http://en.wikipedia.org/wiki/IDLE_(Python)">Idle</a>
+on your machine.
+
+<p/>The test cases are random, so you should Check a few times before Submit.
+
+  <endouttext />
+  <answer type="loncapa/python">
+<![CDATA[
+initial_display = """
+def fib(n):
+"""
+answer = """
+def fib(n):
+    if n <= 1: return n
+    fim2 = 0                             # f(i-2)
+    fim1 = 1                             # f(i-1)
+    for i in range(2,n):
+        fi = fim2 + fim1
+        fim2 = fim1
+        fim1 = fi
+    return fim2 + fim1
+"""
+preamble = """ 
+import sys, time
+"""
+test_program = """
+import random
+import operator
+
+def testFib(n = None):
+    if n is None:
+       n = random.randint(2, 20)
+    print 'Test is: fib(%d)'%n
+    return str(fib(n))
+
+def main():
+   #print "hello world"
+   #return
+   f = os.fdopen(3,'w')
+   test = int(sys.argv[1])
+   #print "test = ",test
+   rndlist = map(int,os.getenv('rndlist').split(','))
+   # print "rndlist = ",rndlist
+   # seed = eval(sys.argv[2])
+   # random.seed(seed)
+   # random.seed(time.time()) # no good, because must be same between tests of student's and our code
+   random.seed(rndlist[0])
+   if test == 1: f.write(testFib(0))
+   elif test == 2: f.write(testFib(1))
+   else:  f.write(testFib())
+   f.close()
+
+main()
+sys.exit(0)
+"""
+]]>
+
+</answer>
+</externalresponse>
+
+</problem>

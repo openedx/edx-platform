@@ -1,0 +1,269 @@
+<!-- First-order Transients: cjt 3/25/12 -->
+
+<problem>
+
+<startouttext />
+
+In this lab we'll be exploring how linear circuits respond to changes in
+their inputs. You may find it useful to review the first three sections of
+<A href="/book-shifted/504">Chapter 10</A> in the text.
+
+<br/><br/>Figure 1 below shows the circuit we'll be using to explore the
+response of two linear devices hooked in series with the input driven
+by a voltage source that has a step from \(0V\) to \(1V\) at \(t=0\).
+
+<br/><center>
+<img src="/static/circuits/Lab8_ckt.png" width="600"/><br/>
+Figure 1.  Circuit for testing step response
+</center>
+
+The circuit includes probes for measuring the voltage across Device #2
+and the current entering the "+" terminal of Device #2.  We'll be asking
+you determine the type and value for each of the two devices based
+on the voltage and current plots shown below.
+
+<br/><br/>For each of the voltage and current plot pairs shown below,
+give the component type (R, C, L) and value in the appropriate units
+(ohm, farads, henries) for each device.  One of the two devices will
+always be a \(1k \Omega\) resistor; it could be in either position.
+The other device is a resistor (R), capacitor (C) or inductor (L) of
+unknown value.
+
+<br/><br/><b>You may find it helpful to run experiments on your own
+copy of the test circuit in the circuit sandbox, which can be found in
+the Overview section of the website.</b>  Remember to click CHECK at
+the bottom of that page in order to save your schematic between visits.
+If you include both the current and voltage probes, both curves will
+appear in the same plot and may overlay each other.  To get separate
+plots like below, you'll need to insert the probes one at a time.
+
+<br/><br/>The step response for series connections of RC and RL
+circuits is discussed in Chapter 10.  For series CR and LR circuits,
+you'll need to complete (or find!) a similar derivation in order to
+have the formulas you'll need to compute the unknown component values.
+Looking at the shape of the voltage and current curves is enough to
+determine the configuration of the series circuit given that one
+component is known to be a resistor.  To determine the
+value of the other component, use the measurements of \((t,v)\)
+or \((t,i)\) shown on the plots to solve the formula for the
+component value, remembering that the other component is a \(1k\Omega\) 
+resistor.
+
+<hr/>
+<br/><br/><b>Voltage and current plots for Circuit 1</b>
+
+<br/><center>
+<img src="/static/circuits/Lab8_1.png" width="700"/>
+</center>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #1 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="R">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #1:
+<numericalresponse answer="1000">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #2 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="C">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #2:
+<numericalresponse answer="60e-12">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<hr/>
+<br/><br/><b>Voltage and current plots for Circuit 2</b>
+
+<br/><center>
+<img src="/static/circuits/Lab8_2.png" width="700"/>
+</center>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #1 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="L">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #1:
+<numericalresponse answer="75e-6">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #2 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="R">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #2:
+<numericalresponse answer="1000">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<hr/>
+<br/><br/><b>Voltage and current plots for Circuit 3</b>
+
+<br/><center>
+<img src="/static/circuits/Lab8_3.png" width="700"/>
+</center>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #1 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="C">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #1:
+<numericalresponse answer="150e-12">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #2 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="R">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #2:
+<numericalresponse answer="1000">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<hr/>
+<br/><br/><b>Voltage and current plots for Circuit 4</b>
+
+<br/><center>
+<img src="/static/circuits/Lab8_4.png" width="700"/>
+</center>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #1 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="R">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #1:
+<numericalresponse answer="1000">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #2 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="L">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #2:
+<numericalresponse answer="42e-6">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<hr/>
+<br/><br/><b>Voltage and current plots for Circuit 5</b>
+
+<br/><center>
+<img src="/static/circuits/Lab8_5.png" width="700"/>
+</center>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #1 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="R">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #1:
+<numericalresponse answer="3300">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of Device #2 (R, C, L):
+<formularesponse type="cs" samples="R,C,L@1,2,3:1,2,3#1" answer="R">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Component value for Device #2:
+<numericalresponse answer="1000">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<endouttext />
+
+</problem>

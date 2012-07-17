@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S13E4_First-Order_Inductor_Examples" slug="S13E4_First-Order_Inductor_Examples" rerandomize="per_student" name="S13E4: First-Order Inductor Examples"/>
+  <customtag tag="S13E4" slug="discuss_882" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="517" slug="book_883" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+</sequential>

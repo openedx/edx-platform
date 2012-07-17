@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:C8IcBVuIFOI,1.0:fpbfO-C9Ic8,1.25:p-AZ2H5o9kQ,1.50:zeM3s7h086M" slug="S17V2_DEMO_Slow_Output_Risetime" rerandomize="per_student" name="S17V2: DEMO Slow Output Risetime"/>
+  <customtag tag="S17" slug="discuss_1130" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="625" slug="book_1131" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1132" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

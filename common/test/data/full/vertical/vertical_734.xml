@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S11E3_Source_Follower_Again_" slug="S11E3_Source_Follower_Again_" showanswer="attempted" rerandomize="false" name="S11E3: Source Follower, Again!"/>
+  <customtag tag="S11E3" slug="discuss_735">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="418" slug="book_736">
+    <impl>book</impl>
+  </customtag>
+</sequential>

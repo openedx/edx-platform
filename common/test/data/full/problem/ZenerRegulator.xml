@@ -1,0 +1,220 @@
+<!--
+This is a week 4 homework problem about nonlinear devices (zener 
+  diodes) and large and small signal voltages 
+-->
+
+<problem>
+
+<script type="loncapa/python">
+# Assuming load line crosses in Zener reverse breakdown region.
+
+# Operating point voltage across load (reverse across Zener)
+# VZ=breakdown voltage(positive), GZ=breakdown conductance.
+
+def VD(RIN, RL, VI, VZ, GZ):
+   rat = RL/(RIN+RL)
+   RTH = RIN*rat
+   VOC = rat*VI
+   return(((RTH*GZ*VZ)+VOC)/((RTH*GZ)+1))
+
+
+# Partial derivative of VD with respect to VI.
+
+def dVD(RIN, RL):
+   return(RL/(RIN*RL + RIN + RL))
+
+
+# Minimum RL for Zener to be in breakdown region.
+
+def minRL(RIN, VI, VZ):
+   return((RIN*VZ)/(VI-VZ))
+
+
+RIN = 1000.0
+
+RL1 = 2000.0
+RL2 = 4000.0
+
+def divider(RIN, RL, VI):
+   return((RL*VI)/(RIN+RL))
+
+
+# 9 to 15 Volts
+VI = float(random.randrange(90, 150, 5))/10.0
+#VI = 10.0 # for testing
+
+# 20 to 60 milliVolts
+vim = float(random.randrange(20, 60, 5))
+#vim = 50.0 # for testing
+vi = vim/1000.0
+
+#   First, no Zener
+
+VO1 = divider(RIN, RL1, VI)
+vo1 = divider(RIN, RL1, vi)
+
+VO2 = divider(RIN, RL2, VI)
+vo2 = divider(RIN, RL2, vi)
+
+# If VI=10.0 and vi=0.05, 
+#    VO1=6.66..., vo1=0.0333...
+#    VO2=8, vo2=0.04
+
+
+#   Now, with Zener
+VZ = 5  # Volts
+GZ = 1  # Ampere/Volt
+
+VO3 = VD(RIN, RL1, VI, VZ, GZ)
+vo3 = dVD(RIN, RL1)*vi
+
+VO4 = VD(RIN, RL2, VI, VZ, GZ)
+vo4 = dVD(RIN, RL2)*vi
+
+RLmin = minRL(RIN, VI, VZ)
+</script>
+
+  <startouttext/>
+  A non-ideal voltage source can be modeled by a series combination of
+  an ideal DC voltage source, a resistance, and a small-signal voltage
+  source.  The small-signal source is included to represent the noise
+  inherent in the source.  This model is illustrated in the figure
+  below: 
+  <br/>
+  <center>
+  <img src="/static/circuits/signal-source.gif"/>
+  </center>
+  <br/>
+  In practice, connecting the non-ideal voltage source to a load
+  may result in undesirable effects due to the noise voltage \(v_o\) 
+  appearing across the load.
+  <br/>
+  <center>
+  <img src="/static/circuits/signal-source-with-load.gif"/>
+  </center>
+  <br/>
+  This problem studies such effects and how a Zener diode may be used
+  to ameliorate the problem.
+  <br/>
+  Assume that \(V_I=$VI\)V, \(R_{IN}\)=1k\(\Omega\), and \(v_i=$vim\)mV.  
+  <br/>
+  In the figure above, calculate the DC output voltage \(V_O\), and
+  the output noise voltage \(v_o\) for two values of the load resistance.
+  <endouttext/>
+
+  <startouttext/>
+  <br/>
+  For \(R_L\) = 2k\(\Omega\) 
+  <br/>
+  the value of \(V_O\) (in Volts) is:
+  <endouttext/>
+  <numericalresponse answer="$VO1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>
+  <startouttext/>
+  <br/>
+  and the value of \(v_o\) (in Volts) is:
+  <endouttext/>
+  <numericalresponse answer="$vo1">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>
+
+  <startouttext/>
+  <br/>
+  For \(R_L\) = 4k\(\Omega\) 
+  <br/>
+  the value of \(V_O\) (in Volts) is:
+  <endouttext/>
+  <numericalresponse answer="$VO2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>  
+  <startouttext/>
+  <br/>
+  and the value of \(v_o\) (in Volts) is: 
+  <endouttext/>
+  <numericalresponse answer="$vo2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>
+
+
+  <startouttext/>
+  <br/>  <br/>
+  Now, we can insert a Zener diode into the circuit, as shown below.
+  The Zener diode is a nonlinear device and a piecewise-linear
+  approximation to its i-v characteristic is shown graphically below.
+  <br/>
+  <center>
+  <img src="/static/circuits/Zener-regulator.gif"/>
+  <img src="/static/circuits/Zener-diode.gif"/>
+  </center>
+  <br/>
+  Again, we calculate \(v_o\) (i.e. output noise) and \(V_O\) (i.e. DC
+  output voltage) for \(R_L\)=2k\(\Omega\) and \(R_L\)=4k\(\Omega\)
+  for this new circuit.
+  <br/>
+  Hint: Your first job here is to determine which of the three
+  regions of the piecewise-linear characteristic of the Zener is the
+  one containing the operating point: we suggest you sketch a load
+  line, but be very careful about the signs.  Once you have determined
+  where the operating point is, you can model the Zener in the
+  circuit with a series combination of an independent voltage source
+  and a resistor.
+  <endouttext/>
+
+  <startouttext/>
+  <br/>  <br/>
+  For \(R_L\) = 2k\(\Omega\) 
+  <br/>
+  the value of \(V_O\) (in Volts) is:
+  <endouttext/>
+  <numericalresponse answer="$VO3">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>
+  <startouttext/>
+  <br/>
+  and the value of \(v_o\) (in Volts) is:
+  <endouttext/>
+  <numericalresponse answer="$vo3">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>
+
+  <startouttext/>
+  <br/>
+  For \(R_L\) = 4k\(\Omega\) 
+  <br/>
+  the value of \(V_O\) (in Volts) is:
+  <endouttext/>
+  <numericalresponse answer="$VO4">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>  
+  <startouttext/>
+  <br/>
+  and the value of \(v_o\) (in Volts) is: 
+  <endouttext/>
+  <numericalresponse answer="$vo4">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>
+
+  <startouttext/>
+  <br/>  <br/>
+  What is the minimum value of \(R_L\), in Ohms, that
+  guarantees that the circuit will operate this way?
+  <endouttext/>
+  <numericalresponse answer="$RLmin">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+  </numericalresponse>
+</problem>
+  
+  
+  
+  
+  

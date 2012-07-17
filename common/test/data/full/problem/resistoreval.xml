@@ -1,0 +1,27 @@
+<problem>
+
+<startouttext />
+Come up with a resistive divider where the resistor ratio is 0.2.
+<endouttext />
+
+<customresponse>
+  <startouttext />
+    <br />
+    R1: <textline size="5" /> 
+    <br />
+    R2: <textline size="5" /> 
+  <endouttext />
+  <answer type="loncapa/python">
+r1 = float(submission[0])
+r2 = float(submission[1])
+
+correct = ['correct', 'correct']
+
+if r1==0 or r2==0:
+  correct = ['incorrect', 'incorrect']
+elif abs(r1/(r1+r2) - 0.2) > 0.002:
+  correct = ['incorrect', 'incorrect']
+</answer>
+</customresponse>
+
+</problem>

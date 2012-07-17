@@ -1,0 +1,214 @@
+<!-- Filter Design -->
+
+<problem>
+
+<script type="loncapa/python">
+LowBreakPoint = random.choice([10,11,12,13,14,15,16]) #Hz
+MidBand = 1 #kHz
+HighBreakPoint = random.choice([15,16,17,18,19,20])    #kHz
+
+MidBandGain = 2
+
+BigCap = random.choice([0.68, 0.82, 1.0, 1.2, 1.5, 1.8]) #uF
+SmallCap = random.choice([220, 390, 470]) #pF
+
+RSk = 20 #kOhm
+RS  = RSk*1e3
+
+Rlow = 100
+Rhik = 100
+
+flow = float(LowBreakPoint)
+fmid =  float(MidBand)*1e3
+fhigh = float(HighBreakPoint)*1e3
+
+CB = BigCap*1e-6
+CS = SmallCap*1e-12
+
+C1 = CB
+R1 = 1.0/(2.0*math.pi*flow*C1)
+
+C2 = CS
+R2 = 1.0/(2.0*math.pi*fhigh*C2)
+
+RF = (float(MidBandGain) - 1.0)*RS
+
+C3 = C1
+R3 = R1
+
+C4 = C2
+R4 = R2
+
+thegain = -R4/R3
+</script>
+
+<startouttext/>
+Op amps give us enormous flexibility of design of filters.  For
+example, we need a filter if we want to measure or record some signals
+in the audio spectrum, but we are in a noisy environment where there
+is rumble at 1Hz and some ultrasonic noise at 200kHz that we would
+like to attenuate.
+<br/>
+You have already seen a few fundamental modules that can be used to
+make filters.  We have learned that circuit fragments A and D are
+low-pass filters and fragments B and C are high-pass filters.
+<center>
+<img src="/static/circuits/FOScircuits.gif" />
+</center>
+An op amp can let us combine modules like these in such a way that the
+behavior of the compound is easily derived from the behaviors of the
+parts separately.  
+<br/>
+Let's design a filter that does not seriously attenuate audio
+frequencies, but discriminates against frequencies outside of that
+band.  Here is one plan that we can use:
+<center>
+<img src="/static/circuits/OpAmpFilter1.gif" />
+</center>
+Our specification is that we want there to be two break frequencies
+for this filter: \($LowBreakPoint\)Hz and \($HighBreakPoint\)kHz.  We
+also want midband frequencies, such as signals around \($MidBand\)kHz, to be
+amplified by about a factor of \($MidBandGain\).
+<br/>
+We have available a \($BigCap\mu\)F and a \($SmallCap\)pF capacitor.
+We also have a variety of resistors between \($Rlow\Omega\) and
+\($Rhik\)k\(\Omega\).  However, our op amp really likes \(R_S=
+$RSk\)k\(\Omega\).
+<br/>
+Your job is to fill in the remaining details of this design.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the value of \(R_1\), in Ohms?
+<endouttext/>
+<numericalresponse answer="$R1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the value of \(R_2\), in Ohms?
+<endouttext/>
+<numericalresponse answer="$R2">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the value of \(R_F\), in Ohms?
+<endouttext/>
+<numericalresponse answer="$RF">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the value of \(C_1\), in Farads?  
+(Remember, you can use "u" for micro and "p" for pico.)
+<endouttext/>
+<numericalresponse answer="$C1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the value of \(C_2\), in Farads?
+(Remember, you can use "u" for micro and "p" for pico.)
+<endouttext/>
+<numericalresponse answer="$C2">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Alternatively, we could choose to implement this filter with the
+following circuit;
+<center>
+<img src="/static/circuits/OpAmpFilter2.gif" />
+</center>
+This time the frequency break point specifications are the same, but 
+we don't have enough degrees of freedom to independently specify the 
+midband gain.  
+<br/>
+We have the same parts available for this design as we had for the
+previous design.
+Your job is to fill in the remaining details of this design.
+<endouttext/>
+
+
+<startouttext/>
+<br/>
+What is the value of \(R_3\), in Ohms?
+<endouttext/>
+<numericalresponse answer="$R3">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the value of \(R_4\), in Ohms?
+<endouttext/>
+<numericalresponse answer="$R4">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the value of \(C_3\), in Farads?  
+(Remember, you can use "u" for micro and "p" for pico.)
+<endouttext/>
+<numericalresponse answer="$C3">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the value of \(C_4\), in Farads?
+(Remember, you can use "u" for micro and "p" for pico.)
+<endouttext/>
+<numericalresponse answer="$C4">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the midband gain for this circuit?
+<endouttext/>
+<numericalresponse answer="$thegain">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/><br/>
+If you want to find out more about filters, a good place to look is
+<a href="http://www.ti.com/lit/an/snoa224a/snoa224a.pdf"> 
+here</a>.
+<endouttext/>
+
+</problem>

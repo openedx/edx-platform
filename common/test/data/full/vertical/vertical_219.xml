@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:ROXTPDkV-gk,1.0:lf80RAv9meE,1.25:p9jBjKVhIY0,1.50:h0eS9BdlkUY" slug="S4V4_Why_Digital" name="S4V4: Why Digital"/>
+  <customtag tag="S4" slug="discuss_220">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="243" slug="book_221">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="4" slug="slides_222">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

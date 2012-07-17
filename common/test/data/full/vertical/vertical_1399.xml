@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:EiEDFbnJELI,1.0:ZQeDIfeAFNY,1.25:0j1CfB-JPlA,1.50:_kzyzgv510E" slug="S20V11_Series_RLC_example_--_Impedance_model" name="S20V11: Series RLC example -- Impedance model"/>
+  <customtag tag="S20" slug="discuss_1400">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="801" slug="book_1401">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="20" slug="slides_1402">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

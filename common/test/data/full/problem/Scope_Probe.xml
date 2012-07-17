@@ -1,0 +1,94 @@
+<problem><script type="loncapa/python">
+RSM = 1.0
+RS  = RSM*1e6
+
+#CSp = 13.0
+CSp = float(random.randrange(12,25,1))
+CS  = CSp*1e-12
+
+RPM = 9.0
+RP  = RPM*1e6
+
+CP = RS*CS/RP
+CPp = CP*1e12
+
+ratio = (RS/(RP+RS))
+
+VM  = float(random.randrange(1,10,2))/10.0
+VSDC = ratio*VM
+
+Vin1 = float(random.randrange(2,10,2))/100.0
+fM1  = float(random.randrange(50,150,1))
+f1   = fM1*1e6
+VS1  = ratio*Vin1
+
+Vin2 = float(random.randrange(2,10,2))/10.0
+fM2  = float(random.randrange(150,250,1))
+f1   = fM2*1e6
+VS2  = ratio*Vin2
+
+Vin3 = float(random.randrange(2,10,2))
+VS3  = ratio*Vin3
+
+</script><startouttext/>
+We can model the interaction of an oscilloscope with the device under
+test (DUT) with the following circuit.
+<center><img src="/static/circuits/ScopeProbe.gif"/></center>
+A typical modern 
+<a href="http://www.tek.com/datasheet/digital-phosphor-oscilloscopes-8"> oscilloscope </a>
+has an input resistance of \(R_s = $RSM\)M\(\Omega\) and
+an input capacitance of \(12 &lt; C_s &lt; 25\)pF.
+Assume that the input capacitance of our oscilloscope \(C_s = $CSp\)pF.
+<br/>
+The oscilloscope is connected to the circuit with a 10X probe with resistance of
+\(R_p = $RPM\)M\(\Omega\).  The probe incorporates a variable capacitor, adjustable
+with a special tool, that is in parallel with the resistance in the
+probe.  The purpose of this capacitor is to compensate for the
+capacitance of the input circuit of the oscilloscope.
+<br/>
+The device under test is modeled as a voltage source with
+voltage \(v_M\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+If the frequency of the source being measured is very low or a DC
+value, for example \(v_M = $VM\)V, what is the value of the voltage
+\(v_S\), in Volts, that the oscilloscope sees?
+<endouttext/>
+<numericalresponse answer="$VSDC"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+The oscilloscope is used to measure and display waveforms
+at many frequencies.  Suppose that 
+\(v_M = $Vin1 \cos({2 \pi\ $fM1\times10^6\ t})\ \)V.
+What is the value, in picoFarads, that \(C_p\) should be set to so that 
+\(V_s = $VS1\)V?  Hint: think about ratios of impedances.
+<endouttext/>
+<numericalresponse answer="$CPp"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Suppose now that 
+\(v_M = $Vin2 \cos({2 \pi\ $fM2\times10^6\ t})\ \)V.
+What is the value, in picoFarads, that \(C_p\) should be set to so that 
+\(V_s = $VS2\)V?
+<endouttext/>
+<numericalresponse answer="$CPp"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+Hmmmmm....  
+<endouttext/>
+
+<startouttext/>
+<br/>
+Now suppose that \(V_M = $Vin3\ u(t)\ \)V and suppose that just before the
+step, \(V_{C_P}(0_-) = 0\) and \(V_{C_S}(0_-) = 0\).  Assume that the
+value of \(C_p\) is what you computed for the last question.  What is
+the voltage \(v_S\) that the scope sees just after the step, in Volts?
+<endouttext/>
+<numericalresponse answer="$VS3"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+
+</problem>

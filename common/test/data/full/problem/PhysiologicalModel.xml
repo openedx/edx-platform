@@ -1,0 +1,129 @@
+<problem>
+<script type="loncapa/python">
+Qm = 400.0 #mg
+Q  = Qm*1e-6 #To make kg
+C  = 70.0  #kg = Liter
+
+vcm = 0.0  #initial concentration
+vcp = Q/C
+vcpum = vcp*1e6
+
+thh = 4.0 #hours
+th  = 3600.0*thh #seconds
+
+tau = -th/math.log(0.5)
+R   = tau/C
+
+tnd = thh*2
+
+Q1 = (5.0/12.0)*Q
+Q1m = Q1*1e6
+
+</script>
+
+<startouttext/>
+The electrical circuit language is a powerful language for modeling
+other kinds of systems, such as mechanical, chemical, thermal, and
+fluidic systems.  Here is an example from physiology: drug delivery.
+<br/><br/>
+Suppose we want to understand what happens when a medical doctor
+injects a drug into an person.  For example, the doctor may need to
+know how the concentration of an antibiotic will vary at a target site
+with time.  To be effective, the concentration must be high enough for
+long enough to kill the invading bacteria, but not so high as to
+damage healthy tissues.
+<br/><br/>
+We can model the amount of the drug by charge and the concentration of
+the drug by voltage.  Thus, we get a very simple model:
+<center>
+<img src="/static/circuits/norton-capacitor.gif" />
+</center>
+\(I\) models the rate of injection of the drug into the body.
+<br/>
+\(v_C\) models the concentration of the drug in the body.
+<br/>
+\(1/R\) models the rate of elimination of the drug.
+<br/>
+\(C\) models the size of the body.
+<br/><br/>
+Of course, this model is very crude, but it can be elaborated.  With
+more circuitry we could model the concentrations in the blood, the
+elimination in the kidneys, the concentrations in 
+various organs, the degradation of the drug in the liver, the
+elimination of the degraded products by the kidneys, etc.  So this can
+be very complicated, for another time!
+<br/><br/>
+If the time constants for these processes are on the order of hours,
+and the injection takes tens of seconds, it is apparent that the exact
+profile of the rate of injection does not matter.  If the doctor takes
+5 seconds or 10 seconds to inject the same amount of antibiotic, the
+profile of concentration in the blood should be about the same for
+times on the order of hours.  Thus, an injection can be modeled as an
+impulse.  (This is just a mental experiment: most antibiotics cannot be
+injected this way, they can be given intravenously, over a period of
+an hour, thus making a pulse rather than an impulse.)
+<br/><br/>
+So, let's do some numbers.
+Consider the consequences of injecting \(Q=$Qm\)mg of 
+<a href="http://en.wikipedia.org/wiki/Ciprofloxacin">cipro</a>
+into a \(C=70\)kg person.  Assume
+<br/>
+The person is entirely made of water, which weighs 1kg/L.
+<br/>
+By the end of the injection the antibiotic is uniformly 
+distributed in all of the body tissues.
+<br/><br/>
+What is the initial concentration after the injection \(v_C(0_+)\), of the
+antibiotic in the body, in mg/L?
+<endouttext/>
+<numericalresponse answer="$vcpum">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+The half-life of the antibiotic in the person is about
+\(t_{h}=$thh\)Hours.  Thus, the concentration will drop to half of its
+initial value in that time.  What is the resistance, in seconds/liter, in our model
+circuit, that will produce this rate of loss of concentration?
+<endouttext/>
+<numericalresponse answer="$R">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+If the doctor wants to keep the concentration between 1/4 and 2/3 of
+the initial concentration, what is longest time, in hours, that may be
+allowed to elapse before a new injection is required?
+<endouttext/>
+<numericalresponse answer="$tnd">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What dose, in milligrams, will be required at that time to get the concentration back
+to 2/3 of the initial concentration?
+<endouttext/>
+<numericalresponse answer="$Q1m">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Note that now the doctor can repeat this calculation to determine how
+often he must give a this new dose to maintain the concentrations in
+the range he believes will be effective.
+<endouttext/>
+
+</problem>
+

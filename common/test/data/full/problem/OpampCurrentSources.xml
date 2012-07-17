@@ -1,0 +1,86 @@
+<!-- Op Amp Current Sources -->
+
+<problem>
+
+<script type="loncapa/python">
+VS = random.choice([15,16,17,18,19,20])
+
+im = random.choice([5,6,7,8,9,10]) #mA
+i =  float(im)*1e-3
+
+vc =  5
+v = float(vc)
+
+R = v/i
+
+RLmax = (float(VS) - R*i)/i
+
+A = 100
+
+RL = 500
+
+iactual = v*(A/(RL + R*(1+A)))
+</script>
+
+<startouttext/>
+We often need a precision current source in a circuit.  An operational
+amplifier gives us one way to make a precisely controlled current flow
+through a load whose properties are not precisely known.  The
+following handy circuit is often the answer.
+<center>
+<img src="/static/circuits/FloatingLoadCurrentSource.gif" />
+</center>
+For example, suppose that we need to put precisely \(i = $im\)mA
+through a load that presents a resistance but the value of the
+resistance is not well controlled.  Suppose also that we have a
+precision voltage source of \(v = $vc\)V, but this voltage source is
+pretty wimpy: it cannot supply more than 0.1mA without smoke coming
+out of it.  With the circuit shown above we can choose a resistor of
+resistance \(R\) that can accomplish this goal.
+<br/>
+First, assuming that the op amp is ideal (\(A = \infty\)) give the
+value of the resistance \(R\), in Ohms, that we need.
+<endouttext/>
+<numericalresponse answer="$R">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Of course, our real op amp is imperfect, in many ways.  For example, it
+is suspended between two power-supply rails with voltage \(\pm V_{S} =
+$VS\)V, so the real circuit is more like this:
+<center>
+<img src="/static/circuits/FloatingLoadCurrentSourcePower.gif" />
+</center>
+An op amp cannot put out a voltage that exceeds the
+power-supply rails.  But assume our op amp can reach the rails.
+Given the value of \(R\) that you deduced above,
+what is the maximum load resistance, in Ohms, that this
+current source can handle?
+<endouttext/>
+<numericalresponse answer="$RLmax">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Another problem is that the gain of the op amp is really finite.  
+Suppose that \(A = $A\).  Using the value of \(R\) that you computed
+above, and assuming a load resistance of \($RL\Omega\),
+what is the actual current, in Amperes, that will go through the load?
+Please give your answer to within 0.1% of the exact answer.
+<endouttext/>
+<numericalresponse answer="$iactual">
+    <responseparam type="tolerance" default="0.1%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+
+</problem>

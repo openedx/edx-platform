@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:ISmPG9Ry7Ow,1.0:qC4QAKu1JHg,1.25:3W2l2HuWf1E,1.50:te0983v-1vs" slug="S12V11_Solving_a_First-Order_Differential_Equation" showanswer="attempted" rerandomize="per_student" name="S12V11: Solving a First-Order Differential Equation"/>
+  <customtag tag="S12" slug="discuss_816" showanswer="attempted" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="513" slug="book_817" showanswer="attempted" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="12" slug="slides_818" showanswer="attempted" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

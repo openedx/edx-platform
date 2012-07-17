@@ -1,0 +1,41 @@
+<problem>
+
+<script type="loncapa/python">
+r1=random.randrange(1,10,1)
+r2=random.randrange(1,10,1)
+r3=random.randrange(1,10,1)
+i=random.randrange(1,10,1)
+rthev=1/(1/float(r3)+1/float(r1+r2))
+vthev=i*(1/float(r2)+1/float(r1+r3))
+power=i*i/(1/float(r2)+1/float(r1+r3))
+</script>
+
+<startouttext /> 
+Take a resistor network with R1=$r1 ohms, R2=$r2 ohms, R3=$r3 ohms,
+and I=$i amps:
+<center>
+<img src="/static/circuits/thevenin.png" />
+</center>
+Assuming the output is disconnected, what is the resistance seen at the output?
+<endouttext />
+
+<numericalresponse answer="$rthev">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext /> 
+<br />
+
+Feynmann criticised instructors who, either out of ignorance or out of
+carelessness, gave unrealistic problems or examples. Try to figure out
+if we're guilty of this. How much power is dissipated in this network?
+
+<endouttext />
+
+<numericalresponse answer="$power">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

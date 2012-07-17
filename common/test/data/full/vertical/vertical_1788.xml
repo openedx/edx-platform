@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:yJ9ZV4im1q4,1.0:48PDMyhYVQY,1.25:2tOqM-zBxnE,1.50:Q5Kr_uhmtxE" slug="S25V4_Static_analysis_of_positive_feedback_circuit" rerandomize="per_student" name="S25V4: Static analysis of positive feedback circuit"/>
+  <customtag tag="S25" slug="discuss_1789" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="869" slug="book_1790" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1791" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

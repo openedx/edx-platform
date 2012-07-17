@@ -1,0 +1,116 @@
+<problem><script type="loncapa/python">
+
+#VDD = 50.0
+#VDD = 150.0
+VDD = float(random.randrange(50, 150, 5))
+
+#RL = 82.0
+#RL = 120.0
+RL = random.choice([82.0, 100.0, 120.0])
+
+RS = 22.0
+
+VI = 6.5
+
+
+VT=2.0
+K=2.0
+
+DELTA = math.sqrt(1+2*K*RS*(VI-VT))
+ID = (1+K*RS*(VI-VT)-DELTA)/(K*RS*RS)
+VO = VDD - RL*ID
+
+Vup = VDD - VO
+
+
+
+vim = 1.0
+vi = 0.001*vim
+dvodvi = (RL*(1-DELTA))/(RS*DELTA)
+vo = dvodvi * vi
+vom = 1000.0*vo
+
+dvodvis = "-((d-1)/d)*(RL/RS)"
+limitgain = "-RL/RS"
+</script><startouttext/>
+The figure shows a circuit for a voltage amplifier.  You will notice
+that it is just a slight modification of the Source Follower we have
+been studying: we added a resistor in the drain circuit and took our
+output from the drain rather than the source.
+<center><img src="/static/circuits/common-source-degeneration.gif"/></center>
+Assume that the power supply voltage \(V_{DD} = $VDD\)V, and the
+resistances \(R_S=$RS\Omega\) and \(R_L=$RL\Omega\). 
+Also assume that \(K=$K\)A/V\(^2\) and \(V_T=$VT\)V.
+<endouttext/>
+
+<startouttext/>
+<br/><br/>
+If the bias input voltage \(V_I &lt; V_T\) what is the output bias voltage
+\(V_O\), in Volts?
+<br/>
+\(V_O\) = 
+<endouttext/>
+<numericalresponse answer="$VDD"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/><br/>
+In the rest of this problem assume the input bias voltage \(V_I = $VI\) 
+<endouttext/>
+<startouttext/>
+<br/>
+What is the bias current \(I_D\), in Amperes?
+<br/>
+\(I_D\) = 
+<endouttext/>
+<numericalresponse answer="$ID"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the output bias voltage \(V_O\), in Volts?
+<br/>
+\(V_O\) = 
+<endouttext/>
+<numericalresponse answer="$VO"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/><br/>
+Now, let's consider the incremental behavior of this circuit for the
+bias conditions you have determined.
+<endouttext/>
+<startouttext/>
+<br/>
+What is the small-signal gain of this amplifier \(\frac{v_o}{v_i}\)?
+<br/>
+ \(\frac{v_o}{v_i}\) = 
+<endouttext/>
+<numericalresponse answer="$dvodvi"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Now let's do some algebra.  To make things a bit easier let's define
+<br/><br/>
+\(d = \sqrt(1 + 2 K R_s (V_{IN} - V_T))\)
+<br/><br/>
+In the space provided below write an algebraic expression for the 
+small-signal gain \(\frac{v_o}{v_i}\) in terms of \(R_L\), \(R_S\),
+and \(d\).  (Be careful, algebraic expressions can be case sensitive!)
+<endouttext/>
+<formularesponse type="cs" samples="RL,RS,d@1,1,1:3,3,3#10" answer="$dvodvis"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+Now, suppose we imagine a transistor with very large \(K\).  Of
+course, we cannot really make it infinite, but we can consider the
+limit as \(K\rightarrow\infty\).  What is the small-signal gain in
+that limit?  Write an algebraic expression here.
+<endouttext/>
+<formularesponse type="cs" samples="RL,RS,d@1,1,1:3,3#10" answer="$limitgain"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+
+<startouttext/>
+<br/>
+You should have gotten a very cool answer here!  Think about this carefully.
+<endouttext/>
+
+</problem>

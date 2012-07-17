@@ -1,0 +1,186 @@
+<!-- Second-order Transients: cjt 4/4/12 -->
+
+<problem>
+
+<startouttext />
+
+In this lab we'll be exploring the properities of <i>second-order
+circuits</i>, i.e., circuits with two energy storage elements.  You
+may find it useful to review <A href="/book-shifted/625">Chapter
+12</A> in the text.
+
+<br/><br/>Figure 1 below shows the circuit we'll be using to explore
+the step response of an RLC circuit.  The voltage source produces a \(1V\)
+step at \(t=0\).  Initially the resistor has been set to \(0\Omega\).
+We'll be probing the voltage across the capacitor, which will indicate
+the amount of charge on the plates of the capacitor (\(q=Cv\)), and the
+current through the inductor, which will indicate the flux linkage
+of the magnetic field of the inductor (\(\lambda=Li\)).
+
+<center>
+<input width="400" type="hidden" height="200" id="schematic1" parts="s,a" analyses="tran" class="schematic" name="RLC"
+value="[[&quot;g&quot;,[32,80,0],{&quot;_json_&quot;:0},[&quot;0&quot;]],[&quot;c&quot;,[144,32,0],{&quot;name&quot;:&quot;C&quot;,&quot;c&quot;:&quot;10p&quot;,&quot;_json_&quot;:1},[&quot;3&quot;,&quot;0&quot;]],[&quot;r&quot;,[144,32,5],{&quot;name&quot;:&quot;R&quot;,&quot;r&quot;:&quot;0&quot;,&quot;_json_&quot;:2},[&quot;3&quot;,&quot;1&quot;]],[&quot;v&quot;,[32,32,0],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;step(0,1,0,1n)&quot;,&quot;_json_&quot;:3},[&quot;4&quot;,&quot;0&quot;]],[&quot;l&quot;,[32,32,3],{&quot;name&quot;:&quot;L&quot;,&quot;l&quot;:&quot;20m&quot;,&quot;_json_&quot;:4},[&quot;4&quot;,&quot;2&quot;]],[&quot;s&quot;,[144,32,0],{&quot;color&quot;:&quot;blue&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:5},[&quot;3&quot;]],[&quot;w&quot;,[144,80,32,80]],[&quot;a&quot;,[80,32,0],{&quot;color&quot;:&quot;red&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:7},[&quot;2&quot;,&quot;1&quot;]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;50u&quot;,&quot;1000&quot;]]"/>
+<br/>Figure 1.  RLC Circuit driven by a voltage step
+</center>
+
+Run a \(50\mu{}s\) TRAN simulation on the circuit.  You'll see that
+the energy imparted by the voltage step oscillates back and forth
+between the flux of the inductor and the charge of the capacitor
+(as indicated by the oscillating voltage across the capacitor and
+the oscillating current through the inductor).
+
+<br/><br/><img src="/static/circuits/Lab9_1.png" width="250" style="margin-left:5px;float:right;"/>
+Leaving the inductance \(L\) as-is, adjust the capacitance \(C\) so
+that the frequency of oscillation is \(100\textrm{ kHz}\) with a period of \(10\mu{}s\).
+You can do this by experimentation, but a more effective approach would
+be to use <A href="/book-shifted/641">Equation 12.45</A> to compute the
+correct value for \(C\) given \(L\) and the desired \(\omega_0\).  Note
+that the units of \(\omega_0\) are in radians/sec, so you'll have to
+convert Hz to radians/sec using \(1\textrm{Hz}=2\pi\textrm{ rad/s}\).
+Your plots should like those shown to the right.
+
+<br/><br/>Please enter the adjusted capacitance \(C\) below:
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Adjusted capacitance <i>C</i> (in farads):
+<numericalresponse answer="126.5e-12">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<img src="/static/circuits/Lab9_2.png" width="250" style="margin-left:5px;float:right;"/>
+Keeping the adjusted \(C\), now adjust the resistance \(R\) so that
+the system is just operating in the over-damped region, i.e., so that
+the voltage across the capacitor makes a single \(0\rightarrow{}1\)
+transition, never exceeding 1V.  Again you can use the analysis
+in <A href="/book-shifted/647">Section 12.2.2</A> to compute the \(R\)
+necessary to produce a plot like that to the right.  Hint: if there's
+any voltage sample that is greater than 1V, the voltage scale will
+have a maximum of 2V, so one quick way to tell if the voltage is
+staying less than or equal to 1V is when the maximum value on the
+voltage scale is 1V.
+
+<br/><br/>Please enter the adjusted resistance \(R\) below:
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Adjusted resistance <i>R</i> (in ohms):
+<numericalresponse answer="25000">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+Now let's use the properties of second-order systems to build a <i>boost converter</i>, a DC-to-DC
+power supply useful where high voltages are required but not directly available.  Powering the
+flash bulb in a camera is one such example.  A boost converter circuit is shown in Figure 2.  In
+this case the supply voltage is \(3V\) and the goal is produce a relatively stable supply of
+\(6V\) to drive a load, here represented as a \(1k\Omega\) resistor.  Your task to is adjust \(L\),
+\(C\) and the duty cycle \(D\) of the square wave controlling the MOSFET switch so that the
+output voltage falls between \(5.9V\) and \(6.1V\) (6V with a maximum of 0.1V ripple).
+
+<endouttext />
+
+<schematicresponse>
+<startouttext />
+<center>
+<schematic height="270" width="700" parts="s,a" analyses="dc,tran"
+submit_analyses="{&quot;tran&quot;:[[&quot;output&quot;,0.0097,0.0098,0.0099]]}"
+initial_value="[[&quot;w&quot;,[88,72,136,72]],[&quot;w&quot;,[40,120,88,120]],[&quot;w&quot;,[160,120,88,120]],[&quot;w&quot;,[240,120,296,120]],[&quot;g&quot;,[40,120,0],{&quot;_json_&quot;:4},[&quot;0&quot;]],[&quot;s&quot;,[272,32,0],{&quot;color&quot;:&quot;cyan&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:5},[&quot;output&quot;]],[&quot;w&quot;,[176,32,160,32]],[&quot;w&quot;,[296,48,296,32]],[&quot;w&quot;,[296,120,296,96]],[&quot;w&quot;,[160,120,240,120]],[&quot;w&quot;,[240,96,240,120]],[&quot;w&quot;,[240,32,240,48]],[&quot;w&quot;,[224,32,240,32]],[&quot;r&quot;,[296,48,0],{&quot;name&quot;:&quot;Rload&quot;,&quot;r&quot;:&quot;1k&quot;,&quot;_json_&quot;:13},[&quot;output&quot;,&quot;0&quot;]],[&quot;d&quot;,[176,32,3],{&quot;name&quot;:&quot;&quot;,&quot;area&quot;:&quot;100&quot;,&quot;type&quot;:&quot;normal&quot;,&quot;_json_&quot;:14},[&quot;3&quot;,&quot;output&quot;]],[&quot;c&quot;,[240,48,0],{&quot;name&quot;:&quot;C&quot;,&quot;c&quot;:&quot;1u&quot;,&quot;_json_&quot;:15},[&quot;output&quot;,&quot;0&quot;]],[&quot;w&quot;,[160,96,160,120]],[&quot;w&quot;,[160,32,160,48]],[&quot;w&quot;,[40,32,40,72]],[&quot;v&quot;,[88,72,0],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;square(0,3,30K,50)&quot;,&quot;_json_&quot;:19},[&quot;4&quot;,&quot;0&quot;]],[&quot;n&quot;,[160,48,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;1000&quot;,&quot;name&quot;:&quot;S1&quot;,&quot;_json_&quot;:20},[&quot;3&quot;,&quot;4&quot;,&quot;0&quot;]],[&quot;l&quot;,[80,32,3],{&quot;name&quot;:&quot;L&quot;,&quot;l&quot;:&quot;2m&quot;,&quot;_json_&quot;:21},[&quot;1&quot;,&quot;3&quot;]],[&quot;v&quot;,[40,72,0],{&quot;name&quot;:&quot;VIN&quot;,&quot;value&quot;:&quot;dc(3)&quot;,&quot;_json_&quot;:22},[&quot;2&quot;,&quot;0&quot;]],[&quot;a&quot;,[56,32,0],{&quot;color&quot;:&quot;magenta&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:23},[&quot;2&quot;,&quot;1&quot;]],[&quot;w&quot;,[80,32,72,32]],[&quot;w&quot;,[40,32,56,32]],[&quot;w&quot;,[160,32,128,32]],[&quot;L&quot;,[296,32,3],{&quot;label&quot;:&quot;output&quot;,&quot;_json_&quot;:27},[&quot;output&quot;]],[&quot;w&quot;,[240,32,272,32]],[&quot;w&quot;,[296,32,272,32]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;10m&quot;,&quot;1000&quot;]]"/>
+<br/>Figure 2.  Boost converter
+</center>
+<endouttext />
+
+<answer type="loncapa/python">
+# for a schematic response, submission[i] is the json representation
+# of the diagram and analysis results for the i-th schematic tag
+
+def get_tran(json,signal):
+  for element in json:
+    if element[0] == 'transient':
+      return element[1].get(signal,[])
+  return []
+
+output = get_tran(submission[0],'output')
+ 
+answer = [[0.0097, 6.0],
+          [0.0098, 6.0],
+          [0.0099, 6.0]]
+
+okay = True
+for (at,av) in answer:
+  for (t,v) in output:
+    if at==t and abs(av - v) &lt; 0.1:
+      # found a good match for this answer, on to the next one
+      break
+  else:
+    #print 'check',at,av
+    # no submission matched answer, complain
+    okay = False;
+    break;
+
+correct = ['correct' if okay else 'incorrect']
+</answer>
+</schematicresponse>
+
+<startouttext />
+
+The operation of the boost converter is analyzed in detail in
+<A href="/book-shifted/671">Example 12.10</A> of the text.  The
+circuit above differs from the example in how the switches are
+implemented.  \(S_1\) in the Example is implemented by a MOSFET
+switch, where a square-wave voltage is used to turn the switch
+on and off.  \(S_2\) in the Example is implemented using a
+diode, which conducts when the voltage on the inductor side
+sufficiently exceeds the voltage on the capacitor side.  In the
+steady state this happens when \(S1\) is off, just what we
+wanted for the correct operation of the circuit.
+
+<br/><br/>The boost converter operates in a two-state cyclic
+manner. During the first state, the MOSFET is turned on. This connects
+the inductor across the power supply, so the inductor current \(i_L\)
+increases. During this time, the diode is reverse biased and so
+behaves as an open circuit, disconnecting the capacitor and load
+resistor from the remainder of the circuit. In this state, the
+capacitor powers the load resistor, discharging in the process.
+
+<br/><br/> During the second state, the MOSFET is turned off but
+the inductor current cannot go to zero instaneously.  So the
+voltage on the diode increases making the diode
+forward biased and the decreasing current from the inductor flows through the
+diode to power the load and simultaneously replenish the charge in the
+capacitor. The inductor flux diminishes in the process.
+
+<br/><br/> This cycle repeats itself indefinitely. Let the duration of
+the first state be \(DT\), and the duration of the second state be
+\((1 − D)T\) , where \(D\) is the fraction of a cycle for which the
+square wave controlling the MOSFET is high (sometimes called
+the <i>duty cycle</i>) and \(T\) is the switching period (set to
+\(1/30 \textrm{kHz}\) in the circuit above).
+
+<br/><br/>Try a \(2ms\) TRAN simulation to see how the circuit works, paying
+attention to the current through the inductor and the output voltage.
+Start by adjusting the capacitance \(C\) so that the ripple on the
+output voltage is \(0.1V\) or less using the equation
+\(i\Delta{}t=C\Delta{}v\) to help choose the appropriate value.  Here
+\(i\) is the desired load current \(6V/1k\Omega\), \(\Delta{}t\) is the
+discharge time in one cycle \(DT\) and \(\Delta{}v\) is the desired ripple \(0.1V\).
+
+<br/><br/>Now choose values for the inductance \(L\) and duty cycle
+\(D\) to produce the desired output voltage.  As explained in the
+text, the average output voltage is roughly \(\textrm{VIN}/(1-D)\), so
+increasing the duty cycle will raise the output voltage.  One wants to
+choose \(D\) and the cycle time \(T\) so that the inductor current reaches
+zero just as the next cycle begins.
+
+<br/><br/>Experiment with the various parameters until the output
+voltage is \(6V\) with a maximum \(0.1V\) ripple.  As a final check,
+perform a \(10ms\) TRAN simulation and then click CHECK.  The on-line
+system will be veryifying that the output voltage meets the specification
+for \(9.5ms \lt t \lt 10ms\).
+
+<endouttext />
+
+</problem>

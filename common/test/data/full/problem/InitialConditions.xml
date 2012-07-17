@@ -1,0 +1,83 @@
+<problem>
+
+<script type="loncapa/python">
+def FOS(tau, start, goal, deltat):
+   return(goal+(start-goal)*math.exp(-(deltat/tau)))
+
+R  = 100.0 #Ohm
+Cu = 10.0 #uF
+C  = Cu*1e-6
+Im = 10 #mA
+I0  = Im*1e-3
+Qu = -20 #uC
+Q  = Qu*1e-6
+
+Vgoal = R*I0
+
+tm1m = -1.0 #ms
+tm1  = tm1m*1e-3
+vm1  = 3.0  #V
+
+t0  = 0
+vm  = FOS(R*C, vm1, Vgoal, t0-tm1)
+vp  = vm + Q/C
+
+print "vm=", vm, " ", "vp=", vp
+
+tp1m = +1.0 #ms
+tp1  = tp1m*1e-3
+vp1  = FOS(R*C, vp, Vgoal, tp1-t0)
+
+print "vp1=", vp1
+</script>
+
+<startouttext/>
+Consider the following circuit:
+<center>
+<img src="/static/circuits/norton-capacitor.gif" />
+</center>
+Let \(R = $R\Omega\) and \(C = $Cu\mu\)F.
+Suppose time is measured in milliseconds and we know that
+\(I(t) = I_0 + Q\delta(t)\)A, where \(I_0 = $Im\)mA and \(Q = $Qu\mu\)C.
+Also, assume that we measured the voltage across the capacitor at \(t=
+$tm1m\)milliseconds, before the impulse is delivered: \(v_C($tm1m) = $vm1\)V.
+<br/><br/>
+What is the voltage, in Volts, across the capacitor at \(t=0_-\), a time
+infinitesimally before the impulse is delivered?
+<endouttext/>
+<numericalresponse answer="$vm">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+What is the voltage, in Volts, across the capacitor at \(t=0_+\), a time
+infinitesimally after the impulse is delivered?
+<endouttext/>
+<numericalresponse answer="$vp">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+What is the voltage, in Volts, across the capacitor at \(t=$tp1m\)ms,
+after the impulse is delivered?
+<endouttext/>
+<numericalresponse answer="$vp1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>
+
+
+<!--
+<br/><br/>
+<img src="/static/circuits/thevenin-inductor.gif" />
+, and  \(L= 0.1\)H.
+and \(V(t) = 1 + B\delta(t)\)V. 
+ and \(i_L(-1) = 3\)A. 
+-->

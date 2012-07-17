@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:rGfpVoJUwHU,1.0:JFde2zCDTZw,1.25:PPcb_NymBAE,1.50:2293CUqNgCQ" slug="S25V8_Dynamics_of_Op_Amp" rerandomize="per_student" name="S25V8: Dynamics of Op Amp"/>
+  <customtag tag="S25" slug="discuss_1805" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="869" slug="book_1806" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1807" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

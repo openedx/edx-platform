@@ -1,0 +1,116 @@
+<!-- Realistic LC Tank -->
+
+<problem>
+
+<script type="loncapa/python">
+
+# Loopstick from Graymark 536 AM Radio Kit
+Lm = 0.65 #mH Main coil measured
+L  = Lm*1e-3
+RL = 4.0  #Ohms Main coil measured
+n   = 7 # turns ratio
+# Link coil inductance
+Ll  = L/n**2
+# Conservative load estimate: (base of Q2, emitter resistor 1.5k, base bias pullup 470k)
+Rload = 1e4 #Ohms
+RC = Rload*n**2
+RCk = RC/1e3
+
+
+fk1 = float(random.randrange(590,1030,30))
+f1  = fk1*1e3
+omega01 = 2.0*math.pi*f1
+C1  = 1.0/(L*omega01**2)
+C1p = C1*1e12
+do1 = (RL/L + 1/(RC*C1))
+df1k = do1/(2*math.pi*1e3)
+
+fk2 = float(random.randrange(1030,1680,30))
+f2  = fk2*1e3
+omega02 = 2.0*math.pi*f2
+C2  = 1.0/(L*omega02**2)
+C2p = C2*1e12
+do2 = (RL/L + 1/(RC*C2))
+df2k = do2/(2*math.pi*1e3)
+
+deltaomega = "(RL/L + 1/(RC*C))"
+</script>
+
+<startouttext/>
+Parallel resonant "tank" circuits are common in radio equipment.  But
+unfortunately there is always resistance that prevents them from being
+perfect: in every real inductor, the wire that makes up the inductance
+has some resistance, and there may be leakage in the capacitor that
+can be modeled as a resistance.  Also, the Norton resistance of the
+system connected to the tank circut looks like a leakage through the
+capacitor.  So a realistic model for a tank circuit is the following:
+<center>
+<img src="/static/circuits/TankCircuit.gif" />
+</center>
+In the space provided below write an algebraic expression in terms of
+the device parameters for the bandwidth \(\Delta\omega\) of the
+impedance \(Z\) looking into this tank circuit.
+<endouttext/>
+<formularesponse type="cs" samples="RL,RC,L,C@1,1,1,1:3,3,3,3#10" answer="$deltaomega">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+The antenna tank of a 
+<a href="https://mmm1127.verio-web.com/grayma/catalog/536nb.htm"> 
+Graymark 536 Radio Kit </a>
+has an inductance \(L \approx $Lm\)mH.  The resistance of the inductor
+\(R_L \approx $RL\Omega\).  The equivalent resistance across the
+capacitor is \(R_C \approx $RCk\)k\(\Omega\).  The capacitor is
+variable, for tuning.
+<endouttext/>
+
+<startouttext/>
+If we tune to a station at \(f = $fk1\)kHz what is the capacitance, in picoFarads,
+of the tuning capacitor?
+<endouttext/>
+<numericalresponse answer="$C1p">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+What is the bandwidth, in kHz, of the tank at \(f = $fk1\)kHz?
+<endouttext/>
+<numericalresponse answer="$df1k">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+If next we tune to a station at \(f = $fk2\)kHz what is the capacitance, in picoFarads,
+of the tuning capacitor?
+<endouttext/>
+<numericalresponse answer="$C2p">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+What is the bandwidth, in kHz, of the tank at \(f = $fk2\)kHz?
+<endouttext/>
+<numericalresponse answer="$df2k">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+So it is apparent that this is not the only circuit in the radio that
+selects the desired station from stations on adjacent channels.
+<endouttext/>
+
+</problem>

@@ -1,0 +1,141 @@
+<problem>
+
+<script type="loncapa/python">
+VS = 5.0
+VOH = 4.5
+VIH = 4.0
+VIL = 1.5
+VOL = 1.0
+VG  = 0.0
+
+VLNM = VIL - VOL
+VHNM = VOH - VIH
+VFOR   = VIH -VIL
+
+VT = 2.0
+RON = 100*float(random.randrange(50,200,10))
+
+RPuI = RON*(VS-VOL)/VOL
+RPuA = 2*RPuI
+RPuO = RPuI
+
+PI = (VS**2)/(RPuI+RON)
+PA = (VS**2)/(RPuA+2*RON)
+PO = (VS**2)/(RPuO+RON/2)
+</script>
+
+<startouttext/>
+For many purposes of gate design, we can model a MOSFET used as a
+switch simply as as an ideal switch and an "on-state resistor"
+\(R_{ON}\).  This is the SR model.
+
+Assuming this model for the MOSFET, consider the inverter in the
+figure.  This inverter is intended to be used as an element in a logic
+family with NAND and NOR gates.
+<center>
+<img src="/static/circuits/mos-gates.gif" />
+</center>
+The static discipline required for this family is:
+<br/>
+\(V_S=$VS\)V, \(V_{OH}=$VOH\)V, \(V_{IH}=$VIH\)V, \(V_{IL}=$VIL\)V,
+\(V_{OL}=$VOL\)V.
+<br/>
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the low noise margin (in Volts)?
+<endouttext/>
+<numericalresponse answer="$VLNM">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the high noise margin (in Volts)?
+<endouttext/>
+<numericalresponse answer="$VHNM">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the width of the forbidden region (in Volts)?
+<endouttext/>
+<numericalresponse answer="$VFOR">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/><br/>
+Suppose that the threshold voltage for the MOSFET is \(V_{T}=$VT\)V and
+\(R_{ON}=$RON\Omega\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the minimum value of the pullup resistor \(R_{PuI}\) (in Ohms) for which
+this inverter can obey the required static discipline?
+<endouttext/>
+<numericalresponse answer="$RPuI">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Now, consider the NAND gate of this family.
+What is the minimum value of the pullup resistor \(R_{PuA}\) (in Ohms) for which
+this inverter can obey the required static discipline?
+<endouttext/>
+<numericalresponse answer="$RPuA">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+How about the NOR gate of this family.
+What is the minimum value of the pullup resistor \(R_{PuO}\) (in Ohms)
+for which this inverter can obey the required static discipline?
+<endouttext/>
+<numericalresponse answer="$RPuO">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Assume that we implemented this family with the minimum pullup
+resistors that you have already calculated.
+<br/>
+What is the maximum power (in Watts) consumed by the inverter?
+<endouttext/>
+<numericalresponse answer="$PI">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the maximum power (in Watts) consumed by the NAND?
+<endouttext/>
+<numericalresponse answer="$PA">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the maximum power (in Watts) consumed by the NOR?
+<endouttext/>
+<numericalresponse answer="$PO">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

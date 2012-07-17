@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:xhVYSNuuhG8,1.0:SrGdVy9-WFw,1.25:plzn7yASTe4,1.50:MbitGjYzv8s" slug="S13V5_Analyzing_a_First-Order_RL_Circuit" rerandomize="per_student" name="S13V5: Analyzing a First-Order RL Circuit"/>
+  <customtag tag="S13" slug="discuss_871" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="517" slug="book_872" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="13" slug="slides_873" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

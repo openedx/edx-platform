@@ -1,0 +1,127 @@
+<!-- An exercise for solving a network with a nonlnear element -->
+
+<problem>
+
+<startouttext/>
+<br/><br/>
+Lem E. Tweakit had a problem.  He bought a mystery apparatus at an
+electrical flea market.
+One element in the apparatus was unmarked and not
+obviously identified, but when he measured its behavior in a curve
+tracer he found that it was a nonlinear resistor with the
+characteristic shown in the figure:
+<center>
+<img src="/static/circuits/nonlinear.gif" />
+</center>
+Lem was afraid to test this device with a current greater than 2mA.
+<endouttext/>
+<startouttext/>
+<br/>
+What is the resistance (in kOhms) when the current is small: less than
+1mA? 
+<endouttext/>
+<numericalresponse answer="1">
+    <responseparam type="tolerance" default="5%" name="tol"
+    description="Numerical Tolerance" /> 
+    <textline />
+</numericalresponse>
+<startouttext/>
+<br/>
+What is the resistance (in kOhms) when the current is outside that
+range? 
+<endouttext/>
+<numericalresponse answer="2">
+    <responseparam type="tolerance" default="5%" name="tol"
+    description="Numerical Tolerance" /> 
+    <textline />
+</numericalresponse>
+
+<script type="loncapa/python">
+Vs = 5.0
+Rs = random.choice([4700.0, 5600.0, 6800.0, 8200.0])
+Rp = random.choice([4700.0, 5600.0, 6800.0, 8200.0])
+
+#Shaya
+#Rs = 8200.0
+#Rp = 6800.0
+
+#GJS
+#Rs = 1000.0
+#Rp = 1000000.0
+
+#compute Load Line
+Vth = Rp*Vs/(Rs+Rp)
+Rth = Rs*Rp/(Rs+Rp)
+Isc = Vth/Rth
+
+#print "Vth", Vth
+#print "Rth", Rth
+#print "Isc", Isc
+
+
+#Element has breakpoint at Ib,Vb
+Ib = 0.001
+Vb = 1.0
+
+#For i smaller than Ib, slope is 1 on graph.
+R1 = Vb/Ib
+
+#intersection with Load Line
+Io1 = Vth/(R1 + Rth)
+Vo1 = R1*Io1
+
+#print "Io1", Io1
+#print "Vo1", Vo1
+
+#For i larger than Ib, slope is 2 on graph.
+R2 = 2000
+#Voltage offset is 
+Voff = Vb - R2*Ib
+
+#Equation of device in outer region
+#v = R2*i + Voff
+
+Io2 = (Vth - Voff)/(R2 + Rth)
+Vo2 = R2*Io2 + Voff
+
+if (Io1 &lt; Ib):
+  Iop = Io1
+  Vop = Vo1
+else:
+  Iop = Io2
+  Vop = Vo2
+</script>
+
+<startouttext/>
+<br/><br/>
+In the circuit that Lem found this the strange element, it was
+connected to a power supply of \(V_s=$Vs\)V with a series resistance
+of \(R_s=$Rs\Omega\) and it was shunted with a parallel resistance of
+\(R_p=$Rp\Omega\).
+<center>
+<img src="/static/circuits/Lem-problem.gif" />
+</center>
+<endouttext/>
+<startouttext/>
+<br/>
+What is the current (in Amperes) through the strange object when it is
+in operation in the circuit?
+<endouttext/>
+<numericalresponse answer="$Iop">
+    <responseparam type="tolerance" default="5%" name="tol"
+    description="Numerical Tolerance" /> 
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the voltage (in Volts) across the strange object when it is in
+operation in the circuit?
+<endouttext/>
+<numericalresponse answer="$Vop">
+    <responseparam type="tolerance" default="5%" name="tol"
+    description="Numerical Tolerance" /> 
+    <textline />
+</numericalresponse>
+
+</problem>

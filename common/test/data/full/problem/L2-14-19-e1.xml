@@ -1,0 +1,97 @@
+<!--  
+This is a KVL and KCL exercise, to be used after L2-14-19.
+Method 3 - the Node Method
+-->
+
+<problem>
+
+<script type="loncapa/python">
+V = 5.0
+I = 3.0
+
+R=float(random.randrange(1,10,1))
+R1 = R + 1
+R2 = R + 3
+
+e = (R2/(R1+R2))*V + (R1*R2/(R1+R2))*I
+v2 = e
+i1 = (V-e)/R1
+
+PV = i1*V
+PI = v2*I
+PR1 = (i1**2)*R1
+PR2 = (v2**2)/R2
+
+en = 0-e
+</script>
+
+
+<startouttext />
+In the network shown you are given that \(V=$V\)V and \(I=$I\), and that the
+resistors have the resistances \(R_1 = $R1 \Omega\) and \(R_2 = $R2 \Omega\).
+<center>
+<img src="/static/circuits/fnode.gif" />
+</center>
+There are three node potentials labeled in this network \(e_1\),
+\(e_2\), and \(e_3\).  We can choose any node to be the reference node
+(the ground) from which voltages are measured, setting the
+corresponding node potential to zero.  (Only voltages, which are
+differences of node potentials, are physically meaningful.)
+Let's start by choosing the ground at the negative terminal of the
+voltage source, so \(e_3 = 0\).
+<endouttext />
+
+<startouttext />
+<br /> What is the value (in Volts) of the node potential \(e_1\)?
+<endouttext />
+<numericalresponse answer="$V">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> Now there is one remaining unknown node, with potential \(e_2\).
+Write a node equation for that node.  What is the value (in Volts) of \(e_2\)?
+<endouttext />
+<numericalresponse answer="$e">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> What is the voltage (in Volts) \(v_2\) across the resistor with resistance \(R_2\)?
+<endouttext />
+<numericalresponse answer="$v2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> <br /> Now, let's start again.  Suppose we chose a different node as the
+ground reference.  Let's choose the top terminal of the current
+source, where it connects to the two resistors.  So now \(e_2 = 0\),
+and there are two remaining nodes.  But if we know \(e_3\) then we
+know that \(e_1 = e_3 + V\), so we still have only one unknown.
+What is the value (in Volts) of the node potential \(e_3\)?
+<endouttext />
+<numericalresponse answer="$en">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> Now, what is the voltage (in volts) \(v_2\) across the resistor with resistance \(R_2\)?
+<endouttext />
+<numericalresponse answer="$v2">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> Notice that the voltage across the resistor is the same, independent
+of the choice of the node chosen for the reference potential.  Indeed, the physics does
+not care about the potentials, only the voltages that are their differences.
+<endouttext />
+
+
+</problem>

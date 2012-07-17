@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S12E1_Scaling_Capacitors" slug="S12E1_Scaling_Capacitors" showanswer="attempted" rerandomize="per_student" name="S12E1: Scaling Capacitors"/>
+  <customtag tag="S12E1" slug="discuss_787" showanswer="attempted" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="461" slug="book_788" showanswer="attempted" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+</sequential>

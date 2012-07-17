@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S17E2_Characteristic_Equation" slug="S17E2_Characteristic_Equation" showanswer="attempted" rerandomize="false" name="S17E2: Characteristic Equation"/>
+  <customtag tag="S17" slug="discuss_1123">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="629" slug="book_1124">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1125">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,96 @@
+<problem>
+
+<script type="loncapa/python">
+global VT, K
+
+VT = 1.0
+K = 0.4
+
+# Bug in display of globals in XML
+VTd = VT
+Kd  = K
+
+def iD(vGS, vDS):
+  va = vGS - VT
+  if (va &lt; 0) or (va == 0) :
+     return(0)
+  elif (0 &lt; va) and (va &lt; vDS) :
+     return((K/2)*va**2)
+  else:
+     return(K*(va-vDS/2)*vDS)
+
+#vGS = 1.5
+#vDS = 2.5
+vGS = random.choice([1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8])
+vDS = random.choice([2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0])
+
+iDS = iD(vGS, vDS)
+im = 1000.0*iDS
+
+vDSmin = vGS-VT
+
+</script>
+
+
+<startouttext/>
+Joe found the following n-channel enhancement-mode MOSFET in a piece
+of apparatus he was working on.  The markings on it indicated that it
+was a
+<a href="http://www.vishay.com/docs/70868/70868.pdf"> TN0205A</a>,
+which has a threshold voltage \(V_T\approx $VTd\)V and
+\(K\approx $Kd\)A/V\(^2\), using the SCS model.
+<center>
+<img src="/static/circuits/MOSFET.gif" />
+</center>
+In operation, Joe measured the gate-to-source voltage \(v_{GS}=$vGS\)V
+and the drain-to-source voltage \(v_{DS}=2.5\)V.  
+<endouttext/>
+
+
+
+<startouttext/>
+<br/>
+What region is the MOSFET operating in?  Your answer should be one of
+"cutoff", "saturated", or "triode":
+<endouttext/>
+<customresponse>
+<startouttext/>
+<textline size="20" correct_answer="saturated" />
+<endouttext/>
+<answer type="loncapa/python">
+correct=['correct']
+try:
+  r = str(submission[0])
+except ValueError:
+  correct[0] ='incorrect'
+  r = '0'
+
+#print(r)
+
+if not(r=="saturated"):
+  correct[0] ='incorrect'
+</answer>
+</customresponse>
+
+<startouttext/>
+<br/>
+What is the approximate drain current \(i_{DS}\) (in mA) that Joe should expect?
+<endouttext/>
+<numericalresponse answer="$im">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the minimum value that \(v_{DS}\) may have (in Volts) for the MOSFET to
+be operating in saturation?
+<endouttext/>
+<numericalresponse answer="$vDSmin">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+
+</problem>

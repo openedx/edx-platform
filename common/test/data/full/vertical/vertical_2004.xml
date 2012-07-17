@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:4owCwdQUD2s,1.0:rf8vYE88DLk,1.25:afa4hYjej8k,1.50:AUpFscphjYc" slug="S28V13_Voltage_Drop_across_the_Parasitic_Inductor" name="S28V13: Voltage Drop across the Parasitic Inductor"/>
+  <customtag tag="S28" slug="discuss_2005">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="520" slug="book_2006">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="28" slug="slides_2007">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

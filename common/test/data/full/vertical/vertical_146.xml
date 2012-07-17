@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:X4xT8TqI-RA,1.0:wO-WqB_k9QQ,1.25:38euKuG1cUs,1.50:DyXplZMIb1Q" slug="S2V11_Matrix_formulation" rerandomize="per_student" name="S2V11: Matrix formulation"/>
+  <customtag tag="S2" slug="discuss_147" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="145" slug="book_148" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="2" slug="slides_149" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,62 @@
+<problem><script type="loncapa/python">
+V = 2.0
+I = 3.0
+
+R=float(random.randrange(1,10,1))
+R1 = R + 2
+R2 = R + 3
+
+e = (R2/(R1+R2))*V + (R1*R2/(R1+R2))*I
+v2 = e
+i1 = (V-e)/R1
+
+PV = i1*V
+PI = v2*I
+PR1 = (i1**2)*R1
+PR2 = (v2**2)/R2
+
+</script><startouttext/>
+In the network shown you are given that \(V=$V\)V, \(I=$I\)A,
+\(R_1=$R1 \Omega\), and \(R_2=$R2 \Omega\).
+<center><img src="/static/circuits/four.gif"/></center>
+<endouttext/>
+
+<startouttext/>
+What is the voltage (in Volts) \(v_2\) across the resistor with resistance \(R_2\)?
+<endouttext/>
+<numericalresponse answer="$v2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> What is the power (in Watts) dissipated by the resistor with resistance \(R_2\)?
+<endouttext/>
+<numericalresponse answer="$PR2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/> What is the current (in Amperes) \(i_1\) through the resistor with resistance \(R_1\)?
+<endouttext/>
+<numericalresponse answer="$i1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> What is the power (in Watts) dissipated by the resistor with resistance \(R_1\)?
+<endouttext/>
+<numericalresponse answer="$PR1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> What is the power (in Watts) supplied by the voltage source?
+<endouttext/>
+<numericalresponse answer="$PV"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> What is the power (in Watts) supplied by the current source?
+<endouttext/>
+<numericalresponse answer="$PI"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> You should observe that the sum of the power supplied by the sources
+is the sum of the power dissipated by the resistors.  If this is not
+true you have done something wrong.
+<endouttext/>
+
+
+</problem>

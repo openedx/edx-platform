@@ -1,0 +1,54 @@
+<problem><script type="loncapa/python">
+VsPeak = random.choice([7.5, 8.0, 8.5, 9.0, 9.5, 10.0])
+V1 = random.choice([2.0, 2.25, 2.5, 2.75, 3.0, 3.25])
+V2 = random.choice([2.0, 2.25, 2.5, 2.75, 3.0, 3.25])
+r = random.choice([4.7, 5.6, 6.8, 8.2])
+RL = 1000.0*r
+
+ID1Peak = (VsPeak - 2*V1)/RL
+ID2Peak = (VsPeak - 2*V2)/RL
+
+V2m = -V2
+</script><startouttext/>
+In the circuit shown there are two ideal diodes,
+two resistors, two DC voltage sources, 
+and an AC voltage source.
+<center><img src="/static/circuits/diode-limiter.gif"/></center>
+The resistors both have the resistance \(R=$r\)k\(\Omega\).
+The voltage of the DC sources is \(V_1=$V1\)V 
+and \(V_2=$V2\)V.
+<br/>
+An ideal diode has the characteristic shown:
+<center><img src="/static/circuits/ideal-diode.gif"/></center>
+<br/>
+The AC voltage source puts out a symmetrical triangle wave 
+that looks like:
+<center><img src="/static/circuits/triangle-wave.gif"/></center>
+The peak voltage of this waveform is \($VsPeak\)V.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the maximum positive voltage (in Volts) that can appear at \(v\)?
+<endouttext/>
+<numericalresponse answer="$V1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the maximum (negative) voltage (in Volts) that can appear at \(v\)?
+<endouttext/>
+<numericalresponse answer="$V2m"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the maximum current (in Amperes) that can go through diode D\(_1\)?
+<endouttext/>
+<numericalresponse answer="$ID1Peak"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the maximum current (in Amperes) that can go through diode D\(_2\)?
+<endouttext/>
+<numericalresponse answer="$ID2Peak"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:K2KMfgw1FmQ,1.0:26JPceJR2d4,1.25:Xt-8wLkRffo,1.50:W4UePzxrZdI" slug="S26V7_Total_energy_dissipated_in_T1_and_T2" rerandomize="per_student" name="S26V7: Total energy dissipated in T1 and T2"/>
+  <customtag tag="S26" slug="discuss_1889" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="603" slug="book_1890" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1891" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:cjK4OAiMXbc,1.0:ZCWXx0VfSes,1.25:42YfPV6JBY8,1.50:0j_yXDuAdNc" slug="S25V6_Equivalent_circuit_with_positive_feedback" rerandomize="per_student" name="S25V6: Equivalent circuit with positive feedback"/>
+  <customtag tag="S25" slug="discuss_1797" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="869" slug="book_1798" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1799" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

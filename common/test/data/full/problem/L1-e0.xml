@@ -1,0 +1,72 @@
+<!-- This problem is to help understand power and associated reference directions -->
+
+<problem>
+<script type="loncapa/python">
+PR = float(random.randrange(10,20,1))
+R = float(random.randrange(1,10,1))
+
+v = math.sqrt(R*PR)
+i = -v/R
+
+v_s = "{v:.3} V".format(v=v)
+i_s = "{i:.3} A".format(i=i)
+
+PN = v*i
+V0 = math.sqrt(2)*v
+</script>
+
+
+<startouttext />
+The picture shows a resistor connected to some unknown network N.
+The resistor is immersed in an isolated water bath, and its temperature is 
+observed and recorded.
+The resistor has resistance \(R=$R\Omega\).
+<center>
+<img src="/static/circuits/resistor-load.gif" />
+</center>
+<endouttext />
+
+<startouttext />
+<br /> By observing the rate of increase of the temperature in the water bath, it is
+determined that the power dissipated in the resistor is \($PR\)W.  
+<endouttext />
+<customresponse>
+<startouttext />
+<br />
+ Assuming that the voltage across the resistor is constant,
+ what is the voltage \(v\) (in Volts) across the resistor?
+ <br /> 
+ v: <textline size="5" correct_answer="$v_s" />
+ <br /> 
+ What is the current \(i\) (in Amperes) entering the network N from the resistor?
+ <br /> 
+ i: <textline size="5" correct_answer="$i_s" />
+<endouttext />
+<answer type="loncapa/python">
+va = 0 # This is a declaration
+ia = 0 # Look how explicit it is!
+
+def close_enuf(x, y):
+   epsilon = 0.025
+   return(((math.fabs(x - y))/(math.fabs(x)+math.fabs(y)+epsilon) &lt; epsilon))
+
+correct = ['correct', 'correct']
+
+try:
+   va = calc.evaluator({},{},submission[0])
+except ValueError:
+   correct[0] = 'incorrect'
+
+try:
+   ia = calc.evaluator({},{},submission[1])
+except ValueError:
+   correct[1] = 'incorrect'
+
+if not(close_enuf(va,v) or close_enuf(va,-v)):
+   correct[0] = 'incorrect'
+
+if va==0 or not(close_enuf(ia,(-math.copysign(v,va)/R))):
+   correct[1] = 'incorrect'
+</answer>
+</customresponse>
+</problem>

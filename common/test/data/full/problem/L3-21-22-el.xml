@@ -1,0 +1,78 @@
+<!--  
+This is a Norton exercise, to be used in L3
+  It should be using the same circuit as the previous sensor
+  exercise, with the same parameters.
+-->
+
+<problem>
+
+<script type="loncapa/python">
+# Sensor current is 100nA--10uA
+I = float(random.randrange(100,10000,1))/1e9
+Iu = I*1e6
+
+# Leakage resistance is 1MOhm--2MOhm
+Rp = float(random.randrange(10,20,1))*1e5
+RpM = Rp/1e6
+
+# Series resistance is between 10kOhm and 20kOhm
+Rs = float(random.randrange(10,20,1))*1e3
+RsK = Rs/1e3
+
+# Loaded by 100kOhm indicator circuit
+Rl = 1e5
+RlK = Rl/1e3
+
+Vt = I*Rp
+Rt = Rp+2*Rs
+In = Vt/Rt
+
+Inu = In*1e6
+
+RtM = Rt/1e6
+
+Vl = (Vt*Rl)/(Rl+Rt)
+</script>
+
+<startouttext />
+This is the same circuit as in the Thevenin exercise, with \(R_p=$RpM\)M\(\Omega\),
+ \(R_s=$RsK\)k\(\Omega\), and \(I=$Iu\mu\)A.
+<center>
+<img src="/static/circuits/sensor-norton.gif" />
+</center>
+In this case, we want to summarize with a Norton model
+<endouttext />
+
+<startouttext />
+<br />  What is the Norton current (in \(\mu\)A) \(I_N\) of the sensor?
+<endouttext />
+<numericalresponse answer="$Inu">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />  What is the Norton resistance (in M\(\Omega\)) \(R_N\) of the sensor?
+<endouttext />
+<numericalresponse answer="$RtM">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> <br /> Again, we present a load as a resistance  
+\(R_L=$RlK\)k\(\Omega\).
+<center>
+<img src="/static/circuits/sensor-loaded.gif" />
+</center>
+<endouttext />
+
+<startouttext />
+<br />  What is the voltage (in Volts) \(V_L\) presented to the amplifier?
+<endouttext />
+<numericalresponse answer="$Vl">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

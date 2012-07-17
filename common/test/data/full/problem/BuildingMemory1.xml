@@ -1,0 +1,52 @@
+<!-- This exercise is for slide9 in Lecture "State and Memory" -->
+
+<problem>
+<script type="loncapa/python">
+RON = 2000.0
+CGS = 5e-15
+CGSf = CGS*1e15
+VS   = 5.0
+VOH  = 4.0
+VIH  = 3.0
+VIL  = 2.0
+VOL  = 1.0 
+
+tup = -RON*CGS*math.log((VOH-VS)/(VOL-VS))
+tupp = tup*1e12
+
+tdown = -RON*CGS*math.log((VIL-VOL)/(VOH-VOL))
+tdownp = tdown*1e12
+</script>
+
+<startouttext/>
+Consider a proposal for using a capacitor as a digital memory:
+<center>
+<img src="/static/circuits/switched-memory.gif" />
+</center>
+Suppose that STORE is high so the switch is on.
+Also assume that the switch has \(R_{ON} = $RON\Omega\) and
+the capacitor has a capacitance of \($CGSf\)fF.  
+<br/><br/>
+How much time, in picoseconds, does it take to
+charge the capacitor from \(V_{OL}=$VOL\)V to \(V_{OH}=$VOH\)V, with
+\(d_{IN} = $VS\)V?
+<endouttext/>
+<numericalresponse answer="$tupp">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Now, suppose that \(d_{IN} = $VOL\)V.
+How much time, in picoseconds, does it take to
+discharge the capacitor from \(V_{OH}=$VOH\)V to \(V_{IL}=$VIL\)V?
+<endouttext/>
+<numericalresponse answer="$tdownp">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

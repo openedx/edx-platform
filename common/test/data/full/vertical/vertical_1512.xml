@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S22E1_Which_output_" slug="S22E1_Which_output_" showanswer="attempted" rerandomize="false" name="S22E1: Which output?"/>
+  <customtag tag="S22" slug="discuss_1513">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="742" slug="book_1514">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="22" slug="slides_1515">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

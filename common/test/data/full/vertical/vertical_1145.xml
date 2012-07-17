@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:KjY9WGanZrw,1.0:b93KDTZDYrs,1.25:e7MMvfuGh9A,1.50:YDidHm8I058" slug="S17V6_Motivation_--_What_s_Going_on_with_the_Fast_Case" rerandomize="per_student" name="S17V6: Motivation -- What's Going on with the Fast Case"/>
+  <customtag tag="S17" slug="discuss_1146" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="627" slug="book_1147" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1148" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:2x5rle93rgg,1.0:0ZeuYSMdHJI,1.25:mJuVcn-KnaE,1.50:C6m3zwXy37s" slug="S4V6_Static_Discipline" name="S4V6: Static Discipline"/>
+  <customtag tag="S4" slug="discuss_228">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="245" slug="book_229">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="4" slug="slides_230">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

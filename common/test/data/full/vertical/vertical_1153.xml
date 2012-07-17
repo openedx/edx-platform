@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:xUQnp9doJxA,1.0:hKC864mrCAw,1.25:-v1cdbpVRZE,1.50:IAmVbVH7trA" slug="S17V8_Solving_Second_Order_Differential_Equation_DE_Particular_Solution" rerandomize="per_student" name="S17V8: Solving Second Order Differential Equation (DE), Particular Solution"/>
+  <customtag tag="S17" slug="discuss_1154" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="629" slug="book_1155" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1156" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

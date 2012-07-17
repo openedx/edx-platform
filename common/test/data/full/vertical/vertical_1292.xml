@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:Qooj2zqImp8,1.0:BVvELD7z_ZM,1.25:AxZodpAIIaM,1.50:BnUnQTmkCec" slug="S18V16_RLC_Dynamics_--_Critically_Damped_Case" rerandomize="per_student" name="S18V16: RLC Dynamics -- Critically Damped Case"/>
+  <customtag tag="S18" slug="discuss_1293" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="649" slug="book_1294" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1295" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

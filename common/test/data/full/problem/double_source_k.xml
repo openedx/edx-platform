@@ -1,0 +1,35 @@
+<!--
+This is a problem about Mosfets
+-->
+
+<problem>
+   <startouttext/>
+   In many amplifiers, we use dual power supplies so we can obtain a
+   0V offset at the output.  An example is shown below:
+   <center>
+   <img src="/static/circuits/double_source.gif"/>
+   </center>
+   <br/>
+   In this problem, \(V_S^+\)=+1.5V, \(V_S^-\)=-1.5V, and we'll use
+   the MOSFET parameters K = 1\(\frac{mA}{V^2}\) and \(V_T\)=0.5V.
+   <br/>
+   Find the value of \(R_L\) such that \(v_{OUT}\)=0V when \(v_{IN}\)=0V:
+   <endouttext/>
+   <numericalresponse answer="3000">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+   <startouttext/>
+   <br/>
+   As \(v_{IN}\) is increased, the output voltage \(v_{OUT}\)
+   decreases. For the value of \(R_L\) that you found above, find the
+   minimum output voltage \(v_{OUT}\) such that the MOSFET will obey the
+   saturation discipline.
+   <br/>
+   \(v_{OUT}\):
+   <endouttext/>
+   <numericalresponse answer="-0.38">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/> 
+      <textline/>
+   </numericalresponse>
+</problem>

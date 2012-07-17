@@ -1,0 +1,13 @@
+<problem>
+
+<startouttext />
+Draw a schematic of a voltage divider: 
+<endouttext />
+
+<customresponse>
+  <schematic  height="240" width="480"  />
+  <data>
+  </data>
+</customresponse>
+
+</problem>

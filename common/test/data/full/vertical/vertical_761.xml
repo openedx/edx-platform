@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S11E3_Source_Follower_Again_" slug="S11E3_Source_Follower_Again_" rerandomize="per_student" name="S11E3: Source Follower, Again!"/>
+  <customtag tag="S11E3" slug="discuss_762" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="418" slug="book_763" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+</sequential>

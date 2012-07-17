@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S9E2_Amplifier_1" slug="S9E2_Amplifier_1" showanswer="attempted" rerandomize="false" name="S9E2: Amplifier 1"/>
+  <customtag tag="S9E2" slug="discuss_593">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="344" slug="book_594">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="9" slug="slides_595">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

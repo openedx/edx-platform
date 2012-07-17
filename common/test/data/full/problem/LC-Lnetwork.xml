@@ -1,0 +1,160 @@
+<!-- Transmitter Lnetwork coupling -->
+
+<problem>
+
+<script type="loncapa/python">
+VoVi = "R2/((R1+R2-L*C*R1*w^2) + (R1*R2*C + L)*j*w)"
+VfIf = "-(R2 + L*j*w)/((L*C*w^2 - 1) - R2*C*j*w)"
+Ccrit = "(1/(R1*w))*sqrt((R1-R2)/R2)"
+Lcrit = "(1/w)*sqrt(R1*R2-R2^2)"
+
+def Cmatch(R1, R2, w):
+  return((1/(R1*w))*math.sqrt((R1-R2)/R2))
+
+def Lmatch(R1, R2, w):
+  return((1/w)*math.sqrt(R1*R2-R2**2))
+
+Rp = 1000.0
+Ra = 50.0
+
+fk = float(random.randrange(540,1700,30))
+omega = 2*math.pi*fk*1e3
+
+Cm=Cmatch(Rp,Ra,omega)
+Lm=Lmatch(Rp,Ra,omega)
+
+Cmp = round(Cm*1e12)
+Lmu = round(Lm*1e7)*1e-1
+
+</script>
+
+<startouttext/>
+The inductor and capacitor in the diagram below are part of the
+output-coupling network of a radio transmitter.  The rest of the
+transmitter (the source of radio-frequency energy) is represented as a
+Thevenin source, and the antenna load is represented by a resistor.
+<center>
+<img src="/static/circuits/LC-Lnetwork.gif" />
+</center>
+In this problem we will examine some of the characteristics of this
+circuit. In the spaces provided below you will write 
+algebraic expressions in terms of the part parameters
+\(L\), \(C\), \(R_1\), \(R_2\), and the angular frequency \(\omega\).
+(As usual, use \(w\) for \(\omega\) in your expressions.)
+<endouttext/>
+
+<startouttext/>
+<br/>
+One thing we want to know is the voltage-transfer ratio (the ratio of
+the complex amplitude of the output voltage to the complex amplitude
+of the input voltage)
+\(\frac{V_o}{V_i}\) of this network, as a function of the operating
+frequency.  Now that we know about impedances this is just like
+solving a resistive ladder!  In the space provided below write an
+algebraic expression for this ratio.
+<endouttext/>
+<formularesponse type="cs" samples="w,R1,R2,L,C@1,1,1,1,1:3,3,3,3,3#10" answer="$VoVi">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+<startouttext/>
+Look carefully at what you just computed.  What is it for
+\(\omega=0\)?  What happens as \(\omega\rightarrow\infty\)?
+You should always examine system functions this way.
+<endouttext/>
+
+<startouttext/>
+<br/>
+Another important value is the driving-point impedance that the final
+amplifier "sees" looking at the antenna through the coupling network.
+This is the ratio of the complex amplitude of the voltage across the
+input port to the complex amplitude of the current into that port.  In
+this circuit it is \(\frac{V_f}{I_f}\).  In the space provided below write an
+algebraic expression for this impedance.  (Hint: The algebra is often
+easier if you invert parallel impedances to make admittances.  They
+then just add.)
+<endouttext/>
+<formularesponse type="cs" samples="w,R1,R2,L,C@1,1,1,1,1:3,3,3,3,3#10" answer="$VfIf">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+<startouttext/>
+Again, look carefully at what you just computed.  What is it for
+\(\omega=0\)?  What happens as \(\omega\rightarrow\infty\)?
+<endouttext/>
+
+<startouttext/>
+<br/>
+Remember that we found that in resistive circuits the load that
+absorbs the maximum power from a Thevenin source is the one where the
+load resistance is the same as the source resistance.  Here we have an
+antenna that we want to transfer power to, but both the amplifier and
+the load have given resistances \(R_1\) and \(R_2\).  
+Since capacitors and inductors do not eat power, they just store the
+energy temporarily, perhaps if we choose the inductance and capcitance
+wisely we can couple the amplifier to the antenna very well.
+<br/>
+It is possible to find values of \(L\) and \(C\) that make
+the driving-point impedance you just computed exactly \(R_1\), if
+\(R_1 &gt; R_2\).  This will "match the antenna to the amplifier".
+<br/>
+<!-- Note: R1 must be bigger than R2 for the tests to work -->
+In the space provided below write an algebraic expression for the
+capacitance \(C_{match}\) that allows this match:
+<endouttext/>
+<formularesponse type="cs" samples="w,R1,R2,L,C@1,4,1,1,1:3,7,3,3,3#10" answer="$Ccrit">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+In the space provided below write an algebraic expression for the
+inductance \(L_{match}\) that allows this match:
+<endouttext/>
+<formularesponse type="cs" samples="w,R1,R2,L,C@1,4,1,1,1:3,7,3,3,3#10" answer="$Lcrit">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Now let's look at some real numbers.  For a big transmitting amplifier
+the output resistance may be \(R_1=$Rp\Omega\).  A typical antenna has
+a radiation resistance of \(R_2=$Ra\Omega\).  Consider an AM broadcast
+transmitter at \(f = $fk\)kHz.  In the spaces provided below, write
+the numerical values of the capacitance (in picoFarads) and inductance
+(in microHenrys) for match.
+<br/>
+\(C_{match}=\)
+<endouttext/>
+<numericalresponse answer="$Cmp">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+\(L_{match}=\)
+<endouttext/>
+<numericalresponse answer="$Lmu">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+By the way, AM broadcast transmitters can be very large: up to 50kW.
+The parts used for such power levels are impressive.  For example, an
+inductor may be made of large gauge silver-coated copper tubing.
+There is a nice picture 
+<a href="http://www.allaboutcircuits.com/vol_2/chpt_3/6.html"> here </a>.
+<endouttext/>
+
+</problem>

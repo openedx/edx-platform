@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:D_BWQTYyItc,1.0:ZNpFu0Mtr_Q,1.25:mgwae4sqP5o,1.50:jXsRyyEYWbc" slug="S26V1_Why_worry_about_energy_" rerandomize="per_student" name="S26V1: Why worry about energy?"/>
+  <customtag tag="S26" slug="discuss_1857" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="595" slug="book_1858" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1859" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

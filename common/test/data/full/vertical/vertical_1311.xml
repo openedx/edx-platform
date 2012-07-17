@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S19E3_Complex_Numbers" slug="S19E3_Complex_Numbers" showanswer="attempted" rerandomize="false" name="S19E3: Complex Numbers"/>
+  <customtag tag="S19" slug="discuss_1312">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="709" slug="book_1313">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="19" slug="slides_1314">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

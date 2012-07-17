@@ -1,0 +1,75 @@
+<problem>
+
+<script type= "loncapa/python">
+V = float(random.randrange(250,350,5))
+Cu = float(random.choice([220, 270, 330, 390, 470]))
+C = Cu*1e-6
+
+E = 0.5*C*V*V
+t = 0.001
+P = E/t
+
+</script>
+
+
+<startouttext/>
+We have just learned the v-i characteristic for a linear capacitor:
+<br/><br/>
+<center>
+\(i = C \frac{d v}{d t}\)
+</center>
+<br/><br/>
+So the power entering the capacitor (as in any two-terminal device) is:
+<br/><br/>
+<center>
+\(P = v i = C v \frac{d v}{d t}\)
+</center>
+<br/><br/>
+If we integrate this between two times we get the energy change in the
+capacitor over the interval:
+<br/><br/>
+<center>
+\( \Delta E = \int_{t_0}^{t_1} P(t) dt 
+            = \int_{t_0}^{t_1} C v(t) \frac{d v(t)}{d t}  dt 
+            = \frac{1}{2} C (v({t_1}))^2 - \frac{1}{2} C (v({t_0}))^2 
+\)
+</center>
+<br/><br/>
+So the energy stored in a capacitor, as a function of the voltage
+across it, is:
+<br/><br/>
+<center>
+\( E = \frac{1}{2} C v^2 \)
+</center>
+<br/><br/>
+<endouttext/>
+
+<startouttext/>
+<br/>
+A typical photographic flash unit charges a capacitor of about
+\($Cu\mu\)F to a voltage of about \($V\)V.  The energy in the
+capacitor is then dumped into the flash tube on a scale of 
+about 1ms.  
+<br/>
+How much energy (in Joules) is stored in this capacitor?
+<endouttext/>
+<numericalresponse answer="$E">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+If the discharge time is actually 1ms what is the power (in Watts)
+delivered to the flash tube?
+<endouttext/>
+<numericalresponse answer="$P">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> <textline />
+</numericalresponse>
+<startouttext/>
+<br/>
+Wow!
+<endouttext/>
+
+</problem>

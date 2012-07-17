@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:XV13gOUB1sc,1.0:wZxr3nlnhQo,1.25:c85CkHRWcE4,1.50:CxjNI4gROmg" slug="S18V12_RLC_Dynamics_--_Overdamped_Case" name="S18V12: RLC Dynamics -- Overdamped Case"/>
+  <customtag tag="S18" slug="discuss_1231">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="648" slug="book_1232">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1233">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

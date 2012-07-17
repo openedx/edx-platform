@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S17E5_An_ILC_circuit" slug="S17E5_An_ILC_circuit" showanswer="attempted" rerandomize="false" name="S17E5: An ILC circuit"/>
+  <customtag tag="S17" slug="discuss_1171">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="627" slug="book_1172">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1173">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

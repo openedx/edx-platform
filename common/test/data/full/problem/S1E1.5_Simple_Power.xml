@@ -1,0 +1,25 @@
+<problem><script type="loncapa/python">
+VS = 10
+R = 50
+
+PR = VS**2/R
+
+PS = -PR
+</script><startouttext/>
+In the circuit shown
+<center><img src="/static/circuits/simple-circuit.gif"/></center>
+the strength of the source is \(V_S=$VS\)V, and the resistance of the
+resistor is \(R=$R\Omega\).
+<br/><br/>
+What is the power dissipated in the resistor (in Watts)?
+<endouttext/>
+<numericalresponse answer="$PR"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+what is the power entering the source (in Watts)?
+<endouttext/>
+<numericalresponse answer="$PS"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+</problem>

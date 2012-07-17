@@ -1,0 +1,113 @@
+<!-- It works, and is not so bad. -->
+
+<problem>
+
+<script type="loncapa/python">
+# US AM Broadcast Band
+
+#flowk = 535    # kHz
+#fhighk = 1705  # kHz
+
+#flow = flowk*1e3
+#fhigh = fhighk*1e3
+
+#omegalow = 2*math.pi*flow
+#omegahigh = 2*math.pi*fhigh
+
+#Cmaxp = 365          # 365pF
+#Cmax  = Cmaxp*1e-12
+
+#L = 1/(Cmax*omegalow**2)
+#Lu = L*1e6
+Lu = 242 # uH
+L = Lu*1e-6
+
+#Cmin = 1/(L*omegahigh**2)
+#Cminp = Cmin*1e12    # pF
+
+# This problem
+fM = 1.030  # MHz
+f  = fM*1e6
+omega = 2*math.pi*f
+C = 1/(L*omega**2)
+Cp = C*1e12  # pF
+
+# Series tuned circuit  3 possible resistances
+R1 = 375
+Q1 = omega*L/R1
+R2 = 150
+Q2 = omega*L/R2
+R3 = 75
+Q3 = omega*L/R3
+
+df1 = (f/Q1)*1e-3
+df2 = (f/Q2)*1e-3
+df3 = (f/Q3)*1e-3
+</script>
+
+<startouttext/>
+We have analyzed the series RLC circuit several ways
+<center>
+<img src="/static/circuits/VCLR1.gif" />
+</center>
+We have determined that the voltage-transfer ratio is
+<br/><br/>
+\( \frac{V_r}{V_i} = \frac{j \omega R C}{(1 - \omega^2 L C) + j \omega R C} \)
+<br/><br/>
+Assume that we are tuned to WCAP-AM at \($fM\)MHz, and that our inductor has
+\(L = $Lu\mu\)H.  What is the capacitance, in picoFarads, needed to
+resonate at \($fM\)MHz?
+<endouttext/>
+<numericalresponse answer="$Cp">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+If \(R = $R1\Omega\) what is the approximate bandwidth (in kiloHertz) of this filter?
+<endouttext/>
+<numericalresponse answer="$df1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+A nearby lightening bolt produces an impulse in the antenna.  For
+about how many cycles will the filter ring?  (Of course, in theory it
+will ring forever, but a crude estimate is that it takes about \(Q\)
+cycles before the ringing is insignificant.  You will be more precise
+about this in the Homework for this week!)
+<endouttext/>
+<numericalresponse answer="$Q1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+If \(R = $R3\Omega\) what is the approximate bandwidth (in kiloHertz) of this filter?
+<endouttext/>
+<numericalresponse answer="$df3">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+A nearby lightening bolt produces an impulse in the antenna.  For
+about how many cycles will the filter ring?
+<endouttext/>
+<numericalresponse answer="$Q3">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+</problem>

@@ -1,0 +1,31 @@
+<problem><script type="loncapa/perl">
+i6 = "-(i1 + i2)";
+i5 = "i3 - (i1 + i2)";
+i4 = "i2 - i3";
+</script><startouttext/>
+In the circuit shown there are six unknown elements.  
+<center><img src="/static/circuits/kcl.gif"/></center>
+By measurements we have values for three of the branch currents:
+\(i_1\), \(i_2\), and \(i_3\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+In terms of the known currents, write an algebraic expression for the current \(i_4\)?
+<endouttext/>
+<formularesponse type="cs" samples="i1,i2,i3@1,1,1:3,3,3#10" answer="$i4"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="25"/></formularesponse>
+
+<startouttext/>
+<br/>
+Write an algebraic expression for the current \(i_5\)?
+<endouttext/>
+<formularesponse type="cs" samples="i1,i2,i3@1,1,1:3,3,3#10" answer="$i5"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="25"/></formularesponse>
+
+<startouttext/>
+<br/>
+Write an algebraic expression for the current \(i_6\)?
+<endouttext/>
+<formularesponse type="cs" samples="i1,i2,i3@1,1,1:3,3,3#10" answer="$i6"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="25"/></formularesponse>
+
+
+</problem>

@@ -1,0 +1,58 @@
+<problem>
+<script type="loncapa/python">
+VI = random.choice([5,6,9,12,15,20,100])
+VIs=str(VI)
+
+v1 = VIs + "-" + VIs + "*e^(-t/(R*C))"
+
+v2 = VIs + "*e^(-t/(R*C))"
+
+#print(v1)
+#print(v2)
+
+</script>
+
+<startouttext/>
+We have a circuit with a capacitor and a resistor driven by an
+independent voltage source with a voltage that is a function of time \(V(t)\).
+<center>
+<img src="/static/circuits/thevenin-capacitor.gif" />
+</center>
+The resistance of the resistor is \(R\Omega\) and the capacitance of
+the capacitor is \(C\)F.
+<endouttext/>
+
+<startouttext/>
+<br/>
+Suppose the drive \(V\) rises in a step from \(0\)V to \($VI\)V at the initial time
+\(t=0\).  Also suppose that the capacitor's initial voltage 
+\(v_C(0) = 0\)V.
+<br/>
+In the space provided below write an algebraic expression
+for the capacitor voltage as a function of time, \(v_C(t)\) for 
+\(t &gt; 0\).
+<endouttext/>
+<formularesponse type="cs" samples="R,C,t,e@1,1,1,1:3,3,3,3#10" answer="$v1">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/>
+Now, suppose the drive falls in a step from \($VI\)V to \(0\)V at the initial time
+\(t=0\).  Also suppose that the capacitor's initial voltage 
+\(v_C(0) = $VI\)V.
+<br/>
+In the space provided below write an algebraic expression
+for the capacitor voltage as a function of time, \(v_C(t)\) for 
+\(t &gt; 0\).
+<endouttext/>
+<formularesponse type="cs" samples="R,C,t,e@1,1,1,1:3,3,3,3#10" answer="$v2">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

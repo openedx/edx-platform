@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:uPMh3FtCVXI,1.0:_1ER9lWc6T8,1.25:rZhKuRPgofY,1.50:mHtq3Ri9kg4" slug="S28V10_The_Double_Dip" name="S28V10: The Double Dip"/>
+  <customtag tag="S28" slug="discuss_1993">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="517" slug="book_1994">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="28" slug="slides_1995">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

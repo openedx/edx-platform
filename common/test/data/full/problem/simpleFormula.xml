@@ -1,0 +1,19 @@
+<problem>
+
+<script type="loncapa/perl">
+k=random.randrange(1,10,1)
+formula="ax^{k}".format(k=k);
+m=k-1;
+derivative="k*a*x^m";
+</script>
+
+<startouttext />
+What is the derivative of \($formula\) with respect to \(x\)?
+<endouttext />
+
+<formularesponse samples="a,x@-3,-3:3,3#4" answer="$derivative">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="25" />    
+</formularesponse>
+
+</problem>

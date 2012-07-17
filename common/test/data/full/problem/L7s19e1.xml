@@ -1,0 +1,105 @@
+<problem>
+
+<script type ="loncapa/python">
+global VT, I0
+VT = 0.025852
+I0 = 8.0e-14 # Amperes
+
+#e = math.exp(1)
+
+def i_diode(v):
+  return(I0*(math.exp(v/VT) - 1.0))
+
+Rinc = "1/((I0/VT)*e^(VD/VT))"
+
+R = 3900.0
+
+def VTr(r):
+  return(-VT*math.log(r*I0/VT))
+
+rdinc1 = 100.0
+VD1 = VTr(rdinc1)
+ID1 = i_diode(VD1)
+VI1 = VD1+R*ID1
+
+rdinc2 = 1000.0
+VD2 = VTr(rdinc2)
+ID2 = i_diode(VD2)
+VI2 = VD2+R*ID2
+
+</script>
+
+<startouttext/>
+The v-i characteristic of a junction diode is well approximated by
+\(i_D = I_0 (e^{v_D/V_T} - 1)\)
+<center>
+<img src="/static/circuits/junction-diode.gif"/>
+</center>
+with two parameters \(V_T\) and \(I_0\).
+<br/>
+A diode has an incremental resistance that varies with the
+current through the diode.  
+<endouttext/>
+
+<startouttext/>
+<br/> 
+In the space provided write an algebraic expression for the
+incremental resistance of a diode when biased with a voltage \(V_D\).
+Your expression will include the parameters \(I_0\) and \(V_T\).
+<endouttext/>
+<formularesponse type="cs" samples="VT,I0,VD@1,1,1:3,3,3#10" answer="$Rinc">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/> 
+<br/>
+This variable incremental resistance characteristic makes a diode
+useful as part of a variable attenuator.  For example, in the circuit
+below
+<center>
+<img src="/static/circuits/diode-attenuator.gif"/>
+</center>
+the diode is the output leg of a voltage divider.  The incremental
+resistance of the diode varies with the bias current, so the
+proportion of the incremental input voltage that appears as
+incremental output voltage can be varied by changing the bias voltage.
+<endouttext/>
+
+<startouttext/>
+<br/>
+The parameter \(V_T \approx 26\)mV at a temperature of 300K (about
+27C).  This is fixed by the physics of the semiconductor.  For a 
+typical small-signal silicon junction diode in a glass case 
+(e.g. <a href="http://www.vishay.com/docs/85622/1n914.pdf"> 1N914</a> 
+or 
+<a href="http://www.fairchildsemi.com/pf/1N/1N4148.html"> 1N4148</a>) 
+\(I_0 \approx 8\times 10^{-14}\)A.
+<br/>
+Assume that \(R=3.9\)k\(\Omega\).  
+<endouttext/>
+
+<startouttext/>
+<br/>
+For what value of the bias voltage \(V_I\) (in Volts) will the
+incremental resistance of the diode \(v_d/i_d = $rdinc1\Omega\)?
+<endouttext/>
+<numericalresponse answer="$VI1">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+For what value of the bias voltage \(V_I\) (in Volts) will the
+incremental resistance of the diode \(v_d/i_d = $rdinc2\Omega\)?
+<endouttext/>
+<numericalresponse answer="$VI2">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+</numericalresponse>
+
+
+
+</problem>
+

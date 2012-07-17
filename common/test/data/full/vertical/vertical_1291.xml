@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S19E1_Trigonometry_Isn_t_So_Bad" slug="S19E1_Trigonometry_Isn_t_So_Bad" showanswer="attempted" rerandomize="false" name="S19E1: Trigonometry Isn't So Bad"/>
+  <customtag tag="S19" slug="discuss_1292">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="707" slug="book_1293">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="19" slug="slides_1294">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

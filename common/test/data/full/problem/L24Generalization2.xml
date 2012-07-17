@@ -1,0 +1,52 @@
+<!-- Generalization of Inverting Amplifier to Nonlinear Elements -->
+
+<problem>
+
+<script type="loncapa/python">
+vol = "-VT*ln(vI/(R*IS) + 1)"
+
+vox = "-R*IS*(e^(vI/VT) - 1)"
+</script>
+
+<startouttext/>
+<br/>
+We can also generalize to nonlinear elements.  For example, a junction
+diode has the characteristic \( i_D = I_S(e^{v_D/V_T}-1) \).
+<center>
+<img src="/static/circuits/LogAmplifier.gif" />
+</center>
+In the space provided below give an algebraic expression for \(v_O\)
+in this circuit.  Your expression will be in terms of \(V_T\),
+\(I_S\), \(R\), and \(v_I\).
+<endouttext/>
+<formularesponse type="cs" samples="R,VT,IS,vI@1,1,1,1:3,3,3,3#10" answer="$vol">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+<startouttext/>
+Since \(I_S\) is always a very small number, for example \(I_S
+=10^{-14}\)A is typical for a small junction diode, the "1" in the
+equation you just wrote can be ignored.  So you should see why 
+this circuit is called a "logarithmic amplifier".
+<endouttext/>
+
+<startouttext/>
+<br/>
+Suppose, instead, we moved the diode into the other position
+<center>
+<img src="/static/circuits/ExpAmplifier.gif" />
+</center>
+In the space provided below give an algebraic expression for \(v_O\)
+in this circuit.  Your expression will be in terms of \(V_T\),
+\(I_S\), \(R\), and \(v_I\).
+<endouttext/>
+<formularesponse type="cs" samples="R,VT,IS,vI@1,1,1,1:3,3,3,3#10" answer="$vox">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+<startouttext/>
+This circuit is called an "exponential amplifier".
+<endouttext/>
+</problem>

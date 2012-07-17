@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:4fIFddsCDIQ,1.0:v0nKHp2ELs0,1.25:IqYUp6yS2ME,1.50:iTgqehUM1kg" slug="S6V12_Method_4_-_Motivate_the_Incremental_Method" rerandomize="per_student" name="S6V12: Method 4 - Motivate the Incremental Method"/>
+  <customtag tag="S6" slug="discuss_417" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="214" slug="book_418" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="6" slug="slides_419" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

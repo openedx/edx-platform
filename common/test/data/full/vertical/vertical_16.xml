@@ -1,0 +1,9 @@
+<sequential>
+  <video youtube="1.50:7TLogToJ0NE,1.25:tWXM7k73wAM,1.0:AnTf6vS5aO8,0.75:WM3frIl1-ek" slug="S0V6_S1V4_Course_Overview" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="S0V6 (S1V4): Course Overview"/>
+  <customtag page="0" slug="book_17" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="1" slug="slides_18" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

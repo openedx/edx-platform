@@ -1,0 +1,30 @@
+<problem>
+
+<script type="loncapa/python">
+vINmin = "VT"
+vOUTmin = "vIN - VT"
+
+vINmax = "(sqrt(1+2*K*RL*VS)-1)/(K*RL)+VT"
+
+</script>
+
+<startouttext/>
+Consider the simple common-source MOSFET amplifier again:
+<center>
+<img src="/static/circuits/mos-amplifier.gif" />
+</center>
+In the spaces provided enter the algebraic expression for your answer.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the maximum value that \(v_{IN}\) can have for the MOSFET to
+operate in saturation?  Express your answer in terms of the device
+parameters \(K\), \(V_T\), \(R_L\), and \(V_S\).
+<endouttext/>
+<formularesponse type="cs" samples="VT,K,RL,VS@1,1,1,1:3,3,3,3#10" answer="$vINmax">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

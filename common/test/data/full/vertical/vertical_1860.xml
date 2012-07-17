@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:D6ndKedmfwo,1.0:tuek8ax5lDs,1.25:GDD7D5NFBjI,1.50:lr5Eq7ozQps" slug="S26V2_Power_dissipation_in_logic_gates" rerandomize="per_student" name="S26V2: Power dissipation in logic gates"/>
+  <customtag tag="S26" slug="discuss_1861" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="604" slug="book_1862" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1863" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

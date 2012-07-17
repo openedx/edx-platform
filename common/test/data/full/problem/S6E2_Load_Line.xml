@@ -1,0 +1,68 @@
+<problem><script type="loncapa/python">
+I = random.choice([4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0])
+R = random.choice([4.7, 5.6, 6.8, 8.2])
+
+ISC = I
+VOC = I*R
+
+global bisect
+
+def bisect(R, VOC, vlo, vhi):
+   epsilon=0.0001
+   dlo = R*vlo**3 + vlo - VOC
+   dhi = R*vhi**3 + vhi - VOC
+   v = (vlo + vhi)/2.0
+   dv = R*v**3 + v - VOC
+   if abs(dlo - dhi) &lt; epsilon:
+      return(v)
+   elif dv*dhi &lt; 0.0:
+      return(bisect(R, VOC, v, vhi))
+   else:
+      return(bisect(R, VOC, vlo, v))
+
+VOP = bisect(R, VOC, 0.0, 2.0)
+IOP = VOP**3
+</script><startouttext/>
+In the circuit shown, the strange nonlinear device
+is specified to have the characteristic \(i = v^3\).  (Admittedly, 
+it is hard to find a device with this kind of characteristic in 
+your junkbox.)  The current supplied by the current source is
+\(I=$I\)A, and the resistance of the parallel resistor is 
+\(R=$R\Omega\).  
+<center><img src="/static/circuits/Norton-nonlinear.gif"/></center>
+<br/>
+In the graph the horizontal axis is the voltage across the nonlinear
+device and the vertical axis is the current through the device.  The
+curve is the voltage-currrent characteristic of the device and the
+straight line is the load line.
+<center><img src="/static/circuits/nonlinear-with-loadline.gif"/></center>
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the current (in Amperes) where the load line intercepts the vertical axis?
+<endouttext/>
+<numericalresponse answer="$ISC"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the voltage (in Volts) where the load line intercepts the horizontal axis?
+<endouttext/>
+<numericalresponse answer="$VOC"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/><br/>
+Hint: use guess and check to solve for the operating point.
+<br/>
+What is the operating voltage (in Volts) of the device in this circuit?
+<endouttext/>
+<numericalresponse answer="$VOP"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the operating current (in Amperes) of the device in this circuit?
+<endouttext/>
+<numericalresponse answer="$IOP"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

@@ -1,0 +1,78 @@
+<problem><script type="loncapa/python">
+gm = "K*(VIN - VT - RS*IDS)"
+
+vovi = "gm*RS/(1 + gm*RS)"
+
+ro = "RS/(1 + gm*RS)"
+</script><startouttext/>
+We have been studying the source follower in H5P1 and H5P2.
+<center><img src="/static/circuits/source-follower.gif"/></center>
+<br/>
+Now we have a small-signal model of the MOSFET.  Using this model of
+the MOSFET the small-signal model of the source-follower looks like:
+<center><img src="/static/circuits/source-follower-small-signal-model.gif"/></center>
+<br/>
+where \(g_m\) is the transconductance of the MOSFET at the operating
+point. 
+<br/>
+Notice that the small-signal circuit is linear with independent sources.
+<endouttext/>
+
+<startouttext/>
+Assume that you have already determined the operating point of the
+MOSFET: it is saturated; the input bias voltage is \(V_{IN}\), and the
+bias current is \(I_{DS}\).
+<br/> 
+In the space provided below write an algebraic expression for the
+transconductance \(g_m\) in terms of the device parameters \(K\),
+\(V_T\), \(R_S\), and the bias conditions \(V_{IN}\), and \(I_{DS}\).
+<br/><br/>
+\(g_m =\)
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,RS,VIN,IDS@1,1,1,1,1:3,3,3,3,3#10" answer="$gm"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+In the space provided below, write an algebraic expression for the incremental gain \(a =
+\frac{v_{out}}{v_{in}}\) of this circuit in terms of \(g_m\) and \(R_S\).
+<br/> <br/>
+\(a =\)
+<endouttext/>
+<formularesponse type="cs" samples="gm,RS@1,1:3,3#10" answer="$vovi"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+
+<startouttext/>
+<br/>
+Now let's get the output resistance of this source follower.  
+<br/> <br/> 
+To do this:
+<br/>
+1. Suppress the independent source \(v_{in}\).  (Short it out.)
+Remember, you may not suppress the dependent source.
+<br/>
+2. Add an independent current source to inject a current into the
+output port.  Analyze the resulting circuit to get the voltage across
+the output port.
+<br/>
+3. The ratio of the voltage you obtained and the current you injected
+is the effective output resistance of this circuit.
+<br/>
+In the space provided below write an algebraic expression for the
+output resistance \(r_{out} = \frac{v_{out}}{i_{out}}|_{v_{in}=0}\) in terms of \(g_m\) and \(R_S\).
+<br/> <br/>
+\(r_{out} =\)
+<endouttext/>
+<formularesponse type="cs" samples="gm,RS@1,1:3,3#10" answer="$ro"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/><br/>
+Note that the input resistance \(r_i = \frac{v_i}{i_i} = \infty\)
+because in our model there is no current allowed into the gate of a
+MOSFET.  For low frequencies this is a good estimate.
+But a real MOSFET has capacitance between its gate and its
+other terminals.  So there are better models that allow us to estimate
+the input "resistance" (impedance).  But you will have to wait until
+we introduce capacitance!
+<endouttext/>
+
+</problem>

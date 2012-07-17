@@ -1,0 +1,18 @@
+<problem><script type="loncapa/python">
+VT=2
+VS=float(random.randrange(5,10,1))
+RL=float(random.randrange(10000, 15000, 100))
+RON=1000
+P = (((VS**2)/(RL+2*RON))+((VS**2)/(RL+RON)))*1000
+</script><startouttext/>
+   Consider the following diagram:
+   <br/>
+   <center><img src="/static/circuits/inverter-power.gif"/></center>
+   <br/>
+   Each MOSFET has a threshold voltage \(V_T\)=2V and an on resistance \(R_{ON}\)=1k\(\Omega\).  Assume \(V_S=$VS\)V and \(R_1=R_2=$RL\Omega\).
+   <br/>
+   What is the worst-case power (in milliWatts) consumed by this system?
+   <endouttext/>
+   <numericalresponse answer="$P"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

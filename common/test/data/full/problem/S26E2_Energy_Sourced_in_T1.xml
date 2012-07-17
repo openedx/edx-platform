@@ -1,0 +1,31 @@
+<problem><script type="loncapa/python">
+E     = "C*VS^2*(1 - e^(-T1/(R1*C)))"
+Elong = "C*VS^2"
+</script><startouttext/>
+We have the energy supplied by the source as an integral
+<br/><br/>
+\( E = \int_0^{T_1} V_S i(t) dt \)
+<br/><br/>
+and we have the current that appears in the integrand
+<br/><br/>
+\( i(t) = \frac{V_S}{R_1} e^{\frac{-t}{R_1 C}}  \)
+<br/><br/>
+In the space provided below write an algebraic expression for the
+energy \(E\) in terms of \(C\), \(V_S\), \(T_1\), and \(R_1\).
+<endouttext/>
+<formularesponse type="cs" samples="C,VS,T1,R1@1,1,1,1:3,3,3,3#10" answer="$E"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+For \(T_1 \gg R_1 C \) what does \(E\) approach?
+In the space provided below write an algebraic expression for the
+energy \(E\), as \(T_1 \rightarrow \infty\) in terms of \(C\), \(V_S\), \(T_1\), and \(R_1\).
+<endouttext/>
+<formularesponse type="cs" samples="C,VS,T1,R1@1,1,1,1:3,3,3,3#10" answer="$Elong"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+Notice that your answer here is independent of \(R_1\).  Hmmmm...
+<endouttext/>
+
+</problem>

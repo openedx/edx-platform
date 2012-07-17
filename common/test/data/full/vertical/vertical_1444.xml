@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:y_7P1i8KFRI,1.0:VGrmAKzicNM,1.25:e3A6srIDjvs,1.50:Sx8I9ZvIEcc" slug="S21V5_Series_RLC_bandpass" name="S21V5: Series RLC bandpass"/>
+  <customtag tag="S21" slug="discuss_1445">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="801" slug="book_1446">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="21" slug="slides_1447">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

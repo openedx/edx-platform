@@ -1,0 +1,35 @@
+<problem><startouttext/>
+In the figure shown there are three circuits.  The first two, labeled
+"a" and "b", are an inverter and a NOR gate, respectively.  Circuit
+"c" is a bit more complex. 
+<center><img src="/static/circuits/compound-gate.gif"/></center>
+In the spaces provided below give the
+logical output at Z as a function of the inputs at X and Y.
+<br/>
+<endouttext/>
+
+<startouttext/>
+<br/>
+When X=0 and Y=0, Z=
+<endouttext/>
+<numericalresponse answer="1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+When X=0 and Y=1, Z=
+<endouttext/>
+<numericalresponse answer="1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+When X=1 and Y=0, Z=
+<endouttext/>
+<numericalresponse answer="0"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+When X=1 and Y=1, Z=
+<endouttext/>
+<numericalresponse answer="1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:B73vUe3WIf8,1.0:ACwDG8aZOpI,1.25:tLHDRq5pA9w,1.50:RJGgVM72o3g" slug="S6V6_Method_2_-_Graphical_Method" rerandomize="per_student" name="S6V6: Method 2 - Graphical Method"/>
+  <customtag tag="S6" slug="discuss_389" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="203" slug="book_390" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="6" slug="slides_391" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

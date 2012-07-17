@@ -1,0 +1,50 @@
+<!--  
+This is an L1 KCL problem
+-->
+
+<problem>
+
+<script type="loncapa/python">
+i1 = (float(random.randrange(100,300,1))-200)/10
+i2 = (float(random.randrange(100,300,1))-200)/10
+i3 = (float(random.randrange(100,300,1))-200)/10
+
+i6 = -(i1 + i2)
+i5 = i6 + i3
+i4 = -(i1 + i5)
+</script>
+
+<startouttext />
+In the circuit shown there are six unknown elements.  
+<center>
+<img src="/static/circuits/kcl.gif" />
+</center>
+By measurements we have found three of the branch currents:
+\(i_1=$i1\)A, \(i_2=$i2\)A, and \(i_3=$i3\)A.
+<br />
+what is the current \(i_4\)?
+<endouttext />
+<numericalresponse answer="$i4">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+what is the current \(i_5\)?
+<endouttext />
+<numericalresponse answer="$i5">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+what is the current \(i_6\)?
+<endouttext />
+<numericalresponse answer="$i6">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

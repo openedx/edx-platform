@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:mrFOEMa-6NU,1.0:qxXZuPKCEXk,1.25:6r7fNLttAFw,1.50:yIsW6OBbGT0" slug="S6V2_Nonlinear_Elements" rerandomize="per_student" name="S6V2: Nonlinear Elements"/>
+  <customtag tag="S6" slug="discuss_369" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="193" slug="book_370" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="6" slug="slides_371" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

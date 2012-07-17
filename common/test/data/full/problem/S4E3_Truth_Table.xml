@@ -1,0 +1,53 @@
+<problem><script type="loncapa/python">
+queries = [['a',0],['b',1],['c',0],['d',1],['e',0],['f',1],['g',1]]
+qs=random.sample(xrange(len(queries)),4)
+
+qa1 = queries[qs[0]]
+q1 = qa1[0]
+a1 = qa1[1]
+
+qa2 = queries[qs[1]]
+q2 = qa2[0]
+a2 = qa2[1]
+
+qa3 = queries[qs[2]]
+q3 = qa3[0]
+a3 = qa3[1]
+
+qa4 = queries[qs[3]]
+q4 = qa4[0]
+a4 = qa4[1]
+</script><startouttext/><center><img src="/static/circuits/logic.gif"/></center>
+In the figure above there are two circuits and a partially filled in
+truth table.  From the information in the truth table you can decide
+which circuit is described by that truth table.
+Enter the number of the chosen circuit:
+<endouttext/>
+
+<numericalresponse answer="2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \($q1\)?
+<endouttext/>
+<numericalresponse answer="$a1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \($q2\)?
+<endouttext/>
+<numericalresponse answer="$a2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \($q3\)?
+<endouttext/>
+<numericalresponse answer="$a3"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \($q4\)?
+<endouttext/>
+<numericalresponse answer="$a4"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

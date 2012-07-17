@@ -1,0 +1,36 @@
+<problem><script type="loncapa/python">
+VI = "VI"
+</script><startouttext/>
+We have the circuit
+<center><img src="/static/circuits/VRLC1.gif"/></center>
+with the input \(v_I(t) = V_I u(t)\) and with initial conditions
+\(v(0) = 0\) and \(i(0) = 0\).
+The capacitor voltage in this system is described by a second-order
+linear constant-coefficient ordinary differential equation:
+<br/><br/>
+\(L C \frac{d^2 v(t)}{dt^2} + R C \frac{d v(t)}{dt} + v(t) = V_I u(t) \)
+<br/><br/>
+After \(t=0\) the step becomes a constant.  
+<br/>
+So first we need a particular solution \(v_P(t)\) to the equation:
+<br/><br/>
+\(L C \frac{d^2 v_P(t)}{dt^2} + R C \frac{d v_P(t)}{dt} + v_P(t) = V_I \)
+<br/><br/>
+(Any particular solution will do, because we will use the
+associated homogeneous equation to match up the initial conditions.)
+<br/>
+We can use \(v_P(t)\) as the value that satisfies the
+equation and makes all the derivative terms in the equation zero.
+<br/>
+What is this particular solution \(v_P(t)\)?
+<endouttext/>
+<formularesponse type="cs" samples="VI@1:3#10" answer="$VI"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+<startouttext/>
+<br/>
+This particular solution is not yet the solution to our problem,
+because it does not match the initial conditions.
+<endouttext/>
+
+
+</problem>

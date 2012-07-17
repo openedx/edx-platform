@@ -1,0 +1,121 @@
+<!-- 
+This is a week 4 problem about nonlinear devices
+-->
+
+<problem>
+<script type="loncapa/python">
+global close_enuf
+global bisect
+
+def close_enuf(x, y, eps):
+    return(abs(x - y) &lt; eps*(abs(x)+abs(y)))
+
+def bisect(f, x0, x1, eps):
+    xlo = x0
+    xhi = x1
+    fx0 = f(x0)
+    fx1 = f(x1)
+    while True:
+        if fx0 == 0.0:
+            return(xlo)
+        elif fx1 == 0.0:
+            return(xhi)
+        elif fx0*fx1>0.0:
+            raise Exception('Root Not Bounded', x0, x1)
+        else:
+            xm = (xlo + xhi)/2.0
+            if close_enuf(xlo, xhi, eps):
+                return(xm)
+            else:
+                fxm = f(xm)
+                if fx1*fxm &lt; 0.0:
+                    xlo = xm
+                    fx0 = fxm
+                else:
+                    xhi = xm
+                    fx1 = fxm
+
+global vI
+
+vI = float(random.randrange(3,20,1))
+#vI = 10.0
+
+global loadline
+
+def loadline(v):
+   return((vI - v)/2)
+
+global device
+
+def device(v):
+   return(10*(1-math.exp(-v/5)))
+
+global f
+
+def f(v):
+   return(loadline(v) - device(v))
+
+vA = bisect(f, 0, 10, .001)
+
+dvI = 0.02*vI
+
+vIold = vI
+
+vI = vI+dvI
+
+dvA = bisect(f, 0, 10, .001) - vA
+
+rat = dvA/dvI
+
+R = 1/(2*math.exp(-vA/5))
+
+</script>
+
+   <startouttext/>
+   Consider the following circuit containing the nonlinear element N:
+   <br/>
+   <center>
+   <img src="/static/circuits/nonlinear_k.gif"/>
+   </center>
+   The i-v relation for N is given by \(i_A=10(1-e^\frac{-v_A}{5})\),
+   where \(i_A\) is in Amperes and \(v_A\) is in Volts.
+   <br/>
+   Solve for the voltage \(v_A\) when \(v_I = $vIold\)V.  Note that this
+   requires that you solve the equation obtained using KVL iteratively
+   for \(v_A\).  
+   <br/>  <br/> 
+   (Hint: Use the exponential term to solve for \(v_A\) as a function
+   of the assumed value of \(v_A\), and then iterate.  
+   <br/>
+   Taking logs on both sides may facilitate convergence.)
+   <endouttext/>
+
+   <startouttext/>
+   <br/> <br/>
+   The voltage \(v_A\) is:
+   <endouttext/>
+   <numericalresponse answer="$vA">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+
+   <startouttext/>
+   <br/>
+   Find the incremental change in \(v_A\) for a 2% increase in \(v_I\) and use it to calculate the ratio \(\frac{\Delta v_A}{\Delta v_I}\).
+   <endouttext/>
+   <numericalresponse answer="$rat">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+
+   <startouttext/>
+   <br/>
+   Find the value for the incremental resistance of the nonlinear
+   element N by linearizing the expression for \(i_A\) about the
+   operating point when \(v_I = $vIold\)V.
+   <endouttext/>
+   <numericalresponse answer="$R">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+</problem>

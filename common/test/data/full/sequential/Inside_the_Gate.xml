@@ -1,0 +1,51 @@
+<sequential>
+  <vertical filename="vertical_275" slug="vertical_275" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_279" slug="vertical_279" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_283" slug="vertical_283" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_287" slug="vertical_287" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_291" slug="vertical_291" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_295" slug="vertical_295" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_299" slug="vertical_299" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_303" slug="vertical_303" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_307" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S5E1_Logic_with_Switches" slug="S5E1_Logic_with_Switches" rerandomize="per_student" name="S5E1: Logic with Switches"/>
+    <customtag tag="S5E1" slug="discuss_308" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_309" slug="vertical_309" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_313" slug="vertical_313" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_318" slug="vertical_318" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_322" slug="vertical_322" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_326" slug="vertical_326" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_330" slug="vertical_330" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_334" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S5E2_Switch_Model" slug="S5E2_Switch_Model" rerandomize="per_student" name="S5E2: Switch Model"/>
+    <customtag tag="S5E2" slug="discuss_335" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_336" slug="vertical_336" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_340" slug="vertical_340" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_344" slug="vertical_344" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_348" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <problem filename="S5E3_SR_Model" slug="S5E3_SR_Model" rerandomize="per_student" name="S5E3: SR Model"/>
+    <customtag tag="S5E3" slug="discuss_349" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical filename="vertical_350" slug="vertical_350" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical filename="vertical_354" slug="vertical_354" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student"/>
+  <vertical slug="vertical_358" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <video youtube="0.75:XFT2yVp6Q-o,1.0:WKdbevNkW-4,1.25:yqzNHmfXtro,1.50:v98KnvmUPuM" slug="What_s_next_359" rerandomize="per_student" name="What's next"/>
+    <customtag tag="S5" slug="discuss_360" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+  <vertical slug="vertical_361" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student">
+    <video youtube="0.75:4NLkvnpGmzM,1.0:GAAsrL_HHGI,1.25:MaEF-amWJhE,1.50:wEeHWZYhZE0" slug="What_s_next_362" rerandomize="per_student" name="What's next"/>
+    <customtag tag="S5" slug="discuss_363" rerandomize="per_student">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+</sequential>

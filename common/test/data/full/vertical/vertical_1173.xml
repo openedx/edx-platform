@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:YQ052I3bolE,1.0:U4TzwyFriSA,1.25:fZhnYQOzUJA,1.50:3a2aycbV96w" slug="S17V11_Total_Solution_--_Part_1" rerandomize="per_student" name="S17V11: Total Solution -- Part 1"/>
+  <customtag tag="S17" slug="discuss_1174" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="630" slug="book_1175" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1176" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

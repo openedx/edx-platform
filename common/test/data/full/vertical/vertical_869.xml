@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:qDUG-N5gI-w,1.0:d81T9ExNKPM,1.25:slnap0vIQn8,1.50:le_aB-7XNYw" slug="S14V5_Rising_Delay" name="S14V5: Rising Delay"/>
+  <customtag tag="S14" slug="discuss_870">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="534" slug="book_871">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="14" slug="slides_872">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

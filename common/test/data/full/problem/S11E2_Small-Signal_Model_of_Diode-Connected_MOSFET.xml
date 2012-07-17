@@ -1,0 +1,43 @@
+<problem><script type="loncapa/python">
+gm = "K*(V-VT)"
+
+R = "1/(K*(V-VT))"
+
+</script><startouttext/>
+   In exercise S10E2 we saw the two-terminal device formed by
+   connecting the gate to the drain of a MOSFET, as illustrated in the
+   figure below. 
+   <center><img src="/static/circuits/gate_to_drain.gif"/></center>
+   As usual, the MOSFET is specified in terms of two parameters, \(K\)
+   and \(V_T\).
+   <endouttext/>
+
+   <startouttext/>
+   <br/>
+   A small-signal model of the MOSFET can be used to make a
+   small-signal model of the two-terminal device, as illustrated below:
+   <center><img src="/static/circuits/diode-connected-small-signal-model.gif"/></center>
+   The coefficient \(g_m\) of the incremental voltage \(v_{gs}\) in the linear
+   dependent current source is called the "transconductance" of the
+   MOSFET.  Given that the bias voltage across the MOSFET is
+   \(V\), write an algebraic expression for the transconductance
+   of the MOSFET in this circuit.  Your expression should be expressed
+   in terms of \(K\), \(V_T\), and \(V\).  Enter your expression in
+   the space provided below: 
+   <endouttext/>
+<formularesponse type="cs" samples="VT,K,V@1,1,1:3,3,3#10" answer="$gm"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+   <startouttext/>
+   <br/>
+   The two-terminal device can be interpreted as a resistor for small signals.
+   <br/>
+   In the space provided below, write an algebraic expression for the
+   incremental resistance presented by this two-terminal device, in
+   terms of \(K\), \(V_T\) and the bias voltage \(V\).
+   <endouttext/>
+<formularesponse type="cs" samples="VT,K,V@1,1,1:3,3,3#10" answer="$R"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+
+
+
+</problem>

@@ -1,0 +1,111 @@
+<problem><script type="loncapa/python">
+VS = float(random.randrange(20,50,1))/10.0
+#VS = 3.3
+
+def TwoDigits(x):
+  return(round(100.0*x)/100.0)
+
+VT = TwoDigits(float(random.randrange(45,55,1))*VS/120.0)
+#VT = 5.0*VS/12.0
+
+RON = float(random.randrange(500,1000,20))
+#RON  = 750
+
+ROFFM = random.randrange(1,5,1)
+#ROFFM = 100
+ROFF  = float(ROFFM)*1e6
+
+def TwoDigits(x):
+  return(round(100.0*x)/100.0)
+
+VMIN = 0.0
+VOL = TwoDigits(VS/6.0)
+VIL = TwoDigits(VS/3.0)
+VIH = TwoDigits(2.0*VS/3.0)
+VOH = TwoDigits(11.0*VS/12.0)
+
+NM0 = VIL - VOL
+NM1 = VOH - VIH
+
+RMIN = 2.0*RON*(VS-VOL)/VOL
+
+RPU  = round((RMIN+1000.0)/100.0)*100.0
+RPUk = RPU/1e3
+
+PMIN = VS**2/(2.0*RON+RPU)+3.0*VS**2/(ROFF + RPU)
+PMINm = PMIN*1e3
+
+PMAX = 3.0*VS**2/(RON+RPU) + VS**2/(2.0*ROFF+RPU)
+PMAXm = PMAX*1e3
+</script><startouttext/>
+The circuit shown computes output \(C\) as a logic function of inputs \(A\)
+and \(B\).  
+<br/>
+The power supply \(V_S = $VS\)V.  The transistors in the technology process in which
+this circuit is implemented have
+\(V_T = $VT\)V, \(R_{ON} = $RON\Omega\), and \(R_{OFF} = $ROFFM\)M\(\Omega\).
+Hint: \(R_{OFF}\) is big enough that you may ignore it in your calculations.
+<center><img src="/static/circuits/nnnan.gif"/></center>
+Some of the following boolean expressions may describe this computation.  
+<br/>
+\(C=AB\), \(\ \overline{C}={\overline{\overline{A}\, \overline{B}}}\),
+\(\ C=\overline{AB}\), \(\ C=\overline{A}+\overline{B}\),
+\(\ C=\overline{A}\, \overline{B}\) 
+<br/>
+In the space provided below enter how many of these expressions are
+equivalent to the function computed by the circuit.
+<endouttext/>
+<numericalresponse answer="2"><responseparam type="tolerance" default=".001" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+We need to make a static discipline for our technology process.
+What is the maximum possible value that we can specify for \(V_{IL}\),
+in Volts?
+<endouttext/>
+<numericalresponse answer="$VT"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+The designer has chosen the following static discipline:
+<br/>
+\(V_{OL} = $VOL\)V, \(V_{IL} = $VIL\)V, 
+\(V_{IH} = $VIH\)V, \(V_{OH} = $VOH\)V
+<br/>
+What is the noise margin for logical zero, in Volts?
+<endouttext/>
+<numericalresponse answer="$NM0"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the noise margin for logical one, in Volts?
+<endouttext/>
+<numericalresponse answer="$NM1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+In this technology process all of the pullup resistors must have the same resistance.
+What is the smallest value, in Ohms, that the designer can use for the
+pullup resistors in this circuit to satisfy the static discipline?
+<endouttext/>
+<numericalresponse answer="$RMIN"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Assume that our designer chose \(R = $RPUk\)k\(\Omega\).  What is the
+minimum power, in milliWatts, that this circuit can consume, for any
+possible combination of inputs?
+<endouttext/>
+<numericalresponse answer="$PMINm"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the
+maximum power, in milliWatts, that this circuit can consume, for any
+possible combination of inputs?
+<endouttext/>
+<numericalresponse answer="$PMAXm"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+
+</problem>

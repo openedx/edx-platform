@@ -1,0 +1,53 @@
+<problem>
+<script type="loncapa/python">
+
+# Static Discipline
+VLOW = 0.0
+VOL  = 1.0
+VIL  = 2.0
+VIH  = 3.0
+VOH  = 4.0
+VS   = 5.0
+
+RLk = 1
+RL  = 1e3*RLk
+RON = 10
+
+CGSp  = 0.1
+CGS   = 1e-12*CGSp
+
+RTH = RON*RL/(RON+RL)
+
+trc = RTH*CGS
+trcn = trc*1e9
+</script>
+
+<startouttext/> 
+Given that \(R_{ON} = $RON\Omega\), \(R_L = $RLk\)k\(\Omega\), and
+\(C_{GS}=$CGSp\)pF.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the Thevenin equivalent resistance, in Ohms, as seen by the gate-source
+capacitance? 
+<endouttext/>
+<numericalresponse answer="$RTH">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the time constant for this circuit, in nanoseconds?
+<endouttext/>
+<numericalresponse answer="$trcn">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> <textline />
+</numericalresponse>
+
+
+
+
+
+</problem>

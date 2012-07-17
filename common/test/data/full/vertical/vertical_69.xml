@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="1.50:8QEfTdAsUcA,1.25:FpSJg9HQvhA,1.0:KsDpWC2M-i0,0.75:aoa8PCsrE3Y" slug="S1V11_Lumped_Element_Abstraction" name="S1V11: Lumped Element Abstraction"/>
+  <customtag page="29" slug="book_70">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="1" slug="slides_71">
+    <impl>slides</impl>
+  </customtag>
+  <customtag tag="S1" slug="discuss_72">
+    <impl>discuss</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:vh-ti-97pko,1.0:bSDQuMKo9Ks,1.25:NDznB9_RIFE,1.50:OfC6fTd7-4o" slug="S18V10_Homogeneous_Solution_--_Part_2" rerandomize="per_student" name="S18V10: Homogeneous Solution  -- Part 2"/>
+  <customtag tag="S18" slug="discuss_1265" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="656" slug="book_1266" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1267" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

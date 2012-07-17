@@ -1,0 +1,26 @@
+<!-- Impedance Model: Lecturer asks students to derive complex 
+     amplitude of voltage across capacitor -->
+
+<problem>
+
+<script type="loncapa/python">
+Vc = "(1/(1+j*w*R*C))*Vi"
+</script>
+
+<startouttext/>
+<center>
+<img src="/static/circuits/thevenin-capacitor2.gif" />
+</center>
+The complex amplitude of \(v_I(t)\) is \(V_i\).
+Derive \(V_c\) as a function of \(R\), \(C\), \(\omega\), and
+\(V_i\).  In the space below enter your algebraic expression for
+\(V_c\).  (As usual, use \(w\) for \(\omega\) in your expression.)
+<endouttext/>
+
+<formularesponse type="cs" samples="w,R,C,Vi@1,1,1,1:3,3,3,3#10" answer="$Vc">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

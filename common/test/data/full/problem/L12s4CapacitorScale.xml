@@ -1,0 +1,104 @@
+<problem>
+
+<script type="loncapa/python">
+epsilon0 = 8.854e-12
+k = 2.25 # polyethylene
+length = 100.0
+width = 0.01
+thickness = 0.00001
+wcm = width/0.01
+tmm = thickness/0.001
+C = k*epsilon0*length*width/thickness
+#print(C)
+</script>
+
+
+<startouttext/>
+A capacitor is a device that stores energy in the electric field
+between its two conductive plates.  The characteristic parameter \(C\)
+of a capacitor is called "capacitance", which is measured in units of
+Farads, after Michael Faraday, who invented fields as a way of
+understanding electromagnetic phenomena.  See
+<a href="http://en.wikipedia.org/wiki/Michael_Faraday"> Faraday</a>
+for more historical information about this great scientist/engineer.
+<br/><br/>
+For a mechanical analogy, if we think of charge in an electrical
+system as analogous to displacement in a mechanical system, so current
+is analogous to velocity, and voltage
+in an electrical system as analogous to force in a mechanical system
+then the law for a linear capacitor is analogous to the law for a
+linear spring:
+<br/><br/>
+<center>
+\(v=\frac{1}{C} Q\ \Longleftrightarrow\ F = k x\)
+</center>
+<br/><br/>
+and
+<br/><br/>
+<center>
+\(i = C \frac{d v}{d t}\)
+</center>
+<br/><br/>
+The capacitance of a parallel-plate capacitor is determined by its geometry and the
+material (called the dielectric) that is between its plates.  As you
+just seen in the lecture segment, the capacitance of a parallel-plate
+capacitor is directly proportional to the area of the plates and
+inversely proportional to the distance between the plates.  
+<br/><br/>
+<center>
+\( C = \frac{\epsilon A}{d} \)
+</center>
+<br/><br/>
+The constant of proportionality \(\epsilon\) is called the "permittivity".
+The permittivity is a property of the material between the plates.
+<endouttext/>
+
+<startouttext/>
+<br/>
+Suppose we double the length, width, and depth of a capacitor, by what
+multiple does the capacitance increase?
+<endouttext/>
+<numericalresponse answer="2">
+    <responseparam type="tolerance" default="1%" name="tol"
+                   description="Numerical Tolerance" /> <textline />
+</numericalresponse>
+
+<startouttext/>
+<br/>
+The permittivity of the vacuum is \(\epsilon_0 \approx
+8.854\times10^{−12}\)F/m.  This is also called the
+<a href="http://physics.nist.gov/cgi-bin/cuu/Value?ep0|search_for=universal_in!">
+  electric constant</a>.
+Non-conductive materials that can be put between the plates, such as
+polyethylene, have higher permittivity than the vacuum.  The ratio of
+the permittivity of a material to the permittivity of the vacuum is
+called the "relative permittivity" or the "dielectric constant" of the
+material.  For example, the dielectric constant of polyethylene is
+2.25.  For more information 
+<a href="http://en.wikipedia.org/wiki/Relative_permittivity">see</a>. 
+<br/>
+As a consequence of the very small permittivity of the vacuum, most
+common capacitors have a capacitance of only a tiny part of a Farad.
+For example, what is the capacitance (in Farads) of a parallel-plate capacitor
+with plates \($length\)m long, \($wcm\)cm wide, and separated by \($tmm\)mm of
+polyethylene? 
+<endouttext/>
+<numericalresponse answer="$C">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> <textline />
+</numericalresponse>
+<!-- about 2 uF -->
+<startouttext/>
+<br/>
+Of course, for such a capacitor the plates would be thin foil or metal
+deposited on the dielectric film.  The result would be rolled up
+into a tight package, with wire leads bonded to the foil plates, and
+hermetically sealed.
+<br/>
+So commonly available approximately linear capacitors range from
+picoFarads (pF) through microFarads (uF).  Electrolytic capacitors,
+which are not very linear, can easily be obtained in the
+thousands of microFarad range.
+<endouttext/>
+
+</problem>

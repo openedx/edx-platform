@@ -1,0 +1,13 @@
+<sequential>
+  <video youtube="0.75:w3Zg1eNlmj8,1.0:t24YP3JIKI8,1.25:VNWmSUeyeJ8,1.50:3C2yy52mUbg" slug="S2V8_Method_3_-_Node_Analysis" rerandomize="per_student" name="S2V8: Method 3 - Node Analysis"/>
+  <html slug="html_132" rerandomize="per_student">Correction: The final equation should be (e1-V0)G1 + (e1-<strong>e2</strong>)G3 +(e1)G2 = 0 </html>
+  <customtag tag="S2" slug="discuss_133" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="119" slug="book_134" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="2" slug="slides_135" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

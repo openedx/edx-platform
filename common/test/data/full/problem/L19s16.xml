@@ -1,0 +1,129 @@
+<!-- Sinusoidal Steady State: Magnitude and Angle computation -->
+
+<problem>
+
+<script type="loncapa/python">
+
+# H(w) =(Vp/Vi)(w) = (j*w*R*C)/(1 + j*w*R*C)
+
+global R,C
+
+R = random.choice([820.0, 910.0, 1000.0, 1100.0, 1200.0])  #Ohms
+Rk = R/1000.0
+C = 10e-9 #10 nF
+Cn = C*1e9
+
+def magH(w):
+   return( (w*R*C)/math.sqrt(1 + (w*R*C)**2) )
+
+def angH(w):
+   return( math.pi/2 - math.atan2((w*R*C), 1.0) )
+
+#wlo  = 2*math.pi*100.0
+#wmid = 2*math.pi*16000.0
+#whi  = 2*math.pi*10e6
+
+flo = random.randrange(50, 200, 10) 
+wlo = 2*math.pi*float(flo)
+mlo = magH(wlo)
+alo = angH(wlo)
+
+wmid  = 1.0/(R*C)
+fmid  =  wmid/(2*math.pi)
+fmidk = fmid/1e3
+mmid  = magH(wmid)
+amid  = angH(wmid)
+
+fhi  = random.randrange(10000000, 20000000, 100000) 
+fhiM = float(fhi)/1e6
+whi  = 2*math.pi*float(fhi)
+mhi  = magH(whi)
+ahi  = angH(whi)
+
+#print magH(wlo), angH(wlo)
+#print magH(wmid), angH(wmid)
+#print magH(whi), angH(whi)
+</script>
+
+<startouttext/>
+Suppose we have a circuit where the ratio of the complex amplitude of the
+particular integral to the amplitude of the driving sinusoid is
+<br/><br/>
+\( \frac{V_p}{V_i} = \frac{{\rm j} \omega R C}{1 + {\rm j} \omega R C} \)
+<br/><br/>
+Given that \(R =$Rk\)k\(\Omega\) and \(C = $Cn\)nF we will  
+compute the magnitude and phase of this ratio for various
+frequencies.
+<endouttext/>
+
+<startouttext/>
+<br/>
+For frequency \(f = $flo\)Hz what is the magnitude of
+\(\frac{V_p}{V_i}\)?
+<endouttext/>
+<numericalresponse answer="$mlo">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+For frequency \(f = $flo\)Hz what is the phase of
+\(\frac{V_p}{V_i}\)?  Enter your answer in radians.
+<endouttext/>
+<numericalresponse answer="$alo">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+For frequency \(f = $fmidk\)kHz what is the magnitude of
+\(\frac{V_p}{V_i}\)?  (Note: we are printing out lots of decimal
+places here for a reason :-).
+<endouttext/>
+<numericalresponse answer="$mmid">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+For frequency \(f = $fmidk\)kHz what is the phase of
+\(\frac{V_p}{V_i}\)?  Enter your answer in radians.
+<endouttext/>
+<numericalresponse answer="$amid">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+For frequency \(f = $fhiM\)MHz what is the magnitude of
+\(\frac{V_p}{V_i}\)?
+<endouttext/>
+<numericalresponse answer="$mhi">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+For frequency \(f = $fhiM\)MHz what is the phase of
+\(\frac{V_p}{V_i}\)?  Enter your answer in radians.
+<endouttext/>
+<numericalresponse answer="$ahi">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+</problem>

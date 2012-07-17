@@ -1,0 +1,44 @@
+<problem><script type="loncapa/python">
+def FOS(tau, start, goal, deltat):
+   return(goal+(start-goal)*math.exp(-(deltat/tau)))
+
+def FOSt(tau, start, goal, valatt):
+   return(-tau*math.log((valatt - goal)/(start - goal)))
+
+def FOStau(t, start, goal, valatt):
+   return(-t/math.log((valatt - goal)/(start - goal)))
+
+VS = 5     #Volts
+VSS = float(VS)
+fk = 10    #kHz
+f  = fk*1e3
+R1k = 1.5  #kOhm
+R1 = R1k*1e3
+Rk  = 1    #kOhm
+R  = Rk*1e3 
+
+tau = FOStau(1/(2*f),-VSS/2, +VSS, +VSS/2)
+C = tau/R
+Cn = C*1e9
+#print C
+
+</script><startouttext/>
+We have a relaxation oscillator circuit.
+<center><img src="/static/circuits/RelaxationOscillator.gif"/></center>
+Suppose that we want to use it to make a \($fk\)kHz clock.  That is,
+we want \($f\) rising edges in every second.  
+<br/>
+Assume that \(V_S =$VS\)V, \(R = $Rk\)k\(\Omega\) and \(R_1 =
+$R1k\)k\(\Omega\).  
+<br/>
+It remains to choose the capacitance \(C\).
+<endouttext/>
+
+<startouttext/>
+What is the value of \(C\), in nanoFarads, required to make this
+circuit oscillate at \($fk\)kHz.
+<endouttext/>
+<numericalresponse answer="$Cn"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+</problem>

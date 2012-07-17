@@ -1,0 +1,136 @@
+<problem><script type="loncapa/python">
+
+betad = random.randrange(200,250,5)
+#betad = 200
+beta  = float(betad)
+
+VBE  = random.choice([0.55, 0.56, 0.57, 0.58, 0.59, 0.6])
+#VBE  = 0.6
+
+VS   =  15.0
+RB1  =  53600.0
+RB2  =  12400.0
+RE   =  2200.0
+RC   =  6800.0
+
+d1 = (beta+1)*RE*(RB1+RB2)
+d2 = RB1*RB2
+d  = d1 + d2
+
+n1 = (beta+1)*RE*RB2
+
+VE = (n1*VS - d1*VBE)/d
+
+VB = (n1*VS + d2*VBE)/d
+
+IB = (RB2*VS - (RB1+RB2)*VBE)/d
+
+IC = beta*IB
+
+IE = IB + IC
+
+VC = VS - RC*IC
+
+vin = random.choice([0.1, 0.3, 0.5, 0.7, 0.9])
+ve  = vin
+ie  = vin/RE
+ic  = (beta/(1+beta))*ie
+vc  = - RC*ic
+
+#Thus the incremental gain.
+gain = -(RC/RE)*(beta/(1+beta))
+
+
+#print VE,VB,IB,VC
+
+
+</script><startouttext/>
+A BJT (Bipolar Junction Transistor) is another three-terminal device
+that can be used to build an amplifier.  The circuit shown is a model
+of an amplifier stage using a BJT in its region of linear operation.
+The crude model of the BJT in this circuit is just an independent
+voltage source and a current-controlled current source.
+<center><img src="/static/circuits/BJT.gif"/></center>
+A <a href="http://www.fairchildsemi.com/ds/2N/2N3904.pdf"> 2N3904 </a>
+has \(100 &lt; \beta &lt; 300\), so let's choose \(\beta = $beta\) and
+\(V_{BE} = 0.6\)V.  Let the power supply voltage be \(V_S = $VS\)V and
+the resistors be \(R_{B1} = $RB1\Omega\), \(R_{B2} = $RB2\Omega\),
+\(R_E = $RE\Omega\), and \(R_C = $RC\Omega\).
+<br/><br/>
+Now compute the operating point.  Hint: Because the current \(i_B\)
+controls the current source you will need to make a node equation for
+each of the two 
+nodes on either side of the independent source \(V_{BE}\), even though 
+the potential on one of those nodes gives the potential on the other.
+<br/><br/>
+What is the operating-point voltage \(V_{IN}\), in Volts?
+<endouttext/>
+<numericalresponse answer="$VB"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the operating-point voltage \(V_E\), in Volts?
+<endouttext/>
+<numericalresponse answer="$VE"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the operating-point current \(I_E\), in Amperes?
+<endouttext/>
+<numericalresponse answer="$IE"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the operating-point voltage \(V_{OUT}\), in Volts?
+<endouttext/>
+<numericalresponse answer="$VC"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+Now that we know the operating-point conditions.
+<br/>
+Note: You do not need to have determined the operating point in this circuit
+do the next parts of this problem.  They do not depend on the
+operating point because this model is entirely constructed from linear
+elements and independent sources.
+<endouttext/>
+
+<startouttext/>
+<br/>
+So, let's now determine the incremental behavior.  
+<br/><br/>
+Hint: Draw the small-signal circuit model for this circuit.
+<br/><br/>
+Assume that the input increases in voltage by \(v_{in} = $vin\)V.
+What is the resulting \(v_e\), in volts?
+<endouttext/>
+<numericalresponse answer="$ve"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+This causes \(i_E\) to change.  What is \(i_e\), in Amperes?
+<endouttext/>
+<numericalresponse answer="$ie"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+This causes \(i_C\) to change.  What is \(i_c\), in Amperes?
+<endouttext/>
+<numericalresponse answer="$ic"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+This causes \(v_{OUT}\) to change.  What is \(v_{out}\), in Volts?
+<endouttext/>
+<numericalresponse answer="$vc"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+So, what is the incremental gain \(\frac{v_{out}}{v_{in}}\)?
+<endouttext/>
+<numericalresponse answer="$gain"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+Note: This works because the circuit model is entirely made of linear
+elements and independent sources, so the scale of the change does not
+matter.
+<endouttext/>
+
+</problem>

@@ -1,0 +1,128 @@
+<!-- This is a problem about associated reference directions and power -->
+
+<problem>
+
+<startouttext />
+The figure below shows two identical circuits connecting a \(6\)V battery
+to an \(18\Omega\) resistor.  The difference is that we chose to
+measure the voltages and currents in the two circuits differently: we
+used a different coordinate system of voltages and currents in our
+measurements.  
+<center>
+<img src="/static/circuits/ard.gif" />
+</center>
+You are to determine the voltages and currents indicated and compute
+the powers entering the elements.
+<br />
+<br />
+What is the voltage (in Volts) \(v_1\) measured across the battery?
+<endouttext />
+<numericalresponse answer="6.0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the voltage (in Volts) \(v_2\) measured across the resistor?
+<endouttext />
+<numericalresponse answer="6.0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the current (in Amperes) \(i_1\) measured entering the battery?
+<endouttext />
+<numericalresponse answer="-0.3333333333">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the current (in Amperes) \(i_2\) measured entering the resistor?
+<endouttext />
+<numericalresponse answer="+0.3333333333">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the power (in Watts) \(P_1 = v_1 i_1\) entering the voltage source?
+<endouttext />
+<numericalresponse answer="-2.0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the power (in Watts) \(P_2 = v_2 i_2\) entering the resistor?
+<endouttext />
+<numericalresponse answer="+2.0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+<startouttext />
+<br />
+<br />
+What is the voltage (in Volts) \(v_3\) measured across the battery?
+<endouttext />
+<numericalresponse answer="-6.0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the voltage (in Volts) \(v_4\) measured across the resistor?
+<endouttext />
+<numericalresponse answer="-6.0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the current (in Amperes) \(i_3\) measured entering the battery?
+<endouttext />
+<numericalresponse answer="0.3333333333">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the current (in Amperes) \(i_4\) measured entering the resistor?
+<endouttext />
+<numericalresponse answer="-0.3333333333">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the power (in Watts) \(P_3 = v_3 i_3\) entering the voltage source?
+<endouttext />
+<numericalresponse answer="-2.0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+<startouttext />
+<br />
+What is the power (in Watts) \(P_4 = v_4 i_4\) entering the resistor?
+<endouttext />
+<numericalresponse answer="+2.0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+<br />
+Notice that the powers are the same in the two circuits.
+That is physical reality: power moves from the battery to the
+resistor, independent of the coordinate systems we use
+to measure the voltage and the current, so long as we use associated
+reference directions.  We must always measure current into the terminal
+that we put the + sign of the voltage measurement on.  Think of this
+as the red probe of the voltmeter.
+<endouttext />
+
+</problem>

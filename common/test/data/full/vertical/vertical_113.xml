@@ -1,0 +1,10 @@
+<sequential>
+  <problem filename="S2E2_Associated_Reference_Directions" slug="S2E2_Associated_Reference_Directions" rerandomize="never" name="S2E2: Associated Reference Directions"/>
+  <customtag tag="S2E2" slug="discuss_114" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S2E3_Using_KVL_KCL_and_VI_constraints" slug="S2E3_Using_KVL_KCL_and_VI_constraints" rerandomize="never" name="S2E3: Using KVL, KCL, and VI constraints"/>
+  <customtag tag="S2E3" slug="discuss_115" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+</sequential>

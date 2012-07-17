@@ -1,0 +1,94 @@
+<problem><script type="loncapa/python">
+ISu = random.randrange(1,5,1)
+IS  = float(ISu)*1e-6
+
+RR  = 600
+
+vsig = RR*IS
+vsigm = vsig*1e3
+
+f0o = random.randrange(700,800,5)
+f0  = float(f0o)
+omega0 = 2*math.pi*f0
+
+Lm  = random.choice([47, 48, 49, 50, 51])
+L   = float(Lm)*1e-3
+
+C   = 1/(L*omega0**2)
+Cu  = C*1e6
+
+
+RLo =  random.choice([27, 28, 29, 30])
+RL  = float(RLo)
+
+Q      = omega0/(RL/L)
+
+vnovn  = RL/(RR + RL) 
+
+
+</script><startouttext/>
+We have a problem in a measurement system.  The useful signal is
+developed by a sensor that we model as a current source, which
+develops a voltage at a recording instrument that we model with a
+resistor. 
+<center><img src="/static/circuits/SensorRecorder.gif"/></center>
+The input resistance of the recording instrument \(R_R =
+$RR\Omega\).  The signal we are looking for is \(I_s =
+$ISu\mu\)A.  What is the signal voltage, in milliVolts, that we expect
+at the recorder? 
+<endouttext/>
+<numericalresponse answer="$vsigm"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Our instrument encounters some nasty
+interference in the audio range, at a specific frequency \(f =
+$f0o\)Hz.  We can model the noise as an additional source in our
+circuit. 
+<br/>
+One way to fix the interference problem is to make a "trap" that
+shorts out the interfering signal.  For example, we could use a series
+resonant circuit tuned to the interfering frequency: 
+<center><img src="/static/circuits/SeriesTrap.gif"/></center>
+We happen to have an inductor with inductance \(L = $Lm\)mH.
+What capacitance, in microFarads, should we use to best attenuate the
+interference? 
+<endouttext/>
+<numericalresponse answer="$Cu"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Unfortunately, our inductor is imperfect: it has a series resistance
+\(R_L = $RLo\Omega\).  This limits the attenuation that we can achieve
+with this trap.  If \(V_n\) is the amplitude of the noise voltage at
+the recorder without the trap, and if \(V_{no}\) is the amplitude of
+the noise voltage at the recorder with the trap in place, what is the
+magnitude of the ratio \(V_{no}/V_n\)?
+<endouttext/>
+<numericalresponse answer="$vnovn"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+Now suppose a large noise pulse comes into the system.  Which of the 
+following approximate graphs is most likely to be the response as seen
+at the recorder?  The horizontal scale is time, in seconds. The
+vertical scale is voltage, scaled so that the pulse starts out the
+response at 1.0. 
+<br/>
+(Careful! Think about how the load resistance of the recorder influences
+the Q of the circuit for the response.)
+<center><img src="/static/circuits/combo-a.gif"/><img src="/static/circuits/combo-b.gif"/><img src="/static/circuits/combo-c.gif"/><img src="/static/circuits/combo-d.gif"/></center>
+In the space provided below enter your answer: A, B, C, or D
+<endouttext/> 
+<customresponse><startouttext/><br/><textline size="5" correct_answer="B"/><endouttext/><answer type="loncapa/python">
+correct = ['correct']
+try:
+  input = submission[0]
+except ValueError:
+  correct[0] = 'incorrect'
+
+if not('B'== input):
+  correct[0] = 'incorrect'
+</answer></customresponse>
+
+</problem>

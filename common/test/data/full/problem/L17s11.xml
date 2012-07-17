@@ -1,0 +1,39 @@
+<problem>
+<script type="loncapa/python">
+A1 = "-VI/2"
+A2 = A1
+</script>
+
+<startouttext/>
+Our total solution is formed from the sum of the particular solution
+we found and the general solution of the associated homogeneous
+equation.  The undetermined coefficients in the homogeneous part are
+determined by the initial conditions.
+<br/><br/>
+\( v(t) =  V_I + A_1 e^{j\omega_0 t} + A_2 e^{-j\omega_0 t} \)
+<br/><br/>
+We were given that \(v(0) = 0\) and \(i(0) = C \frac{dv(t)}{dt}|_{t=0} =0\).
+<br/> <br/>
+This is enough information to solve for \(A_1\) and \(A_2\).
+<br/> <br/>
+In the spaces provided write algebraic expressions for \(A_1\) and
+\(A_2\).
+<br/> <br/>
+\(A_1 =\)
+<endouttext/>
+<formularesponse type="cs" samples="L,C,VI@1,1,1:3,3,3#10" answer="$A1">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/><br/>
+\(A_2 =\)
+<endouttext/>
+<formularesponse type="cs" samples="L,C,VI@1,1,1:3,3,3#10" answer="$A2">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

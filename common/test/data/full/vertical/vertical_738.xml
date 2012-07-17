@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:-8gs2XmlGQc,1.0:PkZXPZJD2CM,1.25:iFWXnFSbmzc,1.50:84SFI-awNu4" slug="S11V7_Small_Signal_MOSFET_Circuit_Model" rerandomize="per_student" name="S11V7: Small Signal MOSFET Circuit Model"/>
+  <customtag tag="S11" slug="discuss_739" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="417" slug="book_740" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="11" slug="slides_741" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

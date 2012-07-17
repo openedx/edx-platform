@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:NK0LoTt_T3E,1.0:uKaQX89gsz0,1.25:Psc5wDT5ajw,1.50:lHFEpIT5ORk" slug="S26V12_Power_numbers_for_the_inverter" rerandomize="per_student" name="S26V12: Power numbers for the inverter"/>
+  <customtag tag="S26" slug="discuss_1913" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="610" slug="book_1914" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1915" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,268 @@
+<problem>
+
+<!-- 
+
+     File:   pyfarmer1.xml
+     Date:   30-Mar-12
+     Author: I. Chuang <ichuang@mit.edu>
+     
+     Python programming exercise test: farmer wolf cabbage goat
+
+-->     
+
+<startouttext />
+<br />Read <a href="https://sicp-s2.mit.edu/wiki/Long-term_decision-making_and_search:_Connection_to_state_machines">Section 8.2 of the class notes</a>.  See also <a href="https://sicp-s2.mit.edu/wiki/Long-term_decision-making_and_search:_Numeric_search_domain">Section 8.3 of the class notes</a> for an example.
+
+
+<p />One version of a standard puzzle
+called the <i>Farmer, Goat, Wolf, Cabbage</i> goes as follows:
+<ul>
+<li> The 
+farmer has a goat, a wolf and a head of cabbage (don't ask why a
+wolf...).  </li> 
+<li>They come to a river (they're on left bank) and need to get to the
+other side (the right bank).
+</li> 
+<li>There's a boat there that fits at most two of them (it's a big head of
+cabbage); the farmer must always be one of the two in the boat.
+</li> 
+<li> If the farmer leaves the goat and cabbage on the same side of the
+river, when he is not present the goat will eat the cabbage (so that's
+not a legal state).
+</li> 
+<li> Similarly, if the farmer leaves the goat and the wolf on the same
+side of the river, when he is not present... well, that's not legal
+either.
+</li> 
+</ul>
+So, the problem is to find a sequence of actions that go from the
+initial state where they are all on the left bank to the final state
+when they are all on the right bank.
+
+<p />We will implement this domain by defining a class which is a
+subclass of the <a href='{{wiki}}/State_Machines:_Primitive_state_machines#State_machines_in_Python"'><tt>SM</tt> class</a>.  We will then use
+<a href="http://mit.edu/6.01/mercurial/fall11/www/documentation/search-module.html"><tt>search.smSearch</tt></a>
+ to find sequences of actions.
+
+<p />The state of <a href="{{wiki}}/State_Machines">the state machine</a> needs to keep track of which bank of
+the river everyone is on.  So, a state  will be:
+<pre>
+(farmerLoc, goatLoc, wolfLoc, cabbageLoc) 
+</pre> 
+where each of these locations is <tt>'L'</tt> or <tt>'R'</tt> 
+(for left or right).
+The boat is always with the farmer so no need to keep track of that.
+
+<p /> Assume that the actions are: 
+<ul>
+<li> <tt>'takeNone'</tt>,
+</li> 
+<li> <tt>'takeGoat'</tt>, 
+</li> 
+<li> <tt>'takeWolf'</tt>, and 
+</li> 
+<li> <tt>'takeCabbage'</tt>.  
+</li> 
+</ul>
+Each action indicates a trip from whatever side of the river the
+farmer is on, to the opposite side of the river.
+
+<hr />
+<p /> Define the state machine class
+<tt>FarmerGoatWolfCabbageClass</tt>.  The state machine needs to have
+a <tt>getNextValues</tt> method and a <tt>legalInputs</tt> attribute,
+which will serve the role of the <tt>successors</tt> function and
+<tt>actions</tt> list respectively.  The <tt>startState</tt> of the
+state machine indicates the initial state for the search and the
+<tt>done</tt> method of the state machine serves as the goal test
+function.
+
+<p /> Make sure that no illegal or impossible actions are permitted,
+that is, states in which the goat and cabbage or the wolf and goat are
+alone together.  Also, you must make sure that if the farmer is to
+take a passenger across the river, then the passenger must be on the
+same side of the river as the farmer.  
+
+<p />If your machine receives an input action that is illegal or
+impossible, it should simply stay in the same state.
+
+<p /> Use the indices defined below to index the elements of the tuple.
+So <tt>state[wolf]</tt> is <tt>state[2]</tt>, which is the third
+component of the state tuple.  
+
+<p /><b>Note that states need to be <a href="http://docs.python.org/tutorial/datastructures.html#tuples-and-sequences">tuples</a>, not lists, so that they can
+be keys in the dictionary used in the search code to implement dynamic
+programming.</b> If you need to turn a tuple x into a list, you can do
+that with <tt>list(x)</tt>.  If you need to turn a list x into a
+tuple, you can do that with <tt>tuple(x)</tt>.
+
+<p />You should write and debug your code in Idle, you can use the file
+<pre>
+swLab13Work.py
+</pre>
+which imports the relevant library files.
+When you have it working, paste your answer in below and
+check it.
+
+<endouttext />
+
+<externalresponse answerdisplay="" answer="1,2,3,4,5,6,7" url="http://eecs1.mit.edu:8889/pyloncapa.py" >
+  <startouttext />
+    <br />
+    <textbox size="5" /> 
+    <br />
+  <endouttext />
+  <answer type="loncapa/python">
+
+<![CDATA[
+
+initial_display = """
+# Indices into the state tuple.
+(farmer, goat, wolf, cabbage) = range(4)
+
+class FarmerGoatWolfCabbage(sm.SM):
+   startState = None
+   legalInputs = None
+   def getNextValues(self, state, action):
+      pass
+   def done(self, state):
+      pass
+"""
+answer = ["""
+## State is a tuple of location of (farmer, goat, wolf, cabbage)
+# Indices into the state tuple.
+(farmer, goat, wolf, cabbage) = range(4)
+# passenger for each action
+actionPassenger = {'takeNone': None, 'takeGoat': goat,
+                    'takeWolf': wolf, 'takeCabbage': cabbage}
+
+class FarmerGoatWolfCabbage(sm.SM):
+    startState = ('L', 'L', 'L', 'L')
+    # The order of actions is arbitrary but can affect which answer you get
+    legalInputs = ['takeNone', 'takeGoat', 'takeWolf', 'takeCabbage']
+
+    # action is one of the legal actions (a string).  
+    def getNextValues(self, state, action):
+        if action not in self.legalInputs or not isPossible(state, action):
+            # illegal or impossible action
+            return (state, state)
+        passenger = actionPassenger[action] # passenger index for this action (or None)
+        new = list(state)               # make a list from contents of state (copies)
+        new[farmer] = opposite(state[farmer])
+        if passenger != None:
+            new[passenger] = opposite(state[passenger])
+        new = tuple(new)               # make sure we return tuple
+        if isSafe(new):
+           return (new, new)
+        else:
+           return (state, state)
+    def done(self, state):
+        return state == ('R', 'R', 'R', 'R')
+
+def isPossible(state, action):
+    passenger = actionPassenger[action]
+    return passenger is None or state[farmer] == state[passenger]
+
+def isSafe(state):
+    return not ((state[goat] == state[wolf] and state[farmer] != state[wolf]) or 
+                (state[goat] == state[cabbage] and state[farmer] != state[goat]))
+
+def opposite(bank):
+    if bank == 'L': return 'R'
+    else: return 'L'
+""",
+"""
+## State is a tuple of location of (farmer, goat, wolf, cabbage)
+# Indices into the state tuple.
+(farmer, goat, wolf, cabbage) = range(4)
+# passenger for each action
+actionPassenger = {'takeNone': None, 'takeGoat': goat,
+                    'takeWolf': wolf, 'takeCabbage': cabbage}
+
+class FarmerGoatWolfCabbage(sm.SM):
+    startState = ('L', 'L', 'L', 'L')
+    # The order of actions is arbitrary but can affect which answer you get
+    legalInputs = ['takeNone', 'takeGoat', 'takeCabbage', 'takeWolf']
+
+    # action is one of the legal actions (a string).  
+    def getNextValues(self, state, action):
+        if action not in self.legalInputs or not isPossible(state, action):
+            # illegal or impossible action
+            return (state, state)
+        passenger = actionPassenger[action] # passenger index for this action (or None)
+        new = list(state)               # make a list from contents of state (copies)
+        new[farmer] = opposite(state[farmer])
+        if passenger != None:
+            new[passenger] = opposite(state[passenger])
+        new = tuple(new)               # make sure we return tuple
+        if isSafe(new):
+           return (new, new)
+        else:
+           return (state, state)
+    def done(self, state):
+        return state == ('R', 'R', 'R', 'R')
+
+def isPossible(state, action):
+    passenger = actionPassenger[action]
+    return passenger is None or state[farmer] == state[passenger]
+
+def isSafe(state):
+    return not ((state[goat] == state[wolf] and state[farmer] != state[wolf]) or 
+                (state[goat] == state[cabbage] and state[farmer] != state[goat]))
+
+def opposite(bank):
+    if bank == 'L': return 'R'
+    else: return 'L'
+""",
+]
+preamble = """ 
+import operator
+import search
+import sm
+"""
+test_program = """
+def printStateFig(state):
+   name = reduce(operator.add, state)
+   print '<img src="http://sicp-s3.mit.edu/courseexport/probs/wk11/farmer/'+name+'.jpg" height="100" width="100"/>',
+
+def printAnswerFigs(states):
+   for state in states: 
+      if state: printStateFig(state)   
+
+def main():
+   f = open(sys.argv[2],'w')
+   test = sys.argv[1]
+   index = int(test[0])
+   print 'fsm = FarmerGoatWolfCabbage()'
+   fsm = FarmerGoatWolfCabbage()
+   search.somewhatVerbose = True
+   ptest = [None,
+	    '''ans = fsm.transduce(['takeGoat', 'takeNone'])''',
+            '''ans = fsm.transduce(['takeCabbage', 'takeNone'])''',
+	    '''ans = fsm.transduce(['takeGoat', 'takeNone', 'takeGoat'])''',
+	    '''ans = fsm.transduce(['takeGoat', 'takeCabbage'])''',
+            '''ans = fsm.transduce(['takeGoat', 'takeWolf'])''',
+            '''ans = fsm.transduce(['takeGoat', 'takeNone', 'takeCabbage', 'takeGoat','takeWolf' ])''',
+            '''ans = search.smSearch(fsm, maxNodes=20)''']
+   print 'Test', index, ':', ptest[index]
+   exec(ptest[index])
+   if ans:
+      if index < 7: printAnswerFigs(ans)
+      else:  printAnswerFigs([s for (a,s) in ans])
+   f.write(str(ans))
+   f.close()
+
+main()
+"""
+def output_check(a, b):
+   return a and b and eval(a) == eval(b)
+
+]]>
+</answer>
+</externalresponse>
+
+</problem>
+
+
+
+

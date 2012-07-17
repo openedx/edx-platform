@@ -1,0 +1,32 @@
+<sequential>
+  <vertical filename="vertical_20" slug="vertical_20" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_24" slug="vertical_24" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_28" slug="vertical_28" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_32" slug="vertical_32" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_36" slug="vertical_36" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_40" slug="vertical_40" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_44" slug="vertical_44" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_48" slug="vertical_48" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_52" slug="vertical_52" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_58" slug="vertical_58" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_62" slug="vertical_62" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical slug="vertical_66" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <problem filename="S1E3_AC_power" slug="S1E3_AC_power" name="S1E3: AC power"/>
+    <customtag tag="S1E3" slug="discuss_67">
+      <impl>discuss</impl>
+    </customtag>
+    <html slug="html_68"> S1E4 has been removed. </html>
+  </vertical>
+  <vertical filename="vertical_69" slug="vertical_69" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_73" slug="vertical_73" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_77" slug="vertical_77" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_81" slug="vertical_81" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_89" slug="vertical_89" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical slug="vertical_94" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <video youtube="0.75:XNh13VZhThQ,1.0:XbDRmF6J0K0,1.25:JDty12WEQWk,1.50:wELKGj-5iyM" slug="What_s_next" name="What's next"/>
+    <html slug="html_95">Minor correction: Six elements (five resistors)</html>
+    <customtag tag="S1" slug="discuss_96">
+      <impl>discuss</impl>
+    </customtag>
+  </vertical>
+</sequential>

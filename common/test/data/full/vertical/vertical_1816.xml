@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:f-LfR8QKy4U,1.0:cXn5_WFTRRQ,1.25:4Nbx_shG2Cc,1.50:od4A5dtvz4A" slug="S25V11_Hysteresis_with_positive_feedback" rerandomize="per_student" name="S25V11: Hysteresis with positive feedback"/>
+  <customtag tag="S25" slug="discuss_1817" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="869" slug="book_1818" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="25" slug="slides_1819" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

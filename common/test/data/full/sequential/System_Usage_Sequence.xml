@@ -1,0 +1,16 @@
+<sequential>
+  <vertical filename="vertical_1" slug="vertical_1" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_4" slug="vertical_4" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical slug="vertical_7" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <problem filename="Sample_Numeric_Problem" slug="Sample_Numeric_Problem" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="false" name="Sample Numeric Problem"/>
+    <problem filename="Sample_Algebraic_Problem" slug="Sample_Algebraic_Problem" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="false" name="Sample Algebraic Problem"/>
+  </vertical>
+  <vertical slug="vertical_8" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <video youtube="0.75:QhH0akny90o,1.0:ZSo0SfCXZlE,1.25:OgVJ5Q3LVc8,1.50:O0tl9DtfyEY" slug="S0V3_Lab_Introduction_Video" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="S0V3: Lab Introduction Video"/>
+    <html slug="html_9" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"> Don't worry if you don't understand how to use all of the elements of the schematic tool. Learning to build circuits is arguably the entire purpose of 6.002x, and you will understand how to use everything by the end of the course. For now, just try to get familiar enough with the tools to be able to complete Lab 0. </html>
+    <html filename="eText" slug="eText" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="eText"/>
+  </vertical>
+  <vertical filename="vertical_10" slug="vertical_10" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_13" slug="vertical_13" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical filename="vertical_16" slug="vertical_16" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+</sequential>

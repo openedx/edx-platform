@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:eh0pyDOnY3c,1.0:pnHDLuxmXHo,1.25:lX5fOJfzvaw,1.50:gIsF_ZFqCTg" slug="S3V6_Demo_Superposition" name="S3V6: Demo Superposition"/>
+  <customtag tag="S3" slug="discuss_173">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="145" slug="book_174">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="3" slug="slides_175">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

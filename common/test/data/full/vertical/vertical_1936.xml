@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:EcHMaR_UXDU,1.0:2lOvML0FtU8,1.25:YeivKDsghoY,1.50:Y5VsZS-hVqc" slug="S27V6_Power_Dissipation_in_CMOS_Logic" name="S27V6: Power Dissipation in CMOS Logic"/>
+  <customtag tag="S27" slug="discuss_1937">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="613" slug="book_1938">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="27" slug="slides_1939">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

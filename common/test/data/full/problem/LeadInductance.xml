@@ -1,0 +1,105 @@
+<problem>
+<script type="loncapa/python">
+RS = 22.0
+RO = 50.0
+Ln = 15.44
+L  = Ln*1e-9
+V  = random.choice([1.0, 1.8, 3.3, 5.0])
+rat = random.choice([0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+
+VFs = "(RO*V)/(RS+RO)"
+taus = "L/(RS+RO)"
+
+vi = 0
+vf = (RO*V)/(RS+RO)
+tau = L/(RS+RO)
+
+vgoal = 0.5*V
+tgoal = -tau*math.log((vgoal-vf)/(vi-vf))
+tgn = tgoal*1e9
+#print(tgn)
+
+c=299792458 #m/s
+x=0.02
+tcn =(x/c)*1e9
+#print(tcn)
+</script>
+
+
+
+<startouttext/> 
+A wire is not a simple thing: it is not a node.  A wire is a physical
+object that has properties.  For example, in power transmission lines
+the resistance of the wire is very important.  When we work at very
+high frequencies, the capacitance of nearby wires to each other and
+even the inductance of the wire and the mutual inductances between
+wires can be important.  We call these unwanted interactions
+"parasitics'.  They break our lumped-circuit abstraction, so we need
+to know just how bad they are.
+<br/><br/>
+Let's look at the effect of the inductance of a wire lead on a
+component.  A typical 1/4 Watt discrete resistor comes with 1.5 inch
+leads of 
+<a href="http://en.wikipedia.org/wiki/American_wire_gauge"> AWG
+#20 </a> wire, one for each terminal.  We usually mount such a part
+using only a bit of that wire.  Suppose we end up with a total of 2cm
+of wire in series with that resistor.  AWG #20 wire has a diameter of
+0.812mm.  So 2cm of this wire has an inductance of about \($Ln\)nH.
+(The estimate of inductance is computed from from a
+<a href="http://www.eeweb.com/toolbox/wire-inductance">
+ magic formula </a> that is
+not part of this subject.  You can learn about this in an electromagnetic theory
+subject.)  We will ignore the resistance of the 2cm of wire... 
+<br/><br/>
+
+Suppose we have a voltage source that turns on (it goes from
+\(0\) to \(V\)) at \(t=0\), and suppose it is connected to an
+\(R_O\) load through a resistor \(R_S\) and a
+wire with inductance \(L\).  Let's model the situation as follows:
+<center>
+<img src="/static/circuits/lead-inductance.gif" />
+</center>
+<endouttext/>
+
+<startouttext/>
+Assume that the initial voltage across the load is zero.  What is the
+final voltage across the load?  Write an algebraic expression for this
+final value in terms of the parameters given:
+<endouttext/>
+<formularesponse type="cs" samples="L,RS,RO,V@1,1,1,1:3,3,3,3#10" answer="$VFs">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+Write an algebraic expression for the time constant of this circuit in
+terms of the parameters given:
+<endouttext/>
+<formularesponse type="cs" samples="L,RS,RO,V@1,1,1,1:3,3,3,3#10" answer="$taus">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+Now, let's get down to numbers.  Let \(V =$V\)V, \(R_S=$RS\Omega\),
+\(R_O=$RO\Omega\), and \(L=$Ln\)nH.  How much time, in nanoseconds, does it take for the
+output voltage to reach \(v_O=$vgoal\)V?
+<endouttext/>
+<numericalresponse answer="$tgn">
+   <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+This is a pretty significant amount of time!  For comparison, how
+long, in nanoseconds,
+does light take to go 2cm?  Remember, the speed of light is
+<a href="http://physics.nist.gov/cgi-bin/cuu/Value?c"> \($c\)m/s</a>. 
+<endouttext/>
+<numericalresponse answer="$tcn">
+   <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+   <textline/>
+</numericalresponse>
+
+
+</problem>

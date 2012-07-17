@@ -1,0 +1,161 @@
+<!-- It works, and is not so bad. -->
+
+<problem>
+
+<script type="loncapa/python">
+R = 10000
+
+flowk = 535    # kHz
+fhighk = 1705  # kHz
+
+flow = flowk*1e3
+fhigh = fhighk*1e3
+
+omegalow = 2*math.pi*flow
+omegahigh = 2*math.pi*fhigh
+
+Cmaxp = 365          # 365pF
+Cmax  = Cmaxp*1e-12
+
+L = 1/(Cmax*omegalow**2)
+Lu = L*1e6
+
+Cmin = 1/(L*omegahigh**2)
+Cminp = Cmin*1e12    # pF
+
+# Parallel tuned circuit
+# 2*alpha
+alpha2low = 1/(R*Cmax)
+alpha2high = 1/(R*Cmin)
+
+Qlow = omegalow/alpha2low
+Qhigh = omegahigh/alpha2high
+
+domegalow = alpha2low
+domegahigh = alpha2high
+
+dflow = domegalow/(2*math.pi)
+dflowk = dflow*1e-3
+
+dfhigh = domegahigh/(2*math.pi)
+dfhighk = dfhigh*1e-3
+
+</script>
+
+<startouttext/>
+In the United States the frequencies between \($flowk\)kHz and \($fhighk\)kHz are
+<a href="http://www.ntia.doc.gov/files/ntia/publications/spectrum_wall_chart_aug2011.pdf">
+allocated </a> to the AM radio broadcast band.  Stations are allocated
+10kHz channels, so in the worst case two stations may be separated by
+as little as 10kHz.  It is proposed that the channel-selection
+mechanism for an AM radio could be modeled by the following circuit
+that uses a variable capacitor to adjust the resonant frequency of 
+a parallel tuned circuit.
+<center>
+<img src="/static/circuits/AM-FrontEndTuning.gif" />
+</center>
+In this exercise we will see why this cannot be the whole story.
+<br/>
+Assume that the antenna presents an impedance of \(R = $R\Omega\).
+(This is not very realistic, but the real story is even worse, as we
+will see!)
+One
+<a href="http://www.angelfire.com/electronic2/index1/VariableCap.html">
+traditional </a> tuning capacitor for an AM radio receiver has
+maximum capacitance of \(C_{max} = $Cmaxp\)pF.  This maximum
+capacitance is used to resonate with the inductor at the lowest
+frequency.  What is the inductance, in microHenrys, required to resonate with
+\(C_{max}\) at the lower band edge \(f = $flowk\)kHz?
+<endouttext/>
+<numericalresponse answer="$Lu">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Given the inductance you just derived, what is the capacitance, in picoFarads, that
+the variable capacitor will need to be set to for the circuit to
+resonate at the higher band edge \(f =$fhighk\)kHz?
+<endouttext/>
+<numericalresponse answer="$Cminp">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Now we know all of the part parameters.  What is the \(Q\) of this tuned
+circuit at the lower band edge?
+<endouttext/>
+<numericalresponse answer="$Qlow">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the \(Q\) of this tuned circuit at the upper band edge?
+<endouttext/>
+<numericalresponse answer="$Qhigh">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the bandwidth \(\Delta\omega\), in kHz, of this tuned circuit
+at the lower band edge?
+<endouttext/>
+<numericalresponse answer="$dflowk">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+What is the bandwidth \(\Delta\omega\), in kHz, of this tuned circuit
+at the upper band edge?
+<endouttext/>
+<numericalresponse answer="$dfhighk">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/> 
+<br/> 
+This bandwidth is way too large.  If we are listening to a station at
+1030kHz and there is an interfering station at 1060kHz the carrier of
+the interfering station will be hardly suppressed.  This is a serious
+problem.  In a densely-populated place,
+<a href="http://www.nyradioguide.com/amlist1.htm"> New York City </a>
+for example, WHLI is at 1100kHz, WBBR is at 1130kHz, and WVNJ is at
+1160kHz.
+<br/>
+To narrow the bandwidth we would have to raise the \(Q\).  But this
+requires raising the value of \(R\), which is already very high: and
+antenna radiation resistance is almost never this high, so we would
+have to use a different way to couple the antenna to the tuned circuit
+(a loop coupling, making the inductor the secondary of a transformer,
+would help a lot).  But even worse, the bandwidth varies drastically
+as we tune from one end of the band to the other.
+<br/>
+So this tuning scheme cannot be the whole story.  It is difficult to
+make a single tuned circuit that can cover a wide frequency range (a
+factor of 3 here) with a high enough \(Q\) to discriminate stations
+even 30kHz apart.
+<br/>
+The <a href="http://en.wikipedia.org/wiki/Superheterodyne_receiver">
+superheterodyne </a> receiver, invented by 
+<a href="http://en.wikipedia.org/wiki/Edwin_Armstrong"> Edwin Armstrong </a> 
+in 1918, solved this and many other problems.
+<endouttext/>
+
+</problem>

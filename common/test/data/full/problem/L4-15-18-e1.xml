@@ -1,0 +1,40 @@
+<!-- Boolean Function exercise: L4-15-18 -->
+
+<problem>
+
+<startouttext />
+How many distinct values can be represented with two boolean-valued signals?
+<endouttext />
+<numericalresponse answer="4">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+How many distinct boolean-valued functions are there of two boolean-valued signals?
+<endouttext />
+<numericalresponse answer="16">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+How many distinct values can be represented with three boolean-valued signals?
+<endouttext />
+<numericalresponse answer="8">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+How many distinct boolean-valued functions are there of three boolean-valued signals?
+<endouttext />
+<numericalresponse answer="256">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

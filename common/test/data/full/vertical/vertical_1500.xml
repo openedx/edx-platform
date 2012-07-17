@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:1Aydd1mekHA,1.0:61NwBjTYBWE,1.25:ZEFA0wZH4oA,1.50:GqM3SyrgbBE" slug="S21V17_Another_way_of_looking_at_Q" name="S21V17: Another way of looking at Q"/>
+  <customtag tag="S21" slug="discuss_1501">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="819" slug="book_1502">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="21" slug="slides_1503">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

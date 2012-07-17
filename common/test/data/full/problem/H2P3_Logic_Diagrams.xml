@@ -1,0 +1,86 @@
+<problem><script type="loncapa/python">
+queries = [[1,3],[2,4],[3,1],[4,2]]
+qs=random.choice(queries)
+
+q = qs[0]
+qa = qs[1]
+
+if ((q==1)or(q==3)):
+    tt = {'a':0, 'b':0, 'c':1, 'd':0, 'e':1, 'f':0, 'g':0, 'h':1} 
+else:
+    tt = {'a':0, 'b':0, 'c':1, 'd':1, 'e':1, 'f':0, 'g':0, 'h':0} 
+
+a=tt['a']
+b=tt['b']
+c=tt['c']
+d=tt['d']
+e=tt['e']
+f=tt['f']
+g=tt['g']
+h=tt['h']
+</script><startouttext/><center><img src="/static/circuits/ha-hs.gif"/></center>
+In the figure above there are four two-input two-output logic
+circuits.  Each circuit is equivalent, in that it computes the same
+logic function, as another circuit in the figure.
+<br/>
+Which circuit is equivalent to circuit number \($q\)?  Enter the
+number of the equivalent circuit in the box provided:
+<endouttext/>
+
+<numericalresponse answer="$qa"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+The truth table for a two-input function has only four lines.
+<center><img src="/static/circuits/ha-hs-tt.gif"/></center>
+Fill in the missing information in the truth table for the circuit
+number \($q\).
+<br/>
+What is the entry in the box labeled \(a\)?
+<endouttext/>
+<numericalresponse answer="$a"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \(b\)?
+<endouttext/>
+<numericalresponse answer="$b"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \(c\)?
+<endouttext/>
+<numericalresponse answer="$c"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \(d\)?
+<endouttext/>
+<numericalresponse answer="$d"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \(e\)?
+<endouttext/>
+<numericalresponse answer="$e"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \(f\)?
+<endouttext/>
+<numericalresponse answer="$f"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \(g\)?
+<endouttext/>
+<numericalresponse answer="$g"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/>
+What is the entry in the box labeled \(h\)?
+<endouttext/>
+<numericalresponse answer="$h"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

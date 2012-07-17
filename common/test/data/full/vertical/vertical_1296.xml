@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:zXRGqrv4DNY,1.0:sMJ0Oczswow,1.25:rHtJq5MNu9I,1.50:ZJsmRHhZVg4" slug="S18V17_Inverter_Pair_RLC_Dynamics" rerandomize="per_student" name="S18V17: Inverter Pair RLC Dynamics"/>
+  <customtag tag="S18" slug="discuss_1297" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="664" slug="book_1298" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1299" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

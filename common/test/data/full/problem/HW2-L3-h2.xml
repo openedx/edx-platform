@@ -1,0 +1,71 @@
+<!--  
+This is a Homework Problem for use after Lecture 3 (linearity and
+   Superposition to Thevenin/Norton)
+-->
+
+<problem>
+
+<script type="loncapa/python">
+VT = 0.6
+I = float(random.randrange(10,100,10))/100
+Rp = VT/I
+Rs = float(random.randrange(100,200,10))/100
+
+RT = Rp+2*Rs
+
+RL = RT
+
+PL = RL*(VT/(RT+RL))**2
+</script>
+
+<startouttext /> 
+
+A simple model of a photovoltaic solar cell is a current source, with
+the current proportional to the amount of sunlight falling on it.  A
+more accurate model includes a diode (a nonlinear element we will see
+later).  There is some leakage current that we can model with a
+parallel resistor, and there is a voltage drop in the interconnect
+that we can model with series resistances connecting to the load
+resistor.  So a crude model of a complete system might be the circuit
+shown below.
+<center>
+<img src="/static/circuits/solar-cell.gif" />
+</center>
+<br />
+In this system we have \(I=$I\)A, \(R_p=$Rp\Omega\), and \(R_s=$Rs\Omega\).
+<br />
+You are to determine the load resistance, \(R_L\), for which the
+maximum power is transferred to the load.  (Hint: remember your calculus!)
+<br/>
+What is this optimum load resistance (in Ohms)?
+<endouttext />
+<numericalresponse answer="$RL">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> 
+What is the power (in Watts) that is delivered to this best load resistance?
+<endouttext />
+<numericalresponse answer="$PL">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> 
+What is the Thevenin equivalent resistance (in Ohms) of the power source as seen
+by the load resistance?
+<endouttext />
+<numericalresponse answer="$RT">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br /> 
+Hmmmmmm.
+<endouttext />
+
+</problem>

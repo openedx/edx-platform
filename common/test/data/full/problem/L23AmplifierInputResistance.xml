@@ -1,0 +1,87 @@
+<!--Non Inverting Amplifier -->
+
+<problem>
+
+<script type="loncapa/python">
+R_1 = 4000
+R_2 = 1000
+
+R1 = float(R_1)
+R2 = float(R_2)
+
+global R1,R2
+
+def non_inverting_gain(A):
+  return( A/(1 + A*R2/(R1+R2)) )
+
+def inverting_gain(A):
+  return( -A*R1/(R1 + (A+1)*R2) )
+
+def inverting_input_resistance(A):
+  return( R2/(1 - R1/(R1 + (A+1)*R2)) )
+
+A_1 = 10
+A1  = float(A_1)
+RI1 = inverting_input_resistance(A1)
+
+A_2 = 100
+A2  = float(A_2)
+RI2 = inverting_input_resistance(A2)
+
+A_3 = 100000
+A3  = float(A_3)
+RI3 = inverting_input_resistance(A3)
+
+</script>
+
+<startouttext/>
+In the non-inverting amplifier the input resistance (the resistance
+looking into the input port) is infinite, because the operational
+amplifier does not take any current into its input terminals (in our
+model: this is only approximately true.)
+<center>
+<img src="/static/circuits/NonInvertingAmplifier.gif" />
+</center>
+However, the inverting amplifier has a finite input resistance.
+<center>
+<img src="/static/circuits/InvertingAmplifierInputPort.gif" />
+</center>
+In our circuit \(R_1 = $R_1\Omega\) and \(R_2 = $R_2\Omega\).
+Here we look at how the input resistance depends on the gain of the
+operational amplifier.
+<br/>
+If \(A = $A_1\) what is the input resistance \(v_I/i_I\), in Ohms, of this amplifier?
+<endouttext/>
+<numericalresponse answer="$RI1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+If \(A = $A_2\) what is the input resistance \(v_I/i_I\), in Ohms, of this amplifier?
+<endouttext/>
+<numericalresponse answer="$RI2">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+If \(A = $A_3\) what is the input resistance \(v_I/i_I\), in Ohms, of this amplifier?
+<endouttext/>
+<numericalresponse answer="$RI3">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Notice how the resistance approaches \(R_2 = $R_2\) as 
+\(A \rightarrow \infty\).
+<endouttext/>
+
+</problem>

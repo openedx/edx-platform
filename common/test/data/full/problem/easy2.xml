@@ -1,0 +1,32 @@
+<problem>
+
+<script type="loncapa/python">
+ANS=7.78
+ANS=8.42
+</script>
+
+<startouttext/>
+The correct answer is 7.78
+<center>
+<img src="/static/circuits/x1.gif" />
+</center>
+What is the correct answer?
+<endouttext/>
+<numericalresponse answer="$ANS">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/><br/>
+The correct answer is 8.42. What is the correct answer?
+<endouttext/>
+<numericalresponse answer="$ANS2">
+   <responseparam type="tolerance" default="5%" name="tol"
+		  description="Numerical Tolerance"/> 
+   <textline/>
+</numericalresponse>
+
+</problem>
+

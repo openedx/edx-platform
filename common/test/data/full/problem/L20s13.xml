@@ -1,0 +1,56 @@
+<!-- Impedance Model: Lecturer asks students to derive frequency
+     limits of complex amplitude of voltage across resistor in series
+     VLCR  circuit. -->
+
+<problem>
+
+<script type="loncapa/python">
+ws = "w*R*C"
+wb = "R/(w*L)"
+</script>
+
+<startouttext/>
+In this circuit we computed the voltage-transfer ratio from the
+complex amplitude of the source \(V_i\) to the complex amplitude of
+the voltage across the resistor \(V_r\).
+<center>
+<img src="/static/circuits/VLCR1.gif" />
+</center>
+This transfer ratio is 
+<br/><br/>
+\( \frac{V_r}{V_i} = \frac{{\rm j} \omega R C}{1 + {\rm j} \omega R C - \omega^2 L C} \)
+<br/><br/>
+What is the value of the magnitude of this ratio when \(\omega \sqrt{L C} = 1\)?
+<endouttext/>
+<numericalresponse answer="1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/><br/>
+In the spaces below enter your algebraic expressions in terms of
+\(\omega\), \(R\), \(C\), and \(L\).
+<br/>
+(As usual, use \(w\) for \(\omega\) in your expressions.)
+<br/><br/>
+What is the approximate form of the magnitude of this ratio for small \(\omega\)?
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,Vi@1,1,1,1,1:3,3,3,3,3#10" answer="$ws">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+What is the approximate form of the magnitude of this ratio for large \(\omega\)?
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,Vi@1,1,1,1,1:3,3,3,3,3#10" answer="$wb">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

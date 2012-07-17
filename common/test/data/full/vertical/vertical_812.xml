@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S12E3_Norton_Capacitor_Circuit" slug="S12E3_Norton_Capacitor_Circuit" showanswer="attempted" rerandomize="per_student" name="S12E3: Norton Capacitor Circuit"/>
+  <customtag tag="S12E3" slug="discuss_813" showanswer="attempted" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="511" slug="book_814" showanswer="attempted" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+</sequential>

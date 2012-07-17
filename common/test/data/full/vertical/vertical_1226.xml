@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S18E3_Total_Solution" slug="S18E3_Total_Solution" showanswer="attempted" rerandomize="false" name="S18E3: Total Solution"/>
+  <customtag tag="S18" slug="discuss_1227">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="658" slug="book_1228">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1229">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

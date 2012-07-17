@@ -1,0 +1,49 @@
+<problem><startouttext/>
+The figure below shows a variety of possible V-I characteristics for a
+two terminal device.
+<center><img src="/static/circuits/various-vics.gif"/></center>
+For each of the following circuit elements enter the label of an
+appropriate V-I characteristic in the slot provided.  Note, there may
+be more than one correct answer to each question.
+<endouttext/>
+<customresponse><startouttext/><br/>
+A linear resistor: <textline size="5" correct_answer="either a or f"/>
+<br/><br/>
+An independent voltage source: <textline size="5" correct_answer="d"/>
+<br/><br/>
+An independent current source: <textline size="5" correct_answer="b"/>
+<endouttext/>
+<answer type="loncapa/python">
+
+correct = ['correct', 'correct', 'correct']
+
+try:
+   r = str(submission[0])
+except ValueError:
+   correct[0] = 'incorrect'
+   r = "0"
+
+try:
+   v = str(submission[1])
+except ValueError:
+   correct[1] = 'incorrect'
+   v = "0"
+
+try:
+   i = str(submission[2])
+except ValueError:
+   correct[2] = 'incorrect'
+   i = "0"
+
+if not(r=="a" or r=="f"):
+   correct[0] = 'incorrect'
+
+if not(v=="d"):
+   correct[1] = 'incorrect'
+
+if not(i=="b"):
+   correct[2] = 'incorrect'
+
+</answer>
+</customresponse>
+</problem>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:y6DCuFYBQnQ,1.0:cX6e2zZ14Fs,1.25:0KGIFVd_878,1.50:XclGMPv9p1w" slug="S19V2_DEMO_Sinusoidal_amplifier_response" name="S19V2: DEMO Sinusoidal amplifier response"/>
+  <customtag tag="S19" slug="discuss_1276">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="705" slug="book_1277">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="19" slug="slides_1278">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

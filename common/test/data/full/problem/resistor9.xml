@@ -1,0 +1,33 @@
+<problem>
+
+<script type="loncapa/python">
+r1=random.randrange(1,10,1)
+r2=random.randrange(1,10,1)
+total=r1+r2
+div=float(r2)/(r1+r2)
+</script>
+
+<startouttext />
+Take a resistor network with \(R_1=$r1\Omega\) and \(R_2=$r2\Omega\):
+<center>
+<img src="/static/circuits/divider.png" />
+</center>
+Without the output, what is the resistance seen at the input?
+<endouttext />
+
+<numericalresponse answer="$total">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+What is the voltage divider gain if voltage is applied to \(R_1\), and \(R_2\) is grounded? 
+<endouttext />
+
+<numericalresponse answer="$div">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

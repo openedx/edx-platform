@@ -1,0 +1,112 @@
+<problem>
+<script type="loncapa/python">
+
+pi = 4.0*math.atan(1.0)
+
+omega0 = "sqrt(k/m)"
+
+f0     = omega0 + "/(2*pi)"
+
+bcrit  = "2*sqrt(m*k)"
+
+alpha  = "b/(2*m)"
+
+
+</script>
+
+
+
+<startouttext/>
+One way to model a vehicle is as a massive object that is connected by
+springs and shock absorbers to the wheels.  Here is a simple model:
+<center>
+<img src="/static/circuits/Vehicle.gif" />
+</center>
+There is a mass \(m\) suspended by a spring with spring constant \(k\)
+and a oil-filled shock-absorber with viscous friction constant \(b\)
+over a wheel base.  The wheels ride over a rough road that moves up
+and down.  We will only model the vertical motion, with vertical
+displacement \(y\).  If you remember your basic physics you will be
+able to see that the balance-of-forces equation governing the motion
+in the \(y\) direction is just a second-order linear
+constant-coefficient ordinary differential equation:
+<br/><br/>
+\( m \frac{d^2 y(t)}{dt^2} + b \frac{d y(t)}{dt} + k (y(t) - Y_{road}(t)) = 0 \)
+<br/><br/>
+(Don't worry if you don't remember this: we are giving you the equation.)
+<br/><br/>
+Now this equation looks very much like the equation governing a driven
+RLC circuit:
+<center>
+<img src="/static/circuits/VRLC.gif" />
+</center>
+<br/><br/>
+\( L C \frac{d^2 v_C(t)}{dt^2} + R C \frac{d v_C(t)}{dt} +  v_C(t) = V(t) \)
+<br/><br/>
+Indeed, if we think of the charge on the capacitor \(q\) as analogous to the
+displacement \(y\), and if we note that \(q = C v\) we can rewrite
+this equation as:
+<br/><br/>
+\( L \frac{d^2 q(t)}{dt^2} + R \frac{d q(t)}{dt} + \frac{1}{C}q(t) -  V(t) = 0 \)
+<br/><br/>
+So the inductance is analogous to the mass (inertia), the resistance
+is analogous to the viscous friction, the reciprocal of the
+capacitance is analogous to the spring constant, and the variations of
+height of the road is analogous to the voltage drive (scaled by \(C\).
+<br/><br/>
+When we hit a bump, a vehicle may oscillate, just like an underdamped circuit.
+<endouttext/>
+
+<startouttext/>
+<br/>
+Since this is second order the characteristic polynomial is of the form:
+<br/><br/>
+\(s^2 + 2 \alpha s + \omega_0^2 = 0\)
+<br/><br/>
+For our differential equation what are the values of \(\alpha\) and
+\(\omega_0\)?  Write algebraic expressions for them in terms of the
+mechanical parameters \(m\), \(b\), and \(k\), in the spaces below.
+<br/><br/>
+\(\alpha =\)
+<endouttext/>
+<formularesponse type="cs" samples="m,b,k@1,1,1:3,3,3#10" answer="$alpha">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+\(\omega_0 =\)
+<endouttext/>
+<formularesponse type="cs" samples="m,b,k@1,1,1:3,3,3#10" answer="$omega0">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+Suppose that the shock absorber is dead, so \(b = 0\).  Write an
+algebraic expression for the frequency, in Hertz, of the bouncing of
+our vehicle.  Your expression should be in terms of \(m\) and \(k\).
+<endouttext/>
+<formularesponse type="cs" samples="b,m,k@1,1,1:3,3,3#10" answer="$f0">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+We can make the frequency of the bouncing go to zero by picking an
+appropriate value of the viscous-friction coefficient \(b\).  (This is
+called critical damping.)  Write an algebraic expression for
+the value of \(b\) that will make this vehicle critically damped.
+<endouttext/>
+<formularesponse type="cs" samples="b,m,k@1,1,1:3,3,3#10" answer="$bcrit">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

@@ -1,0 +1,86 @@
+<problem>
+
+<script type="loncapa/python">
+A = "V"
+B = "V*sqrt(C/L)"
+omega = "1/sqrt(L*C)"
+</script>
+
+<startouttext/>
+Here is another way to attack a simple L-C circuit:
+<center>
+<img src="/static/circuits/LC.gif" />
+</center>
+There are two differential equations among the circuit variables \(i_L\) and \(v_C\):
+<br/><br/>
+\(C \frac{d v_C(t)}{d t} = -i_L(t)\)
+<br/><br/>
+\(L \frac{d i_L(t)}{d t} = v_C(t)\)
+<br/><br/>
+These are called the "state equations" for the circuit.
+<br/>
+Suppose that we are given the initial state: \(v_C(0) = V\ \)V and \(i_L(0) = 0\)A.
+<br/>
+We want to find \(v_C(t)\) and \(i_L(t)\) for all time \(t\).
+<br/><br/>
+Let's try \(v_C(t) = A\cos(\omega t)\) 
+and \(i_L(t) = B\sin(\omega t)\): (I know this works!)
+<br/><br/>
+For each of the following questions write an algebraic expression in terms of
+\(L\), \(C\), and \(V\) in the space provided.
+<endouttext/>
+
+<startouttext/>
+<br/>
+What is the value of \(\omega\)?
+<endouttext/>
+<formularesponse type="cs" samples="V,L,C@1,1,1:3,3,3#10" answer="$omega">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+What is the value of \(A\)? 
+<endouttext/>
+<formularesponse type="cs" samples="V,L,C@1,1,1:3,3,3#10" answer="$A">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+What is the value of \(B\)? 
+<endouttext/>
+<formularesponse type="cs" samples="V,L,C@1,1,1:3,3,3#10" answer="$B">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+
+</problem>
+
+<!--  GJS Check
+
+(define ((LC L C) vc il)
+  (up (- (* L (D il)) vc)
+      (+ (* C (D vc)) il)))
+#| LC |#
+
+(let ((L 'L) (C 'C) (V 'V))
+  (let ((omega (/ 1 (sqrt (* L C))))
+	(A V)
+	(B (* V (sqrt (/ C L)))))
+    (((LC 'L 'C)
+      (lambda (t) (* A (cos (* omega t))))
+      (lambda (t) (* B (sin (* omega t)))))
+     't)))
+#|
+(up 0 0)
+|#
+-->
+

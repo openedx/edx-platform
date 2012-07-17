@@ -1,0 +1,35 @@
+<problem>
+
+<script type="loncapa/python">
+vo = "-RL*K*(VI-VT)*vi"
+</script>
+
+
+<startouttext/>
+For the simple common-source amplifier
+the lecturer just derived expressions
+for the operating point (bias) output voltage \(V_O\)
+<br/><br/>
+\(V_O = V_S - \frac{R_L K}{2}(V_I - V_T)^2\)
+<br/><br/>
+and for the total output voltage \(v_O\), including the
+incremental output voltage \(v_o\)
+<br/><br/>
+\(v_O = V_O + v_o 
+      = V_S - \frac{R_L K}{2}((V_I - V_T)^2 + 2(V_I - V_T)v_i + v_i^2)\)
+<br/><br/>
+In the space provided below write an algebraic expression for the best linear
+approximation to the incremental output voltage \(v_o\), assuming that the 
+incremental input voltage \(v_i\) is very small.  Express your answer
+in terms of the device parameters \(K\), \(V_T\), \(R_L\), the bias
+voltages \(V_S\) and \(V_I\), and the incremental input voltage
+\(v_i\).  Be careful, algebraic expressions involving incremental
+quantities are case sensitive.
+<endouttext/>
+<formularesponse type="cs" samples="RL,K,VI,VT,VS,vi@1,1,1,1,1,1:3,3,3,3,3,3#10" answer="$vo">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+</problem>

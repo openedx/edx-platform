@@ -1,0 +1,12 @@
+<sequential>
+  <sequential filename="Inside_the_Gate" slug="Inside_the_Gate" format="Lecture Sequence" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student" name="Inside the Gate"/>
+  <sequential filename="Circuits_with_Nonlinear_Elements" slug="Circuits_with_Nonlinear_Elements" format="Lecture Sequence" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="per_student" name="Circuits with Nonlinear Elements"/>
+  <vertical slug="Digital_and_Nonlinear" format="Homework" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="per_student" due="April 1" graded="true" name="Digital and Nonlinear">
+    <problem filename="H3P1_A_Logic_Family" slug="H3P1_A_Logic_Family" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="never" due="April 1" graded="true" name="H3P1: A Logic Family"/>
+    <problem filename="H3P2_Power_in_Logic" slug="H3P2_Power_in_Logic" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="never" due="April 1" graded="true" name="H3P2: Power in Logic"/>
+    <problem filename="H3P3_Graphical_Model_of_Inverter" slug="H3P3_Graphical_Model_of_Inverter" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="never" due="April 1" graded="true" name="H3P3: Graphical Model of Inverter"/>
+    <problem filename="H3P4_Diode_Limiter" slug="H3P4_Diode_Limiter" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="never" due="April 1" graded="true" name="H3P4: Diode Limiter"/>
+  </vertical>
+  <problem filename="Logic_Gate_Implementation" slug="Logic_Gate_Implementation" format="Lab" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="false" due="April 1" graded="true" name="Logic Gate Implementation"/>
+  <html filename="Week_3_Tutorials" slug="Week_3_Tutorials" format="Tutorial Index" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Week 3 Tutorials"/>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:ZxWQyrfk7Co,1.0:OboByU_uH-Y,1.25:5w9VBOidM2E,1.50:htt5DKvPgyc" slug="S18V3_Setting_up_the_Differential_Equation_DE_" rerandomize="per_student" name="S18V3: Setting up the Differential Equation (DE)"/>
+  <customtag tag="S18" slug="discuss_1229" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="655" slug="book_1230" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="18" slug="slides_1231" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,9 @@
+<sequential>
+  <problem filename="S12E5_Neon_Relaxation_Oscillator" slug="S12E5_Neon_Relaxation_Oscillator" showanswer="attempted" rerandomize="never" name="S12E5: Neon Relaxation Oscillator"/>
+  <customtag tag="S15" slug="discuss_843" showanswer="attempted" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag lecnum="15" slug="slides_844" showanswer="attempted" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:6CnJvdXr2E8,1.0:wlcwr1VIQ7Y,1.25:cAK4Lmo5krA,1.50:V3MhqSS-gpA" slug="S2V4_Method_1_-_KVL_KCL_method" name="S2V4: Method 1 - KVL, KCL method"/>
+  <customtag tag="S2" slug="discuss_107">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="66" slug="book_108">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="2" slug="slides_109">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

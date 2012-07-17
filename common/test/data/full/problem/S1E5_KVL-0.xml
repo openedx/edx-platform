@@ -1,0 +1,20 @@
+<problem><script type="loncapa/python">
+v3 = random.choice([.5, .6, .7])
+v1 = random.choice([0.2, 0.3, 0.4, 1.2, 1.3, 1.4])
+v2 = v1 - v3
+</script><startouttext/>
+Joe was debugging part of an experimental apparatus, probing around
+with his voltmeter.  Part of the apparatus had two obvious resistors
+in series with an unknown element, as shown in the diagram below:
+<center><img src="/static/circuits/KVL-0.gif"/></center>
+The unknown element is hard to reach, so
+Joe put the negative (black) probe of his voltmeter at the interconnection of the
+two obvious resistors and then put the positive (red) probe at the other
+end of each resistor, measuring \(v_1 = $v1 \)V and \(v_2 = $v2 \)V.
+<br/>
+<br/>
+What is the voltage (in Volts) \(v_3\) measured across the unknown element?
+<endouttext/>
+<numericalresponse answer="$v3"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

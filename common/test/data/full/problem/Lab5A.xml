@@ -1,0 +1,106 @@
+<!-- Mosfet amplifier: cjt 2/29/12 -->
+
+<problem>
+<startouttext />
+
+The goal of this lab is to analyze the performance of an inverting
+mosfet amplifier operating in its <i>linear region</i>, where the
+output waveform is an undistorted but amplified replica of the input
+waveform.  Note that inversion of the signal introduced by the
+amplifier is not an issue in, for example, audio applications where
+the ear isn't sensitive to the 180 degree phase shift in the
+output signal.
+
+<br/><br/>You may find it useful to review Sections
+<A href="/book-shifted/344">7.5</A>, <A href="/book-shifted/353">7.6</A>,
+and Chapter <A href="/book-shifted/405">8</A> in the text.
+
+<br/><br/>To start, let's use a variant of the curve tracer we
+worked on in Lab 4 to plot the \(v_O\) vs. \(v_I\) curve for the
+amplifier so we can identify the range of input voltages that
+corresponding to the linear operating region of the amplifier.
+
+<center>
+<input width="550" type="hidden" height="300" id="schematic1" parts="" analyses="tran" class="schematic" name="vo_vs_vi"
+value="[[&quot;w&quot;,[88,104,136,104]],[&quot;w&quot;,[152,104,136,104]],[&quot;L&quot;,[136,104,2],{&quot;label&quot;:&quot;Input&quot;,&quot;_json_&quot;:2},[&quot;Input&quot;]],[&quot;w&quot;,[240,80,216,80]],[&quot;w&quot;,[176,80,216,80]],[&quot;L&quot;,[216,80,2],{&quot;label&quot;:&quot;Output&quot;,&quot;_json_&quot;:5},[&quot;Output&quot;]],[&quot;w&quot;,[176,32,88,32]],[&quot;v&quot;,[88,104,1],{&quot;name&quot;:&quot;Vin&quot;,&quot;value&quot;:&quot;triangle(0,5,1k)&quot;,&quot;_json_&quot;:7},[&quot;Input&quot;,&quot;0&quot;]],[&quot;v&quot;,[88,32,1],{&quot;name&quot;:&quot;Vpower&quot;,&quot;value&quot;:&quot;dc(5)&quot;,&quot;_json_&quot;:8},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[176,32,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:9},[&quot;1&quot;,&quot;Output&quot;]],[&quot;n&quot;,[176,80,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;100&quot;,&quot;_json_&quot;:10},[&quot;Output&quot;,&quot;Input&quot;,&quot;0&quot;]],[&quot;g&quot;,[24,128,0],{&quot;_json_&quot;:11},[&quot;0&quot;]],[&quot;g&quot;,[176,128,0],{&quot;_json_&quot;:12},[&quot;0&quot;]],[&quot;w&quot;,[24,32,40,32]],[&quot;w&quot;,[40,104,24,104]],[&quot;w&quot;,[24,128,24,104]],[&quot;w&quot;,[24,32,24,104]],[&quot;s&quot;,[240,80,0],{&quot;color&quot;:&quot;magenta&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:17},[&quot;Output&quot;]],[&quot;s&quot;,[88,104,0],{&quot;color&quot;:&quot;x-axis&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:18},[&quot;Input&quot;]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;.5m&quot;,&quot;1000&quot;]]"/>
+<br/>Figure 1.  Circuit to determine \(v_O\) vs. \(v_I\) curve for inverting amplifier
+</center>
+
+The circuit shown in Figure 1 is using a 5V DC voltage source to power
+the amplifier and a triangle-wave voltage source to generate an input
+voltage that ramps from 0V to 5V over 500ms.  Please click on TRAN in
+Figure 1 to generate the plot and then use the plot to determine the
+approximate range of input voltages during the amplifier will operate in its
+linear region.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Input voltage at lower end of linear operating range:
+<numericalresponse answer=".6">
+    <responseparam type="tolerance" default="20%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Input voltage upper end of linear operating range:
+<numericalresponse answer="1.15">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+If we keep the input voltage within the range above, we expect the
+output signal will be a relatively undistorted replica of the
+input signal.
+
+<br/><br/>
+Next let's determine the gain of the amplifier
+when operating in its linear region.  In the circuit shown in Figure 2
+the input signal is a sum of a 1V DC bias voltage (to offet the signal
+into the linear operating range) and the test signal itself, in
+this case a 1kHZ sine wave with an amplitude of 0.1V.
+
+<center>
+<input width="450" type="hidden" height="350" id="schematic2" parts="s,a" analyses="tran" class="schematic" name="amp1"
+value="[[&quot;w&quot;,[88,32,160,32]],[&quot;w&quot;,[112,104,136,104]],[&quot;s&quot;,[112,104,0],{&quot;color&quot;:&quot;blue&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:2},[&quot;2&quot;]],[&quot;s&quot;,[184,80,0],{&quot;color&quot;:&quot;magenta&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:3},[&quot;output&quot;]],[&quot;v&quot;,[64,104,1],{&quot;name&quot;:&quot;Vbias&quot;,&quot;value&quot;:&quot;dc(1)&quot;,&quot;_json_&quot;:4},[&quot;3&quot;,&quot;0&quot;]],[&quot;v&quot;,[112,104,1],{&quot;name&quot;:&quot;Vsignal&quot;,&quot;value&quot;:&quot;sin(0,100m,1000,0,0)&quot;,&quot;_json_&quot;:5},[&quot;2&quot;,&quot;3&quot;]],[&quot;v&quot;,[88,32,1],{&quot;name&quot;:&quot;Vpower&quot;,&quot;value&quot;:&quot;dc(5)&quot;,&quot;_json_&quot;:6},[&quot;1&quot;,&quot;0&quot;]],[&quot;n&quot;,[160,80,0],{&quot;name&quot;:&quot;&quot;,&quot;W/L&quot;:&quot;100&quot;,&quot;_json_&quot;:7},[&quot;output&quot;,&quot;2&quot;,&quot;0&quot;]],[&quot;r&quot;,[160,32,0],{&quot;name&quot;:&quot;&quot;,&quot;r&quot;:&quot;10k&quot;,&quot;_json_&quot;:8},[&quot;1&quot;,&quot;output&quot;]],[&quot;w&quot;,[160,128,160,144]],[&quot;w&quot;,[16,144,16,104]],[&quot;w&quot;,[16,32,40,32]],[&quot;w&quot;,[16,104,16,32]],[&quot;w&quot;,[160,80,184,80]],[&quot;g&quot;,[16,144,0],{&quot;_json_&quot;:14},[&quot;0&quot;]],[&quot;g&quot;,[160,144,0],{&quot;_json_&quot;:15},[&quot;0&quot;]],[&quot;L&quot;,[184,80,3],{&quot;label&quot;:&quot;output&quot;,&quot;_json_&quot;:16},[&quot;output&quot;]],[&quot;view&quot;,0,0,2,&quot;20&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;5ms&quot;,&quot;1000&quot;]]"/>
+<br/>Figure 2.  Circuit to measure amplifier gain
+</center>
+
+Click on TRAN in Figure 2 and measure the gain of the amplier, which is
+simply the ratio of the amplitude of the output signal to the amplitude
+of the input signal.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Measured gain:
+<numericalresponse answer="9.75">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+Now change the amplitude of Vsignal in Figure 2 from 0.1V to 1V and rerun the TRAN analysis.  You
+should see significant distortion in the output signal, in this case <i>clipping</i> or truncation
+of the max and min signal values.  Experiment with amplitudes of Vbias and Vsignal to find the
+largest amplitude for Vsignal for which amplifier produces an unclipped output.
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Largest input amplitude resulting in an undistorted output signal:
+<numericalresponse answer=".3">
+    <responseparam type="tolerance" default="25%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+</div>
+
+Think about how your final choices for the amplitudes of Vbias and Vsignal relate
+to the input voltage range you reported above for linear operation.
+
+<br/><br/>
+In Lab 5B we'll listen to how a similar amplifier sounds with a music signal as
+input.
+
+<endouttext />
+
+</problem>

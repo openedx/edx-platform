@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:DHQRhsWq7Ok,1.0:h2EtLMoAMOQ,1.25:fmRWbC04Xzk,1.50:kVuFFo_7OQ4" slug="S21V11_RLC_capacitor_response_peakiness" name="S21V11: RLC capacitor response peakiness"/>
+  <customtag tag="S21" slug="discuss_1473">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="812" slug="book_1474">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="21" slug="slides_1475">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

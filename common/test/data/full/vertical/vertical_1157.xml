@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S17E1_Particular_Solution" slug="S17E1_Particular_Solution" rerandomize="per_student" name="S17E1: Particular Solution"/>
+  <customtag tag="S17" slug="discuss_1158" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="628" slug="book_1159" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="17" slug="slides_1160" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

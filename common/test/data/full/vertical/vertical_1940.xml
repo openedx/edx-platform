@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:eRx3hqnFa5I,1.0:SgQ6CH4DC68,1.25:PduyC5AlZ9w,1.50:CTk8ALiLSXg" slug="S27V7_CMOS_Logic_DEMO" name="S27V7: CMOS Logic: DEMO"/>
+  <customtag tag="S27" slug="discuss_1941">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="613" slug="book_1942">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="27" slug="slides_1943">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

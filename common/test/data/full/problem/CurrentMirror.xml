@@ -1,0 +1,25 @@
+<problem>
+
+<startouttext/>
+The circuit shown below has two MOSFETs, one of them is configured as
+a two-terminal device that you explored in exercise S10E2.  
+<center>
+<img src="/static/circuits/current-mirror.gif" />
+</center>
+<endouttext/>
+
+
+<startouttext/>
+<br/>
+What is the current \(i_{OUT}\)?
+<endouttext/>
+
+
+<startouttext/>
+<br/><br/>
+Notice that, for the approximations we use in this class, the
+incremental behavior of this circuit is quite independent of the
+detailed properties of the MOSFETs.
+<endouttext/>
+
+</problem>

@@ -1,0 +1,32 @@
+<problem>
+
+<script type="loncapa/python">
+#e = math.exp(1)
+I = "I0*e^(-(R/L)*(t-t0))"
+</script>
+
+<startouttext/>
+We can make a unit falling step from a unit rising step: \(1-u(t))\)
+<br/>
+Continuing with our parallel L-R-I circuit.
+<br/>
+Suppose, instead that the independent current source
+falls at time \(t=t_0\) from \(I_S\) to \(0\).
+<br/>
+We can notate this using our unit step by  
+\(I(t) = I_S\ (1 - u(t-t_0))\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+Suppose that the inductor current \(i_L(t) = I_0\) for \(t &lt;t_0\).  
+In the box provided below write an algebraic expression for
+the value of \(i_L(t)\) for \(t \geq t_0\).
+<endouttext/>
+<formularesponse type="cs" samples="I0,R,L,t,t0@1,1,1,1,1:3,3,3,3,3#10" answer="$I">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

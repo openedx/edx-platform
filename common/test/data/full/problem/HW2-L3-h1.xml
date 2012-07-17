@@ -1,0 +1,141 @@
+<!--  
+This is a Homework Problem for use after Lecture 3 (linearity and
+   Superposition to Thevenin/Norton)
+-->
+
+<problem>
+
+<script type="loncapa/python">
+Vin = float(random.randrange(10,100,10))
+d = random.choice([0.2, 0.25, 0.3, 0.35, 0.4])
+Vout = d*Vin
+</script>
+
+<startouttext />
+The resistances of commercially-available discrete resistors are
+restricted to particular sets.  For example, the available values of
+resistors with 10% tolerance are selections from the E12 set
+multiplied by a power of ten from 10^0 through 10^5.  The E12 set is
+<br />
+E12={10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82}
+<br />
+Thus, you can buy 10% resistors with a nominal resistance of
+330\(\Omega\) or 33k\(\Omega\), but not 350\(\Omega\).  
+<br />
+The "tolerance" means that if you buy a 10% 390\(\Omega\) resistor
+you can be sure that its resistance is between 351\(\Omega\) and
+429\(\Omega\).
+<br />
+In this problem we need to choose 10% resistors to make a voltage
+divider that meets a given specification.
+<br />
+<center>
+<img src="/static/circuits/voltage-divider.gif" />
+</center>
+<br />
+We are given an input voltage \(V_{in}=$Vin\)V, and we need to provide
+an open-circuit output voltage of \(V_{out}\approx $Vout\)V.  An
+additional requirement is that the Thevenin resistance as seen from
+the output terminals is between \(10k\Omega\) and \(30k\Omega\).
+Assume first that the resistors have their nominal resistance.  Come
+up with resistors \(R_1\) and \(R_2\) such that the division ratio
+\(V_{out}/V_{in}\) is within 10% of the requirement.
+<br />
+Of course, the resistances you chose are just nominal.  Given that
+they are only guaranteed to have resistances within 10% of the nominal
+value, what is the largest and smallest value that \(V_{out}\) may have?
+<br />
+Enter your values here.
+<endouttext />
+<customresponse>
+  <startouttext />
+    <br />
+    R1 (in Ohms): <textline size="5" />
+    <br />
+    R2 (in Ohms): <textline size="5" />
+    <br /> <br />
+    Vmax (in Volts): <textline size="5" />
+    <br />
+    Vmin (in Volts): <textline size="5" />
+  <endouttext />
+<answer type="loncapa/python">
+
+def close_enuf(x, y):
+   epsilon = 0.05  # 5percent tolerance
+   return((2*(math.fabs(x - y))/(math.fabs(x)+math.fabs(y)) &lt; epsilon))
+
+def inE12(R):
+   def integerp(x):
+       return(abs(x-round(x)) &lt; .0001)
+   E12=[10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82]
+   return(True in [integerp(math.log10(R/x)) for x in E12])
+
+correct = ['correct', 'correct', 'correct', 'correct']
+
+try:
+  r1 = calc.evaluator({},{},submission[0])
+except ValueError:
+  correct[0] = 'incorrect'
+  r1 = 0
+
+try:
+  r2 = calc.evaluator({},{},submission[1])
+except ValueError:
+  correct[1] = 'incorrect'
+  r2 = 0
+
+if ((r1==0) or (not(inE12(r1)))) or ((r2==0) or (not(inE12(r2)))):
+  correct[0] = 'incorrect'
+  correct[1] = 'incorrect'
+
+
+ratio = (r2/(r1+r2))
+Vth = ratio*Vin
+
+if (abs((ratio-d)/d) &gt; 0.1):
+  correct = ['incorrect', 'incorrect', 'correct', 'correct']
+
+Rth = (r1*r2)/(r1+r2)
+if (Rth &lt; 10000 or Rth &gt; 30000):
+  correct = ['incorrect', 'incorrect', 'correct', 'correct']
+
+
+try:
+  Vmax = calc.evaluator({},{},submission[2])
+except ValueError:
+  correct[2] = 'incorrect'
+  Vmax = 0
+
+try:
+  Vmin = calc.evaluator({},{},submission[3])
+except ValueError:
+  correct[3] = 'incorrect'
+  Vmin = 0
+
+tolerance = 0.1
+
+r1p = (1+tolerance)*r1
+r1m = (1-tolerance)*r1
+
+r2p = (1+tolerance)*r2
+r2m = (1-tolerance)*r2
+
+rat1 = r2p/(r1m+r2p)
+rat2 = r2m/(r1p+r2m)
+
+minV = min(rat1, rat2)*Vin
+maxV = max(rat1, rat2)*Vin
+
+#print(minV)
+#print(maxV)
+
+if not(close_enuf(maxV,Vmax)):
+  correct[2] = 'incorrect'   
+
+if not(close_enuf(minV,Vmin)):
+  correct[3] = 'incorrect'   
+
+</answer>
+</customresponse>
+
+</problem>

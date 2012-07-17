@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:38yWxVhWXyM,1.0:FckIoHsHNsQ,1.25:dj5AfmGqshk,1.50:_SWMJ10NsUI" slug="S26V10_DEMO_Static_and_dynamic_power_for_inverter" rerandomize="per_student" name="S26V10: DEMO: Static and dynamic power for inverter"/>
+  <customtag tag="S26" slug="discuss_1901" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="608" slug="book_1902" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="26" slug="slides_1903" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

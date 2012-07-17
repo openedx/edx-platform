@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:9Y7ACorQee0,1.0:Pcofm5pfJf8,1.25:yY7eeetU0-c,1.50:cxTZH2Ezxi8" slug="S8V5_Another_Dependent_Source_Example" name="S8V5: Another Dependent Source Example"/>
+  <customtag tag="S8" slug="discuss_504">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="102" slug="book_505">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="8" slug="slides_506">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:pqKVvwHFeTI,1.0:CLxINF65Bi8,1.25:L81ixJzNGOQ,1.50:WloDxq9Cr3k" slug="S6V14_If_Only_Circuits_Were_Linear..." rerandomize="per_student" name="S6V14: If Only Circuits Were Linear..."/>
+  <customtag tag="S6" slug="discuss_425" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="214" slug="book_426" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="6" slug="slides_427" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

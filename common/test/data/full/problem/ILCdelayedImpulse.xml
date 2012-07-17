@@ -1,0 +1,120 @@
+<problem>
+
+<script type="loncapa/python">
+
+f = 0.25   # 1/4 Hz
+omega0 = 2*math.pi*f 
+
+L = float(random.randrange(10,200,5)) #H
+C = 1.0/(L * omega0**2)
+Cm = C*1000.0
+
+v0 = 0.0  #V
+i0 = 1.0  #A
+
+E0 = (L/2.0)*i0**2
+vmax = math.sqrt((2.0/C)*E0)
+vmin = -vmax
+
+# When v_C = vmin
+timpulse = random.choice([1.0, 5.0, 9.0]) #s
+# Aimpulse exactly kills the charge on C
+Aimpulse = C*vmax # Coulombs
+
+
+</script>
+
+<startouttext/>
+Note: In this problem we have chosen numbers for
+the part parameters to make it easier to compute an answer :-).  
+By the way, it is
+also hard to arrange zero resistance, except with superconducting
+materials at very low temperatures.
+<br/>
+In the circuit shown below \(L=$L\)H and \(C=$Cm\)mF. 
+<center>
+<img src="/static/circuits/ILC.gif" />
+</center>
+The current source puts out an impulse of
+area \(A = 2/\pi = $Aimpulse\)C at time \(t = $timpulse\)s.  
+<br/><br/>
+At \(t=0\) the state is: \(v_C(0) = $v0\) and \(i_L(0) = $i0\).
+<br/><br/>
+The equation governing the evolution of the inductor current in this
+circuit is 
+<br/><br/>
+\( \frac{d^2 i_L(t)}{dt^2} + \frac{1}{LC} i_L(t) = \frac{A}{LC}\delta(t-$timpulse) \)
+<br/><br/>
+<endouttext/>
+
+<startouttext/>
+What is the natural frequency, in Hertz, of this circuit?
+<endouttext/>
+<numericalresponse answer="$f">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+At the initial time what is the total energy, in Joules, stored in the circuit?
+<endouttext/>
+<numericalresponse answer="$E0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+At the time just before the impulse happens \(t=$timpulse_-\) what is
+the total energy, in Joules, stored in the circuit? 
+<endouttext/>
+<numericalresponse answer="$E0">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+At the time just before the impulse happens what
+is the current \(i_L($timpulse_-)\), in Amperes, through the inductor?
+<endouttext/>
+<numericalresponse answer="0">
+    <responseparam type="tolerance" default="0.000001" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+At the time just before the impulse happens what
+is the voltage \(v_C($timpulse_-)\), in Volts, across the capacitor?
+<endouttext/>
+<numericalresponse answer="$vmin">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+At the time just after the impulse happens what
+is the current \(i_L($timpulse_+)\), in Amperes, through the inductor?
+<endouttext/>
+<numericalresponse answer="0">
+    <responseparam type="tolerance" default="0.000001" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+At the time just after the impulse happens what
+is the voltage \(v_C($timpulse_+)\), in Volts, across the capacitor?
+<endouttext/>
+<numericalresponse answer="0">
+    <responseparam type="tolerance" default="0.000001" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+At the time just after the impulse happens what
+is the total energy, in Joules, stored in the circuit?
+<endouttext/>
+<numericalresponse answer="0">
+    <responseparam type="tolerance" default="0.000001" name="tol" description="Numerical Tolerance"/>
+    <textline/>
+</numericalresponse>
+
+</problem>

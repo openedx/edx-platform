@@ -1,0 +1,65 @@
+<problem>
+
+
+<script type="loncapa/python">
+voln = "-VT*ln(vI/(R*IS) + 1)"
+voexp = "-R*IS*(e^(vI/VT) - 1)"
+</script>
+
+<startouttext/>
+Consider the following circuit:
+<center>
+<img src="/static/circuits/LogAmplifier.gif" />
+</center>
+In the space provided below give an algebraic expression for \(v_O\)
+in this circuit.  Your expression will be in terms of \(V_T\),
+\(I_S\), \(R\), and \(v_I\).
+Remember that a junction
+diode has the characteristic \( i_D = I_S(e^{v_D/V_T}-1) \).
+<endouttext/>
+<formularesponse type="cs" samples="R,VT,IS,vI@1,1,1,1:3,3,3,3#10" answer="$voln">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Now consider this circuit:
+<center>
+<img src="/static/circuits/ExpAmplifier.gif" />
+</center>
+In the space provided below give an algebraic expression for \(v_O\)
+in this circuit.  Your expression will be in terms of \(V_T\),
+\(I_S\), \(R\), and \(v_I\).
+<endouttext/>
+<formularesponse type="cs" samples="R,VT,IS,vI@1,1,1,1:3,3,3,3#10" answer="$voexp">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Now, let's make a bigger circuit:
+<center>
+<img src="/static/circuits/ExpAmplifier.gif" />
+</center>
+In the space provided below give an algebraic expression for \(v_O\)
+in this circuit.  Your expression will be in terms of \(V_T\),
+\(I_S\), \(R\), and \(v_I\).
+<endouttext/>
+<formularesponse type="cs" samples="R,VT,IS,vI@1,1,1,1:3,3,3,3#10" answer="$voexp">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+
+
+<endouttext/>
+
+
+
+</problem>

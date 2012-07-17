@@ -1,0 +1,221 @@
+<!-- Impedance & Frequency Response: cjt 4/15/12 -->
+
+<problem>
+
+<startouttext />
+
+In this lab we'll look at the response of first-order circuits
+as a function of frequency, the topic covered in  <A href="/book-shifted/703">Chapter
+13</A> in the text.
+
+<br/><br/>Consider the series RC and RL circuits shown in Figure 1.  The resistors
+are each \(1k\Omega\); the C and L values are unknown.
+
+<center>
+<img src="/static/circuits/Lab10_1.png" width="500"/>
+<br/>Figure 1. Series RC and RL circuits
+</center>
+
+Since we'll be asking you to complete a filter design below, let's analyze the
+frequency response of each of the circuits.
+Recalling the component transfer functions on <A href="/book-shifted/733">page 733</A>
+of the text
+
+\[H_R(j\omega) = R\]
+\[H_L(j\omega) = j\omega{}L\]
+\[H_C(j\omega) = 1/j\omega{}C\]
+
+we can derive \(H(j\omega) = V_o/V_i\) for the series RL and RC
+circuits using these impedances and the voltage divider technique
+shown in <A href="/book-shifted/737">Example 13.4.2</A>:
+
+\[H_{RC}(j\omega) = \frac{1/RC}{j\omega + 1/RC}\]
+
+\[H_{RL}(j\omega) = \frac{j\omega}{j\omega + R/L}\]
+
+Think about the magnitude of the transfer function \(|H(j\omega)|\)
+for both low frequencies (\(\omega \rightarrow 0\)) and high
+frequencies (\(\omega \rightarrow \infty\)).  Are these filter circuits
+low-pass or high-pass?  Hint: there's one of each!
+
+<br/><br/>The phase of the transfer function \(\angle H(j\omega)\) is given by
+
+\[\angle H(j\omega) = \tan^{-1}\frac{y}{x}\]
+
+where \(x\) is the real part of \(H(j\omega)\) and \(y\) is the imaginary part.  With
+a little algebra we can conclude
+
+\[\angle H_{RC}(j\omega) = \tan^{-1}\frac{-\omega}{1/RC}\]
+
+\[\angle H_{RL}(j\omega) = \tan^{-1}\frac{R/L}{\omega}\]
+
+The <i>break frequency</i> is the frequency at which the filter
+response changes from essentially unity gain to a steadily decreasing
+response.  At the break frequency the phase \(\angle H(j\omega)\) is
+\(\pm \pi/4\) radians or \(\pm 45^\circ\).  In other words, the break
+frequency is the value of \(\omega\) that makes argument to
+\(\tan^{-1}\) equal to \(\pm 1\).  The break frequency is also where
+where the magnitude of the response reaches \(0.707 = 1/\sqrt 2\) of
+its peak value.  Please give the formula for the break frequencies in
+radians/sec for the series RC and RL circuits:
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Break frequency in radians/sec for RC circuit (formula using R and C):
+<formularesponse type="cs" samples="R,C@1,1:10,10#5" answer="1/(R*C)">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Break frequency in radians/sec for RL circuit (formula using R and L):
+<formularesponse type="cs" samples="R,L@1,1:10,10#5" answer="R/L">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+With all this analysis under our belts, let's look at plots of the
+frequency response for the circuits in Figure 1.  The on-line lab tool
+will calculate the frequency response of a circuit if you click on the
+AC analysis tool.  You'll be asked to specify the beginning and ending
+frequencies (the default values are fine) and where in the circuit to
+inject the tone burst, a sinusoidal input of the form
+\(u(t)e^{j\omega t}\) (it has to be one of the named voltage sources).
+For each voltage probe, ratio of the voltage at the probe to the
+voltage at the specified source is computed for frequencies in the
+specified range.  The results appear in two plots, both of which
+use a log scale for the frequency (x) axis.
+One plot shows the
+magnitude of the response \(|H(j\omega)|\) and the other the phase
+\(\angle H(j\omega)\).  The magnitude is plotted in decibels =
+\(20\log(V_o/V_i)\) -- for more on decibels, see footnote 8 on
+<A href="/book-shifted/738">page 738</A> of the text.
+
+
+<br/><br/>The circuits in Figure 1 were entered using the schematic
+tool with voltage probes added to the \(V_o\) nodes.  An AC analysis
+was performed; the resulting plots are shown in Figure 2.  The red
+plots come from one circuit, the blue plots from the other, but it'll
+be up to you to figure which plots came from which circuit.
+
+<center>
+<img src="/static/circuits/Lab10_2m.png"/>
+<img src="/static/circuits/Lab10_2p.png"/>
+<br/>Figure 2. Results of AC analysis
+</center>
+
+Your job is to figure out the unknown C and L values based on the
+information in the plot.  Remember that the R value for both circuits
+is \(1k\Omega\).  You can perform your own experiments using the
+on-line lab tool or you can use the analysis above to determine the
+unknown component types and values.  Note that the formulas for the
+phase use the frequency \(\omega\) in radians/sec but that the plots
+show frequencies in Hz.  Recall that \(1\textrm{ Hz} = 2\pi\textrm{
+radians/sec}\).
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of unknown component in circuit that produced the red plot (C or L):
+<formularesponse type="cs" samples="C,L@2,3:2,3#1" answer="L">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Value of unknown component in circuit that produced the red plot (in farads or henries):
+<numericalresponse answer="800e-6">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Type of unknown component in circuit that produced the blue plot (C or L):
+<formularesponse type="cs" samples="C,L@2,3:2,3#1" answer="C">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="10" />    
+</formularesponse>
+</div>
+
+<br/><br/>
+<div style="margin-left: 4em;">
+Value of unknown component in circuit that produced the blue plot (in farads or henries):
+<numericalresponse answer="20e-9">
+    <responseparam type="tolerance" default="10%" name="tol" description="Numerical Tolerance" />
+    <textline size="10" />
+</numericalresponse>
+</div>
+
+
+
+Now that you're an expert :) use the on-line lab tool below to build
+a <i>band-pass filter</i> with break frequencies at \(1kHz\) and
+\(1MHz\).  A band-pass filter passes frequencies between the break
+frequencies but attenuates frequencies above and below the break
+frequencies, as shown in Figure 3, which shows the magnitude of the
+frequency response \(V_o/V_1\) using the logarithmic decibel scale.
+The expected response is approximately \(-3\textrm{ dB}\) (i.e., a
+ratio of \(0.707\)) at the two break frequencies and close to
+\(0\textrm{ dB}\) (a ratio of 1) inbetween.
+
+<center>
+<img src="/static/circuits/Lab10_3.png"/>
+<br/>Figure 3. AC analysis of a band-pass filter (magnitude plot)
+</center>
+
+Hint: Cascade a low-pass and high-pass filter -- their effects are cumulative.  We've just finished
+analyzing one of each above!  Complete the circuit below, adding the appropriate circuitry between
+the voltage source and \(V_o\), the node labeled "output" in the schematic.
+
+<endouttext />
+
+<schematicresponse>
+<center>
+<schematic height="250" width="600" parts="g,L,r,l,c,v,s" analyses="ac"
+submit_analyses="{&quot;ac&quot;:[[&quot;output&quot;,3,4.5,6]]}"
+initial_value="[[&quot;w&quot;,[224,40,200,40]],[&quot;w&quot;,[64,40,72,40]],[&quot;v&quot;,[64,40,0],{&quot;name&quot;:&quot;Vi&quot;,&quot;value&quot;:&quot;sin(0,1,1k,0,0)&quot;,&quot;_json_&quot;:2},[&quot;1&quot;,&quot;0&quot;]],[&quot;g&quot;,[64,88,0],{&quot;_json_&quot;:3},[&quot;0&quot;]],[&quot;s&quot;,[200,40,0],{&quot;color&quot;:&quot;blue&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:4},[&quot;output&quot;]],[&quot;L&quot;,[224,40,3],{&quot;label&quot;:&quot;output&quot;,&quot;_json_&quot;:5},[&quot;output&quot;]],[&quot;view&quot;,0,0,2,&quot;50&quot;,&quot;10&quot;,&quot;1G&quot;,&quot;Vi&quot;,&quot;100&quot;,&quot;1&quot;,&quot;1000&quot;]]"/>
+</center>
+<answer type="loncapa/python">
+# for a schematic response, submission[i] is the json representation
+# of the diagram and analysis results for the i-th schematic tag
+
+# freqs are logarithmic
+# responses are in dB
+def get_ac(json,signal):
+  for element in json:
+    if element[0] == 'ac':
+      return element[1].get(signal,[])
+  return []
+
+output = get_ac(submission[0],'output')
+
+okay = [False, False, False]
+
+for (t,v) in output:
+    if t == 3:
+      okay[0] = (v > -3.2 and v &lt; -2.8)  # expect -3db
+    elif t == 4.5:
+      okay[1] = (v > -.2 and v &lt; 0.2)    # expect 0db
+    elif t == 6:
+      okay[2] = (v > -3.2 and v &lt; -2.8)  # expect -3db
+
+
+correct = ['correct' if okay[0] and okay[1] and okay[2] else 'incorrect']
+
+</answer>
+</schematicresponse>
+
+<startouttext />
+
+After you've completed your design and run the AC analysis, click
+CHECK to have the system verify correct operation.
+
+<endouttext />
+
+</problem>

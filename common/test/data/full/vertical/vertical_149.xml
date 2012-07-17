@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:p-0dH-hcWxY,1.0:BimuBdq5KqQ,1.25:oLzto2Ni4-A,1.50:QYgk7nMWqPo" slug="S3V1_Introduction_to_Linearity" name="S3V1: Introduction to Linearity"/>
+  <customtag tag="S3" slug="discuss_150">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="145" slug="book_151">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="3" slug="slides_152">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

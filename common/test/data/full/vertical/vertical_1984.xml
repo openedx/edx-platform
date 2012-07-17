@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:UjQ8fBFwxL8,1.0:P6KqCB8fMhs,1.25:eTBbpJIWfvI,1.50:-nZbG3mzOIo" slug="S28V8_Keep_Wires_Short" name="S28V8: Keep Wires Short"/>
+  <customtag tag="S28" slug="discuss_1985">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="14" slug="book_1986">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="28" slug="slides_1987">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

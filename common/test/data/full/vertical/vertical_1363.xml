@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S20E1_Inductor_Impedance" slug="S20E1_Inductor_Impedance" showanswer="attempted" rerandomize="false" name="S20E1: Inductor Impedance"/>
+  <customtag tag="S20" slug="discuss_1364">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="713" slug="book_1365">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="20" slug="slides_1366">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

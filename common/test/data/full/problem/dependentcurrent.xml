@@ -1,0 +1,32 @@
+<!--
+This is a week 4 problem about dependent current sources
+-->
+
+<problem>
+<script type="loncapa/python">
+VS=float(random.randrange(5,10,1))
+R=float(random.randrange(100, 1000, 50))
+K=float(random.randrange(50, 100, 1))/1000
+VO = VS - (K*R)**(1.0/3.0)
+</script>
+
+   <startouttext/>
+   The following figure shows a circuit with a dependent current source:
+   <center>
+   <img src="/static/circuits/dependent_current.gif"/>
+   </center>
+   <br/>
+   Determine the voltage \(v_O\) across the dependent source given
+   that \(i=f(v)=\frac{K}{v^2}\).  Assume also that \(R=$R\Omega\),
+   \(V_S=$VS\)V, and \(K=$K\).
+   <endouttext/>
+
+   <startouttext/>
+   <br/>
+   \(v_O\):  
+   <endouttext/>
+   <numericalresponse answer="$VO">
+      <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/>
+      <textline/>
+   </numericalresponse>
+</problem>

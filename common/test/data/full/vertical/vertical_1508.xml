@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:HJlKX-D1j8A,1.0:6i38qVbJf2M,1.25:4TBY8aIZvc0,1.50:s0CR67Ra488" slug="S22V2_Review" name="S22V2: Review"/>
+  <customtag tag="S22" slug="discuss_1509">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="742" slug="book_1510">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="22" slug="slides_1511">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

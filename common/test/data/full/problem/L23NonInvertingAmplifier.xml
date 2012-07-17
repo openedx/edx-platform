@@ -1,0 +1,77 @@
+<!--Non Inverting Amplifier -->
+
+<problem>
+
+<script type="loncapa/python">
+R_1 = 4000
+R_2 = 1000
+
+R1 = float(R_1)
+R2 = float(R_2)
+
+global R1,R2
+
+def gain(A):
+  return( A/(1 + A*R2/(R1 + R2)) )
+
+A_1 = 10
+A1  = float(A_1)
+G1  = gain(A1)
+
+
+A_2 = 100
+A2  = float(A_2)
+G2  = gain(A2)
+
+
+A_3 = 100000
+A3  = float(A_3)
+G3  = gain(A3)
+
+G   = (R1+R2)/R2
+</script>
+
+<startouttext/>
+In the figure below we have a non-inverting amplifier.
+It is drawn in a way that we see in many professional 
+circuit diagrams.
+<center>
+<img src="/static/circuits/NonInvertingAmplifier.gif" />
+</center>
+In our circuit \(R_1 = $R_1\Omega\) and \(R_2 = $R_2\Omega\).
+<br/>
+If \(A = $A_1\) what is the voltage gain \(v_O/v_I\) of this amplifier?
+<endouttext/>
+<numericalresponse answer="$G1">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+If \(A = $A_2\) what is the voltage gain \(v_O/v_I\) of this amplifier?
+<endouttext/>
+<numericalresponse answer="$G2">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+If \(A = $A_3\) what is the voltage gain \(v_O/v_I\) of this amplifier?
+<endouttext/>
+<numericalresponse answer="$G3">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance"/> 
+    <textline/>
+</numericalresponse>
+
+<startouttext/>
+<br/>
+Notice how the gain approaches \((R_1 + R_2)/R_2 = $G\) as 
+\(A \rightarrow \infty\).
+<endouttext/>
+
+</problem>

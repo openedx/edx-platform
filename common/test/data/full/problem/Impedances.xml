@@ -1,0 +1,163 @@
+<!-- It works, and is not so bad. -->
+
+<problem>
+<script type="loncapa/python">
+ZA = "(-R*L*C*w^2+L*j*w)/((1-L*C*w^2)+R*C*j*w)"
+ZAU = "R"
+ZAD = "0"
+
+ZB = "(R+L*j*w)/((1-L*C*w^2)+R*C*j*w)"
+ZBU = "0"
+ZBD = "R"
+
+ZC = "((1-L*C*w^2)+R*C*j*w)/(C*j*w)"
+ZCU = "inf"
+ZCD = "inf"
+
+ZD = "(L*j*w)/((1-L*C*w^2)+(L/R)*j*w)"
+ZDU = "0"
+ZDD = "0"
+</script>
+
+<startouttext/>
+For each of the following circuits compute the impedance.
+<center>
+<img src="/static/circuits/Impedances.gif" />
+</center>
+In each space write an algebraic expression for the impedance \(Z\) in terms
+of \(R\), \(C\), \(L\), and \(\omega\).  (As usual, use \(w\) for
+\(\omega\) in your expressions.)  In each case we also ask, "How does the
+impedance behave as \(\omega\rightarrow 0\) and as
+\(\omega\rightarrow\infty\)?"  If the answer is zero, enter a "0", if
+the answer is a constant enter the algebraic expression for the
+constant, and if the answer is infinity, enter the symbol "inf".
+<endouttext/>
+
+<startouttext/>
+<br/>
+The impedance of circuit A, \(Z_A =\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZA">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="50" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+As \(\omega\rightarrow 0\) \(Z_A \rightarrow\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZAD">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+As \(\omega\rightarrow \infty\) \(Z_A \rightarrow\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZAU">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/><br/>
+The impedance of circuit B, \(Z_B =\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZB">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+As \(\omega\rightarrow 0\) \(Z_B \rightarrow\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZBD">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+As \(\omega\rightarrow \infty\) \(Z_B \rightarrow\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZBU">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/><br/>
+The impedance of circuit C, \(Z_C =\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZC">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+As \(\omega\rightarrow 0\) \(Z_C \rightarrow\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZCD">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+As \(\omega\rightarrow \infty\) \(Z_C \rightarrow\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZCU">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/><br/>
+The impedance of circuit D, \(Z_D =\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZD">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+As \(\omega\rightarrow 0\) \(Z_D \rightarrow\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZDD">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+As \(\omega\rightarrow \infty\) \(Z_D \rightarrow\)
+<endouttext/>
+<formularesponse type="cs" samples="w,R,L,C,inf@1,1,1,1,1:3,3,3,3,3#10" answer="$ZDU">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+    default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+
+
+
+
+</problem>

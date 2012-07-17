@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:2Bs9N-8Jt48,1.0:6sCmrXMRkO8,1.25:kGGWUWmG1-E,1.50:ZnY6UM7Drfs" slug="S27V10_CMOS_Logic_Gate_Design" name="S27V10: CMOS Logic Gate Design"/>
+  <customtag tag="S27" slug="discuss_1953">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="616" slug="book_1954">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="27" slug="slides_1955">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

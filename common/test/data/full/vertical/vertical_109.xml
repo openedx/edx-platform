@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:6CnJvdXr2E8,1.0:wlcwr1VIQ7Y,1.25:cAK4Lmo5krA,1.50:V3MhqSS-gpA" slug="S2V4_Method_1_-_KVL_KCL_method" rerandomize="per_student" name="S2V4: Method 1 - KVL, KCL method"/>
+  <customtag tag="S2" slug="discuss_110" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="66" slug="book_111" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="2" slug="slides_112" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

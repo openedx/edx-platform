@@ -1,0 +1,28 @@
+<sequential>
+  <problem filename="S1E5_KVL-0" slug="S1E5_KVL-0" name="S1E5: KVL-0"/>
+  <customtag tag="S1E5" slug="discuss_82">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S1E6_KVL" slug="S1E6_KVL" name="S1E6: KVL"/>
+  <customtag tag="S1E6" slug="discuss_83">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S1E7_KCL-0" slug="S1E7_KCL-0" name="S1E7: KCL-0"/>
+  <customtag tag="S1E7" slug="discuss_84">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S1E8_KCL" slug="S1E8_KCL" name="S1E8: KCL"/>
+  <customtag tag="S1E8" slug="discuss_85">
+    <impl>discuss</impl>
+  </customtag>
+  <problem filename="S1E9_Battery_Model" slug="S1E9_Battery_Model" name="S1E9: Battery Model"/>
+  <customtag tag="S1E9" slug="discuss_86">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="70" slug="book_87">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="1" slug="slides_88">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

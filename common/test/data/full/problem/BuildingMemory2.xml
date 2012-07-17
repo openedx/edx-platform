@@ -1,0 +1,41 @@
+<!-- This exercise is for slide10 and slide11 in Lecture "State and Memory" -->
+
+<problem>
+<script type="loncapa/python">
+RON = 2000.0
+CGS = 5e-15
+CGSf = CGS*1e15
+VS   = 5.0
+VOH  = 4.0
+VIH  = 3.0
+VIL  = 2.0
+VOL  = 1.0 
+
+RING = 10.0
+RIN  = RING*1e9
+
+tdown = -RIN*CGS*math.log(VOH/VS)
+tdownu = tdown*1e6
+
+</script>
+
+<startouttext/>
+<center>
+<img src="/static/circuits/switched-memory-off.gif" />
+</center>
+Suppose that STORE is low, so the switch is off, but now we have a 
+leakage resistance to worry about.
+<br/><br/>
+The capacitor has a capacitance of \($CGSf\)fF and the
+leakage resistance \(R_{IN}=$RING\)G\(\Omega\).
+
+How much time, in microseconds, does it take to
+discharge the capacitor from \(V_{S}=$VS\)V to \(V_{OH}=$VOH\)V, with
+<endouttext/>
+<numericalresponse answer="$tdownu">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+</problem>

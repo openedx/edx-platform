@@ -1,0 +1,12 @@
+<sequential>
+  <video youtube="0.75:tMjNKQecJug,1.0:m_Lh09hUOFo,1.25:_s_pMGZYdV4,1.50:oFTGMa3NeQg" slug="S12V10_First_Order_Series_RC_Circuit" showanswer="attempted" rerandomize="per_student" name="S12V10: First Order Series RC Circuit"/>
+  <customtag tag="S12" slug="discuss_809" showanswer="attempted" rerandomize="per_student">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="511" slug="book_810" showanswer="attempted" rerandomize="per_student">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="12" slug="slides_811" showanswer="attempted" rerandomize="per_student">
+    <impl>slides</impl>
+  </customtag>
+</sequential>

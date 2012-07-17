@@ -1,0 +1,99 @@
+<problem>
+<script type="loncapa/python">
+vOUT = "(-1 + sqrt(1 + 4*R*K*VS*(vIN - VT)))/(2*R*K*(vIN - VT))"
+id   = "vds/ro + gm*vgs"
+
+gm   = "K*VDS^2"
+ro   = "1/(2*K*VDS*(VGS-VT))"
+</script>
+
+
+<startouttext/>
+This problem examines the behavior and application of a new field
+effect transistor (NewFET) with large-signal electrical
+characteristics as described in the Figure2, where 
+\(v_{\rm DS} \ge 0\). Note that the coefficient \(K\) and the threshold voltage
+\(V_{\rm T}\) are both positive and constant.
+<center>
+<img src="/static/circuits/hw7f2.png" />
+</center>
+<endouttext/>
+
+<startouttext/> 
+<br/> 
+An amplifier is constructed with the NewFET as shown in Figure3.
+<center>
+<img src="/static/circuits/hw7f3.png" />
+</center>
+<endouttext/>
+
+<startouttext/> 
+<br/>
+Derive an expression of \(v_{\rm OUT}\) as a function of \(v_{\rm
+IN}\) in terms of the power supply voltage \(V_{\rm S}\), the
+resistance \(R\), and the NewFET parameters, \(K\) and \(V_{\rm T}\).
+Do so for the NewFET biased into the active region
+\(0 &lt; V_{\rm T} \le v_{\rm IN} \le V_{\rm S} \).
+<br/>
+Write your expression in the space provided below.  Remember that
+algebraic expressions are case sensitive.
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,VS,R,vIN@1,1,1,1,4:3,3,3,3,6#10" answer="$vOUT">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+<startouttext/> 
+Hint: You will get a quadratic expression.  Which is the correct root?
+Think about what happens when \(v_{\rm IN} = V_{\rm T}\).  You will
+need to use l'Hospital's rule.
+<endouttext/>
+
+<startouttext/> 
+<br/> <br/> 
+With the NewFET biased into its active region, its small-signal
+model is as shown in Figure4.
+<center>
+<img src="/static/circuits/hw7f4.png" />
+</center>
+<endouttext/>
+
+<startouttext/>
+<br/>
+Using this model, find \(i_{\rm d}\) in terms of \(g_{\rm m}\),
+\(r_{\rm o}\), \(v_{\rm gs}\), and \(v_{\rm ds}\).  Write your
+expression in the space provided below.
+<endouttext/>
+<formularesponse type="cs" samples="vds,ro,gm,vgs@1,1,1,1:3,3,3,3#10" answer="$id">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+  
+<startouttext/> 
+<br/> <br/>    
+Assuming that the NewFET is biased into its active region, derive
+expressions for the small-signal-model parameters \(g_{\rm m}\) and
+\(r_{\rm o}\) in terms of the large-signal model parameters \(K\) and
+\(V_{\rm T}\) and the bias voltages \(V_{\rm GS}\) and \(V_{\rm DS}\).
+<endouttext/>
+
+<startouttext/>
+<br/>
+\(g_{\rm m}\) =
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,VGS,VDS@1,1,1,1:3,3,3,3#10" answer="$gm">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+<br/>
+\(r_{\rm o}\) =
+<endouttext/>
+<formularesponse type="cs" samples="K,VT,VGS,VDS@1,1,1,1:3,3,3,3#10" answer="$ro">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+</problem>

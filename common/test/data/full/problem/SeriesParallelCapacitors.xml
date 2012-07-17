@@ -1,0 +1,96 @@
+<problem>
+
+<script type="loncapa/python">
+CP = "C1+C2"
+CS = "(C1*C2)/(C1+C2)"
+CSP = "(C1*(C2+C3))/(C1+C2+C3)"
+CPS = "C1+(C2*C3)/(C2+C3)"
+</script>
+
+<startouttext/>
+Now we know that the voltage-current behavior of a capacitor of
+capacitance \(C\) is:
+<br/>
+<center>
+\(i_C = C \frac{d v_C(t)}{d t} \)
+</center>
+<br/>
+It turns out that, just like with resistors, various combinations of
+capacitors are terminal-equivalent to a single capacitor with a
+capacitance determined from the capacitances of the parts of the
+combination.  For each of the following circuits give the capacitance
+of an equivalent capacitor, as seen from the exposed terminals.
+<endouttext/>
+
+<startouttext/>
+First, let's look at two capacitors in parallel:
+<center>
+<img src="/static/circuits/parallel-capacitors.gif" />
+</center>
+Think in terms of the geometry: how can two capacitors in parallel be
+thought of as one?  
+<br/>
+In the space provided below give an algebraic expression for \(C_P\)
+in terms of  \(C_1\) and \(C_2\) that makes these terminal equivalent.
+<br/> 
+\(C_P\) =
+<endouttext/>
+<formularesponse type="cs" samples="C1,C2@1,1:3,3#10" answer="$CP">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+Next, let's look at two capacitors in series:
+<center>
+<img src="/static/circuits/series-capacitors.gif" />
+</center>
+Think in terms of the geometry: how can two capacitors in series be
+thought of as one?  
+<br/>
+In the space provided below give an algebraic expression for \(C_S\)
+in terms of  \(C_1\) and \(C_2\) that makes these terminal equivalent.
+<br/> 
+\(C_S\) =
+<endouttext/>
+<formularesponse type="cs" samples="C1,C2@1,1:3,3#10" answer="$CS">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+Next, let's look at a combination
+<center>
+<img src="/static/circuits/series-parallel-capacitors.gif" />
+</center>
+In the space provided below give an algebraic expression for \(C_{SP}\)
+in terms of  \(C_1\), \(C_2\), and \(C_3\) that makes these terminal equivalent.
+<br/> 
+\(C_{SP}\) =
+<endouttext/>
+<formularesponse type="cs" samples="C1,C2,C3@1,1,1:3,3,3#10" answer="$CSP">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+<startouttext/>
+Next, let's look at another combination
+<center>
+<img src="/static/circuits/parallel-series-capacitors.gif" />
+</center>
+In the space provided below give an algebraic expression for \(C_{PS}\)
+in terms of  \(C_1\), \(C_2\), and \(C_3\) that makes these terminal equivalent.
+<br/> 
+\(C_{PS}\) =
+<endouttext/>
+<formularesponse type="cs" samples="C1,C2,C3@1,1,1:3,3,3#10" answer="$CPS">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol" />
+    <textline size="40" />    
+</formularesponse>
+
+
+
+
+</problem>

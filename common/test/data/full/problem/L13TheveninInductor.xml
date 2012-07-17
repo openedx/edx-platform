@@ -1,0 +1,53 @@
+<problem>
+<script type="loncapa/python">
+didt = "(V-R*iL)/L"
+
+Rk = 1.0 #kOhm
+R  = 1000*Rk
+
+Lu = 10  #uH
+L  = 1e-6*Lu
+
+V  = 1.0 #V
+iLm = 0.9 #mA
+iL = iLm*1e-3
+
+T  = L/R
+f  = 1/T
+
+ips = (V-R*iL)/L
+ipsm = ips*1e-3
+</script>
+
+
+<startouttext/>
+For the circuit shown below
+<center>
+<img src="/static/circuits/thevenin-inductor.gif" />
+</center>
+write an algebraic expression for the rate of change of the inductor
+current in terms of \(V\), \(R\), \(L\), and \(i_L\).
+<br/><br/>
+\(\frac{d i_L}{d t}\) = 
+<endouttext/>
+<formularesponse type="cs" samples="V,R,L,iL@1,1,1,1:3,3,3,3#10" answer="$didt">
+    <responseparam description="Numerical Tolerance" type="tolerance"
+                   default="0.00001" name="tol" /> 
+    <textline size="40" />    
+</formularesponse>
+
+<startouttext/>
+<br/>
+Let \(R = $Rk\)k\(\Omega\) and \(L = $Lu\mu\)H.  
+If at some time \(t\) we have \(V(t) = $V\)V and \(i_L(t) = $iLm\)mA what
+is the rate of change of inductor current?  Express your answer in
+Amperes/millisecond. 
+<endouttext/>
+<numericalresponse answer="$ipsm">
+    <responseparam type="tolerance" default="5%" name="tol"
+                   description="Numerical Tolerance" /> 
+    <textline />
+</numericalresponse>
+
+</problem>
+

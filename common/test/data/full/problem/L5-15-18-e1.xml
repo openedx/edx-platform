@@ -1,0 +1,56 @@
+<!-- Lecture 5, after slide 18 -->
+
+<problem>
+
+<script type="loncapa/python">
+VS = float(random.randrange(30,50,2))/10
+
+VOL = VS/10
+VIL = 9*VS/50
+VIH = 41*VS/50
+VOH = 45*VS/50
+</script>
+
+
+
+
+
+<startouttext />
+<center>
+<img src="/static/circuits/mos-inverter.gif" />
+</center>
+The inverter shown must meet the static discipline:
+<br />
+\(0 \leq V_{OL} &lt; V_{IL} &lt; V_{IH} &lt; V_{OH} \leq V_S\)
+<br />
+The required discipline is: \(V_{OL}=$VOL\)V, \(V_{IL}=$VIL\)V, 
+\(V_{IH}=$VIH\)V, \(V_{OH}=$VOH\)V, and \(V_{S}=$VS\)V.
+<br />
+The graph shows the input/output behavior of the 
+inverter, given the S-model (perfect switch model) of the MOSFET. 
+<br />
+For what values of the MOS threshold \(V_T\) can the design 
+satisfy the static discipline?
+<endouttext />
+
+<startouttext />
+<br />
+What is the minimum possible value of \(V_T\) (in Volts)?
+<endouttext />
+<numericalresponse answer="$VIL">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+<startouttext />
+<br />
+What is the maximum possible value of \(V_T\) (in Volts)?
+<endouttext />
+<numericalresponse answer="$VIH">
+    <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+    <textline />
+</numericalresponse>
+
+
+
+</problem>

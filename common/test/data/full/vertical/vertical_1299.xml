@@ -1,0 +1,12 @@
+<sequential>
+  <problem filename="S19E2_Exponentials_are_Nice" slug="S19E2_Exponentials_are_Nice" showanswer="attempted" rerandomize="false" name="S19E2: Exponentials are Nice"/>
+  <customtag tag="S19" slug="discuss_1300">
+    <impl>discuss</impl>
+  </customtag>
+  <customtag page="707" slug="book_1301">
+    <impl>book</impl>
+  </customtag>
+  <customtag lecnum="19" slug="slides_1302">
+    <impl>slides</impl>
+  </customtag>
+</sequential>
