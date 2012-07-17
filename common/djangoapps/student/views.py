@@ -47,17 +47,17 @@ def csrf_token(context):
 def index(request):
     ''' Redirects to main page -- info page if user authenticated, or marketing if not
     '''
-    entries = None
-    if settings.RSS_URL:
-        feed = cache.get("students_index_rss_feed")
-        if feed == None:
-            feed = feedparser.parse(settings.RSS_URL)
-            cache.set("students_index_rss_feed", feed, settings.RSS_TIMEOUT)
-        entries = feed['entries'][0:3]
-        for entry in entries:
-            soup = BeautifulSoup(entry.description)
-            if soup.img:
-                entry.image = soup.img['src']
+    feed_data = settings.RSS_URL if hasattr(settings, 'RSS_URL') else render_to_string("feed.rss", None)
+    feed = cache.get("students_index_rss_feed")
+
+    if feed == None:
+        feed = feedparser.parse(feed_data)
+        cache.set("students_index_rss_feed", feed, settings.RSS_TIMEOUT)
+
+    entries = feed['entries'][0:3]
+    for entry in entries:
+        soup = BeautifulSoup(entry.description)
+        entry.image = soup.img['src'] if soup.img else None
 
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect(reverse('dashboard'))

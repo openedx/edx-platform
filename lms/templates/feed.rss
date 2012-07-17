@@ -1,0 +1,25 @@
+<%namespace name='static' file='static_content.html'/>
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+  <id>tag:mitx.mit.edu,2012:/blog</id>
+  <link type="text/html" rel="alternate" href="http://mitx.mit.edu/blog"/>
+  <link type="application/atom+xml" rel="self" href="https://github.com/blog.atom"/>
+  <title>The GitHub Blog</title>
+  <updated>2012-07-16T14:08:12-07:00</updated>
+  <entry>
+    <id>tag:mitx.mit.edu,2012:Post/3</id>
+    <published>2012-07-16T14:08:12-07:00</published>
+    <updated>2012-07-16T14:08:12-07:00</updated>
+    <link type="text/html" rel="alternate" href="#"/>
+    <title>Online Classes Cut Costs, But Do They Dilute Brands?</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/courses/space1.jpg')}&quot; /&gt;A Description</content>
+  </entry>
+  <entry>
+    <id>tag:mitx.mit.edu,2012:Post/3</id>
+    <published>2012-07-16T14:08:12-07:00</published>
+    <updated>2012-07-16T14:08:12-07:00</updated>
+    <link type="text/html" rel="alternate" href="#"/>
+    <title>Online Classes Cut Costs, But Do They Dilute Brands?</title>
+    <content type="html">A Description</content>
+  </entry>
+</feed>
