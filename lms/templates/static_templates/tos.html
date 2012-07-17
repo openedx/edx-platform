@@ -1,7 +1,7 @@
 <%! from django.core.urlresolvers import reverse %>
-<%inherit file="main.html" />
+<%inherit file="../main.html" />
 
-<%namespace name='static' file='static_content.html'/>
+<%namespace name='static' file='../static_content.html'/>
 
 <section class="static-container tos">
   <h1>MITx Terms of Service</h1>
@@ -9,8 +9,8 @@
 
   <div class="inner-wrapper">
     <p>Welcome to <i>MITx</i>. You must read and agree to these Terms of Service
-    (&quot;TOS&quot;), <i>MITx</i>&rsquo;s <a href="/t/privacy.html">Privacy
-    Policy</a>, and <a href="/t/honor.html">Honor Code</a> prior to
+    (&quot;TOS&quot;), <i>MITx</i>&rsquo;s <a href="${reverse('privacy_edx')}">Privacy
+    Policy</a>, and <a href="${reverse('honor')}">Honor Code</a> prior to
     registering for this site or using any portion of this site
     (&ldquo;Site&rdquo;), including accessing any course materials, chat
     room, mailing list, or other electronic service. These TOS, the
@@ -44,7 +44,7 @@
     or other users of the Site, including but not limited to all forum
     posts, wiki edits, notes, questions, comments, videos, and file
     uploads. You agree that you will use the Site in compliance with these
-    TOS, the <a href="/t/honor.html">Honor Code</a>, and all applicable
+    TOS, the <a href="${reverse('honor')}">Honor Code</a>, and all applicable
     local, state, national, and international laws, rules and regulations,
     including copyright laws and any laws regarding the transmission of
     technical data exported from your country of residence and all United
@@ -110,7 +110,7 @@
     information to keep it accurate and current. </p>
 
     <p>We care about the confidentiality and security of your personal
-    information.  Please see our <a href="/t/privacy.html">Privacy
+    information.  Please see our <a href="${reverse('privacy_edx')}">Privacy
     Policy</a> for more information about what information about
     you <i>MITx</i> collects and how <i>MITx</i> uses that
     information.</p>
@@ -133,7 +133,7 @@
     this Site you agree to abide by all such rules and conditions. Due to
     privacy concerns, User Postings shall be licensed to <i>MITx</i> with
     the terms discussed below. Please
-    see <a href="/t/copyright.html"><i>MITx's Copyright Page</i></a> for
+    see <a href="${reverse('copyright')}"><i>MITx's Copyright Page</i></a> for
     more information.</p>
 
     <h2>User Postings</h2>

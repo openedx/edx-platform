@@ -21,11 +21,12 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from django.core.urlresolvers import reverse
 
 from courseware.courses import check_course
+from django_future.csrf import ensure_csrf_cookie
+from student.models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
+from util.cache import cache_if_anonymous 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
-from django_future.csrf import ensure_csrf_cookie
 
-from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 
 log = logging.getLogger("mitx.student")
 
@@ -40,16 +41,15 @@ def csrf_token(context):
 
 
 @ensure_csrf_cookie
+@cache_if_anonymous
 def index(request):
     ''' Redirects to main page -- info page if user authenticated, or marketing if not
     '''
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect(reverse('dashboard'))
     else:
-        csrf_token = csrf(request)['csrf_token']
         # TODO: Clean up how 'error' is done.
-        return render_to_response('index.html', {'courses': modulestore().get_courses(),
-                                                 'csrf': csrf_token})
+        return render_to_response('index.html', {'courses': modulestore().get_courses()})
 
 
 @login_required
@@ -495,27 +495,13 @@ def accept_name_change(request):
 
 
 @ensure_csrf_cookie
+@cache_if_anonymous
 def course_info(request, course_id):
     course = check_course(course_id, course_must_be_open=False)
     # This is the advertising page for a student to look at the course before signing up
     csrf_token = csrf(request)['csrf_token']
     # TODO: Couse should be a model
-    return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course': course})
-
-
-def about(request):
-    return render_to_response('about.html', None)
-
-
-def university_profile(request):
-  return render_to_response('university_profile.html', None)
-
-def jobs(request):
-    return render_to_response('jobs.html', None)
-
-
-def help(request):
-    return render_to_response('help.html', None)
+    return render_to_response('portal/course_about.html', {'course': course})
 
 
 @login_required

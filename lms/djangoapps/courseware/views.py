@@ -17,7 +17,7 @@ from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
 
-from util.cache import cache
+from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup
 from courseware import grades
 from courseware.courses import check_course
@@ -50,11 +50,10 @@ def format_url_params(params):
 
 
 @ensure_csrf_cookie
+@cache_if_anonymous
 def courses(request):
-    csrf_token = csrf(request)['csrf_token']
     # TODO: Clean up how 'error' is done.
-    context = {'courses': modulestore().get_courses(),
-               'csrf': csrf_token}
+    context = {'courses': modulestore().get_courses()}
     return render_to_response("courses.html", context)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
