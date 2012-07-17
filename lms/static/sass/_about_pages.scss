@@ -37,6 +37,13 @@
       margin-bottom: 80px;
     }
 
+    h2.mission-quote {
+      margin: 0 auto;
+      text-align: center;
+      text-transform: none;
+      width: flex-grid(10);
+    }
+
     .message {
       @include clearfix;
       margin-bottom: 60px;
@@ -86,6 +93,19 @@
 
       &:last-child {
         margin-bottom: 0px;
+      }
+    }
+
+    .partners {
+      @include clearfix;
+
+      > article {
+        float: left;
+        width: flex-grid(6);
+
+        &:first-child {
+          margin-right: flex-gutter();
+        }
       }
     }
   }

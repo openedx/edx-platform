@@ -28,16 +28,12 @@
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       @include box-sizing(border-box);
       height: 120px;
-      //@include clearfix;
       @include inline-block;
       margin-left: grid-width(1) + $gw-gutter;
       margin-right: $gw-gutter;
-      //overflow: hidden;
-      //padding: 20px 30px 20px;
       position: relative;
       text-align: center;
       @include transition(all, 0.2s, linear);
-      //width: grid-width(6);
       vertical-align: top;
 
       &:hover {
@@ -59,38 +55,18 @@
       }
 
       > hgroup {
-        //background: rgba(255,255,255, 0.93);
-        //border: 1px solid rgb(100,100,100);
-        //@include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
         @include box-sizing(border-box);
         height: 120px;
         @include inline-block;
         left: 0px;
-        //margin-left: grid-width(1) + $gw-gutter;
-        //margin-right: $gw-gutter;
         opacity: 1;
         padding: 20px 30px;
-        //position: absolute;
         top: 0px;
         @include transition(all, 0.2s, linear);
         text-align: left;
-        //vertical-align: middle;
-
-        &::after {
-          @extend .faded-vertical-divider-light;
-          content: "";
-          display: block;
-          height: 170px;
-          position: absolute;
-          right: -1px;
-          top: -20px;
-        }
 
         h1 {
-          //border-bottom: 1px solid rgb(200,200,200);
-          //margin-bottom: 25px;
           margin-bottom: 0px;
-          //padding-bottom: 15px;
           text-align: left;
           text-shadow: 0 1px rgba(255,255,255, 0.6);
           text-transform: none;
@@ -115,7 +91,6 @@
         width: flex-grid(12);
 
         .main-cta {
-          //display: none;
           float: left;
           margin-right: flex-gutter();
           width: flex-grid(6);
@@ -139,11 +114,9 @@
         }
 
         .secondary-actions {
-          //display: none;
           @include box-sizing(border-box);
           @include clearfix;
           float: left;
-          //height: 47px;
           width: flex-grid(6);
 
           .social-sharing {
@@ -221,10 +194,10 @@
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       height: 120px;
       @include inline-block;
-      padding: 3px;
+      padding: 4px;
       position: relative;
       vertical-align: top;
-      width: flex-grid(2);
+      width: 210px;
       z-index: 2;
 
       &:hover {

@@ -34,6 +34,7 @@
         @include box-sizing(border-box);
         @include clearfix;
         float: left;
+        height: 180px;
         padding: 20px 20px;
         position: relative;
         width: flex-grid(8) + flex-gutter();
@@ -42,8 +43,8 @@
         > hgroup {
           border-bottom: 1px solid rgb(210,210,210);
           @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-          margin-bottom: 30px;
-          padding-bottom: 15px;
+          margin-bottom: 27px;
+          padding-bottom: 20px;
           width: 100%;
 
           h1 {
@@ -100,18 +101,20 @@
       }
 
       .media {
-        background: #fff;
+        background: transparent;
         border-left: 1px solid rgb(100,100,100);
         @include box-sizing(border-box);
         display: block;
         float: right;
-        padding: 1px;
+        height: 180px;
+        padding: 20px;
         position: relative;
         width: flex-grid(4);
         z-index: 2;
 
         .hero {
-          height: 180px;
+          border: 1px solid rgb(100,100,100);
+          height: 100%;
           overflow: hidden;
           position: relative;
 
