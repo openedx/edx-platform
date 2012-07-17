@@ -6,6 +6,7 @@ import string
 import sys
 import uuid
 import feedparser
+import urllib
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -47,13 +48,15 @@ def csrf_token(context):
 def index(request):
     ''' Redirects to main page -- info page if user authenticated, or marketing if not
     '''
-    feed_data = settings.RSS_URL if hasattr(settings, 'RSS_URL') else render_to_string("feed.rss", None)
-    feed = cache.get("students_index_rss_feed")
+    feed_data = cache.get("students_index_rss_feed_data")
+    if feed_data == None:
+        if hasattr(settings, 'RSS_URL'):
+            feed_data = urllib.urlopen(settings.RSS_URL).read()
+        else:
+            feed_data = render_to_string("feed.rss", None)
+        cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
 
-    if feed == None:
-        feed = feedparser.parse(feed_data)
-        cache.set("students_index_rss_feed", feed, settings.RSS_TIMEOUT)
-
+    feed = feedparser.parse(feed_data)
     entries = feed['entries'][0:3]
     for entry in entries:
         soup = BeautifulSoup(entry.description)
