@@ -24,8 +24,9 @@
       @include clearfix;
       margin: 0 auto;
       max-width: 1200px;
+      padding: 0px 10px;
       position: relative;
-      width: flex-grid(12);
+      width: grid-width(12);
       z-index: 2;
 
 

@@ -468,8 +468,8 @@ a:link, a:visited {
 .container {
   zoom: 1;
   margin: 0 auto 0;
-  max-width: 1200px;
-  width: 100%; }
+  padding: 0px 10px;
+  width: 1180px; }
   .container:before, .container:after {
     content: "";
     display: table; }
@@ -489,7 +489,7 @@ a:link, a:visited {
     clear: both; }
   .static-container .inner-wrapper {
     margin: 0 auto 0;
-    width: 82.915%; }
+    width: 83.051%; }
   .static-container ol, .static-container ul {
     list-style: disc; }
     .static-container ol li, .static-container ul li {
@@ -532,7 +532,7 @@ a:link, a:visited {
   height: 1px;
   width: 100%; }
 
-.faded-vertical-divider, .vertical-divider, footer nav .top ol li::after, footer nav .top .primary a.logo::after, header.global h1.logo::before, .home > header .title::before, .home .university-partners .partners li.partner::before, .find-courses header.search .inner-wrapper.main-search .logo::after, .find-courses header.search .inner-wrapper.university-search .logo::after, .university-profile header.search .inner-wrapper.main-search .logo::after, .university-profile header.search .inner-wrapper.university-search .logo::after {
+.faded-vertical-divider, .vertical-divider, footer nav .top ol li::after, footer nav .top .primary a.logo::after, header.global h1.logo::before, .home .university-partners .partners li.partner::before, .find-courses header.search .inner-wrapper.main-search .logo::after, .find-courses header.search .inner-wrapper.university-search .logo::after, .university-profile header.search .inner-wrapper.main-search .logo::after, .university-profile header.search .inner-wrapper.university-search .logo::after {
   background-image: -webkit-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -moz-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
   background-image: -ms-linear-gradient(90deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
@@ -1501,13 +1501,10 @@ footer {
     max-width: 100%;
     position: absolute; }
   footer nav {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
     max-width: 1200px;
     margin: 0 auto;
     padding: 30px 10px 0;
-    width: 100%; }
+    width: 1180px; }
     footer nav .top {
       border-bottom: 1px solid #c8c8c8;
       zoom: 1;
@@ -1716,14 +1713,11 @@ header.global {
   z-index: 10; }
   header.global nav {
     zoom: 1;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
     height: 40px;
     margin: 0 auto;
     max-width: 1200px;
-    padding-top: 14px;
-    width: 100%; }
+    padding: 14px 10px 0px;
+    width: 1180px; }
     header.global nav:before, header.global nav:after {
       content: "";
       display: table; }
@@ -1922,9 +1916,9 @@ header.global {
       -ms-border-radius: 4px;
       -o-border-radius: 4px;
       border-radius: 4px;
-      -webkit-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.4);
-      -moz-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.4);
-      box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.4);
+      -webkit-box-shadow: 0 2px 24px 0 rgba(0, 0, 0, 0.3);
+      -moz-box-shadow: 0 2px 24px 0 rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 24px 0 rgba(0, 0, 0, 0.3);
       border: 1px solid #646464;
       display: none;
       padding: 5px 10px;
@@ -2012,7 +2006,7 @@ header.global {
 
 .highlighted-courses .courses, .find-courses .courses {
   zoom: 1;
-  padding: 40px 15px 15px; }
+  padding: 40px 0px 15px; }
   .highlighted-courses .courses:before, .highlighted-courses .courses:after, .find-courses .courses:before, .find-courses .courses:after {
     content: "";
     display: table; }
@@ -2425,7 +2419,7 @@ header.global {
   left: 50%;
   padding: 8px;
   position: absolute;
-  width: 485px;
+  width: 480px;
   z-index: 12; }
   .modal.video-modal {
     left: 50%;
@@ -2708,6 +2702,7 @@ header.global {
     .home > header .outer-wrapper {
       max-width: 1200px;
       margin: 0 auto;
+      padding: 0 10px;
       position: relative;
       text-align: center; }
       .home > header .outer-wrapper:hover .main-cta {
@@ -2727,7 +2722,7 @@ header.global {
       zoom: 1;
       *display: inline;
       *vertical-align: auto;
-      padding: 30px 50px 30px;
+      padding: 20px 30px 30px;
       position: relative;
       text-align: center;
       z-index: 1; }
@@ -2742,12 +2737,6 @@ header.global {
       position: relative;
       text-align: left;
       vertical-align: middle; }
-      .home > header .title::before {
-        display: block;
-        height: 170px;
-        position: absolute;
-        right: 0px;
-        top: -20px; }
       .home > header .title::after {
         content: "";
         display: block;
@@ -3615,60 +3604,61 @@ header.global {
             display: table; }
           .dashboard .profile-sidebar header.profile .user-info > ul li:after {
             clear: both; }
-          .dashboard .profile-sidebar header.profile .user-info > ul li:hover .icon {
+          .dashboard .profile-sidebar header.profile .user-info > ul li:hover .title .icon {
             opacity: 1; }
-          .dashboard .profile-sidebar header.profile .user-info > ul li p {
+          .dashboard .profile-sidebar header.profile .user-info > ul li span.title {
             color: #a0a0a0;
             float: left;
             font-family: "Open Sans", Verdana, Geneva, sans-serif; }
-            .dashboard .profile-sidebar header.profile .user-info > ul li p span {
-              font-weight: 700;
-              margin-left: 12px; }
-          .dashboard .profile-sidebar header.profile .user-info > ul li .icon {
-            background-size: cover;
-            float: left;
-            height: 19px;
-            margin: 2px 8px 0 0;
-            opacity: 0.6;
-            -webkit-transition-property: all;
-            -moz-transition-property: all;
-            -ms-transition-property: all;
-            -o-transition-property: all;
-            transition-property: all;
-            -webkit-transition-duration: 0.15s;
-            -moz-transition-duration: 0.15s;
-            -ms-transition-duration: 0.15s;
-            -o-transition-duration: 0.15s;
-            transition-duration: 0.15s;
-            -webkit-transition-timing-function: linear;
-            -moz-transition-timing-function: linear;
-            -ms-transition-timing-function: linear;
-            -o-transition-timing-function: linear;
-            transition-timing-function: linear;
-            -webkit-transition-delay: 0;
-            -moz-transition-delay: 0;
-            -ms-transition-delay: 0;
-            -o-transition-delay: 0;
-            transition-delay: 0;
-            width: 19px; }
-            .dashboard .profile-sidebar header.profile .user-info > ul li .icon.email-icon {
-              background-image: url("/static/images/portal-icons/email-icon.png");
-              background-image: url("/static/images/portal-icons/email-icon.png");
-              background-image: url("/static/images/portal-icons/email-icon.png");
-              background-image: url("/static/images/portal-icons/email-icon.png");
-              background-image: url("/static/images/portal-icons/email-icon.png"); }
-            .dashboard .profile-sidebar header.profile .user-info > ul li .icon.location-icon {
-              background-image: url("/static/images/portal-icons/home-icon.png");
-              background-image: url("/static/images/portal-icons/home-icon.png");
-              background-image: url("/static/images/portal-icons/home-icon.png");
-              background-image: url("/static/images/portal-icons/home-icon.png");
-              background-image: url("/static/images/portal-icons/home-icon.png"); }
-            .dashboard .profile-sidebar header.profile .user-info > ul li .icon.language-icon {
-              background-image: url("/static/images/portal-icons/language-icon.png");
-              background-image: url("/static/images/portal-icons/language-icon.png");
-              background-image: url("/static/images/portal-icons/language-icon.png");
-              background-image: url("/static/images/portal-icons/language-icon.png");
-              background-image: url("/static/images/portal-icons/language-icon.png"); }
+            .dashboard .profile-sidebar header.profile .user-info > ul li span.title .icon {
+              background-size: cover;
+              float: left;
+              height: 19px;
+              margin: 2px 8px 0 0;
+              opacity: 0.6;
+              -webkit-transition-property: all;
+              -moz-transition-property: all;
+              -ms-transition-property: all;
+              -o-transition-property: all;
+              transition-property: all;
+              -webkit-transition-duration: 0.15s;
+              -moz-transition-duration: 0.15s;
+              -ms-transition-duration: 0.15s;
+              -o-transition-duration: 0.15s;
+              transition-duration: 0.15s;
+              -webkit-transition-timing-function: linear;
+              -moz-transition-timing-function: linear;
+              -ms-transition-timing-function: linear;
+              -o-transition-timing-function: linear;
+              transition-timing-function: linear;
+              -webkit-transition-delay: 0;
+              -moz-transition-delay: 0;
+              -ms-transition-delay: 0;
+              -o-transition-delay: 0;
+              transition-delay: 0;
+              width: 19px; }
+              .dashboard .profile-sidebar header.profile .user-info > ul li span.title .icon.email-icon {
+                background-image: url("/static/images/portal-icons/email-icon.png");
+                background-image: url("/static/images/portal-icons/email-icon.png");
+                background-image: url("/static/images/portal-icons/email-icon.png");
+                background-image: url("/static/images/portal-icons/email-icon.png");
+                background-image: url("/static/images/portal-icons/email-icon.png"); }
+              .dashboard .profile-sidebar header.profile .user-info > ul li span.title .icon.location-icon {
+                background-image: url("/static/images/portal-icons/home-icon.png");
+                background-image: url("/static/images/portal-icons/home-icon.png");
+                background-image: url("/static/images/portal-icons/home-icon.png");
+                background-image: url("/static/images/portal-icons/home-icon.png");
+                background-image: url("/static/images/portal-icons/home-icon.png"); }
+              .dashboard .profile-sidebar header.profile .user-info > ul li span.title .icon.language-icon {
+                background-image: url("/static/images/portal-icons/language-icon.png");
+                background-image: url("/static/images/portal-icons/language-icon.png");
+                background-image: url("/static/images/portal-icons/language-icon.png");
+                background-image: url("/static/images/portal-icons/language-icon.png");
+                background-image: url("/static/images/portal-icons/language-icon.png"); }
+          .dashboard .profile-sidebar header.profile .user-info > ul li span.data {
+            color: #a0a0a0;
+            font-weight: 700;
+            margin-left: 12px; }
   .dashboard .my-courses {
     float: left;
     margin: 0px;
@@ -4303,8 +4293,9 @@ nav.course-material {
     zoom: 1;
     margin: 0 auto;
     max-width: 1200px;
+    padding: 0px 10px;
     position: relative;
-    width: 100%;
+    width: 1180px;
     z-index: 2; }
     .course-info header.course-profile .intro-inner-wrapper:before, .course-info header.course-profile .intro-inner-wrapper:after {
       content: "";
@@ -4881,7 +4872,7 @@ nav.course-material {
           margin-bottom: 15px; }
 
 .container.about {
-  padding: 20px 0 120px; }
+  padding: 20px 10px 120px; }
   .container.about > nav {
     margin-bottom: 80px;
     text-align: center;
