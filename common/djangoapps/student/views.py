@@ -24,7 +24,6 @@ from django.core.urlresolvers import reverse
 from BeautifulSoup import BeautifulSoup
 from django.core.cache import cache
 
-from courseware.courses import check_course
 from django_future.csrf import ensure_csrf_cookie
 from student.models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 from util.cache import cache_if_anonymous 
@@ -511,23 +510,3 @@ def accept_name_change(request):
 
     return HttpResponse(json.dumps({'success': True}))
 
-
-@ensure_csrf_cookie
-@cache_if_anonymous
-def course_info(request, course_id):
-    course = check_course(course_id, course_must_be_open=False)
-    # This is the advertising page for a student to look at the course before signing up
-    csrf_token = csrf(request)['csrf_token']
-    # TODO: Couse should be a model
-    return render_to_response('portal/course_about.html', {'course': course})
-
-
-@login_required
-@ensure_csrf_cookie
-def enroll(request, course_id):
-    course = check_course(course_id, course_must_be_open=False)
-    user = request.user
-    
-    enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
-    
-    return redirect(reverse('dashboard'))
