@@ -24,7 +24,11 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def title(self):
-        self.metadata['display_name']
+        return self.metadata['display_name']
+
+    @property
+    def number(self):
+        return self.location.course
 
     @property
     def instructors(self):
@@ -38,6 +42,7 @@ class CourseDescriptor(SequenceDescriptor):
         """
         This returns the snippet of html to be rendered on the course about page, given the key for the section.
         Valid keys:
+        - overview
         - title
         - university
         - number
@@ -59,10 +64,10 @@ class CourseDescriptor(SequenceDescriptor):
 
         # TODO: Remove number, instructors from this list
         if section_key in ['short_description', 'description', 'key_dates', 'video', 'course_staff_short', 'course_staff_extended',
-                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number', 'instructors']:
+                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number', 'instructors', 'overview']:
             try:
                 with self.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
-                    return htmlFile.read()
+                    return htmlFile.read().decode('utf-8')
             except ResourceNotFoundError:
                 log.exception("Missing about section {key} in course {url}".format(key=section_key, url=self.location.url()))
                 return "! About section missing !"
@@ -91,7 +96,7 @@ class CourseDescriptor(SequenceDescriptor):
         if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
             try:
                 with self.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
-                    return htmlFile.read()
+                    return htmlFile.read().decode('utf-8')
             except ResourceNotFoundError:
                 log.exception("Missing info section {key} in course {url}".format(key=section_key, url=self.location.url()))
                 return "! Info section missing !"
