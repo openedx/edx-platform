@@ -186,12 +186,13 @@ class LoncapaProblem(object):
          
         Returns an updated CorrectMap
         '''
-        cmap = self.correct_map
+        cmap = CorrectMap()
+        cmap.update(self.correct_map)
         for responder in self.responders.values():
             if hasattr(responder,'update_score'): # TODO: Is this the best way to target 'update_score' of CodeResponse?
                 # Each LoncapaResponse will update the specific entries of 'cmap' that it's responsible for
                 cmap = responder.update_score(score_msg, cmap, queuekey)
-        self.correct_map = cmap
+        self.correct_map.set_dict(cmap.get_dict())
         return cmap 
 
     def is_queued(self):
