@@ -106,7 +106,7 @@
       }
     }
 
-    #enroll_error, #login_error {
+    .modal-form-error {
       background: $error-red;
       border: 1px solid rgb(202, 17, 17);
       color: rgb(143, 14, 14);
