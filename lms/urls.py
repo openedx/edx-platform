@@ -12,10 +12,6 @@ if settings.DEBUG:
 
 urlpatterns = ('',
     url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
-    url(r'^about$', 'student.views.about', name="about_edx"),
-    url(r'^university_profile$', 'student.views.university_profile', name="university_profile"),
-    url(r'^jobs$', 'student.views.jobs', name="jobs"),
-    url(r'^help$', 'student.views.help', name="help_edx"),
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
@@ -48,6 +44,47 @@ urlpatterns = ('',
         name='auth_password_reset_done'),
     ## Feedback
     url(r'^send_feedback$', 'util.views.send_feedback'),
+    
+    
+    
+    #Semi-static views (these need to be rendered and have the login bar, but don't change)
+    url(r'^404$', 'static_template_view.views.render', 
+        {'template': '404.html'}, name="404"),
+    url(r'^about$', 'static_template_view.views.render', 
+        {'template': 'about.html'}, name="about_edx"),
+    url(r'^jobs$', 'static_template_view.views.render', 
+        {'template': 'jobs.html'}, name="jobs"),
+    url(r'^contact$', 'static_template_view.views.render', 
+        {'template': 'contact.html'}, name="contact"),
+    url(r'^press$', 'static_template_view.views.render', 
+        {'template': 'press.html'}, name="press"),
+    url(r'^faq$', 'static_template_view.views.render', 
+        {'template': 'faq.html'}, name="faq_edx"),
+    url(r'^help$', 'static_template_view.views.render', 
+        {'template': 'help.html'}, name="help_edx"),
+    url(r'^pressrelease$', 'static_template_view.views.render', 
+        {'template': 'pressrelease.html'}, name="pressrelease"),
+    url(r'^tos$', 'static_template_view.views.render', 
+        {'template': 'tos.html'}, name="tos"),
+    url(r'^privacy$', 'static_template_view.views.render', 
+        {'template': 'privacy.html'}, name="privacy_edx"),
+    url(r'^copyright$', 'static_template_view.views.render', 
+        {'template': 'copyright.html'}, name="copyright"),
+    url(r'^honor$', 'static_template_view.views.render', 
+        {'template': 'honor.html'}, name="honor"),
+    
+    
+    
+    #Temporarily static, for testing
+    url(r'^university_profile$', 'static_template_view.views.render', 
+        {'template': 'university_profile.html'}, name="university_profile"),
+    
+    
+    #TODO: Convert these pages to the new edX layout
+    # 'tos.html', 
+    # 'privacy.html', 
+    # 'honor.html', 
+    # 'copyright.html', 
 )
 
 if settings.PERFSTATS:
