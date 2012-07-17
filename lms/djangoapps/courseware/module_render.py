@@ -4,8 +4,10 @@ import logging
 from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from functools import wraps
 
+from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
@@ -327,8 +329,6 @@ def add_histogram(module):
     return module
 
 # TODO: TEMPORARY BYPASS OF AUTH!
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.models import User
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
