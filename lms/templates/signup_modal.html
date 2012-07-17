@@ -9,7 +9,7 @@
         <hr>
       </header>
 
-      <form id="enroll_form" method="post">
+      <form id="enroll_form" method="post" data-remote="true" action="/create_account">
         <div id="enroll_error" name="enroll_error"></div>
         <label>E-mail</label>
         <input name="email" type="email" placeholder="E-mail">
@@ -77,34 +77,12 @@
 
 <script type="text/javascript">
   (function() {
-    function getCookie(name) {
-      return $.cookie(name);
-    }
-
-    function postJSON(url, data, callback) {
-      $.ajax({type:'POST',
-        url: url,
-        dataType: 'json',
-        data: data,
-        success: callback,
-        headers : {'X-CSRFToken':getCookie('csrftoken')}
-      });
-    }
-
-    $('form#enroll_form').submit(function(e) {
-      e.preventDefault();
-      var submit_data = $('#enroll_form').serialize();
-
-      postJSON('/create_account',
-        submit_data,
-        function(json) {
-          if(json.success) {
-            $('#enroll').html(json.value);
-          } else {
-            $('#enroll_error').html(json.value).stop().css("display", "block");
-          }
-        }
-      );
+   $(document).delegate('#enroll_form', 'ajax:success', function(data, json, xhr) {
+     if(json.success) {
+       $('#enroll').html(json.value);
+     } else {
+       $('#enroll_error').html(json.value).stop().css("display", "block");
+     }
     });
   })(this)
 </script>
