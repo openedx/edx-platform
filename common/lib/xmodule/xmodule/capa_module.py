@@ -434,11 +434,11 @@ class CapaModule(XModule):
             if not correct_map.is_correct(answer_id):
                 success = 'incorrect'
 
-        # log this in the track_function, ONLY if a full grading has been performed (e.g. not queueing)
-        if not self.lcp.is_queued():
-            event_info['correct_map'] = correct_map.get_dict()
-            event_info['success'] = success
-            self.system.track_function('save_problem_check', event_info)
+        # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
+        #       'success' will always be incorrect
+        event_info['correct_map'] = correct_map.get_dict()
+        event_info['success'] = success
+        self.system.track_function('save_problem_check', event_info)
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
