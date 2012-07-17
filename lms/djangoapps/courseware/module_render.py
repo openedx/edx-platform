@@ -210,7 +210,7 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
-    xqueue_callback_url = settings.MITX_ROOT_URL + '/xqueue/' + user.username + '/' + descriptor.location.url() + '/'
+    xqueue_callback_url = settings.MITX_ROOT_URL + '/xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/'
 
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
@@ -330,7 +330,7 @@ def add_histogram(module):
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 @csrf_exempt
-def xqueue_callback(request, username, id, dispatch):
+def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
     get = request.POST.copy()
     try:
@@ -340,7 +340,7 @@ def xqueue_callback(request, username, id, dispatch):
         raise Exception(msg)
 
     # Retrieve target StudentModule
-    user = User.objects.get(username=username)
+    user = User.objects.get(id=userid)
 
     student_module_cache = StudentModuleCache(user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
