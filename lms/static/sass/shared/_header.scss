@@ -160,7 +160,7 @@ header.global {
 
         .avatar {
           //background: rgb(220,220,220);
-          @include background-image(url('/static/images/portal-icons/home-icon.png'));
+          @include background-image(url('../images/portal-icons/home-icon.png'));
           background-size: cover;
           //@include border-radius(3px);
           //border: 1px solid rgb(80,80,80);

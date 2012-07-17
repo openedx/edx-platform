@@ -384,19 +384,19 @@
           width: 19px;
 
           &.start-icon {
-            @include background-image(url('/static/images/portal-icons/calendar-icon.png'));
+            @include background-image(url('../images/portal-icons/calendar-icon.png'));
           }
 
           &.final-icon {
-            @include background-image(url('/static/images/portal-icons/pencil-icon.png'));
+            @include background-image(url('../images/portal-icons/pencil-icon.png'));
           }
 
           &.length-icon {
-            @include background-image(url('/static/images/portal-icons/chart-icon.png'));
+            @include background-image(url('../images/portal-icons/chart-icon.png'));
           }
 
           &.number-icon {
-            @include background-image(url('/static/images/portal-icons/course-info-icon.png'));
+            @include background-image(url('../images/portal-icons/course-info-icon.png'));
           }
         }
 
