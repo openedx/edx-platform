@@ -1,0 +1,84 @@
+<problem><script type="loncapa/python">
+V = 240
+P = float(random.randrange(800,1600,10))
+Pmax = 3*P
+Imax = Pmax/V
+
+Iq = Pmax/120
+
+R = (V**2)/P
+
+Rbad = 3*R/2
+
+Pbad = (V**2)/Rbad
+
+Ibad = Pbad/V
+
+PH1 = (Ibad**2)*R
+PH2 = ((Ibad/2)**2)*R
+PH3 = PH2
+</script><startouttext/>
+Joe wants to heat his 12'X20' workshop with electric heat.  He has
+hired the HACME electrician company to build the system.  They propose
+to use three \($P\)W 240V baseboard heaters to provide a total heating
+capacity of \($Pmax\)W.  (A heater is basically a
+resistor.  This is not quite true, because there is a thermostatic
+switch incorporated into the heater and because the resistance of a
+heater varies a bit with its temperature.  But we will use a linear
+resistor as a model of a heater.)
+<br/>
+In the proposed system the heaters are connected in parallel with the
+240V 60Hz AC power line (modeled by a voltage source) as shown in the
+diagram:
+<center><img src="/static/circuits/heaters-parallel.gif"/></center>
+Remember (from exercise S1E3: AC POWER) that AC power-line voltages
+and currents are specified as RMS values.  So 120V AC heats a given
+resistance exactly as much as 120V DC would heat that same 
+resistance.
+<endouttext/>
+
+<startouttext/>
+<br/>
+How much current is expected to be drawn from the power line by this
+heating system when all three heaters are on?
+<endouttext/>
+<numericalresponse answer="$Imax"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+If instead, HACME chose to implement the system with 120V heaters, how
+much current would have been needed?
+<endouttext/>
+<numericalresponse answer="$Iq"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+Notice that this would require much heavier and more expensive wire to
+distribute the power.  
+<br/> <br/>
+Back to the original plan with 240V power.
+<br/>
+Unfortunately, Sparky, who works for HACME, was a little sleepy that
+day.  He accidentally connected the heaters as shown below:
+<center><img src="/static/circuits/heaters-bad.gif"/></center>
+<br/>
+As a consequence, Joe found his workshop too cold.  H1 was weak; H2
+and H3 barely warmed up.
+<br/>
+What power was being dissipated in H1?
+<endouttext/>
+<numericalresponse answer="$PH1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+What power was being dissipated in H2 (or in H3)?
+<endouttext/>
+<numericalresponse answer="$PH2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+So the total heating power in Joe's shop was:
+<endouttext/>
+<numericalresponse answer="$Pbad"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+No wonder Joe was cold.
+<endouttext/>
+
+</problem>

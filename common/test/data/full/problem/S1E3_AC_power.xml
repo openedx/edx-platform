@@ -1,0 +1,40 @@
+<problem><script type="loncapa/python">
+R = float(random.randrange(100,200,10))
+
+Vrms = 120
+Vp = math.sqrt(2)*Vrms
+Pp = (Vp**2)/R
+Prms = (Vrms**2)/R
+</script><startouttext/>
+The plot shows 1/10 second of the voltage waveform of a 120V 60Hz AC
+(Alternating Current)
+power circuit, like that delivered to residences in the United States.
+<center><img src="/static/circuits/120V60Hz.gif"/></center>
+The actual voltage is \(120*sqrt(2)*cos(2*\pi*60*t)\)Volts.  If we apply
+this voltage across a resistor of resistance \($R\Omega\) the resistor
+will dissipate a time-varying power.
+What is the peak power (in Watts) dissipated by the resistor?
+<endouttext/>
+<numericalresponse answer="$Pp"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> What is the average power (in Watts) dissipated by the resistor?  (Hint: you
+  compute the average power by integrating the power over one cycle of
+  the waveform.)
+<endouttext/>
+<numericalresponse answer="$Prms"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> What would be the power (in Watts) dissipated by the resistor if the voltage
+  was a constant value of 120V?
+<endouttext/>
+<numericalresponse answer="$Prms"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> If a time-varying voltage dissipates the same power in a resistor
+as a constant voltage would dissipate, we say that the time-varying voltage has
+the RMS value of the constant.  RMS is an abbreviation for Root-Mean-Square.
+<endouttext/>
+
+
+</problem>
