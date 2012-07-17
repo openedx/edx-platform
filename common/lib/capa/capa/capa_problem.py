@@ -430,7 +430,7 @@ class LoncapaProblem(object):
         self.responder_answers = {}
         for response in self.responders.keys():
             try:
-                self.responder_answers[response] = responder.get_answers()
+                self.responder_answers[response] = self.responders[response].get_answers()
             except:
                 log.debug('responder %s failed to properly return get_answers()' % self.responders[response]) # FIXME
                 raise
