@@ -766,7 +766,7 @@ class CodeResponse(LoncapaResponse):
         # Replace 'oldcmap' with new grading results if queuekey matches
         #   If queuekey does not match, we keep waiting for the score_msg that will match
         for answer_id in idset:
-            if oldcmap.is_right_queuekey(answer_id, queuekey):
+            if oldcmap.is_right_queuekey(answer_id, queuekey): # If answer_id is not queued, will return False
                 idx = idset.index(answer_id)
                 msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
                 oldcmap.set(answer_id, self.context['correct'][idx], msg=msg)
@@ -801,7 +801,6 @@ class CodeResponse(LoncapaResponse):
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = { 'return_url': self.system.xqueue_callback_url }
 
-        random.seed()
         queuekey = random.randint(0,2**32-1)
         header.update({'queuekey': queuekey})
 
