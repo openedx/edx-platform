@@ -22,7 +22,6 @@ import random
 import re
 import scipy
 import struct
-import json
 
 from lxml import etree
 from xml.sax.saxutils import unescape
