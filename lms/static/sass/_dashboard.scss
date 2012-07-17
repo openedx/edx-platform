@@ -48,42 +48,43 @@
             padding-bottom: 10px;
 
             &:hover {
-              .icon {
+              .title .icon {
                 opacity: 1;
               }
             }
 
-            p {
+            span.title {
               color: $lighter-base-font-color;
               float: left;
               font-family: $sans-serif;
 
-              span {
-                font-weight: 700;
-                margin-left: 12px;
+              .icon {
+                background-size: cover;
+                float: left;
+                height: 19px;
+                margin: 2px 8px 0 0;
+                opacity: 0.6;
+                @include transition(all, 0.15s, linear);
+                width: 19px;
+
+                &.email-icon {
+                  @include background-image(url('/static/images/portal-icons/email-icon.png'));
+                }
+
+                &.location-icon {
+                  @include background-image(url('/static/images/portal-icons/home-icon.png'));
+                }
+
+                &.language-icon {
+                  @include background-image(url('/static/images/portal-icons/language-icon.png'));
+                }
               }
             }
 
-            .icon {
-              background-size: cover;
-              float: left;
-              height: 19px;
-              margin: 2px 8px 0 0;
-              opacity: 0.6;
-              @include transition(all, 0.15s, linear);
-              width: 19px;
-
-              &.email-icon {
-                @include background-image(url('/static/images/portal-icons/email-icon.png'));
-              }
-
-              &.location-icon {
-                @include background-image(url('/static/images/portal-icons/home-icon.png'));
-              }
-
-              &.language-icon {
-                @include background-image(url('/static/images/portal-icons/language-icon.png'));
-              }
+            span.data {
+              color: $lighter-base-font-color;
+              font-weight: 700;
+              margin-left: 12px;
             }
           }
         }

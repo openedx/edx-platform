@@ -9,12 +9,11 @@ header.global {
 
   nav {
     @include clearfix;
-    @include box-sizing(border-box);
     height: 40px;
     margin: 0 auto;
     max-width: 1200px;
-    padding-top: 14px;
-    width: flex-grid(12);
+    padding: 14px 10px 0px;
+    width: grid-width(12);
   }
 
   h1.logo {
@@ -187,7 +186,7 @@ header.global {
       ul.dropdown-menu {
         background: rgb(252,252,252);
         @include border-radius(4px);
-        @include box-shadow(0 2px 10px 0 rgba(0,0,0, 0.4));
+        @include box-shadow(0 2px 24px 0 rgba(0,0,0, 0.3));
         border: 1px solid rgb(100,100,100);
         display: none;
         padding: 5px 10px;
