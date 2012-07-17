@@ -42,6 +42,7 @@ class CourseDescriptor(SequenceDescriptor):
         """
         This returns the snippet of html to be rendered on the course about page, given the key for the section.
         Valid keys:
+        - overview
         - title
         - university
         - number
@@ -63,7 +64,7 @@ class CourseDescriptor(SequenceDescriptor):
 
         # TODO: Remove number, instructors from this list
         if section_key in ['short_description', 'description', 'key_dates', 'video', 'course_staff_short', 'course_staff_extended',
-                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number', 'instructors']:
+                            'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number', 'instructors', 'overview']:
             try:
                 with self.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
                     return htmlFile.read().decode('utf-8')
