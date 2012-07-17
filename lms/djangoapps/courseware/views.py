@@ -3,6 +3,7 @@ import urllib
 
 from django.conf import settings
 from django.core.context_processors import csrf
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
@@ -18,7 +19,7 @@ from student.models import UserProfile
 from multicourse import multicourse_settings
 
 from util.cache import cache, cache_if_anonymous
-from student.models import UserTestGroup
+from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
 from courseware.courses import check_course
 from xmodule.modulestore.django import modulestore
@@ -249,3 +250,20 @@ def course_info(request, course_id):
     course = check_course(course_id)
 
     return render_to_response('info.html', {'course': course})
+    
+@ensure_csrf_cookie
+def course_about(request, course_id):
+    course = check_course(course_id, course_must_be_open=False)
+
+    return render_to_response('portal/course_about.html', {'course': course})
+
+
+@login_required
+@ensure_csrf_cookie
+def enroll(request, course_id):
+    course = check_course(course_id, course_must_be_open=False)
+    user = request.user
+    
+    enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+    
+    return redirect(reverse('dashboard'))

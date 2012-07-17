@@ -109,9 +109,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/?$', 'courseware.views.courses', name="courses"),        
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 
-            'student.views.course_info', name="about_course"),
+            'courseware.views.course_about', name="about_course"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 
-            'student.views.enroll', name="enroll"),
+            'courseware.views.enroll', name="enroll"),
         
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 
