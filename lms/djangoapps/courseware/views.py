@@ -16,17 +16,16 @@ from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
 
 from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup
 from courseware import grades
+from courseware.courses import check_course
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
-
 
 def user_groups(user):
     if not user.is_authenticated():
@@ -57,20 +56,19 @@ def courses(request):
     context = {'courses': modulestore().get_courses()}
     return render_to_response("courses.html", context)
 
-
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
-
-    course_location = CourseDescriptor.id_to_location(course_id)
-
+    course = check_course(course_id)
+    
+    
     student_objects = User.objects.all()[:100]
     student_info = []
 
     for student in student_objects:
-        student_module_cache = StudentModuleCache(student, modulestore().get_item(course_location))
-        course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
+        student_module_cache = StudentModuleCache(student, course)
+        course, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
         student_info.append({
             'username': student.username,
             'id': student.id,
@@ -87,8 +85,8 @@ def gradebook(request, course_id):
 def profile(request, course_id, student_id=None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
+    course = check_course(course_id)
 
-    course_location = CourseDescriptor.id_to_location(course_id)
     if student_id is None:
         student = request.user
     else:
@@ -98,8 +96,8 @@ def profile(request, course_id, student_id=None):
 
     user_info = UserProfile.objects.get(user=student)
 
-    student_module_cache = StudentModuleCache(request.user, modulestore().get_item(course_location))
-    course, _, _, _ = get_module(request.user, request, course_location, student_module_cache)
+    student_module_cache = StudentModuleCache(request.user, course)
+    course, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
 
     context = {'name': user_info.name,
                'username': student.username,
@@ -142,7 +140,7 @@ def render_accordion(request, course, chapter, section):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def index(request, course_id=None, chapter=None, section=None,
+def index(request, course_id, chapter=None, section=None,
           position=None):
     ''' Displays courseware accordion, and any associated content.
     If course, chapter, and section aren't all specified, just returns
@@ -161,15 +159,14 @@ def index(request, course_id=None, chapter=None, section=None,
 
      - HTTPresponse
     '''
+    course = check_course(course_id)
+    
     def clean(s):
         ''' Fixes URLs -- we convert spaces to _ in URLs to prevent
         funny encoding characters and keep the URLs readable.  This undoes
         that transformation.
         '''
         return s.replace('_', ' ') if s is not None else None
-
-    course_location = CourseDescriptor.id_to_location(course_id)
-    course = modulestore().get_item(course_location)
 
     chapter = clean(chapter)
     section = clean(section)
@@ -249,12 +246,6 @@ def jump_to(request, probname=None):
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
-    csrf_token = csrf(request)['csrf_token']
+    course = check_course(course_id)
 
-    try:
-        course_location = CourseDescriptor.id_to_location(course_id)
-        course = modulestore().get_item(course_location)
-    except KeyError:
-        raise Http404("Course not found")
-
-    return render_to_response('info.html', {'csrf': csrf_token, 'course': course})
+    return render_to_response('info.html', {'course': course})
