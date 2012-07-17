@@ -19,7 +19,7 @@ from multicourse import multicourse_settings
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
-from util.cache import cache
+from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup
 from courseware import grades
 
@@ -51,11 +51,10 @@ def format_url_params(params):
 
 
 @ensure_csrf_cookie
+@cache_if_anonymous
 def courses(request):
-    csrf_token = csrf(request)['csrf_token']
     # TODO: Clean up how 'error' is done.
-    context = {'courses': modulestore().get_courses(),
-               'csrf': csrf_token}
+    context = {'courses': modulestore().get_courses()}
     return render_to_response("courses.html", context)
 
 
