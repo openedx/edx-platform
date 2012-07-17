@@ -37,6 +37,14 @@
       margin-bottom: 80px;
     }
 
+    h2.mission-quote {
+      font-style: italic;
+      margin: 0 auto 120px;;
+      text-align: center;
+      text-transform: none;
+      width: flex-grid(10);
+    }
+
     .message {
       @include clearfix;
       margin-bottom: 60px;
@@ -60,7 +68,7 @@
         img {
           background: rgb(245,245,245);
           display: block;
-          height: 200px;
+          //height: 200px;
           width: 100%;
         }
       }
@@ -86,6 +94,19 @@
 
       &:last-child {
         margin-bottom: 0px;
+      }
+    }
+
+    .partners {
+      @include clearfix;
+
+      > article {
+        float: left;
+        width: flex-grid(6);
+
+        &:first-child {
+          margin-right: flex-gutter();
+        }
       }
     }
   }
@@ -146,27 +167,6 @@
   }
 
   .press {
-
-    .press-resources {
-      @include clearfix;
-      margin-bottom: 60px;
-
-      .pressreleases, .identity-assets {
-        background: rgb(245,245,245);
-        border: 1px solid rgb(200,200,200);
-        @include box-sizing(border-box);
-        @include border-radius(4px);
-        float: left;
-        padding: 20px 30px;
-        text-align: center;
-        width: flex-grid(6);
-      }
-
-      .pressreleases {
-        margin-right: flex-gutter();
-      }
-    }
-
     .press-story {
       border-bottom: 1px solid rgb(220,220,220);
       @include clearfix;
