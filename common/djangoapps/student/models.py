@@ -90,8 +90,11 @@ class PendingEmailChange(models.Model):
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
 class CourseEnrollment(models.Model):
-    user = models.ForeignKey(User, db_index=True)
-    course_id = models.CharField(max_length=255)
+    user = models.ForeignKey(User)
+    course_id = models.CharField(max_length=255, db_index=True)
+    
+    class Meta:
+        unique_together = (('user', 'course_id'), )
 
 #cache_relation(User.profile)
 
