@@ -22,6 +22,7 @@ import random
 import re
 import scipy
 import struct
+import json
 
 from lxml import etree
 from xml.sax.saxutils import unescape
@@ -186,14 +187,13 @@ class LoncapaProblem(object):
          
         Returns an updated CorrectMap
         '''
-        oldcmap = self.correct_map
-        newcmap = CorrectMap()
+        cmap = self.correct_map
         for responder in self.responders.values():
             if hasattr(responder,'update_score'): # TODO: Is this the best way to target 'update_score' of CodeResponse?
-                results = responder.update_score(score_msg, oldcmap, queuekey)
-                newcmap.update(results)
-        self.correct_map = newcmap
-        return newcmap
+                # Each LoncapaResponse will update the specific entries of 'cmap' that it's responsible for
+                cmap = responder.update_score(score_msg, cmap, queuekey)
+        self.correct_map = cmap
+        return cmap 
 
     def is_queued(self):
         '''

@@ -695,8 +695,9 @@ class SymbolicResponse(CustomResponse):
 
 class CodeResponse(LoncapaResponse):
     ''' 
-    Grade student code using an external server. Unlike ExternalResponse, CodeResponse:
-        1) Goes through a queueing system (xqueue)
+    Grade student code using an external server, called 'xqueue'
+    In contrast to ExternalResponse, CodeResponse has following behavior:
+        1) Goes through a queueing system
         2) Does not do external request for 'get_answers'
     '''
 
@@ -740,7 +741,7 @@ class CodeResponse(LoncapaResponse):
         # Non-null CorrectMap['queuekey'] indicates that the problem has been submitted
         cmap = CorrectMap()
         for answer_id in idset:
-            cmap.set(answer_id, queuekey=queuekey)
+            cmap.set(answer_id, queuekey=queuekey, msg='Submitted to queue')
 
         return cmap
 
@@ -804,7 +805,7 @@ class CodeResponse(LoncapaResponse):
         queuekey = random.randint(0,2**32-1)
         header.update({'queuekey': queuekey})
 
-        payload = {'xqueue_header': json.dumps(header), # TODO: 'xqueue_header' should eventually be derived from config file
+        payload = {'xqueue_header': json.dumps(header), # TODO: 'xqueue_header' should eventually be derived from a config file
                    'xml': xmlstr,
                    'edX_cmd': 'get_score',
                    'edX_tests': self.tests,
