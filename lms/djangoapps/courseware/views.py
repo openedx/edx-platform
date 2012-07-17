@@ -20,7 +20,7 @@ from multicourse import multicourse_settings
 from util.cache import cache
 from student.models import UserTestGroup
 from courseware import grades
-from courseware.decorators import check_course
+from courseware.courses import check_course
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("mitx.courseware")
@@ -57,11 +57,12 @@ def courses(request):
                'csrf': csrf_token}
     return render_to_response("courses.html", context)
 
-@check_course
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request, course):
+def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
+    course = check_course(course_id)
+    
     
     student_objects = User.objects.all()[:100]
     student_info = []
@@ -81,11 +82,11 @@ def gradebook(request, course):
 
 
 @login_required
-@check_course
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, course, student_id=None):
+def profile(request, course_id, student_id=None):
     ''' User profile. Show username, location, etc, as well as grades .
         We need to allow the user to change some of these settings .'''
+    course = check_course(course_id)
 
     if student_id is None:
         student = request.user
@@ -139,9 +140,8 @@ def render_accordion(request, course, chapter, section):
 
 
 @ensure_csrf_cookie
-@check_course
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def index(request, course, chapter=None, section=None,
+def index(request, course_id, chapter=None, section=None,
           position=None):
     ''' Displays courseware accordion, and any associated content.
     If course, chapter, and section aren't all specified, just returns
@@ -160,6 +160,8 @@ def index(request, course, chapter=None, section=None,
 
      - HTTPresponse
     '''
+    course = check_course(course_id)
+    
     def clean(s):
         ''' Fixes URLs -- we convert spaces to _ in URLs to prevent
         funny encoding characters and keep the URLs readable.  This undoes
@@ -244,8 +246,7 @@ def jump_to(request, probname=None):
 
 
 @ensure_csrf_cookie
-@check_course
-def course_info(request, course):
-    csrf_token = csrf(request)['csrf_token']
+def course_info(request, course_id):
+    course = check_course(course_id)
 
-    return render_to_response('info.html', {'csrf': csrf_token, 'course': course})
+    return render_to_response('info.html', {'course': course})

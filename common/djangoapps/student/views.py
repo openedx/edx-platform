@@ -20,7 +20,7 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.core.urlresolvers import reverse
 
-from courseware.decorators import check_course
+from courseware.courses import check_course
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from django_future.csrf import ensure_csrf_cookie
@@ -495,8 +495,8 @@ def accept_name_change(request):
 
 
 @ensure_csrf_cookie
-@check_course(course_must_be_open=False)
-def course_info(request, course):
+def course_info(request, course_id):
+    course = check_course(course_id, course_must_be_open=False)
     # This is the advertising page for a student to look at the course before signing up
     csrf_token = csrf(request)['csrf_token']
     # TODO: Couse should be a model
@@ -519,9 +519,10 @@ def help(request):
 
 
 @login_required
-@check_course(course_must_be_open=False)
 @ensure_csrf_cookie
-def enroll(request, course):
+def enroll(request, course_id):
+    course = check_course(course_id, course_must_be_open=False)
+    
     user = request.user
     enrollment = CourseEnrollment(user=user,
         course_id=course.id)
