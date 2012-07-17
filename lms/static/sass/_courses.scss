@@ -4,10 +4,10 @@
 
   header.search {
     background: rgb(240,240,240);
-    //@include background-image(url('/static/images/shot-2-large.jpg'));
     background-size: cover;
     border-bottom: 1px solid rgb(100,100,100);
     @include box-shadow(inset 0 -1px 8px 0 rgba(0,0,0, 0.2), inset 0 1px 12px 0 rgba(0,0,0, 0.3));
+    height: 430px;
     margin-top: -69px;
     width: 100%;
 
@@ -15,26 +15,13 @@
       height: 120px;
       margin: 0 auto;
       max-width: 1200px;
-      overflow: hidden;
-      padding: 154px 0px 80px;
+      padding-top: 200px;
       position: relative;
       text-align: center;
       width: flex-grid(12);
 
-      &::before {
-        @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 1) 0%, rgba(255,255,255, 0) 100%));
-        bottom: -300px;
-        content: "";
-        display: none;
-        height: 600px;
-        margin: 0 auto;
-        position: absolute;
-        width: 100%;
-        z-index: 1;
-      }
-
       > hgroup {
-        background: rgba(255,255,255, 0.9);
+        background: rgba(255,255,255, 0.93);
         border: 1px solid rgb(100,100,100);
         @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
         padding: 20px 30px;

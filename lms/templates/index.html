@@ -6,10 +6,13 @@
 <section class="home">
   <header>
     <div class="outer-wrapper">
-      <div class="inner-wrapper">
-        <div class="title">
-          <h1>Online education for anyone, anywhere, at anytime</h1>
+      <div class="title">
+        <hgroup>
+          <h1>The Future of Online Education</h1>
+          <h2>For anyone, anywhere, anytime.</h2>
+        </hgroup>
 
+        <section class="actions">
           <div class="main-cta">
             <a href="#signup-modal" class="find-courses" rel="leanModal">Sign Up</a>
           </div>
@@ -27,19 +30,18 @@
                 <img src="${static.url('images/email-sharing.png')}">
               </a>
             </div>
-
-            <a href="#video-modal" class="intro-video" rel="leanModal">
-              <!--
-                 -<img src="${static.url('images/courses/space1.jpg')}" />
-                 -->
-              <div class="video">
-                <div class="play"></div>
-              </div>
-              <p>Play intro video</p>
-            </a>
           </div>
-        </div>
+        </section>
       </div>
+
+        <a href="#video-modal" class="media" rel="leanModal">
+          <div class="hero">
+            <img src="${static.url('images/courses/space3.jpg')}" />
+            <div class="play-intro"></div>
+          </div>
+        </a>
+
+
     </div>
   </header>
 
@@ -105,6 +107,10 @@
                 </div>
             </article>
             %endfor
+        </section>
+        <section class="press-links">
+          <h3>Press Links:</h3>
+          <a href="${reverse('pressrelease')}">The edX Press Release</a>
         </section>
       </section>
     </section>
