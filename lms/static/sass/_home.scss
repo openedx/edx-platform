@@ -214,19 +214,22 @@
       }
     }
 
-
     .media {
-      background: #fff;
+      background: rgba(255,255,255, 0.93);
       border: 1px solid rgb(100,100,100);
       @include box-sizing(border-box);
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       height: 120px;
       @include inline-block;
-      padding: 1px;
+      padding: 3px;
       position: relative;
       vertical-align: top;
       width: flex-grid(2);
       z-index: 2;
+
+      &:hover {
+        text-decoration: underline;
+      }
 
       .hero {
         height: 100%;
