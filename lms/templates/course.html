@@ -9,7 +9,7 @@
     <header class="course-preview">
         <a href="${reverse('about_course', args=[course.id])}">
         <hgroup>
-          <h2>${course.get_about_section('title')}</h2>
+          <h2>${course.number} ${course.get_about_section('title')}</h2>
         </hgroup>
         <div class="info-link">&#x2794;</div>
       </a>

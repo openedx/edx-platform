@@ -24,8 +24,9 @@
       @include clearfix;
       margin: 0 auto;
       max-width: 1200px;
+      padding: 0px 10px;
       position: relative;
-      width: flex-grid(12);
+      width: grid-width(12);
       z-index: 2;
 
 
@@ -243,12 +244,12 @@
     border: 1px solid rgb(200,200,200);
     border-top: none;
     float: left;
-    padding: 20px 20px 30px;
+    padding: 16px 20px 30px;
     width: flex-grid(4);
 
     header {
       margin-bottom: 30px;
-      padding-bottom: 20px;
+      padding-bottom: 16px;
       position: relative;
       text-align: center;
 
@@ -358,18 +359,42 @@
         margin-bottom: 20px;
         padding-bottom: 10px;
 
+        &:hover {
+          .icon {
+            opacity: 1;
+          }
+        }
+
         p {
           color: $lighter-base-font-color;
           float: left;
           font-family: $sans-serif;
         }
 
-        img {
-          background: rgb(230,230,230);
+        .icon {
+          background-size: cover;
           float: left;
           height: 19px;
-          margin: 3px 10px 0 0;
+          margin: 2px 10px 0 0;
+          opacity: 0.6;
+          @include transition(all, 0.15s, linear);
           width: 19px;
+
+          &.start-icon {
+            @include background-image(url('/static/images/portal-icons/calendar-icon.png'));
+          }
+
+          &.final-icon {
+            @include background-image(url('/static/images/portal-icons/pencil-icon.png'));
+          }
+
+          &.length-icon {
+            @include background-image(url('/static/images/portal-icons/chart-icon.png'));
+          }
+
+          &.number-icon {
+            @include background-image(url('/static/images/portal-icons/course-info-icon.png'));
+          }
         }
 
         span {

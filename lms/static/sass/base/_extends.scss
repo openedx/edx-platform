@@ -76,3 +76,16 @@
                                                     rgba(200,200,200, 0)));
   border: none;
 }
+
+//Styles for Error messages
+.error-message-colors {
+  background: $error-red;
+  border: 1px solid rgb(202, 17, 17);
+  color: rgb(143, 14, 14);
+}
+
+.success-message-colors {
+  background: rgb(99, 236, 137);
+  border: 1px solid rgb(17, 202, 54);
+  color: rgb(35, 143, 14);
+}

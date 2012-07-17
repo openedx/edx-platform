@@ -17,6 +17,7 @@
       @extend .animation-home-header-pop-up;
       max-width: 1200px;
       margin: 0 auto;
+      padding: 0 10px;
       position: relative;
       text-align: center;
 
@@ -32,7 +33,7 @@
       border: 1px solid rgb(100,100,100);
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       @include inline-block;
-      padding: 30px 50px 30px;
+      padding: 20px 30px 30px;
       position: relative;
       text-align: center;
       z-index: 1;
@@ -40,21 +41,9 @@
 
     .title {
       @include inline-block;
-      margin-right: 50px;
-      padding-right: 50px;
       position: relative;
       text-align: left;
       vertical-align: middle;
-
-      &::before {
-        @extend .faded-vertical-divider;
-        content: "";
-        display: block;
-        height: 170px;
-        position: absolute;
-        right: 0px;
-        top: -20px;
-      }
 
       &::after {
         @extend .faded-vertical-divider-light;
@@ -99,66 +88,139 @@
         }
       }
 
-      .social-sharing {
+      .secondary-actions {
         @include box-sizing(border-box);
+        @include clearfix;
         float: left;
-        height: 44px;
-        position: relative;
-        text-align: center;
+        height: 47px;
         width: flex-grid(6);
 
-        &:hover {
-          .sharing-message {
-            opacity: 1;
-            top: 56px;
-          }
-        }
-
-        .sharing-message {
-          @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
-                                                            rgba(0,0,0, 0.7) 100%));
-          border: 1px solid rgba(0,0,0, 0.5);
-          @include border-radius(4px);
-          @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+        a.intro-video {
+          background: rgb(245,245,245);
+          @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(235,235,235)));
+          border: 1px solid rgb(200,200,200);
+          @include border-radius(30px);
           @include box-sizing(border-box);
-          color: rgb(255,255,255);
-          float: right;
-          font-family: $serif;
-          font-size: 0.9em;
-          font-style: italic;
-          left: 50%;
-          margin-left: -110px;
-          opacity: 0;
-          padding: 6px 10px;
-          position: absolute;
-          text-align: center;
-          @include transition(all, 0.15s, ease-out);
-          top: 65px;
-          width: 220px;
+          @include box-shadow(inset 0 -1px 0 0 rgba(255,255,255, 0.8), inset 0 1px 0 0 rgba(255,255,255, 0.8));
+          @include clearfix;
+          display: block;
+          float: left;
+          height: 100%;
+          overflow: hidden;
+          text-align: middle;
+          width: flex-grid(6);
 
           &:hover {
-            opacity: 0;
+            text-decoration: none;
+
+            p {
+              color: $base-font-color;
+            }
+
+            .video {
+              opacity: 1;
+            }
+          }
+
+          .video {
+            @include background-image(url('/static/images/shot-2-large.jpg'));
+            background-size: cover;
+            border-right: 1px solid rgb(200,200,200);
+            @include border-left-radius(30px);
+            @include box-shadow(1px 0 0 0 rgba(255,255,255, 0.6), inset 1px 0 0 0 rgba(255,255,255, 0.8), inset 0 0 0 1px rgba(255,255,255, 0.7));
+            float: left;
+            height: 100%;
+            opacity: 0.8;
+            position: relative;
+            @include transition(all, 0.15s, linear);
+            width: 60px;
+            vertical-align: middle;
+
+            .play {
+              @include background-image(url('/static/images/portal-icons/video-play-icon.png'));
+              background-size: cover;
+              height: 31px;
+              margin-left: -13px;
+              margin-top: -15px;
+              left: 50%;
+              position: absolute;
+              top: 50%;
+              width: 31px;
+            }
+          }
+
+          p {
+            color: $lighter-base-font-color;
+            font-style: italic;
+            padding-top: 10px;
+            text-align: center;
+            text-shadow: 0 1px rgba(255,255,255, 0.6);
+            @include transition(all, 0.15s, linear);
+            vertical-align: middle;
           }
         }
-
-        .share {
+        .social-sharing {
+          @include box-sizing(border-box);
+          float: left;
           height: 44px;
-          @include inline-block;
-          margin-right: 10px;
-          opacity: 0.5;
-          @include transition(all, 0.15s, linear);
-          width: 44px;
+          margin-right: flex-gutter();
+          position: relative;
+          text-align: center;
+          width: flex-grid(6);
 
           &:hover {
-            opacity: 1;
+            .sharing-message {
+              opacity: 1;
+              top: 56px;
+            }
           }
 
-          img {
-            width: 100%;
+          .sharing-message {
+            @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
+                                                              rgba(0,0,0, 0.7) 100%));
+            border: 1px solid rgba(0,0,0, 0.5);
+            @include border-radius(4px);
+            @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+            @include box-sizing(border-box);
+            color: rgb(255,255,255);
+            float: right;
+            font-family: $serif;
+            font-size: 0.9em;
+            font-style: italic;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            padding: 6px 10px;
+            position: absolute;
+            text-align: center;
+            @include transition(all, 0.15s, ease-out);
+            top: 65px;
+            width: 220px;
+
+            &:hover {
+              opacity: 0;
+            }
           }
 
-          &:last-child {
-            margin-right: 0px;
+          .share {
+            height: 44px;
+            @include inline-block;
+            margin-right: 10px;
+            opacity: 0.5;
+            @include transition(all, 0.15s, linear);
+            width: 44px;
+
+            &:hover {
+              opacity: 1;
+            }
+
+            img {
+              width: 100%;
+            }
+
+            &:last-child {
+              margin-right: 0px;
+            }
           }
         }
       }
@@ -168,15 +230,18 @@
       background: #fff;
       border: 1px solid rgb(200,200,200);
       @include box-sizing(border-box);
+      float: left;
       @include inline-block;
       padding: 1px;
       position: relative;
       vertical-align: middle;
-      width: 210px;
+      //width: 210px;
+      width: flex-grid(3);
       z-index: 2;
 
       .hero {
-        height: 125px;
+        //height: 125px;
+        height: 100%;
         overflow: hidden;
         position: relative;
 

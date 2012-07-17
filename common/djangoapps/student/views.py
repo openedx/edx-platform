@@ -147,12 +147,12 @@ def create_account(request, post_override=None):
             js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
             return HttpResponse(json.dumps(js))
 
-    if 'honor_code' not in post_vars or post_vars['honor_code'] != u'true':
+    if post_vars.get('honor_code', 'false') != u'true':
         js['value']="To enroll, you must follow the honor code.".format(field=a)
         return HttpResponse(json.dumps(js))
 
 
-    if 'terms_of_service' not in post_vars or post_vars['terms_of_service'] != u'true':
+    if post_vars.get('terms_of_service', 'false') != u'true':
         js['value']="You must accept the terms of service.".format(field=a)
         return HttpResponse(json.dumps(js))
 
