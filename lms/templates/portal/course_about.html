@@ -11,7 +11,7 @@
     <div class="intro-inner-wrapper">
       <section class="intro">
         <hgroup>
-        <h1>${course.get_about_section("title")}</h1><h2><a href="#">${course.get_about_section("university")}</a></h2>
+        <h1>${course.number}: ${course.get_about_section("title")}</h1><h2><a href="#">${course.get_about_section("university")}</a></h2>
         </hgroup>
 
         <div class="main-cta">
@@ -47,6 +47,10 @@
 
         <section class="course-staff">
           <h2>Course staff</h3>
+
+          ${course.get_about_section("instructors")}
+
+          <!--
           <article class="teacher">
             <div class="teacher-image">
               <img src="${static.url('images/anant.jpg')}" />
@@ -70,6 +74,7 @@
             <h3>Piotr Mitros</h3>
             <p>Research Scientist at MIT. His research focus is in finding ways to apply techniques from control systems to optimizing the learning process. Dr. Mitros has worked as an analog designer at Texas Instruments, Talking Lights, and most recently, designed the analog front end for a novel medical imaging modality for Rhythmia Medical.</p>
           </article>
+          -->
         </section>
 
         <section class="requirements">
@@ -98,9 +103,6 @@
     <section class="course-sidebar">
       <section class="course-summary">
         <header>
-          <!--
-             -<a href="#" class="university-name">${course.get_about_section("university")}</a><span>${course.get_about_section("title")}</span>
-             -->
           <div class="social-sharing">
             <div class="sharing-message">Share with friends and family!</div>
             <a href="#" class="share">
@@ -116,10 +118,10 @@
         </header>
 
         <ol class="important-dates">
-          <li><img src=""><p>Classes Start</p><span class="start-date">7/12/12</span></li>
-          <li><img src=""><p>Final Exam</p><span class="final-date">12/09/12</span></li>
-          <li><img src=""><p>Course Length</p><span class="course-length">15 weeks</span></li>
-          <li><img src=""><p>Course Number</p><span class="course-number">${course.get_about_section("number")}</span></li>
+          <li><div class="icon start-icon"></div><p>Classes Start</p><span class="start-date">7/12/12</span></li>
+          <li><div class="icon final-icon"></div><p>Final Exam</p><span class="final-date">12/09/12</span></li>
+          <li><div class="icon length-icon"></div><p>Course Length</p><span class="course-length">15 weeks</span></li>
+          <li><div class="icon number-icon"></div><p>Course Number</p><span class="course-number">${course.get_about_section("number")}</span></li>
         </ol>
       </section>
     </section>

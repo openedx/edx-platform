@@ -17,17 +17,17 @@
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
-          <span class="avatar"><img src="${static.url('images/profile.jpg')}" /></span>
+          <span class="avatar"></span>
           ${user.username}
         </a>
       </li>
       <li class="primary">
         <a href="#" class="dropdown">&#9662</a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Account Settings</a></li>
-            <li><a href="${reverse('help')}">Help</a></li>
-            <li><a href="${reverse('logout')}">Log Out</a></li>
-          </ul>
+        <ul class="dropdown-menu">
+          <li><a href="#">Account Settings</a></li>
+          <li><a href="${reverse('help')}">Help</a></li>
+          <li><a href="${reverse('logout')}">Log Out</a></li>
+        </ul>
       </li>
     </ol>
 
@@ -37,6 +37,7 @@
         <a href="/t/about.html">About</a>
         <a href="#">Blog</a>
         <a href="${reverse('jobs')}">Jobs</a>
+        <a href="/t/contact.html">Contact</a>
         <a href="#login-modal" id="login" rel="leanModal">Log In</a>
       </li>
       <li class="primary">
