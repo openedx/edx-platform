@@ -66,12 +66,10 @@ class CorrectMap(object):
         return None
 
     def is_queued(self,answer_id):
-        if answer_id in self.cmap: return self.cmap[answer_id]['queuekey'] is not None
-        return None
+        return answer_id in self.cmap and self.cmap[answer_id]['queuekey'] is not None
 
     def is_right_queuekey(self, answer_id, test_key):
-        if answer_id in self.cmap: return self.cmap[answer_id]['queuekey'] == test_key
-        return None
+        return answer_id in self.cmap and self.cmap[answer_id]['queuekey'] == test_key
 
     def get_npoints(self,answer_id):
         if self.is_correct(answer_id):
