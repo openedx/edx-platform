@@ -38,7 +38,8 @@
     }
 
     h2.mission-quote {
-      margin: 0 auto;
+      font-style: italic;
+      margin: 0 auto 120px;;
       text-align: center;
       text-transform: none;
       width: flex-grid(10);
@@ -67,7 +68,7 @@
         img {
           background: rgb(245,245,245);
           display: block;
-          height: 200px;
+          //height: 200px;
           width: 100%;
         }
       }
