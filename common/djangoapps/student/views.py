@@ -150,17 +150,14 @@ def logout_user(request):
 @login_required
 @ensure_csrf_cookie
 def change_setting(request):
-    ''' JSON call to change a profile setting: Right now, location and language
+    ''' JSON call to change a profile setting: Right now, location
     '''
     up = UserProfile.objects.get(user=request.user) #request.user.profile_cache
     if 'location' in request.POST:
         up.location=request.POST['location']
-    if 'language' in request.POST:
-        up.language=request.POST['language']
     up.save()
 
     return HttpResponse(json.dumps({'success':True,
-                                    'language':up.language,
                                     'location':up.location,}))
 
 @ensure_csrf_cookie
@@ -171,7 +168,7 @@ def create_account(request, post_override=None):
     post_vars = post_override if post_override else request.POST
 
     # Confirm we have a properly formed request
-    for a in ['username', 'email', 'password', 'language', 'name']:
+    for a in ['username', 'email', 'password', 'name']:
         if a not in post_vars:
             js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
             return HttpResponse(json.dumps(js))
@@ -238,7 +235,6 @@ def create_account(request, post_override=None):
 
     up = UserProfile(user=u)
     up.name = post_vars['name']
-    up.language = post_vars['language']
     up.country = post_vars['country']
     up.gender = post_vars['gender']
     up.mailing_address = post_vars['mailing_address']
@@ -288,7 +284,6 @@ def create_random_account(create_account_function):
                             'email' : id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
                             'password' : id_generator(),
                             'location' : id_generator(size=5, chars=string.ascii_uppercase),
-                            'language' : id_generator(size=5, chars=string.ascii_uppercase) + "ish",
                             'name' : id_generator(size=5, chars=string.ascii_lowercase) + " " + id_generator(size=7, chars=string.ascii_lowercase),
                             'honor_code' : u'true',
                             'terms_of_service' : u'true',}
