@@ -9,6 +9,7 @@ form {
     -webkit-font-smoothing: antialiased;
   }
 
+  textarea,
   input[type="text"],
   input[type="email"],
   input[type="password"] {
@@ -32,6 +33,10 @@ form {
       @include box-shadow(0 0 6px 0 rgba($blue, 0.4), inset 0 0 4px 0 rgba(0,0,0, 0.15));
       outline: none;
     }
+  }
+
+  textarea {
+    height: 60px;
   }
 
   input[type="submit"] {
