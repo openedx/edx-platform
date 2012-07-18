@@ -11,6 +11,7 @@
       var options = {
         type: method || 'GET',
         data: data,
+        dataType: 'text json',
         success: function(data, status, xhr) {
           element.trigger("ajax:success", [data, status, xhr]);
         },
