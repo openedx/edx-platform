@@ -19,12 +19,14 @@
         </div>
 
       </section>
+      % if course.get_about_section("video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
           <img src="${static.url('images/courses/circuits.jpeg')}" />
           <div class="play-intro"></div>
         </div>
       </a>
+      % endif
     </div>
   </header>
 
