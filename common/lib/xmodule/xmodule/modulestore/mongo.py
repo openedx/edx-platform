@@ -1,5 +1,7 @@
 import pymongo
+
 from bson.objectid import ObjectId
+from fs.osfs import OSFS
 from importlib import import_module
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
@@ -77,6 +79,7 @@ class MongoModuleStore(ModuleStore):
         # that is used when querying by a location
         self.collection.ensure_index(zip(('_id.' + field for field in Location._fields), repeat(1)))
 
+        # TODO (vshnayder): default arg default_class=None will make this error
         module_path, _, class_name = default_class.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
         self.default_class = class_
@@ -141,6 +144,14 @@ class MongoModuleStore(ModuleStore):
         data_cache = self._cache_children(items, depth)
 
         return [self._load_item(item, data_cache) for item in items]
+
+    def get_courses(self):
+        '''
+        Returns a list of course descriptors.
+        '''
+        # TODO (vshnayder): Why do I have to specify i4x here?
+        course_filter = Location("i4x", category="course")
+        return self.get_items(course_filter)
 
     def get_item(self, location, depth=0):
         """
