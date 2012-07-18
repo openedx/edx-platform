@@ -346,12 +346,13 @@ fragments = set()
 for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
     module_js = descriptor.module_class.get_javascript()
     for filetype in ('coffee', 'js'):
-        for fragment in js.get(filetype, []):
-            fragments.add((filetype, fragment))
+        for idx, fragment in enumerate(module_js.get(filetype, [])):
+            fragments.add((idx, filetype, fragment))
 
 module_js_sources = []
-for filetype, fragment in fragments:
-    path = os.path.join(js_file_dir, "{hash}.{type}".format(
+for idx, filetype, fragment in sorted(fragments):
+    path = os.path.join(js_file_dir, "{idx}-{hash}.{type}".format(
+        idx=idx,
         hash=hashlib.md5(fragment).hexdigest(),
         type=filetype))
     with open(path, 'w') as js_file:
