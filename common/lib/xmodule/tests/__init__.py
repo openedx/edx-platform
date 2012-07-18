@@ -281,7 +281,7 @@ class CodeResponseTest(unittest.TestCase):
         problem_file = os.path.dirname(__file__)+"/test_files/coderesponse.xml"
         test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
         
-        # CodeResponse requires internal CorrectMap state. Build it now
+        # CodeResponse requires internal CorrectMap state. Build it now in the 'queued' state
         old_cmap = CorrectMap()
         answer_ids = sorted(test_lcp.get_question_answers().keys())
         numAnswers = len(answer_ids)
@@ -303,6 +303,9 @@ class CodeResponseTest(unittest.TestCase):
             test_lcp.update_score(xserver_msgs[correctness], queuekey=0)
             self.assertEquals(test_lcp.correct_map.get_dict(), old_cmap.get_dict()) # Deep comparison
 
+            for i in range(numAnswers):
+                self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[i])) # Should be still queued, since message undelivered
+
         # Correct queuekey, state should be updated
         for correctness in ['correct', 'incorrect']:
             for i in range(numAnswers): # Target specific answer_id's
@@ -315,6 +318,12 @@ class CodeResponseTest(unittest.TestCase):
 
                 test_lcp.update_score(xserver_msgs[correctness], queuekey=1000+i)
                 self.assertEquals(test_lcp.correct_map.get_dict(), new_cmap.get_dict())
+
+                for j in range(numAnswers):
+                    if j == i:
+                        self.assertFalse(test_lcp.correct_map.is_queued(answer_ids[j])) # Should be dequeued, message delivered
+                    else:
+                        self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[j])) # Should be queued, message undelivered
 
 #-----------------------------------------------------------------------------
 # Grading tests
