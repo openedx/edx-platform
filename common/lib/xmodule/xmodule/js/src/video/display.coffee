@@ -1,7 +1,7 @@
 class @Video
   constructor: (@element) ->
     @id = $(@element).attr('id').replace(/video_/, '')
-    @caption_url_base = $(@element).data('caption-url-base')
+    @caption_data_dir = $(@element).data('caption-data-dir')
     window.player = null
     @el = $("#video_#{@id}")
     @parseVideos $(@element).data('streams')
