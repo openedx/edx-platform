@@ -195,6 +195,11 @@ class XModule(object):
         return ""
 
     # ================================== HTML INTERFACE DEFINITIONS ======================
+
+    @property
+    def js_module_name(self):
+        return self.__class__.__name__
+
     @classmethod
     def get_javascript(cls):
         """
@@ -399,6 +404,10 @@ class XModuleDescriptor(Plugin):
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
     # ================================== HTML INTERFACE DEFINITIONS ======================
+    @property
+    def js_module_name(self):
+        return self.__class__.__name__
+
     @classmethod
     def get_javascript(cls):
         """
