@@ -29,7 +29,7 @@ class CourseDescriptor(SequenceDescriptor):
     
     def has_started(self):
         return time.gmtime() > self.start
-    
+
     @classmethod
     def id_to_location(cls, course_id):
         org, course, name = course_id.split('/')
@@ -38,6 +38,10 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def id(self):
         return "/".join([self.location.org, self.location.course, self.location.name])
+
+    @property
+    def start_date_text(self):
+        return time.strftime("%m/%d/%y", self.start)
 
     @property
     def title(self):
