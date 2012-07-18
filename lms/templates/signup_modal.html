@@ -16,58 +16,84 @@
         <div class="notice"></div>
         <div id="enroll_error" class="modal-form-error" name="enroll_error"></div>
         <div id="enroll_error" name="enroll_error"></div>
-        <label>E-mail</label>
-        <input name="email" type="email" placeholder="E-mail">
-        <label>Password</label>
-        <input name="password" type="password" placeholder="Password">
-        <label>Public Username</label>
-        <input name="username" type="text" placeholder="Public Username">
-        <label>Full Name</label>
-        <input name="name" type="text" placeholder="Full Name">
-        <p>
-            <label>Mailing address</label>
-            <textarea name="mailing_address" placeholder="Mailing address"></textarea>
-        </p>
-        <label>Country of citizenship</label>
-        <select name="country">
-            %for country_code, country_name in COUNTRIES:
-                <option value="${country_code}">${country_name}</option>
-            %endfor
-        </select>
-        <label>Preferred Language</label>
-        <input name="language" type="text" placeholder="Preferred Language">
-        <label>Gender</label>
-        <select name="gender">
-            %for code, gender in UserProfile.GENDER_CHOICES:
-                <option value="${code}">${gender}</option>
-            %endfor
-        </select>
-        <label>Date of birth</label>
-        <select name='date_of_birth__month'>
-            %for month in range(1,13):
-                <option value="${month}">${month}</option>
-            %endfor
-        </select>
-        <select name='date_of_birth__day'>
-            %for day in range(1,32):
-                <option value="${day}">${day}</option>
-            %endfor
-        </select>
-        <select name='date_of_birth__year'>
-            %for year in range(date.today().year,1899,-1):
-                <option value="${year}">${year}</option>
-            %endfor
-        </select>
-        <label class="terms-of-service">
-          <input name="terms_of_service" type="checkbox" value="true">
-          I agree to the
-          <a href="${reverse('tos')}">Terms of Service</a>
-        </label>
-        <label class="honor-code">
-          <input name="honor_code" type="checkbox" value="true">
-          I agree to the
-          <a href="${reverse('honor')}" target="blank">Honor Code</a>
-        </label>
+
+        <div class="input-group">
+          <label>E-mail</label>
+          <input name="email" type="email" placeholder="E-mail">
+          <label>Password</label>
+          <input name="password" type="password" placeholder="Password">
+          <label>Public Username</label>
+          <input name="username" type="text" placeholder="Public Username">
+          <label>Full Name</label>
+          <input name="name" type="text" placeholder="Full Name">
+          <label>Mailing address</label>
+          <textarea name="mailing_address" placeholder="Mailing address"></textarea>
+        </div>
+
+        <div class="input-group">
+          <section class="citizenship">
+            <label>Citizenship</label>
+            <div class="input-wrapper">
+              <select name="country">
+                  %for country_code, country_name in COUNTRIES:
+                      <option value="${country_code}">${country_name}</option>
+                  %endfor
+              </select>
+            </div>
+          </section>
+
+          <section class="gender">
+            <label>Gender</label>
+            <div class="input-wrapper">
+              <select name="gender">
+                  %for code, gender in UserProfile.GENDER_CHOICES:
+                      <option value="${code}">${gender}</option>
+                  %endfor
+              </select>
+            </div>
+          </section>
+
+          <section class="date-of-birth">
+            <label>Date of birth</label>
+            <div class="input-wrapper">
+              <select name='date_of_birth__month'>
+                  <option value="">month</option>
+                  %for month in range(1,13):
+                      <option value="${month}">${month}</option>
+                  %endfor
+              </select>
+
+              <select name='date_of_birth__day'>
+                  <option value="">day</option>
+                  %for day in range(1,32):
+                      <option value="${day}">${day}</option>
+                  %endfor
+              </select>
+
+              <select name='date_of_birth__year'>
+                  <option value="">year</option>
+                  %for year in range(date.today().year,1899,-1):
+                      <option value="${year}">${year}</option>
+                  %endfor
+              </select>
+            </div>
+          </section>
+        </div>
+
+        <div class="input-group">
+          <label class="terms-of-service">
+            <input name="terms_of_service" type="checkbox" value="true">
+            I agree to the
+            <a href="#">Terms of Service</a>
+          </label>
+
+          <label class="honor-code">
+            <input name="honor_code" type="checkbox" value="true">
+            I agree to the
+            <a href="#">Honor Code</a>
+            , sumarized below as:
+          </label>
+        </div>
 
         <div class="submit">
           <input name="submit" type="submit" value="Create My Account">
