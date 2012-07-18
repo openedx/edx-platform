@@ -1,6 +1,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
     from django.core.urlresolvers import reverse
+    from courseware.courses import course_image_url
 %>
 <%page args="course" />
 
@@ -16,7 +17,7 @@
     </header>
     <section class="info">
       <div class="cover-image">
-        <img src="${static.url('images/courses/history.png')}">
+        <img src="${course_image_url(course)}">
       </div>
       <div class="desc">
         <p>${course.get_about_section('short_description')}</p>
