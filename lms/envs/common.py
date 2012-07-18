@@ -23,6 +23,7 @@ import os
 import tempfile
 import glob2
 import errno
+import hashlib
 
 import djcelery
 from path import path
@@ -341,7 +342,7 @@ except OSError as exc:
     else:
         raise
 
-module_js_sources = []
+fragments = set()
 for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
     module = getattr(descriptor, 'module_class', None)
     if module is None:
@@ -349,14 +350,17 @@ for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
 
     js = module.get_javascript()
     for filetype in ('coffee', 'js'):
-        for idx, fragment in enumerate(js.get(filetype, [])):
-            path = os.path.join(js_file_dir, "{name}.{idx}.{type}".format(
-                name=module.__name__,
-                idx=idx,
-                type=filetype))
-            with open(path, 'w') as js_file:
-                js_file.write(fragment)
-            module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+        for fragment in js.get(filetype, []):
+            fragments.add((filetype, fragment))
+
+module_js_sources = []
+for filetype, fragment in fragments:
+    path = os.path.join(js_file_dir, "{hash}.{type}".format(
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype))
+    with open(path, 'w') as js_file:
+        js_file.write(fragment)
+    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
 
 
 PIPELINE_JS = {
