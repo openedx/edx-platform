@@ -23,7 +23,7 @@
         <p>${get_course_about_section(course, 'short_description')}</p>
       </div>
       <div class="bottom">
-        <a href="#" class="university">${get_course_about_section(course, 'university')}</a>
+        <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
         <span class="start-date">${course.start_date_text}</span>
       </div>
     </section>

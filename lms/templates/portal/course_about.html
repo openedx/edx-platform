@@ -14,7 +14,7 @@
     <div class="intro-inner-wrapper">
       <section class="intro">
         <hgroup>
-        <h1>${course.number}: ${get_course_about_section(course, "title")}</h1><h2><a href="#">${get_course_about_section(course, "university")}</a></h2>
+        <h1>${course.number}: ${get_course_about_section(course, "title")}</h1><h2><a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a></h2>
         </hgroup>
 
         <div class="main-cta">
