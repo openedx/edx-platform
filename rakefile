@@ -171,7 +171,6 @@ task :package do
         set -e
         set -x
 
-        chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
 
         service gunicorn stop || echo "Unable to stop gunicorn. Continuing"
         rm -f #{LINK_PATH}
@@ -184,6 +183,7 @@ task :package do
             pip install -r #{PIP_REPO_REQUIREMENTS}
         fi
 
+        chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
 
         # Delete mako temp files
         rm -rf /tmp/tmp*mako
