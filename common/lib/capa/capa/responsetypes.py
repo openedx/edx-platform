@@ -724,6 +724,24 @@ class CodeResponse(LoncapaResponse):
 
         self.tests = xml.get('tests')
 
+        # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
+        #   (1) Internal edX code, i.e. NOT student submissions, and
+        #   (2) The code should only define the strings 'initial_display', 'answer', 'preamble', 'test_program'
+        #           following the 6.01 problem definition convention
+        penv = {}
+        penv['__builtins__'] = globals()['__builtins__']
+        try:
+            exec(self.code,penv,penv)
+        except Exception as err:
+            log.error('Error in CodeResponse %s: Error in problem reference code' % err)
+            raise Exception(err)
+        try:
+            self.answer = penv['answer']
+            self.initial_display = penv['initial_display']
+        except Exception as err:
+            log.error("Error in CodeResponse %s: Problem reference code does not define 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
+            raise Exception(err)
+
     def get_score(self, student_answers):
         idset = sorted(self.answer_ids)
 
@@ -778,22 +796,11 @@ class CodeResponse(LoncapaResponse):
     # CodeResponse differentiates from ExternalResponse in the behavior of 'get_answers'. CodeResponse.get_answers
     #   does NOT require a queue submission, and the answer is computed (extracted from problem XML) locally.
     def get_answers(self):
-        # Extract the CodeResponse answer from XML
-        penv = {}
-        penv['__builtins__'] = globals()['__builtins__']
-        try:
-            exec(self.code,penv,penv)
-        except Exception as err:
-            log.error('Error in CodeResponse %s: Error in problem reference code' % err)
-            raise Exception(err)
-        try:
-            ans = penv['answer']
-        except Exception as err:
-            log.error('Error in CodeResponse %s: Problem reference code does not define answer in <answer>...</answer>' % err)
-            raise Exception(err)
-
-        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % ans
+        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % self.answer
         return dict(zip(self.answer_ids,[anshtml]))
+        
+    def get_initial_display(self):
+        return dict(zip(self.answer_ids,[self.initial_display]))
 
     # CodeResponse._send_to_queue implements the same interface as defined for ExternalResponse's 'get_score'
     def _send_to_queue(self, extra_payload):

@@ -117,6 +117,9 @@ class LoncapaProblem(object):
         # the dict has keys = xml subtree of Response, values = Response instance
         self._preprocess_problem(self.tree)
 
+        if not self.student_answers: # True when student_answers is an empty dict
+            self.set_initial_display()
+
     def do_reset(self):
         '''
         Reset internal state to unfinished, with no answers
@@ -124,6 +127,14 @@ class LoncapaProblem(object):
         self.student_answers = dict()
         self.correct_map = CorrectMap()
         self.done = False
+
+    def set_initial_display(self):
+        initial_answers = dict()
+        for responder in self.responders.values():
+            if hasattr(responder,'get_initial_display'):
+                initial_answers.update(responder.get_initial_display())
+
+        self.student_answers = initial_answers
 
     def __unicode__(self):
         return u"LoncapaProblem ({0})".format(self.problem_id)
@@ -189,7 +200,7 @@ class LoncapaProblem(object):
         cmap = CorrectMap()
         cmap.update(self.correct_map)
         for responder in self.responders.values():
-            if hasattr(responder,'update_score'): # TODO: Is this the best way to target 'update_score' of CodeResponse?
+            if hasattr(responder,'update_score'):
                 # Each LoncapaResponse will update the specific entries of 'cmap' that it's responsible for
                 cmap = responder.update_score(score_msg, cmap, queuekey)
         self.correct_map.set_dict(cmap.get_dict())
