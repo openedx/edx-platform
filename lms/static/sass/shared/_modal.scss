@@ -177,51 +177,6 @@
         }
       }
 
-      .honor-code-summary {
-        margin-bottom: 20px;
-        padding: 0px;
-        position: relative;
-
-        p {
-          color: $lighter-base-font-color;
-          font-family: $sans-serif;
-        }
-
-        hr {
-          @extend .faded-hr-divider-light;
-          border: none;
-          margin-top: 30px;
-          position: relative;
-          z-index: 2;
-
-          &::after {
-            @extend .faded-hr-divider;
-            bottom: 0px;
-            content: "";
-            display: block;
-            position: absolute;
-            top: -1px;
-          }
-        }
-
-        ul {
-          @include box-sizing(border-box);
-          margin: 0;
-          padding: 0 0 0 20px;
-          width: 100%;
-
-          li {
-            color: $lighter-base-font-color;
-            font: 300 1.2rem/1.6rem $sans-serif;
-            margin-bottom: 10px;
-
-            &:last-child {
-              margin-bottom: 0px;
-            }
-          }
-        }
-      }
-
       .submit {
         padding-top: 10px;
 
