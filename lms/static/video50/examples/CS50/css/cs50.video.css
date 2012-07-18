@@ -1,0 +1,283 @@
+.video50-playback-controls ul {
+    margin: 0px;
+    margin-bottom: 1px;
+    text-align: right;
+}
+
+.video50-playback-controls li {
+    float: none;
+    display: inline-block;
+}
+
+.video50-player {
+    position: relative;
+    -webkit-perspective: 800px;
+    -moz-perspective: 800px;
+    -o-perspective: 800px;
+    perspective: 800px;
+}
+
+.video50-player .player-navbar {
+    border: 1px solid #ddd;
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    line-height: 36px;
+    height: 36px;
+    background-image: -moz-linear-gradient(bottom, #f5f5f5, #ffffff);
+    background-image: -ms-linear-gradient(bottom, #f5f5f5, #ffffff);
+    background-image: -webkit-linear-gradient(bottom, #f5f5f5, #ffffff);
+    background-image: -o-linear-gradient(bottom, #f5f5f5, #ffffff);
+    background-image: linear-gradient(bottom, #f5f5f5, #ffffff);
+}
+
+.video50-player .player-navbar .btn-back {
+    display: none;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+.video50-player .player-navbar-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 10px;
+    text-align: center;
+}
+
+.video50-player .flip-container {
+    width: 100%;
+    position: absolute;
+    -webkit-transition: -webkit-transform 1s;
+    -moz-transition: -moz-transform 1s;
+    -o-transition: -o-transform 1s;
+    transition: transform 1s;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -o-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+
+.video50-player .flip-container.flipped {
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    -o-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+}
+
+.video50-player .flip-container .video-container, .video50-player .flip-container .flip-question-container {
+    position: absolute;
+    display: block;
+    height: 100%;
+    width: 100%;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -o-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.video50-notifications-btn {
+    float: right;
+}
+
+.video50-notifications {
+    width: 640px;
+}
+
+.video50-available-questions {
+    display: inline-block;
+    line-height: 29px;
+    vertical-align: middle;
+    font-size: 16px;
+}
+
+.video50-notifications .video50-available-questions-td {
+    margin: 0px;
+    padding: 4px 4px 4px 8px;
+}
+
+.video50-notifications tbody td {
+    -webkit-animation:pop-in 0.3s;
+    -moz-animation:pop-in 0.3s;
+    -ms-animation:pop-in 0.3s;
+}
+
+.video50-question {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 100%;
+    position: relative;
+}
+
+.flip-question-container {
+    border-top: none;
+    -webkit-border-bottom-right-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    -o-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+}
+
+.video50-question label, .video50-notifications label, .video50-transcript label {
+    display: inline;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.video50-question .question-content {
+    padding: 20px;
+}
+
+.video50-question .question-choices {
+    padding: 10px;
+}
+
+.video50-question .question-choices .alert {
+    margin-top: 13px;
+    margin-bottom: 4px;
+}
+
+.video50-question .btn-show-video {
+    margin-left: 10px;
+}
+
+.video50-question .alert {
+    margin-top: 10px;
+}
+
+.video50-question .panel-close {
+    position: absolute;
+    right: 10px;
+    font-size: 30px;
+    line-height: 30px;
+    opacity: .2;
+}
+
+.video50-question .btn-submit {
+    clear: both;
+    display: block;
+}
+
+.video50-transcript-lang {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.video50-transcript {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.video50-transcript-container {
+    height: 360px;
+    overflow: auto;
+    border-top: 1px solid #ccc;
+    width: 640px;
+    padding: 30px;
+}
+
+.video50-transcript-controls-wrapper {
+    padding: 5px 10px;
+    text-align: right;
+}
+
+.video50-transcript-text {
+    position: relative;
+}
+
+.video50-transcript-text a {
+    color: black;
+}
+
+.video50-transcript-text a.highlight {
+    color: #08C;
+    font-weight: bold;
+}
+
+@-webkit-keyframes pop-in {
+    0% { 
+        opacity: 0;
+        -moz-transform: scale(0.5);
+        -webkit-transform: scale(0.5); 
+    }
+
+    100% { 
+        opacity: 1;
+        -moz-transform: scale(1);
+        -webkit-transform: scale(1); 
+    }
+}
+@-moz-keyframes pop-in {
+    0% { 
+        opacity: 0;
+        -moz-transform: scale(0.5);
+        -webkit-transform: scale(0.5); 
+    }
+
+    100% { 
+        opacity: 1;
+        -moz-transform: scale(1);
+        -webkit-transform: scale(1); 
+    }
+}
+@-ms-keyframes pop-in {
+    0% { 
+        opacity: 0;
+        -moz-transform: scale(0.5);
+        -webkit-transform: scale(0.5); 
+    }
+
+    100% { 
+        opacity: 1;
+        -moz-transform: scale(1);
+        -webkit-transform: scale(1); 
+    }
+}
+
+@-webkit-keyframes pop-out {
+    0% { 
+        opacity: 1;
+        -moz-transform: scale(1);
+        -webkit-transform: scale(1); 
+    }
+    100% { 
+        opacity: 0;
+        -moz-transform: scale(0.5);
+        -webkit-transform: scale(0.5); 
+    }
+}
+@-moz-keyframes pop-out {
+    0% { 
+        opacity: 1;
+        -moz-transform: scale(1);
+        -webkit-transform: scale(1); 
+    }
+
+    100% { 
+        opacity: 0;
+        -moz-transform: scale(0.5);
+        -webkit-transform: scale(0.5); 
+    }
+}
+@-ms-keyframes pop-out {
+    0% { 
+        opacity: 1;
+        -moz-transform: scale(1);
+        -webkit-transform: scale(1); 
+    }
+
+    100% { 
+        opacity: 0;
+        -moz-transform: scale(0.5);
+        -webkit-transform: scale(0.5); 
+    }
+}
