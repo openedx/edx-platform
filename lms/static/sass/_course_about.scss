@@ -34,7 +34,6 @@
         @include box-sizing(border-box);
         @include clearfix;
         float: left;
-        height: 180px;
         padding: 20px 20px;
         position: relative;
         width: flex-grid(8) + flex-gutter();
@@ -43,17 +42,31 @@
         > hgroup {
           border-bottom: 1px solid rgb(210,210,210);
           @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-          margin-bottom: 27px;
+          margin-bottom: 20px;
           padding-bottom: 20px;
           width: 100%;
 
           h1 {
             color: $base-font-color;
-            font-weight: 700;
+            font-weight: normal;
             @include inline-block;
-            margin: 0 10px 0 0;
+            margin: 0;
             letter-spacing: 0px;
+            text-align: left;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
+
+            a {
+              color: $lighter-base-font-color;
+              font: italic 800 0.6em/1em $sans-serif;
+              letter-spacing: 0px;
+              margin-left: 15px;
+              text-shadow: 0 1px rgba(255,255,255, 0.6);
+              text-transform: none;
+
+              &:hover {
+                color: $blue;
+              }
+            }
           }
 
           h2 {
@@ -116,7 +129,6 @@
 
       .media {
         background: transparent;
-        border-left: 1px solid rgb(100,100,100);
         @include box-sizing(border-box);
         display: block;
         float: right;
@@ -167,6 +179,7 @@
 
         &:hover {
           cursor: pointer;
+          text-decoration: none;
 
           .play-intro {
             @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
@@ -246,9 +259,18 @@
           .teacher-image {
             background: rgb(255,255,255);
             border: 1px solid rgb(200,200,200);
+            height: 115px;
             float: left;
-            margin: 0 15px 15px 0;
+            margin: 0 15px 0px 0;
+            overflow: hidden;
             padding: 1px;
+            width: 115px;
+
+            img {
+              display: block;
+              min-height: 100%;
+              max-width: 100%;
+            }
           }
         }
       }
@@ -397,20 +419,28 @@
           @include transition(all, 0.15s, linear);
           width: 19px;
 
-          &.start-icon {
+          &.start {
             @include background-image(url('../images/portal-icons/calendar-icon.png'));
           }
 
-          &.final-icon {
-            @include background-image(url('../images/portal-icons/pencil-icon.png'));
+          &.end {
+            @include background-image(url('../images/portal-icons/calendar-icon.png'));
           }
 
-          &.length-icon {
+          &.length {
             @include background-image(url('../images/portal-icons/chart-icon.png'));
           }
 
-          &.number-icon {
+          &.course-number {
             @include background-image(url('../images/portal-icons/course-info-icon.png'));
+          }
+
+          &.effort {
+            @include background-image(url('../images/portal-icons/pencil-icon.png'));
+          }
+
+          &.prerequisites {
+            @include background-image(url('../images/portal-icons/prerec-icon.png'));
           }
         }
 

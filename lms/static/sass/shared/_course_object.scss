@@ -106,6 +106,7 @@
 
           &:hover {
             @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
+            text-decoration: none;
 
             h2, .info-link {
               color: $blue;
