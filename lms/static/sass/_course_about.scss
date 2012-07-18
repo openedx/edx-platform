@@ -97,6 +97,20 @@
               color: rgb(255,255,255);
             }
           }
+
+          span.register {
+            @include button(shiny, lighten(grayscale($blue), 50%));
+            @include box-sizing(border-box);
+            @include border-radius(3px);
+            color: #888;
+            display: block;
+            font: normal 1.2rem/1.6rem $sans-serif;
+            letter-spacing: 1px;
+            padding: 10px 0px;
+            text-transform: uppercase;
+            text-align: center;
+            width: flex-grid(12);
+          }
         }
       }
 
