@@ -7,6 +7,7 @@ import sys
 import uuid
 import feedparser
 import urllib
+import itertools
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -49,8 +50,13 @@ def csrf_token(context):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def index(request):
+
     ''' Redirects to main page -- info page if user authenticated, or marketing if not
     '''
+
+    if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
+        return redirect(reverse('dashboard'))
+
     feed_data = cache.get("students_index_rss_feed_data")
     if feed_data == None:
         if hasattr(settings, 'RSS_URL'):
@@ -65,11 +71,13 @@ def index(request):
         soup = BeautifulSoup(entry.description)
         entry.image = soup.img['src'] if soup.img else None
 
-    if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
-    else:
-        # TODO: Clean up how 'error' is done.
-        return render_to_response('index.html', {'courses': modulestore().get_courses(), 'entries': entries})
+    courses = modulestore().get_courses()
+    universities = dict()
+    for university, group in itertools.groupby(courses, lambda course: course.org):
+        universities.setdefault(university, [])
+        [universities[university].append(course) for course in group]
+
+    return render_to_response('index.html', {'universities': universities, 'entries': entries})
 
 
 @login_required
