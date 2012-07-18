@@ -74,10 +74,6 @@ urlpatterns = ('',
         {'template': 'honor.html'}, name="honor"),
     
     
-    
-    #Temporarily static, for testing
-    #url(r'^university_profile$', 'static_template_view.views.render', 
-    #    {'template': 'university_profile.html'}, name="university_profile"),
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
     
     #TODO: Convert these pages to the new edX layout
