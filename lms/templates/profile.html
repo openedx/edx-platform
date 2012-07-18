@@ -49,26 +49,6 @@ $(function() {
          }
       });
 
-      $("#change_language").click(function() {
-         $(this).hide();
-         log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
-
-         if(lang) {
-           lang=false;
-           $("#language_sub").html('<form>'+'<input id="id_lang_text" type="text" name="lang_text" />'+
-             '<input type="submit" id="change_lang_button" value="Save" />'+'</form>');
-           $("#change_lang_button").click(function() {
-             $("#change_language").show();
-              postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
-                $("#language_sub").text(json.language);
-                lang=true;
-                $("#description").html("");
-               log_event("profile", {"type":"language_change", "new":json.language});
-              });
-           });
-         }
-      });
-
       $('#change_password').click(function(){
         $('.modal').trigger('click');
         log_event("profile", {"type":"password_show"});
@@ -205,9 +185,6 @@ $(function() {
         </li>
         <li>
           Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location" aria-label="Edit Location">Edit</a>
-        </li>
-        <li>
-          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language" aria-label="Edit Language">Edit</a>
         </li>
         <li>
           Password reset
