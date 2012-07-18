@@ -29,6 +29,7 @@ from student.models import Registration, UserProfile, PendingNameChange, Pending
 from util.cache import cache_if_anonymous 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 log = logging.getLogger("mitx.student")
@@ -80,7 +81,16 @@ def dashboard(request):
         course_loc = CourseDescriptor.id_to_location(id)
         return modulestore().get_item(course_loc)
 
-    courses = [course_from_id(enrollment.course_id) for enrollment in enrollments]
+    # Build our courses list for the user, but ignore any courses that no longer
+    # exist (because the course IDs have changed). Still, we don't delete those
+    # enrollments, because it could have been a data push snafu.
+    courses = []
+    for enrollment in enrollments:
+        try:
+            courses.append(course_from_id(enrollment.course_id))
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existant course {1}"
+                      .format(user.username, enrollment.course_id))
 
     context = {'csrf': csrf_token, 'courses': courses}
     return render_to_response('dashboard.html', context)
