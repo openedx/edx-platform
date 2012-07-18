@@ -27,4 +27,10 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   editSubmodule: (event) ->
     event.preventDefault()
-    CMS.pushView(new CMS.Views.ModuleEdit(model: new CMS.Models.Module(id: $(event.target).data('id'), type: $(event.target).data('type'))))
+    previewType = $(event.target).data('preview-type')
+    moduleType = $(event.target).data('type')
+    CMS.pushView new CMS.Views.ModuleEdit
+        model: new CMS.Models.Module
+            id: $(event.target).data('id')
+            type: if moduleType == 'None' then null else moduleType
+            previewType: if previewType == 'None' then null else previewType

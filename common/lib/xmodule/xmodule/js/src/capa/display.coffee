@@ -1,6 +1,9 @@
 class @Problem
-  constructor: (@id, @element_id, url) ->
-    @el = $("##{@element_id}")
+  constructor: (element) ->
+    @el = $(element)
+    @id = @el.data('problem-id')
+    @element_id = @el.attr('id')
+    @url = @el.data('url')
     @render()
 
   $: (selector) ->
@@ -26,13 +29,13 @@ class @Problem
       @el.html(content)
       @bind()
     else
-      $.postWithPrefix "/modx/#{@id}/problem_get", (response) =>
+      $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
         @bind()
 
   check: =>
     Logger.log 'problem_check', @answers
-    $.postWithPrefix "/modx/#{@id}/problem_check", @answers, (response) =>
+    $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
           @render(response.contents)
@@ -42,14 +45,14 @@ class @Problem
 
   reset: =>
     Logger.log 'problem_reset', @answers
-    $.postWithPrefix "/modx/#{@id}/problem_reset", id: @id, (response) =>
+    $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
         @render(response.html)
         @updateProgress response
 
   show: =>
     if !@el.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
-      $.postWithPrefix "/modx/#{@id}/problem_show", (response) =>
+      $.postWithPrefix "#{@url}/problem_show", (response) =>
         answers = response.answers
         $.each answers, (key, value) =>
           if $.isArray(value)
@@ -69,7 +72,7 @@ class @Problem
 
   save: =>
     Logger.log 'problem_save', @answers
-    $.postWithPrefix "/modx/#{@id}/problem_save", @answers, (response) =>
+    $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       if response.success
         alert 'Saved'
       @updateProgress response
