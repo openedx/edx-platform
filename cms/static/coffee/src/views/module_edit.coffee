@@ -10,7 +10,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   initialize: ->
     @$el.load @model.editUrl(), =>
       @model.loadModule(@el)
-      @$el.find('.preview').each (idx, previewEl) =>
+      @$el.find('.preview :first-child').each (idx, previewEl) =>
           @model.loadPreview(previewEl)
 
   save: (event) ->
