@@ -8,6 +8,7 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import hashlib
 import inspect
 import json
 import logging
@@ -16,6 +17,7 @@ import numpy
 import random
 import re
 import requests
+import time
 import traceback
 import abc
 
@@ -808,8 +810,12 @@ class CodeResponse(LoncapaResponse):
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = { 'return_url': self.system.xqueue_callback_url }
 
-        queuekey = random.randint(0,2**32-1)
-        header.update({'queuekey': queuekey})
+        h = hashlib.md5()
+        if self.system is not None:
+            h.update(str(self.system.get('seed')))
+        h.update(str(time.time()))
+        queuekey = int(h.hexdigest(),16)
+        header.update({'queuekey': queuekey}) 
 
         payload = {'xqueue_header': json.dumps(header), # TODO: 'xqueue_header' should eventually be derived from a config file
                    'xml': xmlstr,
