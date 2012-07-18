@@ -31,6 +31,8 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
+from datetime import date
 
 log = logging.getLogger("mitx.student")
 
@@ -169,7 +171,7 @@ def create_account(request, post_override=None):
     post_vars = post_override if post_override else request.POST
 
     # Confirm we have a properly formed request
-    for a in ['username', 'email', 'password', 'location', 'language', 'name']:
+    for a in ['username', 'email', 'password', 'language', 'name']:
         if a not in post_vars:
             js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
             return HttpResponse(json.dumps(js))
@@ -237,7 +239,16 @@ def create_account(request, post_override=None):
     up = UserProfile(user=u)
     up.name = post_vars['name']
     up.language = post_vars['language']
-    up.location = post_vars['location']
+    up.country = post_vars['country']
+    up.gender = post_vars['gender']
+    up.mailing_address = post_vars['mailing_address']
+
+    date_fields = ['date_of_birth__year', 'date_of_birth__month', 'date_of_birth__day']
+    if all(len(post_vars[field]) > 0 for field in date_fields):
+        up.date_of_birth = date(int(post_vars['date_of_birth__year']),
+                int(post_vars['date_of_birth__month']),
+                int(post_vars['date_of_birth__day']))
+
     up.save()
 
     # TODO (vshnayder): the LMS should probably allow signups without a particular course too
