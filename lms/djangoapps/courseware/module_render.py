@@ -5,7 +5,6 @@ from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from functools import wraps
 
 from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
@@ -14,6 +13,7 @@ from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
 from xmodule.exceptions import NotFoundError
 from xmodule.x_module import ModuleSystem
+from xmodule_modifiers import replace_static_urls, add_histogram
 
 log = logging.getLogger("mitx.courseware")
 
@@ -28,28 +28,6 @@ def make_track_function(request):
     def f(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
-
-
-def grade_histogram(module_id):
-    ''' Print out a histogram of grades on a given problem.
-        Part of staff member debug info.
-    '''
-    from django.db import connection
-    cursor = connection.cursor()
-
-    q = """SELECT courseware_studentmodule.grade,
-                  COUNT(courseware_studentmodule.student_id)
-    FROM courseware_studentmodule
-    WHERE courseware_studentmodule.module_id=%s
-    GROUP BY courseware_studentmodule.grade"""
-    # Passing module_id this way prevents sql-injection.
-    cursor.execute(q, [module_id])
-
-    grades = list(cursor.fetchall())
-    grades.sort(key=lambda x: x[0])          # Add ORDER BY to sql query?
-    if len(grades) == 1 and grades[0][0] is None:
-        return []
-    return grades
 
 
 def toc_for_course(user, request, course, active_chapter, active_section):
@@ -180,11 +158,10 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
-    replace_prefix = module.metadata['data_dir']
-    module = replace_static_urls(module, replace_prefix)
+    module.get_html = replace_static_urls(module.get_html, module.metadata['data_dir'])
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
-        module = add_histogram(module)
+        module.get_html = add_histogram(module.get_html)
 
     # If StudentModule for this instance wasn't already in the database,
     # and this isn't a guest user, create it.
@@ -210,64 +187,6 @@ def get_module(user, request, location, student_module_cache, position=None):
             student_module_cache.append(shared_module)
 
     return (module, instance_module, shared_module, descriptor.category)
-
-
-def replace_static_urls(module, prefix):
-    """
-    Updates the supplied module with a new get_html function that wraps
-    the old get_html function and substitutes urls of the form /static/...
-    with urls that are /static/<prefix>/...
-    """
-    original_get_html = module.get_html
-
-    @wraps(original_get_html)
-    def get_html():
-        return replace_urls(original_get_html(), staticfiles_prefix=prefix)
-
-    module.get_html = get_html
-    return module
-
-
-def add_histogram(module):
-    """
-    Updates the supplied module with a new get_html function that wraps
-    the output of the old get_html function with additional information
-    for admin users only, including a histogram of student answers and the
-    definition of the xmodule
-    """
-    original_get_html = module.get_html
-
-    @wraps(original_get_html)
-    def get_html():
-        module_id = module.id
-        histogram = grade_histogram(module_id)
-        render_histogram = len(histogram) > 0
-
-        # TODO: fixme - no filename in module.xml in general (this code block for edx4edx)
-        # the following if block is for summer 2012 edX course development; it will change when the CMS comes online
-        if settings.MITX_FEATURES.get('DISPLAY_EDIT_LINK') and settings.DEBUG and module_xml.get('filename') is not None:
-            coursename = multicourse_settings.get_coursename_from_request(request)
-            github_url = multicourse_settings.get_course_github_url(coursename)
-            fn = module_xml.get('filename')
-            if module_xml.tag == 'problem': fn = 'problems/' + fn	 # grrr
-            edit_link = (github_url + '/tree/master/' + fn) if github_url is not None else None
-            if module_xml.tag == 'problem': edit_link += '.xml'	 # grrr
-        else:
-            edit_link = False
-
-        # Cast module.definition and module.metadata to dicts so that json can dump them
-        # even though they are lazily loaded
-        staff_context = {'definition': json.dumps(dict(module.definition), indent=4),
-                         'metadata': json.dumps(dict(module.metadata), indent=4),
-                         'element_id': module.location.html_id(),
-                         'edit_link': edit_link,
-                         'histogram': json.dumps(histogram),
-                         'render_histogram': render_histogram,
-                         'module_content': original_get_html()}
-        return render_to_string("staff_problem_info.html", staff_context)
-
-    module.get_html = get_html
-    return module
 
 
 # TODO: TEMPORARY BYPASS OF AUTH!
