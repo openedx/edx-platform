@@ -129,6 +129,8 @@ class XMLModuleStore(ModuleStore):
 
                         module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, xmlstore.default_class)
                         log.debug('==> importing module location %s' % repr(module.location))
+                        module.metadata['data_dir'] = course_dir
+
                         xmlstore.modules[module.location] = module
 
                         if xmlstore.eager:
@@ -145,7 +147,6 @@ class XMLModuleStore(ModuleStore):
                     XMLParsingSystem.__init__(self, **system_kwargs)
 
             course_descriptor = ImportSystem(self).process_xml(etree.tostring(course_data))
-            course_descriptor.metadata['data_dir'] = course_dir
             log.debug('========> Done with course import')
             return course_descriptor
 
