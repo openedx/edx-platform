@@ -115,8 +115,12 @@
       padding: 12px;
     }
 
-    .activation-message {
+    .activation-message, .message {
       padding: 0 40px 10px;
+
+      p {
+        margin-bottom: 10px;
+      }
     }
 
     form {
