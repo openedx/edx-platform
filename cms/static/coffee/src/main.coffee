@@ -39,6 +39,7 @@ $ ->
 
   $.ajaxSetup
     headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
+    dataType: 'json'
 
   window.onTouchBasedDevice = ->
     navigator.userAgent.match /iPhone|iPod|iPad/i

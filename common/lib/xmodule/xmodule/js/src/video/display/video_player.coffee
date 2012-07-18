@@ -54,7 +54,7 @@ class @VideoPlayer extends Subview
 
   onReady: =>
     unless onTouchBasedDevice()
-      $('.course-content .video:first').data('video').player.play()
+      $('.video-load-complete:first').data('video').player.play()
 
   onStateChange: (event) =>
     switch event.data

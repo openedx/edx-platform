@@ -15,11 +15,11 @@ class VideoModule(XModule):
     icon_class = 'video'
 
     js = {'coffee':
-        [resource_string(__name__, 'js/src/video/display.coffee')] +
+        [resource_string(__name__, 'js/src/time.coffee'),
+         resource_string(__name__, 'js/src/video/display.coffee')] +
         [resource_string(__name__, 'js/src/video/display/' + filename)
          for filename
-         in sorted(resource_listdir(__name__, 'js/src/video/display'))
-        ]}
+         in sorted(resource_listdir(__name__, 'js/src/video/display'))]}
     js_module_name = "Video"
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
