@@ -1,4 +1,7 @@
+from fs.errors import ResourceNotFoundError
 from functools import wraps
+import logging
+from path import path
 
 from django.conf import settings
 from django.http import Http404
@@ -6,6 +9,7 @@ from django.http import Http404
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
+log = logging.getLogger(__name__)
 
 def check_course(course_id, course_must_be_open=True, course_required=True):
     """
@@ -33,18 +37,80 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
     
     return course
 
-def course_static_file_url(course, filepath):
-    """
-    Given a course and a filepath from the course's directory 
-    (like images/course_image.png), this returns the url for 
-    the static file in the form. It will be something like
-    /static/content-mit-6002x/images/course_image.png.
-    """
-    return "/".join( [settings.STATIC_URL, course.metadata['data_dir'], filepath] )
+
+### These methods look like they should be on the course_module object itself, but they rely
+### on the lms. Maybe they should be added dynamically to the class?
+
+def course_static_url(course):
+    return settings.STATIC_URL + "/" + course.metadata['data_dir'] + "/"
     
 def course_image_url(course):
-    return course_static_file_url(course, "images/course_image.png")
+    return course_static_url(course) + "images/course_image.png"
     
-    
-    
+def get_course_about_section(course, section_key):
+    """
+    This returns the snippet of html to be rendered on the course about page, given the key for the section.
+    Valid keys:
+    - overview
+    - title
+    - university
+    - number
+    - short_description
+    - description
+    - key_dates (includes start, end, exams, etc)
+    - video
+    - course_staff_short
+    - course_staff_extended
+    - requirements
+    - syllabus
+    - textbook
+    - faq
+    - more_info
+    """
+
+    # Many of these are stored as html files instead of some semantic markup. This can change without effecting
+    # this interface when we find a good format for defining so many snippets of text/html.
+
+# TODO: Remove number, instructors from this list
+    if section_key in ['short_description', 'description', 'key_dates', 'video', 'course_staff_short', 'course_staff_extended',
+                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info', 'number', 'instructors', 'overview',
+                        'effort', 'end_date', 'prerequisites']:
+        try:
+            with course.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
+                return htmlFile.read().decode('utf-8').format(COURSE_STATIC_URL = course_static_url(course) )
+        except ResourceNotFoundError:
+            log.warning("Missing about section {key} in course {url}".format(key=section_key, url=course.location.url()))
+            return None
+    elif section_key == "title":
+        return course.metadata.get('display_name', course.name)
+    elif section_key == "university":
+        return course.location.org
+    elif section_key == "number":
+        return course.number
+
+    raise KeyError("Invalid about key " + str(section_key))
+
+def get_course_info_section(course, section_key):
+    """
+    This returns the snippet of html to be rendered on the course info page, given the key for the section.
+    Valid keys:
+    - handouts
+    - guest_handouts
+    - updates
+    - guest_updates
+    """
+
+    # Many of these are stored as html files instead of some semantic markup. This can change without effecting
+    # this interface when we find a good format for defining so many snippets of text/html.
+
+    if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
+        try:
+            with course.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
+                return htmlFile.read().decode('utf-8')
+        except ResourceNotFoundError:
+            log.exception("Missing info section {key} in course {url}".format(key=section_key, url=course.location.url()))
+            return "! Info section missing !"
+        
+    raise KeyError("Invalid about key " + str(section_key))
+
     
