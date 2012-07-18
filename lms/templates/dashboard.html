@@ -1,4 +1,7 @@
-<%! from django.core.urlresolvers import reverse %>
+<%! 
+  from django.core.urlresolvers import reverse 
+  from courseware.courses import course_image_url, get_course_about_section
+%>
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
@@ -33,14 +36,14 @@
       % for course in courses:
 
         <article class="my-course">
-          <a href="${reverse('info', args=[course.id])}" class="cover" style="background-image: url('static/images/courses/python.png')">
+          <a href="${reverse('info', args=[course.id])}" class="cover" style="background-image: url('${course_image_url(course)}')">
             <div class="shade"></div>
             <div class="arrow"></div>
           </a>
           <section class="info">
             <hgroup>
-              <a href="#" class="university">${course.get_about_section('university')}</a>
-              <h3><a href="${reverse('info', args=[course.id])}">${course.get_about_section("title")}</a></h3>
+              <a href="#" class="university">${get_course_about_section(course, 'university')}</a>
+              <h3><a href="${reverse('info', args=[course.id])}">${get_course_about_section(course, "title")}</a></h3>
             </hgroup>
             <section class="course-status">
               <p>Class Starts - <span>9/2/2012</span></div>
