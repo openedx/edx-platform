@@ -16,12 +16,8 @@ class @Courseware
       .bind 'contentChanged', @render
 
   render: ->
-    $('.course-content .video').each ->
-      id = $(this).attr('id').replace(/video_/, '')
-      new Video id, $(this).data('streams'), $(this).data('caption-url-base')
-    $('.course-content .problems-wrapper').each ->
-      id = $(this).data('problem-id')
-      new Problem id, $(this).attr('id'), $(this).data('url')
+    $('.course-content .video').each (idx, element) -> new Video element
+    $('.course-content .problems-wrapper').each (idx, element) -> new Problem element
     $('.course-content .histogram').each ->
       id = $(this).attr('id').replace(/histogram_/, '')
       new Histogram id, $(this).data('histogram')
