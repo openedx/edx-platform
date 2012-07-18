@@ -14,6 +14,7 @@ from static_replace import replace_urls
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
+from xmodule_modifiers import replace_static_urls
 
 
 # ==== Public views ==================================================
@@ -167,8 +168,21 @@ def get_sample_module(location):
     """
     descriptor = modulestore().get_item(location)
     instance_state, shared_state = descriptor.get_sample_state()[0]
+    return load_sample_module(descriptor, instance_state, shared_state)
+
+
+def load_sample_module(descriptor, instance_state, shared_state):
+    """
+    Return a sample XModule instantiated from the supplied descriptor, instance_state, and shared_state
+
+    descriptor: An XModuleDescriptor
+    instance_state: An instance state string
+    shared_state: A shared state string
+    """
     system = sample_module_system(descriptor)
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+    module.get_html = replace_static_urls(module.get_html, module.metadata['data_dir'])
+
     return module
 
 
@@ -180,9 +194,8 @@ def get_module_previews(descriptor):
     descriptor: An XModuleDescriptor
     """
     preview_html = []
-    system = sample_module_system(descriptor)
     for instance_state, shared_state in descriptor.get_sample_state():
-        module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+        module = load_sample_module(descriptor, instance_state, shared_state)
         preview_html.append(module.get_html())
     return preview_html
 
