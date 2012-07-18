@@ -1,0 +1,19 @@
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+
+<section class="find-courses">
+  <%block name="university_header"/>
+  <br/>
+  <section class="container">
+    <section class="message left">
+      <article>
+        <%block name="university_description" />
+      </article>
+    </section>
+    <section class="courses">
+      %for course in courses:
+       <%include file="../course.html" args="course=course" />
+      %endfor
+    </section>
+  </section>
+</section>

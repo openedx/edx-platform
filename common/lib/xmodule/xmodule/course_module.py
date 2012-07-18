@@ -52,3 +52,7 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def wiki_namespace(self):
         return self.location.course
+
+    @property
+    def org(self):
+        return self.location.org

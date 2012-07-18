@@ -272,3 +272,19 @@ def enroll(request, course_id):
     enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
     
     return redirect(reverse('dashboard'))
+
+
+def university_profile(request, org_id):
+    all_courses = modulestore().get_courses()
+    valid_org_ids = set(c.org for c in all_courses)
+    if org_id not in valid_org_ids:
+        raise Http404("University Profile not found for {0}".format(org_id))
+
+    # Only grab courses for this org...
+    courses=[c for c in all_courses if c.org == org_id]
+    context = dict(courses=courses, org_id=org_id)
+    template_file = "university_profile/{0}.html".format(org_id).lower()
+
+    return render_to_response(template_file, context)
+
+
