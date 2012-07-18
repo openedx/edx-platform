@@ -233,7 +233,6 @@ def create_account(request, post_override=None):
     # TODO (vshnayder): the LMS should probably allow signups without a particular course too
     d = {'name': post_vars['name'],
          'key': r.activation_key,
-         'course_title': getattr(settings, 'COURSE_TITLE', ''),
          }
 
     subject = render_to_string('emails/activation_email_subject.txt', d)
