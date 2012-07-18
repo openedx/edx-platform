@@ -14,7 +14,7 @@
     <div class="intro-inner-wrapper">
       <section class="intro">
         <hgroup>
-        <h1>${course.number}: ${get_course_about_section(course, "title")}</h1><h2><a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a></h2>
+          <h1>${course.number}: ${get_course_about_section(course, "title")}<a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a></h1>
         </hgroup>
 
         <div class="main-cta">
@@ -42,7 +42,7 @@
         <div class="hero">
           <img src="${course_image_url(course)}" />
         </div>
-      </a>
+      </div>
       % endif
     </div>
   </header>
@@ -81,23 +81,23 @@
         </header>
 
         <ol class="important-dates">
-          <li><div class="icon number-icon"></div><p>Course Number</p><span class="course-number">${course.number}</span></li>
-          <li><div class="icon start-icon"></div><p>Classes Start</p><span class="start-date">${course.start_date_text}</span></li>
+          <li><div class="icon course-number"></div><p>Course Number</p><span class="course-number">${course.number}</span></li>
+          <li><div class="icon start"></div><p>Classes Start</p><span class="start-date">${course.start_date_text}</span></li>
 
           ## End date should come from course.xml, but this is a quick hack
           % if get_course_about_section(course, "end_date"):
-            <li><div class="icon final-icon"></div><p>Classes End</p><span class="final-date">${get_course_about_section(course, "end_date")}</span></li>
+            <li><div class="icon end"></div><p>Classes End</p><span class="final-date">${get_course_about_section(course, "end_date")}</span></li>
           % endif
 
           % if get_course_about_section(course, "effort"):
-            <li><div class="icon"></div><p>Estimated Effort</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
+            <li><div class="icon effort"></div><p>Estimated Effort</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
           % endif
+
+          ##<li><div class="icon length"></div><p>Course Length</p><span class="course-length">15 weeks</span></li>
 
           % if get_course_about_section(course, "prerequisites"):
-            <li><div class="icon"></div><p>Prerequisites</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
+            <li><div class="icon prerequisites"></div><p>Prerequisites</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
-
-          ##<li><div class="icon length-icon"></div><p>Course Length</p><span class="course-length">15 weeks</span></li>
         </ol>
       </section>
     </section>
