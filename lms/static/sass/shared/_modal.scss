@@ -115,7 +115,7 @@
       padding: 12px;
     }
 
-    .activation-message, .message, .notice {
+    .notice {
       background: $yellow;
       border: 1px solid darken($yellow, 60%);
       color: darken($yellow, 60%);
@@ -124,7 +124,7 @@
       padding: 12px;
     }
 
-    .activation-message {
+    .activation-message, .message {
       padding: 0 40px 10px;
 
       p {
