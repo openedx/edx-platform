@@ -1,6 +1,14 @@
+jQuery.postWithPrefix = (url, data, callback, type) ->
+  $.post("#{CMS.prefix}#{url}", data, callback, type)
+
+jQuery.getWithPrefix = (url, data, callback, type) ->
+  $.get("#{CMS.prefix}#{url}", data, callback, type)
+
 @CMS =
   Models: {}
   Views: {}
+
+  prefix: $("meta[name='path_prefix']").attr('content')
 
   viewStack: []
 
@@ -32,4 +40,11 @@ $ ->
   $.ajaxSetup
     headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
 
+  window.onTouchBasedDevice = ->
+    navigator.userAgent.match /iPhone|iPod|iPad/i
+
+  $('body').addClass 'touch-based-device' if onTouchBasedDevice()
+
+
   CMS.start($('section.main-container'))
+
