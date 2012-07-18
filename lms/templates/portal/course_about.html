@@ -1,5 +1,4 @@
 <%! from django.core.urlresolvers import reverse %>
-<%! from student.models import CourseEnrollment %>
 <%namespace name='static' file='../static_content.html'/>
 <%block name="js_extra">
   <script src="${static.url('js/course_info.js')}"></script>
@@ -17,10 +16,10 @@
 
         <div class="main-cta">
           %if user.is_authenticated():
-            %if not CourseEnrollment.objects.filter(user=user, course_id=course.id).exists():
-                <a href="${reverse('enroll', args=[course.id])}" class="register">Register</a>
-            %else:
+            %if registered:
                 <span class="register disabled">Registered</span>
+            %else:
+                <a href="${reverse('enroll', args=[course.id])}" class="register">Register</a>
             %endif
           %else:
             <a href="#signup-modal" class="register" rel="leanModal" data-notice="You must register in order to enroll">Register</a>
