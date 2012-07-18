@@ -40,7 +40,12 @@ def render(request, template):
     url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs")
     """    
     return render_to_response('static_templates/' + template, {})
+
+def render_404(request):
+    return render_to_response('static_templates/404.html', {})
     
+def render_500(request):
+    return render_to_response('static_templates/server-error.html', {})
 
 valid_auth_templates=[]
 
