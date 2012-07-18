@@ -78,9 +78,21 @@
       </section>
 
       <section class="courses">
-        %for course in courses:
-          <%include file="course.html" args="course=course" />
-        %endfor
+        <section class='university-column'>
+          %for course in universities['MITx']:
+            <%include file="course.html" args="course=course" />
+          %endfor
+        </section>
+        <section class='university-column'>
+          %for course in universities['HarvardX']:
+            <%include file="course.html" args="course=course" />
+          %endfor
+        </section>
+        <section class='university-column'>
+          %for course in universities['BerkeleyX']:
+            <%include file="course.html" args="course=course" />
+          %endfor
+        </section>
       </section>
     </section>
   </section>
