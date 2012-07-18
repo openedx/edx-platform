@@ -90,8 +90,8 @@ class CourseDescriptor(SequenceDescriptor):
                 with self.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
                     return htmlFile.read().decode('utf-8')
             except ResourceNotFoundError:
-                log.exception("Missing about section {key} in course {url}".format(key=section_key, url=self.location.url()))
-                return "! About section missing !"
+                log.warning("Missing about section {key} in course {url}".format(key=section_key, url=self.location.url()))
+                return None
         elif section_key == "title":
             return self.metadata.get('display_name', self.name)
         elif section_key == "university":
