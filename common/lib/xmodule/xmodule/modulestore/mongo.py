@@ -1,14 +1,14 @@
 import pymongo
 
 from bson.objectid import ObjectId
+from bson.son import SON
 from fs.osfs import OSFS
+from itertools import repeat
+
 from importlib import import_module
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from mitxmako.shortcuts import render_to_string
-from bson.son import SON
-from itertools import repeat
-from fs.osfs import OSFS
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
