@@ -48,6 +48,11 @@
           })
 
           $(modal_id).fadeTo(200,1);
+          $(modal_id).find(".notice").hide().html("");
+          var notice = $(this).data('notice')
+          if(notice !== undefined) {
+            $(modal_id).find(".notice").show().html(notice);
+          }
           e.preventDefault();
 
         });

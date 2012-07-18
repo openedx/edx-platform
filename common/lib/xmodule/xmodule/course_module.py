@@ -29,7 +29,7 @@ class CourseDescriptor(SequenceDescriptor):
     
     def has_started(self):
         return time.gmtime() > self.start
-    
+
     @classmethod
     def id_to_location(cls, course_id):
         org, course, name = course_id.split('/')
@@ -38,6 +38,10 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def id(self):
         return "/".join([self.location.org, self.location.course, self.location.name])
+
+    @property
+    def start_date_text(self):
+        return time.strftime("%m/%d/%y", self.start)
 
     @property
     def title(self):
@@ -86,8 +90,8 @@ class CourseDescriptor(SequenceDescriptor):
                 with self.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
                     return htmlFile.read().decode('utf-8')
             except ResourceNotFoundError:
-                log.exception("Missing about section {key} in course {url}".format(key=section_key, url=self.location.url()))
-                return "! About section missing !"
+                log.warning("Missing about section {key} in course {url}".format(key=section_key, url=self.location.url()))
+                return None
         elif section_key == "title":
             return self.metadata.get('display_name', self.name)
         elif section_key == "university":
