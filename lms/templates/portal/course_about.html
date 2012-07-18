@@ -20,9 +20,9 @@
         <div class="main-cta">
           %if user.is_authenticated():
             %if registered:
-                <span class="register disabled">Registered</span>
+                <span class="register disabled">Registered for ${course.number}</span>
             %else:
-                <a href="${reverse('enroll', args=[course.id])}" class="register">Register</a>
+                <a href="${reverse('enroll', args=[course.id])}" class="register">Register for ${course.number}</a>
             %endif
           %else:
             <a href="#signup-modal" class="register" rel="leanModal" data-notice="You must register in order to enroll">Register</a>
