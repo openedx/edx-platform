@@ -71,6 +71,8 @@ class VideoModule(XModule):
             'id': self.location.html_id(),
             'position': self.position,
             'name': self.name,
+            # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
+            'data_dir': self.metadata['data_dir'],
         })
 
 
