@@ -72,10 +72,23 @@
         </header>
 
         <ol class="important-dates">
-          <li><div class="icon start-icon"></div><p>Classes Start</p><span class="start-date">${course.start_date_text}</span></li>
-          ##<li><div class="icon final-icon"></div><p>Final Exam</p><span class="final-date">12/09/12</span></li>
-          ##<li><div class="icon length-icon"></div><p>Course Length</p><span class="course-length">15 weeks</span></li>
           <li><div class="icon number-icon"></div><p>Course Number</p><span class="course-number">${course.number}</span></li>
+          <li><div class="icon start-icon"></div><p>Classes Start</p><span class="start-date">${course.start_date_text}</span></li>
+
+          ## End date should come from course.xml, but this is a quick hack
+          % if course.get_about_section("end_date"):
+            <li><div class="icon final-icon"></div><p>Classes End</p><span class="final-date">${course.get_about_section("end_date")}</span></li>
+          % endif
+
+          % if course.get_about_section("effort"):
+            <li><div class="icon"></div><p>Estimated Effort</p><span class="start-date">${course.get_about_section("effort")}</span></li>
+          % endif
+
+          % if course.get_about_section("prerequisites"):
+            <li><div class="icon"></div><p>Prerequisites</p><span class="start-date">${course.get_about_section("prerequisites")}</span></li>
+          % endif
+
+          ##<li><div class="icon length-icon"></div><p>Course Length</p><span class="course-length">15 weeks</span></li>
         </ol>
       </section>
     </section>
