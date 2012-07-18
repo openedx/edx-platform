@@ -6,8 +6,14 @@ class CMS.Models.Module extends Backbone.Model
   loadModule: (element) ->
     try
       @module = new window[@get('type')](element)
-    catch TypeError
-      console.error "Unable to load #{@get('type')}." if console
+    catch error
+      console.error "Unable to load #{@get('type')}: #{error.message}" if console
+
+  loadPreview: (element) ->
+    try
+      @previewModule = new window[@get('previewType')](element)
+    catch error
+      console.error "Unable to load #{@get('previewType')}: #{error.message}" if console
 
   editUrl: ->
     "/edit_item?#{$.param(id: @get('id'))}"
