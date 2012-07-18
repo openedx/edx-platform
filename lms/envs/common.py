@@ -344,11 +344,7 @@ except OSError as exc:
 
 fragments = set()
 for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
-    module = getattr(descriptor, 'module_class', None)
-    if module is None:
-        continue
-
-    js = module.get_javascript()
+    module_js = descriptor.module_class.get_javascript()
     for filetype in ('coffee', 'js'):
         for fragment in js.get(filetype, []):
             fragments.add((filetype, fragment))

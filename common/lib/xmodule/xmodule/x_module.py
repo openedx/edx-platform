@@ -78,6 +78,7 @@ class XModule(object):
     icon_class = 'other'
 
     js = {}
+    js_module_name = None
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         '''
@@ -197,10 +198,6 @@ class XModule(object):
 
     # ================================== HTML INTERFACE DEFINITIONS ======================
 
-    @property
-    def js_module_name(self):
-        return self.__class__.__name__
-
     @classmethod
     def get_javascript(cls):
         """
@@ -232,6 +229,8 @@ class XModuleDescriptor(Plugin):
     """
     entry_point = "xmodule.v1"
     js = {}
+    js_module_name = None
+    module_class = XModule
 
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (
@@ -406,10 +405,6 @@ class XModuleDescriptor(Plugin):
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
     # ================================== HTML INTERFACE DEFINITIONS ======================
-    @property
-    def js_module_name(self):
-        return self.__class__.__name__
-
     @classmethod
     def get_javascript(cls):
         """
