@@ -1,8 +1,10 @@
 class @Video
-  constructor: (@id, videos, @caption_url_base) ->
+  constructor: (@element) ->
+    @id = $(@element).attr('id').replace(/video_/, '')
+    @caption_url_base = $(@element).data('caption-url-base')
     window.player = null
     @el = $("#video_#{@id}")
-    @parseVideos videos
+    @parseVideos $(@element).data('streams')
     @fetchMetadata()
     @parseSpeed()
     $("#video_#{@id}").data('video', this)
