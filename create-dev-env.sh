@@ -82,19 +82,20 @@ clone_repos() {
         fi
         git clone git@github.com:MITx/askbot-devel >>$LOG 
     fi
-    
+
+    # By default, dev environments start with a copy of 6.002x
     cd "$BASE"
-    if [[ -d "$BASE/data/.hg" ]]; then
-        output "Pulling data"
-        cd "$BASE/data"
-        hg pull >>$LOG
-        hg update >>$LOG
+    REPO="content-mit-6002x"
+    if [[ -d "$BASE/data/$REPO/.git" ]]; then
+        output "Pulling $REPO"
+        cd "$BASE/data/$REPO"
+        git pull >>$LOG
     else
-        output "Cloning data"
-        if [[ -d "$BASE/data" ]]; then
-            mv "$BASE/data" "${BASE}/data.bak.$$"
+        output "Cloning $REPO"
+        if [[ -d "$BASE/data/$REPO" ]]; then
+            mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
         fi
-        hg clone ssh://hg-content@gp.mitx.mit.edu/data >>$LOG 
+        git clone git@github.com:MITx/$REPO >>$LOG
     fi
 }
 
