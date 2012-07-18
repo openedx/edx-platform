@@ -1,5 +1,6 @@
 from functools import wraps
 
+from django.conf import settings
 from django.http import Http404
 
 from xmodule.course_module import CourseDescriptor
@@ -31,3 +32,19 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
             raise Http404("This course has not yet started.")
     
     return course
+
+def course_static_file_url(course, filepath):
+    """
+    Given a course and a filepath from the course's directory 
+    (like images/course_image.png), this returns the url for 
+    the static file in the form. It will be something like
+    /static/content-mit-6002x/images/course_image.png.
+    """
+    return "/".join( [settings.STATIC_URL, course.metadata['data_dir'], filepath] )
+    
+def course_image_url(course):
+    return course_static_file_url(course, "images/course_image.png")
+    
+    
+    
+    

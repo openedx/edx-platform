@@ -1,4 +1,7 @@
-<%! from django.core.urlresolvers import reverse %>
+<%! 
+  from django.core.urlresolvers import reverse 
+  from courseware.courses import course_image_url
+%>
 <%namespace name='static' file='../static_content.html'/>
 <%block name="js_extra">
   <script src="${static.url('js/course_info.js')}"></script>
@@ -26,7 +29,7 @@
       % if course.get_about_section("video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
-          <img src="${static.url('images/courses/circuits.jpeg')}" />
+          <img src="${course_image_url(course)}" />
           <div class="play-intro"></div>
         </div>
       </a>
