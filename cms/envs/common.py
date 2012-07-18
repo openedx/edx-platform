@@ -26,6 +26,7 @@ import os
 import errno
 import glob2
 import lms.envs.common
+import hashlib
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -190,18 +191,27 @@ except OSError as exc:
     else:
         raise
 
-module_js_sources = []
-for xmodule in XModuleDescriptor.load_classes() + [RawDescriptor]:
-    js = xmodule.get_javascript()
+fragments = set()
+for descriptor in XModuleDescriptor.load_classes() + [RawDescriptor]:
+    descriptor_js = descriptor.get_javascript()
+    module = getattr(descriptor, 'module_class', None)
+    if module is not None:
+        module_js = module.get_javascript()
+    else:
+        module_js = {}
+
     for filetype in ('coffee', 'js'):
-        for idx, fragment in enumerate(js.get(filetype, [])):
-            path = os.path.join(js_file_dir, "{name}.{idx}.{type}".format(
-                name=xmodule.__name__,
-                idx=idx,
-                type=filetype))
-            with open(path, 'w') as js_file:
-                js_file.write(fragment)
-            module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+        for fragment in descriptor_js.get(filetype, []) + module_js.get(filetype, []):
+            fragments.add((filetype, fragment))
+
+module_js_sources = []
+for filetype, fragment in fragments:
+    path = os.path.join(js_file_dir, "{hash}.{type}".format(
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype))
+    with open(path, 'w') as js_file:
+        js_file.write(fragment)
+    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
 
 PIPELINE_JS = {
     'main': {
