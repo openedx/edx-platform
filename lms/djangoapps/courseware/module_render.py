@@ -129,6 +129,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
+    # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
     xqueue_callback_url = settings.MITX_ROOT_URL + '/xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/'
