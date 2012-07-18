@@ -158,7 +158,7 @@ task :package do
         # as the makeitso user
 
         if [[ -d "#{INSTALL_DIR_PATH}" ]]; then
-            sudo -u makeitso rm -rf "#{INSTALL_DIR_PATH}"
+            sudo rm -rf "#{INSTALL_DIR_PATH}"
         fi
 
         AFTERREMOVE
