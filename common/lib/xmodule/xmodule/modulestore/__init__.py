@@ -221,3 +221,11 @@ class ModuleStore(object):
         metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError
+
+    def get_courses(self):
+        '''
+        Returns a list containing the top level XModuleDescriptors of the courses
+        in this modulestore.
+        '''
+        raise NotImplementedError
+

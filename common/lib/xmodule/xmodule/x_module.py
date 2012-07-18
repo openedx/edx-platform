@@ -241,7 +241,7 @@ class XModuleDescriptor(Plugin):
         'data_dir'
     )
 
-    # A list of descriptor attributes that must be equal for the discriptors to be
+    # A list of descriptor attributes that must be equal for the descriptors to be
     # equal
     equality_attributes = ('definition', 'metadata', 'location', 'shared_state_key', '_inherited_metadata')
 
