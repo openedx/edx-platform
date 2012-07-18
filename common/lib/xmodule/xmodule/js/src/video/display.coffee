@@ -7,7 +7,7 @@ class @Video
     @parseVideos $(@element).data('streams')
     @fetchMetadata()
     @parseSpeed()
-    $("#video_#{@id}").data('video', this)
+    $("#video_#{@id}").data('video', this).addClass('video-load-complete')
 
     if YT.Player
       @embed()
