@@ -250,12 +250,17 @@ def course_info(request, course_id):
     course = check_course(course_id)
 
     return render_to_response('info.html', {'course': course})
-    
+
 @ensure_csrf_cookie
 def course_about(request, course_id):
+    def registered_for_course(course, user):
+        if user.is_authenticated():
+            return CourseEnrollment.objects.filter(user = user, course_id=course.id).exists()
+        else:
+            return False
     course = check_course(course_id, course_must_be_open=False)
-
-    return render_to_response('portal/course_about.html', {'course': course})
+    registered = registered_for_course(course, request.user)
+    return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
 
 
 @login_required
