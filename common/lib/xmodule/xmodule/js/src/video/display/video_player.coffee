@@ -25,7 +25,11 @@ class @VideoPlayer extends Subview
 
   render: ->
     @control = new VideoControl el: @$('.video-controls')
-    @caption = new VideoCaption el: @el, youtubeId: @video.youtubeId('1.0'), currentSpeed: @currentSpeed(), captionURLBase: @video.caption_url_base
+    @caption = new VideoCaption
+        el: @el
+        youtubeId: @video.youtubeId('1.0')
+        currentSpeed: @currentSpeed()
+        captionDataDir: @video.caption_data_dir
     unless onTouchBasedDevice()
       @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
     @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
