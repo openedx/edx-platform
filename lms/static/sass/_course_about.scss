@@ -398,6 +398,21 @@
         margin-bottom: 20px;
         padding-bottom: 10px;
 
+        &.prerequisites {
+          border: 1px solid rgb(220,220,220);
+          margin: 0 -10px 0;
+          padding: 10px;
+
+          p {
+            margin-right: 10px;
+          }
+
+          span {
+            float: none;
+            font-weight: normal;
+          }
+        }
+
         &:hover {
           .icon {
             opacity: 1;
@@ -439,7 +454,7 @@
             @include background-image(url('../images/portal-icons/pencil-icon.png'));
           }
 
-          &.prerequisites {
+          &.prereq {
             @include background-image(url('../images/portal-icons/prerec-icon.png'));
           }
         }
