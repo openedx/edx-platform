@@ -1,10 +1,12 @@
 class @Sequence
-  constructor: (@id, @element_id, @elements, @tag, position) ->
-    @el = $("##{@element_id}")
-    @buildNavigation()
+  constructor: (element) ->
+    (@id, @element_id, @elements, position) ->
+    @el = $(element)
+    @contents = @$('.seq_contents')
+    @id = @el.data('id')
     @initProgress()
     @bind()
-    @render position
+    @render parseInt(@el.data('position'))
 
   $: (selector) ->
     $(selector, @el)
@@ -58,19 +60,6 @@ class @Sequence
         when 'in_progress' then element.addClass('progress-some')
         when 'done' then element.addClass('progress-done')
 
-  buildNavigation: ->
-    $.each @elements, (index, item) =>
-      link = $('<a>').attr class: "seq_#{item.type}_inactive", 'data-element': index + 1
-      title = $('<p>').html(item.title)
-      # TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
-      # Make sure it gets updated after ajax calls.
-      # implementation note: will need to figure out how to handle combining detail
-      # statuses of multiple modules in js.
-      list_item = $('<li>').append(link.append(title))
-      @setProgress item.progress_status, link
-
-      @$('#sequence-list').append list_item
-
   toggleArrows: =>
     @$('.sequence-nav-buttons a').unbind('click')
 
@@ -79,7 +68,7 @@ class @Sequence
     else
       @$('.sequence-nav-buttons .prev a').removeClass('disabled').click(@previous)
 
-    if @position == @elements.length
+    if @position == @contents.length
       @$('.sequence-nav-buttons .next a').addClass('disabled')
     else
       @$('.sequence-nav-buttons .next a').removeClass('disabled').click(@next)
@@ -91,7 +80,7 @@ class @Sequence
         $.postWithPrefix "/modx/#{@id}/goto_position", position: new_position
 
       @mark_active new_position
-      @$('#seq_content').html @elements[new_position - 1].content
+      @$('#seq_content').html @contents.eq(new_position - 1).text()
 
       MathJax.Hub.Queue(["Typeset", MathJax.Hub])
       @position = new_position
@@ -122,16 +111,14 @@ class @Sequence
 
   mark_visited: (position) ->
     # Don't overwrite class attribute to avoid changing Progress class
-    type = @elements[position - 1].type
     element = @link_for(position)
-    element.removeClass("seq_#{type}_inactive")
-    .removeClass("seq_#{type}_active")
-    .addClass("seq_#{type}_visited")
+    element.removeClass("inactive")
+    .removeClass("active")
+    .addClass("visited")
 
   mark_active: (position) ->
     # Don't overwrite class attribute to avoid changing Progress class
-    type = @elements[position - 1].type
     element = @link_for(position)
-    element.removeClass("seq_#{type}_inactive")
-    .removeClass("seq_#{type}_visited")
-    .addClass("seq_#{type}_active")
+    element.removeClass("inactive")
+    .removeClass("visited")
+    .addClass("active")

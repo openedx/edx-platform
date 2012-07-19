@@ -84,7 +84,7 @@ class SequenceModule(XModule):
         # Split </script> tags -- browsers handle this as end
         # of script, even if it occurs mid-string. Do this after json.dumps()ing
         # so that we can be sure of the quotations being used
-        params = {'items': json.dumps(contents).replace('</script>', '<"+"/script>'),
+        params = {'items': contents,
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,
