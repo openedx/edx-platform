@@ -8,6 +8,7 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import hashlib
 import inspect
 import json
 import logging
@@ -16,9 +17,9 @@ import numpy
 import random
 import re
 import requests
+import time
 import traceback
 import abc
-import time
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -266,6 +267,94 @@ class LoncapaResponse(object):
         return u'LoncapaProblem Response %s' % self.xml.tag
 
 #-----------------------------------------------------------------------------
+class ChoiceResponse(LoncapaResponse):
+    '''
+    This Response type is used when the student chooses from a discrete set of
+    choices. Currently, to be marked correct, all "correct" choices must be
+    supplied by the student, and no extraneous choices may be included.
+
+    This response type allows for two inputtypes: radiogroups and checkbox
+    groups. radiogroups are used when the student should select a single answer,
+    and checkbox groups are used when the student may supply 0+ answers.
+    Note: it is suggested to include a "None of the above" choice when no
+    answer is correct for a checkboxgroup inputtype; this ensures that a student
+    must actively mark something to get credit.
+
+    If two choices are marked as correct with a radiogroup, the student will
+    have no way to get the answer right.
+
+    TODO: Allow for marking choices as 'optional' and 'required', which would
+    not penalize a student for including optional answers and would also allow
+    for questions in which the student can supply one out of a set of correct
+    answers.This would also allow for survey-style questions in which all
+    answers are correct.
+
+    Example:
+
+    <choiceresponse>
+        <radiogroup>
+            <choice correct="false">
+                <text>This is a wrong answer.</text>
+            </choice>
+            <choice correct="true">
+                <text>This is the right answer.</text>
+            </choice>
+            <choice correct="false">
+                <text>This is another wrong answer.</text>
+            </choice>
+        </radiogroup>
+    </choiceresponse>
+
+    In the above example, radiogroup can be replaced with checkboxgroup to allow
+    the student to select more than one choice.
+
+    '''
+
+    response_tag        = 'choiceresponse'
+    max_inputfields     = 1
+    allowed_inputfields = ['checkboxgroup', 'radiogroup']
+
+    def setup_response(self):
+
+        self.assign_choice_names()
+
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+                                         id=self.xml.get('id'))
+
+        self.correct_choices = set([choice.get('name') for choice in correct_xml])
+
+    def assign_choice_names(self):
+        '''
+        Initialize name attributes in <choice> tags for this response.
+        '''
+
+        for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice', 
+                                                      id=self.xml.get('id'))):
+            choice.set("name", "choice_"+str(index))
+
+    def get_score(self, student_answers):
+
+        student_answer = student_answers.get(self.answer_id, [])
+        
+        if not isinstance(student_answer, list):
+            student_answer = [student_answer]
+        
+        student_answer = set(student_answer)
+
+        required_selected = len(self.correct_choices - student_answer) == 0
+        no_extra_selected = len(student_answer - self.correct_choices) == 0
+
+        correct = required_selected & no_extra_selected
+
+        if correct:
+            return CorrectMap(self.answer_id,'correct')
+        else:
+            return CorrectMap(self.answer_id,'incorrect')
+
+    def get_answers(self):
+        return { self.answer_id : self.correct_choices }
+
+#-----------------------------------------------------------------------------
 
 class MultipleChoiceResponse(LoncapaResponse):
     # TODO: handle direction and randomize
@@ -469,13 +558,13 @@ class CustomResponse(LoncapaResponse):
     or in a <script>...</script>
     '''
     snippets = [{'snippet': '''<customresponse>
-    <startouttext/>
+    <text>
     <br/>
     Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
     In the space provided below write an algebraic expression for \(I(t)\).
     <br/>
     <textline size="5" correct_answer="IS*u(t-t0)" />
-    <endouttext/>
+    </text>
     <answer type="loncapa/python">
     correct=['correct']
     try:
@@ -696,15 +785,19 @@ class SymbolicResponse(CustomResponse):
 
 class CodeResponse(LoncapaResponse):
     ''' 
-    Grade student code using an external server
+    Grade student code using an external server, called 'xqueue'
+    In contrast to ExternalResponse, CodeResponse has following behavior:
+        1) Goes through a queueing system
+        2) Does not do external request for 'get_answers'
     '''
 
     response_tag = 'coderesponse'
     allowed_inputfields = ['textline', 'textbox']
+    max_inputfields = 1
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url') or "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/" # FIXME -- hardcoded url
+        self.url = xml.get('url', "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/") # FIXME -- hardcoded url
 
         answer = xml.find('answer')
         if answer is not None:
@@ -713,63 +806,19 @@ class CodeResponse(LoncapaResponse):
                 self.code = self.system.filesystem.open('src/'+answer_src).read()
             else:
                 self.code = answer.text
-        else:					# no <answer> stanza; get code from <script>
+        else: # no <answer> stanza; get code from <script>
             self.code = self.context['script_code']
             if not self.code:
-                msg = '%s: Missing answer script code for externalresponse' % unicode(self)
+                msg = '%s: Missing answer script code for coderesponse' % unicode(self)
                 msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
                 raise LoncapaProblemError(msg)
 
         self.tests = xml.get('tests')
 
-    def get_score(self, student_answers):
-        idset = sorted(self.answer_ids)
-        
-        try:
-            submission = [student_answers[k] for k in idset]
-        except Exception as err:
-            log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_ids, student_answers))
-            raise Exception(err)
-
-        self.context.update({'submission': submission})
-        extra_payload = {'edX_student_response': json.dumps(submission)}
-
-        # Should do something -- like update the problem state -- based on the queue response
-        r = self._send_to_queue(extra_payload)
-        
-        return CorrectMap() 
-
-    def update_score(self, score_msg):
-        # Parse 'score_msg' as XML
-        try:
-            rxml = etree.fromstring(score_msg)
-        except Exception as err:
-            msg = 'Error in CodeResponse %s: cannot parse response from xworker r.text=%s' % (err, score_msg)
-            raise Exception(err)
-
-        # The following process is lifted directly from ExternalResponse
-        idset = sorted(self.answer_ids)
-        cmap = CorrectMap()
-        ad = rxml.find('awarddetail').text
-        admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
-                 'WRONG_FORMAT': 'incorrect',
-                 }
-        self.context['correct'] = ['correct']
-        if ad in admap:
-            self.context['correct'][0] = admap[ad]
-
-        # create CorrectMap
-        for key in idset:
-            idx = idset.index(key)
-            msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
-            cmap.set(key, self.context['correct'][idx], msg=msg)
-        
-        return cmap
-
-    # CodeResponse differentiates from ExternalResponse in the behavior of 'get_answers'. CodeResponse.get_answers
-    #   does NOT require a queue submission, and the answer is computed (extracted from problem XML) locally.
-    def get_answers(self):
-        # Extract the CodeResponse answer from XML
+        # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
+        #   (1) Internal edX code, i.e. NOT student submissions, and
+        #   (2) The code should only define the strings 'initial_display', 'answer', 'preamble', 'test_program'
+        #           following the 6.01 problem definition convention
         penv = {}
         penv['__builtins__'] = globals()['__builtins__']
         try:
@@ -778,21 +827,80 @@ class CodeResponse(LoncapaResponse):
             log.error('Error in CodeResponse %s: Error in problem reference code' % err)
             raise Exception(err)
         try:
-            ans = penv['answer']
+            self.answer = penv['answer']
+            self.initial_display = penv['initial_display']
         except Exception as err:
-            log.error('Error in CodeResponse %s: Problem reference code does not define answer in <answer>...</answer>' % err)
+            log.error("Error in CodeResponse %s: Problem reference code does not define 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
             raise Exception(err)
 
-        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % ans
-        return dict(zip(self.answer_ids,[anshtml]))
+    def get_score(self, student_answers):
+        try:
+            submission = [student_answers[self.answer_id]]
+        except Exception as err:
+            log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_id, student_answers))
+            raise Exception(err)
+
+        self.context.update({'submission': submission})
+        extra_payload = {'edX_student_response': json.dumps(submission)}
+
+        r, queuekey = self._send_to_queue(extra_payload) # TODO: Perform checks on the xqueue response
+
+        # Non-null CorrectMap['queuekey'] indicates that the problem has been submitted
+        cmap = CorrectMap()
+        cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to queue')
+
+        return cmap
+
+    def update_score(self, score_msg, oldcmap, queuekey):
+        # Parse 'score_msg' as XML
+        try:
+            rxml = etree.fromstring(score_msg)
+        except Exception as err:
+            msg = 'Error in CodeResponse %s: cannot parse response from xworker r.text=%s' % (err, score_msg)
+            raise Exception(err)
+
+        # The following process is lifted directly from ExternalResponse
+        ad = rxml.find('awarddetail').text
+        admap = {'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
+                 'WRONG_FORMAT': 'incorrect',
+                 }
+        self.context['correct'] = ['correct']
+        if ad in admap:
+            self.context['correct'][0] = admap[ad]
+
+        # Replace 'oldcmap' with new grading results if queuekey matches.
+        #   If queuekey does not match, we keep waiting for the score_msg that will match
+        if oldcmap.is_right_queuekey(self.answer_id, queuekey): 
+            msg = rxml.find('message').text.replace('&nbsp;','&#160;')
+            oldcmap.set(self.answer_id, correctness=self.context['correct'][0], msg=msg, queuekey=None) # Queuekey is consumed
+        else:
+            log.debug('CodeResponse: queuekey %d does not match for answer_id=%s.' % (queuekey, self.answer_id)) 
+
+        return oldcmap 
+
+    # CodeResponse differentiates from ExternalResponse in the behavior of 'get_answers'. CodeResponse.get_answers
+    #   does NOT require a queue submission, and the answer is computed (extracted from problem XML) locally.
+    def get_answers(self):
+        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % self.answer
+        return { self.answer_id: anshtml } 
+        
+    def get_initial_display(self):
+        return { self.answer_id: self.initial_display }
 
     # CodeResponse._send_to_queue implements the same interface as defined for ExternalResponse's 'get_score'
     def _send_to_queue(self, extra_payload):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = { 'return_url': self.system.xqueue_callback_url }
-        header.update({'timestamp': time.time()})
-        payload = {'xqueue_header': json.dumps(header), # 'xqueue_header' should eventually be derived from xqueue.queue_common.HEADER_TAG or something similar
+
+        # Queuekey generation
+        h = hashlib.md5()
+        h.update(str(self.system.seed))
+        h.update(str(time.time()))
+        queuekey = int(h.hexdigest(),16)
+        header.update({'queuekey': queuekey}) 
+
+        payload = {'xqueue_header': json.dumps(header), # TODO: 'xqueue_header' should eventually be derived from a config file
                    'xml': xmlstr,
                    'edX_cmd': 'get_score',
                    'edX_tests': self.tests,
@@ -808,7 +916,7 @@ class CodeResponse(LoncapaResponse):
             log.error(msg)
             raise Exception(msg)
 
-        return r
+        return r, queuekey
 
 #-----------------------------------------------------------------------------
 
@@ -1191,5 +1299,5 @@ class ImageResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-__all__ = [ CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse ]
+__all__ = [ CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse, MultipleChoiceResponse, TrueFalseResponse ]
 

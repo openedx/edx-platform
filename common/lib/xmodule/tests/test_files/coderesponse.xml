@@ -1,0 +1,101 @@
+<problem>
+<text>
+<h2>Code response</h2>
+
+<p>
+</p>
+
+<text>
+Write a program to compute the square of a number
+  <coderesponse tests="repeat:2,generate">
+    <textbox rows="10" cols="70"  mode="python"/>
+    <answer><![CDATA[
+initial_display = """
+def square(n):
+"""
+
+answer = """
+def square(n):
+    return n**2    
+"""
+
+preamble = """ 
+import sys, time
+"""
+
+test_program = """
+import random
+import operator
+
+def testSquare(n = None):
+    if n is None:
+       n = random.randint(2, 20)
+    print 'Test is: square(%d)'%n
+    return str(square(n))
+
+def main():
+   f = os.fdopen(3,'w')
+   test = int(sys.argv[1])
+   rndlist = map(int,os.getenv('rndlist').split(','))
+   random.seed(rndlist[0])
+   if test == 1: f.write(testSquare(0))
+   elif test == 2: f.write(testSquare(1))
+   else:  f.write(testSquare())
+   f.close()
+
+main()
+sys.exit(0)
+"""
+]]>
+    </answer>
+  </coderesponse>
+</text>
+
+<text>
+Write a program to compute the cube of a number
+  <coderesponse tests="repeat:2,generate">
+    <textbox rows="10" cols="70"  mode="python"/>
+    <answer><![CDATA[
+initial_display = """
+def cube(n):
+"""
+
+answer = """
+def cube(n):
+    return n**3    
+"""
+
+preamble = """ 
+import sys, time
+"""
+
+test_program = """
+import random
+import operator
+
+def testCube(n = None):
+    if n is None:
+       n = random.randint(2, 20)
+    print 'Test is: cube(%d)'%n
+    return str(cube(n))
+
+def main():
+   f = os.fdopen(3,'w')
+   test = int(sys.argv[1])
+   rndlist = map(int,os.getenv('rndlist').split(','))
+   random.seed(rndlist[0])
+   if test == 1: f.write(testCube(0))
+   elif test == 2: f.write(testCube(1))
+   else:  f.write(testCube())
+   f.close()
+
+main()
+sys.exit(0)
+"""
+]]>
+    </answer>
+  </coderesponse>
+</text>
+
+</text>
+</problem>
