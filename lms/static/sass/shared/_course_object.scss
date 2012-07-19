@@ -47,7 +47,7 @@
       .inner-wrapper {
         border: 1px solid rgba(255,255,255, 1);
         height: 100%;
-        height: 180px;
+        height: 200px;
         overflow: hidden;
         position: relative;
       }
@@ -132,7 +132,7 @@
 
       .info {
         background: rgb(255,255,255);
-        height: 180px + 130px;
+        height: 220px + 130px;
         left: 0px;
         position: absolute;
         top: 0px;
@@ -140,7 +140,7 @@
         width: 100%;
 
         .cover-image {
-          height: 180px;
+          height: 200px;
           overflow: hidden;
           width: 100%;
 
@@ -153,7 +153,7 @@
 
         .desc {
           @include box-sizing(border-box);
-          height: 100px;
+          height: 120px;
           overflow: hidden;
           padding: 10px 10px 12px 10px;
           position: relative;
@@ -197,7 +197,7 @@
         @include box-shadow(0 1px 16px 0 rgba($blue, 0.4));
 
         .info {
-          top: -130px;
+          top: -150px;
         }
 
         .meta-info {

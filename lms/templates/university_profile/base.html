@@ -3,17 +3,15 @@
 
 <section class="find-courses">
   <%block name="university_header"/>
-  <br/>
   <section class="container">
-    <section class="message left">
-      <article>
-        <%block name="university_description" />
-      </article>
-    </section>
     <section class="courses university-courses">
       %for course in courses:
        <%include file="../course.html" args="course=course" />
       %endfor
+    </section>
+
+    <section class="message left">
+      <%block name="university_description" />
     </section>
   </section>
 </section>
