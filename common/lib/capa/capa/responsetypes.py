@@ -315,6 +315,85 @@ class ChoiceResponse(LoncapaResponse):
 
 #-----------------------------------------------------------------------------
 
+class MultipleChoiceResponse(LoncapaResponse):
+    # TODO: handle direction and randomize
+    snippets = [{'snippet': '''<multiplechoiceresponse direction="vertical" randomize="yes">
+     <choicegroup type="MultipleChoice">
+        <choice location="random" correct="false"><span>`a+b`<br/></span></choice>
+        <choice location="random" correct="true"><span><math>a+b^2</math><br/></span></choice>
+        <choice location="random" correct="false"><math>a+b+c</math></choice>
+        <choice location="bottom" correct="false"><math>a+b+d</math></choice>
+     </choicegroup>
+    </multiplechoiceresponse>
+    '''}]
+
+    response_tag = 'multiplechoiceresponse'
+    max_inputfields = 1
+    allowed_inputfields = ['choicegroup']
+
+    def setup_response(self):
+        self.mc_setup_response()	# call secondary setup for MultipleChoice questions, to set name attributes
+
+        # define correct choices (after calling secondary setup)
+        xml = self.xml
+        cxml = xml.xpath('//*[@id=$id]//choice[@correct="true"]',id=xml.get('id'))
+        self.correct_choices = [choice.get('name') for choice in cxml]
+
+    def mc_setup_response(self):
+        '''
+        Initialize name attributes in <choice> stanzas in the <choicegroup> in this response.
+        '''
+        i=0
+        for response in self.xml.xpath("choicegroup"):
+            rtype = response.get('type')
+            if rtype not in ["MultipleChoice"]:
+                response.set("type", "MultipleChoice")		# force choicegroup to be MultipleChoice if not valid
+            for choice in list(response):
+                if choice.get("name") is None:
+                    choice.set("name", "choice_"+str(i))
+                    i+=1
+                else:
+                    choice.set("name", "choice_"+choice.get("name"))
+
+    def get_score(self, student_answers):
+        '''
+        grade student response.
+        '''
+        # log.debug('%s: student_answers=%s, correct_choices=%s' % (unicode(self),student_answers,self.correct_choices))
+        if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
+            return CorrectMap(self.answer_id,'correct')
+        else:
+            return CorrectMap(self.answer_id,'incorrect')
+
+    def get_answers(self):
+        return {self.answer_id:self.correct_choices}
+
+class TrueFalseResponse(MultipleChoiceResponse):
+
+    response_tag = 'truefalseresponse'
+
+    def mc_setup_response(self):
+        i=0
+        for response in self.xml.xpath("choicegroup"):
+            response.set("type", "TrueFalse")
+            for choice in list(response):
+                if choice.get("name") is None:
+                    choice.set("name", "choice_"+str(i))
+                    i+=1
+                else:
+                    choice.set("name", "choice_"+choice.get("name"))
+    
+    def get_score(self, student_answers):
+        correct = set(self.correct_choices)
+        answers = set(student_answers.get(self.answer_id, []))
+        
+        if correct == answers:
+            return CorrectMap( self.answer_id , 'correct')
+        
+        return CorrectMap(self.answer_id ,'incorrect')
+
+#-----------------------------------------------------------------------------
+
 class OptionResponse(LoncapaResponse):
     '''
     TODO: handle direction and randomize
@@ -1179,5 +1258,5 @@ class ImageResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-__all__ = [ CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse ]
+__all__ = [ CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse, MultipleChoiceResponse, TrueFalseResponse ]
 

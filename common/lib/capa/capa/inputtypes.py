@@ -8,6 +8,7 @@ Module containing the problem elements which render into input objects
 - textline
 - textbox     (change this to textarea?)
 - schemmatic
+- choicegroup
 - radiogroup
 - checkboxgroup
 - imageinput  (for clickable image)
@@ -147,6 +148,39 @@ def optioninput(element, value, status, render_template, msg=''):
     return etree.XML(html)
 
 #-----------------------------------------------------------------------------
+
+# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
+# desired semantics.
+@register_render_function
+def choicegroup(element, value, status, render_template, msg=''):
+    '''
+    Radio button inputs: multiple choice or true/false
+
+    TODO: allow order of choices to be randomized, following lon-capa spec.  Use "location" attribute,
+    ie random, top, bottom.
+    '''
+    eid=element.get('id')
+    if element.get('type') == "MultipleChoice":
+        type="radio"
+    elif element.get('type') == "TrueFalse":
+        type="checkbox"
+    else:
+        type="radio"
+    choices=[]
+    for choice in element:
+        if not choice.tag=='choice':
+            raise Exception("[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag)
+        ctext = ""
+        ctext += ''.join([etree.tostring(x) for x in choice])	# TODO: what if choice[0] has math tags in it?
+        if choice.text is not None:
+            ctext += choice.text		# TODO: fix order?
+        choices.append((choice.get("name"),ctext))
+    context={'id':eid, 'value':value, 'state':status, 'input_type':type, 'choices':choices, 'inline':True, 'name_array_suffix':''}
+    html = render_template("choicegroup.html", context)
+    return etree.XML(html)
+
+
+#-----------------------------------------------------------------------------
 def extract_choices(element):
     '''
     Extracts choices for a few input types, such as radiogroup and
@@ -169,6 +203,8 @@ def extract_choices(element):
 
     return choices
 
+# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
+# desired semantics.
 @register_render_function
 def radiogroup(element, value, status, render_template, msg=''):
     '''
@@ -179,11 +215,13 @@ def radiogroup(element, value, status, render_template, msg=''):
 
     choices = extract_choices(element)
 
-    context = { 'id':eid, 'value':value, 'state':status, 'input_type': 'radio', 'choices':choices }
+    context = { 'id':eid, 'value':value, 'state':status, 'input_type': 'radio', 'choices':choices, 'inline': False, 'name_array_suffix': '[]' }
 
     html = render_template("choicegroup.html", context)
     return etree.XML(html)
 
+# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
+# desired semantics.
 @register_render_function
 def checkboxgroup(element, value, status, render_template, msg=''):
     '''
@@ -194,7 +232,7 @@ def checkboxgroup(element, value, status, render_template, msg=''):
 
     choices = extract_choices(element)
 
-    context = { 'id':eid, 'value':value, 'state':status, 'input_type': 'checkbox', 'choices':choices }
+    context = { 'id':eid, 'value':value, 'state':status, 'input_type': 'checkbox', 'choices':choices, 'inline': False, 'name_array_suffix': '[]' }
 
     html = render_template("choicegroup.html", context)
     return etree.XML(html)

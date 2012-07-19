@@ -1,12 +1,14 @@
 <form class="choicegroup">
   
   % for choice_id, choice_description in choices:
-  <label for="input_${id}_${choice_id}">  <input type="${input_type}" name="input_${id}[]" id="input_${id}_${choice_id}" value="${choice_id}"
+  <label for="input_${id}_${choice_id}">  <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" value="${choice_id}"
   % if choice_id in value:
 	checked="true"
   % endif
   /> ${choice_description} </label>
-  <br/>
+  % if not inline:
+    <br/>
+  % endif
   % endfor
   <span id="answer_${id}"></span>
 
