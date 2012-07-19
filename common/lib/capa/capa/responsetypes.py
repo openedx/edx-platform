@@ -267,83 +267,51 @@ class LoncapaResponse(object):
         return u'LoncapaProblem Response %s' % self.xml.tag
 
 #-----------------------------------------------------------------------------
+class ChoiceResponse(LoncapaResponse):
 
-class MultipleChoiceResponse(LoncapaResponse):
-    # TODO: handle direction and randomize
-    snippets = [{'snippet': '''<multiplechoiceresponse direction="vertical" randomize="yes">
-     <choicegroup type="MultipleChoice">
-        <choice location="random" correct="false"><span>`a+b`<br/></span></choice>
-        <choice location="random" correct="true"><span><math>a+b^2</math><br/></span></choice>
-        <choice location="random" correct="false"><math>a+b+c</math></choice>
-        <choice location="bottom" correct="false"><math>a+b+d</math></choice>
-     </choicegroup>
-    </multiplechoiceresponse>
-    '''}]
-
-    response_tag = 'multiplechoiceresponse'
-    max_inputfields = 1
-    allowed_inputfields = ['choicegroup']
+    response_tag        = 'choiceresponse'
+    max_inputfields     = 1
+    allowed_inputfields = ['checkboxgroup', 'radiogroup']
 
     def setup_response(self):
-        self.mc_setup_response()	# call secondary setup for MultipleChoice questions, to set name attributes
 
-        # define correct choices (after calling secondary setup)
-        xml = self.xml
-        cxml = xml.xpath('//*[@id=$id]//choice[@correct="true"]',id=xml.get('id'))
-        self.correct_choices = [choice.get('name') for choice in cxml]
+        self.assign_choice_names()
 
-    def mc_setup_response(self):
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+                                         id=self.xml.get('id'))
+
+        self.correct_choices = set([choice.get('name') for choice in correct_xml])
+
+    def assign_choice_names(self):
         '''
-        Initialize name attributes in <choice> stanzas in the <choicegroup> in this response.
+        Initialize name attributes in <choice> tags for his response.
         '''
-        i=0
-        for response in self.xml.xpath("choicegroup"):
-            rtype = response.get('type')
-            if rtype not in ["MultipleChoice"]:
-                response.set("type", "MultipleChoice")		# force choicegroup to be MultipleChoice if not valid
-            for choice in list(response):
-                if choice.get("name") is None:
-                    choice.set("name", "choice_"+str(i))
-                    i+=1
-                else:
-                    choice.set("name", "choice_"+choice.get("name"))
+
+        for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice', 
+                                                      id=self.xml.get('id'))):
+            choice.set("name", "choice_"+str(index))
 
     def get_score(self, student_answers):
-        '''
-        grade student response.
-        '''
-        # log.debug('%s: student_answers=%s, correct_choices=%s' % (unicode(self),student_answers,self.correct_choices))
-        if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
+
+        student_answer = student_answers.get(self.answer_id, [])
+        
+        if not isinstance(student_answer, list):
+            student_answer = [student_answer]
+        
+        student_answer = set(student_answer)
+
+        required_selected = len(self.correct_choices - student_answer) == 0
+        no_extra_selected = len(student_answer - self.correct_choices) == 0
+
+        correct = required_selected & no_extra_selected
+
+        if correct:
             return CorrectMap(self.answer_id,'correct')
         else:
             return CorrectMap(self.answer_id,'incorrect')
 
     def get_answers(self):
-        return {self.answer_id:self.correct_choices}
-
-class TrueFalseResponse(MultipleChoiceResponse):
-
-    response_tag = 'truefalseresponse'
-
-    def mc_setup_response(self):
-        i=0
-        for response in self.xml.xpath("choicegroup"):
-            response.set("type", "TrueFalse")
-            for choice in list(response):
-                if choice.get("name") is None:
-                    choice.set("name", "choice_"+str(i))
-                    i+=1
-                else:
-                    choice.set("name", "choice_"+choice.get("name"))
-    
-    def get_score(self, student_answers):
-        correct = set(self.correct_choices)
-        answers = set(student_answers.get(self.answer_id, []))
-        
-        if correct == answers:
-            return CorrectMap( self.answer_id , 'correct')
-        
-        return CorrectMap(self.answer_id ,'incorrect')
+        return { self.answer_id : self.correct_choices }
 
 #-----------------------------------------------------------------------------
 
@@ -1211,5 +1179,5 @@ class ImageResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-__all__ = [ CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, MultipleChoiceResponse, TrueFalseResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse ]
+__all__ = [ CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse ]
 
