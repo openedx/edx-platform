@@ -71,7 +71,8 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')]}
+    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
+          'js': [resource_string(__name__, 'js/src/capa/imageinput.js')]}
     js_module_name = "Problem"
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
