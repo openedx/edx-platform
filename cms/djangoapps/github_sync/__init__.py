@@ -5,7 +5,8 @@ from django.conf import settings
 from fs.osfs import OSFS
 from git import Repo, PushInfo
 
-from contentstore import import_from_xml
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 
 from .exceptions import GithubSyncError
@@ -56,7 +57,8 @@ def import_from_github(repo_settings):
     git_repo = setup_repo(repo_settings)
     git_repo.head.reset('origin/%s' % repo_settings['branch'], index=True, working_tree=True)
 
-    module_store = import_from_xml(settings.GITHUB_REPO_ROOT, course_dirs=[course_dir])
+    module_store = import_from_xml(modulestore(),
+                                   settings.GITHUB_REPO_ROOT, course_dirs=[course_dir])
     return git_repo.head.commit.hexsha, module_store.courses[course_dir]
 
 
