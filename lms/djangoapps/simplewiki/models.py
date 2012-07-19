@@ -17,7 +17,7 @@ class ShouldHaveExactlyOneRootSlug(Exception):
     pass
 
 class Namespace(models.Model):
-    name = models.CharField(max_length=30, db_index=True, unique=True, verbose_name=_('namespace'))
+    name = models.CharField(max_length=30, unique=True, verbose_name=_('namespace'))
     # TODO: We may want to add permissions, etc later
     
     @classmethod
