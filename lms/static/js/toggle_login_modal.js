@@ -53,6 +53,7 @@
           if(notice !== undefined) {
             $(modal_id).find(".notice").show().html(notice);
           }
+          window.scrollTo(0, 0);
           e.preventDefault();
 
         });

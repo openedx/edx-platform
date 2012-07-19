@@ -15,7 +15,7 @@
 
     <section class="responses">
       <section id="the-organization" class="category">
-        <h2>Category</h2>
+        <h2>Organization</h2>
 
         <article class="response">
           <h3>What is edX?</h3>
@@ -52,33 +52,8 @@
         </article>
       </section>
 
-      <section id="" class="category">
-        <h2>Category</h2>
-
-        <article class="response">
-          <h3>Who can take edX courses? Will there be an admissions process?</h3>
-          <p>edX will be available to anyone in the world with an internet connection, and in general, there will not be an admissions process.</p>
-        </article>
-
-        <article class="response">
-          <h3>Will certificates be awarded?</h3>
-          <p>Online learners who demonstrate mastery of subjects could earn a certificate of completion. Such certificates will be issued by edX under the name of the underlying X University from where the course originated,  i.e. HarvardX, MITx or BerkeleyX.</p>
-        </article>
-
-        <article class="response">
-          <h3>What will the scope of the online courses be? How many? Which faculty?</h3>
-          <p>Our goal is to offer a wide variety of courses across disciplines. There are currently seven courses planned for the Fall 2012 [Link to courses page].</p>
-        </article>
-
-        <article class="response">
-          <h3>Will on-campus students at partner institutions be able to take these courses for credit?</h3>
-          <p>No. Courses will not be offered for credit at partner universities. The online content will be used to extend and enrich on campus courses. Do we need to keep this?</p>
-        </article>
-
-        <article class="response">
-          <h3>Who is the learner? Domestic or international? Age range?</h3>
-          <p>Improving teaching and learning for students on our campuses is one of our primary goals. Beyond that, we don’t have a target group of potential learners, as the goal is to make these courses available to anyone in the world – from any demographic – who has interest in advancing their own knowledge. The only requirement is to have a computer with an internet connection. More than 150,000 students from over 160 countries registered for edX's first course, 6.002x: Circuits and Electronics. The age range of students certified in this course was from 14 to 74 years.</p>
-        </article>
+    <section id="objectives" class="category">
+        <h2>Objectives</h2>
 
         <article class="response">
           <h3>Many institutions are partnering in this space. Will other institutions be able to collaborate with edX?</h3>
@@ -92,8 +67,36 @@
         </article>
       </section>
 
+      <section id="students" class="category">
+        <h2>Students</h2>
+
+        <article class="response">
+          <h3>Who can take edX courses? Will there be an admissions process?</h3>
+          <p>edX will be available to anyone in the world with an internet connection, and in general, there will not be an admissions process.</p>
+        </article>
+
+        <article class="response">
+          <h3>Will certificates be awarded?</h3>
+          <p>Online learners who demonstrate mastery of subjects could earn a certificate of completion. Such certificates will be issued by edX under the name of the underlying X University from where the course originated,  i.e. HarvardX, MITx or BerkeleyX.</p>
+        </article>
+
+        <article class="response">
+          <h3>What will the scope of the online courses be? How many? Which faculty?</h3>
+          <p>Our goal is to offer a wide variety of courses across disciplines. There are currently seven courses planned for the <a href="${reverse('courses')}">Fall 2012</a>.</p>
+        </article>
+
+        <article class="response">
+          <h3>Will on-campus students at partner institutions be able to take these courses for credit?</h3>
+          <p>No. Courses will not be offered for credit at partner universities. The online content will be used to extend and enrich on campus courses. Do we need to keep this?</p>
+        </article>
+
+        <article class="response">
+          <h3>Who is the learner? Domestic or international? Age range?</h3>
+          <p>Improving teaching and learning for students on our campuses is one of our primary goals. Beyond that, we don’t have a target group of potential learners, as the goal is to make these courses available to anyone in the world – from any demographic – who has interest in advancing their own knowledge. The only requirement is to have a computer with an internet connection. More than 150,000 students from over 160 countries registered for edX's first course, 6.002x: Circuits and Electronics. The age range of students certified in this course was from 14 to 74 years.</p>
+        </article>
+    </section>
       <section id="technology-platform" class="category">
-        <h2>Category</h2>
+        <h2>Technology Platform</h2>
 
         <article class="response">
           <h3>What are the specific arrangements between Berkeley and edX? </h3>
@@ -117,7 +120,7 @@
 
         <article class="response">
           <h3>How may I apply to study with edX?</h3>
-          <p>Simply complete the online registration form here[link], or click on the "SIGN UP" tab at the top of this page).  Enrolling will create your unique student record in the edX database, allows you to enroll in classes, and to receive a certificate on successful completion.</p>
+          <p>Simply complete the online registration form <a href="#signup-modal" rel="leanModal">here</a>, or click on the "SIGN UP" tab at the top of this page).  Enrolling will create your unique student record in the edX database, allows you to enroll in classes, and to receive a certificate on successful completion.</p>
         </article>
 
         <article class="response">
@@ -137,4 +140,6 @@
   </section>
 </section>
 
-
+%if user.is_authenticated():
+  <%include file="../signup_modal.html" />
+%endif
