@@ -87,60 +87,66 @@ nav.sequence-nav {
         }
 
         //video
-        &.seq_video_inactive {
-          @extend .inactive;
-          background-image: url('../images/sequence-nav/video-icon-normal.png');
-          background-position: center;
-        }
+        &.seq_video {
+          &.inactive {
+            @extend .inactive;
+            background-image: url('../images/sequence-nav/video-icon-normal.png');
+            background-position: center;
+          }
 
-        &.seq_video_visited {
-          @extend .visited;
-          background-image: url('../images/sequence-nav/video-icon-visited.png');
-          background-position: center;
-        }
+          &.visited {
+            @extend .visited;
+            background-image: url('../images/sequence-nav/video-icon-visited.png');
+            background-position: center;
+          }
 
-        &.seq_video_active {
-          @extend .active;
-          background-image: url('../images/sequence-nav/video-icon-current.png');
-          background-position: center;
+          &.active {
+            @extend .active;
+            background-image: url('../images/sequence-nav/video-icon-current.png');
+            background-position: center;
+          }
         }
 
         //other
-        &.seq_other_inactive {
-          @extend .inactive;
-          background-image: url('../images/sequence-nav/document-icon-normal.png');
-          background-position: center;
-        }
+        &.seq_other {
+          &.inactive {
+            @extend .inactive;
+            background-image: url('../images/sequence-nav/document-icon-normal.png');
+            background-position: center;
+          }
 
-        &.seq_other_visited {
-          @extend .visited;
-          background-image: url('../images/sequence-nav/document-icon-visited.png');
-          background-position: center;
-        }
+          &.visited {
+            @extend .visited;
+            background-image: url('../images/sequence-nav/document-icon-visited.png');
+            background-position: center;
+          }
 
-        &.seq_other_active {
-          @extend .active;
-          background-image: url('../images/sequence-nav/document-icon-current.png');
-          background-position: center;
+          &.active {
+            @extend .active;
+            background-image: url('../images/sequence-nav/document-icon-current.png');
+            background-position: center;
+          }
         }
 
         //vertical & problems
-        &.seq_vertical_inactive, &.seq_problem_inactive {
-          @extend .inactive;
-          background-image: url('../images/sequence-nav/list-icon-normal.png');
-          background-position: center;
-        }
+        &.seq_vertical, &.seq_problem {
+          &.inactive {
+            @extend .inactive;
+            background-image: url('../images/sequence-nav/list-icon-normal.png');
+            background-position: center;
+          }
 
-        &.seq_vertical_visited, &.seq_problem_visited {
-          @extend .visited;
-          background-image: url('../images/sequence-nav/list-icon-visited.png');
-          background-position: center;
-        }
+          &.visited {
+            @extend .visited;
+            background-image: url('../images/sequence-nav/list-icon-visited.png');
+            background-position: center;
+          }
 
-        &.seq_vertical_active, &.seq_problem_active {
-          @extend .active;
-          background-image: url('../images/sequence-nav/list-icon-current.png');
-          background-position: center;
+          &.active {
+            @extend .active;
+            background-image: url('../images/sequence-nav/list-icon-current.png');
+            background-position: center;
+          }
         }
 
         p {
@@ -263,6 +269,10 @@ section.course-content {
       margin-top: -15px;
       @include border-radius(0);
     }
+  }
+
+  div.seq_contents {
+    display: none;
   }
 
   nav.sequence-bottom {
