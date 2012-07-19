@@ -3,7 +3,7 @@
 
   > header {
     background: rgb(255,255,255);
-    @include background-image(url('/static/images/shot-2-large.jpg'));
+    @include background-image(url('/static/images/homepage_interns_placeholder_2025x550.jpg'));
     background-size: cover;
     border-bottom: 1px solid rgb(80,80,80);
     @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.9), inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
