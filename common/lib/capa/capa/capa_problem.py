@@ -312,6 +312,13 @@ class LoncapaProblem(object):
         at some point.
         '''
 
+        # TODO: perhaps adding to the pythonpath when there is no filestore
+        # should be disallowed.
+        if self.system.filestore:
+            root_path = self.system.filestore.root_path
+        else:
+            root_path = ''
+
         DEFAULT_PATH = ['code']
 
         # Separate paths by :, like the system path.
@@ -326,7 +333,7 @@ class LoncapaProblem(object):
                 continue
 
             # path is an absolute path or a path relative to the data dir
-            dir = os.path.join(self.system.filestore.root_path, dir)
+            dir = os.path.join(root_path, dir)
             abs_dir = os.path.normpath(dir)
             log.debug("appending to path: %s" % abs_dir)
             path.append(abs_dir)
