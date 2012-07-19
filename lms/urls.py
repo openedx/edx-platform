@@ -95,7 +95,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
         url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
-        url(r'^xqueue/(?P<username>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
+        url(r'^xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting'),
         url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
         #    url(r'^course_info/$', 'student.views.courseinfo'),

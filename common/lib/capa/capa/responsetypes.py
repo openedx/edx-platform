@@ -8,6 +8,7 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import hashlib
 import inspect
 import json
 import logging
@@ -16,9 +17,9 @@ import numpy
 import random
 import re
 import requests
+import time
 import traceback
 import abc
-import time
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -696,7 +697,10 @@ class SymbolicResponse(CustomResponse):
 
 class CodeResponse(LoncapaResponse):
     ''' 
-    Grade student code using an external server
+    Grade student code using an external server, called 'xqueue'
+    In contrast to ExternalResponse, CodeResponse has following behavior:
+        1) Goes through a queueing system
+        2) Does not do external request for 'get_answers'
     '''
 
     response_tag = 'coderesponse'
@@ -704,7 +708,7 @@ class CodeResponse(LoncapaResponse):
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url') or "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/" # FIXME -- hardcoded url
+        self.url = xml.get('url', "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/") # FIXME -- hardcoded url
 
         answer = xml.find('answer')
         if answer is not None:
@@ -722,9 +726,27 @@ class CodeResponse(LoncapaResponse):
 
         self.tests = xml.get('tests')
 
+        # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
+        #   (1) Internal edX code, i.e. NOT student submissions, and
+        #   (2) The code should only define the strings 'initial_display', 'answer', 'preamble', 'test_program'
+        #           following the 6.01 problem definition convention
+        penv = {}
+        penv['__builtins__'] = globals()['__builtins__']
+        try:
+            exec(self.code,penv,penv)
+        except Exception as err:
+            log.error('Error in CodeResponse %s: Error in problem reference code' % err)
+            raise Exception(err)
+        try:
+            self.answer = penv['answer']
+            self.initial_display = penv['initial_display']
+        except Exception as err:
+            log.error("Error in CodeResponse %s: Problem reference code does not define 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
+            raise Exception(err)
+
     def get_score(self, student_answers):
         idset = sorted(self.answer_ids)
-        
+
         try:
             submission = [student_answers[k] for k in idset]
         except Exception as err:
@@ -734,12 +756,16 @@ class CodeResponse(LoncapaResponse):
         self.context.update({'submission': submission})
         extra_payload = {'edX_student_response': json.dumps(submission)}
 
-        # Should do something -- like update the problem state -- based on the queue response
-        r = self._send_to_queue(extra_payload)
-        
-        return CorrectMap() 
+        r, queuekey = self._send_to_queue(extra_payload) # TODO: Perform checks on the xqueue response
 
-    def update_score(self, score_msg):
+        # Non-null CorrectMap['queuekey'] indicates that the problem has been submitted
+        cmap = CorrectMap()
+        for answer_id in idset:
+            cmap.set(answer_id, queuekey=queuekey, msg='Submitted to queue')
+
+        return cmap
+
+    def update_score(self, score_msg, oldcmap, queuekey):
         # Parse 'score_msg' as XML
         try:
             rxml = etree.fromstring(score_msg)
@@ -749,7 +775,6 @@ class CodeResponse(LoncapaResponse):
 
         # The following process is lifted directly from ExternalResponse
         idset = sorted(self.answer_ids)
-        cmap = CorrectMap()
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
                  'WRONG_FORMAT': 'incorrect',
@@ -758,41 +783,41 @@ class CodeResponse(LoncapaResponse):
         if ad in admap:
             self.context['correct'][0] = admap[ad]
 
-        # create CorrectMap
-        for key in idset:
-            idx = idset.index(key)
-            msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
-            cmap.set(key, self.context['correct'][idx], msg=msg)
+        # Replace 'oldcmap' with new grading results if queuekey matches
+        #   If queuekey does not match, we keep waiting for the score_msg that will match
+        for answer_id in idset:
+            if oldcmap.is_right_queuekey(answer_id, queuekey): # If answer_id is not queued, will return False
+                idx = idset.index(answer_id)
+                msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
+                oldcmap.set(answer_id, self.context['correct'][idx], msg=msg, queuekey=None) # Queuekey is consumed 
+            else: # Queuekey does not match
+                log.debug('CodeResponse: queuekey %d does not match for answer_id=%s.' % (queuekey, answer_id)) 
         
-        return cmap
+        return oldcmap 
 
     # CodeResponse differentiates from ExternalResponse in the behavior of 'get_answers'. CodeResponse.get_answers
     #   does NOT require a queue submission, and the answer is computed (extracted from problem XML) locally.
     def get_answers(self):
-        # Extract the CodeResponse answer from XML
-        penv = {}
-        penv['__builtins__'] = globals()['__builtins__']
-        try:
-            exec(self.code,penv,penv)
-        except Exception as err:
-            log.error('Error in CodeResponse %s: Error in problem reference code' % err)
-            raise Exception(err)
-        try:
-            ans = penv['answer']
-        except Exception as err:
-            log.error('Error in CodeResponse %s: Problem reference code does not define answer in <answer>...</answer>' % err)
-            raise Exception(err)
-
-        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % ans
+        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % self.answer
         return dict(zip(self.answer_ids,[anshtml]))
+        
+    def get_initial_display(self):
+        return dict(zip(self.answer_ids,[self.initial_display]))
 
     # CodeResponse._send_to_queue implements the same interface as defined for ExternalResponse's 'get_score'
     def _send_to_queue(self, extra_payload):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = { 'return_url': self.system.xqueue_callback_url }
-        header.update({'timestamp': time.time()})
-        payload = {'xqueue_header': json.dumps(header), # 'xqueue_header' should eventually be derived from xqueue.queue_common.HEADER_TAG or something similar
+
+        h = hashlib.md5()
+        if self.system is not None:
+            h.update(str(self.system.get('seed')))
+        h.update(str(time.time()))
+        queuekey = int(h.hexdigest(),16)
+        header.update({'queuekey': queuekey}) 
+
+        payload = {'xqueue_header': json.dumps(header), # TODO: 'xqueue_header' should eventually be derived from a config file
                    'xml': xmlstr,
                    'edX_cmd': 'get_score',
                    'edX_tests': self.tests,
@@ -808,7 +833,7 @@ class CodeResponse(LoncapaResponse):
             log.error(msg)
             raise Exception(msg)
 
-        return r
+        return r, queuekey
 
 #-----------------------------------------------------------------------------
 

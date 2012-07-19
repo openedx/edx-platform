@@ -4,8 +4,10 @@ import logging
 from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from functools import wraps
 
+from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
@@ -33,6 +35,8 @@ class I4xSystem(object):
         Create a closure around the system environment.
 
         ajax_url - the url where ajax calls to the encapsulating module go.
+        xqueue_callback_url - the url where external queueing system (e.g. for grading)
+                              returns its response 
         track_function - function of (event_type, event), intended for logging
                          or otherwise tracking the event.
                          TODO: Not used, and has inconsistent args in different
@@ -208,7 +212,7 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
-    xqueue_callback_url = settings.MITX_ROOT_URL + '/xqueue/' + user.username + '/' + descriptor.location.url() + '/'
+    xqueue_callback_url = settings.MITX_ROOT_URL + '/xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/'
 
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
@@ -324,11 +328,9 @@ def add_histogram(module):
     module.get_html = get_html
     return module
 
-# THK: TEMPORARY BYPASS OF AUTH!
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.models import User
+# TODO: TEMPORARY BYPASS OF AUTH!
 @csrf_exempt
-def xqueue_callback(request, username, id, dispatch):
+def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
     get = request.POST.copy()
     try:
@@ -336,12 +338,9 @@ def xqueue_callback(request, username, id, dispatch):
     except Exception as err:
         msg = "Error in xqueue_callback %s: Invalid return format" % err
         raise Exception(msg)
-    
-    # Should proceed only when the request timestamp is more recent than problem timestamp
-    timestamp = header['timestamp']
 
     # Retrieve target StudentModule
-    user = User.objects.get(username=username)
+    user = User.objects.get(id=userid)
 
     student_module_cache = StudentModuleCache(user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
@@ -353,6 +352,10 @@ def xqueue_callback(request, username, id, dispatch):
     
     oldgrade = instance_module.grade
     old_instance_state = instance_module.state
+
+    # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
+    #   use the interface defined by 'handle_ajax'
+    get.update({'queuekey': header['queuekey']})
 
     # We go through the "AJAX" path
     #   So far, the only dispatch from xqueue will be 'score_update'
