@@ -1,5 +1,6 @@
 import logging
 import urllib
+import itertools
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -54,8 +55,13 @@ def format_url_params(params):
 @cache_if_anonymous
 def courses(request):
     # TODO: Clean up how 'error' is done.
-    context = {'courses': modulestore().get_courses()}
-    return render_to_response("courses.html", context)
+    courses = modulestore().get_courses()
+    universities = dict()
+    for university, group in itertools.groupby(courses, lambda course: course.org):
+        universities.setdefault(university, [])
+        [universities[university].append(course) for course in group]
+
+    return render_to_response("courses.html", { 'universities': universities })
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
