@@ -773,7 +773,7 @@ class CodeResponse(LoncapaResponse):
 
         # The following process is lifted directly from ExternalResponse
         ad = rxml.find('awarddetail').text
-        admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
+        admap = {'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
                  'WRONG_FORMAT': 'incorrect',
                  }
         self.context['correct'] = ['correct']
@@ -794,10 +794,10 @@ class CodeResponse(LoncapaResponse):
     #   does NOT require a queue submission, and the answer is computed (extracted from problem XML) locally.
     def get_answers(self):
         anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % self.answer
-        return dict(zip(self.answer_ids,[anshtml]))
+        return { self.answer_id: anshtml } 
         
     def get_initial_display(self):
-        return dict(zip(self.answer_ids,[self.initial_display]))
+        return { self.answer_id: self.initial_display }
 
     # CodeResponse._send_to_queue implements the same interface as defined for ExternalResponse's 'get_score'
     def _send_to_queue(self, extra_payload):
