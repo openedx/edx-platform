@@ -120,7 +120,7 @@
 
         <article class="response">
           <h3>How may I apply to study with edX?</h3>
-          <p>Simply complete the online registration form here[link], or click on the "SIGN UP" tab at the top of this page).  Enrolling will create your unique student record in the edX database, allows you to enroll in classes, and to receive a certificate on successful completion.</p>
+          <p>Simply complete the online registration form <a href="#signup-modal" rel="leanModal">here</a>, or click on the "SIGN UP" tab at the top of this page).  Enrolling will create your unique student record in the edX database, allows you to enroll in classes, and to receive a certificate on successful completion.</p>
         </article>
 
         <article class="response">
@@ -140,4 +140,6 @@
   </section>
 </section>
 
-
+%if user.is_authenticated():
+  <%include file="../signup_modal.html" />
+%endif
