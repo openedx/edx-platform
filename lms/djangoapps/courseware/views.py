@@ -258,6 +258,7 @@ def course_info(request, course_id):
     return render_to_response('info.html', {'course': course})
 
 @ensure_csrf_cookie
+@cache_if_anonymous
 def course_about(request, course_id):
     def registered_for_course(course, user):
         if user.is_authenticated():
@@ -280,6 +281,8 @@ def enroll(request, course_id):
     return redirect(reverse('dashboard'))
 
 
+@ensure_csrf_cookie
+@cache_if_anonymous
 def university_profile(request, org_id):
     all_courses = modulestore().get_courses()
     valid_org_ids = set(c.org for c in all_courses)
