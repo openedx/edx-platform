@@ -21,7 +21,7 @@ from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
 from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
@@ -228,11 +228,14 @@ def jump_to(request, location):
 
     # Complain if there's not data for this location
     try:
-        item = modulestore().get_item(location)
+        (course, chapter, section, position) = modulestore().path_to_location(location)
     except ItemNotFoundError:
         raise Http404("No data at this location: {0}".format(location))
-        
-    return HttpResponse("O hai")
+    except NoPathToItem:
+        raise Http404("This location is not in any class: {0}".format(location))
+    
+
+    return index(course, chapter, section, position)
 
 @ensure_csrf_cookie
 def course_info(request, course_id):

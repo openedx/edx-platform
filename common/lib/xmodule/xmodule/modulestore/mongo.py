@@ -251,7 +251,7 @@ class MongoModuleStore(ModuleStore):
 
     def update_metadata(self, location, metadata):
         """
-        Set the children for the item specified by the location to
+        Set the metadata for the item specified by the location to
         metadata
 
         location: Something that can be passed to Location
@@ -264,3 +264,25 @@ class MongoModuleStore(ModuleStore):
             {'_id': Location(location).dict()},
             {'$set': {'metadata': metadata}}
         )
+
+    def path_to_location(self, location, course=None):
+        '''
+        Try to find a course/chapter/section[/position] path to this location.
+
+        raise ItemNotFoundError if the location doesn't exist.
+
+        If course is not None, restrict search to paths in that course.
+            
+        raise NoPathToItem if the location exists, but isn't accessible via
+        a chapter/section path in the course(s) being searched.
+
+        In general, a location may be accessible via many paths. This method may
+        return any valid path.
+
+        Return a tuple (course, chapter, section, position).
+
+        If the section a sequence, position should be the position of this location
+        in that sequence.  Otherwise, position should be None.
+        '''
+        raise NotImplementedError
+
