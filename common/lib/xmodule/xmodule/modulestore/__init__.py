@@ -253,3 +253,26 @@ class ModuleStore(object):
         in this modulestore.
         '''
         raise NotImplementedError
+
+    def path_to_location(self, location, course=None, chapter=None, section=None):
+        '''
+        Try to find a course/chapter/section[/position] path to this location.
+
+        raise ItemNotFoundError if the location doesn't exist.
+
+        If course, chapter, section are not None, restrict search to paths with those
+            components as specified.
+            
+        raise NoPathToItem if the location exists, but isn't accessible via
+        a path that matches the course/chapter/section restrictions.
+
+        In general, a location may be accessible via many paths. This method may
+        return any valid path.
+
+        Return a tuple (course, chapter, section, position).
+
+        If the section a sequence, position should be the position of this location
+        in that sequence.  Otherwise, position should be None.
+        '''
+        raise NotImplementedError
+
