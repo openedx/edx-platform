@@ -132,7 +132,8 @@ def optioninput(element, value, status, render_template, msg=''):
     oset = [x[1:-1] for x  in list(oset)]
 
     # osetdict = dict([('option_%s_%s' % (eid,x),oset[x]) for x in range(len(oset)) ])	# make dict with IDs
-    osetdict = dict([(oset[x],oset[x]) for x in range(len(oset)) ])	# make dict with key,value same
+    osetdict = [(oset[x],oset[x]) for x in range(len(oset)) ]	# make ordered list with (key,value) same
+    # TODO: allow ordering to be randomized
     
     context={'id':eid,
              'value':value,
