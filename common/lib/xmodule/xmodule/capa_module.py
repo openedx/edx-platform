@@ -323,8 +323,18 @@ class CapaModule(XModule):
         raise self.system.exception404
 
     def update_score(self, get):
+        """
+        Delivers grading response (e.g. from asynchronous code checking) to
+            the capa problem, so its score can be updated
+
+        'get' must have a field 'response' which is a string that contains the
+            grader's response
+
+        No ajax return is needed. Return empty dict.
+        """
+        queuekey = get['queuekey']
         score_msg = get['response']
-        self.lcp.update_score(score_msg)
+        self.lcp.update_score(score_msg, queuekey)
 
         return dict() # No AJAX return is needed
 
@@ -424,7 +434,8 @@ class CapaModule(XModule):
             if not correct_map.is_correct(answer_id):
                 success = 'incorrect'
 
-        # log this in the track_function
+        # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
+        #       'success' will always be incorrect
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         self.system.track_function('save_problem_check', event_info)

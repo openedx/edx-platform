@@ -14,6 +14,7 @@ class CorrectMap(object):
     - msg         : string (may have HTML) giving extra message response (displayed below textline or textbox)
     - hint        : string (may have HTML) giving optional hint (displayed below textline or textbox, above msg)
     - hintmode    : one of (None,'on_request','always') criteria for displaying hint
+    - queuekey    : a random integer for xqueue_callback verification
 
     Behaves as a dict.
     '''
@@ -29,13 +30,14 @@ class CorrectMap(object):
     def __iter__(self):
         return self.cmap.__iter__()
 
-    def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None):
+    def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None, queuekey=None):
         if answer_id is not None:
             self.cmap[answer_id] = {'correctness': correctness,
                                     'npoints': npoints,
                                     'msg': msg,
                                     'hint' : hint,
                                     'hintmode' : hintmode,
+                                    'queuekey' : queuekey, 
                                     }
 
     def __repr__(self):
@@ -62,6 +64,12 @@ class CorrectMap(object):
     def is_correct(self,answer_id):
         if answer_id in self.cmap: return self.cmap[answer_id]['correctness'] == 'correct'
         return None
+
+    def is_queued(self,answer_id):
+        return answer_id in self.cmap and self.cmap[answer_id]['queuekey'] is not None
+
+    def is_right_queuekey(self, answer_id, test_key):
+        return answer_id in self.cmap and self.cmap[answer_id]['queuekey'] == test_key
 
     def get_npoints(self,answer_id):
         if self.is_correct(answer_id):
