@@ -176,7 +176,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
-    ('js/vendor', COMMON_ROOT / "static" / "js" / "vendor"),
+    COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
@@ -330,6 +330,10 @@ for idx, filetype, fragment in sorted(fragments):
 PIPELINE_JS = {
     'application': {
         'source_filenames': [
+            pth.replace(COMMON_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+        ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth
             in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')

@@ -146,10 +146,10 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles" 
+STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
-    ('js/vendor', COMMON_ROOT / "static" / "js" / "vendor"),
+    COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 
 # This is how you would use the textbook images locally
@@ -219,7 +219,15 @@ for idx, filetype, fragment in sorted(fragments):
 
 PIPELINE_JS = {
     'main': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
+        'source_filenames': [
+            pth.replace(COMMON_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+        ] + [
+            pth.replace(PROJECT_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')
+        ],
         'output_filename': 'js/application.js',
     },
     'module-js': {

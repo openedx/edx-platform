@@ -7,8 +7,8 @@ class @Logger
 
   @bind: ->
     window.onunload = ->
-      $.ajax
-        url: "#{Courseware.prefix}/event"
+      $.ajaxWithPrefix
+        url: "/event"
         data:
           event_type: 'page_close'
           event: ''

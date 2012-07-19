@@ -1,8 +1,4 @@
-jQuery.postWithPrefix = (url, data, callback, type) ->
-  $.post("#{CMS.prefix}#{url}", data, callback, type)
-
-jQuery.getWithPrefix = (url, data, callback, type) ->
-  $.get("#{CMS.prefix}#{url}", data, callback, type)
+AjaxPrefix.addAjaxPrefix(jQuery, -> CMS.prefix)
 
 @CMS =
   Models: {}
