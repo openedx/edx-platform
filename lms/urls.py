@@ -154,6 +154,9 @@ if settings.ASKBOT_ENABLED:
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
 
+# discussion
+urlpatterns += (url(r'^discussions/', include('django_comment_client.urls')), )
+
 if settings.DEBUG:
     ## Jasmine
     urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
