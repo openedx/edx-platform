@@ -45,6 +45,17 @@ class Location(_LocationBase):
         """
         return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
 
+    @classmethod
+    def is_valid(cls, value):
+        '''
+        Check if the value is a valid location, in any acceptable format.
+        '''
+        try:
+            Location(value)
+        except InvalidLocationError:
+            return False
+        return True
+
     def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None,
                 name=None, revision=None):
         """

@@ -30,6 +30,9 @@ class CourseDescriptor(SequenceDescriptor):
 
     @classmethod
     def id_to_location(cls, course_id):
+        '''Convert the given course_id (org/course/name) to a location object.
+        Throws ValueError if course_id is of the wrong format.
+        '''
         org, course, name = course_id.split('/')
         return Location('i4x', org, course, 'course', name)
 
