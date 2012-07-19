@@ -325,7 +325,7 @@ class ChoiceResponse(LoncapaResponse):
 
     def assign_choice_names(self):
         '''
-        Initialize name attributes in <choice> tags for his response.
+        Initialize name attributes in <choice> tags for this response.
         '''
 
         for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice', 
