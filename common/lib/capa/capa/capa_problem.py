@@ -39,7 +39,7 @@ import responsetypes
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag,x) for x in responsetypes.__all__])
 
-entry_types = ['textline', 'schematic', 'choicegroup', 'textbox', 'imageinput', 'optioninput']
+entry_types = ['textline', 'schematic', 'textbox', 'imageinput', 'optioninput', 'choicegroup', 'radiogroup', 'checkboxgroup']
 solution_types = ['solution']    			# extra things displayed after "show answers" is pressed
 response_properties = ["responseparam", "answer"]    	# these get captured as student responses
 
