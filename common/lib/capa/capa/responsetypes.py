@@ -268,6 +268,47 @@ class LoncapaResponse(object):
 
 #-----------------------------------------------------------------------------
 class ChoiceResponse(LoncapaResponse):
+    '''
+    This Response type is used when the student chooses from a discrete set of
+    choices. Currently, to be marked correct, all "correct" choices must be
+    supplied by the student, and no extraneous choices may be included.
+
+    This response type allows for two inputtypes: radiogroups and checkbox
+    groups. radiogroups are used when the student should select a single answer,
+    and checkbox groups are used when the student may supply 0+ answers.
+    Note: it is suggested to include a "None of the above" choice when no
+    answer is correct for a checkboxgroup inputtype; this ensures that a student
+    must actively mark something to get credit.
+
+    If two choices are marked as correct with a radiogroup, the student will
+    have no way to get the answer right.
+
+    TODO: Allow for marking choices as 'optional' and 'required', which would
+    not penalize a student for including optional answers and would also allow
+    for questions in which the student can supply one out of a set of correct
+    answers.This would also allow for survey-style questions in which all
+    answers are correct.
+
+    Example:
+
+    <choiceresponse>
+        <radiogroup>
+            <choice correct="false">
+                <startouttext />This is a wrong answer.<endouttext />
+            </choice>
+            <choice correct="true">
+                <startouttext />This is the right answer.<endouttext />
+            </choice>
+            <choice correct="false">
+                <startouttext />This is another wrong answer.<endouttext />
+            </choice>
+        </radiogroup>
+    </choiceresponse>
+
+    In the above example, radiogroup can be replaced with checkboxgroup to allow
+    the student to select more than one choice.
+
+    '''
 
     response_tag        = 'choiceresponse'
     max_inputfields     = 1
