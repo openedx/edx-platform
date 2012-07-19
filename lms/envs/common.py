@@ -176,6 +176,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
+    ('js/vendor', COMMON_ROOT / "static" / "js" / "vendor"),
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
