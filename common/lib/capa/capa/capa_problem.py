@@ -39,7 +39,7 @@ import responsetypes
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag,x) for x in responsetypes.__all__])
 
-entry_types = ['textline', 'schematic', 'choicegroup', 'textbox', 'imageinput', 'optioninput']
+entry_types = ['textline', 'schematic', 'textbox', 'imageinput', 'optioninput', 'choicegroup', 'radiogroup', 'checkboxgroup']
 solution_types = ['solution']    			# extra things displayed after "show answers" is pressed
 response_properties = ["responseparam", "answer"]    	# these get captured as student responses
 
@@ -118,6 +118,9 @@ class LoncapaProblem(object):
         # the dict has keys = xml subtree of Response, values = Response instance
         self._preprocess_problem(self.tree)
 
+        if not self.student_answers: # True when student_answers is an empty dict
+            self.set_initial_display()
+
     def do_reset(self):
         '''
         Reset internal state to unfinished, with no answers
@@ -125,6 +128,14 @@ class LoncapaProblem(object):
         self.student_answers = dict()
         self.correct_map = CorrectMap()
         self.done = False
+
+    def set_initial_display(self):
+        initial_answers = dict()
+        for responder in self.responders.values():
+            if hasattr(responder,'get_initial_display'):
+                initial_answers.update(responder.get_initial_display())
+
+        self.student_answers = initial_answers
 
     def __unicode__(self):
         return u"LoncapaProblem ({0})".format(self.problem_id)
@@ -180,14 +191,31 @@ class LoncapaProblem(object):
             return {'score': correct,
                     'total': self.get_max_score()}
 
-    def update_score(self, score_msg):
-        newcmap = CorrectMap()
+    def update_score(self, score_msg, queuekey):
+        '''
+        Deliver grading response (e.g. from async code checking) to 
+            the specific ResponseType that requested grading 
+         
+        Returns an updated CorrectMap
+        '''
+        cmap = CorrectMap()
+        cmap.update(self.correct_map)
         for responder in self.responders.values():
-            if hasattr(responder,'update_score'): # Is this the best way to implement 'update_score' for CodeResponse?
-                results = responder.update_score(score_msg)         
-                newcmap.update(results)
-        self.correct_map = newcmap
-        return newcmap
+            if hasattr(responder,'update_score'):
+                # Each LoncapaResponse will update the specific entries of 'cmap' that it's responsible for
+                cmap = responder.update_score(score_msg, cmap, queuekey)
+        self.correct_map.set_dict(cmap.get_dict())
+        return cmap 
+
+    def is_queued(self):
+        '''
+        Returns True if any part of the problem has been submitted to an external queue
+        '''
+        queued = False
+        for answer_id in self.correct_map:
+            if self.correct_map.is_queued(answer_id):
+                queued = True
+        return queued
 
     def grade_answers(self, answers):
         '''
@@ -457,7 +485,7 @@ class LoncapaProblem(object):
         self.responder_answers = {}
         for response in self.responders.keys():
             try:
-                self.responder_answers[response] = responder.get_answers()
+                self.responder_answers[response] = self.responders[response].get_answers()
             except:
                 log.debug('responder %s failed to properly return get_answers()' % self.responders[response]) # FIXME
                 raise

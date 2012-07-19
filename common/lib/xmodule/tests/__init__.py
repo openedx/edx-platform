@@ -13,6 +13,7 @@ import numpy
 import xmodule
 import capa.calc as calc
 import capa.capa_problem as lcp
+from capa.correctmap import CorrectMap
 from xmodule import graders, x_module
 from xmodule.graders import Score, aggregate_scores
 from xmodule.progress import Progress
@@ -270,6 +271,86 @@ class StringResponseWithHintTest(unittest.TestCase):
         cmap = test_lcp.grade_answers(test_answers)
         self.assertEquals(cmap.get_correctness('1_2_1'), 'incorrect')
         self.assertTrue('St. Paul' in cmap.get_hint('1_2_1'))
+
+class CodeResponseTest(unittest.TestCase):
+    '''
+    Test CodeResponse
+
+    '''
+    def test_update_score(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/coderesponse.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
+        
+        # CodeResponse requires internal CorrectMap state. Build it now in the 'queued' state
+        old_cmap = CorrectMap()
+        answer_ids = sorted(test_lcp.get_question_answers().keys())
+        numAnswers = len(answer_ids)
+        for i in range(numAnswers):
+            old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuekey=1000+i))
+
+        # Message format inherited from ExternalResponse
+        correct_score_msg   = "<edxgrade><awarddetail>EXACT_ANS</awarddetail><message>MESSAGE</message></edxgrade>"
+        incorrect_score_msg = "<edxgrade><awarddetail>WRONG_FORMAT</awarddetail><message>MESSAGE</message></edxgrade>" 
+        xserver_msgs = {'correct':   correct_score_msg,
+                        'incorrect': incorrect_score_msg, 
+                        }
+
+        # Incorrect queuekey, state should not be updated
+        for correctness in ['correct', 'incorrect']:
+            test_lcp.correct_map = CorrectMap() 
+            test_lcp.correct_map.update(old_cmap) # Deep copy
+
+            test_lcp.update_score(xserver_msgs[correctness], queuekey=0)
+            self.assertEquals(test_lcp.correct_map.get_dict(), old_cmap.get_dict()) # Deep comparison
+
+            for i in range(numAnswers):
+                self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[i])) # Should be still queued, since message undelivered
+
+        # Correct queuekey, state should be updated
+        for correctness in ['correct', 'incorrect']:
+            for i in range(numAnswers): # Target specific answer_id's
+                test_lcp.correct_map = CorrectMap() 
+                test_lcp.correct_map.update(old_cmap)
+
+                new_cmap = CorrectMap()
+                new_cmap.update(old_cmap)
+                new_cmap.set(answer_id=answer_ids[i], correctness=correctness, msg='MESSAGE', queuekey=None)
+
+                test_lcp.update_score(xserver_msgs[correctness], queuekey=1000+i)
+                self.assertEquals(test_lcp.correct_map.get_dict(), new_cmap.get_dict())
+
+                for j in range(numAnswers):
+                    if j == i:
+                        self.assertFalse(test_lcp.correct_map.is_queued(answer_ids[j])) # Should be dequeued, message delivered
+                    else:
+                        self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[j])) # Should be queued, message undelivered
+
+class ChoiceResponseTest(unittest.TestCase):
+
+    def test_cr_rb_grade(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/choiceresponse_radio.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
+        correct_answers = {'1_2_1':'choice_2',
+                           '1_3_1':['choice_2', 'choice_3']}
+        test_answers = {'1_2_1':'choice_2',
+                        '1_3_1':'choice_2',
+                        }
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
+
+    def test_cr_cb_grade(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/choiceresponse_checkbox.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
+        correct_answers = {'1_2_1':'choice_2',
+                           '1_3_1':['choice_2', 'choice_3'],
+                           '1_4_1':['choice_2', 'choice_3']}
+        test_answers = {'1_2_1':'choice_2',
+                        '1_3_1':'choice_2',
+                        '1_4_1':['choice_2', 'choice_3'],
+                        }
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_4_1'), 'correct')
 
 #-----------------------------------------------------------------------------
 # Grading tests
