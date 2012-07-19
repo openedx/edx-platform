@@ -12,3 +12,6 @@ class InsufficientSpecificationError(Exception):
 
 class InvalidLocationError(Exception):
     pass
+
+class NoPathToItem(Exception):
+    pass
