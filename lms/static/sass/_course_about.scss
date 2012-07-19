@@ -92,19 +92,19 @@
           float: left;
           margin-right: flex-gutter();
           @include transition(all, 0.15s, linear);
-          width: flex-grid(6);
+          width: flex-grid(12);
 
           > a.find-courses, a.register {
             @include button(shiny, $blue);
             @include box-sizing(border-box);
             @include border-radius(3px);
             display: block;
-            font: normal 1.2rem/1.6rem $sans-serif;
+            //font: normal 1.2rem/1.6rem $sans-serif;
             letter-spacing: 1px;
             padding: 10px 0px;
             text-transform: uppercase;
             text-align: center;
-            width: flex-grid(12);
+            width: flex-grid(6);
 
             &:hover {
               color: rgb(255,255,255);
@@ -112,14 +112,14 @@
           }
 
           span.register {
-            @include button(shiny, lighten(grayscale($blue), 50%));
+            background: lighten($blue, 20%);
+            border: 1px solid $blue;
             @include box-sizing(border-box);
-            @include border-radius(3px);
-            color: #888;
+            color: darken($blue, 20%);
             display: block;
-            font: normal 1.2rem/1.6rem $sans-serif;
+            //font: normal 1.2rem/1.6rem $sans-serif;
             letter-spacing: 1px;
-            padding: 10px 0px;
+            padding: 10px 0px 8px;
             text-transform: uppercase;
             text-align: center;
             width: flex-grid(12);
