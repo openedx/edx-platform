@@ -11,7 +11,7 @@ mako
 python-memcached
 path.py
 django_debug_toolbar
--e git+git://github.com/MITx/django-pipeline.git#egg=django-pipeline
+-e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
 django-staticfiles>=1.2.1
 fs
 beautifulsoup

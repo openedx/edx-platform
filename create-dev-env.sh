@@ -85,6 +85,7 @@ clone_repos() {
 
     # By default, dev environments start with a copy of 6.002x
     cd "$BASE"
+    mkdir -p "$BASE/data"
     REPO="content-mit-6002x"
     if [[ -d "$BASE/data/$REPO/.git" ]]; then
         output "Pulling $REPO"
@@ -95,6 +96,7 @@ clone_repos() {
         if [[ -d "$BASE/data/$REPO" ]]; then
             mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
         fi
+	cd "$BASE/data"
         git clone git@github.com:MITx/$REPO >>$LOG
     fi
 }
@@ -285,10 +287,14 @@ fi
 
 output "Installing askbot requirements"
 pip install -r askbot-devel/askbot_requirements.txt >>$LOG 
+output "Installing askbot-dev requirements"
 pip install -r askbot-devel/askbot_requirements_dev.txt >>$LOG 
-output "Installing MITx requirements"
+output "Installing MITx pre-requirements"
 pip install -r mitx/pre-requirements.txt >> $LOG
-pip install -r mitx/requirements.txt >>$LOG 
+# Need to be in the mitx dir to get the paths to local modules right
+output "Installing MITx requirements"
+cd mitx
+pip install -r requirements.txt >>$LOG 
 
 mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true
