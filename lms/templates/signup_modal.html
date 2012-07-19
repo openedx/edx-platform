@@ -3,6 +3,7 @@
 <%! from django_countries.countries import COUNTRIES %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
+<%! import calendar %>
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
@@ -60,7 +61,7 @@
               <select name='date_of_birth__month'>
                   <option value="">month</option>
                   %for month in range(1,13):
-                      <option value="${month}">${month}</option>
+                    <option value="${month}">${month} - ${calendar.month_name[month]}</option>
                   %endfor
               </select>
 
