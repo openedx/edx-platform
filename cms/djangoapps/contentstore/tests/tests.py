@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 from xmodule.modulestore import Location
-from contentstore import import_from_xml
+from xmodule.modulestore.xml_importer import import_from_xml
 import copy
 
 
@@ -189,7 +189,7 @@ class EditTestCase(ContentStoreTestCase):
         xmodule.modulestore.django._MODULESTORES = {}
 
     def check_edit_item(self, test_course_name):
-        import_from_xml('common/test/data/', test_course_name)
+        import_from_xml(modulestore(), 'common/test/data/', test_course_name)
 
         for descriptor in modulestore().get_items(Location(None, None, None, None, None)):
             print "Checking ", descriptor.location.url()
