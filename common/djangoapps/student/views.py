@@ -8,6 +8,7 @@ import uuid
 import feedparser
 import urllib
 import itertools
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -72,9 +73,8 @@ def index(request):
         entry.image = soup.img['src'] if soup.img else None
 
     courses = modulestore().get_courses()
-    universities = dict()
+    universities = defaultdict(list)
     for university, group in itertools.groupby(courses, lambda course: course.org):
-        universities.setdefault(university, [])
         [universities[university].append(course) for course in group]
 
     return render_to_response('index.html', {'universities': universities, 'entries': entries})

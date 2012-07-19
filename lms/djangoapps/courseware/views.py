@@ -1,3 +1,4 @@
+from collections import defaultdict
 import logging
 import urllib
 import itertools
@@ -56,9 +57,8 @@ def format_url_params(params):
 def courses(request):
     # TODO: Clean up how 'error' is done.
     courses = modulestore().get_courses()
-    universities = dict()
+    universities = defaultdict(list)
     for university, group in itertools.groupby(courses, lambda course: course.org):
-        universities.setdefault(university, [])
         [universities[university].append(course) for course in group]
 
     return render_to_response("courses.html", { 'universities': universities })
