@@ -18,9 +18,21 @@
     ## I'm removing this for now since we aren't using it for the fall.
     ## <%include file="course_filter.html" />
     <section class="courses">
-      %for course in courses:
-        <%include file="course.html" args="course=course" />
-      %endfor
+      <section class='university-column'>
+        %for course in universities['MITx']:
+          <%include file="course.html" args="course=course" />
+        %endfor
+      </section>
+      <section class='university-column'>
+        %for course in universities['HarvardX']:
+          <%include file="course.html" args="course=course" />
+        %endfor
+      </section>
+      <section class='university-column'>
+        %for course in universities['BerkeleyX']:
+          <%include file="course.html" args="course=course" />
+        %endfor
+      </section>
     </section>
   </section>
 </section>
