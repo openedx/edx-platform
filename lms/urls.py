@@ -56,7 +56,8 @@ if settings.PERFSTATS:
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         url(r'^masquerade/', include('masquerade.urls')),
-        url(r'^jumpto/(?P<probname>[^/]+)/$', 'courseware.views.jump_to'),
+        url(r'^jumpto/(?P<location>.*)$', 'courseware.views.jump_to'),
+        
         url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
         url(r'^xqueue/(?P<username>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting'),

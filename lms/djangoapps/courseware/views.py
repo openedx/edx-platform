@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -16,6 +16,8 @@ from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
+from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
@@ -200,62 +202,44 @@ def index(request, course_id=None, chapter=None, section=None,
     return result
 
 
-def jump_to(request, probname=None):
+def jump_to(request, location):
     '''
-    Jump to viewing a specific problem.  The problem is specified by a
-    problem name - currently the filename (minus .xml) of the problem.
-    Maybe this should change to a more generic tag, eg "name" given as
-    an attribute in <problem>.
+    Show the page that contains a specific location.
 
-    We do the jump by (1) reading course.xml to find the first
-    instance of <problem> with the given filename, then (2) finding
-    the parent element of the problem, then (3) rendering that parent
-    element with a specific computed position value (if it is
-    <sequential>).
+    If the location is invalid, return a 404.
 
+    If the location is valid, but not present in a course, ?
+
+    If the location is valid, but in a course the current user isn't registered for, ?
+        TODO -- let the index view deal with it?
     '''
-    # get coursename if stored
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    # Complain if the location isn't valid
+    try:
+        location = Location(location)
+    except InvalidLocationError:
+        raise Http404("Invalid location")
 
-    # begin by getting course.xml tree
-    xml = content_parser.course_file(request.user, coursename)
-
-    # look for problem of given name
-    pxml = xml.xpath('//problem[@filename="%s"]' % probname)
-    if pxml:
-        pxml = pxml[0]
-
-    # get the parent element
-    parent = pxml.getparent()
-
-    # figure out chapter and section names
-    chapter = None
-    section = None
-    branch = parent
-    for k in range(4):  # max depth of recursion
-        if branch.tag == 'section':
-            section = branch.get('name')
-        if branch.tag == 'chapter':
-            chapter = branch.get('name')
-        branch = branch.getparent()
-
-    position = None
-    if parent.tag == 'sequential':
-        position = parent.index(pxml) + 1  # position in sequence
-
-    return index(request,
-                 course=coursename, chapter=chapter,
-                 section=section, position=position)
-
+    # Complain if there's not data for this location
+    try:
+        item = modulestore().get_item(location)
+    except ItemNotFoundError:
+        raise Http404("No data at this location: {0}".format(location))
+        
+    return HttpResponse("O hai")
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
+    '''
+    Display the course's info.html, or 404 if there is no such course.
+    
+    Assumes the course_id is in a valid format.
+    '''
     csrf_token = csrf(request)['csrf_token']
 
     try:
         course_location = CourseDescriptor.id_to_location(course_id)
         course = modulestore().get_item(course_location)
-    except KeyError:
+    except ItemNotFoundError:
         raise Http404("Course not found")
 
     return render_to_response('info.html', {'csrf': csrf_token, 'course': course})

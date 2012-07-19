@@ -21,6 +21,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from django.core.urlresolvers import reverse
 
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from django_future.csrf import ensure_csrf_cookie
 
@@ -495,10 +496,18 @@ def accept_name_change(request):
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
-    # This is the advertising page for a student to look at the course before signing up
+    '''
+    This is the advertising page for a student to look at the course before signing up.
+
+    Returns 404 if there is no such course.
+    Assumes that the course_id has a valid format.
+    '''
     csrf_token = csrf(request)['csrf_token']
-    course_loc = CourseDescriptor.id_to_location(course_id)
-    course = modulestore().get_item(course_loc)
+    try:
+        course_loc = CourseDescriptor.id_to_location(course_id)
+        course = modulestore().get_item(course_loc)
+    except ItemNotFoundError:
+        raise Http404('Course not found')
     # TODO: Couse should be a model
     return render_to_response('portal/course_about.html', {'csrf': csrf_token, 'course': course})
 
