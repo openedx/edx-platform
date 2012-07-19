@@ -1,6 +1,19 @@
 .container.jobs {
   padding: 60px 0 120px;
 
+  q {
+    display: block;
+    margin: 10px 0;
+    font-style: italic;
+    text-align: justify;
+  }
+
+  small.author {
+    text-align: right;
+    display: block;
+    color: rgb(100, 100, 100);
+  }
+
   h1 + hr {
     margin-bottom: 80px;
   }
