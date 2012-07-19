@@ -184,6 +184,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
+    ('js/vendor', COMMON_ROOT / "static" / "js" / "vendor"),
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
@@ -300,7 +301,7 @@ PIPELINE_CSS = {
         'output_filename': 'css/application.css',
     },
     'course': {
-      'source_filenames': ['sass/application.scss', 'css/vendor/codemirror.css', 'css/vendor/jquery.treeview.css'],
+      'source_filenames': ['sass/application.scss', 'js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css'],
       'output_filename': 'css/course.css',
       },
     'ie-fixes': {

@@ -61,6 +61,7 @@ MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
+    COMMON_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates'
 ]
 
@@ -147,9 +148,8 @@ STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles" 
 
-# FIXME: We should iterate through the courses we have, adding the static 
-#        contents for each of them. (Right now we just use symlinks.)
 STATICFILES_DIRS = [
+    ('js/vendor', COMMON_ROOT / "static" / "js" / "vendor"),
     PROJECT_ROOT / "static",
 
 # This is how you would use the textbook images locally
