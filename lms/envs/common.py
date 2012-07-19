@@ -184,7 +184,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
-    ('js/vendor', COMMON_ROOT / "static" / "js" / "vendor"),
+    COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
@@ -365,6 +365,10 @@ PIPELINE_JS = {
     'application': {
         # Application will contain all paths not in courseware_only_js
         'source_filenames': [
+            pth.replace(COMMON_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+        ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
             if pth not in courseware_only_js
