@@ -325,6 +325,33 @@ class CodeResponseTest(unittest.TestCase):
                     else:
                         self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[j])) # Should be queued, message undelivered
 
+class ChoiceResponseTest(unittest.TestCase):
+
+    def test_cr_rb_grade(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/choiceresponse_radio.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
+        correct_answers = {'1_2_1':'choice_2',
+                           '1_3_1':['choice_2', 'choice_3']}
+        test_answers = {'1_2_1':'choice_2',
+                        '1_3_1':'choice_2',
+                        }
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
+
+    def test_cr_cb_grade(self):
+        problem_file = os.path.dirname(__file__)+"/test_files/choiceresponse_checkbox.xml"
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
+        correct_answers = {'1_2_1':'choice_2',
+                           '1_3_1':['choice_2', 'choice_3'],
+                           '1_4_1':['choice_2', 'choice_3']}
+        test_answers = {'1_2_1':'choice_2',
+                        '1_3_1':'choice_2',
+                        '1_4_1':['choice_2', 'choice_3'],
+                        }
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_4_1'), 'correct')
+
 #-----------------------------------------------------------------------------
 # Grading tests
 
