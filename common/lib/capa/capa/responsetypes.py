@@ -705,6 +705,7 @@ class CodeResponse(LoncapaResponse):
 
     response_tag = 'coderesponse'
     allowed_inputfields = ['textline', 'textbox']
+    max_inputfields = 1
 
     def setup_response(self):
         xml = self.xml
@@ -717,10 +718,10 @@ class CodeResponse(LoncapaResponse):
                 self.code = self.system.filesystem.open('src/'+answer_src).read()
             else:
                 self.code = answer.text
-        else:					# no <answer> stanza; get code from <script>
+        else: # no <answer> stanza; get code from <script>
             self.code = self.context['script_code']
             if not self.code:
-                msg = '%s: Missing answer script code for externalresponse' % unicode(self)
+                msg = '%s: Missing answer script code for coderesponse' % unicode(self)
                 msg += "\nSee XML source line %s" % getattr(self.xml,'sourceline','<unavailable>')
                 raise LoncapaProblemError(msg)
 
@@ -745,12 +746,10 @@ class CodeResponse(LoncapaResponse):
             raise Exception(err)
 
     def get_score(self, student_answers):
-        idset = sorted(self.answer_ids)
-
         try:
-            submission = [student_answers[k] for k in idset]
+            submission = [student_answers[self.answer_id]]
         except Exception as err:
-            log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_ids, student_answers))
+            log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_id, student_answers))
             raise Exception(err)
 
         self.context.update({'submission': submission})
@@ -760,8 +759,7 @@ class CodeResponse(LoncapaResponse):
 
         # Non-null CorrectMap['queuekey'] indicates that the problem has been submitted
         cmap = CorrectMap()
-        for answer_id in idset:
-            cmap.set(answer_id, queuekey=queuekey, msg='Submitted to queue')
+        cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to queue')
 
         return cmap
 
@@ -774,7 +772,6 @@ class CodeResponse(LoncapaResponse):
             raise Exception(err)
 
         # The following process is lifted directly from ExternalResponse
-        idset = sorted(self.answer_ids)
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS':'correct',         # TODO: handle other loncapa responses
                  'WRONG_FORMAT': 'incorrect',
@@ -783,16 +780,14 @@ class CodeResponse(LoncapaResponse):
         if ad in admap:
             self.context['correct'][0] = admap[ad]
 
-        # Replace 'oldcmap' with new grading results if queuekey matches
+        # Replace 'oldcmap' with new grading results if queuekey matches.
         #   If queuekey does not match, we keep waiting for the score_msg that will match
-        for answer_id in idset:
-            if oldcmap.is_right_queuekey(answer_id, queuekey): # If answer_id is not queued, will return False
-                idx = idset.index(answer_id)
-                msg = rxml.find('message').text.replace('&nbsp;','&#160;') if idx==0 else None
-                oldcmap.set(answer_id, self.context['correct'][idx], msg=msg, queuekey=None) # Queuekey is consumed 
-            else: # Queuekey does not match
-                log.debug('CodeResponse: queuekey %d does not match for answer_id=%s.' % (queuekey, answer_id)) 
-        
+        if oldcmap.is_right_queuekey(self.answer_id, queuekey): 
+            msg = rxml.find('message').text.replace('&nbsp;','&#160;')
+            oldcmap.set(self.answer_id, correctness=self.context['correct'][0], msg=msg, queuekey=None) # Queuekey is consumed
+        else:
+            log.debug('CodeResponse: queuekey %d does not match for answer_id=%s.' % (queuekey, self.answer_id)) 
+
         return oldcmap 
 
     # CodeResponse differentiates from ExternalResponse in the behavior of 'get_answers'. CodeResponse.get_answers
@@ -810,9 +805,9 @@ class CodeResponse(LoncapaResponse):
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = { 'return_url': self.system.xqueue_callback_url }
 
+        # Queuekey generation
         h = hashlib.md5()
-        if self.system is not None:
-            h.update(str(self.system.get('seed')))
+        h.update(str(self.system.seed))
         h.update(str(time.time()))
         queuekey = int(h.hexdigest(),16)
         header.update({'queuekey': queuekey}) 
