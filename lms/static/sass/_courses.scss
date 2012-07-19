@@ -79,4 +79,12 @@
       }
     }
   }
+
+  section.message {
+    border-top: 1px solid rgb(220,220,220);
+    @include clearfix;
+    margin-top: 20px;
+    padding-top: 60px;
+    @include columns(2 20px);
+  }
 }
