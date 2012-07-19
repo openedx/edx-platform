@@ -1,0 +1,30 @@
+.discussion {
+  .title {
+    font-size: 20px;
+    line-height: 20px;
+    font-weight: bold;
+  }
+  .thread {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    .title {
+      font-size: 16px;
+      line-height: 16px;
+    }
+    .body {
+      font-size: 14px;
+      line-height: 14px;
+    }
+    .comments {
+      margin-left: 20px;
+      .comment {
+        .body {
+        }
+        .subcomments {
+          margin-left: 20px;
+        }
+      }
+    }
+  }
+
+}

@@ -1,0 +1,31 @@
+<section class="discussion">
+  <div class="title">
+    Discussion
+  </div>
+  % for thread in threads:
+    <div class="thread">
+      <div class="title">${thread['title']}</div>
+      <div class="body">${thread['body']}</div>
+      <div class="info">
+        ${time_ago_in_words(parse(thread['updated_at']))} ago by user No.${thread['user_id']}
+      </div>
+      <div class="comments">
+        ${render_comments(thread['children'])}
+      </div>
+    </div>
+  % endfor
+</section>
+
+<%def name="render_comments(comments)">
+  % for comment in comments:
+    <div class="comment">
+      <div class="body">${comment['body']}</div>
+      <div class="info">
+        ${time_ago_in_words(parse(comment['updated_at']))} ago by user No.${comment['user_id']}
+      </div>
+      <div class="subcomments">
+        ${render_comments(comment['children'])}
+      </div>
+    </div>
+  % endfor
+</%def>
