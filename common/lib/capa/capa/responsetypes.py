@@ -294,13 +294,13 @@ class ChoiceResponse(LoncapaResponse):
     <choiceresponse>
         <radiogroup>
             <choice correct="false">
-                <startouttext />This is a wrong answer.<endouttext />
+                <text>This is a wrong answer.</text>
             </choice>
             <choice correct="true">
-                <startouttext />This is the right answer.<endouttext />
+                <text>This is the right answer.</text>
             </choice>
             <choice correct="false">
-                <startouttext />This is another wrong answer.<endouttext />
+                <text>This is another wrong answer.</text>
             </choice>
         </radiogroup>
     </choiceresponse>
@@ -558,13 +558,13 @@ class CustomResponse(LoncapaResponse):
     or in a <script>...</script>
     '''
     snippets = [{'snippet': '''<customresponse>
-    <startouttext/>
+    <text>
     <br/>
     Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
     In the space provided below write an algebraic expression for \(I(t)\).
     <br/>
     <textline size="5" correct_answer="IS*u(t-t0)" />
-    <endouttext/>
+    </text>
     <answer type="loncapa/python">
     correct=['correct']
     try:
