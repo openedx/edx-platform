@@ -8,9 +8,9 @@
 <article id="${course.id}"class="course">
   <div class="inner-wrapper">
     <header class="course-preview">
-        <a href="${reverse('about_course', args=[course.id])}">
+      <a href="${reverse('about_course', args=[course.id])}">
         <hgroup>
-          <h2>${course.number} ${get_course_about_section(course, 'title')}</h2>
+          <h2><span class="course-number">${course.number}</span> ${get_course_about_section(course, 'title')}</h2>
         </hgroup>
         <div class="info-link">&#x2794;</div>
       </a>

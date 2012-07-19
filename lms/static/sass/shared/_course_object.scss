@@ -68,30 +68,39 @@
 
           hgroup {
             left: 0px;
-            padding: 5px 10px;
+            padding: 0px 10px;
             position: absolute;
             right: 60px;
             top: 0px;
 
             h2 {
               color: $base-font-color;
+              display: table-cell;
               font-family: $sans-serif;
-              font-size: 1em;
+              font-size: 0.8em;
               font-weight: 700;
+              height: 48px;
+              letter-spacing: 0px;
               margin-bottom: 0px;
-              overflow: hidden;
-              padding-top: 9px;
+              padding-top: 0px;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-overflow: ellipsis;
-              white-space: nowrap;
+              text-transform: none;
+              vertical-align: middle;
+
+              .course-number {
+                font-weight: 700;
+                text-transform: none;
+              }
             }
           }
+
 
           .info-link {
             border-left: 1px solid rgba(150,150,150, 0.5);
             @include box-sizing(border-box);
             color: $base-font-color;
-            display: block;
+            display: inline-block;
             font: bold 1.6em/1.2em $sans-serif;
             height: 100%;
             opacity: 0.6;
@@ -102,19 +111,20 @@
             text-shadow: 0 1px rgba(255,255,255, 0.6);
             top: 0px;
             width: 60px;
+            vertical-align: middle;
           }
 
           &:hover {
             @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
             text-decoration: none;
 
-            h2, .info-link {
+            .info-link {
               color: $blue;
               opacity: 1;
             }
 
             h2 {
-              text-decoration: underline;
+              color: $blue;
             }
           }
         }
