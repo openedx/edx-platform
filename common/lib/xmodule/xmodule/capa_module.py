@@ -371,7 +371,16 @@ class CapaModule(XModule):
         for key in get:
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
-            answers[name] = get[key]
+
+            # This allows for answers which require more than one value for
+            # the same form input (e.g. checkbox inputs). The convention is that
+            # if the name ends with '[]' (which looks like an array), then the
+            # answer will be an array.
+            if not name.endswith('[]'):
+                answers[name] = get[key]
+            else:
+                name          = name[:-2]
+                answers[name] = get.getlist(key)
 
         return answers
 
