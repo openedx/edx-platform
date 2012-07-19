@@ -25,7 +25,7 @@
                 <a href="${reverse('enroll', args=[course.id])}" class="register">Register for ${course.number}</a>
             %endif
           %else:
-            <a href="#signup-modal" class="register" rel="leanModal" data-notice="You must Sign Up in order to resigter">Register</a>
+            <a href="#signup-modal" class="register" rel="leanModal" data-notice="You must Sign Up in order to register">Register for ${course.number}</a>
           %endif
         </div>
 
