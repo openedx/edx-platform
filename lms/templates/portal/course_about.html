@@ -96,7 +96,7 @@
           ##<li><div class="icon length"></div><p>Course Length</p><span class="course-length">15 weeks</span></li>
 
           % if get_course_about_section(course, "prerequisites"):
-            <li><div class="icon prerequisites"></div><p>Prerequisites</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
+            <li class="prerequisites"><div class="icon prereq"></div><p>Prerequisites</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
         </ol>
       </section>
