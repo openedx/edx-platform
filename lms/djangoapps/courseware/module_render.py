@@ -114,12 +114,16 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     Returns:
       - a tuple (xmodule instance, instance_module, shared_module, module category).
-        instance_module is a StudentModule specific to this module for this student
-        shared_module is a StudentModule specific to all modules with the same 'shared_state_key' attribute, or None if the module doesn't elect to share state
+        instance_module is a StudentModule specific to this module for this student,
+            or None if this is an anonymous user
+        shared_module is a StudentModule specific to all modules with the same
+            'shared_state_key' attribute, or None if the module doesn't elect to
+            share state
     '''
     descriptor = modulestore().get_item(location)
 
     instance_module = student_module_cache.lookup(descriptor.category, descriptor.location.url())
+
     shared_state_key = getattr(descriptor, 'shared_state_key', None)
     if shared_state_key is not None:
         shared_module = student_module_cache.lookup(descriptor.category, shared_state_key)
@@ -250,20 +254,14 @@ def modx_dispatch(request, dispatch=None, id=None):
     '''
     # ''' (fix emacs broken parsing)
 
-    # If there are arguments, get rid of them
-    dispatch, _, _ = dispatch.partition('?')
-
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
 
-    if instance_module is None:
-        log.debug("Couldn't find module '%s' for user '%s'",
-                  id, request.user)
-        raise Http404
-
-    oldgrade = instance_module.grade
-    old_instance_state = instance_module.state
-    old_shared_state = shared_module.state if shared_module is not None else None
+    # Don't track state for anonymous users (who don't have student modules)
+    if instance_module is not None:
+        oldgrade = instance_module.grade
+        old_instance_state = instance_module.state
+        old_shared_state = shared_module.state if shared_module is not None else None
 
     # Let the module handle the AJAX
     try:
@@ -276,11 +274,13 @@ def modx_dispatch(request, dispatch=None, id=None):
         raise
 
     # Save the state back to the database
-    instance_module.state = instance.get_instance_state()
-    if instance.get_score():
-        instance_module.grade = instance.get_score()['score']
-    if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
-        instance_module.save()
+    # Don't track state for anonymous users (who don't have student modules)
+    if instance_module is not None:
+        instance_module.state = instance.get_instance_state()
+        if instance.get_score():
+            instance_module.grade = instance.get_score()['score']
+        if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
+            instance_module.save()
 
     if shared_module is not None:
         shared_module.state = instance.get_shared_state()
