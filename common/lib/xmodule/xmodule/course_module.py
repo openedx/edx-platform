@@ -28,17 +28,30 @@ class CourseDescriptor(SequenceDescriptor):
     def has_started(self):
         return time.gmtime() > self.start
 
-    @classmethod
-    def id_to_location(cls, course_id):
+    @staticmethod
+    def id_to_location(course_id):
         '''Convert the given course_id (org/course/name) to a location object.
         Throws ValueError if course_id is of the wrong format.
         '''
         org, course, name = course_id.split('/')
         return Location('i4x', org, course, 'course', name)
 
+    @staticmethod
+    def location_to_id(location):
+        '''Convert a location of a course to a course_id.  If location category
+        is not "course", raise a ValueError.
+
+        location: something that can be passed to Location
+        '''
+        loc = Location(location)
+        if loc.category != "course":
+            raise ValueError("{0} is not a course location".format(loc))
+        return "/".join([loc.org, loc.course, loc.name])
+
+
     @property
     def id(self):
-        return "/".join([self.location.org, self.location.course, self.location.name])
+        return self.location_to_id(self.location)
 
     @property
     def start_date_text(self):

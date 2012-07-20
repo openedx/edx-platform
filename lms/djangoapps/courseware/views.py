@@ -208,7 +208,7 @@ def index(request, course_id, chapter=None, section=None,
     result = render_to_response('courseware.html', context)
     return result
 
-
+@ensure_csrf_cookie
 def jump_to(request, location):
     '''
     Show the page that contains a specific location.
@@ -228,17 +228,22 @@ def jump_to(request, location):
 
     # Complain if there's not data for this location
     try:
-        (course, chapter, section, position) = modulestore().path_to_location(location)
+        (course_id, chapter, section, position) = modulestore().path_to_location(location)
     except ItemNotFoundError:
         raise Http404("No data at this location: {0}".format(location))
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
-    
 
-    return index(course, chapter, section, position)
+
+    return index(request, course_id, chapter, section, position)
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
+    '''
+    Display the course's info.html, or 404 if there is no such course.
+
+    Assumes the course_id is in a valid format.
+    '''
     course = check_course(course_id)
 
     return render_to_response('info.html', {'course': course})
