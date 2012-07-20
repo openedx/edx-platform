@@ -1,7 +1,6 @@
 class @Sequence
   constructor: (element) ->
-    (@id, @element_id, @elements, position) ->
-    @el = $(element)
+    @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
     @id = @el.data('id')
     @initProgress()
@@ -81,12 +80,12 @@ class @Sequence
 
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
+      XModule.loadModules('display', @$('#seq_content'))
 
       MathJax.Hub.Queue(["Typeset", MathJax.Hub])
       @position = new_position
       @toggleArrows()
       @hookUpProgressEvent()
-      @el.trigger 'contentChanged'
 
   goto: (event) =>
     event.preventDefault()

@@ -1,6 +1,6 @@
 class @Problem
   constructor: (element) ->
-    @el = $(element)
+    @el = $(element).find('.problems-wrapper')
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
