@@ -22,7 +22,7 @@
             %if registered:
                 <span class="register disabled">You are registered for this course (${course.number}).</span>
             %else:
-                <a href="${reverse('enroll', args=[course.id])}" class="register">Register for ${course.number}</a>
+                <a href="#" class="register">Register for ${course.number}</a>
             %endif
           %else:
             <a href="#signup-modal" class="register" rel="leanModal" data-notice="You must Sign Up in order to register">Register for ${course.number}</a>
@@ -104,5 +104,31 @@
 
   </section>
 </section>
+
+%if not registered:
+  <div display="hidden">
+    <form id="enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <input name="course_id" type="hidden" value="${course.id}">
+      <input name="enrollment_action" type="hidden" value="enroll">
+      <div class="submit">
+        <input name="submit" type="submit" value="enroll">
+      </div>
+    </form>
+  </div>
+  <script type="text/javascript">
+  (function() {
+    $(".register").click(function() {
+      $("#enroll_form").submit();
+    });
+  
+    $(document).delegate('#enroll_form', 'ajax:success', function(data, json, xhr) {
+      if(json.success) {
+        location.href="${reverse('dashboard')}";
+      }
+    });
+  })(this)
+  </script>
+%endif
+
 
 <%include file="../video_modal.html" />
