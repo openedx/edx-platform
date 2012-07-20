@@ -143,7 +143,7 @@
       @include clearfix;
       height: 120px;
       margin-right: flex-gutter();
-      margin-bottom: 25px;
+      margin-bottom: 10px;
       overflow: hidden;
       position: relative;
       width: flex-grid(12);
@@ -377,6 +377,20 @@
             opacity: 1;
           }
         }
+      }
+    }
+
+    a.unenroll {
+      float: right;
+      font-style: italic;
+      color: #a0a0a0;
+      text-decoration: underline;
+      font-size: .8em;
+      @include inline-block;
+      margin-bottom: 40px;
+
+      &:hover {
+        color: #333;
       }
     }
   }
