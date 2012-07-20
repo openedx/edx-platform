@@ -86,6 +86,11 @@ a:link, a:visited {
   width: grid-width(12);
 }
 
+span.edx {
+  text-transform: none;
+  font: inherit;
+}
+
 .static-container {
   @include clearfix;
   margin: 0 auto 0;
