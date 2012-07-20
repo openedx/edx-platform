@@ -15,10 +15,10 @@
     <section class="user-info">
       <ul>
         <li>
-          <span class="title"><div class="icon email-icon"></div>Email</span><span class="data">${ user.email }</span>
+          <span class="title"><div class="icon name-icon"></div>Full Name</span><span class="data">${ user.profile.name | h }</span>
         </li>
         <li>
-          <span class="title"><div class="icon location-icon"></div>Location</span><span class="data">${ user.profile.location }</span>
+          <span class="title"><div class="icon email-icon"></div>Email</span><span class="data">${ user.email | h }</span>
         </li>
       </ul>
     </section>
