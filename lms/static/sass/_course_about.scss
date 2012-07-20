@@ -25,8 +25,9 @@
       @include clearfix;
       margin: 0 auto;
       max-width: 1200px;
+      min-width: 760px;
       position: relative;
-      width: grid-width(12);
+      width: 100%;
       z-index: 2;
 
 
