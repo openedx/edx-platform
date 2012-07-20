@@ -122,6 +122,14 @@ COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
                                     'default_chapter' : 'Unit 1',
                                     'default_section' : 'Introduction',
                                     },
+                    'OEITx': {'number' : 'HST.582x',
+                                    'title'  : 'OEIT experimental HST582J/6.555J',
+                                    'xmlpath': '/content-mit-OEITx/',
+                                    'github_url': 'https://github.com/MITx/content-mit-OEITx',
+                                    'default_chapter' : 'Spectral_Analysis_Tutorial_for_HST582J_6.555J',
+                                    'default_section' : 'E-text',
+                                    'active' : True,
+                                    },
                     }
 
 #-----------------------------------------------------------------------------
