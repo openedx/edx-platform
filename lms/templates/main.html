@@ -9,6 +9,9 @@
 
 % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
  <%static:css group='application'/>
+  <!--[if lt IE 9]>
+  <%static:css group='ie-fixes'/>
+  <![endif]-->
 % endif
 
 % if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
