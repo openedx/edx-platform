@@ -18,7 +18,7 @@
         <problem type="lecture" showanswer="attempted" rerandomize="true" title="A simple coding problem" name="Simple coding problem" filename="ps01-simple"/>
       </sequential>
     </section>
+    <video name="Lost Video" youtube="1.0:TBvX7HzxexQ"/>
   </chapter>
-  <video name="Lost Video" youtube="1.0:TBvX7HzxexQ"/>
 
 </course>
