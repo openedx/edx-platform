@@ -16,10 +16,6 @@ if settings.STATIC_GRAB:
     valid_templates = valid_templates+['server-down.html',
                                        'server-error.html'
                                        'server-overloaded.html', 
-                                       'mitx_global.html', 
-                                       'mitx-overview.html', 
-                                       '6002x-faq.html',
-                                       '6002x-press-release.html'
                                        ]
 
 def index(request, template): 
@@ -47,13 +43,4 @@ def render_404(request):
 def render_500(request):
     return render_to_response('static_templates/server-error.html', {})
 
-valid_auth_templates=[]
 
-def auth_index(request, template):
-    if not request.user.is_authenticated():
-        return redirect('/')
-
-    if template in valid_auth_templates:
-        return render_to_response(template,{})
-    else:
-        return redirect('/')
