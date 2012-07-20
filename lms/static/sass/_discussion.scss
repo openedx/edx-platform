@@ -1,27 +1,92 @@
+$comment_margin_left: 20px;
+$discussion_title_size: 1.6em;
+$comment_title_size: 1.2em;
+$comment_body_size: 1.0em;
+$comment_info_size: 0.75em;
+
+@mixin discussion-font {
+  font-family: "Comic Sans MS", cursive, sans-serif !important;
+}
+
+@mixin discussion-clickable {
+  color: black;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
 .discussion {
-  .title {
-    font-size: 20px;
-    line-height: 20px;
+  .discussion-title {
+    @include discussion-font;
+    @include discussion-clickable;
+    font-size: $discussion_title_size;
     font-weight: bold;
+    margin-bottom: 20px;
+    display: block;
   }
   .thread {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    .title {
-      font-size: 16px;
-      line-height: 16px;
+    //display: none;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    .thread-title {
+      @include discussion-font;
+      @include discussion-clickable;
+      font-size: $comment_title_size;
+      font-weight: bold;
+      display: block;
     }
-    .body {
-      font-size: 14px;
-      line-height: 14px;
+    .thread-body {
+      @include discussion-font;
+      font-size: $comment_body_size;
+      margin-top: 7px;
+      margin-bottom: 2px;
+    }
+    .info {
+      @include discussion-font;
+      font-size: $comment_info_size;
+      font-style: italic;
+      margin-top: 5px;
+      color: gray;
+      .discussion-link {
+        margin-left: 2px;
+      }
+      .discussion-reply {
+        margin-left: 4px;
+      }
+      .discussion-link {
+        @include discussion-font;
+        display: inline-block;
+        color: #1d9dd9;
+        display: none;
+      }
+      
+    }
+    .discussion-content:hover {
+      .discussion-link {
+        display: inline-block;
+      }
+    }
+    .discussion-content {
+      .discussion-content-edit {
+        .comment-edit {
+          @include discussion-font;
+          margin-left: $comment_margin_left;
+          font-size: $comment_body_size;
+          margin-top: 10px;
+        }
+      }
     }
     .comments {
-      margin-left: 20px;
+      //display: none;
+      margin-left: $comment_margin_left;
+      
       .comment {
-        .body {
-        }
-        .subcomments {
-          margin-left: 20px;
+        .comment-body {
+          @include discussion-font;
+          font-size: $comment_body_size;
+          margin-top: 10px;
+          display: block;
+          color: black;
         }
       }
     }
