@@ -20,6 +20,7 @@ class VideoModule(XModule):
         [resource_string(__name__, 'js/src/video/display/' + filename)
          for filename
          in sorted(resource_listdir(__name__, 'js/src/video/display'))]}
+    css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
