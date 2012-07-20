@@ -1,4 +1,5 @@
 from collections import defaultdict
+import json
 import logging
 import urllib
 import itertools
@@ -8,7 +9,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -271,14 +272,37 @@ def course_about(request, course_id):
 
 
 @login_required
-@ensure_csrf_cookie
-def enroll(request, course_id):
-    course = check_course(course_id, course_must_be_open=False)
+def change_enrollment(request):
+    if request.method != "POST":
+        raise Http404
+    
+    course_id = request.POST.get("course_id", None)
+    if course_id == None:
+        return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
+    action = request.POST.get("enrollment_action" , "")
+        
     user = request.user
     
-    enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+    if action == "enroll":
+        # Make sure the course exists
+        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
+        course = check_course(course_id, course_must_be_open=False) 
+        
+        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        return HttpResponse(json.dumps({'success': True}))
+        
+    elif action == "unenroll":
+        try:
+            enrollment =  CourseEnrollment.objects.get(user=user, course_id=course_id)
+            enrollment.delete()
+            return HttpResponse(json.dumps({'success': True}))
+        except CourseEnrollment.DoesNotExist:
+            return HttpResponse(json.dumps({'success': False, 'error': 'You are not enrolled for this course.'}))
+    else:
+        return HttpResponse(json.dumps({'success': False, 'error': 'Invalid enrollment_action.'}))
     
-    return redirect(reverse('dashboard'))
+    return HttpResponse(json.dumps({'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}))
+    
 
 
 @ensure_csrf_cookie
@@ -295,5 +319,3 @@ def university_profile(request, org_id):
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
-
-

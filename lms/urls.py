@@ -100,14 +100,16 @@ if settings.COURSEWARE_ENABLED:
         url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
         url(r'^calculate$', 'util.views.calculate'),
         url(r'^heartbeat$', include('heartbeat.urls')),
-
+        
+        
+        url(r'^change_enrollment$', 
+            'courseware.views.change_enrollment', name="change_enrollment"),
+        
         # Multicourse related:
         url(r'^courses/?$', 'courseware.views.courses', name="courses"),        
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 
             'courseware.views.course_about', name="about_course"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 
-            'courseware.views.enroll', name="enroll"),
         
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 
