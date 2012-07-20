@@ -294,9 +294,13 @@ PIPELINE_CSS = {
         'source_filenames': ['sass/application.scss'],
         'output_filename': 'css/application.css',
     },
+    'ie-fixes': {
+        'source_filenames': ['sass/ie.scss'],
+        'output_filename': 'css/ie.css',
+    },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss']
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss']
 
 PIPELINE_JS = {
     'application': {
