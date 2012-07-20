@@ -1,6 +1,7 @@
 $ ->
 
-  DEBUG = true
+  #DEBUG = true
+  DEBUG = false
 
   $(".discussion-title").click ->
     $thread = $(this).parent().children(".thread")
@@ -41,6 +42,9 @@ $ ->
   $(".discussion-cancel-reply").click ->
     handleCancelReply(this)
 
+  $(".discussion-new-post").click ->
+    handleSubmitNewThread(this)
+
   discussionLink = (cls, txt, handler) ->
     $("<a>").addClass("discussion-link").
              attr("href", "javascript:void(0)").
@@ -75,7 +79,7 @@ $ ->
 
   urlFor = (name, param) ->
     {
-      create_thread      : "TODO" # TODO
+      create_thread      : "/discussions/#{param}/threads/create"
       update_thread      : "/discussions/threads/#{param}/update"
       create_comment     : "/discussions/threads/#{param}/reply"
       delete_thread      : "/discussions/threads/#{param}/delete"
@@ -89,24 +93,6 @@ $ ->
       downvote_thread    : "/discussions/threads/#{param}/downvote"
     }[name]
 
-  renderComment = (comment) ->
-    """
-    <div class="comment" _id="#{comment['id']}">
-      <div class="discussion-content">
-        <div class="discussion-content-view">
-          <div class="comment-body">#{comment['body']}</div>
-          <div class="info">
-            less than a minute ago by user No.#{comment['user_id']}
-            <a class="discussion-link discussion-reply" href="javascript:void(0)">Reply</a>
-            <a class="discussion-link discussion-edit" href="javascript:void(0)">Edit</a>
-          </div>
-        </div>
-      </div>
-      <div class="comments">
-      </div>
-    </div>
-    """
-
   handleSubmitReply = (elem) ->
     $div = $(elem).parents(".discussion-content").parent()
     if $div.hasClass("thread")
@@ -117,19 +103,32 @@ $ ->
       return
     $edit = $div.children(".discussion-content").find(".comment-edit")
     body = $edit.val()
-    $.post url, {body: body}, (response, textStatus) ->
+    $.post url, {body: body}, handleAnchorAndReload(response, textStatus) ->
       if textStatus == "success"
-        if not DEBUG
-          window.location = window.location.pathname + "#" + response['id']
-          window.location.reload()
+        handleAnchorAndReload(response)
       console.log response
       console.log textStatus
     , 'json'
 
   handleSubmitNewThread = (elem) ->
+    $div = $(elem).parent()
+    title = $div.find(".new-post-title").val()
+    body = $div.find(".new-post-body").val()
+    url = urlFor('create_thread', $div.attr("_id"))
+    $.post url, {title: title, body: body}, (response, textStatus) ->
+      if textStatus == "success"
+        handleAnchorAndReload(response)
+      console.log response
+      console.log textStatus
+    , 'json'
 
   handleSubmitUpdate = (elem) ->
 
   handleSubmitVote = (elem) ->
 
   console.log window.location.pathname
+
+  handleAnchorAndReload = (response) ->
+    if not DEBUG
+      window.location = window.location.pathname + "#" + response['id']
+      window.location.reload()

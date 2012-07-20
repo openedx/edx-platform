@@ -14,6 +14,7 @@ class DiscussionModule(XModule):
             'threads': comment_client.get_threads(self.discussion_id, recursive=True),
             'time_ago_in_words': time_ago_in_words,
             'parse': dateutil.parser.parse,
+            'commentable_id': self.discussion_id,
         }
         return self.system.render_template('discussion.html', context)
 
