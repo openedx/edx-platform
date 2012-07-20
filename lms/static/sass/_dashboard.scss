@@ -73,6 +73,10 @@
               &.email-icon {
                 @include background-image(url('../images/portal-icons/email-icon.png'));
               }
+              
+              &.name-icon {
+                @include background-image(url('../images/portal-icons/course-info-icon.png'));
+              }
 
               &.location-icon {
                 @include background-image(url('../images/portal-icons/home-icon.png'));
