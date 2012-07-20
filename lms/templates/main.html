@@ -13,6 +13,9 @@
 
 % if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
   <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
+  <!--[if lt IE 9]>
+  <link rel="stylesheet" href="/static/sass/ie.css" type="text/css" media="all" / >
+  <![endif]-->
 % endif
 
   <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
@@ -64,10 +67,6 @@
 
 <body class="<%block name='bodyclass'/>">
   <%include file="navigation.html" />
-  <!--[if lte IE 9]>
-  <p class="ie-warning">You are using a browser that is not supported by <span class="edx">edX</span>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p>
-  <![endif]-->
-
   <section class="content-wrapper">
     ${self.body()}
   </section>
