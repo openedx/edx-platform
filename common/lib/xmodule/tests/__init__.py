@@ -7,6 +7,7 @@
 
 import unittest
 import os
+import fs
 
 import numpy
 
@@ -27,7 +28,7 @@ class I4xSystem(object):
     def __init__(self):
         self.ajax_url = '/'
         self.track_function = lambda x: None
-        self.filestore = None
+        self.filestore = fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__)))
         self.render_function = lambda x: {} # Probably incorrect
         self.module_from_xml = lambda x: None  # May need a real impl...
         self.exception404 = Exception
