@@ -46,13 +46,13 @@
 
   <section class="container">
     <section class="highlighted-courses">
-      <h2>Explore courses from <span>edX</span> universities</h2>
+      <h2>Explore courses from <span class="edx">edX</span> universities</h2>
 
       <section class="university-partners">
         <ol class="partners">
           <li class="partner mit">
             <a href="${reverse('university_profile', args=['MITx'])}">
-              <img src="${static.url('images/mit.png')}" />
+              <img src="${static.url('images/university/mit/mit.png')}" />
               <div class="name">
                 <span>MITx</span>
               </div>
@@ -60,7 +60,7 @@
           </li>
           <li class="partner">
             <a href="${reverse('university_profile', args=['HarvardX'])}">
-              <img src="${static.url('images/harvard.png')}" />
+              <img src="${static.url('images/university/harvard/harvard.png')}" />
               <div class="name">
                 <span>HarvardX</span>
               </div>
@@ -68,7 +68,7 @@
           </li>
           <li class="partner">
             <a href="${reverse('university_profile', args=['BerkeleyX'])}">
-              <img src="${static.url('images/berkeley.png')}" />
+              <img src="${static.url('images/university/berkeley/berkeley.png')}" />
               <div class="name">
                 <span>BerkeleyX</span>
               </div>
@@ -100,7 +100,7 @@
   <section class="container">
     <section class="more-info">
       <header>
-        <h2>edX News &amp; Announcements</h2>
+        <h2><span class="edx">edX</span> News &amp; Announcements</h2>
         <a href="${reverse('press')}">Read More &rarr;</a>
       </header>
       <section class="news">
