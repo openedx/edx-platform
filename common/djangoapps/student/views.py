@@ -254,8 +254,7 @@ def create_account(request, post_override=None):
                 int(post_vars['date_of_birth__day']))
 
     up.save()
-
-    # TODO (vshnayder): the LMS should probably allow signups without a particular course too
+    
     d = {'name': post_vars['name'],
          'key': r.activation_key,
          }
