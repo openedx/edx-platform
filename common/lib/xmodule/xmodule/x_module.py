@@ -84,25 +84,37 @@ class XModule(object):
         Construct a new xmodule
 
         system: A ModuleSystem allowing access to external resources
+
         location: Something Location-like that identifies this xmodule
+
         definition: A dictionary containing 'data' and 'children'. Both are optional
             'data': is JSON-like (string, dictionary, list, bool, or None, optionally nested).
-                This defines all of the data necessary for a problem to display that is intrinsic to the problem.
-                It should not include any data that would vary between two courses using the same problem
+                This defines all of the data necessary for a problem to display
+                that is intrinsic to the problem.  It should not include any
+                data that would vary between two courses using the same problem
                 (due dates, grading policy, randomization, etc.)
-            'children': is a list of Location-like values for child modules that this module depends on
-        instance_state: A string of serialized json that contains the state of this module for
-            current student accessing the system, or None if no state has been saved
-        shared_state: A string of serialized json that contains the state that is shared between
-            this module and any modules of the same type with the same shared_state_key. This
-            state is only shared per-student, not across different students
-        kwargs: Optional arguments. Subclasses should always accept kwargs and pass them
-            to the parent class constructor.
+
+            'children': is a list of Location-like values for child modules that
+                this module depends on
+
+        instance_state: A string of serialized json that contains the state of
+            this module for current student accessing the system, or None if no
+            state has been saved
+
+        shared_state: A string of serialized json that contains the state that
+            is shared between this module and any modules of the same type with
+            the same shared_state_key. This state is only shared per-student,
+            not across different students
+
+        kwargs: Optional arguments. Subclasses should always accept kwargs and
+            pass them to the parent class constructor.
+
             Current known uses of kwargs:
-                metadata: SCAFFOLDING - This dictionary will be split into several different types of metadata
-                    in the future (course policy, modification history, etc).
-                    A dictionary containing data that specifies information that is particular
-                    to a problem in the context of a course
+                metadata: SCAFFOLDING - This dictionary will be split into
+                    several different types of metadata in the future (course
+                    policy, modification history, etc).  A dictionary containing
+                    data that specifies information that is particular to a
+                    problem in the context of a course
         '''
         self.system = system
         self.location = Location(location)
@@ -174,25 +186,30 @@ class XModule(object):
         return None
 
     def max_score(self):
-        ''' Maximum score. Two notes: 
-            * This is generic; in abstract, a problem could be 3/5 points on one randomization, and 5/7 on another
-            * In practice, this is a Very Bad Idea, and (a) will break some code in place (although that code
-              should get fixed), and (b) break some analytics we plan to put in place. 
-        ''' 
+        ''' Maximum score. Two notes:
+
+            * This is generic; in abstract, a problem could be 3/5 points on one
+              randomization, and 5/7 on another
+
+            * In practice, this is a Very Bad Idea, and (a) will break some code
+              in place (although that code should get fixed), and (b) break some
+              analytics we plan to put in place.
+        '''
         return None
 
     def get_progress(self):
-        ''' Return a progress.Progress object that represents how far the student has gone
-        in this module.  Must be implemented to get correct progress tracking behavior in
-        nesting modules like sequence and vertical.
+        ''' Return a progress.Progress object that represents how far the
+        student has gone in this module.  Must be implemented to get correct
+        progress tracking behavior in nesting modules like sequence and
+        vertical.
 
         If this module has no notion of progress, return None.
         '''
         return None
 
     def handle_ajax(self, dispatch, get):
-        ''' dispatch is last part of the URL. 
-            get is a dictionary-like object ''' 
+        ''' dispatch is last part of the URL.
+            get is a dictionary-like object '''
         return ""
 
     # ================================== HTML INTERFACE DEFINITIONS ======================
@@ -210,9 +227,12 @@ class XModule(object):
         return cls.js
 
     def get_html(self):
-        ''' HTML, as shown in the browser. This is the only method that must be implemented
+        ''' HTML, as shown in the browser. This is the only method that must be
+        implemented.
         '''
-        raise NotImplementedError("get_html must be defined for all XModules that appear on the screen. Not defined in %s" % self.__class__.__name__)
+        raise NotImplementedError("get_html must be defined for all XModules "
+                                  "that appear on the screen. Not defined in %s"
+                                  % self.__class__.__name__)
 
 
 
@@ -235,14 +255,15 @@ class XModuleDescriptor(Plugin):
     inheritable_metadata = (
         'graded', 'due', 'graceperiod', 'showanswer', 'rerandomize',
 
-        # This is used by the XMLModuleStore to provide for locations for static files,
-        # and will need to be removed when that code is removed
+        # TODO: This is used by the XMLModuleStore to provide for locations for
+        # static files, and will need to be removed when that code is removed
         'data_dir'
     )
 
     # A list of descriptor attributes that must be equal for the descriptors to be
     # equal
-    equality_attributes = ('definition', 'metadata', 'location', 'shared_state_key', '_inherited_metadata')
+    equality_attributes = ('definition', 'metadata', 'location',
+                           'shared_state_key', '_inherited_metadata')
 
     # ============================= STRUCTURAL MANIPULATION ===========================
     def __init__(self,
