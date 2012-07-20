@@ -3,6 +3,7 @@ $discussion_title_size: 1.6em;
 $comment_title_size: 1.2em;
 $comment_body_size: 1.0em;
 $comment_info_size: 0.75em;
+$discussion_input_width: 60%;
 
 @mixin discussion-font {
   font-family: "Comic Sans MS", cursive, sans-serif !important;
@@ -23,6 +24,23 @@ $comment_info_size: 0.75em;
     font-weight: bold;
     margin-bottom: 20px;
     display: block;
+  }
+  .new-post-form {
+    .new-post-title, .new-post-body {
+      @include discussion-font;
+      display: block !important;
+      width: $discussion_input_width !important;
+    }
+    .new-post-body {
+      margin-top: 10px;
+    }
+    .discussion-new-post {
+      @include discussion-font;
+      color: #1d9dd9;
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
   }
   .thread {
     //display: none;
@@ -70,6 +88,7 @@ $comment_info_size: 0.75em;
       .discussion-content-edit {
         .comment-edit {
           @include discussion-font;
+          width: $discussion_input_width !important;
           margin-left: $comment_margin_left;
           font-size: $comment_body_size;
           margin-top: 10px;
