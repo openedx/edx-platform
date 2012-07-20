@@ -14,7 +14,7 @@ from static_replace import replace_urls
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
-from xmodule_modifiers import replace_static_urls
+from xmodule_modifiers import replace_static_urls, wrap_xmodule
 
 
 # ==== Public views ==================================================
@@ -97,6 +97,7 @@ def edit_item(request):
         raise Http404  # TODO (vshnayder): better error
 
     item = modulestore().get_item(item_location)
+    item.get_html = wrap_xmodule(item.get_html, item, "xmodule_edit.html")
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'js_module': item.js_module_name,
@@ -181,7 +182,10 @@ def load_sample_module(descriptor, instance_state, shared_state):
     """
     system = sample_module_system(descriptor)
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
-    module.get_html = replace_static_urls(module.get_html, module.metadata['data_dir'])
+    module.get_html = replace_static_urls(
+        wrap_xmodule(module.get_html, module, "xmodule_display.html"),
+        module.metadata['data_dir']
+    )
 
     return module
 

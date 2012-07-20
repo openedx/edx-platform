@@ -4,20 +4,7 @@ class CMS.Models.Module extends Backbone.Model
     data: ''
 
   loadModule: (element) ->
-    moduleType = @get('type')
-
-    try
-      @module = if moduleType? then new window[moduleType](element) else null
-    catch error
-      console.error "Unable to load #{moduleType}: #{error.message}" if console
-
-  loadPreview: (element) ->
-    previewType = @get('previewType')
-
-    try
-      @previewModule = if previewType? then new window[previewType](element) else null
-    catch error
-      console.error "Unable to load #{previewType}: #{error.message}" if console
+    @module = XModule.loadModule($(element).find('.xmodule_edit'))
 
   editUrl: ->
     "/edit_item?#{$.param(id: @get('id'))}"

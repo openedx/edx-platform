@@ -13,7 +13,7 @@ from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
 from xmodule.exceptions import NotFoundError
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_static_urls, add_histogram
+from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
 
 log = logging.getLogger("mitx.courseware")
 
@@ -163,7 +163,10 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
-    module.get_html = replace_static_urls(module.get_html, module.metadata['data_dir'])
+    module.get_html = replace_static_urls(
+        wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
+        module.metadata['data_dir']
+    )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
         module.get_html = add_histogram(module.get_html)
