@@ -27,6 +27,7 @@ import errno
 import glob2
 import lms.envs.common
 import hashlib
+from collections import defaultdict
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -176,6 +177,69 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
+# Load javascript and css from all of the available descriptors, and
+# prep it for use in pipeline js
+from xmodule.x_module import XModuleDescriptor
+from xmodule.raw_module import RawDescriptor
+js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
+css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
+module_styles_path = css_file_dir / "_module-styles.scss"
+
+for dir_ in (js_file_dir, css_file_dir):
+    try:
+        os.makedirs(dir_)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            pass
+        else:
+            raise
+
+js_fragments = set()
+css_fragments = defaultdict(set)
+for descriptor in XModuleDescriptor.load_classes() + [RawDescriptor]:
+    descriptor_js = descriptor.get_javascript()
+    module_js = descriptor.module_class.get_javascript()
+
+    for filetype in ('coffee', 'js'):
+        for idx, fragment in enumerate(descriptor_js.get(filetype, []) + module_js.get(filetype, [])):
+            js_fragments.add((idx, filetype, fragment))
+
+    for class_ in (descriptor, descriptor.module_class):
+        fragments = class_.get_css()
+        for filetype in ('sass', 'scss', 'css'):
+            for idx, fragment in enumerate(fragments.get(filetype, [])):
+                css_fragments[idx, filetype, fragment].add(class_.__name__)
+
+module_js_sources = []
+for idx, filetype, fragment in sorted(js_fragments):
+    path = js_file_dir / "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    with open(path, 'w') as js_file:
+        js_file.write(fragment)
+    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+
+css_imports = defaultdict(set)
+for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
+    fragment_name = "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    # Prepend _ so that sass just includes the files into a single file
+    with open(css_file_dir / '_' + fragment_name, 'w') as js_file:
+        js_file.write(fragment)
+
+    for class_ in classes:
+        css_imports[class_].add(fragment_name)
+
+with open(module_styles_path, 'w') as module_styles:
+    for class_, fragment_names in css_imports.items():
+        imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
+        module_styles.write(""".xmodule_{class_} {{ {imports} }}""".format(
+            class_=class_, imports=imports
+        ))
+
 PIPELINE_CSS = {
     'base-style': {
         'source_filenames': ['sass/base-style.scss'],
@@ -184,38 +248,6 @@ PIPELINE_CSS = {
 }
 
 PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
-
-# Load javascript from all of the available descriptors, and
-# prep it for use in pipeline js
-from xmodule.x_module import XModuleDescriptor
-from xmodule.raw_module import RawDescriptor
-js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
-try:
-    os.makedirs(js_file_dir)
-except OSError as exc:
-    if exc.errno == errno.EEXIST:
-        pass
-    else:
-        raise
-
-fragments = set()
-for descriptor in XModuleDescriptor.load_classes() + [RawDescriptor]:
-    descriptor_js = descriptor.get_javascript()
-    module_js = descriptor.module_class.get_javascript()
-
-    for filetype in ('coffee', 'js'):
-        for idx, fragment in enumerate(descriptor_js.get(filetype, []) + module_js.get(filetype, [])):
-            fragments.add((idx, filetype, fragment))
-
-module_js_sources = []
-for idx, filetype, fragment in sorted(fragments):
-    path = os.path.join(js_file_dir, "{idx}-{hash}.{type}".format(
-        idx=idx,
-        hash=hashlib.md5(fragment).hexdigest(),
-        type=filetype))
-    with open(path, 'w') as js_file:
-        js_file.write(fragment)
-    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
 
 PIPELINE_JS = {
     'main': {

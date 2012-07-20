@@ -14,6 +14,7 @@ def wrap_xmodule(get_html, module, template):
     module: An XModule
     template: A template that takes the variables:
         content: the results of get_html,
+        class_: the module class name
         module_name: the js_module_name of the module
     """
 
@@ -21,6 +22,7 @@ def wrap_xmodule(get_html, module, template):
     def _get_html():
         return render_to_string(template, {
             'content': get_html(),
+            'class_': module.__class__.__name__,
             'module_name': module.js_module_name
         })
     return _get_html

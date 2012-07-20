@@ -64,7 +64,50 @@ class Plugin(object):
                 in pkg_resources.iter_entry_points(cls.entry_point)]
 
 
-class XModule(object):
+class HTMLSnippet(object):
+    """
+    A base class defining an interface for an object that is able to present an
+    html snippet, along with associated javascript and css
+    """
+
+    js = {}
+    js_module_name = None
+
+    css = {}
+
+    @classmethod
+    def get_javascript(cls):
+        """
+        Return a dictionary containing some of the following keys:
+            coffee: A list of coffeescript fragments that should be compiled and
+                    placed on the page
+            js: A list of javascript fragments that should be included on the page
+
+        All of these will be loaded onto the page in the CMS
+        """
+        return cls.js
+
+    @classmethod
+    def get_css(cls):
+        """
+        Return a dictionary containing some of the following keys:
+            css: A list of css fragments that should be applied to the html contents
+                 of the snippet
+            sass: A list of sass fragments that should be applied to the html contents
+                  of the snippet
+            scss: A list of scss fragments that should be applied to the html contents
+                  of the snippet
+        """
+        return cls.css
+
+    def get_html(self):
+        """
+        Return the html used to edit this module
+        """
+        raise NotImplementedError("get_html() must be provided by specific modules")
+
+
+class XModule(HTMLSnippet):
     ''' Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order to be displayed to users.
@@ -76,9 +119,6 @@ class XModule(object):
     # This attribute can be overridden by subclasses, and the function can also be overridden
     # if the icon class depends on the data in the module
     icon_class = 'other'
-
-    js = {}
-    js_module_name = None
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         '''
@@ -196,28 +236,8 @@ class XModule(object):
             get is a dictionary-like object '''
         return ""
 
-    # ================================== HTML INTERFACE DEFINITIONS ======================
 
-    @classmethod
-    def get_javascript(cls):
-        """
-        Return a dictionary containing some of the following keys:
-            coffee: A list of coffeescript fragments that should be compiled and
-                    placed on the page
-            js: A list of javascript fragments that should be included on the page
-
-        All of these will be loaded onto the page in the LMS
-        """
-        return cls.js
-
-    def get_html(self):
-        ''' HTML, as shown in the browser. This is the only method that must be implemented
-        '''
-        raise NotImplementedError("get_html must be defined for all XModules that appear on the screen. Not defined in %s" % self.__class__.__name__)
-
-
-
-class XModuleDescriptor(Plugin):
+class XModuleDescriptor(Plugin, HTMLSnippet):
     """
     An XModuleDescriptor is a specification for an element of a course. This could
     be a problem, an organizational element (a group of content), or a segment of video,
@@ -228,8 +248,6 @@ class XModuleDescriptor(Plugin):
     and can generate XModules (which do know about student state).
     """
     entry_point = "xmodule.v1"
-    js = {}
-    js_module_name = None
     module_class = XModule
 
     # A list of metadata that this module can inherit from its parent module
@@ -403,25 +421,6 @@ class XModuleDescriptor(Plugin):
         using the from_xml method with the same system, org, and course
         """
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
-
-    # ================================== HTML INTERFACE DEFINITIONS ======================
-    @classmethod
-    def get_javascript(cls):
-        """
-        Return a dictionary containing some of the following keys:
-            coffee: A list of coffeescript fragments that should be compiled and
-                    placed on the page
-            js: A list of javascript fragments that should be included on the page
-
-        All of these will be loaded onto the page in the CMS
-        """
-        return cls.js
-
-    def get_html(self):
-        """
-        Return the html used to edit this module
-        """
-        raise NotImplementedError("get_html() must be provided by specific modules")
 
     # =============================== Testing ===================================
     def get_sample_state(self):

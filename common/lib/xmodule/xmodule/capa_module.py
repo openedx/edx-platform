@@ -75,6 +75,7 @@ class CapaModule(XModule):
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js')]}
     js_module_name = "Problem"
+    css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
