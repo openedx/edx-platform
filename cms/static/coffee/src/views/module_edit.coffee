@@ -16,9 +16,16 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   save: (event) ->
     event.preventDefault()
-    @model.save().success(->
+    @model.save().done((previews) =>
       alert("Your changes have been saved.")
-    ).error(->
+      previews_section = @$el.find('.previews').empty()
+      $.each(previews, (idx, preview) =>
+        preview_wrapper = $('<section/>', class: 'preview').append preview
+        previews_section.append preview_wrapper
+      )
+
+      XModule.loadModules('display')
+    ).fail(->
       alert("There was an error saving your changes. Please try again.")
     )
 
