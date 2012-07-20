@@ -425,7 +425,7 @@ class CapaModule(XModule):
             # TODO (vshnayder): why is this line here?
             #self.lcp = LoncapaProblem(self.definition['data'],
             #                          id=lcp_id, state=old_state, system=self.system)
-            traceback.print_exc()
+            log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
         except Exception, err:
             # TODO: why is this line here?
@@ -435,7 +435,7 @@ class CapaModule(XModule):
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
                 return {'success': msg}
-            traceback.print_exc()
+            log.exception("Error in capa_module problem checking")
             raise Exception("error in capa_module")
 
         self.attempts = self.attempts + 1
