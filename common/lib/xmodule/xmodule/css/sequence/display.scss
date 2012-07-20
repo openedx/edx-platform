@@ -1,5 +1,8 @@
 nav.sequence-nav {
+  // TODO (cpennington): This doesn't work anymore. XModules aren't able to
+  // import from external sources.
   @extend .topbar;
+
   border-bottom: 1px solid darken($cream, 20%);
   margin-bottom: $body-line-height;
   position: relative;
@@ -260,86 +263,73 @@ nav.sequence-nav {
   }
 }
 
+div.seq_contents {
+  display: none;
+}
 
-section.course-content {
-  position: relative;
+nav.sequence-bottom {
+  margin: lh(2) 0 0;
+  text-align: center;
 
-  ol.vert-mod {
-    nav.sequence-nav {
-      margin-top: -15px;
-      @include border-radius(0);
-    }
-  }
+  ul {
+    @extend .clearfix;
+    background-color: darken(#F6EFD4, 5%);
+    background-color: darken($cream, 5%);
+    border: 1px solid darken(#f6efd4, 20%);
+    @include border-radius(3px);
+    @include box-shadow(inset 0 0 0 1px lighten(#f6efd4, 5%));
+    @include inline-block();
 
-  div.seq_contents {
-    display: none;
-  }
+    li {
+      float: left;
 
-  nav.sequence-bottom {
-    margin: lh(2) 0 0;
-    text-align: center;
+      &.prev, &.next {
+        margin-bottom: 0;
 
-    ul {
-      @extend .clearfix;
-      background-color: darken(#F6EFD4, 5%);
-      background-color: darken($cream, 5%);
-      border: 1px solid darken(#f6efd4, 20%);
-      @include border-radius(3px);
-      @include box-shadow(inset 0 0 0 1px lighten(#f6efd4, 5%));
-      @include inline-block();
+        a {
+          background-position: center center;
+          background-repeat: no-repeat;
+          border-bottom: none;
+          display: block;
+          padding: lh(.5) 4px;
+          text-indent: -9999px;
+          @include transition(all, .2s, $ease-in-out-quad);
+          width: 45px;
 
-      li {
-        float: left;
+          &:hover {
+            background-color: $cream;
+            color: darken($cream, 60%);
+            opacity: .5;
+            text-decoration: none;
+          }
 
-        &.prev, &.next {
-          margin-bottom: 0;
-
-          a {
-            background-position: center center;
-            background-repeat: no-repeat;
-            border-bottom: none;
-            display: block;
-            padding: lh(.5) 4px;
-            text-indent: -9999px;
-            @include transition(all, .2s, $ease-in-out-quad);
-            width: 45px;
-
-            &:hover {
-              background-color: $cream;
-              color: darken($cream, 60%);
-              opacity: .5;
-              text-decoration: none;
-            }
-
-            &.disabled {
-              background-color: lighten($cream, 10%);
-              opacity: .4;
-            }
+          &.disabled {
+            background-color: lighten($cream, 10%);
+            opacity: .4;
           }
         }
+      }
 
-        &.prev {
-          a {
-            background-image: url('../images/sequence-nav/previous-icon.png');
-            border-right: 1px solid darken(#f6efd4, 20%);
+      &.prev {
+        a {
+          background-image: url('../images/sequence-nav/previous-icon.png');
+          border-right: 1px solid darken(#f6efd4, 20%);
 
-            &:hover {
-              background-color: none;
-            }
+          &:hover {
+            background-color: none;
           }
         }
+      }
 
-        &.next {
-          a {
-            background-image: url('../images/sequence-nav/next-icon.png');
+      &.next {
+        a {
+          background-image: url('../images/sequence-nav/next-icon.png');
 
-            &:hover {
-              background-color: none;
-            }
+          &:hover {
+            background-color: none;
           }
         }
       }
     }
   }
 }
-

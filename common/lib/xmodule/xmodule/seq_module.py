@@ -21,6 +21,7 @@ class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')]}
+    css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
