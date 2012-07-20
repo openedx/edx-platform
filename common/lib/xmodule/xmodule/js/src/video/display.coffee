@@ -1,10 +1,11 @@
 class @Video
-  constructor: (@element) ->
-    @id = $(@element).attr('id').replace(/video_/, '')
-    @caption_data_dir = $(@element).data('caption-data-dir')
+  constructor: (element) ->
+    @el = $(element).find('.video')
+    @id = @el.attr('id').replace(/video_/, '')
+    @caption_data_dir = @el.data('caption-data-dir')
     window.player = null
     @el = $("#video_#{@id}")
-    @parseVideos $(@element).data('streams')
+    @parseVideos @el.data('streams')
     @fetchMetadata()
     @parseSpeed()
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')

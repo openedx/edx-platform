@@ -5,17 +5,38 @@ from static_replace import replace_urls
 from mitxmako.shortcuts import render_to_string
 
 
-def replace_static_urls(original, prefix):
+def wrap_xmodule(get_html, module, template):
+    """
+    Wraps the results of get_html in a standard <section> with identifying
+    data so that the appropriate javascript module can be loaded onto it.
+
+    get_html: An XModule.get_html method or an XModuleDescriptor.get_html method
+    module: An XModule
+    template: A template that takes the variables:
+        content: the results of get_html,
+        module_name: the js_module_name of the module
+    """
+
+    @wraps(get_html)
+    def _get_html():
+        return render_to_string(template, {
+            'content': get_html(),
+            'module_name': module.js_module_name
+        })
+    return _get_html
+
+
+def replace_static_urls(get_html, prefix):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
     with urls that are /static/<prefix>/...
     """
 
-    @wraps(original)
-    def get_html():
-        return replace_urls(original(), staticfiles_prefix=prefix)
-    return get_html
+    @wraps(get_html)
+    def _get_html():
+        return replace_urls(get_html(), staticfiles_prefix=prefix)
+    return _get_html
 
 
 def grade_histogram(module_id):
@@ -40,15 +61,15 @@ def grade_histogram(module_id):
     return grades
 
 
-def add_histogram(original, module):
+def add_histogram(get_html, module):
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
     for admin users only, including a histogram of student answers and the
     definition of the xmodule
     """
-    @wraps(original)
-    def get_html():
+    @wraps(get_html)
+    def _get_html():
         module_id = module.id
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
@@ -73,7 +94,7 @@ def add_histogram(original, module):
                          'edit_link': edit_link,
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
-                         'module_content': original()}
+                         'module_content': get_html()}
         return render_to_string("staff_problem_info.html", staff_context)
 
-    return get_html
+    return _get_html
