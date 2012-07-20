@@ -9,14 +9,16 @@ from importlib import import_module
 from xmodule.errorhandlers import strict_error_handler
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.course_module import CourseDescriptor
 from mitxmako.shortcuts import render_to_string
 
 from . import ModuleStore, Location
-from .exceptions import ItemNotFoundError, InsufficientSpecificationError
+from .exceptions import ItemNotFoundError, InsufficientSpecificationError, NoPathToItem
 
 # TODO (cpennington): This code currently operates under the assumption that
 # there is only one revision for each item. Once we start versioning inside the CMS,
 # that assumption will have to change
+
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -167,6 +169,14 @@ class MongoModuleStore(ModuleStore):
         course_filter = Location("i4x", category="course")
         return self.get_items(course_filter)
 
+    def _find_one(self, location):
+        '''Look for a given location in the collection.
+        If revision isn't specified, returns the latest.'''
+        return self.collection.find_one(
+            location_to_query(location),
+            sort=[('revision', pymongo.ASCENDING)],
+        )
+
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
@@ -190,10 +200,7 @@ class MongoModuleStore(ModuleStore):
             if key != 'revision' and val is None:
                 raise InsufficientSpecificationError(location)
 
-        item = self.collection.find_one(
-            location_to_query(location),
-            sort=[('revision', pymongo.ASCENDING)],
-        )
+        item = self._find_one(location)
         if item is None:
             raise ItemNotFoundError(location)
         return self._load_items([item], depth)[0]
@@ -265,24 +272,101 @@ class MongoModuleStore(ModuleStore):
             {'$set': {'metadata': metadata}}
         )
 
-    def path_to_location(self, location, course=None):
+    def get_parent_locations(self, location):
+        '''Find all locations that are the parents of this location.
+        Mostly intended for use in path_to_location, but exposed for testing
+        and possible other usefulness.
+
+        returns an iterable of things that can be passed to Location.
         '''
-        Try to find a course/chapter/section[/position] path to this location.
+        location = Location(location)
+        items = self.collection.find({'definition.children': str(location)},
+                                    {'_id': True})
+        return [i['_id'] for i in items]
+
+
+
+    def path_to_location(self, location, course_name=None):
+        '''
+        Try to find a course_id/chapter/section[/position] path to this location.
+        The courseware insists that the first level in the course is chapter,
+        but any kind of module can be a "section".
+
+        location: something that can be passed to Location
+        course_name: [optional].  If not None, restrict search to paths
+            in that course.
 
         raise ItemNotFoundError if the location doesn't exist.
 
-        If course is not None, restrict search to paths in that course.
-            
         raise NoPathToItem if the location exists, but isn't accessible via
         a chapter/section path in the course(s) being searched.
 
-        In general, a location may be accessible via many paths. This method may
+        Return a tuple (course_id, chapter, section, position) suitable for the
+        courseware index view.
+
+        A location may be accessible via many paths. This method may
         return any valid path.
 
-        Return a tuple (course, chapter, section, position).
-
-        If the section a sequence, position should be the position of this location
-        in that sequence.  Otherwise, position should be None.
+        If the section is a sequence, position will be the position
+        of this location in that sequence.  Otherwise, position will
+        be None. TODO (vshnayder): Not true yet.
         '''
-        raise NotImplementedError
+        # Check that location is present at all
+        if self._find_one(location) is None:
+            raise ItemNotFoundError(location)
+
+        def flatten(xs):
+            '''Convert lisp-style (a, (b, (c, ()))) lists into a python list.
+            Not a general flatten function. '''
+            p = []
+            while xs != ():
+                p.append(xs[0])
+                xs = xs[1]
+            return p
+
+        def find_path_to_course(location, course_name=None):
+            '''Find a path up the location graph to a node with the
+            specified category.  If no path exists, return None.  If a
+            path exists, return it as a list with target location
+            first, and the starting location last.
+            '''
+            # Standard DFS
+
+            # To keep track of where we came from, the work queue has
+            # tuples (location, path-so-far).  To avoid lots of
+            # copying, the path-so-far is stored as a lisp-style
+            # list--nested hd::tl tuples, and flattened at the end.
+            queue = [(location, ())]
+            while len(queue) > 0:
+                (loc, path) = queue.pop()  # Takes from the end
+                loc = Location(loc)
+                print 'Processing loc={0}, path={1}'.format(loc, path)
+                if loc.category == "course":
+                    if course_name is None or course_name == loc.name:
+                        # Found it!
+                        path = (loc, path)
+                        return flatten(path)
+
+                # otherwise, add parent locations at the end
+                newpath = (loc, path)
+                parents = self.get_parent_locations(loc)
+                queue.extend(zip(parents, repeat(newpath)))
+
+            # If we're here, there is no path
+            return None
+
+        path = find_path_to_course(location, course_name)
+        if path is None:
+            raise(NoPathToItem(location))
+
+
+        n = len(path)
+        course_id = CourseDescriptor.location_to_id(path[0])
+        chapter = path[1].name if n > 1 else None
+        section = path[2].name if n > 2 else None
+
+        # TODO (vshnayder): not handling position at all yet...
+        position = None
+
+        return (course_id, chapter, section, position)
 
