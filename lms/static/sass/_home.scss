@@ -19,7 +19,8 @@
       margin: 0 auto;
       padding: 200px 10px 0px;
       position: relative;
-      width: 100%;
+      max-width: 1200px;
+      min-width: 760px;
     }
 
     .title {
