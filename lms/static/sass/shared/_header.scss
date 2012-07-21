@@ -13,7 +13,8 @@ header.global {
     margin: 0 auto;
     max-width: 1200px;
     padding: 14px 10px 0px;
-    width: grid-width(12);
+    max-width: grid-width(12);
+    min-width: 760px;
   }
 
   h1.logo {

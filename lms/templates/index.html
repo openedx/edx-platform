@@ -19,15 +19,15 @@
 
           <div class="secondary-actions">
             <div class="social-sharing">
-              <div class="sharing-message">Share with friends and family!</div>
-              <a href="#" class="share">
+              <div class="sharing-message">Stay up to date with all edX has to offer!</div>
+              <a href="https://twitter.com/edXOnline" class="share">
                 <img src="${static.url('images/social/twitter-sharing.png')}">
               </a>
-              <a href="#" class="share">
+              <a href="http://www.facebook.com/EdxOnline" class="share">
                 <img src="${static.url('images/social/facebook-sharing.png')}">
               </a>
-              <a href="#" class="share">
-                <img src="${static.url('images/social/email-sharing.png')}">
+              <a href="https://plus.google.com/108235383044095082735/posts" class="share">
+                <img src="${static.url('images/social/google-plus-sharing.png')}">
               </a>
             </div>
           </div>
@@ -36,7 +36,7 @@
 
         <a href="#video-modal" class="media" rel="leanModal">
           <div class="hero">
-            <img src="${static.url('images/courses/space3.jpg')}" />
+            <img src="${static.url('images/courses/video-thumb.jpg')}" />
             <div class="play-intro"></div>
           </div>
         </a>
@@ -66,7 +66,7 @@
               </div>
             </a>
           </li>
-          <li class="partner">
+          <li class="partner last">
             <a href="${reverse('university_profile', args=['BerkeleyX'])}">
               <img src="${static.url('images/university/berkeley/berkeley.png')}" />
               <div class="name">
@@ -88,7 +88,7 @@
             <%include file="course.html" args="course=course" />
           %endfor
         </section>
-        <section class='university-column'>
+        <section class='university-column last'>
           %for course in universities['BerkeleyX']:
             <%include file="course.html" args="course=course" />
           %endfor

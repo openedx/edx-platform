@@ -262,7 +262,6 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'util.middleware.ExceptionLoggingMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -294,9 +293,13 @@ PIPELINE_CSS = {
         'source_filenames': ['sass/application.scss'],
         'output_filename': 'css/application.css',
     },
+    'ie-fixes': {
+        'source_filenames': ['sass/ie.scss'],
+        'output_filename': 'css/ie.css',
+    },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss']
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss']
 
 PIPELINE_JS = {
     'application': {

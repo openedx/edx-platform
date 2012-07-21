@@ -38,6 +38,34 @@
         width: 100%;
       }
     }
+
+    header {
+      float: left;
+      width: flex-grid(7);
+
+      blockquote {
+        margin-left: 0;
+        margin-bottom: 40px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        p {
+          margin-left: 0;
+          font-style: italic;
+          line-height: 1.4;
+          font-size: 1.1em;
+          color: #666;
+        }
+
+        cite {
+          margin-top: 12px;
+          display: block;
+          color: #a0a0a0;
+        }
+      }
+    }
   }
 
   .jobs-wrapper {
