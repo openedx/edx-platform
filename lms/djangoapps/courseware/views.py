@@ -269,39 +269,6 @@ def course_about(request, course_id):
     course = check_course(course_id, course_must_be_open=False)
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
-
-
-@login_required
-def change_enrollment(request):
-    if request.method != "POST":
-        raise Http404
-    
-    course_id = request.POST.get("course_id", None)
-    if course_id == None:
-        return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
-    action = request.POST.get("enrollment_action" , "")
-        
-    user = request.user
-    
-    if action == "enroll":
-        # Make sure the course exists
-        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
-        course = check_course(course_id, course_must_be_open=False) 
-        
-        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
-        return HttpResponse(json.dumps({'success': True}))
-        
-    elif action == "unenroll":
-        try:
-            enrollment =  CourseEnrollment.objects.get(user=user, course_id=course_id)
-            enrollment.delete()
-            return HttpResponse(json.dumps({'success': True}))
-        except CourseEnrollment.DoesNotExist:
-            return HttpResponse(json.dumps({'success': False, 'error': 'You are not enrolled for this course.'}))
-    else:
-        return HttpResponse(json.dumps({'success': False, 'error': 'Invalid enrollment_action.'}))
-    
-    return HttpResponse(json.dumps({'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}))
     
 
 

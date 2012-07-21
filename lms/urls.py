@@ -101,7 +101,7 @@ if settings.COURSEWARE_ENABLED:
                 
         url(r'^courses/?$', 'courseware.views.courses', name="courses"),     
         url(r'^change_enrollment$', 
-            'courseware.views.change_enrollment', name="change_enrollment"),
+            'student.views.change_enrollment_view', name="change_enrollment"),
            
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 
