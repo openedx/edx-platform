@@ -19,14 +19,14 @@
         <div id="enroll_error" name="enroll_error"></div>
 
         <div class="input-group">
-          <label>E-mail</label>
-          <input name="email" type="email" placeholder="E-mail">
-          <label>Password</label>
-          <input name="password" type="password" placeholder="Password">
-          <label>Public Username</label>
-          <input name="username" type="text" placeholder="Public Username">
+          <label>E-mail*</label>
+          <input name="email" type="email" placeholder="E-mail*">
+          <label>Password*</label>
+          <input name="password" type="password" placeholder="Password*">
+          <label>Public Username*</label>
+          <input name="username" type="text" placeholder="Public Username*">
           <label>Full Name</label>
-          <input name="name" type="text" placeholder="Full Name">
+          <input name="name" type="text" placeholder="Full Name*">
           <label>Mailing address</label>
           <textarea name="mailing_address" placeholder="Mailing address"></textarea>
         </div>
@@ -86,13 +86,13 @@
           <label class="terms-of-service">
             <input name="terms_of_service" type="checkbox" value="true">
             I agree to the
-            <a href="${reverse('tos')}">Terms of Service</a>
+            <a href="${reverse('tos')}">Terms of Service</a>*
           </label>
 
           <label class="honor-code">
             <input name="honor_code" type="checkbox" value="true">
             I agree to the
-            <a href="${reverse('honor')}">Honor Code</a>
+            <a href="${reverse('honor')}">Honor Code</a>*
           </label>
         </div>
 
