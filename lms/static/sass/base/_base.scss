@@ -83,7 +83,7 @@ a:link, a:visited {
   @include clearfix;
   margin: 0 auto 0;
   padding: 0px 10px;
-  width: grid-width(12);
+  max-width: grid-width(12);
 }
 
 span.edx {

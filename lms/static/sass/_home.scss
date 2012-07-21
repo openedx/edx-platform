@@ -19,10 +19,12 @@
       margin: 0 auto;
       padding: 200px 10px 0px;
       position: relative;
-      width: grid-width(12);
+      max-width: 1200px;
+      min-width: 760px;
     }
 
     .title {
+      background: #FFF;
       background: rgba(255,255,255, 0.93);
       border: 1px solid rgb(100,100,100);
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
@@ -188,6 +190,7 @@
     }
 
     .media {
+      background: #FFF;
       background: rgba(255,255,255, 0.93);
       border: 1px solid rgb(100,100,100);
       @include box-sizing(border-box);
@@ -225,6 +228,7 @@
           width: 60px;
 
           &::after {
+            color: #fff;
             color: rgba(255,255,255, 0.8);
             content: "\25B6";
             display: block;
@@ -253,6 +257,7 @@
           border-color: rgba(255,255,255, 0.9);
 
           &::after {
+            color: #fff;
             color: rgba(255,255,255, 1);
           }
         }

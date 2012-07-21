@@ -15,19 +15,20 @@
       height: 120px;
       margin: 0 auto;
       max-width: 1200px;
+      min-width: 760px;
       padding-top: 200px;
       position: relative;
       text-align: center;
       width: flex-grid(12);
 
       > hgroup {
+        background: #FFF;
         background: rgba(255,255,255, 0.93);
         border: 1px solid rgb(100,100,100);
         @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
         padding: 20px 30px;
         position: relative;
         z-index: 2;
-
       }
 
       &.main-search, &.university-search {

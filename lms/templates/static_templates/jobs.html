@@ -2,6 +2,8 @@
 
 <%inherit file="../main.html" />
 
+<%block name="title"><title>Jobs</title></%block>
+
 <section class="container jobs">
   <h1>Do You Want to Change the Future of Education?</h1>
   <hr class="horizontal-divider">
@@ -11,14 +13,19 @@
       <div class="photo">
         <img src="${static.url('images/jobs.jpeg')}">
       </div>
+      <header>
       <h2>Our mission is to transform learning.</h2>
-      <h2>Our goal is to educate 1 billion people around the world.</h2>
 
-      <q>“Edx represents a unique opportunity to improve education on our campuses though online learning, while simultaneously creating a bold new educational path for millions of learners worldwide.” </q>
-      <small class="author">Rafael Reif, MIT President </small>
+      <blockquote>
+        <p>&ldquo;Edx represents a unique opportunity to improve education on our campuses though online learning, while simultaneously creating a bold new educational path for millions of learners worldwide.&rdquo;</p>
+        <cite>&mdash;Rafael Reif, MIT President </cite>
+      </blockquote>
 
-      <q>“EdX gives Harvard and MIT an unprecedented opportunity to dramatically extend our collective reach by conducting groundbreaking research into effective education and by extending online access  to quality higher education.”</q>
-      <small class="author">Drew Faust, Harvard President</small>
+      <blockquote>
+        <p>&ldquo;EdX gives Harvard and MIT an unprecedented opportunity to dramatically extend our collective reach by conducting groundbreaking research into effective education and by extending online access to quality higher education.&rdquo;</p>
+        <cite>&mdash;Drew Faust, Harvard President</cite>
+      </blockquote>
+      </header>
     </div>
   </section>
   <hr class="horizontal-divider">

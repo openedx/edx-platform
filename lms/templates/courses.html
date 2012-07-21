@@ -2,6 +2,8 @@
 
 <%namespace name='static' file='static_content.html'/>
 
+<%block name="title"><title>Courses</title></%block>
+
 <section class="find-courses">
   <header class="search" style="background: url('/static/images/homepage_interns_placeholder_2025x550.jpg')">
     <div class="inner-wrapper main-search">
@@ -28,7 +30,7 @@
           <%include file="course.html" args="course=course" />
         %endfor
       </section>
-      <section class='university-column'>
+      <section class='university-column last'>
         %for course in universities['BerkeleyX']:
           <%include file="course.html" args="course=course" />
         %endfor
