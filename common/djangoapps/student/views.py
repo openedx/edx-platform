@@ -83,7 +83,6 @@ def index(request):
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
-    csrf_token = csrf(request)['csrf_token']
     user = request.user
     enrollments = CourseEnrollment.objects.filter(user=user)
 
@@ -101,8 +100,13 @@ def dashboard(request):
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existant course {1}"
                       .format(user.username, enrollment.course_id))
+    
+    
+    message = ""
+    if not user.is_active:
+        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
 
-    context = {'csrf': csrf_token, 'courses': courses}
+    context = {'courses': courses, 'message' : message}
     return render_to_response('dashboard.html', context)
 
 
@@ -112,7 +116,7 @@ def login_user(request, error=""):
     ''' AJAX request to log in the user. '''
     if 'email' not in request.POST or 'password' not in request.POST:
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))  # TODO: User error message
+                                        'value': 'There was an error receiving your login information. Please email us.'}))  # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
@@ -121,14 +125,14 @@ def login_user(request, error=""):
     except User.DoesNotExist:
         log.warning("Login failed - Unknown user email: {0}".format(email))
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))  # TODO: User error message
+                                        'value': 'Email or password is incorrect.'}))  # TODO: User error message
 
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
         log.warning("Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))
+                                        'value': 'Email or password is incorrect.'}))
 
     if user is not None and user.is_active:
         try:
@@ -147,7 +151,7 @@ def login_user(request, error=""):
 
     log.warning("Login failed - Account not active for user {0}".format(username))
     return HttpResponse(json.dumps({'success':False,
-                                    'error': 'Account not active. Check your e-mail.'}))
+                                    'value': 'This account has not been activated. Please check your e-mail for the activation instructions.'}))
 
 @ensure_csrf_cookie
 def logout_user(request):
@@ -275,10 +279,15 @@ def create_account(request, post_override=None):
         log.exception(sys.exc_info())
         js['value'] = 'Could not send activation e-mail.'
         return HttpResponse(json.dumps(js))
-
-    js={'success': True,
-        'value': render_to_string('registration/reg_complete.html', {'email': post_vars['email'],
-                                                                     'csrf': csrf(request)['csrf_token']})}
+     
+    # Immediately after a user creates an account, we log them in. They are only
+    # logged in until they close the browser. They can't log in again until they click
+    # the activation link from the email.
+    login_user = authenticate(username=post_vars['username'], password = post_vars['password'] )
+    login(request, login_user)
+    request.session.set_expiry(0)  
+    
+    js={'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
 def create_random_account(create_account_function):
