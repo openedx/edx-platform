@@ -38,7 +38,7 @@ def cache_if_anonymous(view_func):
     
     @wraps(view_func)
     def _decorated(request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if False and not request.user.is_authenticated():
             #Use the cache
             cache_key = "cache_if_anonymous." + request.path
             response = cache.get(cache_key)

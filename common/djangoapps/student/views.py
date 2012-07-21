@@ -79,16 +79,15 @@ def index(request):
 
     return render_to_response('index.html', {'universities': universities, 'entries': entries})
 
+def course_from_id(id):
+    course_loc = CourseDescriptor.id_to_location(id)
+    return modulestore().get_item(course_loc)
 
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
     user = request.user
     enrollments = CourseEnrollment.objects.filter(user=user)
-
-    def course_from_id(id):
-        course_loc = CourseDescriptor.id_to_location(id)
-        return modulestore().get_item(course_loc)
 
     # Build our courses list for the user, but ignore any courses that no longer
     # exist (because the course IDs have changed). Still, we don't delete those
@@ -109,6 +108,45 @@ def dashboard(request):
     context = {'courses': courses, 'message' : message}
     return render_to_response('dashboard.html', context)
 
+
+@login_required
+def change_enrollment_view(request):
+    return HttpResponse(json.dumps(change_enrollment(request)))
+
+def change_enrollment(request):
+    if request.method != "POST":
+        raise Http404
+    
+    action = request.POST.get("enrollment_action" , "")
+    user = request.user
+    course_id = request.POST.get("course_id", None)
+    if course_id == None:
+        return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
+        
+    if action == "enroll":
+        # Make sure the course exists
+        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
+        try:
+            course = course_from_id(course_id)
+        except ItemNotFoundError:
+            log.error("User {0} tried to enroll in non-existant course {1}"
+                      .format(user.username, enrollment.course_id))
+            return {'success': False, 'error': 'The course requested does not exist.'}
+                
+        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        return {'success': True}
+        
+    elif action == "unenroll":
+        try:
+            enrollment =  CourseEnrollment.objects.get(user=user, course_id=course_id)
+            enrollment.delete()
+            return {'success': True}
+        except CourseEnrollment.DoesNotExist:
+            return {'success': False, 'error': 'You are not enrolled for this course.'}
+    else:
+        return {'success': False, 'error': 'Invalid enrollment_action.'}
+    
+    return {'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}
 
 # Need different levels of logging
 @ensure_csrf_cookie
@@ -147,6 +185,16 @@ def login_user(request, error=""):
             log.exception(e)
 
         log.info("Login success - {0} ({1})".format(username, email))
+        
+        if 'enrollment_action' in request.POST:
+            try:
+                enrollment_output = change_enrollment(request)
+                # There isn't really a way to display the results to the user, so we just log it
+                # We expect the enrollment to be a success, and will show up on the dashboard anyway
+                log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
+            except Exception, e:
+                log.error("Exception automatically enrolling after login: {0}".format(str(e)))
+        
         return HttpResponse(json.dumps({'success':True}))
 
     log.warning("Login failed - Account not active for user {0}".format(username))
@@ -286,6 +334,15 @@ def create_account(request, post_override=None):
     login_user = authenticate(username=post_vars['username'], password = post_vars['password'] )
     login(request, login_user)
     request.session.set_expiry(0)  
+    
+    if 'enrollment_action' in request.POST:
+        try:
+            enrollment_output = change_enrollment(request)
+            # There isn't really a way to display the results to the user, so we just log it
+            # We expect the enrollment to be a success, and will show up on the dashboard anyway
+            log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
+        except Exception, e:
+            log.error("Exception automatically enrolling after login: {0}".format(str(e)))
     
     js={'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
