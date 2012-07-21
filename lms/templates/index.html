@@ -36,7 +36,7 @@
 
         <a href="#video-modal" class="media" rel="leanModal">
           <div class="hero">
-            <img src="${static.url('images/courses/edx_hp_video_thumbsmall.jpg')}" />
+            <img src="${static.url('images/courses/video-thumb.jpg')}" />
             <div class="play-intro"></div>
           </div>
         </a>
@@ -66,7 +66,7 @@
               </div>
             </a>
           </li>
-          <li class="partner">
+          <li class="partner last">
             <a href="${reverse('university_profile', args=['BerkeleyX'])}">
               <img src="${static.url('images/university/berkeley/berkeley.png')}" />
               <div class="name">
@@ -88,7 +88,7 @@
             <%include file="course.html" args="course=course" />
           %endfor
         </section>
-        <section class='university-column'>
+        <section class='university-column last'>
           %for course in universities['BerkeleyX']:
             <%include file="course.html" args="course=course" />
           %endfor
