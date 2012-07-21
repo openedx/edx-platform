@@ -94,7 +94,7 @@ class CourseEnrollment(models.Model):
     user = models.ForeignKey(User)
     course_id = models.CharField(max_length=255, db_index=True)
     
-    created = models.DateTimeField(auto_now_add=True, null=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     
     class Meta:
         unique_together = (('user', 'course_id'), )
