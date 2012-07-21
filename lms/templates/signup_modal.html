@@ -121,7 +121,7 @@
   (function() {
    $(document).delegate('#enroll_form', 'ajax:success', function(data, json, xhr) {
      if(json.success) {
-       $('#enroll').html(json.value);
+       location.href="${reverse('dashboard')}";
      } else {
        $('#enroll_error').html(json.value).stop().css("display", "block");
      }
