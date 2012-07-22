@@ -11,7 +11,7 @@
     <id>tag:www.edx.org,2012:Post/3</id>
     <published>2012-07-16T14:08:12-07:00</published>
     <updated>2012-07-16T14:08:12-07:00</updated>
-    <link type="text/html" rel="alternate" href="#"/>
+    <link type="text/html" rel="alternate" href="${reverse('press/uc-berkeley-joins-edx')}"/>
     <title>UC Berkeley joins edX</title>
     <content type="html">&lt;img src=&quot;${static.url('images/press/edx_logo_108x81.jpeg')}&quot; /&gt; 
       &lt;p&gt;edX broadens course offerings&lt;/p&gt;</content>
