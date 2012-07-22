@@ -31,7 +31,7 @@
 
         <div class="input-group">
           <section class="citizenship">
-            <label>Level of Education</label>
+            <label>Ed. completed</label>
             <div class="input-wrapper">
               <select name="level_of_education">
                   <option value="">--</option>
@@ -57,7 +57,13 @@
           <section class="gender">
             <label>Year of birth</label>
             <div class="input-wrapper">
-              <input name="year_of_birth" type="text" placeholder="Year of birth">
+              <select name="year_of_birth">
+                <option value="">--</option>
+                %for year in UserProfile.VALID_YEARS:
+                  <option value="${year}">${year}</option>
+                %endfor
+              </select>
+              ##<input name="year_of_birth" type="text" placeholder="Year of birth">
             </div>
           </section>
 

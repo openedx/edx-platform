@@ -8,11 +8,12 @@ file and check it in at the same time as your model changes. To do that,
 2. django-admin.py schemamigration student --auto --settings=lms.envs.dev --pythonpath=. description_of_your_change
 3. Add the migration file created in mitx/common/djangoapps/student/migrations/
 """
+from datetime import datetime
+import json
 import uuid
 
 from django.db import models
 from django.contrib.auth.models import User
-import json
 from django_countries import CountryField
 
 #from cache_toolbox import cache_model, cache_relation
@@ -36,6 +37,8 @@ class UserProfile(models.Model):
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
     # Optional demographic data we started capturing from Fall 2012
+    this_year = datetime.now().year
+    VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
     gender = models.CharField(blank=True, null=True, max_length=6, db_index=True,
@@ -43,7 +46,7 @@ class UserProfile(models.Model):
     LEVEL_OF_EDUCATION_CHOICES = (('p_se', 'Doctorate in science or engineering'),
                                   ('p_oth', 'Doctorate in another field'),
                                   ('m', "Master's or professional degree"),
-                                  ('b', "Master's or professional degree"),
+                                  ('b', "Bachelor's degree"),
                                   ('hs', "Secondary/high school"),
                                   ('jhs', "Junior secondary/junior high/middle school"),
                                   ('el', "Elementary/primary school"),
