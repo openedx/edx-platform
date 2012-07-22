@@ -18,6 +18,16 @@
       margin-bottom: 30px;
       text-align: center;
     }
+    
+    li {
+      color: $base-font-color;
+      font: normal 1em/1.6em $serif;
+      margin: 0px;
+    }
+    
+    li + li {
+      margin-top: 20px;
+    }
 
     > article {
       border: 1px solid rgb(220,220,220);
