@@ -3,6 +3,16 @@ $ ->
   #DEBUG = true
   DEBUG = false
 
+  if $('#accordion').length
+    active = $('#accordion ul:has(li.active)').index('#accordion ul')
+    $('#accordion').bind('accordionchange', @log).accordion
+      active: if active >= 0 then active else 1
+      header: 'h3'
+      autoHeight: false
+    $('#open_close_accordion a').click @toggle
+
+    $('#accordion').show()
+
   $(".discussion-title").click ->
     $thread = $(this).parent().children(".thread")
     if $thread.css("display") == "none"
@@ -103,7 +113,7 @@ $ ->
       return
     $edit = $div.children(".discussion-content").find(".comment-edit")
     body = $edit.val()
-    $.post url, {body: body}, handleAnchorAndReload(response, textStatus) ->
+    $.post url, {body: body}, (response, textStatus) ->
       if textStatus == "success"
         handleAnchorAndReload(response)
       console.log response
