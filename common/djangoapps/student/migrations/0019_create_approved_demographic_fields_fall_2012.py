@@ -8,14 +8,70 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting field 'UserProfile.occupation'
+        db.delete_column('auth_userprofile', 'occupation')
 
-        # Changing field 'UserProfile.country'
-        db.alter_column('auth_userprofile', 'country', self.gf('django_countries.fields.CountryField')(max_length=2, null=True))
+        # Deleting field 'UserProfile.telephone_number'
+        db.delete_column('auth_userprofile', 'telephone_number')
+
+        # Deleting field 'UserProfile.date_of_birth'
+        db.delete_column('auth_userprofile', 'date_of_birth')
+
+        # Deleting field 'UserProfile.country'
+        db.delete_column('auth_userprofile', 'country')
+
+        # Adding field 'UserProfile.year_of_birth'
+        db.add_column('auth_userprofile', 'year_of_birth',
+                      self.gf('django.db.models.fields.IntegerField')(db_index=True, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'UserProfile.level_of_education'
+        db.add_column('auth_userprofile', 'level_of_education',
+                      self.gf('django.db.models.fields.CharField')(db_index=True, max_length=6, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'UserProfile.goals'
+        db.add_column('auth_userprofile', 'goals',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding index on 'UserProfile', fields ['gender']
+        db.create_index('auth_userprofile', ['gender'])
+
 
     def backwards(self, orm):
+        # Removing index on 'UserProfile', fields ['gender']
+        db.delete_index('auth_userprofile', ['gender'])
 
-        # Changing field 'UserProfile.country'
-        db.alter_column('auth_userprofile', 'country', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
+        # Adding field 'UserProfile.occupation'
+        db.add_column('auth_userprofile', 'occupation',
+                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'UserProfile.telephone_number'
+        db.add_column('auth_userprofile', 'telephone_number',
+                      self.gf('django.db.models.fields.CharField')(max_length=25, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'UserProfile.date_of_birth'
+        db.add_column('auth_userprofile', 'date_of_birth',
+                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'UserProfile.country'
+        db.add_column('auth_userprofile', 'country',
+                      self.gf('django_countries.fields.CountryField')(max_length=2, null=True, blank=True),
+                      keep_default=False)
+
+        # Deleting field 'UserProfile.year_of_birth'
+        db.delete_column('auth_userprofile', 'year_of_birth')
+
+        # Deleting field 'UserProfile.level_of_education'
+        db.delete_column('auth_userprofile', 'level_of_education')
+
+        # Deleting field 'UserProfile.goals'
+        db.delete_column('auth_userprofile', 'goals')
+
 
     models = {
         'auth.group': {
@@ -80,8 +136,9 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'student.courseenrollment': {
-            'Meta': {'object_name': 'CourseEnrollment'},
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'Meta': {'unique_together': "(('user', 'course_id'),)", 'object_name': 'CourseEnrollment'},
+            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
@@ -107,19 +164,18 @@ class Migration(SchemaMigration):
         },
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
-            'country': ('django_countries.fields.CountryField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
-            'date_of_birth': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '6', 'null': 'True', 'blank': 'True'}),
+            'gender': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '6', 'null': 'True', 'blank': 'True'}),
+            'goals': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
+            'level_of_education': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '6', 'null': 'True', 'blank': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
             'mailing_address': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'meta': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'meta': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
-            'occupation': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'telephone_number': ('django.db.models.fields.CharField', [], {'max_length': '25', 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.User']"})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.User']"}),
+            'year_of_birth': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'})
         },
         'student.usertestgroup': {
             'Meta': {'object_name': 'UserTestGroup'},
