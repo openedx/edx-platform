@@ -99,12 +99,13 @@ if settings.COURSEWARE_ENABLED:
         # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
                 
-        url(r'^courses/?$', 'courseware.views.courses', name="courses"),        
+        url(r'^courses/?$', 'courseware.views.courses', name="courses"),     
+        url(r'^change_enrollment$', 
+            'student.views.change_enrollment_view', name="change_enrollment"),
+           
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 
             'courseware.views.course_about', name="about_course"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 
-            'courseware.views.enroll', name="enroll"),
         
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 

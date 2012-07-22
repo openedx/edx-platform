@@ -79,17 +79,15 @@ def index(request):
 
     return render_to_response('index.html', {'universities': universities, 'entries': entries})
 
+def course_from_id(id):
+    course_loc = CourseDescriptor.id_to_location(id)
+    return modulestore().get_item(course_loc)
 
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
-    csrf_token = csrf(request)['csrf_token']
     user = request.user
     enrollments = CourseEnrollment.objects.filter(user=user)
-
-    def course_from_id(id):
-        course_loc = CourseDescriptor.id_to_location(id)
-        return modulestore().get_item(course_loc)
 
     # Build our courses list for the user, but ignore any courses that no longer
     # exist (because the course IDs have changed). Still, we don't delete those
@@ -101,10 +99,72 @@ def dashboard(request):
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existant course {1}"
                       .format(user.username, enrollment.course_id))
+    
+    
+    message = ""
+    if not user.is_active:
+        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
 
-    context = {'csrf': csrf_token, 'courses': courses}
+    context = {'courses': courses, 'message' : message}
     return render_to_response('dashboard.html', context)
 
+
+def try_change_enrollment(request):
+    """
+    This method calls change_enrollment if the necessary POST 
+    parameters are present, but does not return anything. It
+    simply logs the result or exception. This is usually
+    called after a registration or login, as secondary action.
+    It should not interrupt a successful registration or login.
+    """
+    if 'enrollment_action' in request.POST:
+        try:
+            enrollment_output = change_enrollment(request)
+            # There isn't really a way to display the results to the user, so we just log it
+            # We expect the enrollment to be a success, and will show up on the dashboard anyway
+            log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
+        except Exception, e:
+            log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
+    
+
+@login_required
+def change_enrollment_view(request):
+    return HttpResponse(json.dumps(change_enrollment(request)))
+
+def change_enrollment(request):
+    if request.method != "POST":
+        raise Http404
+    
+    action = request.POST.get("enrollment_action" , "")
+    user = request.user
+    course_id = request.POST.get("course_id", None)
+    if course_id == None:
+        return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
+        
+    if action == "enroll":
+        # Make sure the course exists
+        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
+        try:
+            course = course_from_id(course_id)
+        except ItemNotFoundError:
+            log.error("User {0} tried to enroll in non-existant course {1}"
+                      .format(user.username, enrollment.course_id))
+            return {'success': False, 'error': 'The course requested does not exist.'}
+                
+        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        return {'success': True}
+        
+    elif action == "unenroll":
+        try:
+            enrollment =  CourseEnrollment.objects.get(user=user, course_id=course_id)
+            enrollment.delete()
+            return {'success': True}
+        except CourseEnrollment.DoesNotExist:
+            return {'success': False, 'error': 'You are not enrolled for this course.'}
+    else:
+        return {'success': False, 'error': 'Invalid enrollment_action.'}
+    
+    return {'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}
 
 # Need different levels of logging
 @ensure_csrf_cookie
@@ -112,7 +172,7 @@ def login_user(request, error=""):
     ''' AJAX request to log in the user. '''
     if 'email' not in request.POST or 'password' not in request.POST:
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))  # TODO: User error message
+                                        'value': 'There was an error receiving your login information. Please email us.'}))  # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
@@ -121,14 +181,14 @@ def login_user(request, error=""):
     except User.DoesNotExist:
         log.warning("Login failed - Unknown user email: {0}".format(email))
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))  # TODO: User error message
+                                        'value': 'Email or password is incorrect.'}))  # TODO: User error message
 
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
         log.warning("Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))
+                                        'value': 'Email or password is incorrect.'}))
 
     if user is not None and user.is_active:
         try:
@@ -143,11 +203,14 @@ def login_user(request, error=""):
             log.exception(e)
 
         log.info("Login success - {0} ({1})".format(username, email))
+        
+        try_change_enrollment(request)
+        
         return HttpResponse(json.dumps({'success':True}))
 
     log.warning("Login failed - Account not active for user {0}".format(username))
     return HttpResponse(json.dumps({'success':False,
-                                    'error': 'Account not active. Check your e-mail.'}))
+                                    'value': 'This account has not been activated. Please check your e-mail for the activation instructions.'}))
 
 @ensure_csrf_cookie
 def logout_user(request):
@@ -278,10 +341,17 @@ def create_account(request, post_override=None):
         log.exception(sys.exc_info())
         js['value'] = 'Could not send activation e-mail.'
         return HttpResponse(json.dumps(js))
-
-    js={'success': True,
-        'value': render_to_string('registration/reg_complete.html', {'email': post_vars['email'],
-                                                                     'csrf': csrf(request)['csrf_token']})}
+     
+    # Immediately after a user creates an account, we log them in. They are only
+    # logged in until they close the browser. They can't log in again until they click
+    # the activation link from the email.
+    login_user = authenticate(username=post_vars['username'], password = post_vars['password'] )
+    login(request, login_user)
+    request.session.set_expiry(0)  
+    
+    try_change_enrollment(request)
+    
+    js={'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
 def create_random_account(create_account_function):
@@ -311,14 +381,15 @@ def activate_account(request, key):
     '''
     r=Registration.objects.filter(activation_key=key)
     if len(r)==1:
+        user_logged_in = request.user.is_authenticated()
+        already_active = True
         if not r[0].user.is_active:
             r[0].activate()
-            resp = render_to_response("activation_complete.html",{'csrf':csrf(request)['csrf_token']})
-            return resp
-        resp = render_to_response("activation_active.html",{'csrf':csrf(request)['csrf_token']})
+            already_active = False
+        resp = render_to_response("registration/activation_complete.html",{'user_logged_in':user_logged_in, 'already_active' : already_active})
         return resp
     if len(r)==0:
-        return render_to_response("activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
+        return render_to_response("registration/activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
     return HttpResponse("Unknown error. Please e-mail us to let us know how it happened.")
 
 @ensure_csrf_cookie

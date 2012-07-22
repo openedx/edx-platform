@@ -1,4 +1,5 @@
 from collections import defaultdict
+import json
 import logging
 import urllib
 import itertools
@@ -8,7 +9,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -268,17 +269,7 @@ def course_about(request, course_id):
     course = check_course(course_id, course_must_be_open=False)
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
-
-
-@login_required
-@ensure_csrf_cookie
-def enroll(request, course_id):
-    course = check_course(course_id, course_must_be_open=False)
-    user = request.user
     
-    enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
-    
-    return redirect(reverse('dashboard'))
 
 
 @ensure_csrf_cookie
@@ -295,5 +286,3 @@ def university_profile(request, org_id):
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
-
-
