@@ -16,6 +16,13 @@ $discussion_input_width: 60%;
   }
 }
 
+.course-content {
+  .discussion {
+    margin-left: 40px;
+    margin-top: 15px;
+  }
+}
+
 .discussion {
   .discussion-title {
     @include discussion-font;

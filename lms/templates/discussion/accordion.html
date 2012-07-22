@@ -1,0 +1,26 @@
+<%! from django.core.urlresolvers import reverse %>
+
+<%
+def url_for(board):
+  if board['category'] == 'General':
+    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id.replace('/', '-'), 'general'])
+  else:
+    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id.replace('/', '-'), board['discussion_id']])
+%>
+
+<%def name="make_category(category, boards)">
+  <h3><a href="#">${category}</a></h3>
+
+    <ul>
+      % for board in boards: 
+        <li${' class="active"' if active == board['discussion_id'] else ''}>
+          <a href="${url_for(board)}">
+            <p>${board['title']}</p>
+          </a>
+        % endfor
+      </ul>
+    </%def>
+
+% for category, boards in discussion_info.items(): 
+    ${make_category(category, boards)}
+% endfor
