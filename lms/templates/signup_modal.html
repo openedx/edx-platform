@@ -36,6 +36,7 @@
             <label>Country</label>
             <div class="input-wrapper">
               <select name="country">
+                  <option value="">--</option>
                   %for country_code, country_name in COUNTRIES:
                       <option value="${country_code}">${country_name}</option>
                   %endfor
@@ -86,13 +87,13 @@
           <label class="terms-of-service">
             <input name="terms_of_service" type="checkbox" value="true">
             I agree to the
-            <a href="${reverse('tos')}">Terms of Service</a>*
+            <a href="${reverse('tos')}" target="_blank">Terms of Service</a>*
           </label>
 
           <label class="honor-code">
             <input name="honor_code" type="checkbox" value="true">
             I agree to the
-            <a href="${reverse('honor')}">Honor Code</a>*
+            <a href="${reverse('honor')}" target="_blank">Honor Code</a>*
           </label>
         </div>
 
