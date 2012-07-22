@@ -74,7 +74,9 @@ urlpatterns = ('',
         {'template': 'copyright.html'}, name="copyright"),
     url(r'^honor$', 'static_template_view.views.render', 
         {'template': 'honor.html'}, name="honor"),
-        
+    
+    
+    (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
     
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
     # url(r'^send_feedback$', 'util.views.send_feedback'),
