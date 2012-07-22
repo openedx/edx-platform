@@ -109,6 +109,24 @@ def dashboard(request):
     return render_to_response('dashboard.html', context)
 
 
+def try_change_enrollment(request):
+    """
+    This method calls change_enrollment if the necessary POST 
+    parameters are present, but does not return anything. It
+    simply logs the result or exception. This is usually
+    called after a registration or login, as secondary action.
+    It should not interrupt a successful registration or login.
+    """
+    if 'enrollment_action' in request.POST:
+        try:
+            enrollment_output = change_enrollment(request)
+            # There isn't really a way to display the results to the user, so we just log it
+            # We expect the enrollment to be a success, and will show up on the dashboard anyway
+            log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
+        except Exception, e:
+            log.error("Exception automatically enrolling after login: {0}".format(str(e)))
+    
+
 @login_required
 def change_enrollment_view(request):
     return HttpResponse(json.dumps(change_enrollment(request)))
@@ -186,14 +204,7 @@ def login_user(request, error=""):
 
         log.info("Login success - {0} ({1})".format(username, email))
         
-        if 'enrollment_action' in request.POST:
-            try:
-                enrollment_output = change_enrollment(request)
-                # There isn't really a way to display the results to the user, so we just log it
-                # We expect the enrollment to be a success, and will show up on the dashboard anyway
-                log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
-            except Exception, e:
-                log.error("Exception automatically enrolling after login: {0}".format(str(e)))
+        try_change_enrollment(request)
         
         return HttpResponse(json.dumps({'success':True}))
 
@@ -335,14 +346,7 @@ def create_account(request, post_override=None):
     login(request, login_user)
     request.session.set_expiry(0)  
     
-    if 'enrollment_action' in request.POST:
-        try:
-            enrollment_output = change_enrollment(request)
-            # There isn't really a way to display the results to the user, so we just log it
-            # We expect the enrollment to be a success, and will show up on the dashboard anyway
-            log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
-        except Exception, e:
-            log.error("Exception automatically enrolling after login: {0}".format(str(e)))
+    try_change_enrollment(request)
     
     js={'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
@@ -374,14 +378,15 @@ def activate_account(request, key):
     '''
     r=Registration.objects.filter(activation_key=key)
     if len(r)==1:
+        user_logged_in = request.user.is_authenticated()
+        already_active = True
         if not r[0].user.is_active:
             r[0].activate()
-            resp = render_to_response("activation_complete.html",{'csrf':csrf(request)['csrf_token']})
-            return resp
-        resp = render_to_response("activation_active.html",{'csrf':csrf(request)['csrf_token']})
+            already_active = False
+        resp = render_to_response("registration/activation_complete.html",{'user_logged_in':user_logged_in, 'already_active' : already_active})
         return resp
     if len(r)==0:
-        return render_to_response("activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
+        return render_to_response("registration/activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
     return HttpResponse("Unknown error. Please e-mail us to let us know how it happened.")
 
 @ensure_csrf_cookie
