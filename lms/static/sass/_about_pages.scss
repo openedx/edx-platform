@@ -220,15 +220,15 @@
         border: 1px solid rgb(120,120,120);
         @include box-sizing(border-box);
         float: left;
-        height: 120px;
+        height: 140px;
         margin-right: flex-gutter();
         overflow: hidden;
         width: flex-grid(2);
 
         img {
           display: block;
-          min-height: 100%;
-          width: 100%;
+          //min-height: 100%;
+          //width: 100%;
         }
       }
 
