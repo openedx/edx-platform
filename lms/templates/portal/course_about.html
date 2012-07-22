@@ -28,7 +28,7 @@
                 <a href="#" class="register">Register for ${course.number}</a>
             %endif
           %else:
-            <a href="#signup-modal" class="register" rel="leanModal" data-notice="You must Sign Up in order to register">Register for ${course.number}</a>
+            <a href="#signup-modal" class="register" rel="leanModal" data-notice='You must Sign Up or <a href="#login-modal" rel="leanModal">Log In</a> to enroll.'>Register for ${course.number}</a>
           %endif
         </div>
 
