@@ -39,7 +39,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        return time.strftime("%m/%d/%y", self.start)
+        return time.strftime("%b %d, %Y", self.start)
 
     @property
     def title(self):

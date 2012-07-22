@@ -5,7 +5,7 @@
 
   header.course-profile {
     background: rgb(245,245,245);
-    @include background-image(url('/static/images/homepage_interns_placeholder_2025x550.jpg'));
+    @include background-image(url('/static/images/homepage-bg.jpg'));
     background-size: cover;
     @include box-shadow(0 1px 80px 0 rgba(0,0,0, 0.5));
     border-bottom: 1px solid rgb(100,100,100);
