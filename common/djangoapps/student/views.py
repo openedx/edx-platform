@@ -124,7 +124,7 @@ def try_change_enrollment(request):
             # We expect the enrollment to be a success, and will show up on the dashboard anyway
             log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
         except Exception, e:
-            log.error("Exception automatically enrolling after login: {0}".format(str(e)))
+            log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
     
 
 @login_required
