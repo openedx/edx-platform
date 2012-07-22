@@ -84,7 +84,7 @@ div.leanModal_box {
   form {
     text-align: left;
 
-    div#enroll_error, div#login_error, div#pwd_error {
+    div#register_error, div#login_error, div#pwd_error {
       $error-color: #333;
       background-color: $error-color;
       border: darken($error-color, 20%);
