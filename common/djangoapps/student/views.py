@@ -306,17 +306,20 @@ def create_account(request, post_override=None):
 
     up = UserProfile(user=u)
     up.name = post_vars['name']
-    up.country = post_vars['country']
+    up.level_of_education = post_vars['level_of_education']
     up.gender = post_vars['gender']
     up.mailing_address = post_vars['mailing_address']
-
-    date_fields = ['date_of_birth__year', 'date_of_birth__month', 'date_of_birth__day']
-    if all(len(post_vars[field]) > 0 for field in date_fields):
-        up.date_of_birth = date(int(post_vars['date_of_birth__year']),
-                int(post_vars['date_of_birth__month']),
-                int(post_vars['date_of_birth__day']))
-
-    up.save()
+    up.goals = post_vars['goals']
+    
+    try:
+        up.year_of_birth = int(post_vars['year_of_birth'])
+    except ValueError:
+        up.year_of_birth = None # If they give us garbage, just ignore it instead
+                                # of asking them to put an integer.
+    try:
+        up.save()
+    except Exception:
+        log.exception("UserProfile creation failed for user {0}.".format(u.id))
     
     d = {'name': post_vars['name'],
          'key': r.activation_key,
