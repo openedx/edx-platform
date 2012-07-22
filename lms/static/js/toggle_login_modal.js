@@ -7,9 +7,11 @@
         closeButton: null,
         position: 'fixed'
       }
-
-      var overlay = $("<div id='lean_overlay'></div>");
-      $("body").append(overlay);
+      
+      if ($("#lean_overlay").length == 0) {
+        var overlay = $("<div id='lean_overlay'></div>");
+        $("body").append(overlay);
+      }
 
       options =  $.extend(defaults, options);
 
@@ -51,7 +53,11 @@
           $(modal_id).find(".notice").hide().html("");
           var notice = $(this).data('notice')
           if(notice !== undefined) {
-            $(modal_id).find(".notice").show().html(notice);
+            $notice = $(modal_id).find(".notice");
+            $notice.show().html(notice);
+            // This is for activating leanModal links that were in the notice. We should have a cleaner way of
+            // allowing all dynamically added leanmodal links to work.
+            $notice.find("a[rel*=leanModal]").leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
           }
           window.scrollTo(0, 0);
           e.preventDefault();

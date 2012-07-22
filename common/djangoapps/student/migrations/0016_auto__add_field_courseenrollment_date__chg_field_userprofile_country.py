@@ -8,23 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # This table is dropped in a subsequent migration. This migration was causing problems when using InnoDB,
-        # so we are just dropping it.
-        pass
-        # # Removing unique constraint on 'CourseEnrollment', fields ['user']
-        # db.delete_unique('student_courseenrollment', ['user_id'])
-        # 
-        # 
-        # # Changing field 'CourseEnrollment.user'
-        # db.alter_column('student_courseenrollment', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
+        # Adding field 'CourseEnrollment.date'
+        db.add_column('student_courseenrollment', 'date',
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, blank=True),
+                      keep_default=False)
+
+
+        # Changing field 'UserProfile.country'
+        db.alter_column('auth_userprofile', 'country', self.gf('django_countries.fields.CountryField')(max_length=2, null=True))
 
     def backwards(self, orm):
-        pass
-        # # Changing field 'CourseEnrollment.user'
-        # db.alter_column('student_courseenrollment', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True))
-        # # Adding unique constraint on 'CourseEnrollment', fields ['user']
-        # db.create_unique('student_courseenrollment', ['user_id'])
+        # Deleting field 'CourseEnrollment.date'
+        db.delete_column('student_courseenrollment', 'date')
 
+
+        # Changing field 'UserProfile.country'
+        db.alter_column('auth_userprofile', 'country', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
 
     models = {
         'auth.group': {
@@ -89,8 +88,9 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'student.courseenrollment': {
-            'Meta': {'object_name': 'CourseEnrollment'},
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'Meta': {'unique_together': "(('user', 'course_id'),)", 'object_name': 'CourseEnrollment'},
+            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
@@ -116,12 +116,18 @@ class Migration(SchemaMigration):
         },
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
+            'country': ('django_countries.fields.CountryField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
+            'date_of_birth': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'gender': ('django.db.models.fields.CharField', [], {'max_length': '6', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
             'location': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
-            'meta': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'mailing_address': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'meta': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
+            'occupation': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'telephone_number': ('django.db.models.fields.CharField', [], {'max_length': '25', 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.User']"})
         },
         'student.usertestgroup': {

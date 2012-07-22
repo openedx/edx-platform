@@ -7,16 +7,16 @@
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
-    <div id="enroll">
+    <div id="register">
       <header>
         <h2>Sign Up for <span class="edx">edX</span></h2>
         <hr>
       </header>
 
-      <form id="enroll_form" method="post" data-remote="true" action="/create_account">
+      <form id="register_form" method="post" data-remote="true" action="/create_account">
         <div class="notice"></div>
-        <div id="enroll_error" class="modal-form-error" name="enroll_error"></div>
-        <div id="enroll_error" name="enroll_error"></div>
+        <div id="register_error" class="modal-form-error" name="register_error"></div>
+        <div id="register_error" name="register_error"></div>
 
         <div class="input-group">
           <label>E-mail*</label>
@@ -105,11 +105,11 @@
 
 <script type="text/javascript">
   (function() {
-   $(document).delegate('#enroll_form', 'ajax:success', function(data, json, xhr) {
+   $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
      if(json.success) {
-       $('#enroll').html(json.value);
+       location.href="${reverse('dashboard')}";
      } else {
-       $('#enroll_error').html(json.value).stop().css("display", "block");
+       $('#register_error').html(json.value).stop().css("display", "block");
      }
     });
   })(this)
