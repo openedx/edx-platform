@@ -108,12 +108,10 @@
             %for entry in entries:
             <article>
                 %if entry.image:
-                    <a href="${entry.link}" class="post-graphics">
-                        <img src="${entry.image}" />
-                    </a>
+                    <a href="${entry.link}" class="post-graphics" target="_blank"><img src="${entry.image}" /></a>
                 %endif
                 <div class="post-name">
-                    <a href="${entry.link}">${entry.title}</a>
+                    <a href="${entry.link}" target="_blank">${entry.title}</a>
                     <p class="post-date">${strftime("%m/%d/%y", entry.published_parsed)}</p>
                 </div>
             </article>
@@ -122,12 +120,11 @@
         <section class="press-links">
           <h3>edX in the News:</h3>
           ##<a href="${reverse('pressrelease')}">The edX Press Release</a>
-          <a href="http://www.nytimes.com/2012/07/20/education/edlife/anant-agarwal-discusses-free-online-courses-offered-by-a-harvard-mit-partnership.html">New York Times</a>,
-          <a href="http://www.bostonglobe.com/magazine/2012/07/14/anant-agarwal-believes-online-education-from-mit-and-harvard-should-available-all/Af0kX44dPqpBKRV2IOSjPP/story.html">Boston Globe</a>,
-          <a href="http://www.huffingtonpost.co.uk/2012/06/20/harvard-and-mit-create-edx-free-university-courses_n_1612143.html?utm_hp_ref=uk">Huffington Post</a>,
-          <a href="http://gigaom.com/cloud/everybody-codes/">GigaOM</a>,
-          <a href="http://web.mit.edu/newsoffice/2012/mitx-edx-first-course-recap-0716.html">MIT News</a>
-
+          <a target="_blank" href="http://www.nytimes.com/2012/07/20/education/edlife/anant-agarwal-discusses-free-online-courses-offered-by-a-harvard-mit-partnership.html">New York Times</a>,
+          <a target="_blank" href="http://www.bostonglobe.com/magazine/2012/07/14/anant-agarwal-believes-online-education-from-mit-and-harvard-should-available-all/Af0kX44dPqpBKRV2IOSjPP/story.html"target="_blank" >Boston Globe</a>,
+          <a target="_blank" href="http://www.huffingtonpost.co.uk/2012/06/20/harvard-and-mit-create-edx-free-university-courses_n_1612143.html?utm_hp_ref=uk">Huffington Post</a>,
+          <a target="_blank" href="http://gigaom.com/cloud/everybody-codes/">GigaOM</a>,
+          <a target="_blank" href="http://web.mit.edu/newsoffice/2012/mitx-edx-first-course-recap-0716.html">MIT News</a>
         </section>
       </section>
     </section>
