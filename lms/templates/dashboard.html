@@ -61,11 +61,12 @@
                 </div>
               </div>
               <div class="complete">
-                <p><span class="completeness">60%</span> compleat</p>
+                <p><span class="completeness">60%</span> complete</p>
               </div>
             </section>
           </section>
         </article>
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unenroll</a>
 
       % endfor
     % else:
@@ -77,3 +78,52 @@
 
   </section>
 </section>
+
+
+
+<section id="unenroll-modal" class="modal unenroll-modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Are you sure you want to unenroll from <span id="unenroll_course_number"></span>?</h2>
+      <hr>
+    </header>
+
+    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <input name="course_id" id="unenroll_course_id" type="hidden" />
+      <input name="enrollment_action" type="hidden" value="unenroll" />
+      <div class="submit">
+        <input name="submit" type="submit" value="Unenroll" />
+      </div>
+    </form>
+
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script type="text/javascript">
+(function() {
+  
+  $(".unenroll").click(function(event) {
+    $("#unenroll_course_id").val( $(event.target).data("course-id") );
+    $("#unenroll_course_number").text( $(event.target).data("course-number") );
+    
+  });
+  
+   $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
+     if(json.success) {
+       location.href="${reverse('dashboard')}";
+     } else {
+       if($('#unenroll_error').length == 0) {
+         $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
+       }
+       $('#unenroll_error').text(json.error).stop().css("display", "block");
+     }
+   });
+})(this)
+</script>
+
