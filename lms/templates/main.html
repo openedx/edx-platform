@@ -13,6 +13,10 @@
   <%static:js group='main_vendor'/>
   <%block name="headextra"/>
 
+  <!--[if lt IE 9]>
+  <script src="${static.url('js/html5shiv.js')}"></script>
+  <![endif]-->
+
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
 </head>
 
@@ -26,10 +30,6 @@
   <%include file="footer.html" />
 
   <%static:js group='application'/>
-
-  <!--[if lt IE 9]>
-  <script src="${static.url('js/html5shiv.js')}"></script>
-  <![endif]-->
 
   <%block name="js_extra"/>
 </body>
