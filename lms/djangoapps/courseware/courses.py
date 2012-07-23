@@ -105,7 +105,7 @@ def get_course_info_section(course, section_key):
     if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
         try:
             with course.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
-                return htmlFile.read().decode('utf-8')
+                return replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
         except ResourceNotFoundError:
             log.exception("Missing info section {key} in course {url}".format(key=section_key, url=course.location.url()))
             return "! Info section missing !"
