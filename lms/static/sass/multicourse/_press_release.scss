@@ -60,5 +60,34 @@
        margin-top: 0px; 
       }
     }
+
+    h3.date {
+      margin-bottom: 0;
+    }
+
+    div.social-sharing {
+      @include clearfix;
+
+      hr.horizontal-divider {
+        margin-top: 40px !important;
+      }
+
+      .fb-like {
+        margin-top: 8px;
+        margin-left: 10px;
+        float: left;
+      }
+
+      p {
+        float: left;
+        margin-top: 8px;
+        margin-right: 10px;
+      }
+
+      a {
+        display: block;
+        float: left;
+      }
+    }
   }
 }

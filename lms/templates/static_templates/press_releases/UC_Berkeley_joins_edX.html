@@ -4,6 +4,14 @@
 <%namespace name='static' file='../../static_content.html'/>
 
 <%block name="title"><title>UC Berkeley joins edX</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 
 <section class="pressrelease">
   <section class="container">
@@ -89,6 +97,19 @@
       <section class="footer">
         <hr class="horizontal-divider">
         <div class="logo"></div><h3 class="date">7 - 24 - 2012</h3>
+        <div class="social-sharing">
+        <hr class="horizontal-divider">
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=UC+Berkeley+joins+Harvard+and+MIT+not-for-profit+online+learning+collaborative:+http://edx.org/press/uc-berkeley-joins-edx" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}">
+          </a>
+        </a>
+        <a href="mailto:?subject=UC%20Berkeley%20Joins%20edX&body=UC%20Berkeley%20joins%20Harvard%20and%20MIT%20not-for-profit%20online%20learning%20collaborative;%20edX%20broadens%20free%20course%20offerings%20into%20public%20health…http://edx.org/press/uc-berkeley-joins-edx" class="share">
+          <img src="${static.url('images/social/email-sharing.png')}">
+        </a>
+        <div class="fb-like" data-href="http://edx.org/press/uc-berkeley-joins-edx" data-send="true" data-width="450" data-show-faces="true"></div>
+      </div>
+        
       </section>
     </article>
   </section>

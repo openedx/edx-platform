@@ -146,16 +146,6 @@
     }
   }
 
-  .help {
-    section.emails {
-      border: 1px solid rgb(220,220,220);
-      @include box-sizing(border-box);
-      float: left;
-      margin-left: flex-gutter();
-      padding: 20px;
-      width: flex-grid(3);
-    }
-  }
 
   .faq {
     @include clearfix;
