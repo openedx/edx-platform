@@ -307,14 +307,14 @@ def create_account(request, post_override=None):
 
     up = UserProfile(user=u)
     up.name = post_vars['name']
-    up.level_of_education = post_vars['level_of_education']
-    up.gender = post_vars['gender']
-    up.mailing_address = post_vars['mailing_address']
-    up.goals = post_vars['goals']
+    up.level_of_education = post_vars.get('level_of_education')
+    up.gender = post_vars.get('gender')
+    up.mailing_address = post_vars.get('mailing_address')
+    up.goals = post_vars.get('goals')
     
     try:
         up.year_of_birth = int(post_vars['year_of_birth'])
-    except ValueError:
+    except (ValueError, KeyError):
         up.year_of_birth = None # If they give us garbage, just ignore it instead
                                 # of asking them to put an integer.
     try:

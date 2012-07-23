@@ -30,6 +30,7 @@ class AuthTestCase(TestCase):
         self.email = 'a@b.com'
         self.pw = 'xyz'
         self.username = 'testuser'
+        self.client = Client()
 
     def check_page_get(self, url, expected):
         resp = self.client.get(url)
@@ -63,7 +64,8 @@ class AuthTestCase(TestCase):
             'language' : 'Franglish',
             'name' : 'Fred Weasley',
             'terms_of_service' : 'true',
-            'honor_code' : 'true'})
+            'honor_code' : 'true',
+        })
         return resp
 
     def create_account(self, username, email, pw):
@@ -121,7 +123,7 @@ class AuthTestCase(TestCase):
         resp = self._login(self.email, self.pw)
         data = parse_json(resp)
         self.assertFalse(data['success'])
-        
+
         self.activate_user(self.email)
 
         # Now login should work
@@ -143,6 +145,9 @@ class AuthTestCase(TestCase):
 
         # need an activated user
         self.test_create_account()
+
+        # Create a new session
+        self.client = Client()
 
         # Not logged in.  Should redirect to login.
         print 'Not logged in'
