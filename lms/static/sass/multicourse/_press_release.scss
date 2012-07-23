@@ -54,13 +54,10 @@
     }
     
     .contact {
-      @include box-sizing(border-box);
-      border: 1px solid rgb(220,220,220);
-      padding: 20px;
-      margin-top: 60px;
+      margin-top: 20px;
       
       p + p {
-       margin-top: 10px; 
+       margin-top: 0px; 
       }
     }
   }
