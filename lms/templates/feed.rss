@@ -22,7 +22,7 @@
     <updated>2012-07-16T14:08:12-07:00</updated>
     <link type="text/html" rel="alternate" href="http://edxonline.tumblr.com/post/27589840852/opening-doors-for-exceptional-students-6-002x-in"/>
     <title>Opening Doors For Exceptional Students: 6.002x in Mongolia</title>
-    <content type="html">&lt;img src=&quot;http://media.tumblr.com/tumblr_m6y5eyXV1F1rsal4c.jpg&quot; /&gt;</content>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/tumblr_tumbnail_opening_doors_mongolia.jpg')}&quot; /&gt;</content>
   </entry>
   <entry>
     <id>tag:www.edx.org,2012:Post/1</id>
@@ -30,6 +30,6 @@
     <updated>2012-07-16T14:08:12-07:00</updated>
     <link type="text/html" rel="alternate" href="http://edxonline.tumblr.com/post/27589835076/beyond-the-circuits-a-students-experience-with-6-002x"/>
     <title>Brazilian teen blogs about his 6.002x experience</title>
-    <content type="html">&lt;img src=&quot;http://media.tumblr.com/tumblr_m7bdkyV9Lp1rsal4c.png&quot; /&gt;</content>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/tumblr_tumbnail_brazilian_teen.jpg')}&quot; /&gt;</content>
   </entry>
 </feed>
