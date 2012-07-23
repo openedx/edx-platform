@@ -53,7 +53,7 @@ class XMLModuleStore(ModuleStore):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager,self.data_dir))
+        log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
         log.debug('default_class = %s' % self.default_class)
 
         for course_dir in os.listdir(self.data_dir):

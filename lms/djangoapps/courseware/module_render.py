@@ -36,7 +36,7 @@ class I4xSystem(object):
 
         ajax_url - the url where ajax calls to the encapsulating module go.
         xqueue_callback_url - the url where external queueing system (e.g. for grading)
-                              returns its response 
+                              returns its response
         track_function - function of (event_type, event), intended for logging
                          or otherwise tracking the event.
                          TODO: Not used, and has inconsistent args in different
@@ -278,7 +278,7 @@ def replace_static_urls(module, prefix):
     with urls that are /static/<prefix>/...
     """
     original_get_html = module.get_html
-    
+
     @wraps(original_get_html)
     def get_html():
         return replace_urls(original_get_html(), staticfiles_prefix=prefix)
@@ -308,9 +308,9 @@ def add_histogram(module):
             coursename = multicourse_settings.get_coursename_from_request(request)
             github_url = multicourse_settings.get_course_github_url(coursename)
             fn = module_xml.get('filename')
-            if module_xml.tag=='problem': fn = 'problems/' + fn	# grrr
+            if module_xml.tag == 'problem': fn = 'problems/' + fn	 # grrr
             edit_link = (github_url + '/tree/master/' + fn) if github_url is not None else None
-            if module_xml.tag=='problem': edit_link += '.xml'	# grrr
+            if module_xml.tag == 'problem': edit_link += '.xml'	 # grrr
         else:
             edit_link = False
 
@@ -328,13 +328,14 @@ def add_histogram(module):
     module.get_html = get_html
     return module
 
+
 # TODO: TEMPORARY BYPASS OF AUTH!
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
     get = request.POST.copy()
     try:
-        header = json.loads(get.pop('xqueue_header')[0]) # 'dict'
+        header = json.loads(get.pop('xqueue_header')[0])  # 'dict'
     except Exception as err:
         msg = "Error in xqueue_callback %s: Invalid return format" % err
         raise Exception(msg)
@@ -344,12 +345,12 @@ def xqueue_callback(request, userid, id, dispatch):
 
     student_module_cache = StudentModuleCache(user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
-    
+
     if instance_module is None:
         log.debug("Couldn't find module '%s' for user '%s'",
                   id, request.user)
         raise Http404
-    
+
     oldgrade = instance_module.grade
     old_instance_state = instance_module.state
 
@@ -360,7 +361,7 @@ def xqueue_callback(request, userid, id, dispatch):
     # We go through the "AJAX" path
     #   So far, the only dispatch from xqueue will be 'score_update'
     try:
-        ajax_return = instance.handle_ajax(dispatch, get) # Can ignore the "ajax" return in 'xqueue_callback'
+        ajax_return = instance.handle_ajax(dispatch, get)  # Can ignore the "ajax" return in 'xqueue_callback'
     except:
         log.exception("error processing ajax call")
         raise
@@ -373,6 +374,7 @@ def xqueue_callback(request, userid, id, dispatch):
         instance_module.save()
 
     return HttpResponse("")
+
 
 def modx_dispatch(request, dispatch=None, id=None):
     ''' Generic view for extensions. This is where AJAX calls go.
@@ -392,7 +394,7 @@ def modx_dispatch(request, dispatch=None, id=None):
 
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
-    
+
     if instance_module is None:
         log.debug("Couldn't find module '%s' for user '%s'",
                   id, request.user)

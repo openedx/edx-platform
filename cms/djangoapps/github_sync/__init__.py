@@ -58,7 +58,7 @@ def export_to_github(course, commit_message, author_str=None):
             git_repo.git.commit(m=commit_message, author=author_str)
         else:
             git_repo.git.commit(m=commit_message)
-        
+
         origin = git_repo.remotes.origin
         if settings.MITX_FEATURES['GITHUB_PUSH']:
             push_infos = origin.push()

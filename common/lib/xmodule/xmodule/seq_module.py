@@ -53,9 +53,9 @@ class SequenceModule(XModule):
 
     def handle_ajax(self, dispatch, get):		# TODO: bounds checking
         ''' get = request.POST instance '''
-        if dispatch=='goto_position':
+        if dispatch == 'goto_position':
             self.position = int(get['position'])
-            return json.dumps({'success':True})
+            return json.dumps({'success': True})
         raise self.system.exception404
 
     def render(self):
@@ -81,7 +81,7 @@ class SequenceModule(XModule):
         # of script, even if it occurs mid-string. Do this after json.dumps()ing
         # so that we can be sure of the quotations being used
         import re
-        params = {'items': re.sub(r'(?i)</(script)', r'\u003c/\1', json.dumps(contents)),	# ?i = re.IGNORECASE for py2.6 compatability
+        params = {'items': re.sub(r'(?i)</(script)', r'\u003c/\1', json.dumps(contents)),	 # ?i = re.IGNORECASE for py2.6 compatability
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,

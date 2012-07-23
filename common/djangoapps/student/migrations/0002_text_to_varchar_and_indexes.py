@@ -4,10 +4,11 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Changing field 'UserProfile.name'
         db.alter_column('auth_userprofile', 'name', self.gf('django.db.models.fields.CharField')(max_length=255))
 
@@ -32,9 +33,8 @@ class Migration(SchemaMigration):
         # Adding index on 'UserProfile', fields ['location']
         db.create_index('auth_userprofile', ['location'])
 
-
     def backwards(self, orm):
-        
+
         # Removing index on 'UserProfile', fields ['location']
         db.delete_index('auth_userprofile', ['location'])
 
@@ -58,7 +58,6 @@ class Migration(SchemaMigration):
 
         # Changing field 'UserProfile.location'
         db.alter_column('auth_userprofile', 'location', self.gf('django.db.models.fields.TextField')())
-
 
     models = {
         'auth.group': {

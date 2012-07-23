@@ -31,6 +31,7 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
+
 def user_groups(user):
     if not user.is_authenticated():
         return []
@@ -62,15 +63,15 @@ def courses(request):
     for course in courses:
         universities[course.org].append(course)
 
-    return render_to_response("courses.html", { 'universities': universities })
+    return render_to_response("courses.html", {'universities': universities})
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
     course = check_course(course_id)
-    
-    
+
     student_objects = User.objects.all()[:100]
     student_info = []
 
@@ -168,7 +169,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     '''
     course = check_course(course_id)
-    
+
     def clean(s):
         ''' Fixes URLs -- we convert spaces to _ in URLs to prevent
         funny encoding characters and keep the URLs readable.  This undoes
@@ -258,18 +259,18 @@ def course_info(request, course_id):
 
     return render_to_response('info.html', {'course': course})
 
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
     def registered_for_course(course, user):
         if user.is_authenticated():
-            return CourseEnrollment.objects.filter(user = user, course_id=course.id).exists()
+            return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
         else:
             return False
     course = check_course(course_id, course_must_be_open=False)
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
-    
 
 
 @ensure_csrf_cookie
@@ -281,7 +282,7 @@ def university_profile(request, org_id):
         raise Http404("University Profile not found for {0}".format(org_id))
 
     # Only grab courses for this org...
-    courses=[c for c in all_courses if c.org == org_id]
+    courses = [c for c in all_courses if c.org == org_id]
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 

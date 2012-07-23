@@ -2,6 +2,7 @@ from functools import wraps
 import copy
 import json
 
+
 def expect_json(view_function):
     @wraps(view_function)
     def expect_json_with_cloned_request(request, *args, **kwargs):

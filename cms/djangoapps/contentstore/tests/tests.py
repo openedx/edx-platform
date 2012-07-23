@@ -19,9 +19,11 @@ def user(email):
     '''look up a user by email'''
     return User.objects.get(email=email)
 
+
 def registration(email):
     '''look up registration object by email'''
     return Registration.objects.get(user__email=email)
+
 
 class AuthTestCase(TestCase):
     """Check that various permissions-related things work"""
@@ -36,7 +38,7 @@ class AuthTestCase(TestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, expected)
         return resp
-        
+
     def test_public_pages_load(self):
         """Make sure pages that don't require login load without error."""
         pages = (
@@ -60,11 +62,11 @@ class AuthTestCase(TestCase):
             'username': username,
             'email': email,
             'password': pw,
-            'location' : 'home',
-            'language' : 'Franglish',
-            'name' : 'Fred Weasley',
-            'terms_of_service' : 'true',
-            'honor_code' : 'true',
+            'location': 'home',
+            'language': 'Franglish',
+            'name': 'Fred Weasley',
+            'terms_of_service': 'true',
+            'honor_code': 'true',
         })
         return resp
 
@@ -99,7 +101,6 @@ class AuthTestCase(TestCase):
         self.create_account(self.username, self.email, self.pw)
         self.activate_user(self.email)
 
-
     def _login(self, email, pw):
         '''Login.  View should always return 200.  The success/fail is in the
         returned json'''
@@ -107,7 +108,6 @@ class AuthTestCase(TestCase):
                                 {'email': email, 'password': pw})
         self.assertEqual(resp.status_code, 200)
         return resp
-
 
     def login(self, email, pw):
         '''Login, check that it worked.'''
@@ -162,7 +162,6 @@ class AuthTestCase(TestCase):
         for page in simple_auth_pages:
             print "Checking '{0}'".format(page)
             self.check_page_get(page, expected=200)
-        
 
     def test_index_auth(self):
 

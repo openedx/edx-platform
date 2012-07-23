@@ -25,27 +25,29 @@ import mitxmako.middleware as middleware
 
 middleware.MakoMiddleware()
 
+
 class Command(BaseCommand):
     help = \
-'''Exports all users and user profiles. 
+'''Exports all users and user profiles.
 Caveat: Should be looked over before any run
-for schema changes. 
+for schema changes.
 
-Current version grabs user_keys from 
+Current version grabs user_keys from
 django.contrib.auth.models.User and up_keys
 from student.userprofile. '''
+
     def handle(self, *args, **options):
         users = list(User.objects.all())
         user_profiles = list(UserProfile.objects.all())
         user_profile_dict = dict([(up.user_id, up) for up in user_profiles])
-    
+
         user_tuples = [(user_profile_dict[u.id], u) for u in users if u.id in user_profile_dict]
-    
-        user_keys = ['id', 'username', 'email', 'password', 'is_staff', 
-                     'is_active', 'is_superuser', 'last_login', 'date_joined', 
+
+        user_keys = ['id', 'username', 'email', 'password', 'is_staff',
+                     'is_active', 'is_superuser', 'last_login', 'date_joined',
                      'password']
-        up_keys = ['language', 'location','meta','name', 'id','user_id']
-        
+        up_keys = ['language', 'location', 'meta', 'name', 'id', 'user_id']
+
         def extract_dict(keys, object):
             d = {}
             for key in keys:

@@ -198,12 +198,12 @@ class CapaModule(XModule):
             if self.system.DEBUG:
                 log.exception(err)
                 msg = '[courseware.capa.capa_module] <font size="+1" color="red">Failed to generate HTML for problem %s</font>' % (self.location.url())
-                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<','&lt;')
-                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
+                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 html = msg
             else:
                 raise
-                
+
         content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
@@ -336,7 +336,7 @@ class CapaModule(XModule):
         score_msg = get['response']
         self.lcp.update_score(score_msg, queuekey)
 
-        return dict() # No AJAX return is needed
+        return dict()  # No AJAX return is needed
 
     def get_answer(self, get):
         '''
@@ -379,7 +379,7 @@ class CapaModule(XModule):
             if not name.endswith('[]'):
                 answers[name] = get[key]
             else:
-                name          = name[:-2]
+                name = name[:-2]
                 answers[name] = get.getlist(key)
 
         return answers
@@ -430,7 +430,7 @@ class CapaModule(XModule):
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
-                return {'success':msg}
+                return {'success': msg}
             traceback.print_exc()
             raise Exception("error in capa_module")
 

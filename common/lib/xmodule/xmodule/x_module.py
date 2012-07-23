@@ -7,6 +7,7 @@ from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
 
+
 def dummy_track(event_type, event):
     pass
 
@@ -171,11 +172,11 @@ class XModule(object):
         return None
 
     def max_score(self):
-        ''' Maximum score. Two notes: 
+        ''' Maximum score. Two notes:
             * This is generic; in abstract, a problem could be 3/5 points on one randomization, and 5/7 on another
             * In practice, this is a Very Bad Idea, and (a) will break some code in place (although that code
-              should get fixed), and (b) break some analytics we plan to put in place. 
-        ''' 
+              should get fixed), and (b) break some analytics we plan to put in place.
+        '''
         return None
 
     def get_html(self):
@@ -193,8 +194,8 @@ class XModule(object):
         return None
 
     def handle_ajax(self, dispatch, get):
-        ''' dispatch is last part of the URL. 
-            get is a dictionary-like object ''' 
+        ''' dispatch is last part of the URL.
+            get is a dictionary-like object '''
         return ""
 
 

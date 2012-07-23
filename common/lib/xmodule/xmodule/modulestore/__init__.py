@@ -81,7 +81,7 @@ class Location(_LocationBase):
         def check_list(list_):
             for val in list_:
                 if val is not None and INVALID_CHARS.search(val) is not None:
-                    log.debug('invalid characters val="%s", list_="%s"' % (val,list_))
+                    log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
                     raise InvalidLocationError(location)
 
         if isinstance(location, basestring):
@@ -169,7 +169,7 @@ class ModuleStore(object):
             calls to get_children() to cache. None indicates to cache all descendents
         """
         raise NotImplementedError
-    
+
     def get_items(self, location, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items

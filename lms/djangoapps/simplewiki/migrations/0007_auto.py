@@ -11,11 +11,9 @@ class Migration(SchemaMigration):
         # Removing index on 'Namespace', fields ['name']
         db.delete_index('simplewiki_namespace', ['name'])
 
-
     def backwards(self, orm):
         # Adding index on 'Namespace', fields ['name']
         db.create_index('simplewiki_namespace', ['name'])
-
 
     models = {
         'auth.group': {

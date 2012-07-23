@@ -38,7 +38,6 @@ class Migration(SchemaMigration):
         # Adding index on 'UserProfile', fields ['gender']
         db.create_index('auth_userprofile', ['gender'])
 
-
     def backwards(self, orm):
         # Removing index on 'UserProfile', fields ['gender']
         db.delete_index('auth_userprofile', ['gender'])
@@ -71,7 +70,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'UserProfile.goals'
         db.delete_column('auth_userprofile', 'goals')
-
 
     models = {
         'auth.group': {

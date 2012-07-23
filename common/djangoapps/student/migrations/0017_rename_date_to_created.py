@@ -15,7 +15,6 @@ class Migration(SchemaMigration):
         # Rename 'created' field to 'date'
         db.rename_column('student_courseenrollment', 'created', 'date')
 
-
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
