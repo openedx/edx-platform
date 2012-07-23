@@ -1,5 +1,5 @@
 .container.jobs {
-  padding: 60px 0 120px;
+  padding: 60px 30px 120px;
 
   q {
     display: block;
@@ -34,8 +34,7 @@
       img {
         background: rgb(245,245,245);
         display: block;
-        height: 200px;
-        width: 100%;
+        max-width: 100%;
       }
     }
 
@@ -54,7 +53,7 @@
         p {
           margin-left: 0;
           font-style: italic;
-          line-height: 1.4;
+          line-height: 1.6;
           font-size: 1.1em;
           color: #666;
         }
@@ -63,6 +62,7 @@
           margin-top: 12px;
           display: block;
           color: #a0a0a0;
+          font-weight: 300;
         }
       }
     }
