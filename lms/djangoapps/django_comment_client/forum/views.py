@@ -91,8 +91,6 @@ def render_accordion(request, course, discussion_info, discussion_id):
 def render_discussion(request, threads, discussion_id=None, search_text=''):
     context = {
         'threads': threads,
-        'time_ago_in_words': time_ago_in_words,
-        'parse': dateutil.parser.parse,
         'discussion_id': discussion_id,
         'search_bar': render_search_bar(request, discussion_id, text=search_text),
     }
@@ -139,8 +137,6 @@ def forum_form_discussion(request, course_id, discussion_id):
 def render_single_thread(request, thread_id):
     context = {
         'thread': comment_client.get_thread(thread_id, recursive=True),
-        'time_ago_in_words': time_ago_in_words,
-        'parse': dateutil.parser.parse,
     }
     return render_to_string('discussion/single_thread.html', context)
 
