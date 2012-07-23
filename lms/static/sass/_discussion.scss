@@ -1,4 +1,4 @@
-$comment_margin_left: 20px;
+$comment_margin_left: 30px;
 $discussion_title_size: 1.6em;
 $comment_title_size: 1.2em;
 $comment_body_size: 1.0em;
@@ -44,6 +44,33 @@ $discussion_input_width: 60%;
     font-weight: bold;
     margin-bottom: 20px;
     display: block;
+  }
+  .discussion-votes {
+    margin-right: 8px;
+    margin-top: 5px;
+    text-align: center;
+    height: 40px;
+    float: left;
+    .discussion-vote-count {
+      font-size: $comment_body_size;
+      @include discussion-font;
+    }
+    a.discussion-vote {
+      display: block;
+      color: black;
+      font-weight: bold;
+      font-size: 15px;
+      &.discussion-vote-up {
+        margin-bottom: 3px;
+      }
+      &.discussion-vote-down {
+        margin-top: 3px;
+      }
+    }
+  }
+  .discussion-right-wrapper {
+    min-height: 40px;
+    float: left;
   }
   .new-post-form {
     .new-post-title, .new-post-body {
@@ -105,6 +132,8 @@ $discussion_input_width: 60%;
       }
     }
     .discussion-content {
+      margin-top: 10px;
+      overflow: hidden;
       .discussion-content-edit {
         .comment-edit {
           @include discussion-font;
@@ -118,15 +147,19 @@ $discussion_input_width: 60%;
     .comments {
       //display: none;
       margin-left: $comment_margin_left;
-      
+      overflow: hidden;
       .comment {
         .comment-body {
           @include discussion-font;
           font-size: $comment_body_size;
-          margin-top: 10px;
+          margin-top: 3px;
           display: block;
           color: black;
         }
+      }
+      .discussion-votes {
+        margin-right: 6px;
+        margin-top: 6px;
       }
     }
   }
