@@ -195,9 +195,8 @@
 
       .citizenship, .gender, .date-of-birth {
         margin-bottom: 20px;
-
-        .input-wrapper {
-        }
+        float: left;
+        width: flex-grid(4);
 
         label {
           display: block;
@@ -205,34 +204,13 @@
 
         select {
           width: 100%;
+          @include box-sizing(border-box);
+          display: block;
         }
       }
 
       .citizenship, .gender {
-        float: left;
-        width: flex-grid(4);
-      }
-
-      .citizenship {
         margin-right: flex-gutter();
-      }
-
-      .date-of-birth {
-        float: left;
-        width: flex-grid(12);
-
-        select {
-          @include box-sizing(border-box);
-          display: block;
-          float: left;
-          margin-right: flex-gutter();
-          max-width: flex-grid(4);
-          width: flex-grid(4);
-
-          &:last-child {
-            margin: 0px;
-          }
-        }
       }
 
       .submit {
