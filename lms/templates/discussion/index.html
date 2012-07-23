@@ -1,0 +1,39 @@
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%block name="bodyclass">courseware discussion</%block>
+<%block name="title"><title>Discussion – MITx 6.002x</title></%block>
+
+<%block name="headextra">
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+</%block>
+
+<%block name="js_extra">
+<!-- TODO: http://docs.jquery.com/Plugins/Validation -->
+<script type="text/javascript">
+  document.write('\x3Cscript type="text/javascript" src="' +
+      document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
+</script>
+</%block>
+
+##<%include file="../course_navigation.html" args="active_page='discussion'" />
+
+<section class="container">
+  <div class="course-wrapper">
+    <section aria-label="Course Navigation" class="course-index">
+      <header id="open_close_accordion">
+        <h2>Discussion Boards</h2>
+        <a href="#">close</a>
+      </header>
+      <div id="accordion" style="display:none">
+        <nav>
+          ${accordion}
+        </nav>
+      </div>
+
+    </section>
+
+    <section class="course-content">
+      ${content}
+    </section>
+  </div>
+</section>

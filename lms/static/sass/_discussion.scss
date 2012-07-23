@@ -1,0 +1,134 @@
+$comment_margin_left: 20px;
+$discussion_title_size: 1.6em;
+$comment_title_size: 1.2em;
+$comment_body_size: 1.0em;
+$comment_info_size: 0.75em;
+$discussion_input_width: 60%;
+
+@mixin discussion-font {
+  font-family: "Comic Sans MS", cursive, sans-serif !important;
+}
+
+@mixin discussion-clickable {
+  color: black;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.course-content {
+  .discussion {
+    margin-left: 40px;
+    margin-top: 15px;
+  }
+}
+
+.discussion {
+  .discussion-search-form {
+    margin-bottom: 40px;
+    .discussion-search {
+      @include discussion-font;
+      color: #1d9dd9;
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .discussion-search-text {
+      @include discussion-font;
+    }
+  }
+  .discussion-title {
+    @include discussion-font;
+    @include discussion-clickable;
+    font-size: $discussion_title_size;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .new-post-form {
+    .new-post-title, .new-post-body {
+      @include discussion-font;
+      display: block !important;
+      width: $discussion_input_width !important;
+    }
+    .new-post-body {
+      margin-top: 10px;
+    }
+    .discussion-new-post {
+      @include discussion-font;
+      color: #1d9dd9;
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  }
+  .thread {
+    //display: none;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    .thread-title {
+      @include discussion-font;
+      @include discussion-clickable;
+      font-size: $comment_title_size;
+      font-weight: bold;
+      display: block;
+    }
+    .thread-body {
+      @include discussion-font;
+      font-size: $comment_body_size;
+      margin-top: 7px;
+      margin-bottom: 2px;
+    }
+    .info {
+      @include discussion-font;
+      font-size: $comment_info_size;
+      font-style: italic;
+      margin-top: 5px;
+      color: gray;
+      .discussion-link {
+        margin-left: 2px;
+      }
+      .discussion-reply {
+        margin-left: 4px;
+      }
+      .discussion-link {
+        @include discussion-font;
+        display: inline-block;
+        color: #1d9dd9;
+        display: none;
+      }
+      
+    }
+    .discussion-content:hover {
+      .discussion-link {
+        display: inline-block;
+      }
+    }
+    .discussion-content {
+      .discussion-content-edit {
+        .comment-edit {
+          @include discussion-font;
+          width: $discussion_input_width !important;
+          margin-left: $comment_margin_left;
+          font-size: $comment_body_size;
+          margin-top: 10px;
+        }
+      }
+    }
+    .comments {
+      //display: none;
+      margin-left: $comment_margin_left;
+      
+      .comment {
+        .comment-body {
+          @include discussion-font;
+          font-size: $comment_body_size;
+          margin-top: 10px;
+          display: block;
+          color: black;
+        }
+      }
+    }
+  }
+
+}
