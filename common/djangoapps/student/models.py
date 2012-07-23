@@ -5,14 +5,16 @@ If you make changes to this model, be sure to create an appropriate migration
 file and check it in at the same time as your model changes. To do that,
 
 1. Go to the mitx dir
-2. ./manage.py schemamigration user --auto description_of_your_change
-3. Add the migration file created in mitx/courseware/migrations/
+2. django-admin.py schemamigration student --auto --settings=lms.envs.dev --pythonpath=. description_of_your_change
+3. Add the migration file created in mitx/common/djangoapps/student/migrations/
 """
+from datetime import datetime
+import json
 import uuid
 
 from django.db import models
 from django.contrib.auth.models import User
-import json
+from django_countries import CountryField
 
 #from cache_toolbox import cache_model, cache_relation
 
@@ -20,23 +22,43 @@ class UserProfile(models.Model):
     class Meta:
         db_table = "auth_userprofile"
 
-    GENDER_CHOICES = (('male', 'Male'), ('female', 'Female'), ('other', 'Other'))
-
     ## CRITICAL TODO/SECURITY
     # Sanitize all fields.
     # This is not visible to other users, but could introduce holes later
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
-    language = models.CharField(blank=True, max_length=255, db_index=True)
-    location = models.CharField(blank=True, max_length=255, db_index=True) # TODO: What are we doing with this?
+
     meta = models.TextField(blank=True) # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
-    gender = models.CharField(blank=True, null=True, max_length=6, choices=GENDER_CHOICES)
-    date_of_birth = models.DateField(blank=True, null=True)
+
+    # Location is no longer used, but is held here for backwards compatibility
+    # for users imported from our first class.
+    language = models.CharField(blank=True, max_length=255, db_index=True)
+    location = models.CharField(blank=True, max_length=255, db_index=True)
+
+    # Optional demographic data we started capturing from Fall 2012
+    this_year = datetime.now().year
+    VALID_YEARS = range(this_year, this_year - 120, -1)
+    year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
+    GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
+    gender = models.CharField(blank=True, null=True, max_length=6, db_index=True,
+                              choices=GENDER_CHOICES)
+    LEVEL_OF_EDUCATION_CHOICES = (('p_se', 'Doctorate in science or engineering'),
+                                  ('p_oth', 'Doctorate in another field'),
+                                  ('m', "Master's or professional degree"),
+                                  ('b', "Bachelor's degree"),
+                                  ('hs', "Secondary/high school"),
+                                  ('jhs', "Junior secondary/junior high/middle school"),
+                                  ('el', "Elementary/primary school"),
+                                  ('none', "None"),
+                                  ('other', "Other"))
+    level_of_education = models.CharField(
+                            blank=True, null=True, max_length=6, db_index=True,
+                            choices=LEVEL_OF_EDUCATION_CHOICES
+                         )
     mailing_address = models.TextField(blank=True, null=True)
-    country = models.CharField(blank=True, null=True, max_length=255)
-    telephone_number = models.CharField(blank=True, null=True, max_length=25)
-    occupation = models.CharField(blank=True, null=True, max_length=255)
+    goals = models.TextField(blank=True, null=True)
+
 
     def get_meta(self):
         js_str = self.meta
@@ -90,8 +112,13 @@ class PendingEmailChange(models.Model):
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
 class CourseEnrollment(models.Model):
-    user = models.ForeignKey(User, db_index=True)
-    course_id = models.CharField(max_length=255)
+    user = models.ForeignKey(User)
+    course_id = models.CharField(max_length=255, db_index=True)
+    
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+    
+    class Meta:
+        unique_together = (('user', 'course_id'), )
 
 #cache_relation(User.profile)
 

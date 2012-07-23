@@ -106,7 +106,7 @@
       }
     }
 
-    #enroll_error, #login_error {
+    .modal-form-error {
       background: $error-red;
       border: 1px solid rgb(202, 17, 17);
       color: rgb(143, 14, 14);
@@ -115,8 +115,21 @@
       padding: 12px;
     }
 
-    .activation-message {
+    .notice {
+      background: $yellow;
+      border: 1px solid darken($yellow, 60%);
+      color: darken($yellow, 60%);
+      display: none;
+      margin-bottom: 20px;
+      padding: 12px;
+    }
+
+    .activation-message, .message {
       padding: 0 40px 10px;
+
+      p {
+        margin-bottom: 10px;
+      }
     }
 
     form {
@@ -125,12 +138,28 @@
       position: relative;
       z-index: 2;
 
+      .input-group {
+        @include clearfix;
+        border-bottom: 1px solid rgb(210,210,210);
+        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+      }
+
       label {
         display: none;
       }
 
       input[type="checkbox"] {
         margin-right: 5px;
+      }
+
+      textarea {
+        background: rgb(255,255,255);
+        display: block;
+        height: 45px;
+        margin-bottom: 20px;
+        width: 100%;
       }
 
       input[type="email"],
@@ -164,47 +193,44 @@
         }
       }
 
-      .honor-code-summary {
+      .citizenship, .gender, .date-of-birth {
         margin-bottom: 20px;
-        padding: 0px;
-        position: relative;
 
-        p {
-          color: $lighter-base-font-color;
-          font-family: $sans-serif;
+        .input-wrapper {
         }
 
-        hr {
-          @extend .faded-hr-divider-light;
-          border: none;
-          margin-top: 30px;
-          position: relative;
-          z-index: 2;
-
-          &::after {
-            @extend .faded-hr-divider;
-            bottom: 0px;
-            content: "";
-            display: block;
-            position: absolute;
-            top: -1px;
-          }
+        label {
+          display: block;
         }
 
-        ul {
-          @include box-sizing(border-box);
-          margin: 0;
-          padding: 0 0 0 20px;
+        select {
           width: 100%;
+        }
+      }
 
-          li {
-            color: $lighter-base-font-color;
-            font: 300 1.2rem/1.6rem $sans-serif;
-            margin-bottom: 10px;
+      .citizenship, .gender {
+        float: left;
+        width: flex-grid(4);
+      }
 
-            &:last-child {
-              margin-bottom: 0px;
-            }
+      .citizenship {
+        margin-right: flex-gutter();
+      }
+
+      .date-of-birth {
+        float: left;
+        width: flex-grid(12);
+
+        select {
+          @include box-sizing(border-box);
+          display: block;
+          float: left;
+          margin-right: flex-gutter();
+          max-width: flex-grid(4);
+          width: flex-grid(4);
+
+          &:last-child {
+            margin: 0px;
           }
         }
       }

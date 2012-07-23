@@ -1,0 +1,23 @@
+@import 'bourbon/bourbon';
+
+@import 'base/reset';
+@import 'base/font_face';
+@import 'base/variables';
+@import 'base/base';
+@import 'base/mixins';
+@import 'base/extends';
+@import 'base/animations';
+
+// Course styles
+@import 'course/courseware_subnav';
+
+// Courseware styles
+@import 'course/old/base/variables';
+@import 'course/old/base/extends';
+@import 'course/old/base/functions';
+@import 'course/old/courseware/courseware';
+@import 'course/old/courseware/sequence-nav';
+@import 'course/old/courseware/sidebar';
+@import 'course/old/courseware/video';
+@import 'course/old/courseware/amplifier';
+@import 'course/old/courseware/problems';

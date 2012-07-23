@@ -104,6 +104,8 @@ LIB_URL = '/static/js/'
 # Dev machines shouldn't need the book
 # BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/' # For AWS deploys
+# RSS_URL = r'lms/templates/feed.rss'
+RSS_TIMEOUT = 600
 
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
@@ -260,7 +262,6 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'util.middleware.ExceptionLoggingMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -292,14 +293,58 @@ PIPELINE_CSS = {
         'source_filenames': ['sass/application.scss'],
         'output_filename': 'css/application.css',
     },
+    'course': {
+      'source_filenames': ['sass/application.scss', 'css/vendor/codemirror.css', 'css/vendor/jquery.treeview.css'],
+      'output_filename': 'css/course.css',
+      },
+    'ie-fixes': {
+        'source_filenames': ['sass/ie.scss'],
+        'output_filename': 'css/ie.css',
+    },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss']
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss']
+
+courseware_only_js = [
+    PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
+    for pth
+    in ['courseware', 'histogram', 'navigation', 'time', ]
+]
+courseware_only_js += [
+    pth for pth
+    in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee')
+]
+
+main_vendor_js = [
+  'js/vendor/jquery.min.js',
+  'js/vendor/jquery-ui.min.js',
+  'js/vendor/swfobject/swfobject.js',
+  'js/vendor/jquery.cookie.js',
+  'js/vendor/jquery.qtip.min.js',
+]
 
 PIPELINE_JS = {
     'application': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
+        # Application will contain all paths not in courseware_only_js
+        'source_filenames': [
+            pth.replace(PROJECT_ROOT / 'static/', '')
+            for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
+            if pth not in courseware_only_js
+        ] + [
+            'js/form.ext.js',
+            'js/my_courses_dropdown.js',
+            'js/toggle_login_modal.js',
+            'js/sticky_filter.js',
+        ],
         'output_filename': 'js/application.js'
+    },
+    'courseware': {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in courseware_only_js],
+        'output_filename': 'js/courseware.js'
+    },
+    'main_vendor': {
+        'source_filenames': main_vendor_js,
+        'output_filename': 'js/main_vendor.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],

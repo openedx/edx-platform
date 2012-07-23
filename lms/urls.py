@@ -13,22 +13,24 @@ if settings.DEBUG:
 urlpatterns = ('',
     url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
     url(r'^accept_name_change$', 'student.views.accept_name_change'),
     url(r'^reject_name_change$', 'student.views.reject_name_change'),
     url(r'^pending_name_changes$', 'student.views.pending_name_changes'),
-    url(r'^gradebook$', 'courseware.views.gradebook'),
+    
     url(r'^event$', 'track.views.user_track'),
-    url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),
+    url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'), # TODO: Is this used anymore? What is STATIC_GRAB?
+    
     url(r'^login$', 'student.views.login_user'),
     url(r'^login/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account'),
-#    url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
-    url(r'^password_reset/$', 'student.views.password_reset'),
+    
+    url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
     url(r'^password_change/$', django.contrib.auth.views.password_change,
@@ -42,10 +44,10 @@ urlpatterns = ('',
         name='auth_password_reset_complete'),
     url(r'^password_reset_done/$', django.contrib.auth.views.password_reset_done,
         name='auth_password_reset_done'),
-    ## Feedback
-    url(r'^send_feedback$', 'util.views.send_feedback'),
     
+    url(r'^heartbeat$', include('heartbeat.urls')),
     
+    url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
     
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
     url(r'^404$', 'static_template_view.views.render', 
@@ -74,17 +76,11 @@ urlpatterns = ('',
         {'template': 'honor.html'}, name="honor"),
     
     
+    (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
     
-    #Temporarily static, for testing
-    url(r'^university_profile$', 'static_template_view.views.render', 
-        {'template': 'university_profile.html'}, name="university_profile"),
-    
-    
-    #TODO: Convert these pages to the new edX layout
-    # 'tos.html', 
-    # 'privacy.html', 
-    # 'honor.html', 
-    # 'copyright.html', 
+    # TODO: These urls no longer work. They need to be updated before they are re-enabled
+    # url(r'^send_feedback$', 'util.views.send_feedback'),
+    # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
 )
 
 if settings.PERFSTATS:
@@ -97,21 +93,21 @@ if settings.COURSEWARE_ENABLED:
         url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
         url(r'^xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting'),
-        url(r'^s/(?P<template>[^/]*)$', 'static_template_view.views.auth_index'),
-        #    url(r'^course_info/$', 'student.views.courseinfo'),
-        #    url(r'^show_circuit/(?P<circuit>[^/]*)$', 'circuit.views.show_circuit'),
-        url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
-        url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
-        url(r'^calculate$', 'util.views.calculate'),
-        url(r'^heartbeat$', include('heartbeat.urls')),
-
-        # Multicourse related:
-        url(r'^courses/?$', 'courseware.views.courses', name="courses"),        
+        
+        # TODO: These views need to be updated before they work
+        # url(r'^calculate$', 'util.views.calculate'),
+        # url(r'^gradebook$', 'courseware.views.gradebook'),
+        # TODO: We should probably remove the circuit package. I believe it was only used in the old way of saving wiki circuits for the wiki
+        # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
+        # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
+                
+        url(r'^courses/?$', 'courseware.views.courses', name="courses"),     
+        url(r'^change_enrollment$', 
+            'student.views.change_enrollment_view', name="change_enrollment"),
+           
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 
-            'student.views.course_info', name="about_course"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll$', 
-            'student.views.enroll', name="enroll"),
+            'courseware.views.course_about', name="about_course"),
         
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$', 
@@ -139,9 +135,6 @@ if settings.WIKI_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
     )
 
-if settings.ENABLE_MULTICOURSE:
-	urlpatterns += (url(r'^mitxhome$', 'multicourse.views.mitxhome'),)
-
 if settings.QUICKEDIT:
 	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
 	urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
@@ -162,3 +155,9 @@ urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    
+    
+#Custom error pages 
+handler404 = 'static_template_view.views.render_404'
+handler500 = 'static_template_view.views.render_500'
+
