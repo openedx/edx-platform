@@ -30,11 +30,11 @@
       border: 1px solid rgb(100,100,100);
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       @include box-sizing(border-box);
-      height: 120px;
+      min-height: 120px;
       margin-left: grid-width(2) + $gw-gutter;
+      width: flex-grid(6);
       float: left;
       position: relative;
-      text-align: center;
       @include transition(all, 0.2s, linear);
       vertical-align: top;
 
@@ -46,7 +46,6 @@
 
       > hgroup {
         @include box-sizing(border-box);
-        height: 120px;
         @include inline-block;
         left: 0px;
         opacity: 1;
@@ -86,7 +85,7 @@
       padding: 4px;
       position: relative;
       vertical-align: top;
-      width: 210px;
+      width: flex-grid(2) + flex-gutter();
       z-index: 2;
 
       &:hover {
@@ -97,6 +96,8 @@
         height: 100%;
         overflow: hidden;
         position: relative;
+        background: url('../images/courses/video-thumb.jpg') center no-repeat;
+        @include background-size(cover);
 
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
