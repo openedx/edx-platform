@@ -24,6 +24,19 @@ $discussion_input_width: 60%;
 }
 
 .discussion {
+  .discussion-search-form {
+    margin-bottom: 40px;
+    .discussion-search {
+      @include discussion-font;
+      color: #1d9dd9;
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .discussion-search-text {
+      @include discussion-font;
+    }
+  }
   .discussion-title {
     @include discussion-font;
     @include discussion-clickable;

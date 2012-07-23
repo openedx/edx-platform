@@ -1,31 +1,14 @@
 <%! from django.core.urlresolvers import reverse %>
 
-<%
-def url_for(thread_id):
-  return reverse('django_comment_client.forum.views.single_thread', args=[thread_id])
-%>
-
-
-
 <section class="discussion">
-  <div class="discussion-non-content">
-    <a class="discussion-title" href="javascript:void(0)">Discussion</a>
-    ${search_bar}
-    <form class="new-post-form" _id="${discussion_id}">
-      <input type="text" class="new-post-title" placeholder="Title"/>
-      <textarea class="new-post-body"></textarea>
-      <a class="discussion-new-post" href="javascript:void(0)">New Post</a>
-    </form>
-  </div>
-  % for thread in threads:
-    ${render_thread(thread)}
-  % endfor
+  <a class="discussion-title" href="javascript:void(0)">Discussion</a>
+  ${render_thread(thread, edit_thread=True, show_comments=True)}
 </section>
 
 <%def name="render_thread(thread, edit_thread=False, show_comments=False)">
   <div class="thread" _id="${thread['id']}">
     <div class="discussion-content">
-      <a class="thread-title" name="${thread['id']}" href="${url_for(thread['id'])}">${thread['title']}</a>
+      <a class="thread-title" name="${thread['id']}" href="javascript:void(0)">${thread['title']}</a>
       <div class="discussion-content-view">
         <div class="thread-body">${thread['body']}</div>
         <div class="info">

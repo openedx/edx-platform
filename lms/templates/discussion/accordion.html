@@ -2,10 +2,7 @@
 
 <%
 def url_for(board):
-  if board['category'] == 'General':
-    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id.replace('/', '-'), 'general'])
-  else:
-    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id.replace('/', '-'), board['discussion_id']])
+  return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id.replace('/', '-'), board['discussion_id']])
 %>
 
 <%def name="make_category(category, boards)">
