@@ -46,7 +46,7 @@ def course_static_url(course):
     return settings.STATIC_URL + "/" + course.metadata['data_dir'] + "/"
     
 def course_image_url(course):
-    return course_static_url(course) + "images/course_image.png"
+    return course_static_url(course) + "images/course_image.jpg"
     
 def get_course_about_section(course, section_key):
     """
