@@ -4,10 +4,14 @@
     width: flex-grid(9);
     margin-right: flex-gutter();
 
-    h2 {
-      border-bottom: 1px solid rgb(220,220,220);
+    article {
       margin-bottom: 40px;
-      padding-bottom: 20px;
+
+      h2 {
+        border-bottom: 1px solid rgb(220,220,220);
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+      }
     }
   }
 
