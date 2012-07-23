@@ -11,6 +11,10 @@
 <%block name="headextra">
 <script type="text/javascript" src="${static.url('js/simplewiki-AutoSuggest_c_2.0.js')}"></script>
 
+## TODO (cpennington): Remove this when we have a good way for modules to specify js to load on the page
+## and in the wiki
+<script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
+
   <script type="text/javascript">
     function set_related_article_id(s) {
       document.getElementById('wiki_related_input_id').value = s.id;
