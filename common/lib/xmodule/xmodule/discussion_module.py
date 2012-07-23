@@ -11,10 +11,11 @@ from datehelper import time_ago_in_words
 class DiscussionModule(XModule):
     def get_html(self):
         context = {
-            'threads': comment_client.get_threads(self.discussion_id, recursive=True),
+            'threads': comment_client.get_threads(self.discussion_id, recursive=False),
             'time_ago_in_words': time_ago_in_words,
             'parse': dateutil.parser.parse,
-            'commentable_id': self.discussion_id,
+            'discussion_id': self.discussion_id,
+            'search_bar': '',
         }
         return self.system.render_template('discussion/inline.html', context)
 
