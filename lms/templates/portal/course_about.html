@@ -3,11 +3,47 @@
   from courseware.courses import course_image_url, get_course_about_section
 %>
 <%namespace name='static' file='../static_content.html'/>
-<%block name="js_extra">
-  <script src="${static.url('js/course_info.js')}"></script>
-</%block>
 
 <%inherit file="../main.html" />
+
+<%block name="js_extra">
+  % if not registered:
+    %if user.is_authenticated():
+      ## If the user is authenticated, clicking the enroll button just submits a form
+      <script type="text/javascript">
+      (function() {
+        $(".register").click(function() {
+          $("#class_enroll_form").submit();
+        });
+    
+        $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
+          if(json.success) {
+            location.href="${reverse('dashboard')}";
+          }
+        });
+      })(this)
+      </script>
+    %else:
+      ## If the user is not authenticated, clicking the enroll button pops up the register
+      ## field. We also slip in the registration fields into the login/register fields so
+      ## the user is automatically registered after logging in / registering
+      <script type="text/javascript">
+      (function() {
+        $(".register").click(function() {
+          if ($("#login_form .enroll_fieldset").length === 0) {
+            $("#login_form").append( $(".enroll_fieldset").first().clone() );
+          }
+          if ($("#register_form .enroll_fieldset").length === 0) {
+            $("#register_form").append( $(".enroll_fieldset").first().clone() );
+          }
+        });
+      })(this)
+      </script>
+    %endif
+  %endif
+
+  <script src="${static.url('js/course_info.js')}"></script>
+</%block>
 
 
 <%block name="title"><title>About ${course.number}</title></%block>
@@ -25,10 +61,10 @@
             %if registered:
                 <span class="register disabled">You are registered for this course (${course.number}).</span>
             %else:
-                <a href="#" class="register submit_registration">Register for ${course.number}</a>
+                <a href="#" class="register">Register for ${course.number}</a>
             %endif
           %else:
-            <a href="#signup-modal" class="register" rel="leanModal" data-notice="You must Sign Up in order to register">Register for ${course.number}</a>
+            <a href="#signup-modal" class="register" rel="leanModal" data-notice='You must Sign Up or <a href="#login-modal" rel="leanModal">Log In</a> to enroll.'>Register for ${course.number}</a>
           %endif
         </div>
 
@@ -108,28 +144,17 @@
 </section>
 
 %if not registered:
-  <div display="hidden">
-    <form id="enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
-      <input name="course_id" type="hidden" value="${course.id}">
-      <input name="enrollment_action" type="hidden" value="enroll">
+  <div style="display: none;">
+    <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <fieldset class="enroll_fieldset">
+        <input name="course_id" type="hidden" value="${course.id}">
+        <input name="enrollment_action" type="hidden" value="enroll">
+      </fieldset>
       <div class="submit">
         <input name="submit" type="submit" value="enroll">
       </div>
     </form>
   </div>
-  <script type="text/javascript">
-  (function() {
-    $(".submit_registration").click(function() {
-      $("#enroll_form").submit();
-    });
-  
-    $(document).delegate('#enroll_form', 'ajax:success', function(data, json, xhr) {
-      if(json.success) {
-        location.href="${reverse('dashboard')}";
-      }
-    });
-  })(this)
-  </script>
 %endif
 
 
