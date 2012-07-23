@@ -57,10 +57,10 @@ def format_url_params(params):
 @cache_if_anonymous
 def courses(request):
     # TODO: Clean up how 'error' is done.
-    courses = modulestore().get_courses()
+    courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
     universities = defaultdict(list)
-    for university, group in itertools.groupby(courses, lambda course: course.org):
-        [universities[university].append(course) for course in group]
+    for course in courses:
+        universities[course.org].append(course)
 
     return render_to_response("courses.html", { 'universities': universities })
 
@@ -275,7 +275,7 @@ def course_about(request, course_id):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def university_profile(request, org_id):
-    all_courses = modulestore().get_courses()
+    all_courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
     valid_org_ids = set(c.org for c in all_courses)
     if org_id not in valid_org_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
