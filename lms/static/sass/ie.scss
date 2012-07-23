@@ -16,7 +16,6 @@ header.global {
 
 .home > header .title {
   &:hover {
-    height: 120px;
 
     > hgroup {
       h1 {
@@ -128,3 +127,10 @@ header.global {
   }
 }
 
+#lean_overlay {
+  background: #000;
+}
+
+.modal .inner-wrapper form label {
+  display: block;
+}
