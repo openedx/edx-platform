@@ -112,6 +112,9 @@
                 %endif
                 <div class="post-name">
                     <a href="${entry.link}" target="_blank">${entry.title}</a>
+                    %if entry.summary:
+                        <p>${entry.summary}</p>
+                    %endif
                     <p class="post-date">${strftime("%m/%d/%y", entry.published_parsed)}</p>
                 </div>
             </article>
