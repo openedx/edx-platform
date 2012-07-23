@@ -301,10 +301,18 @@ PIPELINE_CSS = {
 
 PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss']
 
+courseware_only_js = [PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee' for pth in ['courseware', 'histogram', 'navigation', 'time', ] ]
+courseware_only_js += [pth for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee') ]
+
 PIPELINE_JS = {
     'application': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
+        # Application will contain all paths not in courseware_only_js
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee') if pth not in courseware_only_js],
         'output_filename': 'js/application.js'
+    },
+    'courseware' : {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in courseware_only_js],
+        'output_filename': 'js/courseware.js'
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
