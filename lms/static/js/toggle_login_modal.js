@@ -77,8 +77,13 @@
     $(this).leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
     embed = $($(this).attr('href')).find('iframe')
     if(embed.length > 0) {
-      embed.data('src', embed.attr('src') + '?autoplay=1');
-      embed.attr('src', '');
+      if(embed.attr('src').indexOf("?") > 0) {
+          embed.data('src', embed.attr('src') + '&autoplay=1&rel=0');
+          embed.attr('src', '');
+      } else {
+          embed.data('src', embed.attr('src') + '?autoplay=1&rel=0');
+          embed.attr('src', '');
+      }
     }
   });
 })(jQuery);
