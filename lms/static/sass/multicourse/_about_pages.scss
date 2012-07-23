@@ -146,7 +146,7 @@
     }
   }
 
-  .faq {
+  .faq, .help {
     @include clearfix;
 
     nav.categories {
