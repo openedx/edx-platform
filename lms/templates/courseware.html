@@ -5,10 +5,8 @@
 
 <%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
-  <link rel="stylesheet" href="${static.url('css/vendor/jquery.treeview.css')}" type="text/css" media="all" />
 
   ## codemirror
-  <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
 
   ## alternate codemirror
@@ -25,6 +23,7 @@
   
   
    <%static:js group='courseware'/>
+   <%static:css group='course'/>
 
   <%include file="mathjax_include.html" />
 

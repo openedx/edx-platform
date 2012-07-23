@@ -293,6 +293,10 @@ PIPELINE_CSS = {
         'source_filenames': ['sass/application.scss'],
         'output_filename': 'css/application.css',
     },
+    'course': {
+      'source_filenames': ['sass/application.scss', 'css/vendor/codemirror.css', 'css/vendor/jquery.treeview.css'],
+      'output_filename': 'css/course.css',
+      },
     'ie-fixes': {
         'source_filenames': ['sass/ie.scss'],
         'output_filename': 'css/ie.css',
