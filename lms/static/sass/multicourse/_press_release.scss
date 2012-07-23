@@ -52,5 +52,16 @@
     h2 + p {
       margin-top: 30px;
     }
+    
+    .contact {
+      @include box-sizing(border-box);
+      border: 1px solid rgb(220,220,220);
+      padding: 20px;
+      margin-top: 60px;
+      
+      p + p {
+       margin-top: 10px; 
+      }
+    }
   }
 }
