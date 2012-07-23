@@ -9,6 +9,7 @@ $ ->
     $('#open_close_accordion a').click @toggle
     $('#accordion').show()
 
+
   $("section.discussion").each (index, discussion) ->
     Discussion.bindDiscussionEvents(discussion)
 
@@ -32,7 +33,7 @@ Discussion =
     }[name]
 
   handleAnchorAndReload: (response) ->
-    window.location = window.location.pathname + "#" + response['id']
+    #window.location = window.location.pathname + "#" + response['id']
     window.location.reload()
 
   bindContentEvents: (content) ->
@@ -100,11 +101,25 @@ Discussion =
           Discussion.handleAnchorAndReload(response)
       , 'json'
 
+    handleVote = (elem, value) ->
+      contentType = if $content.hasClass("thread") then "thread" else "comment"
+      url = Discussion.urlFor("#{value}vote_#{contentType}", $content.attr("_id"))
+      $.post url, {}, (response, textStatus) ->
+        if textStatus == "success"
+          Discussion.handleAnchorAndReload(response)
+      , 'json'
+          
     $local(".discussion-reply").click ->
       handleReply(this)
 
     $local(".discussion-cancel-reply").click ->
       handleCancelReply(this)
+
+    $local(".discussion-vote-up").click ->
+      handleVote(this, "up")
+
+    $local(".discussion-vote-down").click ->
+      handleVote(this, "down")
 
   bindDiscussionEvents: (discussion) ->
     $discussion = $(discussion)
