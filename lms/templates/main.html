@@ -22,18 +22,16 @@
   <![endif]-->
 % endif
 
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery-ui.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/swfobject/swfobject.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.cookie.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.qtip.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/form.ext.js')}"></script>
 
 % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+ <%static:js group='main_vendor'/>
  <%static:js group='application'/>
 % endif
 
 % if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+  % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['main_vendor']['source_filenames'] ]:
+    <script type="text/javascript" src="${jsfn}"></script>
+  % endfor
   % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['application']['source_filenames'] ]:
     <script type="text/javascript" src="${jsfn}"></script>
   % endfor
