@@ -24,16 +24,7 @@
   <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
   
   
-  % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
    <%static:js group='courseware'/>
-  % endif
-
-  % if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
-    % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['courseware']['source_filenames'] ]:
-      <script type="text/javascript" src="${jsfn}"></script>
-    % endfor
-  % endif
-  
 
   <%include file="mathjax_include.html" />
 </%block>
