@@ -301,18 +301,46 @@ PIPELINE_CSS = {
 
 PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss']
 
-courseware_only_js = [PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee' for pth in ['courseware', 'histogram', 'navigation', 'time', ] ]
-courseware_only_js += [pth for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee') ]
+courseware_only_js = [
+    PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
+    for pth
+    in ['courseware', 'histogram', 'navigation', 'time', ]
+]
+courseware_only_js += [
+    pth for pth
+    in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee')
+]
+
+main_vendor_js = [
+  'js/vendor/jquery.min.js',
+  'js/vendor/jquery-ui.min.js',
+  'js/vendor/swfobject/swfobject.js',
+  'js/vendor/jquery.cookie.js',
+  'js/vendor/jquery.qtip.min.js',
+]
 
 PIPELINE_JS = {
     'application': {
         # Application will contain all paths not in courseware_only_js
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee') if pth not in courseware_only_js],
+        'source_filenames': [
+            pth.replace(PROJECT_ROOT / 'static/', '')
+            for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
+            if pth not in courseware_only_js
+        ] + [
+            'js/form.ext.js',
+            'js/my_courses_dropdown.js',
+            'js/toggle_login_modal.js',
+            'js/sticky_filter.js',
+        ],
         'output_filename': 'js/application.js'
     },
-    'courseware' : {
+    'courseware': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in courseware_only_js],
         'output_filename': 'js/courseware.js'
+    },
+    'main_vendor': {
+        'source_filenames': main_vendor_js,
+        'output_filename': 'js/main_vendor.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
