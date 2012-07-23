@@ -22,6 +22,7 @@ import mitxmako.middleware as middleware
 
 middleware.MakoMiddleware()
 
+
 def import_user(u):
     user_info = u['u']
     up_info = u['up']
@@ -30,11 +31,10 @@ def import_user(u):
     user_info['last_login'] = dateutil.parser.parse(user_info['last_login'])
     user_info['date_joined'] = dateutil.parser.parse(user_info['date_joined'])
 
-    user_keys = ['id', 'username', 'email', 'password', 'is_staff', 
-                 'is_active', 'is_superuser', 'last_login', 'date_joined', 
+    user_keys = ['id', 'username', 'email', 'password', 'is_staff',
+                 'is_active', 'is_superuser', 'last_login', 'date_joined',
                  'password']
-    up_keys = ['language', 'location','meta','name', 'id','user_id']
-
+    up_keys = ['language', 'location', 'meta', 'name', 'id', 'user_id']
 
     u = User()
     for key in user_keys:
@@ -47,20 +47,22 @@ def import_user(u):
         up.__setattr__(key, up_info[key])
     up.save()
 
+
 class Command(BaseCommand):
     help = \
-'''Exports all users and user profiles. 
+'''Exports all users and user profiles.
 Caveat: Should be looked over before any run
-for schema changes. 
+for schema changes.
 
-Current version grabs user_keys from 
+Current version grabs user_keys from
 django.contrib.auth.models.User and up_keys
 from student.userprofile. '''
+
     def handle(self, *args, **options):
         extracted = json.load(open('transfer_users.txt'))
-        n=0
+        n = 0
         for u in extracted:
             import_user(u)
-            if n%100 == 0: 
+            if n % 100 == 0:
                 print n
-            n = n+1
+            n = n + 1

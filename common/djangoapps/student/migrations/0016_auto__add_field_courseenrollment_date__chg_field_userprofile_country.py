@@ -13,14 +13,12 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, blank=True),
                       keep_default=False)
 
-
         # Changing field 'UserProfile.country'
         db.alter_column('auth_userprofile', 'country', self.gf('django_countries.fields.CountryField')(max_length=2, null=True))
 
     def backwards(self, orm):
         # Deleting field 'CourseEnrollment.date'
         db.delete_column('student_courseenrollment', 'date')
-
 
         # Changing field 'UserProfile.country'
         db.alter_column('auth_userprofile', 'country', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))

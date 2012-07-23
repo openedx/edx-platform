@@ -18,6 +18,7 @@ from django_countries import CountryField
 
 #from cache_toolbox import cache_model, cache_relation
 
+
 class UserProfile(models.Model):
     class Meta:
         db_table = "auth_userprofile"
@@ -28,7 +29,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
 
-    meta = models.TextField(blank=True) # JSON dictionary for future expansion
+    meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
     # Location is no longer used, but is held here for backwards compatibility
@@ -59,7 +60,6 @@ class UserProfile(models.Model):
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
 
-
     def get_meta(self):
         js_str = self.meta
         if not js_str:
@@ -69,8 +69,9 @@ class UserProfile(models.Model):
 
         return js_str
 
-    def set_meta(self,js):
+    def set_meta(self, js):
         self.meta = json.dumps(js)
+
 
 ## TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
@@ -78,6 +79,7 @@ class UserTestGroup(models.Model):
     users = models.ManyToManyField(User, db_index=True)
     name = models.CharField(blank=False, max_length=32, db_index=True)
     description = models.TextField(blank=True)
+
 
 class Registration(models.Model):
     ''' Allows us to wait for e-mail before user is registered. A
@@ -92,8 +94,8 @@ class Registration(models.Model):
 
     def register(self, user):
         # MINOR TODO: Switch to crypto-secure key
-        self.activation_key=uuid.uuid4().hex
-        self.user=user
+        self.activation_key = uuid.uuid4().hex
+        self.user = user
         self.save()
 
     def activate(self):
@@ -101,22 +103,25 @@ class Registration(models.Model):
         self.user.save()
         #self.delete()
 
+
 class PendingNameChange(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_name = models.CharField(blank=True, max_length=255)
     rationale = models.CharField(blank=True, max_length=1024)
+
 
 class PendingEmailChange(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
+
 class CourseEnrollment(models.Model):
     user = models.ForeignKey(User)
     course_id = models.CharField(max_length=255, db_index=True)
-    
+
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
-    
+
     class Meta:
         unique_together = (('user', 'course_id'), )
 
@@ -124,38 +129,45 @@ class CourseEnrollment(models.Model):
 
 #### Helper methods for use from python manage.py shell.
 
+
 def get_user(email):
-    u = User.objects.get(email = email)
-    up = UserProfile.objects.get(user = u)
-    return u,up
+    u = User.objects.get(email=email)
+    up = UserProfile.objects.get(user=u)
+    return u, up
+
 
 def user_info(email):
-    u,up = get_user(email)
+    u, up = get_user(email)
     print "User id", u.id
     print "Username", u.username
     print "E-mail", u.email
     print "Name", up.name
     print "Location", up.location
     print "Language", up.language
-    return u,up
+    return u, up
+
 
 def change_email(old_email, new_email):
-    u = User.objects.get(email = old_email)
+    u = User.objects.get(email=old_email)
     u.email = new_email
     u.save()
 
+
 def change_name(email, new_name):
-    u,up = get_user(email)
+    u, up = get_user(email)
     up.name = new_name
     up.save()
 
+
 def user_count():
     print "All users", User.objects.all().count()
-    print "Active users", User.objects.filter(is_active = True).count()
+    print "Active users", User.objects.filter(is_active=True).count()
     return User.objects.all().count()
 
+
 def active_user_count():
-    return User.objects.filter(is_active = True).count()
+    return User.objects.filter(is_active=True).count()
+
 
 def create_group(name, description):
     utg = UserTestGroup()
@@ -163,29 +175,31 @@ def create_group(name, description):
     utg.description = description
     utg.save()
 
+
 def add_user_to_group(user, group):
-    utg = UserTestGroup.objects.get(name = group)
-    utg.users.add(User.objects.get(username = user))
+    utg = UserTestGroup.objects.get(name=group)
+    utg.users.add(User.objects.get(username=user))
     utg.save()
+
 
 def remove_user_from_group(user, group):
-    utg = UserTestGroup.objects.get(name = group)
-    utg.users.remove(User.objects.get(username = user))
+    utg = UserTestGroup.objects.get(name=group)
+    utg.users.remove(User.objects.get(username=user))
     utg.save()
 
-default_groups = {'email_future_courses' : 'Receive e-mails about future MITx courses',
-                  'email_helpers' : 'Receive e-mails about how to help with MITx',
-                  'mitx_unenroll' : 'Fully unenrolled -- no further communications',
-                  '6002x_unenroll' : 'Took and dropped 6002x'}
+default_groups = {'email_future_courses': 'Receive e-mails about future MITx courses',
+                  'email_helpers': 'Receive e-mails about how to help with MITx',
+                  'mitx_unenroll': 'Fully unenrolled -- no further communications',
+                  '6002x_unenroll': 'Took and dropped 6002x'}
+
 
 def add_user_to_default_group(user, group):
     try:
-        utg = UserTestGroup.objects.get(name = group)
+        utg = UserTestGroup.objects.get(name=group)
     except UserTestGroup.DoesNotExist:
         utg = UserTestGroup()
         utg.name = group
         utg.description = default_groups[group]
         utg.save()
-    utg.users.add(User.objects.get(username = user))
+    utg.users.add(User.objects.get(username=user))
     utg.save()
-

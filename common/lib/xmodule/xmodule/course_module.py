@@ -9,22 +9,21 @@ from fs.errors import ResourceNotFoundError
 log = logging.getLogger(__name__)
 
 
-
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
 
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-        
+
         try:
             self.start = time.strptime(self.metadata["start"], "%Y-%m-%dT%H:%M")
         except KeyError:
-            self.start = time.gmtime(0) #The epoch
+            self.start = time.gmtime(0)  # The epoch
             log.critical("Course loaded without a start date. " + str(self.id))
         except ValueError, e:
-            self.start = time.gmtime(0) #The epoch
+            self.start = time.gmtime(0)  # The epoch
             log.critical("Course loaded with a bad start date. " + str(self.id) + " '" + str(e) + "'")
-    
+
     def has_started(self):
         return time.gmtime() > self.start
 
@@ -44,11 +43,11 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def title(self):
         return self.metadata['display_name']
-    
+
     @property
     def number(self):
         return self.location.course
-        
+
     @property
     def wiki_namespace(self):
         return self.location.course

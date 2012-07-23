@@ -56,6 +56,7 @@ def location_to_query(location):
 
     return query
 
+
 class MongoModuleStore(ModuleStore):
     """
     A Mongodb backed ModuleStore

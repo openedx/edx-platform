@@ -84,6 +84,7 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 
 from .model import cache_model
 
+
 class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
     def __init__(self):
         cache_model(User)

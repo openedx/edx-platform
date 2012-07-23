@@ -74,6 +74,7 @@ from django.db.models.signals import post_save, post_delete
 
 from .core import get_instance, delete_instance
 
+
 def cache_relation(descriptor, timeout=None):
     rel = descriptor.related
     related_name = '%s_cache' % rel.field.related_query_name()

@@ -11,11 +11,9 @@ class Migration(SchemaMigration):
         # Adding index on 'CourseEnrollment', fields ['created']
         db.create_index('student_courseenrollment', ['created'])
 
-
     def backwards(self, orm):
         # Removing index on 'CourseEnrollment', fields ['created']
         db.delete_index('student_courseenrollment', ['created'])
-
 
     models = {
         'auth.group': {

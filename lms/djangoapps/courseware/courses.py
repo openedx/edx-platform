@@ -12,15 +12,16 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
+
 def check_course(course_id, course_must_be_open=True, course_required=True):
     """
     Given a course_id, this returns the course object. By default,
     if the course is not found or the course is not open yet, this
     method will raise a 404.
-    
+
     If course_must_be_open is False, the course will be returned
     without a 404 even if it is not open.
-    
+
     If course_required is False, a course_id of None is acceptable. The
     course returned will be None. Even if the course is not required,
     if a course_id is given that does not exist a 404 will be raised.
@@ -32,10 +33,10 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
             course = modulestore().get_item(course_loc)
         except (KeyError, ItemNotFoundError):
             raise Http404("Course not found.")
-        
+
         if course_must_be_open and not course.has_started():
             raise Http404("This course has not yet started.")
-    
+
     return course
 
 
@@ -44,10 +45,12 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
 
 def course_static_url(course):
     return settings.STATIC_URL + "/" + course.metadata['data_dir'] + "/"
-    
+
+
 def course_image_url(course):
     return course_static_url(course) + "images/course_image.jpg"
-    
+
+
 def get_course_about_section(course, section_key):
     """
     This returns the snippet of html to be rendered on the course about page, given the key for the section.
@@ -78,7 +81,7 @@ def get_course_about_section(course, section_key):
                         'effort', 'end_date', 'prerequisites']:
         try:
             with course.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
-                return htmlFile.read().decode('utf-8').format(COURSE_STATIC_URL = course_static_url(course) )
+                return htmlFile.read().decode('utf-8').format(COURSE_STATIC_URL=course_static_url(course))
         except ResourceNotFoundError:
             log.warning("Missing about section {key} in course {url}".format(key=section_key, url=course.location.url()))
             return None
@@ -90,6 +93,7 @@ def get_course_about_section(course, section_key):
         return course.number
 
     raise KeyError("Invalid about key " + str(section_key))
+
 
 def get_course_info_section(course, section_key):
     """
@@ -111,7 +115,7 @@ def get_course_info_section(course, section_key):
         except ResourceNotFoundError:
             log.exception("Missing info section {key} in course {url}".format(key=section_key, url=course.location.url()))
             return "! Info section missing !"
-        
+
     raise KeyError("Invalid about key " + str(section_key))
 
-    
+

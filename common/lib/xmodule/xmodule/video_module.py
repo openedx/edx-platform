@@ -36,7 +36,7 @@ class VideoModule(XModule):
         if dispatch == 'goto_position':
             self.position = int(float(get['position']))
             log.info(u"NEW POSITION {0}".format(self.position))
-            return json.dumps({'success':True})
+            return json.dumps({'success': True})
         raise Http404()
 
     def get_progress(self):

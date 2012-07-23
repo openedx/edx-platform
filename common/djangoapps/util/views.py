@@ -14,52 +14,56 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 import capa.calc
 import track.views
 
+
 def calculate(request):
     ''' Calculator in footer of every page. '''
     equation = request.GET['equation']
-    try: 
+    try:
         result = capa.calc.evaluator({}, {}, equation)
     except:
-        event = {'error':map(str,sys.exc_info()),
-                 'equation':equation}
+        event = {'error': map(str, sys.exc_info()),
+                 'equation': equation}
         track.views.server_track(request, 'error:calc', event, page='calc')
-        return HttpResponse(json.dumps({'result':'Invalid syntax'}))
-    return HttpResponse(json.dumps({'result':str(result)}))
+        return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
+    return HttpResponse(json.dumps({'result': str(result)}))
+
 
 def send_feedback(request):
     ''' Feeback mechanism in footer of every page. '''
-    try: 
+    try:
         username = request.user.username
         email = request.user.email
-    except: 
+    except:
         username = "anonymous"
         email = "anonymous"
-    
-    try: 
-        browser = request.META['HTTP_USER_AGENT']
-    except: 
-        browser = "Unknown"
-    
-    feedback = render_to_string("feedback_email.txt", 
-                                {"subject":request.POST['subject'], 
-                                 "url": request.POST['url'], 
-                                 "time": datetime.datetime.now().isoformat(),
-                                 "feedback": request.POST['message'], 
-                                 "email":email,
-                                 "browser":browser,
-                                 "user":username})
 
-    send_mail("MITx Feedback / " +request.POST['subject'], 
-              feedback, 
+    try:
+        browser = request.META['HTTP_USER_AGENT']
+    except:
+        browser = "Unknown"
+
+    feedback = render_to_string("feedback_email.txt",
+                                {"subject": request.POST['subject'],
+                                 "url": request.POST['url'],
+                                 "time": datetime.datetime.now().isoformat(),
+                                 "feedback": request.POST['message'],
+                                 "email": email,
+                                 "browser": browser,
+                                 "user": username})
+
+    send_mail("MITx Feedback / " + request.POST['subject'],
+              feedback,
               settings.DEFAULT_FROM_EMAIL,
-              [ settings.DEFAULT_FEEDBACK_EMAIL ],
-              fail_silently = False
+              [settings.DEFAULT_FEEDBACK_EMAIL],
+              fail_silently=False
               )
-    return HttpResponse(json.dumps({'success':True}))
+    return HttpResponse(json.dumps({'success': True}))
+
 
 def info(request):
     ''' Info page (link from main header) '''
     return render_to_response("info.html", {})
+
 
 # From http://djangosnippets.org/snippets/1042/
 def parse_accept_header(accept):
@@ -81,6 +85,7 @@ def parse_accept_header(accept):
         result.append((media_type, tuple(media_params), q))
     result.sort(lambda x, y: -cmp(x[2], y[2]))
     return result
+
 
 def accepts(request, media_type):
     """Return whether this request has an Accept header that matches type"""

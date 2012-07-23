@@ -51,6 +51,7 @@ def test_invalid_locations():
     assert_raises(InvalidLocationError, Location, None)
     assert_raises(InvalidLocationError, Location, "tag://org/course/category/name with spaces/revision")
 
+
 def test_equality():
     assert_equals(
         Location('tag', 'org', 'course', 'category', 'name'),
