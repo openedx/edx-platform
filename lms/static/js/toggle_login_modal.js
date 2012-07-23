@@ -24,6 +24,11 @@
 
           var modal_id = $(this).attr("href");
 
+          modal_clone = $(modal_id).clone(true, true);
+          modal_clone.attr('id', 'modal_clone');
+          $(modal_id).after(modal_clone);
+          modal_id = '#modal_clone';
+
           $("#lean_overlay").click(function() {
              close_modal(modal_id);
           });
@@ -69,6 +74,7 @@
         $("#lean_overlay").fadeOut(200);
         $('iframe', modal_id).attr('src', '');
         $(modal_id).css({ 'display' : 'none' });
+        $(modal_id).remove();
       }
     }
   });
