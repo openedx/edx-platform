@@ -36,7 +36,7 @@ usage() {
     Usage: $PROG [-c] [-v] [-h]
     
             -c        compile scipy and numpy
-            -s        --system-site-packages for virtualenv
+            -s        do _not_ set --no-site-packages for virtualenv
             -v        set -x + spew
             -h        this
 
@@ -254,9 +254,9 @@ source $RUBY_DIR/scripts/rvm
 # skip the intro 
 LESS="-E" rvm install $RUBY_VER
 if [[ -n $systempkgs ]]; then
-    virtualenv --system-site-packages "$PYTHON_DIR"
-else
     virtualenv "$PYTHON_DIR"
+else
+    virtualenv --no-site-packages "$PYTHON_DIR"
 fi
 source $PYTHON_DIR/bin/activate
 output "Installing gem bundler"
