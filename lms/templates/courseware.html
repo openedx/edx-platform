@@ -4,15 +4,46 @@
 <%block name="title"><title>Courseware – MITx 6.002x</title></%block>
 
 <%block name="headextra">
-<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <link rel="stylesheet" href="${static.url('css/vendor/jquery.treeview.css')}" type="text/css" media="all" />
+
+  ## codemirror
+  <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
+  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
+
+  ## alternate codemirror
+  ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/lib/codemirror.js')}"></script>
+  ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/xml/xml.js')}"></script>
+  ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/python/python.js')}"></script>
+
+  ## image input: for clicking on images (see imageinput.html)
+  <script type="text/javascript" src="${static.url('js/vendor/imageinput.js')}"></script>
+
+  ## TODO (cpennington): Remove this when we have a good way for modules to specify js to load on the page
+  ## and in the wiki
+  <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
+  
+  
+  % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+   <%static:js group='courseware'/>
+  % endif
+
+  % if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+    % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['courseware']['source_filenames'] ]:
+      <script type="text/javascript" src="${jsfn}"></script>
+    % endfor
+  % endif
+  
+
+  <%include file="mathjax_include.html" />
 </%block>
 
 <%block name="js_extra">
-<!-- TODO: http://docs.jquery.com/Plugins/Validation -->
-<script type="text/javascript">
-  document.write('\x3Cscript type="text/javascript" src="' +
-      document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
-</script>
+  <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
+  <script type="text/javascript">
+    document.write('\x3Cscript type="text/javascript" src="' +
+        document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
+  </script>
 </%block>
 
 <%include file="course_navigation.html" args="active_page='courseware'" />
