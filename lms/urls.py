@@ -81,6 +81,8 @@ urlpatterns = ('',
         {'template': 'press_releases/UC_Berkeley_joins_edX.html'}, name="press/uc-berkeley-joins-edx"),
     
     
+    (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
+        
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
     # url(r'^send_feedback$', 'util.views.send_feedback'),
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
@@ -106,7 +108,7 @@ if settings.COURSEWARE_ENABLED:
                 
         url(r'^courses/?$', 'courseware.views.courses', name="courses"),     
         url(r'^change_enrollment$', 
-            'courseware.views.change_enrollment', name="change_enrollment"),
+            'student.views.change_enrollment_view', name="change_enrollment"),
            
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$', 

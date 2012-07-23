@@ -57,10 +57,10 @@ def format_url_params(params):
 @cache_if_anonymous
 def courses(request):
     # TODO: Clean up how 'error' is done.
-    courses = modulestore().get_courses()
+    courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
     universities = defaultdict(list)
-    for university, group in itertools.groupby(courses, lambda course: course.org):
-        [universities[university].append(course) for course in group]
+    for course in courses:
+        universities[course.org].append(course)
 
     return render_to_response("courses.html", { 'universities': universities })
 
@@ -269,46 +269,13 @@ def course_about(request, course_id):
     course = check_course(course_id, course_must_be_open=False)
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
-
-
-@login_required
-def change_enrollment(request):
-    if request.method != "POST":
-        raise Http404
-    
-    course_id = request.POST.get("course_id", None)
-    if course_id == None:
-        return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
-    action = request.POST.get("enrollment_action" , "")
-        
-    user = request.user
-    
-    if action == "enroll":
-        # Make sure the course exists
-        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
-        course = check_course(course_id, course_must_be_open=False) 
-        
-        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
-        return HttpResponse(json.dumps({'success': True}))
-        
-    elif action == "unenroll":
-        try:
-            enrollment =  CourseEnrollment.objects.get(user=user, course_id=course_id)
-            enrollment.delete()
-            return HttpResponse(json.dumps({'success': True}))
-        except CourseEnrollment.DoesNotExist:
-            return HttpResponse(json.dumps({'success': False, 'error': 'You are not enrolled for this course.'}))
-    else:
-        return HttpResponse(json.dumps({'success': False, 'error': 'Invalid enrollment_action.'}))
-    
-    return HttpResponse(json.dumps({'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}))
     
 
 
 @ensure_csrf_cookie
 @cache_if_anonymous
 def university_profile(request, org_id):
-    all_courses = modulestore().get_courses()
+    all_courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
     valid_org_ids = set(c.org for c in all_courses)
     if org_id not in valid_org_ids:
         raise Http404("University Profile not found for {0}".format(org_id))

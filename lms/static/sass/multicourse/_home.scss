@@ -8,7 +8,7 @@
     border-bottom: 1px solid rgb(80,80,80);
     @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.9), inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
     @include clearfix;
-    height: 430px;
+    height: 460px;
     margin-top: -69px;
     overflow: hidden;
     padding: 0px;
@@ -17,10 +17,11 @@
     .outer-wrapper {
       @extend .animation-home-header-pop-up;
       margin: 0 auto;
-      padding: 200px 10px 0px;
+      padding: 240px 10px 0px;
       position: relative;
       max-width: 1200px;
       min-width: 760px;
+      @include clearfix;
     }
 
     .title {
@@ -30,29 +31,16 @@
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       @include box-sizing(border-box);
       height: 120px;
-      @include inline-block;
-      margin-left: grid-width(1) + $gw-gutter;
-      margin-right: $gw-gutter;
+      margin-left: grid-width(2) + $gw-gutter;
+      float: left;
       position: relative;
       text-align: center;
       @include transition(all, 0.2s, linear);
       vertical-align: top;
 
       &:hover {
-        height: 165px;
-
-        > hgroup {
-          h1 {
-            border-bottom: 1px solid rgb(200,200,200);
-            padding-bottom: 10px;
-          }
-          h2 {
-            opacity: 0;
-          }
-        }
-
         .actions {
-          opacity: 1;
+          display: none;
         }
       }
 
@@ -80,123 +68,21 @@
           text-transform: lowercase;
         }
       }
+    }
 
-      .actions {
-        @include clearfix;
-        @include box-sizing(border-box);
-        left: 0px;
-        opacity: 0;
-        padding: 20px 30px 0px;
-        position: absolute;
-        @include transition(opacity, 0.2s, linear);
-        top: 75px;
-        width: flex-grid(12);
-
-        .main-cta {
-          float: left;
-          margin-right: flex-gutter();
-          width: flex-grid(6);
-
-          > a.find-courses {
-            @include button(shiny, $blue);
-            @include box-sizing(border-box);
-            @include border-radius(3px);
-            display: block;
-            font: normal 1.2rem/1.6rem $sans-serif;
-            letter-spacing: 1px;
-            padding: 10px 0px;
-            text-transform: uppercase;
-            text-align: center;
-            width: flex-grid(12);
-
-            &:hover {
-              color: rgb(255,255,255);
-            }
-          }
-        }
-
-        .secondary-actions {
-          @include box-sizing(border-box);
-          @include clearfix;
-          float: left;
-          width: flex-grid(6);
-
-          .social-sharing {
-            @include box-sizing(border-box);
-            float: left;
-            height: 44px;
-            margin-right: flex-gutter();
-            position: relative;
-            text-align: center;
-            width: flex-grid(12);
-
-            &:hover {
-              .sharing-message {
-                opacity: 1;
-                top: 50px;
-              }
-            }
-
-            .sharing-message {
-              @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.9) 0%,
-                                                                rgba(0,0,0, 0.7) 100%));
-              border: 1px solid rgba(0,0,0, 0.5);
-              @include border-radius(4px);
-              @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
-              @include box-sizing(border-box);
-              color: rgb(255,255,255);
-              float: right;
-              font-family: $serif;
-              font-size: 0.9em;
-              font-style: italic;
-              left: 50%;
-              margin-left: -110px;
-              opacity: 0;
-              padding: 6px 10px;
-              position: absolute;
-              text-align: center;
-              @include transition(all, 0.15s, ease-out);
-              top: 25px;
-              width: 220px;
-
-              &:hover {
-                opacity: 0;
-              }
-            }
-
-            .share {
-              height: 44px;
-              @include inline-block;
-              margin-right: 10px;
-              opacity: 0.5;
-              @include transition(all, 0.15s, linear);
-              width: 44px;
-
-              &:hover {
-                opacity: 1;
-              }
-
-              img {
-                width: 100%;
-              }
-
-              &:last-child {
-                margin-right: 0px;
-              }
-            }
-          }
-        }
-      }
+    .actions {
+      display: none;
     }
 
     .media {
       background: #FFF;
       background: rgba(255,255,255, 0.93);
       border: 1px solid rgb(100,100,100);
+      border-left: 0;
       @include box-sizing(border-box);
-      @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+      // @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       height: 120px;
-      @include inline-block;
+      float: left;
       padding: 4px;
       position: relative;
       vertical-align: top;
@@ -249,8 +135,6 @@
       }
 
       &:hover {
-        cursor: pointer;
-
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
           @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.5));

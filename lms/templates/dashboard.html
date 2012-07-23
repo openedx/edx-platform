@@ -8,7 +8,36 @@
 
 <%block name="title"><title>Dashboard</title></%block>
 
+<%block name="js_extra">
+  <script type="text/javascript">
+  (function() {
+
+    $(".unenroll").click(function(event) {
+      $("#unenroll_course_id").val( $(event.target).data("course-id") );
+      $("#unenroll_course_number").text( $(event.target).data("course-number") );
+
+    });
+    
+     $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
+       if(json.success) {
+         location.href="${reverse('dashboard')}";
+       } else {
+         if($('#unenroll_error').length == 0) {
+           $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
+         }
+         $('#unenroll_error').text(json.error).stop().css("display", "block");
+       }
+     });
+  })(this)
+  </script>
+</%block>
+
 <section class="container dashboard">
+  
+  <section class="dashboard-banner">
+    ${message}
+    <br/>
+  </section>
 
   <section class="profile-sidebar">
     <header class="profile">
@@ -48,10 +77,10 @@
           <section class="info">
             <hgroup>
               <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
-              <h3><a href="${course_target}">${get_course_about_section(course, "title")}</a></h3>
+              <h3><a href="${course_target}">${course.number} ${course.title}</a></h3>
             </hgroup>
             <section class="course-status">
-              <p>Class Starts - <span>9/2/2012</span></div>
+              <p>Class Starts - <span>${course.start_date_text}</span></div>
             </section>
             <section class="meta">
               <div class="course-work-icon"></div>
@@ -61,7 +90,7 @@
                 </div>
               </div>
               <div class="complete">
-                <p><span class="completeness">60%</span> complete</p>
+                ##<p><span class="completeness">60%</span> complete</p>
               </div>
             </section>
           </section>
@@ -104,26 +133,4 @@
   </div>
 </section>
 
-
-<script type="text/javascript">
-(function() {
-  
-  $(".unenroll").click(function(event) {
-    $("#unenroll_course_id").val( $(event.target).data("course-id") );
-    $("#unenroll_course_number").text( $(event.target).data("course-number") );
-    
-  });
-  
-   $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
-     if(json.success) {
-       location.href="${reverse('dashboard')}";
-     } else {
-       if($('#unenroll_error').length == 0) {
-         $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
-       }
-       $('#unenroll_error').text(json.error).stop().css("display", "block");
-     }
-   });
-})(this)
-</script>
 
