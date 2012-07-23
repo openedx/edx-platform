@@ -8,6 +8,30 @@
 
 <%block name="title"><title>Dashboard</title></%block>
 
+<%block name="js_extra">
+  <script type="text/javascript">
+  (function() {
+
+    $(".unenroll").click(function(event) {
+      $("#unenroll_course_id").val( $(event.target).data("course-id") );
+      $("#unenroll_course_number").text( $(event.target).data("course-number") );
+
+    });
+    
+     $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
+       if(json.success) {
+         location.href="${reverse('dashboard')}";
+       } else {
+         if($('#unenroll_error').length == 0) {
+           $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
+         }
+         $('#unenroll_error').text(json.error).stop().css("display", "block");
+       }
+     });
+  })(this)
+  </script>
+</%block>
+
 <section class="container dashboard">
   
   <section class="dashboard-banner">
@@ -109,26 +133,4 @@
   </div>
 </section>
 
-
-<script type="text/javascript">
-(function() {
-  
-  $(".unenroll").click(function(event) {
-    $("#unenroll_course_id").val( $(event.target).data("course-id") );
-    $("#unenroll_course_number").text( $(event.target).data("course-number") );
-    
-  });
-  
-   $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
-     if(json.success) {
-       location.href="${reverse('dashboard')}";
-     } else {
-       if($('#unenroll_error').length == 0) {
-         $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
-       }
-       $('#unenroll_error').text(json.error).stop().css("display", "block");
-     }
-   });
-})(this)
-</script>
 

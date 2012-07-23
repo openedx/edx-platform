@@ -3,11 +3,47 @@
   from courseware.courses import course_image_url, get_course_about_section
 %>
 <%namespace name='static' file='../static_content.html'/>
-<%block name="js_extra">
-  <script src="${static.url('js/course_info.js')}"></script>
-</%block>
 
 <%inherit file="../main.html" />
+
+<%block name="js_extra">
+  % if not registered:
+    %if user.is_authenticated():
+      ## If the user is authenticated, clicking the enroll button just submits a form
+      <script type="text/javascript">
+      (function() {
+        $(".register").click(function() {
+          $("#class_enroll_form").submit();
+        });
+    
+        $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
+          if(json.success) {
+            location.href="${reverse('dashboard')}";
+          }
+        });
+      })(this)
+      </script>
+    %else:
+      ## If the user is not authenticated, clicking the enroll button pops up the register
+      ## field. We also slip in the registration fields into the login/register fields so
+      ## the user is automatically registered after logging in / registering
+      <script type="text/javascript">
+      (function() {
+        $(".register").click(function() {
+          if ($("#login_form .enroll_fieldset").length === 0) {
+            $("#login_form").append( $(".enroll_fieldset").first().clone() );
+          }
+          if ($("#register_form .enroll_fieldset").length === 0) {
+            $("#register_form").append( $(".enroll_fieldset").first().clone() );
+          }
+        });
+      })(this)
+      </script>
+    %endif
+  %endif
+
+  <script src="${static.url('js/course_info.js')}"></script>
+</%block>
 
 
 <%block name="title"><title>About ${course.number}</title></%block>
@@ -119,38 +155,6 @@
       </div>
     </form>
   </div>
-  %if user.is_authenticated():
-    ## If the user is authenticated, clicking the enroll button just submits a form
-    <script type="text/javascript">
-    (function() {
-      $(".register").click(function() {
-        $("#class_enroll_form").submit();
-      });
-  
-      $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
-        if(json.success) {
-          location.href="${reverse('dashboard')}";
-        }
-      });
-    })(this)
-    </script>
-  %else:
-    ## If the user is not authenticated, clicking the enroll button pops up the register
-    ## field. We also slip in the registration fields into the login/register fields so
-    ## the user is automatically registered after logging in / registering
-    <script type="text/javascript">
-    (function() {
-      $(".register").click(function() {
-        if ($("#login_form .enroll_fieldset").length === 0) {
-          $("#login_form").append( $(".enroll_fieldset").first().clone() );
-        }
-        if ($("#register_form .enroll_fieldset").length === 0) {
-          $("#register_form").append( $(".enroll_fieldset").first().clone() );
-        }
-      });
-    })(this)
-    </script>
-  %endif
 %endif
 
 
