@@ -326,7 +326,12 @@ PIPELINE_JS = {
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
             if pth not in courseware_only_js
-        ] + ['js/form.ext.js'],
+        ] + [
+            'js/form.ext.js',
+            'js/my_courses_dropdown.js',
+            'js/toggle_login_modal.js',
+            'js/sticky_filter.js',
+        ],
         'output_filename': 'js/application.js'
     },
     'courseware': {
