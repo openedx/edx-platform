@@ -30,11 +30,11 @@
       <script type="text/javascript">
       (function() {
         $(".register").click(function() {
-          if ($("#login_form .enroll_fieldset").length === 0) {
-            $("#login_form").append( $(".enroll_fieldset").first().clone() );
+          if ($(".login_form .enroll_fieldset").length === 0) {
+            $(".login_form").append( $(".enroll_fieldset").first().clone() );
           }
-          if ($("#register_form .enroll_fieldset").length === 0) {
-            $("#register_form").append( $(".enroll_fieldset").first().clone() );
+          if ($(".register_form .enroll_fieldset").length === 0) {
+            $(".register_form").append( $(".enroll_fieldset").first().clone() );
           }
         });
       })(this)
