@@ -3,7 +3,7 @@
 <%block name="bodyclass">courseware</%block>
 <%block name="title"><title>Courseware – MITx 6.002x</title></%block>
 
-<%block name="headextra">
+<%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <link rel="stylesheet" href="${static.url('css/vendor/jquery.treeview.css')}" type="text/css" media="all" />
 
@@ -24,21 +24,10 @@
   <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
   
   
-  % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
    <%static:js group='courseware'/>
-  % endif
-
-  % if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
-    % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['courseware']['source_filenames'] ]:
-      <script type="text/javascript" src="${jsfn}"></script>
-    % endfor
-  % endif
-  
 
   <%include file="mathjax_include.html" />
-</%block>
 
-<%block name="js_extra">
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
   <script type="text/javascript">
     document.write('\x3Cscript type="text/javascript" src="' +
