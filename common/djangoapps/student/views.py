@@ -72,10 +72,10 @@ def index(request):
         soup = BeautifulSoup(entry.description)
         entry.image = soup.img['src'] if soup.img else None
 
-    courses = modulestore().get_courses()
     universities = defaultdict(list)
-    for university, group in itertools.groupby(courses, lambda course: course.org):
-        [universities[university].append(course) for course in group]
+    courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
+    for course in courses:
+        universities[course.org].append(course)
 
     return render_to_response('index.html', {'universities': universities, 'entries': entries})
 
