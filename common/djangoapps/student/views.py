@@ -71,6 +71,7 @@ def index(request):
     for entry in entries:
         soup = BeautifulSoup(entry.description)
         entry.image = soup.img['src'] if soup.img else None
+        entry.summary = soup.getText()
 
     universities = defaultdict(list)
     courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
