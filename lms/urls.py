@@ -69,8 +69,9 @@ urlpatterns = ('',
         {'template': 'tos.html'}, name="tos"),
     url(r'^privacy$', 'static_template_view.views.render', 
         {'template': 'privacy.html'}, name="privacy_edx"),
-    url(r'^copyright$', 'static_template_view.views.render', 
-        {'template': 'copyright.html'}, name="copyright"),
+    # TODO: (bridger) The copyright has been removed until it is updated for edX
+    # url(r'^copyright$', 'static_template_view.views.render', 
+    #     {'template': 'copyright.html'}, name="copyright"),
     url(r'^honor$', 'static_template_view.views.render', 
         {'template': 'honor.html'}, name="honor"),
         
