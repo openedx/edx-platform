@@ -52,5 +52,13 @@
     h2 + p {
       margin-top: 30px;
     }
+    
+    .contact {
+      margin-top: 20px;
+      
+      p + p {
+       margin-top: 0px; 
+      }
+    }
   }
 }
