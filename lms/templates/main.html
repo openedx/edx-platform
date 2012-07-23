@@ -8,34 +8,13 @@
   
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:800italic,400,800' rel='stylesheet' type='text/css'>
 
-% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
  <%static:css group='application'/>
   <!--[if lt IE 9]>
   <%static:css group='ie-fixes'/>
   <![endif]-->
-% endif
 
-% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
-  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
-  <!--[if lt IE 9]>
-  <link rel="stylesheet" href="/static/sass/ie.css" type="text/css" media="all" / >
-  <![endif]-->
-% endif
-
-
-% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
  <%static:js group='main_vendor'/>
  <%static:js group='application'/>
-% endif
-
-% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
-  % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['main_vendor']['source_filenames'] ]:
-    <script type="text/javascript" src="${jsfn}"></script>
-  % endfor
-  % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['application']['source_filenames'] ]:
-    <script type="text/javascript" src="${jsfn}"></script>
-  % endfor
-% endif
 
   <!--[if lt IE 9]>
   <script src="${static.url('js/html5shiv.js')}"></script>
