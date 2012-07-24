@@ -403,7 +403,7 @@ def password_reset(request):
         form.save( use_https = request.is_secure(),
                    from_email = settings.DEFAULT_FROM_EMAIL,
                    request = request,
-                   domain_override = "edx.org" )
+                   domain_override = settings.SITE_NAME )
         return HttpResponse(json.dumps({'success':True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
