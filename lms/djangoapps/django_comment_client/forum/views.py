@@ -22,6 +22,7 @@ from datehelper import time_ago_in_words
 
 import operator
 import itertools
+import json
 
 _FULLMODULES = None
 _DISCUSSIONINFO = None
@@ -80,11 +81,12 @@ def get_categorized_discussion_info(request, user, course, course_name, url_cour
     return _DISCUSSIONINFO
 
 def render_accordion(request, course, discussion_info, discussion_id):
-    context = dict([
-        ('course', course),
-        ('discussion_info', discussion_info),
-        ('active', discussion_id), # TODO change this later
-        ('csrf', csrf(request)['csrf_token'])])
+    context = {
+        'course': course,
+        'discussion_info': discussion_info,
+        'active': discussion_id,
+        'csrf': csrf(request)['csrf_token'],
+    }
 
     return render_to_string('discussion/accordion.html', context)
 
@@ -147,6 +149,7 @@ def single_thread(request, thread_id):
         'init': '',
         'content': render_single_thread(request, thread_id),
         'accordion': '',
+        'user_info': json.dumps(comment_client.get_user_info(request.user.id)),
     }
 
     return render_to_response('discussion/index.html', context)

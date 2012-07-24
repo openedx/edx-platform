@@ -129,8 +129,47 @@ def vote_for_thread(request, thread_id, value):
     response = comment_client.vote_for_thread(thread_id, user_id, value)
     return JsonResponse(response)
 
-#undo vote: disabled for now
+@login_required
+@require_POST
+def watch_thread(request, thread_id):
+    user_id = request.user.id
+    response = comment_client.subscribe_thread(user_id, thread_id)
+    return JsonResponse(response)
 
+@login_required
+@require_POST
+def watch_commentable(request, commentable_id):
+    user_id = request.user.id
+    response = comment_client.subscribe_commentable(user_id, commentable_id)
+    return JsonResponse(response)
+
+@login_required
+@require_POST
+def follow(request, followed_user_id):
+    user_id = request.user.id
+    response = comment_client.follow(user_id, followed_user_id)
+    return JsonResponse(response)
+
+@login_required
+@require_POST
+def unwatch_thread(request, thread_id):
+    user_id = request.user.id
+    response = comment_client.unsubscribe_thread(user_id, thread_id)
+    return JsonResponse(response)
+
+@login_required
+@require_POST
+def unwatch_commentable(request, commentable_id):
+    user_id = request.user.id
+    response = comment_client.unsubscribe_commentable(user_id, commentable_id)
+    return JsonResponse(response)
+
+@login_required
+@require_POST
+def unfollow(request, followed_user_id):
+    user_id = request.user.id
+    response = comment_client.unfollow(user_id, followed_user_id)
+    return JsonResponse(response)
 
 @login_required
 @require_GET
