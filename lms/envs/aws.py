@@ -32,10 +32,14 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
+for feature in ENV_TOKEN['ENABLED_FEATURE']:
+    MITX_FEATURES[feature] = True
+
 LOGGING = get_logger_config(LOG_DIR, 
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             debug=False)
+
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
