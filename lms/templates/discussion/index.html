@@ -8,11 +8,10 @@
 </%block>
 
 <%block name="js_extra">
-<!-- TODO: http://docs.jquery.com/Plugins/Validation -->
 <script type="text/javascript">
-  document.write('\x3Cscript type="text/javascript" src="' +
-      document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
+  var user_info = JSON.parse('${user_info}');
 </script>
+
 </%block>
 
 ##<%include file="../course_navigation.html" args="active_page='discussion'" />
