@@ -2,8 +2,6 @@
 <%! from datehelper import time_ago_in_words %>
 <%! from dateutil.parser import parse %>
 
-
-
 <%def name="render_thread(thread, edit_thread=False, show_comments=False)">
   <%
     if show_comments:
@@ -24,7 +22,6 @@
             % if edit_thread:
               ${render_reply()}
               ${render_edit()}
-              ${render_watch_thread()}
             % endif
           </div>
         </div>
