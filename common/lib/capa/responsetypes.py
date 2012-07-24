@@ -795,7 +795,10 @@ main()
         try:
             rxml = etree.fromstring(r.text)         # response is XML; prase it
         except Exception as err:
-            msg = 'Error %s - cannot parse response from external server r.text=%s' % (err,r.text)
+            etext = r.text
+            #etext = etext.replace('<![CDATA[','< ![ CDATA [')
+            etext = etext.replace('<','&lt;').replace('>','&gt;')	# escape
+            msg = 'Error %s - cannot parse response from external server r.text=%s' % (err,etext)
             log.error(msg)
             raise Exception(msg)
 

@@ -252,11 +252,22 @@ def textbox(element, value, status, render_template, msg=''):
     try:
         xhtml = etree.XML(html)
     except Exception as err:
-        newmsg = 'error %s in rendering message' % (str(err).replace('<','&lt;'))
-        newmsg += '<br/>Original message: %s' % msg.replace('<','&lt;')
+        log.debug('error in textbox BAD HTML is : %s' % html)
+        newmsg = 'error %s in rendering message' % (str(err).replace('<','&lt;').replace('>','&gt;').replace(']]','&#93;&#93;'))
+        newmsg += '<br/>Original message: %s' % msg.replace('<','&lt;').replace('>','&gt;').replace(']]','&#93;&#93;')
         context['msg'] = newmsg
+        log.debug('error in textbox: %s' % newmsg)
         html = render_template("textbox.html", context)
-        xhtml = etree.XML(html)
+        try:
+            xhtml = etree.XML(html)
+        except Exception as err:
+            log.debug('SECONDARY error in textbox, giving up on status and msg')
+            newmsg = 'error %s in rendering message' % (str(err).replace('<','&lt;').replace('>','&gt;').replace(']]','&#93;&#93;'))
+            context['msg'] = newmsg
+            context['status'] = ''
+            log.debug('error in textbox: %s' % newmsg)
+            html = render_template("textbox.html", context)
+            xhtml = etree.XML(html)
     return xhtml
 
 #-----------------------------------------------------------------------------
