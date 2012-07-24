@@ -135,6 +135,10 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.profile', name="profile"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 
             'courseware.views.profile'),
+
+        # discussion
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
+            include('django_comment_client.urls')),
     )
     
     # Multicourse wiki
@@ -156,8 +160,6 @@ if settings.ASKBOT_ENABLED:
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
 
-# discussion
-urlpatterns += (url(r'^discussions/', include('django_comment_client.urls')), )
 
 if settings.DEBUG:
     ## Jasmine

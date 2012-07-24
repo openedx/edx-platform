@@ -26,23 +26,23 @@ Discussion =
 
   urlFor: (name, param) ->
     {
-      watch_commentable   : "/discussions/#{param}/watch"
-      unwatch_commentable : "/discussions/#{param}/unwatch"
-      create_thread       : "/discussions/#{param}/threads/create"
-      update_thread       : "/discussions/threads/#{param}/update"
-      create_comment      : "/discussions/threads/#{param}/reply"
-      delete_thread       : "/discussions/threads/#{param}/delete"
-      upvote_thread       : "/discussions/threads/#{param}/upvote"
-      downvote_thread     : "/discussions/threads/#{param}/downvote"
-      watch_thread        : "/discussions/threads/#{param}/watch"
-      unwatch_thread      : "/discussions/threads/#{param}/unwatch"
-      update_comment      : "/discussions/comments/#{param}/update"
-      endorse_comment     : "/discussions/comments/#{param}/endorse"
-      create_sub_comment  : "/discussions/comments/#{param}/reply"
-      delete_comment      : "/discussions/comments/#{param}/delete"
-      upvote_comment      : "/discussions/comments/#{param}/upvote"
-      downvote_comment    : "/discussions/comments/#{param}/downvote"
-      search              : "/discussions/forum/search"
+      watch_commentable   : "/courses/#{$$course_id}/discussion/#{param}/watch"
+      unwatch_commentable : "/courses/#{$$course_id}/discussion/#{param}/unwatch"
+      create_thread       : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
+      update_thread       : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
+      create_comment      : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
+      delete_thread       : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
+      upvote_thread       : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
+      downvote_thread     : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
+      watch_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/watch"
+      unwatch_thread      : "/courses/#{$$course_id}/discussion/threads/#{param}/unwatch"
+      update_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/update"
+      endorse_comment     : "/courses/#{$$course_id}/discussion/comments/#{param}/endorse"
+      create_sub_comment  : "/courses/#{$$course_id}/discussion/comments/#{param}/reply"
+      delete_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/delete"
+      upvote_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/upvote"
+      downvote_comment    : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
+      search              : "/courses/#{$$course_id}/discussion/forum/search"
     }[name]
 
   handleAnchorAndReload: (response) ->
@@ -54,11 +54,36 @@ Discussion =
       $content = $(content)
       $local = generateLocal($content.children(".discussion-content"))
       id = $content.attr("_id")
-      if id in user_info.upvoted_ids
+      if id in $$user_info.upvoted_ids
         $local(".discussion-vote-up").addClass("voted")
-      else if id in user_info.downvoted_ids
+      else if id in $$user_info.downvoted_ids
         $local(".discussion-vote-down").addClass("voted")
 
+    initializeWatchDiscussion = (discussion) ->
+      $discussion = $(discussion)
+      id = $discussion.attr("_id")
+      $local = generateLocal($discussion.children(".discussion-non-content"))
+
+      handleWatchDiscussion = (elem) ->
+        url = Discussion.urlFor('watch_commentable', id)
+        $.post url, {}, (response, textStatus) ->
+          if textStatus == "success"
+            Discussion.handleAnchorAndReload(response)
+        , 'json'
+
+      handleUnwatchDiscussion = (elem) ->
+        url = Discussion.urlFor('unwatch_commentable', id)
+        $.post url, {}, (response, textStatus) ->
+          if textStatus == "success"
+            Discussion.handleAnchorAndReload(response)
+        , 'json'
+
+      if id in $$user_info.subscribed_commentable_ids
+        unwatchDiscussion = generateDiscussionLink("discussion-unwatch-discussion", "Unwatch", handleUnwatchDiscussion)
+        $local(".discussion-title-wrapper").append(unwatchDiscussion)
+      else
+        watchDiscussion = generateDiscussionLink("discussion-watch-discussion", "Watch", handleWatchDiscussion)
+        $local(".discussion-title-wrapper").append(watchDiscussion)
 
     initializeWatchThreads = (index, thread) ->
       $thread = $(thread)
@@ -67,7 +92,6 @@ Discussion =
 
       handleWatchThread = (elem) ->
         url = Discussion.urlFor('watch_thread', id)
-        console.log url
         $.post url, {}, (response, textStatus) ->
           if textStatus == "success"
             Discussion.handleAnchorAndReload(response)
@@ -80,16 +104,17 @@ Discussion =
             Discussion.handleAnchorAndReload(response)
         , 'json'
 
-      if id in user_info.subscribed_thread_ids
+      if id in $$user_info.subscribed_thread_ids
         unwatchThread = generateDiscussionLink("discussion-unwatch-thread", "Unwatch", handleUnwatchThread)
         $local(".info").append(unwatchThread)
       else
         watchThread = generateDiscussionLink("discussion-watch-thread", "Watch", handleWatchThread)
         $local(".info").append(watchThread)
 
-    if user_info?
+    if $$user_info?
       $(discussion).find(".comment").each(initializeVote)
       $(discussion).find(".thread").each(initializeVote).each(initializeWatchThreads)
+      initializeWatchDiscussion(discussion)
 
   bindContentEvents: (content) ->
 
