@@ -37,6 +37,7 @@ $discussion_input_width: 60%;
       @include discussion-font;
     }
   }
+  
   .discussion-title {
     @include discussion-font;
     @include discussion-clickable;
@@ -44,6 +45,22 @@ $discussion_input_width: 60%;
     font-weight: bold;
     margin-bottom: 20px;
     display: block;
+  }
+  .discussion-title-wrapper {
+    .discussion-watch-discussion, .discussion-unwatch-discussion {
+      display: none;
+      @include discussion-font;
+      margin-left: 5px;
+      font-size: $comment_info_size;
+    }
+    .discussion-title {
+      display: inline-block;
+    }
+    &:hover {
+      .discussion-watch-discussion, .discussion-unwatch-discussion {
+        display: inline-block;
+      }
+    }
   }
   .discussion-votes {
     margin-right: 8px;
