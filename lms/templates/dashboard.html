@@ -95,7 +95,7 @@
             </section>
           </section>
         </article>
-        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unenroll</a>
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
 
       % endfor
     % else:
@@ -113,7 +113,7 @@
 <section id="unenroll-modal" class="modal unenroll-modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Are you sure you want to unenroll from <span id="unenroll_course_number"></span>?</h2>
+      <h2>Are you sure you want to unregister from <span id="unenroll_course_number"></span>?</h2>
       <hr>
     </header>
 
@@ -121,7 +121,7 @@
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
-        <input name="submit" type="submit" value="Unenroll" />
+        <input name="submit" type="submit" value="Unregister" />
       </div>
     </form>
 
