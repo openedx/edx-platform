@@ -65,7 +65,7 @@
 
         <article class="my-course">
           <%
-          if course.has_started():
+          if course.has_started() or settings.MITX_FEATURES['DISABLE_START_DATES']:
             course_target = reverse('info', args=[course.id])
           else:
             course_target = reverse('about_course', args=[course.id])
