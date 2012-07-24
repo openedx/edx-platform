@@ -9,38 +9,93 @@ $ ->
     $('#open_close_accordion a').click @toggle
     $('#accordion').show()
 
-
   $("section.discussion").each (index, discussion) ->
     Discussion.bindDiscussionEvents(discussion)
+    Discussion.initializeDiscussion(discussion)
+
+generateLocal = (elem) ->
+  (selector) -> $(elem).find(selector)
+
+generateDiscussionLink = (cls, txt, handler) ->
+  $("<a>").addClass("discussion-link").
+           attr("href", "javascript:void(0)").
+           addClass(cls).html(txt).
+           click(-> handler(this))
 
 Discussion =
 
   urlFor: (name, param) ->
     {
-      create_thread      : "/discussions/#{param}/threads/create"
-      update_thread      : "/discussions/threads/#{param}/update"
-      create_comment     : "/discussions/threads/#{param}/reply"
-      delete_thread      : "/discussions/threads/#{param}/delete"
-      update_comment     : "/discussions/comments/#{param}/update"
-      endorse_comment    : "/discussions/comments/#{param}/endorse"
-      create_sub_comment : "/discussions/comments/#{param}/reply"
-      delete_comment     : "/discussions/comments/#{param}/delete"
-      upvote_comment     : "/discussions/comments/#{param}/upvote"
-      downvote_comment   : "/discussions/comments/#{param}/downvote"
-      upvote_thread      : "/discussions/threads/#{param}/upvote"
-      downvote_thread    : "/discussions/threads/#{param}/downvote"
-      search             : "/discussions/forum/search"
+      watch_commentable   : "/discussions/#{param}/watch"
+      unwatch_commentable : "/discussions/#{param}/unwatch"
+      create_thread       : "/discussions/#{param}/threads/create"
+      update_thread       : "/discussions/threads/#{param}/update"
+      create_comment      : "/discussions/threads/#{param}/reply"
+      delete_thread       : "/discussions/threads/#{param}/delete"
+      upvote_thread       : "/discussions/threads/#{param}/upvote"
+      downvote_thread     : "/discussions/threads/#{param}/downvote"
+      watch_thread        : "/discussions/threads/#{param}/watch"
+      unwatch_thread      : "/discussions/threads/#{param}/unwatch"
+      update_comment      : "/discussions/comments/#{param}/update"
+      endorse_comment     : "/discussions/comments/#{param}/endorse"
+      create_sub_comment  : "/discussions/comments/#{param}/reply"
+      delete_comment      : "/discussions/comments/#{param}/delete"
+      upvote_comment      : "/discussions/comments/#{param}/upvote"
+      downvote_comment    : "/discussions/comments/#{param}/downvote"
+      search              : "/discussions/forum/search"
     }[name]
 
   handleAnchorAndReload: (response) ->
     #window.location = window.location.pathname + "#" + response['id']
     window.location.reload()
 
+  initializeDiscussion: (discussion) ->
+    initializeVote = (index, content) ->
+      $content = $(content)
+      $local = generateLocal($content.children(".discussion-content"))
+      id = $content.attr("_id")
+      if id in user_info.upvoted_ids
+        $local(".discussion-vote-up").addClass("voted")
+      else if id in user_info.downvoted_ids
+        $local(".discussion-vote-down").addClass("voted")
+
+
+    initializeWatchThreads = (index, thread) ->
+      $thread = $(thread)
+      id = $thread.attr("_id")
+      $local = generateLocal($thread.children(".discussion-content"))
+
+      handleWatchThread = (elem) ->
+        url = Discussion.urlFor('watch_thread', id)
+        console.log url
+        $.post url, {}, (response, textStatus) ->
+          if textStatus == "success"
+            Discussion.handleAnchorAndReload(response)
+        , 'json'
+
+      handleUnwatchThread = (elem) ->
+        url = Discussion.urlFor('unwatch_thread', id)
+        $.post url, {}, (response, textStatus) ->
+          if textStatus == "success"
+            Discussion.handleAnchorAndReload(response)
+        , 'json'
+
+      if id in user_info.subscribed_thread_ids
+        unwatchThread = generateDiscussionLink("discussion-unwatch-thread", "Unwatch", handleUnwatchThread)
+        $local(".info").append(unwatchThread)
+      else
+        watchThread = generateDiscussionLink("discussion-watch-thread", "Watch", handleWatchThread)
+        $local(".info").append(watchThread)
+
+    if user_info?
+      $(discussion).find(".comment").each(initializeVote)
+      $(discussion).find(".thread").each(initializeVote).each(initializeWatchThreads)
+
   bindContentEvents: (content) ->
 
     $content = $(content)
     $discussionContent = $content.children(".discussion-content")
-    $local = (selector) -> $discussionContent.find(selector)
+    $local = generateLocal($discussionContent)
 
     discussionContentHoverIn = ->
       status = $discussionContent.attr("status") || "normal"
@@ -58,11 +113,7 @@ Discussion =
 
     $discussionContent.hover(discussionContentHoverIn, discussionContentHoverOut)
 
-    generateDiscussionLink = (cls, txt, handler) ->
-      $("<a>").addClass("discussion-link").
-               attr("href", "javascript:void(0)").
-               addClass(cls).html(txt).
-               click(-> handler(this))
+    
 
     handleReply = (elem) ->
       editView = $local(".discussion-content-edit")

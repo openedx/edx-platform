@@ -66,6 +66,9 @@ $discussion_input_width: 60%;
       &.discussion-vote-down {
         margin-top: 3px;
       }
+      &.voted {
+        color: #1d9dd9;
+      }
     }
   }
   .discussion-right-wrapper {
