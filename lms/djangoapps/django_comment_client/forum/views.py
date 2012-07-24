@@ -58,7 +58,7 @@ def get_categorized_discussion_info(request, user, course, course_name, url_cour
             return {
                 'title': module.title,
                 'discussion_id': module.discussion_id,
-                'category': module.category,
+                'category': module.discussion_category,
             }
 
         discussion_module_descriptors = map(_get_module_descriptor,
@@ -90,27 +90,28 @@ def render_accordion(request, course, discussion_info, discussion_id):
 
     return render_to_string('discussion/accordion.html', context)
 
-def render_discussion(request, threads, discussion_id=None, search_text=''):
+def render_discussion(request, course_id, threads, discussion_id=None, search_text=''):
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
-        'search_bar': render_search_bar(request, discussion_id, text=search_text),
+        'search_bar': render_search_bar(request, course_id, discussion_id, text=search_text),
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
+        'course_id': course_id,
     }
     return render_to_string('discussion/inline.html', context)
 
-def render_search_bar(request, discussion_id=None, text=''):
+def render_search_bar(request, course_id, discussion_id=None, text=''):
     if not discussion_id:
         return ''
     context = {
         'discussion_id': discussion_id,
         'text': text,
+        'course_id': course_id,
     }
     return render_to_string('discussion/search_bar.html', context)
 
 def forum_form_discussion(request, course_id, discussion_id):
 
-    course_id = course_id.replace('-', '/')
     course = check_course(course_id)
 
     _, course_name, _ = course_id.split('/')
@@ -131,39 +132,46 @@ def forum_form_discussion(request, course_id, discussion_id):
         'COURSE_TITLE': course.title,
         'course': course,
         'init': '',
-        'content': render_discussion(request, threads, discussion_id, search_text),
+        'content': render_discussion(request, course_id, threads, discussion_id, search_text),
         'accordion': render_accordion(request, course, discussion_info, discussion_id),
     }
 
     return render_to_response('discussion/index.html', context)
 
-def render_single_thread(request, thread_id):
+def render_single_thread(request, course_id, thread_id):
     context = {
         'thread': comment_client.get_thread(thread_id, recursive=True),
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
+        'course_id': course_id,
     }
     return render_to_string('discussion/single_thread.html', context)
 
-def single_thread(request, thread_id):
+def single_thread(request, course_id, thread_id):
+
+    course = check_course(course_id)
 
     context = {
         'csrf': csrf(request)['csrf_token'],
         'init': '',
-        'content': render_single_thread(request, thread_id),
+        'content': render_single_thread(request, course_id, thread_id),
         'accordion': '',
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
+        'course': course,
     }
 
     return render_to_response('discussion/index.html', context)
 
-def search(request):
+def search(request, course_id):
+
+    course = check_course(course_id)
     text = request.GET.get('text', None)
     threads = comment_client.search(text)
     context = {
         'csrf': csrf(request)['csrf_token'],
         'init': '',
-        'content': render_discussion(request, threads, search_text=text),
+        'content': render_discussion(request, course_id, threads, search_text=text),
         'accordion': '',
+        'course': course,
     }
 
     return render_to_response('discussion/index.html', context)

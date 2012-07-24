@@ -1,8 +1,10 @@
 <%namespace name="renderer" file="thread.html"/>
 
-<section class="discussion">
+<section class="discussion" _id="${discussion_id}">
   <div class="discussion-non-content">
-    <a class="discussion-title" href="javascript:void(0)">Discussion</a>
+    <div class="discussion-title-wrapper">
+      <a class="discussion-title" href="javascript:void(0)">Discussion</a>
+    </div>
     ${search_bar}
     <form class="new-post-form" _id="${discussion_id}">
       <input type="text" class="new-post-title" placeholder="Title"/>
@@ -11,11 +13,11 @@
     </form>
   </div>
   % for thread in threads:
-    ${renderer.render_thread(thread, edit_thread=False, show_comments=False)}
+    ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
   % endfor
 </section>
 
 <script type="text/javascript">
-  var user_info = JSON.parse('${user_info}');
+  var $$user_info = JSON.parse('${user_info}');
+  var $$course_id = "${course_id}";
 </script>
-

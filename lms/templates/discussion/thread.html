@@ -2,13 +2,13 @@
 <%! from datehelper import time_ago_in_words %>
 <%! from dateutil.parser import parse %>
 
-<%def name="render_thread(thread, edit_thread=False, show_comments=False)">
+<%def name="render_thread(course_id, thread, edit_thread=False, show_comments=False)">
   <%
     if show_comments:
       url_for_thread = ""
     else:
       thread_id = thread['id']
-      url_for_thread = reverse('django_comment_client.forum.views.single_thread', args=[thread_id])
+      url_for_thread = reverse('django_comment_client.forum.views.single_thread', args=[course_id, thread_id])
   %>
   <div class="thread" _id="${thread['id']}">
     <div class="discussion-content">

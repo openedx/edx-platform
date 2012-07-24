@@ -19,6 +19,7 @@ class DiscussionModule(XModule):
             'discussion_id': self.discussion_id,
             'search_bar': '',
             'user_info': comment_client.get_user_info(self.user_id, raw=True),
+            'course_id': self.course_id,
         }
         return self.system.render_template('discussion/inline.html', context)
 
@@ -30,8 +31,9 @@ class DiscussionModule(XModule):
         xml_data = etree.fromstring(definition['data'])
         self.discussion_id = xml_data.attrib['id']
         self.title = xml_data.attrib['for']
-        self.category = xml_data.attrib['category']
+        self.discussion_category = xml_data.attrib['discussion_category']
         self.user_id = instance_state['user_id']
+        self.course_id = instance_state['course_id']
 
 class DiscussionDescriptor(RawDescriptor):
     module_class = DiscussionModule

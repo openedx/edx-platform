@@ -15,7 +15,7 @@ def url_class(url):
       <li class="info"><a href="${reverse('info', args=[course.id])}" class="${url_class('info')}">Course Info</a></li>
 % if user.is_authenticated():
       <li class="book"><a href="${reverse('book', args=[course.id])}" class="${url_class('book')}">Textbook</a></li>
-      <li class="discussion"><a href="${reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id.replace('/', '-'), course.id.replace('/', '_').replace('.', '_')])}" class="${url_class('discussion')}">Discussion</a></li>
+      <li class="discussion"><a href="${reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id, course.id.replace('/', '_').replace('.', '_')])}" class="${url_class('discussion')}">Discussion</a></li>
 % endif
       <li class="wiki"><a href="${reverse('wiki_root', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
 % if user.is_authenticated():

@@ -2,7 +2,7 @@
 
 <%
 def url_for_search():
-  return reverse('django_comment_client.forum.views.search')
+  return reverse('django_comment_client.forum.views.search', args=[course_id])
 %>
 
 <form action="${url_for_search()}" method="get" class="discussion-search-form">
