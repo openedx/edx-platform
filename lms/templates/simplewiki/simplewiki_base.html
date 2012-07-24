@@ -3,6 +3,10 @@
 <%inherit file="../main.html"/>
 <%namespace name='static' file='../static_content.html'/>
 
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
 <%!
   from django.core.urlresolvers import reverse
   from simplewiki.views import wiki_reverse
@@ -78,6 +82,7 @@
 <%include file="../course_navigation.html" args="active_page='wiki'" />
 %endif
 
+<section class="container">
 <section class="main-content">
   <div class="wiki-wrapper">
     <%block name="wiki_panel">
@@ -158,4 +163,5 @@
   </div>
 </section>
 
+</section>
 </%block>
