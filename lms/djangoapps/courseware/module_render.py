@@ -200,6 +200,13 @@ def get_module(user, request, location, student_module_cache, position=None):
     '''
     descriptor = modulestore().get_item(location)
 
+    user_id = user.id
+
+    import re
+    course_id = re.search(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/', request.path)
+    if course_id:
+        course_id = course_id.group('course_id')
+
     instance_module = student_module_cache.lookup(descriptor.category, descriptor.location.url())
     shared_state_key = getattr(descriptor, 'shared_state_key', None)
     if shared_state_key is not None:
@@ -207,8 +214,12 @@ def get_module(user, request, location, student_module_cache, position=None):
     else:
         shared_module = None
 
-    instance_state = instance_module.state if instance_module is not None else None
-    instance_state = json.dumps(dict(json.loads(instance_state).items() + [("user_id", user.id)]))
+    instance_state = instance_module.state if instance_module is not None else {}
+
+    instance_hash = json.loads(instance_state) if isinstance(instance_state, str) or isinstance(instance_state, unicode) \
+                                               else instance_state
+
+    instance_state = json.dumps(dict(instance_hash.items() + [("user_id", user.id), ("course_id", course_id)]))
     shared_state = shared_module.state if shared_module is not None else None
 
     # Setup system context for module instance
