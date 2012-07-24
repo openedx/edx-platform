@@ -95,6 +95,7 @@ def render_discussion(request, threads, discussion_id=None, search_text=''):
         'threads': threads,
         'discussion_id': discussion_id,
         'search_bar': render_search_bar(request, discussion_id, text=search_text),
+        'user_info': comment_client.get_user_info(request.user.id, raw=True),
     }
     return render_to_string('discussion/inline.html', context)
 
@@ -139,6 +140,7 @@ def forum_form_discussion(request, course_id, discussion_id):
 def render_single_thread(request, thread_id):
     context = {
         'thread': comment_client.get_thread(thread_id, recursive=True),
+        'user_info': comment_client.get_user_info(request.user.id, raw=True),
     }
     return render_to_string('discussion/single_thread.html', context)
 
@@ -149,7 +151,7 @@ def single_thread(request, thread_id):
         'init': '',
         'content': render_single_thread(request, thread_id),
         'accordion': '',
-        'user_info': json.dumps(comment_client.get_user_info(request.user.id)),
+        'user_info': comment_client.get_user_info(request.user.id, raw=True),
     }
 
     return render_to_response('discussion/index.html', context)
