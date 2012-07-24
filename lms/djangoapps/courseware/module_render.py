@@ -305,8 +305,8 @@ def add_histogram(module):
         # TODO: fixme - no filename in module.xml in general (this code block for edx4edx)
         # the following if block is for summer 2012 edX course development; it will change when the CMS comes online
         if settings.MITX_FEATURES.get('DISPLAY_EDIT_LINK') and settings.DEBUG and module_xml.get('filename') is not None:
-            coursename = multicourse_settings.get_coursename_from_request(request)
-            github_url = multicourse_settings.get_course_github_url(coursename)
+            # coursename = multicourse_settings.get_coursename_from_request(request)
+            # github_url = multicourse_settings.get_course_github_url(coursename)
             fn = module_xml.get('filename')
             if module_xml.tag == 'problem': fn = 'problems/' + fn	 # grrr
             edit_link = (github_url + '/tree/master/' + fn) if github_url is not None else None

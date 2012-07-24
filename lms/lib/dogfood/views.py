@@ -27,7 +27,6 @@ from lxml import etree
 
 from courseware.module_render import make_track_function, I4xSystem, get_module
 from courseware.models import StudentModule
-from multicourse import multicourse_settings
 from student.models import UserProfile
 from util.cache import cache
 from util.views import accepts
@@ -50,7 +49,7 @@ def update_problem(pfn, pxml, coursename=None, overwrite=True, filestore=None):
     '''
     if not filestore:
         if not coursename: coursename = DOGFOOD_COURSENAME
-        xp = multicourse_settings.get_course_xmlpath(coursename)	 # path to XML for the course
+        # xp = multicourse_settings.get_course_xmlpath(coursename)	 # path to XML for the course
         pfn2 = settings.DATA_DIR + xp + 'problems/%s.xml' % pfn
         fp = open(pfn2, 'w')
     else:
@@ -81,7 +80,7 @@ def df_capa_problem(request, id=None):
     else:
         coursename = request.session['coursename']
 
-    xp = multicourse_settings.get_course_xmlpath(coursename)	 # path to XML for the course
+    # xp = multicourse_settings.get_course_xmlpath(coursename)	 # path to XML for the course
 
     # Grab the XML corresponding to the request from course.xml
     module = 'problem'
@@ -169,9 +168,9 @@ def quickedit(request, id=None, qetemplate='quickedit.html', coursename=None):
         return quickedit_git_reload(request)
 
     # get coursename if stored
-    if not coursename:
-        coursename = multicourse_settings.get_coursename_from_request(request)
-    xp = multicourse_settings.get_course_xmlpath(coursename)	 # path to XML for the course
+    # if not coursename:
+        # coursename = multicourse_settings.get_coursename_from_request(request)
+    # xp = multicourse_settings.get_course_xmlpath(coursename)	 # path to XML for the course
 
     def get_lcp(coursename, id):
         # Grab the XML corresponding to the request from course.xml
@@ -301,8 +300,8 @@ def quickedit_git_reload(request):
         return redirect('/')
 
     # get coursename if stored
-    coursename = multicourse_settings.get_coursename_from_request(request)
-    xp = multicourse_settings.get_course_xmlpath(coursename)	 # path to XML for the course
+    # coursename = multicourse_settings.get_coursename_from_request(request)
+    # xp = multicourse_settings.get_course_xmlpath(coursename)	 # path to XML for the course
 
     msg = ""
     if 'cancel' in request.POST:

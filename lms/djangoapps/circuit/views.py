@@ -42,7 +42,7 @@ def edit_circuit(request, circuit):
 
     if not circuit.isalnum():
         raise Http404()
-    response = render_to_response('edit_circuit.html', {'name': circuit,
+    response = render_to_response('circuits/edit_circuit.html', {'name': circuit,
                                                         'circuit_line': circuit_line(circuit)})
     response['Cache-Control'] = 'no-cache'
     return response

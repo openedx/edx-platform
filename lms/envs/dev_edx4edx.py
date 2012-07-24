@@ -33,7 +33,6 @@ EDX4EDX_ROOT = ENV_ROOT / "data/edx4edx"
 # ichuang
 
 DEBUG = True
-ENABLE_MULTICOURSE = True     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 QUICKEDIT = True
 
 MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT ]

@@ -78,7 +78,7 @@ def index(request):
     for course in courses:
         universities[course.org].append(course)
 
-    return render_to_response('index.html', {'universities': universities, 'entries': entries})
+    return render_to_response('student/index.html', {'universities': universities, 'entries': entries})
 
 
 def course_from_id(id):
@@ -108,7 +108,7 @@ def dashboard(request):
         message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
 
     context = {'courses': courses, 'message': message}
-    return render_to_response('dashboard.html', context)
+    return render_to_response('student/dashboard.html', context)
 
 
 def try_change_enrollment(request):
@@ -512,14 +512,14 @@ def confirm_email_change(request, key):
     try:
         pec = PendingEmailChange.objects.get(activation_key=key)
     except PendingEmailChange.DoesNotExist:
-        return render_to_response("invalid_email_key.html", {})
+        return render_to_response("registration/invalid_email_key.html", {})
 
     user = pec.user
     d = {'old_email': user.email,
          'new_email': pec.new_email}
 
     if len(User.objects.filter(email=pec.new_email)) != 0:
-        return render_to_response("email_exists.html", d)
+        return render_to_response("registration/email_exists.html", d)
 
     subject = render_to_string('emails/email_change_subject.txt', d)
     subject = ''.join(subject.splitlines())
@@ -536,7 +536,7 @@ def confirm_email_change(request, key):
     pec.delete()
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
-    return render_to_response("email_change_successful.html", d)
+    return render_to_response("registration/email_change_successful.html", d)
 
 
 @ensure_csrf_cookie
@@ -573,7 +573,7 @@ def pending_name_changes(request):
                         'email':c.user.email,
                         'uid':c.user.id,
                         'cid':c.id} for c in changes]}
-    return render_to_response('name_changes.html', js)
+    return render_to_response('student/name_changes.html', js)
 
 
 @ensure_csrf_cookie

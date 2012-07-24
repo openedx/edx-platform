@@ -85,7 +85,7 @@ def certificate_request(request):
                  'survey_list': survey_list,
                  'name': user_info.name}
 
-        return render_to_response('cert_request.html', context)
+        return render_to_response('cert_request.html', context) # TODO: This doesn't exist currently
 
 
 # This method should only be called if the user has a grade and has requested a certificate

@@ -19,7 +19,6 @@ from django.views.decorators.cache import cache_control
 from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
-from multicourse import multicourse_settings
 
 from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup, CourseEnrollment
@@ -63,7 +62,7 @@ def courses(request):
     for course in courses:
         universities[course.org].append(course)
 
-    return render_to_response("courses.html", {'universities': universities})
+    return render_to_response("courseware/courses.html", {'universities': universities})
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -86,7 +85,7 @@ def gradebook(request, course_id):
             'realname': UserProfile.objects.get(user=student).name
         })
 
-    return render_to_response('gradebook.html', {'students': student_info, 'course': course})
+    return render_to_response('courseware/gradebook.html', {'students': student_info, 'course': course})
 
 
 @login_required
@@ -119,7 +118,7 @@ def profile(request, course_id, student_id=None):
                }
     context.update(grades.grade_sheet(student, course, student_module_cache))
 
-    return render_to_response('profile.html', context)
+    return render_to_response('courseware/profile.html', context)
 
 
 def render_accordion(request, course, chapter, section):
@@ -144,7 +143,7 @@ def render_accordion(request, course, chapter, section):
                     ('course_id', course.id),
                     ('format_url_params', format_url_params),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
-    return render_to_string('accordion.html', context)
+    return render_to_string('courseware/accordion.html', context)
 
 
 @ensure_csrf_cookie
@@ -180,9 +179,6 @@ def index(request, course_id, chapter=None, section=None,
     chapter = clean(chapter)
     section = clean(section)
 
-    if settings.ENABLE_MULTICOURSE:
-        settings.MODULESTORE['default']['OPTIONS']['data_dir'] = settings.DATA_DIR + multicourse_settings.get_course_xmlpath(course)
-
     context = {
         'csrf': csrf(request)['csrf_token'],
         'accordion': render_accordion(request, course, chapter, section),
@@ -201,7 +197,7 @@ def index(request, course_id, chapter=None, section=None,
         module, _, _, _ = get_module(request.user, request, section.location, student_module_cache)
         context['content'] = module.get_html()
 
-    result = render_to_response('courseware.html', context)
+    result = render_to_response('courseware/courseware.html', context)
     return result
 
 
@@ -220,7 +216,7 @@ def jump_to(request, probname=None):
 
     '''
     # get coursename if stored
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    # coursename = multicourse_settings.get_coursename_from_request(request)
 
     # begin by getting course.xml tree
     xml = content_parser.course_file(request.user, coursename)
@@ -257,7 +253,7 @@ def jump_to(request, probname=None):
 def course_info(request, course_id):
     course = check_course(course_id)
 
-    return render_to_response('info.html', {'course': course})
+    return render_to_response('courseware/info.html', {'course': course})
 
 
 @ensure_csrf_cookie
@@ -270,7 +266,7 @@ def course_about(request, course_id):
             return False
     course = check_course(course_id, course_must_be_open=False)
     registered = registered_for_course(course, request.user)
-    return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
+    return render_to_response('courseware/course_about.html', {'course': course, 'registered': registered})
 
 
 @ensure_csrf_cookie
@@ -284,6 +280,6 @@ def university_profile(request, org_id):
     # Only grab courses for this org...
     courses = [c for c in all_courses if c.org == org_id]
     context = dict(courses=courses, org_id=org_id)
-    template_file = "university_profile/{0}.html".format(org_id).lower()
+    template_file = "courseware/university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
