@@ -425,6 +425,16 @@
           font-family: $serif;
           font-style: italic;
           margin-left: 10px;
+
+          &.read-more {
+            float: right;
+            color: lighten($base-font-color, 50%);
+
+            &:hover {
+              color: $blue;
+              text-decoration: underline;
+            }
+          }
         }
       }
     }

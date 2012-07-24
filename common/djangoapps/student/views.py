@@ -266,13 +266,13 @@ def create_account(request, post_override=None):
     # TODO: Check password is sane
     for a in ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']:
         if len(post_vars[a]) < 2:
-            error_str = {'username': 'Username of length 2 or greater',
-                         'email': 'Properly formatted e-mail',
-                         'name': 'Your legal name ',
-                         'password': 'Valid password ',
-                         'terms_of_service': 'Accepting Terms of Service',
-                         'honor_code': 'Agreeing to the Honor Code'}
-            js['value'] = "{field} is required.".format(field=error_str[a])
+            error_str = {'username': 'Username must be minimum of two characters long.',
+                         'email': 'A properly formatted e-mail is required.',
+                         'name': 'Your legal name must be a minimum of two characters long.',
+                         'password': 'A valid password is required.',
+                         'terms_of_service': 'Accepting Terms of Service is required.',
+                         'honor_code': 'Agreeing to the Honor Code is required.'}
+            js['value'] = error_str[a]
             return HttpResponse(json.dumps(js))
 
     try:
@@ -408,10 +408,11 @@ def password_reset(request):
         raise Http404
     form = PasswordResetForm(request.POST)
     if form.is_valid():
-        form.save(use_https=request.is_secure(),
-                   from_email=settings.DEFAULT_FROM_EMAIL,
-                   request=request)
-        return HttpResponse(json.dumps({'success': True,
+        form.save(use_https = request.is_secure(),
+                  from_email = settings.DEFAULT_FROM_EMAIL,
+                  request = request,
+                  domain_override = settings.SITE_NAME)
+        return HttpResponse(json.dumps({'success':True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
         return HttpResponse(json.dumps({'success': False,

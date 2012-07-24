@@ -158,17 +158,17 @@ TEMPLATE_DEBUG = False
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "localhost:8000"
+SITE_NAME = "edx.org"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@mitx.mit.edu'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
+DEFAULT_FROM_EMAIL = 'registration@edx.org'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 ADMINS = (
-    ('MITx Admins', 'admin@mitx.mit.edu'),
+    ('edX Admins', 'admin@edx.org'),
 )
 MANAGERS = ADMINS
 

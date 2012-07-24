@@ -45,7 +45,7 @@
 
   <section class="container">
     <section class="highlighted-courses">
-      <h2>Explore courses from <span class="edx">edX</span> universities</h2>
+      <h2>Explore free courses from <span class="edx">edX</span> universities</h2>
 
       <section class="university-partners">
         <ol class="partners">
@@ -100,7 +100,6 @@
     <section class="more-info">
       <header>
         <h2><span class="edx">edX</span> News &amp; Announcements</h2>
-        <a href="${reverse('press')}">Read More &rarr;</a>
       </header>
       <section class="news">
         <section class="blog-posts">
@@ -121,13 +120,15 @@
         </section>
         <section class="press-links">
           <h3>edX in the News:</h3>
-          ##<a href="${reverse('pressrelease')}">The edX Press Release</a>
+          ##<a href="${reverse('press/mit-and-harvard-announce-edx')}">The edX Press Release</a>
           <a target="_blank" href="http://www.nytimes.com/2012/07/20/education/edlife/anant-agarwal-discusses-free-online-courses-offered-by-a-harvard-mit-partnership.html">New York Times</a>,
           <a target="_blank" href="http://www.bostonglobe.com/magazine/2012/07/14/anant-agarwal-believes-online-education-from-mit-and-harvard-should-available-all/Af0kX44dPqpBKRV2IOSjPP/story.html"target="_blank" >Boston Globe</a>,
           <a target="_blank" href="http://www.huffingtonpost.co.uk/2012/06/20/harvard-and-mit-create-edx-free-university-courses_n_1612143.html?utm_hp_ref=uk">Huffington Post</a>,
           <a target="_blank" href="http://gigaom.com/cloud/everybody-codes/">GigaOM</a>,
           <a target="_blank" href="http://web.mit.edu/newsoffice/2012/mitx-edx-first-course-recap-0716.html">MIT News</a>,
           <a target="_blank" href="http://spectrum.ieee.org/at-work/education/review-mitxs-online-circuit-design-and-analysis-course">IEEE Spectrum</a>
+
+          <a href="${reverse('press')}" class="read-more">Read More &rarr;</a>
         </section>
       </section>
     </section>
@@ -135,8 +136,8 @@
 
 </section>
 
-<section id="video-modal" class="modal home-page-video-modal">
+<section id="video-modal" class="modal home-page-video-modal video-modal">
   <div class="inner-wrapper">
-    <iframe width="640" height="360" src="http://www.youtube.com/embed/SA6ELdIRkRU" frameborder="0" allowfullscreen></iframe>
+    <iframe width="640" height="360" src="http://www.youtube.com/embed/C2OQ51tu7W4?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
 </section>
