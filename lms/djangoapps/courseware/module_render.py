@@ -131,6 +131,7 @@ def get_module(user, request, location, student_module_cache, position=None):
         shared_module = None
 
     instance_state = instance_module.state if instance_module is not None else None
+    instance_state = json.dumps(dict(json.loads(instance_state).items() + [("user_id", user.id)]))
     shared_state = shared_module.state if shared_module is not None else None
 
     # TODO (vshnayder): fix hardcoded urls (use reverse)
