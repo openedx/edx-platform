@@ -64,20 +64,29 @@ urlpatterns = ('',
         {'template': 'faq.html'}, name="faq_edx"),
     url(r'^help$', 'static_template_view.views.render', 
         {'template': 'help.html'}, name="help_edx"),
-    url(r'^pressrelease$', 'static_template_view.views.render', 
-        {'template': 'pressrelease.html'}, name="pressrelease"),
+
     url(r'^tos$', 'static_template_view.views.render', 
         {'template': 'tos.html'}, name="tos"),
     url(r'^privacy$', 'static_template_view.views.render', 
         {'template': 'privacy.html'}, name="privacy_edx"),
-    url(r'^copyright$', 'static_template_view.views.render', 
-        {'template': 'copyright.html'}, name="copyright"),
+    # TODO: (bridger) The copyright has been removed until it is updated for edX
+    # url(r'^copyright$', 'static_template_view.views.render', 
+    #     {'template': 'copyright.html'}, name="copyright"),
     url(r'^honor$', 'static_template_view.views.render', 
         {'template': 'honor.html'}, name="honor"),
+        
+    #Press releases    
+    url(r'^press/mit-and-harvard-announce-edx$', 'static_template_view.views.render', 
+        {'template': 'press_releases/MIT_and_Harvard_announce_edX.html'}, name="press/mit-and-harvard-announce-edx"),
+    url(r'^press/uc-berkeley-joins-edx$', 'static_template_view.views.render', 
+        {'template': 'press_releases/UC_Berkeley_joins_edX.html'}, name="press/uc-berkeley-joins-edx"),
+    # Should this always update to point to the latest press release?
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/uc-berkeley-joins-edx'}), 
+    
     
     
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
-    
+        
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
     # url(r'^send_feedback$', 'util.views.send_feedback'),
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),

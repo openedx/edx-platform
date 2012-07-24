@@ -9,6 +9,8 @@ from django.http import Http404
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from static_replace import replace_urls
+from staticfiles.storage import staticfiles_storage
 
 log = logging.getLogger(__name__)
 
@@ -40,15 +42,8 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
     return course
 
 
-### These methods look like they should be on the course_module object itself, but they rely
-### on the lms. Maybe they should be added dynamically to the class?
-
-def course_static_url(course):
-    return settings.STATIC_URL + "/" + course.metadata['data_dir'] + "/"
-
-
 def course_image_url(course):
-    return course_static_url(course) + "images/course_image.jpg"
+    return staticfiles_storage.url(course.metadata['data_dir'] + "/images/course_image.jpg")
 
 
 def get_course_about_section(course, section_key):
@@ -81,7 +76,7 @@ def get_course_about_section(course, section_key):
                         'effort', 'end_date', 'prerequisites']:
         try:
             with course.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
-                return htmlFile.read().decode('utf-8').format(COURSE_STATIC_URL=course_static_url(course))
+                return replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
         except ResourceNotFoundError:
             log.warning("Missing about section {key} in course {url}".format(key=section_key, url=course.location.url()))
             return None
@@ -111,11 +106,9 @@ def get_course_info_section(course, section_key):
     if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
         try:
             with course.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
-                return htmlFile.read().decode('utf-8')
+                return replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
         except ResourceNotFoundError:
             log.exception("Missing info section {key} in course {url}".format(key=section_key, url=course.location.url()))
             return "! Info section missing !"
 
     raise KeyError("Invalid about key " + str(section_key))
-
-

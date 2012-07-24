@@ -1,7 +1,6 @@
 <%!
 from staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
-from static_replace import replace_urls
 %>
 
 <%def name='url(file)'>${staticfiles_storage.url(file)}</%def>
@@ -24,5 +23,3 @@ from static_replace import replace_urls
     % endfor
   %endif
 </%def>
-
-<%def name='replace_urls(text)'>${replace_urls(text)}</%def>

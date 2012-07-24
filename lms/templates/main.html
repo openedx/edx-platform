@@ -4,14 +4,18 @@
 <head>
   <%block name="title"><title>edX</title></%block>
   
-  <link rel="icon" type="image/image/x-icon" href="${static.url('images/favicon.ico')}" />
+  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
 
   <%static:css group='application'/>
-  <!--[if lt IE 9]>
+  <!--[if lte IE 9]>
   <%static:css group='ie-fixes'/>
   <![endif]-->
   <%static:js group='main_vendor'/>
   <%block name="headextra"/>
+
+  <!--[if lt IE 9]>
+  <script src="${static.url('js/html5shiv.js')}"></script>
+  <![endif]-->
 
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
 </head>
@@ -26,10 +30,6 @@
   <%include file="footer.html" />
 
   <%static:js group='application'/>
-
-  <!--[if lt IE 9]>
-  <script src="${static.url('js/html5shiv.js')}"></script>
-  <![endif]-->
 
   <%block name="js_extra"/>
 </body>
