@@ -36,7 +36,7 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
         except (KeyError, ItemNotFoundError):
             raise Http404("Course not found.")
 
-        if course_must_be_open and not course.has_started():
+        if course_must_be_open and not (course.has_started() or settings.MITX_FEATURES['DISABLE_START_DATES']):
             raise Http404("This course has not yet started.")
 
     return course
