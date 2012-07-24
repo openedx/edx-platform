@@ -303,7 +303,7 @@ PIPELINE_CSS = {
         'output_filename': 'css/application.css',
     },
     'course': {
-      'source_filenames': ['sass/application.scss', 'js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css'],
+      'source_filenames': ['sass/course.scss', 'js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css'],
       'output_filename': 'css/course.css',
       },
     'ie-fixes': {
@@ -312,7 +312,7 @@ PIPELINE_CSS = {
     },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss']
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/course.scss']
 
 courseware_only_js = [
     PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
