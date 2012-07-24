@@ -13,6 +13,8 @@ from .logsettings import get_logger_config
 DEBUG = True
 TEMPLATE_DEBUG = True
 
+MITX_FEATURES['DISABLE_START_DATES'] = True
+
 WIKI_ENABLED = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log", 
