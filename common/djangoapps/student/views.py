@@ -402,7 +402,8 @@ def password_reset(request):
     if form.is_valid():
         form.save( use_https = request.is_secure(),
                    from_email = settings.DEFAULT_FROM_EMAIL,
-                   request = request )
+                   request = request,
+                   domain_override = settings.SITE_NAME )
         return HttpResponse(json.dumps({'success':True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
