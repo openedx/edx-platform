@@ -1,5 +1,9 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
 <%block name="title"><title>Profile - edX 6.002x</title></%block>
