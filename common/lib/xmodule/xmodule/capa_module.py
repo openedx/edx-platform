@@ -550,6 +550,7 @@ class CapaDescriptor(RawDescriptor):
 
     module_class = CapaModule
 
+    # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
     @classmethod
@@ -558,3 +559,7 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
+    @classmethod
+    def split_to_file(cls, xml_object):
+        '''Problems always written in their own files'''
+        return True
