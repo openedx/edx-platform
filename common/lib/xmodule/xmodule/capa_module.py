@@ -67,7 +67,8 @@ class ComplexEncoder(json.JSONEncoder):
 
 class CapaModule(XModule):
     '''
-    An XModule implementing LonCapa format problems, implemented by way of capa.capa_problem.LoncapaProblem
+    An XModule implementing LonCapa format problems, implemented by way of
+    capa.capa_problem.LoncapaProblem
     '''
     icon_class = 'problem'
 
@@ -77,8 +78,10 @@ class CapaModule(XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition, instance_state=None,
+                 shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, instance_state,
+                         shared_state, **kwargs)
 
         self.attempts = 0
         self.max_attempts = None
@@ -133,7 +136,8 @@ class CapaModule(XModule):
             seed = None
 
         try:
-            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(), instance_state, seed=seed, system=self.system)
+            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
+                                      instance_state, seed=seed, system=self.system)
         except Exception:
             msg = 'cannot create LoncapaProblem %s' % self.location.url()
             log.exception(msg)
@@ -141,15 +145,20 @@ class CapaModule(XModule):
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 # create a dummy problem with error message instead of failing
-                problem_text = '<problem><text><font color="red" size="+2">Problem %s has an error:</font>%s</text></problem>' % (self.location.url(), msg)
-                self.lcp = LoncapaProblem(problem_text, self.location.html_id(), instance_state, seed=seed, system=self.system)
+                problem_text = ('<problem><text><font color="red" size="+2">'
+                                'Problem %s has an error:</font>%s</text></problem>' %
+                                (self.location.url(), msg))
+                self.lcp = LoncapaProblem(
+                    problem_text, self.location.html_id(),
+                    instance_state, seed=seed, system=self.system)
             else:
                 raise
 
     @property
     def rerandomize(self):
         """
-        Property accessor that returns self.metadata['rerandomize'] in a canonical form
+        Property accessor that returns self.metadata['rerandomize'] in a
+        canonical form
         """
         rerandomize = self.metadata.get('rerandomize', 'always')
         if rerandomize in ("", "always", "true"):
@@ -203,7 +212,10 @@ class CapaModule(XModule):
         except Exception, err:
             if self.system.DEBUG:
                 log.exception(err)
-                msg = '[courseware.capa.capa_module] <font size="+1" color="red">Failed to generate HTML for problem %s</font>' % (self.location.url())
+                msg = (
+                    '[courseware.capa.capa_module] <font size="+1" color="red">'
+                    'Failed to generate HTML for problem %s</font>' %
+                    (self.location.url()))
                 msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 html = msg
@@ -215,8 +227,8 @@ class CapaModule(XModule):
                    'weight': self.weight,
                   }
 
-        # We using strings as truthy values, because the terminology of the check button
-        # is context-specific.
+        # We using strings as truthy values, because the terminology of the
+        # check button is context-specific.
         check_button = "Grade" if self.max_attempts else "Check"
         reset_button = True
         save_button = True
@@ -242,7 +254,8 @@ class CapaModule(XModule):
         if not self.lcp.done:
             reset_button = False
 
-        # We don't need a "save" button if infinite number of attempts and non-randomized
+        # We don't need a "save" button if infinite number of attempts and
+        # non-randomized
         if self.max_attempts is None and self.rerandomize != "always":
             save_button = False
 

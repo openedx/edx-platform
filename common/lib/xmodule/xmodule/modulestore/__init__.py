@@ -45,13 +45,17 @@ class Location(_LocationBase):
         """
         return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
 
-    def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None, name=None, revision=None):
+    def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None,
+                name=None, revision=None):
         """
         Create a new location that is a clone of the specifed one.
 
         location - Can be any of the following types:
-            string: should be of the form {tag}://{org}/{course}/{category}/{name}[/{revision}]
+            string: should be of the form
+                    {tag}://{org}/{course}/{category}/{name}[/{revision}]
+
             list: should be of the form [tag, org, course, category, name, revision]
+
             dict: should be of the form {
                 'tag': tag,
                 'org': org,
@@ -62,16 +66,19 @@ class Location(_LocationBase):
             }
             Location: another Location object
 
-        In both the dict and list forms, the revision is optional, and can be ommitted.
+        In both the dict and list forms, the revision is optional, and can be
+        ommitted.
 
-        Components must be composed of alphanumeric characters, or the characters '_', '-', and '.'
+        Components must be composed of alphanumeric characters, or the
+        characters '_', '-', and '.'
 
-        Components may be set to None, which may be interpreted by some contexts to mean
-        wildcard selection
+        Components may be set to None, which may be interpreted by some contexts
+        to mean wildcard selection
         """
 
 
-        if org is None and course is None and category is None and name is None and revision is None:
+        if (org is None and course is None and category is None and
+            name is None and revision is None):
             location = loc_or_tag
         else:
             location = (loc_or_tag, org, course, category, name, revision)
@@ -131,9 +138,11 @@ class Location(_LocationBase):
 
     def html_id(self):
         """
-        Return a string with a version of the location that is safe for use in html id attributes
+        Return a string with a version of the location that is safe for use in
+        html id attributes
         """
-        return "-".join(str(v) for v in self.list() if v is not None).replace('.', '_')
+        return "-".join(str(v) for v in self.list()
+                        if v is not None).replace('.', '_')
 
     def dict(self):
         """
@@ -154,7 +163,8 @@ class Location(_LocationBase):
 
 class ModuleStore(object):
     """
-    An abstract interface for a database backend that stores XModuleDescriptor instances
+    An abstract interface for a database backend that stores XModuleDescriptor
+    instances
     """
     def get_item(self, location, depth=0):
         """
@@ -164,13 +174,16 @@ class ModuleStore(object):
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
+
+        If no object is found at that location, raises
+            xmodule.modulestore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
 
-        depth (int): An argument that some module stores may use to prefetch descendents of the queried modules
-            for more efficient results later in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all descendents
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of calls to
+            get_children() to cache. None indicates to cache all descendents
         """
         raise NotImplementedError
 
@@ -182,9 +195,10 @@ class ModuleStore(object):
 
         location: Something that can be passed to Location
 
-        depth: An argument that some module stores may use to prefetch descendents of the queried modules
-            for more efficient results later in the request. The depth is counted in the number of calls
-            to get_children() to cache. None indicates to cache all descendents
+        depth: An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of calls to
+            get_children() to cache. None indicates to cache all descendents
         """
         raise NotImplementedError
 
@@ -228,4 +242,3 @@ class ModuleStore(object):
         in this modulestore.
         '''
         raise NotImplementedError
-

@@ -19,7 +19,9 @@ class MakoModuleDescriptor(XModuleDescriptor):
 
     def __init__(self, system, definition=None, **kwargs):
         if getattr(system, 'render_template', None) is None:
-            raise TypeError('{system} must have a render_template function in order to use a MakoDescriptor'.format(system=system))
+            raise TypeError('{system} must have a render_template function'
+                            ' in order to use a MakoDescriptor'.format(
+                    system=system))
         super(MakoModuleDescriptor, self).__init__(system, definition, **kwargs)
 
     def get_context(self):
@@ -29,4 +31,5 @@ class MakoModuleDescriptor(XModuleDescriptor):
         return {'module': self}
 
     def get_html(self):
-        return self.system.render_template(self.mako_template, self.get_context())
+        return self.system.render_template(
+            self.mako_template, self.get_context())

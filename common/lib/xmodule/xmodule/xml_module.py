@@ -13,13 +13,19 @@ log = logging.getLogger(__name__)
 # TODO (cpennington): This was implemented in an attempt to improve performance,
 # but the actual improvement wasn't measured (and it was implemented late at night).
 # We should check if it hurts, and whether there's a better way of doing lazy loading
+
 class LazyLoadingDict(MutableMapping):
     """
-    A dictionary object that lazily loads it's contents from a provided
-    function on reads (of members that haven't already been set)
+    A dictionary object that lazily loads its contents from a provided
+    function on reads (of members that haven't already been set).
     """
 
     def __init__(self, loader):
+        '''
+        On the first read from this dictionary, it will call loader() to
+        populate its contents.  loader() must return something dict-like. Any
+        elements set before the first read will be preserved.
+        '''
         self._contents = {}
         self._loaded = False
         self._loader = loader
@@ -70,10 +76,12 @@ _AttrMapBase = namedtuple('_AttrMap', 'metadata_key to_metadata from_metadata')
 
 class AttrMap(_AttrMapBase):
     """
-    A class that specifies a metadata_key, a function to transform an xml attribute to be placed in that key,
-    and to transform that key value
+    A class that specifies a metadata_key, a function to transform an xml
+    attribute to be placed in that key, and to transform that key value
     """
-    def __new__(_cls, metadata_key, to_metadata=lambda x: x, from_metadata=lambda x: x):
+    def __new__(_cls, metadata_key,
+                to_metadata=lambda x: x,
+                from_metadata=lambda x: x):
         return _AttrMapBase.__new__(_cls, metadata_key, to_metadata, from_metadata)
 
 
@@ -93,7 +101,9 @@ class XmlDescriptor(XModuleDescriptor):
     # A dictionary mapping xml attribute names to functions of the value
     # that return the metadata key and value
     xml_attribute_map = {
-        'graded': AttrMap('graded', lambda val: val == 'true', lambda val: str(val).lower()),
+        'graded': AttrMap('graded',
+                          lambda val: val == 'true',
+                          lambda val: str(val).lower()),
         'name': AttrMap('display_name'),
     }
 
@@ -105,12 +115,14 @@ class XmlDescriptor(XModuleDescriptor):
 
         xml_object: An etree Element
         """
-        raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
+        raise NotImplementedError(
+            "%s does not implement definition_from_xml" % cls.__name__)
 
     @classmethod
     def clean_metadata_from_xml(cls, xml_object):
         """
-        Remove any attribute named in self.metadata_attributes from the supplied xml_object
+        Remove any attribute named in cls.metadata_attributes from the supplied
+        xml_object
         """
         for attr in cls.metadata_attributes:
             if xml_object.get(attr) is not None:
@@ -134,7 +146,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         xml_data: A string of xml that will be translated into data and children for
             this module
-        system: An XModuleSystem for interacting with external resources
+        system: A DescriptorSystem for interacting with external resources
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
@@ -157,6 +169,7 @@ class XmlDescriptor(XModuleDescriptor):
             else:
                 filepath = cls._format_filepath(xml_object.tag, filename)
 
+                # VS[compat]
                 # TODO (cpennington): If the file doesn't exist at the right path,
                 # give the class a chance to fix it up. The file will be written out again
                 # in the correct format.
@@ -243,4 +256,5 @@ class XmlDescriptor(XModuleDescriptor):
         """
         Return a new etree Element object created from this modules definition.
         """
-        raise NotImplementedError("%s does not implement definition_to_xml" % self.__class__.__name__)
+        raise NotImplementedError(
+            "%s does not implement definition_to_xml" % self.__class__.__name__)

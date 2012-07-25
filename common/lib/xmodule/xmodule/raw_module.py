@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
     """
-    Module that provides a raw editing view of it's data and children
+    Module that provides a raw editing view of its data and children
     """
     mako_template = "widgets/raw-edit.html"
 
