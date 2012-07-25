@@ -60,6 +60,7 @@ def csrf_response_exempt(view_func):
                   PendingDeprecationWarning)
     return view_func
 
+
 def csrf_view_exempt(view_func):
     """
     Marks a view function as being exempt from CSRF view protection.
@@ -67,6 +68,7 @@ def csrf_view_exempt(view_func):
     warnings.warn("csrf_view_exempt is deprecated. Use csrf_exempt instead.",
                   PendingDeprecationWarning)
     return csrf_exempt(view_func)
+
 
 def csrf_exempt(view_func):
     """

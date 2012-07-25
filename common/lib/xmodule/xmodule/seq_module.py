@@ -7,6 +7,8 @@ from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
+from xmodule.exceptions import NotFoundError
+from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.common.lib.seq_module")
 
@@ -18,6 +20,9 @@ class_priority = ['video', 'problem']
 class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
+    js = {'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')]}
+    css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
+    js_module_name = "Sequence"
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
@@ -53,10 +58,10 @@ class SequenceModule(XModule):
 
     def handle_ajax(self, dispatch, get):		# TODO: bounds checking
         ''' get = request.POST instance '''
-        if dispatch=='goto_position':
+        if dispatch == 'goto_position':
             self.position = int(get['position'])
-            return json.dumps({'success':True})
-        raise self.system.exception404
+            return json.dumps({'success': True})
+        raise NotFoundError('Unexpected dispatch type')
 
     def render(self):
         if self.rendered:
@@ -77,11 +82,7 @@ class SequenceModule(XModule):
                 'type': child.get_icon_class(),
             })
 
-        # Split </script> tags -- browsers handle this as end
-        # of script, even if it occurs mid-string. Do this after json.dumps()ing
-        # so that we can be sure of the quotations being used
-        import re
-        params = {'items': re.sub(r'(?i)</(script)', r'\u003c/\1', json.dumps(contents)),	# ?i = re.IGNORECASE for py2.6 compatability
+        params = {'items': contents,
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,

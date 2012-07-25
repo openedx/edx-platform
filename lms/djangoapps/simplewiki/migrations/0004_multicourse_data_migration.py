@@ -4,20 +4,21 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+
 class Migration(DataMigration):
 
     def forwards(self, orm):
         namespace6002x, created = orm.Namespace.objects.get_or_create(name="6.002xS12")
         if created:
             namespace6002x.save()
-        
+
         for article in orm.Article.objects.all():
             article.namespace = namespace6002x
             article.save()
 
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration.")
-    
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},

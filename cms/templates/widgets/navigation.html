@@ -55,7 +55,11 @@
 
       <ul class="modules">
         % for module in week.get_children():
-        <li class="module" data-id="${module.location.url()}" data-type="${module.js_module_name()}">
+        <li class="module"
+            data-id="${module.location.url()}"
+            data-type="${module.js_module_name}"
+            data-preview-type="${module.module_class.js_module_name}">
+
             <a href="#" class="module-edit">${module.name}</a>
             <a href="#" class="draggable">handle</a>
         </li>

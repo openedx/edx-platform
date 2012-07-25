@@ -2,8 +2,10 @@ import json
 
 from x_module import XModule, XModuleDescriptor
 
+
 class ModuleDescriptor(XModuleDescriptor):
     pass
+
 
 class Module(XModule):
     def get_html(self):

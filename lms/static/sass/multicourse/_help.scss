@@ -1,0 +1,36 @@
+.static-container.help {
+  section.questions {
+    float: left;
+    width: flex-grid(9);
+    margin-right: flex-gutter();
+
+    article {
+      margin-bottom: 40px;
+
+      h2 {
+        border-bottom: 1px solid rgb(220,220,220);
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+      }
+    }
+  }
+
+  section.emails {
+    border: 1px solid rgb(220,220,220);
+    @include box-sizing(border-box);
+    float: left;
+    padding: 20px;
+    width: flex-grid(3);
+
+    ul {
+      margin-left: 0;
+      padding-left: 0;
+      list-style: none;
+
+      li {
+        margin-bottom: 1em;
+      }
+    }
+  }
+}
+

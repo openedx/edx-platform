@@ -4,10 +4,11 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Adding model 'PendingEmailChange'
         db.create_table('student_pendingemailchange', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -29,9 +30,8 @@ class Migration(SchemaMigration):
         # Changing field 'UserProfile.user'
         db.alter_column('auth_userprofile', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(unique=True, to=orm['auth.User']))
 
-
     def backwards(self, orm):
-        
+
         # Deleting model 'PendingEmailChange'
         db.delete_table('student_pendingemailchange')
 
@@ -40,7 +40,6 @@ class Migration(SchemaMigration):
 
         # Changing field 'UserProfile.user'
         db.alter_column('auth_userprofile', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True))
-
 
     models = {
         'auth.group': {

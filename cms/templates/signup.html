@@ -10,10 +10,10 @@
       <hr>
     </header>
 
-    <div id="enroll">
+    <div id="register">
 
-      <form id="enroll_form" method="post">
-        <div id="enroll_error" name="enroll_error"></div>
+      <form id="register_form" method="post">
+        <div id="register_error" name="register_error"></div>
         <label>E-mail</label>
         <input name="email" type="email" placeholder="E-mail">
         <label>Password</label>
@@ -64,17 +64,17 @@
       });
     }
 
-    $('form#enroll_form').submit(function(e) {
+    $('form#register_form').submit(function(e) {
       e.preventDefault();
-      var submit_data = $('#enroll_form').serialize();
+      var submit_data = $('#register_form').serialize();
 
       postJSON('/create_account',
         submit_data,
         function(json) {
           if(json.success) {
-            $('#enroll').html(json.value);
+            $('#register').html(json.value);
           } else {
-            $('#enroll_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+            $('#register_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
           }
         }
       );

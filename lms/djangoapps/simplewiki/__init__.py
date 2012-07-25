@@ -1,4 +1,4 @@
-# Source: django-simplewiki. GPL license. 
+# Source: django-simplewiki. GPL license.
 
 import os
 import sys

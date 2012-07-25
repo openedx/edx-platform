@@ -1,0 +1,135 @@
+@import "bourbon/bourbon";
+@import "base/variables";
+
+// These are all quick solutions for IE please rewrite
+.highlighted-courses .courses .course header.course-preview, .find-courses .courses .course header.course-preview,
+.home .highlighted-courses > h2, .home .highlighted-courses > section.outside-app h1, section.outside-app .home .highlighted-courses > h1,
+header.global {
+  background: #FFF;
+}
+
+.home > header .title .actions,
+.home > header .title:hover .actions {
+  display: none;
+  height: auto;
+}
+
+.home > header .title {
+  &:hover {
+
+    > hgroup {
+      h1 {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      h2 {
+        opacity: 1;
+      }
+    }
+
+    .actions {
+      opacity: 0;
+    }
+  }
+}
+
+.last {
+  margin-right: 0  !important;
+}
+
+.home .university-partners .partners a {
+  .name {
+    position: static;
+  }
+
+  &:hover {
+    text-decoration: none;
+
+    &::before {
+      opacity: 1;
+    }
+
+    .name {
+      bottom: 0px;
+    }
+
+    img {
+      top: 0px;
+    }
+  }
+
+}
+
+
+.home .university-partners .partners { 
+  width: 660px;
+
+  li.partner {
+    float: left;
+    display: block;
+    padding: 0;
+    width: 220px;
+    overflow: hidden;
+  }
+}
+
+.highlighted-courses .courses .course, .find-courses .courses .course {
+  .meta-info {
+    display: none;
+  }
+
+  .inner-wrapper {
+    height: 100%;
+    overflow: visible;
+    position: relative;
+  }
+
+  header.course-preview {
+    left: 0px;
+    position: relative;
+    top: 0px;
+    width: 100%;
+    z-index: 3;
+    height: auto;
+
+    hgroup {
+      position: relative;
+      right: 0;
+      top: 0;
+    }
+
+  }
+
+  .info {
+    height: auto;
+    position: static;
+    overflow: visible;
+
+    .desc {
+      height: auto;
+    }
+  }
+
+  &:hover {
+    background: rgb(245,245,245);
+    border-color: rgb(170,170,170);
+    @include box-shadow(0 1px 16px 0 rgba($blue, 0.4));
+
+    .info {
+      top: 0;
+    }
+
+    .meta-info {
+      opacity: 0;
+    }
+  }
+}
+
+#lean_overlay {
+  background: #000;
+}
+
+.modal .inner-wrapper form label {
+  display: block;
+}

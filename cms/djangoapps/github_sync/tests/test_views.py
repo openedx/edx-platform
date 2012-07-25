@@ -50,4 +50,3 @@ class PostReceiveTestCase(TestCase):
         import_from_github.assert_called_with(settings.REPOS['repo'])
         mock_revision, mock_course = import_from_github.return_value
         export_to_github.assert_called_with(mock_course, 'path', "Changes from cms import of revision %s" % mock_revision)
-

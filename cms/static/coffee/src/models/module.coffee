@@ -4,10 +4,7 @@ class CMS.Models.Module extends Backbone.Model
     data: ''
 
   loadModule: (element) ->
-    try
-      @module = new window[@get('type')](element)
-    catch TypeError
-      console.error "Unable to load #{@get('type')}." if console
+    @module = XModule.loadModule($(element).find('.xmodule_edit'))
 
   editUrl: ->
     "/edit_item?#{$.param(id: @get('id'))}"
