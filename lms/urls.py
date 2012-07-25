@@ -130,6 +130,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.profile', name="profile"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$', 
             'courseware.views.profile'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
+            'courseware.views.news', name="news"),
 
         # discussion
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
