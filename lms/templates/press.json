@@ -1,5 +1,77 @@
 [
     {
+        "title": "Berkeley to Join the Free Online Learning Partnership EdX",
+        "url": "http://www.nytimes.com/2012/07/24/education/berkeley-to-offer-free-online-classes-on-edx.html?_r=1",
+        "author": "Tamar Lewin",
+        "image": "nyt_logo_178x138.jpeg",
+        "deck": "",
+        "publication": "The New York Times",
+        "publish_date": "July 24, 2012"
+    },
+    {
+        "title": "UC Berkeley to join Harvard and MIT in online course offerings",
+        "url": "http://bostonglobe.com/metro/2012/07/23/university-california-berkeley-join-edx-joint-harvard-mit-venture-offer-online-courses/mKl47LI5BdBX0MMO2RHHwI/story.html",
+        "author": "Melissa M. Werthmann",
+        "image": "bostonglobe_logo_178x138.jpeg",
+        "deck": "",
+        "publication": "The Boston Globe",
+        "publish_date": "July 24, 2012"
+    },
+    {
+        "title": "UC Berkeley to offer free online classes through edX",
+        "url": "http://www.latimes.com/news/local/la-me-0725-berkeley-online-20120725,0,519697.story",
+        "author": "Larry Gordon",
+        "image": "latimes_logo_178x138.jpeg",
+        "deck": "EdX, founded by Harvard and MIT, will host two not-for-credit UC Berkeley courses this fall.",
+        "publication": "Los Angeles Times",
+        "publish_date": "July 2012"
+    },
+    {
+        "title": "Berkeley Joins 'EdX' Effort to Offer Free Open Courses",
+        "url": "http://chronicle.com/blogs/wiredcampus/uc-berkeley-joins-edx-effort-to-offer-free-open-courses/37969",
+        "author": "Jeffrey R. Young",
+        "image": "chroniclehighered_logo_178x138.jpeg",
+        "deck": "",
+        "publication": "The Chronicle of Higher Education",
+        "publish_date": "July 24, 2012"
+    },
+    {
+        "title": "Berkeley Joins Harvard, MIT Offering Free Online Classes",
+        "url": "http://www.bloomberg.com/news/2012-07-24/berkeley-joins-harvard-mit-offering-free-online-classes.html",
+        "author": "Jeanna Smialek",
+        "image": "bloomberg_logo_178x138.jpeg",
+        "deck": "",
+        "publication": "Bloomberg",
+        "publish_date": "July 24, 2012"
+    },
+    {
+        "title": "Free online courses divide UC professors",
+        "url": "http://www.mercurynews.com/education/ci_21144592",
+        "author": "Matt Krupnick",
+        "image": "mercurynews_logo_178x138.jpeg",
+        "deck": "",
+        "publication": "Mercury News",
+        "publish_date": "July 24, 2012"
+    },
+    {
+        "title": "UC Berkeley joins edX",
+        "url": "http://news.harvard.edu/gazette/story/2012/07/uc-berkeley-joins-edx/",
+        "author": "",
+        "image": "harvardgazette_logo_178x138.jpeg",
+        "deck": "UC Berkeley joins Harvard and MIT in not-for-profit online learning collaborative",
+        "publication": "Harvard Gazette",
+        "publish_date": "July 24, 2012"
+    },
+    {
+        "title": "Harvard, Extended",
+        "url": "http://harvardmagazine.com/2012/07/harvard-extended",
+        "author": "John Harvard's Journal",
+        "image": "harvardmagazine_logo_178x138.jpeg",
+        "deck": "",
+        "publication": "The Harvard Crimson",
+        "publish_date": "July-August 2012"
+    },
+    {
         "title": "Review: MITx's Online Circuit Design and Analysis Course",
         "url": "http://spectrum.ieee.org/at-work/education/review-mitxs-online-circuit-design-and-analysis-course",
         "author": "Steven J. Frank",
@@ -115,6 +187,33 @@
         "deck": null,
         "publication": "USA Today",
         "publish_date": "May 15, 2012"
+    },
+    {
+        "title": "Harvard and MIT Launch Virtual Learning Initiative EdX",
+        "url": "http://www.thecrimson.com/article/2012/5/2/mit-edx-virtual-online/",
+        "author": "Hana N. Rouse and Justin C. Worland",
+        "image": "harvardcrimson_logo_178x138.jpeg",
+        "deck": "",
+        "publication": "The Harvard Crimson",
+        "publish_date": "May 4, 2012"
+    },
+    {
+        "title": "Educating Harvard, MIT - and the world",
+        "url": "http://news.harvard.edu/gazette/story/2012/05/edx_press_conference/",
+        "author": "",
+        "image": "harvardgazette_logo_178x138.jpeg",
+        "deck": "EdX platform will enhance classroom experience, build on distance learning initiatives, leaders say",
+        "publication": "Harvard Gazette",
+        "publish_date": "May 2, 2012"
+    },
+    {
+        "title": "Remarks by Drew Gilpin Faust at announcement of edX",
+        "url": "http://www.harvard.edu/president/remarks-by-drew-gilpin-faust-announcement-edx",
+        "author": "",
+        "image": "harvarduniv_logo_178x138.jpeg",
+        "deck": "",
+        "publication": "Harvard University",
+        "publish_date": "May 2, 2012"
     },
     {
         "title": "What is edX?",
