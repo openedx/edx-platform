@@ -13,7 +13,8 @@ from xmodule.course_module import CourseDescriptor
 from mitxmako.shortcuts import render_to_string
 
 from . import ModuleStore, Location
-from .exceptions import ItemNotFoundError, InsufficientSpecificationError, NoPathToItem
+from .exceptions import (ItemNotFoundError, InsufficientSpecificationError,
+                         NoPathToItem)
 
 # TODO (cpennington): This code currently operates under the assumption that
 # there is only one revision for each item. Once we start versioning inside the CMS,
@@ -155,7 +156,8 @@ class MongoModuleStore(ModuleStore):
 
     def _load_items(self, items, depth=0):
         """
-        Load a list of xmodules from the data in items, with children cached up to specified depth
+        Load a list of xmodules from the data in items, with children cached up
+        to specified depth
         """
         data_cache = self._cache_children(items, depth)
 
@@ -369,4 +371,3 @@ class MongoModuleStore(ModuleStore):
         position = None
 
         return (course_id, chapter, section, position)
-
