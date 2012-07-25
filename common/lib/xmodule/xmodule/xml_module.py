@@ -213,6 +213,20 @@ class XmlDescriptor(XModuleDescriptor):
                                                  name=name,
                                                  ext=cls.filename_extension)
 
+    @classmethod
+    def split_to_file(cls, xml_object):
+        '''
+        Decide whether to write this object to a separate file or not.
+
+        xml_object: an xml definition of an instance of cls.
+
+        This default implementation will split if this has more than 7
+        descendant tags.
+
+        Can be overridden by subclasses.
+        '''
+        return len(list(xml_object.iter())) > 7
+
     def export_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module, and all modules
@@ -233,14 +247,14 @@ class XmlDescriptor(XModuleDescriptor):
 
         xml_object.tag = self.category
         xml_object.set('slug', self.name)
-        # Put content in a separate file if it's large (has more than 5 descendent tags)
-        if len(list(xml_object.iter())) > 5:
 
+        if self.split_to_file(xml_object):
+            # Put this object in it's own file
             filepath = self.__class__._format_filepath(self.category, self.name)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True))
-
+            # ...and remove all of its children here
             for child in xml_object:
                 xml_object.remove(child)
 

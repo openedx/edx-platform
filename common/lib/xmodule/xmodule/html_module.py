@@ -42,3 +42,8 @@ class HtmlDescriptor(RawDescriptor):
     def file_to_xml(cls, file_object):
         parser = etree.HTMLParser()
         return etree.parse(file_object, parser).getroot()
+
+    @classmethod
+    def split_to_file(cls, xml_object):
+        # never include inline html
+        return True
