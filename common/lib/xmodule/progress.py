@@ -3,7 +3,7 @@ Progress class for modules.  Represents where a student is in a module.
 
 Useful things to know:
  - Use Progress.to_js_status_str() to convert a progress into a simple
-   status string to pass to js.  
+   status string to pass to js.
  - Use Progress.to_js_detail_str() to convert a progress into a more detailed
    string to pass to js.
 
@@ -11,10 +11,11 @@ In particular, these functions have a canonical handing of None.
 
 For most subclassing needs, you should only need to reimplement
 frac() and __str__().
-''' 
+'''
 
 from collections import namedtuple
 import numbers
+
 
 class Progress(object):
     '''Represents a progress of a/b (a out of b done)
@@ -37,7 +38,7 @@ class Progress(object):
         if not (isinstance(a, numbers.Number) and
                 isinstance(b, numbers.Number)):
             raise TypeError('a and b must be numbers.  Passed {0}/{1}'.format(a, b))
-        
+
         if not (0 <= a <= b and b > 0):
             raise ValueError(
                 'fraction a/b = {0}/{1} must have 0 <= a <= b and b > 0'.format(a, b))
@@ -66,13 +67,12 @@ class Progress(object):
         '''
         return self.frac()[0] > 0
 
-
     def inprogress(self):
         ''' Returns True if fractional progress is strictly between 0 and 1.
 
         subclassing note: implemented in terms of frac(), assumes sanity
         checking is done at construction time.
-        ''' 
+        '''
         (a, b) = self.frac()
         return a > 0 and a < b
 
@@ -83,15 +83,14 @@ class Progress(object):
         checking is done at construction time.
         '''
         (a, b) = self.frac()
-        return a==b
-
+        return a == b
 
     def ternary_str(self):
         ''' Return a string version of this progress: either
            "none", "in_progress", or "done".
 
         subclassing note: implemented in terms of frac()
-        ''' 
+        '''
         (a, b) = self.frac()
         if a == 0:
             return "none"
@@ -111,8 +110,7 @@ class Progress(object):
     def __ne__(self, other):
         ''' The opposite of equal'''
         return not self.__eq__(other)
-        
-    
+
     def __str__(self):
         ''' Return a string representation of this string.
 
@@ -146,7 +144,6 @@ class Progress(object):
         if progress is None:
             return "NA"
         return progress.ternary_str()
-
 
     @staticmethod
     def to_js_detail_str(progress):

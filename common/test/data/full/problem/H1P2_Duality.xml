@@ -1,0 +1,127 @@
+<problem><script type="loncapa/python">
+scale = float(random.randrange(1000,2000,10))/1000
+
+V  = 10*scale
+R1 = 3*scale
+R2 = 2*scale
+
+vV = V
+R1R2S = R1+R2
+i1 = V/R1R2S
+i2 = i1
+iV = -i1
+v1 = i1*R1
+v2 = i2*R2
+
+Ps= vV*iV + v1*i1 + v2*i2
+
+
+I  = V
+R3 = 1/R1
+R4 = 1/R2
+
+iI = -I
+R3R4P = (R3*R4)/(R3+R4)
+vI = I*R3R4P
+v3 = vI
+v4 = vI
+i3 = v3/R3
+i4 = v4/R4
+
+Pp = vI*iI + v3*i3 + v4*i4
+</script><startouttext/>
+In this problem we will investigate a fun idea called "duality."
+<br/>
+Consider the series circuit in the diagram shown.
+<center><img src="/static/circuits/duality.gif"/></center>
+We are given device parameters \(V=$V\)V, \(R_1=$R1\Omega\), and \(R_2=$R2\Omega\).
+All of the unknown voltages and currents are labeled in associated reference
+directions.  Solve this circuit for the unknowns and enter them into
+the boxes given.
+<br/>
+The value (in Volts) of \(v_1\) is: 
+<endouttext/>
+<numericalresponse answer="$v1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Amperes) of \(i_1\) is: 
+<endouttext/>
+<numericalresponse answer="$i1"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Volts) of \(v_2\) is: 
+<endouttext/>
+<numericalresponse answer="$v2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Amperes) of \(i_2\) is: 
+<endouttext/>
+<numericalresponse answer="$i2"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Volts) of \(v_V\) is: 
+<endouttext/>
+<numericalresponse answer="$vV"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Amperes) of \(i_V\) is: 
+<endouttext/>
+<numericalresponse answer="$iV"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The sum of the powers (in Watts) entering all of the elements is:
+<endouttext/>
+<numericalresponse answer="$Ps"><responseparam type="tolerance" default="0.00001" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> <br/> Now, let's turn our attentions to the parallel circuit.  
+The numerical value of the strength of the current source is set to be
+the same as the numerical value of the strength of the voltage source: 
+\(I=$I\)A.  The resistances are set to be reciprocals of the
+resistances in the series circuit:  \(R_3=$R3\Omega\) and
+\(R_4=$R4\Omega\). 
+<br/>
+Solve this circuit for the unknowns and enter them into
+the boxes given.
+<br/>
+The value (in Volts) of \(v_3\) is: 
+<endouttext/>
+<numericalresponse answer="$v3"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Amperes) of \(i_3\) is: 
+<endouttext/>
+<numericalresponse answer="$i3"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Volts) of \(v_4\) is: 
+<endouttext/>
+<numericalresponse answer="$v4"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Amperes) of \(i_4\) is: 
+<endouttext/>
+<numericalresponse answer="$i4"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value (in Volts) of \(v_I\) is: 
+<endouttext/>
+<numericalresponse answer="$vI"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The value of (in Amperes) \(i_I\) is: 
+<endouttext/>
+<numericalresponse answer="$iI"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+<startouttext/>
+<br/>
+The sum of the powers (in Watts) entering all of the elements is:
+<endouttext/>
+<numericalresponse answer="$Pp"><responseparam type="tolerance" default="0.00001" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+<startouttext/>
+<br/> <br/>  Look carefully at the numbers you have derived.
+Compare the series and parallel circuit.  Do you see the pattern?
+<endouttext/>
+
+
+</problem>

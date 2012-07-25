@@ -11,8 +11,9 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 
 from models import ServerCircuit
 
+
 def circuit_line(circuit):
-    ''' Returns string for an appropriate input element for a circuit. 
+    ''' Returns string for an appropriate input element for a circuit.
         TODO: Rename. '''
     if not circuit.isalnum():
         raise Http404()
@@ -28,9 +29,10 @@ def circuit_line(circuit):
     circuit_line.set('width', '640')
     circuit_line.set('height', '480')
     circuit_line.set('name', 'schematic')
-    circuit_line.set('id', 'schematic_'+circuit)
-    circuit_line.set('value', schematic) # We do it this way for security -- guarantees users cannot put funny stuff in schematic. 
+    circuit_line.set('id', 'schematic_' + circuit)
+    circuit_line.set('value', schematic)  # We do it this way for security -- guarantees users cannot put funny stuff in schematic.
     return xml.etree.ElementTree.tostring(circuit_line)
+
 
 def edit_circuit(request, circuit):
     try:
@@ -40,10 +42,11 @@ def edit_circuit(request, circuit):
 
     if not circuit.isalnum():
         raise Http404()
-    response = render_to_response('edit_circuit.html', {'name':circuit, 
-                                                        'circuit_line':circuit_line(circuit)})
+    response = render_to_response('edit_circuit.html', {'name': circuit,
+                                                        'circuit_line': circuit_line(circuit)})
     response['Cache-Control'] = 'no-cache'
     return response
+
 
 def save_circuit(request, circuit):
     if not circuit.isalnum():
@@ -63,4 +66,3 @@ def save_circuit(request, circuit):
     response = HttpResponse(json_str, mimetype='application/json')
     response['Cache-Control'] = 'no-cache'
     return response
-

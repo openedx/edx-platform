@@ -1,0 +1,59 @@
+<problem><startouttext/><br/><br/>You have a 6-volt battery (assumed ideal) and a 1.5-volt flashlight
+bulb, which is known to draw \(0.5 A\) when the bulb voltage is \(1.5 V\) (see
+figure below). Design a network of resistors to go between the battery
+and the bulb to give \(v_s = 1.5 V\) when the bulb is connected, yet
+ensures that \(v_s\) does not rise above \(2 V\) when the bulb is disconnected.
+
+<br/><br/><center><img src="/static/circuits/Lab1_1.png"/></center><br/><br/><i>Hint</i>: use a two-resistor voltage divider to create the voltage for node A.  You'll
+have two unknowns (R1 and R2) which can be determined by solving the two equations for
+\(v_s\) derived from the constraints above: one involving R1, R2 and Rbulb where \(v_s = 1.5\), and
+one involving R1 and R2 where \(v_s = 2\).
+
+<br/><br/>There are two schematic diagrams below.  Please enter the network
+of resistors you've designed into both diagrams.  The top diagram is
+the model when the bulb is connected; the bottom diagram is the model
+when the bulb is disconnected.
+
+<br/><br/>Run a DC analysis on both diagrams to
+show that the node labeled "A" has a voltage of approximately 
+\(1.5 V\) in the top diagram and less than \(2 V\) in the bottom
+adiagram.  Submit your results <i>after</i> the DC analyses have
+been run (so the results of the analyses will be submitted too).
+<endouttext/>
+
+<schematicresponse><startouttext/>
+Schematic model when bulb is connected:
+
+<center><schematic height="270" width="400" parts="r" analyses="dc" initial_value="[[&quot;w&quot;,[48,88,48,112]],[&quot;L&quot;,[160,16,3],{&quot;label&quot;:&quot;A&quot;},[&quot;A&quot;]],[&quot;g&quot;,[48,112,0],{},[&quot;0&quot;]],[&quot;w&quot;,[160,112,136,112]],[&quot;w&quot;,[160,88,160,112]],[&quot;w&quot;,[160,16,136,16]],[&quot;w&quot;,[160,40,160,16]],[&quot;r&quot;,[160,40,0],{&quot;name&quot;:&quot;Bulb&quot;,&quot;r&quot;:&quot;3&quot;},[&quot;A&quot;,&quot;1&quot;]],[&quot;w&quot;,[48,112,72,112]],[&quot;w&quot;,[48,16,72,16]],[&quot;w&quot;,[48,40,48,16]],[&quot;v&quot;,[48,40,0],{&quot;name&quot;:&quot;Battery&quot;,&quot;value&quot;:&quot;6V&quot;},[&quot;2&quot;,&quot;0&quot;]],[&quot;view&quot;,0,0,2]]"/></center>
+
+Schematic model when bulb is disconnected:
+
+<center><schematic height="270" width="400" parts="r" analyses="dc" initial_value="[[&quot;w&quot;,[48,88,48,112]],[&quot;L&quot;,[160,16,3],{&quot;label&quot;:&quot;A&quot;},[&quot;A&quot;]],[&quot;g&quot;,[48,112,0],{},[&quot;0&quot;]],[&quot;w&quot;,[160,112,136,112]],[&quot;w&quot;,[160,88,160,112]],[&quot;w&quot;,[160,16,136,16]],[&quot;w&quot;,[160,40,160,16]],[&quot;w&quot;,[48,112,72,112]],[&quot;w&quot;,[48,16,72,16]],[&quot;w&quot;,[48,40,48,16]],[&quot;v&quot;,[48,40,0],{&quot;name&quot;:&quot;Battery&quot;,&quot;value&quot;:&quot;6V&quot;},[&quot;2&quot;,&quot;0&quot;]],[&quot;view&quot;,0,0,2]]"/></center>
+<endouttext/>
+
+<answer type="loncapa/python">
+# for a schematic response, submission[i] is the json representation
+# of the diagram and analysis results for the i-th schematic tag
+
+correct = ['incorrect',  'incorrect']    # optimistic default :)
+
+def get_dc(json):
+  for element in json:
+    if element[0] == 'dc': return element[1]
+  return None
+
+dc_with_bulb = get_dc(submission[0])
+if dc_with_bulb:
+  v = dc_with_bulb['A']
+  if v &gt;= 1.4 and v &lt;= 1.6:    # want 1.5
+    correct[0] = 'correct'
+
+dc_without_bulb = get_dc(submission[1])
+if dc_without_bulb:
+  v = dc_without_bulb['A']
+  if v &lt;= 2.1:    # want 2
+    correct[1] = 'correct'
+
+</answer>
+</schematicresponse>
+</problem>

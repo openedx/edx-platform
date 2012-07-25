@@ -4,10 +4,11 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Adding model 'StudentModule'
         db.create_table('courseware_studentmodule', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -24,15 +25,13 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'StudentModule', fields ['student', 'module_id', 'module_type']
         db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
 
-
     def backwards(self, orm):
-        
+
         # Removing unique constraint on 'StudentModule', fields ['student', 'module_id', 'module_type']
         db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
 
         # Deleting model 'StudentModule'
         db.delete_table('courseware_studentmodule')
-
 
     models = {
         'auth.group': {

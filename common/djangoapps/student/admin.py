@@ -15,4 +15,3 @@ admin.site.register(CourseEnrollment)
 admin.site.register(Registration)
 
 admin.site.register(PendingNameChange)
-

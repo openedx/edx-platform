@@ -8,20 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Removing unique constraint on 'CourseEnrollment', fields ['user']
-        db.delete_unique('student_courseenrollment', ['user_id'])
-
-
-        # Changing field 'CourseEnrollment.user'
-        db.alter_column('student_courseenrollment', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
+        # This table is dropped in a subsequent migration. This migration was causing problems when using InnoDB,
+        # so we are just dropping it.
+        pass
+        # # Removing unique constraint on 'CourseEnrollment', fields ['user']
+        # db.delete_unique('student_courseenrollment', ['user_id'])
+        #
+        #
+        # # Changing field 'CourseEnrollment.user'
+        # db.alter_column('student_courseenrollment', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
 
     def backwards(self, orm):
-
-        # Changing field 'CourseEnrollment.user'
-        db.alter_column('student_courseenrollment', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True))
-        # Adding unique constraint on 'CourseEnrollment', fields ['user']
-        db.create_unique('student_courseenrollment', ['user_id'])
-
+        pass
+        # # Changing field 'CourseEnrollment.user'
+        # db.alter_column('student_courseenrollment', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True))
+        # # Adding unique constraint on 'CourseEnrollment', fields ['user']
+        # db.create_unique('student_courseenrollment', ['user_id'])
 
     models = {
         'auth.group': {

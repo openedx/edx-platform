@@ -17,7 +17,7 @@ def get_full_modules():
         class_path = settings.MODULESTORE['default']['ENGINE']
         module_path, _, class_name = class_path.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
-        modulestore = class_(eager=True, **settings.MODULESTORE['default']['OPTIONS'])
+        modulestore = class_(**dict(settings.MODULESTORE['default']['OPTIONS'].items() + [('eager', True)]))
         _FULLMODULES = modulestore.modules
     return _FULLMODULES
 

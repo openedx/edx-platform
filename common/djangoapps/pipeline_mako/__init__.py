@@ -6,6 +6,7 @@ from pipeline.conf import settings
 from pipeline.packager import Packager
 from pipeline.utils import guess_type
 
+
 def compressed_css(package_name):
     package = settings.PIPELINE_CSS.get(package_name, {})
     if package:
@@ -20,6 +21,7 @@ def compressed_css(package_name):
         paths = packager.compile(package.paths)
         return render_individual_css(package, paths)
 
+
 def render_css(package, path):
     template_name = package.template_name or "mako/css.html"
     context = package.extra_context
@@ -28,6 +30,7 @@ def render_css(package, path):
         'url': staticfiles_storage.url(path)
     })
     return render_to_string(template_name, context)
+
 
 def render_individual_css(package, paths):
     tags = [render_css(package, path) for path in paths]
@@ -49,6 +52,7 @@ def compressed_js(package_name):
         templates = packager.pack_templates(package)
         return render_individual_js(package, paths, templates)
 
+
 def render_js(package, path):
     template_name = package.template_name or "mako/js.html"
     context = package.extra_context
@@ -58,12 +62,14 @@ def render_js(package, path):
     })
     return render_to_string(template_name, context)
 
+
 def render_inline_js(package, js):
     context = package.extra_context
     context.update({
         'source': js
     })
     return render_to_string("mako/inline_js.html", context)
+
 
 def render_individual_js(package, paths, templates=None):
     tags = [render_js(package, js) for js in paths]

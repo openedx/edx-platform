@@ -34,9 +34,10 @@ class DemoSystem(object):
         context_dict.update(context)
         return self.lookup.get_template(template_filename).render(**context_dict)
 
+
 def main():
     parser = argparse.ArgumentParser(description='Check Problem Files')
-    parser.add_argument("command", choices=['test', 'show']) # Watch? Render? Open?
+    parser.add_argument("command", choices=['test', 'show'])  # Watch? Render? Open?
     parser.add_argument("files", nargs="+", type=argparse.FileType('r'))
     parser.add_argument("--seed", required=False, type=int)
     parser.add_argument("--log-level", required=False, default="INFO",
@@ -67,13 +68,14 @@ def main():
 
     # In case we want to do anything else here.
 
+
 def command_show(problem):
     """Display the text for this problem"""
     print problem.get_html()
-    
+
 
 def command_test(problem):
-    # We're going to trap stdout/stderr from the problems (yes, some print)    
+    # We're going to trap stdout/stderr from the problems (yes, some print)
     old_stdout, old_stderr = sys.stdout, sys.stderr
     try:
         sys.stdout = StringIO()
@@ -82,7 +84,7 @@ def command_test(problem):
         check_that_suggested_answers_work(problem)
         check_that_blanks_fail(problem)
 
-        log_captured_output(sys.stdout, 
+        log_captured_output(sys.stdout,
                             "captured stdout from {0}".format(problem))
         log_captured_output(sys.stderr,
                             "captured stderr from {0}".format(problem))
@@ -91,9 +93,10 @@ def command_test(problem):
     finally:
         sys.stdout, sys.stderr = old_stdout, old_stderr
 
+
 def check_that_blanks_fail(problem):
     """Leaving it blank should never work. Neither should a space."""
-    blank_answers = dict((answer_id, u"") 
+    blank_answers = dict((answer_id, u"")
                          for answer_id in problem.get_question_answers())
     grading_results = problem.grade_answers(blank_answers)
     try:
@@ -113,7 +116,7 @@ def check_that_suggested_answers_work(problem):
     * Displayed answers use units but acceptable ones do not.
       - L1e0.xml
       - Presents itself as UndefinedVariable (when it tries to pass to calc)
-    * "a or d" is what's displayed, but only "a" or "d" is accepted, not the 
+    * "a or d" is what's displayed, but only "a" or "d" is accepted, not the
       string "a or d".
       - L1-e00.xml
     """
@@ -129,14 +132,14 @@ def check_that_suggested_answers_work(problem):
     log.debug("Real answers: {0}".format(real_answers))
     if real_answers:
         try:
-            real_results = dict((answer_id, result) for answer_id, result 
+            real_results = dict((answer_id, result) for answer_id, result
                                 in problem.grade_answers(all_answers).items()
                                 if answer_id in real_answers)
             log.debug(real_results)
             assert(all(result == 'correct'
                        for answer_id, result in real_results.items()))
         except UndefinedVariable as uv_exc:
-            log.error("The variable \"{0}\" specified in the ".format(uv_exc) + 
+            log.error("The variable \"{0}\" specified in the ".format(uv_exc) +
                       "solution isn't recognized (is it a units measure?).")
         except AssertionError:
             log.error("The following generated answers were not accepted for {0}:"
@@ -147,6 +150,7 @@ def check_that_suggested_answers_work(problem):
         except Exception as ex:
             log.error("Uncaught error in {0}".format(problem))
             log.exception(ex)
+
 
 def log_captured_output(output_stream, stream_name):
     output_stream.seek(0)

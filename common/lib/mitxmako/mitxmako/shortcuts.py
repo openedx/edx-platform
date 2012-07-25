@@ -22,6 +22,7 @@ from django.http import HttpResponse
 from . import middleware
 from django.conf import settings
 
+
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance = Context(dictionary)
     # add dictionary to context_instance
@@ -42,6 +43,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     # fetch and render template
     template = middleware.lookup[namespace].get_template(template_name)
     return template.render(**context_dictionary)
+
 
 def render_to_response(template_name, dictionary, context_instance=None, namespace='main', **kwargs):
     """
