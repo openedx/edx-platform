@@ -3,5 +3,4 @@
     <problem filename="Sample_Numeric_Problem" slug="Sample_Numeric_Problem" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="false" name="Sample Numeric Problem"/>
     <problem filename="Sample_Algebraic_Problem" slug="Sample_Algebraic_Problem" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="false" name="Sample Algebraic Problem"/>
   </vertical>
-  <vertical filename="vertical_16" slug="vertical_16" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
 </sequential>
