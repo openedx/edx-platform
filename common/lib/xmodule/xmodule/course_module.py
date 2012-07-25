@@ -17,11 +17,12 @@ class CourseDescriptor(SequenceDescriptor):
         try:
             self.start = time.strptime(self.metadata["start"], "%Y-%m-%dT%H:%M")
         except KeyError:
-            self.start = time.gmtime(0)  # The epoch
-            log.critical("Course loaded without a start date. " + str(self.id))
-        except ValueError, e:
-            self.start = time.gmtime(0)  # The epoch
-            log.critical("Course loaded with a bad start date. " + str(self.id) + " '" + str(e) + "'")
+            self.start = time.gmtime(0) #The epoch
+            log.critical("Course loaded without a start date. %s", self.id)
+        except ValueError as e:
+            self.start = time.gmtime(0) #The epoch
+            log.critical("Course loaded with a bad start date. %s '%s'",
+                         self.id, e)
 
     def has_started(self):
         return time.gmtime() > self.start
