@@ -3,6 +3,7 @@ import pkg_resources
 import logging
 
 from xmodule.modulestore import Location
+
 from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
@@ -192,11 +193,7 @@ class XModule(HTMLSnippet):
         self._loaded_children = None
 
     def get_name(self):
-        name = self.__xmltree.get('name')
-        if name:
-            return name
-        else:
-            raise "We should iterate through children and find a default name"
+        return self.name
 
     def get_children(self):
         '''
