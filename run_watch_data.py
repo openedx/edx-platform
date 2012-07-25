@@ -14,10 +14,11 @@ from watchdog.events import LoggingEventHandler, FileSystemEventHandler
 
 # To watch more (or more specific) directories, change WATCH_DIRS to include the
 # directories you want to watch. Note that this is recursive. If you want to
-# watch fewer or more extensions, you can change EXTENSIONS.
+# watch fewer or more extensions, you can change EXTENSIONS. To watch all
+# extensions, add "*" to EXTENSIONS.
 
 WATCH_DIRS = ["../data"]
-EXTENSIONS = ["xml", "js", "css", "coffee", "scss", "html"]
+EXTENSIONS = ["*", "xml", "js", "css", "coffee", "scss", "html"]
 
 WATCH_DIRS = [os.path.abspath(os.path.normpath(dir)) for dir in WATCH_DIRS]
 
@@ -30,12 +31,13 @@ class DjangoEventHandler(FileSystemEventHandler):
 
     def on_any_event(self, event):
         for extension in EXTENSIONS:
-            if event.src_path.endswith(extension):
+            if event.src_path.endswith(extension) or extension == "*":
                 print "%s changed: restarting server." % event.src_path
                 self.process.terminate()
                 os.system("ps aux | grep 'django' | grep -v grep | awk '{print $2}' | xargs kill")
                 time.sleep(0.25)
                 self.process = Popen(['rake', 'lms'])
+                break
 
 if __name__ == "__main__":
     event_handler = DjangoEventHandler(Popen(['rake', 'lms']))
