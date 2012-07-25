@@ -5,7 +5,7 @@
 
 .CodeMirror-scroll {
   overflow: auto;
-  height: 300px;
+  height: 480px;
   /* This is needed to prevent an IE[67] bug where the scrolled content
      is visible outside of the scrolling box. */
   position: relative;
@@ -38,10 +38,16 @@
   border-radius: 0;
   border-width: 0; margin: 0; padding: 0; background: transparent;
   font-family: inherit;
-  font-size: inherit;
+  font-size: 16px;
   padding: 0; margin: 0;
   white-space: pre;
+  line-height: 22px;
   word-wrap: normal;
+}
+
+/* THK: This is to prevent global 'span' from defining .CodeMirror style */
+.CodeMirror pre span {
+    font: inherit;
 }
 
 .CodeMirror-wrap pre {
