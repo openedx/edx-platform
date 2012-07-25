@@ -82,7 +82,6 @@ class TranslateCustomTagDescriptor(XModuleDescriptor):
         xml_object = etree.fromstring(xml_data)
         tag = xml_object.tag
         xml_object.tag = 'customtag'
-        impl = etree.SubElement(xml_object, 'impl')
-        impl.text = tag
+        xml_object.attrib['impl'] = tag
 
         return system.process_xml(etree.tostring(xml_object))
