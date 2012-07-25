@@ -789,6 +789,8 @@ class CodeResponse(LoncapaResponse):
     In contrast to ExternalResponse, CodeResponse has following behavior:
         1) Goes through a queueing system
         2) Does not do external request for 'get_answers'
+    The XML definition of a CodeResponse is meant to be identical to that of ExternalResponse. Simply replace the
+        tag 'externalresponse' with 'coderesponse'
     '''
 
     response_tag = 'coderesponse'
@@ -797,7 +799,7 @@ class CodeResponse(LoncapaResponse):
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url', "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/") # FIXME -- hardcoded url
+        self.url = xml.get('url', "http://ec2-50-17-86-200.compute-1.amazonaws.com/xqueue/submit/") # FIXME -- hardcoded url
 
         answer = xml.find('answer')
         if answer is not None:
@@ -859,7 +861,6 @@ class CodeResponse(LoncapaResponse):
             msg = 'Error in CodeResponse %s: cannot parse response from xworker r.text=%s' % (err, score_msg)
             raise Exception(err)
 
-        # The following process is lifted directly from ExternalResponse
         ad = rxml.find('awarddetail').text
         admap = {'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
                  'WRONG_FORMAT': 'incorrect',
@@ -1020,7 +1021,7 @@ main()
             raise Exception('Error: no response from external server url=%s' % self.url)
 
         try:
-            rxml = etree.fromstring(r.text)         # response is XML; prase it
+            rxml = etree.fromstring(r.text)         # response is XML; parse it
         except Exception as err:
             msg = 'Error %s - cannot parse response from external server r.text=%s' % (err,r.text)
             log.error(msg)
