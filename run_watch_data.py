@@ -1,4 +1,4 @@
-#! ../python/bin/python
+#! /usr/bin/env python
 
 # This script requires that you have watchdog installed. You can install
 # watchdog via 'pip install watchdog'
