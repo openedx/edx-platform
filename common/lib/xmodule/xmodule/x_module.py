@@ -203,13 +203,16 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            self._loaded_children = [self.system.get_module(child) for child in self.definition.get('children', [])]
+            self._loaded_children = [
+                self.system.get_module(child)
+                for child in self.definition.get('children', [])]
+
         return self._loaded_children
 
     def get_display_items(self):
         '''
-        Returns a list of descendent module instances that will display immediately
-        inside this module
+        Returns a list of descendent module instances that will display
+        immediately inside this module
         '''
         items = []
         for child in self.get_children():
@@ -219,8 +222,8 @@ class XModule(HTMLSnippet):
 
     def displayable_items(self):
         '''
-        Returns list of displayable modules contained by this module. If this module
-        is visible, should return [self]
+        Returns list of displayable modules contained by this module. If this
+        module is visible, should return [self]
         '''
         return [self]
 
@@ -439,16 +442,19 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         on the contents of xml_data.
 
         xml_data must be a string containing valid xml
+
         system is an XMLParsingSystem
-        org and course are optional strings that will be used in the generated modules
-            url identifiers
+
+        org and course are optional strings that will be used in the generated
+            modules url identifiers
         """
         class_ = XModuleDescriptor.load_class(
             etree.fromstring(xml_data).tag,
             default_class
         )
-        # leave next line in code, commented out - useful for low-level debugging
-        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (etree.fromstring(xml_data).tag,class_))
+        # leave next line, commented out - useful for low-level debugging
+        log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
+                etree.fromstring(xml_data).tag,class_))
         return class_.from_xml(xml_data, system, org, course)
 
     @classmethod
@@ -457,35 +463,42 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         Creates an instance of this descriptor from the supplied xml_data.
         This may be overridden by subclasses
 
-        xml_data: A string of xml that will be translated into data and children for
-            this module
+        xml_data: A string of xml that will be translated into data and children
+            for this module
+
         system is an XMLParsingSystem
-        org and course are optional strings that will be used in the generated modules
-            url identifiers
+
+        org and course are optional strings that will be used in the generated
+            module's url identifiers
         """
-        raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
+        raise NotImplementedError(
+            'Modules must implement from_xml to be parsable from xml')
 
     def export_to_xml(self, resource_fs):
         """
-        Returns an xml string representing this module, and all modules underneath it.
-        May also write required resources out to resource_fs
+        Returns an xml string representing this module, and all modules
+        underneath it.  May also write required resources out to resource_fs
 
-        Assumes that modules have single parantage (that no module appears twice in the same course),
-        and that it is thus safe to nest modules as xml children as appropriate.
+        Assumes that modules have single parentage (that no module appears twice
+        in the same course), and that it is thus safe to nest modules as xml
+        children as appropriate.
 
-        The returned XML should be able to be parsed back into an identical XModuleDescriptor
-        using the from_xml method with the same system, org, and course
+        The returned XML should be able to be parsed back into an identical
+        XModuleDescriptor using the from_xml method with the same system, org,
+        and course
         """
-        raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
+        raise NotImplementedError(
+            'Modules must implement export_to_xml to enable xml export')
 
-    # =============================== Testing ===================================
+    # =============================== Testing ==================================
     def get_sample_state(self):
         """
-        Return a list of tuples of instance_state, shared_state. Each tuple defines a sample case for this module
+        Return a list of tuples of instance_state, shared_state. Each tuple
+        defines a sample case for this module
         """
         return [('{}', '{}')]
 
-    # =============================== BUILTIN METHODS ===========================
+    # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
         eq = (self.__class__ == other.__class__ and
                 all(getattr(self, attr, None) == getattr(other, attr, None)
@@ -493,38 +506,76 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
         if not eq:
             for attr in self.equality_attributes:
-                print getattr(self, attr, None), getattr(other, attr, None), getattr(self, attr, None) == getattr(other, attr, None)
+                print(getattr(self, attr, None),
+                      getattr(other, attr, None),
+                      getattr(self, attr, None) == getattr(other, attr, None))
 
         return eq
 
     def __repr__(self):
-        return "{class_}({system!r}, {definition!r}, location={location!r}, metadata={metadata!r})".format(
+        return ("{class_}({system!r}, {definition!r}, location={location!r},"
+                " metadata={metadata!r})".format(
             class_=self.__class__.__name__,
             system=self.system,
             definition=self.definition,
             location=self.location,
             metadata=self.metadata
-        )
+        ))
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item, resources_fs, **kwargs):
+    def __init__(self, load_item, resources_fs,
+                 error_handler,
+                 **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
+
         resources_fs: A Filesystem object that contains all of the
             resources needed for the course
+
+        error_handler: A hook for handling errors in loading the descriptor.
+            Must be a function of (error_msg, exc_info=None).
+            See errorhandlers.py for some simple ones.
+
+            Patterns for using the error handler:
+               try:
+                  x = access_some_resource()
+                  check_some_format(x)
+               except SomeProblem:
+                  msg = 'Grommet {0} is broken'.format(x)
+                  log.exception(msg) # don't rely on handler to log
+                  self.system.error_handler(msg)
+                  # if we get here, work around if possible
+                  raise # if no way to work around
+                       OR
+                  return 'Oops, couldn't load grommet'
+
+               OR, if not in an exception context:
+
+               if not check_something(thingy):
+                  msg = "thingy {0} is broken".format(thingy)
+                  log.critical(msg)
+                  error_handler(msg)
+                  # if we get here, work around
+                  pass   # e.g. if no workaround needed
         """
 
         self.load_item = load_item
         self.resources_fs = resources_fs
+        self.error_handler = error_handler
 
 
 class XMLParsingSystem(DescriptorSystem):
     def __init__(self, load_item, resources_fs, process_xml, **kwargs):
         """
-        process_xml: Takes an xml string, and returns the the XModuleDescriptor created from that xml
+        load_item: Takes a Location and returns an XModuleDescriptor
+
+        process_xml: Takes an xml string, and returns a XModuleDescriptor
+            created from that xml
+
+
         """
-        DescriptorSystem.__init__(self, load_item, resources_fs)
+        DescriptorSystem.__init__(self, load_item, resources_fs, **kwargs)
         self.process_xml = process_xml
 
 

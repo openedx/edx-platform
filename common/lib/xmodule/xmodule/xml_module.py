@@ -187,7 +187,10 @@ class XmlDescriptor(XModuleDescriptor):
                     with system.resources_fs.open(filepath) as file:
                         definition_xml = cls.file_to_xml(file)
                 except (ResourceNotFoundError, etree.XMLSyntaxError):
-                    log.exception('Unable to load file contents at path %s' % filepath)
+                    msg = 'Unable to load file contents at path %s' % filepath
+                    log.exception(msg)
+                    system.error_handler(msg)
+                    # if error_handler didn't reraise, work around it.
                     return {'data': 'Error loading file contents at path %s' % filepath}
 
             cls.clean_metadata_from_xml(definition_xml)
@@ -206,20 +209,24 @@ class XmlDescriptor(XModuleDescriptor):
 
     @classmethod
     def _format_filepath(cls, category, name):
-        return u'{category}/{name}.{ext}'.format(category=category, name=name, ext=cls.filename_extension)
+        return u'{category}/{name}.{ext}'.format(category=category,
+                                                 name=name,
+                                                 ext=cls.filename_extension)
 
     def export_to_xml(self, resource_fs):
         """
-        Returns an xml string representing this module, and all modules underneath it.
-        May also write required resources out to resource_fs
+        Returns an xml string representing this module, and all modules
+        underneath it.  May also write required resources out to resource_fs
 
-        Assumes that modules have single parantage (that no module appears twice in the same course),
-        and that it is thus safe to nest modules as xml children as appropriate.
+        Assumes that modules have single parentage (that no module appears twice
+        in the same course), and that it is thus safe to nest modules as xml
+        children as appropriate.
 
-        The returned XML should be able to be parsed back into an identical XModuleDescriptor
-        using the from_xml method with the same system, org, and course
+        The returned XML should be able to be parsed back into an identical
+        XModuleDescriptor using the from_xml method with the same system, org,
+        and course
 
-        resource_fs is a pyfilesystem office (from the fs package)
+        resource_fs is a pyfilesystem object (from the fs package)
         """
         xml_object = self.definition_to_xml(resource_fs)
         self.__class__.clean_metadata_from_xml(xml_object)
@@ -244,7 +251,8 @@ class XmlDescriptor(XModuleDescriptor):
             attr_map = self.xml_attribute_map.get(attr, AttrMap(attr))
             metadata_key = attr_map.metadata_key
 
-            if metadata_key not in self.metadata or metadata_key in self._inherited_metadata:
+            if (metadata_key not in self.metadata or
+                metadata_key in self._inherited_metadata):
                 continue
 
             val = attr_map.from_metadata(self.metadata[metadata_key])
