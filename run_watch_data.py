@@ -33,10 +33,7 @@ class DjangoEventHandler(FileSystemEventHandler):
         for extension in EXTENSIONS:
             if event.src_path.endswith(extension) or extension == "*":
                 print "%s changed: restarting server." % event.src_path
-                self.process.terminate()
-                os.system("ps aux | grep 'django' | grep -v grep | awk '{print $2}' | xargs kill")
-                time.sleep(0.25)
-                self.process = Popen(['rake', 'lms'])
+                os.system("touch lms/__init__.py")
                 break
 
 if __name__ == "__main__":
