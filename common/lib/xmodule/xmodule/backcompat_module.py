@@ -29,6 +29,7 @@ def process_includes(fn):
                         etree.tostring(next_include, pretty_print=True))
                     msg += 'Cannot find file %s in %s' % (file, dir)
                     log.exception(msg)
+                    system.error_handler(msg)
                     raise
                 try:
                     # read in and convert to XML
@@ -38,6 +39,7 @@ def process_includes(fn):
                         etree.tostring(next_include, pretty_print=True))
                     msg += 'Cannot parse XML in %s' % (file)
                     log.exception(msg)
+                    system.error_handler(msg)
                     raise
                 # insert  new XML into tree in place of inlcude
                 parent = next_include.getparent()
