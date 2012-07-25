@@ -1,0 +1,105 @@
+<script type="text/javascript">
+$(document).ready(function() { 
+$("#r1_slider").slider({
+value: 1, min: 1, max: 10, step: 1, slide: schematic.component_slider,
+schematic: "ctrls", component: "R1", property: "r", analysis: "dc",
+})
+
+$("#r2_slider").slider({
+value: 1, min: 1, max: 10, step: 1, slide: schematic.component_slider,
+schematic: "ctrls", component: "R2", property: "r", analysis: "dc",
+})
+
+$("#r3_slider").slider({
+value: 1, min: 1, max: 10, step: 1, slide: schematic.component_slider,
+schematic: "ctrls", component: "R3", property: "r", analysis: "dc",
+})
+
+$("#r4_slider").slider({
+value: 1, min: 1, max: 10, step: 1, slide: schematic.component_slider,
+schematic: "ctrls", component: "R4", property: "r", analysis: "dc",
+})
+
+$("#slider").slider(); });
+</script>
+
+<b>Lab 2A: Superposition Experiment</b>
+
+<br><br><i>Note: This part of the lab is just to develop your intuition about
+superposition.  There are no responses that need to be checked.</i>
+
+<br/><br/>Circuits with multiple sources can be hard to analyze as-is.  For example, what is the voltage
+between the two terminals on the right of Figure 1?
+
+<center>
+<input width="425" type="hidden" height="150" id="schematic1" parts="" analyses="" class="schematic ctrls" name="test2" value="[[&quot;w&quot;,[160,64,184,64]],[&quot;w&quot;,[160,16,184,16]],[&quot;w&quot;,[64,16,112,16]],[&quot;w&quot;,[112,64,88,64]],[&quot;w&quot;,[64,64,88,64]],[&quot;g&quot;,[88,64,0],{},[&quot;0&quot;]],[&quot;w&quot;,[112,64,160,64]],[&quot;w&quot;,[16,64,64,64]],[&quot;r&quot;,[160,16,0],{&quot;name&quot;:&quot;R4&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[160,16,1],{&quot;name&quot;:&quot;R3&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;2&quot;]],[&quot;i&quot;,[112,64,6],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;6A&quot;},[&quot;0&quot;,&quot;2&quot;]],[&quot;r&quot;,[64,16,0],{&quot;name&quot;:&quot;R2&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;0&quot;]],[&quot;r&quot;,[64,16,1],{&quot;name&quot;:&quot;R1&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;3&quot;]],[&quot;v&quot;,[16,16,0],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;8V&quot;},[&quot;3&quot;,&quot;0&quot;]],[&quot;view&quot;,-24,0,2]]"/>
+Figure 1.  Example multi-source circuit
+</center>
+
+<br/><br/>We can use superposition to make the analysis much easier.
+The circuit in Figure 1 can be decomposed into two separate
+subcircuits: one involving only the voltage source and one involving only the
+current source.  We'll analyze each circuit separately and combine the
+results using superposition.  Recall that to decompose a circuit for
+analysis, we'll pick each source in turn and set all the other sources
+to zero (i.e., voltage sources become short circuits and current
+sources become open circuits).  The circuit above has two sources, so
+the decomposition produces two subcircuits, as shown in Figure 2.
+
+<center>
+<table><tr><td>
+<input style="display:inline;" width="425" type="hidden" height="150" id="schematic2" parts="" analyses="" class="schematic ctrls" name="test2" value="[[&quot;w&quot;,[160,64,184,64]],[&quot;w&quot;,[160,16,184,16]],[&quot;w&quot;,[64,16,112,16]],[&quot;w&quot;,[112,64,88,64]],[&quot;w&quot;,[64,64,88,64]],[&quot;g&quot;,[88,64,0],{},[&quot;0&quot;]],[&quot;w&quot;,[112,64,160,64]],[&quot;w&quot;,[16,64,64,64]],[&quot;r&quot;,[160,16,0],{&quot;name&quot;:&quot;R4&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[160,16,1],{&quot;name&quot;:&quot;R3&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;2&quot;]],[&quot;r&quot;,[64,16,0],{&quot;name&quot;:&quot;R2&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;0&quot;]],[&quot;r&quot;,[64,16,1],{&quot;name&quot;:&quot;R1&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;3&quot;]],[&quot;v&quot;,[16,16,0],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;8V&quot;},[&quot;3&quot;,&quot;0&quot;]],[&quot;view&quot;,-24,0,2]]"/>
+(a) Subcircuit for analyzing contribution of voltage source
+</td><td>
+<input width="425" type="hidden" height="150" id="schematic3" parts="" analyses="" class="schematic ctrls" name="test2" value="[[&quot;w&quot;,[16,16,16,64]],[&quot;w&quot;,[160,64,184,64]],[&quot;w&quot;,[160,16,184,16]],[&quot;w&quot;,[64,16,112,16]],[&quot;w&quot;,[112,64,88,64]],[&quot;w&quot;,[64,64,88,64]],[&quot;g&quot;,[88,64,0],{},[&quot;0&quot;]],[&quot;w&quot;,[112,64,160,64]],[&quot;w&quot;,[16,64,64,64]],[&quot;r&quot;,[160,16,0],{&quot;name&quot;:&quot;R4&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[160,16,1],{&quot;name&quot;:&quot;R3&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;1&quot;,&quot;2&quot;]],[&quot;i&quot;,[112,64,6],{&quot;name&quot;:&quot;&quot;,&quot;value&quot;:&quot;6A&quot;},[&quot;0&quot;,&quot;2&quot;]],[&quot;r&quot;,[64,16,0],{&quot;name&quot;:&quot;R2&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;0&quot;]],[&quot;r&quot;,[64,16,1],{&quot;name&quot;:&quot;R1&quot;,&quot;r&quot;:&quot;1&quot;},[&quot;2&quot;,&quot;3&quot;]],[&quot;view&quot;,-24,0,2]]"/>
+(b) Subcircuit for analyzing contribution of current source
+</td></tr></table>
+<br>Figure 2.  Decomposition of Figure 1 into subcircuits
+</center>
+
+<br/>Let's use the DC analysis capability of the schematic tool to see superposition
+in action.  The sliders below control the resistances of R1, R2, R3 and R4 in all
+the diagrams.  As you move the sliders, the schematic tool will adjust the appropriate
+resistance, perform a DC analysis and display the node voltages on the diagrams.  Here's
+what you want to observe as you play with the sliders:
+
+<ul style="margin-left:2em;margin-top:1em;margin-right:2em;margin-bottom:1em;">
+<i>The voltage for a node in Figure 1 is the sum of the voltages for
+that node in Figures 2(a) and 2(b), just as predicted by
+superposition. (Note that due to round-off in the display of the
+voltages, the sum of the displayed voltages in Figure 2 may only be within
+.01 of the voltages displayed in Figure 1.)</i>
+</ul>
+
+<br>
+<center>
+<table><tr valign="top">
+<td>
+  <table>
+    <tr valign="top">
+      <td>R1</td>
+      <td>
+	<div id="r1_slider" style="width:200px; height:10px; margin-left:15px"></div>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>R2</td>
+      <td>
+	<div id="r2_slider" style="width:200px; height:10px; margin-left:15px; margin-top:10px;"></div>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>R3</td>
+      <td>
+	<div id="r3_slider" style="width:200px; height:10px; margin-left:15px; margin-top:10px;"></div>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>R4</td>
+      <td>
+	<div id="r4_slider" style="width:200px; height:10px; margin-left:15px; margin-top:10px;"></div>
+      </td>
+    </tr>
+  </table>
+</td></tr></table>
+</center>

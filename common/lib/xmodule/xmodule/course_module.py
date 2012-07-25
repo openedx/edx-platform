@@ -4,7 +4,6 @@ import logging
 
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from fs.errors import ResourceNotFoundError
 
 log = logging.getLogger(__name__)
 

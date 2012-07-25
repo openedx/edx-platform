@@ -22,8 +22,21 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 TEST_ROOT = path('test_root')
 
 # Want static files in the same dir for running on jenkins.
-STATIC_ROOT = TEST_ROOT / "staticfiles" 
+STATIC_ROOT = TEST_ROOT / "staticfiles"
 
+GITHUB_REPO_ROOT = TEST_ROOT / "data"
+COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
+
+# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
+STATICFILES_DIRS = [
+    COMMON_ROOT / "static",
+    PROJECT_ROOT / "static",
+]
+STATICFILES_DIRS += [
+    (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
+    for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
+    if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
+]
 
 MODULESTORE = {
     'default': {
@@ -33,6 +46,7 @@ MODULESTORE = {
             'host': 'localhost',
             'db': 'test_xmodule',
             'collection': 'modulestore',
+            'fs_root': GITHUB_REPO_ROOT,
         }
     }
 }

@@ -50,7 +50,7 @@ class SimpleInput():#  XModule
         '''
         Instantiate a SimpleInput class.  Arguments:
 
-        - system    : I4xSystem instance which provides OS, rendering, and user context
+        - system    : ModuleSystem instance which provides OS, rendering, and user context
         - xml       : Element tree of this Input element
         - item_id   : id for this input element (assigned by capa_problem.LoncapProblem) - string
         - track_url : URL used for tracking - string
