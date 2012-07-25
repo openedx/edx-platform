@@ -6,6 +6,7 @@ from fs.osfs import OSFS
 from itertools import repeat
 
 from importlib import import_module
+from xmodule.errorhandlers import strict_error_handler
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from mitxmako.shortcuts import render_to_string
@@ -23,15 +24,26 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
     """
-    def __init__(self, modulestore, module_data, default_class, resources_fs, render_template):
+    def __init__(self, modulestore, module_data, default_class, resources_fs,
+                 error_handler, render_template):
         """
         modulestore: the module store that can be used to retrieve additional modules
-        module_data: a dict mapping Location -> json that was cached from the underlying modulestore
-        default_class: The default_class to use when loading an XModuleDescriptor from the module_data
+
+        module_data: a dict mapping Location -> json that was cached from the
+            underlying modulestore
+
+        default_class: The default_class to use when loading an
+            XModuleDescriptor from the module_data
+
         resources_fs: a filesystem, as per MakoDescriptorSystem
-        render_template: a function for rendering templates, as per MakoDescriptorSystem
+
+        error_handler:
+
+        render_template: a function for rendering templates, as per
+            MakoDescriptorSystem
         """
-        super(CachingDescriptorSystem, self).__init__(render_template, self.load_item, resources_fs)
+        super(CachingDescriptorSystem, self).__init__(
+                self.load_item, resources_fs, error_handler, render_template)
         self.modulestore = modulestore
         self.module_data = module_data
         self.default_class = default_class
@@ -127,13 +139,15 @@ class MongoModuleStore(ModuleStore):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
-        resource_fs = OSFS(self.fs_root / item.get('data_dir', item['location']['course']))
+        resource_fs = OSFS(self.fs_root / item.get('data_dir',
+                                                   item['location']['course']))
         system = CachingDescriptorSystem(
             self,
             data_cache,
             self.default_class,
             resource_fs,
-            render_to_string
+            strict_error_handler,
+            render_to_string,
         )
         return system.load_item(item['location'])
 

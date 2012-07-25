@@ -13,8 +13,9 @@ import re
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError
 
-etree.set_default_parser(etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                         remove_comments=True, remove_blank_text=True))
+etree.set_default_parser(
+    etree.XMLParser(dtd_validation=False, load_dtd=False,
+                    remove_comments=True, remove_blank_text=True))
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -28,8 +29,7 @@ def clean_out_mako_templating(xml_string):
     return xml_string
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
-    def __init__(self, xmlstore, org, course, course_dir,
-                 error_handler):
+    def __init__(self, xmlstore, org, course, course_dir, error_handler):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -82,15 +82,14 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 module.get_children()
             return module
 
-        system_kwargs = dict(
-            render_template=lambda: '',
-            load_item=xmlstore.get_item,
-            resources_fs=OSFS(xmlstore.data_dir / course_dir),
-            process_xml=process_xml,
-            error_handler=error_handler,
-        )
-        MakoDescriptorSystem.__init__(self, **system_kwargs)
-        XMLParsingSystem.__init__(self, **system_kwargs)
+        render_template = lambda: ''
+        load_item = xmlstore.get_item
+        resources_fs = OSFS(xmlstore.data_dir / course_dir)
+
+        MakoDescriptorSystem.__init__(self, load_item, resources_fs,
+                                      error_handler, render_template)
+        XMLParsingSystem.__init__(self, load_item, resources_fs,
+                                  error_handler, process_xml)
 
 
 
