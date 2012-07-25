@@ -122,6 +122,8 @@ Discussion =
     $discussionContent = $content.children(".discussion-content")
     $local = generateLocal($discussionContent)
 
+    id = $content.attr("_id")
+
     discussionContentHoverIn = ->
       status = $discussionContent.attr("status") || "normal"
       if status == "normal"
@@ -138,15 +140,32 @@ Discussion =
 
     $discussionContent.hover(discussionContentHoverIn, discussionContentHoverOut)
 
-    
-
     handleReply = (elem) ->
       editView = $local(".discussion-content-edit")
       if editView.length
         editView.show()
       else
         editView = $("<div>").addClass("discussion-content-edit")
-        editView.append($("<textarea>").addClass("comment-edit"))
+
+        textarea = $("<textarea>").addClass("comment-edit")
+        editView.append(textarea)
+
+        anonymousCheckbox = $("<input>").attr("type", "checkbox")
+                                        .addClass("discussion-post-anonymously")
+                                        .attr("id", "discussion-post-anonymously-#{id}")
+        anonymousLabel = $("<label>").attr("for", "discussion-post-anonymously-#{id}")
+                                     .html("post anonymously")
+        editView.append(anonymousCheckbox).append(anonymousLabel)
+        
+        if $discussionContent.parent(".thread").attr("_id") not in $$user_info.subscribed_thread_ids
+          watchCheckbox = $("<input>").attr("type", "checkbox")
+                                      .addClass("discussion-auto-watch")
+                                      .attr("id", "discussion-auto-watch-#{id}")
+                                      .attr("checked", "")
+          watchLabel = $("<label>").attr("for", "discussion-auto-watch-#{id}")
+                                   .html("watch this thread")
+          editView.append(watchCheckbox).append(watchLabel)
+        
         $discussionContent.append(editView)
       cancelReply = generateDiscussionLink("discussion-cancel-reply", "Cancel", handleCancelReply)
       submitReply = generateDiscussionLink("discussion-submit-reply", "Submit", handleSubmitReply)
@@ -166,20 +185,24 @@ Discussion =
 
     handleSubmitReply = (elem) ->
       if $content.hasClass("thread")
-        url = Discussion.urlFor('create_comment', $content.attr("_id"))
+        url = Discussion.urlFor('create_comment', id)
       else if $content.hasClass("comment")
-        url = Discussion.urlFor('create_sub_comment', $content.attr("_id"))
+        url = Discussion.urlFor('create_sub_comment', id)
       else
         return
       body = $local(".comment-edit").val()
-      $.post url, {body: body}, (response, textStatus) ->
+
+      anonymous = false || $local(".discussion-post-anonymously").is(":checked")
+      autowatch = false || $local(".discussion-auto-watch").is(":checked")
+
+      $.post url, {body: body, anonymous: anonymous, autowatch: autowatch}, (response, textStatus) ->
         if textStatus == "success"
           Discussion.handleAnchorAndReload(response)
       , 'json'
 
     handleVote = (elem, value) ->
       contentType = if $content.hasClass("thread") then "thread" else "comment"
-      url = Discussion.urlFor("#{value}vote_#{contentType}", $content.attr("_id"))
+      url = Discussion.urlFor("#{value}vote_#{contentType}", id)
       $.post url, {}, (response, textStatus) ->
         if textStatus == "success"
           Discussion.handleAnchorAndReload(response)

@@ -155,12 +155,13 @@ $discussion_input_width: 60%;
       margin-top: 10px;
       overflow: hidden;
       .discussion-content-edit {
+        margin-left: $comment_margin_left;
         .comment-edit {
           @include discussion-font;
           width: $discussion_input_width !important;
-          margin-left: $comment_margin_left;
           font-size: $comment_body_size;
           margin-top: 10px;
+          display: block;
         }
       }
     }

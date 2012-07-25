@@ -71,8 +71,11 @@ def update_thread(request, course_id, thread_id):
 @require_POST
 def create_comment(request, course_id, thread_id):
     attributes = extract(request.POST, ['body'])
-    attributes['user_id'] = request.user.id
+    if request.POST.get('anonymous', 'false').lower() == 'false':
+        attributes['user_id'] = request.user.id
     attributes['course_id'] = course_id
+    attributes['auto_subscribe'] = bool(request.POST.get('autowatch', False))
+    print attributes
     response = comment_client.create_comment(thread_id, attributes)
     return JsonResponse(response)
 
@@ -103,8 +106,10 @@ def endorse_comment(request, course_id, comment_id):
 @require_POST
 def create_sub_comment(request, course_id, comment_id):
     attributes = extract(request.POST, ['body'])
-    attributes['user_id'] = request.user.id
-    attributes['course_id'] = "1" # TODO either remove this or pass this parameter somehow
+    if request.POST.get('anonymous', 'false').lower() == 'false':
+        attributes['user_id'] = request.user.id
+    attributes['course_id'] = course_id
+    attributes['auto_subscribe'] = bool(request.POST.get('autowatch', False))
     response = comment_client.create_sub_comment(comment_id, attributes)
     return JsonResponse(response)
 
