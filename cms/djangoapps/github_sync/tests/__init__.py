@@ -57,7 +57,7 @@ class GithubSyncTestCase(TestCase):
         """
         self.assertEquals('Toy Course', self.import_course.metadata['display_name'])
         self.assertIn(
-            Location('i4x://edx/local_repo/chapter/Overview'),
+            Location('i4x://edX/toy/chapter/Overview'),
             [child.location for child in self.import_course.get_children()])
         self.assertEquals(1, len(self.import_course.get_children()))
 
