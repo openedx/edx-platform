@@ -193,6 +193,7 @@ class EditTestCase(ContentStoreTestCase):
         self.activate_user(email)
         self.login(email, password)
         xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django.modulestore().collection.drop()
 
     def check_edit_item(self, test_course_name):
         import_from_xml('common/test/data/', test_course_name)
