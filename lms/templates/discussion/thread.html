@@ -12,17 +12,19 @@
   %>
   <div class="thread" _id="${thread['id']}">
     <div class="discussion-content">
-      ${render_vote(thread)}
-      <div class="discussion-right-wrapper clearfix">
-        <a class="thread-title" name="${thread['id']}" href="${url_for_thread}">${thread['title']}</a>
-        <div class="discussion-content-view">
-          <div class="thread-body">${thread['body']}</div>
-          <div class="info">
-            ${render_info(thread)}
-            % if edit_thread:
-              ${render_reply()}
-              ${render_edit()}
-            % endif
+      <div class="discussion-upper-wrapper clearfix">
+        ${render_vote(thread)}
+        <div class="discussion-right-wrapper clearfix">
+          <a class="thread-title" name="${thread['id']}" href="${url_for_thread}">${thread['title']}</a>
+          <div class="discussion-content-view">
+            <div class="thread-body">${thread['body']}</div>
+            <div class="info">
+              ${render_info(thread)}
+              % if edit_thread:
+                ${render_reply()}
+                ${render_edit()}
+              % endif
+            </div>
           </div>
         </div>
       </div>
@@ -59,7 +61,12 @@
 </%def>
 
 <%def name="render_info(content)">
-  ${time_ago_in_words(parse(content['updated_at']))} ago by user No.${content['user_id']}
+  ${time_ago_in_words(parse(content['updated_at']))} ago by
+  % if content.get('user_id', False):
+    user No.${content['user_id']}
+  % else:
+    anonymous
+  % endif
 </%def>
 
 <%def name="render_reply()">
