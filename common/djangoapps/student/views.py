@@ -35,9 +35,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 from datetime import date
+from collections import namedtuple
 
 log = logging.getLogger("mitx.student")
-
+Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
 def csrf_token(context):
     ''' A csrf token that can be included in a form.
@@ -83,6 +84,19 @@ def index(request):
 def course_from_id(id):
     course_loc = CourseDescriptor.id_to_location(id)
     return modulestore().get_item(course_loc)
+
+def press(request):
+    json_articles = cache.get("student_press_json_articles")
+    if json_articles == None:
+        if hasattr(settings, 'RSS_URL'):
+            content = urllib.urlopen(settings.PRESS_URL).read()
+            json_articles = json.loads(content)
+        else:
+            content = open(settings.PROJECT_ROOT / "templates" / "press.json").read()
+            json_articles = json.loads(content)
+        cache.set("student_press_json_articles", json_articles)
+    articles = [Article(**article) for article in json_articles]
+    return render_to_response('static_templates/press.html', {'articles': articles})
 
 @login_required
 @ensure_csrf_cookie
