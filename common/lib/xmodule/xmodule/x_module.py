@@ -102,7 +102,7 @@ class HTMLSnippet(object):
 
     def get_html(self):
         """
-        Return the html used to edit this module
+        Return the html used to display this snippet
         """
         raise NotImplementedError("get_html() must be provided by specific modules")
 
@@ -425,7 +425,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     # =============================== Testing ===================================
     def get_sample_state(self):
         """
-        Return a list of tuples of instance_state, shared_state. Each tuple defines a test/sample case for this module
+        Return a list of tuples of instance_state, shared_state. Each tuple defines a sample case for this module
         """
         return [('{}', '{}')]
 
