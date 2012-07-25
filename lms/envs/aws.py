@@ -32,8 +32,9 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
-for feature in ENV_TOKEN['ENABLED_FEATURE']:
-    MITX_FEATURES[feature] = True
+for feature,value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
+    MITX_FEATURES[feature] = value
+
 
 LOGGING = get_logger_config(LOG_DIR, 
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
