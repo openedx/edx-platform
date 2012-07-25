@@ -1,0 +1,39 @@
+	     Clarification of the term "Linear"
+  <p>
+    The term "linear" is very clear when applied to a
+    mathematical function.  A function F is linear if and only
+    if it obeys homogeneity and superposition:
+    </p><p>
+    Homogeneity:        F(cx) = cF(x)
+    <br/>
+    Superposition:      F(x+y) = F(x) + F(y)
+    </p><p>
+    In the context of what we have seen so far, the only
+    elements that are linear as mathematical functions are
+    resistors.  An independent voltage source or an independent
+    current source is not a linear element.  (There are also
+    linear dependent sources, linear
+    inductors, and other linear elements, but we have not yet introduced them in our class.
+    You will see them later.)
+    </p><p>
+    Formally, a circuit composed of only linear elements is a
+    linear circuit.  When we add independent sources to a linear
+    circuit as inputs, we get a circuit that is not linear
+    because it has an offset: its v-i characteristic at a pair
+    of exposed terminals may not pass through the origin.
+    However, we can make a Thevenin or Norton equivalent model
+    of such a circuit: the Thevenin resistance summarizes the
+    effect of the linear elements and the Thevenin voltage
+    summarizes the effect of the independent sources.
+    </p><p>
+    However the term "linear," when applied to an electrical
+    circuit often takes on an informal meaning.  We often say
+    that a circuit containing only linear elements and
+    independent sources is a "linear circuit."  So, in the
+    informal sense, a linear circuit is one where we can apply
+    the Thevenin or Norton theorems to summarize the behavior at
+    a pair of exposed terminals.
+    </p><p>
+    Sorry for the confusion of words -- natural language is like
+    that!
+  </p>

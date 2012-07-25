@@ -22,6 +22,9 @@ import sys
 import os
 import tempfile
 import glob2
+import errno
+import hashlib
+from collections import defaultdict
 
 import djcelery
 from path import path
@@ -150,6 +153,7 @@ MODULESTORE = {
         'OPTIONS': {
             'data_dir': DATA_DIR,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+            'eager': True,
         }
     }
 }
@@ -182,6 +186,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
+    COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
@@ -298,7 +303,7 @@ PIPELINE_CSS = {
         'output_filename': 'css/application.css',
     },
     'course': {
-      'source_filenames': ['sass/application.scss', 'css/vendor/codemirror.css', 'css/vendor/jquery.treeview.css'],
+      'source_filenames': ['sass/application.scss', 'js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css'],
       'output_filename': 'css/course.css',
       },
     'ie-fixes': {
@@ -327,10 +332,74 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
 ]
 
+# Load javascript from all of the available xmodules, and
+# prep it for use in pipeline js
+from xmodule.x_module import XModuleDescriptor
+from xmodule.hidden_module import HiddenDescriptor
+js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
+css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
+module_styles_path = css_file_dir / "_module-styles.scss"
+
+for dir_ in (js_file_dir, css_file_dir):
+    try:
+        os.makedirs(dir_)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            pass
+        else:
+            raise
+
+js_fragments = set()
+css_fragments = defaultdict(set)
+for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
+    module_js = descriptor.module_class.get_javascript()
+    for filetype in ('coffee', 'js'):
+        for idx, fragment in enumerate(module_js.get(filetype, [])):
+            js_fragments.add((idx, filetype, fragment))
+
+    module_css = descriptor.module_class.get_css()
+    for filetype in ('sass', 'scss', 'css'):
+        for idx, fragment in enumerate(module_css.get(filetype, [])):
+            css_fragments[idx, filetype, fragment].add(descriptor.module_class.__name__)
+
+module_js_sources = []
+for idx, filetype, fragment in sorted(js_fragments):
+    path = js_file_dir / "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    with open(path, 'w') as js_file:
+        js_file.write(fragment)
+    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+
+css_imports = defaultdict(set)
+for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
+    fragment_name = "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    # Prepend _ so that sass just includes the files into a single file
+    with open(css_file_dir / '_' + fragment_name, 'w') as js_file:
+        js_file.write(fragment)
+
+    for class_ in classes:
+        css_imports[class_].add(fragment_name)
+
+with open(module_styles_path, 'w') as module_styles:
+    for class_, fragment_names in css_imports.items():
+        imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
+        module_styles.write(""".xmodule_{class_} {{ {imports} }}""".format(
+            class_=class_, imports=imports
+        ))
+
 PIPELINE_JS = {
     'application': {
         # Application will contain all paths not in courseware_only_js
         'source_filenames': [
+            pth.replace(COMMON_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+        ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
             if pth not in courseware_only_js
@@ -349,6 +418,10 @@ PIPELINE_JS = {
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/main_vendor.js',
+    },
+    'module-js': {
+        'source_filenames': module_js_sources,
+        'output_filename': 'js/modules.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],

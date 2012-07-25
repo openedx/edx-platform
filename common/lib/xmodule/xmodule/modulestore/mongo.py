@@ -1,11 +1,14 @@
 import pymongo
+
 from bson.objectid import ObjectId
+from bson.son import SON
+from fs.osfs import OSFS
+from itertools import repeat
+
 from importlib import import_module
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from mitxmako.shortcuts import render_to_string
-from bson.son import SON
-from itertools import repeat
 
 from . import ModuleStore, Location
 from .exceptions import ItemNotFoundError, InsufficientSpecificationError
@@ -61,7 +64,9 @@ class MongoModuleStore(ModuleStore):
     """
     A Mongodb backed ModuleStore
     """
-    def __init__(self, host, db, collection, port=27017, default_class=None):
+
+    # TODO (cpennington): Enable non-filesystem filestores
+    def __init__(self, host, db, collection, fs_root, port=27017, default_class=None):
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port
@@ -74,9 +79,11 @@ class MongoModuleStore(ModuleStore):
         # that is used when querying by a location
         self.collection.ensure_index(zip(('_id.' + field for field in Location._fields), repeat(1)))
 
+        # TODO (vshnayder): default arg default_class=None will make this error
         module_path, _, class_name = default_class.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
         self.default_class = class_
+        self.fs_root = fs_root
 
     def _clean_item_data(self, item):
         """
@@ -89,7 +96,9 @@ class MongoModuleStore(ModuleStore):
         """
         Returns a dictionary mapping Location -> item data, populated with json data
         for all descendents of items up to the specified depth.
-        This will make a number of queries that is linear in the depth
+        (0 = no descendents, 1 = children, 2 = grandchildren, etc)
+        If depth is None, will load all the children.
+        This will make a number of queries that is linear in the depth.
         """
         data = {}
         to_process = list(items)
@@ -104,7 +113,8 @@ class MongoModuleStore(ModuleStore):
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
             if children:
-                to_process = list(self.collection.find({'_id': {'$in': [Location(child).dict() for child in children]}}))
+                to_process = list(self.collection.find(
+                    {'_id': {'$in': [Location(child).dict() for child in children]}}))
             else:
                 to_process = []
             # If depth is None, then we just recurse until we hit all the descendents
@@ -113,28 +123,52 @@ class MongoModuleStore(ModuleStore):
 
         return data
 
+    def _load_item(self, item, data_cache):
+        """
+        Load an XModuleDescriptor from item, using the children stored in data_cache
+        """
+        resource_fs = OSFS(self.fs_root / item.get('data_dir', item['location']['course']))
+        system = CachingDescriptorSystem(
+            self,
+            data_cache,
+            self.default_class,
+            resource_fs,
+            render_to_string
+        )
+        return system.load_item(item['location'])
+
     def _load_items(self, items, depth=0):
         """
         Load a list of xmodules from the data in items, with children cached up to specified depth
         """
         data_cache = self._cache_children(items, depth)
-        system = CachingDescriptorSystem(self, data_cache, self.default_class, None, render_to_string)
-        return [system.load_item(item['location']) for item in items]
+
+        return [self._load_item(item, data_cache) for item in items]
+
+    def get_courses(self):
+        '''
+        Returns a list of course descriptors.
+        '''
+        # TODO (vshnayder): Why do I have to specify i4x here?
+        course_filter = Location("i4x", category="course")
+        return self.get_items(course_filter)
 
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the most item with the most
-        recent revision
+        If location.revision is None, returns the item with the most
+        recent revision.
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
+        If no object is found at that location, raises
+            xmodule.modulestore.exceptions.ItemNotFoundError
 
         location: a Location object
-        depth (int): An argument that some module stores may use to prefetch descendents of the queried modules
-            for more efficient results later in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all descendents
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents.
 
         """
 

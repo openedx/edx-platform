@@ -13,16 +13,17 @@ from .exceptions import GithubSyncError
 log = logging.getLogger(__name__)
 
 
-def import_from_github(repo_settings):
+def setup_repo(repo_settings):
     """
-    Imports data into the modulestore based on the XML stored on github
+    Reset the local github repo specified by repo_settings
 
     repo_settings is a dictionary with the following keys:
         path: file system path to the local git repo
         branch: name of the branch to track on github
+        origin: git url for the repository to track
     """
-    repo_path = repo_settings['path']
-    data_dir, course_dir = os.path.split(repo_path)
+    course_dir = repo_settings['path']
+    repo_path = settings.GITHUB_REPO_ROOT / course_dir
 
     if not os.path.isdir(repo_path):
         Repo.clone_from(repo_settings['origin'], repo_path)
@@ -33,8 +34,29 @@ def import_from_github(repo_settings):
 
     # Do a hard reset to the remote branch so that we have a clean import
     git_repo.git.checkout(repo_settings['branch'])
+
+    return git_repo
+
+
+def load_repo_settings(course_dir):
+    """
+    Returns the repo_settings for the course stored in course_dir
+    """
+    for repo_settings in settings.REPOS.values():
+        if repo_settings['path'] == course_dir:
+            return repo_settings
+    raise InvalidRepo(course_dir)
+
+
+def import_from_github(repo_settings):
+    """
+    Imports data into the modulestore based on the XML stored on github
+    """
+    course_dir = repo_settings['path']
+    git_repo = setup_repo(repo_settings)
     git_repo.head.reset('origin/%s' % repo_settings['branch'], index=True, working_tree=True)
-    module_store = import_from_xml(data_dir, course_dirs=[course_dir])
+
+    module_store = import_from_xml(settings.GITHUB_REPO_ROOT, course_dirs=[course_dir])
     return git_repo.head.commit.hexsha, module_store.courses[course_dir]
 
 
@@ -44,14 +66,16 @@ def export_to_github(course, commit_message, author_str=None):
     and push to github (if MITX_FEATURES['GITHUB_PUSH'] is True).
     If author_str is specified, uses it in the commit.
     '''
-    repo_path = settings.DATA_DIR / course.metadata.get('course_dir', course.location.course)
-    fs = OSFS(repo_path)
+    course_dir = course.metadata.get('data_dir', course.location.course)
+    repo_settings = load_repo_settings(course_dir)
+    git_repo = setup_repo(repo_settings)
+
+    fs = OSFS(git_repo.working_dir)
     xml = course.export_to_xml(fs)
 
     with fs.open('course.xml', 'w') as course_xml:
         course_xml.write(xml)
 
-    git_repo = Repo(repo_path)
     if git_repo.is_dirty():
         git_repo.git.add(A=True)
         if author_str is not None:

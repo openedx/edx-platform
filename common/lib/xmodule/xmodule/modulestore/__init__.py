@@ -45,7 +45,7 @@ class Location(_LocationBase):
         """
         return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
 
-    def __new__(_cls, loc_or_tag, org=None, course=None, category=None, name=None, revision=None):
+    def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None, name=None, revision=None):
         """
         Create a new location that is a clone of the specifed one.
 
@@ -70,10 +70,14 @@ class Location(_LocationBase):
         wildcard selection
         """
 
+
         if org is None and course is None and category is None and name is None and revision is None:
             location = loc_or_tag
         else:
             location = (loc_or_tag, org, course, category, name, revision)
+
+        if location is None:
+            return _LocationBase.__new__(_cls, *([None] * 6))
 
         def check_dict(dict_):
             check_list(dict_.itervalues())
@@ -217,3 +221,11 @@ class ModuleStore(object):
         metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError
+
+    def get_courses(self):
+        '''
+        Returns a list containing the top level XModuleDescriptors of the courses
+        in this modulestore.
+        '''
+        raise NotImplementedError
+

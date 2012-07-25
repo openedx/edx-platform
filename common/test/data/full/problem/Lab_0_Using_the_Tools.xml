@@ -1,0 +1,115 @@
+<problem><startouttext/><br/>In this first lab, the goal is to familiarize yourself with the
+interactive tool that will be used to enter and analyze circuits.  Here's
+the example schematic used below:
+
+<br/><center><input type="hidden" class="schematic" analyses="" parts="" origin_x="50" origin_y="20" width="400" height="350" name="fig1" value="[[&quot;w&quot;,[120,160,144,160]],[&quot;v&quot;,[48,64,0],{&quot;name&quot;:&quot;Vsupply&quot;,&quot;value&quot;:&quot;dc(3)&quot;,&quot;_json_&quot;:1},[&quot;A&quot;,&quot;D&quot;]],[&quot;r&quot;,[120,64,0],{&quot;name&quot;:&quot;R2&quot;,&quot;r&quot;:&quot;3k&quot;,&quot;_json_&quot;:2},[&quot;B&quot;,&quot;C&quot;]],[&quot;r&quot;,[120,16,0],{&quot;name&quot;:&quot;R1&quot;,&quot;r&quot;:&quot;1k&quot;,&quot;_json_&quot;:3},[&quot;A&quot;,&quot;B&quot;]],[&quot;r&quot;,[120,112,0],{&quot;name&quot;:&quot;R3&quot;,&quot;r&quot;:&quot;2k&quot;,&quot;_json_&quot;:4},[&quot;C&quot;,&quot;D&quot;]],[&quot;w&quot;,[48,64,48,16]],[&quot;w&quot;,[48,16,120,16]],[&quot;w&quot;,[48,112,48,160]],[&quot;w&quot;,[48,160,120,160]],[&quot;w&quot;,[120,112,144,112]],[&quot;w&quot;,[120,64,144,64]],[&quot;w&quot;,[120,16,144,16]],[&quot;L&quot;,[144,16,3],{&quot;label&quot;:&quot;A&quot;,&quot;_json_&quot;:12},[&quot;A&quot;]],[&quot;L&quot;,[144,64,3],{&quot;label&quot;:&quot;B&quot;,&quot;_json_&quot;:13},[&quot;B&quot;]],[&quot;L&quot;,[144,112,3],{&quot;label&quot;:&quot;C&quot;,&quot;_json_&quot;:14},[&quot;C&quot;]],[&quot;g&quot;,[48,160,0],{&quot;_json_&quot;:15},[&quot;D&quot;]],[&quot;L&quot;,[144,160,3],{&quot;label&quot;:&quot;D&quot;,&quot;_json_&quot;:16},[&quot;D&quot;]],[&quot;view&quot;,0,0,2,&quot;5&quot;,&quot;10&quot;,&quot;10MEG&quot;,null,&quot;100&quot;,&quot;1&quot;]]"/>
+Figure 1.  Test Circuit for Lab 0
+</center><br/>And here's the interactive tool to be used in the tasks that follow:
+
+<endouttext/><schematicresponse><startouttext/><br/><center><schematic analyses="dc,tran" parts="g,L,v,r,s" name="work" value="" width="600" height="400"/></center><endouttext/><answer type="loncapa/python">
+correct = ['correct']
+</answer></schematicresponse><startouttext/><br/>Please do the following tasks.  When you're done, remember to click CHECK to preserve
+your work and to verify your answers.
+
+<ol style="list-style-type:decimal; margin-left: 2em;"><br/><li><b>Enter schematic.</b> Add the voltage source, resistors,
+wires and ground reference to your diagram, connected as shown
+in <nobr>Figure 1</nobr>.</li><br/><li><b>Measure voltages.</b> Use the tool to run a DC analysis on
+the circuit, i.e.., click on the DC button in the toolbar.  This will
+annotate each node/voltage source in the circuit with a
+voltage/current.  If the components are wired correctly, the
+voltage for node D should be reported as 0V since it's
+connected to the ground reference and the voltage for node A
+should be reported as 3V since it is connected directly to the
+positive terminal of a 3V voltage source whose negative terminal
+is connected to ground.  Please enter the voltages reported for nodes
+B and C.
+
+<br/><div style="margin-left: 4em;">
+Voltage for node B (volts):
+<numericalresponse answer="2.5"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Voltage for node C (volts):
+<numericalresponse answer="1.0"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+</li><br/><li><b>Measure current.</b>
+
+The DC analysis annotates each voltage source with the current it is
+providing to the rest of the circuit. The simulator denotes the sign
+of the source current as positive if the current is flowing out of the
+positive terminal of the source, through the rest of the circuit, and
+then back in to the negative terminal.  And the source current sign is
+negative if the current is flowing out of the negative terminal of the
+source, through the circuit, and into the positive terminal of the
+source. Please report the total resistance of the path connecting the
+positive and negative terminals of the source, the signed current
+flowing from the source into the circuit, and (using the voltage
+value for the source) verify that Ohm's law is obeyed.
+
+<br/><div style="margin-left: 4em;">
+Total resistance between pos and neg terminals (ohms):
+<numericalresponse answer="6000"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Current flowing from source into the circuit (amps, with correct sign):
+<numericalresponse answer="500e-6"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+</li><br/><li><b>Verify KVL.</b> The four components in the schematic form a
+large loop -- let's verify that Kirchoff's Voltage Law holds by
+summing the voltage changes across the devices.  Starting with node A,
+travel clockwise around the loop of components, entering the voltage
+change across each component.  Choose the sign of the change for a
+component using the first terminal you come to in the clockwise
+traversal as the reference node.  Verify that these four values sum
+to 0.
+
+<br/>
+<div style="margin-left: 4em;">
+Voltage change across R1 (volts, with correct sign):
+<numericalresponse answer="-0.5"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Voltage change across R2 (volts, with correct sign):
+<numericalresponse answer="-1.5"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Voltage change across R3 (volts, with correct sign):
+<numericalresponse answer="-1.0"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Voltage change across Vsupply (volts, with correct sign):
+<numericalresponse answer="3.0"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+</li><br/><li><b>Transient analysis.</b> Change the waveform produced by
+the voltage source from a DC value of 3V to a sinusoid with a 1V
+amplitude, an offset voltage of 1V, and a frequency of 1kHz.  Add
+scope probes to nodes A, B and C and edit their properties so that the
+plots will be different colors. Now run a transient analysis for 5ms.
+Move the mouse over the plot until the marker (a vertical dashed line
+that follows the mouse when it's over the plot) is at approximately
+1.25ms.  Please report the measured voltages for nodes A, B and C.
+
+<br/>
+<div style="margin-left: 4em;">
+Voltage for node A (volts):
+<numericalresponse answer="1.995"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Voltage for node B (volts):
+<numericalresponse answer="1.662"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+<div style="margin-left: 4em;">
+Voltage for node C (volts):
+<numericalresponse answer=".665"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+</div>
+
+</li></ol><endouttext/></problem>
