@@ -231,6 +231,8 @@ class XmlDescriptor(XModuleDescriptor):
         xml_object = self.definition_to_xml(resource_fs)
         self.__class__.clean_metadata_from_xml(xml_object)
 
+        xml_object.tag = self.category
+        xml_object.set('slug', self.name)
         # Put content in a separate file if it's large (has more than 5 descendent tags)
         if len(list(xml_object.iter())) > 5:
 
@@ -243,9 +245,6 @@ class XmlDescriptor(XModuleDescriptor):
                 xml_object.remove(child)
 
             xml_object.set('filename', self.name)
-
-        xml_object.set('slug', self.name)
-        xml_object.tag = self.category
 
         for attr in self.metadata_attributes:
             attr_map = self.xml_attribute_map.get(attr, AttrMap(attr))
