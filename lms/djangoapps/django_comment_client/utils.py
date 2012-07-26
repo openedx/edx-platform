@@ -35,9 +35,6 @@ def get_discussion_title(request, course, discussion_id):
     if not _DISCUSSIONINFO:
         initialize_discussion_info(request, course)
     title = _DISCUSSIONINFO['by_id'].get(discussion_id, {}).get('title', '(no title)')
-    if title == '(no title)':
-        print "title shouldn't be none"
-        import pdb; pdb.set_trace()
     return title
 
 def initialize_discussion_info(request, course):
