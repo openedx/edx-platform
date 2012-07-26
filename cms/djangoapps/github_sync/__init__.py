@@ -16,6 +16,24 @@ log = logging.getLogger(__name__)
 RepoSettings = namedtuple('RepoSettings', 'path branch origin')
 
 
+def sync_all_with_github():
+    """
+    Sync all defined repositories from github
+    """
+    for repo_name in settings.REPOS:
+        sync_with_github(load_repo_settings(repo_name))
+
+
+def sync_with_github(repo_settings):
+    """
+    Sync specified repository from github
+
+    repo_settings: A RepoSettings defining which repo to sync
+    """
+    revision, course = import_from_github(repo_settings)
+    export_to_github(course, "Changes from cms import of revision %s" % revision, "CMS <cms@edx.org>")
+
+
 def setup_repo(repo_settings):
     """
     Reset the local github repo specified by repo_settings

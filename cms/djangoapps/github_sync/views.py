@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django_future.csrf import csrf_exempt
 
-from . import import_from_github, export_to_github
+from . import sync_with_github, load_repo_settings
 
 log = logging.getLogger()
 
@@ -40,13 +40,12 @@ def github_post_receive(request):
         log.info('No repository matching %s found' % repo_name)
         return HttpResponse('No Repo Found')
 
-    repo = settings.REPOS[repo_name]
+    repo = load_repo_settings(repo_name)
 
-    if repo['branch'] != branch_name:
+    if repo.branch != branch_name:
         log.info('Ignoring changes to non-tracked branch %s in repo %s' % (branch_name, repo_name))
         return HttpResponse('Ignoring non-tracked branch')
 
-    revision, course = import_from_github(repo)
-    export_to_github(course, repo['path'], "Changes from cms import of revision %s" % revision)
+    sync_with_github(repo)
 
     return HttpResponse('Push received')

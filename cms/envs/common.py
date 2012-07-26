@@ -309,6 +309,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
+    'github_sync',
     'student',  # misleading name due to sharing with lms
 
     # For asset pipelining
