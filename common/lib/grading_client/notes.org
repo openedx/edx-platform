@@ -1,0 +1,112 @@
+Notes on refactoring grading queue
+
+* Routes:
+  resources :users do
+    get 'get_by_external_id', :on => :collection
+  end
+  resources :rubrics do
+    resources :entries, :controller => :rubric_entries
+  end
+
+  resources :groups do
+    resources :memberships, :controller => :group_memberships, :only=>[:create, :destroy, :index] do
+      delete 'by_user_id', :on=> :collection
+    end
+  end
+
+  resources :questions do
+    get 'get_by_external_id', :on => :collection
+    resources :submissions do
+      resources :evaluations
+      get 'last', :on => :collection
+    end
+    # This is an evil bit of trickery to require a user_id in the url. This might be a Bad Thing
+    # TODO: move into params[]
+    # TODO Document not obvious things here
+    resources :users, :only=>[] do
+      resources :tasks do
+        post 'request_work', :on => :collection
+      end
+    end
+    resource :grading_configuration, :only=>[:update, :show] do
+      resources :examples
+      resources :group_roles
+    end
+  end
+
+* Potential use case/workflow/story:
+  Flipped classroom model, CS188 being taught online
+  Local students are graded by readers, rubric is created by instructors by flipping through
+  Readers are assigned local students' submissions to grade - each student gets graded by 1 reader
+  Online students then peer grade themselves, grouped by language (let's say we have English speakers and Mandarin speakers, for instance)
+
+* Instructors - Before Submission deadline
+** Create Users (just used as a reference, don't need to authenticate)
+** Create Questions (possibly multiple questions for one external question)
+** Configure groups of submitters and graders for each group
+*** TODO Come up with a better name than GroupRole
+** Configure parameters such as weights and number of gradings needed
+
+* Local Students - Before deadline
+** Accept submissions via some sort of hook
+*** Can submit via external ID and have them sorted into the proper question for the user
+**** Putting the same user in submitter groups for multiple questions is an undefined, but allowed operation (probably not hard to disallow it completely though)
+
+* Instructors - Post submission deadline
+** Grade any submissions they want, creating a rubric as they go along
+** TODO Browse submissions easily, by user -  edX side
+*** Important at this phase that multiple instructors can grade independently and the system tracs all evaluations
+*** TODO Notify instructors of other instructors' rubric additions (?) (maybe we just assume that instructors create a rubric together)
+*** TODO Notify instructors of other instructors' evaluations, potentially even track in real time ("Another instructor is grading this submission")
+*** TODO Need service calls for "Begin Evaluation" and "End Evaluation"
+**** Could use some nice in-memory storage option for this (perhaps redis?) [Perhaps a redis-set of current graders]
+     Model: CurrentGraders=>(submission:references, graderset:redis_set)
+     Graders Set stores user_ids of current graders
+     API: /questions/1/submissions/12/current_graders/{index,create,destroy}
+**** Some sort of websocket or other ongoing connection, or just poll periodically for current graders
+
+* Once a rubric is created and finalized, instructors open grading for readers
+** Readers could potentially come up with the rubric themselves too.
+    Rubric permissions: We can either restrict rubric editing to admins, or allow graders to edit as well
+    The other model is to just allow anyone to edit the rubric but have a lock toggle so that instructors can lock it once it's finalized
+** Graders open the grading page, see that they have X things left to grade, and can immediately start grading by question
+*** TODO Grader todo pages
+** Instructors can monitor progress of graders and send them some sort of message to hurry up
+*** TODO Things left to grade view
+*** TODO Graders view
+    The table I had before would show you both what submissions need grading and
+    what students need to finish but in the case of asymmetric grading this
+    doesn't make sense
+
+* After grading period is closed, grades are finalized
+   Could run inference algorithm here
+   Instructor can see results, export data, etc.
+** Instructor manually approves grades to be shown (edX)
+
+* Local students can view grades, view stats, submit regrade requests
+** TODO Figure out where regrade requests go
+
+* Instructor - for remote class
+** Sets up grading configurations per group (using some tool)
+** Selects training examples from the pool of locally graded submissions
+
+* Remote students submit
+** Service sorts their submission into the appropriate bins
+** New questions have the same rubric as the local question
+
+* After remote submission deadline
+** Can't submit anymore
+
+* Peer grading for remote students begins
+** Students have presumably provided some information by which we have grouped them
+** Students go to a page to see what they have to do
+** If not finished training, give training examples
+*** TODO Structure training in such a way that you don't have to persist the evaluation, just keep track of how many they finished
+** Once training completed, students can ask for work
+   Do we know what service Question they belong to? Does it matter? What does this call look like from the client?
+   They get the same UI that local graders got
+   Pop submissions off of the right priority queue
+
+* TODO Benchmark redis performance (for eg. thousands of insertions, priority updates, etc)
+* Pseudo-code using a hypothetical API (basically the API I would want to have)
+** See demo.py
