@@ -429,6 +429,21 @@ PIPELINE_JS = {
     }
 }
 
+if os.path.isdir(DATA_DIR):
+    for course_dir in os.listdir(DATA_DIR):
+        js_dir = DATA_DIR / course_dir / "js"
+        if not os.path.isdir(js_dir):
+            continue
+        for filename in os.listdir(js_dir):
+            if filename.endswith('coffee'):
+                new_filename = os.path.splitext(filename)[0] + ".js"
+                if os.path.exists(js_dir / new_filename):
+                    coffee_timestamp = os.stat(js_dir / filename).st_mtime
+                    js_timestamp     = os.stat(js_dir / new_filename).st_mtime
+                    if coffee_timestamp <= js_timestamp:
+                        continue
+                os.system("coffee -c %s" % (js_dir / filename))
+
 PIPELINE_COMPILERS = [
     'pipeline.compilers.sass.SASSCompiler',
     'pipeline.compilers.coffee.CoffeeScriptCompiler',
