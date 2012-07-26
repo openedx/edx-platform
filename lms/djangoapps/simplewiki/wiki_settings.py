@@ -94,18 +94,18 @@ WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
                             ])
 
 
-WIKI_IMAGE_EXTENSIONS       = getattr(settings, 
+WIKI_IMAGE_EXTENSIONS = getattr(settings,
                                 'SIMPLE_WIKI_IMAGE_EXTENSIONS',
-                                ('jpg','jpeg','gif','png','tiff','bmp'))
+                                ('jpg', 'jpeg', 'gif', 'png', 'tiff', 'bmp'))
 # Planned features
-WIKI_PAGE_WIDTH             = getattr(settings, 
+WIKI_PAGE_WIDTH = getattr(settings,
                                 'SIMPLE_WIKI_PAGE_WIDTH', "100%")
-                                
-WIKI_PAGE_ALIGN             = getattr(settings, 
+
+WIKI_PAGE_ALIGN = getattr(settings,
                                 'SIMPLE_WIKI_PAGE_ALIGN', "center")
-                                
-WIKI_IMAGE_THUMB_SIZE       = getattr(settings, 
-                                'SIMPLE_WIKI_IMAGE_THUMB_SIZE', (200,150))
-                                
-WIKI_IMAGE_THUMB_SIZE_SMALL = getattr(settings, 
-                                'SIMPLE_WIKI_IMAGE_THUMB_SIZE_SMALL', (100,100))
+
+WIKI_IMAGE_THUMB_SIZE = getattr(settings,
+                                'SIMPLE_WIKI_IMAGE_THUMB_SIZE', (200, 150))
+
+WIKI_IMAGE_THUMB_SIZE_SMALL = getattr(settings,
+                                'SIMPLE_WIKI_IMAGE_THUMB_SIZE_SMALL', (100, 100))

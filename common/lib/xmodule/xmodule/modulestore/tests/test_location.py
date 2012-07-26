@@ -44,12 +44,16 @@ def test_location():
     assert_equals("tag://org/course/category/name", Location(Location(input_list)).url())
 
 
+def test_none():
+    assert_equals([None] * 6, Location(None).list())
+
+
 def test_invalid_locations():
     assert_raises(InvalidLocationError, Location, "foo")
     assert_raises(InvalidLocationError, Location, ["foo", "bar"])
     assert_raises(InvalidLocationError, Location, ["foo", "bar", "baz", "blat", "foo/bar"])
-    assert_raises(InvalidLocationError, Location, None)
     assert_raises(InvalidLocationError, Location, "tag://org/course/category/name with spaces/revision")
+
 
 def test_equality():
     assert_equals(

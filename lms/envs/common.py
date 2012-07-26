@@ -22,6 +22,9 @@ import sys
 import os
 import tempfile
 import glob2
+import errno
+import hashlib
+from collections import defaultdict
 
 import djcelery
 from path import path
@@ -41,6 +44,10 @@ MITX_FEATURES = {
     'DISPLAY_HISTOGRAMS_TO_STAFF' : True,
     'REROUTE_ACTIVATION_EMAIL' : False,		# nonempty string = address for all activation emails 
     'DEBUG_LEVEL' : 0,				# 0 = lowest level, least verbose, 255 = max level, most verbose
+
+    ## DO NOT SET TO True IN THIS FILE
+    ## Doing so will cause all courses to be released on production
+    'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 }
 
 # Used for A/B testing
@@ -104,6 +111,9 @@ LIB_URL = '/static/js/'
 # Dev machines shouldn't need the book
 # BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/' # For AWS deploys
+# RSS_URL = r'lms/templates/feed.rss'
+# PRESS_URL = r''
+RSS_TIMEOUT = 600
 
 # Configuration option for when we want to grab server error pages
 STATIC_GRAB = False
@@ -144,6 +154,7 @@ MODULESTORE = {
         'OPTIONS': {
             'data_dir': DATA_DIR,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+            'eager': True,
         }
     }
 }
@@ -156,17 +167,17 @@ TEMPLATE_DEBUG = False
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "localhost:8000"
+SITE_NAME = "edx.org"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@mitx.mit.edu'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
+DEFAULT_FROM_EMAIL = 'registration@edx.org'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 ADMINS = (
-    ('MITx Admins', 'admin@mitx.mit.edu'),
+    ('edX Admins', 'admin@edx.org'),
 )
 MANAGERS = ADMINS
 
@@ -176,6 +187,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
+    COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
@@ -260,7 +272,6 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'util.middleware.ExceptionLoggingMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -292,14 +303,126 @@ PIPELINE_CSS = {
         'source_filenames': ['sass/application.scss'],
         'output_filename': 'css/application.css',
     },
+    'course': {
+      'source_filenames': ['sass/course.scss', 'js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css'],
+      'output_filename': 'css/course.css',
+      },
+    'ie-fixes': {
+        'source_filenames': ['sass/ie.scss'],
+        'output_filename': 'css/ie.css',
+    },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss']
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/course.scss']
+
+courseware_only_js = [
+    PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
+    for pth
+    in ['courseware', 'histogram', 'navigation', 'time', ]
+]
+courseware_only_js += [
+    pth for pth
+    in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee')
+]
+
+main_vendor_js = [
+  'js/vendor/jquery.min.js',
+  'js/vendor/jquery-ui.min.js',
+  'js/vendor/swfobject/swfobject.js',
+  'js/vendor/jquery.cookie.js',
+  'js/vendor/jquery.qtip.min.js',
+]
+
+# Load javascript from all of the available xmodules, and
+# prep it for use in pipeline js
+from xmodule.x_module import XModuleDescriptor
+from xmodule.hidden_module import HiddenDescriptor
+js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
+css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
+module_styles_path = css_file_dir / "_module-styles.scss"
+
+for dir_ in (js_file_dir, css_file_dir):
+    try:
+        os.makedirs(dir_)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            pass
+        else:
+            raise
+
+js_fragments = set()
+css_fragments = defaultdict(set)
+for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
+    module_js = descriptor.module_class.get_javascript()
+    for filetype in ('coffee', 'js'):
+        for idx, fragment in enumerate(module_js.get(filetype, [])):
+            js_fragments.add((idx, filetype, fragment))
+
+    module_css = descriptor.module_class.get_css()
+    for filetype in ('sass', 'scss', 'css'):
+        for idx, fragment in enumerate(module_css.get(filetype, [])):
+            css_fragments[idx, filetype, fragment].add(descriptor.module_class.__name__)
+
+module_js_sources = []
+for idx, filetype, fragment in sorted(js_fragments):
+    path = js_file_dir / "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    with open(path, 'w') as js_file:
+        js_file.write(fragment)
+    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+
+css_imports = defaultdict(set)
+for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
+    fragment_name = "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    # Prepend _ so that sass just includes the files into a single file
+    with open(css_file_dir / '_' + fragment_name, 'w') as js_file:
+        js_file.write(fragment)
+
+    for class_ in classes:
+        css_imports[class_].add(fragment_name)
+
+with open(module_styles_path, 'w') as module_styles:
+    for class_, fragment_names in css_imports.items():
+        imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
+        module_styles.write(""".xmodule_{class_} {{ {imports} }}""".format(
+            class_=class_, imports=imports
+        ))
 
 PIPELINE_JS = {
     'application': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
+        # Application will contain all paths not in courseware_only_js
+        'source_filenames': [
+            pth.replace(COMMON_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+        ] + [
+            pth.replace(PROJECT_ROOT / 'static/', '')
+            for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
+            if pth not in courseware_only_js
+        ] + [
+            'js/form.ext.js',
+            'js/my_courses_dropdown.js',
+            'js/toggle_login_modal.js',
+            'js/sticky_filter.js',
+        ],
         'output_filename': 'js/application.js'
+    },
+    'courseware': {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in courseware_only_js],
+        'output_filename': 'js/courseware.js'
+    },
+    'main_vendor': {
+        'source_filenames': main_vendor_js,
+        'output_filename': 'js/main_vendor.js',
+    },
+    'module-js': {
+        'source_filenames': module_js_sources,
+        'output_filename': 'js/modules.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],

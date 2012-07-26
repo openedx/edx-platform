@@ -1,0 +1,10 @@
+<sequential>
+  <sequential filename="Administrivia_and_Circuit_Elements" slug="Administrivia_and_Circuit_Elements" format="Lecture Sequence" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Administrivia and Circuit Elements"/>
+  <vertical slug="Basic_Circuit_Analysis" format="Homework" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="per_student" due="March 18" graded="true" name="Basic Circuit Analysis">
+    <problem filename="H1P1_Energy" slug="H1P1_Energy" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="per_student" due="March 18" graded="true" name="H1P1: Energy"/>
+    <problem filename="H1P2_Duality" slug="H1P2_Duality" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="per_student" due="March 18" graded="true" name="H1P2: Duality"/>
+    <problem filename="H1P3_Poor_Workmanship" slug="H1P3_Poor_Workmanship" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="closed" rerandomize="per_student" due="March 18" graded="true" name="H1P3: Poor Workmanship"/>
+  </vertical>
+  <problem filename="Resistor_Divider" slug="Resistor_Divider" format="Lab" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" due="March 18" graded="true" name="Resistor Divider"/>
+  <html filename="Week_1_Tutorials" slug="Week_1_Tutorials" format="Tutorial Index" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Week 1 Tutorials"/>
+</sequential>

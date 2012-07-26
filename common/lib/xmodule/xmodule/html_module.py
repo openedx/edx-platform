@@ -4,7 +4,6 @@ from lxml import etree
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.courseware")
 
@@ -25,9 +24,6 @@ class HtmlDescriptor(RawDescriptor):
     mako_template = "widgets/html-edit.html"
     module_class = HtmlModule
     filename_extension = "html"
-
-    js = {'coffee': [resource_string(__name__, 'js/module/html.coffee')]}
-    js_module = 'HTML'
 
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms

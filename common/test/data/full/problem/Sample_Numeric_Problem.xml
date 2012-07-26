@@ -1,0 +1,8 @@
+<problem><startouttext/>
+Enter the numerical value of the expression \(x + y\) where 
+\(x = 3\) and \(y = 5\).
+<endouttext/>
+
+<numericalresponse answer="8"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
+
+</problem>

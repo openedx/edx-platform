@@ -1,58 +1,92 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django_countries.countries import COUNTRIES %>
+<%! from student.models import UserProfile %>
+<%! from datetime import date %>
+<%! import calendar %>
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
-    <div id="enroll">
+    <div id="register">
       <header>
-        <h2>Sign Up for edX</h2>
+        <h2>Sign Up for <span class="edx">edX</span></h2>
         <hr>
       </header>
 
-      <form id="enroll_form" method="post">
-        <div id="enroll_error" name="enroll_error"></div>
-        <label>E-mail</label>
-        <input name="email" type="email" placeholder="E-mail">
-        <label>Password</label>
-        <input name="password" type="password" placeholder="Password">
-        <label>Public Username</label>
-        <input name="username" type="text" placeholder="Public Username">
-        <label>Full Name</label>
-        <input name="name" type="text" placeholder="Full Name">
-        <label>Your Location</label>
-        <input name="location" type="text" placeholder="Your Location">
-        <label>Preferred Language</label>
-        <input name="language" type="text" placeholder="Preferred Language">
-        <label class="terms-of-service">
-          <input name="terms_of_service" type="checkbox" value="true">
-          I agree to the
-          <a href="${reverse('tos')}">Terms of Service</a>
-        </label>
-        <label class="honor-code">
-          <input name="honor_code" type="checkbox" value="true">
-          I agree to the
-          <a href="${reverse('honor')}" target="blank">Honor Code</a>
-        </label>
+      <form id="register_form" class="register_form" method="post" data-remote="true" action="/create_account">
+        <div class="notice"></div>
+        <div id="register_error" class="modal-form-error" name="register_error"></div>
+        <div id="register_error" name="register_error"></div>
 
-          <!--
-             -<div class="honor-code-summary">
-             -  <ul>
-             -    <li>
-             -      <p>Complete all mid-terms and final exams with only my own work.</p>
-             -    </li>
-             -    <li>
-             -      <p>Maintain only one account, and not share the username or password.</p>
-             -    </li>
-             -    <li>
-             -      <p>Not engage in any activity that would dishonestly improve my results, or improve or hurt those of others.</p>
-             -    </li>
-             -    <li>
-             -      <p>Not post answers to problems that are being used to assess student performance.</p>
-             -    </li>
-             -  </ul>
-             -  <hr>
-             -</div>
-             -->
+        <div class="input-group">
+          <label>E-mail*</label>
+          <input name="email" type="email" placeholder="E-mail*">
+          <label>Password*</label>
+          <input name="password" type="password" placeholder="Password*">
+          <label>Public Username*</label>
+          <input name="username" type="text" placeholder="Public Username*">
+          <label>Full Name</label>
+          <input name="name" type="text" placeholder="Full Name*">
+        </div>
+
+        <div class="input-group">
+          <section class="citizenship">
+            <label>Ed. completed</label>
+            <div class="input-wrapper">
+              <select name="level_of_education">
+                  <option value="">--</option>
+                  %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
+                      <option value="${code}">${ed_level}</option>
+                  %endfor
+              </select>
+            </div>
+          </section>
+
+          <section class="gender">
+            <label>Gender</label>
+            <div class="input-wrapper">
+              <select name="gender">
+                  <option value="">--</option>
+                  %for code, gender in UserProfile.GENDER_CHOICES:
+                      <option value="${code}">${gender}</option>
+                  %endfor
+              </select>
+            </div>
+          </section>
+
+          <section class="date-of-birth">
+            <label>Year of birth</label>
+            <div class="input-wrapper">
+              <select name="year_of_birth">
+                <option value="">--</option>
+                %for year in UserProfile.VALID_YEARS:
+                  <option value="${year}">${year}</option>
+                %endfor
+              </select>
+              ##<input name="year_of_birth" type="text" placeholder="Year of birth">
+            </div>
+          </section>
+
+          <label>Mailing address</label>
+          <textarea name="mailing_address" placeholder="Mailing address"></textarea>
+          <label>Goals in signing up for edX</label>
+          <textarea name="goals" placeholder="Goals in signing up for edX"></textarea>
+
+        </div>
+
+        <div class="input-group">
+          <label class="terms-of-service">
+            <input name="terms_of_service" type="checkbox" value="true">
+            I agree to the
+            <a href="${reverse('tos')}" target="_blank">Terms of Service</a>*
+          </label>
+
+          <label class="honor-code">
+            <input name="honor_code" type="checkbox" value="true">
+            I agree to the
+            <a href="${reverse('honor')}" target="_blank">Honor Code</a>*
+          </label>
+        </div>
 
         <div class="submit">
           <input name="submit" type="submit" value="Create My Account">
@@ -77,34 +111,12 @@
 
 <script type="text/javascript">
   (function() {
-    function getCookie(name) {
-      return $.cookie(name);
-    }
-
-    function postJSON(url, data, callback) {
-      $.ajax({type:'POST',
-        url: url,
-        dataType: 'json',
-        data: data,
-        success: callback,
-        headers : {'X-CSRFToken':getCookie('csrftoken')}
-      });
-    }
-
-    $('form#enroll_form').submit(function(e) {
-      e.preventDefault();
-      var submit_data = $('#enroll_form').serialize();
-
-      postJSON('/create_account',
-        submit_data,
-        function(json) {
-          if(json.success) {
-            $('#enroll').html(json.value);
-          } else {
-            $('#enroll_error').html(json.value).stop().css("display", "block");
-          }
-        }
-      );
+   $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
+     if(json.success) {
+       location.href="${reverse('dashboard')}";
+     } else {
+       $('#register_error').html(json.value).stop().css("display", "block");
+     }
     });
   })(this)
 </script>

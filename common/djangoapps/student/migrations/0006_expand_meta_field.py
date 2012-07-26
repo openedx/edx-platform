@@ -4,19 +4,18 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Changing field 'UserProfile.meta'
         db.alter_column('auth_userprofile', 'meta', self.gf('django.db.models.fields.TextField')())
 
-
     def backwards(self, orm):
-        
+
         # Changing field 'UserProfile.meta'
         db.alter_column('auth_userprofile', 'meta', self.gf('django.db.models.fields.CharField')(max_length=255))
-
 
     models = {
         'auth.group': {

@@ -3,33 +3,42 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>Help - MITx 6.002x</title></%block>
+<%block name="title"><title>edX Help</title></%block>
 
 <section class="static-container help">
   <h1>Help</h1>
   <hr class="horizontal-divider">
 
-  <div class="inner-wrapper">
-    <h2>Self-help</h2>
+  <section class="questions">
+    <article class="response">
+      <h2>I tried to sign up, but it says the username is already taken.</h2>
+      <p>If you have previously signed up for an MITx account, you already have an edX account and can log in with your existing username and password. If you don’t have an MITx account and received this error, it's possible that someone else has already signed up with that username. Please try a different, more unique username &ndash; for example, try adding a random number to the end.</p>
+    </article>
+    <article class="response">
+      <h2>How will I know that the course I have signed up for has started?</h2>
+      <p>The start date for each course is listed on the right-hand side of the Course About page.</p>
+    </article>
+    <article class="response">
+      <h2>I just signed up into edX. I have not received any form of acknowledgement that I have enrolled.</h2>
+      <p>You should receive a single activation e-mail. If you did not, it may be because:</p>
+      <ul>
+        <li>There was a typo in your e-mail address.</li>
+        <li>The activation e-mail was caught by your spam filter. Please check your spam folder.</li>
+        <li>You may be using an older browser. We recommend downloading the current version of Firefox or Chrome.</li>
+        <li>JavaScript is disabled in your browser. Please confirm it is enabled.</li>
+        <li>If you run into issues, try recreating your account. There is no need to do anything about the old account, if any. If it is not activated through the link in the e-mail, it will disappear later.</li>
+      </ul>
+    </article>
+  </section>
 
-    <ul>
-      <li><p>Read the <a href="${reverse('faq_edx')}">FAQ</a> carefully</p></li>
-      <li><p>Check the <a href="/info">course updates</a> -- we will announce major errors and issues there </p></li>
-      <li><p>Check whether the issues has been asked on the <a href="/discussion">discussion forums</a>, and if not, ask</p></li>
-      <li><p>Ask in the IRC channel (irc.mitx.mit.edu, channel #6002)]</p></li>
-      <li><p>Check the <a href="/info">course handouts.</a></p></li>
-    </ul>
-
+  <section class="emails">
     <h2>Help email</h2>
-    <p> If you can't solve your problems with self-help, we have several e-mail addresses set up:</p>
 
     <ul>
-      <li><p>System-related questions: <a href="mailto:technical@mitx.mit.edu">technical@mitx.mit.edu</a></p></li>
-      <li><p>Content-related questions: <a href="mailto:content@mitx.mit.edu">content@mitx.mit.edu</a></p></li>
-      <li><p>Bug reports: <a href="mailto:bugs@mitx.mit.edu">bugs@mitx.mit.edu</a></p></li>
-      <li><p>Suggestions: <a href="mailto:suggestions@mitx.mit.edu">suggestions@mitx.mit.edu</a></p></li>
+      <li><p>System-related questions: <a href="mailto:technical@edx.org">technical@edx.org</a></p></li>
+      <li><p>Content-related questions: <a href="mailto:content@edx.org">content@edx.org</a></p></li>
+      <li><p>Bug reports: <a href="mailto:bugs@edx.org">bugs@edx.org</a></p></li>
+      <li><p>Suggestions: <a href="mailto:suggestions@edx.org">suggestions@edx.org</a></p></li>
     </ul>
-
-    <p>Please bear in mind that while we read them, we do not expect to have time to respond to all e-mails. For technical questions, please make sure you are using the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome/">Chrome</a>, and include browser and version in your e-mail, as well as screenshots or other pertinent details.</p>
-  </div>
+  </section>
 </section>

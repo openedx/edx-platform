@@ -4,10 +4,11 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Removing unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
         db.delete_unique('courseware_studentmodule', ['module_id', 'module_type', 'student_id'])
 
@@ -20,9 +21,8 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'StudentModule', fields ['module_id', 'student']
         db.create_unique('courseware_studentmodule', ['module_id', 'student_id'])
 
-
     def backwards(self, orm):
-        
+
         # Removing unique constraint on 'StudentModule', fields ['module_id', 'student']
         db.delete_unique('courseware_studentmodule', ['module_id', 'student_id'])
 
@@ -34,7 +34,6 @@ class Migration(SchemaMigration):
 
         # Adding unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
         db.create_unique('courseware_studentmodule', ['module_id', 'module_type', 'student_id'])
-
 
     models = {
         'auth.group': {

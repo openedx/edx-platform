@@ -1,0 +1,116 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>UC Berkeley joins edX</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+  <section class="container">
+    <h1>UC Berkeley joins edX</h1>
+    <hr class="horizontal-divider">
+
+    <article>
+      <h2>UC Berkeley joins Harvard and MIT not-for-profit online learning collaborative; edX broadens free course offerings into public health, computer science and solid-state chemistry; opens registration</h2>
+      
+      <p>EdX, the online learning initiative founded by Harvard University and the Massachusetts Institute of Technology (MIT) and launched in May, announced today the addition of the University of California, Berkeley to its platform.  UC Berkeley, ranked No. 1 among public universities in the United States in 2012 by US News &amp; World Report, will collaborate with edX to expand the group of participating "X Universities" &ndash; universities offering their courses on the edX platform. </p>
+
+      <p>Through edX, the "X Universities" will provide interactive education wherever there is access to the Internet and will enhance teaching and learning through research about how students learn, and how technologies can facilitate effective teaching both on-campus and online. EdX plans to add other "X Universities" from around the world to the edX platform in the coming months. </p>
+
+      <p>UC Berkeley will offer two courses on edX this Fall, and the university will also serve as the inaugural chair of the to-be-formed "X University" Consortium.</p>
+
+      <p>Robert J. Birgeneau, the Chancellor of UC Berkeley, announced:  "We are committed to excellence in online education with the dual goals of distributing higher education more broadly and enriching the quality of campus-based education. We share the vision of MIT and Harvard leadership and believe that collaborating with the not-for-profit model of edX is the best way to do this. <em>Fiat Lux</em>."</p>
+      <p>Meanwhile, edX announced two new courses each from HarvardX and <em>MITx</em> to be launched on edX this fall, along with <em>MITx</em>'s 6.002x Circuits &amp; Electronics. All of the courses will be hosted from edX's website, www.edx.org. </p>
+
+      <p>MIT launched its <em>MITx</em> online learning initiative in December 2011, with 6.002x as its prototype course, and more than 150,000 students worldwide enrolled. EdX was announced by Harvard and MIT in May, with each university committing to contribute $30 million toward the online partnership.</p>
+
+      <p>"We are very excited that UC Berkeley is joining us in this effort," said Anant Agarwal, President of edX. "EdX is about revolutionizing learning, and we have received a tremendous outpouring of excitement and interest from universities around the world. UC Berkeley is an extraordinary public institution known not only for its academic excellence but also for its innovativeness. With this collaboration, edX is now positioned to improve education more rapidly, both online and on-campus worldwide."</p>
+
+      <p>"From the outset, we have imagined edX as a platform to be shared with other educational institutions," said MIT President L. Rafael Reif. "Berkeley's decision to join the effort is great news: MIT is already seeing the benefits of its collaboration with Harvard, and we look forward to working with our remarkable colleagues at Berkeley as we explore the future of online education. Together, we are sure to learn much about how to enrich residential education even as we reach new learners far from our campuses."</p>
+
+      <p>In addition to the funding commitments by Harvard and MIT, edX has already garnered outside financial support, including two individual leadership gifts. MIT alumnus Philippe Laffont, founder and chief investment officer of Coatue Management, LLC, has made a gift to support <em>MITx</em> in honor of MIT Professor Stephen A. Ward, Laffont's thesis advisor at MIT. Harvard Alumnus Jonathan Grayer, former chairman and CEO of Kaplan, Inc. and cofounder of Weld North LLC, has made a gift in support of HarvardX. </p>
+
+      <p>Foundation support has also begun to flow in. Earlier in the summer, MIT received a grant from the Bill &amp; Melinda Gates Foundation. Grant funds will go towards developing an introduction to computer science course on the edX platform and partnering with a postsecondary institution that targets low-income young adults to offer this introductory course in a "flipped classroom" setting, where students watch course videos at home and work together in the classroom. </p>
+
+      <p>"Interest from other institutions in collaborating with edX has been enormous from the outset and we are delighted that the partnership announced today by Berkeley has come together so quickly," said Harvard President Drew Faust. "Since the beginning, our goal has been to broaden edX offerings by partnering with other universities who are equally committed to both expanding access to education and improving research about teaching and learning. Today's announcement is in an important step in that direction."</p>
+
+      <p>UC Berkeley will bring significant, new, open source technology to the edX platform. Developers from UC Berkeley  are working directly with the edX team to integrate the technology. </p>
+
+      <p>EdX will release its learning platform as open source software so that anyone around the world can adopt and improve this shared tool. Timing of the release has not yet been determined. </p>
+
+      <p>The classes to be offered on edX this fall are: </p>
+
+      <ul>
+      <li>HarvardX &ndash; "Health in Numbers: Quantitative Methods in Clinical and Public Health Research" is a course in Biostatistics and Epidemiology focused on teaching a diversity of health care practitioners and other students from around the world how to design rigorous clinical and public health studies and analyze complex health data, thereby furthering the school's mission of improving global health. The course is taught by Professors E. Francis Cook and Marcello Pagano. Dr. Cook is a Professor of Epidemiology at the Harvard School of Public Health (HSPH) and at the Harvard Medical School and he has won citations for Excellence in Teaching from the Harvard School of Public Health on four occasions. Dr. Pagano obtained a Ph.D. from Johns Hopkins University and has spent the last 35 years on the faculty at HSPH teaching biostatistics and advising students.</li>
+
+      <li>HarvardX &ndash; "Computer Science 50" (CS 50) is Harvard College's introduction to the intellectual enterprises of computer science and the art of programming for majors and non-majors alike. An entry-level course, CS50 teaches students how to think algorithmically and solve problems efficiently. Topics include abstraction, data structures, memory management and security. Languages include C, PHP and JavaScript. The course is designed for students with or without prior programming experience. As of Fall 2011, CS50 was Harvard College's third-largest course. It is taught by Harvard Senior Lecturer David J. Malan. He received his A.B., S.M. and Ph.D. in Computer Science from Harvard in 1999, 2004 and 2007, respectively.</li>
+
+      <li><em>MITx</em> &ndash; "Introduction to Computer Science and Programming" provides an understanding of computational approaches to scientific problem solving for students with little or no prior programming experience. It is based on the most popular course on MIT's OpenCourseWare platform and provides a tour of the major features of the Python programming language and object-oriented programming, algorithmic design and analysis and computational approaches to generating and understanding data, with examples drawn largely from the sciences and social sciences. The principal instructors for the course are John Guttag, W. Eric Grimson, and Chris Terman. John Guttag is the Dugald C. Jackson Professor of Computer Science and Electrical Engineering at MIT, and currently heads the Computer Science and Artificial Intelligence Laboratory's Data-driven Medical Research Group. Christopher J. Terman has taught computer science courses in the EECS department for many years; his research has been in the areas of programming languages, compilers, computer-aided design tools and educational technologies. W. Eric Grimson is the Bernard Gordon Professor of Medical Engineering and Chancellor of MIT.</li>
+
+      <li><em>MITx</em> &ndash; "Introduction to Solid State Chemistry" is a first-year college course where chemical principles are explained by examination of the properties of materials. The electronic structure and chemical bonding of materials is related to applications and engineering systems throughout the course. The on-campus version of the course has been taught for more than 40 years and is one of the largest classes at MIT. The instructor for the course is MIT Professor of Materials Science and Engineering Michael J. Cima. Cima is author or co-author of more than 200 peer-reviewed scientific publications and 45 patents.</li>
+
+      <li><em>MITx</em> &ndash; "Circuits and Electronics" is an introductory undergraduate electrical engineering course taught by visiting MIT Associate Professor Khurram K. Afridi and developed by edX president MIT Professor Anant Agarwal, MIT Professor Gerald J. Sussman, MIT Senior Lecturer Christopher J. Terman and edX Chief Scientist Piotr Mitros.</li>
+
+      <li>BerkeleyX &ndash; "Artificial Intelligence" is a course in the basic ideas and techniques underlying the design of intelligent computer systems, with a specific emphasis on the statistical and decision-theoretic modeling paradigm. By the end of this course, students will have built autonomous agents that reason in uncertain environments and will have developed machine learning algorithms that will classify handwritten digits and photographs. The on-campus version of the course is one of the most popular computer science courses at Berkeley. It will be taught by UC Berkeley Assistant Professor Pieter Abbeel and Associate Professor Dan Klein, a recent recipient of the Distinguished Teaching Award, UC Berkeley's highest teaching honor.</li>
+
+      <li>BerkeleyX &ndash; "Software as a Service" teaches the fundamentals for engineering long-lived software using highly-productive agile techniques to develop Software as a Service (SaaS) using Ruby on Rails. The topics include test-driven development, behavior-driven/user-centric design, design patterns, legacy code, refactoring and deployment. It will be taught by UC Berkeley Adjunct Associate Professor Armando Fox, who has received teaching and mentoring awards from Stanford University, the Society of Women Engineers and Tau Beta Pi Honor Society, and Professor David A. Patterson, winner of the ACM Karl Karlstrom Teaching Award and the IEEE Mulligan Medal in Education.</li>
+      </ul>
+
+      <p>For this introductory set of courses, certificates of mastery will be available at no charge for each of the courses to those learners motivated and able to demonstrate their knowledge of the course material. </p>
+
+      <h2>About edX</h2>
+
+      <p>EdX is a not-for-profit enterprise of its founding partners Harvard University and the Massachusetts Institute of Technology that features learning designed specifically for interactive study via the web. Based on a long history of collaboration and their shared educational missions the founders are creating a new online-learning experience. Anant Agarwal, former Director of MIT's Computer Science and Artificial Intelligence Laboratory, serves as the first president of edX. Along with offering online courses, the institutions will use edX to research how students learn and how technology can transform learning&mdash;both on-campus and worldwide.  EdX is based in Cambridge, Massachusetts and is governed by MIT and Harvard. </p>
+
+      <h2>About Harvard University</h2>
+
+      <p>Harvard University is devoted to excellence in teaching, learning and research, and to developing leaders in many disciplines who make a difference globally.  Harvard Faculty are engaged with teaching and research to push the boundaries of human knowledge. The University has twelve degree-granting Schools in addition to the Radcliffe Institute for Advanced Study.</p>
+      <p>Established in 1636, Harvard is the oldest institution of higher education in the United States. The University, which is based in Cambridge and Boston, Massachusetts, has an enrollment of over 20,000 degree candidates, including undergraduate, graduate and professional students. Harvard has more than 360,000 alumni around the world.</p>
+
+      <h2>About MIT</h2>
+
+      <p>The Massachusetts Institute of Technology &mdash; a coeducational, privately endowed research university founded in 1861 &mdash; is dedicated to advancing knowledge and educating students in science, technology and other areas of scholarship that will best serve the nation and the world in the 21st century. The Institute has close to 1,000 faculty and 10,000 undergraduate and graduate students. It is organized into five Schools: Architecture and Urban Planning; Engineering; Humanities, Arts, and Social Sciences; Sloan School of Management; and Science.</p>
+
+      <p>MIT's commitment to innovation has led to a host of scientific breakthroughs and technological advances. Achievements of the Institute's faculty and graduates have included the first chemical synthesis of penicillin and vitamin A, the development of inertial guidance systems, modern technologies for artificial limbs and the magnetic core memory that made possible the development of digital computers. Seventy-eight alumni, faculty, researchers and staff have won Nobel Prizes.</p>
+
+      <p>Current areas of research and education include neuroscience and the study of the brain and mind, bioengineering, cancer, energy, the environment and sustainable development, information sciences and technology, new media, financial technology and entrepreneurship.</p>
+
+      <h2>About the University of California, Berkeley</h2>
+
+      <p>The University of California, Berkeley is the world's premier public university with a mission to excel in teaching, research and public service. This longstanding mission has led to the university's distinguished record of Nobel-level scholarship, constant innovation, a concern for the betterment of our world and consistently high rankings of its schools and departments. The campus offers superior, high value education for extraordinarily talented students from all walks of life; operational excellence and a commitment to the competitiveness and prosperity of California and the nation. </p>
+      
+      <p>The University of California was chartered in 1868 and its flagship campus in Berkeley, on San Francisco Bay, was envisioned as a "City of Learning." Today, there are more than 1,500 full-time and 500 part-time faculty members dispersed among more than 130 academic departments and more than 80 interdisciplinary research units. Twenty-two Nobel Prizes have been garnered by faculty and twenty-eight Nobel prizes have been awarded to UC Berkeley alumni. There are 9 Nobel Laureates, 32 MacArthur Fellows and 4 Pulitzer Prize winners among the current faculty.</p>
+      
+      <section class="contact">
+        <p><strong>Contact: </strong>Amanda Keane</p>
+        <p>akeane@webershandwick.com</p>
+      </section>
+      
+      <section class="footer">
+        <hr class="horizontal-divider">
+        <div class="logo"></div><h3 class="date">7 - 24 - 2012</h3>
+        <div class="social-sharing">
+        <hr class="horizontal-divider">
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=UC+Berkeley+joins+Harvard+and+MIT+not-for-profit+online+learning+collaborative:+http://www.edx.org/press/uc-berkeley-joins-edx" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}">
+          </a>
+        </a>
+        <a href="mailto:?subject=UC%20Berkeley%20Joins%20edX&body=UC%20Berkeley%20joins%20Harvard%20and%20MIT%20not-for-profit%20online%20learning%20collaborative;%20edX%20broadens%20free%20course%20offerings%20into%20public%20health…http://edx.org/press/uc-berkeley-joins-edx" class="share">
+          <img src="${static.url('images/social/email-sharing.png')}">
+        </a>
+        <div class="fb-like" data-href="http://edx.org/press/uc-berkeley-joins-edx" data-send="true" data-width="450" data-show-faces="true"></div>
+      </div>
+        
+      </section>
+    </article>
+  </section>
+</section>

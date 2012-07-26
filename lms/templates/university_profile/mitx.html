@@ -1,0 +1,26 @@
+<%inherit file="base.html" />
+<%namespace name='static' file='../static_content.html'/>
+
+<%block name="title"><title>MITx</title></%block>
+
+<%block name="university_header">
+  <header class="search" style="background: url('/static/images/university/mit/shot-2-large.jpg')">
+    <div class="inner-wrapper university-search">
+      <hgroup>
+        <div class="logo">
+           <img src="${static.url('images/university/mit/mit.png')}" />
+        </div>
+        <h1>MITx</h1>
+      </hgroup>
+    </div>
+  </header>
+
+</%block>
+
+<%block name="university_description">
+        <p>The Massachusetts Institute of Technology &mdash; a coeducational, privately endowed research university founded in 1861 &mdash; is dedicated to advancing knowledge and educating students in science, technology, and other areas of scholarship that will best serve the nation and the world in the 21st century. The Institute has close to 1,000 faculty and 10,000 undergraduate and graduate students. It is organized into five Schools: Architecture and Urban Planning; Engineering; Humanities, Arts, and Social Sciences; Sloan School of Management; and Science.</p>
+        <p>MIT's commitment to innovation has led to a host of scientific breakthroughs and technological advances. Achievements of the Institute's faculty and graduates have included the first chemical synthesis of penicillin and vitamin A, the development of inertial guidance systems, modern technologies for artificial limbs, and the magnetic core memory that made possible the development of digital computers. 78 alumni, faculty, researchers and staff have won Nobel Prizes.</p>
+        <p>Current areas of research and education include neuroscience and the study of the brain and mind, bioengineering, cancer, energy, the environment and sustainable development, information sciences and technology, new media, financial technology, and entrepreneurship.</p>
+</%block>
+
+${parent.body()}

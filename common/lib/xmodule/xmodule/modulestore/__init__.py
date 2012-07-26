@@ -45,7 +45,7 @@ class Location(_LocationBase):
         """
         return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
 
-    def __new__(_cls, loc_or_tag, org=None, course=None, category=None, name=None, revision=None):
+    def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None, name=None, revision=None):
         """
         Create a new location that is a clone of the specifed one.
 
@@ -70,10 +70,14 @@ class Location(_LocationBase):
         wildcard selection
         """
 
+
         if org is None and course is None and category is None and name is None and revision is None:
             location = loc_or_tag
         else:
             location = (loc_or_tag, org, course, category, name, revision)
+
+        if location is None:
+            return _LocationBase.__new__(_cls, *([None] * 6))
 
         def check_dict(dict_):
             check_list(dict_.itervalues())
@@ -81,7 +85,7 @@ class Location(_LocationBase):
         def check_list(list_):
             for val in list_:
                 if val is not None and INVALID_CHARS.search(val) is not None:
-                    log.debug('invalid characters val="%s", list_="%s"' % (val,list_))
+                    log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
                     raise InvalidLocationError(location)
 
         if isinstance(location, basestring):
@@ -169,7 +173,7 @@ class ModuleStore(object):
             calls to get_children() to cache. None indicates to cache all descendents
         """
         raise NotImplementedError
-    
+
     def get_items(self, location, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
@@ -217,3 +221,11 @@ class ModuleStore(object):
         metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError
+
+    def get_courses(self):
+        '''
+        Returns a list containing the top level XModuleDescriptors of the courses
+        in this modulestore.
+        '''
+        raise NotImplementedError
+

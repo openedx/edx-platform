@@ -1,4 +1,4 @@
-<section id="unit-wrapper" class="${js_module}">
+<section id="unit-wrapper">
   <header>
     <section>
       <h1 class="editable">${name}</h1>
@@ -12,6 +12,47 @@
   </header>
 
   <section>
+    <section class="meta wip">
+      <section class="status-settings">
+        <ul>
+          <li><a href="#" class="current">Scrap</a></li>
+          <li><a href="#">Draft</a></li>
+          <li><a href="#">Proofed</a></li>
+          <li><a href="#">Published</a></li>
+        </ul>
+        <a href="#" class="settings">Settings</a>
+      </section>
+      <section class="author">
+        <dl>
+          <dt>Last modified:</dt>
+          <dd>mm/dd/yy</dd>
+          <dt>By</dt>
+          <dd>Anant Agarwal</dd>
+        </dl>
+      </section>
+      <section class="tags">
+        <div>
+          <h2>Tags:</h2>
+          <p class="editable">Click to edit</p>
+        </div>
+        <div>
+          <h2>Goal</h2>
+          <p class="editable">Click to edit</p>
+        </div>
+      </section>
+    </section>
     ${contents}
+    <section class="previews">
+      % for preview in previews:
+        <section class="preview">
+          ${preview}
+        </section>
+      % endfor
+    </section>
+    <div class="actions wip">
+      <a href="" class="save-update">Save &amp; Update</a>
+      <a href="#" class="cancel">Cancel</a>
+    </div>
+    <%include file="widgets/notes.html"/>
   </section>
 </section>
