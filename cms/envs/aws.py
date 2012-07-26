@@ -33,7 +33,8 @@ LOGGING = get_logger_config(LOG_DIR,
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             debug=False)
 
-REPOS = ENV_TOKENS['REPOS']
+with open(ENV_ROOT / "repos.json") as repos_file:
+    REPOS = json.load(repos_file)
 
 
 ############################## SECURE AUTH ITEMS ###############################
