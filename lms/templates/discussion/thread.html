@@ -45,12 +45,11 @@
           ${render_vote(comment)}
           <div class="discussion-right-wrapper">
             <div class="discussion-content-view">
-                <a class="comment-body" name="${comment['id']}">${comment['body']}</a>
-                <div class="info">
-                  ${render_info(comment)}
-                  ${render_reply()}
-                  ${render_edit()}
-                </div>
+              <a class="comment-body" name="${comment['id']}">${comment['body']}</a>
+              <div class="info">
+                ${render_info(comment)}
+                ${render_reply()}
+                ${render_edit()}
               </div>
             </div>
           </div>
