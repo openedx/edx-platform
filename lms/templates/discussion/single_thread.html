@@ -1,0 +1,11 @@
+<%namespace name="renderer" file="thread.html"/>
+
+<section class="discussion">
+  <a class="discussion-title" href="javascript:void(0)">Discussion</a>
+  ${renderer.render_thread(course_id, thread, edit_thread=True, show_comments=True)}
+</section>
+
+<script type="text/javascript">
+  var $$user_info = JSON.parse('${user_info}');
+  var $$course_id = "${course_id}";
+</script>

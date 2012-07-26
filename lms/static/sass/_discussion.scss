@@ -1,0 +1,310 @@
+$comment_margin_left: 30px;
+$discussion_title_size: 1.6em;
+$comment_title_size: 1.2em;
+$comment_body_size: 1.0em;
+$comment_info_size: 0.75em;
+$discussion_input_width: 60%;
+
+@mixin discussion-font {
+  font-family: "Comic Sans MS", cursive, sans-serif !important;
+}
+
+@mixin discussion-clickable {
+  color: black;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.course-content {
+  .discussion {
+    margin-left: 40px;
+    margin-top: 15px;
+  }
+}
+
+.discussion {
+  .discussion-search-form {
+    margin-bottom: 40px;
+    .discussion-search {
+      @include discussion-font;
+      color: #1d9dd9;
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .discussion-search-text {
+      @include discussion-font;
+    }
+  }
+  
+  .discussion-title {
+    @include discussion-font;
+    @include discussion-clickable;
+    font-size: $discussion_title_size;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .discussion-title-wrapper {
+    .discussion-watch-discussion, .discussion-unwatch-discussion {
+      display: none;
+      @include discussion-font;
+      margin-left: 5px;
+      font-size: $comment_info_size;
+    }
+    .discussion-title {
+      display: inline-block;
+    }
+    &:hover {
+      .discussion-watch-discussion, .discussion-unwatch-discussion {
+        display: inline-block;
+      }
+    }
+  }
+  .discussion-votes {
+    margin-right: 8px;
+    margin-top: 5px;
+    text-align: center;
+    height: 40px;
+    float: left;
+    .discussion-vote-count {
+      font-size: $comment_body_size;
+      @include discussion-font;
+    }
+    a.discussion-vote {
+      display: block;
+      color: black;
+      font-weight: bold;
+      font-size: 15px;
+      &.discussion-vote-up {
+        margin-bottom: 3px;
+      }
+      &.discussion-vote-down {
+        margin-top: 3px;
+      }
+      &.voted {
+        color: #1d9dd9;
+      }
+    }
+  }
+  .discussion-right-wrapper {
+    min-height: 40px;
+    float: left;
+  }
+  .new-post-form {
+    .new-post-title, .new-post-body {
+      @include discussion-font;
+      display: block !important;
+      width: $discussion_input_width !important;
+    }
+    .new-post-body {
+      margin-top: 10px;
+    }
+    .discussion-new-post {
+      @include discussion-font;
+      color: #1d9dd9;
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  }
+  .thread {
+    //display: none;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    .thread-title {
+      @include discussion-font;
+      @include discussion-clickable;
+      font-size: $comment_title_size;
+      font-weight: bold;
+      display: block;
+    }
+    .thread-body {
+      @include discussion-font;
+      font-size: $comment_body_size;
+      margin-top: 7px;
+      margin-bottom: 2px;
+    }
+    .info {
+      @include discussion-font;
+      font-size: $comment_info_size;
+      font-style: italic;
+      margin-top: 5px;
+      color: gray;
+      .discussion-link {
+        margin-left: 2px;
+      }
+      .discussion-reply {
+        margin-left: 4px;
+      }
+      .discussion-link {
+        @include discussion-font;
+        display: inline-block;
+        color: #1d9dd9;
+        display: none;
+      }
+      
+    }
+    .discussion-content:hover {
+      .discussion-link {
+        display: inline-block;
+      }
+    }
+    .discussion-content {
+      margin-top: 10px;
+      overflow: hidden;
+      .discussion-content-edit {
+        margin-left: $comment_margin_left;
+        .comment-edit {
+          @include discussion-font;
+          width: $discussion_input_width !important;
+          font-size: $comment_body_size;
+          margin-top: 10px;
+          display: block;
+        }
+      }
+    }
+    .comments {
+      //display: none;
+      margin-left: $comment_margin_left;
+      overflow: hidden;
+      .comment {
+        .comment-body {
+          @include discussion-font;
+          font-size: $comment_body_size;
+          margin-top: 3px;
+          display: block;
+          color: black;
+        }
+      }
+      .discussion-votes {
+        margin-right: 6px;
+        margin-top: 6px;
+      }
+    }
+  }
+
+}
+
+
+body 
+{ 
+        background-color: White;
+    font-family: sans-serif;
+}
+
+.wmd-panel
+{
+        margin-left: 25%;
+        margin-right: 25%;
+        width: 50%;
+        min-width: 500px;
+}
+
+.wmd-button-bar 
+{
+        width: 100%;
+        background-color: Silver; 
+}
+
+.wmd-input 
+{ 
+        height: 300px;
+        width: 100%;
+        background-color: Gainsboro;
+        border: 1px solid DarkGray;
+}
+
+.wmd-preview 
+{ 
+        background-color: #c0e0ff; 
+}
+
+.wmd-button-row 
+{
+        position: relative; 
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        margin-top: 10px;
+        padding: 0px;  
+        height: 20px;
+}
+
+.wmd-spacer
+{
+        width: 1px; 
+        height: 20px; 
+        margin-left: 14px;
+        
+        position: absolute;
+        background-color: Silver;
+        display: inline-block; 
+        list-style: none;
+}
+
+.wmd-button {
+    width: 20px;
+    height: 20px;
+    padding-left: 2px;
+    padding-right: 3px;
+    position: absolute;
+    display: inline-block;
+    list-style: none;
+    cursor: pointer;
+}
+
+.wmd-button > span {
+    background-image: url('/static/images/wmd-buttons.png');
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+}
+
+.wmd-spacer1
+{
+    left: 50px;
+}
+.wmd-spacer2
+{
+    left: 175px;
+}
+.wmd-spacer3
+{
+    left: 300px;
+}
+
+
+
+
+.wmd-prompt-background
+{
+        background-color: Black;
+}
+
+.wmd-prompt-dialog
+{
+        border: 1px solid #999999;
+        background-color: #F5F5F5;
+}
+
+.wmd-prompt-dialog > div {
+        font-size: 0.8em;
+        font-family: arial, helvetica, sans-serif;
+}
+
+
+.wmd-prompt-dialog > form > input[type="text"] {
+        border: 1px solid #999999;
+        color: black;
+}
+
+.wmd-prompt-dialog > form > input[type="button"]{
+        border: 1px solid #888888;
+        font-family: trebuchet MS, helvetica, sans-serif;
+        font-size: 0.8em;
+        font-weight: bold;
+}

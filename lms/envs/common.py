@@ -484,6 +484,9 @@ INSTALLED_APPS = (
     # For testing
     'django_jasmine',
 
+    # Discussion
+    'django_comment_client',
+
     # For Askbot 
     'django.contrib.sitemaps',
     'django.contrib.admin',
