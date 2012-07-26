@@ -17,22 +17,16 @@
 @import 'shared/modal';
 @import 'shared/activation_messages';
 
-@import 'home';
-@import 'dashboard';
-@import 'courseware_subnav';
-@import 'courses';
-@import 'course_about';
-@import 'jobs';
-@import 'about_pages';
-@import 'press_release';
+@import 'multicourse/home';
+@import 'multicourse/dashboard';
+@import 'multicourse/courses';
+@import 'multicourse/course_about';
+@import 'multicourse/jobs';
+@import 'multicourse/about_pages';
+@import 'multicourse/press_release';
+@import 'multicourse/password_reset';
+@import 'multicourse/error-pages';
+@import 'multicourse/help';
+
 @import 'discussion';
 @import 'news';
-
-
-// Courseware styles
-@import 'sass_old/courseware/courseware';
-@import 'sass_old/courseware/sequence-nav';
-@import 'sass_old/courseware/sidebar';
-@import 'sass_old/courseware/video';
-@import 'sass_old/courseware/amplifier';
-@import 'sass_old/courseware/problems';
