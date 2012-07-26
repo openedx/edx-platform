@@ -16,7 +16,7 @@ class APIModel(object):
     """
     # This is kind of a premature optimization, but it restricts objects to only have fields specified explicitly. Saves
     # a lot of memory because the object doesn't need to have a dict, and I think that might be an issue with some pages
-    __slots__ = ['_id']
+    __slots__ = ['_id', 'errors']
     __attributes__ = []
     __base_url__ = ""
     __parent__ = None
@@ -49,7 +49,7 @@ class APIModel(object):
     def save(self):
         # TODO: Think of a better way to handle nested resources, currently you have to manually set __base_url__
         attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
-        params = json.dumps({self.__class__.__name__.lower():attributes})
+        params = json.dumps({self.json_root:attributes})
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         post_url = slumber.url_join(HOST, self.url())
         if self.id: # This object was retrieved from the service or otherwise persisted
@@ -60,7 +60,9 @@ class APIModel(object):
             self.update_attributes(**response.json)
         else:
             # TODO: handle errors
+            print response
             self.errors = response.json['errors']
+            print self.errors
         return self
 
     def delete(self):
@@ -70,6 +72,9 @@ class APIModel(object):
             if response.status_code == 200:
                 self._id = None
 
+    @property
+    def json_root(self):
+      return self.__class__.__name__.lower()
     @property
     def id(self):
         """
@@ -172,6 +177,18 @@ class Rubric(APIModel):
         self.entries.append(entry)
         return entry
 
+    def create_evaluation(self, user_id, submission_id, entry_values):
+        # TODO: When async API is implemented, entries should be created in a callback
+        evaluation = Evaluation(rubric_id=self.id, user_id=user_id, submission_id=submission_id)
+        evaluation.save()
+        for entry in self.entries:
+            present = False
+            if entry.id in entry_values:
+                present = entry_values[entry.id]
+            value = RubricEntryValue(rubric_entry_id=entry.id, evaluation_id=evaluation.id, present=present)
+            value.save()
+        return evaluation
+
 class RubricEntry(APIModel):
     __attributes__ = ['rubric_id', 'description', 'explanation', 'weight']
     __slots__ = __attributes__
@@ -182,6 +199,10 @@ class RubricEntry(APIModel):
         else:
             return slumber.url_join('rubrics', self.rubric_id, 'entries')
 
+    @property
+    def json_root(self):
+      return 'rubric_entry'
+
 class GradingConfiguration(APIModel):
     __attributes__ = ['due_date', 'evaluations_per_submission', 'evaluations_per_grader',
                       'open_date', 'priority_weights', 'question_id', 'training_exercises_required']
@@ -190,6 +211,9 @@ class GradingConfiguration(APIModel):
 
     def url(self):
         return slumber.url_join('question', self.question_id, 'grading_configuration')
+    @property
+    def json_root(self):
+      return 'grading_configuration'
 
 class Group(APIModel):
     __attributes__ = ['title']
@@ -228,11 +252,17 @@ class GroupMembership(APIModel):
     __attributes__ = ['user_id', 'group_id', 'name']
     __slots__ = __attributes__
     __base_url__ = 'memberships'
+    @property
+    def json_root(self):
+      return 'group_membership'
 
 class GroupRole(APIModel):
     __attributes__ = ['grading_configuration_id', 'group_id', 'role']
     __slots__ = __attributes__
     __base_url__ = 'group_roles'
+    @property
+    def json_root(self):
+      return 'group_role'
 
 class Example(APIModel):
     __attributes__ = ['grading_configuration_id', 'submission_id', 'user_id']
@@ -242,10 +272,14 @@ class Example(APIModel):
 class Evaluation(APIModel):
     __attributes__ = ['rubric_id', 'user_id', 'submission_id', 'comments', 'offset']
     __slots__ = __attributes__
+    # TODO: Build some sort of association with entry values?
 
 class RubricEntryValue(APIModel):
     __attributes__ = ['rubric_entry_id', 'evaluation_id', 'present']
     __slots__ = __attributes__
+    @property
+    def json_root(self):
+      return 'rubric_entry_value'
 
 class Task(APIModel):
     __attributes__ = ['grader_id', 'submission_id', 'question_id', 'completed']

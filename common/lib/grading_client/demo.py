@@ -69,8 +69,8 @@ instructor_evals = []
 for question in questions['local']:
   for submission in local_submissions[question][:5]:
     entries_dict = { entry.id:value for entry, value in zip(rubric.entries, local_true_scores[submission.id]) }
-    evaluation = rubric.build_evaluation(user_id=inst1.id, submission_id=submission.id, entry_values=entries_dict)
-    evaluation.save()
+    evaluation = rubric.create_evaluation(user_id=inst1.id, submission_id=submission.id, entry_values=entries_dict)
+    #evaluation.save()
     instructor_evals.append(evaluation)
 
 local_configurations = [question.grading_configuration for question in questions['local']]
@@ -100,5 +100,5 @@ for user in graders:
     for task in tasks:
       submission = Submission.get_by_question_id_and_id(question.id, task.submission_id)    
       entries_dict = { entry.id:value for entry, value in zip(rubric.entries, local_true_scores[submission.id]) }
-      evaluation = rubric.build_evaluation(user_id=user.id, submission_id=submission.id, entry_values=entries_dict)
-      evaluation.save()
+      evaluation = rubric.create_evaluation(user_id=user.id, submission_id=submission.id, entry_values=entries_dict)
+      #evaluation.save()
