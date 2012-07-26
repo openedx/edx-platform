@@ -8,6 +8,9 @@
 </%block>
 
 <%block name="js_extra">
+  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Converter.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Sanitizer.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Editor.js')}"></script>
 </%block>
 
 <%include file="../course_navigation.html" args="active_page='discussion'" />
