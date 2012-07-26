@@ -54,7 +54,7 @@
         idPostfix = idPostfix || "";
 
         var hooks = this.hooks = new Markdown.HookCollection();
-        hooks.addNoop("onPreviewRefresh");       // called with no arguments after the preview has been refreshed
+        hooks.addNoop("onPreviewPush");       // called with no arguments after the preview has been refreshed
         hooks.addNoop("postBlockquoteCreation"); // called with the user's selection *after* the blockquote was created; should return the actual to-be-inserted text
         hooks.addFalse("insertImageDialog");     /* called with one parameter: a callback to be called with the URL of the image. If the application creates
                                                   * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
@@ -72,7 +72,7 @@
 
             panels = new PanelCollection(idPostfix);
             var commandManager = new CommandManager(hooks);
-            var previewManager = new PreviewManager(markdownConverter, panels, function () { hooks.onPreviewRefresh(); });
+            var previewManager = new PreviewManager(markdownConverter, panels, function (text, previewSet) { hooks.onPreviewPush(text, previewSet); });
             var undoManager, uiManager;
 
             if (!/\?noundo/.test(doc.location.href)) {
@@ -769,7 +769,7 @@
         this.init();
     };
 
-    function PreviewManager(converter, panels, previewRefreshCallback) {
+    function PreviewManager(converter, panels, previewPushCallback) {
 
         var managerObj = this;
         var timeout;
@@ -928,8 +928,7 @@
             var emptyTop = position.getTop(panels.input) - getDocScrollTop();
 
             if (panels.preview) {
-                previewSet(text);
-                previewRefreshCallback();
+                previewPushCallback(text, previewSet);
             }
 
             setPanelScrollTops();
