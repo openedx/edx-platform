@@ -789,8 +789,8 @@ class CodeResponse(LoncapaResponse):
     In contrast to ExternalResponse, CodeResponse has following behavior:
         1) Goes through a queueing system
         2) Does not do external request for 'get_answers'
-    The XML definition of a CodeResponse is meant to be identical to that of ExternalResponse. Simply replace the
-        tag 'externalresponse' with 'coderesponse'
+    The XML definition of a CodeResponse is identical to that of ExternalResponse. Simply replace
+        the tag 'externalresponse' with 'coderesponse'
     '''
 
     response_tag = 'coderesponse'
