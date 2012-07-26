@@ -41,14 +41,17 @@
   % for comment in comments:
     <div class="comment" _id="${comment['id']}">
       <div class="discussion-content">
-        ${render_vote(comment)}
-        <div class="discussion-right-wrapper">
-          <div class="discussion-content-view">
-            <a class="comment-body" name="${comment['id']}">${comment['body']}</a>
-            <div class="info">
-              ${render_info(comment)}
-              ${render_reply()}
-              ${render_edit()}
+        <div class="discussion-upper-wrapper clearfix">
+          ${render_vote(comment)}
+          <div class="discussion-right-wrapper">
+            <div class="discussion-content-view">
+                <a class="comment-body" name="${comment['id']}">${comment['body']}</a>
+                <div class="info">
+                  ${render_info(comment)}
+                  ${render_reply()}
+                  ${render_edit()}
+                </div>
+              </div>
             </div>
           </div>
         </div>
