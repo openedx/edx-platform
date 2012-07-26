@@ -42,5 +42,7 @@ with open(ENV_ROOT / "repos.json") as repos_file:
 with open(ENV_ROOT / "cms.auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
+AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
+AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
 DATABASES = AUTH_TOKENS['DATABASES']
 MODULESTORE = AUTH_TOKENS['MODULESTORE']
