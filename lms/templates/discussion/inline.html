@@ -10,6 +10,12 @@
       <input type="text" class="new-post-title" placeholder="Title"/>
       <textarea class="new-post-body"></textarea>
       <a class="discussion-new-post" href="javascript:void(0)">New Post</a>
+        <div class="wmd-panel">
+          <div id="wmd-button-bar"></div>
+          <textarea class="wmd-input" id="wmd-input">
+          </textarea>
+          <div id="wmd-preview" class="wmd-panel wmd-preview"></div>
+        </div>
     </form>
   </div>
   % for thread in threads:
