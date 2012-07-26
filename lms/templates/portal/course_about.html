@@ -51,6 +51,7 @@
 <section class="course-info">
   <header class="course-profile">
     <div class="intro-inner-wrapper">
+      <div class="table">
       <section class="intro">
         <hgroup>
           <h1>${course.number}: ${get_course_about_section(course, "title")}<a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a></h1>
@@ -84,6 +85,7 @@
       </div>
       % endif
     </div>
+      </div>
   </header>
 
   <section class="container">
@@ -107,7 +109,7 @@
         <header>
           <div class="social-sharing">
             <div class="sharing-message">Share with friends and family!</div>
-            <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
+            <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
               <img src="${static.url('images/social/twitter-sharing.png')}">
             </a>
             <a href="http://www.facebook.com/EdxOnline" class="share"> <img src="${static.url('images/social/facebook-sharing.png')}">
