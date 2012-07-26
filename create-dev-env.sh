@@ -110,7 +110,7 @@ NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 BREW_FILE="$BASE/mitx/brew-formulas.txt"
 LOG="/var/tmp/install.log"
-APT_PKGS="curl git mercurial python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript"
+APT_PKGS="curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript"
 
 if [[ $EUID -eq 0 ]]; then
     error "This script should not be run using sudo or as the root user"
@@ -208,10 +208,6 @@ case `uname -s` in
         command -v git &>/dev/null || {
             output "Installing git"
             brew install git >> $LOG
-        }
-        command -v hg &>/dev/null || {
-            output "Installaing mercurial"
-            brew install mercurial >> $LOG
         }
 
         clone_repos
