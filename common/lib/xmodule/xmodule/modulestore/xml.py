@@ -53,8 +53,9 @@ class XMLModuleStore(ModuleStore):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
-        log.debug('default_class = %s' % self.default_class)
+        # TODO (cpennington): We need a better way of selecting specific sets of debug messages to enable. These were drowning out important messages
+        #log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
+        #log.debug('default_class = %s' % self.default_class)
 
         for course_dir in os.listdir(self.data_dir):
             if course_dirs is not None and course_dir not in course_dirs:
