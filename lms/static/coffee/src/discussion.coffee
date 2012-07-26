@@ -13,6 +13,8 @@ $ ->
     Discussion.bindDiscussionEvents(discussion)
     Discussion.initializeDiscussion(discussion)
 
+  Markdown.makeWmdEditor()
+
 generateLocal = (elem) ->
   (selector) -> $(elem).find(selector)
 
