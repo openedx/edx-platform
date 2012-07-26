@@ -27,19 +27,6 @@ $ ->
       (?!`)
     ///gm
 
-    ###HUB.Queue ->
-      console.log "initializing"
-      renderReady = true
-      HUB.processUpdateTime = 50
-      HUB.Config
-        "HTML-CSS":
-          EqnChunk: 10
-          EqnChunkFactor: 1
-        SVG:
-          EqnChunk: 10
-          EqnChunkFactor: 1
-    ###
-
     @processMath: (start, last, preProcess) =>
       block = blocks.slice(start, last + 1).join("").replace(/&/g, "&amp;")
                                                     .replace(/</g, "&lt;")
@@ -112,60 +99,6 @@ $ ->
       math = null
       text
 
-    @updateMathJax: =>
-      HUB.Queue(["Typeset", HUB, "wmd-preview"])
-      
-          
-
-    ###
-    if not HUB.Cancel? #and 1 == 2
-      HUB.cancelTypeset = false
-      CANCELMESSAGE = "MathJax Canceled"
-
-      HOOKS = [
-        {
-          name: "HTML-CSS Jax Config"
-          engine: -> window["MathJax"].OutputJax["HTML-CSS"]
-        },
-        {
-          name: "SVG Jax Config"
-          engine: -> window["MathJax"].OutputJax["SVG"]
-        },
-        {
-          name: "TeX Jax Config"
-          engine: -> window["MathJax"].InputJax.TeX
-        },
-      ]
-      
-      for hook in HOOKS
-        do (hook) ->
-          HUB.Register.StartupHook hook.name, ->
-            engine = hook.engine()
-            engine.Augment
-              Translate: (script, state) ->
-                console.log "translating"
-                if HUB.cancelTypeset or state.cancelled
-                  throw Error(CANCELMESSAGE)
-                engine.Translate.call(engine, script, state)
-
-      prevProcessError = HUB.processError
-      HUB.processError = (error, state, type) ->
-        if error.message != CANCELMESSAGE
-          return prevProcessError.call(HUB, error, state, type)
-        else
-          console.log "handling message"
-          MathJax.Message.Clear(0, 0)
-          state.jaxIds = []
-          state.jax = {}
-          state.scripts = []
-          state.i = state.j = 0
-          state.cancelled = true
-          return null
-
-      HUB.Cancel = ->
-          this.cancelTypeset = true
-  ###
-  
   if Markdown?
     converter = Markdown.getSanitizingConverter()
     editor = new Markdown.Editor(converter)
