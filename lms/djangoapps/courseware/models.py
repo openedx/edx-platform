@@ -63,7 +63,6 @@ class StudentModule(models.Model):
 # TODO (cpennington): Remove these once the LMS switches to using XModuleDescriptors
 
 
-
 class StudentModuleCache(object):
     """
     A cache of StudentModules for a specific student
@@ -84,7 +83,7 @@ class StudentModuleCache(object):
             # that can be put into a single query
             self.cache = []
             chunk_size = 500
-            for id_chunk in [module_ids[i:i+chunk_size] for i in xrange(0, len(module_ids), chunk_size)]:
+            for id_chunk in [module_ids[i:i + chunk_size] for i in xrange(0, len(module_ids), chunk_size)]:
                 self.cache.extend(StudentModule.objects.filter(
                     student=user,
                     module_state_key__in=id_chunk)

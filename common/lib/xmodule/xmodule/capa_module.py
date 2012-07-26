@@ -5,14 +5,14 @@ import json
 import logging
 import traceback
 import re
-import StringIO
-import os
 
 from datetime import timedelta
 from lxml import etree
+from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.exceptions import NotFoundError
 from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
@@ -70,6 +70,12 @@ class CapaModule(XModule):
     An XModule implementing LonCapa format problems, implemented by way of capa.capa_problem.LoncapaProblem
     '''
     icon_class = 'problem'
+
+    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
+          'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
+                 resource_string(__name__, 'js/src/capa/schematic.js')]}
+    js_module_name = "Problem"
+    css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
@@ -198,12 +204,12 @@ class CapaModule(XModule):
             if self.system.DEBUG:
                 log.exception(err)
                 msg = '[courseware.capa.capa_module] <font size="+1" color="red">Failed to generate HTML for problem %s</font>' % (self.location.url())
-                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<','&lt;')
-                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<','&lt;')
+                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
+                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 html = msg
             else:
                 raise
-                
+
         content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
@@ -319,8 +325,8 @@ class CapaModule(XModule):
 
         if self.show_answer == 'always':
             return True
-        #TODO: Not 404
-        raise self.system.exception404
+
+        return False
 
     def update_score(self, get):
         """
@@ -336,7 +342,7 @@ class CapaModule(XModule):
         score_msg = get['response']
         self.lcp.update_score(score_msg, queuekey)
 
-        return dict() # No AJAX return is needed
+        return dict()  # No AJAX return is needed
 
     def get_answer(self, get):
         '''
@@ -347,7 +353,7 @@ class CapaModule(XModule):
         Returns the answers: {'answers' : answers}
         '''
         if not self.answer_available():
-            raise self.system.exception404
+            raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
             return {'answers': answers}
@@ -379,7 +385,7 @@ class CapaModule(XModule):
             if not name.endswith('[]'):
                 answers[name] = get[key]
             else:
-                name          = name[:-2]
+                name = name[:-2]
                 answers[name] = get.getlist(key)
 
         return answers
@@ -403,15 +409,14 @@ class CapaModule(XModule):
         if self.closed():
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_check_fail', event_info)
-            # TODO (vshnayder): probably not 404?
-            raise self.system.exception404
+            raise NotFoundError('Problem is closed')
 
         # Problem submitted. Student should reset before checking
         # again.
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
             self.system.track_function('save_problem_check_fail', event_info)
-            raise self.system.exception404
+            raise NotFoundError('Problem must be reset before it can be checked again')
 
         try:
             old_state = self.lcp.get_state()
@@ -421,7 +426,7 @@ class CapaModule(XModule):
             # TODO (vshnayder): why is this line here?
             #self.lcp = LoncapaProblem(self.definition['data'],
             #                          id=lcp_id, state=old_state, system=self.system)
-            traceback.print_exc()
+            log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
         except Exception, err:
             # TODO: why is this line here?
@@ -430,8 +435,8 @@ class CapaModule(XModule):
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
-                return {'success':msg}
-            traceback.print_exc()
+                return {'success': msg}
+            log.exception("Error in capa_module problem checking")
             raise Exception("error in capa_module")
 
         self.attempts = self.attempts + 1

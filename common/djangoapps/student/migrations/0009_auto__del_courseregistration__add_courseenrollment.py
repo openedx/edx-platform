@@ -19,7 +19,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('student', ['CourseEnrollment'])
 
-
     def backwards(self, orm):
         # Adding model 'CourseRegistration'
         db.create_table('student_courseregistration', (
@@ -31,7 +30,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'CourseEnrollment'
         db.delete_table('student_courseenrollment')
-
 
     models = {
         'auth.group': {

@@ -7,6 +7,7 @@ from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
 
+
 def dummy_track(event_type, event):
     pass
 
@@ -63,7 +64,50 @@ class Plugin(object):
                 in pkg_resources.iter_entry_points(cls.entry_point)]
 
 
-class XModule(object):
+class HTMLSnippet(object):
+    """
+    A base class defining an interface for an object that is able to present an
+    html snippet, along with associated javascript and css
+    """
+
+    js = {}
+    js_module_name = None
+
+    css = {}
+
+    @classmethod
+    def get_javascript(cls):
+        """
+        Return a dictionary containing some of the following keys:
+            coffee: A list of coffeescript fragments that should be compiled and
+                    placed on the page
+            js: A list of javascript fragments that should be included on the page
+
+        All of these will be loaded onto the page in the CMS
+        """
+        return cls.js
+
+    @classmethod
+    def get_css(cls):
+        """
+        Return a dictionary containing some of the following keys:
+            css: A list of css fragments that should be applied to the html contents
+                 of the snippet
+            sass: A list of sass fragments that should be applied to the html contents
+                  of the snippet
+            scss: A list of scss fragments that should be applied to the html contents
+                  of the snippet
+        """
+        return cls.css
+
+    def get_html(self):
+        """
+        Return the html used to display this snippet
+        """
+        raise NotImplementedError("get_html() must be provided by specific modules")
+
+
+class XModule(HTMLSnippet):
     ''' Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order to be displayed to users.
@@ -80,7 +124,7 @@ class XModule(object):
         '''
         Construct a new xmodule
 
-        system: An I4xSystem allowing access to external resources
+        system: A ModuleSystem allowing access to external resources
         location: Something Location-like that identifies this xmodule
         definition: A dictionary containing 'data' and 'children'. Both are optional
             'data': is JSON-like (string, dictionary, list, bool, or None, optionally nested).
@@ -171,17 +215,12 @@ class XModule(object):
         return None
 
     def max_score(self):
-        ''' Maximum score. Two notes: 
+        ''' Maximum score. Two notes:
             * This is generic; in abstract, a problem could be 3/5 points on one randomization, and 5/7 on another
             * In practice, this is a Very Bad Idea, and (a) will break some code in place (although that code
-              should get fixed), and (b) break some analytics we plan to put in place. 
-        ''' 
-        return None
-
-    def get_html(self):
-        ''' HTML, as shown in the browser. This is the only method that must be implemented
+              should get fixed), and (b) break some analytics we plan to put in place.
         '''
-        raise NotImplementedError("get_html must be defined for all XModules that appear on the screen. Not defined in %s" % self.__class__.__name__)
+        return None
 
     def get_progress(self):
         ''' Return a progress.Progress object that represents how far the student has gone
@@ -193,12 +232,12 @@ class XModule(object):
         return None
 
     def handle_ajax(self, dispatch, get):
-        ''' dispatch is last part of the URL. 
-            get is a dictionary-like object ''' 
+        ''' dispatch is last part of the URL.
+            get is a dictionary-like object '''
         return ""
 
 
-class XModuleDescriptor(Plugin):
+class XModuleDescriptor(Plugin, HTMLSnippet):
     """
     An XModuleDescriptor is a specification for an element of a course. This could
     be a problem, an organizational element (a group of content), or a segment of video,
@@ -209,8 +248,7 @@ class XModuleDescriptor(Plugin):
     and can generate XModules (which do know about student state).
     """
     entry_point = "xmodule.v1"
-    js = {}
-    js_module = None
+    module_class = XModule
 
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (
@@ -221,7 +259,7 @@ class XModuleDescriptor(Plugin):
         'data_dir'
     )
 
-    # A list of descriptor attributes that must be equal for the discriptors to be
+    # A list of descriptor attributes that must be equal for the descriptors to be
     # equal
     equality_attributes = ('definition', 'metadata', 'location', 'shared_state_key', '_inherited_metadata')
 
@@ -384,31 +422,12 @@ class XModuleDescriptor(Plugin):
         """
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
-    # ================================== HTML INTERFACE DEFINITIONS ======================
-    @classmethod
-    def get_javascript(cls):
+    # =============================== Testing ===================================
+    def get_sample_state(self):
         """
-        Return a dictionary containing some of the following keys:
-            coffee: A list of coffeescript fragments that should be compiled and
-                    placed on the page
-            js: A list of javascript fragments that should be included on the page
-
-        All of these will be loaded onto the page in the CMS
+        Return a list of tuples of instance_state, shared_state. Each tuple defines a sample case for this module
         """
-        return cls.js
-
-    def js_module_name(self):
-        """
-        Return the name of the javascript class to instantiate when
-        this module descriptor is loaded for editing
-        """
-        return self.js_module
-
-    def get_html(self):
-        """
-        Return the html used to edit this module
-        """
-        raise NotImplementedError("get_html() must be provided by specific modules")
+        return [('{}', '{}')]
 
     # =============================== BUILTIN METHODS ===========================
     def __eq__(self, other):
@@ -451,3 +470,62 @@ class XMLParsingSystem(DescriptorSystem):
         """
         DescriptorSystem.__init__(self, load_item, resources_fs)
         self.process_xml = process_xml
+
+
+class ModuleSystem(object):
+    '''
+    This is an abstraction such that x_modules can function independent
+    of the courseware (e.g. import into other types of courseware, LMS,
+    or if we want to have a sandbox server for user-contributed content)
+
+    ModuleSystem objects are passed to x_modules to provide access to system
+    functionality.
+
+    Note that these functions can be closures over e.g. a django request
+    and user, or other environment-specific info.
+    '''
+    def __init__(self, ajax_url, track_function,
+                 get_module, render_template, replace_urls,
+                 user=None, filestore=None, debug=False, xqueue_callback_url=None):
+        '''
+        Create a closure around the system environment.
+
+        ajax_url - the url where ajax calls to the encapsulating module go.
+        track_function - function of (event_type, event), intended for logging
+                         or otherwise tracking the event.
+                         TODO: Not used, and has inconsistent args in different
+                         files.  Update or remove.
+        get_module - function that takes (location) and returns a corresponding
+                          module instance object.
+        render_template - a function that takes (template_file, context), and returns
+                          rendered html.
+        user - The user to base the random number generator seed off of for this request
+        filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
+                    settings.DATA_DIR.
+        replace_urls - TEMPORARY - A function like static_replace.replace_urls
+            that capa_module can use to fix up the static urls in ajax results.
+        '''
+        self.ajax_url = ajax_url
+        self.xqueue_callback_url = xqueue_callback_url
+        self.track_function = track_function
+        self.filestore = filestore
+        self.get_module = get_module
+        self.render_template = render_template
+        self.DEBUG = self.debug = debug
+        self.seed = user.id if user is not None else 0
+        self.replace_urls = replace_urls
+
+    def get(self, attr):
+        '''	provide uniform access to attributes (like etree).'''
+        return self.__dict__.get(attr)
+
+    def set(self, attr, val):
+        '''provide uniform access to attributes (like etree)'''
+        self.__dict__[attr] = val
+
+    def __repr__(self):
+        return repr(self.__dict__)
+
+    def __str__(self):
+        return str(self.__dict__)
+

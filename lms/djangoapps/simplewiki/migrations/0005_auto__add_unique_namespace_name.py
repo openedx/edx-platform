@@ -11,11 +11,9 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'Namespace', fields ['name']
         db.create_unique('simplewiki_namespace', ['name'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'Namespace', fields ['name']
         db.delete_unique('simplewiki_namespace', ['name'])
-
 
     models = {
         'auth.group': {

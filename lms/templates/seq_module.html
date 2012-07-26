@@ -1,6 +1,17 @@
-<div id="sequence_${element_id}" class="sequence">
+<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" >
   <nav aria-label="Section Navigation" class="sequence-nav">
     <ol id="sequence-list">
+      % for idx, item in enumerate(items):
+      ## TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
+      ## Make sure it gets updated after ajax calls.
+      ## implementation note: will need to figure out how to handle combining detail
+      ## statuses of multiple modules in js.
+      <li>
+        <a class="seq_${item['type']} inactive progress-${item['progress_status']}" data-element="${idx+1}">
+          <p>${item['title']}</p>
+        </a>
+      </li>
+      % endfor
     </ol>
 
     <ul class="sequence-nav-buttons">
@@ -9,6 +20,9 @@
     </ul>
   </nav>
 
+  % for item in items:
+  <div class="seq_contents">${item['content'] | h}</div>
+  % endfor
   <div id="seq_content"></div>
 
   <nav class="sequence-bottom">
@@ -18,11 +32,3 @@
     </ul>
   </nav>
 </div>
-
-<%block name="js_extra">
-<script type="text/javascript">
-  $(function(){
-    new Sequence('${item_id}', 'sequence_${element_id}', ${items}, '${tag}', ${position});
-  });
-</script>
-</%block>

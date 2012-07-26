@@ -24,8 +24,8 @@
       <li class="primary">
         <a href="#" class="dropdown">&#9662</a>
         <ul class="dropdown-menu">
-          <li><a href="#">Account Settings</a></li>
-          <li><a href="${reverse('help')}">Help</a></li>
+##          <li><a href="#">Account Settings</a></li>
+          <li><a href="${reverse('help_edx')}">Help</a></li>
           <li><a href="${reverse('logout')}">Log Out</a></li>
         </ul>
       </li>
@@ -35,9 +35,8 @@
     <ol class="guest">
       <li class="secondary">
         <a href="${reverse('about_edx')}">About</a>
-        <a href="#">Blog</a>
+        <a href="http://edxonline.tumblr.com/">Blog</a>
         <a href="${reverse('jobs')}">Jobs</a>
-        <a href="/t/contact.html">Contact</a>
         <a href="#login-modal" id="login" rel="leanModal">Log In</a>
       </li>
       <li class="primary">
@@ -51,4 +50,5 @@
 %if not user.is_authenticated():
   <%include file="login_modal.html" />
   <%include file="signup_modal.html" />
+  <%include file="forgot_password_modal.html" />
 %endif

@@ -10,18 +10,20 @@ import mitxmako.middleware as middleware
 
 middleware.MakoMiddleware()
 
+
 class Command(BaseCommand):
     help = \
-'''Sends an e-mail to all users. Takes a single 
+'''Sends an e-mail to all users. Takes a single
 parameter -- name of e-mail template -- located
 in templates/email. Adds a .txt for the message
 body, and an _subject.txt for the subject. '''
+
     def handle(self, *args, **options):
         #text = open(args[0]).read()
         #subject = open(args[1]).read()
         users = User.objects.all()
-        text = middleware.lookup['main'].get_template('email/'+args[0]+".txt").render()
-        subject = middleware.lookup['main'].get_template('email/'+args[0]+"_subject.txt").render().strip()
+        text = middleware.lookup['main'].get_template('email/' + args[0] + ".txt").render()
+        subject = middleware.lookup['main'].get_template('email/' + args[0] + "_subject.txt").render().strip()
         for user in users:
             if user.is_active:
                 user.email_user(subject, text)

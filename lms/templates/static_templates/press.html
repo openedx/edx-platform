@@ -3,6 +3,8 @@
 
 <%inherit file="../main.html" />
 
+<%block name="title"><title>edX in the Press</title></%block>
+
 <section class="container about">
   <nav>
     <a href="${reverse('about_edx')}">Vision</a>
@@ -12,61 +14,27 @@
   </nav>
 
   <section class="press">
-    <article class="press-story">
-      <div class="article-cover">
-        <img src="${static.url('images/courses/circuits.jpeg')}" />
-      </div>
-      <div class="press-info">
-        <header>
-          <h3>Online Classes Cut Costs, But Do They Dilute Brands?</h3>
-          <span class="post-date">7/12/2012</span>
-          <a href="http://www.npr.org/2012/07/02/156122748/online-classes-cut-costs-but-do-they-dilute-brands">http://n.pr/Lt5ydM</a>
-        </header>
-        <p>"You know this is the Wild West. There's a lot of things we have to figure out," Agarwal says. "And you know if anybody says they know exactly what they're doing, I think that would be a far cry from reality."</p>
-      </div>
-    </article>
-
-    <article class="press-story">
-      <div class="article-cover">
-        <img src="${static.url('images/courses/circuits.jpeg')}" />
-      </div>
-      <div class="press-info">
-        <header>
-          <h3>Online Classes Cut Costs, But Do They Dilute Brands?</h3>
-          <span class="post-date">7/12/2012</span>
-          <a href="http://www.npr.org/2012/07/02/156122748/online-classes-cut-costs-but-do-they-dilute-brands">http://n.pr/Lt5ydM</a>
-        </header>
-        <p>"You know this is the Wild West. There's a lot of things we have to figure out," Agarwal says. "And you know if anybody says they know exactly what they're doing, I think that would be a far cry from reality."</p>
-      </div>
-    </article>
-
-    <article class="press-story">
-      <div class="article-cover">
-        <img src="${static.url('images/courses/circuits.jpeg')}" />
-      </div>
-      <div class="press-info">
-        <header>
-          <h3>Online Classes Cut Costs, But Do They Dilute Brands?</h3>
-          <span class="post-date">7/12/2012</span>
-          <a href="http://www.npr.org/2012/07/02/156122748/online-classes-cut-costs-but-do-they-dilute-brands">http://n.pr/Lt5ydM</a>
-        </header>
-        <p>"You know this is the Wild West. There's a lot of things we have to figure out," Agarwal says. "And you know if anybody says they know exactly what they're doing, I think that would be a far cry from reality."</p>
-      </div>
-    </article>
-
-    <article class="press-story">
-      <div class="article-cover">
-        <img src="${static.url('images/courses/circuits.jpeg')}" />
-      </div>
-      <div class="press-info">
-        <header>
-          <h3>Online Classes Cut Costs, But Do They Dilute Brands?</h3>
-          <span class="post-date">7/12/2012</span>
-          <a href="http://www.npr.org/2012/07/02/156122748/online-classes-cut-costs-but-do-they-dilute-brands">http://n.pr/Lt5ydM</a>
-        </header>
-        <p>"You know this is the Wild West. There's a lot of things we have to figure out," Agarwal says. "And you know if anybody says they know exactly what they're doing, I think that would be a far cry from reality."</p>
-      </div>
-    </article>
+    % for article in articles:
+      <article class="press-story">
+        <div class="article-cover">
+          <a href="${article.url}" target="_blank"/><img src="${static.url('images/press/' + article.image)}" /></a>
+        </div>
+        <div class="press-info">
+          <header>
+            <h3>${article.title}</h3>
+            % if article.deck:
+              <p>${article.deck}</p>
+            % endif
+            <span class="post-date">${article.publication} | ${article.publish_date} 
+            % if article.author:
+              | By ${article.author}
+            % endif
+            </span><br/>
+          </header>
+          <a href="${article.url}" target="_blank">${article.url}</a>
+        </div>
+      </article>
+    % endfor
   </section>
 </section>
 

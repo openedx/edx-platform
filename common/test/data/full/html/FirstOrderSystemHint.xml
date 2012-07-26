@@ -1,0 +1,8 @@
+Hint
+<br/><br/>
+Remember that the time evolution of any variable \(x(t)\) governed by
+a first-order system with a time-constant \(\tau\) for a time \(t) between an initial
+value \(x(t_0)\) and a final value \(x(\infty)\) is the following:
+<br/><br/>
+\(x(t) = x(\infty) + (x(t_0) - x(\infty)) e^(-(t-t_0)/\tau)\)
+<br/><br/>

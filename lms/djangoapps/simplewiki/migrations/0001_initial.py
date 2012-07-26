@@ -82,7 +82,6 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('simplewiki_permission_can_read', ['permission_id', 'user_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'Article', fields ['slug', 'parent']
         db.delete_unique('simplewiki_article', ['slug', 'parent_id'])
@@ -107,7 +106,6 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field can_read on 'Permission'
         db.delete_table('simplewiki_permission_can_read')
-
 
     models = {
         'auth.group': {

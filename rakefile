@@ -66,9 +66,13 @@ end
     desc "Run pylint on all #{system} code"
     task "pylint_#{system}" => report_dir do
         Dir["#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
-            ENV['PYTHONPATH'] = File.dirname(app)
+            if File.exists? "#{app}/setup.py"
+                pythonpath_prefix = "PYTHONPATH=#{app}"
+            else
+                pythonpath_prefix = "PYTHONPATH=#{File.dirname(app)}"
+            end
             app = File.basename(app)
-            sh("pylint --rcfile=.pylintrc -f parseable #{app} | tee #{report_dir}/#{app}.pylint.report")
+            sh("#{pythonpath_prefix} pylint --rcfile=.pylintrc -f parseable #{app} | tee #{report_dir}/#{app}.pylint.report")
         end
     end
     task :pylint => "pylint_#{system}"
@@ -158,7 +162,7 @@ task :package do
         # as the makeitso user
 
         if [[ -d "#{INSTALL_DIR_PATH}" ]]; then
-            sudo -u makeitso rm -rf "#{INSTALL_DIR_PATH}"
+            sudo rm -rf "#{INSTALL_DIR_PATH}"
         fi
 
         AFTERREMOVE
@@ -171,7 +175,6 @@ task :package do
         set -e
         set -x
 
-        chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
 
         service gunicorn stop || echo "Unable to stop gunicorn. Continuing"
         rm -f #{LINK_PATH}
@@ -184,6 +187,7 @@ task :package do
             pip install -r #{PIP_REPO_REQUIREMENTS}
         fi
 
+        chown -R makeitso:makeitso #{INSTALL_DIR_PATH}
 
         # Delete mako temp files
         rm -rf /tmp/tmp*mako

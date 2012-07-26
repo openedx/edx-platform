@@ -46,6 +46,19 @@ LOGGING = get_logger_config(TEST_ROOT / "log",
                             tracking_filename="tracking.log",
                             debug=True)
 
+COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
+
+# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
+STATICFILES_DIRS = [
+    COMMON_ROOT / "static",
+    PROJECT_ROOT / "static",
+]
+STATICFILES_DIRS += [
+    (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
+    for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
+    if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
+]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

@@ -1,5 +1,9 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
 <%block name="title"><title>Profile - edX 6.002x</title></%block>
@@ -8,7 +12,7 @@
     from django.core.urlresolvers import reverse
 %>
 
-<%block name="headextra">
+<%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
@@ -44,26 +48,6 @@ $(function() {
                 loc=true;
                 $("#description").html("");
                log_event("profile", {"type":"location_change", "new":json.location});
-              });
-           });
-         }
-      });
-
-      $("#change_language").click(function() {
-         $(this).hide();
-         log_event("profile", {"type":"language_show", "old":$("#language_sub").text()});
-
-         if(lang) {
-           lang=false;
-           $("#language_sub").html('<form>'+'<input id="id_lang_text" type="text" name="lang_text" />'+
-             '<input type="submit" id="change_lang_button" value="Save" />'+'</form>');
-           $("#change_lang_button").click(function() {
-             $("#change_language").show();
-              postJSON('/change_setting', {'language':$("#id_lang_text").attr("value")}, function(json) {
-                $("#language_sub").text(json.language);
-                lang=true;
-                $("#description").html("");
-               log_event("profile", {"type":"language_change", "new":json.language});
               });
            });
          }
@@ -207,9 +191,6 @@ $(function() {
           Location: <div id="location_sub">${location}</div><div id="description"></div> <a href="#" id="change_location" aria-label="Edit Location">Edit</a>
         </li>
         <li>
-          Language: <div id="language_sub">${language}</div> <a href="#" id="change_language" aria-label="Edit Language">Edit</a>
-        </li>
-        <li>
           Password reset
           <input id="id_email" type="hidden" name="email" maxlength="75" value="${email}" />
           <input type="submit" id="pwd_reset_button" value="Reset" aria-label="Reset Password" />
@@ -234,10 +215,10 @@ $(function() {
   <form id="change_name_form">
     <div id="change_name_error"> </div>
     <fieldset>
-      <p>To uphold the credibility of edX certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p> 
+      <p>To uphold the credibility of <span class="edx">edX</span> certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p> 
       <ul>
         <li>
-          <label>Enter your desired full name, as it will appear on the edX Certificate: </label>
+          <label>Enter your desired full name, as it will appear on the <span class="edx">edX</span> Certificate: </label>
           <input id="new_name_field" value="" type="text" />
         </li>
         <li>
@@ -278,7 +259,7 @@ $(function() {
 </div>
 
 <div id="deactivate-account" class="leanModal_box">
-  <h1>Deactivate edX Account</h1>
+  <h1>Deactivate <span class="edx">edX</span> Account</h1>
   <p>Once you deactivate you&rsquo;re MIT<em>x</em> account you will no longer recieve updates and new class announcements from MIT<em>x</em>.</p>
   <p>If you&rsquo;d like to still get updates and new class announcements you can just <a href="#unenroll" rel="leanModal">unenroll</a> and keep your account active.</p>
 

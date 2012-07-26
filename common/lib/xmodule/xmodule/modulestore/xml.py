@@ -42,8 +42,8 @@ class XMLModuleStore(ModuleStore):
 
         self.eager = eager
         self.data_dir = path(data_dir)
-        self.modules = {}
-        self.courses = {}
+        self.modules = {}  # location -> XModuleDescriptor
+        self.courses = {}  # course_dir -> XModuleDescriptor for the course
 
         if default_class is None:
             self.default_class = None
@@ -53,7 +53,7 @@ class XMLModuleStore(ModuleStore):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager,self.data_dir))
+        log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
         log.debug('default_class = %s' % self.default_class)
 
         for course_dir in os.listdir(self.data_dir):
@@ -77,20 +77,24 @@ class XMLModuleStore(ModuleStore):
 
         with open(self.data_dir / course_dir / "course.xml") as course_file:
 
-            # TODO (cpennington): Remove this once all fall 2012 courses have been imported into the cms from xml
+            # TODO (cpennington): Remove this once all fall 2012 courses have been imported
+            # into the cms from xml
             course_file = StringIO(clean_out_mako_templating(course_file.read()))
 
             course_data = etree.parse(course_file).getroot()
             org = course_data.get('org')
 
             if org is None:
-                log.error("No 'org' attribute set for course in {dir}. Using default 'edx'".format(dir=course_dir))
+                log.error(
+                    "No 'org' attribute set for course in {dir}. Using default 'edx'".format(
+                        dir=course_dir))
                 org = 'edx'
 
             course = course_data.get('course')
 
             if course is None:
-                log.error("No 'course' attribute set for course in {dir}. Using default '{default}'".format(
+                log.error(
+                    "No 'course' attribute set for course in {dir}. Using default '{default}'".format(
                     dir=course_dir,
                     default=course_dir
                 ))
@@ -106,7 +110,8 @@ class XMLModuleStore(ModuleStore):
 
                     def process_xml(xml):
                         try:
-                            # TODO (cpennington): Remove this once all fall 2012 courses have been imported into the cms from xml
+                            # TODO (cpennington): Remove this once all fall 2012 courses
+                            # have been imported into the cms from xml
                             xml = clean_out_mako_templating(xml)
                             xml_data = etree.fromstring(xml)
                         except:
@@ -117,18 +122,24 @@ class XMLModuleStore(ModuleStore):
                                 slug = Location.clean(xml_data.get('name'))
                             else:
                                 self.unnamed_modules += 1
-                                slug = '{tag}_{count}'.format(tag=xml_data.tag, count=self.unnamed_modules)
+                                slug = '{tag}_{count}'.format(tag=xml_data.tag,
+                                                              count=self.unnamed_modules)
 
                             if slug in self.used_slugs:
                                 self.unnamed_modules += 1
-                                slug = '{slug}_{count}'.format(slug=slug, count=self.unnamed_modules)
+                                slug = '{slug}_{count}'.format(slug=slug,
+                                                               count=self.unnamed_modules)
 
                             self.used_slugs.add(slug)
                             # log.debug('-> slug=%s' % slug)
                             xml_data.set('slug', slug)
 
-                        module = XModuleDescriptor.load_from_xml(etree.tostring(xml_data), self, org, course, xmlstore.default_class)
+                        module = XModuleDescriptor.load_from_xml(
+                            etree.tostring(xml_data), self, org,
+                            course, xmlstore.default_class)
                         log.debug('==> importing module location %s' % repr(module.location))
+                        module.metadata['data_dir'] = course_dir
+
                         xmlstore.modules[module.location] = module
 
                         if xmlstore.eager:
@@ -143,9 +154,9 @@ class XMLModuleStore(ModuleStore):
                     )
                     MakoDescriptorSystem.__init__(self, **system_kwargs)
                     XMLParsingSystem.__init__(self, **system_kwargs)
+                    
 
             course_descriptor = ImportSystem(self).process_xml(etree.tostring(course_data))
-            course_descriptor.metadata['data_dir'] = course_dir
             log.debug('========> Done with course import')
             return course_descriptor
 

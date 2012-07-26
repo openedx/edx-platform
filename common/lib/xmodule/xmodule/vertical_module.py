@@ -26,7 +26,7 @@ class VerticalModule(XModule):
         # TODO: Cache progress or children array?
         children = self.get_children()
         progresses = [child.get_progress() for child in children]
-        progress = reduce(Progress.add_counts, progresses)
+        progress = reduce(Progress.add_counts, progresses, None)
         return progress
 
     def get_icon_class(self):

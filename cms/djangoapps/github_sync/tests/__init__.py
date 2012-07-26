@@ -10,36 +10,37 @@ from xmodule.modulestore import Location
 from override_settings import override_settings
 from github_sync.exceptions import GithubSyncError
 
+REPO_DIR = settings.GITHUB_REPO_ROOT / 'local_repo'
+WORKING_DIR = path(settings.TEST_ROOT)
+REMOTE_DIR = WORKING_DIR / 'remote_repo'
 
-@override_settings(DATA_DIR=path('test_root'))
+
+@override_settings(REPOS={
+    'local': {
+        'path': 'local_repo',
+        'origin': REMOTE_DIR,
+        'branch': 'master',
+    }
+})
 class GithubSyncTestCase(TestCase):
 
     def cleanup(self):
-        shutil.rmtree(self.repo_dir, ignore_errors=True)
-        shutil.rmtree(self.remote_dir, ignore_errors=True)
+        shutil.rmtree(REPO_DIR, ignore_errors=True)
+        shutil.rmtree(REMOTE_DIR, ignore_errors=True)
+        modulestore().collection.drop()
 
     def setUp(self):
-        self.working_dir = path(settings.TEST_ROOT)
-        self.repo_dir = self.working_dir / 'local_repo'
-        self.remote_dir = self.working_dir / 'remote_repo'
-
         # make sure there's no stale data lying around
         self.cleanup()
 
-        shutil.copytree('common/test/data/toy', self.remote_dir)
+        shutil.copytree('common/test/data/toy', REMOTE_DIR)
 
-        remote = Repo.init(self.remote_dir)
+        remote = Repo.init(REMOTE_DIR)
         remote.git.add(A=True)
         remote.git.commit(m='Initial commit')
         remote.git.config("receive.denyCurrentBranch", "ignore")
 
-        modulestore().collection.drop()
-
-        self.import_revision, self.import_course = import_from_github({
-            'path': self.repo_dir,
-            'origin': self.remote_dir,
-            'branch': 'master',
-        })
+        self.import_revision, self.import_course = import_from_github(settings.REPOS['local'])
 
     def tearDown(self):
         self.cleanup()
@@ -48,7 +49,7 @@ class GithubSyncTestCase(TestCase):
         """
         Test that importing from github will create a repo if the repo doesn't already exist
         """
-        self.assertEquals(1, len(Repo(self.repo_dir).head.reference.log()))
+        self.assertEquals(1, len(Repo(REPO_DIR).head.reference.log()))
 
     def test_import_contents(self):
         """
@@ -66,7 +67,7 @@ class GithubSyncTestCase(TestCase):
         Test that with the GITHUB_PUSH feature disabled, no content is pushed to the remote
         """
         export_to_github(self.import_course, 'Test no-push')
-        self.assertEquals(1, Repo(self.remote_dir).head.commit.count())
+        self.assertEquals(1, Repo(REMOTE_DIR).head.commit.count())
 
     @override_settings(MITX_FEATURES={'GITHUB_PUSH': True})
     def test_export_push(self):
@@ -75,7 +76,7 @@ class GithubSyncTestCase(TestCase):
         """
         self.import_course.metadata['display_name'] = 'Changed display name'
         export_to_github(self.import_course, 'Test push')
-        self.assertEquals(2, Repo(self.remote_dir).head.commit.count())
+        self.assertEquals(2, Repo(REMOTE_DIR).head.commit.count())
 
     @override_settings(MITX_FEATURES={'GITHUB_PUSH': True})
     def test_export_conflict(self):
@@ -84,7 +85,7 @@ class GithubSyncTestCase(TestCase):
         """
         self.import_course.metadata['display_name'] = 'Changed display name'
 
-        remote = Repo(self.remote_dir)
+        remote = Repo(REMOTE_DIR)
         remote.git.commit(allow_empty=True, m="Testing conflict commit")
 
         self.assertRaises(GithubSyncError, export_to_github, self.import_course, 'Test push')

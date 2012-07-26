@@ -1,4 +1,4 @@
-# Source: django-simplewiki. GPL license. 
+# Source: django-simplewiki. GPL license.
 
 from django import forms
 from django.contrib import admin
@@ -6,16 +6,20 @@ from django.utils.translation import ugettext as _
 
 from models import Article, Revision, Permission, ArticleAttachment
 
+
 class RevisionInline(admin.TabularInline):
     model = Revision
     extra = 1
+
 
 class RevisionAdmin(admin.ModelAdmin):
     list_display = ('article', '__unicode__', 'revision_date', 'revision_user', 'revision_text')
     search_fields = ('article', 'counter')
 
+
 class AttachmentAdmin(admin.ModelAdmin):
     list_display = ('article', '__unicode__', 'uploaded_on', 'uploaded_by')
+
 
 class ArticleAdminForm(forms.ModelForm):
     def clean(self):
@@ -30,16 +34,19 @@ class ArticleAdminForm(forms.ModelForm):
                 raise forms.ValidationError(_('Article slug and parent must be '
                                               'unique together.'))
         return cleaned_data
+
     class Meta:
         model = Article
+
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('created_by', 'slug', 'modified_on', 'namespace')
     search_fields = ('slug',)
-    prepopulated_fields = {'slug': ('title',) }
+    prepopulated_fields = {'slug': ('title',)}
     inlines = [RevisionInline]
     form = ArticleAdminForm
     save_on_top = True
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'current_revision':
             # Try to determine the id of the article being edited
@@ -52,6 +59,7 @@ class ArticleAdmin(admin.ModelAdmin):
                 db_field.editable = False
                 return db_field.formfield(**kwargs)
         return super(ArticleAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 class PermissionAdmin(admin.ModelAdmin):
     search_fields = ('article', 'counter')

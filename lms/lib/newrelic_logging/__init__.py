@@ -2,6 +2,7 @@ import newrelic.agent
 
 import logging
 
+
 class NewRelicHandler(logging.Handler):
     def emit(self, record):
         if record.exc_info is not None:

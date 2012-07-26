@@ -13,6 +13,8 @@ from .logsettings import get_logger_config
 DEBUG = True
 TEMPLATE_DEBUG = True
 
+MITX_FEATURES['DISABLE_START_DATES'] = True
+
 WIKI_ENABLED = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log", 
@@ -54,8 +56,8 @@ CACHES = {
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ################################ DEBUG TOOLBAR #################################
-#INSTALLED_APPS += ('debug_toolbar',) 
-#MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+INSTALLED_APPS += ('debug_toolbar',) 
+MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (

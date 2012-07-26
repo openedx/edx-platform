@@ -38,7 +38,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'UserProfile.gender'
         db.delete_column('auth_userprofile', 'gender')
@@ -57,7 +56,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'UserProfile.occupation'
         db.delete_column('auth_userprofile', 'occupation')
-
 
     models = {
         'auth.group': {

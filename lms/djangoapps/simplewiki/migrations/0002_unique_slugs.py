@@ -4,6 +4,7 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+
 class Migration(DataMigration):
 
     def forwards(self, orm):
@@ -16,11 +17,11 @@ class Migration(DataMigration):
                 while new_name in unique_slugs:
                     i += 1
                     new_name = article.slug + str(i)
-                print "Changing" , article.slug , "to" , new_name
+                print "Changing", article.slug, "to", new_name
                 article.slug = new_name
                 article.save()
-            
-            unique_slugs.add( article.slug )
+
+            unique_slugs.add(article.slug)
 
     def backwards(self, orm):
         "Write your backwards methods here."
