@@ -1,8 +1,7 @@
 from django.test import TestCase
 from path import path
 import shutil
-import os
-from github_sync import import_from_github, export_to_github
+from github_sync import import_from_github, export_to_github, load_repo_settings
 from git import Repo
 from django.conf import settings
 from xmodule.modulestore.django import modulestore
@@ -16,8 +15,7 @@ REMOTE_DIR = WORKING_DIR / 'remote_repo'
 
 
 @override_settings(REPOS={
-    'local': {
-        'path': 'local_repo',
+    'local_repo': {
         'origin': REMOTE_DIR,
         'branch': 'master',
     }
@@ -40,7 +38,7 @@ class GithubSyncTestCase(TestCase):
         remote.git.commit(m='Initial commit')
         remote.git.config("receive.denyCurrentBranch", "ignore")
 
-        self.import_revision, self.import_course = import_from_github(settings.REPOS['local'])
+        self.import_revision, self.import_course = import_from_github(load_repo_settings('local_repo'))
 
     def tearDown(self):
         self.cleanup()
