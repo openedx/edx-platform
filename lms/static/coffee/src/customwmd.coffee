@@ -6,10 +6,6 @@ $ ->
 
   class MathJaxProcessor
 
-    inlineMark = "$"
-    math = null
-    blocks = null
-
     MATHSPLIT = /// (
       \$\$?                          # normal inline or display delimiter
       | \\(?:begin|end)\{[a-z]*\*?\} # \begin{} \end{} style
@@ -27,20 +23,26 @@ $ ->
       (?!`)
     ///gm
 
-    @processMath: (start, last, preProcess) =>
-      block = blocks.slice(start, last + 1).join("").replace(/&/g, "&amp;")
+    constructor: (inlineMark, displayMark) ->
+      @inlineMark = inlineMark || "$"
+      @displayMark = displayMark || "$$"
+      @math = null
+      @blocks = null
+
+    processMath: (start, last, preProcess) ->
+      block = @blocks.slice(start, last + 1).join("").replace(/&/g, "&amp;")
                                                     .replace(/</g, "&lt;")
                                                     .replace(/>/g, "&gt;")
       if HUB.Browser.isMSIE
         block = block.replace /(%[^\n]*)\n/g, "$1<br/>\n"
-      blocks[i] = "" for i in [start+1..last]
-      blocks[start] = "@@#{math.length}@@"
+      @blocks[i] = "" for i in [start+1..last]
+      @blocks[start] = "@@#{@math.length}@@"
       block = preProcess(block) if preProcess
-      math.push block
+      @math.push block
 
-    @removeMath: (text) =>
+    removeMath: (text) ->
 
-      math = []
+      @math = []
       start = end = last = null
       braces = 0
 
@@ -54,13 +56,13 @@ $ ->
       else
         deTilde = (text) -> text
 
-      blocks = _split(text.replace(/\r\n?/g, "\n"), MATHSPLIT)
+      @blocks = _split(text.replace(/\r\n?/g, "\n"), MATHSPLIT)
 
-      for current in [1...blocks.length] by 2
-        block = blocks[current]
+      for current in [1...@blocks.length] by 2
+        block = @blocks[current]
         if block.charAt(0) == "@"
-          blocks[current] = "@@#{math.length}@@"
-          math.push block
+          @blocks[current] = "@@#{@math.length}@@"
+          @math.push block
         else if start
           if block == end
             if braces
@@ -79,7 +81,7 @@ $ ->
           else if block == "}" and braces
             --braces
         else
-          if block == inlineMark or block == "$$"
+          if block == @inlineMark or block == @displayMark
             start = current
             end = block
             braces = 0
@@ -92,21 +94,27 @@ $ ->
         @processMath(start, last, deTilde)
         start = end = last = null
 
-      deTilde(blocks.join(""))
+      deTilde(@blocks.join(""))
 
-    @replaceMath: (text) =>
-      text = text.replace /@@(\d+)@@/g, ($0, $1) => math[$1]
-      math = null
+    replaceMath: (text) ->
+      text = text.replace /@@(\d+)@@/g, ($0, $1) => @math[$1]
+      @math = null
       text
 
   if Markdown?
-    converter = Markdown.getSanitizingConverter()
-    editor = new Markdown.Editor(converter)
-    converter.hooks.chain "preConversion", MathJaxProcessor.removeMath
-    converter.hooks.chain "postConversion", MathJaxProcessor.replaceMath
-    delayRenderer = new MathJaxDelayRenderer()
-    editor.hooks.chain "onPreviewPush", (text, previewSet) ->
-      delayRenderer.render
-        text: text
-        previewSetter: previewSet
-    editor.run()
+    Markdown.getMathCompatibleConverter = ->
+        converter = Markdown.getSanitizingConverter()
+        processor = new MathJaxProcessor()
+        converter.hooks.chain "preConversion", processor.removeMath
+        converter.hooks.chain "postConversion", processor.replaceMath
+        converter
+
+    Markdown.makeWmdEditor = (appended_id) ->
+      converter = Markdown.getMathCompatibleConverter()
+      editor = new Markdown.Editor(converter, appended_id)
+      delayRenderer = new MathJaxDelayRenderer()
+      editor.hooks.chain "onPreviewPush", (text, previewSet) ->
+        delayRenderer.render
+          text: text
+          previewSetter: previewSet
+      editor.run()
