@@ -33,7 +33,7 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
-#disable=
+disable=E1102,W0142
 
 
 [REPORTS]
@@ -82,7 +82,7 @@ zope=no
 # List of members which are set dynamically and missed by pylint inference
 # system, and so shouldn't trigger E0201 when accessed. Python regular
 # expressions are accepted.
-generated-members=REQUEST,acl_users,aq_parent
+generated-members=REQUEST,acl_users,aq_parent,objects,DoesNotExist,can_read,can_write,get_url,size
 
 
 [BASIC]

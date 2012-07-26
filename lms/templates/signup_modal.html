@@ -19,19 +19,19 @@
         <div id="register_error" name="register_error"></div>
 
         <div class="input-group">
-          <label>E-mail*</label>
+          <label data-field="email">E-mail*</label>
           <input name="email" type="email" placeholder="E-mail*">
-          <label>Password*</label>
+          <label data-field="password">Password*</label>
           <input name="password" type="password" placeholder="Password*">
-          <label>Public Username*</label>
+          <label data-field="username">Public Username*</label>
           <input name="username" type="text" placeholder="Public Username*">
-          <label>Full Name</label>
+          <label data-field="name">Full Name</label>
           <input name="name" type="text" placeholder="Full Name*">
         </div>
 
         <div class="input-group">
           <section class="citizenship">
-            <label>Ed. completed</label>
+            <label data-field="level_of_education">Ed. completed</label>
             <div class="input-wrapper">
               <select name="level_of_education">
                   <option value="">--</option>
@@ -43,7 +43,7 @@
           </section>
 
           <section class="gender">
-            <label>Gender</label>
+            <label data-field="gender">Gender</label>
             <div class="input-wrapper">
               <select name="gender">
                   <option value="">--</option>
@@ -55,7 +55,7 @@
           </section>
 
           <section class="date-of-birth">
-            <label>Year of birth</label>
+            <label data-field="date-of-birth">Year of birth</label>
             <div class="input-wrapper">
               <select name="year_of_birth">
                 <option value="">--</option>
@@ -67,21 +67,21 @@
             </div>
           </section>
 
-          <label>Mailing address</label>
+          <label data-field="mailing_address">Mailing address</label>
           <textarea name="mailing_address" placeholder="Mailing address"></textarea>
-          <label>Goals in signing up for edX</label>
+          <label data-field="goals">Goals in signing up for edX</label>
           <textarea name="goals" placeholder="Goals in signing up for edX"></textarea>
 
         </div>
 
         <div class="input-group">
-          <label class="terms-of-service">
+          <label data-field="terms_of_service" class="terms-of-service">
             <input name="terms_of_service" type="checkbox" value="true">
             I agree to the
             <a href="${reverse('tos')}" target="_blank">Terms of Service</a>*
           </label>
 
-          <label class="honor-code">
+          <label data-field="honor_code" class="honor-code">
             <input name="honor_code" type="checkbox" value="true">
             I agree to the
             <a href="${reverse('honor')}" target="_blank">Honor Code</a>*
@@ -115,7 +115,9 @@
      if(json.success) {
        location.href="${reverse('dashboard')}";
      } else {
+       $(".field-error").removeClass('field-error');
        $('#register_error').html(json.value).stop().css("display", "block");
+       $("[data-field='"+json.field+"']").addClass('field-error')
      }
     });
   })(this)
