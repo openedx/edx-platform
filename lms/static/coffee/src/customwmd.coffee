@@ -109,7 +109,18 @@ $ ->
         converter.hooks.chain "postConversion", processor.replaceMath
         converter
 
-    Markdown.makeWmdEditor = (appended_id) ->
+    Markdown.makeWmdEditor = (elem, appended_id) ->
+      $elem = $(elem)
+      if not $elem.length
+        console.log "warning: elem for makeWmdEditor doesn't exist"
+        return
+      if not $elem.find(".wmd-panel").length
+        _append = appended_id || ""
+        $wmdPanel = $("<div>").addClass("wmd-panel")
+                   .append($("<div>").attr("id", "wmd-button-bar#{_append}"))
+                   .append($("<textarea>").addClass("wmd-input").attr("id", "wmd-input#{_append}"))
+                   .append($("<div>").attr("id", "wmd-preview#{_append}").addClass("wmd-panel wmd-preview"))
+        $elem.append($wmdPanel)
       converter = Markdown.getMathCompatibleConverter()
       editor = new Markdown.Editor(converter, appended_id)
       delayRenderer = new MathJaxDelayRenderer()
