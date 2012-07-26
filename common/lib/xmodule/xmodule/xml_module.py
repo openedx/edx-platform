@@ -257,6 +257,11 @@ class XmlDescriptor(XModuleDescriptor):
             # ...and remove all of its children here
             for child in xml_object:
                 xml_object.remove(child)
+            # also need to remove the text of this object.
+            xml_object.text = ''
+            # and the tail for good measure...
+            xml_object.tail = ''
+
 
             xml_object.set('filename', self.name)
 
