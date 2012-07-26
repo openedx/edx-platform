@@ -1,0 +1,23 @@
+<%! from django.core.urlresolvers import reverse %>
+
+<%
+def url_for(commentable):
+  return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id, commentable['discussion_id']])
+%>
+
+<%def name="make_category(category, commentables)">
+  <h3><a href="#">${category}</a></h3>
+
+    <ul>
+      % for commentable in commentables: 
+        <li${' class="active"' if active == commentable['discussion_id'] else ''}>
+          <a href="${url_for(commentable)}">
+            <p>${commentable['title']}</p>
+          </a>
+        % endfor
+      </ul>
+    </%def>
+
+% for category, commentables in discussion_info.items(): 
+    ${make_category(category, commentables)}
+% endfor
