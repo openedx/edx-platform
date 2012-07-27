@@ -74,7 +74,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 etree.tostring(xml_data), self, org,
                 course, xmlstore.default_class)
 
-            log.debug('==> importing module location %s' % repr(module.location))
+            #log.debug('==> importing module location %s' % repr(module.location))
             module.metadata['data_dir'] = course_dir
 
             xmlstore.modules[module.location] = module
@@ -130,13 +130,14 @@ class XMLModuleStore(ModuleStore):
             self.default_class = None
         else:
             module_path, _, class_name = default_class.rpartition('.')
-            log.debug('module_path = %s' % module_path)
+            #log.debug('module_path = %s' % module_path)
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        # TODO (cpennington): We need a better way of selecting specific sets of debug messages to enable. These were drowning out important messages
-        log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
-        log.debug('default_class = %s' % self.default_class)
+        # TODO (cpennington): We need a better way of selecting specific sets of
+        # debug messages to enable. These were drowning out important messages
+        #log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
+        #log.debug('default_class = %s' % self.default_class)
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -162,6 +163,7 @@ class XMLModuleStore(ModuleStore):
 
         returns a CourseDescriptor for the course
         """
+        log.debug('========> Starting course import from {0}'.format(course_dir))
 
         with open(self.data_dir / course_dir / "course.xml") as course_file:
 
@@ -192,7 +194,7 @@ class XMLModuleStore(ModuleStore):
                                   self.error_handler)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
-            log.debug('========> Done with course import')
+            log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
     def get_item(self, location, depth=0):
