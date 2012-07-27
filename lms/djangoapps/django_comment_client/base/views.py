@@ -1,9 +1,21 @@
+import time
+import random
+import os
+import os.path
+import logging
+import urlparse
+
+import comment_client
+
+from django.core import exceptions
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_GET
 from django.http import HttpResponse
 from django.utils import simplejson
-
-import comment_client
+from django.views.decorators import csrf
+from django.core.files.storage import get_storage_class
+from django.utils.translation import ugettext as _
+from django.conf import settings
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
@@ -183,3 +195,82 @@ def search(request, course_id):
     commentable_id = request.GET.get('commentable_id', None)
     response = comment_client.search(text, commentable_id)
     return JsonResponse(response)
+
+@csrf.csrf_exempt
+@login_required
+@require_POST
+def upload(request, course_id):#ajax upload file to a question or answer 
+    """view that handles file upload via Ajax
+    """
+
+    # check upload permission
+    result = ''
+    error = ''
+    new_file_name = ''
+    try:
+        # TODO authorization
+        #may raise exceptions.PermissionDenied 
+        #if request.user.is_anonymous():
+        #    msg = _('Sorry, anonymous users cannot upload files')
+        #    raise exceptions.PermissionDenied(msg)
+
+        #request.user.assert_can_upload_file()
+
+        # check file type
+        f = request.FILES['file-upload']
+        file_extension = os.path.splitext(f.name)[1].lower()
+        if not file_extension in settings.DISCUSSION_ALLOWED_UPLOAD_FILE_TYPES:
+            file_types = "', '".join(settings.DISCUSSION_ALLOWED_UPLOAD_FILE_TYPES)
+            msg = _("allowed file types are '%(file_types)s'") % \
+                    {'file_types': file_types}
+            raise exceptions.PermissionDenied(msg)
+
+        # generate new file name
+        new_file_name = str(
+                            time.time()
+                        ).replace(
+                            '.', 
+                            str(random.randint(0,100000))
+                        ) + file_extension
+
+        file_storage = get_storage_class()()
+        # use default storage to store file
+        file_storage.save(new_file_name, f)
+        # check file size
+        # byte
+        size = file_storage.size(new_file_name)
+        if size > settings.ASKBOT_MAX_UPLOAD_FILE_SIZE:
+            file_storage.delete(new_file_name)
+            msg = _("maximum upload file size is %(file_size)sK") % \
+                    {'file_size': settings.ASKBOT_MAX_UPLOAD_FILE_SIZE}
+            raise exceptions.PermissionDenied(msg)
+
+    except exceptions.PermissionDenied, e:
+        error = unicode(e)
+    except Exception, e:
+        logging.critical(unicode(e))
+        error = _('Error uploading file. Please contact the site administrator. Thank you.')
+
+    if error == '':
+        result = 'Good'
+        file_url = file_storage.url(new_file_name)
+        parsed_url = urlparse.urlparse(file_url)
+        file_url = urlparse.urlunparse(
+            urlparse.ParseResult(
+                parsed_url.scheme, 
+                parsed_url.netloc,
+                parsed_url.path,
+                '', '', ''
+            )
+        )
+    else:
+        result = ''
+        file_url = ''
+
+    return JsonResponse({
+        'result': {
+            'msg': result,
+            'error': error,
+            'file_url': file_url,
+        }
+    })
