@@ -1,6 +1,7 @@
 import logging
 
 from .xml import XMLModuleStore
+from .exceptions import DuplicateItemError
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ def import_from_xml(store, data_dir, course_dirs=None, eager=True,
         # This should in the future create new revisions of the items on import
         try:
             store.create_item(module.location)
-        except:
+        except DuplicateItemError:
             log.exception('Item already exists at %s' % module.location.url())
             pass
         if 'data' in module.definition:
