@@ -301,15 +301,15 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 PIPELINE_CSS = {
     'application': {
         'source_filenames': ['sass/application.scss'],
-        'output_filename': 'css/application.css',
+        'output_filename': 'css/lms-application.css',
     },
     'course': {
       'source_filenames': ['sass/course.scss', 'js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css'],
-      'output_filename': 'css/course.css',
+      'output_filename': 'css/lms-course.css',
       },
     'ie-fixes': {
         'source_filenames': ['sass/ie.scss'],
-        'output_filename': 'css/ie.css',
+        'output_filename': 'css/lms-ie.css',
     },
 }
 
@@ -410,23 +410,23 @@ PIPELINE_JS = {
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
         ],
-        'output_filename': 'js/application.js'
+        'output_filename': 'js/lms-application.js'
     },
     'courseware': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in courseware_only_js],
-        'output_filename': 'js/courseware.js'
+        'output_filename': 'js/lms-courseware.js'
     },
     'main_vendor': {
         'source_filenames': main_vendor_js,
-        'output_filename': 'js/main_vendor.js',
+        'output_filename': 'js/lms-main_vendor.js',
     },
     'module-js': {
         'source_filenames': module_js_sources,
-        'output_filename': 'js/modules.js',
+        'output_filename': 'js/lms-modules.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
-        'output_filename': 'js/spec.js'
+        'output_filename': 'js/lms-spec.js'
     }
 }
 
