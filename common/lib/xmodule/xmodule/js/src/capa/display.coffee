@@ -31,7 +31,19 @@ class @Problem
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
+        @executeProblemScripts()
         @bind()
+
+  executeProblemScripts: ->
+    @el.find(".script_placeholder").each (index, placeholder) ->
+      s = $("<script>")
+      s.attr("type", "text/javascript")
+      s.attr("src", $(placeholder).attr("data-src"))
+
+      # Need to use the DOM elements directly or the scripts won't execute
+      # properly.
+      $('head')[0].appendChild(s[0])
+      $(placeholder).remove()
 
   check: =>
     Logger.log 'problem_check', @answers
