@@ -14,7 +14,9 @@ def dictfetchall(cursor):
 
 def dashboard(request):
     """
-    Simple view that a loadbalancer can check to verify that the app is up
+    Quick hack to show staff enrollment numbers.  This should be
+    replaced with a real dashboard later. This version is a short-term
+    bandaid for the next couple weeks. 
     """
     if not request.user.is_staff:
         raise Http404
