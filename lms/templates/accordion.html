@@ -5,17 +5,15 @@
 
   <ul>
     % for section in chapter['sections']:
-    %   if not section['hide_from_toc']:
-          <li${' class="active"' if 'active' in section and section['active'] else ''}>
-            <a href="${reverse('courseware_section', args=[course_id] + format_url_params([chapter['name'], section['name']]))}">
-              <p>${section['name']}
-              <span class="subtitle">
-                ${section['format']} ${"due " + section['due'] if 'due' in section and section['due'] != '' else ''}
-              </span>
-              </p>
-            </a>
-          </li>
-    %   endif
+        <li${' class="active"' if 'active' in section and section['active'] else ''}>
+          <a href="${reverse('courseware_section', args=[course_id] + format_url_params([chapter['name'], section['name']]))}">
+            <p>${section['name']}
+            <span class="subtitle">
+              ${section['format']} ${"due " + section['due'] if 'due' in section and section['due'] != '' else ''}
+            </span>
+            </p>
+          </a>
+        </li>
     % endfor
   </ul>
 </%def>

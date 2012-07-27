@@ -58,11 +58,11 @@ def toc_for_course(user, request, course, active_chapter, active_section):
                       section.metadata.get('display_name') == active_section)
             hide_from_toc = section.metadata.get('hide_from_toc', 'false').lower() == 'true'
 
-            sections.append({'name': section.metadata.get('display_name'),
-                             'format': section.metadata.get('format', ''),
-                             'due': section.metadata.get('due', ''),
-                             'active': active,
-                             'hide_from_toc' : hide_from_toc})
+            if not hide_from_toc:
+                sections.append({'name': section.metadata.get('display_name'),
+                                 'format': section.metadata.get('format', ''),
+                                 'due': section.metadata.get('due', ''),
+                                 'active': active})
 
         chapters.append({'name': chapter.metadata.get('display_name'),
                          'sections': sections,
