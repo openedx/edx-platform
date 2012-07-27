@@ -4,6 +4,7 @@ from xmodule.modulestore import Location
 from lxml import etree
 import copy
 import logging
+import traceback
 from collections import namedtuple
 from fs.errors import ResourceNotFoundError
 import os
@@ -220,7 +221,10 @@ class XmlDescriptor(XModuleDescriptor):
                     system.error_handler(msg)
                     # if error_handler didn't reraise, work around problem.
                     error_elem = etree.Element('error')
-                    error_elem.text = msg
+                    message_elem = etree.SubElement(error_elem, 'error_message')
+                    message_elem.text = msg
+                    stack_elem = etree.SubElement(error_elem, 'stack_trace')
+                    stack_elem.text = traceback.format_exc()
                     return {'data': etree.tostring(error_elem)}
 
             cls.clean_metadata_from_xml(definition_xml)
