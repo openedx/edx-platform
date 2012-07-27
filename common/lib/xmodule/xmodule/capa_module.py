@@ -530,11 +530,13 @@ class CapaModule(XModule):
 
         self.lcp.do_reset()
         if self.rerandomize == "always":
-            # reset random number generator seed (note the self.lcp.get_state() in next line)
+            # reset random number generator seed (note the self.lcp.get_state()
+            # in next line)
             self.lcp.seed = None
 
         self.lcp = LoncapaProblem(self.definition['data'],
-                                  self.location.html_id(), self.lcp.get_state(), system=self.system)
+                                  self.location.html_id(), self.lcp.get_state(),
+                                  system=self.system)
 
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)

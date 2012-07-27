@@ -104,7 +104,7 @@ def import_with_checks(course_dir, verbose=True):
     if n != 1:
         print 'ERROR: Expect exactly 1 course.  Loaded {n}: {lst}'.format(
             n=n, lst=courses)
-        return
+        return (False, None)
 
     course = courses[0]
 
