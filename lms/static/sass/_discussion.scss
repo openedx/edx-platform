@@ -91,6 +91,7 @@ $discussion_input_width: 60%;
   .discussion-right-wrapper {
     min-height: 40px;
     float: left;
+    width: 70%;
   }
   .new-post-form {
     .new-post-title, .new-post-body {
@@ -190,7 +191,6 @@ $discussion_input_width: 60%;
 
 .wmd-panel
 {
-  margin-left: 25%;
   margin-right: 25%;
   width: 50%;
   min-width: 500px;

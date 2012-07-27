@@ -13,9 +13,7 @@ class @MathJaxDelayRenderer
   constructor: (params) ->
     params = params || {}
     @maxDelay = params["maxDelay"] || @maxDelay
-    @bufferId = params["buffer"] || @bufferId
-    if not $("##{@bufferId}").length
-      $("<div>").attr("id", @bufferId).css("display", "none").appendTo($("body"))
+    @$buffer = $("<div>").attr("id", @bufferId).css("display", "none").appendTo($("body"))
 
   # render: (params) ->
   # params:
@@ -35,7 +33,6 @@ class @MathJaxDelayRenderer
     if not text?
       text = $(elem).html()
     preprocessor = params["preprocessor"]
-    buffer = $("##{@bufferId}")
 
     if params["delay"] == false
       if preprocessor?
@@ -54,20 +51,20 @@ class @MathJaxDelayRenderer
         prevTime = getTime()
         if preprocessor?
           text = preprocessor(text)
-        buffer.html(text)
+        @$buffer.html(text)
         curTime = getTime()
         @elapsedTime = curTime - prevTime
         if MathJax
           prevTime = getTime()
           @mathjaxRunning = true
-          MathJax.Hub.Queue ["Typeset", MathJax.Hub, buffer.attr("id")], =>
+          MathJax.Hub.Queue ["Typeset", MathJax.Hub, @$buffer.attr("id")], =>
             @mathjaxRunning = false
             curTime = getTime()
             @mathjaxDelay = curTime - prevTime
             if previewSetter
-              previewSetter($(buffer).html())
+              previewSetter($(@$buffer).html())
             else
-              $(elem).html($(buffer).html())
+              $(elem).html($(@$buffer).html())
         else
           @mathjaxDelay = 0
       @mathjaxTimeout = window.setTimeout(renderer, delay)
