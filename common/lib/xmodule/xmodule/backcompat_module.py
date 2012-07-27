@@ -5,6 +5,7 @@ from x_module import XModuleDescriptor
 from lxml import etree
 from functools import wraps
 import logging
+import traceback
 
 log = logging.getLogger(__name__)
 
@@ -21,29 +22,31 @@ def process_includes(fn):
         next_include = xml_object.find('include')
         while next_include is not None:
             file = next_include.get('file')
-            if file is not None:
-                try:
-                    ifp = system.resources_fs.open(file)
-                except Exception:
-                    msg = 'Error in problem xml include: %s\n' % (
-                        etree.tostring(next_include, pretty_print=True))
-                    msg += 'Cannot find file %s in %s' % (file, dir)
-                    log.exception(msg)
-                    system.error_handler(msg)
-                    raise
-                try:
-                    # read in and convert to XML
-                    incxml = etree.XML(ifp.read())
-                except Exception:
-                    msg = 'Error in problem xml include: %s\n' % (
-                        etree.tostring(next_include, pretty_print=True))
-                    msg += 'Cannot parse XML in %s' % (file)
-                    log.exception(msg)
-                    system.error_handler(msg)
-                    raise
+            parent = next_include.getparent()
+
+            if file is None:
+                continue
+
+            try:
+                ifp = system.resources_fs.open(file)
+                # read in and convert to XML
+                incxml = etree.XML(ifp.read())
+
                 # insert  new XML into tree in place of inlcude
-                parent = next_include.getparent()
                 parent.insert(parent.index(next_include), incxml)
+            except Exception:
+                msg = "Error in problem xml include: %s" % (etree.tostring(next_include, pretty_print=True))
+                log.exception(msg)
+                parent = next_include.getparent()
+
+                errorxml = etree.Element('error')
+                messagexml = etree.SubElement(errorxml, 'message')
+                messagexml.text = msg
+                stackxml = etree.SubElement(errorxml, 'stacktrace')
+                stackxml.text = traceback.format_exc()
+
+                # insert error XML in place of include
+                parent.insert(parent.index(next_include), errorxml)
             parent.remove(next_include)
 
             next_include = xml_object.find('include')
