@@ -61,7 +61,7 @@ PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
-ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
+ASKBOT_ROOT = REPO_ROOT / "askbot"
 COURSES_ROOT = ENV_ROOT / "data"
 
 # FIXME: To support multiple courses, we should walk the courses dir at startup
