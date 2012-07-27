@@ -200,10 +200,19 @@ def index(request, course_id, chapter=None, section=None,
     if look_for_module:
         # TODO (cpennington): Pass the right course in here
 
-        section = get_section(course, chapter, section)
-        student_module_cache = StudentModuleCache(request.user, section)
-        module, _, _, _ = get_module(request.user, request, section.location, student_module_cache)
-        context['content'] = module.get_html()
+        section_descriptor = get_section(course, chapter, section)
+        if section_descriptor is not None:
+            student_module_cache = StudentModuleCache(request.user,
+                                                      section_descriptor)
+            module, _, _, _ = get_module(request.user, request,
+                                         section_descriptor.location,
+                                         student_module_cache)
+            context['content'] = module.get_html()
+        else:
+            log.warning("Couldn't find a section descriptor for course_id '{0}',"
+                        "chapter '{1}', section '{2}'".format(
+                        course_id, chapter, section))
+
 
     result = render_to_response('courseware.html', context)
     return result

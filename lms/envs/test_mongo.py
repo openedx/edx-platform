@@ -1,26 +1,36 @@
 """
-This config file runs the simplest dev environment using sqlite, and db-based
-sessions. Assumes structure:
-
-/envroot/
-        /db   # This is where it'll write the database file
-        /mitx # The location of this repo
-        /log  # Where we're going to write log files
+This config file runs the test environment, but with mongo as the datastore
 """
 from .common import *
+
 from .logsettings import get_logger_config
 import os
 from path import path
 
-INSTALLED_APPS = [
-    app
-    for app
-    in INSTALLED_APPS
-    if not app.startswith('askbot')
-]
+# can't testing start dates with this True, but on the other hand,
+# can test everything else :)
+MITX_FEATURES['DISABLE_START_DATES'] = True
+
+WIKI_ENABLED = True
+
+GITHUB_REPO_ROOT = ENV_ROOT / "data"
+
+MODULESTORE = {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': {
+            'default_class': 'xmodule.raw_module.RawDescriptor',
+            'host': 'localhost',
+            'db': 'xmodule',
+            'collection': 'modulestore',
+            'fs_root': GITHUB_REPO_ROOT,
+        }
+    }
+}
+
 
 # Nose Test Runner
-INSTALLED_APPS += ['django_nose']
+INSTALLED_APPS += ('django_nose',)
 NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html',
              '--cover-inclusive', '--cover-html-dir',
              os.environ.get('NOSE_COVER_HTML_DIR', 'cover_html')]
@@ -28,38 +38,17 @@ for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
     NOSE_ARGS += ['--cover-package', app]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-# Local Directories
+
 TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 
-COURSES_ROOT = TEST_ROOT / "data"
-DATA_DIR = COURSES_ROOT
-MAKO_TEMPLATES['course'] = [DATA_DIR]
-MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
-MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
-MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
-                          DATA_DIR / 'info',
-                          DATA_DIR / 'problems']
+
 
 LOGGING = get_logger_config(TEST_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
                             debug=True)
-
-COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
-
-# TODO (cpennington): We need to figure out how envs/test.py can inject things
-# into common.py so that we don't have to repeat this sort of thing
-STATICFILES_DIRS = [
-    COMMON_ROOT / "static",
-    PROJECT_ROOT / "static",
-]
-STATICFILES_DIRS += [
-    (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
-    for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
-    if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
-]
 
 DATABASES = {
     'default': {
@@ -93,6 +82,9 @@ CACHES = {
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# Makes the tests run much faster...
+SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 
 ############################ FILE UPLOADS (ASKBOT) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

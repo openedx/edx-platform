@@ -342,7 +342,7 @@ class MongoModuleStore(ModuleStore):
             while len(queue) > 0:
                 (loc, path) = queue.pop()  # Takes from the end
                 loc = Location(loc)
-                print 'Processing loc={0}, path={1}'.format(loc, path)
+                # print 'Processing loc={0}, path={1}'.format(loc, path)
                 if loc.category == "course":
                     if course_name is None or course_name == loc.name:
                         # Found it!
