@@ -104,7 +104,8 @@ class HTMLSnippet(object):
         """
         Return the html used to display this snippet
         """
-        raise NotImplementedError("get_html() must be provided by specific modules")
+        raise NotImplementedError("get_html() must be provided by specific modules - not present in {0}"
+                                  .format(self.__class__))
 
 
 class XModule(HTMLSnippet):
