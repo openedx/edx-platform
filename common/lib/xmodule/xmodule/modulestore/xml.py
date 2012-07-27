@@ -50,24 +50,25 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 log.exception("Unable to parse xml: {xml}".format(xml=xml))
                 raise
 
-            # TODO (vshnayder): is the slug munging permanent, or also intended
-            # to be taken out?
-            if xml_data.get('slug') is None:
+            # VS[compat]. Take this out once course conversion is done
+            if xml_data.get('slug') is None and xml_data.get('url_name') is None:
                 if xml_data.get('name'):
                     slug = Location.clean(xml_data.get('name'))
+                elif xml_data.get('display_name'):
+                    slug = Location.clean(xml_data.get('display_name'))
                 else:
                     self.unnamed_modules += 1
                     slug = '{tag}_{count}'.format(tag=xml_data.tag,
                                                   count=self.unnamed_modules)
 
-                if slug in self.used_slugs:
+                while slug in self.used_slugs:
                     self.unnamed_modules += 1
                     slug = '{slug}_{count}'.format(slug=slug,
                                                    count=self.unnamed_modules)
 
                 self.used_slugs.add(slug)
                 # log.debug('-> slug=%s' % slug)
-                xml_data.set('slug', slug)
+                xml_data.set('url_name', slug)
 
             module = XModuleDescriptor.load_from_xml(
                 etree.tostring(xml_data), self, org,
