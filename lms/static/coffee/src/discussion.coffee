@@ -43,6 +43,7 @@ Discussion =
       delete_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/delete"
       upvote_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/upvote"
       downvote_comment    : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
+      upload              : "/courses/#{$$course_id}/discussion/upload"
       search              : "/courses/#{$$course_id}/discussion/forum/search"
     }[name]
 
@@ -89,7 +90,7 @@ Discussion =
 
       newPostBody = $(discussion).find(".new-post-body")
       if newPostBody.length
-        Markdown.makeWmdEditor newPostBody, "-new-post-body-#{$(discussion).attr('_id')}"
+        Markdown.makeWmdEditor newPostBody, "-new-post-body-#{$(discussion).attr('_id')}", Discussion.urlFor('upload')
 
     initializeWatchThreads = (index, thread) ->
       $thread = $(thread)
@@ -175,7 +176,7 @@ Discussion =
         
         $discussionContent.append(editView)
 
-        Markdown.makeWmdEditor $local(".comment-edit"), "-comment-edit-#{id}"
+        Markdown.makeWmdEditor $local(".comment-edit"), "-comment-edit-#{id}", Discussion.urlFor('upload')
       cancelReply = generateDiscussionLink("discussion-cancel-reply", "Cancel", handleCancelReply)
       submitReply = generateDiscussionLink("discussion-submit-reply", "Submit", handleSubmitReply)
       $local(".discussion-link").hide()
@@ -230,10 +231,17 @@ Discussion =
     $local(".discussion-vote-down").click ->
       handleVote(this, "down")
 
+  initializeContent: (content) ->
+    $content = $(content)
+    $local = generateLocal($content.children(".discussion-content"))
+    raw_text = $local(".content-body").html()
+    converter = Markdown.getMathCompatibleConverter()
+    $local(".content-body").html(converter.makeHtml(raw_text))
+
   bindDiscussionEvents: (discussion) ->
     $discussion = $(discussion)
     $discussionNonContent = $discussion.children(".discussion-non-content")
-    $local = (selector) -> $discussionNonContent.find(selector)
+    $local = generateLocal($discussionNonContent)#(selector) -> $discussionNonContent.find(selector)
 
     id = $discussion.attr("_id")
 
@@ -266,7 +274,9 @@ Discussion =
       $local(".new-post-form").submit()
 
     $discussion.find(".thread").each (index, thread) ->
+      Discussion.initializeContent(thread)
       Discussion.bindContentEvents(thread)
 
     $discussion.find(".comment").each (index, comment) ->
+      Discussion.initializeContent(comment)
       Discussion.bindContentEvents(comment)
