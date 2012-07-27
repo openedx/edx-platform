@@ -3,7 +3,7 @@ from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
 from path import path
-from xmodule.errorhandlers import strict_error_handler
+from xmodule.errorhandlers import logging_error_handler
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 from xmodule.mako_module import MakoDescriptorSystem
 from cStringIO import StringIO
@@ -100,7 +100,7 @@ class XMLModuleStore(ModuleStore):
     """
     def __init__(self, data_dir, default_class=None, eager=False,
                  course_dirs=None,
-                 error_handler=strict_error_handler):
+                 error_handler=logging_error_handler):
         """
         Initialize an XMLModuleStore from data_dir
 

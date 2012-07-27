@@ -1,4 +1,11 @@
+import logging
 import sys
+
+log = logging.getLogger(__name__)
+
+def in_exception_handler():
+    '''Is there an active exception?'''
+    return sys.exc_info() != (None, None, None)
 
 def strict_error_handler(msg, exc_info=None):
     '''
@@ -11,11 +18,24 @@ def strict_error_handler(msg, exc_info=None):
     if exc_info is not None:
         raise exc_info[0], exc_info[1], exc_info[2]
 
-    # Check if there is an exception being handled somewhere up the stack
-    if sys.exc_info() != (None, None, None):
+    if in_exception_handler():
         raise
 
     raise Exception(msg)
+
+
+def logging_error_handler(msg, exc_info=None):
+    '''Log all errors, but otherwise let them pass, relying on the caller to
+    workaround.'''
+    if exc_info is not None:
+        log.exception(msg, exc_info=exc_info)
+        return
+
+    if in_exception_handler():
+        log.exception(msg)
+        return
+
+    log.error(msg)
 
 
 def ignore_errors_handler(msg, exc_info=None):
