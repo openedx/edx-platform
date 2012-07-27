@@ -13,6 +13,7 @@ $ ->
     Discussion.bindDiscussionEvents(discussion)
     Discussion.initializeDiscussion(discussion)
 
+
 generateLocal = (elem) ->
   (selector) -> $(elem).find(selector)
 
@@ -50,6 +51,7 @@ Discussion =
     window.location.reload()
 
   initializeDiscussion: (discussion) ->
+
     initializeVote = (index, content) ->
       $content = $(content)
       $local = generateLocal($content.children(".discussion-content"))
@@ -84,6 +86,10 @@ Discussion =
       else
         watchDiscussion = generateDiscussionLink("discussion-watch-discussion", "Watch", handleWatchDiscussion)
         $local(".discussion-title-wrapper").append(watchDiscussion)
+
+      newPostBody = $(discussion).find(".new-post-body")
+      if newPostBody.length
+        Markdown.makeWmdEditor newPostBody, "-new-post-body-#{$(discussion).attr('_id')}"
 
     initializeWatchThreads = (index, thread) ->
       $thread = $(thread)
@@ -147,7 +153,7 @@ Discussion =
       else
         editView = $("<div>").addClass("discussion-content-edit")
 
-        textarea = $("<textarea>").addClass("comment-edit")
+        textarea = $("<div>").addClass("comment-edit")
         editView.append(textarea)
 
         anonymousCheckbox = $("<input>").attr("type", "checkbox")
@@ -156,7 +162,8 @@ Discussion =
         anonymousLabel = $("<label>").attr("for", "discussion-post-anonymously-#{id}")
                                      .html("post anonymously")
         editView.append(anonymousCheckbox).append(anonymousLabel)
-        
+
+
         if $discussionContent.parent(".thread").attr("_id") not in $$user_info.subscribed_thread_ids
           watchCheckbox = $("<input>").attr("type", "checkbox")
                                       .addClass("discussion-auto-watch")
@@ -167,6 +174,8 @@ Discussion =
           editView.append(watchCheckbox).append(watchLabel)
         
         $discussionContent.append(editView)
+
+        Markdown.makeWmdEditor $local(".comment-edit"), "-comment-edit-#{id}"
       cancelReply = generateDiscussionLink("discussion-cancel-reply", "Cancel", handleCancelReply)
       submitReply = generateDiscussionLink("discussion-submit-reply", "Submit", handleSubmitReply)
       $local(".discussion-link").hide()
@@ -190,7 +199,8 @@ Discussion =
         url = Discussion.urlFor('create_sub_comment', id)
       else
         return
-      body = $local(".comment-edit").val()
+
+      body = $local("#wmd-input-comment-edit-#{id}").val()
 
       anonymous = false || $local(".discussion-post-anonymously").is(":checked")
       autowatch = false || $local(".discussion-auto-watch").is(":checked")
@@ -225,6 +235,8 @@ Discussion =
     $discussionNonContent = $discussion.children(".discussion-non-content")
     $local = (selector) -> $discussionNonContent.find(selector)
 
+    id = $discussion.attr("_id")
+
     handleSearch = (text, isSearchWithinBoard) ->
       if text.length
         if $local(".discussion-search-within-board").is(":checked")
@@ -234,7 +246,7 @@ Discussion =
 
     handleSubmitNewThread = (elem) ->
       title = $local(".new-post-title").val()
-      body = $local(".new-post-body").val()
+      body = $local("#wmd-input-new-post-body-#{id}").val()
       url = Discussion.urlFor('create_thread', $local(".new-post-form").attr("_id"))
       $.post url, {title: title, body: body}, (response, textStatus) ->
         if textStatus == "success"
