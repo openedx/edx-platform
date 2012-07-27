@@ -1,5 +1,6 @@
 from collections import MutableMapping
 from xmodule.x_module import XModuleDescriptor
+from xmodule.modulestore import Location
 from lxml import etree
 import copy
 import logging
@@ -12,6 +13,7 @@ log = logging.getLogger(__name__)
 # TODO (cpennington): This was implemented in an attempt to improve performance,
 # but the actual improvement wasn't measured (and it was implemented late at night).
 # We should check if it hurts, and whether there's a better way of doing lazy loading
+
 
 class LazyLoadingDict(MutableMapping):
     """
@@ -173,6 +175,9 @@ class XmlDescriptor(XModuleDescriptor):
             url identifiers
         """
         xml_object = etree.fromstring(xml_data)
+        # VS[compat] -- just have the url_name lookup once translation is done
+        slug = xml_object.get('url_name', xml_object.get('slug'))
+        location = Location('i4x', org, course, xml_object.tag, slug)
 
         def metadata_loader():
             metadata = {}
@@ -210,25 +215,21 @@ class XmlDescriptor(XModuleDescriptor):
                     with system.resources_fs.open(filepath) as file:
                         definition_xml = cls.file_to_xml(file)
                 except (ResourceNotFoundError, etree.XMLSyntaxError):
-                    msg = 'Unable to load file contents at path %s' % filepath
+                    msg = 'Unable to load file contents at path %s for item %s' % (filepath, location.url())
                     log.exception(msg)
                     system.error_handler(msg)
                     # if error_handler didn't reraise, work around problem.
-                    return {'data': 'Error loading file contents at path %s' % filepath}
+                    error_elem = etree.Element('error')
+                    error_elem.text = msg
+                    return {'data': etree.tostring(error_elem)}
 
             cls.clean_metadata_from_xml(definition_xml)
             return cls.definition_from_xml(definition_xml, system)
 
-        # VS[compat] -- just have the url_name lookup once translation is done
-        slug = xml_object.get('url_name', xml_object.get('slug'))
         return cls(
             system,
             LazyLoadingDict(definition_loader),
-            location=['i4x',
-                      org,
-                      course,
-                      xml_object.tag,
-                      slug],
+            location=location,
             metadata=LazyLoadingDict(metadata_loader),
         )
 
