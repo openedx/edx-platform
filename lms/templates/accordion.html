@@ -3,8 +3,8 @@
 <%def name="make_chapter(chapter)">
   <h3><a href="#">${chapter['name']}</a></h3>
 
-    <ul>
-      % for section in chapter['sections']:
+  <ul>
+    % for section in chapter['sections']:
         <li${' class="active"' if 'active' in section and section['active'] else ''}>
           <a href="${reverse('courseware_section', args=[course_id] + format_url_params([chapter['name'], section['name']]))}">
             <p>${section['name']}
@@ -12,11 +12,11 @@
               ${section['format']} ${"due " + section['due'] if 'due' in section and section['due'] != '' else ''}
             </span>
             </p>
-
           </a>
-        % endfor
-      </ul>
-    </%def>
+        </li>
+    % endfor
+  </ul>
+</%def>
 
 % for chapter in toc:
     ${make_chapter(chapter)}

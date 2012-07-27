@@ -27,9 +27,6 @@
 
   <br/>
 
-  <script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/codemirror.js"></script>
-  <script type="text/javascript" src="${ settings.LIB_URL }CodeMirror/python.js"></script>
-  <link rel="stylesheet" href="${ settings.LIB_URL }CodeMirror/codemirror.css" />
   <script>
     // Note: We need to make the area follow the CodeMirror for this to work.
     $(function(){
@@ -42,7 +39,10 @@
     });
   </script>
   <style type="text/css">
-    .CodeMirror {border-style: solid;
-      border-width: 1px;}
+    .CodeMirror {
+        border: 2px solid black;
+        font-size: 14px;
+        line-height: 18px;
+    }
   </style>
 </section>
