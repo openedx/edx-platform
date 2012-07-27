@@ -3,6 +3,7 @@ import pymongo
 from bson.son import SON
 from fs.osfs import OSFS
 from itertools import repeat
+from path import path
 
 from importlib import import_module
 from xmodule.errorhandlers import strict_error_handler
@@ -96,7 +97,7 @@ class MongoModuleStore(ModuleStore):
         module_path, _, class_name = default_class.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
         self.default_class = class_
-        self.fs_root = fs_root
+        self.fs_root = path(fs_root)
 
     def _clean_item_data(self, item):
         """
