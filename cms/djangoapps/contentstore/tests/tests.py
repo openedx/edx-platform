@@ -74,7 +74,7 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def _activate_user(self, email):
-        '''look up the user's activation key in the db, then hit the activate view.
+        '''Look up the activation key for the user, then hit the activate view.
         No error checking'''
         activation_key = registration(email).activation_key
 
@@ -102,7 +102,7 @@ class AuthTestCase(ContentStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, expected)
         return resp
-        
+
     def test_public_pages_load(self):
         """Make sure pages that don't require login load without error."""
         pages = (
