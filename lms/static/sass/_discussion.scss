@@ -6,7 +6,7 @@ $comment_info_size: 0.75em;
 $discussion_input_width: 60%;
 
 @mixin discussion-font {
-  font-family: "Comic Sans MS", cursive, sans-serif !important;
+  font-family: inherit;
 }
 
 @mixin discussion-clickable {

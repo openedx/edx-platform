@@ -23,9 +23,8 @@
     });
   </script>
 
-  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
-       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
-       MathJax extension libraries -->
+  ## This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+  ## It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of MathJax extension libraries
   <script type="text/javascript" src="/static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
   <script type="text/javascript" src="${static.url('js/vendor/split.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/Markdown.Converter.js')}"></script>
@@ -42,12 +41,12 @@
         <h2>Discussion Boards</h2>
         <a href="#">close</a>
       </header>
+
       <div id="accordion" style="display:none">
         <nav>
           ${accordion}
         </nav>
       </div>
-
     </section>
 
     <section class="course-content">
