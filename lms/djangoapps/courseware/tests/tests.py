@@ -1,4 +1,9 @@
+import copy
 import json
+import os
+
+from pprint import pprint
+
 from django.test import TestCase
 from django.test.client import Client
 from mock import patch, Mock
@@ -14,7 +19,6 @@ from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
-import copy
 
 
 def parse_json(response):
@@ -32,14 +36,32 @@ def registration(email):
     return Registration.objects.get(user__email=email)
 
 
-TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
-# TODO (vshnayder): test the real courses
-TEST_DATA_DIR = 'common/test/data'
-TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path(TEST_DATA_DIR)
+# A bit of a hack--want mongo modulestore for these tests, until
+# jump_to works with the xmlmodulestore or we have an even better solution
+# NOTE: this means this test requires mongo to be running.
 
-@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
-class IntegrationTestCase(TestCase):
-    '''Check that all objects in all accessible courses will load properly'''
+def mongo_store_config(data_dir):
+    return {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': {
+            'default_class': 'xmodule.raw_module.RawDescriptor',
+            'host': 'localhost',
+            'db': 'xmodule',
+            'collection': 'modulestore',
+            'fs_root': data_dir,
+        }
+    }
+}
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_DATA_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
+
+REAL_DATA_DIR = settings.GITHUB_REPO_ROOT
+REAL_DATA_MODULESTORE = mongo_store_config(REAL_DATA_DIR)
+
+class ActivateLoginTestCase(TestCase):
+    '''Check that we can activate and log in'''
 
     def setUp(self):
         email = 'view@test.com'
@@ -47,9 +69,6 @@ class IntegrationTestCase(TestCase):
         self.create_account('viewtest', email, password)
         self.activate_user(email)
         self.login(email, password)
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
 
     # ============ User creation and login ==============
 
@@ -107,15 +126,22 @@ class IntegrationTestCase(TestCase):
         # Now make sure that the user is now actually activated
         self.assertTrue(user(email).is_active)
 
-    # ============ Page loading ==============
+    def test_activate_login(self):
+        '''The setup function does all the work'''
+        pass
 
-    def check_pages_load(self, test_course_name):
-        import_from_xml(modulestore(), TEST_DATA_DIR, [test_course_name])
+
+class PageLoader(ActivateLoginTestCase):
+    ''' Base class that adds a function to load all pages in a modulestore '''
+
+    def check_pages_load(self, course_name, data_dir, modstore):
+        print "Checking course {0} in {1}".format(course_name, data_dir)
+        import_from_xml(modstore, data_dir, [course_name])
 
         n = 0
         num_bad = 0
         all_ok = True
-        for descriptor in modulestore().get_items(
+        for descriptor in modstore.get_items(
                 Location(None, None, None, None, None)):
             n += 1
             print "Checking ", descriptor.location.url()
@@ -129,16 +155,54 @@ class IntegrationTestCase(TestCase):
                 all_ok = False
                 num_bad += 1
             print msg
-            self.assertTrue(all_ok)
+            self.assertTrue(all_ok)  # fail fast
 
         print "{0}/{1} good".format(n - num_bad, n)
+        self.assertTrue(all_ok)
 
+
+@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
+class TestCoursesLoadTestCase(PageLoader):
+    '''Check that all pages in test courses load properly'''
+
+    def setUp(self):
+        ActivateLoginTestCase.setUp(self)
+        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django.modulestore().collection.drop()
 
     def test_toy_course_loads(self):
-        self.check_pages_load('toy')
+        self.check_pages_load('toy', TEST_DATA_DIR, modulestore())
 
     def test_full_course_loads(self):
-        self.check_pages_load('full')
+        self.check_pages_load('full', TEST_DATA_DIR, modulestore())
+
+
+    # ========= TODO: check ajax interaction here too?
+
+
+@override_settings(MODULESTORE=REAL_DATA_MODULESTORE)
+class RealCoursesLoadTestCase(PageLoader):
+    '''Check that all pages in real courses load properly'''
+
+    def setUp(self):
+        ActivateLoginTestCase.setUp(self)
+        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django.modulestore().collection.drop()
+
+    # TODO: Disabled test for now..  Fix once things are cleaned up.
+    def Xtest_real_courses_loads(self):
+        '''See if any real courses are available at the REAL_DATA_DIR.
+        If they are, check them.'''
+
+        # TODO: adjust staticfiles_dirs
+        if not os.path.isdir(REAL_DATA_DIR):
+            # No data present.  Just pass.
+            return
+
+        courses = [course_dir for course_dir in os.listdir(REAL_DATA_DIR)
+                   if os.path.isdir(REAL_DATA_DIR / course_dir)]
+        for course in courses:
+            self.check_pages_load(course, REAL_DATA_DIR, modulestore())
 
 
     # ========= TODO: check ajax interaction here too?
