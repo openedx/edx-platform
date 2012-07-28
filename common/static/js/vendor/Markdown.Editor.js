@@ -28,7 +28,7 @@
     // The text that appears on the upper part of the dialog box when
     // entering links.
     var linkDialogText = "<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>";
-    var imageDialogText = "<p><b>Insert Image</b></p><p>http://example.com/images/diagram.jpg \"optional title\"<br><br>Need <a href='http://www.google.com/search?q=free+image+hosting' target='_blank'>free image hosting?</a></p>";
+    var imageDialogText = "<p><b>Insert Image (upload file or type url)</b></p><p>http://example.com/images/diagram.jpg \"optional title\"<br><br></p>";
 
     // The default text that appears in the dialog input box when entering
     // links.
@@ -49,7 +49,7 @@
     // - getConverter() returns the markdown converter object that was passed to the constructor
     // - run() actually starts the editor; should be called after all necessary plugins are registered. Calling this more than once is a no-op.
     // - refreshPreview() forces the preview to be updated. This method is only available after run() was called.
-    Markdown.Editor = function (markdownConverter, idPostfix, help) {
+    Markdown.Editor = function (markdownConverter, idPostfix, help, imageUploadHandler) {
 
         idPostfix = idPostfix || "";
 
@@ -88,7 +88,7 @@
                 }
             }
 
-            uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, help);
+            uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, help, imageUploadHandler);
             uiManager.setUndoRedoButtonStates();
 
             var forceRefresh = that.refreshPreview = function () { previewManager.refresh(true); };
@@ -1010,7 +1010,7 @@
     // callback: The function which is executed when the prompt is dismissed, either via OK or Cancel.
     //      It receives a single argument; either the entered text (if OK was chosen) or null (if Cancel
     //      was chosen).
-    ui.prompt = function (text, defaultInputText, callback) {
+    ui.prompt = function (text, defaultInputText, callback, imageUploadHandler) {
 
         // These variables need to be declared at this level since they are used
         // in multiple functions.
@@ -1044,8 +1044,10 @@
             else {
                 // Fixes common pasting errors.
                 text = text.replace(/^http:\/\/(https?|ftp):\/\//, '$1://');
-                if (!/^(?:https?|ftp):\/\//.test(text))
+                // doesn't change url if started with '/' (local)
+                if (!/^(?:https?|ftp):\/\//.test(text) && text.charAt(0) != '/') {
                     text = 'http://' + text;
+                }
             }
 
             dialog.parentNode.removeChild(dialog);
@@ -1094,6 +1096,21 @@
             style.width = "80%";
             style.marginLeft = style.marginRight = "auto";
             form.appendChild(input);
+
+            // The choose file button if prompt type is 'image'
+
+            if (imageUploadHandler) {
+              var chooseFile = doc.createElement("input");
+              chooseFile.type = "file";
+              chooseFile.name = "file-upload";
+              chooseFile.id = "file-upload";
+              chooseFile.onchange = function() {
+                imageUploadHandler(this, input);
+              };
+              form.appendChild(doc.createElement("br"));
+              form.appendChild(chooseFile);
+            }
+
 
             // The ok button
             var okButton = doc.createElement("input");
@@ -1160,7 +1177,7 @@
         }, 0);
     };
 
-    function UIManager(postfix, panels, undoManager, previewManager, commandManager, helpOptions) {
+    function UIManager(postfix, panels, undoManager, previewManager, commandManager, helpOptions, imageUploadHandler) {
 
         var inputBox = panels.input,
             buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
@@ -1419,7 +1436,7 @@
             buttons.quote = makeButton("wmd-quote-button", "Blockquote <blockquote> Ctrl+Q", "-60px", bindCommand("doBlockquote"));
             buttons.code = makeButton("wmd-code-button", "Code Sample <pre><code> Ctrl+K", "-80px", bindCommand("doCode"));
             buttons.image = makeButton("wmd-image-button", "Image <img> Ctrl+G", "-100px", bindCommand(function (chunk, postProcessing) {
-                return this.doLinkOrImage(chunk, postProcessing, true);
+                return this.doLinkOrImage(chunk, postProcessing, true, imageUploadHandler);
             }));
             makeSpacer(2);
             buttons.olist = makeButton("wmd-olist-button", "Numbered List <ol> Ctrl+O", "-120px", bindCommand(function (chunk, postProcessing) {
@@ -1649,7 +1666,7 @@
         });
     }
 
-    commandProto.doLinkOrImage = function (chunk, postProcessing, isImage) {
+    commandProto.doLinkOrImage = function (chunk, postProcessing, isImage, imageUploadHandler) {
 
         chunk.trimWhitespace();
         chunk.findTags(/\s*!?\[/, /\][ ]?(?:\n[ ]*)?(\[.*?\])?/);
@@ -1724,7 +1741,7 @@
 
             if (isImage) {
                 if (!this.hooks.insertImageDialog(linkEnteredCallback))
-                    ui.prompt(imageDialogText, imageDefaultText, linkEnteredCallback);
+                    ui.prompt(imageDialogText, imageDefaultText, linkEnteredCallback, imageUploadHandler);
             }
             else {
                 ui.prompt(linkDialogText, linkDefaultText, linkEnteredCallback);

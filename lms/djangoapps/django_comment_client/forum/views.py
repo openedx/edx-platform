@@ -32,6 +32,7 @@ def render_discussion(request, course_id, threads, discussion_id=None, search_te
         'discussion_id': discussion_id,
         'search_bar': render_search_bar(request, course_id, discussion_id, text=search_text),
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
+        'tags': comment_client.get_threads_tags(raw=True),
         'course_id': course_id,
     }
     return render_to_string('discussion/inline.html', context)
@@ -78,6 +79,7 @@ def render_single_thread(request, course_id, thread_id):
     context = {
         'thread': comment_client.get_thread(thread_id, recursive=True),
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
+        'tags': comment_client.get_threads_tags(raw=True),
         'course_id': course_id,
     }
     return render_to_string('discussion/single_thread.html', context)
@@ -91,7 +93,6 @@ def single_thread(request, course_id, thread_id):
         'init': '',
         'content': render_single_thread(request, course_id, thread_id),
         'accordion': '',
-        'user_info': comment_client.get_user_info(request.user.id, raw=True),
         'course': course,
     }
 

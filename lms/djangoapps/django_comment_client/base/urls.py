@@ -3,6 +3,7 @@ import django_comment_client.base.views
 
 urlpatterns = patterns('django_comment_client.base.views',
 
+    url(r'upload$', 'upload', name='upload'),
     url(r'threads/(?P<thread_id>[\w\-]+)/update$', 'update_thread', name='update_thread'),
     url(r'threads/(?P<thread_id>[\w\-]+)/reply$', 'create_comment', name='create_comment'),
     url(r'threads/(?P<thread_id>[\w\-]+)/delete', 'delete_thread', name='delete_thread'),
