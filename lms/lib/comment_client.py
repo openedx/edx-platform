@@ -11,6 +11,9 @@ def delete_threads(commentable_id, *args, **kwargs):
 def get_threads(commentable_id, recursive=False, *args, **kwargs):
     return _perform_request('get', _url_for_threads(commentable_id), {'recursive': recursive}, *args, **kwargs)
 
+def get_threads_tags(*args, **kwargs):
+    return _perform_request('get', _url_for_threads_tags(), {}, *args, **kwargs)
+
 def create_thread(commentable_id, attributes, *args, **kwargs):
     return _perform_request('post', _url_for_threads(commentable_id), attributes, *args, **kwargs)
     
@@ -126,3 +129,6 @@ def _url_for_user(user_id):
 
 def _url_for_search():
     return "{prefix}/search".format(prefix=PREFIX)
+
+def _url_for_threads_tags():
+    return "{prefix}/threads/tags".format(prefix=PREFIX)
