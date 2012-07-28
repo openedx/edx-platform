@@ -30,6 +30,7 @@ import djcelery
 from path import path
 
 from .askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
+from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True

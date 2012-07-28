@@ -15,9 +15,9 @@
       <div class="discussion-upper-wrapper clearfix">
         ${render_vote(thread)}
         <div class="discussion-right-wrapper clearfix">
-          <a class="thread-title" name="${thread['id']}" href="${url_for_thread}">${thread['title']}</a>
+          <a class="thread-title" name="${thread['id']}" href="${url_for_thread}">${thread['title'] | h}</a>
           <div class="discussion-content-view">
-            <div class="thread-body">${thread['body']}</div>
+            <div class="content-body thread-body">${thread['body'] | h}</div>
             <div class="info">
               ${render_info(thread)}
               % if edit_thread:
@@ -45,7 +45,7 @@
           ${render_vote(comment)}
           <div class="discussion-right-wrapper">
             <div class="discussion-content-view">
-              <a class="comment-body" name="${comment['id']}">${comment['body']}</a>
+              <a class="content-body comment-body" name="${comment['id']}">${comment['body'] | h}</a>
               <div class="info">
                 ${render_info(comment)}
                 ${render_reply()}

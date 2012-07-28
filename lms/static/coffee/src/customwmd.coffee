@@ -102,6 +102,7 @@ $ ->
       text
 
   if Markdown?
+
     Markdown.getMathCompatibleConverter = ->
         converter = Markdown.getSanitizingConverter()
         processor = new MathJaxProcessor()
@@ -109,11 +110,13 @@ $ ->
         converter.hooks.chain "postConversion", processor.replaceMath
         converter
 
-    Markdown.makeWmdEditor = (elem, appended_id) ->
+    Markdown.makeWmdEditor = (elem, appended_id, imageUploadUrl) ->
       $elem = $(elem)
+
       if not $elem.length
         console.log "warning: elem for makeWmdEditor doesn't exist"
         return
+
       if not $elem.find(".wmd-panel").length
         _append = appended_id || ""
         $wmdPanel = $("<div>").addClass("wmd-panel")
@@ -121,8 +124,42 @@ $ ->
                    .append($("<textarea>").addClass("wmd-input").attr("id", "wmd-input#{_append}"))
                    .append($("<div>").attr("id", "wmd-preview#{_append}").addClass("wmd-panel wmd-preview"))
         $elem.append($wmdPanel)
+
       converter = Markdown.getMathCompatibleConverter()
-      editor = new Markdown.Editor(converter, appended_id)
+
+      ajaxFileUpload = (imageUploadUrl, input, startUploadHandler) ->
+        $("#loading").ajaxStart(-> $(this).show()).ajaxComplete(-> $(this).hide())
+        $("#upload").ajaxStart(-> $(this).hide()).ajaxComplete(-> $(this).show())
+        $.ajaxFileUpload
+          url: imageUploadUrl
+          secureuri: false
+          fileElementId: 'file-upload'
+          dataType: 'json'
+          success: (data, status) ->
+            fileURL = data['result']['file_url']
+            error = data['result']['error']
+            if error != ''
+              alert error
+              if startUploadHandler
+                $('#file-upload').unbind('change').change(startUploadHandler)
+              console.log error
+            else
+              $(input).attr('value', fileURL)
+          error: (data, status, e) ->
+            alert(e)
+            if startUploadHandler
+              $('#file-upload').unbind('change').change(startUploadHandler)
+              
+      imageUploadHandler = (elem, input) ->
+        console.log "here"
+        ajaxFileUpload(imageUploadUrl, input, imageUploadHandler)
+
+      editor = new Markdown.Editor(
+        converter,
+        appended_id, # idPostfix
+        null, # help handler
+        imageUploadHandler
+      )
       delayRenderer = new MathJaxDelayRenderer()
       editor.hooks.chain "onPreviewPush", (text, previewSet) ->
         delayRenderer.render
