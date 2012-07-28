@@ -8,10 +8,9 @@
     ${search_bar}
     <form class="new-post-form" _id="${discussion_id}">
       <input type="text" class="new-post-title" placeholder="Title"/>
-      <div class="new-post-body">
-      </div>
+      <div class="new-post-body"></div>
+      <input type="text" class="new-pot-tags" placeholder="tag1, tag2"/>
       <a class="discussion-new-post" href="javascript:void(0)">New Post</a>
-        
     </form>
   </div>
   % for thread in threads:
@@ -19,7 +18,13 @@
   % endfor
 </section>
 
+<%!
+  def escape_quotes(text):
+    return text.replace('\"', '\\\"').replace("\'", "\\\'")
+%>
+
 <script type="text/javascript">
-  var $$user_info = JSON.parse('${user_info}');
+  var $$user_info = JSON.parse('${user_info | escape_quotes}');
   var $$course_id = "${course_id}";
+  var $$tags = JSON.parse("${tags | escape_quotes}");
 </script>

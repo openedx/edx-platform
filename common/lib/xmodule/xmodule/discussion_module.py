@@ -19,6 +19,7 @@ class DiscussionModule(XModule):
             'discussion_id': self.discussion_id,
             'search_bar': '',
             'user_info': comment_client.get_user_info(self.user_id, raw=True),
+            'tags': comment_client.get_threads_tags(raw=True),
             'course_id': self.course_id,
         }
         return self.system.render_template('discussion/inline.html', context)
