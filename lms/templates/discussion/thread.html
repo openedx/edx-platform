@@ -3,8 +3,6 @@
 <%! from dateutil.parser import parse %>
 <%! import urllib %>
 
-
-
 <%def name="render_thread(course_id, thread, edit_thread=False, show_comments=False)">
   <%
     if show_comments:
@@ -92,7 +90,6 @@
 <%def name="render_watch_thread()">
   <a class="discussion-link discussion-watch-thread" href="javascript:void(0)">Watch</a>
 </%def>
-
 
 <%def name="render_vote(content)">
   <%
