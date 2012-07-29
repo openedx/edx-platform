@@ -96,18 +96,24 @@ $ ->
 
       deTilde(@blocks.join(""))
 
+    @removeMathWrapper: (_this) ->
+      (text) -> _this.removeMath(text)
+
     replaceMath: (text) ->
       text = text.replace /@@(\d+)@@/g, ($0, $1) => @math[$1]
       @math = null
       text
+
+    @replaceMathWrapper: (_this) ->
+      (text) -> _this.replaceMath(text)
 
   if Markdown?
 
     Markdown.getMathCompatibleConverter = ->
         converter = Markdown.getSanitizingConverter()
         processor = new MathJaxProcessor()
-        converter.hooks.chain "preConversion", processor.removeMath
-        converter.hooks.chain "postConversion", processor.replaceMath
+        converter.hooks.chain "preConversion", MathJaxProcessor.removeMathWrapper(processor)#processor.removeMath
+        converter.hooks.chain "postConversion", MathJaxProcessor.replaceMathWrapper(processor)#.replaceMath
         converter
 
     Markdown.makeWmdEditor = (elem, appended_id, imageUploadUrl) ->
