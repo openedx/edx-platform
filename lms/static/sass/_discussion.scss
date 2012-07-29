@@ -124,23 +124,30 @@ $discussion_input_width: 60%;
       font-weight: bold;
       display: block;
     }
-    .thread-body {
+    .thread-body, .content-body {
       @include discussion-font;
       font-size: $comment_body_size;
       margin-top: 7px;
       margin-bottom: 2px;
+      p {
+        @include discussion-font;
+        margin: 0;
+      }
     }
     .thread-tags {
       .thread-tag {
         @include discussion-font;
-        border-right: 3px solid #205C85;
-        padding-right: 5px;
+        font-size: 0.75em;
+        border-width: 0px 1px 1px 0px;
+        border-style: solid;
+        border-color: #205C85;
+        padding: 0px 3px 3px 0px;
         margin-right: 5px;
-        border-radius: 15px;
+        border-radius: 4px;
         color: #205C85;
         &:hover {
           color: #3CC5E7;
-          border-right: 3px solid #3CC5E7;
+          border-color: #3CC5E7;
         }
       }
     }
@@ -188,7 +195,7 @@ $discussion_input_width: 60%;
       margin-left: $comment_margin_left;
       overflow: hidden;
       .comment {
-        .comment-body {
+        .comment-body, .content-body {
           @include discussion-font;
           font-size: $comment_body_size;
           margin-top: 3px;
