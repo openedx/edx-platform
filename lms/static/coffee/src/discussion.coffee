@@ -111,6 +111,7 @@ Discussion =
             Discussion.handleAnchorAndReload(response)
         , 'json'
 
+      
       if id in $$user_info.subscribed_thread_ids
         unwatchThread = generateDiscussionLink("discussion-unwatch-thread", "Unwatch", handleUnwatchThread)
         $local(".info").append(unwatchThread)
@@ -118,10 +119,20 @@ Discussion =
         watchThread = generateDiscussionLink("discussion-watch-thread", "Watch", handleWatchThread)
         $local(".info").append(watchThread)
 
+    $local = generateLocal(discussion)
+
     if $$user_info?
-      $(discussion).find(".comment").each(initializeVote)
-      $(discussion).find(".thread").each(initializeVote).each(initializeWatchThreads)
+      $local(".comment").each(initializeVote)
+      $local(".thread").each(initializeVote).each(initializeWatchThreads)
       initializeWatchDiscussion(discussion)
+
+    if $$tags?
+      $local(".new-post-tags").tagsInput
+        autocomplete: $$tags
+        interactive: true
+        defaultText: "add a tag"
+        height: "30px"
+        removeWithBackspace: true
 
   bindContentEvents: (content) ->
 
@@ -255,8 +266,9 @@ Discussion =
     handleSubmitNewThread = (elem) ->
       title = $local(".new-post-title").val()
       body = $local("#wmd-input-new-post-body-#{id}").val()
+      tags = $local(".new-post-tags").val()
       url = Discussion.urlFor('create_thread', $local(".new-post-form").attr("_id"))
-      $.post url, {title: title, body: body}, (response, textStatus) ->
+      $.post url, {title: title, body: body, tags: tags}, (response, textStatus) ->
         if textStatus == "success"
           Discussion.handleAnchorAndReload(response)
       , 'json'

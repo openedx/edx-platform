@@ -22,4 +22,6 @@ urlpatterns = patterns('django_comment_client.base.views',
     url(r'(?P<commentable_id>[\w\-]+)/threads/create$', 'create_thread', name='create_thread'),
     url(r'(?P<commentable_id>[\w\-]+)/watch$', 'watch_commentable', name='watch_commentable'),
     url(r'(?P<commentable_id>[\w\-]+)/unwatch$', 'unwatch_commentable', name='unwatch_commentable'),
+
+    url(r'search$', 'search', name='search'),
 )

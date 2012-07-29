@@ -109,6 +109,9 @@ $discussion_input_width: 60%;
       margin-top: 10px;
       font-weight: bold;
     }
+    .tagsinput {
+      margin-top: 20px;
+    }
   }
   .thread {
     //display: none;
@@ -126,6 +129,20 @@ $discussion_input_width: 60%;
       font-size: $comment_body_size;
       margin-top: 7px;
       margin-bottom: 2px;
+    }
+    .thread-tags {
+      .thread-tag {
+        @include discussion-font;
+        border-right: 3px solid #205C85;
+        padding-right: 5px;
+        margin-right: 5px;
+        border-radius: 15px;
+        color: #205C85;
+        &:hover {
+          color: #3CC5E7;
+          border-right: 3px solid #3CC5E7;
+        }
+      }
     }
     .info {
       @include discussion-font;
