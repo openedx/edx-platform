@@ -14,6 +14,9 @@ def get_threads(commentable_id, recursive=False, *args, **kwargs):
 def get_threads_tags(*args, **kwargs):
     return _perform_request('get', _url_for_threads_tags(), {}, *args, **kwargs)
 
+def tags_autocomplete(value, *args, **kwargs):
+    return _perform_request('get', _url_for_threads_tags_autocomplete(), {'value': value}, *args, **kwargs)
+
 def create_thread(commentable_id, attributes, *args, **kwargs):
     return _perform_request('post', _url_for_threads(commentable_id), attributes, *args, **kwargs)
     
@@ -132,3 +135,6 @@ def _url_for_search_threads():
 
 def _url_for_threads_tags():
     return "{prefix}/threads/tags".format(prefix=PREFIX)
+
+def _url_for_threads_tags_autocomplete():
+    return "{prefix}/threads/tags/autocomplete".format(prefix=PREFIX)

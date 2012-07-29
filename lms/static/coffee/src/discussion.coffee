@@ -45,6 +45,7 @@ Discussion =
       downvote_comment    : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
       upload              : "/courses/#{$$course_id}/discussion/upload"
       search              : "/courses/#{$$course_id}/discussion/forum/search"
+      tags_autocomplete   : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
     }[name]
 
   handleAnchorAndReload: (response) ->
@@ -128,7 +129,9 @@ Discussion =
 
     if $$tags?
       $local(".new-post-tags").tagsInput
-        autocomplete: $$tags
+        autocomplete_url: Discussion.urlFor('tags_autocomplete')
+        autocomplete:
+          remoteDataType: 'json'
         interactive: true
         defaultText: "add a tag"
         height: "30px"

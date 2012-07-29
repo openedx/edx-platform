@@ -258,16 +258,26 @@
 					}
 				
 					if (jQuery.Autocompleter !== undefined) {
+            onSelectCallback = settings.autocomplete.onItemSelect;
+            settings.autocomplete.onItemSelect = function() {
+              console.log("here");
+              $(data.real_input).addTag($(data.fake_input).val(), {focus: true, unique: (settings.unique)});
+              $(data.fake_input).resetAutosize(settings);
+              if (onSelectCallback) {
+                onSelectCallback();
+              }
+            }
 						$(data.fake_input).autocomplete(settings.autocomplete_url, settings.autocomplete);
 						$(data.fake_input).bind('result',data,function(event,data,formatted) {
 							if (data) {
 								$('#'+id).addTag(data[0] + "",{focus:true,unique:(settings.unique)});
 							}
-					  	});
+					  });
 					} else if (jQuery.ui.autocomplete !== undefined) {
 						$(data.fake_input).autocomplete(autocomplete_options);
 						$(data.fake_input).bind('autocompleteselect',data,function(event,ui) {
 							$(event.data.real_input).addTag(ui.item.value,{focus:true,unique:(settings.unique)});
+              
 							return false;
 						});
 					}
@@ -299,7 +309,6 @@
 						return false;
 					} else if (event.data.autosize) {
 			            $(event.data.fake_input).doAutosize(settings);
-            
           			}
 				});
 				//Delete last tag on backspace

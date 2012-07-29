@@ -188,7 +188,6 @@ def unfollow(request, course_id, followed_user_id):
     response = comment_client.unfollow(user_id, followed_user_id)
     return JsonResponse(response)
 
-@login_required
 @require_GET
 def search(request, course_id):
     text = request.GET.get('text', None)
@@ -200,6 +199,14 @@ def search(request, course_id):
         'tags': tags,
     })
     return JsonResponse(response)
+
+@require_GET
+def tags_autocomplete(request, course_id):
+    value = request.GET.get('q', None)
+    results = []
+    if value:
+        results = comment_client.tags_autocomplete(value)
+    return JsonResponse(results)
 
 @csrf.csrf_exempt
 @login_required
