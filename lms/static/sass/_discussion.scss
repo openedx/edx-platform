@@ -110,6 +110,9 @@ $discussion_input_width: 85%;
       display: block !important;
       width: $discussion_input_width !important;
     }
+    .discussion-errors {
+      color: red;
+    }
     .new-post-body {
       margin-top: 10px;
     }
@@ -193,6 +196,8 @@ $discussion_input_width: 85%;
     .discussion-content {
       margin-top: 10px;
       overflow: hidden;
+      border-top: lightgray 1px solid;
+      padding-top: 20px;
       .discussion-content-edit {
         margin-left: $comment_margin_left;
         .comment-edit {
