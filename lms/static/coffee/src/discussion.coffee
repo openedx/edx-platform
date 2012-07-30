@@ -25,6 +25,19 @@ generateDiscussionLink = (cls, txt, handler) ->
 
 Discussion =
 
+  replyTemplate: """
+    <div class="discussion-reply-new">
+      <ul class="discussion-errors"></ul>
+      <div class="reply-body"></div>
+      <input type="checkbox" class="discussion-post-anonymously" id="discussion-post-anonymously-{{id}}" />
+      <label for="discussion-post-anonymously-{{id}}">post anonymously</label>
+      {{#showWatchCheckbox}}
+      <input type="checkbox" class="discussion-auto-watch" id="discussion-autowatch-{{id}}" checked />
+      <label for="discussion-auto-watch-{{id}}">watch this thread</label>
+      {{/showWatchCheckbox}}
+    </div>
+  """
+  
   urlFor: (name, param) ->
     {
       watch_commentable   : "/courses/#{$$course_id}/discussion/#{param}/watch"
@@ -162,38 +175,16 @@ Discussion =
     $discussionContent.hover(discussionContentHoverIn, discussionContentHoverOut)
 
     handleReply = (elem) ->
-      editView = $local(".discussion-content-edit")
+      editView = $local(".discussion-reply-new")
       if editView.length
         editView.show()
       else
-        editView = $("<div>").addClass("discussion-content-edit")
-
-        errorsField = $("<ul>").addClass("discussion-errors")
-        editView.append(errorsField)
-
-        textarea = $("<div>").addClass("comment-edit")
-        editView.append(textarea)
-
-        anonymousCheckbox = $("<input>").attr("type", "checkbox")
-                                        .addClass("discussion-post-anonymously")
-                                        .attr("id", "discussion-post-anonymously-#{id}")
-        anonymousLabel = $("<label>").attr("for", "discussion-post-anonymously-#{id}")
-                                     .html("post anonymously")
-        editView.append(anonymousCheckbox).append(anonymousLabel)
-
-
-        if $discussionContent.parent(".thread").attr("_id") not in $$user_info.subscribed_thread_ids
-          watchCheckbox = $("<input>").attr("type", "checkbox")
-                                      .addClass("discussion-auto-watch")
-                                      .attr("id", "discussion-auto-watch-#{id}")
-                                      .attr("checked", "")
-          watchLabel = $("<label>").attr("for", "discussion-auto-watch-#{id}")
-                                   .html("watch this thread")
-          editView.append(watchCheckbox).append(watchLabel)
-        
-        $discussionContent.append(editView)
-
-        Markdown.makeWmdEditor $local(".comment-edit"), "-comment-edit-#{id}", Discussion.urlFor('upload')
+        view = {
+          id: id
+          showWatchCheckbox: $discussionContent.parent(".thread").attr("_id") not in $$user_info.subscribed_thread_ids
+        }
+        $discussionContent.append Mustache.render Discussion.replyTemplate, view
+        Markdown.makeWmdEditor $local(".reply-body"), "-reply-body-#{id}", Discussion.urlFor('upload')
       cancelReply = generateDiscussionLink("discussion-cancel-reply", "Cancel", handleCancelReply)
       submitReply = generateDiscussionLink("discussion-submit-reply", "Submit", handleSubmitReply)
       $local(".discussion-link").hide()
@@ -201,7 +192,7 @@ Discussion =
       $discussionContent.attr("status", "reply")
 
     handleCancelReply = (elem) ->
-      editView = $local(".discussion-content-edit")
+      editView = $local(".discussion-reply-new")
       if editView.length
         editView.hide()
       $local(".discussion-submit-reply").remove()
@@ -218,7 +209,7 @@ Discussion =
       else
         return
 
-      body = $local("#wmd-input-comment-edit-#{id}").val()
+      body = $local("#wmd-input-reply-body-#{id}").val()
 
       anonymous = false || $local(".discussion-post-anonymously").is(":checked")
       autowatch = false || $local(".discussion-auto-watch").is(":checked")
