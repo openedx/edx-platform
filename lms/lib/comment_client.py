@@ -5,6 +5,12 @@ SERVICE_HOST = 'http://localhost:4567'
 
 PREFIX = SERVICE_HOST + '/api/v1'
 
+class CommentClientError(Exception):
+    pass
+
+class CommentClientUnknownError(CommentClientError):
+    pass
+
 def delete_threads(commentable_id, *args, **kwargs):
     return _perform_request('delete', _url_for_commentable_threads(commentable_id), *args, **kwargs)
 
@@ -98,10 +104,15 @@ def _perform_request(method, url, data_or_params=None, *args, **kwargs):
         response = requests.request(method, url, data=data_or_params)
     else:
         response = requests.request(method, url, params=data_or_params)
-    if kwargs.get("raw", False):
-        return response.text
+    if 200 < response.status_code < 500:
+        raise CommentClientException(response.text)
+    elif response.status_code == 500:
+        raise CommentClientUnknownException(response.text)
     else:
-        return json.loads(response.text)
+        if kwargs.get("raw", False):
+            return response.text
+        else:
+            return json.loads(response.text)
 
 def _url_for_threads(commentable_id):
     return "{prefix}/{commentable_id}/threads".format(prefix=PREFIX, commentable_id=commentable_id)
