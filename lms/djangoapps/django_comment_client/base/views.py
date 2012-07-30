@@ -10,30 +10,13 @@ import comment_client
 from django.core import exceptions
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_GET
-from django.http import HttpResponse
-from django.utils import simplejson
 from django.views.decorators import csrf
 from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
-class JsonResponse(HttpResponse):
-    def __init__(self, data=None):
-        content = simplejson.dumps(data,
-                                   indent=2,
-                                   ensure_ascii=False)
-        super(JsonResponse, self).__init__(content,
-                                           mimetype='application/json; charset=utf8')
+from django_comment_client.utils import JsonResponse, JsonError
 
-class JsonError(HttpResponse):
-    def __init__(self, status, error_message=""):
-        content = simplejson.dumps({'errors': error_message},
-                                   indent=2,
-                                   ensure_ascii=False)
-        super(JsonError, self).__init__(content,
-                                           status=status,
-                                           mimetype='application/json; charset=utf8')
-        
 def thread_author_only(fn):
     def verified_fn(request, *args, **kwargs):
         thread_id = args.get('thread_id', False) or \

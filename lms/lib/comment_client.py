@@ -6,7 +6,8 @@ SERVICE_HOST = 'http://localhost:4567'
 PREFIX = SERVICE_HOST + '/api/v1'
 
 class CommentClientError(Exception):
-    pass
+    def __init__(self, msg):
+        self.message = msg
 
 class CommentClientUnknownError(CommentClientError):
     pass
