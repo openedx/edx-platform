@@ -464,6 +464,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             # Put import here to avoid circular import errors
             from xmodule.malformed_module import MalformedDescriptor
 
+            #system.error_handler("Error loading from xml.")
             descriptor = MalformedDescriptor.from_xml(xml_data, system, org, course)
 
         return descriptor

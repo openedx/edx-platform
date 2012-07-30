@@ -20,8 +20,15 @@ class MalformedDescriptor(EditingDescriptor):
         Does not try to parse the data--just stores it.
         '''
 
-        # TODO (vshnayder): how does one get back from this to a valid descriptor?
-        # try to parse and if successfull, send back to x_module?
+        #log.debug("processing '{0}'".format(xml_data))
+        try:
+            xml_obj = etree.fromstring(xml_data)
+            if xml_obj.tag == 'malformed':
+                xml_data = xml_obj.text
+            # TODO (vshnayder): how does one get back from this to a valid descriptor?
+            # For now, have to fix manually.
+        except etree.XMLSyntaxError:
+            pass
 
         definition = { 'data' : xml_data }
         # TODO (vshnayder): Do we need a valid slug here?  Just pick a random
