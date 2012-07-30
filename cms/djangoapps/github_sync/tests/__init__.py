@@ -1,7 +1,10 @@
 from django.test import TestCase
 from path import path
 import shutil
-from github_sync import import_from_github, export_to_github, load_repo_settings, sync_all_with_github, sync_with_github
+from github_sync import (
+    import_from_github, export_to_github, load_repo_settings,
+    sync_all_with_github, sync_with_github
+)
 from git import Repo
 from django.conf import settings
 from xmodule.modulestore.django import modulestore

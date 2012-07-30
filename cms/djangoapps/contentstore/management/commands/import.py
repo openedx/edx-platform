@@ -1,5 +1,5 @@
 ###
-### Script for importing courseware form XML format
+### Script for importing courseware from XML format
 ###
 
 from django.core.management.base import BaseCommand, CommandError

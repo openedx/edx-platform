@@ -33,7 +33,6 @@ def get_logger_config(log_dir,
 
     return {
         'version': 1,
-        'disable_existing_loggers': True,
         'formatters' : {
             'standard' : {
                 'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
