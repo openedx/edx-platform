@@ -1,0 +1,105 @@
+start
+  = sections:(StringResponse / NumericalResponse / MultipleChoice / Paragraph / Linebreak+)+
+    {
+      var hasKind = function(o) {
+        return o.hasOwnProperty('type');
+      }
+      return sections.filter(hasKind);
+    }
+
+StudentProducedResponseIdentifier
+  = '='
+
+NumericalResponse
+  = StudentProducedResponseIdentifier OptionalSpaces '(' OptionalSpaces value:NumericalValue OptionalSpaces ')' OptionalSpaces Linebreak
+    {
+      return {'type': 'numerical', 'answer': value};
+    }
+
+StringResponse
+  = StudentProducedResponseIdentifier OptionalSpaces !'(' value:Text Linebreak
+    {
+      return {'type': 'string', 'answer': $.trim(value)};
+    }
+
+/* MultipleChoice */
+ChoiceIdentifier
+  = '(' parenthesized:[x\s]? ')'
+    {
+      return parenthesized == 'x';
+    }
+
+ChoiceTextLine
+  = !ChoiceIdentifier line:Line
+    {
+      return line;
+    }
+
+Choice
+  = correct:ChoiceIdentifier lines:(ChoiceTextLine)+
+    {
+      return {'type': 'choice', 'correct' : correct, 'text': lines.join("")};
+    }
+
+MultipleChoice
+  = choices:Choice+
+    {
+      return {'type': 'multiple_choice', 'choices': choices};
+    }
+
+
+/* Paragraph */
+ParagraphTextLine
+  = !ChoiceIdentifier !StudentProducedResponseIdentifier line:Line
+    {
+      return line;
+    }
+
+Paragraph
+  = lines:ParagraphTextLine+
+    {
+      return {'type': 'paragraph', 'text': lines.join("")};
+    }
+
+/* Base symbols */
+Line
+  = text:Text terminator:Linebreak
+    {
+      return text + terminator;
+    }
+
+Text
+  = chars:([^\n]+)
+    {
+      return chars.join("");
+    }
+
+OptionalSpaces
+  = ' '*
+
+Linebreak
+  = ('\n')
+
+
+NumericalValue
+  = additive
+
+/* Mathematical rules */
+additive
+  = left:multiplicative "+" right:additive { return left + right; }
+  / left:multiplicative "-" right:additive { return left - right; }
+  / multiplicative
+
+multiplicative
+  = left:primary "*" right:multiplicative { return left * right; }
+  / left:primary "/" right:multiplicative { return left / right; }
+  / primary
+
+primary
+  = integer
+  / "(" additive:additive ")" { return additive; }
+
+integer "integer"
+  = digits:[0-9]+ { return parseInt(digits.join(""), 10); }
+
+
