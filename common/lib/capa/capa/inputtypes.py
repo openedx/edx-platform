@@ -317,6 +317,7 @@ def textbox(element, value, status, render_template, msg=''):
     hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
     linenumbers = element.get('linenumbers')	 # for CodeMirror
     if not value: value = element.text	 # if no student input yet, then use the default input given by the problem
+    if linenumbers is None: linenumbers = 'true'
     context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size, 'msg': msg,
                'mode': mode, 'linenumbers': linenumbers,
                'rows': rows, 'cols': cols,

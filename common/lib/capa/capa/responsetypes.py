@@ -810,7 +810,7 @@ class CodeResponse(LoncapaResponse):
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url', "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/")  # FIXME -- hardcoded url
+        self.url = xml.get('url', "http://107.20.215.194/xqueue/submit/")  # FIXME -- hardcoded url
 
         answer = xml.find('answer')
         if answer is not None:
@@ -904,7 +904,9 @@ class CodeResponse(LoncapaResponse):
     def _send_to_queue(self, extra_payload):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
-        header = {'return_url': self.system.xqueue_callback_url}
+        header = {'return_url': self.system.xqueue_callback_url,
+                  'queue_name': 'mitx-600x',
+                 }
 
         # Queuekey generation
         h = hashlib.md5()
@@ -913,11 +915,15 @@ class CodeResponse(LoncapaResponse):
         queuekey = int(h.hexdigest(), 16)
         header.update({'queuekey': queuekey})
 
-        payload = {'xqueue_header': json.dumps(header),  # TODO: 'xqueue_header' should eventually be derived from a config file
-                   'xml': xmlstr,
-                   'edX_cmd': 'get_score',
-                   'edX_tests': self.tests,
-                   'processor': self.code,
+        body = {'xml': xmlstr,
+                'edX_cmd': 'get_score',
+                'edX_tests': self.tests,
+                'processor': self.code,
+                }
+        body.update(extra_payload)
+
+        payload = {'xqueue_header': json.dumps(header),
+                   'xqueue_body'  : json.dumps(body),
                   }
         payload.update(extra_payload)
 
