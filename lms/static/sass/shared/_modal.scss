@@ -148,6 +148,16 @@
 
       label {
         display: none;
+
+        &.field-error {
+          display: block;
+          color: #8F0E0E;
+
+          + input {
+            border: 1px solid #CA1111;
+            color: #8F0E0E;
+          }
+        }
       }
 
       input[type="checkbox"] {
@@ -185,6 +195,10 @@
 
         &:hover {
           background: rgb(230,230,230);
+        }
+
+        &.field-error {
+          border: 1px solid #CA1111;
         }
 
         a {
