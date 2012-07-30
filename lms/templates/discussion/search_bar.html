@@ -6,8 +6,10 @@ def url_for_search():
 %>
 
 <form action="${url_for_search()}" method="get" class="discussion-search-form">
-  <input class="searchInput" type="text" value="${text}" id="keywords" autocomplete="off"/>
-  <a class="discussion-link discussion-search" href="javascript:void(0)">Search</a>
-  <input type="checkbox" id="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board" checked/>
-  <label for="discussion-search-within-board-${discussion_id}">Search within board</label>
+  <input class="search-input" type="text" value="${text}" id="keywords" autocomplete="off"/>
+  <a class="discussion-link" href="javascript:void(0)">Search</a>
+  <div class="search-within">
+    <input type="checkbox" id="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board" checked/>
+    <label for="discussion-search-within-board-${discussion_id}">Search within board</label>
+  </div>
 </form>
