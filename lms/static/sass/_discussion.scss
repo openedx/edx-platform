@@ -193,9 +193,9 @@ $discussion_input_width: 85%;
     .discussion-content {
       margin-top: 10px;
       overflow: hidden;
-      .discussion-content-edit {
+      .discussion-reply-new {
         margin-left: $comment_margin_left;
-        .comment-edit {
+        .reply-body {
           @include discussion-font;
           width: $discussion_input_width !important;
           font-size: $comment_body_size;
