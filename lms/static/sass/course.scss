@@ -12,16 +12,13 @@
 @import 'course/courseware_subnav';
 
 // Courseware styles
-@import 'course/old/base/variables';
 @import 'course/old/base/extends';
-@import 'course/old/base/functions';
 
 @import 'module/module-styles.scss';
 
 @import 'course/old/courseware/courseware';
 @import 'course/old/courseware/sidebar';
 @import 'course/old/courseware/amplifier';
-// @import 'course/old/courseware/problems';
 
 @import "course/old/info";
 
