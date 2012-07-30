@@ -12,8 +12,10 @@ class HtmlModule(XModule):
     def get_html(self):
         return self.html
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition,
+                 instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition,
+                         instance_state, shared_state, **kwargs)
         self.html = self.definition['data']
 
 
@@ -42,3 +44,8 @@ class HtmlDescriptor(RawDescriptor):
     def file_to_xml(cls, file_object):
         parser = etree.HTMLParser()
         return etree.parse(file_object, parser).getroot()
+
+    @classmethod
+    def split_to_file(cls, xml_object):
+        # never include inline html
+        return True

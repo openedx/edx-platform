@@ -12,8 +12,8 @@ log = logging.getLogger(__name__)
 def process_includes(fn):
     """
     Wraps a XModuleDescriptor.from_xml method, and modifies xml_data to replace
-    any immediate child <include> items with the contents of the file that they are
-    supposed to include
+    any immediate child <include> items with the contents of the file that they
+    are supposed to include
     """
     @wraps(fn)
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -25,15 +25,21 @@ def process_includes(fn):
                 try:
                     ifp = system.resources_fs.open(file)
                 except Exception:
-                    log.exception('Error in problem xml include: %s' % (etree.tostring(next_include, pretty_print=True)))
-                    log.exception('Cannot find file %s in %s' % (file, dir))
+                    msg = 'Error in problem xml include: %s\n' % (
+                        etree.tostring(next_include, pretty_print=True))
+                    msg += 'Cannot find file %s in %s' % (file, dir)
+                    log.exception(msg)
+                    system.error_handler(msg)
                     raise
                 try:
                     # read in and convert to XML
                     incxml = etree.XML(ifp.read())
                 except Exception:
-                    log.exception('Error in problem xml include: %s' % (etree.tostring(next_include, pretty_print=True)))
-                    log.exception('Cannot parse XML in %s' % (file))
+                    msg = 'Error in problem xml include: %s\n' % (
+                        etree.tostring(next_include, pretty_print=True))
+                    msg += 'Cannot parse XML in %s' % (file)
+                    log.exception(msg)
+                    system.error_handler(msg)
                     raise
                 # insert  new XML into tree in place of inlcude
                 parent = next_include.getparent()
@@ -50,8 +56,8 @@ class SemanticSectionDescriptor(XModuleDescriptor):
     @process_includes
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
-        Removes sections single child elements in favor of just embedding the child element
-
+        Removes sections with single child elements in favor of just embedding
+        the child element
         """
         xml_object = etree.fromstring(xml_data)
 
@@ -76,7 +82,6 @@ class TranslateCustomTagDescriptor(XModuleDescriptor):
         xml_object = etree.fromstring(xml_data)
         tag = xml_object.tag
         xml_object.tag = 'customtag'
-        impl = etree.SubElement(xml_object, 'impl')
-        impl.text = tag
+        xml_object.attrib['impl'] = tag
 
         return system.process_xml(etree.tostring(xml_object))
