@@ -16,3 +16,17 @@ $pink: rgb(182,37,104);
 $yellow: rgb(255, 252, 221);
 $error-red: rgb(253, 87, 87);
 
+// old variables
+$body-font-family: "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+$body-font-size: 14px;
+$body-line-height: golden-ratio($body-font-size, 1);
+
+$fg-max-width: 1400px;
+$fg-min-width: 810px;
+
+$light-gray: #ddd;
+$dark-gray: #333;
+$mit-red: #993333;
+$cream: #F6EFD4;
+$text-color: $dark-gray;
+$border-color: $light-gray;
