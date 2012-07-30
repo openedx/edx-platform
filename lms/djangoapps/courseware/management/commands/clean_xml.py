@@ -143,6 +143,7 @@ def check_roundtrip(course_dir):
     # dircmp doesn't do recursive diffs.
     # diff = dircmp(course_dir, export_dir, ignore=[], hide=[])
     print "======== Roundtrip diff: ========="
+    sys.stdout.flush()  # needed to make diff appear in the right place
     os.system("diff -r {0} {1}".format(course_dir, export_dir))
     print "======== ideally there is no diff above this ======="
 
