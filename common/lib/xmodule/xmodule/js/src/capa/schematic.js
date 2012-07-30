@@ -52,6 +52,7 @@ function update_schematics() {
 	    schematics[i].setAttribute("loaded","true");
 	}
 }
+window.update_schematics = update_schematics;
 
 // add ourselves to the tasks that get performed when window is loaded
 function add_schematic_handler(other_onload) {

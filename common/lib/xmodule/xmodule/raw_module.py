@@ -6,6 +6,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
     """
     Module that provides a raw editing view of its data and children
@@ -33,7 +34,7 @@ class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
             line, offset = err.position
             msg = ("Unable to create xml for problem {loc}. "
                    "Context: '{context}'".format(
-                    context=lines[line-1][offset - 40:offset + 40],
+                    context=lines[line - 1][offset - 40:offset + 40],
                     loc=self.location))
             log.exception(msg)
             self.system.error_handler(msg)
