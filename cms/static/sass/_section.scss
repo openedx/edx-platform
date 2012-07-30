@@ -1,6 +1,7 @@
 section#unit-wrapper {
   section.filters {
     @include clearfix;
+    display: none;
     opacity: .4;
     margin-bottom: 10px;
     @include transition;
@@ -52,22 +53,22 @@ section#unit-wrapper {
     display: table;
     border: 1px solid lighten($dark-blue, 40%);
     width: 100%;
+    @include border-radius(3px);
+    @include box-shadow(0 0 4px lighten($dark-blue, 50%));
 
     section {
       header {
         background: #fff;
         padding: 6px;
         border-bottom: 1px solid lighten($dark-blue, 60%);
-        border-top: 1px solid lighten($dark-blue, 60%);
-        margin-top: -1px;
         @include clearfix;
 
         h2 {
           color: $bright-blue;
-          float: left;
-          font-size: 12px;
+          // float: left;
+          font-size: 14px;
           letter-spacing: 1px;
-          line-height: 19px;
+          // line-height: 20px;
           text-transform: uppercase;
           margin: 0;
         }
@@ -172,7 +173,6 @@ section#unit-wrapper {
           padding: 0;
 
           li {
-            border-bottom: 1px solid darken($light-blue, 8%);
             background: $light-blue;
 
             &:last-child {
@@ -181,6 +181,7 @@ section#unit-wrapper {
 
             &.new-module a {
               background-color: darken($light-blue, 2%);
+              border-bottom: 1px solid darken($light-blue, 8%);
 
               &:hover {
                 background-color: lighten($yellow, 10%);
@@ -199,6 +200,7 @@ section#unit-wrapper {
               li {
                 padding: 6px;
                 border-collapse: collapse;
+                border-bottom: 1px solid darken($light-blue, 8%);
                 position: relative;
 
                 &:last-child {

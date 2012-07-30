@@ -24,13 +24,19 @@ from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
+
 from django_comment_client.utils import get_discussion_title
+
+from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
 from courseware.courses import check_course
-from xmodule.modulestore.django import modulestore
+
 
 import comment_client
 
@@ -206,65 +212,59 @@ def index(request, course_id, chapter=None, section=None,
     if look_for_module:
         # TODO (cpennington): Pass the right course in here
 
-        section = get_section(course, chapter, section)
-        student_module_cache = StudentModuleCache(request.user, section)
-        module, _, _, _ = get_module(request.user, request, section.location, student_module_cache)
-        context['content'] = module.get_html()
+        section_descriptor = get_section(course, chapter, section)
+        if section_descriptor is not None:
+            student_module_cache = StudentModuleCache(request.user,
+                                                      section_descriptor)
+            module, _, _, _ = get_module(request.user, request,
+                                         section_descriptor.location,
+                                         student_module_cache)
+            context['content'] = module.get_html()
+        else:
+            log.warning("Couldn't find a section descriptor for course_id '{0}',"
+                        "chapter '{1}', section '{2}'".format(
+                        course_id, chapter, section))
+
 
     result = render_to_response('courseware.html', context)
     return result
 
-
-def jump_to(request, probname=None):
+@ensure_csrf_cookie
+def jump_to(request, location):
     '''
-    Jump to viewing a specific problem.  The problem is specified by a
-    problem name - currently the filename (minus .xml) of the problem.
-    Maybe this should change to a more generic tag, eg "name" given as
-    an attribute in <problem>.
+    Show the page that contains a specific location.
 
-    We do the jump by (1) reading course.xml to find the first
-    instance of <problem> with the given filename, then (2) finding
-    the parent element of the problem, then (3) rendering that parent
-    element with a specific computed position value (if it is
-    <sequential>).
+    If the location is invalid, return a 404.
 
+    If the location is valid, but not present in a course, ?
+
+    If the location is valid, but in a course the current user isn't registered for, ?
+        TODO -- let the index view deal with it?
     '''
-    # get coursename if stored
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    # Complain if the location isn't valid
+    try:
+        location = Location(location)
+    except InvalidLocationError:
+        raise Http404("Invalid location")
 
-    # begin by getting course.xml tree
-    xml = content_parser.course_file(request.user, coursename)
+    # Complain if there's not data for this location
+    try:
+        (course_id, chapter, section, position) = modulestore().path_to_location(location)
+    except ItemNotFoundError:
+        raise Http404("No data at this location: {0}".format(location))
+    except NoPathToItem:
+        raise Http404("This location is not in any class: {0}".format(location))
 
-    # look for problem of given name
-    pxml = xml.xpath('//problem[@filename="%s"]' % probname)
-    if pxml:
-        pxml = pxml[0]
 
-    # get the parent element
-    parent = pxml.getparent()
-
-    # figure out chapter and section names
-    chapter = None
-    section = None
-    branch = parent
-    for k in range(4):  # max depth of recursion
-        if branch.tag == 'section':
-            section = branch.get('name')
-        if branch.tag == 'chapter':
-            chapter = branch.get('name')
-        branch = branch.getparent()
-
-    position = None
-    if parent.tag == 'sequential':
-        position = parent.index(pxml) + 1  # position in sequence
-
-    return index(request,
-                 course=coursename, chapter=chapter,
-                 section=section, position=position)
-
+    return index(request, course_id, chapter, section, position)
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
+    '''
+    Display the course's info.html, or 404 if there is no such course.
+
+    Assumes the course_id is in a valid format.
+    '''
     course = check_course(course_id)
 
     return render_to_response('info.html', {'course': course})

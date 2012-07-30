@@ -3,7 +3,7 @@ $discussion_title_size: 1.6em;
 $comment_title_size: 1.2em;
 $comment_body_size: 1.0em;
 $comment_info_size: 0.75em;
-$discussion_input_width: 60%;
+$discussion_input_width: 85%;
 
 @mixin discussion-font {
   font-family: inherit;
@@ -41,11 +41,11 @@ $discussion_input_width: 60%;
     }
     .search-input {
       float: left;
-      width: flex-grid(6);
+      width: flex-grid(9);
     }
     .search-within {
       display: block;
-      margin-top: flex-gutter();
+      margin-top: flex-gutter(8);
     }
   }
   
@@ -122,6 +122,9 @@ $discussion_input_width: 60%;
     }
     .tagsinput {
       margin-top: 20px;
+      width: 83%;
+      min-height: 30px;
+      height: 100%;
     }
   }
   .thread {
@@ -226,8 +229,7 @@ $discussion_input_width: 60%;
 
 .wmd-panel
 {
-  margin-right: 25%;
-  width: 50%;
+  width: 100%;
   min-width: 500px;
 }
 
@@ -239,7 +241,7 @@ $discussion_input_width: 60%;
 
 .wmd-input 
 { 
-  height: 300px;
+  height: 150px;
   width: 100%;
   background-color: Gainsboro;
   border: 1px solid DarkGray;

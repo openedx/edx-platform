@@ -1,25 +1,33 @@
 from collections import MutableMapping
 from xmodule.x_module import XModuleDescriptor
+from xmodule.modulestore import Location
 from lxml import etree
 import copy
 import logging
+import traceback
 from collections import namedtuple
 from fs.errors import ResourceNotFoundError
 import os
 
 log = logging.getLogger(__name__)
 
-
 # TODO (cpennington): This was implemented in an attempt to improve performance,
 # but the actual improvement wasn't measured (and it was implemented late at night).
 # We should check if it hurts, and whether there's a better way of doing lazy loading
+
+
 class LazyLoadingDict(MutableMapping):
     """
-    A dictionary object that lazily loads it's contents from a provided
-    function on reads (of members that haven't already been set)
+    A dictionary object that lazily loads its contents from a provided
+    function on reads (of members that haven't already been set).
     """
 
     def __init__(self, loader):
+        '''
+        On the first read from this dictionary, it will call loader() to
+        populate its contents.  loader() must return something dict-like. Any
+        elements set before the first read will be preserved.
+        '''
         self._contents = {}
         self._loaded = False
         self._loader = loader
@@ -70,10 +78,17 @@ _AttrMapBase = namedtuple('_AttrMap', 'metadata_key to_metadata from_metadata')
 
 class AttrMap(_AttrMapBase):
     """
-    A class that specifies a metadata_key, a function to transform an xml attribute to be placed in that key,
-    and to transform that key value
+    A class that specifies a metadata_key, and two functions:
+
+        to_metadata: convert value from the xml representation into
+            an internal python representation
+
+        from_metadata: convert the internal python representation into
+            the value to store in the xml.
     """
-    def __new__(_cls, metadata_key, to_metadata=lambda x: x, from_metadata=lambda x: x):
+    def __new__(_cls, metadata_key,
+                to_metadata=lambda x: x,
+                from_metadata=lambda x: x):
         return _AttrMapBase.__new__(_cls, metadata_key, to_metadata, from_metadata)
 
 
@@ -88,14 +103,34 @@ class XmlDescriptor(XModuleDescriptor):
     # The attributes will be removed from the definition xml passed
     # to definition_from_xml, and from the xml returned by definition_to_xml
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
-        'start', 'due', 'graded', 'name', 'slug', 'hide_from_toc')
+        'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
+        # VS[compat] Remove once unused.
+        'name', 'slug')
 
-    # A dictionary mapping xml attribute names to functions of the value
-    # that return the metadata key and value
+
+    # A dictionary mapping xml attribute names AttrMaps that describe how
+    # to import and export them
     xml_attribute_map = {
-        'graded': AttrMap('graded', lambda val: val == 'true', lambda val: str(val).lower()),
-        'name': AttrMap('display_name'),
+        # type conversion: want True/False in python, "true"/"false" in xml
+        'graded': AttrMap('graded',
+                          lambda val: val == 'true',
+                          lambda val: str(val).lower()),
     }
+
+
+    # VS[compat].  Backwards compatibility code that can go away after
+    # importing 2012 courses.
+    # A set of metadata key conversions that we want to make
+    metadata_translations = {
+        'slug' : 'url_name',
+        'name' : 'display_name',
+        }
+
+    @classmethod
+    def _translate(cls, key):
+        'VS[compat]'
+        return cls.metadata_translations.get(key, key)
+
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -105,12 +140,14 @@ class XmlDescriptor(XModuleDescriptor):
 
         xml_object: An etree Element
         """
-        raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
+        raise NotImplementedError(
+            "%s does not implement definition_from_xml" % cls.__name__)
 
     @classmethod
     def clean_metadata_from_xml(cls, xml_object):
         """
-        Remove any attribute named in self.metadata_attributes from the supplied xml_object
+        Remove any attribute named in cls.metadata_attributes from the supplied
+        xml_object
         """
         for attr in cls.metadata_attributes:
             if xml_object.get(attr) is not None:
@@ -134,20 +171,25 @@ class XmlDescriptor(XModuleDescriptor):
 
         xml_data: A string of xml that will be translated into data and children for
             this module
-        system: An XModuleSystem for interacting with external resources
+        system: A DescriptorSystem for interacting with external resources
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
         xml_object = etree.fromstring(xml_data)
+        # VS[compat] -- just have the url_name lookup once translation is done
+        slug = xml_object.get('url_name', xml_object.get('slug'))
+        location = Location('i4x', org, course, xml_object.tag, slug)
 
         def metadata_loader():
             metadata = {}
             for attr in cls.metadata_attributes:
                 val = xml_object.get(attr)
                 if val is not None:
+                    # VS[compat].  Remove after all key translations done
+                    attr = cls._translate(attr)
+
                     attr_map = cls.xml_attribute_map.get(attr, AttrMap(attr))
                     metadata[attr_map.metadata_key] = attr_map.to_metadata(val)
-
             return metadata
 
         def definition_loader():
@@ -157,6 +199,7 @@ class XmlDescriptor(XModuleDescriptor):
             else:
                 filepath = cls._format_filepath(xml_object.tag, filename)
 
+                # VS[compat]
                 # TODO (cpennington): If the file doesn't exist at the right path,
                 # give the class a chance to fix it up. The file will be written out again
                 # in the correct format.
@@ -169,13 +212,20 @@ class XmlDescriptor(XModuleDescriptor):
                             filepath = candidate
                             break
 
-                log.debug('filepath=%s, resources_fs=%s' % (filepath, system.resources_fs))
                 try:
                     with system.resources_fs.open(filepath) as file:
                         definition_xml = cls.file_to_xml(file)
                 except (ResourceNotFoundError, etree.XMLSyntaxError):
-                    log.exception('Unable to load file contents at path %s' % filepath)
-                    return {'data': 'Error loading file contents at path %s' % filepath}
+                    msg = 'Unable to load file contents at path %s for item %s' % (filepath, location.url())
+                    log.exception(msg)
+                    system.error_handler(msg)
+                    # if error_handler didn't reraise, work around problem.
+                    error_elem = etree.Element('error')
+                    message_elem = etree.SubElement(error_elem, 'error_message')
+                    message_elem.text = msg
+                    stack_elem = etree.SubElement(error_elem, 'stack_trace')
+                    stack_elem.text = traceback.format_exc()
+                    return {'data': etree.tostring(error_elem)}
 
             cls.clean_metadata_from_xml(definition_xml)
             return cls.definition_from_xml(definition_xml, system)
@@ -183,64 +233,90 @@ class XmlDescriptor(XModuleDescriptor):
         return cls(
             system,
             LazyLoadingDict(definition_loader),
-            location=['i4x',
-                      org,
-                      course,
-                      xml_object.tag,
-                      xml_object.get('slug')],
+            location=location,
             metadata=LazyLoadingDict(metadata_loader),
         )
 
     @classmethod
     def _format_filepath(cls, category, name):
-        return u'{category}/{name}.{ext}'.format(category=category, name=name, ext=cls.filename_extension)
+        return u'{category}/{name}.{ext}'.format(category=category,
+                                                 name=name,
+                                                 ext=cls.filename_extension)
+
+    @classmethod
+    def split_to_file(cls, xml_object):
+        '''
+        Decide whether to write this object to a separate file or not.
+
+        xml_object: an xml definition of an instance of cls.
+
+        This default implementation will split if this has more than 7
+        descendant tags.
+
+        Can be overridden by subclasses.
+        '''
+        return len(list(xml_object.iter())) > 7
 
     def export_to_xml(self, resource_fs):
         """
-        Returns an xml string representing this module, and all modules underneath it.
-        May also write required resources out to resource_fs
+        Returns an xml string representing this module, and all modules
+        underneath it.  May also write required resources out to resource_fs
 
-        Assumes that modules have single parantage (that no module appears twice in the same course),
-        and that it is thus safe to nest modules as xml children as appropriate.
+        Assumes that modules have single parentage (that no module appears twice
+        in the same course), and that it is thus safe to nest modules as xml
+        children as appropriate.
 
-        The returned XML should be able to be parsed back into an identical XModuleDescriptor
-        using the from_xml method with the same system, org, and course
+        The returned XML should be able to be parsed back into an identical
+        XModuleDescriptor using the from_xml method with the same system, org,
+        and course
 
-        resource_fs is a pyfilesystem office (from the fs package)
+        resource_fs is a pyfilesystem object (from the fs package)
         """
+
+        # Get the definition
         xml_object = self.definition_to_xml(resource_fs)
         self.__class__.clean_metadata_from_xml(xml_object)
 
-        # Put content in a separate file if it's large (has more than 5 descendent tags)
-        if len(list(xml_object.iter())) > 5:
+        # Set the tag first, so it's right if writing to a file
+        xml_object.tag = self.category
 
+        # Write it to a file if necessary
+        if self.split_to_file(xml_object):
+            # Put this object in it's own file
             filepath = self.__class__._format_filepath(self.category, self.name)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True))
-
+            # ...and remove all of its children here
             for child in xml_object:
                 xml_object.remove(child)
+            # also need to remove the text of this object.
+            xml_object.text = ''
+            # and the tail for good measure...
+            xml_object.tail = ''
+
 
             xml_object.set('filename', self.name)
 
-        xml_object.set('slug', self.name)
-        xml_object.tag = self.category
-
+        # Add the metadata
+        xml_object.set('url_name', self.name)
         for attr in self.metadata_attributes:
             attr_map = self.xml_attribute_map.get(attr, AttrMap(attr))
             metadata_key = attr_map.metadata_key
 
-            if metadata_key not in self.metadata or metadata_key in self._inherited_metadata:
+            if (metadata_key not in self.metadata or
+                metadata_key in self._inherited_metadata):
                 continue
 
             val = attr_map.from_metadata(self.metadata[metadata_key])
             xml_object.set(attr, val)
 
+        # Now we just have to make it beautiful
         return etree.tostring(xml_object, pretty_print=True)
 
     def definition_to_xml(self, resource_fs):
         """
         Return a new etree Element object created from this modules definition.
         """
-        raise NotImplementedError("%s does not implement definition_to_xml" % self.__class__.__name__)
+        raise NotImplementedError(
+            "%s does not implement definition_to_xml" % self.__class__.__name__)
