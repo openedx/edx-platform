@@ -521,7 +521,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item, resources_fs, error_handler):
+    def __init__(self, load_item, resources_fs, error_handler, **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
 
@@ -561,14 +561,15 @@ class DescriptorSystem(object):
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_handler, process_xml):
+    def __init__(self, load_item, resources_fs, error_handler, process_xml, **kwargs):
         """
         load_item, resources_fs, error_handler: see DescriptorSystem
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
         """
-        DescriptorSystem.__init__(self, load_item, resources_fs, error_handler)
+        DescriptorSystem.__init__(self, load_item, resources_fs, error_handler,
+                                  **kwargs)
         self.process_xml = process_xml
 
 
