@@ -24,6 +24,7 @@ class @CapaDescriptor
         try
             source = @source_box.val() + "\n"
             result = @parser.parse (source)
+            console.log result
             @outputXML(result)
             @message_box.css {"display":"none"}
         catch e 
@@ -37,7 +38,8 @@ class @CapaDescriptor
     dom2capa: (node) ->
         capa = new XMLSerializer().serializeToString(node)
         capa = capa + ""
-        return capa.replace(/<startouttext>/g, '<startouttext />').replace(/<\/startouttext>/g, '<endouttext />')
+        return capa.replace(/<startouttext>/g, '<startouttext />')
+                   .replace(/<\/startouttext>/g, '<endouttext />')
 
     buildXML: (parsed) ->
         dom_parser = new DOMParser()
@@ -53,6 +55,13 @@ class @CapaDescriptor
             if section.type == 'paragraph'
                 newel = create_text_element(section.text)
                 problem.append(newel)
+
+            else if section.type == 'linebreaks'
+                text = create_text_element('')
+                for i in [0..section.count] by 1
+                    br = doc.createElement('br')
+                    text.append(br)
+                problem.append(text)
 
             else if section.type == 'multiple_choice'
                 newel = $(doc.createElement('choiceresponse'))

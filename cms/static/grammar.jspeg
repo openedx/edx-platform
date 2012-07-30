@@ -1,11 +1,5 @@
 start
-  = sections:(StringResponse / NumericalResponse / MultipleChoice / Paragraph / Linebreak+)+
-    {
-      var hasKind = function(o) {
-        return o.hasOwnProperty('type');
-      }
-      return sections.filter(hasKind);
-    }
+  = sections:(StringResponse / NumericalResponse / MultipleChoice / Paragraph / PreservedLinebreaks)+
 
 StudentProducedResponseIdentifier
   = '='
@@ -76,7 +70,7 @@ Paragraph
 Line
   = text:Text terminator:Linebreak
     {
-      return text + terminator;
+      return text + '\n';
     }
 
 Text
@@ -87,6 +81,12 @@ Text
 
 OptionalSpaces
   = ' '*
+
+PreservedLinebreaks
+  = terminators:('\n')+
+  {
+    return {'type': 'linebreaks', 'count': terminators.length}
+  }
 
 Linebreak
   = ('\n')
