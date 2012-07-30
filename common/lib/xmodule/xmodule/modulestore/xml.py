@@ -29,7 +29,7 @@ def clean_out_mako_templating(xml_string):
     return xml_string
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
-    def __init__(self, xmlstore, org, course, course_dir, error_handler):
+    def __init__(self, xmlstore, org, course, course_dir, error_handler, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -88,9 +88,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
         MakoDescriptorSystem.__init__(self, load_item, resources_fs,
-                                      error_handler, render_template)
+                                      error_handler, render_template, **kwargs)
         XMLParsingSystem.__init__(self, load_item, resources_fs,
-                                  error_handler, process_xml)
+                                  error_handler, process_xml, **kwargs)
 
 
 
