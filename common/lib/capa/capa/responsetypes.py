@@ -905,7 +905,7 @@ class CodeResponse(LoncapaResponse):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = {'return_url': self.system.xqueue_callback_url,
-                  'queue_name': 'mitx-600x',
+                  'queue_name': 'mitx-600x', # TODO: Queue name should derive from courseware or XML
                  }
 
         # Queuekey generation
