@@ -10,10 +10,21 @@ start
 StudentProducedResponseIdentifier
   = '='
 
-NumericalResponse
-  = StudentProducedResponseIdentifier OptionalSpaces '(' OptionalSpaces value:NumericalValue OptionalSpaces ')' OptionalSpaces Linebreak
+NumericalToleranceValueType
+  = decimal / percentage / integer
+
+NumericalTolerance
+  = '+-' OptionalSpaces value:NumericalToleranceValueType OptionalSpaces
     {
-      return {'type': 'numerical', 'answer': value};
+      return value;
+    }
+
+NumericalResponse
+  = StudentProducedResponseIdentifier OptionalSpaces '(' OptionalSpaces value:NumericalValue OptionalSpaces tolerance:NumericalTolerance? ')' OptionalSpaces Linebreak
+    {
+      if (tolerance == "")
+        tolerance = "5%"
+      return {'type': 'numerical', 'answer': value, 'tolerance': tolerance};
     }
 
 StringResponse
@@ -80,7 +91,6 @@ OptionalSpaces
 Linebreak
   = ('\n')
 
-
 NumericalValue
   = additive
 
@@ -96,10 +106,16 @@ multiplicative
   / primary
 
 primary
-  = integer
+  = decimal
+  / integer
   / "(" additive:additive ")" { return additive; }
+
+decimal "decimal"
+  = first:[0-9]+ point:'.' last:[0-9]+
+    { return parseFloat(first.join("") + point + last.join("")); }
 
 integer "integer"
   = digits:[0-9]+ { return parseInt(digits.join(""), 10); }
 
-
+percentage "percentage"
+  = digits:[0-9]+ '%' { return parseInt(digits.join(""), 10) + '%'; }

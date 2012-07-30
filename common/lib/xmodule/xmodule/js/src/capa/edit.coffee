@@ -81,6 +81,12 @@ class @CapaDescriptor
                 newel = $(doc.createElement('numericalresponse'))
                 newel.attr 'answer', section.answer
 
+                tolerance = $(doc.createElement('responseparam'))
+                tolerance.attr 'type', 'tolerance'
+                tolerance.attr 'default', section.tolerance
+                tolerance.attr 'name', 'tol'
+                tolerance.attr 'description', 'Numerical Tolerance'
+                newel.append tolerance
                 newel.append doc.createElement('textline') 
                 problem.append(newel)
 
