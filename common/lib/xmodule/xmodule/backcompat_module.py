@@ -32,7 +32,7 @@ def process_includes(fn):
                 # read in and convert to XML
                 incxml = etree.XML(ifp.read())
 
-                # insert  new XML into tree in place of inlcude
+                # insert  new XML into tree in place of include
                 parent.insert(parent.index(next_include), incxml)
             except Exception:
                 msg = "Error in problem xml include: %s" % (etree.tostring(next_include, pretty_print=True))
