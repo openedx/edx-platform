@@ -168,6 +168,9 @@ Discussion =
       else
         editView = $("<div>").addClass("discussion-content-edit")
 
+        errorsField = $("<ul>").addClass("discussion-errors")
+        editView.append(errorsField)
+
         textarea = $("<div>").addClass("comment-edit")
         editView.append(textarea)
 
@@ -221,7 +224,11 @@ Discussion =
       autowatch = false || $local(".discussion-auto-watch").is(":checked")
 
       $.post url, {body: body, anonymous: anonymous, autowatch: autowatch}, (response, textStatus) ->
-        if textStatus == "success"
+        if response.errors
+          errorsField = $local(".discussion-errors").empty()
+          for error in response.errors
+            errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+        else
           Discussion.handleAnchorAndReload(response)
       , 'json'
 
@@ -232,6 +239,10 @@ Discussion =
         if textStatus == "success"
           Discussion.handleAnchorAndReload(response)
       , 'json'
+
+    handleEditThread = (elem) ->
+
+    handleEditComment = (elem) ->
           
     $local(".discussion-reply").click ->
       handleReply(this)
@@ -244,6 +255,13 @@ Discussion =
 
     $local(".discussion-vote-down").click ->
       handleVote(this, "down")
+
+    $local(".discussion-edit").click ->
+      if $content.hasClass("thread")
+        handleEditThread(this)
+      else
+        handleEditComment(this)
+      
 
   initializeContent: (content) ->
     $content = $(content)
@@ -272,13 +290,17 @@ Discussion =
       tags = $local(".new-post-tags").val()
       url = Discussion.urlFor('create_thread', $local(".new-post-form").attr("_id"))
       $.post url, {title: title, body: body, tags: tags}, (response, textStatus) ->
-        if textStatus == "success"
+        if response.errors
+          errorsField = $local(".discussion-errors").empty()
+          for error in response.errors
+            errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+        else
           Discussion.handleAnchorAndReload(response)
       , 'json'
     
     $local(".discussion-search-form").submit (event) ->
       event.preventDefault()
-      text = $local(".discussion-search-text").val()
+      text = $local(".searchInput").val()
       isSearchWithinBoard = $local(".discussion-search-within-board").is(":checked")
       handleSearch(text, isSearchWithinBoard)
 
