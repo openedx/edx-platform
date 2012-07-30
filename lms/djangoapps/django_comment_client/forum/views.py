@@ -16,7 +16,10 @@ from django_comment_client.utils import get_categorized_discussion_info
 
 import json
 
-def render_accordion(request, course, discussion_info, discussion_id):
+def render_accordion(request, course, discussion_id):
+
+    discussion_info = get_categorized_discussion_info(request, course)
+
     context = {
         'course': course,
         'discussion_info': discussion_info,
@@ -55,8 +58,6 @@ def forum_form_discussion(request, course_id, discussion_id):
 
     url_course_id = course_id.replace('/', '_').replace('.', '_')
 
-    discussion_info = get_categorized_discussion_info(request, course)#request.user, course, course_name, url_course_id)
-
     search_text = request.GET.get('text', '')
 
     if len(search_text) > 0:
@@ -70,12 +71,13 @@ def forum_form_discussion(request, course_id, discussion_id):
         'course': course,
         'init': '',
         'content': render_discussion(request, course_id, threads, discussion_id, search_text),
-        'accordion': render_accordion(request, course, discussion_info, discussion_id),
+        'accordion': render_accordion(request, course, discussion_id),
     }
 
     return render_to_response('discussion/index.html', context)
 
 def render_single_thread(request, course_id, thread_id):
+    
     context = {
         'thread': comment_client.get_thread(thread_id, recursive=True),
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
@@ -84,7 +86,7 @@ def render_single_thread(request, course_id, thread_id):
     }
     return render_to_string('discussion/single_thread.html', context)
 
-def single_thread(request, course_id, thread_id):
+def single_thread(request, course_id, discussion_id, thread_id):
 
     course = check_course(course_id)
 
@@ -92,7 +94,7 @@ def single_thread(request, course_id, thread_id):
         'csrf': csrf(request)['csrf_token'],
         'init': '',
         'content': render_single_thread(request, course_id, thread_id),
-        'accordion': '',
+        'accordion': render_accordion(request, course, discussion_id),
         'course': course,
     }
 
@@ -105,10 +107,6 @@ def search(request, course_id):
     text = request.GET.get('text', None)
     commentable_id = request.GET.get('commentable_id', None)
     tags = request.GET.get('tags', None)
-
-    print text
-    print commentable_id
-    print tags
 
     threads = comment_client.search_threads({
         'text': text,
