@@ -507,7 +507,7 @@ INSTALLED_APPS = (
     # Discussion
     'django_comment_client',
 
-    # For Askbot 
+    # For Askbot
     'django.contrib.sitemaps',
     'django.contrib.admin',
     'django_countries',

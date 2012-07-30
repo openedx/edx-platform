@@ -25,6 +25,7 @@ from models import StudentModuleCache
 from student.models import UserProfile
 from multicourse import multicourse_settings
 from django_comment_client.utils import get_discussion_title
+
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.django import modulestore
