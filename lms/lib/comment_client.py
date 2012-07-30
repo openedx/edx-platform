@@ -105,9 +105,9 @@ def _perform_request(method, url, data_or_params=None, *args, **kwargs):
     else:
         response = requests.request(method, url, params=data_or_params)
     if 200 < response.status_code < 500:
-        raise CommentClientException(response.text)
+        raise CommentClientError(response.text)
     elif response.status_code == 500:
-        raise CommentClientUnknownException(response.text)
+        raise CommentClientUnknownError(response.text)
     else:
         if kwargs.get("raw", False):
             return response.text

@@ -28,28 +28,8 @@
   
    <%static:js group='courseware'/>
 
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [
-          ["$","$"],
-        ],
-        displayMath: [
-          ["$$","$$"],
-        ]
-      }
-    });
-  </script>
-
-  <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
-       It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
-       MathJax extension libraries -->
-  <script type="text/javascript" src="/static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/split.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.ajaxfileupload.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Converter.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Sanitizer.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Editor.js')}"></script>
+  <%include file="discussion/_js_dependencies.html" />
+  
 
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
   <script type="text/javascript">
