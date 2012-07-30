@@ -45,7 +45,6 @@ section.course-index {
     ul.ui-accordion-content {
       @include border-radius(0);
       @include box-shadow(inset -1px 0 0 #e6e6e6);
-      background: #dadada;
       border: none;
       font-size: 12px;
       margin: 0;
@@ -66,6 +65,7 @@ section.course-index {
 
           p {
             font-weight: bold;
+            font-family: $sans-serif;
             margin-bottom: 0;
 
             span.subtitle {
