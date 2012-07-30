@@ -163,6 +163,52 @@ class XmlDescriptor(XModuleDescriptor):
         return etree.parse(file_object).getroot()
 
     @classmethod
+    def definition_loader(cls, xml_object, system, location):
+        '''Load a descriptor definition from the specified xml_object.
+        Subclasses should not need to override this except in special
+        cases (e.g. html module)'''
+
+        filename = xml_object.get('filename')
+        if filename is None:
+            definition_xml = copy.deepcopy(xml_object)
+        else:
+            filepath = cls._format_filepath(xml_object.tag, filename)
+
+            # VS[compat]
+            # TODO (cpennington): If the file doesn't exist at the right path,
+            # give the class a chance to fix it up. The file will be written out again
+            # in the correct format.
+            # This should go away once the CMS is online and has imported all current (fall 2012)
+            # courses from xml
+            if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
+                candidates = cls.backcompat_paths(filepath)
+                for candidate in candidates:
+                    if system.resources_fs.exists(candidate):
+                        filepath = candidate
+                        break
+
+            try:
+                with system.resources_fs.open(filepath) as file:
+                    definition_xml = cls.file_to_xml(file)
+            except (ResourceNotFoundError, etree.XMLSyntaxError):
+                msg = 'Unable to load file contents at path %s for item %s' % (
+                    filepath, location.url())
+
+                log.exception(msg)
+                system.error_handler(msg)
+                # if error_handler didn't reraise, work around problem.
+                error_elem = etree.Element('error')
+                message_elem = etree.SubElement(error_elem, 'error_message')
+                message_elem.text = msg
+                stack_elem = etree.SubElement(error_elem, 'stack_trace')
+                stack_elem.text = traceback.format_exc()
+                return {'data': etree.tostring(error_elem)}
+
+        cls.clean_metadata_from_xml(definition_xml)
+        return cls.definition_from_xml(definition_xml, system)
+
+
+    @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Creates an instance of this descriptor from the supplied xml_data.
@@ -191,44 +237,8 @@ class XmlDescriptor(XModuleDescriptor):
                     metadata[attr_map.metadata_key] = attr_map.to_metadata(val)
             return metadata
 
-        def definition_loader():
-            filename = xml_object.get('filename')
-            if filename is None:
-                definition_xml = copy.deepcopy(xml_object)
-            else:
-                filepath = cls._format_filepath(xml_object.tag, filename)
-
-                # VS[compat]
-                # TODO (cpennington): If the file doesn't exist at the right path,
-                # give the class a chance to fix it up. The file will be written out again
-                # in the correct format.
-                # This should go away once the CMS is online and has imported all current (fall 2012)
-                # courses from xml
-                if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
-                    candidates = cls.backcompat_paths(filepath)
-                    for candidate in candidates:
-                        if system.resources_fs.exists(candidate):
-                            filepath = candidate
-                            break
-
-                try:
-                    with system.resources_fs.open(filepath) as file:
-                        definition_xml = cls.file_to_xml(file)
-                except (ResourceNotFoundError, etree.XMLSyntaxError):
-                    msg = 'Unable to load file contents at path %s for item %s' % (filepath, location.url())
-                    log.exception(msg)
-                    system.error_handler(msg)
-                    # if error_handler didn't reraise, work around problem.
-                    error_elem = etree.Element('error')
-                    message_elem = etree.SubElement(error_elem, 'error_message')
-                    message_elem.text = msg
-                    stack_elem = etree.SubElement(error_elem, 'stack_trace')
-                    stack_elem.text = traceback.format_exc()
-                    return {'data': etree.tostring(error_elem)}
-
-            cls.clean_metadata_from_xml(definition_xml)
-            return cls.definition_from_xml(definition_xml, system)
-
+        definition = cls.definition_loader(xml_object, system, location)
+        metadata = metadata_loader()
         # VS[compat] -- just have the url_name lookup once translation is done
         slug = xml_object.get('url_name', xml_object.get('slug'))
         return cls(
@@ -283,7 +293,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         # Write it to a file if necessary
         if self.split_to_file(xml_object):
-            # Put this object in it's own file
+            # Put this object in its own file
             filepath = self.__class__._format_filepath(self.category, self.name)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
