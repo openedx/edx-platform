@@ -14,6 +14,9 @@ def get_threads(commentable_id, recursive=False, *args, **kwargs):
 def get_threads_tags(*args, **kwargs):
     return _perform_request('get', _url_for_threads_tags(), {}, *args, **kwargs)
 
+def tags_autocomplete(value, *args, **kwargs):
+    return _perform_request('get', _url_for_threads_tags_autocomplete(), {'value': value}, *args, **kwargs)
+
 def create_thread(commentable_id, attributes, *args, **kwargs):
     return _perform_request('post', _url_for_threads(commentable_id), attributes, *args, **kwargs)
     
@@ -87,8 +90,8 @@ def unsubscribe_thread(user_id, thread_id, *args, **kwargs):
 def unsubscribe_commentable(user_id, commentable_id, *args, **kwargs):
     return unsubscribe(user_id, {'source_type': 'other', 'source_id': commentable_id})
 
-def search(text, commentable_id=None, *args, **kwargs):
-    return _perform_request('get', _url_for_search(), {'text': text, 'commentable_id': commentable_id}, *args, **kwargs)
+def search_threads(attributes, *args, **kwargs):
+    return _perform_request('get', _url_for_search_threads(), attributes, *args, **kwargs)
 
 def _perform_request(method, url, data_or_params=None, *args, **kwargs):
     if method in ['post', 'put', 'patch']:
@@ -127,8 +130,11 @@ def _url_for_subscription(user_id):
 def _url_for_user(user_id):
     return "{prefix}/users/{user_id}".format(prefix=PREFIX, user_id=user_id)
 
-def _url_for_search():
-    return "{prefix}/search".format(prefix=PREFIX)
+def _url_for_search_threads():
+    return "{prefix}/search/threads".format(prefix=PREFIX)
 
 def _url_for_threads_tags():
     return "{prefix}/threads/tags".format(prefix=PREFIX)
+
+def _url_for_threads_tags_autocomplete():
+    return "{prefix}/threads/tags/autocomplete".format(prefix=PREFIX)

@@ -1,6 +1,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from datehelper import time_ago_in_words %>
 <%! from dateutil.parser import parse %>
+<%! import urllib %>
 
 <%def name="render_thread(course_id, thread, edit_thread=False, show_comments=False)">
   <%
@@ -9,6 +10,8 @@
     else:
       thread_id = thread['id']
       url_for_thread = reverse('django_comment_client.forum.views.single_thread', args=[course_id, thread_id])
+    def url_for_tags(tags):
+      return reverse('django_comment_client.forum.views.search', args=[course_id]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
   %>
   <div class="thread" _id="${thread['id']}">
     <div class="discussion-content">
@@ -18,6 +21,11 @@
           <a class="thread-title" name="${thread['id']}" href="${url_for_thread}">${thread['title'] | h}</a>
           <div class="discussion-content-view">
             <div class="content-body thread-body">${thread['body'] | h}</div>
+            <div class="thread-tags">
+              % for tag in thread['tags']:
+                <a class="thread-tag" href="${url_for_tags([tag])}">${tag}</a>
+              % endfor
+            </div>
             <div class="info">
               ${render_info(thread)}
               % if edit_thread:
@@ -82,7 +90,6 @@
 <%def name="render_watch_thread()">
   <a class="discussion-link discussion-watch-thread" href="javascript:void(0)">Watch</a>
 </%def>
-
 
 <%def name="render_vote(content)">
   <%

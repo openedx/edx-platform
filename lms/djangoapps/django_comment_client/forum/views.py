@@ -101,8 +101,21 @@ def single_thread(request, course_id, thread_id):
 def search(request, course_id):
 
     course = check_course(course_id)
+
     text = request.GET.get('text', None)
-    threads = comment_client.search(text)
+    commentable_id = request.GET.get('commentable_id', None)
+    tags = request.GET.get('tags', None)
+
+    print text
+    print commentable_id
+    print tags
+
+    threads = comment_client.search_threads({
+        'text': text,
+        'commentable_id': commentable_id,
+        'tags': tags,
+    })
+
     context = {
         'csrf': csrf(request)['csrf_token'],
         'init': '',
