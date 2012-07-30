@@ -13,6 +13,7 @@ if settings.DEBUG:
 urlpatterns = ('',
     url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
     
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
