@@ -8,33 +8,7 @@
 </%block>
 
 <%block name="js_extra">
-  <!-- The configuration below is different from the main mathjax config because dollar signs make it easier
-       to integrate with Markdown.  -->
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [
-          ["$","$"],
-        ],
-        displayMath: [
-          ["$$","$$"],
-        ]
-      }
-    });
-  </script>
-
-  ## This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
-  ## It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of MathJax extension libraries
-  <script type="text/javascript" src="/static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/split.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.ajaxfileupload.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Converter.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Sanitizer.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/Markdown.Editor.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.autocomplete.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.tagsinput.js')}"></script>
-  <link href="${static.url('css/vendor/jquery.tagsinput.css')}" rel="stylesheet" type="text/css">
-  <link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
+<%include file="_js_dependencies.html" />
 </%block>
 
 <%include file="../course_navigation.html" args="active_page='discussion'" />
