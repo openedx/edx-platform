@@ -300,7 +300,7 @@ Discussion =
     
     $local(".discussion-search-form").submit (event) ->
       event.preventDefault()
-      text = $local(".searchInput").val()
+      text = $local(".search-input").val()
       isSearchWithinBoard = $local(".discussion-search-within-board").is(":checked")
       handleSearch(text, isSearchWithinBoard)
 
