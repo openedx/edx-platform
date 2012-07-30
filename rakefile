@@ -51,6 +51,7 @@ default_options = {
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
     sh('pip install -e common/lib/xmodule')
+    sh('git submodule update --init')
 end
 
 [:lms, :cms, :common].each do |system|
@@ -150,14 +151,14 @@ end
 
 task :package do
     FileUtils.mkdir_p(BUILD_DIR)
-    
+
     Dir.chdir(BUILD_DIR) do
         afterremove = Tempfile.new('afterremove')
         afterremove.write <<-AFTERREMOVE.gsub(/^\s*/, '')
         #! /bin/bash
         set -e
         set -x
-        
+
         # to be a little safer this rm is executed
         # as the makeitso user
 

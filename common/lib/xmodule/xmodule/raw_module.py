@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
     """
-    Module that provides a raw editing view of it's data and children
+    Module that provides a raw editing view of its data and children
     """
     mako_template = "widgets/raw-edit.html"
 
@@ -31,8 +31,11 @@ class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
         except etree.XMLSyntaxError as err:
             lines = self.definition['data'].split('\n')
             line, offset = err.position
-            log.exception("Unable to create xml for problem {loc}. Context: '{context}'".format(
-                context=lines[line-1][offset - 40:offset + 40],
-                loc=self.location
-            ))
+            msg = ("Unable to create xml for problem {loc}. "
+                   "Context: '{context}'".format(
+                    context=lines[line-1][offset - 40:offset + 40],
+                    loc=self.location))
+            log.exception(msg)
+            self.system.error_handler(msg)
+            # no workaround possible, so just re-raise
             raise
