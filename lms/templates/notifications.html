@@ -1,13 +1,13 @@
 <%! from django.core.urlresolvers import reverse %>
 
 <%
-def url_for_thread(thread_id):
-  return reverse('django_comment_client.forum.views.single_thread', args=[course.id, thread_id])
+def url_for_thread(discussion_id, thread_id):
+  return reverse('django_comment_client.forum.views.single_thread', args=[course.id, discussion_id, thread_id])
 %>
 
 <% 
-def url_for_comment(thread_id, comment_id):
-  return reverse('django_comment_client.forum.views.single_thread', args=[course.id, thread_id]) + "#" + comment_id
+def url_for_comment(discussion_id, thread_id, comment_id):
+  return url_for_thread(discussion_id, thread_id) + "#" + comment_id
 %>
 
 <%
@@ -32,14 +32,14 @@ def discussion_title(discussion_id):
     <% info = notification['info'] %>
     % if notification['notification_type'] == 'post_reply':
       User No.${notification['actor_id']} posted a
-      <a href="${url_for_comment(info['thread_id'], info['comment_id'])}">comment</a>
+      <a href="${url_for_comment(info['commentable_id', info['thread_id'], info['comment_id'])}">comment</a>
       to the thread
-      <a href="${url_for_thread(info['thread_id'])}">${info['thread_title']}</a>
+      <a href="${url_for_thread(info['commentable_id'], info['thread_id'])}">${info['thread_title']}</a>
       in discussion
       <a href="${url_for_discussion(info['commentable_id'])}">${discussion_title(info['commentable_id'])}</a>
     % elif notification['notification_type'] == 'post_topic':
       User No.${notification['actor_id']} posted a new thread
-      <a href="${url_for_thread(info['thread_id'])}">${info['thread_title']}</a>
+      <a href="${url_for_thread(info['commentable_id'], info['thread_id'])}">${info['thread_title']}</a>
       in discussion
       <a href="${url_for_discussion(info['commentable_id'])}">${discussion_title(info['commentable_id'])}</a>
     % endif

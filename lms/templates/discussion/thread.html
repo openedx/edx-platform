@@ -44,10 +44,11 @@
 
 <%def name="render_title(content, type, **kwargs)">
   <%
-    if kwargs.get('show_comments', False):
-      url_for_thread = ""
-    else:
-      url_for_thread = reverse('django_comment_client.forum.views.single_thread', args=[course_id, content['id']])
+    if type == "thread":
+      if kwargs.get('show_comments', False):
+        url_for_thread = ""
+      else:
+        url_for_thread = reverse('django_comment_client.forum.views.single_thread', args=[course_id, content['commentable_id'], content['id']])
   %>
   % if type == "thread":
     <a class="thread-title" name="${content['id']}" href="${url_for_thread}">${content['title'] | h}</a>
