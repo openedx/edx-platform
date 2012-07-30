@@ -1,10 +1,12 @@
 from lxml import etree
+from lxml.etree import XMLSyntaxError
 import pkg_resources
 import logging
+from fs.errors import ResourceNotFoundError
+from functools import partial
 
 from xmodule.modulestore import Location
 
-from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -443,16 +445,28 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         system is an XMLParsingSystem
 
         org and course are optional strings that will be used in the generated
-            modules url identifiers
+            module's url identifiers
         """
-        class_ = XModuleDescriptor.load_class(
-            etree.fromstring(xml_data).tag,
-            default_class
-        )
-        # leave next line, commented out - useful for low-level debugging
-        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
-        #        etree.fromstring(xml_data).tag,class_))
-        return class_.from_xml(xml_data, system, org, course)
+        try:
+            class_ = XModuleDescriptor.load_class(
+                etree.fromstring(xml_data).tag,
+                default_class
+                )
+            # leave next line, commented out - useful for low-level debugging
+            # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
+            #        etree.fromstring(xml_data).tag,class_))
+
+            descriptor = class_.from_xml(xml_data, system, org, course)
+        except (ResourceNotFoundError, XMLSyntaxError) as err:
+            # Didn't load properly.  Fall back on loading as a malformed
+            # descriptor.  This should never error due to formatting.
+
+            # Put import here to avoid circular import errors
+            from xmodule.malformed_module import MalformedDescriptor
+
+            descriptor = MalformedDescriptor.from_xml(xml_data, system, org, course)
+
+        return descriptor
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):

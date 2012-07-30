@@ -1,27 +1,17 @@
 from pkg_resources import resource_string
 from lxml import etree
+from xmodule.editing_module import EditingDescriptor
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
 import logging
 
 log = logging.getLogger(__name__)
 
-
-class RawDescriptor(MakoModuleDescriptor, XmlDescriptor):
+class RawDescriptor(XmlDescriptor, EditingDescriptor):
     """
-    Module that provides a raw editing view of its data and children
+    Module that provides a raw editing view of its data and children.  It
+    requires that the definition xml is valid.
     """
-    mako_template = "widgets/raw-edit.html"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit.coffee')]}
-    js_module_name = "RawDescriptor"
-
-    def get_context(self):
-        return {
-            'module': self,
-            'data': self.definition['data'],
-        }
-
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         return {'data': etree.tostring(xml_object)}
