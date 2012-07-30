@@ -1,7 +1,6 @@
 @import "bourbon/bourbon";
 
 // Base layout
-@import "base/reset", "base/font-face";
 @import "base/variables", "base/functions", "base/extends", "base/base";
 @import "layout/layout", "layout/header", "layout/footer", "layout/calculator", "layout/leanmodal";
 @import "plugins/jquery-ui-1.8.16.custom", "plugins/jquery.qtip.min";
