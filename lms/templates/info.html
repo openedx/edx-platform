@@ -10,6 +10,15 @@
   from courseware.courses import get_course_info_section
 %>
 
+<%block name="js_extra">
+  <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
+  <script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    $(".handouts").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
+    });
+  </script>
+</%block>
+
 <section class="container">
   <section class="courseware">
     <div class="info-wrapper">
