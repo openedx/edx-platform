@@ -1,0 +1,27 @@
+@mixin bounce-in {
+  0% {
+    opacity: 0;
+    @include transform(scale(.3));
+  }
+
+  50% {
+    opacity: 1;
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    @include transform(scale(1));
+  }
+}
+
+@-moz-keyframes bounce-in { @include bounce-in(); }
+@-webkit-keyframes bounce-in { @include bounce-in(); }
+@-o-keyframes bounce-in { @include bounce-in(); }
+@keyframes bounce-in { @include bounce-in();}
+
+@mixin bounce-in-animation($duration, $timing: ease-in-out) {
+  @include animation-name(bounce-in);
+  @include animation-duration($duration);
+  @include animation-timing-function($timing);
+  @include animation-fill-mode(both);
+}

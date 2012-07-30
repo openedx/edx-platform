@@ -32,12 +32,12 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
-for feature,value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
+for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
     MITX_FEATURES[feature] = value
 
-WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED',WIKI_ENABLED)
+WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
-LOGGING = get_logger_config(LOG_DIR, 
+LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             debug=False)

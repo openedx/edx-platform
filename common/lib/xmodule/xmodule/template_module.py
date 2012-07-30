@@ -21,19 +21,23 @@ class CustomTagModule(XModule):
 
     course.xml::
         ...
-        <customtag page="234"><impl>book</impl></customtag>
+        <customtag page="234" impl="book"/>
         ...
 
     Renders to::
         More information given in <a href="/book/234">the text</a>
     """
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition,
+                 instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition,
+                         instance_state, shared_state, **kwargs)
+
         xmltree = etree.fromstring(self.definition['data'])
-        template_name = xmltree.find('impl').text
+        template_name = xmltree.attrib['impl']
         params = dict(xmltree.items())
-        with self.system.filestore.open('custom_tags/{name}'.format(name=template_name)) as template:
+        with self.system.filestore.open(
+                'custom_tags/{name}'.format(name=template_name)) as template:
             self.html = Template(template.read()).render(**params)
 
     def get_html(self):

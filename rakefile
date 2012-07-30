@@ -27,7 +27,7 @@ NORMALIZED_DEPLOY_NAME = DEPLOY_NAME.downcase().gsub(/[_\/]/, '-')
 INSTALL_DIR_PATH = File.join(DEPLOY_DIR, NORMALIZED_DEPLOY_NAME)
 PIP_REPO_REQUIREMENTS = "#{INSTALL_DIR_PATH}/repo-requirements.txt"
 # Set up the clean and clobber tasks
-CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage', 'test_root/*_repo')
+CLOBBER.include(BUILD_DIR, REPORT_DIR, 'cover*', '.coverage', 'test_root/*_repo', 'test_root/staticfiles')
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
 def select_executable(*cmds)
@@ -51,6 +51,11 @@ default_options = {
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
     sh('pip install -e common/lib/xmodule')
+    sh('git submodule update --init')
+end
+
+task :clean_test_files do
+    sh("git clean -fdx test_root")
 end
 
 [:lms, :cms, :common].each do |system|
@@ -92,7 +97,7 @@ end
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}" => ["#{system}:collectstatic:test", "fasttest_#{system}"]
+    task "test_#{system}" => ["clean_test_files", "#{system}:collectstatic:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
@@ -150,14 +155,14 @@ end
 
 task :package do
     FileUtils.mkdir_p(BUILD_DIR)
-    
+
     Dir.chdir(BUILD_DIR) do
         afterremove = Tempfile.new('afterremove')
         afterremove.write <<-AFTERREMOVE.gsub(/^\s*/, '')
         #! /bin/bash
         set -e
         set -x
-        
+
         # to be a little safer this rm is executed
         # as the makeitso user
 
