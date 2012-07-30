@@ -11,25 +11,23 @@
 %>
 
 <section class="container">
-  <section class="course-content">
-    <section class="courseware">
-      <div class="info-wrapper">
-        % if user.is_authenticated():
-        <section class="updates">
-          ${get_course_info_section(course, 'updates')}
-        </section>
-        <section aria-label="Handout Navigation" class="handouts">
-          ${get_course_info_section(course, 'handouts')}
-        </section>
-        % else:
-        <section class="updates">
-          ${get_course_info_section(course, 'guest_updates')}
-        </section>
-        <section aria-label="Handout Navigation" class="handouts">
-          ${get_course_info_section(course, 'guest_handouts')}
-        </section>
-        % endif
-      </div>
-    </section>
+  <section class="courseware">
+    <div class="info-wrapper">
+      % if user.is_authenticated():
+      <section class="updates">
+        ${get_course_info_section(course, 'updates')}
+      </section>
+      <section aria-label="Handout Navigation" class="handouts">
+        ${get_course_info_section(course, 'handouts')}
+      </section>
+      % else:
+      <section class="updates">
+        ${get_course_info_section(course, 'guest_updates')}
+      </section>
+      <section aria-label="Handout Navigation" class="handouts">
+        ${get_course_info_section(course, 'guest_handouts')}
+      </section>
+      % endif
+    </div>
   </section>
 </section>
