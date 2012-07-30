@@ -3,6 +3,8 @@ from courseware.models import StudentModuleCache
 from courseware.module_render import get_module
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from django.http import HttpResponse
+from django.utils import simplejson
 
 from django.conf import settings
 import operator
@@ -88,3 +90,19 @@ def initialize_discussion_info(request, course):
         'discussion_id': url_course_id,
         'category': 'General',
     }]
+
+class JsonResponse(HttpResponse):
+    def __init__(self, data=None):
+        content = simplejson.dumps(data,
+                                   indent=2,
+                                   ensure_ascii=False)
+        super(JsonResponse, self).__init__(content,
+                                           mimetype='application/json; charset=utf8')
+
+class JsonError(HttpResponse):
+    def __init__(self, error_message=""):
+        content = simplejson.dumps({'errors': error_message},
+                                   indent=2,
+                                   ensure_ascii=False)
+        super(JsonError, self).__init__(content,
+                                        mimetype='application/json; charset=utf8')

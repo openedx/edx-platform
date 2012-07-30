@@ -60,7 +60,7 @@ def forum_form_discussion(request, course_id, discussion_id):
     search_text = request.GET.get('text', '')
 
     if len(search_text) > 0:
-        threads = comment_client.search(search_text, discussion_id)
+        threads = comment_client.search_threads({'text': search_text, 'commentable_id': discussion_id})
     else:
         threads = comment_client.get_threads(discussion_id, recursive=False)
 
