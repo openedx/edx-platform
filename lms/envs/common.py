@@ -6,16 +6,16 @@ MITX_FEATURES[...]. Modules that extend this one can change the feature
 configuration in an environment specific config file and re-calculate those
 values.
 
-We should make a method that calls all these config methods so that you just 
+We should make a method that calls all these config methods so that you just
 make one call at the end of your site-specific dev file to reset all the
 dependent variables (like INSTALLED_APPS) for you.
 
 Longer TODO:
-1. Right now our treatment of static content in general and in particular 
+1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
    just means that we stick them in a dict called MITX_FEATURES.
-3. We need to handle configuration for multiple courses. This could be as 
+3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
 import sys
@@ -43,7 +43,7 @@ MITX_FEATURES = {
     'SAMPLE' : False,
     'USE_DJANGO_PIPELINE' : True,
     'DISPLAY_HISTOGRAMS_TO_STAFF' : True,
-    'REROUTE_ACTIVATION_EMAIL' : False,		# nonempty string = address for all activation emails 
+    'REROUTE_ACTIVATION_EMAIL' : False,		# nonempty string = address for all activation emails
     'DEBUG_LEVEL' : 0,				# 0 = lowest level, least verbose, 255 = max level, most verbose
 
     ## DO NOT SET TO True IN THIS FILE
@@ -62,7 +62,7 @@ PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
-ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
+ASKBOT_ROOT = REPO_ROOT / "askbot"
 COURSES_ROOT = ENV_ROOT / "data"
 
 # FIXME: To support multiple courses, we should walk the courses dir at startup
@@ -86,7 +86,7 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
                           COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
 
-# This is where Django Template lookup is defined. There are a few of these 
+# This is where Django Template lookup is defined. There are a few of these
 # still left lying around.
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
@@ -104,8 +104,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 
-# FIXME: 
-# We should have separate S3 staged URLs in case we need to make changes to 
+# FIXME:
+# We should have separate S3 staged URLs in case we need to make changes to
 # these assets and test them.
 LIB_URL = '/static/js/'
 
@@ -121,7 +121,7 @@ STATIC_GRAB = False
 DEV_CONTENT = True
 
 # FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 10000 
+TRACK_MAX_EVENT = 10000
 DEBUG_TRACK_LOG = False
 
 MITX_ROOT_URL = ''
@@ -130,7 +130,7 @@ COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
 COURSE_TITLE = "Circuits and Electronics"
 
-### Dark code. Should be enabled in local settings for devel. 
+### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 QUICKEDIT = False
@@ -212,9 +212,9 @@ USE_L10N = True
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 #################################### AWS #######################################
-# S3BotoStorage insists on a timeout for uploaded assets. We should make it 
+# S3BotoStorage insists on a timeout for uploaded assets. We should make it
 # permanent instead, but rather than trying to figure out exactly where that
-# setting is, I'm just bumping the expiration time to something absurd (100 
+# setting is, I'm just bumping the expiration time to something absurd (100
 # years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
 # in the global settings.py
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60 # 10 years
@@ -281,7 +281,7 @@ MIDDLEWARE_CLASSES = (
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
-    
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
@@ -303,15 +303,15 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 PIPELINE_CSS = {
     'application': {
         'source_filenames': ['sass/application.scss'],
-        'output_filename': 'css/application.css',
+        'output_filename': 'css/lms-application.css',
     },
     'course': {
       'source_filenames': ['sass/course.scss', 'js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css'],
-      'output_filename': 'css/course.css',
+      'output_filename': 'css/lms-course.css',
       },
     'ie-fixes': {
         'source_filenames': ['sass/ie.scss'],
-        'output_filename': 'css/ie.css',
+        'output_filename': 'css/lms-ie.css',
     },
 }
 
@@ -412,23 +412,23 @@ PIPELINE_JS = {
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
         ],
-        'output_filename': 'js/application.js'
+        'output_filename': 'js/lms-application.js'
     },
     'courseware': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in courseware_only_js],
-        'output_filename': 'js/courseware.js'
+        'output_filename': 'js/lms-courseware.js'
     },
     'main_vendor': {
         'source_filenames': main_vendor_js,
-        'output_filename': 'js/main_vendor.js',
+        'output_filename': 'js/lms-main_vendor.js',
     },
     'module-js': {
         'source_filenames': module_js_sources,
-        'output_filename': 'js/modules.js',
+        'output_filename': 'js/lms-modules.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
-        'output_filename': 'js/spec.js'
+        'output_filename': 'js/lms-spec.js'
     }
 }
 
