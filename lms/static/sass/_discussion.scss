@@ -18,23 +18,34 @@ $discussion_input_width: 60%;
 
 .course-content {
   .discussion {
-    margin-left: 40px;
-    margin-top: 15px;
+    margin-left: flex-gutter(4);
+    margin-top: flex-gutter(6);
   }
 }
 
 .discussion {
   .discussion-search-form {
-    margin-bottom: 40px;
-    .discussion-search {
+    margin-bottom: flex-gutter(4);
+    display: inline-block;
+    width: flex-grid(12);
+    .discussion-link {
+      display: inline-block;
+      margin-left: flex-gutter();
       @include discussion-font;
       color: #1d9dd9;
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
+      margin-top: flex-gutter();
+      font-weight: bold; 
     }
     .discussion-search-text {
       @include discussion-font;
+    }
+    .search-input {
+      float: left;
+      width: flex-grid(6);
+    }
+    .search-within {
+      display: block;
+      margin-top: flex-gutter();
     }
   }
   
@@ -43,7 +54,7 @@ $discussion_input_width: 60%;
     @include discussion-clickable;
     font-size: $discussion_title_size;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: flex-gutter(6);
     display: block;
   }
   .discussion-title-wrapper {
@@ -66,7 +77,7 @@ $discussion_input_width: 60%;
     margin-right: 8px;
     margin-top: 5px;
     text-align: center;
-    height: 40px;
+    height: flex-grid(3);
     float: left;
     .discussion-vote-count {
       font-size: $comment_body_size;
