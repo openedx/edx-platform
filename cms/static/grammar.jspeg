@@ -29,7 +29,7 @@ StringResponse
 
 /* MultipleChoice */
 ChoiceIdentifier
-  = '(' parenthesized:[x\s]? ')'
+  = '(' parenthesized:[x ]? ')'
     {
       return parenthesized == 'x';
     }
