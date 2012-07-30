@@ -51,6 +51,7 @@
 <section class="course-info">
   <header class="course-profile">
     <div class="intro-inner-wrapper">
+      <div class="table">
       <section class="intro">
         <hgroup>
           <h1>${course.number}: ${get_course_about_section(course, "title")}<a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a></h1>
@@ -84,6 +85,7 @@
       </div>
       % endif
     </div>
+      </div>
   </header>
 
   <section class="container">
