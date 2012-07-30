@@ -65,7 +65,7 @@ def extract(dic, keys):
 @login_required
 @require_POST
 def create_thread(request, course_id, commentable_id):
-    attributes = extract(request.POST, ['body', 'title'])
+    attributes = extract(request.POST, ['body', 'title', 'tags'])
     attributes['user_id'] = request.user.id
     attributes['course_id'] = course_id
     response = comment_client.create_thread(commentable_id, attributes)
@@ -75,7 +75,7 @@ def create_thread(request, course_id, commentable_id):
 @login_required
 @require_POST
 def update_thread(request, course_id, thread_id):
-    attributes = extract(request.POST, ['body', 'title'])
+    attributes = extract(request.POST, ['body', 'title', 'tags'])
     response = comment_client.update_thread(thread_id, attributes)
     return JsonResponse(response)
 
@@ -188,13 +188,25 @@ def unfollow(request, course_id, followed_user_id):
     response = comment_client.unfollow(user_id, followed_user_id)
     return JsonResponse(response)
 
-@login_required
 @require_GET
 def search(request, course_id):
     text = request.GET.get('text', None)
     commentable_id = request.GET.get('commentable_id', None)
-    response = comment_client.search(text, commentable_id)
+    tags = request.GET.get('tags', None)
+    response = comment_client.search_threads({
+        'text': text,
+        'commentable_id': commentable_id,
+        'tags': tags,
+    })
     return JsonResponse(response)
+
+@require_GET
+def tags_autocomplete(request, course_id):
+    value = request.GET.get('q', None)
+    results = []
+    if value:
+        results = comment_client.tags_autocomplete(value)
+    return JsonResponse(results)
 
 @csrf.csrf_exempt
 @login_required
