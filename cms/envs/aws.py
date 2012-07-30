@@ -1,10 +1,5 @@
 """
-This is the default template for our main set of AWS servers. This does NOT
-cover the content machines, which use content.py
-
-Common traits:
-* Use memcached, and cache-backed sessions
-* Use a MySQL 5.1 database
+This is the default template for our main set of AWS servers.
 """
 import json
 
@@ -21,13 +16,11 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 ########################### NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
-with open(ENV_ROOT / "env.json") as env_file:
+with open(ENV_ROOT / "cms.env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 
-BOOK_URL = ENV_TOKENS['BOOK_URL']
-MEDIA_URL = ENV_TOKENS['MEDIA_URL']
 LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
@@ -35,22 +28,21 @@ CACHES = ENV_TOKENS['CACHES']
 for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
     MITX_FEATURES[feature] = value
 
-WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
-
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             debug=False)
 
+with open(ENV_ROOT / "repos.json") as repos_file:
+    REPOS = json.load(repos_file)
+
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
-with open(ENV_ROOT / "auth.json") as auth_file:
+with open(ENV_ROOT / "cms.auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
-
-SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 
 AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
-
 DATABASES = AUTH_TOKENS['DATABASES']
+MODULESTORE = AUTH_TOKENS['MODULESTORE']

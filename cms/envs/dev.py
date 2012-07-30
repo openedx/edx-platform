@@ -32,38 +32,23 @@ DATABASES = {
 
 REPOS = {
     'edx4edx': {
-        'path': "edx4edx",
-        'org': 'edx',
-        'course': 'edx4edx',
-        'branch': 'for_cms',
+        'branch': 'master',
         'origin': 'git@github.com:MITx/edx4edx.git',
     },
-    '6002x-fall-2012': {
-        'path': '6002x-fall-2012',
-        'org': 'mit.edu',
-        'course': '6.002x',
-        'branch': 'for_cms',
+    'content-mit-6002x': {
+        'branch': 'master',
         'origin': 'git@github.com:MITx/6002x-fall-2012.git',
     },
     '6.00x': {
-        'path': '6.00x',
-        'org': 'mit.edu',
-        'course': '6.00x',
-        'branch': 'for_cms',
+        'branch': 'master',
         'origin': 'git@github.com:MITx/6.00x.git',
     },
     '7.00x': {
-        'path': '7.00x',
-        'org': 'mit.edu',
-        'course': '7.00x',
-        'branch': 'for_cms',
+        'branch': 'master',
         'origin': 'git@github.com:MITx/7.00x.git',
     },
     '3.091x': {
-        'path': '3.091x',
-        'org': 'mit.edu',
-        'course': '3.091x',
-        'branch': 'for_cms',
+        'branch': 'master',
         'origin': 'git@github.com:MITx/3.091x.git',
     },
 }

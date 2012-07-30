@@ -1,9 +1,9 @@
 import pymongo
 
-from bson.objectid import ObjectId
 from bson.son import SON
 from fs.osfs import OSFS
 from itertools import repeat
+from path import path
 
 from importlib import import_module
 from xmodule.errorhandlers import strict_error_handler
@@ -14,12 +14,11 @@ from mitxmako.shortcuts import render_to_string
 
 from . import ModuleStore, Location
 from .exceptions import (ItemNotFoundError, InsufficientSpecificationError,
-                         NoPathToItem)
+                         NoPathToItem, DuplicateItemError)
 
 # TODO (cpennington): This code currently operates under the assumption that
 # there is only one revision for each item. Once we start versioning inside the CMS,
 # that assumption will have to change
-
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -98,7 +97,7 @@ class MongoModuleStore(ModuleStore):
         module_path, _, class_name = default_class.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
         self.default_class = class_
-        self.fs_root = fs_root
+        self.fs_root = path(fs_root)
 
     def _clean_item_data(self, item):
         """
@@ -142,8 +141,9 @@ class MongoModuleStore(ModuleStore):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
-        resource_fs = OSFS(self.fs_root / item.get('data_dir',
-                                                   item['location']['course']))
+        data_dir = item.get('metadata', {}).get('data_dir', item['location']['course'])
+        resource_fs = OSFS(self.fs_root / data_dir)
+
         system = CachingDescriptorSystem(
             self,
             data_cache,
@@ -215,15 +215,22 @@ class MongoModuleStore(ModuleStore):
 
         return self._load_items(list(items), depth)
 
+    # TODO (cpennington): This needs to be replaced by clone_item as soon as we allow
+    # creation of items from the cms
     def create_item(self, location):
         """
-        Create an empty item at the specified location with the supplied editor
+        Create an empty item at the specified location.
+
+        If that location already exists, raises a DuplicateItemError
 
         location: Something that can be passed to Location
         """
-        self.collection.insert({
-            '_id': Location(location).dict(),
-        })
+        try:
+            self.collection.insert({
+                '_id': Location(location).dict(),
+            })
+        except pymongo.errors.DuplicateKeyError:
+            raise DuplicateItemError(location)
 
     def update_item(self, location, data):
         """
@@ -285,8 +292,6 @@ class MongoModuleStore(ModuleStore):
         items = self.collection.find({'definition.children': str(location)},
                                     {'_id': True})
         return [i['_id'] for i in items]
-
-
 
     def path_to_location(self, location, course_name=None):
         '''
@@ -360,7 +365,6 @@ class MongoModuleStore(ModuleStore):
         path = find_path_to_course(location, course_name)
         if path is None:
             raise(NoPathToItem(location))
-
 
         n = len(path)
         course_id = CourseDescriptor.location_to_id(path[0])
