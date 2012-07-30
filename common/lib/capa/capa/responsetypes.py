@@ -848,13 +848,13 @@ class CodeResponse(LoncapaResponse):
 
     def get_score(self, student_answers):
         try:
-            submission = [student_answers[self.answer_id]]
+            submission = student_answers[self.answer_id]
         except Exception as err:
             log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_id, student_answers))
             raise Exception(err)
 
         self.context.update({'submission': submission})
-        extra_payload = {'edX_student_response': json.dumps(submission)}
+        extra_payload = {'edX_student_response': submission}
 
         r, queuekey = self._send_to_queue(extra_payload)  # TODO: Perform checks on the xqueue response
 
@@ -925,7 +925,6 @@ class CodeResponse(LoncapaResponse):
         payload = {'xqueue_header': json.dumps(header),
                    'xqueue_body'  : json.dumps(body),
                   }
-        payload.update(extra_payload)
 
         # Contact queue server
         try:
