@@ -243,7 +243,7 @@ with open(module_styles_path, 'w') as module_styles:
 PIPELINE_CSS = {
     'base-style': {
         'source_filenames': ['sass/base-style.scss'],
-        'output_filename': 'css/base-style.css',
+        'output_filename': 'css/cms-base-style.css',
     },
 }
 
@@ -260,15 +260,15 @@ PIPELINE_JS = {
             for pth
             in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')
         ],
-        'output_filename': 'js/application.js',
+        'output_filename': 'js/cms-application.js',
     },
     'module-js': {
         'source_filenames': module_js_sources,
-        'output_filename': 'js/modules.js',
+        'output_filename': 'js/cms-modules.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
-        'output_filename': 'js/spec.js'
+        'output_filename': 'js/cms-spec.js'
     }
 }
 
@@ -309,6 +309,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
+    'github_sync',
     'student',  # misleading name due to sharing with lms
 
     # For asset pipelining

@@ -1,8 +1,9 @@
 @import 'bourbon/bourbon';
 @import 'vendor/normalize';
+@import 'keyframes';
 
 @import 'base', 'layout', 'content-types';
 @import 'calendar';
-@import 'section', 'unit';
+@import 'section', 'unit', 'index';
 
 @import 'module/module-styles.scss';

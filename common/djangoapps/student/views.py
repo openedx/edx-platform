@@ -30,6 +30,7 @@ from django_future.csrf import ensure_csrf_cookie
 from student.models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 from util.cache import cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
