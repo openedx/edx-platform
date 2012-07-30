@@ -1,6 +1,7 @@
 from path import path
-
 import unittest
+
+from lxml import etree
 
 from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
 from xmodule.errorhandlers import ignore_errors_handler
@@ -61,3 +62,26 @@ class ImportTestCase(unittest.TestCase):
 
         self.assertEqual(descriptor.definition['data'],
                          re_import_descriptor.definition['data'])
+
+    def test_fixed_xml_tag(self):
+        """Make sure a tag that's been fixed exports as the original tag type"""
+
+        # create a malformed tag with valid xml contents
+        root = etree.Element('malformed')
+        good_xml = '''<sequential display_name="fixed"><video url="hi"/></sequential>'''
+        root.text = good_xml
+
+        xml_str_in = etree.tostring(root)
+
+        # load it
+        system = self.get_system()
+        descriptor = XModuleDescriptor.load_from_xml(xml_str_in, system, 'org', 'course',
+                                                     None)
+        # export it
+        resource_fs = None
+        xml_str_out = descriptor.export_to_xml(resource_fs)
+
+        # Now make sure the exported xml is a sequential
+        xml_out = etree.fromstring(xml_str_out)
+        self.assertEqual(xml_out.tag, 'sequential')
+
