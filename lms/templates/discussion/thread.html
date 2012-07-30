@@ -4,70 +4,78 @@
 <%! import urllib %>
 
 <%def name="render_thread(course_id, thread, edit_thread=False, show_comments=False)">
-  <%
-    if show_comments:
-      url_for_thread = ""
-    else:
-      thread_id = thread['id']
-      url_for_thread = reverse('django_comment_client.forum.views.single_thread', args=[course_id, thread_id])
-    def url_for_tags(tags):
-      return reverse('django_comment_client.forum.views.search', args=[course_id]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
-  %>
+  
   <div class="thread" _id="${thread['id']}">
-    <div class="discussion-content">
-      <div class="discussion-upper-wrapper clearfix">
-        ${render_vote(thread)}
-        <div class="discussion-right-wrapper clearfix">
-          <a class="thread-title" name="${thread['id']}" href="${url_for_thread}">${thread['title'] | h}</a>
-          <div class="discussion-content-view">
-            <div class="content-body thread-body">${thread['body'] | h}</div>
-            <div class="thread-tags">
-              % for tag in thread['tags']:
-                <a class="thread-tag" href="${url_for_tags([tag])}">${tag}</a>
-              % endfor
-            </div>
-            <div class="info">
-              ${render_info(thread)}
-              % if edit_thread:
-                ${render_reply()}
-                ${render_edit()}
-              % endif
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    ${render_content(thread, "thread", edit_thread=edit_thread, show_comments=show_comments)}
     % if show_comments:
-      <div class="comments">
-        ${render_comments(thread['children'])}
-      </div>
+      ${render_comments(thread['children'])}
     % endif
   </div>
 </%def>
 
 <%def name="render_comments(comments)">
-  % for comment in comments:
-    <div class="comment" _id="${comment['id']}">
-      <div class="discussion-content">
-        <div class="discussion-upper-wrapper clearfix">
-          ${render_vote(comment)}
-          <div class="discussion-right-wrapper">
-            <div class="discussion-content-view">
-              <a class="content-body comment-body" name="${comment['id']}">${comment['body'] | h}</a>
-              <div class="info">
-                ${render_info(comment)}
-                ${render_reply()}
-                ${render_edit()}
-              </div>
-            </div>
-          </div>
+  <div class="comments">
+    % for comment in comments:
+      <div class="comment" _id="${comment['id']}">
+        ${render_content(comment, "comment")}
+        <div class="comments">
+          ${render_comments(comment['children'])}
         </div>
       </div>
-      <div class="comments">
-        ${render_comments(comment['children'])}
+    % endfor
+  </div>
+</%def>
+
+<%def name="render_content(content, type, **kwargs)">
+  <div class="discussion-content">
+    <div class="discussion-upper-wrapper clearfix">
+      ${render_vote(content)}
+      <div class="discussion-right-wrapper clearfix">
+        ${render_title(content, type, **kwargs)}
+        <div class="discussion-content-view">
+          <div class="content-body ${type}-body">${content['body'] | h}</div>
+          ${render_tags(content, type, **kwargs)}
+          ${render_bottom_bar(content, type, **kwargs)}
+        </div>
       </div>
     </div>
-  % endfor
+  </div>
+</%def>
+
+<%def name="render_title(content, type, **kwargs)">
+  <%
+    if kwargs.get('show_comments', False):
+      url_for_thread = ""
+    else:
+      url_for_thread = reverse('django_comment_client.forum.views.single_thread', args=[course_id, thread['id']])
+  %>
+  % if type == "thread":
+    <a class="thread-title" name="${content['id']}" href="${kwargs['url_for_thread']}">${content['title'] | h}</a>
+  % endif
+</%def>
+
+<%def name="render_tags(content, type, **kwargs)">
+  <%
+    def url_for_tags(tags):
+      return reverse('django_comment_client.forum.views.search', args=[course_id]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
+  %>
+  % if type == "thread":
+    <div class="thread-tags">
+      % for tag in content['tags']:
+        <a class="thread-tag" href="${url_for_tags([tag])}">${tag}</a>
+      % endfor
+    </div>
+  % endif
+</%def>
+
+<%def name="render_bottom_bar(content, type, **kwargs)">
+  <div class="info">
+    ${render_info(content)}
+    % if type == "thread" and kwargs['edit_thread'] or type == "comment":
+      ${render_link("discussion-link discussion-reply", "Reply")}
+      ${render_link("discussion-link discussion-edit", "Edit")}
+    % endif
+  </div>
 </%def>
 
 <%def name="render_info(content)">
@@ -79,26 +87,14 @@
   % endif
 </%def>
 
-<%def name="render_reply()">
-  <a class="discussion-link discussion-reply" href="javascript:void(0)">Reply</a>
-</%def>
-
-<%def name="render_edit()">
-  <a class="discussion-link discussion-edit" href="javascript:void(0)">Edit</a>
-</%def>
-
-<%def name="render_watch_thread()">
-  <a class="discussion-link discussion-watch-thread" href="javascript:void(0)">Watch</a>
+<%def name="render_link(cls, html)">
+  <a class="${cls}" href="javascript:void(0)">${html}</a>
 </%def>
 
 <%def name="render_vote(content)">
-  <%
-    upvote = "&#x2C4;"
-    downvote = "&#x2C5;"
-  %>
-  <div class="discussion-votes" title="Current votes: ${content['votes']['point']}">
-    <a class="discussion-vote discussion-vote-up" href="javascript:void(0)" title="Current votes: ${content['votes']['point']}">${upvote}</a>
+  <div class="discussion-votes">
+    ${render_link("discussion-vote discussion-vote-up", "&#x2C4;")}
     ${content['votes']['point']}
-    <a class="discussion-vote discussion-vote-down" href="javascript:void(0)" title="Current votes: ${content['votes']['point']}">${downvote}</a>
+    ${render_link("discussion-vote discussion-vote-down", "&#x2C5;")}
   </div>
 </%def>
