@@ -439,7 +439,7 @@ Discussion =
           autocomplete:
             remoteDataType: 'json'
           interactive: true
-          defaultText: "Tag your post"
+          defaultText: "Tag your post: press enter after each tag"
           height: "30px"
           width: "85%"
           removeWithBackspace: true
