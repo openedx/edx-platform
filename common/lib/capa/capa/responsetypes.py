@@ -905,7 +905,7 @@ class CodeResponse(LoncapaResponse):
     def _send_to_queue(self, extra_payload):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
-        header = {'return_url': self.system.xqueue_callback_url,
+        header = {'lms_callback_url': self.system.xqueue_callback_url,
                   'queue_name': self.queue_name,
                  }
 
@@ -914,7 +914,7 @@ class CodeResponse(LoncapaResponse):
         h.update(str(self.system.seed))
         h.update(str(time.time()))
         queuekey = int(h.hexdigest(), 16)
-        header.update({'queuekey': queuekey})
+        header.update({'lms_key': queuekey})
 
         body = {'xml': xmlstr,
                 'edX_cmd': 'get_score',
