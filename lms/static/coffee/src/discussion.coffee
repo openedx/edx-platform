@@ -64,8 +64,10 @@ Discussion =
       <input type="text" class="thread-title-edit title-input" placeholder="Title" value="{{title}}"/>
       <div class="thread-body-edit body-input">{{body}}</div>
       <input class="thread-tags-edit" placeholder="Tags" value="{{tags}}" />
-      <a class="discussion-submit-update control-button" href="javascript:void(0)">Update</a>
-      <a class="discussion-cancel-update control-button" href="javascript:void(0)">Cancel</a>
+      <div class = "edit-post-control">
+        <a class="discussion-cancel-update" href="javascript:void(0)">Cancel</a>
+        <a class="discussion-submit-update control-button" href="javascript:void(0)">Update</a>
+      </div>
     </form>
   """
 
@@ -323,8 +325,9 @@ Discussion =
           autocomplete:
             remoteDataType: 'json'
           interactive: true
-          defaultText: ""
+          defaultText: "Tag your post: press enter after each tag"
           height: "30px"
+          width: "90%"
           removeWithBackspace: true
         $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditThread(this)
         $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
