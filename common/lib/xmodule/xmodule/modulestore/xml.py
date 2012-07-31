@@ -70,18 +70,19 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # log.debug('-> slug=%s' % slug)
                 xml_data.set('url_name', slug)
 
-            module = XModuleDescriptor.load_from_xml(
+            descriptor = XModuleDescriptor.load_from_xml(
                 etree.tostring(xml_data), self, org,
                 course, xmlstore.default_class)
 
-            #log.debug('==> importing module location %s' % repr(module.location))
-            module.metadata['data_dir'] = course_dir
+            #log.debug('==> importing descriptor location %s' %
+            #          repr(descriptor.location))
+            descriptor.metadata['data_dir'] = course_dir
 
-            xmlstore.modules[module.location] = module
+            xmlstore.modules[descriptor.location] = descriptor
 
             if xmlstore.eager:
-                module.get_children()
-            return module
+                descriptor.get_children()
+            return descriptor
 
         render_template = lambda: ''
         load_item = xmlstore.get_item
