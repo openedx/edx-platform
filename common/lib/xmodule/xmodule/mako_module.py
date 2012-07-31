@@ -2,9 +2,12 @@ from x_module import XModuleDescriptor, DescriptorSystem
 
 
 class MakoDescriptorSystem(DescriptorSystem):
-    def __init__(self, render_template, *args, **kwargs):
+    def __init__(self, load_item, resources_fs, error_handler,
+                 render_template):
+        super(MakoDescriptorSystem, self).__init__(
+            load_item, resources_fs, error_handler)
+
         self.render_template = render_template
-        super(MakoDescriptorSystem, self).__init__(*args, **kwargs)
 
 
 class MakoModuleDescriptor(XModuleDescriptor):
@@ -19,7 +22,9 @@ class MakoModuleDescriptor(XModuleDescriptor):
 
     def __init__(self, system, definition=None, **kwargs):
         if getattr(system, 'render_template', None) is None:
-            raise TypeError('{system} must have a render_template function in order to use a MakoDescriptor'.format(system=system))
+            raise TypeError('{system} must have a render_template function'
+                            ' in order to use a MakoDescriptor'.format(
+                    system=system))
         super(MakoModuleDescriptor, self).__init__(system, definition, **kwargs)
 
     def get_context(self):
@@ -29,4 +34,5 @@ class MakoModuleDescriptor(XModuleDescriptor):
         return {'module': self}
 
     def get_html(self):
-        return self.system.render_template(self.mako_template, self.get_context())
+        return self.system.render_template(
+            self.mako_template, self.get_context())

@@ -60,7 +60,7 @@ class VideoModule(XModule):
         return None
 
     def get_instance_state(self):
-        log.debug(u"STATE POSITION {0}".format(self.position))
+        #log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
     def video_list(self):

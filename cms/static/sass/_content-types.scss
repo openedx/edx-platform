@@ -53,3 +53,13 @@
   @extend .content-type;
   background-image: url('../img/content-types/chapter.png');
 }
+
+.module a:first-child {
+  @extend .content-type;
+  background-image: url('/static/img/content-types/module.png');
+}
+
+.module a:first-child {
+  @extend .content-type;
+  background-image: url('/static/img/content-types/module.png');
+}
