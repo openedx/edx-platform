@@ -141,11 +141,15 @@ def get_module(user, request, location, student_module_cache, position=None):
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
-    # Fully qualified callback URL for xqueue
+    # Fully qualified callback URL for external queueing system 
     xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL + 
-    #xqueue_callback_url = ('http://18.189.52.120:8000/' + settings.MITX_ROOT_URL +      # Sandbox URL
                           'xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/' + 
                           'score_update')
+
+    # Default queuename is course-specific and is derived from the course that 
+    #   contains the current module.
+    # TODO: Queuename should be derived from 'course_settings.json' of each course
+    xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location,
@@ -159,6 +163,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           render_template=render_to_string,
                           ajax_url=ajax_url,
                           xqueue_callback_url=xqueue_callback_url,
+                          xqueue_default_queuename=xqueue_default_queuename.replace(' ','_'),
                           # TODO (cpennington): Figure out how to share info between systems
                           filestore=descriptor.system.resources_fs,
                           get_module=_get_module,

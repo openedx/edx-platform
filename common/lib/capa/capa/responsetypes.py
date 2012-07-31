@@ -811,7 +811,7 @@ class CodeResponse(LoncapaResponse):
     def setup_response(self):
         xml = self.xml
         self.url = xml.get('url', "http://107.20.215.194/xqueue/submit/")  # FIXME -- hardcoded url
-        self.queue_name = xml.get('queuename', 'python') # TODO: Default queue_name should be course-specific
+        self.queue_name = xml.get('queuename', self.system.xqueue_default_queuename)
 
         answer = xml.find('answer')
         if answer is not None:
