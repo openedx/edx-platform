@@ -142,8 +142,8 @@ def get_module(user, request, location, student_module_cache, position=None):
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
     # Fully qualified callback URL for xqueue
-    #xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL +  # TODO: build_absolute_uri on sandbox instance returns 127.0.0.1
-    xqueue_callback_url = ('http://18.189.52.120:8000/' + settings.MITX_ROOT_URL +      # Sandbox URL
+    xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL + 
+    #xqueue_callback_url = ('http://18.189.52.120:8000/' + settings.MITX_ROOT_URL +      # Sandbox URL
                           'xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/' + 
                           'score_update')
 
