@@ -227,10 +227,10 @@ case `uname -s` in
             output "Installing pip"
             sudo easy_install pip  
         }
-        command -v virtualenv &>/dev/null || {
-            output "Installing virtualenv"
-            sudo pip install 'virtualenv>1.7' virtualenvwrapper 
-        }
+
+        output "Installing virtualenv"
+        sudo pip install 'virtualenv>1.7' virtualenvwrapper 
+
         command -v coffee &>/dev/null || {
             output "Installing coffee script"
             curl http://npmjs.org/install.sh | sh
