@@ -19,24 +19,22 @@ from django_comment_client.utils import JsonResponse, JsonError
 
 def thread_author_only(fn):
     def verified_fn(request, *args, **kwargs):
-        thread_id = args.get('thread_id', False) or \
-                    kwargs.get('thread_id', False)
+        thread_id = kwargs.get('thread_id', False)
         thread = comment_client.get_thread(thread_id)
-        if request.user.id == thread['user_id']:
+        if str(request.user.id) == str(thread['user_id']):
             return fn(request, *args, **kwargs)
         else:
-            return JsonError(400, "unauthorized")
+            return JsonError("unauthorized")
     return verified_fn
 
 def comment_author_only(fn):
     def verified_fn(request, *args, **kwargs):
-        comment_id = args.get('comment_id', False) or \
-                    kwargs.get('comment_id', False)
+        comment_id = kwargs.get('comment_id', False)
         comment = comment_client.get_comment(comment_id)
-        if request.user.id == comment['user_id']:
+        if str(request.user.id) == str(comment['user_id']):
             return fn(request, *args, **kwargs)
         else:
-            return JsonError(400, "unauthorized")
+            return JsonError("unauthorized")
     return verified_fn
 
 def instructor_only(fn): #TODO add instructor verification
@@ -81,7 +79,7 @@ def delete_thread(request, course_id, thread_id):
     response = comment_client.delete_thread(thread_id)
     return JsonResponse(response)
 
-@thread_author_only
+@comment_author_only
 @login_required
 @require_POST
 def update_comment(request, course_id, comment_id):

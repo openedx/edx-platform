@@ -26,7 +26,7 @@ generateDiscussionLink = (cls, txt, handler) ->
 Discussion =
 
   replyTemplate: """
-    <div class="discussion-reply-new">
+    <form class="discussion-reply-new">
       <ul class="discussion-errors"></ul>
       <div class="reply-body"></div>
       <input type="checkbox" class="discussion-post-anonymously" id="discussion-post-anonymously-{{id}}" />
@@ -35,9 +35,32 @@ Discussion =
       <input type="checkbox" class="discussion-auto-watch" id="discussion-autowatch-{{id}}" checked />
       <label for="discussion-auto-watch-{{id}}">watch this thread</label>
       {{/showWatchCheckbox}}
-    </div>
+      <br />
+      <a class="discussion-submit-reply control-button" href="javascript:void(0)">Submit</a>
+      <a class="discussion-cancel-reply control-button" href="javascript:void(0)">Cancel</a>
+    </form>
   """
-  
+
+  editThreadTemplate: """
+    <form class="discussion-content-edit discussion-thread-edit" _id="{{id}}">
+      <ul class="discussion-errors discussion-update-errors"></ul>    
+      <input type="text" class="thread-title-edit title-input" placeholder="Title" value="{{title}}"/>
+      <div class="thread-body-edit body-input">{{body}}</div>
+      <input class="thread-tags-edit" placeholder="Tags" value="{{tags}}" />
+      <a class="discussion-submit-update control-button" href="javascript:void(0)">Update</a>
+      <a class="discussion-cancel-update control-button" href="javascript:void(0)">Cancel</a>
+    </form>
+  """
+
+  editCommentTemplate: """
+    <form class="discussion-content-edit discussion-comment-edit" _id="{{id}}">
+      <ul class="discussion-errors discussion-update-errors"></ul>    
+      <div class="comment-body-edit body-input">{{body}}</div>
+      <a class="discussion-submit-update control-button" href="javascript:void(0)">Update</a>
+      <a class="discussion-cancel-update control-button" href="javascript:void(0)">Cancel</a>
+    </form>
+  """
+
   urlFor: (name, param) ->
     {
       watch_commentable   : "/courses/#{$$course_id}/discussion/#{param}/watch"
@@ -140,15 +163,14 @@ Discussion =
       $local(".thread").each(initializeVote).each(initializeWatchThreads)
       initializeWatchDiscussion(discussion)
 
-    if $$tags?
-      $local(".new-post-tags").tagsInput
-        autocomplete_url: Discussion.urlFor('tags_autocomplete')
-        autocomplete:
-          remoteDataType: 'json'
-        interactive: true
-        defaultText: "add a tag"
-        height: "30px"
-        removeWithBackspace: true
+    $local(".new-post-tags").tagsInput
+      autocomplete_url: Discussion.urlFor('tags_autocomplete')
+      autocomplete:
+        remoteDataType: 'json'
+      interactive: true
+      defaultText: "add a tag"
+      height: "30px"
+      removeWithBackspace: true
 
   bindContentEvents: (content) ->
 
@@ -162,12 +184,6 @@ Discussion =
       status = $discussionContent.attr("status") || "normal"
       if status == "normal"
         $local(".discussion-link").show()
-      else if status == "reply"
-        $local(".discussion-cancel-reply").show()
-        $local(".discussion-submit-reply").show()
-      else if status == "edit"
-        $local(".discussion-cancel-edit").show()
-        $local(".discussion-update-edit").show()
 
     discussionContentHoverOut = ->
       $local(".discussion-link").hide()
@@ -175,9 +191,9 @@ Discussion =
     $discussionContent.hover(discussionContentHoverIn, discussionContentHoverOut)
 
     handleReply = (elem) ->
-      editView = $local(".discussion-reply-new")
-      if editView.length
-        editView.show()
+      $replyView = $local(".discussion-reply-new")
+      if $replyView.length
+        $replyView.show()
       else
         view = {
           id: id
@@ -185,19 +201,16 @@ Discussion =
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Markdown.makeWmdEditor $local(".reply-body"), "-reply-body-#{id}", Discussion.urlFor('upload')
-      cancelReply = generateDiscussionLink("discussion-cancel-reply", "Cancel", handleCancelReply)
-      submitReply = generateDiscussionLink("discussion-submit-reply", "Submit", handleSubmitReply)
+        $local(".discussion-submit-reply").click handleSubmitReply
+        $local(".discussion-cancel-reply").click handleCancelReply
       $local(".discussion-link").hide()
-      $(elem).after(submitReply).replaceWith(cancelReply)
       $discussionContent.attr("status", "reply")
 
     handleCancelReply = (elem) ->
-      editView = $local(".discussion-reply-new")
-      if editView.length
-        editView.hide()
-      $local(".discussion-submit-reply").remove()
+      $replyView = $local(".discussion-reply-new")
+      if $replyView.length
+        $replyView.hide()
       reply = generateDiscussionLink("discussion-reply", "Reply", handleReply)
-      $local(".discussion-link").show()
       $(elem).replaceWith(reply)
       $discussionContent.attr("status", "normal")
 
@@ -231,10 +244,76 @@ Discussion =
           Discussion.handleAnchorAndReload(response)
       , 'json'
 
+    handleCancelEdit = (elem) ->
+      $local(".discussion-content-edit").hide()
+      $local(".discussion-content-wrapper").show()
+
     handleEditThread = (elem) ->
+      $local(".discussion-content-wrapper").hide()
+      $editView = $local(".discussion-content-edit")
+      if $editView.length
+        $editView.show()
+      else
+        view = {
+          id: id
+          title: $local(".thread-title").html()
+          body: $local(".thread-raw-body").html()
+          tags: $local(".thread-raw-tags").html()
+        }
+        $discussionContent.append Mustache.render Discussion.editThreadTemplate, view
+        Markdown.makeWmdEditor $local(".thread-body-edit"), "-thread-body-edit-#{id}", Discussion.urlFor('update_thread', id)
+        $local(".thread-tags-edit").tagsInput
+          autocomplete_url: Discussion.urlFor('tags_autocomplete')
+          autocomplete:
+            remoteDataType: 'json'
+          interactive: true
+          defaultText: ""
+          height: "30px"
+          removeWithBackspace: true
+        $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditThread(this)
+        $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
+
+    handleSubmitEditThread = (elem) ->
+      url = Discussion.urlFor('update_thread', id)
+      title = $local(".thread-title-edit").val()
+      body = $local("#wmd-input-thread-body-edit-#{id}").val()
+      tags = $local(".thread-tags-edit").val()
+      $.post url, {title: title, body: body, tags: tags}, (response, textStatus) ->
+        if response.errors
+          errorsField = $local(".discussion-update-errors").empty()
+          for error in response.errors
+            errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+        else
+          Discussion.handleAnchorAndReload(response)
+      , 'json'
 
     handleEditComment = (elem) ->
-          
+      $local(".discussion-content-wrapper").hide()
+      $editView = $local(".discussion-content-edit")
+      if $editView.length
+        $editView.show()
+      else
+        view = {
+          id: id
+          body: $local(".comment-raw-body").html()
+        }
+        $discussionContent.append Mustache.render Discussion.editCommentTemplate, view
+        Markdown.makeWmdEditor $local(".comment-body-edit"), "-comment-body-edit-#{id}", Discussion.urlFor('update_comment', id)
+        $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditComment(this)
+        $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
+
+    handleSubmitEditComment= (elem) ->
+      url = Discussion.urlFor('update_comment', id)
+      body = $local("#wmd-input-comment-body-edit-#{id}").val()
+      $.post url, {body: body}, (response, textStatus) ->
+        if response.errors
+          errorsField = $local(".discussion-update-errors").empty()
+          for error in response.errors
+            errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+        else
+          Discussion.handleAnchorAndReload(response)
+      , 'json'
+
     $local(".discussion-reply").click ->
       handleReply(this)
 
