@@ -49,6 +49,10 @@ def create_thread(request, course_id, commentable_id):
     attributes = extract(request.POST, ['body', 'title', 'tags'])
     attributes['user_id'] = request.user.id
     attributes['course_id'] = course_id
+    if request.POST.get('anonymous', 'false').lower() == 'true':
+        attributes['anonymous'] = True
+    if request.POST.get('autowatch', 'false').lower() == 'true':
+        attributes['auto_subscribe'] = True
     response = comment_client.create_thread(commentable_id, attributes)
     return JsonResponse(response)
 
@@ -64,11 +68,13 @@ def update_thread(request, course_id, thread_id):
 @require_POST
 def create_comment(request, course_id, thread_id):
     attributes = extract(request.POST, ['body'])
-    if request.POST.get('anonymous', 'false').lower() == 'false':
-        attributes['user_id'] = request.user.id
+    attributes['user_id'] = request.user.id
     attributes['course_id'] = course_id
-    attributes['auto_subscribe'] = bool(request.POST.get('autowatch', False))
-    print attributes
+    print request.POST
+    if request.POST.get('anonymous', 'false').lower() == 'true':
+        attributes['anonymous'] = True
+    if request.POST.get('autowatch', 'false').lower() == 'true':
+        attributes['auto_subscribe'] = True
     response = comment_client.create_comment(thread_id, attributes)
     return JsonResponse(response)
 
@@ -99,10 +105,12 @@ def endorse_comment(request, course_id, comment_id):
 @require_POST
 def create_sub_comment(request, course_id, comment_id):
     attributes = extract(request.POST, ['body'])
-    if request.POST.get('anonymous', 'false').lower() == 'false':
-        attributes['user_id'] = request.user.id
+    attributes['user_id'] = request.user.id
     attributes['course_id'] = course_id
-    attributes['auto_subscribe'] = bool(request.POST.get('autowatch', False))
+    if request.POST.get('anonymous', 'false').lower() == 'true':
+        attributes['anonymous'] = True
+    if request.POST.get('autowatch', 'false').lower() == 'true':
+        attributes['auto_subscribe'] = True
     response = comment_client.create_sub_comment(comment_id, attributes)
     return JsonResponse(response)
 
