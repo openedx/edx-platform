@@ -67,7 +67,7 @@
         <a class="thread-tag" href="${url_for_tags([tag])}">${tag | h}</a>
       % endfor
     </div>
-    <div class="thread-raw-tags" style="display: none">${tag | h}</div>
+    <div class="thread-raw-tags" style="display: none">${",".join(content['tags']) | h}</div>
   % endif
 </%def>
 
