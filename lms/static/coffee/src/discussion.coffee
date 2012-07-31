@@ -148,6 +148,7 @@ Discussion =
         interactive: true
         defaultText: "add a tag"
         height: "30px"
+        width: "83.5%"
         removeWithBackspace: true
 
   bindContentEvents: (content) ->
