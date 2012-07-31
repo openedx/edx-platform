@@ -33,7 +33,7 @@ class ImportTestCase(unittest.TestCase):
         return system
 
     def test_fallback(self):
-        '''Make sure that malformed xml loads as a MalformedDescriptorb.'''
+        '''Make sure that malformed xml loads as an ErrorDescriptor.'''
 
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
 
@@ -43,10 +43,10 @@ class ImportTestCase(unittest.TestCase):
                                                      None)
 
         self.assertEqual(descriptor.__class__.__name__,
-                         'MalformedDescriptor')
+                         'ErrorDescriptor')
 
     def test_reimport(self):
-        '''Make sure an already-exported malformed xml tag loads properly'''
+        '''Make sure an already-exported error xml tag loads properly'''
 
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
         system = self.get_system()
@@ -58,7 +58,7 @@ class ImportTestCase(unittest.TestCase):
                                                                'org', 'course',
                                                                None)
         self.assertEqual(re_import_descriptor.__class__.__name__,
-                         'MalformedDescriptor')
+                         'ErrorDescriptor')
 
         self.assertEqual(descriptor.definition['data'],
                          re_import_descriptor.definition['data'])
@@ -66,8 +66,8 @@ class ImportTestCase(unittest.TestCase):
     def test_fixed_xml_tag(self):
         """Make sure a tag that's been fixed exports as the original tag type"""
 
-        # create a malformed tag with valid xml contents
-        root = etree.Element('malformed')
+        # create a error tag with valid xml contents
+        root = etree.Element('error')
         good_xml = '''<sequential display_name="fixed"><video url="hi"/></sequential>'''
         root.text = good_xml
 
