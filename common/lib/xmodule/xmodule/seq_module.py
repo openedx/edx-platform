@@ -20,12 +20,15 @@ class_priority = ['video', 'problem']
 class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
-    js = {'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')]}
+    js = {'coffee': [resource_string(__name__,
+                                     'js/src/sequence/display.coffee')]}
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition, instance_state=None,
+                 shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition,
+                         instance_state, shared_state, **kwargs)
         self.position = 1
 
         if instance_state is not None:
@@ -92,7 +95,8 @@ class SequenceModule(XModule):
         self.rendered = True
 
     def get_icon_class(self):
-        child_classes = set(child.get_icon_class() for child in self.get_children())
+        child_classes = set(child.get_icon_class()
+                            for child in self.get_children())
         new_class = 'other'
         for c in class_priority:
             if c in child_classes:
@@ -114,5 +118,20 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')
         for child in self.get_children():
-            xml_object.append(etree.fromstring(child.export_to_xml(resource_fs)))
+            xml_object.append(
+                etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
+
+    @classmethod
+    def split_to_file(cls, xml_object):
+        # Note: if we end up needing subclasses, can port this logic there.
+        yes = ('chapter',)
+        no = ('course',)
+
+        if xml_object.tag in yes:
+            return True
+        elif xml_object.tag in no:
+            return False
+
+        # otherwise maybe--delegate to superclass.
+        return XmlDescriptor.split_to_file(xml_object)

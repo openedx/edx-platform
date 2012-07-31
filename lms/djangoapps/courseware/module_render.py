@@ -56,11 +56,13 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
             active = (chapter.metadata.get('display_name') == active_chapter and
                       section.metadata.get('display_name') == active_section)
+            hide_from_toc = section.metadata.get('hide_from_toc', 'false').lower() == 'true'
 
-            sections.append({'name': section.metadata.get('display_name'),
-                             'format': section.metadata.get('format', ''),
-                             'due': section.metadata.get('due', ''),
-                             'active': active})
+            if not hide_from_toc:
+                sections.append({'name': section.metadata.get('display_name'),
+                                 'format': section.metadata.get('format', ''),
+                                 'due': section.metadata.get('due', ''),
+                                 'active': active})
 
         chapters.append({'name': chapter.metadata.get('display_name'),
                          'sections': sections,
@@ -117,16 +119,18 @@ def get_module(user, request, location, student_module_cache, position=None):
         instance_module is a StudentModule specific to this module for this student,
             or None if this is an anonymous user
         shared_module is a StudentModule specific to all modules with the same
-            'shared_state_key' attribute, or None if the module doesn't elect to
+            'shared_state_key' attribute, or None if the module does not elect to
             share state
     '''
     descriptor = modulestore().get_item(location)
 
-    instance_module = student_module_cache.lookup(descriptor.category, descriptor.location.url())
+    instance_module = student_module_cache.lookup(descriptor.category,
+                                                  descriptor.location.url())
 
     shared_state_key = getattr(descriptor, 'shared_state_key', None)
     if shared_state_key is not None:
-        shared_module = student_module_cache.lookup(descriptor.category, shared_state_key)
+        shared_module = student_module_cache.lookup(descriptor.category,
+                                                    shared_state_key)
     else:
         shared_module = None
 
@@ -136,10 +140,12 @@ def get_module(user, request, location, student_module_cache, position=None):
     # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
-    xqueue_callback_url = settings.MITX_ROOT_URL + '/xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/'
+    xqueue_callback_url = (settings.MITX_ROOT_URL + '/xqueue/' +
+                           str(user.id) + '/' + descriptor.location.url() + '/')
 
     def _get_module(location):
-        (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
+        (module, _, _, _) = get_module(user, request, location,
+                                       student_module_cache, position)
         return module
 
     # TODO (cpennington): When modules are shared between courses, the static

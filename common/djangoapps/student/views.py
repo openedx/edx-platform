@@ -30,6 +30,7 @@ from django_future.csrf import ensure_csrf_cookie
 from student.models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 from util.cache import cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -264,14 +265,17 @@ def create_account(request, post_override=None):
     for a in ['username', 'email', 'password', 'name']:
         if a not in post_vars:
             js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
+            js['field'] = a
             return HttpResponse(json.dumps(js))
 
     if post_vars.get('honor_code', 'false') != u'true':
         js['value'] = "To enroll, you must follow the honor code.".format(field=a)
+        js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
     if post_vars.get('terms_of_service', 'false') != u'true':
         js['value'] = "You must accept the terms of service.".format(field=a)
+        js['field'] = 'terms_of_service'
         return HttpResponse(json.dumps(js))
 
     # Confirm appropriate fields are there.
@@ -288,18 +292,21 @@ def create_account(request, post_override=None):
                          'terms_of_service': 'Accepting Terms of Service is required.',
                          'honor_code': 'Agreeing to the Honor Code is required.'}
             js['value'] = error_str[a]
+            js['field'] = a
             return HttpResponse(json.dumps(js))
 
     try:
         validate_email(post_vars['email'])
     except ValidationError:
         js['value'] = "Valid e-mail is required.".format(field=a)
+        js['field'] = 'email'
         return HttpResponse(json.dumps(js))
 
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
         js['value'] = "Username should only consist of A-Z and 0-9.".format(field=a)
+        js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
     u = User(username=post_vars['username'],
@@ -315,10 +322,12 @@ def create_account(request, post_override=None):
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
             js['value'] = "An account with this username already exists."
+            js['field'] = 'username'
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
             js['value'] = "An account with this e-mail already exists."
+            js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
         raise
