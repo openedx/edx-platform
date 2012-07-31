@@ -59,6 +59,9 @@ div.course-wrapper {
     }
 
     ol.vert-mod {
+      padding: 0;
+      margin: 0;
+
       > li {
         @extend .clearfix;
         @extend .problem-set;
