@@ -185,7 +185,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
-        module.get_html = add_histogram(module.get_html)
+        module.get_html = add_histogram(module.get_html, module)
 
     # If StudentModule for this instance wasn't already in the database,
     # and this isn't a guest user, create it.
