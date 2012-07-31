@@ -439,8 +439,9 @@ Discussion =
           autocomplete:
             remoteDataType: 'json'
           interactive: true
-          defaultText: "add a tag"
+          defaultText: "Tag your post"
           height: "30px"
+          width: "85%"
           removeWithBackspace: true
         $local(".discussion-submit-post").click ->
           handleSubmitNewPost(this)

@@ -29,12 +29,14 @@ $discussion_input_width: 85%;
     display: inline-block;
     width: flex-grid(12);
     .discussion-link {
+      @include button;
       display: inline-block;
-      margin-left: flex-gutter();
-      @include discussion-font;
-      color: #1d9dd9;
-      margin-top: flex-gutter();
-      font-weight: bold; 
+      margin-left: 1%;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      padding-top: 9px;
+      font-size: inherit;
     }
     .discussion-search-text {
       @include discussion-font;
@@ -45,7 +47,7 @@ $discussion_input_width: 85%;
     }
     .search-within {
       display: block;
-      margin-top: flex-gutter(8);
+      margin-top: flex-gutter();
     }
   }
 
@@ -74,8 +76,8 @@ $discussion_input_width: 85%;
     }
   }
   .discussion-votes {
-    margin-right: 8px;
-    margin-top: 5px;
+    margin-right: 4%;
+    margin-top: 2%;
     text-align: center;
     height: flex-grid(3);
     float: left;
@@ -102,7 +104,7 @@ $discussion_input_width: 85%;
   .discussion-right-wrapper {
     min-height: 40px;
     float: left;
-    width: 70%;
+    width: 85%;
   }
   .new-post-form, .discussion-thread-edit {
     .title-input, .body-input {
@@ -110,21 +112,44 @@ $discussion_input_width: 85%;
       display: block !important;
       width: $discussion_input_width !important;
     }
-    .body-input {
-      margin-top: 10px;
-    }
-    .control-button {
-      @include discussion-font;
-      color: #1d9dd9;
+    .discussion-errors {
       display: block;
-      margin-top: 10px;
-      font-weight: bold;
+      color: #8F0E0E;
+      margin-left: -5%;
+    }
+    .new-post-body {
+      margin-top: flex-gutter();
     }
     .tagsinput {
-      margin-top: 20px;
-      width: 83%;
-      min-height: 30px;
-      height: 100%;
+      margin-top: flex-gutter();
+      background: #FAFAFA;
+      border: 1px solid #C8C8C8;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
+      -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      vertical-align: top;
+      -webkit-font-smoothing: antialiased;
+    }
+    .control-button {
+      @include button;
+      @include discussion-font;
+      color: white;
+      margin-top: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      margin-left: flex-grid(9);
+      padding-top: 9px;
+      font-size: inherit;
+      width: inherit;
     }
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
@@ -147,8 +172,8 @@ $discussion_input_width: 85%;
     .thread-body, .content-body {
       @include discussion-font;
       font-size: $comment_body_size;
-      margin-top: 7px;
-      margin-bottom: 2px;
+      margin-top: 3px;
+      margin-bottom: 4px;
       p {
         @include discussion-font;
         margin: 0;
@@ -158,10 +183,10 @@ $discussion_input_width: 85%;
       .thread-tag {
         @include discussion-font;
         font-size: 0.75em;
-        border-width: 0px 1px 1px 0px;
+        border-width: 1px;
         border-style: solid;
         border-color: #205C85;
-        padding: 0px 3px 3px 0px;
+        padding: 2px;
         margin-right: 5px;
         border-radius: 4px;
         color: #205C85;
@@ -175,7 +200,7 @@ $discussion_input_width: 85%;
       @include discussion-font;
       font-size: $comment_info_size;
       font-style: italic;
-      margin-top: 5px;
+      margin-top: 10px;
       color: gray;
       .discussion-link {
         margin-left: 2px;
@@ -199,6 +224,8 @@ $discussion_input_width: 85%;
     .discussion-content {
       margin-top: 10px;
       overflow: hidden;
+      border-top: lightgray 1px solid;
+      padding-top: 20px;
       .discussion-reply-new {
         margin-left: $comment_margin_left;
         .reply-body {
