@@ -3,7 +3,7 @@ $discussion_title_size: 1.6em;
 $comment_title_size: 1.2em;
 $comment_body_size: 1.0em;
 $comment_info_size: 0.75em;
-$discussion_input_width: 85%;
+$discussion_input_width: 90%;
 
 @mixin discussion-font {
   font-family: inherit;
@@ -43,7 +43,7 @@ $discussion_input_width: 85%;
     }
     .search-input {
       float: left;
-      width: flex-grid(9);
+      width: 72%;
     }
     .search-within {
       display: block;
@@ -146,7 +146,7 @@ $discussion_input_width: 85%;
       font-weight: bold;
       text-decoration: none;
       display: inline-block;
-      margin-left: flex-grid(9);
+      margin-left: 76%;
       padding-top: 9px;
       font-size: inherit;
       width: inherit;
@@ -190,6 +190,7 @@ $discussion_input_width: 85%;
         margin-right: 5px;
         border-radius: 4px;
         color: #205C85;
+        text-decoration: none;
         &:hover {
           color: #3CC5E7;
           border-color: #3CC5E7;

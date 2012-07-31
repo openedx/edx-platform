@@ -215,7 +215,7 @@ Discussion =
         interactive: true
         defaultText: "Tag your post"
         height: "30px"
-        width: "85%"
+        width: "90%"
         removeWithBackspace: true
 
   bindContentEvents: (content) ->
