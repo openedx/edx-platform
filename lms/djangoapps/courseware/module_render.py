@@ -140,8 +140,11 @@ def get_module(user, request, location, student_module_cache, position=None):
     # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
-    xqueue_callback_url = (settings.MITX_ROOT_URL + '/xqueue/' +
-                           str(user.id) + '/' + descriptor.location.url() + '/')
+
+    # Fully qualified callback URL for xqueue
+    xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL + 
+                          'xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/' + 
+                          'score_update')
 
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location,
@@ -202,8 +205,6 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     return (module, instance_module, shared_module, descriptor.category)
 
-
-# TODO: TEMPORARY BYPASS OF AUTH!
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
