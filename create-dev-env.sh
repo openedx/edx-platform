@@ -71,6 +71,16 @@ clone_repos() {
         fi
         git clone git@github.com:MITx/mitx.git
     fi
+     
+    if [[ -d "$BASE/mitx/askbot/.git" ]]; then
+        output "Pulling askbot"
+        cd "$BASE/mitx/askbot"
+        git pull 
+    else
+        output "Cloning askbot as a submodule of mitx"
+        cd "$BASE/mitx"
+        git submodule update --init
+    fi
     
     cd "$BASE"
     # By default, dev environments start with a copy of 6.002x
@@ -276,6 +286,10 @@ pip install -r mitx/pre-requirements.txt
 output "Installing MITx requirements"
 cd mitx
 pip install -r requirements.txt 
+output "Installing askbot requirements"
+pip install -r askbot/askbot_requirements.txt 
+pip install -r askbot/askbot_requirements_dev.txt 
+
 
 mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true
