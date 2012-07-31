@@ -206,6 +206,7 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     return (module, instance_module, shared_module, descriptor.category)
 
+
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
