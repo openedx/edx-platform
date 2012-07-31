@@ -211,7 +211,7 @@ def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
     get = request.POST.copy()
     try:
-        header = json.loads(get.pop('xqueue_header')[0])  # 'dict'
+        header = json.loads(get['xqueue_header'])
     except Exception as err:
         msg = "Error in xqueue_callback %s: Invalid return format" % err
         raise Exception(msg)
