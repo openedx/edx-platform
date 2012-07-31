@@ -130,9 +130,9 @@ h1.top-header {
       @include transition();
     }
 
-    span.ui-icon {
-      background-image: url(../images/ui-icons_454545_256x240.png);
-    }
+    // span.ui-icon {
+    //   background-image: url(../images/ui-icons_454545_256x240.png);
+    // }
 
     &.active {
       border-bottom: 1px solid #d3d3d3;
