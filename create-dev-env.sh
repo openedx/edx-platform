@@ -38,7 +38,7 @@ usage() {
     Usage: $PROG [-c] [-v] [-h]
     
             -c        compile scipy and numpy
-            -s        do _not_ set --no-site-packages for virtualenv
+            -s        give access to global site-packages for virtualenv 
             -v        set -x + spew
             -h        this
 
@@ -229,7 +229,7 @@ case `uname -s` in
         }
         command -v virtualenv &>/dev/null || {
             output "Installing virtualenv"
-            sudo pip install virtualenv virtualenvwrapper 
+            sudo pip install 'virtualenv>1.7' virtualenvwrapper 
         }
         command -v coffee &>/dev/null || {
             output "Installing coffee script"
@@ -248,10 +248,12 @@ curl -sL get.rvm.io | bash -s stable
 source $RUBY_DIR/scripts/rvm
 # skip the intro 
 LESS="-E" rvm install $RUBY_VER
-if [[ -n $systempkgs ]]; then
-    virtualenv "$PYTHON_DIR"
+if [[ $systempkgs ]]; then
+    virtualenv --system-site-packages "$PYTHON_DIR"
 else
-    virtualenv --no-site-packages "$PYTHON_DIR"
+    # default behavior for virtualenv>1.7 is 
+    # --no-site-packages
+    virtualenv  "$PYTHON_DIR"
 fi
 source $PYTHON_DIR/bin/activate
 output "Installing gem bundler"
