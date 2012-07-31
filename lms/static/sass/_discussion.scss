@@ -196,20 +196,24 @@ $discussion_input_width: 90%;
       }
     }
     .thread-tags {
+      display: inline-block;
       .thread-tag {
         @include discussion-font;
-        font-size: 0.75em;
-        border-width: 1px;
-        border-style: solid;
-        border-color: #205C85;
-        padding: 2px;
-        margin-right: 5px;
-        border-radius: 4px;
-        color: #205C85;
+        border: 1px solid #A5D24A;
+        -moz-border-radius: 2px;
+        -webkit-border-radius: 2px;
+        display: block;
+        float: left;
+        padding: 5px;
         text-decoration: none;
+        background: #CDE69C;
+        color: #638421;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        font-size: 13px;
         &:hover {
-          color: #3CC5E7;
-          border-color: #3CC5E7;
+          color: #06580D; 
+          border-color: #06580D;
         }
       }
     }
@@ -217,7 +221,6 @@ $discussion_input_width: 90%;
       @include discussion-font;
       font-size: $comment_info_size;
       font-style: italic;
-      margin-top: 10px;
       color: gray;
       .discussion-link {
         margin-left: 2px;
