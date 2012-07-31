@@ -352,7 +352,7 @@ class CapaModule(XModule):
         No ajax return is needed. Return empty dict.
         """
         queuekey = get['queuekey']
-        score_msg = get['response']
+        score_msg = get['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
 
         return dict()  # No AJAX return is needed

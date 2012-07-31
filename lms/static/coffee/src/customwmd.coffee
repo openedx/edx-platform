@@ -124,10 +124,12 @@ $ ->
         return
 
       if not $elem.find(".wmd-panel").length
+        initialText = $elem.html()
+        $elem.empty()
         _append = appended_id || ""
         $wmdPanel = $("<div>").addClass("wmd-panel")
                    .append($("<div>").attr("id", "wmd-button-bar#{_append}"))
-                   .append($("<textarea>").addClass("wmd-input").attr("id", "wmd-input#{_append}"))
+                   .append($("<textarea>").addClass("wmd-input").attr("id", "wmd-input#{_append}").html(initialText))
                    .append($("<div>").attr("id", "wmd-preview#{_append}").addClass("wmd-panel wmd-preview"))
         $elem.append($wmdPanel)
 
