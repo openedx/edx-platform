@@ -304,7 +304,7 @@ PIPELINE_CSS = {
         'output_filename': 'css/lms-application.css',
     },
     'course': {
-      'source_filenames': ['sass/course.scss', 'js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css', 'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css', 'css/vendor/jquery.qtip.min.css'],
+      'source_filenames': ['js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css', 'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css', 'css/vendor/jquery.qtip.min.css', 'sass/course.scss'],
       'output_filename': 'css/lms-course.css',
       },
     'ie-fixes': {
