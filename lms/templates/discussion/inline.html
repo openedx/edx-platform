@@ -6,13 +6,7 @@
       <a class="discussion-title" href="javascript:void(0)">Discussion</a>
     </div>
     ${search_bar}
-    <form class="new-post-form" _id="${discussion_id}">
-      <ul class="discussion-errors"></ul>    
-      <input type="text" class="new-post-title title-input" placeholder="Title"/>
-      <div class="new-post-body body-input"></div>
-      <input class="new-post-tags" placeholder="Tags"/>
-      <a class="discussion-new-post control-button" href="javascript:void(0)">New Post</a>
-    </form>
+    <a class="discussion-new-post control-button" href="javascript:void(0)">New Post</a>
   </div>
   % for thread in threads:
     ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
