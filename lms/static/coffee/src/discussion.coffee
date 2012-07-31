@@ -50,7 +50,7 @@ Discussion =
       <label for="discussion-post-anonymously-{{id}}">post anonymously</label>
       {{#showWatchCheckbox}}
       <input type="checkbox" class="discussion-auto-watch" id="discussion-autowatch-{{id}}" checked />
-      <label for="discussion-auto-watch-{{id}}">watch this thread</label>
+      <label for="discussion-auto-watch-{{id}}">follow this thread</label>
       {{/showWatchCheckbox}}
       <br />
       <a class="discussion-submit-reply control-button" href="javascript:void(0)">Submit</a>
@@ -204,10 +204,10 @@ Discussion =
         , 'json'
 
       if id in $$user_info.subscribed_thread_ids
-        unwatchThread = generateDiscussionLink("discussion-unwatch-thread", "Unwatch", handleUnwatchThread)
+        unwatchThread = generateDiscussionLink("discussion-unwatch-thread", "Unfollow", handleUnwatchThread)
         $local(".info").append(unwatchThread)
       else
-        watchThread = generateDiscussionLink("discussion-watch-thread", "Watch", handleWatchThread)
+        watchThread = generateDiscussionLink("discussion-watch-thread", "Follow", handleWatchThread)
         $local(".info").append(watchThread)
 
     $local = generateLocal(discussion)
