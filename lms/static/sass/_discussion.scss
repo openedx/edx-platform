@@ -1,6 +1,6 @@
 $comment_margin_left: 30px;
 $discussion_title_size: 1.6em;
-$comment_title_size: 1.2em;
+$comment_title_size: 1.0em;
 $comment_body_size: 0.9em;
 $comment_info_size: 0.75em;
 $discussion_input_width: 90%;
@@ -209,7 +209,7 @@ $discussion_input_width: 90%;
         background: #CDE69C;
         color: #638421;
         margin-right: 7px;
-        margin-bottom: 5px;
+        margin-bottom: 4px;
         font-size: 13px;
         &:hover {
           color: #1E4612;
@@ -221,15 +221,13 @@ $discussion_input_width: 90%;
       @include discussion-font;
       font-size: $comment_info_size;
       font-style: italic;
-      color: gray;
-      .discussion-link {
-        margin-left: 2px;
-      }
+      color: gray;      
       .discussion-reply {
         margin-left: 4px;
       }
       .discussion-link {
         @include discussion-font;
+        margin-left: 2px;
         display: inline-block;
         color: #1d9dd9;
         display: none;
