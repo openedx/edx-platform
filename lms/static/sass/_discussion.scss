@@ -42,12 +42,18 @@ $discussion_input_width: 90%;
       @include discussion-font;
     }
     .search-input {
+      font: inherit;
+      font-style: normal;
       float: left;
       width: 72%;
     }
     .search-within {
       display: block;
       margin-top: flex-gutter();
+    }
+    .discussion-search-within-board {
+      font-style: normal;
+      font: inherit;
     }
   }
   .control-button {
@@ -117,7 +123,8 @@ $discussion_input_width: 90%;
   }
   .new-post-form, .discussion-thread-edit{
     .title-input, .body-input {
-      @include discussion-font;
+      font-style: normal;
+      font: inherit;
       display: block !important;
       width: $discussion_input_width !important;
     }
@@ -149,7 +156,7 @@ $discussion_input_width: 90%;
     }
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
-    .new-post-control {
+    .new-post-control, .edit-post-control {
       margin-left: 70.5%;
       margin-top: 1%;
     }
@@ -288,12 +295,12 @@ $discussion_input_width: 90%;
   width: 100%;
   background-color: Gainsboro;
   border: 1px solid DarkGray;
-  font-style: normal;
+  font: inherit;
 }
 
 .wmd-preview 
 { 
-  background-color: #c0e0ff; 
+  background-color: #c0e0ff;
 }
 
 .wmd-button-row 
