@@ -17,8 +17,10 @@ ouch() {
     !! ERROR !!
 
     The last command did not complete successfully, 
-    see $LOG for more details or trying running the
+    For more details or trying running the
     script again with the -v flag.  
+    
+    Output of the script is recorded in $LOG
 
 EOL
     printf '\E[0m'
@@ -36,7 +38,7 @@ usage() {
     Usage: $PROG [-c] [-v] [-h]
     
             -c        compile scipy and numpy
-            -s        do _not_ set --no-site-packages for virtualenv
+            -s        give access to global site-packages for virtualenv 
             -v        set -x + spew
             -h        this
 
@@ -61,28 +63,21 @@ clone_repos() {
     if [[ -d "$BASE/mitx/.git" ]]; then
         output "Pulling mitx"
         cd "$BASE/mitx"
-        git pull >>$LOG
+        git pull 
     else
         output "Cloning mitx"
         if [[ -d "$BASE/mitx" ]]; then
             mv "$BASE/mitx" "${BASE}/mitx.bak.$$"
         fi
-        git clone git@github.com:MITx/mitx.git >>$LOG 
+        git clone git@github.com:MITx/mitx.git
+    fi
+     
+    if [[ ! -d "$BASE/mitx/askbot/.git" ]]; then
+        output "Cloning askbot as a submodule of mitx"
+        cd "$BASE/mitx"
+        git submodule update --init
     fi
     
-    cd "$BASE"
-    if [[ -d "$BASE/askbot-devel/.git" ]]; then
-        output "Pulling askbot-devel"
-        cd "$BASE/askbot-devel"
-        git pull >>$LOG
-    else
-        output "Cloning askbot-devel"
-        if [[ -d "$BASE/askbot-devel" ]]; then
-            mv "$BASE/askbot-devel" "${BASE}/askbot-devel.bak.$$"
-        fi
-        git clone git@github.com:MITx/askbot-devel >>$LOG 
-    fi
-
     # By default, dev environments start with a copy of 6.002x
     cd "$BASE"
     mkdir -p "$BASE/data"
@@ -90,14 +85,14 @@ clone_repos() {
     if [[ -d "$BASE/data/$REPO/.git" ]]; then
         output "Pulling $REPO"
         cd "$BASE/data/$REPO"
-        git pull >>$LOG
+        git pull 
     else
         output "Cloning $REPO"
         if [[ -d "$BASE/data/$REPO" ]]; then
             mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
         fi
 	cd "$BASE/data"
-        git clone git@github.com:MITx/$REPO >>$LOG
+        git clone git@github.com:MITx/$REPO 
     fi
 }
 
@@ -109,8 +104,8 @@ RUBY_VER="1.9.3"
 NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 BREW_FILE="$BASE/mitx/brew-formulas.txt"
-LOG="/var/tmp/install.log"
-APT_PKGS="curl git mercurial python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript"
+LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
+APT_PKGS="curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript"
 
 if [[ $EUID -eq 0 ]]; then
     error "This script should not be run using sudo or as the root user"
@@ -163,23 +158,30 @@ cat<<EO
 
   To compile scipy and numpy from source use the -c option
 
-  Most of STDOUT is redirected to /var/tmp/install.log, run
-  $ tail -f /var/tmp/install.log
-  to monitor progress
+  !!! Do not run this script from an existing virtualenv !!!
+  
+  If you are in a ruby/python virtualenv please start a new
+  shell. 
 
 EO
 info
 output "Press return to begin or control-C to abort"
 read dummy
 
-if [[ -f $HOME/.rvmrc ]]; then
-    output "$HOME/.rvmrc alredy exists, not adding $RUBY_DIR"
-else
-    output "Creating $HOME/.rmrc so rvm uses $RUBY_DIR"
+# log all stdout and stderr 
+exec > >(tee $LOG)
+exec 2>&1
+
+if ! grep -q "export rvm_path=$RUBY_DIR" ~/.rvmrc; then
+    if [[ -f $HOME/.rvmrc ]]; then
+        output "Copying existing .rvmrc to .rvmrc.bak"
+        cp $HOME/.rvmrc $HOME/.rvmrc.bak
+    fi
+    output "Creating $HOME/.rvmrc so rvm uses $RUBY_DIR"
     echo "export rvm_path=$RUBY_DIR" > $HOME/.rvmrc
 fi
+
 mkdir -p $BASE
-rm -f $LOG
 case `uname -s` in
     [Ll]inux)
         command -v lsb_release &>/dev/null || {
@@ -207,11 +209,7 @@ case `uname -s` in
         } 
         command -v git &>/dev/null || {
             output "Installing git"
-            brew install git >> $LOG
-        }
-        command -v hg &>/dev/null || {
-            output "Installaing mercurial"
-            brew install mercurial >> $LOG
+            brew install git 
         }
 
         clone_repos
@@ -225,17 +223,19 @@ case `uname -s` in
         for pkg in $(cat $BREW_FILE); do
             grep $pkg <(brew list) &>/dev/null || {
                 output "Installing $pkg"
-                brew install $pkg  >>$LOG 
+                brew install $pkg  
             }
         done
         command -v pip &>/dev/null || {
             output "Installing pip"
-            sudo easy_install pip  >>$LOG 
+            sudo easy_install pip  
         }
-        command -v virtualenv &>/dev/null || {
-            output "Installing virtualenv"
-            sudo pip install virtualenv virtualenvwrapper >> $LOG
-        }
+
+        if ! grep -Eq ^1.7 <(virtualenv --version 2>/dev/null); then
+            output "Installing virtualenv >1.7"
+            sudo pip install 'virtualenv>1.7' virtualenvwrapper
+        fi
+
         command -v coffee &>/dev/null || {
             output "Installing coffee script"
             curl http://npmjs.org/install.sh | sh
@@ -253,10 +253,12 @@ curl -sL get.rvm.io | bash -s stable
 source $RUBY_DIR/scripts/rvm
 # skip the intro 
 LESS="-E" rvm install $RUBY_VER
-if [[ -n $systempkgs ]]; then
-    virtualenv "$PYTHON_DIR"
+if [[ $systempkgs ]]; then
+    virtualenv --system-site-packages "$PYTHON_DIR"
 else
-    virtualenv --no-site-packages "$PYTHON_DIR"
+    # default behavior for virtualenv>1.7 is 
+    # --no-site-packages
+    virtualenv  "$PYTHON_DIR"
 fi
 source $PYTHON_DIR/bin/activate
 output "Installing gem bundler"
@@ -277,24 +279,24 @@ if [[ -n $compile ]]; then
     rm -f numpy.tar.gz scipy.tar.gz
     output "Compiling numpy"
     cd "$BASE/numpy-${NUMPY_VER}"
-    python setup.py install >>$LOG  2>&1
+    python setup.py install 
     output "Compiling scipy"
     cd "$BASE/scipy-${SCIPY_VER}"
-    python setup.py install >>$LOG  2>&1
+    python setup.py install 
     cd "$BASE"
     rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 fi
 
-output "Installing askbot requirements"
-pip install -r askbot-devel/askbot_requirements.txt >>$LOG 
-output "Installing askbot-dev requirements"
-pip install -r askbot-devel/askbot_requirements_dev.txt >>$LOG 
 output "Installing MITx pre-requirements"
-pip install -r mitx/pre-requirements.txt >> $LOG
+pip install -r mitx/pre-requirements.txt 
 # Need to be in the mitx dir to get the paths to local modules right
 output "Installing MITx requirements"
 cd mitx
-pip install -r requirements.txt >>$LOG 
+pip install -r requirements.txt 
+output "Installing askbot requirements"
+pip install -r askbot/askbot_requirements.txt 
+pip install -r askbot/askbot_requirements_dev.txt 
+
 
 mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true
