@@ -811,6 +811,7 @@ class CodeResponse(LoncapaResponse):
     def setup_response(self):
         xml = self.xml
         self.url = xml.get('url', "http://107.20.215.194/xqueue/submit/")  # FIXME -- hardcoded url
+        self.queue_name = xml.get('queuename', 'python') # TODO: Default queue_name should be course-specific
 
         answer = xml.find('answer')
         if answer is not None:
@@ -905,7 +906,7 @@ class CodeResponse(LoncapaResponse):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
         header = {'return_url': self.system.xqueue_callback_url,
-                  'queue_name': 'mitx-600x', # TODO: Queue name should derive from courseware or XML
+                  'queue_name': self.queue_name,
                  }
 
         # Queuekey generation
