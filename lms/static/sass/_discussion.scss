@@ -137,14 +137,19 @@ $discussion_input_width: 85%;
       box-sizing: border-box;
       vertical-align: top;
       -webkit-font-smoothing: antialiased;
-      }
-      .control-button {
+    }
+    .control-button {
+      @include button;
       @include discussion-font;
-      color: #1d9dd9;
-      display: block;
+      color: white;
       margin-top: 10px;
       font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
       margin-left: flex-grid(9);
+      padding-top: 9px;
+      font-size: inherit;
+      width: inherit;
     }
   }
   .discussion-content-edit, .discussion-reply-new {
