@@ -73,18 +73,6 @@ clone_repos() {
     fi
     
     cd "$BASE"
-    if [[ -d "$BASE/askbot-devel/.git" ]]; then
-        output "Pulling askbot-devel"
-        cd "$BASE/askbot-devel"
-        git pull 
-    else
-        output "Cloning askbot-devel"
-        if [[ -d "$BASE/askbot-devel" ]]; then
-            mv "$BASE/askbot-devel" "${BASE}/askbot-devel.bak.$$"
-        fi
-        git clone git@github.com:MITx/askbot-devel 
-    fi
-
     # By default, dev environments start with a copy of 6.002x
     cd "$BASE"
     mkdir -p "$BASE/data"
@@ -282,10 +270,6 @@ if [[ -n $compile ]]; then
     rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 fi
 
-output "Installing askbot requirements"
-pip install -r askbot-devel/askbot_requirements.txt 
-output "Installing askbot-dev requirements"
-pip install -r askbot-devel/askbot_requirements_dev.txt 
 output "Installing MITx pre-requirements"
 pip install -r mitx/pre-requirements.txt 
 # Need to be in the mitx dir to get the paths to local modules right
