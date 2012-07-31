@@ -460,8 +460,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
             # Put import here to avoid circular import errors
             from xmodule.error_module import ErrorDescriptor
-
-            system.error_tracker("Error loading from xml.")
+            msg = "Error loading from xml."
+            log.exception(msg)
+            system.error_tracker(msg)
             descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course, err)
 
         return descriptor

@@ -47,6 +47,13 @@
 
     <section class="course-content">
       ${content}
+
+      % if course_errors is not UNDEFINED:
+          <h2>Course errors</h2>
+          <div id="course-errors">
+            ${course_errors}
+          </div>
+      % endif
     </section>
   </div>
 </section>
