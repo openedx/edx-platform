@@ -29,6 +29,17 @@ generateDiscussionLink = (cls, txt, handler) ->
 
 Discussion =
 
+  newPostTemplate: """
+    <form class="new-post-form" _id="{{discussion_id}}">
+      <ul class="discussion-errors"></ul>    
+      <input type="text" class="new-post-title title-input" placeholder="Title"/>
+      <div class="new-post-body body-input"></div>
+      <input class="new-post-tags" placeholder="Tags"/>
+      <a class="discussion-submit-post control-button" href="javascript:void(0)">Submit</a>
+      <a class="discussion-cancel-post control-button" href="javascript:void(0)">Cancel</a>
+    </form>
+  """
+
   replyTemplate: """
     <form class="discussion-reply-new">
       <ul class="discussion-errors"></ul>
@@ -169,9 +180,7 @@ Discussion =
         watchDiscussion = generateDiscussionLink("discussion-watch-discussion", "Watch", handleWatchDiscussion)
         $local(".discussion-title-wrapper").append(watchDiscussion)
 
-      newPostBody = $(discussion).find(".new-post-body")
-      if newPostBody.length
-        Markdown.makeWmdEditor newPostBody, "-new-post-body-#{$(discussion).attr('_id')}", Discussion.urlFor('upload')
+      
 
     initializeWatchThreads = (index, thread) ->
       $thread = $(thread)
@@ -192,7 +201,6 @@ Discussion =
             Discussion.handleAnchorAndReload(response)
         , 'json'
 
-      
       if id in $$user_info.subscribed_thread_ids
         unwatchThread = generateDiscussionLink("discussion-unwatch-thread", "Unwatch", handleUnwatchThread)
         $local(".info").append(unwatchThread)
@@ -206,15 +214,6 @@ Discussion =
       $local(".comment").each(initializeVote)
       $local(".thread").each(initializeVote).each(initializeWatchThreads)
       initializeWatchDiscussion(discussion)
-
-    $local(".new-post-tags").tagsInput
-      autocomplete_url: Discussion.urlFor('tags_autocomplete')
-      autocomplete:
-        remoteDataType: 'json'
-      interactive: true
-      defaultText: "add a tag"
-      height: "30px"
-      removeWithBackspace: true
 
   bindContentEvents: (content) ->
 
@@ -404,7 +403,7 @@ Discussion =
         else
           window.location = Discussion.urlFor('search') + '?text=' + encodeURI(text)
 
-    handleSubmitNewThread = (elem) ->
+    handleSubmitNewPost = (elem) ->
       title = $local(".new-post-title").val()
       body = $local("#wmd-input-new-post-body-#{id}").val()
       tags = $local(".new-post-tags").val()
@@ -417,6 +416,37 @@ Discussion =
         else
           Discussion.handleAnchorAndReload(response)
       , 'json'
+
+    handleCancelNewPost = (elem) ->
+      $local(".new-post-form").hide()
+      $local(".discussion-new-post").show()
+
+    handleNewPost = (elem) ->
+      newPostForm = $local(".new-post-form")
+      if newPostForm.length
+        newPostForm.show()
+        $(elem).hide()
+      else
+        view = {
+          discussion_id: id
+        }
+        $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
+        newPostBody = $(discussion).find(".new-post-body")
+        if newPostBody.length
+          Markdown.makeWmdEditor newPostBody, "-new-post-body-#{$(discussion).attr('_id')}", Discussion.urlFor('upload')
+        $local(".new-post-tags").tagsInput
+          autocomplete_url: Discussion.urlFor('tags_autocomplete')
+          autocomplete:
+            remoteDataType: 'json'
+          interactive: true
+          defaultText: "add a tag"
+          height: "30px"
+          removeWithBackspace: true
+        $local(".discussion-submit-post").click ->
+          handleSubmitNewPost(this)
+        $local(".discussion-cancel-post").click ->
+          handleCancelNewPost(this)
+        $(elem).hide()
     
     $local(".discussion-search-form").submit (event) ->
       event.preventDefault()
@@ -425,7 +455,7 @@ Discussion =
       handleSearch(text, isSearchWithinBoard)
 
     $local(".discussion-new-post").click ->
-      handleSubmitNewThread(this)
+      handleNewPost(this)
 
     $local(".discussion-search").click ->
       $local(".new-post-form").submit()
