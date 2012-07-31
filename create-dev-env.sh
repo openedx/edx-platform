@@ -233,9 +233,6 @@ case `uname -s` in
             sudo pip install 'virtualenv>1.7' virtualenvwrapper
         fi
 
-        output "Installing virtualenv"
-        sudo pip install 'virtualenv>1.7' virtualenvwrapper 
-
         command -v coffee &>/dev/null || {
             output "Installing coffee script"
             curl http://npmjs.org/install.sh | sh
