@@ -6,7 +6,7 @@
       <a class="discussion-title" href="javascript:void(0)">Discussion</a>
     </div>
     ${search_bar}
-    <a class="discussion-new-post control-button" href="javascript:void(0)">New Post</a>
+    <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
   </div>
   % for thread in threads:
     ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
