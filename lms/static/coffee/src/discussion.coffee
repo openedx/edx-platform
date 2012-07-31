@@ -9,9 +9,13 @@ $ ->
     $('#open_close_accordion a').click @toggle
     $('#accordion').show()
 
+  $(".discussion-module").each (index, elem) ->
+    Discussion.initializeDiscussionModule(elem)
+    
+
   $("section.discussion").each (index, discussion) ->
-    Discussion.bindDiscussionEvents(discussion)
     Discussion.initializeDiscussion(discussion)
+    Discussion.bindDiscussionEvents(discussion)
 
 
 generateLocal = (elem) ->
@@ -82,11 +86,51 @@ Discussion =
       upload              : "/courses/#{$$course_id}/discussion/upload"
       search              : "/courses/#{$$course_id}/discussion/forum/search"
       tags_autocomplete   : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
+      retrieve_discussion : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
     }[name]
 
   handleAnchorAndReload: (response) ->
     #window.location = window.location.pathname + "#" + response['id']
     window.location.reload()
+
+  initializeDiscussionModule: (elem) ->
+    $discussionModule = $(elem)
+    $local = generateLocal($discussionModule)
+    handleShowDiscussion = (elem) ->
+      $elem = $(elem)
+      if $elem.attr("disabled")
+        return
+      if not $local("section.discussion").length
+        $elem.attr("disabled", "disabled")
+        discussion_id = $elem.attr("discussion_id")
+        url = Discussion.urlFor 'retrieve_discussion', discussion_id
+        $.ajax
+          url: url
+          method: "GET"
+          success: (data, textStatus, xhr) ->
+            $discussionModule.append(data)
+            discussion = $local("section.discussion")
+            Discussion.initializeDiscussion(discussion)
+            Discussion.bindDiscussionEvents(discussion)
+            $elem.removeAttr("disabled")
+            $elem.html("Hide Discussion")
+            $elem.unbind('click').click ->
+              handleHideDiscussion(this)
+          dataType: 'html'
+      else
+        $local("section.discussion").show()
+        $elem.html("Hide Discussion")
+        $elem.unbind('click').click ->
+          handleHideDiscussion(this)
+    handleHideDiscussion = (elem) ->
+      $local("section.discussion").hide()
+      $elem = $(elem)
+      $elem.html("Show Discussion")
+      $elem.unbind('click').click ->
+        handleShowDiscussion(this)
+
+    $local(".discussion-show").click ->
+      handleShowDiscussion(this)
 
   initializeDiscussion: (discussion) ->
 
@@ -342,8 +386,9 @@ Discussion =
     converter = Markdown.getMathCompatibleConverter()
     $local(".content-body").html(converter.makeHtml(raw_text))
     id = $content.attr("_id")
-    if not ($$annotated_content_info[id] || [])['editable']
-      $local(".discussion-edit").remove()
+    if $$annotated_content_info?
+      if not ($$annotated_content_info[id] || [])['editable']
+        $local(".discussion-edit").remove()
 
     
 
