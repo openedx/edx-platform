@@ -227,6 +227,7 @@
 			markup = markup + '</div><div class="tags_clear"></div></div>';
 			
 			$(markup).insertAfter(this);
+      
 
 			$(data.holder).css('width',settings.width);
 			$(data.holder).css('min-height',settings.height);
@@ -240,6 +241,7 @@
 				$(data.fake_input).css('color',settings.placeholderColor);
 		        $(data.fake_input).resetAutosize(settings);
 		
+        $(data.fake_input).doAutosize(settings);
 				$(data.holder).bind('click',data,function(event) {
 					$(event.data.fake_input).focus();
 				});
@@ -260,7 +262,6 @@
 					if (jQuery.Autocompleter !== undefined) {
             onSelectCallback = settings.autocomplete.onItemSelect;
             settings.autocomplete.onItemSelect = function() {
-              console.log("here");
               $(data.real_input).addTag($(data.fake_input).val(), {focus: true, unique: (settings.unique)});
               $(data.fake_input).resetAutosize(settings);
               if (onSelectCallback) {
