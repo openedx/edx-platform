@@ -100,8 +100,10 @@ class JsonResponse(HttpResponse):
                                            mimetype='application/json; charset=utf8')
 
 class JsonError(HttpResponse):
-    def __init__(self, error_message=""):
-        content = simplejson.dumps({'errors': error_message},
+    def __init__(self, error_messages=[]):
+        if isinstance(error_messages, str):
+            error_messages = [error_messages]
+        content = simplejson.dumps({'errors': error_messages},
                                    indent=2,
                                    ensure_ascii=False)
         super(JsonError, self).__init__(content,
