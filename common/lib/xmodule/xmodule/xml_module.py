@@ -1,4 +1,3 @@
-from collections import MutableMapping
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore import Location
 from lxml import etree
@@ -8,12 +7,11 @@ import traceback
 from collections import namedtuple
 from fs.errors import ResourceNotFoundError
 import os
+import sys
 
 log = logging.getLogger(__name__)
 
-
 _AttrMapBase = namedtuple('_AttrMap', 'metadata_key to_metadata from_metadata')
-
 
 class AttrMap(_AttrMapBase):
     """
@@ -116,11 +114,12 @@ class XmlDescriptor(XModuleDescriptor):
 
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
-            # give the class a chance to fix it up. The file will be written out again
-            # in the correct format.
-            # This should go away once the CMS is online and has imported all current (fall 2012)
-            # courses from xml
-            if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
+            # give the class a chance to fix it up. The file will be written out
+            # again in the correct format.  This should go away once the CMS is
+            # online and has imported all current (fall 2012) courses from xml
+            if not system.resources_fs.exists(filepath) and hasattr(
+                    cls,
+                    'backcompat_paths'):
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
@@ -130,19 +129,11 @@ class XmlDescriptor(XModuleDescriptor):
             try:
                 with system.resources_fs.open(filepath) as file:
                     definition_xml = cls.file_to_xml(file)
-            except (ResourceNotFoundError, etree.XMLSyntaxError):
+            except Exception:
                 msg = 'Unable to load file contents at path %s for item %s' % (
                     filepath, location.url())
-
-                log.exception(msg)
-                system.error_handler(msg)
-                # if error_handler didn't reraise, work around problem.
-                error_elem = etree.Element('error')
-                message_elem = etree.SubElement(error_elem, 'error_message')
-                message_elem.text = msg
-                stack_elem = etree.SubElement(error_elem, 'stack_trace')
-                stack_elem.text = traceback.format_exc()
-                return {'data': etree.tostring(error_elem)}
+                # Add info about where we are, but keep the traceback
+                raise Exception, msg, sys.exc_info()[2]
 
         cls.clean_metadata_from_xml(definition_xml)
         return cls.definition_from_xml(definition_xml, system)

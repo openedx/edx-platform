@@ -3,7 +3,7 @@ from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
 from path import path
-from xmodule.errorhandlers import logging_error_handler
+from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 from xmodule.mako_module import MakoDescriptorSystem
 from cStringIO import StringIO
@@ -29,7 +29,7 @@ def clean_out_mako_templating(xml_string):
     return xml_string
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
-    def __init__(self, xmlstore, org, course, course_dir, error_handler, **kwargs):
+    def __init__(self, xmlstore, org, course, course_dir, error_tracker, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -89,9 +89,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
         MakoDescriptorSystem.__init__(self, load_item, resources_fs,
-                                      error_handler, render_template, **kwargs)
+                                      error_tracker, render_template, **kwargs)
         XMLParsingSystem.__init__(self, load_item, resources_fs,
-                                  error_handler, process_xml, **kwargs)
+                                  error_tracker, process_xml, **kwargs)
 
 
 
@@ -101,7 +101,7 @@ class XMLModuleStore(ModuleStore):
     """
     def __init__(self, data_dir, default_class=None, eager=False,
                  course_dirs=None,
-                 error_handler=logging_error_handler):
+                 error_tracker=null_error_tracker):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -116,8 +116,8 @@ class XMLModuleStore(ModuleStore):
         course_dirs: If specified, the list of course_dirs to load. Otherwise,
             load all course dirs
 
-        error_handler: The error handler used here and in the underlying
-                DescriptorSystem.  By default, raise exceptions for all errors.
+        error_tracker: The error tracker used here and in the underlying
+                DescriptorSystem.  By default, ignore all messages.
                 See the comments in x_module.py:DescriptorSystem
         """
 
@@ -125,7 +125,7 @@ class XMLModuleStore(ModuleStore):
         self.data_dir = path(data_dir)
         self.modules = {}  # location -> XModuleDescriptor
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
-        self.error_handler = error_handler
+        self.error_tracker = error_tracker
 
         if default_class is None:
             self.default_class = None
@@ -154,7 +154,7 @@ class XMLModuleStore(ModuleStore):
             except:
                 msg = "Failed to load course '%s'" % course_dir
                 log.exception(msg)
-                error_handler(msg)
+                error_tracker(msg)
 
 
     def load_course(self, course_dir):
@@ -192,7 +192,7 @@ class XMLModuleStore(ModuleStore):
                 course = course_dir
 
             system = ImportSystem(self, org, course, course_dir,
-                                  self.error_handler)
+                                  self.error_tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
             log.debug('========> Done with course import from {0}'.format(course_dir))

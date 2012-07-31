@@ -6,7 +6,7 @@ from itertools import repeat
 from path import path
 
 from importlib import import_module
-from xmodule.errorhandlers import strict_error_handler
+from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from mitxmako.shortcuts import render_to_string
@@ -26,7 +26,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     from, with a backup of calling to the underlying modulestore for more data
     """
     def __init__(self, modulestore, module_data, default_class, resources_fs,
-                 error_handler, render_template):
+                 error_tracker, render_template):
         """
         modulestore: the module store that can be used to retrieve additional modules
 
@@ -38,13 +38,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
         resources_fs: a filesystem, as per MakoDescriptorSystem
 
-        error_handler:
+        error_tracker:
 
         render_template: a function for rendering templates, as per
             MakoDescriptorSystem
         """
         super(CachingDescriptorSystem, self).__init__(
-                self.load_item, resources_fs, error_handler, render_template)
+                self.load_item, resources_fs, error_tracker, render_template)
         self.modulestore = modulestore
         self.module_data = module_data
         self.default_class = default_class
@@ -79,7 +79,8 @@ class MongoModuleStore(ModuleStore):
     """
 
     # TODO (cpennington): Enable non-filesystem filestores
-    def __init__(self, host, db, collection, fs_root, port=27017, default_class=None):
+    def __init__(self, host, db, collection, fs_root, port=27017, default_class=None,
+                 error_tracker=null_error_tracker):
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port
@@ -90,13 +91,17 @@ class MongoModuleStore(ModuleStore):
 
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
-        self.collection.ensure_index(zip(('_id.' + field for field in Location._fields), repeat(1)))
+        self.collection.ensure_index(
+            zip(('_id.' + field for field in Location._fields), repeat(1)))
 
-        # TODO (vshnayder): default arg default_class=None will make this error
-        module_path, _, class_name = default_class.rpartition('.')
-        class_ = getattr(import_module(module_path), class_name)
-        self.default_class = class_
+        if default_class is not None:
+            module_path, _, class_name = default_class.rpartition('.')
+            class_ = getattr(import_module(module_path), class_name)
+            self.default_class = class_
+        else:
+            self.default_class = None
         self.fs_root = path(fs_root)
+        self.error_tracker = error_tracker
 
     def _clean_item_data(self, item):
         """
@@ -148,7 +153,7 @@ class MongoModuleStore(ModuleStore):
             data_cache,
             self.default_class,
             resource_fs,
-            strict_error_handler,
+            self.error_tracker,
             render_to_string,
         )
         return system.load_item(item['location'])

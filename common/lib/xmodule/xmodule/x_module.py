@@ -454,15 +454,15 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             #        etree.fromstring(xml_data).tag,class_))
 
             descriptor = class_.from_xml(xml_data, system, org, course)
-        except (ResourceNotFoundError, XMLSyntaxError) as err:
+        except Exception as err:
             # Didn't load properly.  Fall back on loading as an error
             # descriptor.  This should never error due to formatting.
 
             # Put import here to avoid circular import errors
             from xmodule.error_module import ErrorDescriptor
 
-            #system.error_handler("Error loading from xml.")
-            descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course)
+            system.error_tracker("Error loading from xml.")
+            descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course, err)
 
         return descriptor
 
@@ -533,16 +533,19 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item, resources_fs, error_handler, **kwargs):
+    def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
 
         resources_fs: A Filesystem object that contains all of the
             resources needed for the course
 
-        error_handler: A hook for handling errors in loading the descriptor.
-            Must be a function of (error_msg, exc_info=None).
-            See errorhandlers.py for some simple ones.
+        error_tracker: A hook for tracking errors in loading the descriptor.
+            Used for example to get a list of all non-fatal problems on course
+            load, and display them to the user.
+
+            A function of (error_msg). errortracker.py provides a
+            handy make_error_tracker() function.
 
             Patterns for using the error handler:
                try:
@@ -551,10 +554,8 @@ class DescriptorSystem(object):
                except SomeProblem:
                   msg = 'Grommet {0} is broken'.format(x)
                   log.exception(msg) # don't rely on handler to log
-                  self.system.error_handler(msg)
-                  # if we get here, work around if possible
-                  raise # if no way to work around
-                       OR
+                  self.system.error_tracker(msg)
+                  # work around
                   return 'Oops, couldn't load grommet'
 
                OR, if not in an exception context:
@@ -562,25 +563,26 @@ class DescriptorSystem(object):
                if not check_something(thingy):
                   msg = "thingy {0} is broken".format(thingy)
                   log.critical(msg)
-                  error_handler(msg)
-                  # if we get here, work around
-                  pass   # e.g. if no workaround needed
+                  self.system.error_tracker(msg)
+
+               NOTE: To avoid duplication, do not call the tracker on errors
+               that you're about to re-raise---let the caller track them.
         """
 
         self.load_item = load_item
         self.resources_fs = resources_fs
-        self.error_handler = error_handler
+        self.error_tracker = error_tracker
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_handler, process_xml, **kwargs):
+    def __init__(self, load_item, resources_fs, error_tracker, process_xml, **kwargs):
         """
-        load_item, resources_fs, error_handler: see DescriptorSystem
+        load_item, resources_fs, error_tracker: see DescriptorSystem
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
         """
-        DescriptorSystem.__init__(self, load_item, resources_fs, error_handler,
+        DescriptorSystem.__init__(self, load_item, resources_fs, error_tracker,
                                   **kwargs)
         self.process_xml = process_xml
 

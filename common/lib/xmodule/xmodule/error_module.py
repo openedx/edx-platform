@@ -15,7 +15,7 @@ class ErrorModule(XModule):
         TODO (vshnayder): proper style, divs, etc.
         '''
         if not self.system.is_staff:
-            return self.system.render_template('module-error.html')
+            return self.system.render_template('module-error.html', {})
 
         # staff get to see all the details
         return self.system.render_template('module-error-staff.html', {
@@ -31,22 +31,27 @@ class ErrorDescriptor(EditingDescriptor):
     module_class = ErrorModule
 
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None):
+    def from_xml(cls, xml_data, system, org=None, course=None, err=None):
         '''Create an instance of this descriptor from the supplied data.
 
         Does not try to parse the data--just stores it.
+
+        Takes an extra, optional, parameter--the error that caused an
+        issue.
         '''
 
         definition = {}
+        if err is not None:
+            definition['error'] = err
+
         try:
             # If this is already an error tag, don't want to re-wrap it.
             xml_obj = etree.fromstring(xml_data)
             if xml_obj.tag == 'error':
                 xml_data = xml_obj.text
         except etree.XMLSyntaxError as err:
-            # Save the error to display later
-            definition['error'] = str(err)
-
+            # Save the error to display later--overrides other problems
+            definition['error'] = err
 
         definition['data'] = xml_data
         # TODO (vshnayder): Do we need a unique slug here?  Just pick a random
