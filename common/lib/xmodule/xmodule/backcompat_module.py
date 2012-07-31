@@ -35,18 +35,21 @@ def process_includes(fn):
                 # insert  new XML into tree in place of include
                 parent.insert(parent.index(next_include), incxml)
             except Exception:
-                msg = "Error in problem xml include: %s" % (etree.tostring(next_include, pretty_print=True))
-                log.exception(msg)
-                parent = next_include.getparent()
+                # Log error and work around it
+                msg = "Error in problem xml include: %s" % (
+                    etree.tostring(next_include, pretty_print=True))
 
+                system.error_tracker(msg)
+
+                parent = next_include.getparent()
                 errorxml = etree.Element('error')
                 messagexml = etree.SubElement(errorxml, 'message')
                 messagexml.text = msg
                 stackxml = etree.SubElement(errorxml, 'stacktrace')
                 stackxml.text = traceback.format_exc()
-
                 # insert error XML in place of include
                 parent.insert(parent.index(next_include), errorxml)
+
             parent.remove(next_include)
 
             next_include = xml_object.find('include')

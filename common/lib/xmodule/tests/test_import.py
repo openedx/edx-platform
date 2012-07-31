@@ -4,7 +4,7 @@ import unittest
 from lxml import etree
 
 from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
-from xmodule.errorhandlers import ignore_errors_handler
+from xmodule.errortracker import null_error_tracker
 from xmodule.modulestore import Location
 
 class ImportTestCase(unittest.TestCase):
@@ -27,7 +27,7 @@ class ImportTestCase(unittest.TestCase):
             raise Exception("Shouldn't be called")
 
         system = XMLParsingSystem(load_item, resources_fs,
-                                  ignore_errors_handler, process_xml)
+                                  null_error_tracker, process_xml)
         system.render_template = render_template
 
         return system
