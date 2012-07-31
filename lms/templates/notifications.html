@@ -32,7 +32,7 @@ def discussion_title(discussion_id):
     <% info = notification['info'] %>
     % if notification['notification_type'] == 'post_reply':
       User No.${notification['actor_id']} posted a
-      <a href="${url_for_comment(info['commentable_id', info['thread_id'], info['comment_id'])}">comment</a>
+      <a href="${url_for_comment(info['commentable_id'], info['thread_id'], info['comment_id'])}">comment</a>
       to the thread
       <a href="${url_for_thread(info['commentable_id'], info['thread_id'])}">${info['thread_title']}</a>
       in discussion
