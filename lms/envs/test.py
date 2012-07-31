@@ -12,17 +12,21 @@ from .logsettings import get_logger_config
 import os
 from path import path
 
-INSTALLED_APPS = [
-    app
-    for app
-    in INSTALLED_APPS
-    if not app.startswith('askbot')
-]
+# can't test start dates with this True, but on the other hand,
+# can test everything else :)
+MITX_FEATURES['DISABLE_START_DATES'] = True
+
+# Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
+WIKI_ENABLED = True
+
+# Makes the tests run much faster...
+SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 
 # Nose Test Runner
-INSTALLED_APPS += ['django_nose']
+INSTALLED_APPS += ('django_nose',)
 NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html',
-             '--cover-inclusive', '--cover-html-dir', os.environ.get('NOSE_COVER_HTML_DIR', 'cover_html')]
+             '--cover-inclusive', '--cover-html-dir',
+             os.environ.get('NOSE_COVER_HTML_DIR', 'cover_html')]
 for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
     NOSE_ARGS += ['--cover-package', app]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -30,28 +34,27 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # Local Directories
 TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
-STATIC_ROOT = TEST_ROOT / "staticfiles" 
+STATIC_ROOT = TEST_ROOT / "staticfiles"
 
 COURSES_ROOT = TEST_ROOT / "data"
 DATA_DIR = COURSES_ROOT
-MAKO_TEMPLATES['course'] = [DATA_DIR]
-MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
-MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
-MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates', 
-                          DATA_DIR / 'info',
-                          DATA_DIR / 'problems']
 
-LOGGING = get_logger_config(TEST_ROOT / "log", 
+LOGGING = get_logger_config(TEST_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
                             debug=True)
 
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
+# Where the content data is checked out.  This may not exist on jenkins.
+GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
-# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
+
+# TODO (cpennington): We need to figure out how envs/test.py can inject things
+# into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    ASKBOT_ROOT / "askbot" / "skins",
 ]
 STATICFILES_DIRS += [
     (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
@@ -67,7 +70,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a 
+    # This is the cache used for most things. Askbot will not work without a
     # functioning cache -- it relies on caching to load its settings in places.
     # In staging/prod envs, the sessions also live here.
     'default': {

@@ -810,7 +810,8 @@ class CodeResponse(LoncapaResponse):
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url', "http://ec2-50-16-59-149.compute-1.amazonaws.com/xqueue/submit/")  # FIXME -- hardcoded url
+        self.url = xml.get('url', "http://107.20.215.194/xqueue/submit/")  # FIXME -- hardcoded url
+        self.queue_name = xml.get('queuename', 'python') # TODO: Default queue_name should be course-specific
 
         answer = xml.find('answer')
         if answer is not None:
@@ -848,13 +849,13 @@ class CodeResponse(LoncapaResponse):
 
     def get_score(self, student_answers):
         try:
-            submission = [student_answers[self.answer_id]]
+            submission = student_answers[self.answer_id]
         except Exception as err:
             log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_id, student_answers))
             raise Exception(err)
 
         self.context.update({'submission': submission})
-        extra_payload = {'edX_student_response': json.dumps(submission)}
+        extra_payload = {'edX_student_response': submission}
 
         r, queuekey = self._send_to_queue(extra_payload)  # TODO: Perform checks on the xqueue response
 
@@ -904,7 +905,9 @@ class CodeResponse(LoncapaResponse):
     def _send_to_queue(self, extra_payload):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
-        header = {'return_url': self.system.xqueue_callback_url}
+        header = {'return_url': self.system.xqueue_callback_url,
+                  'queue_name': self.queue_name,
+                 }
 
         # Queuekey generation
         h = hashlib.md5()
@@ -913,13 +916,16 @@ class CodeResponse(LoncapaResponse):
         queuekey = int(h.hexdigest(), 16)
         header.update({'queuekey': queuekey})
 
-        payload = {'xqueue_header': json.dumps(header),  # TODO: 'xqueue_header' should eventually be derived from a config file
-                   'xml': xmlstr,
-                   'edX_cmd': 'get_score',
-                   'edX_tests': self.tests,
-                   'processor': self.code,
+        body = {'xml': xmlstr,
+                'edX_cmd': 'get_score',
+                'edX_tests': self.tests,
+                'processor': self.code,
+                }
+        body.update(extra_payload)
+
+        payload = {'xqueue_header': json.dumps(header),
+                   'xqueue_body'  : json.dumps(body),
                   }
-        payload.update(extra_payload)
 
         # Contact queue server
         try:

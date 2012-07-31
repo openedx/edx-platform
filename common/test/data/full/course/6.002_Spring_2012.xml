@@ -6,7 +6,7 @@
       <vertical slug="vertical_1122" graceperiod="0 day 0 hours 5 minutes 0 seconds" showanswer="attempted" rerandomize="per_student" due="April 30, 12:00" graded="true">
         <html filename="Midterm_Exam_1123" slug="Midterm_Exam_1123" graceperiod="0 day 0 hours 5 minutes 0 seconds" rerandomize="per_student" due="April 30, 12:00" graded="true" name="Midterm Exam"/>
       </vertical>
-      <vertical filename="vertical_1124" slug="vertical_1124" graceperiod="0 day 0 hours 5 minutes 0 seconds" showanswer="attempted" rerandomize="per_student" due="April 30, 12:00" graded="true"/>
+      <vertical filename="vertical_98" slug="vertical_1124" graceperiod="0 day 0 hours 5 minutes 0 seconds" showanswer="attempted" rerandomize="per_student" due="April 30, 12:00" graded="true"/>
     </sequential>
   </chapter>
 </sequential>

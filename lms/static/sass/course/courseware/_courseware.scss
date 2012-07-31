@@ -1,0 +1,234 @@
+html {
+  height: 100%;
+  max-height: 100%;
+}
+
+body.courseware {
+  height: 100%;
+  max-height: 100%;
+
+  .container {
+    padding-bottom: 40px;
+    margin-top: 20px;
+  }
+
+  footer {
+    &.fixed-bottom {
+      Position: static;
+    }
+  }
+}
+
+div.course-wrapper {
+  @extend .table-wrapper;
+
+  ul, ol {
+    list-style: none;
+  }
+
+  section.course-content {
+    @extend .content;
+    @include border-radius(0 4px 4px 0);
+
+    h1 {
+      margin: 0 0 lh();
+    }
+
+    p {
+      margin-bottom: lh();
+
+      &:empty {
+        display: none;
+        margin-bottom: 0;
+      }
+    }
+
+    ul {
+      li {
+        margin-bottom: lh(.5);
+      }
+    }
+
+    div#seq_content {
+      h1 {
+        background: none;
+        margin-bottom: lh();
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+    }
+
+    ol.vert-mod {
+      padding: 0;
+      margin: 0;
+
+      > li {
+        @extend .clearfix;
+        @extend .problem-set;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 15px;
+        padding: 0 0 15px;
+
+        header {
+          @extend h1.top-header;
+          @include border-radius(0 4px 0 0);
+          margin-bottom: -16px;
+
+          h1 {
+            margin: 0;
+          }
+
+          h2 {
+            float: right;
+            margin-right: 0;
+            margin-top: 8px;
+            text-align: right;
+            padding-right: 0;
+            border-right: 0;
+          }
+        }
+
+        &:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        .histogram {
+          width: 200px;
+          height: 150px;
+        }
+
+        ul {
+          list-style: disc outside none;
+          padding-left: 1em;
+        }
+
+        nav.sequence-bottom {
+          ul {
+          list-style: none;
+          padding: 0;
+          }
+        }
+      }
+    }
+
+    section.tutorials {
+      h2 {
+        margin-bottom: lh();
+      }
+
+      ul {
+        margin: 0;
+        @include clearfix();
+
+        li {
+          width: flex-grid(3, 9);
+          float: left;
+          margin-right: flex-gutter(9);
+          margin-bottom: lh();
+
+          &:nth-child(3n) {
+            margin-right: 0;
+          }
+
+          &:nth-child(3n+1) {
+            clear: both;
+          }
+
+          a {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+
+    div.staff_info {
+      @include clearfix();
+      white-space: pre-wrap;
+      border-top: 1px solid #ccc;
+      padding-top: lh();
+      margin-top: lh();
+      line-height: lh();
+      font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
+    }
+
+    div.ui-slider {
+      border: 1px solid #aaa;
+      background: #ddd;
+      @include box-shadow(inset 0 1px 0 #eee);
+      @include border-radius(0);
+
+      a.ui-slider-handle {
+        @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
+        background: $mit-red url(../images/slider-bars.png) center center no-repeat;
+        border: 1px solid darken($mit-red, 20%);
+        cursor: pointer;
+
+        &:hover, &:focus {
+          background-color: lighten($mit-red, 10%);
+          outline: none;
+        }
+      }
+    }
+
+    div.ui-tabs {
+      border: 0;
+      @include border-radius(0);
+      margin: 0;
+      padding: 0;
+
+      .ui-tabs-nav {
+        background: none;
+        border: 0;
+        margin-bottom: lh(.5);
+      }
+
+      .ui-tabs-panel {
+        @include border-radius(0);
+        padding: 0;
+      }
+    }
+  }
+
+  &.closed {
+    section.course-index {
+      width: flex-grid(.6);
+      overflow: hidden;
+
+      header#open_close_accordion {
+        padding: 0;
+        min-height: 47px;
+
+        a {
+          background-image: url('../images/slide-right-icon.png');
+        }
+
+        h2 {
+          visibility: hidden;
+          width: 10px;
+        }
+      }
+
+      div#accordion {
+        visibility: hidden;
+        width: 10px;
+        padding: 0;
+
+       nav {
+         white-space: pre;
+         overflow: hidden;
+
+         ul {
+           overflow: hidden;
+           white-space: nowrap;
+         }
+        }
+      }
+    }
+
+    section.course-content {
+      width: flex-grid(11.5) + flex-gutter();
+    }
+  }
+}
