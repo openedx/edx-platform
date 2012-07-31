@@ -48,7 +48,7 @@ $discussion_input_width: 85%;
       margin-top: flex-gutter(8);
     }
   }
-  
+
   .discussion-title {
     @include discussion-font;
     @include discussion-clickable;
@@ -104,16 +104,16 @@ $discussion_input_width: 85%;
     float: left;
     width: 70%;
   }
-  .new-post-form {
-    .new-post-title, .new-post-body {
+  .new-post-form, .discussion-thread-edit {
+    .title-input, .body-input {
       @include discussion-font;
       display: block !important;
       width: $discussion_input_width !important;
     }
-    .new-post-body {
+    .body-input {
       margin-top: 10px;
     }
-    .discussion-new-post {
+    .control-button {
       @include discussion-font;
       color: #1d9dd9;
       display: block;
@@ -126,6 +126,12 @@ $discussion_input_width: 85%;
       min-height: 30px;
       height: 100%;
     }
+  }
+  .discussion-content-edit, .discussion-reply-new {
+    .control-button {
+      display: inline-block;
+    }
+    margin: 10px 0 10px 0;
   }
   .thread {
     //display: none;
