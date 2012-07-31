@@ -228,6 +228,11 @@ case `uname -s` in
             sudo easy_install pip  
         }
 
+        if ! grep -Eq ^1.7 <(virtualenv --version 2>/dev/null); then
+            output "Installing virtualenv >1.7"
+            sudo pip install 'virtualenv>1.7' virtualenvwrapper
+        fi
+
         output "Installing virtualenv"
         sudo pip install 'virtualenv>1.7' virtualenvwrapper 
 
