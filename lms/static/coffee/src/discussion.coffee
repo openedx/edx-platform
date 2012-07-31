@@ -197,7 +197,7 @@ Discussion =
       else
         view = {
           id: id
-          showWatchCheckbox: $discussionContent.parent(".thread").attr("_id") not in $$user_info.subscribed_thread_ids
+          showWatchCheckbox: $discussionContent.parents(".thread").attr("_id") not in $$user_info.subscribed_thread_ids
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Markdown.makeWmdEditor $local(".reply-body"), "-reply-body-#{id}", Discussion.urlFor('upload')
@@ -339,6 +339,11 @@ Discussion =
     raw_text = $local(".content-body").html()
     converter = Markdown.getMathCompatibleConverter()
     $local(".content-body").html(converter.makeHtml(raw_text))
+    id = $content.attr("_id")
+    if not ($$annotated_content_info[id] || [])['editable']
+      $local(".discussion-edit").remove()
+
+    
 
   bindDiscussionEvents: (discussion) ->
     $discussion = $(discussion)
