@@ -4,7 +4,6 @@
 <%! import urllib %>
 
 <%def name="render_thread(course_id, thread, edit_thread=False, show_comments=False)">
-  
   <div class="thread" _id="${thread['id']}">
     ${render_content(thread, "thread", edit_thread=edit_thread, show_comments=show_comments)}
     % if show_comments:
@@ -83,10 +82,13 @@
 
 <%def name="render_info(content)">
   ${time_ago_in_words(parse(content['updated_at']))} ago by
-  % if content.get('user_id', False):
-    user No.${content['user_id']}
-  % else:
+  % if content['anonymous']:
     anonymous
+  % else:
+    user No.${content['user_id']}
+  % endif
+  % if content.get('comments_count', -1) >= 0:
+    / ${content['comments_count']} comment(s)
   % endif
 </%def>
 

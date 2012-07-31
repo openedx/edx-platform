@@ -78,9 +78,23 @@ def forum_form_discussion(request, course_id, discussion_id):
 
 def render_single_thread(request, course_id, thread_id):
     
+    def get_annotated_content_info(thread, user_id):
+        infos = {}
+        def _annotate(content):
+            infos[str(content['id'])] = {
+                'editable': str(content['user_id']) == str(user_id), # TODO may relax this to instructors
+            }
+            for child in content['children']:
+                _annotate(child)
+        _annotate(thread)
+        return infos
+
+    thread = comment_client.get_thread(thread_id, recursive=True)
+
     context = {
-        'thread': comment_client.get_thread(thread_id, recursive=True),
+        'thread': thread,
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
+        'annotated_content_info': json.dumps(get_annotated_content_info(thread=thread, user_id=request.user.id)),
         'tags': comment_client.get_threads_tags(raw=True),
         'course_id': course_id,
     }
