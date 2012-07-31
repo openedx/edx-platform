@@ -35,8 +35,10 @@ Discussion =
       <input type="text" class="new-post-title title-input" placeholder="Title"/>
       <div class="new-post-body body-input"></div>
       <input class="new-post-tags" placeholder="Tags"/>
-      <a class="discussion-submit-post control-button" href="javascript:void(0)">Submit</a>
-      <a class="discussion-cancel-post control-button" href="javascript:void(0)">Cancel</a>
+      <div class = "new-post-control">
+        <a class="discussion-cancel-post" href="javascript:void(0)">Cancel</a>
+        <a class="discussion-submit-post control-button" href="javascript:void(0)">Submit</a>
+      </div>
     </form>
   """
 
@@ -452,7 +454,7 @@ Discussion =
           interactive: true
           defaultText: "Tag your post: press enter after each tag"
           height: "30px"
-          width: "85%"
+          width: "90%"
           removeWithBackspace: true
         $local(".discussion-submit-post").click ->
           handleSubmitNewPost(this)
