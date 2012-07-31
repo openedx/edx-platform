@@ -54,6 +54,7 @@ GITHUB_REPO_ROOT = ENV_ROOT / "data"
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    ASKBOT_ROOT / "askbot" / "skins",
 ]
 STATICFILES_DIRS += [
     (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
