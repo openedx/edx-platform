@@ -72,11 +72,7 @@ clone_repos() {
         git clone git@github.com:MITx/mitx.git
     fi
      
-    if [[ -d "$BASE/mitx/askbot/.git" ]]; then
-        output "Pulling askbot"
-        cd "$BASE/mitx/askbot"
-        git pull 
-    else
+    if [[ ! -d "$BASE/mitx/askbot/.git" ]]; then
         output "Cloning askbot as a submodule of mitx"
         cd "$BASE/mitx"
         git submodule update --init
