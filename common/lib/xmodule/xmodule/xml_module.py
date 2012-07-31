@@ -163,7 +163,7 @@ class XmlDescriptor(XModuleDescriptor):
         return etree.parse(file_object).getroot()
 
     @classmethod
-    def definition_loader(cls, xml_object, system, location):
+    def load_definition(cls, xml_object, system, location):
         '''Load a descriptor definition from the specified xml_object.
         Subclasses should not need to override this except in special
         cases (e.g. html module)'''
@@ -225,7 +225,7 @@ class XmlDescriptor(XModuleDescriptor):
         slug = xml_object.get('url_name', xml_object.get('slug'))
         location = Location('i4x', org, course, xml_object.tag, slug)
 
-        def metadata_loader():
+        def load_metadata():
             metadata = {}
             for attr in cls.metadata_attributes:
                 val = xml_object.get(attr)
@@ -237,8 +237,8 @@ class XmlDescriptor(XModuleDescriptor):
                     metadata[attr_map.metadata_key] = attr_map.to_metadata(val)
             return metadata
 
-        definition = cls.definition_loader(xml_object, system, location)
-        metadata = metadata_loader()
+        definition = cls.load_definition(xml_object, system, location)
+        metadata = load_metadata()
         # VS[compat] -- just have the url_name lookup once translation is done
         slug = xml_object.get('url_name', xml_object.get('slug'))
         return cls(

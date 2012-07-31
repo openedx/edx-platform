@@ -20,6 +20,7 @@ from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
 from xmodule.modulestore import Location
+from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
@@ -233,7 +234,7 @@ def jump_to(request, location):
 
     # Complain if there's not data for this location
     try:
-        (course_id, chapter, section, position) = modulestore().path_to_location(location)
+        (course_id, chapter, section, position) = path_to_location(modulestore(), location)
     except ItemNotFoundError:
         raise Http404("No data at this location: {0}".format(location))
     except NoPathToItem:
