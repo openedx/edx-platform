@@ -10,7 +10,7 @@ class @CapaDescriptor
     save: -> @edit_box.val()
 
     buildParser: ->
-        $.get "/static/grammar.jspeg", (data) =>
+        $.get "/static/grammars/main.jspeg", (data) =>
             @grammar = data
             @parser = PEG.buildParser @grammar
         , "text"
@@ -55,6 +55,17 @@ class @CapaDescriptor
             if section.type == 'paragraph'
                 newel = create_text_element(section.text)
                 problem.append(newel)
+
+            else if section.type == 'image'
+                center = $(doc.createElement('center'))
+                img = $(doc.createElement('img'))
+                img.attr 'src', section.url
+                center.append img
+                if section.title
+                    title = create_text_element(section.title)
+                    center.append doc.createElement('br')
+                    center.append title
+                problem.append center
 
             else if section.type == 'linebreaks'
                 text = create_text_element('')

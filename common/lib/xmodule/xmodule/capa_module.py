@@ -446,6 +446,8 @@ class CapaModule(XModule):
         try:
             old_state = self.lcp.get_state()
             lcp_id = self.lcp.problem_id
+            import pdb
+            pdb.set_trace()
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?
