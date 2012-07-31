@@ -25,7 +25,7 @@ setup(
             "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "html = xmodule.html_module:HtmlDescriptor",
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-            "malformed = xmodule.malformed_module:MalformedDescriptor",
+            "error = xmodule.error_module:ErrorDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.vertical_module:VerticalDescriptor",
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",

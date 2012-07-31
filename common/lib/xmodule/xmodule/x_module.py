@@ -455,14 +455,14 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
             descriptor = class_.from_xml(xml_data, system, org, course)
         except (ResourceNotFoundError, XMLSyntaxError) as err:
-            # Didn't load properly.  Fall back on loading as a malformed
+            # Didn't load properly.  Fall back on loading as an error
             # descriptor.  This should never error due to formatting.
 
             # Put import here to avoid circular import errors
-            from xmodule.malformed_module import MalformedDescriptor
+            from xmodule.error_module import ErrorDescriptor
 
             #system.error_handler("Error loading from xml.")
-            descriptor = MalformedDescriptor.from_xml(xml_data, system, org, course)
+            descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course)
 
         return descriptor
 
@@ -597,10 +597,18 @@ class ModuleSystem(object):
     Note that these functions can be closures over e.g. a django request
     and user, or other environment-specific info.
     '''
-    def __init__(self, ajax_url, track_function,
-                 get_module, render_template, replace_urls,
-                 user=None, filestore=None, debug=False,
-                 xqueue_callback_url=None, xqueue_default_queuename="null"):
+    def __init__(self,
+                 ajax_url,
+                 track_function,
+                 get_module,
+                 render_template,
+                 replace_urls,
+                 user=None,
+                 filestore=None,
+                 debug=False,
+                 xqueue_callback_url=None,
+                 xqueue_default_queuename="null",
+                 is_staff=False):
         '''
         Create a closure around the system environment.
 
@@ -626,6 +634,9 @@ class ModuleSystem(object):
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
+
+        is_staff - Is the user making the request a staff user?
+             TODO (vshnayder): this will need to change once we have real user roles.
         '''
         self.ajax_url = ajax_url
         self.xqueue_callback_url = xqueue_callback_url
@@ -637,6 +648,7 @@ class ModuleSystem(object):
         self.DEBUG = self.debug = debug
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
+        self.is_staff = is_staff
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

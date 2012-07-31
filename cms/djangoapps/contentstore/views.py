@@ -214,7 +214,10 @@ def preview_module_system(request, preview_id, descriptor):
         get_module=partial(get_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
-        replace_urls=replace_urls
+        replace_urls=replace_urls,
+        # TODO (vshnayder): CMS users won't see staff view unless they are CMS staff.
+        # is that what we want?
+        is_staff=request.user.is_staff
     )
 
 

@@ -9,18 +9,26 @@ import logging
 
 log = logging.getLogger(__name__)
 
-class MalformedModule(XModule):
+class ErrorModule(XModule):
     def get_html(self):
         '''Show an error.
         TODO (vshnayder): proper style, divs, etc.
         '''
-        return "Malformed content--not showing through get_html()"
+        if not self.system.is_staff:
+            return self.system.render_template('module-error.html')
 
-class MalformedDescriptor(EditingDescriptor):
+        # staff get to see all the details
+        return self.system.render_template('module-error-staff.html', {
+            'data' : self.definition['data'],
+            # TODO (vshnayder): need to get non-syntax errors in here somehow
+            'error' : self.definition.get('error', 'Error not available')
+            })
+
+class ErrorDescriptor(EditingDescriptor):
     """
     Module that provides a raw editing view of broken xml.
     """
-    module_class = MalformedModule
+    module_class = ErrorModule
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -29,38 +37,39 @@ class MalformedDescriptor(EditingDescriptor):
         Does not try to parse the data--just stores it.
         '''
 
+        definition = {}
         try:
-            # If this is already a malformed tag, don't want to re-wrap it.
+            # If this is already an error tag, don't want to re-wrap it.
             xml_obj = etree.fromstring(xml_data)
-            if xml_obj.tag == 'malformed':
+            if xml_obj.tag == 'error':
                 xml_data = xml_obj.text
-            # TODO (vshnayder): how does one get back from this to a valid descriptor?
-            # For now, have to fix manually.
-        except etree.XMLSyntaxError:
-            pass
+        except etree.XMLSyntaxError as err:
+            # Save the error to display later
+            definition['error'] = str(err)
 
-        definition = { 'data' : xml_data }
-        # TODO (vshnayder): Do we need a valid slug here?  Just pick a random
+
+        definition['data'] = xml_data
+        # TODO (vshnayder): Do we need a unique slug here?  Just pick a random
         # 64-bit num?
-        location = ['i4x', org, course, 'malformed', 'slug']
+        location = ['i4x', org, course, 'error', 'slug']
         metadata = {}  # stays in the xml_data
 
         return cls(system, definition, location=location, metadata=metadata)
 
     def export_to_xml(self, resource_fs):
         '''
-        If the definition data is invalid xml, export it wrapped in a malformed
+        If the definition data is invalid xml, export it wrapped in an "error"
         tag.  If it is valid, export without the wrapper.
 
         NOTE: There may still be problems with the valid xml--it could be
         missing required attributes, could have the wrong tags, refer to missing
-        files, etc.
+        files, etc.  That would just get re-wrapped on import.
         '''
         try:
            xml = etree.fromstring(self.definition['data'])
            return etree.tostring(xml)
         except etree.XMLSyntaxError:
             # still not valid.
-            root = etree.Element('malformed')
+            root = etree.Element('error')
             root.text = self.definition['data']
             return etree.tostring(root)
