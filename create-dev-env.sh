@@ -163,6 +163,11 @@ cat<<EO
 
   To compile scipy and numpy from source use the -c option
 
+  !!! Do not run this script from an existing virtualenv !!!
+  
+  If you are in a ruby/python virtualenv please start a new
+  shell. 
+
 EO
 info
 output "Press return to begin or control-C to abort"
@@ -172,12 +177,15 @@ read dummy
 exec > >(tee $LOG)
 exec 2>&1
 
-if [[ -f $HOME/.rvmrc ]]; then
-    output "$HOME/.rvmrc alredy exists, not adding $RUBY_DIR"
-else
-    output "Creating $HOME/.rmrc so rvm uses $RUBY_DIR"
+if ! grep -q "export rvm_path=$RUBY_DIR" ~/.rvmrc; then
+    if [[ -f $HOME/.rvmrc ]]; then
+        output "Copying existing .rvmrc to .rvmrc.bak"
+        cp $HOME/.rvmrc $HOME/.rvmrc.bak
+    fi
+    output "Creating $HOME/.rvmrc so rvm uses $RUBY_DIR"
     echo "export rvm_path=$RUBY_DIR" > $HOME/.rvmrc
 fi
+
 mkdir -p $BASE
 case `uname -s` in
     [Ll]inux)
