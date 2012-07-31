@@ -194,9 +194,6 @@ class XModule(HTMLSnippet):
         self.metadata = kwargs.get('metadata', {})
         self._loaded_children = None
 
-    def get_name(self):
-        return self.name
-
     def get_children(self):
         '''
         Return module instances for all the children of this module.

@@ -17,9 +17,6 @@ def traverse_tree(course):
     queue = [course]
     while len(queue) > 0:
         node = queue.pop()
-#        print '{0}:'.format(node.location)
-#        if 'data' in node.definition:
-#            print '{0}'.format(node.definition['data'])
         queue.extend(node.get_children())
 
     return True
