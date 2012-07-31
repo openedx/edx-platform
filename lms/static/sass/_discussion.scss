@@ -1,7 +1,7 @@
 $comment_margin_left: 30px;
 $discussion_title_size: 1.6em;
 $comment_title_size: 1.2em;
-$comment_body_size: 1.0em;
+$comment_body_size: 0.9em;
 $comment_info_size: 0.75em;
 $discussion_input_width: 90%;
 
@@ -18,8 +18,8 @@ $discussion_input_width: 90%;
 
 .course-content {
   .discussion {
-    margin-left: flex-gutter(4);
-    margin-top: flex-gutter(6);
+    margin-left: flex-gutter();
+    margin-top: flex-gutter();
   }
 }
 
