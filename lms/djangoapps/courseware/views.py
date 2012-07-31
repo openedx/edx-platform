@@ -184,34 +184,54 @@ def index(request, course_id, chapter=None, section=None,
     chapter = clean(chapter)
     section = clean(section)
 
-    context = {
-        'csrf': csrf(request)['csrf_token'],
-        'accordion': render_accordion(request, course, chapter, section),
-        'COURSE_TITLE': course.title,
-        'course': course,
-        'init': '',
-        'content': ''
-    }
+    try:
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'accordion': render_accordion(request, course, chapter, section),
+            'COURSE_TITLE': course.title,
+            'course': course,
+            'init': '',
+            'content': ''
+            }
 
-    look_for_module = chapter is not None and section is not None
-    if look_for_module:
-        # TODO (cpennington): Pass the right course in here
+        look_for_module = chapter is not None and section is not None
+        if look_for_module:
+            # TODO (cpennington): Pass the right course in here
 
-        section_descriptor = get_section(course, chapter, section)
-        if section_descriptor is not None:
-            student_module_cache = StudentModuleCache(request.user,
-                                                      section_descriptor)
-            module, _, _, _ = get_module(request.user, request,
-                                         section_descriptor.location,
-                                         student_module_cache)
-            context['content'] = module.get_html()
+            section_descriptor = get_section(course, chapter, section)
+            if section_descriptor is not None:
+                student_module_cache = StudentModuleCache(request.user,
+                                                          section_descriptor)
+                module, _, _, _ = get_module(request.user, request,
+                                             section_descriptor.location,
+                                             student_module_cache)
+                context['content'] = module.get_html()
+            else:
+                log.warning("Couldn't find a section descriptor for course_id '{0}',"
+                            "chapter '{1}', section '{2}'".format(
+                                course_id, chapter, section))
+
+
+        result = render_to_response('courseware.html', context)
+    except:
+        # In production, don't want to let a 500 out for any reason
+        if settings.DEBUG:
+            raise
         else:
-            log.warning("Couldn't find a section descriptor for course_id '{0}',"
-                        "chapter '{1}', section '{2}'".format(
-                        course_id, chapter, section))
+            log.exception("Error in index view: user={user}, course={course},"
+                          " chapter={chapter} section={section}"
+                          "position={position}".format(
+                              user=request.user,
+                              course=course,
+                              chapter=chapter,
+                              section=section,
+                              position=position
+                              ))
+            try:
+                result = render_to_response('courseware-error.html', {})
+            except:
+                result = HttpResponse("There was an unrecoverable error")
 
-
-    result = render_to_response('courseware.html', context)
     return result
 
 @ensure_csrf_cookie
