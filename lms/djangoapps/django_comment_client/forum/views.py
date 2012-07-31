@@ -40,6 +40,12 @@ def render_discussion(request, course_id, threads, discussion_id=None, search_te
     }
     return render_to_string('discussion/inline.html', context)
 
+def inline_discussion(request, course_id, discussion_id):
+    print "rendering inline"
+    threads = comment_client.get_threads(discussion_id, recursive=False)
+    html = render_discussion(request, course_id, threads, discussion_id)
+    return HttpResponse(html, content_type="text/plain")
+
 def render_search_bar(request, course_id, discussion_id=None, text=''):
     if not discussion_id:
         return ''
@@ -54,10 +60,6 @@ def forum_form_discussion(request, course_id, discussion_id):
 
     course = check_course(course_id)
 
-    _, course_name, _ = course_id.split('/')
-
-    url_course_id = course_id.replace('/', '_').replace('.', '_')
-
     search_text = request.GET.get('text', '')
 
     if len(search_text) > 0:
@@ -67,9 +69,7 @@ def forum_form_discussion(request, course_id, discussion_id):
 
     context = {
         'csrf': csrf(request)['csrf_token'],
-        'COURSE_TITLE': course.title,
         'course': course,
-        'init': '',
         'content': render_discussion(request, course_id, threads, discussion_id, search_text),
         'accordion': render_accordion(request, course, discussion_id),
     }
