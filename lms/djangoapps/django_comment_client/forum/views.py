@@ -70,7 +70,7 @@ def forum_form_discussion(request, course_id, discussion_id):
     context = {
         'csrf': csrf(request)['csrf_token'],
         'course': course,
-        'content': render_discussion(request, course_id, threads, discussion_id, search_text),
+        'content': render_discussion(request, course_id, threads, discussion_id=discussion_id, search_text=search_text),
         'accordion': render_accordion(request, course, discussion_id),
     }
 
