@@ -29,12 +29,14 @@ $discussion_input_width: 85%;
     display: inline-block;
     width: flex-grid(12);
     .discussion-link {
+      @include button;
       display: inline-block;
-      margin-left: flex-gutter();
-      @include discussion-font;
-      color: #1d9dd9;
-      margin-top: flex-gutter();
-      font-weight: bold; 
+      margin-left: 1%;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      padding-top: 9px;
+      font-size: inherit;
     }
     .discussion-search-text {
       @include discussion-font;
@@ -45,7 +47,7 @@ $discussion_input_width: 85%;
     }
     .search-within {
       display: block;
-      margin-top: flex-gutter(8);
+      margin-top: flex-gutter();
     }
   }
 
