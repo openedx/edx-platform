@@ -114,13 +114,12 @@ div.video {
         @extend .dullify;
         float: left;
         list-style: none;
-        margin-right: lh();
+        margin: 0 lh() 0 0;
         padding: 0;
 
         li {
           float: left;
           margin-bottom: 0;
-
 
           a {
             border-bottom: none;
@@ -183,6 +182,8 @@ div.video {
             ol.video_speeds {
               display: block;
               opacity: 1;
+              padding: 0;
+              margin: 0;
             }
           }
 
@@ -210,6 +211,7 @@ div.video {
               font-weight: normal;
               letter-spacing: 1px;
               padding: 0 lh(.25) 0 lh(.5);
+              line-height: 46px;
               text-transform: uppercase;
             }
 
@@ -218,6 +220,7 @@ div.video {
               font-weight: bold;
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
+              line-height: 46px;
             }
 
             &:hover, &:active, &:focus {
@@ -422,10 +425,12 @@ div.video {
   }
 
   ol.subtitles {
+    padding-left: 0;
     float: left;
     max-height: 460px;
     overflow: auto;
     width: flex-grid(3, 9);
+    margin: 0;
 
     li {
       border: 0;
