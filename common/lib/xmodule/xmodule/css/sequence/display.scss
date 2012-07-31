@@ -3,8 +3,9 @@ nav.sequence-nav {
   // import from external sources.
   @extend .topbar;
 
-  border-bottom: 1px solid darken($cream, 20%);
-  margin-bottom: $body-line-height;
+  border-bottom: 1px solid #ddd;
+  margin: (-(lh())) (-(lh())) lh() (-(lh()));
+  background: #eee;
   position: relative;
   @include border-top-right-radius(4px);
 
@@ -12,6 +13,8 @@ nav.sequence-nav {
     @include box-sizing(border-box);
     display: table;
     height: 100%;
+    margin: 0;
+    padding-left: 0;
     padding-right: flex-grid(1, 9);
     width: 100%;
 
@@ -20,7 +23,7 @@ nav.sequence-nav {
     }
 
     li {
-      border-left: 1px solid darken($cream, 20%);
+      border-left: 1px solid #eee;
       display: table-cell;
       min-width: 20px;
 
@@ -32,17 +35,15 @@ nav.sequence-nav {
         background-repeat: no-repeat;
 
         &:hover {
-          background-color: lighten($cream, 3%);
+          background-color: #eee;
         }
       }
 
       .visited {
-        background-color: #DCCDA2;
+        background-color: #ddd;
         background-repeat: no-repeat;
-        @include box-shadow(inset 0 0 3px darken(#dccda2, 10%));
 
         &:hover {
-          background-color: $cream;
           background-position: center center;
         }
       }
@@ -214,7 +215,7 @@ nav.sequence-nav {
       &.prev, &.next {
 
         a {
-          background-color: darken($cream, 5%);
+          // background-color: darken($cream, 5%);
           background-position: center center;
           background-repeat: no-repeat;
           border-left: 1px solid darken(#f6efd4, 20%);
@@ -241,7 +242,7 @@ nav.sequence-nav {
           background-image: url('../images/sequence-nav/previous-icon.png');
 
           &:hover {
-            background-color: $cream;
+            // background-color: $cream;
           }
         }
       }
@@ -251,7 +252,7 @@ nav.sequence-nav {
           background-image: url('../images/sequence-nav/next-icon.png');
 
           &:hover {
-            background-color: $cream;
+            // background-color: $cream;
           }
         }
       }
@@ -273,9 +274,8 @@ nav.sequence-bottom {
 
   ul {
     @extend .clearfix;
-    background-color: darken(#F6EFD4, 5%);
-    background-color: darken($cream, 5%);
-    border: 1px solid darken(#f6efd4, 20%);
+    background-color: #eee;
+    border: 1px solid #ddd;
     @include border-radius(3px);
     @include box-shadow(inset 0 0 0 1px lighten(#f6efd4, 5%));
     @include inline-block();
@@ -297,14 +297,13 @@ nav.sequence-bottom {
           width: 45px;
 
           &:hover {
-            background-color: $cream;
-            color: darken($cream, 60%);
+            background-color: #ddd;
+            color: #000;
             opacity: .5;
             text-decoration: none;
           }
 
           &.disabled {
-            background-color: lighten($cream, 10%);
             opacity: .4;
           }
         }
