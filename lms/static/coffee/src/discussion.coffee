@@ -169,9 +169,9 @@ Discussion =
         autocomplete:
           remoteDataType: 'json'
         interactive: true
-        defaultText: "add a tag"
+        defaultText: "Tag your post"
         height: "30px"
-        width: "83.5%"
+        width: "85%"
         removeWithBackspace: true
 
   bindContentEvents: (content) ->

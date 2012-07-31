@@ -74,8 +74,8 @@ $discussion_input_width: 85%;
     }
   }
   .discussion-votes {
-    margin-right: 8px;
-    margin-top: 5px;
+    margin-right: 4%;
+    margin-top: 2%;
     text-align: center;
     height: flex-grid(3);
     float: left;
@@ -102,7 +102,7 @@ $discussion_input_width: 85%;
   .discussion-right-wrapper {
     min-height: 40px;
     float: left;
-    width: 70%;
+    width: 85%;
   }
   .new-post-form, .discussion-thread-edit {
     .title-input, .body-input {
@@ -111,17 +111,38 @@ $discussion_input_width: 85%;
       width: $discussion_input_width !important;
     }
     .discussion-errors {
-      color: red;
+      display: block;
+      color: #8F0E0E;
+      margin-left: -5%;
     }
     .new-post-body {
-      margin-top: 10px;
+      margin-top: flex-gutter();
     }
-    .control-button {
+    .tagsinput {
+      margin-top: flex-gutter();
+      background: #FAFAFA;
+      border: 1px solid #C8C8C8;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
+      -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      vertical-align: top;
+      -webkit-font-smoothing: antialiased;
+      }
+      .control-button {
       @include discussion-font;
       color: #1d9dd9;
       display: block;
       margin-top: 10px;
       font-weight: bold;
+      margin-left: flex-grid(9);
     }
   }
   .discussion-content-edit, .discussion-reply-new {
