@@ -82,7 +82,6 @@ clone_repos() {
         git submodule update --init
     fi
     
-    cd "$BASE"
     # By default, dev environments start with a copy of 6.002x
     cd "$BASE"
     mkdir -p "$BASE/data"
