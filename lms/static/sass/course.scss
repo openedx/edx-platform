@@ -8,22 +8,40 @@
 @import 'base/extends';
 @import 'base/animations';
 
-// Course styles
-@import 'course/courseware_subnav';
-
-// Courseware styles
-@import 'course/old/base/variables';
-@import 'course/old/base/extends';
-@import 'course/old/base/functions';
-
+// Course base / layout styles
+@import 'course/layout/courseware_subnav';
+@import 'course/base/base';
+@import 'course/base/extends';
 @import 'module/module-styles.scss';
 
-@import 'course/old/courseware/courseware';
-@import 'course/old/courseware/sidebar';
-@import 'course/old/courseware/amplifier';
-// @import 'course/old/courseware/problems';
+// courseware
+@import 'course/courseware/courseware';
+@import 'course/courseware/sidebar';
+@import 'course/courseware/amplifier';
 
-@import "course/old/info";
+// wiki
+@import "course/wiki/basic-html";
+@import "course/wiki/sidebar";
+@import "course/wiki/create";
+@import "course/wiki/wiki";
+@import "course/wiki/table";
 
-@import "course/old/plugins/jquery-ui-1.8.16.custom", "course/old/plugins/jquery.qtip.min";
-@import "course/old/textbook";
+// pages
+@import "course/info";
+@import "course/textbook";
+@import "course/profile";
+@import "course/gradebook";
+
+// Askbot / Discussion styles
+@import "course/discussion/askbot-original";
+@import "course/discussion/discussion";
+@import "course/discussion/sidebar";
+@import "course/discussion/questions";
+@import "course/discussion/tags";
+@import "course/discussion/question-view" ;
+@import "course/discussion/answers";
+@import "course/discussion/forms";
+@import "course/discussion/form-wmd-toolbar";
+@import "course/discussion/modals";
+@import "course/discussion/profile";
+@import "course/discussion/badges";

@@ -13,17 +13,17 @@ You should be familiar with the following.  If you're not, go read some docs...
  - css
  - git
  - mako templates -- we use these instead of django templates, because they support embedding real python.
- 
+
 ## Other relevant terms
 
  - CAPA -- lon-capa.org -- content management system that has defined a standard for online learning and assessment materials.  Many of our materials follow this standard.
-    - TODO: add more details / link to relevant docs.  lon-capa.org is not immediately intuitive.  
+    - TODO: add more details / link to relevant docs.  lon-capa.org is not immediately intuitive.
     - lcp = loncapa problem
 
 
 ## Parts of the system
 
-  - LMS -- Learning Management System.   The student-facing parts of the system.  Handles student accounts, displaying videos, tutorials, exercies, problems, etc. 
+  - LMS -- Learning Management System.   The student-facing parts of the system.  Handles student accounts, displaying videos, tutorials, exercies, problems, etc.
 
   - CMS -- Course Management System.  The instructor-facing parts of the system.  Allows instructors to see and modify their course, add lectures, problems, reorder things, etc.
 
@@ -42,7 +42,7 @@ You should be familiar with the following.  If you're not, go read some docs...
 
 ## High Level Entities in the code
 
-### Common libraries 
+### Common libraries
 
 - xmodule: generic learning modules. *x* can be sequence, video, template, html,
            vertical, capa, etc.  These are the things that one puts inside sections
@@ -51,7 +51,7 @@ You should be familiar with the following.  If you're not, go read some docs...
     - XModuleDescriptor: This defines the problem and all data and UI needed to edit
            that problem. It is unaware of any student data, but can be used to retrieve
            an XModule, which is aware of that student state.
-             
+
     - XModule: The XModule is a problem instance that is particular to a student. It knows
            how to render itself to html to display the problem, how to score itself,
            and how to handle ajax calls from the front end.
@@ -59,19 +59,25 @@ You should be familiar with the following.  If you're not, go read some docs...
     - Both XModule and XModuleDescriptor take system context parameters. These are named
            ModuleSystem and DescriptorSystem respectively. These help isolate the XModules
            from any interactions with external resources that they require.
-           
+
            For instance, the DescriptorSystem has a function to load an XModuleDescriptor
            from a Location object, and the ModuleSystem knows how to render things,
            track events, and complain about 404s
-    - TODO: document the system context interface--it's different in `x_module.XModule.__init__` and in `x_module tests.py` (do this in the code, not here)
+
+    - `course.xml` format.  We use python setuptools to connect supported tags with the descriptors that handle them.  See `common/lib/xmodule/setup.py`.  There are checking and validation tools in `common/validate`.
+
+         - the xml import+export functionality is in `xml_module.py:XmlDescriptor`, which is a mixin class that's used by the actual descriptor classes.
+
+         - There is a distinction between descriptor _definitions_ that stay the same for any use of that descriptor (e.g. here is what a particular problem is), and _metadata_ describing how that descriptor is used (e.g. whether to allow checking of answers, due date, etc).  When reading in `from_xml`, the code pulls out the metadata attributes into a separate structure, and puts it back on export.
+
     - in `common/lib/xmodule`
 
-- capa modules -- defines `LoncapaProblem` and many related things.  
+- capa modules -- defines `LoncapaProblem` and many related things.
     - in `common/lib/capa`
 
-### LMS 
+### LMS
 
-The LMS is a django site, with root in `lms/`.  It runs in many different environments--the settings files are in `lms/envs`. 
+The LMS is a django site, with root in `lms/`.  It runs in many different environments--the settings files are in `lms/envs`.
 
 - We use the Django Auth system, including the is_staff and is_superuser flags.  User profiles and related code lives in `lms/djangoapps/student/`.   There is support for groups of students (e.g. 'want emails about future courses', 'have unenrolled', etc) in `lms/djangoapps/student/models.py`.
 
@@ -79,19 +85,19 @@ The LMS is a django site, with root in `lms/`.  It runs in many different enviro
     - `lms/djangoapps/courseware/models.py`
 
 - Core rendering path:
-  - `lms/urls.py` points to `courseware.views.index`, which gets module info from the course xml file, pulls list of `StudentModule` objects for this user (to avoid multiple db hits).  
+  - `lms/urls.py` points to `courseware.views.index`, which gets module info from the course xml file, pulls list of `StudentModule` objects for this user (to avoid multiple db hits).
 
   - Calls `render_accordion` to render the "accordion"--the display of the course structure.
 
   - To render the current module, calls `module_render.py:render_x_module()`, which gets the `StudentModule` instance, and passes the `StudentModule` state and other system context to the module constructor the get an instance of the appropriate module class for this user.
 
   - calls the module's `.get_html()` method.  If the module has nested submodules, render_x_module() will be called again for each.
-  
+
   - ajax calls go to `module_render.py:modx_dispatch()`, which passes it to the module's `handle_ajax()` function, and then updates the grade and state if they changed.
 
   - [This diagram](https://github.com/MITx/mitx/wiki/MITx-Architecture) visually shows how the clients communicate with problems + modules.
-  
-- See `lms/urls.py` for the wirings of urls to views.  
+
+- See `lms/urls.py` for the wirings of urls to views.
 
 - Tracking: there is support for basic tracking of client-side events in `lms/djangoapps/track`.
 
@@ -110,7 +116,7 @@ environments, defined in `cms/envs`.
 
 - _mako_  -- we use this for templates, and have wrapper called mitxmako that makes mako look like the django templating calls.
 
-We use a fork of django-pipeline to make sure that the js and css always reflect the latest `*.coffee` and `*.sass` files (We're hoping to get our changes merged in the official version soon).  This works differently in development and production.  Test uses the production settings.  
+We use a fork of django-pipeline to make sure that the js and css always reflect the latest `*.coffee` and `*.sass` files (We're hoping to get our changes merged in the official version soon).  This works differently in development and production.  Test uses the production settings.
 
 In production, the django `collectstatic` command recompiles everything and puts all the generated static files in a static/ dir.  A starting point in the code is `django-pipeline/pipeline/packager.py:pack`.
 
@@ -126,8 +132,6 @@ In development, we don't use collectstatic, instead accessing the files in place
 See `testing.md`.
 
 ## TODO:
-
-- update lms/envs/README.txt
 
 - describe our production environment
 
