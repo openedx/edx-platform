@@ -293,7 +293,7 @@ class MongoModuleStore(ModuleStore):
         # Check that it's actually in this modulestore.
         item = self._find_one(location)
         # now get the parents
-        items = self.collection.find({'definition.children': str(location)},
+        items = self.collection.find({'definition.children': location.url()},
                                     {'_id': True})
         return [i['_id'] for i in items]
 
