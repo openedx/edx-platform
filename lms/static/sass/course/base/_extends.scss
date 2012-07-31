@@ -84,7 +84,8 @@ h1.top-header {
 }
 
 .sidebar {
-  border-right: 1px solid #d3d3d3;
+  border-right: 1px solid #C8C8C8;
+  @include box-shadow(inset -1px 0 0 #e6e6e6);
   @include box-sizing(border-box);
   display: table-cell;
   font-family: $sans-serif;
@@ -181,7 +182,6 @@ h1.top-header {
 
 .topbar {
   @extend .clearfix;
-  background: $cream;
   border-bottom: 1px solid darken($cream, 10%);
   border-top: 1px solid #fff;
   font-size: 12px;
