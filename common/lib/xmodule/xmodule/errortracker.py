@@ -1,7 +1,11 @@
 import logging
 import sys
 
+from collections import namedtuple
+
 log = logging.getLogger(__name__)
+
+ErrorLog = namedtuple('ErrorLog', 'tracker errors')
 
 def in_exception_handler():
     '''Is there an active exception?'''
@@ -9,9 +13,9 @@ def in_exception_handler():
 
 
 def make_error_tracker():
-    '''Return a tuple (logger, error_list), where
+    '''Return an ErrorLog (named tuple), with fields (tracker, errors), where
     the logger appends a tuple (message, exc_info=None)
-    to the error_list on every call.
+    to the errors on every call.
 
     error_list is a simple list.  If the caller messes with it, info
     will be lost.
@@ -26,7 +30,7 @@ def make_error_tracker():
 
         errors.append((msg, exc_info))
 
-    return (error_tracker, errors)
+    return ErrorLog(error_tracker, errors)
 
 def null_error_tracker(msg):
     '''A dummy error tracker that just ignores the messages'''

@@ -2,6 +2,7 @@ import copy
 from fs.errors import ResourceNotFoundError
 import logging
 import os
+import sys
 from lxml import etree
 
 from xmodule.x_module import XModule
@@ -95,8 +96,8 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             except (ResourceNotFoundError) as err:
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
                     filepath, err)
-                log.error(msg)
-                raise
+                # add more info and re-raise
+                raise Exception(msg), None, sys.exc_info()[2]
 
     @classmethod
     def split_to_file(cls, xml_object):

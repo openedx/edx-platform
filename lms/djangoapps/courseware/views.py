@@ -55,14 +55,20 @@ def user_groups(user):
 
 
 def format_url_params(params):
-    return [urllib.quote(string.replace(' ', '_')) for string in params]
+    return [urllib.quote(string.replace(' ', '_'))
+            if string is not None else None
+            for string in params]
 
 
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
     # TODO: Clean up how 'error' is done.
-    courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
+
+    # filter out any courses that errored.
+    courses = [c for c in modulestore().get_courses()
+               if isinstance(c, CourseDescriptor)]
+    courses = sorted(courses, key=lambda course: course.number)
     universities = defaultdict(list)
     for course in courses:
         universities[course.org].append(course)
@@ -210,7 +216,10 @@ def index(request, course_id, chapter=None, section=None,
                 log.warning("Couldn't find a section descriptor for course_id '{0}',"
                             "chapter '{1}', section '{2}'".format(
                                 course_id, chapter, section))
-
+        else:
+            if request.user.is_staff:
+                # Add a list of all the errors...
+                context['course_errors'] = modulestore().get_item_errors(course.location)
 
         result = render_to_response('courseware.html', context)
     except:

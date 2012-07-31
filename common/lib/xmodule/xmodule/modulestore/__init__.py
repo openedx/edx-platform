@@ -213,6 +213,18 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
+    def get_item_errors(self, location):
+        """
+        Return a list of (msg, exception-or-None) errors that the modulestore
+        encountered when loading the item at location.
+
+        location : something that can be passed to Location
+
+        Raises the same exceptions as get_item if the location isn't found or
+        isn't fully specified.
+        """
+        raise NotImplementedError
+
     def get_items(self, location, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
@@ -268,6 +280,7 @@ class ModuleStore(object):
         in this modulestore.
         '''
         raise NotImplementedError
+
 
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
