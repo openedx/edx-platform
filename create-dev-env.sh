@@ -215,7 +215,7 @@ case `uname -s` in
         and re-run the script:
 
         $ sudo chown -R $USER /usr/local
-EO 
+EO
 
             exit 1
 
