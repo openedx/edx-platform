@@ -13,6 +13,12 @@ import itertools
 _FULLMODULES = None
 _DISCUSSIONINFO = None
 
+def extract(dic, keys):
+    return {k: dic[k] for k in keys}
+
+def strip_none(dic):
+    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+
 def get_full_modules():
     global _FULLMODULES
     if not _FULLMODULES:

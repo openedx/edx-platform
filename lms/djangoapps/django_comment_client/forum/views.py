@@ -11,7 +11,7 @@ from courseware.courses import check_course
 from dateutil.tz import tzlocal
 from datehelper import time_ago_in_words
 
-from django_comment_client.utils import get_categorized_discussion_info
+from django_comment_client.utils import get_categorized_discussion_info, extract, strip_none
 from urllib import urlencode
 
 import json
@@ -39,57 +39,67 @@ def render_accordion(request, course, discussion_id):
 
     return render_to_string('discussion/_accordion.html', context)
 
-def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, 
-                      search_text='', discussion_type='inline', page=1, num_pages=None, 
-                      per_page=THREADS_PER_PAGE):
+def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, \
+                      discussion_type='inline', query_params={}):
+
     template = {
         'inline': 'discussion/_inline.html',
         'forum': 'discussion/_forum.html',
     }[discussion_type]
 
-    def _url_for_inline_page(page, per_page):
-        raw_url = reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])
-        return raw_url + '?' + urlencode({'page': page, 'per_page': per_page})
+    base_url = {
+        'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])), 
+        'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, discussion_id])),
+    }[discussion_type]()
 
-    def _url_for_forum_page(page, per_page):
-        raw_url = reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, discussion_id])
-        return raw_url + '?' + urlencode({'page': page, 'per_page': per_page})
-
-    url_for_page = {
-        'inline': _url_for_inline_page,
-        'forum': _url_for_forum_page,
-    }[discussion_type]
-
-    
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
         'search_bar': '' if not with_search_bar \
-                      else render_search_bar(request, course_id, discussion_id, text=search_text),
+                      else render_search_bar(request, course_id, discussion_id, text=query_params.get('text', '')),
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
         'course_id': course_id,
         'request': request,
-        'page': page,
-        'per_page': per_page,
-        'num_pages': num_pages,
         'pages_nearby_delta': PAGES_NEARBY_DELTA,
         'discussion_type': discussion_type,
-        'url_for_page': url_for_page,
+        'base_url': base_url,
+        'query_params': strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text'])),
     }
+    context = dict(context.items() + query_params.items())
     return render_to_string(template, context)
 
 def render_inline_discussion(*args, **kwargs):
-    
     return render_discussion(discussion_type='inline', *args, **kwargs)
 
 def render_forum_discussion(*args, **kwargs):
     return render_discussion(discussion_type='forum', *args, **kwargs)
 
+def get_threads(request, course_id, discussion_id):
+    query_params = {
+        'page': request.GET.get('page', 1),
+        'per_page': THREADS_PER_PAGE, #TODO maybe change this later
+        'sort_key': request.GET.get('sort_key', None),
+        'sort_order': request.GET.get('sort_order', None),
+        'text': request.GET.get('text', None), 
+        'tags': request.GET.get('tags', None),
+    }
+
+    if query_params['text'] or query_params['tags']: #TODO do tags search without sunspot
+        query_params['commentable_id'] = discussion_id
+        threads, page, num_pages = comment_client.search_threads(course_id, recursive=False, query_params=query_params)
+    else:
+        threads, page, num_pages = comment_client.get_threads(discussion_id, recursive=False, query_params=query_params)
+
+    query_params['page'] = page
+    query_params['num_pages'] = num_pages
+
+    return threads, query_params
+
 # discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
-    page = request.GET.get('page', 1)
-    threads, page, per_page, num_pages = comment_client.get_threads(discussion_id, recursive=False, page=page, per_page=THREADS_PER_PAGE)
-    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id, num_pages=num_pages, page=page, per_page=per_page)
+    threads, query_params = get_threads(request, course_id, discussion_id)
+    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
+                                                                 query_params=query_params)
     return HtmlResponse(html)
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
@@ -103,38 +113,19 @@ def render_search_bar(request, course_id, discussion_id=None, text=''):
     return render_to_string('discussion/_search_bar.html', context)
 
 def forum_form_discussion(request, course_id, discussion_id):
-
     course = check_course(course_id)
-    search_text = request.GET.get('text', '')
-    page = request.GET.get('page', 1)
-
-    if len(search_text) > 0:
-        threads, page, per_page, num_pages = comment_client.search_threads({
-            'text': search_text,
-            'commentable_id': discussion_id,
-            'course_id': course_id,
-            'page': page,
-            'per_page': THREADS_PER_PAGE,
-        })
-    else:
-        threads, page, per_page, num_pages = comment_client.get_threads(discussion_id, recursive=False, page=page, per_page=THREADS_PER_PAGE)
-
+    threads, query_params = get_threads(request, course_id, discussion_id)
+    content = render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, \
+                                                                   query_params=query_params)
     context = {
         'csrf': csrf(request)['csrf_token'],
         'course': course,
-        'content': render_forum_discussion(request, course_id, threads, 
-                                           discussion_id=discussion_id,
-                                           search_text=search_text,
-                                           num_pages=num_pages,
-                                           per_page=per_page,
-                                           page=page),
+        'content': content,
         'accordion': render_accordion(request, course, discussion_id),
     }
-
     return render_to_response('discussion/index.html', context)
 
 def render_single_thread(request, course_id, thread_id):
-    
     def get_annotated_content_info(thread, user_id):
         infos = {}
         def _annotate(content):
