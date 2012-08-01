@@ -373,6 +373,15 @@ Discussion =
           Discussion.handleAnchorAndReload(response)
       , 'json'
 
+    handleEndorse = (elem) ->
+      url = Discussion.urlFor('endorse_comment', id)
+      endorsed = $local(".discussion-endorse").is(":checked")
+      $.post url, {endorsed: endorsed}, (response, textStatus) ->
+        # TODO error handling
+        Discussion.handleAnchorAndReload(response)
+      , 'json'
+      
+
     $local(".discussion-reply").click ->
       handleReply(this)
 
@@ -384,6 +393,9 @@ Discussion =
 
     $local(".discussion-vote-down").click ->
       handleVote(this, "down")
+
+    $local(".discussion-endorse").click ->
+      handleEndorse(this)
 
     $local(".discussion-edit").click ->
       if $content.hasClass("thread")

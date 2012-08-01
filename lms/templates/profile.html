@@ -137,8 +137,9 @@ $(function() {
               total = section['section_total'].possible
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
+
               <h3><a href="${reverse('courseware_section', kwargs={'course_id' : course.id, 'chapter' : chapter['chapter'], 'section' : section['section']})}">
->>>>>>> 7f2f47597fd50acbab49be5173b76b026ff4378d
+
                 ${ section['section'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
               ${section['format']}
               %if 'due' in section and section['due']!="":

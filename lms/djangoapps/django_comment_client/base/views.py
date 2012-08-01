@@ -38,7 +38,12 @@ def comment_author_only(fn):
     return verified_fn
 
 def instructor_only(fn): #TODO add instructor verification
-    return fn
+    def verified_fn(request, *args, **kwargs):
+        if not request.user.is_staff:
+            return JsonError("unauthorized")
+        else:
+            return fn(request, *args, **kwargs)
+    return verified_fn
 
 def extract(dic, keys):
     return {k: dic[k] for k in keys}
@@ -70,7 +75,6 @@ def create_comment(request, course_id, thread_id):
     attributes = extract(request.POST, ['body'])
     attributes['user_id'] = request.user.id
     attributes['course_id'] = course_id
-    print request.POST
     if request.POST.get('anonymous', 'false').lower() == 'true':
         attributes['anonymous'] = True
     if request.POST.get('autowatch', 'false').lower() == 'true':

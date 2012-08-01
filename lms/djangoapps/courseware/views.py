@@ -23,8 +23,11 @@ from django.views.decorators.cache import cache_control
 from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
+<<<<<<< HEAD
 
 from multicourse import multicourse_settings
+=======
+>>>>>>> 38dd8f18984df3ab14f5715891af7f984c7f14a7
 from django_comment_client.utils import get_discussion_title
 
 from xmodule.modulestore import Location
