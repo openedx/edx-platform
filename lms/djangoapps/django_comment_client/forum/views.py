@@ -29,7 +29,7 @@ def render_accordion(request, course, discussion_id):
 
     return render_to_string('discussion/accordion.html', context)
 
-def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, search_text=''):
+def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, search_text='', template='discussion/inline.html'):
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
@@ -40,11 +40,17 @@ def render_discussion(request, course_id, threads, discussion_id=None, with_sear
         'course_id': course_id,
         'request': request,
     }
-    return render_to_string('discussion/inline.html', context)
+    return render_to_string(template, context)
+
+def render_inline_discussion(*args, **kwargs):
+    return render_discussion(template='discussion/inline.html', *args, **kwargs)
+
+def render_forum_discussion(*args, **kwargs):
+    return render_discussion(template='discussion/forum.html', *args, **kwargs)
 
 def inline_discussion(request, course_id, discussion_id):
     threads = comment_client.get_threads(discussion_id, recursive=False)
-    html = render_discussion(request, course_id, threads, discussion_id=discussion_id)
+    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id)
     return HttpResponse(html, content_type="text/plain")
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
@@ -71,7 +77,7 @@ def forum_form_discussion(request, course_id, discussion_id):
     context = {
         'csrf': csrf(request)['csrf_token'],
         'course': course,
-        'content': render_discussion(request, course_id, threads, discussion_id=discussion_id, search_text=search_text),
+        'content': render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, search_text=search_text),
         'accordion': render_accordion(request, course, discussion_id),
     }
 
@@ -133,7 +139,7 @@ def search(request, course_id):
     context = {
         'csrf': csrf(request)['csrf_token'],
         'init': '',
-        'content': render_discussion(request, course_id, threads, search_text=text),
+        'content': render_forum_discussion(request, course_id, threads, search_text=text),
         'accordion': '',
         'course': course,
     }

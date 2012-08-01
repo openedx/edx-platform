@@ -1,0 +1,25 @@
+<%namespace name="renderer" file="thread.html"/>
+
+<section class="discussion" _id="${discussion_id}">
+  <div class="discussion-non-content">
+    <div class="discussion-title-wrapper">
+      <a class="discussion-title" href="javascript:void(0)">Discussion</a>
+    </div>
+    ${search_bar}
+    <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
+  </div>
+  % for thread in threads:
+    ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
+  % endfor
+</section>
+
+<%!
+  def escape_quotes(text):
+    return text.replace('\"', '\\\"').replace("\'", "\\\'")
+%>
+
+<script type="text/javascript">
+  var $$user_info = JSON.parse('${user_info | escape_quotes}');
+  var $$course_id = "${course_id}";
+  var $$tags = JSON.parse("${tags | escape_quotes}");
+</script>
