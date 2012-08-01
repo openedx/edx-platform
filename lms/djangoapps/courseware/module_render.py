@@ -140,8 +140,16 @@ def get_module(user, request, location, student_module_cache, position=None):
     # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
-    xqueue_callback_url = (settings.MITX_ROOT_URL + '/xqueue/' +
-                           str(user.id) + '/' + descriptor.location.url() + '/')
+
+    # Fully qualified callback URL for external queueing system 
+    xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL + 
+                          'xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/' + 
+                          'score_update')
+
+    # Default queuename is course-specific and is derived from the course that 
+    #   contains the current module.
+    # TODO: Queuename should be derived from 'course_settings.json' of each course
+    xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location,
@@ -155,6 +163,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           render_template=render_to_string,
                           ajax_url=ajax_url,
                           xqueue_callback_url=xqueue_callback_url,
+                          xqueue_default_queuename=xqueue_default_queuename.replace(' ','_'),
                           # TODO (cpennington): Figure out how to share info between systems
                           filestore=descriptor.system.resources_fs,
                           get_module=_get_module,
@@ -203,13 +212,12 @@ def get_module(user, request, location, student_module_cache, position=None):
     return (module, instance_module, shared_module, descriptor.category)
 
 
-# TODO: TEMPORARY BYPASS OF AUTH!
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
     get = request.POST.copy()
     try:
-        header = json.loads(get.pop('xqueue_header')[0])  # 'dict'
+        header = json.loads(get['xqueue_header'])
     except Exception as err:
         msg = "Error in xqueue_callback %s: Invalid return format" % err
         raise Exception(msg)
@@ -230,7 +238,7 @@ def xqueue_callback(request, userid, id, dispatch):
 
     # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
     #   use the interface defined by 'handle_ajax'
-    get.update({'queuekey': header['queuekey']})
+    get.update({'queuekey': header['lms_key']})
 
     # We go through the "AJAX" path
     #   So far, the only dispatch from xqueue will be 'score_update'
