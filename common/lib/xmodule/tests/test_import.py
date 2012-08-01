@@ -137,4 +137,3 @@ class ImportTestCase(unittest.TestCase):
         chapter_tag = root[0]
         self.assertEqual(chapter_tag.tag, 'chapter')
         self.assertFalse('graceperiod' in chapter_tag.attrib)
-        self.assertTrue(False)
