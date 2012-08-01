@@ -8,13 +8,6 @@
 @import 'base/extends';
 @import 'base/animations';
 
-
-// Courseware styles
-@import 'sass_old/base/variables';
-@import 'sass_old/base/extends';
-@import 'sass_old/base/functions';
-
-
 // Multicourse styles
 @import 'shared/forms';
 @import 'shared/footer';
@@ -24,22 +17,13 @@
 @import 'shared/modal';
 @import 'shared/activation_messages';
 
-@import 'home';
-@import 'dashboard';
-@import 'courseware_subnav';
-@import 'courses';
-@import 'course_about';
-@import 'jobs';
-@import 'about_pages';
-@import 'press_release';
-@import 'password_reset';
-@import 'error-pages';
-
-
-// Courseware styles
-@import 'sass_old/courseware/courseware';
-@import 'sass_old/courseware/sequence-nav';
-@import 'sass_old/courseware/sidebar';
-@import 'sass_old/courseware/video';
-@import 'sass_old/courseware/amplifier';
-@import 'sass_old/courseware/problems';
+@import 'multicourse/home';
+@import 'multicourse/dashboard';
+@import 'multicourse/courses';
+@import 'multicourse/course_about';
+@import 'multicourse/jobs';
+@import 'multicourse/about_pages';
+@import 'multicourse/press_release';
+@import 'multicourse/password_reset';
+@import 'multicourse/error-pages';
+@import 'multicourse/help';

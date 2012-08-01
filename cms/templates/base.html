@@ -6,38 +6,35 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
     <%static:css group='base-style'/>
-    % else:
-    <link rel="stylesheet" href="${static.url('css/base-style.css')}">
-    % endif
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
     <title><%block name="title"></%block></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <meta name="path_prefix" content="${MITX_ROOT_URL}">
   </head>
 
-  <body>
+  <body class="<%block name='bodyclass'></%block>">
 
     <%include file="widgets/header.html"/>
+    <%include file="courseware_vendor_js.html"/>
 
-    <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/jquery.markitup.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/sets/wiki/set.js')}"></script>
-    % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
     <%static:js group='main'/>
-    % else:
-    <script src="${ STATIC_URL }/js/main.js"></script>
-    % endif
-
     <%static:js group='module-js'/>
     <script src="${static.url('js/vendor/jquery.inlineedit.js')}"></script>
     <script src="${static.url('js/vendor/jquery.cookie.js')}"></script>
     <script src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>
     <script src="${static.url('js/vendor/jquery.tablednd.js')}"></script>
+    <script type="text/javascript">
+      document.write('\x3Cscript type="text/javascript" src="' +
+          document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
+    </script>
 
     <%block name="content"></%block>
 

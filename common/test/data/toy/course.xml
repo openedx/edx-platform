@@ -1,11 +1,9 @@
-<course name="Toy Course" graceperiod="1 day 5 hours 59 minutes 59 seconds" showanswer="always" rerandomize="never">
+<course name="Toy Course" org="edX" course="toy" graceperiod="1 day 5 hours 59 minutes 59 seconds" slug="2012_Fall" start="2015-07-17T12:00">
   <chapter name="Overview">
-    <section format="Video" name="Welcome">
-      <video youtube="0.75:izygArpw-Qo,1.0:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"/>
-    </section>
-    <section format="Lecture Sequence" name="System Usage Sequence">
-      <html id="Lab2A" filename="Lab2A.html"/>
-      <video name="S0V1: Video Resources" youtube="0.75:EuzkdzfR0i8,1.0:1bK-WdDi6Qw,1.25:0v1VzoDVUTM,1.50:Bxk_-ZJb240"/>
-    </section>
+    <videosequence format="Lecture Sequence" name="Toy Videos">
+      <html name="toylab" filename="toylab"/>
+      <video name="Video Resources" youtube="1.0:1bK-WdDi6Qw"/>
+    </videosequence>
+    <video name="Welcome" youtube="1.0:p2Q6BrNhdh8"/>
   </chapter>
 </course>

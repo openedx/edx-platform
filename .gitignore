@@ -23,4 +23,5 @@ reports/
 *.egg-info
 Gemfile.lock
 .env/
-
+lms/static/sass/*.css
+cms/static/sass/*.css

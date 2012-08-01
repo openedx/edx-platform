@@ -1,14 +1,19 @@
 import pymongo
-from bson.objectid import ObjectId
+
+from bson.son import SON
+from fs.osfs import OSFS
+from itertools import repeat
+from path import path
+
 from importlib import import_module
+from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from mitxmako.shortcuts import render_to_string
-from bson.son import SON
-from itertools import repeat
 
 from . import ModuleStore, Location
-from .exceptions import ItemNotFoundError, InsufficientSpecificationError
+from .exceptions import (ItemNotFoundError,
+                         NoPathToItem, DuplicateItemError)
 
 # TODO (cpennington): This code currently operates under the assumption that
 # there is only one revision for each item. Once we start versioning inside the CMS,
@@ -20,15 +25,26 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
     """
-    def __init__(self, modulestore, module_data, default_class, resources_fs, render_template):
+    def __init__(self, modulestore, module_data, default_class, resources_fs,
+                 error_tracker, render_template):
         """
         modulestore: the module store that can be used to retrieve additional modules
-        module_data: a dict mapping Location -> json that was cached from the underlying modulestore
-        default_class: The default_class to use when loading an XModuleDescriptor from the module_data
+
+        module_data: a dict mapping Location -> json that was cached from the
+            underlying modulestore
+
+        default_class: The default_class to use when loading an
+            XModuleDescriptor from the module_data
+
         resources_fs: a filesystem, as per MakoDescriptorSystem
-        render_template: a function for rendering templates, as per MakoDescriptorSystem
+
+        error_tracker:
+
+        render_template: a function for rendering templates, as per
+            MakoDescriptorSystem
         """
-        super(CachingDescriptorSystem, self).__init__(render_template, self.load_item, resources_fs)
+        super(CachingDescriptorSystem, self).__init__(
+                self.load_item, resources_fs, error_tracker, render_template)
         self.modulestore = modulestore
         self.module_data = module_data
         self.default_class = default_class
@@ -56,11 +72,15 @@ def location_to_query(location):
 
     return query
 
+
 class MongoModuleStore(ModuleStore):
     """
     A Mongodb backed ModuleStore
     """
-    def __init__(self, host, db, collection, port=27017, default_class=None):
+
+    # TODO (cpennington): Enable non-filesystem filestores
+    def __init__(self, host, db, collection, fs_root, port=27017, default_class=None,
+                 error_tracker=null_error_tracker):
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port
@@ -71,11 +91,17 @@ class MongoModuleStore(ModuleStore):
 
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
-        self.collection.ensure_index(zip(('_id.' + field for field in Location._fields), repeat(1)))
+        self.collection.ensure_index(
+            zip(('_id.' + field for field in Location._fields), repeat(1)))
 
-        module_path, _, class_name = default_class.rpartition('.')
-        class_ = getattr(import_module(module_path), class_name)
-        self.default_class = class_
+        if default_class is not None:
+            module_path, _, class_name = default_class.rpartition('.')
+            class_ = getattr(import_module(module_path), class_name)
+            self.default_class = class_
+        else:
+            self.default_class = None
+        self.fs_root = path(fs_root)
+        self.error_tracker = error_tracker
 
     def _clean_item_data(self, item):
         """
@@ -88,7 +114,9 @@ class MongoModuleStore(ModuleStore):
         """
         Returns a dictionary mapping Location -> item data, populated with json data
         for all descendents of items up to the specified depth.
-        This will make a number of queries that is linear in the depth
+        (0 = no descendents, 1 = children, 2 = grandchildren, etc)
+        If depth is None, will load all the children.
+        This will make a number of queries that is linear in the depth.
         """
         data = {}
         to_process = list(items)
@@ -103,7 +131,8 @@ class MongoModuleStore(ModuleStore):
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
             if children:
-                to_process = list(self.collection.find({'_id': {'$in': [Location(child).dict() for child in children]}}))
+                to_process = list(self.collection.find(
+                    {'_id': {'$in': [Location(child).dict() for child in children]}}))
             else:
                 to_process = []
             # If depth is None, then we just recurse until we hit all the descendents
@@ -112,41 +141,73 @@ class MongoModuleStore(ModuleStore):
 
         return data
 
+    def _load_item(self, item, data_cache):
+        """
+        Load an XModuleDescriptor from item, using the children stored in data_cache
+        """
+        data_dir = item.get('metadata', {}).get('data_dir', item['location']['course'])
+        resource_fs = OSFS(self.fs_root / data_dir)
+
+        system = CachingDescriptorSystem(
+            self,
+            data_cache,
+            self.default_class,
+            resource_fs,
+            self.error_tracker,
+            render_to_string,
+        )
+        return system.load_item(item['location'])
+
     def _load_items(self, items, depth=0):
         """
-        Load a list of xmodules from the data in items, with children cached up to specified depth
+        Load a list of xmodules from the data in items, with children cached up
+        to specified depth
         """
         data_cache = self._cache_children(items, depth)
-        system = CachingDescriptorSystem(self, data_cache, self.default_class, None, render_to_string)
-        return [system.load_item(item['location']) for item in items]
 
-    def get_item(self, location, depth=0):
-        """
-        Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the most item with the most
-        recent revision
+        return [self._load_item(item, data_cache) for item in items]
 
-        If any segment of the location is None except revision, raises
-            xmodule.modulestore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
+    def get_courses(self):
+        '''
+        Returns a list of course descriptors.
+        '''
+        # TODO (vshnayder): Why do I have to specify i4x here?
+        course_filter = Location("i4x", category="course")
+        return self.get_items(course_filter)
 
-        location: a Location object
-        depth (int): An argument that some module stores may use to prefetch descendents of the queried modules
-            for more efficient results later in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all descendents
-
-        """
-
-        for key, val in Location(location).dict().iteritems():
-            if key != 'revision' and val is None:
-                raise InsufficientSpecificationError(location)
-
+    def _find_one(self, location):
+        '''Look for a given location in the collection.  If revision is not
+        specified, returns the latest.  If the item is not present, raise
+        ItemNotFoundError.
+        '''
         item = self.collection.find_one(
             location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],
         )
         if item is None:
             raise ItemNotFoundError(location)
+        return item
+
+    def get_item(self, location, depth=0):
+        """
+        Returns an XModuleDescriptor instance for the item at location.
+        If location.revision is None, returns the item with the most
+        recent revision.
+
+        If any segment of the location is None except revision, raises
+            xmodule.modulestore.exceptions.InsufficientSpecificationError
+        If no object is found at that location, raises
+            xmodule.modulestore.exceptions.ItemNotFoundError
+
+        location: a Location object
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents.
+
+        """
+        location = Location.ensure_fully_specified(location)
+        item = self._find_one(location)
         return self._load_items([item], depth)[0]
 
     def get_items(self, location, depth=0):
@@ -157,15 +218,22 @@ class MongoModuleStore(ModuleStore):
 
         return self._load_items(list(items), depth)
 
+    # TODO (cpennington): This needs to be replaced by clone_item as soon as we allow
+    # creation of items from the cms
     def create_item(self, location):
         """
-        Create an empty item at the specified location with the supplied editor
+        Create an empty item at the specified location.
+
+        If that location already exists, raises a DuplicateItemError
 
         location: Something that can be passed to Location
         """
-        self.collection.insert({
-            '_id': Location(location).dict(),
-        })
+        try:
+            self.collection.insert({
+                '_id': Location(location).dict(),
+            })
+        except pymongo.errors.DuplicateKeyError:
+            raise DuplicateItemError(location)
 
     def update_item(self, location, data):
         """
@@ -202,7 +270,7 @@ class MongoModuleStore(ModuleStore):
 
     def update_metadata(self, location, metadata):
         """
-        Set the children for the item specified by the location to
+        Set the metadata for the item specified by the location to
         metadata
 
         location: Something that can be passed to Location
@@ -215,3 +283,22 @@ class MongoModuleStore(ModuleStore):
             {'_id': Location(location).dict()},
             {'$set': {'metadata': metadata}}
         )
+
+    def get_parent_locations(self, location):
+        '''Find all locations that are the parents of this location.  Needed
+        for path_to_location().
+
+        If there is no data at location in this modulestore, raise
+            ItemNotFoundError.
+
+        returns an iterable of things that can be passed to Location.  This may
+        be empty if there are no parents.
+        '''
+        location = Location.ensure_fully_specified(location)
+        # Check that it's actually in this modulestore.
+        item = self._find_one(location)
+        # now get the parents
+        items = self.collection.find({'definition.children': location.url()},
+                                    {'_id': True})
+        return [i['_id'] for i in items]
+

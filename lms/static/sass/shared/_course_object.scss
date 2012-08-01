@@ -24,6 +24,9 @@
       width: 100%;
       @include transition(all, 0.15s, linear);
 
+      a:hover {
+        text-decoration: none;
+      }
 
       .meta-info {
         background: rgba(0,0,0, 0.6);
@@ -33,7 +36,7 @@
         @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.15));
         @include clearfix;
         position: absolute;
-        right: -3px;
+        right: -4px;
         @include transition(all, 0.15s, linear);
 
         p {
@@ -47,7 +50,7 @@
       .inner-wrapper {
         border: 1px solid rgba(255,255,255, 1);
         height: 100%;
-        height: 180px;
+        height: 200px;
         overflow: hidden;
         position: relative;
       }
@@ -59,12 +62,26 @@
         width: 100%;
         z-index: 3;
 
-        > a {
+        // > a {
           @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.85)));
           @include box-shadow(inset 0 -1px 0 0 rgba(255,255,255, 0.2));
           border-bottom: 1px solid rgba(150,150,150, 0.7);
           display: block;
           height: 50px;
+
+          &:hover {
+            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
+            text-decoration: none;
+
+            .info-link {
+              color: $blue;
+              opacity: 1;
+            }
+
+            h2 {
+              color: $blue;
+            }
+          }
 
           hgroup {
             left: 0px;
@@ -95,7 +112,6 @@
             }
           }
 
-
           .info-link {
             border-left: 1px solid rgba(150,150,150, 0.5);
             @include box-sizing(border-box);
@@ -114,33 +130,21 @@
             vertical-align: middle;
           }
 
-          &:hover {
-            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
-            text-decoration: none;
-
-            .info-link {
-              color: $blue;
-              opacity: 1;
-            }
-
-            h2 {
-              color: $blue;
-            }
-          }
         }
-      }
+      // }
 
       .info {
         background: rgb(255,255,255);
-        height: 180px + 130px;
+        height: 220px + 130px;
         left: 0px;
         position: absolute;
         top: 0px;
         @include transition(all, 0.15s, linear);
         width: 100%;
+        overflow: hidden;
 
         .cover-image {
-          height: 180px;
+          height: 200px;
           overflow: hidden;
           width: 100%;
 
@@ -153,7 +157,7 @@
 
         .desc {
           @include box-sizing(border-box);
-          height: 100px;
+          height: 120px;
           overflow: hidden;
           padding: 10px 10px 12px 10px;
           position: relative;
@@ -170,7 +174,6 @@
           @include box-sizing(border-box);
           padding: 0px 10px 10px 10px;
           width: 100%;
-
 
           .university {
             border-right: 1px solid rgb(200,200,200);
@@ -197,7 +200,7 @@
         @include box-shadow(0 1px 16px 0 rgba($blue, 0.4));
 
         .info {
-          top: -130px;
+          top: -150px;
         }
 
         .meta-info {

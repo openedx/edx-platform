@@ -1,9 +1,11 @@
 ###
-### One-off script for importing courseware form XML format
+### Script for importing courseware from XML format
 ###
 
 from django.core.management.base import BaseCommand, CommandError
-from contentstore import import_from_xml
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
+
 
 unnamed_modules = 0
 
@@ -21,4 +23,7 @@ class Command(BaseCommand):
             course_dirs = args[1:]
         else:
             course_dirs = None
-        import_from_xml(data_dir, course_dirs)
+        print "Importing.  Data_dir={data}, course_dirs={courses}".format(
+            data=data_dir,
+            courses=course_dirs)
+        import_from_xml(modulestore(), data_dir, course_dirs)

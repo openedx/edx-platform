@@ -25,6 +25,9 @@ import os.path
 import os
 import errno
 import glob2
+import lms.envs.common
+import hashlib
+from collections import defaultdict
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -43,10 +46,8 @@ PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
-COURSES_ROOT = ENV_ROOT / "data"
 
-# FIXME: To support multiple courses, we should walk the courses dir at startup
-DATA_DIR = COURSES_ROOT
+GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
@@ -61,8 +62,12 @@ MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
+    COMMON_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates'
 ]
+
+for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
+    MAKO_TEMPLATES['lms.' + namespace] = template_dirs
 
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
@@ -132,26 +137,32 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@mitx.mit.edu'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
+DEFAULT_FROM_EMAIL = 'registration@edx.org'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 ADMINS = (
-    ('MITx Admins', 'admin@mitx.mit.edu'),
+    ('edX Admins', 'admin@edx.org'),
 )
 MANAGERS = ADMINS
 
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles" 
+STATIC_ROOT = ENV_ROOT / "staticfiles"
 
-# FIXME: We should iterate through the courses we have, adding the static 
-#        contents for each of them. (Right now we just use symlinks.)
 STATICFILES_DIRS = [
+    COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 
 # This is how you would use the textbook images locally
 #    ("book", ENV_ROOT / "book_images")
 ]
+if os.path.isdir(GITHUB_REPO_ROOT):
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses aren't loaded from github, remove this
+        (course_dir, GITHUB_REPO_ROOT / course_dir)
+        for course_dir in os.listdir(GITHUB_REPO_ROOT)
+        if os.path.isdir(GITHUB_REPO_ROOT / course_dir)
+    ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -166,51 +177,98 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
+# Load javascript and css from all of the available descriptors, and
+# prep it for use in pipeline js
+from xmodule.x_module import XModuleDescriptor
+from xmodule.raw_module import RawDescriptor
+js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
+css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
+module_styles_path = css_file_dir / "_module-styles.scss"
+
+for dir_ in (js_file_dir, css_file_dir):
+    try:
+        os.makedirs(dir_)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            pass
+        else:
+            raise
+
+js_fragments = set()
+css_fragments = defaultdict(set)
+for descriptor in XModuleDescriptor.load_classes() + [RawDescriptor]:
+    descriptor_js = descriptor.get_javascript()
+    module_js = descriptor.module_class.get_javascript()
+
+    for filetype in ('coffee', 'js'):
+        for idx, fragment in enumerate(descriptor_js.get(filetype, []) + module_js.get(filetype, [])):
+            js_fragments.add((idx, filetype, fragment))
+
+    for class_ in (descriptor, descriptor.module_class):
+        fragments = class_.get_css()
+        for filetype in ('sass', 'scss', 'css'):
+            for idx, fragment in enumerate(fragments.get(filetype, [])):
+                css_fragments[idx, filetype, fragment].add(class_.__name__)
+
+module_js_sources = []
+for idx, filetype, fragment in sorted(js_fragments):
+    path = js_file_dir / "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    with open(path, 'w') as js_file:
+        js_file.write(fragment)
+    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+
+css_imports = defaultdict(set)
+for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
+    fragment_name = "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    # Prepend _ so that sass just includes the files into a single file
+    with open(css_file_dir / '_' + fragment_name, 'w') as js_file:
+        js_file.write(fragment)
+
+    for class_ in classes:
+        css_imports[class_].add(fragment_name)
+
+with open(module_styles_path, 'w') as module_styles:
+    for class_, fragment_names in css_imports.items():
+        imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
+        module_styles.write(""".xmodule_{class_} {{ {imports} }}""".format(
+            class_=class_, imports=imports
+        ))
+
 PIPELINE_CSS = {
     'base-style': {
         'source_filenames': ['sass/base-style.scss'],
-        'output_filename': 'css/base-style.css',
+        'output_filename': 'css/cms-base-style.css',
     },
 }
 
 PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
 
-from xmodule.x_module import XModuleDescriptor
-from xmodule.raw_module import RawDescriptor
-js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
-try:
-    os.makedirs(js_file_dir)
-except OSError as exc:
-    if exc.errno == errno.EEXIST:
-        pass
-    else:
-        raise
-
-module_js_sources = []
-for xmodule in XModuleDescriptor.load_classes() + [RawDescriptor]:
-    js = xmodule.get_javascript()
-    for filetype in ('coffee', 'js'):
-        for idx, fragment in enumerate(js.get(filetype, [])):
-            path = os.path.join(js_file_dir, "{name}.{idx}.{type}".format(
-                name=xmodule.__name__,
-                idx=idx,
-                type=filetype))
-            with open(path, 'w') as js_file:
-                js_file.write(fragment)
-            module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
-
 PIPELINE_JS = {
     'main': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
-        'output_filename': 'js/application.js',
+        'source_filenames': [
+            pth.replace(COMMON_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+        ] + [
+            pth.replace(PROJECT_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')
+        ],
+        'output_filename': 'js/cms-application.js',
     },
     'module-js': {
         'source_filenames': module_js_sources,
-        'output_filename': 'js/modules.js',
+        'output_filename': 'js/cms-modules.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
-        'output_filename': 'js/spec.js'
+        'output_filename': 'js/cms-spec.js'
     }
 }
 
@@ -251,6 +309,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
+    'github_sync',
     'student',  # misleading name due to sharing with lms
 
     # For asset pipelining

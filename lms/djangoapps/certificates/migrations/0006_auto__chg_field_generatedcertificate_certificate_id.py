@@ -4,19 +4,18 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Changing field 'GeneratedCertificate.certificate_id'
         db.alter_column('certificates_generatedcertificate', 'certificate_id', self.gf('django.db.models.fields.CharField')(max_length=32, null=True))
 
-
     def backwards(self, orm):
-        
+
         # Changing field 'GeneratedCertificate.certificate_id'
         db.alter_column('certificates_generatedcertificate', 'certificate_id', self.gf('django.db.models.fields.CharField')(default=None, max_length=32))
-
 
     models = {
         'auth.group': {

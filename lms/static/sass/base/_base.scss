@@ -43,6 +43,10 @@ p {
 span {
   font: normal 1em/1.6em $sans-serif;
 }
+/* Fix for CodeMirror: prevent top-level span from affecting deeply-embedded span in CodeMirror */
+.CodeMirror span {
+  font: inherit;
+}
 
 p + p, ul + p, ol + p {
   margin-top: 20px;
@@ -82,8 +86,14 @@ a:link, a:visited {
 .container {
   @include clearfix;
   margin: 0 auto 0;
-  padding: 0px 10px;
-  width: grid-width(12);
+  padding: 0px 30px;
+  max-width: grid-width(12);
+  min-width: 760px;
+}
+
+span.edx {
+  text-transform: none;
+  font: inherit;
 }
 
 .static-container {

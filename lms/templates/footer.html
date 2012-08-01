@@ -8,21 +8,23 @@
         <a href="${reverse('root')}" class="logo"></a>
         <a href="${reverse('courses')}">Find Courses</a>
         <a href="${reverse('about_edx')}">About</a>
-        <a href="#">Blog</a>
+        <a href="http://edxonline.tumblr.com/">Blog</a>
         <a href="${reverse('jobs')}">Jobs</a>
         <a href="${reverse('contact')}">Contact</a>
       </section>
 
       <section class="social">
-        <a href="#"><img src="${static.url('images/linkedin.png')}" /></a>
-        <a href="#"><img src="${static.url('images/facebook.png')}" /></a>
-        <a href="#"><img src="${static.url('images/twitter.png')}" /></a>
+        <a href="http://youtube.com/user/edxonline"><img src="${static.url('images/social/youtube-sharing.png')}" /></a>
+        <a href="https://plus.google.com/108235383044095082735"><img src="${static.url('images/social/google-plus-sharing.png')}" /></a>
+        <a href="http://www.facebook.com/EdxOnline"><img src="${static.url('images/social/facebook-sharing.png')}" /></a>
+        <a href="https://twitter.com/edXOnline"><img src="${static.url('images/social/twitter-sharing.png')}" /></a>
       </section>
     </section>
 
     <section class="bottom">
       <section class="copyright">
-        <p>&copy; 2012 edX, <a href="${reverse('copyright')}">some rights reserved.</a></p>
+##        <p>&copy; 2012 edX, <a href="${reverse('copyright')}">some rights reserved.</a></p> # TODO: (bridger) Update the copyright for edX, then re-enable the link.
+        <p>&copy; 2012 edX, some rights reserved.</p>
       </section>
 
       <section class="secondary">

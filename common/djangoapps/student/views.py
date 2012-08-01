@@ -8,6 +8,7 @@ import uuid
 import feedparser
 import urllib
 import itertools
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -22,21 +23,24 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.core.urlresolvers import reverse
-from BeautifulSoup import BeautifulSoup
+#from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie
 from student.models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
-from util.cache import cache_if_anonymous 
+from util.cache import cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 from datetime import date
+from collections import namedtuple
 
 log = logging.getLogger("mitx.student")
-
+Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
 def csrf_token(context):
     ''' A csrf token that can be included in a form.
@@ -70,26 +74,40 @@ def index(request):
     for entry in entries:
         soup = BeautifulSoup(entry.description)
         entry.image = soup.img['src'] if soup.img else None
+        entry.summary = soup.getText()
 
-    courses = modulestore().get_courses()
-    universities = dict()
-    for university, group in itertools.groupby(courses, lambda course: course.org):
-        universities.setdefault(university, [])
-        [universities[university].append(course) for course in group]
+    universities = defaultdict(list)
+    courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
+    for course in courses:
+        universities[course.org].append(course)
 
     return render_to_response('index.html', {'universities': universities, 'entries': entries})
+
+
+def course_from_id(id):
+    course_loc = CourseDescriptor.id_to_location(id)
+    return modulestore().get_item(course_loc)
+
+
+def press(request):
+    json_articles = cache.get("student_press_json_articles")
+    if json_articles == None:
+        if hasattr(settings, 'RSS_URL'):
+            content = urllib.urlopen(settings.PRESS_URL).read()
+            json_articles = json.loads(content)
+        else:
+            content = open(settings.PROJECT_ROOT / "templates" / "press.json").read()
+            json_articles = json.loads(content)
+        cache.set("student_press_json_articles", json_articles)
+    articles = [Article(**article) for article in json_articles]
+    return render_to_response('static_templates/press.html', {'articles': articles})
 
 
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
-    csrf_token = csrf(request)['csrf_token']
     user = request.user
     enrollments = CourseEnrollment.objects.filter(user=user)
-
-    def course_from_id(id):
-        course_loc = CourseDescriptor.id_to_location(id)
-        return modulestore().get_item(course_loc)
 
     # Build our courses list for the user, but ignore any courses that no longer
     # exist (because the course IDs have changed). Still, we don't delete those
@@ -102,8 +120,71 @@ def dashboard(request):
             log.error("User {0} enrolled in non-existant course {1}"
                       .format(user.username, enrollment.course_id))
 
-    context = {'csrf': csrf_token, 'courses': courses}
+    message = ""
+    if not user.is_active:
+        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
+
+    context = {'courses': courses, 'message': message}
     return render_to_response('dashboard.html', context)
+
+
+def try_change_enrollment(request):
+    """
+    This method calls change_enrollment if the necessary POST
+    parameters are present, but does not return anything. It
+    simply logs the result or exception. This is usually
+    called after a registration or login, as secondary action.
+    It should not interrupt a successful registration or login.
+    """
+    if 'enrollment_action' in request.POST:
+        try:
+            enrollment_output = change_enrollment(request)
+            # There isn't really a way to display the results to the user, so we just log it
+            # We expect the enrollment to be a success, and will show up on the dashboard anyway
+            log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
+        except Exception, e:
+            log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
+
+
+@login_required
+def change_enrollment_view(request):
+    return HttpResponse(json.dumps(change_enrollment(request)))
+
+
+def change_enrollment(request):
+    if request.method != "POST":
+        raise Http404
+
+    action = request.POST.get("enrollment_action", "")
+    user = request.user
+    course_id = request.POST.get("course_id", None)
+    if course_id == None:
+        return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
+
+    if action == "enroll":
+        # Make sure the course exists
+        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
+        try:
+            course = course_from_id(course_id)
+        except ItemNotFoundError:
+            log.error("User {0} tried to enroll in non-existant course {1}"
+                      .format(user.username, enrollment.course_id))
+            return {'success': False, 'error': 'The course requested does not exist.'}
+
+        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        return {'success': True}
+
+    elif action == "unenroll":
+        try:
+            enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            enrollment.delete()
+            return {'success': True}
+        except CourseEnrollment.DoesNotExist:
+            return {'success': False, 'error': 'You are not enrolled for this course.'}
+    else:
+        return {'success': False, 'error': 'Invalid enrollment_action.'}
+
+    return {'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}
 
 
 # Need different levels of logging
@@ -112,7 +193,7 @@ def login_user(request, error=""):
     ''' AJAX request to log in the user. '''
     if 'email' not in request.POST or 'password' not in request.POST:
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))  # TODO: User error message
+                                        'value': 'There was an error receiving your login information. Please email us.'}))  # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
@@ -121,20 +202,20 @@ def login_user(request, error=""):
     except User.DoesNotExist:
         log.warning("Login failed - Unknown user email: {0}".format(email))
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))  # TODO: User error message
+                                        'value': 'Email or password is incorrect.'}))  # TODO: User error message
 
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
         log.warning("Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid login'}))
+                                        'value': 'Email or password is incorrect.'}))
 
     if user is not None and user.is_active:
         try:
             login(request, user)
             if request.POST.get('remember') == 'true':
-                request.session.set_expiry(None) # or change to 604800 for 7 days
+                request.session.set_expiry(None)  # or change to 604800 for 7 days
                 log.debug("Setting user session to never expire")
             else:
                 request.session.set_expiry(0)
@@ -143,11 +224,15 @@ def login_user(request, error=""):
             log.exception(e)
 
         log.info("Login success - {0} ({1})".format(username, email))
-        return HttpResponse(json.dumps({'success':True}))
+
+        try_change_enrollment(request)
+
+        return HttpResponse(json.dumps({'success': True}))
 
     log.warning("Login failed - Account not active for user {0}".format(username))
-    return HttpResponse(json.dumps({'success':False,
-                                    'error': 'Account not active. Check your e-mail.'}))
+    return HttpResponse(json.dumps({'success': False,
+                                    'value': 'This account has not been activated. Please check your e-mail for the activation instructions.'}))
+
 
 @ensure_csrf_cookie
 def logout_user(request):
@@ -155,23 +240,25 @@ def logout_user(request):
     logout(request)
     return redirect('/')
 
+
 @login_required
 @ensure_csrf_cookie
 def change_setting(request):
     ''' JSON call to change a profile setting: Right now, location
     '''
-    up = UserProfile.objects.get(user=request.user) #request.user.profile_cache
+    up = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
     if 'location' in request.POST:
-        up.location=request.POST['location']
+        up.location = request.POST['location']
     up.save()
 
-    return HttpResponse(json.dumps({'success':True,
-                                    'location':up.location,}))
+    return HttpResponse(json.dumps({'success': True,
+                                    'location': up.location, }))
+
 
 @ensure_csrf_cookie
 def create_account(request, post_override=None):
     ''' JSON call to enroll in the course. '''
-    js={'success':False}
+    js = {'success': False}
 
     post_vars = post_override if post_override else request.POST
 
@@ -179,15 +266,17 @@ def create_account(request, post_override=None):
     for a in ['username', 'email', 'password', 'name']:
         if a not in post_vars:
             js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
+            js['field'] = a
             return HttpResponse(json.dumps(js))
 
     if post_vars.get('honor_code', 'false') != u'true':
-        js['value']="To enroll, you must follow the honor code.".format(field=a)
+        js['value'] = "To enroll, you must follow the honor code.".format(field=a)
+        js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
-
     if post_vars.get('terms_of_service', 'false') != u'true':
-        js['value']="You must accept the terms of service.".format(field=a)
+        js['value'] = "You must accept the terms of service.".format(field=a)
+        js['field'] = 'terms_of_service'
         return HttpResponse(json.dumps(js))
 
     # Confirm appropriate fields are there.
@@ -197,25 +286,28 @@ def create_account(request, post_override=None):
     # TODO: Check password is sane
     for a in ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']:
         if len(post_vars[a]) < 2:
-            error_str = {'username' : 'Username of length 2 or greater',
-                         'email' : 'Properly formatted e-mail',
-                         'name' : 'Your legal name ',
-                         'password': 'Valid password ',
-                         'terms_of_service': 'Accepting Terms of Service',
-                         'honor_code': 'Agreeing to the Honor Code'}
-            js['value']="{field} is required.".format(field=error_str[a])
+            error_str = {'username': 'Username must be minimum of two characters long.',
+                         'email': 'A properly formatted e-mail is required.',
+                         'name': 'Your legal name must be a minimum of two characters long.',
+                         'password': 'A valid password is required.',
+                         'terms_of_service': 'Accepting Terms of Service is required.',
+                         'honor_code': 'Agreeing to the Honor Code is required.'}
+            js['value'] = error_str[a]
+            js['field'] = a
             return HttpResponse(json.dumps(js))
 
     try:
         validate_email(post_vars['email'])
     except ValidationError:
-        js['value']="Valid e-mail is required.".format(field=a)
+        js['value'] = "Valid e-mail is required.".format(field=a)
+        js['field'] = 'email'
         return HttpResponse(json.dumps(js))
 
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
-        js['value']="Username should only consist of A-Z and 0-9.".format(field=a)
+        js['value'] = "Username should only consist of A-Z and 0-9.".format(field=a)
+        js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
     u = User(username=post_vars['username'],
@@ -231,10 +323,12 @@ def create_account(request, post_override=None):
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
             js['value'] = "An account with this username already exists."
+            js['field'] = 'username'
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
             js['value'] = "An account with this e-mail already exists."
+            js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
         raise
@@ -243,19 +337,21 @@ def create_account(request, post_override=None):
 
     up = UserProfile(user=u)
     up.name = post_vars['name']
-    up.country = post_vars['country']
-    up.gender = post_vars['gender']
-    up.mailing_address = post_vars['mailing_address']
+    up.level_of_education = post_vars.get('level_of_education')
+    up.gender = post_vars.get('gender')
+    up.mailing_address = post_vars.get('mailing_address')
+    up.goals = post_vars.get('goals')
 
-    date_fields = ['date_of_birth__year', 'date_of_birth__month', 'date_of_birth__day']
-    if all(len(post_vars[field]) > 0 for field in date_fields):
-        up.date_of_birth = date(int(post_vars['date_of_birth__year']),
-                int(post_vars['date_of_birth__month']),
-                int(post_vars['date_of_birth__day']))
+    try:
+        up.year_of_birth = int(post_vars['year_of_birth'])
+    except (ValueError, KeyError):
+        up.year_of_birth = None  # If they give us garbage, just ignore it instead
+                                # of asking them to put an integer.
+    try:
+        up.save()
+    except Exception:
+        log.exception("UserProfile creation failed for user {0}.".format(u.id))
 
-    up.save()
-
-    # TODO (vshnayder): the LMS should probably allow signups without a particular course too
     d = {'name': post_vars['name'],
          'key': r.activation_key,
          }
@@ -268,7 +364,7 @@ def create_account(request, post_override=None):
     try:
         if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
             dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
-            message = "Activation for %s (%s): %s\n" % (u,u.email,up.name) + '-' * 80 + '\n\n' + message
+            message = "Activation for %s (%s): %s\n" % (u, u.email, up.name) + '-' * 80 + '\n\n' + message
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
         elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
             res = u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
@@ -277,10 +373,18 @@ def create_account(request, post_override=None):
         js['value'] = 'Could not send activation e-mail.'
         return HttpResponse(json.dumps(js))
 
-    js={'success': True,
-        'value': render_to_string('registration/reg_complete.html', {'email': post_vars['email'],
-                                                                     'csrf': csrf(request)['csrf_token']})}
+    # Immediately after a user creates an account, we log them in. They are only
+    # logged in until they close the browser. They can't log in again until they click
+    # the activation link from the email.
+    login_user = authenticate(username=post_vars['username'], password=post_vars['password'])
+    login(request, login_user)
+    request.session.set_expiry(0)
+
+    try_change_enrollment(request)
+
+    js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
+
 
 def create_random_account(create_account_function):
 
@@ -288,36 +392,39 @@ def create_random_account(create_account_function):
         return ''.join(random.choice(chars) for x in range(size))
 
     def inner_create_random_account(request):
-        post_override= {'username' : "random_" + id_generator(),
-                            'email' : id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
-                            'password' : id_generator(),
-                            'location' : id_generator(size=5, chars=string.ascii_uppercase),
-                            'name' : id_generator(size=5, chars=string.ascii_lowercase) + " " + id_generator(size=7, chars=string.ascii_lowercase),
-                            'honor_code' : u'true',
-                            'terms_of_service' : u'true',}
+        post_override = {'username': "random_" + id_generator(),
+                            'email': id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
+                            'password': id_generator(),
+                            'location': id_generator(size=5, chars=string.ascii_uppercase),
+                            'name': id_generator(size=5, chars=string.ascii_lowercase) + " " + id_generator(size=7, chars=string.ascii_lowercase),
+                            'honor_code': u'true',
+                            'terms_of_service': u'true', }
 
-        return create_account_function(request, post_override = post_override)
+        return create_account_function(request, post_override=post_override)
 
     return inner_create_random_account
 
 if settings.GENERATE_RANDOM_USER_CREDENTIALS:
     create_account = create_random_account(create_account)
 
+
 @ensure_csrf_cookie
 def activate_account(request, key):
     ''' When link in activation e-mail is clicked
     '''
-    r=Registration.objects.filter(activation_key=key)
-    if len(r)==1:
+    r = Registration.objects.filter(activation_key=key)
+    if len(r) == 1:
+        user_logged_in = request.user.is_authenticated()
+        already_active = True
         if not r[0].user.is_active:
             r[0].activate()
-            resp = render_to_response("activation_complete.html",{'csrf':csrf(request)['csrf_token']})
-            return resp
-        resp = render_to_response("activation_active.html",{'csrf':csrf(request)['csrf_token']})
+            already_active = False
+        resp = render_to_response("registration/activation_complete.html", {'user_logged_in': user_logged_in, 'already_active': already_active})
         return resp
-    if len(r)==0:
-        return render_to_response("activation_invalid.html",{'csrf':csrf(request)['csrf_token']})
+    if len(r) == 0:
+        return render_to_response("registration/activation_invalid.html", {'csrf': csrf(request)['csrf_token']})
     return HttpResponse("Unknown error. Please e-mail us to let us know how it happened.")
+
 
 @ensure_csrf_cookie
 def password_reset(request):
@@ -326,14 +433,16 @@ def password_reset(request):
         raise Http404
     form = PasswordResetForm(request.POST)
     if form.is_valid():
-        form.save( use_https = request.is_secure(),
-                   from_email = settings.DEFAULT_FROM_EMAIL,
-                   request = request )
+        form.save(use_https = request.is_secure(),
+                  from_email = settings.DEFAULT_FROM_EMAIL,
+                  request = request,
+                  domain_override = settings.SITE_NAME)
         return HttpResponse(json.dumps({'success':True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
-        return HttpResponse(json.dumps({'success':False,
+        return HttpResponse(json.dumps({'success': False,
                                         'error': 'Invalid e-mail'}))
+
 
 @ensure_csrf_cookie
 def reactivation_email(request):
@@ -341,28 +450,28 @@ def reactivation_email(request):
     resend an activation e-mail. Untested. '''
     email = request.POST['email']
     try:
-        user = User.objects.get(email = 'email')
+        user = User.objects.get(email='email')
     except User.DoesNotExist:
-        return HttpResponse(json.dumps({'success':False,
+        return HttpResponse(json.dumps({'success': False,
                                         'error': 'No inactive user with this e-mail exists'}))
 
     if user.is_active:
-        return HttpResponse(json.dumps({'success':False,
+        return HttpResponse(json.dumps({'success': False,
                                         'error': 'User is already active'}))
 
-    reg = Registration.objects.get(user = user)
+    reg = Registration.objects.get(user=user)
     reg.register(user)
 
-    d={'name':UserProfile.get(user = user).name,
-       'key':r.activation_key}
+    d = {'name': UserProfile.get(user=user).name,
+       'key': r.activation_key}
 
-    subject = render_to_string('reactivation_email_subject.txt',d)
+    subject = render_to_string('reactivation_email_subject.txt', d)
     subject = ''.join(subject.splitlines())
-    message = render_to_string('reactivation_email.txt',d)
+    message = render_to_string('reactivation_email.txt', d)
 
-    res=u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    res = u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
-    return HttpResponse(json.dumps({'success':True}))
+    return HttpResponse(json.dumps({'success': True}))
 
 
 @ensure_csrf_cookie
@@ -376,26 +485,26 @@ def change_email_request(request):
     user = request.user
 
     if not user.check_password(request.POST['password']):
-        return HttpResponse(json.dumps({'success':False,
-                                        'error':'Invalid password'}))
+        return HttpResponse(json.dumps({'success': False,
+                                        'error': 'Invalid password'}))
 
     new_email = request.POST['new_email']
     try:
         validate_email(new_email)
     except ValidationError:
-        return HttpResponse(json.dumps({'success':False,
-                                        'error':'Valid e-mail address required.'}))
+        return HttpResponse(json.dumps({'success': False,
+                                        'error': 'Valid e-mail address required.'}))
 
-    if len(User.objects.filter(email = new_email)) != 0:
+    if len(User.objects.filter(email=new_email)) != 0:
         ## CRITICAL TODO: Handle case sensitivity for e-mails
-        return HttpResponse(json.dumps({'success':False,
-                                        'error':'An account with this e-mail already exists.'}))
+        return HttpResponse(json.dumps({'success': False,
+                                        'error': 'An account with this e-mail already exists.'}))
 
-    pec_list = PendingEmailChange.objects.filter(user = request.user)
+    pec_list = PendingEmailChange.objects.filter(user=request.user)
     if len(pec_list) == 0:
         pec = PendingEmailChange()
         pec.user = user
-    else :
+    else:
         pec = pec_list[0]
 
     pec.new_email = request.POST['new_email']
@@ -404,20 +513,21 @@ def change_email_request(request):
 
     if pec.new_email == user.email:
         pec.delete()
-        return HttpResponse(json.dumps({'success':False,
-                                        'error':'Old email is the same as the new email.'}))
+        return HttpResponse(json.dumps({'success': False,
+                                        'error': 'Old email is the same as the new email.'}))
 
-    d = {'key':pec.activation_key,
-         'old_email' : user.email,
-         'new_email' : pec.new_email}
+    d = {'key': pec.activation_key,
+         'old_email': user.email,
+         'new_email': pec.new_email}
 
-    subject = render_to_string('emails/email_change_subject.txt',d)
+    subject = render_to_string('emails/email_change_subject.txt', d)
     subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/email_change.txt',d)
+    message = render_to_string('emails/email_change.txt', d)
 
-    res=send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
+    res = send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
 
-    return HttpResponse(json.dumps({'success':True}))
+    return HttpResponse(json.dumps({'success': True}))
+
 
 @ensure_csrf_cookie
 def confirm_email_change(request, key):
@@ -425,22 +535,21 @@ def confirm_email_change(request, key):
     link is clicked. We confirm with the old e-mail, and update
     '''
     try:
-        pec=PendingEmailChange.objects.get(activation_key=key)
+        pec = PendingEmailChange.objects.get(activation_key=key)
     except PendingEmailChange.DoesNotExist:
         return render_to_response("invalid_email_key.html", {})
 
     user = pec.user
-    d = {'old_email' : user.email,
-         'new_email' : pec.new_email}
+    d = {'old_email': user.email,
+         'new_email': pec.new_email}
 
-    if len(User.objects.filter(email = pec.new_email)) != 0:
+    if len(User.objects.filter(email=pec.new_email)) != 0:
         return render_to_response("email_exists.html", d)
 
-
-    subject = render_to_string('emails/email_change_subject.txt',d)
+    subject = render_to_string('emails/email_change_subject.txt', d)
     subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/confirm_email_change.txt',d)
-    up = UserProfile.objects.get( user = user )
+    message = render_to_string('emails/confirm_email_change.txt', d)
+    up = UserProfile.objects.get(user=user)
     meta = up.get_meta()
     if 'old_emails' not in meta:
         meta['old_emails'] = []
@@ -454,6 +563,7 @@ def confirm_email_change(request, key):
 
     return render_to_response("email_change_successful.html", d)
 
+
 @ensure_csrf_cookie
 def change_name_request(request):
     ''' Log a request for a new name. '''
@@ -461,18 +571,18 @@ def change_name_request(request):
         raise Http404
 
     try:
-        pnc = PendingNameChange.objects.get(user = request.user)
+        pnc = PendingNameChange.objects.get(user=request.user)
     except PendingNameChange.DoesNotExist:
         pnc = PendingNameChange()
     pnc.user = request.user
     pnc.new_name = request.POST['new_name']
     pnc.rationale = request.POST['rationale']
-    if len(pnc.new_name)<2:
-        return HttpResponse(json.dumps({'success':False,'error':'Name required'}))
-    if len(pnc.rationale)<2:
-        return HttpResponse(json.dumps({'success':False,'error':'Rationale required'}))
+    if len(pnc.new_name) < 2:
+        return HttpResponse(json.dumps({'success': False, 'error': 'Name required'}))
+    if len(pnc.rationale) < 2:
+        return HttpResponse(json.dumps({'success': False, 'error': 'Rationale required'}))
     pnc.save()
-    return HttpResponse(json.dumps({'success':True}))
+    return HttpResponse(json.dumps({'success': True}))
 
 
 @ensure_csrf_cookie
@@ -532,4 +642,3 @@ def accept_name_change(request):
     pnc.delete()
 
     return HttpResponse(json.dumps({'success': True}))
-

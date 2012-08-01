@@ -138,6 +138,7 @@ except:
 
 version = "0.1.6"
 
+
 class VideoExtension(markdown.Extension):
     def __init__(self, configs):
         self.config = {
@@ -187,6 +188,7 @@ class VideoExtension(markdown.Extension):
         self.add_inline(md, 'youtube', Youtube,
             r'([^(]|^)http://www\.youtube\.com/watch\?\S*v=(?P<youtubeargs>[A-Za-z0-9_&=-]+)\S*')
 
+
 class Bliptv(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://blip.tv/scripts/flash/showplayer.swf?file=http://blip.tv/file/get/%s' % m.group('bliptvfile')
@@ -194,12 +196,14 @@ class Bliptv(markdown.inlinepatterns.Pattern):
         height = self.ext.config['bliptv_height'][0]
         return flash_object(url, width, height)
 
+
 class Dailymotion(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://www.dailymotion.com/swf/%s' % m.group('dailymotionid').split('/')[-1]
         width = self.ext.config['dailymotion_width'][0]
         height = self.ext.config['dailymotion_height'][0]
         return flash_object(url, width, height)
+
 
 class Gametrailers(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
@@ -209,12 +213,14 @@ class Gametrailers(markdown.inlinepatterns.Pattern):
         height = self.ext.config['gametrailers_height'][0]
         return flash_object(url, width, height)
 
+
 class Metacafe(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://www.metacafe.com/fplayer/%s.swf' % m.group('metacafeid')
         width = self.ext.config['metacafe_width'][0]
         height = self.ext.config['metacafe_height'][0]
         return flash_object(url, width, height)
+
 
 class Veoh(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
@@ -223,12 +229,14 @@ class Veoh(markdown.inlinepatterns.Pattern):
         height = self.ext.config['veoh_height'][0]
         return flash_object(url, width, height)
 
+
 class Vimeo(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://vimeo.com/moogaloop.swf?clip_id=%s&amp;server=vimeo.com' % m.group('vimeoid')
         width = self.ext.config['vimeo_width'][0]
         height = self.ext.config['vimeo_height'][0]
         return flash_object(url, width, height)
+
 
 class Yahoo(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
@@ -243,12 +251,14 @@ class Yahoo(markdown.inlinepatterns.Pattern):
         obj.append(param)
         return obj
 
+
 class Youtube(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://www.youtube.com/v/%s' % m.group('youtubeargs')
         width = self.ext.config['youtube_width'][0]
         height = self.ext.config['youtube_height'][0]
         return flash_object(url, width, height)
+
 
 def flash_object(url, width, height):
         obj = etree.Element('object')
@@ -270,7 +280,8 @@ def flash_object(url, width, height):
         #obj.append(param)
         return obj
 
-def makeExtension(configs=None) :
+
+def makeExtension(configs=None):
     return VideoExtension(configs=configs)
 
 if __name__ == "__main__":

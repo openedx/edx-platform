@@ -4,31 +4,30 @@
     from courseware.courses import course_image_url, get_course_about_section
 %>
 <%page args="course" />
-
-<article id="${course.id}"class="course">
+<article id="${course.id}" class="course">
+  <a href="${reverse('about_course', args=[course.id])}">
   <div class="inner-wrapper">
-    <header class="course-preview">
-      <a href="${reverse('about_course', args=[course.id])}">
+      <header class="course-preview">
         <hgroup>
           <h2><span class="course-number">${course.number}</span> ${get_course_about_section(course, 'title')}</h2>
         </hgroup>
         <div class="info-link">&#x2794;</div>
-      </a>
-    </header>
-    <section class="info">
-      <div class="cover-image">
-        <img src="${course_image_url(course)}">
-      </div>
-      <div class="desc">
-        <p>${get_course_about_section(course, 'short_description')}</p>
-      </div>
-      <div class="bottom">
-        <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
-        <span class="start-date">${course.start_date_text}</span>
-      </div>
-    </section>
-  </div>
-  <div class="meta-info">
-    <p class="university">${get_course_about_section(course, 'university')}</p>
-  </div>
+      </header>
+      <section class="info">
+        <div class="cover-image">
+          <img src="${course_image_url(course)}">
+        </div>
+        <div class="desc">
+          <p>${get_course_about_section(course, 'short_description')}</p>
+        </div>
+        <div class="bottom">
+          <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
+          <span class="start-date">${course.start_date_text}</span>
+        </div>
+      </section>
+    </div>
+    <div class="meta-info">
+      <p class="university">${get_course_about_section(course, 'university')}</p>
+    </div>
+  </a>
 </article>

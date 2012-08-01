@@ -4,10 +4,11 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Adding model 'UserTestGroup'
         db.create_table('student_usertestgroup', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -24,15 +25,13 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('student_usertestgroup_users', ['usertestgroup_id', 'user_id'])
 
-
     def backwards(self, orm):
-        
+
         # Deleting model 'UserTestGroup'
         db.delete_table('student_usertestgroup')
 
         # Removing M2M table for field users on 'UserTestGroup'
         db.delete_table('student_usertestgroup_users')
-
 
     models = {
         'auth.group': {

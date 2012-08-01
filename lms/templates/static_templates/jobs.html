@@ -2,59 +2,59 @@
 
 <%inherit file="../main.html" />
 
+<%block name="title"><title>Jobs</title></%block>
+
 <section class="container jobs">
-  <h1>Want to change the future of education?</h1>
+  <h1>Do You Want to Change the Future of Education?</h1>
   <hr class="horizontal-divider">
 
   <section class="message">
     <div class="inner-wrapper">
       <div class="photo">
-        <img src="${static.url('images/courses/space2.jpg')}">
+        <img src="${static.url('images/jobs.jpeg')}">
       </div>
-      <h2>Our Mission is to Educate 1 billion people around the world</h2>
-      <p>“EdX represents a unique opportunity to improve education on our own campuses through online learning, while simultaneously creating a bold new educational path for millions of learners worldwide,” MIT President Susan Hockfield said.</p>
-      <p>Harvard President Drew Faust said, “edX gives Harvard and MIT an unprecedented opportunity to dramatically extend our collective reach by conducting groundbreaking research into effective education and by extending online access to quality higher education.”
+      <header>
+      <h2>Our mission is to transform learning.</h2>
+
+      <blockquote>
+        <p>&ldquo;EdX represents a unique opportunity to improve education on our campuses through online learning, while simultaneously creating a bold new educational path for millions of learners worldwide.&rdquo;</p>
+        <cite>&mdash;Rafael Reif, MIT President </cite>
+      </blockquote>
+
+      <blockquote>
+        <p>&ldquo;EdX gives Harvard and MIT an unprecedented opportunity to dramatically extend our collective reach by conducting groundbreaking research into effective education and by extending online access to quality higher education.&rdquo;</p>
+        <cite>&mdash;Drew Faust, Harvard President</cite>
+      </blockquote>
+      </header>
     </div>
   </section>
   <hr class="horizontal-divider">
 
   <section class="jobs-wrapper">
-    <h2>We are currently looking for</h2>
-
     <section class="jobs-listing">
-      <article id="technology-team" class="job">
+      <article id="edx-fellow" class="job">
         <div class="inner-wrapper">
-          <h3>Technology Team</h3>
-          <p>[Looking for both back-end and front-end developers. Strong backgrounds in machine learning, education, user interaction design, big data, or social network analysis are desirable, but team members do wear many hats. Best candidate would be a masterful hacker who went and did startups after finishing their Ph.D. We should find a way to make some positions that parallel fellows, and can leverage MIT/Harvard prestige]</p>
-          <p>If you're interested in this position, send an e-mail to <a href="">content-engineer@edx.org</a></p>
+          <h3>EdX Fellow</h3>
+          <p>EdX Fellows are immersed in developing innovative solutions for online teaching, learning and research. They partner with faculty and staff from edX universities in the development, implementation and evaluation of online courses. We're looking for candidates with recent masters or doctorate degrees in the social sciences, humanities, natural sciences, engineering, or education. We welcome new ways of thinking about both the promises and practices of online learning.</p>
+          <p>Ability to work in a fast-paced, highly collaborative environment is essential.</p>
+          <p>If you are interested in this position, please send an email to <a href='mailto:jobs@edx.org'>jobs@edx.org</a>.</p>
         </div>
       </article>
 
-      <article id="edx-fellow" class="job">
+      <article id="platform-developer" class="job">
         <div class="inner-wrapper">
-          <h3>edX Fellow</h3>
-          <p>The edX fellows program is intended as an alternative to the traditional academic track for candidates with a strong focus on teaching. Fellows act as contact points for departments at MIT and Harvard, and help facilitate putting together on-line courses. </p>
-          <p>If you're interested in this position, send an e-mail to <a href="">fellow-jobs@edx.org</a></p>
+          <h3>Platform Developer</h3>
+          <p>Platform Developers build the core learning platform that powers edX, writing both front-end and back-end code. They tackle a wide range of technical challenges, and so the best candidates will have a strong background in one or more of the following areas: machine learning, education, user interaction design, big data, social network analysis, and devops. Specialists are encouraged to apply, but team members often wear many hats. Our ideal candidate would have excellent coding skills, a proven history of delivering projects, and a deep research background.</p>
+          <p>If you are interested in this position, please send an email to <a href='mailto:jobs@edx.org'>jobs@edx.org</a></p>
         </div>
       </article>
 
       <article id="content-engineer" class="job">
         <div class="inner-wrapper">
           <h3>Content Engineer</h3>
-          <p>Content engineers help create the technology for specific courses. The tasks include:</p>
-          <ul>
-            <li>
-              <p>Development of course-specific user-facing elements, such as the circuit editor and simulator that Chris Terman and Jacob White developed for 6.002x</p>
-            </li>
-            <li>
-              <p>Simple integration of course materials into courses</p>
-            </li>
-            <li>
-              <p>Developing programs to grade rich design questions, such as the ones developed by Gerald Sussman to allow basic design problems in 6.002x.</p>
-            </li>
-          </ul>
-          <p>Knowledge of Python, XML, and/or JavaScript is desired. Strong interest and background in pedagogy and education is desired as well.</p>
-          <p>If you're interested in this position, send an e-mail to <a href="">content-engineer@edx.org</a></p>
+          <p>Content Engineers develop sophisticated, domain-specific tools that enable professors to deliver the best possible educational experience in their classes. Examples include circuit schematic editors, scientific simulators of every kind, and peer collaboration tools. Content Engineers are dedicated to pushing the boundaries of what can be taught and assessed online, and will work closely with edX Fellows and course staff.</p>
+          <p>Strong JavaScript skills are required. A deep interest and background in pedagogy and education is highly desired. Knowledge of GWT, Backbone.js, and Python a plus.</p>
+          <p>If you are interested in this position, please send an email to <a href='mailto:jobs@edx.org'>jobs@edx.org</a>.</p>
         </div>
       </article>
     </section>
@@ -62,12 +62,12 @@
     <section class="jobs-sidebar">
       <h2>Positions</h2>
       <nav>
-        <a href="#technology-team">Technology Team</a>
-        <a href="#edx-fellow">edX Fellow</a>
+        <a href="#edx-fellow">EdX Fellow</a>
+        <a href="#platform-developer">Platform Developer</a>
         <a href="#content-engineer">Content Engineer</a>
       </nav>
       <h2>How to Apply</h2>
-      <p>E-mail your resume, coverletter and any other materials to <a href="#">careers@edx.org</a></p>
+      <p>E-mail your resume, coverletter and any other materials to <a href="mailto:jobs@edx.org">jobs@edx.org</a></p>
       <h2>Our Location</h2>
       <p>11 Cambridge Center <br/>
       Cambridge, MA 02142</p>

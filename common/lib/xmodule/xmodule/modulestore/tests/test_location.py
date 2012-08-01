@@ -13,14 +13,51 @@ def test_string_roundtrip():
     check_string_roundtrip("tag://org/course/category/name/revision")
 
 
+input_dict = {
+    'tag': 'tag',
+    'course': 'course',
+    'category': 'category',
+    'name': 'name',
+    'org': 'org'
+}
+
+input_list = ['tag', 'org', 'course', 'category', 'name']
+
+input_str = "tag://org/course/category/name"
+input_str_rev = "tag://org/course/category/name/revision"
+
+valid = (input_list, input_dict, input_str, input_str_rev)
+
+invalid_dict = {
+    'tag': 'tag',
+    'course': 'course',
+    'category': 'category',
+    'name': 'name/more_name',
+    'org': 'org'
+}
+
+invalid_dict2 = {
+    'tag': 'tag',
+    'course': 'course',
+    'category': 'category',
+    'name': 'name ',   # extra space
+    'org': 'org'
+}
+
+invalid = ("foo", ["foo"], ["foo", "bar"],
+           ["foo", "bar", "baz", "blat", "foo/bar"],
+           "tag://org/course/category/name with spaces/revision",
+           invalid_dict,
+           invalid_dict2)
+
+def test_is_valid():
+    for v in valid:
+        assert_equals(Location.is_valid(v), True)
+
+    for v in invalid:
+        assert_equals(Location.is_valid(v), False)
+
 def test_dict():
-    input_dict = {
-        'tag': 'tag',
-        'course': 'course',
-        'category': 'category',
-        'name': 'name',
-        'org': 'org'
-    }
     assert_equals("tag://org/course/category/name", Location(input_dict).url())
     assert_equals(dict(revision=None, **input_dict), Location(input_dict).dict())
 
@@ -30,7 +67,6 @@ def test_dict():
 
 
 def test_list():
-    input_list = ['tag', 'org', 'course', 'category', 'name']
     assert_equals("tag://org/course/category/name", Location(input_list).url())
     assert_equals(input_list + [None], Location(input_list).list())
 
@@ -44,12 +80,16 @@ def test_location():
     assert_equals("tag://org/course/category/name", Location(Location(input_list)).url())
 
 
+def test_none():
+    assert_equals([None] * 6, Location(None).list())
+
+
 def test_invalid_locations():
     assert_raises(InvalidLocationError, Location, "foo")
     assert_raises(InvalidLocationError, Location, ["foo", "bar"])
     assert_raises(InvalidLocationError, Location, ["foo", "bar", "baz", "blat", "foo/bar"])
-    assert_raises(InvalidLocationError, Location, None)
     assert_raises(InvalidLocationError, Location, "tag://org/course/category/name with spaces/revision")
+
 
 def test_equality():
     assert_equals(
@@ -61,3 +101,13 @@ def test_equality():
         Location('tag', 'org', 'course', 'category', 'name1'),
         Location('tag', 'org', 'course', 'category', 'name')
     )
+
+def test_clean():
+    pairs = [ ('',''),
+              (' ', '_'),
+              ('abc,', 'abc_'),
+              ('ab    fg!@//\\aj', 'ab_fg_aj'),
+              (u"ab\xA9", "ab_"),  # no unicode allowed for now
+              ]
+    for input, output in pairs:
+        assert_equals(Location.clean(input), output)

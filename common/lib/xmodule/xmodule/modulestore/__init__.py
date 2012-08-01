@@ -5,7 +5,7 @@ that are stored in a database an accessible using their Location as an identifie
 
 import re
 from collections import namedtuple
-from .exceptions import InvalidLocationError
+from .exceptions import InvalidLocationError, InsufficientSpecificationError
 import logging
 
 log = logging.getLogger('mitx.' + 'modulestore')
@@ -38,20 +38,50 @@ class Location(_LocationBase):
     '''
     __slots__ = ()
 
-    @classmethod
-    def clean(cls, value):
+    @staticmethod
+    def clean(value):
         """
         Return value, made into a form legal for locations
         """
         return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
 
-    def __new__(_cls, loc_or_tag, org=None, course=None, category=None, name=None, revision=None):
+    @staticmethod
+    def is_valid(value):
+        '''
+        Check if the value is a valid location, in any acceptable format.
+        '''
+        try:
+            Location(value)
+        except InvalidLocationError:
+            return False
+        return True
+
+    @staticmethod
+    def ensure_fully_specified(location):
+        '''Make sure location is valid, and fully specified.  Raises
+        InvalidLocationError or InsufficientSpecificationError if not.
+
+        returns a Location object corresponding to location.
+        '''
+        loc = Location(location)
+        for key, val in loc.dict().iteritems():
+            if key != 'revision' and val is None:
+                raise InsufficientSpecificationError(location)
+        return loc
+
+
+
+    def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None,
+                name=None, revision=None):
         """
         Create a new location that is a clone of the specifed one.
 
         location - Can be any of the following types:
-            string: should be of the form {tag}://{org}/{course}/{category}/{name}[/{revision}]
+            string: should be of the form
+                    {tag}://{org}/{course}/{category}/{name}[/{revision}]
+
             list: should be of the form [tag, org, course, category, name, revision]
+
             dict: should be of the form {
                 'tag': tag,
                 'org': org,
@@ -62,18 +92,25 @@ class Location(_LocationBase):
             }
             Location: another Location object
 
-        In both the dict and list forms, the revision is optional, and can be ommitted.
+        In both the dict and list forms, the revision is optional, and can be
+        ommitted.
 
-        Components must be composed of alphanumeric characters, or the characters '_', '-', and '.'
+        Components must be composed of alphanumeric characters, or the
+        characters '_', '-', and '.'
 
-        Components may be set to None, which may be interpreted by some contexts to mean
-        wildcard selection
+        Components may be set to None, which may be interpreted by some contexts
+        to mean wildcard selection
         """
 
-        if org is None and course is None and category is None and name is None and revision is None:
+
+        if (org is None and course is None and category is None and
+            name is None and revision is None):
             location = loc_or_tag
         else:
             location = (loc_or_tag, org, course, category, name, revision)
+
+        if location is None:
+            return _LocationBase.__new__(_cls, *([None] * 6))
 
         def check_dict(dict_):
             check_list(dict_.itervalues())
@@ -81,7 +118,7 @@ class Location(_LocationBase):
         def check_list(list_):
             for val in list_:
                 if val is not None and INVALID_CHARS.search(val) is not None:
-                    log.debug('invalid characters val="%s", list_="%s"' % (val,list_))
+                    log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
                     raise InvalidLocationError(location)
 
         if isinstance(location, basestring):
@@ -127,9 +164,11 @@ class Location(_LocationBase):
 
     def html_id(self):
         """
-        Return a string with a version of the location that is safe for use in html id attributes
+        Return a string with a version of the location that is safe for use in
+        html id attributes
         """
-        return "-".join(str(v) for v in self.list() if v is not None).replace('.', '_')
+        return "-".join(str(v) for v in self.list()
+                        if v is not None).replace('.', '_')
 
     def dict(self):
         """
@@ -150,7 +189,8 @@ class Location(_LocationBase):
 
 class ModuleStore(object):
     """
-    An abstract interface for a database backend that stores XModuleDescriptor instances
+    An abstract interface for a database backend that stores XModuleDescriptor
+    instances
     """
     def get_item(self, location, depth=0):
         """
@@ -160,16 +200,31 @@ class ModuleStore(object):
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises xmodule.modulestore.exceptions.ItemNotFoundError
+
+        If no object is found at that location, raises
+            xmodule.modulestore.exceptions.ItemNotFoundError
 
         location: Something that can be passed to Location
 
-        depth (int): An argument that some module stores may use to prefetch descendents of the queried modules
-            for more efficient results later in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all descendents
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of calls to
+            get_children() to cache. None indicates to cache all descendents
         """
         raise NotImplementedError
-    
+
+    def get_item_errors(self, location):
+        """
+        Return a list of (msg, exception-or-None) errors that the modulestore
+        encountered when loading the item at location.
+
+        location : something that can be passed to Location
+
+        Raises the same exceptions as get_item if the location isn't found or
+        isn't fully specified.
+        """
+        raise NotImplementedError
+
     def get_items(self, location, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
@@ -178,9 +233,10 @@ class ModuleStore(object):
 
         location: Something that can be passed to Location
 
-        depth: An argument that some module stores may use to prefetch descendents of the queried modules
-            for more efficient results later in the request. The depth is counted in the number of calls
-            to get_children() to cache. None indicates to cache all descendents
+        depth: An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of calls to
+            get_children() to cache. None indicates to cache all descendents
         """
         raise NotImplementedError
 
@@ -217,3 +273,20 @@ class ModuleStore(object):
         metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError
+
+    def get_courses(self):
+        '''
+        Returns a list containing the top level XModuleDescriptors of the courses
+        in this modulestore.
+        '''
+        raise NotImplementedError
+
+
+    def get_parent_locations(self, location):
+        '''Find all locations that are the parents of this location.  Needed
+        for path_to_location().
+
+        returns an iterable of things that can be passed to Location.
+        '''
+        raise NotImplementedError
+

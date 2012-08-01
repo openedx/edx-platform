@@ -26,19 +26,19 @@ try:
 except:
     from markdown import etree
 
+
 class CircuitExtension(markdown.Extension):
     def __init__(self, configs):
-        for key, value in configs :
+        for key, value in configs:
             self.setConfig(key, value)
-            
-    
+
     def extendMarkdown(self, md, md_globals):
         ## Because Markdown treats contigous lines as one block of text, it is hard to match
         ## a regex that must occupy the whole line (like the circuit regex). This is why we have
         ## a preprocessor that inspects the lines and replaces the matched lines with text that is
         ## easier to match
-        md.preprocessors.add('circuit',  CircuitPreprocessor(md), "_begin")
-        
+        md.preprocessors.add('circuit', CircuitPreprocessor(md), "_begin")
+
         pattern = CircuitLink(r'processed-schematic:(?P<data>.*?)processed-schematic-end')
         pattern.md = md
         pattern.ext = self
@@ -47,16 +47,16 @@ class CircuitExtension(markdown.Extension):
 
 class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
     preRegex = re.compile(r'^circuit-schematic:(?P<data>.*)$')
-    
+
     def run(self, lines):
         def convertLine(line):
             m = self.preRegex.match(line)
             if m:
-                return 'processed-schematic:{0}processed-schematic-end'.format( m.group('data') )
+                return 'processed-schematic:{0}processed-schematic-end'.format(m.group('data'))
             else:
                 return line
-        
-        return [ convertLine(line) for line in lines ]
+
+        return [convertLine(line) for line in lines]
 
 
 class CircuitLink(markdown.inlinepatterns.Pattern):
@@ -64,9 +64,9 @@ class CircuitLink(markdown.inlinepatterns.Pattern):
         data = m.group('data')
         data = escape(data)
         return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='640' height='480'/></div>")
-        
-    
+
+
 def makeExtension(configs=None):
     to_return = CircuitExtension(configs=configs)
-    print "circuit returning " , to_return
+    print "circuit returning ", to_return
     return to_return

@@ -6,22 +6,25 @@ MITX_FEATURES[...]. Modules that extend this one can change the feature
 configuration in an environment specific config file and re-calculate those
 values.
 
-We should make a method that calls all these config methods so that you just 
+We should make a method that calls all these config methods so that you just
 make one call at the end of your site-specific dev file to reset all the
 dependent variables (like INSTALLED_APPS) for you.
 
 Longer TODO:
-1. Right now our treatment of static content in general and in particular 
+1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
    just means that we stick them in a dict called MITX_FEATURES.
-3. We need to handle configuration for multiple courses. This could be as 
+3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
 import sys
 import os
 import tempfile
 import glob2
+import errno
+import hashlib
+from collections import defaultdict
 
 import djcelery
 from path import path
@@ -39,8 +42,12 @@ MITX_FEATURES = {
     'SAMPLE' : False,
     'USE_DJANGO_PIPELINE' : True,
     'DISPLAY_HISTOGRAMS_TO_STAFF' : True,
-    'REROUTE_ACTIVATION_EMAIL' : False,		# nonempty string = address for all activation emails 
+    'REROUTE_ACTIVATION_EMAIL' : False,		# nonempty string = address for all activation emails
     'DEBUG_LEVEL' : 0,				# 0 = lowest level, least verbose, 255 = max level, most verbose
+
+    ## DO NOT SET TO True IN THIS FILE
+    ## Doing so will cause all courses to be released on production
+    'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 }
 
 # Used for A/B testing
@@ -54,7 +61,7 @@ PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
-ASKBOT_ROOT = ENV_ROOT / "askbot-devel"
+ASKBOT_ROOT = REPO_ROOT / "askbot"
 COURSES_ROOT = ENV_ROOT / "data"
 
 # FIXME: To support multiple courses, we should walk the courses dir at startup
@@ -78,7 +85,7 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
                           COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates']
 
-# This is where Django Template lookup is defined. There are a few of these 
+# This is where Django Template lookup is defined. There are a few of these
 # still left lying around.
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
@@ -96,8 +103,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 
-# FIXME: 
-# We should have separate S3 staged URLs in case we need to make changes to 
+# FIXME:
+# We should have separate S3 staged URLs in case we need to make changes to
 # these assets and test them.
 LIB_URL = '/static/js/'
 
@@ -105,6 +112,7 @@ LIB_URL = '/static/js/'
 # BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/' # For AWS deploys
 # RSS_URL = r'lms/templates/feed.rss'
+# PRESS_URL = r''
 RSS_TIMEOUT = 600
 
 # Configuration option for when we want to grab server error pages
@@ -112,7 +120,7 @@ STATIC_GRAB = False
 DEV_CONTENT = True
 
 # FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 10000 
+TRACK_MAX_EVENT = 10000
 DEBUG_TRACK_LOG = False
 
 MITX_ROOT_URL = ''
@@ -121,7 +129,7 @@ COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
 COURSE_TITLE = "Circuits and Electronics"
 
-### Dark code. Should be enabled in local settings for devel. 
+### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 QUICKEDIT = False
@@ -146,6 +154,7 @@ MODULESTORE = {
         'OPTIONS': {
             'data_dir': DATA_DIR,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+            'eager': True,
         }
     }
 }
@@ -158,17 +167,17 @@ TEMPLATE_DEBUG = False
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "localhost:8000"
+SITE_NAME = "edx.org"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@mitx.mit.edu'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@mitx.mit.edu'
+DEFAULT_FROM_EMAIL = 'registration@edx.org'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 ADMINS = (
-    ('MITx Admins', 'admin@mitx.mit.edu'),
+    ('edX Admins', 'admin@edx.org'),
 )
 MANAGERS = ADMINS
 
@@ -178,6 +187,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
+    COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     ASKBOT_ROOT / "askbot" / "skins",
 
@@ -201,9 +211,9 @@ USE_L10N = True
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 #################################### AWS #######################################
-# S3BotoStorage insists on a timeout for uploaded assets. We should make it 
+# S3BotoStorage insists on a timeout for uploaded assets. We should make it
 # permanent instead, but rather than trying to figure out exactly where that
-# setting is, I'm just bumping the expiration time to something absurd (100 
+# setting is, I'm just bumping the expiration time to something absurd (100
 # years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
 # in the global settings.py
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60 # 10 years
@@ -262,7 +272,6 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'util.middleware.ExceptionLoggingMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -270,7 +279,7 @@ MIDDLEWARE_CLASSES = (
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
-    
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
@@ -292,22 +301,152 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 PIPELINE_CSS = {
     'application': {
         'source_filenames': ['sass/application.scss'],
-        'output_filename': 'css/application.css',
+        'output_filename': 'css/lms-application.css',
+    },
+    'course': {
+      'source_filenames': ['js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css', 'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css', 'css/vendor/jquery.qtip.min.css', 'sass/course.scss'],
+      'output_filename': 'css/lms-course.css',
+      },
+    'ie-fixes': {
+        'source_filenames': ['sass/ie.scss'],
+        'output_filename': 'css/lms-ie.css',
     },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss']
+PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/course.scss']
+
+courseware_only_js = [
+    PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
+    for pth
+    in ['courseware', 'histogram', 'navigation', 'time', ]
+]
+courseware_only_js += [
+    pth for pth
+    in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee')
+]
+
+main_vendor_js = [
+  'js/vendor/jquery.min.js',
+  'js/vendor/jquery-ui.min.js',
+  'js/vendor/swfobject/swfobject.js',
+  'js/vendor/jquery.cookie.js',
+  'js/vendor/jquery.qtip.min.js',
+]
+
+# Load javascript from all of the available xmodules, and
+# prep it for use in pipeline js
+from xmodule.x_module import XModuleDescriptor
+from xmodule.hidden_module import HiddenDescriptor
+js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
+css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
+module_styles_path = css_file_dir / "_module-styles.scss"
+
+for dir_ in (js_file_dir, css_file_dir):
+    try:
+        os.makedirs(dir_)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            pass
+        else:
+            raise
+
+js_fragments = set()
+css_fragments = defaultdict(set)
+for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
+    module_js = descriptor.module_class.get_javascript()
+    for filetype in ('coffee', 'js'):
+        for idx, fragment in enumerate(module_js.get(filetype, [])):
+            js_fragments.add((idx, filetype, fragment))
+
+    module_css = descriptor.module_class.get_css()
+    for filetype in ('sass', 'scss', 'css'):
+        for idx, fragment in enumerate(module_css.get(filetype, [])):
+            css_fragments[idx, filetype, fragment].add(descriptor.module_class.__name__)
+
+module_js_sources = []
+for idx, filetype, fragment in sorted(js_fragments):
+    path = js_file_dir / "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    with open(path, 'w') as js_file:
+        js_file.write(fragment)
+    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
+
+css_imports = defaultdict(set)
+for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
+    fragment_name = "{idx}-{hash}.{type}".format(
+        idx=idx,
+        hash=hashlib.md5(fragment).hexdigest(),
+        type=filetype)
+    # Prepend _ so that sass just includes the files into a single file
+    with open(css_file_dir / '_' + fragment_name, 'w') as js_file:
+        js_file.write(fragment)
+
+    for class_ in classes:
+        css_imports[class_].add(fragment_name)
+
+with open(module_styles_path, 'w') as module_styles:
+    for class_, fragment_names in css_imports.items():
+        imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
+        module_styles.write(""".xmodule_{class_} {{ {imports} }}""".format(
+            class_=class_, imports=imports
+        ))
 
 PIPELINE_JS = {
     'application': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')],
-        'output_filename': 'js/application.js'
+        # Application will contain all paths not in courseware_only_js
+        'source_filenames': [
+            pth.replace(COMMON_ROOT / 'static/', '')
+            for pth
+            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+        ] + [
+            pth.replace(PROJECT_ROOT / 'static/', '')
+            for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
+            if pth not in courseware_only_js
+        ] + [
+            'js/form.ext.js',
+            'js/my_courses_dropdown.js',
+            'js/toggle_login_modal.js',
+            'js/sticky_filter.js',
+        ],
+        'output_filename': 'js/lms-application.js'
+    },
+    'courseware': {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in courseware_only_js],
+        'output_filename': 'js/lms-courseware.js'
+    },
+    'main_vendor': {
+        'source_filenames': main_vendor_js,
+        'output_filename': 'js/lms-main_vendor.js',
+    },
+    'module-js': {
+        'source_filenames': module_js_sources,
+        'output_filename': 'js/lms-modules.js',
     },
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
-        'output_filename': 'js/spec.js'
+        'output_filename': 'js/lms-spec.js'
     }
 }
+
+# Compile all coffee files in course data directories if they are out of date.
+# TODO: Remove this once we move data into Mongo. This is only temporary while
+# course data directories are still in use.
+if os.path.isdir(DATA_DIR):
+    for course_dir in os.listdir(DATA_DIR):
+        js_dir = DATA_DIR / course_dir / "js"
+        if not os.path.isdir(js_dir):
+            continue
+        for filename in os.listdir(js_dir):
+            if filename.endswith('coffee'):
+                new_filename = os.path.splitext(filename)[0] + ".js"
+                if os.path.exists(js_dir / new_filename):
+                    coffee_timestamp = os.stat(js_dir / filename).st_mtime
+                    js_timestamp     = os.stat(js_dir / new_filename).st_mtime
+                    if coffee_timestamp <= js_timestamp:
+                        continue
+                os.system("coffee -c %s" % (js_dir / filename))
 
 PIPELINE_COMPILERS = [
     'pipeline.compilers.sass.SASSCompiler',
@@ -363,7 +502,7 @@ INSTALLED_APPS = (
     # For testing
     'django_jasmine',
 
-    # For Askbot 
+    # For Askbot
     'django.contrib.sitemaps',
     'django.contrib.admin',
     'django_countries',

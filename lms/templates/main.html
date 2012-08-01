@@ -4,80 +4,35 @@
 <head>
   <%block name="title"><title>edX</title></%block>
 
-  <link href='http://fonts.googleapis.com/css?family=Open+Sans:800italic,400,800' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="${static.url('css/vendor/jquery.treeview.css')}" type="text/css" media="all" />
+  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
 
-% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
- <%static:css group='application'/>
-% endif
+  <%static:css group='application'/>
 
-% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
-  <link rel="stylesheet" href="/static/sass/application.css" type="text/css" media="all" / >
-% endif
-
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery-ui.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/swfobject/swfobject.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.cookie.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.qtip.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/form.ext.js')}"></script>
-
-  ## TODO (cpennington): Remove this when we have a good way for modules to specify js to load on the page
-  ## and in the wiki
-  <script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
-
-% if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
- <%static:js group='application'/>
-% endif
-
-% if not settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
-  % for jsfn in [ '/static/%s' % x.replace('.coffee','.js') for x in settings.PIPELINE_JS['application']['source_filenames'] ]:
-    <script type="text/javascript" src="${jsfn}"></script>
-  % endfor
-% endif
-
-## codemirror
-  <link rel="stylesheet" href="/static/css/codemirror.css" type="text/css" media="all" />
-  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
-
-## alternate codemirror
-##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/lib/codemirror.js')}"></script>
-##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/xml/xml.js')}"></script>
-##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/python/python.js')}"></script>
-
-## image input: for clicking on images (see imageinput.html)
-  <script type="text/javascript" src="${static.url('js/vendor/imageinput.js')}"></script>
-
-##  <script type="text/javascript">
-##    var codemirror_set = {};		// track all codemirror textareas, so they can be refreshed on page changes
-##  </script>
+  <!--[if lte IE 9]>
+  <%static:css group='ie-fixes'/>
+  <![endif]-->
+  <%static:js group='main_vendor'/>
+  <%block name="headextra"/>
 
   <!--[if lt IE 9]>
   <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
- <%block name="headextra"/>
-
-  <%include file="mathjax_include.html" />
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
 </head>
 
 <body class="<%block name='bodyclass'/>">
   <%include file="navigation.html" />
-  <!--[if lte IE 9]>
-  <p class="ie-warning">You are using a browser that is not supported by <em>edX</em>, and you might not be able to complete pieces of the course. Please download the latest version of <a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a> or <a href="https://www.google.com/chrome">Chrome</a> to get the full experience.</p>
-  <![endif]-->
-
   <section class="content-wrapper">
     ${self.body()}
   </section>
 
   <%block name="bodyextra"/>
   <%include file="footer.html" />
-  <%block name="js_extra"/>
-  <script src="${static.url('js/my_courses_dropdown.js')}"></script>
-  <script src="${static.url('js/toggle_login_modal.js')}"></script>
-  <script src="${static.url('js/sticky_filter.js')}"></script>
 
+  <%static:js group='application'/>
+  <%static:js group='module-js'/>
+
+  <%block name="js_extra"/>
 </body>
 </html>

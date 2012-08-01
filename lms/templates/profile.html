@@ -1,5 +1,10 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
 <%block name="title"><title>Profile - edX 6.002x</title></%block>
@@ -8,7 +13,7 @@
     from django.core.urlresolvers import reverse
 %>
 
-<%block name="headextra">
+<%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
@@ -106,9 +111,9 @@ $(function() {
 </%block>
 
 
-<%include file="navigation.html" args="active_page='profile'" />
+<%include file="course_navigation.html" args="active_page='profile'" />
 
-<section class="main-content">
+<section class="container">
   <div class="profile-wrapper">
 
     <section class="course-info">
@@ -122,8 +127,7 @@ $(function() {
         %for chapter in courseware_summary:
         %if not chapter['chapter'] == "hidden":
         <li>
-          <h2><a href="${reverse('courseware_chapter', args=format_url_params([chapter['course'], chapter['chapter']])) }">
-          ${ chapter['chapter'] }</a></h2>
+          <h2>${ chapter['chapter'] }</h2>
 
           <ol class="sections">
             %for section in chapter['sections']:
@@ -134,7 +138,7 @@ $(function() {
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
               
-              <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">
+              <h3><a href="${reverse('courseware_section', kwargs={'course_id' : course.id, 'chapter' : chapter['chapter'], 'section' : section['section']})}">
                 ${ section['section'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
               ${section['format']}
               %if 'due' in section and section['due']!="":
@@ -211,10 +215,10 @@ $(function() {
   <form id="change_name_form">
     <div id="change_name_error"> </div>
     <fieldset>
-      <p>To uphold the credibility of edX certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p> 
+      <p>To uphold the credibility of <span class="edx">edX</span> certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p> 
       <ul>
         <li>
-          <label>Enter your desired full name, as it will appear on the edX Certificate: </label>
+          <label>Enter your desired full name, as it will appear on the <span class="edx">edX</span> Certificate: </label>
           <input id="new_name_field" value="" type="text" />
         </li>
         <li>
@@ -255,7 +259,7 @@ $(function() {
 </div>
 
 <div id="deactivate-account" class="leanModal_box">
-  <h1>Deactivate edX Account</h1>
+  <h1>Deactivate <span class="edx">edX</span> Account</h1>
   <p>Once you deactivate you&rsquo;re MIT<em>x</em> account you will no longer recieve updates and new class announcements from MIT<em>x</em>.</p>
   <p>If you&rsquo;d like to still get updates and new class announcements you can just <a href="#unenroll" rel="leanModal">unenroll</a> and keep your account active.</p>
 

@@ -37,9 +37,9 @@ from util import contextualize_text
 import responsetypes
 
 # dict of tagname, Response Class -- this should come from auto-registering
-response_tag_dict = dict([(x.response_tag,x) for x in responsetypes.__all__])
+response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
-entry_types = ['textline', 'schematic', 'choicegroup', 'textbox', 'imageinput', 'optioninput']
+entry_types = ['textline', 'schematic', 'textbox', 'imageinput', 'optioninput', 'choicegroup', 'radiogroup', 'checkboxgroup']
 solution_types = ['solution']    			# extra things displayed after "show answers" is pressed
 response_properties = ["responseparam", "answer"]    	# these get captured as student responses
 
@@ -57,12 +57,13 @@ global_context = {'random': random,
                   'eia': eia}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["responseparam", "answer", "script","hintgroup"]
+html_problem_semantics = ["responseparam", "answer", "script", "hintgroup"]
 
 log = logging.getLogger('mitx.' + __name__)
 
 #-----------------------------------------------------------------------------
 # main class for this module
+
 
 class LoncapaProblem(object):
     '''
@@ -79,7 +80,7 @@ class LoncapaProblem(object):
          - id           (string): identifier for this problem; often a filename (no spaces)
          - state        (dict): student state
          - seed         (int): random number generator seed (int)
-         - system       (I4xSystem): I4xSystem instance which provides OS, rendering, and user context 
+         - system       (ModuleSystem): ModuleSystem instance which provides OS, rendering, and user context
 
         '''
 
@@ -118,6 +119,9 @@ class LoncapaProblem(object):
         # the dict has keys = xml subtree of Response, values = Response instance
         self._preprocess_problem(self.tree)
 
+        if not self.student_answers:  # True when student_answers is an empty dict
+            self.set_initial_display()
+
     def do_reset(self):
         '''
         Reset internal state to unfinished, with no answers
@@ -125,6 +129,14 @@ class LoncapaProblem(object):
         self.student_answers = dict()
         self.correct_map = CorrectMap()
         self.done = False
+
+    def set_initial_display(self):
+        initial_answers = dict()
+        for responder in self.responders.values():
+            if hasattr(responder, 'get_initial_display'):
+                initial_answers.update(responder.get_initial_display())
+
+        self.student_answers = initial_answers
 
     def __unicode__(self):
         return u"LoncapaProblem ({0})".format(self.problem_id)
@@ -149,11 +161,11 @@ class LoncapaProblem(object):
         '''
         maxscore = 0
         for response, responder in self.responders.iteritems():
-            if hasattr(responder,'get_max_score'):
+            if hasattr(responder, 'get_max_score'):
                 try:
                     maxscore += responder.get_max_score()
                 except Exception:
-                    log.debug('responder %s failed to properly return from get_max_score()' % responder) # FIXME
+                    log.debug('responder %s failed to properly return from get_max_score()' % responder)  # FIXME
                     raise
             else:
                 maxscore += len(self.responder_answers[response])
@@ -170,7 +182,7 @@ class LoncapaProblem(object):
             try:
                 correct += self.correct_map.get_npoints(key)
             except Exception:
-                log.error('key=%s, correct_map = %s' % (key,self.correct_map))
+                log.error('key=%s, correct_map = %s' % (key, self.correct_map))
                 raise
 
         if (not self.student_answers) or len(self.student_answers) == 0:
@@ -180,14 +192,31 @@ class LoncapaProblem(object):
             return {'score': correct,
                     'total': self.get_max_score()}
 
-    def update_score(self, score_msg):
-        newcmap = CorrectMap()
+    def update_score(self, score_msg, queuekey):
+        '''
+        Deliver grading response (e.g. from async code checking) to
+            the specific ResponseType that requested grading
+
+        Returns an updated CorrectMap
+        '''
+        cmap = CorrectMap()
+        cmap.update(self.correct_map)
         for responder in self.responders.values():
-            if hasattr(responder,'update_score'): # Is this the best way to implement 'update_score' for CodeResponse?
-                results = responder.update_score(score_msg)         
-                newcmap.update(results)
-        self.correct_map = newcmap
-        return newcmap
+            if hasattr(responder, 'update_score'):
+                # Each LoncapaResponse will update the specific entries of 'cmap' that it's responsible for
+                cmap = responder.update_score(score_msg, cmap, queuekey)
+        self.correct_map.set_dict(cmap.get_dict())
+        return cmap
+
+    def is_queued(self):
+        '''
+        Returns True if any part of the problem has been submitted to an external queue
+        '''
+        queued = False
+        for answer_id in self.correct_map:
+            if self.correct_map.is_queued(answer_id):
+                queued = True
+        return queued
 
     def grade_answers(self, answers):
         '''
@@ -204,7 +233,7 @@ class LoncapaProblem(object):
         newcmap = CorrectMap()					# start new with empty CorrectMap
         # log.debug('Responders: %s' % self.responders)
         for responder in self.responders.values():
-            results = responder.evaluate_answers(answers,oldcmap)      # call the responsetype instance to do the actual grading
+            results = responder.evaluate_answers(answers, oldcmap)      # call the responsetype instance to do the actual grading
             newcmap.update(results)
         self.correct_map = newcmap
         # log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
@@ -257,23 +286,23 @@ class LoncapaProblem(object):
             file = inc.get('file')
             if file is not None:
                 try:
-                    ifp = self.system.filestore.open(file)	# open using I4xSystem OSFS filestore
+                    ifp = self.system.filestore.open(file)  # open using ModuleSystem OSFS filestore
                 except Exception as err:
-                    log.error('Error %s in problem xml include: %s' % (err,etree.tostring(inc,pretty_print=True)))
-                    log.error('Cannot find file %s in %s' % (file,self.system.filestore))
+                    log.error('Error %s in problem xml include: %s' % (err, etree.tostring(inc, pretty_print=True)))
+                    log.error('Cannot find file %s in %s' % (file, self.system.filestore))
                     if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
                         raise
                     else: continue
                 try:
                     incxml = etree.XML(ifp.read())		# read in and convert to XML
                 except Exception as err:
-                    log.error('Error %s in problem xml include: %s' % (err,etree.tostring(inc,pretty_print=True)))
+                    log.error('Error %s in problem xml include: %s' % (err, etree.tostring(inc, pretty_print=True)))
                     log.error('Cannot parse XML in %s' % (file))
                     if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
                         raise
                     else: continue
                 parent = inc.getparent()			# insert  new XML into tree in place of inlcude
-                parent.insert(parent.index(inc),incxml)
+                parent.insert(parent.index(inc), incxml)
                 parent.remove(inc)
                 log.debug('Included %s into %s' % (file, self.problem_id))
 
@@ -300,11 +329,11 @@ class LoncapaProblem(object):
             # path is an absolute path or a path relative to the data dir
             dir = os.path.join(self.system.filestore.root_path, dir)
             abs_dir = os.path.normpath(dir)
-            log.debug("appending to path: %s" % abs_dir)
+            #log.debug("appending to path: %s" % abs_dir)
             path.append(abs_dir)
-        
+
         return path
-    
+
     def _extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
         '''
         Extract content of <script>...</script> from the problem.xml file, and exec it in the
@@ -325,7 +354,7 @@ class LoncapaProblem(object):
         return context
 
     def _execute_scripts(self, scripts, context):
-        ''' 
+        '''
         Executes scripts in the given context.
         '''
         original_path = sys.path
@@ -363,7 +392,7 @@ class LoncapaProblem(object):
 
         Used by get_html.
         '''
-        if problemtree.tag=='script' and problemtree.get('type') and 'javascript' in problemtree.get('type'):
+        if problemtree.tag == 'script' and problemtree.get('type') and 'javascript' in problemtree.get('type'):
             # leave javascript intact.
             return problemtree
 
@@ -396,8 +425,8 @@ class LoncapaProblem(object):
                                                           'status': status,
                                                           'id': problemtree.get('id'),
                                                           'feedback': {'message': msg,
-                                                                       'hint' : hint,
-                                                                       'hintmode' : hintmode,
+                                                                       'hint': hint,
+                                                                       'hintmode': hintmode,
                                                                        }
                                                           },
                                                    use='capa_input')
@@ -415,7 +444,7 @@ class LoncapaProblem(object):
         if tree.tag in html_transforms:
             tree.tag = html_transforms[problemtree.tag]['tag']
         else:
-            for (key, value) in problemtree.items():	# copy attributes over if not innocufying
+            for (key, value) in problemtree.items():	 # copy attributes over if not innocufying
                 tree.set(key, value)
 
         tree.text = problemtree.text
@@ -438,7 +467,7 @@ class LoncapaProblem(object):
         self.responders = {}
         for response in tree.xpath('//' + "|//".join(response_tag_dict)):
             response_id_str = self.problem_id + "_" + str(response_id)
-            response.set('id',response_id_str)				# create and save ID for this response
+            response.set('id', response_id_str)				# create and save ID for this response
             response_id += 1
 
             answer_id = 1
@@ -450,18 +479,18 @@ class LoncapaProblem(object):
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
-            responder = response_tag_dict[response.tag](response, inputfields, self.context, self.system) # instantiate capa Response
+            responder = response_tag_dict[response.tag](response, inputfields, self.context, self.system)  # instantiate capa Response
             self.responders[response] = responder                               # save in list in self
 
         # get responder answers (do this only once, since there may be a performance cost, eg with externalresponse)
         self.responder_answers = {}
         for response in self.responders.keys():
             try:
-                self.responder_answers[response] = responder.get_answers()
+                self.responder_answers[response] = self.responders[response].get_answers()
             except:
-                log.debug('responder %s failed to properly return get_answers()' % self.responders[response]) # FIXME
+                log.debug('responder %s failed to properly return get_answers()' % self.responders[response])  # FIXME
                 raise
-        
+
         # <solution>...</solution> may not be associated with any specific response; give IDs for those separately
         # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
         solution_id = 1

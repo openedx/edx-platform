@@ -29,7 +29,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'Article', fields ['namespace', 'slug']
         db.create_unique('simplewiki_article', ['namespace_id', 'slug'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'Article', fields ['namespace', 'slug']
         db.delete_unique('simplewiki_article', ['namespace_id', 'slug'])
@@ -47,7 +46,6 @@ class Migration(SchemaMigration):
 
         # Adding unique constraint on 'Article', fields ['slug', 'parent']
         db.create_unique('simplewiki_article', ['slug', 'parent_id'])
-
 
     models = {
         'auth.group': {

@@ -148,6 +148,16 @@
 
       label {
         display: none;
+
+        &.field-error {
+          display: block;
+          color: #8F0E0E;
+
+          + input {
+            border: 1px solid #CA1111;
+            color: #8F0E0E;
+          }
+        }
       }
 
       input[type="checkbox"] {
@@ -187,6 +197,10 @@
           background: rgb(230,230,230);
         }
 
+        &.field-error {
+          border: 1px solid #CA1111;
+        }
+
         a {
           font-family: $serif;
           font-style: italic;
@@ -195,9 +209,8 @@
 
       .citizenship, .gender, .date-of-birth {
         margin-bottom: 20px;
-
-        .input-wrapper {
-        }
+        float: left;
+        width: flex-grid(4);
 
         label {
           display: block;
@@ -205,34 +218,13 @@
 
         select {
           width: 100%;
+          @include box-sizing(border-box);
+          display: block;
         }
       }
 
       .citizenship, .gender {
-        float: left;
-        width: flex-grid(6);
-      }
-
-      .citizenship {
         margin-right: flex-gutter();
-      }
-
-      .date-of-birth {
-        float: left;
-        width: flex-grid(12);
-
-        select {
-          @include box-sizing(border-box);
-          display: block;
-          float: left;
-          margin-right: flex-gutter();
-          max-width: flex-grid(4);
-          width: flex-grid(4);
-
-          &:last-child {
-            margin: 0px;
-          }
-        }
       }
 
       .submit {

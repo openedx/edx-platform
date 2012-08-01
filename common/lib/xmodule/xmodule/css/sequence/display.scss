@@ -1,0 +1,334 @@
+nav.sequence-nav {
+  // TODO (cpennington): This doesn't work anymore. XModules aren't able to
+  // import from external sources.
+  @extend .topbar;
+
+  border-bottom: 1px solid #ddd;
+  margin: (-(lh())) (-(lh())) lh() (-(lh()));
+  background: #eee;
+  position: relative;
+  @include border-top-right-radius(4px);
+
+  ol {
+    @include box-sizing(border-box);
+    display: table;
+    height: 100%;
+    margin: 0;
+    padding-left: 0;
+    padding-right: flex-grid(1, 9);
+    width: 100%;
+
+    a {
+      @extend .block-link;
+    }
+
+    li {
+      border-left: 1px solid #eee;
+      display: table-cell;
+      min-width: 20px;
+
+      &:first-child {
+        border-left: none;
+      }
+
+      .inactive {
+        background-repeat: no-repeat;
+
+        &:hover {
+          background-color: #eee;
+        }
+      }
+
+      .visited {
+        background-color: #ddd;
+        background-repeat: no-repeat;
+
+        &:hover {
+          background-position: center center;
+        }
+      }
+
+      .active {
+        background-color: #fff;
+        background-repeat: no-repeat;
+        @include box-shadow(0 1px 0 #fff);
+
+        &:hover {
+          background-color: #fff;
+          background-position: center;
+        }
+      }
+
+      a {
+        background-position: center center;
+        border: none;
+        cursor: pointer;
+        display: block;
+        height: 17px;
+        padding: 15px 0 14px;
+        position: relative;
+        @include transition(all, .4s, $ease-in-out-quad);
+        width: 100%;
+
+        &.progress {
+          border-bottom-style: solid;
+          border-bottom-width: 4px;
+        }
+
+        &.progress-none {
+          @extend .progress;
+          border-bottom-color: red;
+        }
+
+        &.progress-some {
+          @extend .progress;
+          border-bottom-color: yellow;
+        }
+
+        &.progress-done {
+          @extend .progress;
+          border-bottom-color: green;
+        }
+
+        //video
+        &.seq_video {
+          &.inactive {
+            @extend .inactive;
+            background-image: url('../images/sequence-nav/video-icon-normal.png');
+            background-position: center;
+          }
+
+          &.visited {
+            @extend .visited;
+            background-image: url('../images/sequence-nav/video-icon-visited.png');
+            background-position: center;
+          }
+
+          &.active {
+            @extend .active;
+            background-image: url('../images/sequence-nav/video-icon-current.png');
+            background-position: center;
+          }
+        }
+
+        //other
+        &.seq_other {
+          &.inactive {
+            @extend .inactive;
+            background-image: url('../images/sequence-nav/document-icon-normal.png');
+            background-position: center;
+          }
+
+          &.visited {
+            @extend .visited;
+            background-image: url('../images/sequence-nav/document-icon-visited.png');
+            background-position: center;
+          }
+
+          &.active {
+            @extend .active;
+            background-image: url('../images/sequence-nav/document-icon-current.png');
+            background-position: center;
+          }
+        }
+
+        //vertical & problems
+        &.seq_vertical, &.seq_problem {
+          &.inactive {
+            @extend .inactive;
+            background-image: url('../images/sequence-nav/list-icon-normal.png');
+            background-position: center;
+          }
+
+          &.visited {
+            @extend .visited;
+            background-image: url('../images/sequence-nav/list-icon-visited.png');
+            background-position: center;
+          }
+
+          &.active {
+            @extend .active;
+            background-image: url('../images/sequence-nav/list-icon-current.png');
+            background-position: center;
+          }
+        }
+
+        p {
+          background: #333;
+          color: #fff;
+          display: none;
+          line-height: lh();
+          left: 0px;
+          opacity: 0;
+          padding: 6px;
+          position: absolute;
+          top: 48px;
+          text-shadow: 0 -1px 0 #000;
+          @include transition(all, .1s, $ease-in-out-quart);
+          white-space: pre;
+          z-index: 99;
+
+          &:empty {
+            background: none;
+
+            &::after {
+              display: none;
+            }
+          }
+
+          &::after {
+            background: #333;
+            content: " ";
+            display: block;
+            height: 10px;
+            left: 18px;
+            position: absolute;
+            top: -5px;
+            @include transform(rotate(45deg));
+            width: 10px;
+          }
+        }
+
+        &:hover {
+          p {
+            display: block;
+            margin-top: 4px;
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  ul {
+    list-style: none;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: flex-grid(1, 9);
+
+    li {
+      float: left;
+      width: 50%;
+
+      &.prev, &.next {
+
+        a {
+          // background-color: darken($cream, 5%);
+          background-position: center center;
+          background-repeat: no-repeat;
+          border-left: 1px solid darken(#f6efd4, 20%);
+          @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
+          @include box-sizing(border-box);
+          cursor: pointer;
+          display: block;
+          text-indent: -9999px;
+          @include transition(all, .2s, $ease-in-out-quad);
+
+          &:hover {
+            opacity: .5;
+          }
+
+          &.disabled {
+            cursor: normal;
+            opacity: .4;
+          }
+        }
+      }
+
+      &.prev {
+        a {
+          background-image: url('../images/sequence-nav/previous-icon.png');
+
+          &:hover {
+            // background-color: $cream;
+          }
+        }
+      }
+
+      &.next {
+        a {
+          background-image: url('../images/sequence-nav/next-icon.png');
+
+          &:hover {
+            // background-color: $cream;
+          }
+        }
+      }
+    }
+  }
+
+  body.touch-based-device & ol li a:hover p {
+    display: none;
+  }
+}
+
+div.seq_contents {
+  display: none;
+}
+
+nav.sequence-bottom {
+  margin: lh(2) 0 0;
+  text-align: center;
+
+  ul {
+    @extend .clearfix;
+    background-color: #eee;
+    border: 1px solid #ddd;
+    @include border-radius(3px);
+    @include box-shadow(inset 0 0 0 1px lighten(#f6efd4, 5%));
+    @include inline-block();
+
+    li {
+      float: left;
+
+      &.prev, &.next {
+        margin-bottom: 0;
+
+        a {
+          background-position: center center;
+          background-repeat: no-repeat;
+          border-bottom: none;
+          display: block;
+          padding: lh(.5) 4px;
+          text-indent: -9999px;
+          @include transition(all, .2s, $ease-in-out-quad);
+          width: 45px;
+
+          &:hover {
+            background-color: #ddd;
+            color: #000;
+            opacity: .5;
+            text-decoration: none;
+          }
+
+          &.disabled {
+            opacity: .4;
+          }
+        }
+      }
+
+      &.prev {
+        a {
+          background-image: url('../images/sequence-nav/previous-icon.png');
+          border-right: 1px solid darken(#f6efd4, 20%);
+
+          &:hover {
+            background-color: none;
+          }
+        }
+      }
+
+      &.next {
+        a {
+          background-image: url('../images/sequence-nav/next-icon.png');
+
+          &:hover {
+            background-color: none;
+          }
+        }
+      }
+    }
+  }
+}
