@@ -1,19 +1,20 @@
 import copy
 import json
+from path import path
 import os
 
 from pprint import pprint
+from nose import SkipTest
 
 from django.test import TestCase
 from django.test.client import Client
-from mock import patch, Mock
-from override_settings import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from path import path
+from mock import patch, Mock
+from override_settings import override_settings
 
-from student.models import Registration
 from django.contrib.auth.models import User
+from student.models import Registration
 
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
@@ -189,11 +190,12 @@ class RealCoursesLoadTestCase(PageLoader):
         xmodule.modulestore.django._MODULESTORES = {}
         xmodule.modulestore.django.modulestore().collection.drop()
 
-    # TODO: Disabled test for now..  Fix once things are cleaned up.
-    def Xtest_real_courses_loads(self):
+    def test_real_courses_loads(self):
         '''See if any real courses are available at the REAL_DATA_DIR.
         If they are, check them.'''
 
+        # TODO: Disabled test for now..  Fix once things are cleaned up.
+        raise SkipTest
         # TODO: adjust staticfiles_dirs
         if not os.path.isdir(REAL_DATA_DIR):
             # No data present.  Just pass.

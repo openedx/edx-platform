@@ -20,15 +20,22 @@ class CourseDescriptor(SequenceDescriptor):
         self._grader = None
         self._grade_cutoffs = None
 
+        msg = None
         try:
             self.start = time.strptime(self.metadata["start"], "%Y-%m-%dT%H:%M")
         except KeyError:
             self.start = time.gmtime(0) #The epoch
-            log.critical("Course loaded without a start date. %s", self.id)
+            msg = "Course loaded without a start date. id = %s" % self.id
+            log.critical(msg)
         except ValueError as e:
             self.start = time.gmtime(0) #The epoch
-            log.critical("Course loaded with a bad start date. %s '%s'",
-                         self.id, e)
+            msg = "Course loaded with a bad start date. %s '%s'" % (self.id, e)
+            log.critical(msg)
+
+        # Don't call the tracker from the exception handler.
+        if msg is not None:
+            system.error_tracker(msg)
+
 
     def has_started(self):
         return time.gmtime() > self.start
@@ -104,3 +111,4 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
+

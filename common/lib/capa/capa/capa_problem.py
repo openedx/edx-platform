@@ -329,7 +329,7 @@ class LoncapaProblem(object):
             # path is an absolute path or a path relative to the data dir
             dir = os.path.join(self.system.filestore.root_path, dir)
             abs_dir = os.path.normpath(dir)
-            log.debug("appending to path: %s" % abs_dir)
+            #log.debug("appending to path: %s" % abs_dir)
             path.append(abs_dir)
 
         return path
