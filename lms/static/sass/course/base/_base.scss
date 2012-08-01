@@ -12,4 +12,10 @@ table {
 
 .container {
   padding: lh(2);
+
+  > div {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
 }
