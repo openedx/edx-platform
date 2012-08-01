@@ -203,6 +203,24 @@ case `uname -s` in
         esac
         ;;
     Darwin)
+    
+        if [[ ! -w /usr/local ]]; then
+            cat<<EO
+   
+        You need to be able to write to /usr/local for 
+        the installation of brew and brew packages.
+
+        Either make sure the group you are in (most likely 'staff')
+        can write to that directory or simply execute the following
+        and re-run the script:
+
+        $ sudo chown -R $USER /usr/local
+EO 
+
+            exit 1
+
+        fi
+
         command -v brew &>/dev/null || { 
             output "Installing brew"
             /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)" 
@@ -238,7 +256,7 @@ case `uname -s` in
 
         command -v coffee &>/dev/null || {
             output "Installing coffee script"
-            curl http://npmjs.org/install.sh | sh
+            curl --insecure https://npmjs.org/install.sh | sh
             npm install -g coffee-script
         }
         ;;
