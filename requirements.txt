@@ -13,7 +13,8 @@ django_debug_toolbar
 -e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
 django-staticfiles>=1.2.1
 fs
-beautifulsoup
+beautifulsoup 
+beautifulsoup4
 feedparser
 requests
 sympy

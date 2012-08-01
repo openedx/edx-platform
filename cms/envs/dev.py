@@ -37,7 +37,8 @@ REPOS = {
     },
     'content-mit-6002x': {
         'branch': 'master',
-        'origin': 'git@github.com:MITx/6002x-fall-2012.git',
+        #'origin': 'git@github.com:MITx/6002x-fall-2012.git',
+        'origin': 'git@github.com:MITx/content-mit-6002x.git',
     },
     '6.00x': {
         'branch': 'master',
