@@ -32,6 +32,7 @@ setup(
             "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",
             "video = xmodule.video_module:VideoDescriptor",
+            "survey = xmodule.survey_module:SurveyDescriptor",
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
         ]

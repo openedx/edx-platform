@@ -1,0 +1,17 @@
+<%namespace name="survey_fields" file="survey_fields.html"/>
+
+<h2 class="survey-header">
+  ${ survey_name } 
+</h2>
+
+<section class="survey" class="main-content">  
+	<form id="survey_form">
+	    %if not took_survey:             
+	      ${survey_fields.body(survey_list)}    
+	    %else:
+	      <p>Thank you for your help! You can only take the survey once, and we already have your submission.</p>
+	    %endif
+	    
+	    <input type="submit" id="" value="Submit Survey" />
+	</form>
+</section>
