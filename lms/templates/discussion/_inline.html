@@ -8,9 +8,11 @@
     ${search_bar}
     <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
   </div>
+  <%include file="_paginator.html" />
   % for thread in threads:
     ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
   % endfor
+  <%include file="_paginator.html" />
 </section>
 
 <%!
@@ -21,5 +23,4 @@
 <script type="text/javascript">
   var $$user_info = JSON.parse('${user_info | escape_quotes}');
   var $$course_id = "${course_id}";
-  var $$tags = JSON.parse("${tags | escape_quotes}");
 </script>
