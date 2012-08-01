@@ -32,7 +32,18 @@ class CustomTagModule(XModule):
                          instance_state, shared_state, **kwargs)
 
         xmltree = etree.fromstring(self.definition['data'])
-        template_name = xmltree.attrib['impl']
+        if 'impl' in xmltree.attrib:
+            template_name = xmltree.attrib['impl']
+        else:
+            # VS[compat]  backwards compatibility with old nested customtag structure
+            child_impl = xmltree.find('impl')
+            if child_impl is not None:
+                template_name = child_impl.text
+            else:
+                # TODO (vshnayder): better exception type
+                raise Exception("Could not find impl attribute in customtag {0}"
+                                .format(location))
+
         params = dict(xmltree.items())
         with self.system.filestore.open(
                 'custom_tags/{name}'.format(name=template_name)) as template:
