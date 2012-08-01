@@ -811,7 +811,7 @@ class CodeResponse(LoncapaResponse):
     def setup_response(self):
         xml = self.xml
         self.url = xml.get('url', "http://107.20.215.194/xqueue/submit/")  # FIXME -- hardcoded url
-        self.queue_name = xml.get('queuename', 'python') # TODO: Default queue_name should be course-specific
+        self.queue_name = xml.get('queuename', self.system.xqueue_default_queuename)
 
         answer = xml.find('answer')
         if answer is not None:
@@ -905,7 +905,7 @@ class CodeResponse(LoncapaResponse):
     def _send_to_queue(self, extra_payload):
         # Prepare payload
         xmlstr = etree.tostring(self.xml, pretty_print=True)
-        header = {'return_url': self.system.xqueue_callback_url,
+        header = {'lms_callback_url': self.system.xqueue_callback_url,
                   'queue_name': self.queue_name,
                  }
 
@@ -914,7 +914,7 @@ class CodeResponse(LoncapaResponse):
         h.update(str(self.system.seed))
         h.update(str(time.time()))
         queuekey = int(h.hexdigest(), 16)
-        header.update({'queuekey': queuekey})
+        header.update({'lms_key': queuekey})
 
         body = {'xml': xmlstr,
                 'edX_cmd': 'get_score',
