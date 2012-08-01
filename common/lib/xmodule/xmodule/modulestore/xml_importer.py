@@ -35,6 +35,8 @@ def import_from_xml(store, data_dir, course_dirs=None, eager=True,
             store.update_item(module.location, module.definition['data'])
         if 'children' in module.definition:
             store.update_children(module.location, module.definition['children'])
-        store.update_metadata(module.location, dict(module.metadata))
+        # NOTE: It's important to use own_metadata here to avoid writing
+        # inherited metadata everywhere.
+        store.update_metadata(module.location, dict(module.own_metadata))
 
     return module_store
