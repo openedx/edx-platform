@@ -2,7 +2,6 @@ django<1.4
 pip
 numpy
 scipy
-matplotlib
 markdown
 pygments
 lxml
