@@ -33,6 +33,7 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
         try:
             course_loc = CourseDescriptor.id_to_location(course_id)
             course = modulestore().get_item(course_loc)
+
         except (KeyError, ItemNotFoundError):
             raise Http404("Course not found.")
 

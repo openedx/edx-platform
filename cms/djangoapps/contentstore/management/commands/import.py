@@ -23,4 +23,7 @@ class Command(BaseCommand):
             course_dirs = args[1:]
         else:
             course_dirs = None
+        print "Importing.  Data_dir={data}, course_dirs={courses}".format(
+            data=data_dir,
+            courses=course_dirs)
         import_from_xml(modulestore(), data_dir, course_dirs)

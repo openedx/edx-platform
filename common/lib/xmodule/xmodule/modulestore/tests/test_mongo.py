@@ -8,6 +8,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.search import path_to_location
 
 # from ~/mitx_all/mitx/common/lib/xmodule/xmodule/modulestore/tests/
 # to   ~/mitx_all/mitx/common/test
@@ -28,7 +29,7 @@ DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 
 
 class TestMongoModuleStore(object):
-
+    '''Tests!'''
     @classmethod
     def setupClass(cls):
         cls.connection = pymongo.connection.Connection(HOST, PORT)
@@ -67,7 +68,7 @@ class TestMongoModuleStore(object):
 
     def test_init(self):
         '''Make sure the db loads, and print all the locations in the db.
-        Call this directly from failing tests to see what's loaded'''
+        Call this directly from failing tests to see what is loaded'''
         ids = list(self.connection[DB][COLLECTION].find({}, {'_id': True}))
 
         pprint([Location(i['_id']).url() for i in ids])
@@ -93,8 +94,6 @@ class TestMongoModuleStore(object):
             self.store.get_item("i4x://edX/toy/video/Welcome"),
             None)
 
-
-
     def test_find_one(self):
         assert_not_equals(
             self.store._find_one(Location("i4x://edX/toy/course/2012_Fall")),
@@ -117,13 +116,13 @@ class TestMongoModuleStore(object):
              ("edX/toy/2012_Fall", "Overview", "Toy_Videos", None)),
             )
         for location, expected in should_work:
-            assert_equals(self.store.path_to_location(location), expected)
+            assert_equals(path_to_location(self.store, location), expected)
 
         not_found = (
-            "i4x://edX/toy/video/WelcomeX",
+            "i4x://edX/toy/video/WelcomeX", "i4x://edX/toy/course/NotHome"
             )
         for location in not_found:
-            assert_raises(ItemNotFoundError, self.store.path_to_location, location)
+            assert_raises(ItemNotFoundError, path_to_location, self.store, location)
 
         # Since our test files are valid, there shouldn't be any
         # elements with no path to them.  But we can look for them in
@@ -132,5 +131,5 @@ class TestMongoModuleStore(object):
             "i4x://edX/simple/video/Lost_Video",
             )
         for location in no_path:
-            assert_raises(NoPathToItem, self.store.path_to_location, location, "toy")
+            assert_raises(NoPathToItem, path_to_location, self.store, location, "toy")
 
