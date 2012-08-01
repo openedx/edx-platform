@@ -60,11 +60,13 @@ h1.top-header {
   width: flex-grid(3);
 
   h1, h2 {
-   font-size: 18px;
-   font-weight: bold;
+   font-size: em(18);
+   font-weight: 100;
    letter-spacing: 0;
    text-transform: none;
    font-family: $sans-serif;
+   text-align: left;
+   font-style: italic;
   }
 
   a {
