@@ -16,10 +16,12 @@ div.info-wrapper {
     > ol {
       list-style: none;
       padding-left: 0;
+      margin-bottom: lh();
 
       > li {
         @extend .clearfix;
         border-bottom: 1px solid #e3e3e3;
+        margin-bottom: lh();
         padding-bottom: lh(.5);
         list-style-type: disk;
 
@@ -41,7 +43,7 @@ div.info-wrapper {
           float: left;
           margin: 0 flex-gutter() 0 0;
           width: flex-grid(2, 9);
-          font-size: body-font-size;
+          font-size: $body-font-size;
           font-weight: bold;
         }
 
@@ -68,16 +70,20 @@ div.info-wrapper {
     @extend .sidebar;
     border-left: 1px solid #d3d3d3;
     @include border-radius(0 4px 4px 0);
+    @include box-shadow(none);
     border-right: 0;
 
-    header {
+    h1 {
       @extend .bottom-border;
-      padding: lh(.5) lh(.75);
+      padding: lh(.5) lh(.5);
+    }
 
-      h1 {
-        font-size: 18px;
-        margin: 0 ;
-      }
+    header {
+
+      // h1 {
+      //   font-weight: 100;
+      //   font-style: italic;
+      // }
 
       p {
          color: #666;
