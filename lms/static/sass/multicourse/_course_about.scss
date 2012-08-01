@@ -274,6 +274,24 @@
           }
         }
       }
+      
+      .faq {
+        @include clearfix;
+
+        .responses {
+          float: left;
+        }
+
+        .response {
+          margin-bottom: 40px;
+
+          h3 {
+            font-family: $sans-serif;
+            font-weight: 700;
+            margin-bottom: 15px;
+          }
+        }
+      }
     }
   }
 
