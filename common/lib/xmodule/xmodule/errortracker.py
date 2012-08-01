@@ -1,5 +1,6 @@
 import logging
 import sys
+import traceback
 
 from collections import namedtuple
 
@@ -14,21 +15,21 @@ def in_exception_handler():
 
 def make_error_tracker():
     '''Return an ErrorLog (named tuple), with fields (tracker, errors), where
-    the logger appends a tuple (message, exc_info=None)
-    to the errors on every call.
+    the logger appends a tuple (message, exception_str) to the errors on every
+    call.  exception_str is in the format returned by traceback.format_exception.
 
-    error_list is a simple list.  If the caller messes with it, info
+    error_list is a simple list.  If the caller modifies it, info
     will be lost.
     '''
     errors = []
 
     def error_tracker(msg):
         '''Log errors'''
-        exc_info = None
+        exc_str = ''
         if in_exception_handler():
-            exc_info = sys.exc_info()
+            exc_str = ''.join(traceback.format_exception(*sys.exc_info()))
 
-        errors.append((msg, exc_info))
+        errors.append((msg, exc_str))
 
     return ErrorLog(error_tracker, errors)
 

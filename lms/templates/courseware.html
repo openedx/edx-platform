@@ -51,7 +51,13 @@
       % if course_errors is not UNDEFINED:
           <h2>Course errors</h2>
           <div id="course-errors">
-            ${course_errors}
+            <ul>
+          % for (msg, err) in course_errors:
+            <li>${msg}
+              <ul><li><pre>${err}</pre></li></ul>
+            </li>
+          % endfor
+            </ul>
           </div>
       % endif
     </section>
