@@ -5,7 +5,7 @@ that are stored in a database an accessible using their Location as an identifie
 
 import re
 from collections import namedtuple
-from .exceptions import InvalidLocationError
+from .exceptions import InvalidLocationError, InsufficientSpecificationError
 import logging
 
 log = logging.getLogger('mitx.' + 'modulestore')
@@ -38,15 +38,15 @@ class Location(_LocationBase):
     '''
     __slots__ = ()
 
-    @classmethod
-    def clean(cls, value):
+    @staticmethod
+    def clean(value):
         """
         Return value, made into a form legal for locations
         """
         return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
 
-    @classmethod
-    def is_valid(cls, value):
+    @staticmethod
+    def is_valid(value):
         '''
         Check if the value is a valid location, in any acceptable format.
         '''
@@ -55,6 +55,21 @@ class Location(_LocationBase):
         except InvalidLocationError:
             return False
         return True
+
+    @staticmethod
+    def ensure_fully_specified(location):
+        '''Make sure location is valid, and fully specified.  Raises
+        InvalidLocationError or InsufficientSpecificationError if not.
+
+        returns a Location object corresponding to location.
+        '''
+        loc = Location(location)
+        for key, val in loc.dict().iteritems():
+            if key != 'revision' and val is None:
+                raise InsufficientSpecificationError(location)
+        return loc
+
+
 
     def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None,
                 name=None, revision=None):
@@ -198,6 +213,18 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
+    def get_item_errors(self, location):
+        """
+        Return a list of (msg, exception-or-None) errors that the modulestore
+        encountered when loading the item at location.
+
+        location : something that can be passed to Location
+
+        Raises the same exceptions as get_item if the location isn't found or
+        isn't fully specified.
+        """
+        raise NotImplementedError
+
     def get_items(self, location, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
@@ -254,25 +281,12 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
-    def path_to_location(self, location, course=None, chapter=None, section=None):
-        '''
-        Try to find a course/chapter/section[/position] path to this location.
 
-        raise ItemNotFoundError if the location doesn't exist.
+    def get_parent_locations(self, location):
+        '''Find all locations that are the parents of this location.  Needed
+        for path_to_location().
 
-        If course, chapter, section are not None, restrict search to paths with those
-            components as specified.
-            
-        raise NoPathToItem if the location exists, but isn't accessible via
-        a path that matches the course/chapter/section restrictions.
-
-        In general, a location may be accessible via many paths. This method may
-        return any valid path.
-
-        Return a tuple (course, chapter, section, position).
-
-        If the section a sequence, position should be the position of this location
-        in that sequence.  Otherwise, position should be None.
+        returns an iterable of things that can be passed to Location.
         '''
         raise NotImplementedError
 
