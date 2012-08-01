@@ -16,14 +16,10 @@ $discussion_input_width: 90%;
   }
 }
 
-.course-content {
-  .discussion {
-    margin-left: flex-gutter();
-    margin-top: flex-gutter();
-  }
-}
-
 .discussion {
+  .discussion-non-content {
+    margin-left: flex-gutter();
+  }
   .search-wrapper-inline {
     width: 80%;
     display: inline-block;
