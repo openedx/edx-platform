@@ -19,7 +19,6 @@ from django.views.decorators.cache import cache_control
 from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
-from multicourse import multicourse_settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.django import modulestore
@@ -110,8 +109,8 @@ def profile(request, course_id, student_id=None):
     user_info = UserProfile.objects.get(user=student)
 
     student_module_cache = StudentModuleCache(request.user, course)
-    course, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
-
+    course_module, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
+    
     context = {'name': user_info.name,
                'username': student.username,
                'location': user_info.location,
@@ -121,7 +120,7 @@ def profile(request, course_id, student_id=None):
                'format_url_params': format_url_params,
                'csrf': csrf(request)['csrf_token']
                }
-    context.update(grades.grade_sheet(student, course, student_module_cache))
+    context.update(grades.grade_sheet(student, course_module, course.grader, student_module_cache))
 
     return render_to_response('profile.html', context)
 
@@ -183,9 +182,6 @@ def index(request, course_id, chapter=None, section=None,
 
     chapter = clean(chapter)
     section = clean(section)
-
-    if settings.ENABLE_MULTICOURSE:
-        settings.MODULESTORE['default']['OPTIONS']['data_dir'] = settings.DATA_DIR + multicourse_settings.get_course_xmlpath(course)
 
     context = {
         'csrf': csrf(request)['csrf_token'],
