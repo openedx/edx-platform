@@ -267,6 +267,12 @@ $discussion_input_width: 90%;
           display: block;
           color: black;
         }
+
+        &.endorsed {
+          > .discussion-content {
+            background-color: lightyellow;
+          }
+        }
       }
       .discussion-votes {
         margin-right: 6px;

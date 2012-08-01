@@ -38,6 +38,7 @@ def render_discussion(request, course_id, threads, discussion_id=None, with_sear
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
         'tags': comment_client.get_threads_tags(raw=True),
         'course_id': course_id,
+        'request': request,
     }
     return render_to_string('discussion/inline.html', context)
 
@@ -97,6 +98,7 @@ def render_single_thread(request, course_id, thread_id):
         'annotated_content_info': json.dumps(get_annotated_content_info(thread=thread, user_id=request.user.id)),
         'tags': comment_client.get_threads_tags(raw=True),
         'course_id': course_id,
+        'request': request,
     }
     return render_to_string('discussion/single_thread.html', context)
 
