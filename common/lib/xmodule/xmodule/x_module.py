@@ -1,10 +1,12 @@
 from lxml import etree
+from lxml.etree import XMLSyntaxError
 import pkg_resources
 import logging
+from fs.errors import ResourceNotFoundError
+from functools import partial
 
 from xmodule.modulestore import Location
 
-from functools import partial
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -191,9 +193,6 @@ class XModule(HTMLSnippet):
         self.category = self.location.category
         self.metadata = kwargs.get('metadata', {})
         self._loaded_children = None
-
-    def get_name(self):
-        return self.name
 
     def get_children(self):
         '''
@@ -443,16 +442,30 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         system is an XMLParsingSystem
 
         org and course are optional strings that will be used in the generated
-            modules url identifiers
+            module's url identifiers
         """
-        class_ = XModuleDescriptor.load_class(
-            etree.fromstring(xml_data).tag,
-            default_class
-        )
-        # leave next line, commented out - useful for low-level debugging
-        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
-        #        etree.fromstring(xml_data).tag,class_))
-        return class_.from_xml(xml_data, system, org, course)
+        try:
+            class_ = XModuleDescriptor.load_class(
+                etree.fromstring(xml_data).tag,
+                default_class
+                )
+            # leave next line, commented out - useful for low-level debugging
+            # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
+            #        etree.fromstring(xml_data).tag,class_))
+
+            descriptor = class_.from_xml(xml_data, system, org, course)
+        except Exception as err:
+            # Didn't load properly.  Fall back on loading as an error
+            # descriptor.  This should never error due to formatting.
+
+            # Put import here to avoid circular import errors
+            from xmodule.error_module import ErrorDescriptor
+            msg = "Error loading from xml."
+            log.exception(msg)
+            system.error_tracker(msg)
+            descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course, err)
+
+        return descriptor
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -521,16 +534,19 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
 
 class DescriptorSystem(object):
-    def __init__(self, load_item, resources_fs, error_handler):
+    def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
 
         resources_fs: A Filesystem object that contains all of the
             resources needed for the course
 
-        error_handler: A hook for handling errors in loading the descriptor.
-            Must be a function of (error_msg, exc_info=None).
-            See errorhandlers.py for some simple ones.
+        error_tracker: A hook for tracking errors in loading the descriptor.
+            Used for example to get a list of all non-fatal problems on course
+            load, and display them to the user.
+
+            A function of (error_msg). errortracker.py provides a
+            handy make_error_tracker() function.
 
             Patterns for using the error handler:
                try:
@@ -539,10 +555,8 @@ class DescriptorSystem(object):
                except SomeProblem:
                   msg = 'Grommet {0} is broken'.format(x)
                   log.exception(msg) # don't rely on handler to log
-                  self.system.error_handler(msg)
-                  # if we get here, work around if possible
-                  raise # if no way to work around
-                       OR
+                  self.system.error_tracker(msg)
+                  # work around
                   return 'Oops, couldn't load grommet'
 
                OR, if not in an exception context:
@@ -550,25 +564,27 @@ class DescriptorSystem(object):
                if not check_something(thingy):
                   msg = "thingy {0} is broken".format(thingy)
                   log.critical(msg)
-                  error_handler(msg)
-                  # if we get here, work around
-                  pass   # e.g. if no workaround needed
+                  self.system.error_tracker(msg)
+
+               NOTE: To avoid duplication, do not call the tracker on errors
+               that you're about to re-raise---let the caller track them.
         """
 
         self.load_item = load_item
         self.resources_fs = resources_fs
-        self.error_handler = error_handler
+        self.error_tracker = error_tracker
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_handler, process_xml):
+    def __init__(self, load_item, resources_fs, error_tracker, process_xml, **kwargs):
         """
-        load_item, resources_fs, error_handler: see DescriptorSystem
+        load_item, resources_fs, error_tracker: see DescriptorSystem
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
         """
-        DescriptorSystem.__init__(self, load_item, resources_fs, error_handler)
+        DescriptorSystem.__init__(self, load_item, resources_fs, error_tracker,
+                                  **kwargs)
         self.process_xml = process_xml
 
 
@@ -584,10 +600,18 @@ class ModuleSystem(object):
     Note that these functions can be closures over e.g. a django request
     and user, or other environment-specific info.
     '''
-    def __init__(self, ajax_url, track_function,
-                 get_module, render_template, replace_urls,
-                 user=None, filestore=None, debug=False,
-                 xqueue_callback_url=None, xqueue_default_queuename="null"):
+    def __init__(self,
+                 ajax_url,
+                 track_function,
+                 get_module,
+                 render_template,
+                 replace_urls,
+                 user=None,
+                 filestore=None,
+                 debug=False,
+                 xqueue_callback_url=None,
+                 xqueue_default_queuename="null",
+                 is_staff=False):
         '''
         Create a closure around the system environment.
 
@@ -613,6 +637,9 @@ class ModuleSystem(object):
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
+
+        is_staff - Is the user making the request a staff user?
+             TODO (vshnayder): this will need to change once we have real user roles.
         '''
         self.ajax_url = ajax_url
         self.xqueue_callback_url = xqueue_callback_url
@@ -624,6 +651,7 @@ class ModuleSystem(object):
         self.DEBUG = self.debug = debug
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
+        self.is_staff = is_staff
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

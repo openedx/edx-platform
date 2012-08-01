@@ -7,16 +7,14 @@ from mako.template import Template
 class CustomTagModule(XModule):
     """
     This module supports tags of the form
-    <customtag option="val" option2="val2">
-        <impl>$tagname</impl>
-    </customtag>
+    <customtag option="val" option2="val2" impl="tagname"/>
 
     In this case, $tagname should refer to a file in data/custom_tags, which contains
     a mako template that uses ${option} and ${option2} for the content.
 
     For instance:
 
-    data/custom_tags/book::
+    data/mycourse/custom_tags/book::
         More information given in <a href="/book/${page}">the text</a>
 
     course.xml::
