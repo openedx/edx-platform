@@ -4,6 +4,7 @@
 <%block name="headextra">
   <%static:css group='course'/>
 </%block>
+
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
 <%block name="title"><title>Profile - edX 6.002x</title></%block>
@@ -110,9 +111,9 @@ $(function() {
 </%block>
 
 
-<%include file="navigation.html" args="active_page='profile'" />
+<%include file="course_navigation.html" args="active_page='profile'" />
 
-<section class="main-content">
+<section class="container">
   <div class="profile-wrapper">
 
     <section class="course-info">
@@ -126,8 +127,7 @@ $(function() {
         %for chapter in courseware_summary:
         %if not chapter['chapter'] == "hidden":
         <li>
-          <h2><a href="javascript:void(0)">
-          ${ chapter['chapter'] }</a></h2>
+          <h2>${ chapter['chapter'] }</h2>
 
           <ol class="sections">
             %for section in chapter['sections']:
@@ -137,8 +137,8 @@ $(function() {
               total = section['section_total'].possible
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
-              
-              <h3><a href="javascript:void(0)">
+              <h3><a href="${reverse('courseware_section', kwargs={'course_id' : course.id, 'chapter' : chapter['chapter'], 'section' : section['section']})}">
+>>>>>>> 7f2f47597fd50acbab49be5173b76b026ff4378d
                 ${ section['section'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
               ${section['format']}
               %if 'due' in section and section['due']!="":
