@@ -304,9 +304,21 @@ $discussion_input_width: 90%;
     }
   }
   .discussion-paginator {
-    margin-top: 40px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: $comment_body_size;
+    text-align: center;
     div {
       display: inline-block;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      -ms-border-radius: 3px;
+      -o-border-radius: 3px;
+      border-radius: 3px;
+      background: #EEE;
+      margin: 0 5px;
+      padding: 4px 10px;
+      text-decoration: none;
     }
   }
 }
