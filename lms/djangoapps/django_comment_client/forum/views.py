@@ -27,9 +27,9 @@ def render_accordion(request, course, discussion_id):
         'csrf': csrf(request)['csrf_token'],
     }
 
-    return render_to_string('discussion/accordion.html', context)
+    return render_to_string('discussion/_accordion.html', context)
 
-def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, search_text='', template='discussion/inline.html'):
+def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, search_text='', template='discussion/_inline.html'):
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
@@ -43,10 +43,10 @@ def render_discussion(request, course_id, threads, discussion_id=None, with_sear
     return render_to_string(template, context)
 
 def render_inline_discussion(*args, **kwargs):
-    return render_discussion(template='discussion/inline.html', *args, **kwargs)
+    return render_discussion(template='discussion/_inline.html', *args, **kwargs)
 
 def render_forum_discussion(*args, **kwargs):
-    return render_discussion(template='discussion/forum.html', *args, **kwargs)
+    return render_discussion(template='discussion/_forum.html', *args, **kwargs)
 
 def inline_discussion(request, course_id, discussion_id):
     threads = comment_client.get_threads(discussion_id, recursive=False)
@@ -61,7 +61,7 @@ def render_search_bar(request, course_id, discussion_id=None, text=''):
         'text': text,
         'course_id': course_id,
     }
-    return render_to_string('discussion/search_bar.html', context)
+    return render_to_string('discussion/_search_bar.html', context)
 
 def forum_form_discussion(request, course_id, discussion_id):
 
@@ -106,7 +106,7 @@ def render_single_thread(request, course_id, thread_id):
         'course_id': course_id,
         'request': request,
     }
-    return render_to_string('discussion/single_thread.html', context)
+    return render_to_string('discussion/_single_thread.html', context)
 
 def single_thread(request, course_id, discussion_id, thread_id):
 
