@@ -15,7 +15,11 @@
 <%def name="render_comments(comments)">
   <div class="comments">
     % for comment in comments:
+      % if comment['endorsed']:
+      <div class="comment endorsed" _id="${comment['id']}">
+      % else:
       <div class="comment" _id="${comment['id']}">
+      % endif
         ${render_content(comment, "comment")}
         <div class="comments">
           ${render_comments(comment['children'])}
@@ -76,6 +80,14 @@
     % if type == "thread" and kwargs['edit_thread'] or type == "comment":
       ${render_link("discussion-link discussion-reply", "Reply")}
       ${render_link("discussion-link discussion-edit", "Edit")}
+      % if type == "comment" and request.user.is_staff:
+        % if content['endorsed']:
+          <input type="checkbox" checked="checked" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
+        % else:
+          <input type="checkbox" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
+        % endif
+        <label class="discussion-link" for="discussion-endorse-${content['id']}">Endorsed</label>
+      % endif
     % endif
   </div>
 </%def>
