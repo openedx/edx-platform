@@ -41,6 +41,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.used_slugs = set()
 
         def process_xml(xml):
+            """Takes an xml string, and returns a XModuleDescriptor created from
+            that xml.
+            """
             try:
                 # VS[compat]
                 # TODO (cpennington): Remove this once all fall 2012 courses
